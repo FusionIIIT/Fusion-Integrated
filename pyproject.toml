@@ -76,7 +76,10 @@ ignore = [
 "config/settings/*" = ["F403", "F405"]
 
 [tool.pytest.ini_options]
+# `--ds` rather than DJANGO_SETTINGS_MODULE: pytest-django lets the
+# environment variable win over this file, and a developer exporting
+# config.settings.dev would then run a different suite from CI.
 DJANGO_SETTINGS_MODULE = "config.settings.test"
 python_files = ["test_*.py"]
-addopts = "-q --no-header"
+addopts = "-q --no-header --ds=config.settings.test"
 testpaths = ["modules", "core", "fusion_auth"]

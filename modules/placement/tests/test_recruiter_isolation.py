@@ -327,7 +327,13 @@ class TestInvitation:
             recruiters.invite(company_id=b.pk, email="shared@x.test",
                               invited_by_user_id=9)
 
-    def test_the_password_is_argon2(self):
+    def test_the_password_is_argon2(self, settings):
+        """Test settings swap in MD5 for speed, so this restores the real
+        hashers — otherwise it asserts whatever the runner happens to set."""
+        settings.PASSWORD_HASHERS = [
+            "django.contrib.auth.hashers.Argon2PasswordHasher",
+            "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+        ]
         company = make_company("Hash")
         _, raw = recruiters.invite(company_id=company.pk, email="a@hash.test",
                                    invited_by_user_id=9)

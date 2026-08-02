@@ -36,11 +36,50 @@ jobs:
       - name: Contract getters are plural
         run: .venv/bin/python ops/checks/contracts_are_plural.py
 
+      - name: Sidebar and client routes agree
+        run: .venv/bin/python ops/checks/nav_matches_routes.py
+
       - name: Models and migrations agree
         run: .venv/bin/python manage.py makemigrations --check --dry-run
 
       - name: Django checks
         run: .venv/bin/python manage.py check
 
+      # Prod settings, so this sees the security warnings test settings hide.
+      # The values are throwaway; only their presence matters.
+      - name: Deployment checks
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.prod
+          DJANGO_SECRET_KEY: ci-only-key-long-enough-to-satisfy-the-length-check
+          DJANGO_ALLOWED_HOSTS: ci.invalid
+          IAM_SERVICE_TOKEN: ci
+          PLACEMENT_UPLOAD_ROOT: /tmp/ci-uploads
+        run: .venv/bin/python manage.py check --deploy --fail-level WARNING
+
+      - name: Committed OpenAPI schema matches the code
+        run: |
+          .venv/bin/python manage.py spectacular --fail-on-warn \
+            --file /tmp/openapi.check.yaml
+          diff -u openapi/fusion-integrated.v1.yaml /tmp/openapi.check.yaml \
+            || { echo "::error::openapi schema is stale — run 'make schema'"; exit 1; }
+
       - name: Tests
         run: .venv/bin/pytest -q
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - name: Build
+        run: npm run build
