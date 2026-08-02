@@ -1,0 +1,46 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: fusion_integrated
+          POSTGRES_USER: fusion_admin
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-retries 10
+        ports: ["5432:5432"]
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.test
+      DB_PASSWORD: postgres
+      DB_HOST: 127.0.0.1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - run: uv venv --python 3.12 .venv
+      - run: uv pip install --python .venv/bin/python -e ".[dev]"
+
+      - name: Lint
+        run: .venv/bin/ruff check .
+
+      - name: Module boundaries (import-linter)
+        run: .venv/bin/lint-imports
+
+      - name: No cross-module foreign keys
+        run: .venv/bin/python ops/checks/no_cross_module_fk.py
+
+      - name: Contract getters are plural
+        run: .venv/bin/python ops/checks/contracts_are_plural.py
+
+      - name: Models and migrations agree
+        run: .venv/bin/python manage.py makemigrations --check --dry-run
+
+      - name: Django checks
+        run: .venv/bin/python manage.py check
+
+      - name: Tests
+        run: .venv/bin/pytest -q

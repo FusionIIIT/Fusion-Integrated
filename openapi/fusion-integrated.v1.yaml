@@ -1,0 +1,2807 @@
+openapi: 3.0.3
+info:
+  title: Fusion-Integrated API
+  version: 1.0.0
+  description: Non-academic platform. Independent modules, one login.
+paths:
+  /api/v1/auth/login:
+    post:
+      operationId: v1_auth_login_create
+      description: Sets the httpOnly session cookie. The token itself is never returned
+        in the body.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+          description: ''
+  /api/v1/auth/logout:
+    post:
+      operationId: v1_auth_logout_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+          description: ''
+  /api/v1/directory/users:
+    get:
+      operationId: v1_directory_users_retrieve
+      description: |-
+        Type-ahead over the local projection. Read-only by construction —
+        directory data is owned by IAM and edited there.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSearchResult'
+          description: ''
+  /api/v1/me:
+    get:
+      operationId: v1_me_retrieve
+      description: |-
+        The session payload the shell renders its sidebar from. `navigation`
+        arrives already filtered, so the client cannot draw an ungranted module.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+          description: ''
+  /api/v1/placement/announcements:
+    get:
+      operationId: v1_placement_announcements_list
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAnnouncementList'
+          description: ''
+    post:
+      operationId: v1_placement_announcements_create
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Announcement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Announcement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Announcement'
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Announcement'
+          description: ''
+  /api/v1/placement/announcements/{id}/withdraw:
+    post:
+      operationId: v1_placement_announcements_withdraw_create
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Withdraw'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Withdraw'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Withdraw'
+        required: true
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Announcement'
+          description: ''
+  /api/v1/placement/applications:
+    get:
+      operationId: v1_placement_applications_list
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedApplicationList'
+          description: ''
+  /api/v1/placement/applications/{id}/transition:
+    post:
+      operationId: v1_placement_applications_transition_create
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transition'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Transition'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Transition'
+        required: true
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+          description: ''
+  /api/v1/placement/applications/apply:
+    post:
+      operationId: v1_placement_applications_apply_create
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Apply'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Apply'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Apply'
+        required: true
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+          description: ''
+  /api/v1/placement/companies:
+    get:
+      operationId: v1_placement_companies_list
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCompanyList'
+          description: ''
+    post:
+      operationId: v1_placement_companies_create
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Company'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Company'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Company'
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+          description: ''
+  /api/v1/placement/companies/{id}/{action}:
+    post:
+      operationId: placement_company_decide
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Approval'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Approval'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Approval'
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+          description: ''
+  /api/v1/placement/documents:
+    get:
+      operationId: v1_placement_documents_list
+      description: |-
+        GET  /placement/documents   my documents
+        POST /placement/documents   attach a Drive link
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileDocument'
+          description: ''
+    post:
+      operationId: v1_placement_documents_create
+      description: |-
+        GET  /placement/documents   my documents
+        POST /placement/documents   attach a Drive link
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentLink'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DocumentLink'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DocumentLink'
+        required: true
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDocument'
+          description: ''
+  /api/v1/placement/documents/{id}:
+    delete:
+      operationId: v1_placement_documents_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/placement/documents/{id}/download:
+    get:
+      operationId: v1_placement_documents_download_retrieve
+      description: |-
+        Readable by the owner, by staff, and by a recruiter the owner has a
+        live application with — the same scope that governs the profile.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '302':
+          description: Redirect to the document. The Drive URL is disclosed here and
+            nowhere else.
+        '200':
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          description: ''
+        '404':
+          description: Absent, or outside the caller's scope — the two are deliberately
+            the same answer.
+  /api/v1/placement/interviews/rounds:
+    get:
+      operationId: v1_placement_interviews_rounds_list
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInterviewRoundList'
+          description: ''
+    post:
+      operationId: v1_placement_interviews_rounds_create
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InterviewRound'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InterviewRound'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InterviewRound'
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InterviewRound'
+          description: ''
+  /api/v1/placement/interviews/rounds/{id}/candidates:
+    post:
+      operationId: v1_placement_interviews_rounds_candidates_create
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCandidates'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AddCandidates'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AddCandidates'
+        required: true
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduledCount'
+          description: ''
+  /api/v1/placement/interviews/rounds/{id}/outcome:
+    post:
+      operationId: v1_placement_interviews_rounds_outcome_create
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoundOutcome'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RoundOutcome'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoundOutcome'
+        required: true
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoundParticipation'
+          description: ''
+  /api/v1/placement/offers:
+    get:
+      operationId: v1_placement_offers_list
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOfferList'
+          description: ''
+  /api/v1/placement/offers/{id}/respond:
+    post:
+      operationId: v1_placement_offers_respond_create
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfferRespond'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OfferRespond'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OfferRespond'
+        required: true
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offer'
+          description: ''
+  /api/v1/placement/offers/issue:
+    post:
+      operationId: v1_placement_offers_issue_create
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfferIssue'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OfferIssue'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OfferIssue'
+        required: true
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offer'
+          description: ''
+  /api/v1/placement/postings:
+    get:
+      operationId: v1_placement_postings_list
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedJobPostingList'
+          description: ''
+    post:
+      operationId: v1_placement_postings_create
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobPosting'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/JobPosting'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/JobPosting'
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPosting'
+          description: ''
+  /api/v1/placement/postings/{id}:
+    get:
+      operationId: v1_placement_postings_retrieve
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPosting'
+          description: ''
+    put:
+      operationId: v1_placement_postings_update
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobPosting'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/JobPosting'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/JobPosting'
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPosting'
+          description: ''
+    patch:
+      operationId: v1_placement_postings_partial_update
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedJobPosting'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedJobPosting'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedJobPosting'
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPosting'
+          description: ''
+  /api/v1/placement/postings/{id}/eligibility:
+    get:
+      operationId: v1_placement_postings_eligibility_retrieve
+      description: PC-UC-003's precondition, made visible to the student.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EligibilityVerdict'
+          description: ''
+  /api/v1/placement/postings/{id}/publish:
+    post:
+      operationId: v1_placement_postings_publish_create
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPosting'
+          description: ''
+  /api/v1/placement/profile:
+    get:
+      operationId: v1_placement_profile_retrieve
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentProfile'
+          description: ''
+    put:
+      operationId: v1_placement_profile_update
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentProfile'
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentProfile'
+          description: ''
+  /api/v1/placement/profile/resume:
+    get:
+      operationId: v1_placement_profile_resume_retrieve
+      description: 'PC-UC-002: a structured resume derived from the profile.'
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resume'
+          description: ''
+  /api/v1/placement/profiles/{user_id}:
+    get:
+      operationId: v1_placement_profiles_retrieve
+      description: |-
+        A recruiter or the TPO reading a candidate's profile.
+
+        Scoped so a recruiter reaches only their own live applicants — see
+        selectors/scoping.profiles_for.
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentProfile'
+          description: ''
+  /api/v1/placement/recruiters/accept:
+    post:
+      operationId: v1_placement_recruiters_accept_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecruiterAccept'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RecruiterAccept'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RecruiterAccept'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Detail'
+          description: ''
+  /api/v1/placement/recruiters/invite:
+    post:
+      operationId: v1_placement_recruiters_invite_create
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecruiterInvite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RecruiterInvite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RecruiterInvite'
+        required: true
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecruiterInviteResult'
+          description: ''
+  /api/v1/placement/recruiters/login:
+    post:
+      operationId: v1_placement_recruiters_login_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecruiterLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RecruiterLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RecruiterLogin'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecruiterLoginResult'
+          description: ''
+  /api/v1/placement/recruiters/logout:
+    post:
+      operationId: v1_placement_recruiters_logout_create
+      description: |-
+        Recruiters authenticate on a separate scheme; both pools land on
+        `request.principal`.
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Detail'
+          description: ''
+  /api/v1/placement/recruiters/me:
+    get:
+      operationId: v1_placement_recruiters_me_retrieve
+      description: Their company, and nothing about the institute.
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecruiterMe'
+          description: ''
+  /api/v1/placement/stats:
+    get:
+      operationId: v1_placement_stats_retrieve
+      description: Staff receive StaffStats; everyone else receives the anonymised
+        StudentStats shape (PC-BR-016).
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffStats'
+          description: ''
+  /api/v1/placement/students/cpi:
+    get:
+      operationId: v1_placement_students_cpi_retrieve
+      description: GET /api/v1/placement/students/cpi
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcademicDirectory'
+          description: ''
+  /api/v1/placement/students/cpi/filters:
+    get:
+      operationId: v1_placement_students_cpi_filters_retrieve
+      description: The values actually present, so the UI hard-codes nothing.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcademicFilters'
+          description: ''
+components:
+  schemas:
+    AcademicDirectory:
+      type: object
+      properties:
+        count:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AcademicStandingRow'
+      required:
+      - count
+      - limit
+      - offset
+      - results
+    AcademicFilters:
+      type: object
+      properties:
+        disciplines:
+          type: array
+          items:
+            type: string
+        batch_years:
+          type: array
+          items:
+            type: integer
+        programmes:
+          type: array
+          items:
+            type: string
+      required:
+      - batch_years
+      - disciplines
+      - programmes
+    AcademicStandingRow:
+      type: object
+      description: |-
+        One row of the CPI directory. `cpi` is null when nothing is declared —
+        never zero.
+      properties:
+        user_id:
+          type: integer
+        roll_no:
+          type: string
+        name:
+          type: string
+        programme:
+          type: string
+        discipline:
+          type: string
+        batch_year:
+          type: integer
+          nullable: true
+        cpi:
+          type: string
+          nullable: true
+        semester:
+          type: integer
+          nullable: true
+        semester_type:
+          type: string
+          nullable: true
+        declared_seq:
+          type: integer
+          nullable: true
+        earned_credits:
+          type: string
+          nullable: true
+        active_backlogs:
+          type: integer
+          nullable: true
+      required:
+      - active_backlogs
+      - batch_year
+      - cpi
+      - declared_seq
+      - discipline
+      - earned_credits
+      - name
+      - programme
+      - roll_no
+      - semester
+      - semester_type
+      - user_id
+    AddCandidates:
+      type: object
+      properties:
+        application_ids:
+          type: array
+          items:
+            type: integer
+          maxItems: 500
+          minItems: 1
+      required:
+      - application_ids
+    Announcement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        body:
+          type: string
+          readOnly: true
+        topic:
+          allOf:
+          - $ref: '#/components/schemas/TopicEnum'
+          readOnly: true
+        audience:
+          allOf:
+          - $ref: '#/components/schemas/AudienceEnum'
+          readOnly: true
+        placement_year:
+          type: string
+          readOnly: true
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        published_by_role:
+          type: string
+          readOnly: true
+        is_withdrawn:
+          type: boolean
+          readOnly: true
+        withdrawn_reason:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - audience
+      - body
+      - created_at
+      - id
+      - is_withdrawn
+      - placement_year
+      - published_at
+      - published_by_role
+      - title
+      - topic
+      - withdrawn_reason
+    Application:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        posting:
+          allOf:
+          - $ref: '#/components/schemas/JobPosting'
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationStatusEnum'
+          readOnly: true
+        cpi_at_apply:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        semester_at_apply:
+          type: integer
+          readOnly: true
+          nullable: true
+        eligibility_snapshot:
+          readOnly: true
+        cover_note:
+          type: string
+          readOnly: true
+        applied_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        withdrawn_reason:
+          type: string
+          readOnly: true
+        allowed_transitions:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        candidate:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: |-
+            Populated only when the view batch-loaded the directory, i.e. when
+            the reader is staff. A student's own list needs no directory call.
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - allowed_transitions
+      - applied_at
+      - candidate
+      - cover_note
+      - cpi_at_apply
+      - created_at
+      - eligibility_snapshot
+      - id
+      - posting
+      - semester_at_apply
+      - status
+      - user_id
+      - withdrawn_reason
+    ApplicationStatusEnum:
+      enum:
+      - draft
+      - submitted
+      - under_review
+      - shortlisted
+      - interview_scheduled
+      - selected
+      - rejected
+      - withdrawn
+      - auto_withdrawn
+      - offer_issued
+      - offer_accepted
+      - offer_declined
+      - offer_expired
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `submitted` - Submitted
+        * `under_review` - Under review
+        * `shortlisted` - Shortlisted
+        * `interview_scheduled` - Interview scheduled
+        * `selected` - Selected
+        * `rejected` - Rejected
+        * `withdrawn` - Withdrawn
+        * `auto_withdrawn` - Withdrawn automatically
+        * `offer_issued` - Offer issued
+        * `offer_accepted` - Offer accepted
+        * `offer_declined` - Offer declined
+        * `offer_expired` - Offer expired
+    Apply:
+      type: object
+      properties:
+        posting_id:
+          type: integer
+        cover_note:
+          type: string
+          default: ''
+          maxLength: 4000
+        resume_id:
+          type: integer
+          nullable: true
+      required:
+      - posting_id
+    Approval:
+      type: object
+      properties:
+        note:
+          type: string
+          default: ''
+          maxLength: 300
+    ApprovalStatusEnum:
+      enum:
+      - pending
+      - approved
+      - rejected
+      type: string
+      description: |-
+        * `pending` - Pending institute approval
+        * `approved` - Approved
+        * `rejected` - Rejected
+    AudienceEnum:
+      enum:
+      - students
+      - registered
+      - alumni
+      - all
+      type: string
+      description: |-
+        * `students` - All students
+        * `registered` - Registered students
+        * `alumni` - Alumni
+        * `all` - Everyone
+    Company:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        sector:
+          type: string
+          readOnly: true
+        sector_kind:
+          allOf:
+          - $ref: '#/components/schemas/SectorKindEnum'
+          readOnly: true
+        website:
+          type: string
+          format: uri
+          readOnly: true
+        hq_city:
+          type: string
+          readOnly: true
+        tier_rank:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: 1 = best
+        is_marquee:
+          type: boolean
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/CompanyStatusEnum'
+          readOnly: true
+        approval_status:
+          allOf:
+          - $ref: '#/components/schemas/ApprovalStatusEnum'
+          readOnly: true
+        approval_note:
+          type: string
+          readOnly: true
+        approved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        can_operate:
+          type: boolean
+          readOnly: true
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompanyContact'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - approval_note
+      - approval_status
+      - approved_at
+      - can_operate
+      - contacts
+      - created_at
+      - hq_city
+      - id
+      - is_marquee
+      - name
+      - sector
+      - sector_kind
+      - slug
+      - status
+      - tier_rank
+      - website
+    CompanyBrief:
+      type: object
+      description: What a student sees. No approval trail, no internal notes.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        sector:
+          type: string
+          readOnly: true
+        sector_kind:
+          allOf:
+          - $ref: '#/components/schemas/SectorKindEnum'
+          readOnly: true
+        website:
+          type: string
+          format: uri
+          readOnly: true
+        hq_city:
+          type: string
+          readOnly: true
+        tier_rank:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: 1 = best
+        is_marquee:
+          type: boolean
+          readOnly: true
+      required:
+      - hq_city
+      - id
+      - is_marquee
+      - name
+      - sector
+      - sector_kind
+      - slug
+      - tier_rank
+      - website
+    CompanyContact:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 120
+        designation:
+          type: string
+          maxLength: 120
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        phone:
+          type: string
+          maxLength: 32
+        is_primary:
+          type: boolean
+      required:
+      - email
+      - id
+      - name
+    CompanyStatusEnum:
+      enum:
+      - prospect
+      - active
+      - blacklisted
+      type: string
+      description: |-
+        * `prospect` - Prospect
+        * `active` - Active
+        * `blacklisted` - Blacklisted
+    Detail:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+      - detail
+    DocumentLink:
+      type: object
+      description: A Drive link. Validated in core.files.drive.
+      properties:
+        kind:
+          $ref: '#/components/schemas/DocumentLinkKindEnum'
+        url:
+          type: string
+          maxLength: 500
+        title:
+          type: string
+          default: ''
+          maxLength: 160
+      required:
+      - kind
+      - url
+    DocumentLinkKindEnum:
+      enum:
+      - resume
+      - certificate
+      - offer_letter
+      - other
+      type: string
+      description: |-
+        * `resume` - resume
+        * `certificate` - certificate
+        * `offer_letter` - offer_letter
+        * `other` - other
+    EligibilityFailure:
+      type: object
+      properties:
+        field:
+          type: string
+        reason:
+          type: string
+        message:
+          type: string
+        required:
+          nullable: true
+        actual:
+          nullable: true
+      required:
+      - actual
+      - field
+      - message
+      - reason
+      - required
+    EligibilityVerdict:
+      type: object
+      description: Why a student may or may not apply (PC-UC-003).
+      properties:
+        is_eligible:
+          type: boolean
+        failed:
+          type: array
+          items:
+            $ref: '#/components/schemas/EligibilityFailure'
+        error:
+          type: string
+          nullable: true
+        season_decision:
+          $ref: '#/components/schemas/SeasonDecision'
+        cpi:
+          type: string
+          nullable: true
+        semester:
+          type: integer
+          nullable: true
+        declared_seq:
+          type: integer
+          nullable: true
+        standing: {}
+        evaluated_at:
+          type: string
+          format: date-time
+      required:
+      - cpi
+      - declared_seq
+      - error
+      - evaluated_at
+      - failed
+      - is_eligible
+      - season_decision
+      - semester
+      - standing
+    InterviewRound:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        posting:
+          type: integer
+          readOnly: true
+        seq:
+          type: integer
+          readOnly: true
+          default: 1
+        kind:
+          allOf:
+          - $ref: '#/components/schemas/InterviewRoundKindEnum'
+          readOnly: true
+        mode:
+          allOf:
+          - $ref: '#/components/schemas/ModeEnum'
+          readOnly: true
+        starts_at:
+          type: string
+          format: date-time
+          readOnly: true
+        ends_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        venue:
+          type: string
+          readOnly: true
+        meeting_url:
+          type: string
+          format: uri
+          readOnly: true
+        capacity:
+          type: integer
+          readOnly: true
+          nullable: true
+        instructions:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - capacity
+      - created_at
+      - ends_at
+      - id
+      - instructions
+      - kind
+      - meeting_url
+      - mode
+      - posting
+      - seq
+      - starts_at
+      - venue
+    InterviewRoundKindEnum:
+      enum:
+      - test
+      - gd
+      - tech
+      - hr
+      - other
+      type: string
+      description: |-
+        * `test` - Written / online test
+        * `gd` - Group discussion
+        * `tech` - Technical interview
+        * `hr` - HR interview
+        * `other` - Other
+    JobPosting:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        kind:
+          allOf:
+          - $ref: '#/components/schemas/JobPostingKindEnum'
+          readOnly: true
+        company:
+          allOf:
+          - $ref: '#/components/schemas/CompanyBrief'
+          readOnly: true
+        placement_year:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        location:
+          type: string
+          readOnly: true
+        ctc_lpa:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        stipend_pm:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        bond_months:
+          type: integer
+          readOnly: true
+          nullable: true
+        seats:
+          type: integer
+          readOnly: true
+          nullable: true
+        eligibility_rule:
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/JobPostingStatusEnum'
+          readOnly: true
+        is_dream_slot:
+          type: boolean
+          readOnly: true
+        dream_slot_note:
+          type: string
+          readOnly: true
+        opens_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        closes_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        is_open:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - bond_months
+      - closes_at
+      - company
+      - created_at
+      - ctc_lpa
+      - description
+      - dream_slot_note
+      - eligibility_rule
+      - id
+      - is_dream_slot
+      - is_open
+      - kind
+      - location
+      - opens_at
+      - placement_year
+      - published_at
+      - seats
+      - status
+      - stipend_pm
+      - title
+    JobPostingKindEnum:
+      enum:
+      - fte
+      - internship
+      - ppo
+      type: string
+      description: |-
+        * `fte` - Full time
+        * `internship` - Internship
+        * `ppo` - Pre-placement offer
+    JobPostingStatusEnum:
+      enum:
+      - draft
+      - pending_approval
+      - published
+      - closed
+      - in_progress
+      - completed
+      - cancelled
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `pending_approval` - Pending TPO approval
+        * `published` - Published
+        * `closed` - Applications closed
+        * `in_progress` - Selection in progress
+        * `completed` - Completed
+        * `cancelled` - Cancelled
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - password
+      - username
+    ModeEnum:
+      enum:
+      - online
+      - offline
+      type: string
+      description: |-
+        * `online` - Online
+        * `offline` - Offline
+    NavGroup:
+      type: object
+      description: |-
+        A sidebar section. Already filtered to what the caller was granted —
+        the client does none of its own filtering (ADR-0010).
+      properties:
+        code:
+          type: string
+        label:
+          type: string
+        icon:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/NavItem'
+      required:
+      - code
+      - icon
+      - items
+      - label
+    NavItem:
+      type: object
+      properties:
+        code:
+          type: string
+        label:
+          type: string
+        to:
+          type: string
+        icon:
+          type: string
+      required:
+      - code
+      - icon
+      - label
+      - to
+    Offer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        posting:
+          allOf:
+          - $ref: '#/components/schemas/JobPosting'
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        ctc_lpa:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        tier_rank:
+          type: integer
+          readOnly: true
+          nullable: true
+        is_dream:
+          type: boolean
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/OfferStatusEnum'
+          readOnly: true
+        respond_by:
+          type: string
+          format: date-time
+          readOnly: true
+        responded_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        policy_decision:
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - ctc_lpa
+      - id
+      - is_dream
+      - policy_decision
+      - posting
+      - respond_by
+      - responded_at
+      - status
+      - tier_rank
+      - user_id
+    OfferIssue:
+      type: object
+      properties:
+        application_id:
+          type: integer
+        ctc_lpa:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          nullable: true
+        tier_rank:
+          type: integer
+          nullable: true
+        respond_by:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - application_id
+    OfferRespond:
+      type: object
+      properties:
+        accept:
+          type: boolean
+      required:
+      - accept
+    OfferStatusEnum:
+      enum:
+      - issued
+      - accepted
+      - declined
+      - revoked
+      - superseded
+      - expired
+      type: string
+      description: |-
+        * `issued` - Issued
+        * `accepted` - Accepted
+        * `declined` - Declined
+        * `revoked` - Revoked
+        * `superseded` - Superseded
+        * `expired` - Expired
+    Ok:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        csrf_token:
+          type: string
+      required:
+      - csrf_token
+      - ok
+    PaginatedAnnouncementList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Announcement'
+    PaginatedApplicationList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Application'
+    PaginatedCompanyList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Company'
+    PaginatedInterviewRoundList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/InterviewRound'
+    PaginatedJobPostingList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobPosting'
+    PaginatedOfferList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Offer'
+    PatchedJobPosting:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        kind:
+          allOf:
+          - $ref: '#/components/schemas/JobPostingKindEnum'
+          readOnly: true
+        company:
+          allOf:
+          - $ref: '#/components/schemas/CompanyBrief'
+          readOnly: true
+        placement_year:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        location:
+          type: string
+          readOnly: true
+        ctc_lpa:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        stipend_pm:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        bond_months:
+          type: integer
+          readOnly: true
+          nullable: true
+        seats:
+          type: integer
+          readOnly: true
+          nullable: true
+        eligibility_rule:
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/JobPostingStatusEnum'
+          readOnly: true
+        is_dream_slot:
+          type: boolean
+          readOnly: true
+        dream_slot_note:
+          type: string
+          readOnly: true
+        opens_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        closes_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        is_open:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    ProfileDocument:
+      type: object
+      description: |-
+        Deliberately no `drive_url` — whoever holds it opens the file, with no
+        further check. `download_url` re-authorises on every use.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        kind:
+          allOf:
+          - $ref: '#/components/schemas/ProfileDocumentKindEnum'
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        original_filename:
+          type: string
+          readOnly: true
+        content_type:
+          type: string
+          readOnly: true
+        size_bytes:
+          type: integer
+          readOnly: true
+          nullable: true
+        is_link:
+          type: boolean
+          readOnly: true
+        download_url:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - content_type
+      - created_at
+      - download_url
+      - id
+      - is_link
+      - kind
+      - original_filename
+      - size_bytes
+      - title
+    ProfileDocumentKindEnum:
+      enum:
+      - resume
+      - certificate
+      - offer_letter
+      - other
+      type: string
+      description: |-
+        * `resume` - Resume
+        * `certificate` - Certificate
+        * `offer_letter` - Offer letter
+        * `other` - Other
+    RecruiterAccept:
+      type: object
+      properties:
+        token:
+          type: string
+          maxLength: 200
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+      required:
+      - password
+      - token
+    RecruiterCompany:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        approval_status:
+          type: string
+      required:
+      - approval_status
+      - id
+      - name
+    RecruiterInvite:
+      type: object
+      properties:
+        company_id:
+          type: integer
+        email:
+          type: string
+          format: email
+        full_name:
+          type: string
+          default: ''
+          maxLength: 120
+      required:
+      - company_id
+      - email
+    RecruiterInviteResult:
+      type: object
+      description: '`invite_token` is returned once and is not stored in readable
+        form.'
+      properties:
+        account_id:
+          type: integer
+        email:
+          type: string
+          format: email
+        invite_token:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+      required:
+      - account_id
+      - email
+      - expires_at
+      - invite_token
+    RecruiterLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+      required:
+      - email
+      - password
+    RecruiterLoginResult:
+      type: object
+      properties:
+        expires_at:
+          type: string
+          format: date-time
+        company_id:
+          type: integer
+        csrf_token:
+          type: string
+      required:
+      - company_id
+      - csrf_token
+      - expires_at
+    RecruiterMe:
+      type: object
+      properties:
+        csrf_token:
+          type: string
+        email:
+          type: string
+          format: email
+        full_name:
+          type: string
+        company:
+          $ref: '#/components/schemas/RecruiterCompany'
+        modules:
+          type: array
+          items:
+            type: string
+      required:
+      - company
+      - csrf_token
+      - email
+      - full_name
+      - modules
+    Resume:
+      type: object
+      description: 'PC-UC-002: the profile rendered as a structured resume.'
+      properties:
+        user_id:
+          type: integer
+        headline:
+          type: string
+        summary:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+        education: {}
+        experience: {}
+        projects: {}
+        links: {}
+        standing:
+          nullable: true
+      required:
+      - education
+      - experience
+      - headline
+      - links
+      - projects
+      - skills
+      - standing
+      - summary
+      - user_id
+    RoundOutcome:
+      type: object
+      properties:
+        application_id:
+          type: integer
+        outcome:
+          $ref: '#/components/schemas/RoundOutcomeOutcomeEnum'
+        score:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          nullable: true
+        remarks:
+          type: string
+          default: ''
+          maxLength: 300
+      required:
+      - application_id
+      - outcome
+    RoundOutcomeOutcomeEnum:
+      enum:
+      - pending
+      - attended
+      - absent
+      - passed
+      - failed
+      type: string
+      description: |-
+        * `pending` - pending
+        * `attended` - attended
+        * `absent` - absent
+        * `passed` - passed
+        * `failed` - failed
+    RoundParticipation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        round:
+          type: integer
+          readOnly: true
+        application:
+          type: integer
+          readOnly: true
+        outcome:
+          $ref: '#/components/schemas/RoundParticipationOutcomeEnum'
+        score:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          nullable: true
+        remarks:
+          type: string
+          maxLength: 300
+      required:
+      - application
+      - id
+      - round
+    RoundParticipationOutcomeEnum:
+      enum:
+      - pending
+      - attended
+      - absent
+      - passed
+      - failed
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `attended` - Attended
+        * `absent` - Absent
+        * `passed` - Passed
+        * `failed` - Failed
+    ScheduledCount:
+      type: object
+      properties:
+        scheduled:
+          type: integer
+      required:
+      - scheduled
+    SeasonDecision:
+      type: object
+      properties:
+        allowed:
+          type: boolean
+        rule:
+          type: string
+        message:
+          type: string
+      required:
+      - allowed
+      - message
+      - rule
+    SectorKindEnum:
+      enum:
+      - it
+      - core
+      - other
+      type: string
+      description: |-
+        * `it` - IT / software
+        * `core` - Core engineering
+        * `other` - Other
+    Session:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/SessionUser'
+        active_role:
+          type: string
+          nullable: true
+        roles:
+          type: array
+          items:
+            type: string
+        permissions:
+          type: array
+          items:
+            type: string
+        modules:
+          type: array
+          items:
+            type: string
+        navigation:
+          type: array
+          items:
+            $ref: '#/components/schemas/NavGroup'
+        csrf_token:
+          type: string
+      required:
+      - active_role
+      - csrf_token
+      - modules
+      - navigation
+      - permissions
+      - roles
+      - user
+    SessionUser:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        display_name:
+          type: string
+        kind:
+          type: string
+        email:
+          oneOf:
+          - type: string
+            format: email
+          - type: string
+            maxLength: 0
+      required:
+      - display_name
+      - email
+      - id
+      - kind
+      - username
+    StaffStats:
+      type: object
+      description: PC-UC-011/012. Operational figures, staff only.
+      properties:
+        season:
+          type: string
+        available:
+          type: boolean
+        registered:
+          type: integer
+        debarred:
+          type: integer
+        placed:
+          type: integer
+        median_ctc:
+          type: string
+          nullable: true
+        mean_ctc:
+          type: string
+          nullable: true
+        max_ctc:
+          type: string
+          nullable: true
+        by_company: {}
+        applications_by_status: {}
+      required:
+      - available
+      - season
+    StudentProfile:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          readOnly: true
+        headline:
+          type: string
+          maxLength: 160
+        about:
+          type: string
+        phone:
+          type: string
+          maxLength: 32
+        alternate_email:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        skills: {}
+        achievements: {}
+        certifications: {}
+        experience: {}
+        projects: {}
+        education: {}
+        github_url:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        linkedin_url:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        portfolio_url:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        completeness_percent:
+          type: integer
+          readOnly: true
+        is_complete:
+          type: boolean
+          readOnly: true
+        missing_fields:
+          readOnly: true
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProfileDocument'
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - completeness_percent
+      - documents
+      - is_complete
+      - missing_fields
+      - updated_at
+      - user_id
+    TopicEnum:
+      enum:
+      - drive
+      - company_visit
+      - training
+      - workshop
+      - internship
+      - general
+      type: string
+      description: |-
+        * `drive` - Placement drive
+        * `company_visit` - Company visit
+        * `training` - Training session
+        * `workshop` - Workshop
+        * `internship` - Internship programme
+        * `general` - General
+    Transition:
+      type: object
+      properties:
+        to_status:
+          type: string
+          maxLength: 24
+        reason:
+          type: string
+          default: ''
+          maxLength: 300
+      required:
+      - to_status
+    UserRef:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        username:
+          type: string
+        display_name:
+          type: string
+        kind:
+          type: string
+        email:
+          oneOf:
+          - type: string
+            format: email
+          - type: string
+            maxLength: 0
+        department:
+          type: string
+        programme:
+          type: string
+        discipline:
+          type: string
+        batch_year:
+          type: integer
+          nullable: true
+      required:
+      - batch_year
+      - department
+      - discipline
+      - display_name
+      - email
+      - kind
+      - programme
+      - user_id
+      - username
+    UserSearchResult:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserRef'
+      required:
+      - results
+    Withdraw:
+      type: object
+      properties:
+        reason:
+          type: string
+          maxLength: 300
+      required:
+      - reason
+  securitySchemes:
+    iamSession:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: '`Token <value>` from the IAM, or the httpOnly `auth_token` cookie
+        the SPA carries.'
+    recruiterSession:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: '`Recruiter <value>` for an external company account, or the httpOnly
+        `recruiter_session` cookie set at portal login. A separate pool from institute
+        users.'

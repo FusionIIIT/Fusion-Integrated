@@ -1,0 +1,49 @@
+%% Token lifecycle. See 02-iam/token-and-session-design.md and ADR-0003.
+sequenceDiagram
+    autonumber
+    actor u as User
+    participant shell as apps/shell
+    participant iam as fusion-iam
+    participant plat as fusion-platform
+    participant legacy as legacy monolith
+    participant redis as Redis
+
+    u->>shell: username + password
+    shell->>iam: POST /auth/login  (throttled 5/min per IP, 10/h per username)
+    Note over iam: Argon2id verify · progressive lockout<br/>generic error on failure (no user enumeration)
+    iam->>iam: create identity_session + identity_refresh_token
+    iam-->>shell: Set-Cookie fusion_at  (JWT RS256, 10 min, HttpOnly, Path=/)<br/>Set-Cookie fusion_rt  (opaque, Path=/app/api/iam/v1/auth, Strict)<br/>Set-Cookie fusion_csrf (readable, for double-submit)
+
+    shell->>iam: GET /me   (cookie)
+    iam-->>shell: user · roles · active_role · permissions · pv<br/>modules · navigation (render shape) · idle_timeout
+
+    par local validation, no IAM round trip
+        shell->>plat: GET /placement/postings
+        plat->>iam: GET /.well-known/jwks.json (cached 10 min, nginx + Redis)
+        plat->>redis: is sid denylisted?
+        plat-->>shell: 200
+    and legacy keeps working unchanged
+        shell->>legacy: GET /api/auth/me
+        Note over legacy: IamJWTAuthentication first,<br/>TokenAuthentication second — old tokens still valid
+        legacy-->>shell: byte-identical legacy response shape
+    end
+
+    Note over shell: 10 minutes pass
+    shell->>plat: GET /placement/postings
+    plat-->>shell: 401
+    Note over shell: single-flight: N concurrent 401s queue<br/>behind ONE refresh, then replay
+    shell->>iam: POST /auth/refresh  (fusion_rt only)
+    alt token unused
+        iam->>iam: rotate — mark old used, issue child
+        iam-->>shell: new fusion_at + fusion_rt
+    else token already used → replay detected
+        iam->>iam: revoke the ENTIRE token family
+        iam-->>shell: 401
+        shell->>shell: clear hint, hard redirect to /login
+    end
+
+    u->>shell: Logout
+    shell->>iam: POST /auth/logout
+    iam->>iam: identity_session.revoked_at = now()
+    iam->>redis: denylist sid for 10 min (one access-token lifetime)
+    iam-->>shell: clear all three cookies

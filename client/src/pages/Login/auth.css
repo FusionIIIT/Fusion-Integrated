@@ -1,0 +1,156 @@
+/*
+ * Login feature styles: keyframes, responsive rules and reduced-motion handling.
+ * Everything is namespaced under `.fsa-auth` (and `fsa*` keyframes) so nothing leaks
+ * into the rest of the app.
+ */
+
+@keyframes fsaFloat {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  33% {
+    transform: translate(30px, -30px) rotate(120deg);
+  }
+  66% {
+    transform: translate(-20px, 20px) rotate(240deg);
+  }
+}
+
+@keyframes fsaSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fsaShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-10px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(10px);
+  }
+}
+
+@keyframes fsaGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(21, 171, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(21, 171, 255, 0.6);
+  }
+}
+
+@keyframes fsaPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes fsaShimmer {
+  0%,
+  100% {
+    background-position: 200% 0;
+  }
+  50% {
+    background-position: -200% 0;
+  }
+}
+
+.fsa-auth {
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  /* Match the main Fusion client exactly: 'Inter' then a plain sans-serif fallback
+     (Arial/Helvetica). Using system-ui here made the giant outlined "WELCOME" render
+     in San Francisco, whose "M" differs from the main client's Arial "M". */
+  font-family: "Inter", sans-serif;
+}
+
+.fsa-auth__shake {
+  animation: fsaShake 0.5s ease-in-out;
+}
+
+.fsa-auth__card {
+  scroll-behavior: smooth;
+}
+.fsa-auth__card::-webkit-scrollbar {
+  width: 6px;
+}
+.fsa-auth__card::-webkit-scrollbar-thumb {
+  background: rgba(21, 171, 255, 0.3);
+  border-radius: 3px;
+}
+.fsa-auth__card::-webkit-scrollbar-thumb:hover {
+  background: rgba(21, 171, 255, 0.6);
+}
+
+/* Tablet / mobile: collapse the two-panel layout into a single centred form. */
+@media (max-width: 768px) {
+  .fsa-auth__welcome {
+    width: 100% !important;
+    padding: 40px 20px !important;
+  }
+  .fsa-auth__welcome--minimized {
+    display: none !important;
+  }
+  .fsa-auth__login {
+    width: 100% !important;
+  }
+  .fsa-auth__status {
+    display: none !important;
+  }
+  .fsa-auth__outline {
+    font-size: 80px !important;
+    letter-spacing: -8px !important;
+  }
+  .fsa-auth__title {
+    font-size: 36px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .fsa-auth__outline {
+    font-size: 60px !important;
+    letter-spacing: -5px !important;
+  }
+  .fsa-auth__title {
+    font-size: 28px !important;
+  }
+}
+
+/* Respect users who prefer reduced motion — kill all decorative animation. */
+@media (prefers-reduced-motion: reduce) {
+  .fsa-auth *,
+  .fsa-auth *::before,
+  .fsa-auth *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

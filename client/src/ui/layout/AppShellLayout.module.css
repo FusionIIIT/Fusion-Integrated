@@ -1,0 +1,82 @@
+/* Byte-for-byte the sysadmin client's AppLayout.module.css. This file IS the
+   visual contract — if it drifts, the two apps stop looking like one product. */
+.navbar {
+  background: linear-gradient(180deg, #0c1526 0%, #080d18 100%);
+  border-right: none;
+}
+
+.header {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 2px solid #0b1220;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+
+.brand {
+  border-left: 3px solid #15abff;
+  padding-left: 14px;
+  background: linear-gradient(90deg, rgba(21, 171, 255, 0.06) 0%, transparent 100%);
+}
+
+.sectionLabel {
+  color: rgba(255, 255, 255, 0.34);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 16px 10px 6px;
+}
+
+.navLink {
+  color: rgba(255, 255, 255, 0.68);
+  border-radius: 9px;
+  font-size: 0.9rem;
+}
+.navLink:hover { background-color: rgba(255, 255, 255, 0.05); color: #fff; }
+.navLink[data-active] {
+  background-color: rgba(21, 171, 255, 0.14);
+  color: #fff;
+  box-shadow: inset 2px 0 0 0 #15abff;
+}
+.navLink[data-active]:hover { background-color: rgba(21, 171, 255, 0.2); }
+
+.scroll { flex: 1; padding: 0 10px; }
+
+.search input {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.search input::placeholder { color: rgba(255, 255, 255, 0.36); }
+
+/* ---- Signed-in user footer (the only place identity is rendered) ---- */
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  margin: 6px 10px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+.footerName {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.82rem;
+  line-height: 1.1;
+}
+.footerRole {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.footerLogout {
+  color: rgba(255, 255, 255, 0.55);
+}
+.footerLogout:hover {
+  color: #ff8787;
+  background: rgba(255, 135, 135, 0.1);
+}

@@ -1,0 +1,232 @@
+"""Fusion-Integrated — base settings.
+
+Every value comes from the environment. This service holds NO user table:
+identity, RBAC and directory data all come from Fusion_System_Administrator
+over HTTP — see fusion_auth/.
+"""
+import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+
+def env(name, default=None):
+    v = os.environ.get(name)
+    return default if v is None or v.strip() == "" else v.strip()
+
+
+def env_bool(name, default=False):
+    raw = env(name)
+    return default if raw is None else raw.lower() in ("1", "true", "yes", "on")
+
+
+def env_int(name, default=None):
+    raw = env(name)
+    try:
+        return int(raw) if raw is not None else default
+    except ValueError:
+        return default
+
+
+def env_list(name, default=None):
+    raw = env(name)
+    if raw is None:
+        return list(default or [])
+    return [x.strip() for x in raw.split(",") if x.strip()]
+
+
+SECRET_KEY = env("DJANGO_SECRET_KEY", "django-insecure-dev-only-change-me")
+DEBUG = False
+ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", ["localhost", "127.0.0.1"])
+
+# django.contrib.auth is installed because DRF needs it, but this service
+# never authenticates against it — fusion_auth does, against the IAM.
+DJANGO_APPS = [
+    "django.contrib.contenttypes",
+    "django.contrib.auth",
+    "django.contrib.staticfiles",
+]
+
+THIRD_PARTY_APPS = [
+    "rest_framework",
+    "corsheaders",
+    "django_filters",
+    "drf_spectacular",
+]
+
+# Each module is an independent Django app with its own tables, migrations
+# and public contract.
+PLATFORM_MODULES = [
+    "modules.directory",         # who people are, projected from IAM
+    "modules.accesscontrol",     # which modules a role may enter
+]
+
+# See docs/03-platform/module-authoring-guide.md to add one.
+DOMAIN_MODULES = [
+    "modules.placement",
+]
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PLATFORM_MODULES + DOMAIN_MODULES
+
+MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "core.observability.middleware.RequestIDMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    # X_FRAME_OPTIONS is inert without this; only this middleware emits it.
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+
+# No CsrfViewMiddleware: it assumes Django sessions and HTML forms, neither of
+# which exist here. core/api/csrf.py does the job from inside the
+# authentication classes. security.W003 cannot see that, hence the silence.
+
+ROOT_URLCONF = "config.urls"
+WSGI_APPLICATION = "config.wsgi.application"
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {"context_processors": []},
+    }
+]
+
+# One database, owned entirely by this service. No ERP connection, no user
+# table — a module that needs to know about a person asks modules.directory.
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env("DB_NAME", "fusion_integrated"),
+        "USER": env("DB_USER", "fusion_admin"),
+        "PASSWORD": env("DB_PASSWORD", ""),
+        "HOST": env("DB_HOST", "127.0.0.1"),
+        "PORT": env("DB_PORT", "5432"),
+        # MUST stay 0 under PgBouncer transaction pooling: persistent
+        # connections would leak session state between requests.
+        "CONN_MAX_AGE": env_int("DB_CONN_MAX_AGE", 0),
+    }
+}
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# The IAM. This service is a client of it and caches nothing it cannot rebuild.
+IAM_BASE_URL = env("IAM_BASE_URL", "http://127.0.0.1:8001")
+IAM_API_PREFIX = env("IAM_API_PREFIX", "/api")
+IAM_SERVICE_TOKEN = env("IAM_SERVICE_TOKEN", "")
+IAM_TIMEOUT_SECONDS = env_int("IAM_TIMEOUT_SECONDS", 5)
+IAM_SESSION_CACHE_SECONDS = env_int("IAM_SESSION_CACHE_SECONDS", 60)
+IAM_AUTH_COOKIE_NAME = env("IAM_AUTH_COOKIE_NAME", "auth_token")
+
+CACHES = {
+    "default": (
+        {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": env("REDIS_CACHE_URL"),
+        }
+        if env("REDIS_CACHE_URL")
+        else {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "fusion-integrated",
+        }
+    )
+}
+
+CELERY_BROKER_URL = env("REDIS_BROKER_URL", "memory://")
+CELERY_TASK_ALWAYS_EAGER = env_bool("CELERY_TASK_ALWAYS_EAGER", False)
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_REJECT_ON_WORKER_LOST = True
+
+# Console by default, so a laptop never mails 3,000 students by accident.
+EMAIL_BACKEND = env("DJANGO_EMAIL_BACKEND",
+                    "django.core.mail.backends.console.EmailBackend")
+EMAIL_HOST = env("EMAIL_HOST", "localhost")
+EMAIL_PORT = env_int("EMAIL_PORT", 25)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", False)
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL",
+                         "Placement Cell <placement@iiitdmj.ac.in>")
+
+#: Ceiling per worker pass, so a runaway loop cannot mail the institute.
+NOTIFY_MAX_PER_RUN = env_int("NOTIFY_MAX_PER_RUN", 500)
+#: Attempts before a notification is parked as failed for a human to look at.
+NOTIFY_MAX_ATTEMPTS = env_int("NOTIFY_MAX_ATTEMPTS", 5)
+#: A dozen events a day is legitimate during a drive; thirty is a bug.
+NOTIFY_DAILY_CAP_PER_RECIPIENT = env_int("NOTIFY_DAILY_CAP_PER_RECIPIENT", 20)
+
+#: Documents attached BEFORE the move to Drive links. Nothing writes here now,
+#: but the rows pointing at it are still served. Outside BASE_DIR on purpose —
+#: `check_upload_root` fails the boot otherwise.
+PLACEMENT_UPLOAD_ROOT = env(
+    "PLACEMENT_UPLOAD_ROOT",
+    str(Path.home() / ".local" / "share" / "fusion-integrated" / "uploads"))
+#: When set, legacy reads go to nginx via X-Accel-Redirect. Must be `internal;`.
+PLACEMENT_UPLOAD_INTERNAL_PREFIX = env("PLACEMENT_UPLOAD_INTERNAL_PREFIX", "")
+
+# No multipart endpoints remain, so this only caps the JSON body.
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "fusion_auth.authentication.IamSessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "fusion_auth.permissions.IsAuthenticatedPrincipal",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "core.api.pagination.CursorPagination",
+    "PAGE_SIZE": 25,
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    "EXCEPTION_HANDLER": "core.api.exceptions.exception_handler",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "UNAUTHENTICATED_USER": None,
+    # Unset, DRF keys anonymous throttles on the whole client-controlled
+    # X-Forwarded-For, so rotating it buys unlimited login attempts.
+    "NUM_PROXIES": env_int("DJANGO_NUM_PROXIES", 1),
+    # NOT DRF's ScopedRateThrottle: it identifies callers by `request.user.pk`
+    # and there is no Django user here, so it 500s on every throttled endpoint.
+    "DEFAULT_THROTTLE_CLASSES": ["core.api.throttling.PrincipalScopedThrottle"],
+    # Only endpoints that opt in via `throttle_scope` are limited. Recruiter
+    # login is the one reachable by an unauthenticated outsider.
+    "DEFAULT_THROTTLE_RATES": {
+        "recruiter_login": "5/min",
+        "recruiter_invite_accept": "10/hour",
+        "apply": "30/hour",
+        "export": "5/hour",
+        "upload": "20/hour",
+    },
+}
+
+# Recruiter passwords are the only credentials stored here. PBKDF2 is retained
+# so an older hash still verifies, and is upgraded on next login.
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+]
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Fusion-Integrated API",
+    "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
+
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = env_list("DJANGO_CORS_ALLOWED_ORIGINS", ["http://localhost:5173"])
+CORS_ALLOW_CREDENTIALS = True
+
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "Asia/Kolkata"
+USE_I18N = True
+USE_TZ = True
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+X_FRAME_OPTIONS = "DENY"
+
+# W003: CSRF is enforced by core/api/csrf.py. See the note above MIDDLEWARE.
+SILENCED_SYSTEM_CHECKS = ["security.W003"]
+
+LOGGING_CONFIG = None

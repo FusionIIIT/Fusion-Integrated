@@ -1,0 +1,55 @@
+%% Generated from domain/state_machine.py TRANSITIONS. See 04-placement/application-state-machine.md
+stateDiagram-v2
+    [*] --> DRAFT
+
+    DRAFT --> SUBMITTED: submit<br/>window_open · is_registered<br/>not_debarred · is_eligible · has_resume<br/>▸ freezes cpi_at_apply
+    DRAFT --> [*]: abandon
+
+    SUBMITTED --> UNDER_REVIEW: review
+    SUBMITTED --> REJECTED: reject (has_reason)
+
+    UNDER_REVIEW --> SHORTLISTED: shortlist
+    UNDER_REVIEW --> REJECTED: reject (has_reason)
+
+    SHORTLISTED --> IN_PROCESS: schedule<br/>round_exists
+    SHORTLISTED --> REJECTED: reject (has_reason)
+
+    IN_PROCESS --> SELECTED: all_rounds_passed
+    IN_PROCESS --> REJECTED: a_round_failed_or_absent
+
+    SELECTED --> OFFER_ISSUED: issue offer ⚠️<br/>no_pending_offer · respond_by_in_future
+
+    OFFER_ISSUED --> OFFER_ACCEPTED: accept<br/>can_accept(policy, state, offer)
+    OFFER_ISSUED --> OFFER_DECLINED: decline
+    OFFER_ISSUED --> OFFER_EXPIRED: respond_by_passed<br/>(system, every 15 min)
+    OFFER_ISSUED --> REJECTED: revoke ⚠️<br/>has_reason + step-up auth
+
+    state "any non-terminal" as ANY
+    ANY --> WITHDRAWN: student withdraws<br/>not_offer_accepted
+    ANY --> AUTO_WITHDRAWN: placed_elsewhere<br/>(per pool_after_offer)
+    ANY --> AUTO_WITHDRAWN: posting_cancelled
+
+    REJECTED --> [*]
+    WITHDRAWN --> [*]
+    AUTO_WITHDRAWN --> [*]
+    OFFER_ACCEPTED --> [*]
+    OFFER_DECLINED --> [*]
+    OFFER_EXPIRED --> [*]
+
+    note right of OFFER_ACCEPTED
+        One transaction:
+        create PlacementRecord
+        supersede prior offer
+        auto-withdraw others
+        bump registration counters
+        Guarded by select_for_update
+        on PlacementRegistration
+        + a partial unique index on
+        PlacementRecord(user, year)
+    end note
+
+    note left of AUTO_WITHDRAWN
+        Distinct from WITHDRAWN on purpose:
+        "policy removed them" must not read
+        as "they chose to leave"
+    end note

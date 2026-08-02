@@ -1,0 +1,61 @@
+%% C4 Level 2 — containers. Rendered by CI; do not commit a rendered image.
+graph TB
+    subgraph browser["Browser"]
+        shell["apps/shell<br/>React 18 + TS + Vite + Mantine 7<br/>one login, one sidebar"]
+        legacyspa["Fusion-client<br/>React 18 + JSX + Redux<br/>academic modules, linked out"]
+    end
+
+    nginx["nginx<br/>fusion.iiitdmj.ac.in<br/>TLS · static · reverse proxy"]
+
+    subgraph services["Application services"]
+        iam["fusion-iam<br/>Django 5.2 + DRF<br/>identity · RBAC · modules · audit"]
+        platform["fusion-platform<br/>Django 5.2 + DRF<br/>modular monolith"]
+        legacy["legacy monolith<br/>Django 3.1.5<br/>5 live academic apps"]
+        sysops["sysadmin console<br/>Django 5.1<br/>absorbed in Phase 7"]
+    end
+
+    subgraph workers["Celery"]
+        wiam["iam workers<br/>queue: iam"]
+        wplat["platform workers<br/>queues: default, notifications,<br/>reports, ingest"]
+    end
+
+    subgraph data["Data"]
+        pgb["PgBouncer<br/>transaction pooling"]
+        sysdb[("fusion_system_db<br/>schema iam → fusion-iam<br/>schema public → console")]
+        nonacad[("fusion_nonacad<br/>fusion-platform")]
+        erp[("fusion_newui_prod<br/>legacy monolith<br/>auth_user + 424 models")]
+        rcache[("Redis cache<br/>allkeys-lru")]
+        rbroker[("Redis broker<br/>noeviction")]
+    end
+
+    shell -->|"/app/api/iam/v1"| nginx
+    shell -->|"/app/api/platform/v1"| nginx
+    shell -->|"/app/api/sysops/v1"| nginx
+    legacyspa -->|"/api"| nginx
+
+    nginx --> iam
+    nginx --> platform
+    nginx --> legacy
+    nginx --> sysops
+
+    iam --> pgb --> sysdb
+    platform --> pgb --> nonacad
+    legacy --> erp
+    sysops --> sysdb
+
+    platform -.->|"platform_erp_ro<br/>SELECT only"| erp
+    wiam -.->|"iam_erp_projector<br/>3 tables only"| erp
+    platform -->|"internal snapshot pull<br/>127.0.0.1"| legacy
+    legacy -.->|"validates IAM JWT<br/>via cached JWKS"| iam
+
+    iam --> rcache
+    platform --> rcache
+    wiam --> rbroker
+    wplat --> rbroker
+    platform --> rbroker
+    iam --> rbroker
+
+    classDef new fill:#15abff,stroke:#0b1220,color:#fff
+    classDef existing fill:#e9ecef,stroke:#868e96,color:#111
+    class shell,iam,platform,wiam,wplat,nonacad new
+    class legacyspa,legacy,sysops,erp existing

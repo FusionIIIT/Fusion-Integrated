@@ -1,0 +1,31 @@
+%% A single authorized platform request, end to end.
+flowchart TD
+    A["Browser<br/>GET /app/api/platform/v1/placement/postings<br/>Cookie: fusion_at, fusion_csrf"] --> B{nginx}
+    B -->|"location /app/api/platform/"| C["unix:/run/fusion/platform.sock<br/>gunicorn, gthread, 5 workers × 4 threads"]
+
+    C --> D["RequestIDMiddleware<br/>accept nginx $request_id or generate UUIDv7<br/>store in contextvar"]
+    D --> E["IamJWTAuthentication<br/>verify RS256 against cached JWKS<br/>NO database hit"]
+    E -->|"invalid / expired"| E1["401 — the client's cue to refresh"]
+    E --> F{"sid on the<br/>Redis denylist?"}
+    F -->|yes| F1["401 — session revoked"]
+    F -->|no| G["request.principal<br/>sub · erp_uid · rol · mod · pv"]
+
+    G --> H{"CSRF required?<br/>unsafe method"}
+    H -->|"yes, mismatched"| H1["403"]
+    H -->|"no / matched"| I["HasModuleGrant('placement_cell')<br/>reads the token's mod claim"]
+    I -->|"not granted"| I1["403"]
+    I --> J["HasPermission('placement.job_posting.view')<br/>Redis, key includes pv"]
+    J -->|"denied"| J1["403"]
+    J --> K["ScopedUserThrottle<br/>Redis, shared across workers"]
+    K -->|"exceeded"| K1["429 + Retry-After"]
+
+    K --> L["selector<br/>queryset filtered by ownership/scope<br/>select_related + prefetch_related<br/>cursor pagination"]
+    L --> M[("fusion_nonacad<br/>via PgBouncer<br/>CONN_MAX_AGE=0")]
+    L --> N["read serializer<br/>no fields='__all__'"]
+    N --> O["200 {results, next}<br/>X-Request-ID echoed<br/>+ security header block"]
+
+    L -.->|"needs user names"| P["directory.contracts.get_users(ids)<br/>ONE batched call — plural by signature"]
+    L -.->|"needs declared CPI"| Q["academics.contracts.get_standings(ids)<br/>never recomputes CPI"]
+
+    classDef err fill:#fa5252,stroke:#c92a2a,color:#fff
+    class E1,F1,H1,I1,J1,K1 err

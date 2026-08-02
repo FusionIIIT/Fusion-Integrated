@@ -1,0 +1,37 @@
+%% The declared-CPI ingest. See 04-placement/academic-snapshot-integration.md
+sequenceDiagram
+    autonumber
+    actor admin as Academic admin
+    participant exam as legacy examination app
+    participant erpdb as ERP database
+    participant plat as platform modules/academics
+    participant celery as Celery ingest queue
+    participant place as modules/placement
+
+    admin->>exam: POST /api/publish-result-selected/
+    Note over exam: _user_has_exam_admin_role()<br/>verifies real designation
+
+    rect rgb(240,248,255)
+    Note over exam,erpdb: ONE transaction
+    exam->>erpdb: delete + bulk_create PublishedResultStudent
+    exam->>erpdb: ResultAnnouncement.announced = True<br/>per_student_selection = True
+    exam->>erpdb: ExamOutboxEvent("academics.result.declared")<br/>with a real declared_at
+    end
+
+    plat->>erpdb: poll ExamOutboxEvent (read-only role)
+    plat->>celery: ingest_declaration(announcement_id, offset=0)
+
+    loop 50 students per chunk, 2s apart, concurrency 1
+        celery->>exam: POST /internal/academic-snapshot/<br/>{announcement_id, offset, limit:50}
+        Note over exam: reuses _is_result_published_for() verbatim<br/>then calculate_spi_for_student()<br/>and calculate_cpi_for_student()
+        exam-->>celery: {students:[{roll_no, spi, cpi,<br/>earned_credits, cpi_denominator_credits,<br/>active_backlogs, courses[]}],<br/>computed_by:"erp:...@sha"}
+        celery->>plat: resolve roll_no → user_id via directory.UserRef
+        celery->>plat: bulk_create ResultSnapshot(ignore_conflicts=True)
+        Note over plat: IMMUTABLE — UPDATE/DELETE revoked
+        celery->>plat: upsert StudentAcademicStanding<br/>ON CONFLICT ... WHERE EXCLUDED.declared_seq > current
+        Note over plat: the WHERE clause is the whole guarantee:<br/>an older declaration can never win
+        celery->>place: academics.standing.changed
+    end
+
+    place->>place: invalidate EligibilityEvaluation<br/>(inputs_version changed)
+    place->>place: flag in-flight applications<br/>for coordinator review — never auto-reject

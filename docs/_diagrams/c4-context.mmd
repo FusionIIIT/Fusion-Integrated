@@ -1,0 +1,40 @@
+%% C4 Level 1 — system context.
+graph TB
+    student(["Student<br/>applies, tracks results"])
+    faculty(["Faculty<br/>academic + profile"])
+    staff(["Staff<br/>HR, leave, purchase"])
+    coord(["Placement coordinator<br/>postings, shortlists, offers"])
+    operator(["System administrator<br/>users, roles, backups"])
+
+    subgraph fusion["Fusion — fusion.iiitdmj.ac.in"]
+        newp["Fusion Platform (new)<br/>one login · one sidebar<br/>central auth + RBAC<br/>non-academic modules"]
+        legacy["Fusion Academic (existing)<br/>5 live apps<br/>unchanged"]
+    end
+
+    smtp["Institute SMTP relay"]
+    clam["ClamAV daemon<br/>upload scanning"]
+    sentry["Sentry<br/>error tracking"]
+
+    student --> newp
+    student --> legacy
+    faculty --> newp
+    faculty --> legacy
+    staff --> newp
+    coord --> newp
+    operator --> newp
+
+    newp -->|"declared results only,<br/>read-only + snapshot"| legacy
+    newp -->|"one-way role projection"| legacy
+    legacy -->|"validates tokens issued by"| newp
+
+    newp --> smtp
+    newp --> clam
+    newp --> sentry
+    legacy --> smtp
+
+    classDef new fill:#15abff,stroke:#0b1220,color:#fff
+    classDef existing fill:#e9ecef,stroke:#868e96,color:#111
+    classDef ext fill:#fff,stroke:#dee2e6,color:#495057
+    class newp new
+    class legacy existing
+    class smtp,clam,sentry ext

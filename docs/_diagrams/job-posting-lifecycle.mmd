@@ -1,0 +1,43 @@
+%% See 04-placement/job-posting-lifecycle.md
+stateDiagram-v2
+    [*] --> draft
+
+    draft --> pending_approval: submit<br/>rule_valid · has_window · company_active
+    pending_approval --> draft: reject (has_reason)
+    draft --> [*]: delete<br/>ONLY from draft, no_applications
+
+    pending_approval --> published: approve+publish ⚠️<br/>rule_valid · has_window<br/>company_active · year_active<br/>▸ FREEZES eligibility_rule
+
+    published --> applications_closed: window_passed<br/>(hourly task)
+    published --> in_progress: schedule rounds<br/>(closes window early)
+    applications_closed --> in_progress: schedule rounds<br/>round_exists
+    in_progress --> completed: no_pending_offers
+
+    draft --> cancelled: cancel ⚠️ (has_reason)
+    pending_approval --> cancelled: cancel ⚠️
+    published --> cancelled: cancel ⚠️
+    applications_closed --> cancelled: cancel ⚠️
+    in_progress --> cancelled: cancel ⚠️
+
+    completed --> [*]
+    cancelled --> [*]
+
+    note right of published
+        After publish:
+          eligibility_rule  — NEVER editable
+          closes_at         — extend only
+          ctc_lpa           — editable but AUDITED
+                              (it feeds is_dream)
+          company / kind    — NEVER editable
+        Enforced by the DB constraint
+        posting_published_has_locked_rule
+    end note
+
+    note left of cancelled
+        Applications → AUTO_WITHDRAWN
+        ISSUED offers → revoked
+        ACCEPTED offers → left intact.
+        A student who accepted holds a
+        commitment; cancelling the posting
+        does not undo it.
+    end note
