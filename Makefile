@@ -38,7 +38,7 @@ check: ## everything CI runs
 	$(PY) -m pytest -q
 
 check-client: ## the client half of CI
-	cd client && npm run typecheck && npm run build
+	cd client && npm run typecheck && npm test && npm run build
 
 SCHEMA := openapi/fusion-integrated.v1.yaml
 
