@@ -7,6 +7,12 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `directory`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

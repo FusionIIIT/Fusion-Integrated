@@ -206,6 +206,7 @@ REST_FRAMEWORK = {
         "apply": "30/hour",
         "export": "5/hour",
         "upload": "20/hour",
+        "directory_search": "120/hour",
     },
 }
 

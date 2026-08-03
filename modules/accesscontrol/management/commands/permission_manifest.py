@@ -26,10 +26,12 @@ def collect() -> dict:
             reg = import_module(f"{cfg.name}.registry")
         except ModuleNotFoundError:
             continue
-        spec = getattr(reg, "MODULE", None)
-        if not spec:
+        if not getattr(reg, "PERMISSIONS", None):
             continue
-        modules[spec["code"]] = {
+        spec = getattr(reg, "MODULE", None)
+        # A module with permissions but no screens still owns its grants.
+        code = spec["code"] if spec else cfg.label
+        modules[code] = {
             "permissions": [
                 {"code": code, "label": label}
                 for code, label in getattr(reg, "PERMISSIONS", [])
