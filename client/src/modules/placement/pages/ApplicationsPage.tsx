@@ -63,8 +63,7 @@ export default function ApplicationsPage() {
   const rows = useMemo(
     () => (data?.results ?? []) as Application[], [data]);
 
-  // A terminal application cannot move, so offering its checkbox would only
-  // produce refusals the user has to read past.
+  // A terminal application cannot move, so its checkbox would only refuse.
   const isSelectable = (row: Application) =>
     (row.allowed_transitions ?? []).some(
       (t) => BULK_MOVES.some((m) => m.value === t));
@@ -261,8 +260,7 @@ export default function ApplicationsPage() {
             {
               key: "actions", header: "", align: "right",
               render: (r) => {
-                // The server says what is legal; there is no client-side
-                // state machine to drift out of sync with it.
+                // The server says what is legal; no client state machine to drift.
                 const moves = (r.allowed_transitions ?? [])
                   .filter((t) => LABELS[t]);
                 return (

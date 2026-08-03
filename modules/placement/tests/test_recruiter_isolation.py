@@ -243,8 +243,7 @@ class TestRecruiterSignIn:
                                 ("hire@acme.test", "wrong-password")):
             with pytest.raises(PermissionDeniedError):
                 recruiters.sign_in(email=email, password=password)
-        # Indistinguishable outside, fully distinguishable in the audit log —
-        # which is what makes stuffing detectable.
+        # Indistinguishable outside, distinguishable in the log; that is the point.
         assert set(RecruiterLoginAttempt.objects.values_list("outcome", flat=True)) \
             == {"unknown_account", "bad_password"}
 
@@ -385,8 +384,7 @@ class TestRecruiterCookie:
         c.post("/api/v1/placement/recruiters/logout", {}, format="json",
                HTTP_X_CSRF_TOKEN=login.json()["csrf_token"])
 
-        # Clearing the cookie is cosmetic; the row must be dead too, or a
-        # copied value keeps working after "sign out".
+        # Clearing the cookie is cosmetic; the row must be dead too.
         replay = APIClient()
         replay.credentials(HTTP_AUTHORIZATION=f"Recruiter {key}")
         assert replay.get("/api/v1/placement/postings").status_code == 401

@@ -158,8 +158,7 @@ def transition(*, application_id: int, to_status: str, actor,
     kind = actor_kind(actor, app)
     t = resolve_or_raise(app.status, to_status, kind)
 
-    # Recruiters hold no permissions by construction; their authority is the
-    # actor set plus the company-scoped queryset.
+    # Recruiters hold no codes; the company-scoped queryset is their authority.
     if kind in (sm.STAFF, sm.STUDENT) and not actor.has_permission(t.permission):
         raise PermissionDeniedError(f"This action needs {t.permission}.",
                                     code="permission_denied")
@@ -290,8 +289,7 @@ def evaluate_for(*, posting: JobPosting, user_id: int,
     }
 
 
-#: A bulk action is a convenience, not a data-migration tool. Beyond this it is
-#: almost certainly a mistake, and it is also an N-queries-per-item endpoint.
+#: A convenience, not a migration tool, and N queries per item.
 MAX_BULK = 200
 
 

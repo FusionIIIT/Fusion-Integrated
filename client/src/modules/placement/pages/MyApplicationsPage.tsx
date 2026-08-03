@@ -61,8 +61,7 @@ export default function MyApplicationsPage() {
             },
             {
               key: "cpi_at_apply", header: "CPI at apply",
-              // The frozen value, not the current one. If the student's CPI has
-              // moved since, this is still what the decision was made on.
+              // The frozen value: what the decision was made on, not today's CPI.
               render: (r) => (
                 <CpiBadge
                   cpi={r.cpi_at_apply}

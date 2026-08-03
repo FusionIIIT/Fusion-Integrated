@@ -33,8 +33,7 @@ def sanitise_cell(value: Any) -> str:
         return ""
     text = str(value)
     if text.startswith(FORMULA_PREFIXES):
-        # A leading apostrophe is the spreadsheet convention for "this is
-        # text". Quoting alone does not stop evaluation.
+        # A leading apostrophe means "text"; quoting alone does not stop evaluation.
         return "'" + text
     return text
 

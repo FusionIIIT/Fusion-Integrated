@@ -49,8 +49,7 @@ export function NewPostingModal({ opened, onClose }: {
   const [maxBacklogs, setMaxBacklogs] = useState<number | string>("");
   const [skills, setSkills] = useState<string[]>([]);
 
-  // Only approved companies may hold a posting (PC-BR-006), so the picker
-  // cannot offer one that would be rejected on submit.
+  // PC-BR-006: only approved companies, so the picker cannot offer a refusal.
   const companyOptions = useMemo(
     () => (companies.data?.results ?? [])
       .filter((c) => c.can_operate)

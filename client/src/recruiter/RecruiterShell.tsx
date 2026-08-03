@@ -44,9 +44,7 @@ export function RecruiterShell() {
       navGroups={NAV}
       activePath={pathname}
       onNavigate={(to) => navigate(to)}
-      // The subtitle is the one place a recruiter always sees which company
-      // they are acting for. With one account per company that is not strictly
-      // ambiguous, but it makes a mis-issued invitation obvious immediately.
+      // The one place a recruiter always sees which company they act for.
       brandSubtitle={`RECRUITER · ${(session?.company.name ?? "").toUpperCase()}`}
       user={{
         name: session?.full_name || session?.email || "Recruiter",

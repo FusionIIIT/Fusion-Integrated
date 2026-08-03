@@ -63,8 +63,7 @@ def parse(raw: str) -> DriveRef:
         # `javascript:` and `data:` would execute in whoever clicked it.
         _reject("The link must start with https://.", "url_not_https")
 
-    # `drive.google.com@evil.test` passes the allowlist below but resolves
-    # to evil.test in a browser.
+    # `drive.google.com@evil.test` passes the allowlist but resolves to evil.test.
     if parts.username or parts.password or "@" in (parts.netloc or ""):
         _reject("That link is not a Google Drive link.", "url_not_drive")
 

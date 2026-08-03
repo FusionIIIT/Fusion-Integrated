@@ -14,9 +14,7 @@ def unpublish_incomplete_postings(apps, schema_editor):
     recoverable — the office fills in what is missing and publishes again.
     """
     JobPosting = apps.get_model("placement", "JobPosting")
-    # `published_at` is added by a later operation in this same migration, so
-    # it does not exist in the model state here — and being new, it is NULL for
-    # every existing row anyway. Only the status needs correcting.
+    # published_at is added later in this migration and is NULL anyway; fix the status.
     JobPosting.objects.filter(status="published").filter(
         models.Q(description="") | models.Q(closes_at__isnull=True)
     ).update(status="draft")

@@ -121,8 +121,7 @@ function PostingDrawer({ posting, onClose, canManage }: {
   const publish = usePublishPosting();
 
   const canApply = can("placement_cell.application.create");
-  // Never inferred client-side. The server decides, and the button follows —
-  // and the server re-checks on submit regardless of what the button did.
+  // The server decides and re-checks on submit; the button only follows.
   const isEligible = eligibility.data?.is_eligible === true;
 
   function submit() {

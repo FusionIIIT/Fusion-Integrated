@@ -33,12 +33,10 @@ class PlacementPolicy(TimeStampedModel):
                                               null=True, blank=True)
     allow_backlog_registration = models.BooleanField(default=True)
 
-    # Rule 20's "stipulated deadline". After it, registering needs the late
-    # fee and the Placement Cell's approval.
+    # Rule 20's deadline; after it, registering needs the fee and approval.
     registration_closes_on = models.DateField(null=True, blank=True)
 
-    # Rule 22's "on or before April 15" — a date, because the season label
-    # ("2026-27") does not say which calendar year it falls in.
+    # Rule 22's April 15: a date, because "2026-27" does not name the year.
     notify_non_joining_by = models.DateField(null=True, blank=True)
 
     # Rules 20 and 21. Recorded only; PCMS does not take payment.
@@ -133,8 +131,7 @@ class Company(TimeStampedModel):
     # Rule 8: once placed here a student may not switch out, and must join.
     is_marquee = models.BooleanField(default=False)
 
-    # Rules 2.B and 10 turn on this, so it is a field, not a guess from
-    # the free-text `sector`.
+    # Rules 2.B and 10 turn on this, so it is a field, not a guess from `sector`.
     SECTOR_KIND = [("it", "IT / software"), ("core", "Core engineering"),
                    ("other", "Other")]
     sector_kind = models.CharField(max_length=8, choices=SECTOR_KIND,
@@ -156,8 +153,7 @@ class Company(TimeStampedModel):
             models.Index(fields=["approval_status"], name="company_approval_idx"),
         ]
         constraints = [
-            # An approval must record who made it, even if the service layer
-            # is bypassed.
+            # An approval records who made it even if the service layer is bypassed.
             models.CheckConstraint(
                 condition=~Q(approval_status="approved")
                 | Q(approved_by_user_id__isnull=False),
@@ -380,8 +376,7 @@ class PlacementRegistration(TimeStampedModel, UserScopedModel):
     best_accepted_ctc_lpa = models.DecimalField(max_digits=8, decimal_places=2,
                                                 null=True, blank=True)
 
-    # Rule 2.A, "one time only": locked on the first accepted offer from its
-    # CTC band, or set ahead of time by the office.
+    # Rule 2.A, one time only: locked on the first accepted offer in its band.
     category_number = models.PositiveSmallIntegerField(null=True, blank=True)
     category_locked_at = models.DateTimeField(null=True, blank=True)
 
@@ -400,15 +395,12 @@ class PlacementRegistration(TimeStampedModel, UserScopedModel):
     debarred_reason = models.CharField(max_length=300, blank=True)
     registered_at = models.DateTimeField(null=True, blank=True)
 
-    # Rules 20 and 21 both require a challan or receipt to be produced. PCMS
-    # takes no payment — it records the reference the office was shown.
+    # Rules 20 and 21: no payment is taken, only the reference the office saw.
     late_fee_reference = models.CharField(max_length=80, blank=True)
     reregistration_reference = models.CharField(max_length=80, blank=True)
     approved_by_user_id = models.IntegerField(null=True, blank=True)
 
-    # The sanction in force, from domain.conduct.Sanction. Rule 19's first tier
-    # is scoped to the next two drives rather than the season, so the bar needs
-    # a start point to count from.
+    # Rule 19's first tier bars the next two drives, so the bar needs a start point.
     sanction = models.CharField(max_length=16, blank=True)
     sanction_rule = models.CharField(max_length=4, blank=True)
     sanctioned_at = models.DateTimeField(null=True, blank=True)
@@ -479,8 +471,7 @@ class JobPosting(TimeStampedModel):
                          name="posting_company_year_idx"),
         ]
         constraints = [
-            # PC-BR-002: publishing freezes the rule so criteria cannot move
-            # under applicants.
+            # PC-BR-002: publishing freezes the rule under applicants.
             models.CheckConstraint(
                 condition=~Q(status="published")
                 | Q(eligibility_rule_locked_at__isnull=False),
@@ -698,8 +689,7 @@ class PlacementRecord(TimeStampedModel, UserScopedModel):
 
     policy = models.ForeignKey(PlacementPolicy, on_delete=models.PROTECT,
                                related_name="records")
-    # Null for an off-campus placement: rules 5 and 24 cover those too, and
-    # they never passed through a posting or an offer here.
+    # Null off-campus: rules 5 and 24 cover placements that had no posting here.
     offer = models.OneToOneField(Offer, on_delete=models.PROTECT,
                                  related_name="record", null=True, blank=True)
     posting = models.ForeignKey(JobPosting, on_delete=models.PROTECT,
@@ -712,15 +702,13 @@ class PlacementRecord(TimeStampedModel, UserScopedModel):
     is_active = models.BooleanField(default=True)
     recorded_by_user_id = models.IntegerField(null=True, blank=True)
 
-    # Rule 24. The no-dues certificate is withheld until this is submitted, so
-    # it is the institute's lever and the reason this column exists.
+    # Rule 24: the no-dues certificate is withheld until this is submitted.
     offer_letter = models.ForeignKey("ProfileDocument", on_delete=models.SET_NULL,
                                      null=True, blank=True,
                                      related_name="offer_letter_for")
     offer_letter_submitted_at = models.DateTimeField(null=True, blank=True)
 
-    # Rule 22. Declaring it does not release the letter obligation — the
-    # acceptance happened and the record stands.
+    # Rule 22: declaring it does not release the letter obligation.
     not_joining_declared_at = models.DateTimeField(null=True, blank=True)
     not_joining_reason = models.CharField(max_length=300, blank=True)
     not_joining_was_late = models.BooleanField(default=False)
@@ -732,9 +720,7 @@ class PlacementRecord(TimeStampedModel, UserScopedModel):
                 fields=["user_id", "policy"], condition=Q(is_active=True),
                 name="one_active_placement_per_student_per_season",
             ),
-            # A campus placement came from an offer on a posting; an off-campus
-            # one has neither. Allowing both to be null on a campus record
-            # would make the source field a lie.
+            # Both null on a campus record would make the source field a lie.
             models.CheckConstraint(
                 condition=(
                     Q(source="campus", offer__isnull=False, posting__isnull=False)
@@ -815,8 +801,7 @@ class NotificationOutbox(TimeStampedModel):
     attempts = models.PositiveSmallIntegerField(default=0)
     last_error = models.CharField(max_length=300, blank=True)
     sent_at = models.DateTimeField(null=True, blank=True)
-    #: When a worker claimed this row. A crash between claiming and sending
-    #: would otherwise strand it in "sending" forever.
+    #: When a worker claimed it, so a crash cannot strand it in "sending".
     claimed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:

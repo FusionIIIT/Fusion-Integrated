@@ -54,9 +54,7 @@ class LoginView(APIView):
                 status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
         if not token:
-            # One message for both failure modes — no user enumeration. 401
-            # rather than the DomainError default of 422, so alerting on
-            # authentication failure rates can actually see it.
+            # One message for both modes (no enumeration), and 401 so alerting sees it.
             raise AuthFailed("Incorrect username or password.",
                              code="invalid_credentials")
         # The client holds this in memory and echoes it on every write.
@@ -98,7 +96,6 @@ class MeView(APIView):
                 granted_module_codes=p.modules,
                 permissions=p.permissions,
             ),
-            # Re-issued on every /me so a reloaded tab recovers it without a
-            # second round trip.
+            # Re-issued on every /me so a reloaded tab needs no second trip.
             "csrf_token": csrf.token_for(request.auth or ""),
         })

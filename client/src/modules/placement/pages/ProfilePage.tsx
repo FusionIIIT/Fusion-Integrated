@@ -24,8 +24,7 @@ export default function ProfilePage() {
   const [achievements, setAchievements] = useState<string[]>([]);
   const [certifications, setCertifications] = useState<string[]>([]);
 
-  // Seed the form once the server payload lands. Kept out of render so typing
-  // is never clobbered by a background refetch.
+  // Seeded outside render so a background refetch cannot clobber typing.
   useEffect(() => {
     if (!data || data.exists === false) return;
     setForm({

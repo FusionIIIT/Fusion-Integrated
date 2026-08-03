@@ -32,8 +32,7 @@ FRONTEND = ROOT / "client" / "src" / "modules" / "placement"
 
 SKIP_DIRS = {"__pycache__", "node_modules"}
 
-#: Listed as a count rather than file by file — they are numbered, sequential
-#: and carry no lesson individually.
+#: Counted rather than listed: numbered, sequential, no lesson individually.
 COLLAPSE = {"migrations"}
 
 #: One line per path, relative to the module root. Directories get an entry too.
@@ -376,8 +375,7 @@ def main() -> int:
               file=sys.stderr)
         return 1
 
-    # Fixed argv built from an allowlisted browser path; nothing here is
-    # user input.
+    # Fixed argv from an allowlisted browser path; no user input.
     subprocess.run(  # noqa: S603
         [chrome, "--headless", "--disable-gpu", "--no-pdf-header-footer",
          f"--print-to-pdf={OUT_PDF}", OUT_HTML.as_uri()],

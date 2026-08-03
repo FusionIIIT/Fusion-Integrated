@@ -88,8 +88,7 @@ def test_bad_credentials_do_not_reveal_whether_the_user_exists(stub_iam):
     b = APIClient().post("/api/v1/auth/login",
                          {"username": "nobody-at-all", "password": "wrong"},
                          format="json")
-    # 401: the credential was rejected. Not 422, which would say the REQUEST
-    # was malformed and makes an auth outage invisible to 4xx monitoring.
+    # 401, not 422: 422 would say the request was malformed and hide auth outages.
     assert a.status_code == b.status_code == 401
     assert a.json()["error"]["message"] == b.json()["error"]["message"]
     assert a.json()["error"]["code"] == "invalid_credentials"
@@ -100,8 +99,7 @@ def test_login_when_iam_is_down_is_503_not_401(stub_iam):
     fake.login_error = IamUnavailable("connection refused")
     r = APIClient().post("/api/v1/auth/login",
                          {"username": "a", "password": "b"}, format="json")
-    # 503, not 401: the credentials may be perfectly good — this is our problem,
-    # and telling the user to re-login would be a lie.
+    # 503, not 401: the credentials may be fine and the problem is ours.
     assert r.status_code == 503
     assert r.json()["error"]["code"] == "iam_unavailable"
 

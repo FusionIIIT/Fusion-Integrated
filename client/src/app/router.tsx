@@ -12,8 +12,7 @@ import LoginPage from "./LoginPage";
 import { MODULE_REGISTRY } from "./registry";
 import { Dashboard, NotFound, Shell } from "./Shell";
 
-// The recruiter portal is a separate audience with a separate credential, so
-// none of it belongs in the bundle an institute user downloads.
+// A separate audience and credential, so none of it enters the institute bundle.
 const RecruiterLoginPage = lazy(() => import("../recruiter/RecruiterLoginPage"));
 const AcceptInvitePage = lazy(() => import("../recruiter/AcceptInvitePage"));
 const RecruiterPostings = lazy(
@@ -105,8 +104,7 @@ export function AppRoutes() {
   const { session } = useAuth();
   const { routes: moduleRoutes, ready } = useModuleRoutes(session?.modules ?? []);
 
-  // Held back until the granted modules register, or a deep link flashes
-  // NotFound before the real page.
+  // Held back until granted modules register, or a deep link flashes NotFound.
   const authedChildren: RouteObject[] = [
     { index: true, element: <Dashboard /> },
     { path: "dashboard", element: <Dashboard /> },

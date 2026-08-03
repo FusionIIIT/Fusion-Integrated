@@ -14,8 +14,7 @@ P_MANAGE = "placement_cell.job_posting.manage"
 
 EDITABLE = ("title", "kind", "description", "location", "ctc_lpa", "stipend_pm",
             "bond_months", "seats", "opens_at", "closes_at", "eligibility_rule",
-            # Policy rule 7. Declared by the Placement Cell per company; a
-            # Dream Slot opens the process to placed students too.
+            # Rule 7: a Dream Slot opens the process to placed students too.
             "is_dream_slot", "dream_slot_note")
 
 
@@ -70,8 +69,7 @@ def update(*, posting_id: int, actor, scope=None, **fields) -> JobPosting:
         raise NotFoundError("No such posting.")
 
     if posting.eligibility_rule_locked_at and "eligibility_rule" in fields:
-        # PC-BR-002 in spirit: criteria cannot move under people who already
-        # applied against them.
+        # PC-BR-002: criteria cannot move under people who already applied.
         raise ConflictError(
             "Eligibility criteria are frozen once the posting is published.",
             code="eligibility_rule_locked")
@@ -107,8 +105,7 @@ def publish(*, posting_id: int, actor, scope=None) -> JobPosting:
         raise ConflictError("This company is not approved for recruitment yet.",
                             code="company_not_approved")
 
-    # PC-BR-003, checked here with a useful message. The same rule is a CHECK
-    # constraint on the table, so a direct UPDATE cannot get around it either.
+    # PC-BR-003, also a CHECK constraint, so a direct UPDATE cannot bypass it.
     missing = []
     if not (posting.description or "").strip():
         missing.append("description")

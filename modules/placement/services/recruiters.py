@@ -169,9 +169,7 @@ def sign_in(*, email: str, password: str, ip: str | None = None) -> RecruiterSes
 
     RecruiterLoginAttempt.objects.create(email=email, ip=ip, outcome="success")
 
-    # Only the digest is stored. The raw value goes out in the cookie and is
-    # never recoverable from the table, so a dump yields no live session — the
-    # lookup is by digest and costs one sha256.
+    # Only the digest is stored, so a dump of this table yields no live session.
     raw = make_session_key()
     session = RecruiterSession.objects.create(
         key=hash_token(raw), account=account, ip=ip,

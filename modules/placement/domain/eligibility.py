@@ -12,8 +12,7 @@ from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
-# The closed vocabulary of PC-BR-004. Enumerated, so an unknown field DENIES
-# rather than being quietly ignored. No fact here is student-declared.
+# PC-BR-004's closed vocabulary: an unknown field denies rather than being ignored.
 FIELDS = {
     "cpi", "earned_credits", "active_backlogs", "semester",   # IAM projection
     "programme", "discipline", "batch_year",                  # IAM directory
@@ -21,8 +20,7 @@ FIELDS = {
     "skills", "profile_complete",                             # own profile
 }
 
-# List-valued facts. `in`/`eq` against these would be a silent mistake, so they
-# are only comparable with the set operators.
+# List-valued facts, comparable only with the set operators.
 LIST_FIELDS = {"skills"}
 LIST_OPS = {"has_all", "has_any", "has_none"}
 
@@ -80,8 +78,7 @@ def _compare_list(op: str, field: str, expected, actual) -> RuleOutcome:
 
 
 def _compare(op: str, field: str, expected, actual) -> RuleOutcome:
-    # A rule-authoring mistake, not a student problem — but it still denies,
-    # because guessing what was meant is how someone becomes eligible by accident.
+    # A rule-authoring mistake still denies: guessing is how someone slips through.
     if (field in LIST_FIELDS) != (op in LIST_OPS):
         return RuleOutcome(field, op, expected, actual, False, "operator_not_valid_for_field")
     if op in LIST_OPS:
@@ -155,8 +152,7 @@ def evaluate(rule: dict | None, facts: dict, _depth: int = 0) -> Outcome:
         return Outcome(False, [], "evaluation_error")          # malformed = deny
 
 
-# Human-readable reasons. A student told only "not eligible" opens a support
-# ticket, so every denial carries the actual value and the required one.
+# Every denial carries the actual value and the required one, not just "no".
 LABELS = {
     "cpi": "CPI", "earned_credits": "earned credits",
     "active_backlogs": "active backlogs", "semester": "semester",
@@ -193,8 +189,7 @@ def describe(outcome: RuleOutcome) -> str:
     return f"{label} is {outcome.actual} — this posting needs {phrase} {outcome.required}."
 
 
-#: The RULE is broken, not the student. Never render these as a personal
-#: shortfall — a typo in the posting must not read as the student's failing.
+#: The rule is broken, not the student; never render these as a personal shortfall.
 STRUCTURAL_ERRORS = {"unknown_field", "rule_too_complex", "evaluation_error"}
 
 

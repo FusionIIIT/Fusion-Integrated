@@ -39,8 +39,7 @@ def academic_facts(user_ids: Sequence[int]) -> dict[int, dict]:
     try:
         rows = get_client().get_academic_standings(ids)
     except IamUnavailable as exc:
-        # Callers surface this as a 503. Guessing would either pass everyone
-        # or freeze "ineligible" into a stored snapshot.
+        # Surfaced as a 503; guessing would freeze a wrong verdict into a snapshot.
         log.warning("placement.facts.iam_unavailable n=%d err=%s", len(ids), exc)
         raise
 

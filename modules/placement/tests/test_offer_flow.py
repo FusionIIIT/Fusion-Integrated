@@ -70,8 +70,7 @@ def make_world(discipline="CSE"):
     PlacementRegistration.objects.create(policy=policy, user_id=STUDENT,
                                          status="registered",
                                          registered_at=timezone.now())
-    # The stub captures its users at install time, so re-install — otherwise
-    # every "Core" test silently runs as CSE.
+    # The stub captures users at install time; without re-install, Core runs as CSE.
     _SET_DISCIPLINE["fn"](discipline)
     return policy
 

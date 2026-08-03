@@ -154,8 +154,7 @@ class StudentProfileSerializer(serializers.ModelSerializer):
                   "projects", "education", "github_url", "linkedin_url",
                   "portfolio_url", "completeness_percent", "is_complete",
                   "missing_fields", "documents", "updated_at")
-        # Computed, never accepted. There is deliberately no CPI field at all:
-        # academic data is owned by the ERP.
+        # Computed, never accepted: academic data is owned by the ERP.
         read_only_fields = ("user_id", "completeness_percent", "is_complete",
                             "missing_fields", "documents", "updated_at")
 
@@ -337,8 +336,7 @@ class SeasonSerializer(serializers.ModelSerializer):
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
-    #: The season code, so a client can match a registration to a season
-    #: without resolving the policy id.
+    #: The season code, so a client need not resolve the policy id.
     season = serializers.CharField(source="policy.season", read_only=True)
 
     class Meta:
@@ -714,8 +712,7 @@ class TransitionEntrySerializer(serializers.Serializer):
 
 class TransitionHistorySerializer(serializers.Serializer):
     application_id = serializers.IntegerField()
-    #: True when reasons and actor identities were withheld, so a client can
-    #: say so rather than implying the trail is empty.
+    #: True when reasons and actors were withheld, so the UI can say so.
     redacted = serializers.BooleanField()
     results = TransitionEntrySerializer(many=True)
 

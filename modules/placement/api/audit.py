@@ -48,8 +48,7 @@ class ApplicationHistoryView(APIView):
 
     def get(self, request, pk):
         actor = _actor(request)
-        # Scoped exactly like every other read of an application, so someone
-        # else's history is absent rather than forbidden.
+        # Scoped like every other read, so a foreign history is absent, not forbidden.
         application = scoping.applications_for(actor).filter(pk=pk).first()
         if application is None:
             raise NotFoundError("No such application.")

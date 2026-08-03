@@ -73,8 +73,7 @@ export default function AnnouncementsPage() {
         {rows.map((a) => (
           <Card
             key={a.id} padding="lg" withBorder
-            // History is kept forever, so a withdrawn notice stays visible to
-            // staff — greyed out, and clearly marked so nobody acts on it.
+            // Withdrawn notices stay visible to staff, marked so nobody acts on them.
             style={a.is_withdrawn ? { opacity: 0.6 } : undefined}
           >
             <Group justify="space-between" align="flex-start" wrap="nowrap">

@@ -41,8 +41,7 @@ class TestDelivery:
         assert len(mail.outbox) == 1
         assert mail.outbox[0].subject == "Subject"
 
-        # Re-running must not re-send. This is the property that makes the
-        # worker safe on a cron with overlapping runs.
+        # Re-running must not re-send; this is what makes overlapping runs safe.
         assert notifications.deliver_pending().sent == 0
         assert len(mail.outbox) == 1
 

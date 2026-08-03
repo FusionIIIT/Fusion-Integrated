@@ -20,8 +20,7 @@ from modules.placement.models import (
     PlacementStatsSnapshot,
 )
 
-#: Suppress a cell below this many placements — with 3 students in a
-#: discipline, "median CTC" identifies individuals.
+#: Below this many placements, a "median CTC" identifies individuals.
 MIN_CELL = 5
 
 
@@ -123,8 +122,7 @@ def student_view(*, season: str) -> dict:
         "companies_participated": overall.companies_participated,
         "median_ctc": str(overall.median_ctc) if overall.median_ctc else None,
         "max_ctc": str(overall.max_ctc) if overall.max_ctc else None,
-        # Deliberately absent: mean CTC (with max, it identifies the outlier)
-        # and any per-discipline split.
+        # Mean CTC and per-discipline splits are absent: they identify outliers.
         "companies": companies,
         "computed_at": overall.computed_at.isoformat(),
     }

@@ -64,8 +64,7 @@ export function DataTable<T>({
 
   function toggleAll() {
     if (!selection) return;
-    // Only ever touches the rows on screen, so changing a filter cannot
-    // silently drop a selection made elsewhere.
+    // Only the rows on screen, so a filter change cannot drop a selection.
     const next = new Set(selection.selected);
     for (const row of selectable) {
       if (allSelected) next.delete(rowKey(row));

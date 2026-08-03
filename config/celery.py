@@ -14,8 +14,6 @@ app = Celery("fusion_integrated")
 app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
-# Each module owns its own timers; this only merges them. A module that is not
-# installed contributes nothing, which is what keeps them independently
-# removable.
+# Each module owns its timers; this only merges them, so modules stay removable.
 app.conf.beat_schedule = {**PLACEMENT_SCHEDULE}
 app.conf.task_routes = {**PLACEMENT_ROUTES}

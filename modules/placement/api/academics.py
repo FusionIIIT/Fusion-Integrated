@@ -36,8 +36,7 @@ class AcademicDirectoryView(APIView):
     permission_classes = [MODULE, HasPermission(P_VIEW_DIRECTORY)]
 
     def get(self, request):
-        # The permission class already refused a recruiter, but this is the
-        # one endpoint where a mistake exposes the whole cohort.
+        # Explicit because a slip here exposes the whole cohort, not because the gate is unsure.
         if getattr(request.principal, "kind", None) == "recruiter" \
                 or not scoping.is_staff(request.principal):
             return Response({"detail": "Not available."},

@@ -25,13 +25,11 @@ OFFER_EXPIRED = "offer_expired"
 TERMINAL = frozenset({REJECTED, WITHDRAWN, AUTO_WITHDRAWN, OFFER_ACCEPTED,
                       OFFER_DECLINED, OFFER_EXPIRED})
 
-#: States in which a student is still "in the running" for a posting. Used by
-#: the auto-withdraw sweep when they accept an offer elsewhere.
+#: Still in the running, so the auto-withdraw sweep knows what to close.
 IN_FLIGHT = frozenset({DRAFT, SUBMITTED, UNDER_REVIEW, SHORTLISTED,
                        INTERVIEW_SCHEDULED, SELECTED, OFFER_ISSUED})
 
-# Who may drive an edge. Explicit per transition rather than inferred from a
-# permission string, because a recruiter is an outsider.
+# Explicit per transition rather than inferred, because a recruiter is an outsider.
 STUDENT = "student"
 STAFF = "staff"           # TPO / placement chairman, via IAM permissions
 RECRUITER = "recruiter"   # a company's own account, scoped to its postings

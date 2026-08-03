@@ -23,9 +23,7 @@ from modules.placement.models import RecruiterSession
 SESSION_TTL_HOURS = 8
 TOUCH_EVERY = timedelta(minutes=1)
 
-# httpOnly, and a different name from the institute session so the two can
-# never be confused. The portal never holds a bearer token in JS-readable
-# storage. Path-scoped to the API, not "/".
+# httpOnly, path-scoped, and named apart from the institute session.
 COOKIE_NAME = "recruiter_session"
 COOKIE_PATH = "/api/v1/placement"
 
@@ -59,8 +57,7 @@ class RecruiterPrincipal:
     roles: tuple[str, ...] = ("recruiter",)
     permissions: frozenset[str] = field(default_factory=frozenset)
 
-    # A recruiter holds exactly one module and nothing else. Hard-coded rather
-    # than granted, so no data change can widen it.
+    # Hard-coded, not granted, so no data change can widen a recruiter's reach.
     modules: tuple[str, ...] = ("placement_cell",)
 
     def has_permission(self, code: str) -> bool:
@@ -86,8 +83,7 @@ class RecruiterAuthentication(BaseAuthentication):
         if header.startswith(self.keyword + " "):
             raw = header[len(self.keyword) + 1:].strip()
         elif header:
-            # Another scheme is in play. Decline rather than fall back to our
-            # cookie, so a request cannot authenticate as two principals.
+            # Decline rather than fall back, so one request is never two principals.
             return None
         else:
             raw = request.COOKIES.get(COOKIE_NAME, "")
@@ -103,8 +99,7 @@ class RecruiterAuthentication(BaseAuthentication):
         if session.expires_at <= timezone.now():
             raise AuthenticationFailed("Invalid or expired session.")
 
-        # Re-checked per request: deactivation must take effect immediately,
-        # not at the end of an eight-hour session.
+        # Re-checked per request, so deactivation takes effect immediately.
         account = session.account
         if not account.is_active:
             raise AuthenticationFailed("Invalid or expired session.")
@@ -119,8 +114,7 @@ class RecruiterAuthentication(BaseAuthentication):
         if from_cookie:
             csrf.require(request, raw)
 
-        # Downstream code reads request.principal without caring which pool
-        # the caller came from.
+        # Downstream code reads request.principal without knowing the pool.
         principal = RecruiterPrincipal(
             account_id=account.pk, company_id=account.company_id,
             email=account.email, display_name=account.full_name or account.email,

@@ -196,8 +196,7 @@ class PostingEligibilityView(_Scoped, APIView):
 
 # -- Applications --------------------------------------------------------------
 class ApplicationListView(_Scoped, generics.ListAPIView):
-    # A recruiter reaches this too; they are authorised by the company-scoped
-    # queryset rather than by a permission code. See api/permissions.py.
+    # A recruiter is authorised by the company-scoped queryset, not by a code.
     permission_classes = [MODULE, ScopedCollection(P_VIEW_APPS, P_VIEW_SELF)]
 
     def get_serializer_class(self):
@@ -223,8 +222,7 @@ class ApplicationListView(_Scoped, generics.ListAPIView):
         page = self.paginate_queryset(queryset)
         rows = page if page is not None else list(queryset)
 
-        # One batched directory call for the page. A student reading their
-        # own list needs no names, so no call is made.
+        # One batched directory call per page, and none for a student's own list.
         context = {"actor": actor, "view": self, "request": request}
         if scoping.is_staff(actor) or getattr(actor, "kind", None) == "recruiter":
             context["people"] = directory.get_users([a.user_id for a in rows])
@@ -390,8 +388,7 @@ class CompanyApprovalView(_Scoped, APIView):
     permission_classes = [MODULE, HasPermission(P_MANAGE_COMPANIES)]
 
     @extend_schema(
-        # Distinct from the company-create POST, which generates the same
-        # operationId otherwise.
+        # Distinct from the company-create POST, which collides on operationId.
         operation_id="placement_company_decide",
         request=s.ApprovalSerializer, responses=s.CompanySerializer)
     def post(self, request, pk, action):
@@ -653,8 +650,7 @@ class RecruiterLogoutView(_Scoped, APIView):
                else request.COOKIES.get(RECRUITER_COOKIE, ""))
         if key:
             recruiter_service.sign_out(session_key=key)
-        # Already revoked server-side; this stops a shared browser
-        # presenting a dead credential.
+        # Already revoked server-side; this clears it from a shared browser.
         response = Response({"detail": "Signed out."})
         response.delete_cookie(RECRUITER_COOKIE, path=RECRUITER_COOKIE_PATH)
         return response

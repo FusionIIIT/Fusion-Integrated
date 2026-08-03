@@ -45,8 +45,7 @@ class Recommendation:
     sanction: Sanction
     rule: str
     message: str
-    #: False wherever the policy says "may be" or leaves it to the Chairperson,
-    #: which is everywhere. Kept explicit so no caller reads this as automatic.
+    #: False wherever the policy says "may be", so nothing reads as automatic.
     automatic: bool = False
 
 

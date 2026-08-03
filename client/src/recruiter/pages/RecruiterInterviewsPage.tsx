@@ -122,8 +122,7 @@ function ScheduleModal({ opened, onClose }: {
   const [capacity, setCapacity] = useState<number | string>("");
   const [instructions, setInstructions] = useState("");
 
-  // Online needs a link, offline needs a venue — a round nobody can attend is
-  // not a round. The database enforces this too.
+  // Online needs a link, offline a venue; the database enforces this too.
   const locationOk = mode === "online" ? url.trim() !== "" : venue.trim() !== "";
 
   return (
@@ -205,8 +204,7 @@ function AddCandidatesModal({ round, onClose }: {
   round: InterviewRound | null; onClose: () => void;
 }) {
   const add = useAddMyCandidates();
-  // Only shortlisted candidates for THIS round's role. Both filters matter:
-  // the server rejects a candidate who did not apply to the posting.
+  // Both filters matter: the server rejects a candidate from another posting.
   const { data } = useMyApplicants(
     round ? { posting: round.posting, status: "shortlisted" } : undefined);
   const [picked, setPicked] = useState<number[]>([]);

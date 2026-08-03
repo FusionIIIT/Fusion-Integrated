@@ -66,8 +66,7 @@ def add_candidates(*, round_id: int, application_ids: list[int], actor,
     apps = list(apps_qs.filter(pk__in=application_ids,
                                posting_id=round_.posting_id))
     if len(apps) != len(set(application_ids)):
-        # Silently scheduling the subset the caller happens to be allowed to
-        # touch would hide a mistake; say so instead.
+        # Scheduling only the allowed subset would hide a mistake; say so instead.
         raise ConflictError(
             "Some applications are not available for this posting.",
             code="applications_out_of_scope",

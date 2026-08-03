@@ -121,8 +121,7 @@ def issue(*, application_id: int, actor, ctc_lpa=None, tier_rank=None,
 
     policy = _policy_for(posting.placement_year)
     if respond_by is None:
-        # PC-BR-013: always a deadline. Without one the offer never expires
-        # and blocks the student's pool forever.
+        # PC-BR-013: without a deadline the offer never expires and blocks the pool.
         respond_by = timezone.now() + timedelta(
             hours=policy.default_offer_response_hours)
     if respond_by <= timezone.now():
@@ -183,8 +182,7 @@ def _decide_and_apply(*, offer_id: int, accept: bool, actor):
     The registration row is locked for the whole block: every acceptance for a
     student contends on the same row, so two tabs cannot both read "0 held".
     """
-    # Scoped by user_id in the query, so someone else's offer is not found
-    # rather than found-and-refused.
+    # Scoped by user_id, so another's offer is not found rather than refused.
     offer = (Offer.objects.select_for_update()
              .select_related("application", "posting", "posting__company")
              .filter(pk=offer_id, user_id=actor.user_id).first())

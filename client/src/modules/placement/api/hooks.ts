@@ -142,8 +142,7 @@ export function useOffers() {
   return useQuery({
     queryKey: keys.offers(),
     queryFn: async () => (await http.get<Page<Offer>>("/placement/offers")).data,
-    // Short, because a deadline is ticking and an expired offer must not keep
-    // rendering an enabled Accept button.
+    // Short: an expired offer must not keep rendering an enabled Accept button.
     staleTime: 10_000,
   });
 }

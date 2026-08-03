@@ -24,8 +24,7 @@ export function EligibilityPanel({ verdict, isPending, error }: {
     );
   }
 
-  // A 503 means the IAM could not be reached, so the academic standing is
-  // unknown. Saying "not eligible" here would be a lie the student acts on.
+  // On a 503 the standing is unknown; "not eligible" would be a lie acted on.
   if ((error as AxiosError)?.response?.status === 503) {
     return (
       <Alert

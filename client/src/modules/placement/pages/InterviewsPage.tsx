@@ -109,8 +109,7 @@ function ScheduleModal({ opened, onClose }: {
   const [capacity, setCapacity] = useState<number | string>("");
   const [instructions, setInstructions] = useState("");
 
-  // A round nobody can attend is not a round: online needs a link, offline
-  // needs a venue. The database enforces this too.
+  // Online needs a link, offline a venue; the database enforces this too.
   const locationOk = mode === "online" ? url.trim() !== "" : venue.trim() !== "";
 
   return (

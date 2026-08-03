@@ -32,10 +32,7 @@ P_VIEW_ALL = "placement_cell.application.view"
 P_MANAGE_POSTINGS = "placement_cell.job_posting.manage"
 P_VIEW_REPORTS = "placement_cell.report.view"
 
-# Any of these makes someone staff for scoping. Checking only
-# `application.view` would leave a TPO holding just `application.review`
-# seeing nothing but their own row. `application.view_self` is the student
-# grant and is deliberately absent.
+# Any of these makes someone staff; view_self is the student grant and absent.
 STAFF_SCOPE_PERMISSIONS = (
     P_VIEW_ALL,
     "placement_cell.application.review",
@@ -98,8 +95,7 @@ def postings_for(actor) -> QuerySet[JobPosting]:
     if _is_alumni(actor):
         return base.filter(status="published")
 
-    # A draft must not be discoverable: its CTC and eligibility bar are
-    # commercially sensitive before the company agrees to publish.
+    # A draft's CTC and bar are commercially sensitive before publication.
     return base.filter(status__in=("published", "closed", "in_progress",
                                    "completed"))
 
@@ -109,9 +105,7 @@ def applications_for(actor) -> QuerySet[Application]:
     base = Application.objects.select_related("posting", "posting__company")
 
     if _is_recruiter(actor):
-        # PC-BR-009, filtered on the POSTING's company so a guessed
-        # application id reaches nothing. Drafts are excluded too — an
-        # unsubmitted application is not the company's business.
+        # PC-BR-009: filtered on the posting's company, drafts excluded.
         return (base.filter(posting__company_id=actor.company_id)
                 .exclude(status="draft"))
 
@@ -144,8 +138,7 @@ def interview_rounds_for(actor) -> QuerySet[InterviewRound]:
         return base.none()
     if _sees_everything(actor):
         return base
-    # Only rounds they are scheduled into — the full calendar leaks the
-    # shortlist.
+    # Only rounds they are scheduled into; the full calendar leaks the shortlist.
     own = _own_id(actor)
     if own is None:
         return base.none()

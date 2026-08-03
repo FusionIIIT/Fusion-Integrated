@@ -68,8 +68,7 @@ def main() -> int:
             f"item — the page is unreachable from the sidebar"
             for orphan in sorted(routes - nav_paths - EXEMPT_ROUTES))
 
-        # A nav item guarded by a permission nobody can hold is invisible
-        # forever, which looks identical to a bug.
+        # A nav item guarded by an unholdable permission is invisible forever.
         known = {code for code, _ in getattr(registry, "PERMISSIONS", [])}
         if known:
             for item in registry.NAV_ITEMS:

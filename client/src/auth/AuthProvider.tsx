@@ -69,8 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       status: isPending ? "loading"
         : isError ? "unavailable"
         : session ? "authenticated" : "anonymous",
-      // UX only. Every one of these has a server-side counterpart; hiding a
-      // button is not an authorization control.
+      // UX only: every one of these has a server-side counterpart.
       can: (p) => perms.has(p),
       hasModule: (m) => mods.has(m),
       logout,

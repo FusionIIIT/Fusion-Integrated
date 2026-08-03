@@ -11,8 +11,7 @@ MODULE = {
 }
 
 NAV_ITEMS = [
-    # -- student -----------------------------------------------------------
-    # First, because rule 1 makes it the gate on everything below it.
+    # -- student: registration first, because rule 1 gates everything below ---
     {"code": "placement.registration", "label": "Season Registration",
      "icon": "FaClipboardCheck", "to": "/placement/registration",
      "required_permission": "placement_cell.registration.self",
@@ -60,9 +59,7 @@ NAV_ITEMS = [
      "required_permission": "placement_cell.report.view", "sort_order": 90},
 ]
 
-#: Every permission this module recognises. Seeded into the IAM and used by the
-#: permission-catalogue check, so a view cannot guard on a code that nobody can
-#: ever be granted — a typo there would otherwise lock an endpoint forever.
+#: Every permission this module recognises; ROLE_GRANTS below says who holds each.
 PERMISSIONS = [
     ("placement_cell.job_posting.view", "See job postings"),
     ("placement_cell.job_posting.manage", "Create and publish postings"),

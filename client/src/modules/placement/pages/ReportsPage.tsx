@@ -132,8 +132,7 @@ export default function ReportsPage() {
   if (error) return <Container size="lg"><ErrorState error={error} /></Container>;
   if (isPending) return <Container size="lg"><Text c="dimmed">Loading…</Text></Container>;
 
-  // Too few placements to publish safely. An "anonymous" aggregate over a
-  // handful of people is not anonymous, so the server suppresses it entirely.
+  // An aggregate over a handful of people is not anonymous; the server suppresses it.
   if (data && data.available === false) {
     return (
       <Container size="lg">

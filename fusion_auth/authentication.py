@@ -18,8 +18,7 @@ class IamSessionAuthentication(BaseAuthentication):
     keyword = "Token"
 
     def authenticate(self, request):
-        # Forwarded as a header, not by replaying our cookie: the IAM names
-        # its cookie differently.
+        # Forwarded as a header: the IAM names its cookie differently.
         token = self._token_from(request)
         # Only a cookie is ambient, so only a cookie needs the CSRF check.
         from_cookie = token is None
@@ -30,8 +29,7 @@ class IamSessionAuthentication(BaseAuthentication):
         try:
             session = get_client().resolve_session(auth_token=token)
         except IamUnavailable as exc:
-            # Fail closed, but say why — a 503 is honest, a 401 would send the
-            # user to re-login for a problem that is not theirs.
+            # Fail closed but honestly: a 401 would blame the user for our outage.
             raise AuthenticationFailed(
                 f"Identity service unavailable: {exc}"
             ) from exc

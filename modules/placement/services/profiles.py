@@ -77,8 +77,7 @@ def build_resume(*, user_id: int, standing: dict | None = None) -> dict:
         },
         "headline": profile.headline,
         "about": profile.about,
-        # Rendered as "8.1 · Sem 5 (Odd)" — a CPI without its provenance is
-        # what starts the "my CPI is wrong" support queue.
+        # Rendered with its provenance; a bare CPI starts the support queue.
         "academic": standing or None,
         "skills": profile.skills,
         "education": profile.education,

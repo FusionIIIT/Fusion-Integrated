@@ -53,8 +53,7 @@ class _StaffExport(APIView):
     })
     def get(self, request):
         actor = _actor(request)
-        # The permission class already refuses a recruiter, who holds no codes
-        # at all — but this is bulk personal data, so the check is explicit.
+        # Explicit because this is bulk personal data, not because the gate is unsure.
         if getattr(actor, "kind", None) == "recruiter" or not scoping.is_staff(actor):
             return Response({"detail": "Not available."},
                             status=status.HTTP_403_FORBIDDEN)

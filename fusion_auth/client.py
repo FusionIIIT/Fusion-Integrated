@@ -78,8 +78,7 @@ class IamClient:
         if auth_token:
             headers["Authorization"] = f"Token {auth_token}"     # as the person
         elif self.token:
-            # As the service. A separate scheme so the IAM cannot mistake a
-            # machine for a person — see iam/authentication.py.
+            # As the service: a separate scheme, so a machine is never a person.
             headers["Authorization"] = f"Service {self.token}"
         try:
             r = requests.get(self._url(path), params=params, headers=headers,
@@ -158,8 +157,7 @@ class IamClient:
             raise IamUnavailable("IAM returned a non-JSON body") from exc
 
     def logout(self, auth_token: str) -> None:
-        # Best effort: our own cookie is cleared either way, and a failure
-        # here must not stop someone signing out.
+        # Best effort: a failure here must not stop someone signing out.
         with contextlib.suppress(requests.RequestException):
             requests.post(self._url("iam/v1/auth/logout"),
                           headers={"Authorization": f"Token {auth_token}"},

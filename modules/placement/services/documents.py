@@ -49,8 +49,7 @@ def attach_link(*, user_id: int, kind: str, url: str,
         return existing        # submitted twice, not two documents
 
     if kind == "resume":
-        # Deactivated, not deleted: an application points at what it was
-        # submitted with.
+        # Deactivated, not deleted: an application points at what it was sent with.
         ProfileDocument.objects.filter(
             profile=profile, kind="resume", is_active=True
         ).update(is_active=False)

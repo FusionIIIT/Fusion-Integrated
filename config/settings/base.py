@@ -62,8 +62,7 @@ SECRET_KEY = env("DJANGO_SECRET_KEY", "django-insecure-dev-only-change-me")
 DEBUG = False
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", ["localhost", "127.0.0.1"])
 
-# django.contrib.auth is installed because DRF needs it, but this service
-# never authenticates against it — fusion_auth does, against the IAM.
+# django.contrib.auth is here because DRF needs it; fusion_auth authenticates.
 DJANGO_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.auth",
@@ -77,8 +76,7 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
 ]
 
-# Each module is an independent Django app with its own tables, migrations
-# and public contract.
+# Each module is an independent Django app: own tables, migrations and contract.
 PLATFORM_MODULES = [
     "modules.directory",         # who people are, projected from IAM
     "modules.accesscontrol",     # which modules a role may enter
@@ -100,9 +98,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# No CsrfViewMiddleware: it assumes Django sessions and HTML forms, neither of
-# which exist here. core/api/csrf.py does the job from inside the
-# authentication classes. security.W003 cannot see that, hence the silence.
+# No CsrfViewMiddleware: core/api/csrf.py does it from the authentication classes.
 
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
@@ -116,8 +112,7 @@ TEMPLATES = [
     }
 ]
 
-# One database, owned entirely by this service. No ERP connection, no user
-# table — a module that needs to know about a person asks modules.directory.
+# One database, owned by this service; person data comes from modules.directory.
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -126,8 +121,7 @@ DATABASES = {
         "PASSWORD": env("DB_PASSWORD", ""),
         "HOST": env("DB_HOST", "127.0.0.1"),
         "PORT": env("DB_PORT", "5432"),
-        # MUST stay 0 under PgBouncer transaction pooling: persistent
-        # connections would leak session state between requests.
+        # MUST stay 0 under PgBouncer transaction pooling, which leaks session state.
         "CONN_MAX_AGE": env_int("DB_CONN_MAX_AGE", 0),
     }
 }
@@ -178,9 +172,7 @@ NOTIFY_MAX_ATTEMPTS = env_int("NOTIFY_MAX_ATTEMPTS", 5)
 #: A dozen events a day is legitimate during a drive; thirty is a bug.
 NOTIFY_DAILY_CAP_PER_RECIPIENT = env_int("NOTIFY_DAILY_CAP_PER_RECIPIENT", 20)
 
-#: Documents attached BEFORE the move to Drive links. Nothing writes here now,
-#: but the rows pointing at it are still served. Outside BASE_DIR on purpose —
-#: `check_upload_root` fails the boot otherwise.
+#: Pre-Drive uploads, still served but never written; outside BASE_DIR or boot fails.
 PLACEMENT_UPLOAD_ROOT = env(
     "PLACEMENT_UPLOAD_ROOT",
     str(Path.home() / ".local" / "share" / "fusion-integrated" / "uploads"))
@@ -203,14 +195,11 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "core.api.exceptions.exception_handler",
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "UNAUTHENTICATED_USER": None,
-    # Unset, DRF keys anonymous throttles on the whole client-controlled
-    # X-Forwarded-For, so rotating it buys unlimited login attempts.
+    # Unset, DRF throttles on the whole client-controlled X-Forwarded-For.
     "NUM_PROXIES": env_int("DJANGO_NUM_PROXIES", 1),
-    # NOT DRF's ScopedRateThrottle: it identifies callers by `request.user.pk`
-    # and there is no Django user here, so it 500s on every throttled endpoint.
+    # Not DRF's ScopedRateThrottle: it keys on request.user.pk, absent here.
     "DEFAULT_THROTTLE_CLASSES": ["core.api.throttling.PrincipalScopedThrottle"],
-    # Only endpoints that opt in via `throttle_scope` are limited. Recruiter
-    # login is the one reachable by an unauthenticated outsider.
+    # Only endpoints opting in via `throttle_scope` are limited.
     "DEFAULT_THROTTLE_RATES": {
         "recruiter_login": "5/min",
         "recruiter_invite_accept": "10/hour",
@@ -220,8 +209,7 @@ REST_FRAMEWORK = {
     },
 }
 
-# Recruiter passwords are the only credentials stored here. PBKDF2 is retained
-# so an older hash still verifies, and is upgraded on next login.
+# Recruiter passwords only; PBKDF2 verifies an older hash, then upgrades it.
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.Argon2PasswordHasher",
     "django.contrib.auth.hashers.PBKDF2PasswordHasher",
@@ -240,8 +228,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Asia/Kolkata"
-# Declared after TIME_ZONE, which it reads: a crontab entry would otherwise
-# fire at the wrong local hour.
+# After TIME_ZONE, which it reads, or a crontab entry fires at the wrong hour.
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_ENABLE_UTC = True
 USE_I18N = True

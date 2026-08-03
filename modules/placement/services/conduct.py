@@ -136,8 +136,6 @@ def apply_sanction(*, season: str, user_id: int, sanction: str, rule: str,
     registration.debarred_reason = reason.strip()[:300]
 
     # Only a season-wide or permanent bar changes the registration's status.
-    # Rule 19's first tier leaves the student registered and merely skips two
-    # drives, and rule 21's de-registration is its own state.
     if chosen in (conduct.Sanction.BAR_SEASON, conduct.Sanction.BAR_PERMANENT):
         registration.status = "debarred"
     elif chosen is conduct.Sanction.DEREGISTER:
@@ -204,8 +202,7 @@ def bars_posting(registration: PlacementRegistration,
     if sanction is not conduct.Sanction.BAR_NEXT_TWO:
         return False
 
-    # "the NEXT two": a drive already open when the sanction landed is not one
-    # of them, so a sanction is never retroactive.
+    # "the NEXT two": a drive already open is not one, so this is never retroactive.
     if (posting.published_at is None
             or posting.published_at <= registration.sanctioned_at):
         return False

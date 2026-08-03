@@ -60,9 +60,7 @@ def enqueue_many(rows: list[dict]) -> int:
     return sum(1 for r in rows if enqueue(**r) is not None)
 
 
-# -- Delivery — runs outside the request cycle and never raises into a caller. ---
-# "Expand to an audience at send time". Fanning out at enqueue time would put
-# thousands of inserts inside the publisher's transaction.
+# -- Delivery: outside the request cycle, audiences expanded at send time -------
 BROADCAST_SENTINEL = "placement-broadcast@invalid"
 
 
@@ -96,8 +94,7 @@ def _sent_today(recipient_user_id: int | None, now) -> int:
         sent_at__gte=since).count()
 
 
-#: A row claimed but not resolved within this window is assumed to belong to a
-#: worker that died, and is returned to the queue.
+#: A row unresolved this long is assumed orphaned and returned to the queue.
 CLAIM_TIMEOUT = timedelta(minutes=10)
 
 
@@ -205,8 +202,7 @@ def _fail(row: NotificationOutbox, error: str, max_attempts: int) -> None:
         log.warning("placement.notify.giving_up id=%s topic=%s err=%s",
                     row.pk, row.topic, error)
     else:
-        # Back to the queue explicitly: a claimed row would otherwise sit in
-        # "sending" until the reclaim sweep noticed it.
+        # Back to the queue explicitly, or it sits in "sending" until the sweep.
         row.status = "pending"
     row.claimed_at = None
     row.save(update_fields=["attempts", "last_error", "status", "claimed_at",

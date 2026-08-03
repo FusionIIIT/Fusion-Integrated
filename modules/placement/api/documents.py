@@ -85,8 +85,7 @@ class DocumentDownloadView(APIView):
     def get(self, request, pk):
         actor = _actor(request)
 
-        # Narrow from who they may see at all, so a foreign document is
-        # absent rather than forbidden.
+        # Narrowed by queryset, so a foreign document is absent, not forbidden.
         readable_user_ids = scoping.profiles_for(actor).values("user_id")
         document = (ProfileDocument.objects
                     .filter(pk=pk, is_active=True,
@@ -96,8 +95,7 @@ class DocumentDownloadView(APIView):
             raise NotFoundError("No such document.")
 
         if getattr(actor, "kind", None) == "recruiter":
-            # A reachable profile is not enough: it must be attached to an
-            # application to their own posting.
+            # A reachable profile is not enough: it must be on their own posting.
             attached = Application.objects.filter(
                 posting__company_id=actor.company_id,
                 user_id=document.user_id,
@@ -110,8 +108,7 @@ class DocumentDownloadView(APIView):
 
 def _serve(document: ProfileDocument):
     if document.is_link:
-        # A redirect, not a fetch: pulling a student-supplied URL server-side
-        # would make this endpoint an SSRF primitive.
+        # A redirect, not a fetch: fetching would make this an SSRF primitive.
         response = HttpResponseRedirect(document.drive_url)
         response["Cache-Control"] = "private, no-store"
         response["Referrer-Policy"] = "no-referrer"

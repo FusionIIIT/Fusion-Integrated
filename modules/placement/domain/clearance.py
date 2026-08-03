@@ -25,16 +25,14 @@ class RecordState:
 
     company: str
     has_signed_offer_letter: bool
-    #: Rule 22: a student who has declared they will not join still owes the
-    #: letter, because the acceptance happened and the record stands.
+    #: Rule 22: declaring "not joining" does not release the letter obligation.
     declared_not_joining: bool = False
 
 
 @dataclass(frozen=True)
 class Clearance:
     cleared: bool
-    #: Empty when cleared. One entry per placement still owing a letter, so the
-    #: student is told which company rather than just "blocked".
+    #: One entry per placement still owing a letter, so the student is told which.
     blocking: tuple[str, ...] = ()
 
     @property

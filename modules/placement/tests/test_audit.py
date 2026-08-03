@@ -204,8 +204,7 @@ class TestMyConductRecord:
         assert rows[0]["kind"] == "consent_failure"
 
     def test_the_waiver_reason_is_shown_too(self, stub_iam, incident):
-        # Waiving needs registration.debar, which the reviewing actor above
-        # deliberately does not hold.
+        # Waiving needs registration.debar, which the actor above does not hold.
         from fusion_auth.principal import Principal
         from modules.placement.services import conduct
         officer = Principal.from_session(make_session(
