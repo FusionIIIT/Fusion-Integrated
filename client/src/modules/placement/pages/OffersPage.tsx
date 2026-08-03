@@ -9,6 +9,7 @@ import { errorMessage } from "../../../lib/http";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
+import { PlacementRecordCard } from "../components/PlacementRecordCard";
 import { StatusBadge } from "../../../ui/components/StatusBadge";
 import { useOffers, useRespondToOffer } from "../api/hooks";
 import type { Offer } from "../api/types";
@@ -66,6 +67,10 @@ export default function OffersPage() {
         title="My Offers"
         subtitle="Offers extended to you, and the deadline to answer each one"
       />
+
+      {/* Post-acceptance obligations (rules 22 and 24). Renders nothing until
+          there is a placement on record. */}
+      <PlacementRecordCard />
 
       {isPending && <Text c="dimmed">Loading…</Text>}
 

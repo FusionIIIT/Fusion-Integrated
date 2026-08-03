@@ -1,6 +1,9 @@
-import { Button, Card, Container, Group, Stack, Text } from "@mantine/core";
+import { useState } from "react";
+import {
+  ActionIcon, Button, Card, Container, Group, Stack, Text,
+} from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { FaUserCheck } from "react-icons/fa";
+import { FaHistory, FaUserCheck } from "react-icons/fa";
 
 import { errorMessage } from "../../../lib/http";
 import { DataTable } from "../../../ui/components/DataTable";
@@ -8,12 +11,14 @@ import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { StatusBadge } from "../../../ui/components/StatusBadge";
 import { CpiBadge } from "../components/CpiBadge";
+import { HistoryDrawer } from "../components/HistoryDrawer";
 import { useApplications, useTransition } from "../api/hooks";
 import type { Application } from "../api/types";
 
 export default function MyApplicationsPage() {
   const { data, isPending, error } = useApplications();
   const transition = useTransition();
+  const [historyFor, setHistoryFor] = useState<number | null>(null);
 
   if (error) return <Container size="xl"><ErrorState error={error} /></Container>;
 
@@ -77,6 +82,14 @@ export default function MyApplicationsPage() {
               key: "actions", header: "", align: "right",
               render: (r) => (
                 <Group justify="flex-end" gap="xs">
+                  {/* "Why is my application at this status?" answered without
+                      a support request. */}
+                  <ActionIcon
+                    variant="subtle" color="gray" aria-label="History"
+                    onClick={() => setHistoryFor(r.id)}
+                  >
+                    <FaHistory size={12} />
+                  </ActionIcon>
                   {r.allowed_transitions?.includes("withdrawn") && (
                     <Button
                       size="xs" variant="subtle" color="gray"
@@ -97,6 +110,10 @@ export default function MyApplicationsPage() {
           }}
         />
       </Card>
+
+      <HistoryDrawer
+        applicationId={historyFor} onClose={() => setHistoryFor(null)}
+      />
     </Container>
   );
 }

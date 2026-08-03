@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
-  Button, Card, Container, Menu, Select, Stack, Text, Textarea,
+  ActionIcon, Alert, Badge, Button, Card, Container, Group, Menu, Paper, Select,
+  Stack, Text, Textarea,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { FaChevronDown, FaUsers } from "react-icons/fa";
+import {
+  FaChevronDown, FaExclamationTriangle, FaHistory, FaUsers,
+} from "react-icons/fa";
 
 import { errorMessage } from "../../../lib/http";
 import { DataTable } from "../../../ui/components/DataTable";
@@ -12,9 +15,20 @@ import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { StatusBadge } from "../../../ui/components/StatusBadge";
 import { CpiBadge } from "../components/CpiBadge";
+import { HistoryDrawer } from "../components/HistoryDrawer";
 import { IssueOfferModal } from "../components/IssueOfferModal";
-import { useApplications, useTransition } from "../api/hooks";
+import { useApplications, useBulkTransition, useTransition } from "../api/hooks";
+import type { BulkResult } from "../api/hooks";
 import type { Application } from "../api/types";
+import type { RowKey } from "../../../ui/components/DataTable";
+
+/** Bulk targets a TPO actually reaches for. Anything else stays a per-row
+ *  decision, because it needs looking at the individual candidate. */
+const BULK_MOVES = [
+  { value: "under_review", label: "Move to review" },
+  { value: "shortlisted", label: "Shortlist" },
+  { value: "rejected", label: "Reject" },
+];
 
 /** Transitions that must carry a reason. The server enforces this too — the
  *  prompt here just avoids a round trip that would only produce an error. */
@@ -38,6 +52,57 @@ export default function ApplicationsPage() {
   const [offerFor, setOfferFor] = useState<Application | null>(null);
   const [reason, setReason] = useState("");
   const transition = useTransition();
+
+  const [selected, setSelected] = useState<Set<RowKey>>(new Set());
+  const [bulkTo, setBulkTo] = useState<string | null>(null);
+  const [bulkReason, setBulkReason] = useState("");
+  const [lastBulk, setLastBulk] = useState<BulkResult | null>(null);
+  const [historyFor, setHistoryFor] = useState<number | null>(null);
+  const bulk = useBulkTransition();
+
+  const rows = useMemo(
+    () => (data?.results ?? []) as Application[], [data]);
+
+  // A terminal application cannot move, so offering its checkbox would only
+  // produce refusals the user has to read past.
+  const isSelectable = (row: Application) =>
+    (row.allowed_transitions ?? []).some(
+      (t) => BULK_MOVES.some((m) => m.value === t));
+
+  function runBulk() {
+    if (!bulkTo || !selected.size) return;
+    bulk.mutate(
+      {
+        application_ids: [...selected].map(Number),
+        to_status: bulkTo,
+        reason: bulkReason,
+      },
+      {
+        onSuccess: (result) => {
+          setLastBulk(result);
+          notifications.show({
+            color: result.refused ? "orange" : "green",
+            title: result.refused
+              ? `${result.moved} moved, ${result.refused} refused`
+              : `${result.moved} moved`,
+            message: result.refused
+              ? "Some could not be moved — see the note above the table."
+              : "Every selected application was updated.",
+          });
+          // Only clear what actually moved, so a retry keeps the rest selected.
+          const movedIds = new Set(result.results
+            .filter((r) => r.moved).map((r) => r.application_id));
+          setSelected(new Set([...selected].filter(
+            (id) => !movedIds.has(Number(id)))));
+          setBulkTo(null);
+          setBulkReason("");
+        },
+        onError: (e) => notifications.show({
+          color: "red", title: "Bulk action failed", message: errorMessage(e),
+        }),
+      },
+    );
+  }
 
   function run(app: Application, to: string, why: string) {
     transition.mutate(
@@ -83,12 +148,77 @@ export default function ApplicationsPage() {
         }
       />
 
+      {/* Appears only with a selection, so it never competes with the table for
+          attention when there is nothing to act on. */}
+      {selected.size > 0 && (
+        <Paper
+          withBorder p="sm" mb="md" radius="md"
+          bg="var(--mantine-color-blue-0)"
+        >
+          <Group justify="space-between" wrap="nowrap">
+            <Group gap="sm" wrap="nowrap">
+              <Badge variant="filled">{selected.size} selected</Badge>
+              <Button
+                variant="subtle" size="xs"
+                onClick={() => setSelected(new Set())}
+              >
+                Clear
+              </Button>
+            </Group>
+            <Group gap="xs" wrap="nowrap">
+              <Select
+                data={BULK_MOVES} value={bulkTo} onChange={setBulkTo}
+                placeholder="Choose an action" w={190} size="xs"
+              />
+              <Button
+                size="xs" loading={bulk.isPending}
+                color={bulkTo === "rejected" ? "red" : undefined}
+                disabled={!bulkTo
+                  || (bulkTo === "rejected" && !bulkReason.trim())}
+                onClick={runBulk}
+              >
+                Apply
+              </Button>
+            </Group>
+          </Group>
+
+          {/* Rejection needs a reason per item; the server refuses without one,
+              so asking here avoids a round trip that only returns errors. */}
+          {bulkTo === "rejected" && (
+            <Textarea
+              mt="sm" label="Reason" required autosize minRows={2}
+              value={bulkReason}
+              onChange={(e) => setBulkReason(e.currentTarget.value)}
+              description="Recorded against every selected application, and sent to each student."
+              maxLength={300}
+            />
+          )}
+        </Paper>
+      )}
+
+      {lastBulk && lastBulk.refused > 0 && (
+        <Alert
+          variant="light" color="orange" icon={<FaExclamationTriangle />}
+          mb="md" withCloseButton onClose={() => setLastBulk(null)}
+          title={`${lastBulk.moved} moved, ${lastBulk.refused} could not be`}
+        >
+          <Stack gap={2}>
+            {lastBulk.results.filter((r) => !r.moved).slice(0, 8).map((r) => (
+              <Text size="sm" key={r.application_id}>
+                #{r.application_id} — {r.error}
+              </Text>
+            ))}
+          </Stack>
+        </Alert>
+      )}
+
       <Card padding="lg">
         <DataTable<Application>
-          rows={(data?.results ?? []) as Application[]}
+          rows={rows}
           loading={isPending}
           rowKey={(r) => r.id}
           minWidth={1000}
+          selection={{ selected, onChange: setSelected, isSelectable }}
           columns={[
             {
               key: "candidate", header: "Candidate",
@@ -135,29 +265,38 @@ export default function ApplicationsPage() {
                 // state machine to drift out of sync with it.
                 const moves = (r.allowed_transitions ?? [])
                   .filter((t) => LABELS[t]);
-                if (!moves.length) return <Text size="xs" c="dimmed">—</Text>;
                 return (
-                  <Menu position="bottom-end" withinPortal>
-                    <Menu.Target>
-                      <Button
-                        size="xs" variant="light"
-                        rightSection={<FaChevronDown size={9} />}
-                      >
-                        Action
-                      </Button>
-                    </Menu.Target>
-                    <Menu.Dropdown>
-                      {moves.map((t) => (
-                        <Menu.Item
-                          key={t}
-                          color={t === "rejected" ? "red" : undefined}
-                          onClick={() => act(r, t)}
-                        >
-                          {LABELS[t]}
-                        </Menu.Item>
-                      ))}
-                    </Menu.Dropdown>
-                  </Menu>
+                  <Group gap={4} justify="flex-end" wrap="nowrap">
+                    <ActionIcon
+                      variant="subtle" color="gray" aria-label="History"
+                      onClick={() => setHistoryFor(r.id)}
+                    >
+                      <FaHistory size={12} />
+                    </ActionIcon>
+                    {moves.length > 0 && (
+                      <Menu position="bottom-end" withinPortal>
+                        <Menu.Target>
+                          <Button
+                            size="xs" variant="light"
+                            rightSection={<FaChevronDown size={9} />}
+                          >
+                            Action
+                          </Button>
+                        </Menu.Target>
+                        <Menu.Dropdown>
+                          {moves.map((t) => (
+                            <Menu.Item
+                              key={t}
+                              color={t === "rejected" ? "red" : undefined}
+                              onClick={() => act(r, t)}
+                            >
+                              {LABELS[t]}
+                            </Menu.Item>
+                          ))}
+                        </Menu.Dropdown>
+                      </Menu>
+                    )}
+                  </Group>
                 );
               },
             },
@@ -187,6 +326,10 @@ export default function ApplicationsPage() {
       </FormModal>
 
       <IssueOfferModal application={offerFor} onClose={() => setOfferFor(null)} />
+
+      <HistoryDrawer
+        applicationId={historyFor} onClose={() => setHistoryFor(null)}
+      />
     </Container>
   );
 }

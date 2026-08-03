@@ -1,12 +1,88 @@
 import {
-  Alert, Card, Container, Grid, Group, Progress, SimpleGrid, Stack, Table, Text,
+  Alert, Badge, Button, Card, Container, Grid, Group, Progress, SimpleGrid,
+  Stack, Table, Text,
 } from "@mantine/core";
-import { FaChartBar, FaInfoCircle } from "react-icons/fa";
+import { FaChartBar, FaDownload, FaInfoCircle } from "react-icons/fa";
 
 import { useAuth } from "../../../auth/AuthProvider";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
-import { useStats } from "../api/hooks";
+import { exportUrls, useOutstandingLetters, useStats } from "../api/hooks";
+
+/** Staff only, matching the server. Hiding it is UX; the endpoint enforces. */
+function ExportActions() {
+  return (
+    <Group gap="xs">
+      <Button
+        component="a" href={exportUrls.applications}
+        variant="default" size="xs" leftSection={<FaDownload size={11} />}
+      >
+        Applications CSV
+      </Button>
+      <Button
+        component="a" href={exportUrls.placements}
+        variant="default" size="xs" leftSection={<FaDownload size={11} />}
+      >
+        Placements CSV
+      </Button>
+    </Group>
+  );
+}
+
+/** Rule 24's worklist. The office chases these before convocation, so it is a
+ *  report rather than a screen of its own. */
+function OutstandingLetters() {
+  const { data, isPending } = useOutstandingLetters();
+  const rows = data?.results ?? [];
+
+  return (
+    <Card padding="lg" mt="md">
+      <Group justify="space-between" mb="xs">
+        <div>
+          <Text fw={600}>Offer letters outstanding</Text>
+          <Text size="xs" c="dimmed">
+            Rule 24 holds each of these students&apos; no-dues certificate.
+          </Text>
+        </div>
+        <Badge variant="light" color={rows.length ? "orange" : "green"}>
+          {rows.length}
+        </Badge>
+      </Group>
+
+      {isPending && <Text size="sm" c="dimmed">Loading…</Text>}
+      {!isPending && !rows.length && (
+        <Text size="sm" c="dimmed">Every placed student has filed one.</Text>
+      )}
+
+      {rows.length > 0 && (
+        <Table>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>Company</Table.Th>
+              <Table.Th>Source</Table.Th>
+              <Table.Th>Not joining</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {rows.map((r) => (
+              <Table.Tr key={r.id}>
+                <Table.Td>{r.company?.name ?? "—"}</Table.Td>
+                <Table.Td>
+                  {r.source === "off_campus" ? "Off campus" : "Campus"}
+                </Table.Td>
+                <Table.Td>
+                  {r.not_joining_declared_at
+                    ? (r.not_joining_was_late ? "Declared (late)" : "Declared")
+                    : "—"}
+                </Table.Td>
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      )}
+    </Card>
+  );
+}
 
 function Metric({ label, value, hint }: {
   label: string; value: string | number | null | undefined; hint?: string;
@@ -52,6 +128,7 @@ export default function ReportsPage() {
         subtitle={isStaff
           ? `Operational figures for ${data?.season}`
           : `Anonymised figures for ${data?.season}`}
+        action={isStaff ? <ExportActions /> : undefined}
       />
 
       <SimpleGrid cols={{ base: 2, sm: 4 }} mb="md">
@@ -139,6 +216,8 @@ export default function ReportsPage() {
           </Grid.Col>
         )}
       </Grid>
+
+      {isStaff && <OutstandingLetters />}
     </Container>
   );
 }
