@@ -77,11 +77,9 @@ wipe the table. Only rows for modules the manifest names are touched.
 
 ### Frontend
 
-```bash
-cd /srv/fusion/shell/releases/<sha>
-pnpm install --frozen-lockfile && pnpm turbo build
-ln -sfn /srv/fusion/shell/releases/<sha> /srv/fusion/shell/current
-```
+Nothing separate to do: `deploy.sh` runs `npm ci && npm run build` inside the release, and nginx serves
+`current/client/dist`. The symlink swap publishes both halves at once, so the API and the bundle that calls
+it are never a release apart.
 
 No service restart — nginx serves the files. `index.html` is `no-store` and assets are `immutable`, so the
 next page load picks up the new build without serving a stale shell against deleted chunks.
@@ -94,15 +92,17 @@ next page load picks up the new build without serving a stale shell against dele
 sudo -u fusion /srv/fusion/ops/deploy/smoke.sh "$SVC"
 ```
 
-```bash
-curl -fsS localhost/app/api/iam/v1/readyz              # DB + Redis + JWKS
-curl -fsS localhost/app/api/platform/v1/readyz
-curl -fsS https://fusion.iiitdmj.ac.in/.well-known/jwks.json | jq -e '.keys|length>=1'
-curl -fsS https://fusion.iiitdmj.ac.in/app/ | grep -q '<div id="root">'
+`smoke.sh` covers all of it: the unit is running, the socket exists, `/healthz` and `/readyz` answer,
+`/api/v1/me` refuses an anonymous caller, the SPA is served, assets are `immutable`, source maps are **not**
+published, and `/api/schema` is reachable. It exits non-zero on any failure, which is what `deploy.sh` keys
+its automatic rollback off.
 
-# The legacy monolith still responds. It shares this nginx config and a new
-# location block can shadow "/". Check this on EVERY deploy.
-curl -s -o /dev/null -w '%{http_code}\n' https://fusion.iiitdmj.ac.in/api/auth/me   # expect 401
+Set `LEGACY_URL` and it also asserts the legacy monolith still responds — it shares this nginx and a new
+`location` block can shadow `/`, which the platform's own checks would not notice:
+
+```bash
+LEGACY_URL=https://fusion.iiitdmj.ac.in/api/auth/me \
+  sudo -u fusion /srv/fusion/platform/current/ops/deploy/smoke.sh platform
 ```
 
 Then, for 10 minutes:

@@ -4,7 +4,9 @@ One page each, copy-pasteable, **tested**. A runbook that has never been execute
 
 | Runbook | When | Tested |
 |---|---|---|
+| [provision-host.md](provision-host.md) | standing up a host for the first time | once per host |
 | [deploy.md](deploy.md) | shipping a release | every deploy |
+| [enable-scheduled-work.md](enable-scheduled-work.md) | turning on beat and the workers | once, after provisioning |
 | [rollback.md](rollback.md) | a deploy went wrong | quarterly drill |
 | [restore-from-backup.md](restore-from-backup.md) | data loss or corruption | **quarterly drill — mandatory, Phase 1 deliverable** |
 | [rotate-signing-key.md](rotate-signing-key.md) | quarterly, or on suspected compromise | quarterly |

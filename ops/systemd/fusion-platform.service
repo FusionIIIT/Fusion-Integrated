@@ -1,0 +1,54 @@
+# Gunicorn for fusion-platform, behind nginx on a unix socket.
+#
+#   cp ops/systemd/fusion-platform.service /etc/systemd/system/
+#   systemctl daemon-reload
+#   systemctl enable --now fusion-platform
+#
+# `systemctl reload` re-execs the workers gracefully; in-flight requests finish.
+
+[Unit]
+Description=Fusion platform (Django/gunicorn)
+After=network-online.target postgresql.service redis-cache.service
+Wants=network-online.target
+
+[Service]
+Type=notify
+User=fusion
+Group=fusion
+WorkingDirectory=/srv/fusion/platform/current
+EnvironmentFile=/etc/fusion/platform.env
+Environment=DJANGO_SETTINGS_MODULE=config.settings.prod
+
+# gthread, not sync: every authenticated request calls the IAM over HTTP, so a
+# worker spends most of its time waiting rather than computing.
+ExecStart=/srv/fusion/platform/venv/bin/gunicorn config.wsgi:application \
+  --bind unix:/run/fusion/platform.sock \
+  --workers 5 --worker-class gthread --threads 4 \
+  --max-requests 1000 --max-requests-jitter 100 \
+  --timeout 60 --graceful-timeout 30 --keep-alive 5 \
+  --access-logfile - --error-logfile - --capture-output \
+  --access-logformat '%({X-Request-ID}i)s %(m)s %(U)s %(s)s %(M)sms'
+ExecReload=/bin/kill -s HUP $MAINPID
+
+Restart=always
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=40
+
+# /run/fusion holds the socket; 0750 keeps it to fusion and nginx's group.
+RuntimeDirectory=fusion
+RuntimeDirectoryMode=0750
+StateDirectory=fusion
+ReadWritePaths=/var/lib/fusion
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+MemoryMax=1500M
+
+[Install]
+WantedBy=multi-user.target
