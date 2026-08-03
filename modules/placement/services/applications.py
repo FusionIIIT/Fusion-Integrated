@@ -10,10 +10,14 @@ or a management command. Three checks must all pass:
 """
 from __future__ import annotations
 
+import logging
+from collections.abc import Sequence
+from dataclasses import dataclass
+
 from django.db import transaction
 from django.utils import timezone
 
-from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedError
+from core.api.exceptions import ConflictError, DomainError, NotFoundError, PermissionDeniedError
 from modules.placement.domain import eligibility as elig
 from modules.placement.domain import state_machine as sm
 from modules.placement.models import (
@@ -28,6 +32,8 @@ from modules.placement.models import (
 from modules.placement.selectors import scoping
 from modules.placement.services import facts as facts_service
 from modules.placement.services import notifications
+
+log = logging.getLogger("fusion.placement.applications")
 
 
 def actor_kind(actor, application=None) -> str:
@@ -47,6 +53,23 @@ def actor_kind(actor, application=None) -> str:
                and application.user_id == getattr(actor, "user_id", None))
         return sm.STUDENT if own else sm.STAFF
     return sm.STUDENT
+
+
+def _guard_conduct_sanction(application) -> None:
+    """Rule 19's first tier bars the next two drives, not the season, so the
+    season-wide debarred flag cannot express it."""
+    from modules.placement.services import conduct as conduct_service
+
+    registration = PlacementRegistration.objects.filter(
+        policy__season=application.posting.placement_year,
+        user_id=application.user_id).first()
+    if registration is None:
+        return
+    if conduct_service.bars_posting(registration, application.posting):
+        raise ConflictError(
+            registration.debarred_reason
+            or "A placement sanction is in force against your registration.",
+            code="conduct_sanction")
 
 
 def resolve_or_raise(frm: str, to: str, kind: str):
@@ -109,6 +132,7 @@ def _guard(name: str, *, application, reason: str, actor) -> None:
         if decision and not decision.get("allowed"):
             raise ConflictError(decision.get("message", "You may not apply."),
                                 code=decision.get("rule", "not_allowed"))
+        _guard_conduct_sanction(application)
 
     if name == "has_scheduled_round" and not RoundParticipation.objects.filter(
             application=application).exists():
@@ -264,3 +288,58 @@ def evaluate_for(*, posting: JobPosting, user_id: int,
         "standing": standing,
         "evaluated_at": timezone.now().isoformat(),
     }
+
+
+#: A bulk action is a convenience, not a data-migration tool. Beyond this it is
+#: almost certainly a mistake, and it is also an N-queries-per-item endpoint.
+MAX_BULK = 200
+
+
+@dataclass(frozen=True)
+class BulkOutcome:
+    application_id: int
+    moved: bool
+    #: The refusal a single transition would have given, verbatim.
+    error: str = ""
+    code: str = ""
+
+
+def bulk_transition(*, application_ids: Sequence[int], to_status: str, actor,
+                    reason: str = "", scope=None) -> list[BulkOutcome]:
+    """Move several applications, reporting each one's fate.
+
+    Each item goes through `transition` — the same scope, permission, state
+    machine and guards. A separate bulk path is precisely where one of those
+    checks gets forgotten, so there isn't one.
+
+    Deliberately NOT all-or-nothing: a TPO shortlisting forty candidates should
+    not be blocked because one of them withdrew an hour ago. Each item commits
+    on its own and the caller is told exactly which did not, so a partial run
+    can never read as a complete one.
+    """
+    ids = list(dict.fromkeys(int(i) for i in application_ids))
+    if not ids:
+        raise ConflictError("Select at least one application.",
+                            code="nothing_selected")
+    if len(ids) > MAX_BULK:
+        raise ConflictError(
+            f"Up to {MAX_BULK} applications at a time; {len(ids)} were sent.",
+            code="too_many")
+
+    outcomes: list[BulkOutcome] = []
+    for application_id in ids:
+        try:
+            # Its own transaction, so one refusal does not roll back the rest.
+            with transaction.atomic():
+                transition(application_id=application_id, to_status=to_status,
+                           actor=actor, reason=reason, scope=scope)
+            outcomes.append(BulkOutcome(application_id, moved=True))
+        except DomainError as exc:
+            outcomes.append(BulkOutcome(application_id, moved=False,
+                                        error=exc.message, code=exc.code))
+
+    moved = sum(1 for o in outcomes if o.moved)
+    log.info("placement.applications.bulk to=%s moved=%d refused=%d by=%s",
+             to_status, moved, len(outcomes) - moved,
+             getattr(actor, "user_id", None))
+    return outcomes

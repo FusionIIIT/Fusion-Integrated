@@ -48,7 +48,24 @@ def expire_overdue_offers() -> int:
 
 @shared_task(name="placement.rebuild_stats", acks_late=True)
 def rebuild_stats(season: str) -> int:
-    """Recompute the materialised statistics for a season."""
+    """Recompute the materialised statistics for one season."""
     from modules.placement.services import stats
 
     return stats.rebuild(season=season)
+
+
+@shared_task(name="placement.rebuild_active_stats", acks_late=True)
+def rebuild_active_stats() -> int:
+    """Rebuild every active season. The beat entry point.
+
+    A static schedule cannot name a season, and hard-coding one would silently
+    stop refreshing the day the season rolls over.
+    """
+    from modules.placement.models import PlacementPolicy
+
+    seasons = list(PlacementPolicy.objects
+                   .filter(is_active=True)
+                   .values_list("season", flat=True))
+    rows = sum(rebuild_stats(season=s) for s in seasons)
+    log.info("placement.stats.rebuilt seasons=%d rows=%d", len(seasons), rows)
+    return rows

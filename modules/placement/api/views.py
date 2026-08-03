@@ -234,6 +234,37 @@ class ApplicationListView(_Scoped, generics.ListAPIView):
                 else Response(data))
 
 
+@extend_schema(request=s.BulkTransitionSerializer,
+               responses=s.BulkResultSerializer)
+class ApplicationBulkTransitionView(_Scoped, APIView):
+    """Move several applications at once (PC-UC-008).
+
+    Every item goes through the same service as a single transition, so the
+    scope, permission, state machine and guards are identical. Partial success
+    is reported rather than hidden.
+    """
+
+    permission_classes = [MODULE]
+    throttle_scope = "apply"
+
+    def post(self, request):
+        payload = s.BulkTransitionSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        actor = _actor(request)
+        outcomes = application_service.bulk_transition(
+            actor=actor, scope=scoping.applications_for(actor),
+            **payload.validated_data)
+        moved = sum(1 for o in outcomes if o.moved)
+        return Response({
+            "moved": moved,
+            "refused": len(outcomes) - moved,
+            "results": [
+                {"application_id": o.application_id, "moved": o.moved,
+                 "error": o.error, "code": o.code} for o in outcomes
+            ],
+        })
+
+
 @extend_schema(request=s.TransitionSerializer, responses=s.ApplicationSerializer)
 class ApplicationTransitionView(_Scoped, APIView):
     permission_classes = [MODULE]
@@ -502,6 +533,22 @@ class AnnouncementWithdrawView(_Scoped, APIView):
             announcement_id=pk, actor=_actor(request),
             reason=payload.validated_data["reason"])
         return Response(s.AnnouncementSerializer(announcement).data)
+
+
+class SeasonListView(_Scoped, generics.ListAPIView):
+    """The seasons a posting may belong to.
+
+    Free text here was a trap: a typo produced a posting whose season has no
+    PlacementPolicy, so it looked fine until a student applied and hit an
+    opaque `policy_missing`. A closed list moves that failure to authoring time.
+    """
+
+    serializer_class = s.SeasonSerializer
+    permission_classes = [MODULE]
+    pagination_class = None          # a handful of rows; never paginated
+
+    def get_queryset(self):
+        return PlacementPolicy.objects.order_by("-is_active", "-season")
 
 
 # -- Statistics ----------------------------------------------------------------

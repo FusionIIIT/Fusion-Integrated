@@ -80,6 +80,17 @@ def make_principal(**kw):
     return Principal.from_session(make_session(**kw))
 
 
+@pytest.fixture(autouse=True)
+def _clear_throttle_state():
+    """Throttle counters live in the cache and would otherwise carry from one
+    test into the next — the sixth request of a run failing wherever it landed."""
+    from django.core.cache import cache
+
+    cache.clear()
+    yield
+    cache.clear()
+
+
 @pytest.fixture
 def stub_iam(monkeypatch):
     fake = FakeIam()

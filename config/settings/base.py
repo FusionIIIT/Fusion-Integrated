@@ -217,6 +217,10 @@ CORS_ALLOW_CREDENTIALS = True
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Asia/Kolkata"
+# Declared after TIME_ZONE, which it reads: a crontab entry would otherwise
+# fire at the wrong local hour.
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_ENABLE_UTC = True
 USE_I18N = True
 USE_TZ = True
 STATIC_URL = "/static/"

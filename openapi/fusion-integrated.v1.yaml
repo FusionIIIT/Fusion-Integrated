@@ -206,6 +206,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/PaginatedApplicationList'
           description: ''
+  /api/v1/placement/applications/{id}/history:
+    get:
+      operationId: v1_placement_applications_history_retrieve
+      description: GET /placement/applications/<pk>/history
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransitionHistory'
+          description: ''
   /api/v1/placement/applications/{id}/transition:
     post:
       operationId: v1_placement_applications_transition_create
@@ -271,6 +293,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Application'
+          description: ''
+  /api/v1/placement/applications/bulk-transition:
+    post:
+      operationId: v1_placement_applications_bulk_transition_create
+      description: |-
+        Move several applications at once (PC-UC-008).
+
+        Every item goes through the same service as a single transition, so the
+        scope, permission, state machine and guards are identical. Partial success
+        is reported rather than hidden.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkTransition'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BulkTransition'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BulkTransition'
+        required: true
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkResult'
           description: ''
   /api/v1/placement/companies:
     get:
@@ -371,6 +426,159 @@ paths:
               schema:
                 $ref: '#/components/schemas/Company'
           description: ''
+  /api/v1/placement/conduct/incidents:
+    get:
+      operationId: v1_placement_conduct_incidents_list
+      description: GET  the incidents on record   POST a new one.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConductIncident'
+          description: ''
+    post:
+      operationId: v1_placement_conduct_incidents_create
+      description: GET  the incidents on record   POST a new one.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordIncident'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RecordIncident'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RecordIncident'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentRecorded'
+          description: ''
+  /api/v1/placement/conduct/incidents/{id}/waive:
+    post:
+      operationId: v1_placement_conduct_incidents_waive_create
+      description: Rule 19's written-notice exception.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WaiveIncident'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WaiveIncident'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WaiveIncident'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConductIncident'
+          description: ''
+  /api/v1/placement/conduct/mine:
+    get:
+      operationId: v1_placement_conduct_mine_list
+      description: |-
+        A student's own conduct record, in full.
+
+        Rule 19 allows a waiver and rule 21 leaves a sanction to the Chairperson's
+        discretion. Both are contestable, and nobody can contest what they cannot
+        see — so the note and any waiver reason are shown, unlike an application's
+        internal review note.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConductIncident'
+          description: ''
+  /api/v1/placement/conduct/sanctions:
+    post:
+      operationId: v1_placement_conduct_sanctions_create
+      description: Impose the sanction. The human decision the policy calls for.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplySanction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ApplySanction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ApplySanction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+          description: ''
+  /api/v1/placement/conduct/sanctions/lift:
+    post:
+      operationId: v1_placement_conduct_sanctions_lift_create
+      description: Anything a human can impose, a human can undo.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LiftSanction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LiftSanction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LiftSanction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+          description: ''
   /api/v1/placement/documents:
     get:
       operationId: v1_placement_documents_list
@@ -467,6 +675,40 @@ paths:
         '404':
           description: Absent, or outside the caller's scope — the two are deliberately
             the same answer.
+  /api/v1/placement/exports/applications.csv:
+    get:
+      operationId: v1_placement_exports_applications.csv_retrieve
+      description: Every application in the caller's scope, one row each.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            text/csv:
+              schema:
+                type: string
+          description: ''
+        '403':
+          description: Staff only; never a recruiter.
+  /api/v1/placement/exports/placements.csv:
+    get:
+      operationId: v1_placement_exports_placements.csv_retrieve
+      description: Who was placed where — the season's outcome, for the annual report.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            text/csv:
+              schema:
+                type: string
+          description: ''
+        '403':
+          description: Staff only; never a recruiter.
   /api/v1/placement/interviews/rounds:
     get:
       operationId: v1_placement_interviews_rounds_list
@@ -980,6 +1222,152 @@ paths:
               schema:
                 $ref: '#/components/schemas/StudentProfile'
           description: ''
+  /api/v1/placement/records:
+    get:
+      operationId: v1_placement_records_list
+      description: The caller's own placements and what each still owes.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlacementRecordDetail'
+          description: ''
+  /api/v1/placement/records/{id}/not-joining:
+    post:
+      operationId: v1_placement_records_not_joining_create
+      description: Rule 22 — telling the Placement Cell you will not join.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotJoining'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NotJoining'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NotJoining'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotJoiningResult'
+          description: ''
+  /api/v1/placement/records/{id}/offer-letter:
+    post:
+      operationId: v1_placement_records_offer_letter_create
+      description: Rule 24 — attach the signed copy to release the no-dues hold.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitOfferLetter'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubmitOfferLetter'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubmitOfferLetter'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlacementRecordDetail'
+          description: ''
+  /api/v1/placement/records/clearance:
+    get:
+      operationId: v1_placement_records_clearance_retrieve
+      description: Rule 24, for the caller. Scoped by the credential, never by a parameter.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Clearance'
+          description: ''
+  /api/v1/placement/records/off-campus:
+    post:
+      operationId: v1_placement_records_off_campus_create
+      description: |-
+        Rules 5 and 24 — an off-campus placement the Cell was told about.
+
+        Without this the no-dues gate would miss off-campus students entirely,
+        which is the group rule 24 names explicitly.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OffCampusRecord'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OffCampusRecord'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OffCampusRecord'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlacementRecordDetail'
+          description: ''
+  /api/v1/placement/records/outstanding:
+    get:
+      operationId: v1_placement_records_outstanding_list
+      description: 'The office''s worklist: placed students who still owe a letter.'
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlacementRecordDetail'
+          description: ''
   /api/v1/placement/recruiters/accept:
     post:
       operationId: v1_placement_recruiters_accept_create
@@ -1091,6 +1479,172 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecruiterMe'
+          description: ''
+  /api/v1/placement/registrations:
+    get:
+      operationId: v1_placement_registrations_list
+      description: The caller's own registrations. Scoped by the credential, not a
+        filter.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Registration'
+          description: ''
+    post:
+      operationId: v1_placement_registrations_create
+      description: The caller's own registrations. Scoped by the credential, not a
+        filter.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Register'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Register'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+          description: ''
+  /api/v1/placement/registrations/approve-late:
+    post:
+      operationId: v1_placement_registrations_approve_late_create
+      description: Rule 20 — the office approves a late registration against a challan.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeeApproval'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FeeApproval'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FeeApproval'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+          description: ''
+  /api/v1/placement/registrations/opt-out:
+    post:
+      operationId: v1_placement_registrations_opt_out_create
+      description: |-
+        Withdrawing. Rule 21 makes coming back cost a fee and allows it once,
+        so the client should say so before confirming.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OptOut'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OptOut'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OptOut'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+          description: ''
+  /api/v1/placement/registrations/re-register:
+    post:
+      operationId: v1_placement_registrations_re_register_create
+      description: Rule 21 — once only, at the Chairperson's discretion.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeeApproval'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FeeApproval'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FeeApproval'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+          description: ''
+  /api/v1/placement/registrations/terms:
+    get:
+      operationId: v1_placement_registrations_terms_retrieve
+      description: Can I register, and on what terms? Read-only.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationTerms'
+          description: ''
+  /api/v1/placement/seasons:
+    get:
+      operationId: v1_placement_seasons_list
+      description: |-
+        The seasons a posting may belong to.
+
+        Free text here was a trap: a typo produced a posting whose season has no
+        PlacementPolicy, so it looked fine until a student applied and hit an
+        opaque `policy_missing`. A closed list moves that failure to authoring time.
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Season'
           description: ''
   /api/v1/placement/stats:
     get:
@@ -1407,6 +1961,28 @@ components:
           nullable: true
       required:
       - posting_id
+    ApplySanction:
+      type: object
+      properties:
+        season:
+          type: string
+          maxLength: 12
+        user_id:
+          type: integer
+        sanction:
+          $ref: '#/components/schemas/SanctionEnum'
+        rule:
+          type: string
+          maxLength: 4
+        reason:
+          type: string
+          maxLength: 300
+      required:
+      - reason
+      - rule
+      - sanction
+      - season
+      - user_id
     Approval:
       type: object
       properties:
@@ -1436,6 +2012,77 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BulkOutcome:
+      type: object
+      properties:
+        application_id:
+          type: integer
+        moved:
+          type: boolean
+        error:
+          type: string
+        code:
+          type: string
+      required:
+      - application_id
+      - code
+      - error
+      - moved
+    BulkResult:
+      type: object
+      description: |-
+        Counts first, then the per-item detail — a partial run must never read
+        as a complete one.
+      properties:
+        moved:
+          type: integer
+        refused:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BulkOutcome'
+      required:
+      - moved
+      - refused
+      - results
+    BulkTransition:
+      type: object
+      properties:
+        application_ids:
+          type: array
+          items:
+            type: integer
+          maxItems: 200
+        to_status:
+          type: string
+          maxLength: 24
+        reason:
+          type: string
+          default: ''
+          maxLength: 300
+      required:
+      - application_ids
+      - to_status
+    Clearance:
+      type: object
+      description: Rule 24. `blocking` names each company, so a refusal is actionable.
+      properties:
+        user_id:
+          type: integer
+        cleared:
+          type: boolean
+        blocking:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+      required:
+      - blocking
+      - cleared
+      - message
+      - user_id
     Company:
       type: object
       properties:
@@ -1597,6 +2244,59 @@ components:
         * `prospect` - Prospect
         * `active` - Active
         * `blacklisted` - Blacklisted
+    ConductIncident:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        kind:
+          allOf:
+          - $ref: '#/components/schemas/ConductIncidentKindEnum'
+          readOnly: true
+        posting:
+          type: integer
+          readOnly: true
+          nullable: true
+        note:
+          type: string
+          readOnly: true
+        waived:
+          type: boolean
+          readOnly: true
+        waived_reason:
+          type: string
+          readOnly: true
+        recorded_by_user_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - kind
+      - note
+      - posting
+      - recorded_by_user_id
+      - user_id
+      - waived
+      - waived_reason
+    ConductIncidentKindEnum:
+      enum:
+      - consent_failure
+      - code_of_conduct
+      - misrepresentation
+      type: string
+      description: |-
+        * `consent_failure` - Did not appear after consenting (r19)
+        * `code_of_conduct` - Code of conduct (r21)
+        * `misrepresentation` - False resume or unfair means (r18)
     Detail:
       type: object
       properties:
@@ -1689,6 +2389,32 @@ components:
       - season_decision
       - semester
       - standing
+    FeeApproval:
+      type: object
+      description: Rules 20 and 21 both require the challan or receipt to be produced.
+      properties:
+        season:
+          type: string
+          maxLength: 12
+        user_id:
+          type: integer
+        fee_reference:
+          type: string
+          maxLength: 80
+      required:
+      - fee_reference
+      - season
+      - user_id
+    IncidentRecorded:
+      type: object
+      properties:
+        incident:
+          $ref: '#/components/schemas/ConductIncident'
+        recommendation:
+          $ref: '#/components/schemas/Recommendation'
+      required:
+      - incident
+      - recommendation
     InterviewRound:
       type: object
       properties:
@@ -1893,6 +2619,21 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LiftSanction:
+      type: object
+      properties:
+        season:
+          type: string
+          maxLength: 12
+        user_id:
+          type: integer
+        reason:
+          type: string
+          maxLength: 300
+      required:
+      - reason
+      - season
+      - user_id
     Login:
       type: object
       properties:
@@ -1949,6 +2690,63 @@ components:
       - icon
       - label
       - to
+    NotJoining:
+      type: object
+      properties:
+        reason:
+          type: string
+          maxLength: 300
+      required:
+      - reason
+    NotJoiningResult:
+      type: object
+      properties:
+        record:
+          $ref: '#/components/schemas/PlacementRecordDetail'
+        accepted:
+          type: boolean
+        is_late:
+          type: boolean
+        message:
+          type: string
+      required:
+      - accepted
+      - is_late
+      - message
+      - record
+    OffCampusRecord:
+      type: object
+      properties:
+        season:
+          type: string
+          maxLength: 12
+        user_id:
+          type: integer
+        company_id:
+          type: integer
+        ctc_lpa:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          nullable: true
+        kind:
+          allOf:
+          - $ref: '#/components/schemas/OffCampusRecordKindEnum'
+          default: fte
+      required:
+      - company_id
+      - season
+      - user_id
+    OffCampusRecordKindEnum:
+      enum:
+      - fte
+      - internship
+      - ppo
+      type: string
+      description: |-
+        * `fte` - fte
+        * `internship` - internship
+        * `ppo` - ppo
     Offer:
       type: object
       properties:
@@ -2058,6 +2856,18 @@ components:
       required:
       - csrf_token
       - ok
+    OptOut:
+      type: object
+      properties:
+        season:
+          type: string
+          maxLength: 12
+        reason:
+          type: string
+          default: ''
+          maxLength: 300
+      required:
+      - season
     PaginatedAnnouncementList:
       type: object
       required:
@@ -2252,6 +3062,66 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PlacementRecordDetail:
+      type: object
+      description: A student's own record, with what rules 22 and 24 still want from
+        it.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        company:
+          allOf:
+          - $ref: '#/components/schemas/CompanyBrief'
+          readOnly: true
+        source:
+          allOf:
+          - $ref: '#/components/schemas/SourceEnum'
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        ctc_lpa:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        offer_letter_submitted:
+          type: boolean
+          readOnly: true
+        offer_letter_submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        not_joining_declared_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        not_joining_reason:
+          type: string
+          readOnly: true
+        not_joining_was_late:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - company
+      - created_at
+      - ctc_lpa
+      - id
+      - kind
+      - not_joining_declared_at
+      - not_joining_reason
+      - not_joining_was_late
+      - offer_letter_submitted
+      - offer_letter_submitted_at
+      - source
     ProfileDocument:
       type: object
       description: |-
@@ -2310,6 +3180,56 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    Recommendation:
+      type: object
+      description: |-
+        What the policy points to. `automatic` is always false — rules 19 and 21
+        leave the decision to a human.
+      properties:
+        sanction:
+          type: string
+        rule:
+          type: string
+        message:
+          type: string
+        automatic:
+          type: boolean
+      required:
+      - automatic
+      - message
+      - rule
+      - sanction
+    RecordIncident:
+      type: object
+      properties:
+        season:
+          type: string
+          maxLength: 12
+        user_id:
+          type: integer
+        kind:
+          $ref: '#/components/schemas/RecordIncidentKindEnum'
+        note:
+          type: string
+          maxLength: 300
+        posting_id:
+          type: integer
+          nullable: true
+      required:
+      - kind
+      - note
+      - season
+      - user_id
+    RecordIncidentKindEnum:
+      enum:
+      - consent_failure
+      - code_of_conduct
+      - misrepresentation
+      type: string
+      description: |-
+        * `consent_failure` - consent_failure
+        * `code_of_conduct` - code_of_conduct
+        * `misrepresentation` - misrepresentation
     RecruiterAccept:
       type: object
       properties:
@@ -2420,6 +3340,111 @@ components:
       - email
       - full_name
       - modules
+    Register:
+      type: object
+      properties:
+        season:
+          type: string
+          maxLength: 12
+      required:
+      - season
+    Registration:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        policy:
+          type: integer
+          readOnly: true
+        season:
+          type: string
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RegistrationStatusEnum'
+          readOnly: true
+        category_number:
+          type: integer
+          readOnly: true
+          nullable: true
+        switches_used:
+          type: integer
+          readOnly: true
+        offer_count:
+          type: integer
+          readOnly: true
+        best_accepted_ctc_lpa:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        held_is_marquee:
+          type: boolean
+          readOnly: true
+        held_sector_kind:
+          type: string
+          readOnly: true
+        registered_late:
+          type: boolean
+          readOnly: true
+        debarred_reason:
+          type: string
+          readOnly: true
+        registered_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - best_accepted_ctc_lpa
+      - category_number
+      - debarred_reason
+      - held_is_marquee
+      - held_sector_kind
+      - id
+      - offer_count
+      - policy
+      - registered_at
+      - registered_late
+      - season
+      - status
+      - switches_used
+      - user_id
+    RegistrationStatusEnum:
+      enum:
+      - registered
+      - debarred
+      - opted_out
+      type: string
+      description: |-
+        * `registered` - Registered
+        * `debarred` - Debarred
+        * `opted_out` - Opted out
+    RegistrationTerms:
+      type: object
+      description: What route is open to this student, and what it costs.
+      properties:
+        route:
+          type: string
+        reason:
+          type: string
+        message:
+          type: string
+        fee:
+          type: integer
+        allowed:
+          type: boolean
+      required:
+      - allowed
+      - fee
+      - message
+      - reason
+      - route
     Resume:
       type: object
       description: 'PC-UC-002: the profile rendered as a structured resume.'
@@ -2523,6 +3548,18 @@ components:
         * `absent` - Absent
         * `passed` - Passed
         * `failed` - Failed
+    SanctionEnum:
+      enum:
+      - bar_next_two
+      - deregister
+      - bar_season
+      - bar_permanent
+      type: string
+      description: |-
+        * `bar_next_two` - bar_next_two
+        * `deregister` - deregister
+        * `bar_season` - bar_season
+        * `bar_permanent` - bar_permanent
     ScheduledCount:
       type: object
       properties:
@@ -2530,6 +3567,23 @@ components:
           type: integer
       required:
       - scheduled
+    Season:
+      type: object
+      description: Just enough to populate a season picker.
+      properties:
+        season:
+          type: string
+          readOnly: true
+        label:
+          type: string
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+      required:
+      - is_active
+      - label
+      - season
     SeasonDecision:
       type: object
       properties:
@@ -2610,6 +3664,14 @@ components:
       - id
       - kind
       - username
+    SourceEnum:
+      enum:
+      - campus
+      - off_campus
+      type: string
+      description: |-
+        * `campus` - Through the Placement Cell
+        * `off_campus` - Off campus (rules 5 and 24)
     StaffStats:
       type: object
       description: PC-UC-011/012. Operational figures, staff only.
@@ -2710,6 +3772,13 @@ components:
       - missing_fields
       - updated_at
       - user_id
+    SubmitOfferLetter:
+      type: object
+      properties:
+        document_id:
+          type: integer
+      required:
+      - document_id
     TopicEnum:
       enum:
       - drive
@@ -2738,6 +3807,49 @@ components:
           maxLength: 300
       required:
       - to_status
+    TransitionEntry:
+      type: object
+      description: |-
+        `reason` and the actor ids are absent for a non-staff reader — see
+        api/audit.py for why.
+      properties:
+        from_status:
+          type: string
+        to_status:
+          type: string
+        at:
+          type: string
+          format: date-time
+        actor_label:
+          type: string
+        reason:
+          type: string
+        actor_user_id:
+          type: integer
+          nullable: true
+        actor_recruiter_id:
+          type: integer
+          nullable: true
+      required:
+      - actor_label
+      - at
+      - from_status
+      - to_status
+    TransitionHistory:
+      type: object
+      properties:
+        application_id:
+          type: integer
+        redacted:
+          type: boolean
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransitionEntry'
+      required:
+      - application_id
+      - redacted
+      - results
     UserRef:
       type: object
       properties:
@@ -2783,6 +3895,14 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    WaiveIncident:
+      type: object
+      properties:
+        reason:
+          type: string
+          maxLength: 300
+      required:
+      - reason
     Withdraw:
       type: object
       properties:

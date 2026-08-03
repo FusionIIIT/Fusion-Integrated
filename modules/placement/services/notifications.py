@@ -27,7 +27,8 @@ TOPICS = {
     "application.rejected", "interview.scheduled", "interview.rescheduled",
     "offer.issued", "offer.expiring", "offer.expired",
     "announcement.published", "recruiter.invited", "company.approved",
-    "company.rejected",
+    "company.rejected", "conduct.sanctioned", "registration.confirmed",
+    "record.not_joining",
 }
 
 
@@ -95,9 +96,35 @@ def _sent_today(recipient_user_id: int | None, now) -> int:
         sent_at__gte=since).count()
 
 
+#: A row claimed but not resolved within this window is assumed to belong to a
+#: worker that died, and is returned to the queue.
+CLAIM_TIMEOUT = timedelta(minutes=10)
+
+
+def _reclaim_stranded(now) -> int:
+    """Return rows whose worker died mid-send back to pending."""
+    return (NotificationOutbox.objects
+            .filter(status="sending", claimed_at__lt=now - CLAIM_TIMEOUT)
+            .update(status="pending", claimed_at=None))
+
+
+def _claim(row) -> bool:
+    """Take exclusive ownership of a row, or report that someone else has it.
+
+    A single conditional UPDATE: the database decides the winner, so of two
+    workers holding the same `pending` row exactly one proceeds to send. Doing
+    this after send_mail — which is where the mark used to be — meant both
+    would deliver and the recipient got the notification twice.
+    """
+    return NotificationOutbox.objects.filter(
+        pk=row.pk, status="pending",
+    ).update(status="sending", claimed_at=timezone.now()) == 1
+
+
 def deliver_pending(*, limit: int | None = None, now=None) -> DeliveryReport:
     """Drain the outbox. Safe to run concurrently and safe to re-run."""
     now = now or timezone.now()
+    _reclaim_stranded(now)
     limit = limit or getattr(settings, "NOTIFY_MAX_PER_RUN", 500)
     max_attempts = getattr(settings, "NOTIFY_MAX_ATTEMPTS", 5)
     daily_cap = getattr(settings, "NOTIFY_DAILY_CAP_PER_RECIPIENT", 20)
@@ -138,6 +165,11 @@ def deliver_pending(*, limit: int | None = None, now=None) -> DeliveryReport:
             report.skipped_capped += 1
             continue
 
+        # Claim before sending, never after.
+        if not _claim(row):
+            report.deferred += 1
+            continue
+
         try:
             send_mail(
                 subject=row.subject, message=row.body,
@@ -153,8 +185,9 @@ def deliver_pending(*, limit: int | None = None, now=None) -> DeliveryReport:
         row.sent_at = timezone.now()
         row.attempts += 1
         row.last_error = ""
+        row.claimed_at = None
         row.save(update_fields=["status", "sent_at", "attempts", "last_error",
-                                "updated_at"])
+                                "claimed_at", "updated_at"])
         report.sent += 1
 
     left = NotificationOutbox.objects.filter(status="pending").count()
@@ -171,7 +204,13 @@ def _fail(row: NotificationOutbox, error: str, max_attempts: int) -> None:
         row.status = "failed"
         log.warning("placement.notify.giving_up id=%s topic=%s err=%s",
                     row.pk, row.topic, error)
-    row.save(update_fields=["attempts", "last_error", "status", "updated_at"])
+    else:
+        # Back to the queue explicitly: a claimed row would otherwise sit in
+        # "sending" until the reclaim sweep noticed it.
+        row.status = "pending"
+    row.claimed_at = None
+    row.save(update_fields=["attempts", "last_error", "status", "claimed_at",
+                            "updated_at"])
 
 
 def _resolve_addresses(rows: list[NotificationOutbox]) -> dict[int, str]:

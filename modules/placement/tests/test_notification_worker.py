@@ -5,6 +5,7 @@ nothing is sent twice however often the worker runs, a permanently-bad address
 stops being retried, and a broadcast is one row that fans out at send time.
 """
 from datetime import timedelta
+from unittest.mock import patch
 
 import pytest
 from django.core import mail
@@ -222,3 +223,68 @@ class TestVolumeGuards:
         assert report.skipped_capped == 2
         # Suppressed, not failed: the decision was right, the volume was not.
         assert NotificationOutbox.objects.filter(status="suppressed").count() == 2
+
+
+class TestConcurrentDrains:
+    """Two workers draining at once must not send the same row twice.
+
+    Latent until the beat schedule existed: nothing ran the task, so the drains
+    never overlapped. A 60-second beat with a 270-second time limit makes
+    overlap the normal case.
+    """
+
+    def test_a_row_is_claimed_before_it_is_sent(self):
+        """The claim is a conditional UPDATE, so the loser sees zero rows
+        affected and skips — rather than both sending and both marking sent."""
+        row = notifications.enqueue(
+            topic="offer.issued", dedupe_key="race:1",
+            recipient_email="a@test.invalid", subject="s", body="b")
+
+        assert notifications._claim(row) is True
+        # A second worker holding the same in-memory row loses the race.
+        assert notifications._claim(row) is False
+
+        row.refresh_from_db()
+        assert row.status == "sending"
+
+    def test_a_claimed_row_is_not_picked_up_by_the_next_pass(self, mailoutbox):
+        notifications.enqueue(
+            topic="offer.issued", dedupe_key="race:2",
+            recipient_email="b@test.invalid", subject="s", body="b")
+        NotificationOutbox.objects.update(status="sending",
+                                          claimed_at=timezone.now())
+
+        notifications.deliver_pending()
+
+        assert len(mailoutbox) == 0
+
+    def test_a_row_stranded_by_a_dead_worker_is_reclaimed(self, mailoutbox):
+        """A worker that dies between claiming and sending must not park the
+        notification forever."""
+        notifications.enqueue(
+            topic="offer.issued", dedupe_key="race:3",
+            recipient_email="c@test.invalid", subject="s", body="b")
+        stranded = timezone.now() - notifications.CLAIM_TIMEOUT - timedelta(minutes=1)
+        NotificationOutbox.objects.update(status="sending", claimed_at=stranded)
+
+        notifications.deliver_pending()
+
+        assert len(mailoutbox) == 1
+        assert NotificationOutbox.objects.get().status == "sent"
+
+    def test_a_retryable_failure_returns_the_row_to_the_queue(self, settings):
+        """Not left in `sending`, or every transient bounce would wait out the
+        reclaim window before being retried."""
+        settings.NOTIFY_MAX_ATTEMPTS = 3
+        notifications.enqueue(
+            topic="offer.issued", dedupe_key="race:4",
+            recipient_email="d@test.invalid", subject="s", body="b")
+
+        with patch("modules.placement.services.notifications.send_mail",
+                   side_effect=OSError("smtp down")):
+            notifications.deliver_pending()
+
+        row = NotificationOutbox.objects.get()
+        assert row.status == "pending"
+        assert row.claimed_at is None
+        assert row.attempts == 1

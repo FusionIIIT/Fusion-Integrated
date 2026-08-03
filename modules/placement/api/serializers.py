@@ -10,6 +10,7 @@ from modules.placement.models import (
     Application,
     Company,
     CompanyContact,
+    ConductIncident,
     InterviewRound,
     JobPosting,
     Offer,
@@ -326,12 +327,27 @@ class PlacementPolicySerializer(serializers.ModelSerializer):
                   "default_offer_response_hours")
 
 
+class SeasonSerializer(serializers.ModelSerializer):
+    """Just enough to populate a season picker."""
+
+    class Meta:
+        model = PlacementPolicy
+        fields = ("season", "label", "is_active")
+        read_only_fields = fields
+
+
 class RegistrationSerializer(serializers.ModelSerializer):
+    #: The season code, so a client can match a registration to a season
+    #: without resolving the policy id.
+    season = serializers.CharField(source="policy.season", read_only=True)
+
     class Meta:
         model = PlacementRegistration
-        fields = ("id", "policy", "user_id", "status", "category_number",
-                  "switches_used", "offer_count", "best_accepted_ctc_lpa",
-                  "held_is_marquee", "held_sector_kind", "registered_at")
+        fields = ("id", "policy", "season", "user_id", "status",
+                  "category_number", "switches_used", "offer_count",
+                  "best_accepted_ctc_lpa", "held_is_marquee",
+                  "held_sector_kind", "registered_late", "debarred_reason",
+                  "registered_at")
         read_only_fields = fields
 
 
@@ -521,3 +537,194 @@ class AcademicFiltersSerializer(serializers.Serializer):
     disciplines = serializers.ListField(child=serializers.CharField())
     batch_years = serializers.ListField(child=serializers.IntegerField())
     programmes = serializers.ListField(child=serializers.CharField())
+
+
+# -- Conduct and sanctions (rules 18, 19, 21) ----------------------------------
+class ConductIncidentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ConductIncident
+        fields = ("id", "user_id", "kind", "posting", "note", "waived",
+                  "waived_reason", "recorded_by_user_id", "created_at")
+        read_only_fields = fields
+
+
+class RecordIncidentSerializer(serializers.Serializer):
+    season = serializers.CharField(max_length=12)
+    user_id = serializers.IntegerField()
+    kind = serializers.ChoiceField(
+        choices=["consent_failure", "code_of_conduct", "misrepresentation"])
+    note = serializers.CharField(max_length=300)
+    posting_id = serializers.IntegerField(required=False, allow_null=True)
+
+
+class RecommendationSerializer(serializers.Serializer):
+    """What the policy points to. `automatic` is always false — rules 19 and 21
+    leave the decision to a human."""
+
+    sanction = serializers.CharField()
+    rule = serializers.CharField()
+    message = serializers.CharField()
+    automatic = serializers.BooleanField()
+
+
+class IncidentRecordedSerializer(serializers.Serializer):
+    incident = ConductIncidentSerializer()
+    recommendation = RecommendationSerializer()
+
+
+class ApplySanctionSerializer(serializers.Serializer):
+    season = serializers.CharField(max_length=12)
+    user_id = serializers.IntegerField()
+    sanction = serializers.ChoiceField(
+        choices=["bar_next_two", "deregister", "bar_season", "bar_permanent"])
+    rule = serializers.CharField(max_length=4)
+    reason = serializers.CharField(max_length=300)
+
+
+class LiftSanctionSerializer(serializers.Serializer):
+    season = serializers.CharField(max_length=12)
+    user_id = serializers.IntegerField()
+    reason = serializers.CharField(max_length=300)
+
+
+class WaiveIncidentSerializer(serializers.Serializer):
+    reason = serializers.CharField(max_length=300)
+
+
+# -- Registration (rules 1, 20, 21) --------------------------------------------
+class RegistrationTermsSerializer(serializers.Serializer):
+    """What route is open to this student, and what it costs."""
+
+    route = serializers.CharField()
+    reason = serializers.CharField()
+    message = serializers.CharField()
+    fee = serializers.IntegerField()
+    allowed = serializers.BooleanField()
+
+
+class RegisterSerializer(serializers.Serializer):
+    season = serializers.CharField(max_length=12)
+
+
+class OptOutSerializer(serializers.Serializer):
+    season = serializers.CharField(max_length=12)
+    reason = serializers.CharField(max_length=300, required=False,
+                                   allow_blank=True, default="")
+
+
+class FeeApprovalSerializer(serializers.Serializer):
+    """Rules 20 and 21 both require the challan or receipt to be produced."""
+
+    season = serializers.CharField(max_length=12)
+    user_id = serializers.IntegerField()
+    fee_reference = serializers.CharField(max_length=80)
+
+
+# -- Post-offer obligations (rules 22, 24) -------------------------------------
+class PlacementRecordDetailSerializer(serializers.ModelSerializer):
+    """A student's own record, with what rules 22 and 24 still want from it."""
+
+    company = CompanyBriefSerializer(read_only=True)
+    offer_letter_submitted = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PlacementRecord
+        fields = ("id", "company", "source", "kind", "ctc_lpa",
+                  "offer_letter_submitted", "offer_letter_submitted_at",
+                  "not_joining_declared_at", "not_joining_reason",
+                  "not_joining_was_late", "created_at")
+        read_only_fields = fields
+
+    def get_offer_letter_submitted(self, obj) -> bool:
+        return obj.offer_letter_id is not None
+
+
+class ClearanceSerializer(serializers.Serializer):
+    """Rule 24. `blocking` names each company, so a refusal is actionable."""
+
+    user_id = serializers.IntegerField()
+    cleared = serializers.BooleanField()
+    blocking = serializers.ListField(child=serializers.CharField())
+    message = serializers.CharField()
+
+
+class SubmitOfferLetterSerializer(serializers.Serializer):
+    document_id = serializers.IntegerField()
+
+
+class NotJoiningSerializer(serializers.Serializer):
+    reason = serializers.CharField(max_length=300)
+
+
+class NotJoiningResultSerializer(serializers.Serializer):
+    record = PlacementRecordDetailSerializer()
+    accepted = serializers.BooleanField()
+    is_late = serializers.BooleanField()
+    message = serializers.CharField()
+
+
+class OffCampusRecordSerializer(serializers.Serializer):
+    season = serializers.CharField(max_length=12)
+    user_id = serializers.IntegerField()
+    company_id = serializers.IntegerField()
+    ctc_lpa = serializers.DecimalField(max_digits=8, decimal_places=2,
+                                       required=False, allow_null=True)
+    kind = serializers.ChoiceField(choices=["fte", "internship", "ppo"],
+                                   default="fte")
+
+
+# -- Bulk actions --------------------------------------------------------------
+class BulkTransitionSerializer(serializers.Serializer):
+    application_ids = serializers.ListField(
+        child=serializers.IntegerField(), allow_empty=False, max_length=200)
+    to_status = serializers.CharField(max_length=24)
+    reason = serializers.CharField(max_length=300, required=False,
+                                   allow_blank=True, default="")
+
+
+class BulkOutcomeSerializer(serializers.Serializer):
+    application_id = serializers.IntegerField()
+    moved = serializers.BooleanField()
+    error = serializers.CharField(allow_blank=True)
+    code = serializers.CharField(allow_blank=True)
+
+
+class BulkResultSerializer(serializers.Serializer):
+    """Counts first, then the per-item detail — a partial run must never read
+    as a complete one."""
+
+    moved = serializers.IntegerField()
+    refused = serializers.IntegerField()
+    results = BulkOutcomeSerializer(many=True)
+
+
+# -- Audit trail (PC-BR-008) ---------------------------------------------------
+class TransitionEntrySerializer(serializers.Serializer):
+    """`reason` and the actor ids are absent for a non-staff reader — see
+    api/audit.py for why."""
+
+    from_status = serializers.CharField()
+    to_status = serializers.CharField()
+    at = serializers.DateTimeField()
+    actor_label = serializers.CharField(allow_blank=True)
+    reason = serializers.CharField(required=False, allow_blank=True)
+    actor_user_id = serializers.IntegerField(required=False, allow_null=True)
+    actor_recruiter_id = serializers.IntegerField(required=False, allow_null=True)
+
+
+class TransitionHistorySerializer(serializers.Serializer):
+    application_id = serializers.IntegerField()
+    #: True when reasons and actor identities were withheld, so a client can
+    #: say so rather than implying the trail is empty.
+    redacted = serializers.BooleanField()
+    results = TransitionEntrySerializer(many=True)
+
+
+class StudentConductIncidentSerializer(serializers.ModelSerializer):
+    """A student's own record. Shows the note and waiver — both contestable —
+    but not who recorded it."""
+
+    class Meta:
+        model = ConductIncident
+        fields = ("id", "kind", "note", "waived", "waived_reason", "created_at")
+        read_only_fields = fields

@@ -33,6 +33,14 @@ class PlacementPolicy(TimeStampedModel):
                                               null=True, blank=True)
     allow_backlog_registration = models.BooleanField(default=True)
 
+    # Rule 20's "stipulated deadline". After it, registering needs the late
+    # fee and the Placement Cell's approval.
+    registration_closes_on = models.DateField(null=True, blank=True)
+
+    # Rule 22's "on or before April 15" — a date, because the season label
+    # ("2026-27") does not say which calendar year it falls in.
+    notify_non_joining_by = models.DateField(null=True, blank=True)
+
     # Rules 20 and 21. Recorded only; PCMS does not take payment.
     late_registration_fee = models.PositiveIntegerField(default=1000)
     reregistration_fee = models.PositiveIntegerField(default=2000)
@@ -392,6 +400,20 @@ class PlacementRegistration(TimeStampedModel, UserScopedModel):
     debarred_reason = models.CharField(max_length=300, blank=True)
     registered_at = models.DateTimeField(null=True, blank=True)
 
+    # Rules 20 and 21 both require a challan or receipt to be produced. PCMS
+    # takes no payment — it records the reference the office was shown.
+    late_fee_reference = models.CharField(max_length=80, blank=True)
+    reregistration_reference = models.CharField(max_length=80, blank=True)
+    approved_by_user_id = models.IntegerField(null=True, blank=True)
+
+    # The sanction in force, from domain.conduct.Sanction. Rule 19's first tier
+    # is scoped to the next two drives rather than the season, so the bar needs
+    # a start point to count from.
+    sanction = models.CharField(max_length=16, blank=True)
+    sanction_rule = models.CharField(max_length=4, blank=True)
+    sanctioned_at = models.DateTimeField(null=True, blank=True)
+    sanctioned_by_user_id = models.IntegerField(null=True, blank=True)
+
     class Meta:
         db_table = "placement_registration"
         constraints = [
@@ -671,18 +693,37 @@ class PlacementRecord(TimeStampedModel, UserScopedModel):
     student cannot hold two active placements in one season.
     """
 
+    SOURCE = [("campus", "Through the Placement Cell"),
+              ("off_campus", "Off campus (rules 5 and 24)")]
+
     policy = models.ForeignKey(PlacementPolicy, on_delete=models.PROTECT,
                                related_name="records")
+    # Null for an off-campus placement: rules 5 and 24 cover those too, and
+    # they never passed through a posting or an offer here.
     offer = models.OneToOneField(Offer, on_delete=models.PROTECT,
-                                 related_name="record")
-    company = models.ForeignKey(Company, on_delete=models.PROTECT,
-                                related_name="records")
+                                 related_name="record", null=True, blank=True)
     posting = models.ForeignKey(JobPosting, on_delete=models.PROTECT,
+                                related_name="records", null=True, blank=True)
+    source = models.CharField(max_length=12, choices=SOURCE, default="campus")
+    company = models.ForeignKey(Company, on_delete=models.PROTECT,
                                 related_name="records")
     ctc_lpa = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     kind = models.CharField(max_length=12, default="fte")
     is_active = models.BooleanField(default=True)
     recorded_by_user_id = models.IntegerField(null=True, blank=True)
+
+    # Rule 24. The no-dues certificate is withheld until this is submitted, so
+    # it is the institute's lever and the reason this column exists.
+    offer_letter = models.ForeignKey("ProfileDocument", on_delete=models.SET_NULL,
+                                     null=True, blank=True,
+                                     related_name="offer_letter_for")
+    offer_letter_submitted_at = models.DateTimeField(null=True, blank=True)
+
+    # Rule 22. Declaring it does not release the letter obligation — the
+    # acceptance happened and the record stands.
+    not_joining_declared_at = models.DateTimeField(null=True, blank=True)
+    not_joining_reason = models.CharField(max_length=300, blank=True)
+    not_joining_was_late = models.BooleanField(default=False)
 
     class Meta:
         db_table = "placement_record"
@@ -690,6 +731,17 @@ class PlacementRecord(TimeStampedModel, UserScopedModel):
             models.UniqueConstraint(
                 fields=["user_id", "policy"], condition=Q(is_active=True),
                 name="one_active_placement_per_student_per_season",
+            ),
+            # A campus placement came from an offer on a posting; an off-campus
+            # one has neither. Allowing both to be null on a campus record
+            # would make the source field a lie.
+            models.CheckConstraint(
+                condition=(
+                    Q(source="campus", offer__isnull=False, posting__isnull=False)
+                    | Q(source="off_campus", offer__isnull=True,
+                        posting__isnull=True)
+                ),
+                name="record_source_matches_its_origin",
             ),
         ]
         indexes = [
@@ -746,8 +798,8 @@ class NotificationOutbox(TimeStampedModel):
     `dedupe_key` makes redelivery idempotent.
     """
 
-    STATUS = [("pending", "Pending"), ("sent", "Sent"), ("failed", "Failed"),
-              ("suppressed", "Suppressed")]
+    STATUS = [("pending", "Pending"), ("sending", "Sending"), ("sent", "Sent"),
+              ("failed", "Failed"), ("suppressed", "Suppressed")]
 
     topic = models.CharField(max_length=60, db_index=True)
     dedupe_key = models.CharField(max_length=200, unique=True)
@@ -763,6 +815,9 @@ class NotificationOutbox(TimeStampedModel):
     attempts = models.PositiveSmallIntegerField(default=0)
     last_error = models.CharField(max_length=300, blank=True)
     sent_at = models.DateTimeField(null=True, blank=True)
+    #: When a worker claimed this row. A crash between claiming and sending
+    #: would otherwise strand it in "sending" forever.
+    claimed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = "placement_notification_outbox"
@@ -809,3 +864,52 @@ class PlacementStatsSnapshot(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.policy_id} {self.dimension}={self.dimension_value}"
+
+
+class ConductIncident(TimeStampedModel, UserScopedModel):
+    """One recorded breach of the code of conduct (rules 18, 19, 21).
+
+    The ladder is derived by counting these, never by a stored tally that could
+    drift. A waived incident stays on the record and stops counting, because
+    rule 19's escape hatch — "the student may inform the placement cell in
+    writing" — is a decision someone made and should remain visible.
+    """
+
+    KIND = [("consent_failure", "Did not appear after consenting (r19)"),
+            ("code_of_conduct", "Code of conduct (r21)"),
+            ("misrepresentation", "False resume or unfair means (r18)")]
+
+    registration = models.ForeignKey(PlacementRegistration,
+                                     on_delete=models.CASCADE,
+                                     related_name="incidents")
+    kind = models.CharField(max_length=20, choices=KIND)
+    #: Which company's process, where the incident had one.
+    posting = models.ForeignKey(JobPosting, on_delete=models.SET_NULL,
+                                null=True, blank=True, related_name="incidents")
+    note = models.CharField(max_length=300)
+
+    recorded_by_user_id = models.IntegerField()
+
+    waived = models.BooleanField(default=False)
+    waived_reason = models.CharField(max_length=300, blank=True)
+    waived_by_user_id = models.IntegerField(null=True, blank=True)
+    waived_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "placement_conduct_incident"
+        indexes = [
+            models.Index(fields=["registration", "kind", "waived"],
+                         name="incident_ladder_idx"),
+        ]
+        constraints = [
+            # A waiver is a decision; it must say who made it and why.
+            models.CheckConstraint(
+                condition=Q(waived=False)
+                | (Q(waived=True) & ~Q(waived_reason="")
+                   & Q(waived_by_user_id__isnull=False)),
+                name="incident_waiver_is_attributed",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.kind} u{self.user_id}{' (waived)' if self.waived else ''}"

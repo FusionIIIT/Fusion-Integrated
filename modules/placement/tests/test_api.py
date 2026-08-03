@@ -157,3 +157,24 @@ def test_every_transition_is_audited(stub_iam, posting):
     t = ApplicationTransition.objects.get(application=app)
     assert (t.from_status, t.to_status, t.actor_user_id) == ("submitted",
                                                              "under_review", 9)
+
+
+def test_seasons_are_a_closed_list(stub_iam):
+    """Free text let a typo create a posting whose season has no policy — it
+    looked fine until a student applied and hit `policy_missing`."""
+    from modules.placement.models import PlacementPolicy
+
+    PlacementPolicy.objects.create(season="2025-26", is_active=False)
+    PlacementPolicy.objects.create(season="2026-27", is_active=True)
+    client = _client(stub_iam, modules=("placement_cell",))
+
+    rows = client.get("/api/v1/placement/seasons").json()
+
+    # Active first, so the form can default to it.
+    assert [r["season"] for r in rows] == ["2026-27", "2025-26"]
+    assert rows[0]["is_active"] is True
+
+
+def test_seasons_need_the_module_grant(stub_iam):
+    client = _client(stub_iam, modules=())
+    assert client.get("/api/v1/placement/seasons").status_code == 403

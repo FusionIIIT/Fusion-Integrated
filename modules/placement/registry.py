@@ -12,6 +12,11 @@ MODULE = {
 
 NAV_ITEMS = [
     # -- student -----------------------------------------------------------
+    # First, because rule 1 makes it the gate on everything below it.
+    {"code": "placement.registration", "label": "Season Registration",
+     "icon": "FaClipboardCheck", "to": "/placement/registration",
+     "required_permission": "placement_cell.registration.self",
+     "sort_order": 5},
     {"code": "placement.postings", "label": "Opportunities",
      "icon": "FaClipboardList", "to": "/placement/postings",
      "required_permission": "placement_cell.job_posting.view", "sort_order": 10},
@@ -28,6 +33,10 @@ NAV_ITEMS = [
      "sort_order": 40},
 
     # -- staff (TPO / chairman) -------------------------------------------
+    {"code": "placement.registrations", "label": "Registrations",
+     "icon": "FaClipboardCheck", "to": "/placement/registration-approvals",
+     "required_permission": "placement_cell.registration.manage",
+     "sort_order": 55},
     {"code": "placement.applications", "label": "Applications",
      "icon": "FaUsers", "to": "/placement/applications",
      "required_permission": "placement_cell.application.view", "sort_order": 50},
@@ -71,6 +80,14 @@ PERMISSIONS = [
     ("placement_cell.company.manage", "Register and approve companies"),
     ("placement_cell.announcement.publish", "Publish announcements"),
     ("placement_cell.report.view", "See operational reports"),
+    ("placement_cell.registration.debar",
+     "Record conduct incidents and impose placement sanctions"),
+    ("placement_cell.registration.manage",
+     "Approve late registrations and re-registrations"),
+    ("placement_cell.registration.self",
+     "Register yourself for a placement season"),
+    ("placement_cell.record.manage",
+     "Record off-campus placements and chase offer letters"),
     ("placement_cell.academic_directory.view",
      "Browse every student's declared CPI"),
 ]
