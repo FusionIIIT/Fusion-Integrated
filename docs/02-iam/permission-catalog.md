@@ -1,19 +1,19 @@
 ---
 owner: iam-lead
-status: generated
-last-reviewed: 2026-08-01
-generated-by: python manage.py export_permission_catalog --file docs/02-iam/permission-catalog.md
+status: design
+last-reviewed: 2026-08-03
 ---
 
 # Permission Catalog
 
-> **This file is generated. Do not hand-edit.**
+> **This file is the intended taxonomy, not the implemented one.** It was
+> written before the code and covers modules that do not exist yet, so a code
+> listed here may not be one any view guards on.
 >
-> Source of truth is the `rbac_permission` seed data in each module's
-> `permissions.py`. CI runs `export_permission_catalog` and fails on a non-empty
-> `git diff`, so this document cannot drift from the code.
->
-> Regenerate: `make permission-catalog`
+> For what is actually implemented and who actually holds it, read
+> [permission-catalog.generated.md](permission-catalog.generated.md). That file
+> is written by `make permissions` from each module's `registry.py` and verified
+> in CI, so it cannot drift.
 
 Naming rules and semantics: [rbac-model.md](rbac-model.md#permission-codes).
 Format is `<module>.<resource>.<action>`, where the first segment must be an existing

@@ -104,17 +104,34 @@ NAV_ITEMS = [
 ]
 ```
 
-Three things to get right:
+Declaring a permission is only half of it. Say who may hold it, in the same file:
+
+```python
+# registry.py
+SYSTEM_PERMISSIONS = ["complaints.complaint.auto_close"]   # only a task does this
+
+_RESIDENT = ["complaints.complaint.view_self", "complaints.complaint.create"]
+_WARDEN = [*_RESIDENT, "complaints.complaint.view", "complaints.complaint.assign"]
+
+ROLE_GRANTS = {"student": _RESIDENT, "warden": _WARDEN}
+```
+
+Four things to get right:
 
 - Permission codes follow `<module>.<resource>.<action>` with an action from the closed vocabulary. CI
   enforces the regex and that the first segment names a real module
   ([rbac-model.md](../02-iam/rbac-model.md#permission-codes)).
+- **Every permission needs a holder in `ROLE_GRANTS`, or a place in `SYSTEM_PERMISSIONS`.** A code no
+  designation holds does not fail loudly: the nav item is filtered out of the sidebar and the endpoint
+  answers 403 forever. `make check` refuses it for that reason.
 - `status="planned"` means nobody sees it. Flip to `active` in the last commit of the last sub-phase.
 - `legacy_column_name` only if the ERP has a matching `globals_moduleaccess` column. Wrong or invented
   values fail the H2 parity check.
 
-Seeded by a data migration in `services/iam`, then `make permission-catalog` to regenerate
-[permission-catalog.md](../02-iam/permission-catalog.md) — CI fails on a stale diff.
+Then `make permissions`, which writes `registry/permissions.json` and
+[permission-catalog.generated.md](../02-iam/permission-catalog.generated.md). CI fails on a stale diff.
+The IAM seeds from that manifest on deploy — this module's registry is the source of truth for who holds
+what, and the IAM only stores the answer.
 
 ---
 

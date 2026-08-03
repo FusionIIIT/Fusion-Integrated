@@ -45,6 +45,7 @@ git worktree add /srv/fusion/$SVC/releases/<sha> $TAG
 uv sync --frozen
 psql -f ops/db/roles.sql                    # idempotent; new tables get grants
 manage.py migrate --noinput                 # as platform_migrator (runtime role has no DDL)
+manage.py seed_modules                      # module registry and nav from registry.py
 manage.py check --deploy --fail-level WARNING
 ln -sfn releases/<sha> current              # ATOMIC swap
 systemctl reload fusion-$SVC                # graceful gunicorn re-exec, in-flight requests finish
@@ -55,6 +56,24 @@ ops/deploy/prune.sh $SVC --keep 5
 
 **If it stops at `migrate`:** the symlink has **not** moved, so the old code is still serving. Do not rerun
 blindly — read the error. A partially-applied migration is a stop-and-escalate condition.
+
+### Permissions — on the IAM host, after the swap
+
+The platform declares which permissions exist and which designations may hold
+them; the IAM stores that. A release that adds a permission is not finished
+until the IAM has seeded it, and until then the endpoint guarding on it answers
+403 and its nav item is missing:
+
+```bash
+cd /srv/fusion/sysadmin/current/Backend/backend
+manage.py seed_iam_permissions --dry-run     # reads /srv/fusion/platform/current/registry/permissions.json
+manage.py seed_iam_permissions
+```
+
+Always read the dry run first — it prints every grant it would revoke, and a
+revoke is a live loss of access. The command refuses a manifest whose version it
+does not recognise and one that lists no modules, so a truncated file cannot
+wipe the table. Only rows for modules the manifest names are touched.
 
 ### Frontend
 

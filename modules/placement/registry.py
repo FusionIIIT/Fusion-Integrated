@@ -91,3 +91,60 @@ PERMISSIONS = [
     ("placement_cell.academic_directory.view",
      "Browse every student's declared CPI"),
 ]
+
+#: Performed by a service or a scheduled task, so no designation holds them.
+SYSTEM_PERMISSIONS = [
+    "placement_cell.application.auto_withdraw",
+    "placement_cell.offer.expire",
+]
+
+_STUDENT = [
+    "placement_cell.registration.self",
+    "placement_cell.job_posting.view",
+    "placement_cell.application.view_self",
+    "placement_cell.application.create",
+    "placement_cell.application.delete",
+    "placement_cell.offer.respond",
+]
+
+_COORDINATOR = [
+    "placement_cell.job_posting.view",
+    "placement_cell.application.view",
+    "placement_cell.application.review",
+    "placement_cell.report.view",
+    "placement_cell.academic_directory.view",
+]
+
+_OFFICER = [
+    *_COORDINATOR,
+    "placement_cell.job_posting.manage",
+    "placement_cell.interview.schedule",
+    "placement_cell.offer.issue",
+    "placement_cell.offer.revoke",
+    "placement_cell.company.manage",
+    "placement_cell.announcement.publish",
+    "placement_cell.registration.manage",
+    "placement_cell.registration.debar",
+    "placement_cell.record.manage",
+]
+
+#: Oversees rather than operates: no shortlisting and no offers.
+_CHAIRMAN = [
+    "placement_cell.job_posting.view",
+    "placement_cell.application.view",
+    "placement_cell.report.view",
+    "placement_cell.academic_directory.view",
+    "placement_cell.announcement.publish",
+]
+
+#: Keyed by the designation name as it exists in globals_designation. The IAM
+#: seeds from this via the generated manifest, so a permission this module
+#: checks can never be one nobody is able to hold.
+ROLE_GRANTS = {
+    "student": _STUDENT,
+    "placement_coordinator": _COORDINATOR,
+    "placement_officer": _OFFICER,
+    "placement_chairman": _CHAIRMAN,
+    "Dean Academic": _CHAIRMAN,
+    "acadadmin": _COORDINATOR,
+}

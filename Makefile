@@ -33,6 +33,7 @@ check: ## everything CI runs
 	$(PY) ops/checks/no_cross_module_fk.py
 	$(PY) ops/checks/contracts_are_plural.py
 	$(PY) ops/checks/nav_matches_routes.py
+	$(PY) manage.py permission_manifest --check
 	$(MAKE) schema-check
 	$(PY) -m pytest -q
 
@@ -44,6 +45,9 @@ SCHEMA := openapi/fusion-integrated.v1.yaml
 schema:  ## regenerate the committed OpenAPI schema
 	$(PY) manage.py spectacular --fail-on-warn --file $(SCHEMA)
 
+permissions:  ## regenerate the permission manifest the IAM seeds from
+	$(PY) manage.py permission_manifest
+
 module-structure:  ## regenerate the module-structure reference PDF
 	$(PY) ops/docs/module_structure.py
 
@@ -54,4 +58,4 @@ schema-check:  ## the committed schema must match the code
 	@echo "openapi schema matches the code"
 
 .PHONY: help install up migrate seed dev test check check-client schema \
-	schema-check module-structure
+	schema-check permissions module-structure
