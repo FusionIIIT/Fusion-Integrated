@@ -50,6 +50,20 @@ export function errorMessage(e: unknown): string {
   return env.message ?? "Request failed.";
 }
 
+/** A `responseType: "blob"` request delivers the *error* body as a Blob too,
+ *  which hides the envelope from errorMessage. Read it back before rethrowing. */
+export async function readBlobError(e: unknown): Promise<unknown> {
+  const res = (e as { response?: { data?: unknown } })?.response;
+  if (res?.data instanceof Blob) {
+    try {
+      res.data = JSON.parse(await res.data.text());
+    } catch {
+      res.data = undefined;             // an HTML page, not our envelope
+    }
+  }
+  return e;
+}
+
 export function requestId(e: unknown): string | undefined {
   return (e as { response?: { data?: { error?: { request_id?: string } } } })
     ?.response?.data?.error?.request_id;

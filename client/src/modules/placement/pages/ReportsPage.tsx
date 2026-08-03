@@ -2,26 +2,45 @@ import {
   Alert, Badge, Button, Card, Container, Grid, Group, Progress, SimpleGrid,
   Stack, Table, Text,
 } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { FaChartBar, FaDownload, FaInfoCircle } from "react-icons/fa";
 
 import { useAuth } from "../../../auth/AuthProvider";
+import { errorMessage } from "../../../lib/http";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
-import { exportUrls, useOutstandingLetters, useStats } from "../api/hooks";
+import {
+  useCsvExport, useOutstandingLetters, useStats, type ExportKind,
+} from "../api/hooks";
 
 /** Staff only, matching the server. Hiding it is UX; the endpoint enforces. */
 function ExportActions() {
+  const exportCsv = useCsvExport();
+  const running = exportCsv.isPending ? exportCsv.variables : undefined;
+
+  function download(kind: ExportKind, label: string) {
+    exportCsv.mutate(kind, {
+      onError: (e) => notifications.show({
+        color: "red", title: `${label} export failed`, message: errorMessage(e),
+      }),
+    });
+  }
+
   return (
     <Group gap="xs">
       <Button
-        component="a" href={exportUrls.applications}
         variant="default" size="xs" leftSection={<FaDownload size={11} />}
+        loading={running === "applications"}
+        disabled={exportCsv.isPending && running !== "applications"}
+        onClick={() => download("applications", "Applications")}
       >
         Applications CSV
       </Button>
       <Button
-        component="a" href={exportUrls.placements}
         variant="default" size="xs" leftSection={<FaDownload size={11} />}
+        loading={running === "placements"}
+        disabled={exportCsv.isPending && running !== "placements"}
+        onClick={() => download("placements", "Placements")}
       >
         Placements CSV
       </Button>

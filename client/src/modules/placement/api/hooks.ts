@@ -8,7 +8,8 @@ import {
   useMutation, useQuery, useQueryClient, type UseMutationOptions,
 } from "@tanstack/react-query";
 
-import { http } from "../../../lib/http";
+import { filenameFromDisposition, saveBlob } from "../../../lib/download";
+import { http, readBlobError } from "../../../lib/http";
 import type {
   Announcement, Applicant, Application, Company, EligibilityVerdict,
   InterviewRound, Offer, Page, Posting, ProfileDocument, StaffStats,
@@ -339,13 +340,32 @@ export function documentDownloadUrl(id: number): string {
   return `/api/v1/placement/documents/${id}/download`;
 }
 
-/** Exports are plain navigations, not fetches: the browser handles the
- *  download and the session cookie authenticates it. Fetching would mean
- *  buffering the whole file in JS to hand it straight back to the browser. */
-export const exportUrls = {
-  applications: "/api/v1/placement/exports/applications.csv",
-  placements: "/api/v1/placement/exports/placements.csv",
-} as const;
+export type ExportKind = "applications" | "placements";
+
+const EXPORT_PATHS: Record<ExportKind, string> = {
+  applications: "/placement/exports/applications.csv",
+  placements: "/placement/exports/placements.csv",
+};
+
+/** Exports are fetched, not navigated to. A link would leave the SPA, so a
+ *  refused or throttled export lands the officer on a raw server error page;
+ *  buffering a capped file is the cost of reporting it as a toast instead. */
+export function useCsvExport() {
+  return useMutation({
+    mutationFn: async (kind: ExportKind) => {
+      try {
+        const res = await http.get(EXPORT_PATHS[kind], { responseType: "blob" });
+        saveBlob(
+          res.data as Blob,
+          filenameFromDisposition(
+            res.headers["content-disposition"], `${kind}.csv`),
+        );
+      } catch (e) {
+        throw await readBlobError(e);
+      }
+    },
+  });
+}
 
 // -- Audit trail (PC-BR-008) ---------------------------------------------------
 export interface TransitionEntry {
