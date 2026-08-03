@@ -137,9 +137,7 @@ _CHAIRMAN = [
     "placement_cell.announcement.publish",
 ]
 
-#: Keyed by the designation name as it exists in globals_designation. The IAM
-#: seeds from this via the generated manifest, so a permission this module
-#: checks can never be one nobody is able to hold.
+#: Keyed by the designation name as it exists in globals_designation.
 ROLE_GRANTS = {
     "student": _STUDENT,
     "placement_coordinator": _COORDINATOR,

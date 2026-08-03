@@ -26,8 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         return (await http.get<Session>("/me")).data;
       } catch (e) {
-        // 401 is the answer "nobody", not a failure; anything else is one, and
-        // treating the two alike told users the IAM being down was a logout.
+        // 401 is the answer "nobody"; anything else is a real failure.
         if (errorStatus(e) === 401) return null;
         throw e;
       }

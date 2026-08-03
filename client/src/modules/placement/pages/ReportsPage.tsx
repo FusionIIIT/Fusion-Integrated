@@ -71,8 +71,7 @@ function OutstandingLetters() {
       </Group>
 
       {isPending && <Text size="sm" c="dimmed">Loading…</Text>}
-      {/* An unread list is not an empty one — saying "all filed" here would be
-          a false all-clear on a rule 24 hold. */}
+      {/* An unread list is not an empty one: "all filed" would be a false all-clear. */}
       {error && (
         <Text size="sm" c="red">
           This list could not be loaded, so it is not known whether any letter

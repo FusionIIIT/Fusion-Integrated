@@ -1,14 +1,7 @@
-"""Publish the permission catalogue and its designation grants.
-
-The platform decides what permissions exist and who may hold them; the IAM only
-stores the answer. It reads the file this writes:
+"""Publish the permission catalogue and its designation grants for the IAM to seed.
 
     manage.py permission_manifest            write registry/permissions.json
     manage.py permission_manifest --check    fail if stale or ungrantable
-
-`--check` runs in CI, so the failure that used to reach production — a view
-guarding on a code no designation could hold, which silently hid a nav item and
-locked the endpoint — cannot be merged.
 """
 import json
 from importlib import import_module

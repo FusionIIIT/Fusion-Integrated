@@ -1,9 +1,4 @@
-"""The guard that makes an unreachable endpoint a CI failure.
-
-A permission a view guards on but no designation can hold does not raise
-anything: the nav item is filtered out and the endpoint answers 403 forever.
-That is what these cases are for.
-"""
+"""The guard that makes an unreachable endpoint a CI failure rather than a 403."""
 import pytest
 from django.core.management import call_command
 from django.core.management.base import CommandError

@@ -10,8 +10,7 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
   if (status === "loading") {
     return <Center h="100vh"><Loader /></Center>;
   }
-  // Sending someone to the login page here would blame them for an outage, and
-  // signing in again cannot work while the identity service is unreachable.
+  // Not a logout: signing in again cannot work while the IAM is unreachable.
   if (status === "unavailable") {
     return (
       <Center h="100vh" p="md">

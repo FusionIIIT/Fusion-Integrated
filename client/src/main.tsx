@@ -17,8 +17,7 @@ import { theme } from "./ui/theme/theme";
 const qc = new QueryClient({
   defaultOptions: {
     queries: {
-      // A 4xx is a deterministic answer: retrying it delays the error the user
-      // needs to see and doubles it in the console.
+      // A 4xx is a deterministic answer; retrying only delays it.
       retry: (count, error) => {
         const status = (error as { response?: { status?: number } })
           ?.response?.status;
