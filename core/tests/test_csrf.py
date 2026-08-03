@@ -4,10 +4,15 @@ A cookie is attached by the browser whether or not the page meant to send it.
 An `Authorization` header cannot be set cross-site, so it needs no token.
 """
 import pytest
+from django.conf import settings
 from rest_framework.test import APIClient
 
 from conftest import make_session
 from core.api import csrf
+
+#: Read, not pinned: the name is configurable and must not
+#: collide with the console's.
+COOKIE = settings.IAM_AUTH_COOKIE_NAME
 
 pytestmark = pytest.mark.django_db
 
@@ -18,7 +23,7 @@ PERMS = ("placement_cell.application.view_self",
 def _cookie_client(stub_iam, token="tok-123"):
     stub_iam(make_session(modules=("placement_cell",), permissions=PERMS))
     client = APIClient()
-    client.cookies["auth_token"] = token
+    client.cookies[COOKIE] = token
     return client
 
 

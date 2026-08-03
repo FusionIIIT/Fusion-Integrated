@@ -76,6 +76,11 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
 ]
 
+# No models. Installed so its AppConfig runs and registers the session checks.
+LOCAL_APPS = [
+    "fusion_auth",
+]
+
 # Each module is an independent Django app: own tables, migrations and contract.
 PLATFORM_MODULES = [
     "modules.directory",         # who people are, projected from IAM
@@ -87,7 +92,8 @@ DOMAIN_MODULES = [
     "modules.placement",
 ]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PLATFORM_MODULES + DOMAIN_MODULES
+INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+                  + PLATFORM_MODULES + DOMAIN_MODULES)
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -133,7 +139,7 @@ IAM_API_PREFIX = env("IAM_API_PREFIX", "/api")
 IAM_SERVICE_TOKEN = env("IAM_SERVICE_TOKEN", "")
 IAM_TIMEOUT_SECONDS = env_int("IAM_TIMEOUT_SECONDS", 5)
 IAM_SESSION_CACHE_SECONDS = env_int("IAM_SESSION_CACHE_SECONDS", 60)
-IAM_AUTH_COOKIE_NAME = env("IAM_AUTH_COOKIE_NAME", "auth_token")
+IAM_AUTH_COOKIE_NAME = env("IAM_AUTH_COOKIE_NAME", "fusion_session")
 
 CACHES = {
     "default": (

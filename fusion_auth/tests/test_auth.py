@@ -1,10 +1,15 @@
 """The identity boundary: this service trusts IAM and nothing else."""
 import pytest
+from django.conf import settings
 from rest_framework.test import APIClient
 
 from conftest import make_session
 from core.api import csrf
 from fusion_auth.client import IamUnavailable
+
+#: Read, not pinned: the name is configurable and must not
+#: collide with the console's.
+COOKIE = settings.IAM_AUTH_COOKIE_NAME
 
 pytestmark = pytest.mark.django_db
 
@@ -74,7 +79,7 @@ def test_login_forwards_to_iam_and_sets_an_httponly_cookie(stub_iam):
     r = APIClient().post("/api/v1/auth/login",
                          {"username": "asha", "password": "x"}, format="json")
     assert r.status_code == 200
-    c = r.cookies["auth_token"]
+    c = r.cookies[COOKIE]
     assert c.value == "tok-123"
     assert c["httponly"] is True          # never readable from JavaScript
     assert c["samesite"] == "Lax"
@@ -107,11 +112,11 @@ def test_login_when_iam_is_down_is_503_not_401(stub_iam):
 def test_logout_clears_the_cookie(stub_iam):
     stub_iam(make_session())
     c = APIClient()
-    c.cookies["auth_token"] = "tok-123"
+    c.cookies[COOKIE] = "tok-123"
     r = c.post("/api/v1/auth/logout",
                HTTP_X_CSRF_TOKEN=csrf.token_for("tok-123"))
     assert r.status_code == 200
-    assert r.cookies["auth_token"].value == ""
+    assert r.cookies[COOKIE].value == ""
 
 
 def test_cookie_session_is_forwarded_as_a_header_not_a_replayed_cookie(stub_iam):
@@ -120,7 +125,7 @@ def test_cookie_session_is_forwarded_as_a_header_not_a_replayed_cookie(stub_iam)
     every request after login 401'd."""
     fake = stub_iam(make_session(user_id=7))
     c = APIClient()
-    c.cookies["auth_token"] = "tok-from-cookie"
+    c.cookies[COOKIE] = "tok-from-cookie"
     r = c.get("/api/v1/me")
     assert r.status_code == 200
     assert ("resolve_session", "tok-from-cookie") in fake.calls
