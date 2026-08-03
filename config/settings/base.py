@@ -256,4 +256,26 @@ X_FRAME_OPTIONS = "DENY"
 # W003: CSRF is enforced by core/api/csrf.py. See the note above MIDDLEWARE.
 SILENCED_SYSTEM_CHECKS = ["security.W003"]
 
-LOGGING_CONFIG = None
+# `LOGGING_CONFIG = None` used to sit here, which left logging unconfigured:
+# no handler anywhere and an effective level of WARNING, so every audit line
+# this service writes at INFO — who exported the cohort, who approved a late
+# registration, what a scheduled task did — was discarded.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "plain": {
+            "format": "%(asctime)s %(levelname)s %(name)s %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "plain"},
+    },
+    "root": {"handlers": ["console"], "level": "WARNING"},
+    "loggers": {
+        # stdout, because systemd hands it to journald. Raise the level to quiet
+        # a host down; do not remove the handler.
+        "fusion": {"level": env("FUSION_LOG_LEVEL", "INFO"), "propagate": True},
+    },
+}
