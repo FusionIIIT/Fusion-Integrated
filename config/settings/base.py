@@ -10,6 +10,29 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
+def _load_env_file(path):
+    """Fill in from .env whatever the environment has not already set.
+
+    Local development only in practice: production passes real variables
+    through systemd, and setdefault means those always win. Without this,
+    `cp .env.example .env` does nothing and every entry point depends on one
+    shell's exports.
+    """
+    try:
+        lines = path.read_text().splitlines()
+    except OSError:
+        return
+    for line in lines:
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        name, _, value = line.partition("=")
+        os.environ.setdefault(name.strip(), value.strip().strip('"').strip("'"))
+
+
+_load_env_file(BASE_DIR / ".env")
+
+
 def env(name, default=None):
     v = os.environ.get(name)
     return default if v is None or v.strip() == "" else v.strip()
