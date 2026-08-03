@@ -326,6 +326,15 @@ class TestClearanceApi:
         assert client.get(
             "/api/v1/placement/records/outstanding").status_code == 403
 
+    def test_a_reports_reader_can_read_the_office_worklist(self, stub_iam,
+                                                           policy):
+        """The worklist is a report; gating it on record.manage locked out every
+        coordinator and rendered as "every student has filed one"."""
+        campus_record(policy, make_company())
+        client = _client(stub_iam, perms=("placement_cell.report.view",), uid=9)
+        assert client.get(
+            "/api/v1/placement/records/outstanding").status_code == 200
+
     def test_a_student_cannot_record_an_off_campus_placement(self, stub_iam,
                                                             policy):
         client = _client(stub_iam)

@@ -17,9 +17,14 @@ import { theme } from "./ui/theme/theme";
 const qc = new QueryClient({
   defaultOptions: {
     queries: {
-      // 1, not the default 3: a 403 or 422 is a deterministic answer, and
-      // retrying it three times just delays the error the user needs to see.
-      retry: 1,
+      // A 4xx is a deterministic answer: retrying it delays the error the user
+      // needs to see and doubles it in the console.
+      retry: (count, error) => {
+        const status = (error as { response?: { status?: number } })
+          ?.response?.status;
+        if (status && status >= 400 && status < 500) return false;
+        return count < 1;
+      },
       staleTime: 30_000,
       refetchOnWindowFocus: true,
     },
@@ -31,7 +36,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <MantineProvider theme={theme} defaultColorScheme="light">
       <Notifications />
       <QueryClientProvider client={qc}>
-        <BrowserRouter>
+        {/* Opted in now so the v7 upgrade is not also a behaviour change. */}
+        <BrowserRouter
+          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+        >
           {/* AuthProvider is INSIDE the router — it redirects on 401. */}
           <AuthProvider>
             <AppRoutes />

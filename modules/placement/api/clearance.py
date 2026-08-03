@@ -20,6 +20,8 @@ from modules.placement.services import clearance as service
 MODULE = HasModuleGrant("placement_cell")
 P_VIEW_SELF = "placement_cell.application.view_self"
 P_MANAGE = "placement_cell.record.manage"
+#: Reading the worklist is a report; recording a placement is not.
+P_VIEW_REPORTS = "placement_cell.report.view"
 
 
 def _actor(request):
@@ -98,7 +100,7 @@ class NotJoiningView(APIView):
 class OutstandingLettersView(APIView):
     """The office's worklist: placed students who still owe a letter."""
 
-    permission_classes = [MODULE, HasPermission(P_MANAGE)]
+    permission_classes = [MODULE, HasPermission(P_VIEW_REPORTS, P_MANAGE)]
 
     def get(self, request):
         rows = service.outstanding(season=request.query_params.get("season"))

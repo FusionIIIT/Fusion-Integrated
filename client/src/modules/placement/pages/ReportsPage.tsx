@@ -51,7 +51,7 @@ function ExportActions() {
 /** Rule 24's worklist. The office chases these before convocation, so it is a
  *  report rather than a screen of its own. */
 function OutstandingLetters() {
-  const { data, isPending } = useOutstandingLetters();
+  const { data, isPending, error } = useOutstandingLetters();
   const rows = data?.results ?? [];
 
   return (
@@ -63,13 +63,23 @@ function OutstandingLetters() {
             Rule 24 holds each of these students&apos; no-dues certificate.
           </Text>
         </div>
-        <Badge variant="light" color={rows.length ? "orange" : "green"}>
-          {rows.length}
-        </Badge>
+        {!error && (
+          <Badge variant="light" color={rows.length ? "orange" : "green"}>
+            {rows.length}
+          </Badge>
+        )}
       </Group>
 
       {isPending && <Text size="sm" c="dimmed">Loading…</Text>}
-      {!isPending && !rows.length && (
+      {/* An unread list is not an empty one — saying "all filed" here would be
+          a false all-clear on a rule 24 hold. */}
+      {error && (
+        <Text size="sm" c="red">
+          This list could not be loaded, so it is not known whether any letter
+          is outstanding. {errorMessage(error)}
+        </Text>
+      )}
+      {!isPending && !error && !rows.length && (
         <Text size="sm" c="dimmed">Every placed student has filed one.</Text>
       )}
 
