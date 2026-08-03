@@ -47,6 +47,9 @@ jobs:
 
       # Prod settings, so this sees the security warnings test settings hide.
       # The values are throwaway; only their presence matters.
+      - name: Every permission has a holder, and the manifest is current
+        run: .venv/bin/python manage.py permission_manifest --check
+
       - name: Deployment checks
         env:
           DJANGO_SETTINGS_MODULE: config.settings.prod
@@ -54,6 +57,8 @@ jobs:
           DJANGO_ALLOWED_HOSTS: ci.invalid
           IAM_SERVICE_TOKEN: ci
           PLACEMENT_UPLOAD_ROOT: /tmp/ci-uploads
+          REDIS_CACHE_URL: redis://127.0.0.1:6379/1
+          REDIS_BROKER_URL: redis://127.0.0.1:6380/0
         run: .venv/bin/python manage.py check --deploy --fail-level WARNING
 
       - name: Committed OpenAPI schema matches the code
