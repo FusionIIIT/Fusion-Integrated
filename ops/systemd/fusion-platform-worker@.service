@@ -1,0 +1,51 @@
+# Celery worker for fusion-platform, one instance per queue.
+#
+#   systemctl enable --now fusion-platform-worker@default
+#   systemctl enable --now fusion-platform-worker@notifications
+#   systemctl enable --now fusion-platform-worker@reports
+#
+# Per-queue instances so a 15-minute stats rebuild cannot sit in front of a
+# student's offer email. Concurrency and prefetch come from the environment
+# file, keyed by queue — see ops/systemd/README.md.
+
+[Unit]
+Description=Fusion platform Celery worker (%i queue)
+After=network-online.target redis-broker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=fusion
+Group=fusion
+WorkingDirectory=/srv/fusion/platform/current
+EnvironmentFile=/etc/fusion/platform.env
+# Defaults if the environment file says nothing for this queue.
+Environment=CONCURRENCY=4 PREFETCH=4
+ExecStart=/srv/fusion/platform/venv/bin/celery -A config worker \
+  --queues=%i --hostname=%i@%%h --loglevel=INFO \
+  --concurrency=${CONCURRENCY} --prefetch-multiplier=${PREFETCH} \
+  --max-tasks-per-child=500
+
+Restart=always
+RestartSec=5
+
+# acks_late is set in Django settings, so an in-flight task is redelivered
+# rather than lost. TERM lets the worker finish what it holds first.
+KillSignal=SIGTERM
+TimeoutStopSec=310
+
+RuntimeDirectory=fusion
+StateDirectory=fusion
+ReadWritePaths=/var/lib/fusion
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+MemoryMax=1000M
+
+[Install]
+WantedBy=multi-user.target

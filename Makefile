@@ -44,10 +44,14 @@ SCHEMA := openapi/fusion-integrated.v1.yaml
 schema:  ## regenerate the committed OpenAPI schema
 	$(PY) manage.py spectacular --fail-on-warn --file $(SCHEMA)
 
+module-structure:  ## regenerate the module-structure reference PDF
+	$(PY) ops/docs/module_structure.py
+
 schema-check:  ## the committed schema must match the code
 	@$(PY) manage.py spectacular --fail-on-warn --file /tmp/openapi.check.yaml
 	@diff -u $(SCHEMA) /tmp/openapi.check.yaml > /dev/null \
 		|| { echo "$(SCHEMA) is stale — run 'make schema'"; exit 1; }
 	@echo "openapi schema matches the code"
 
-.PHONY: help install up migrate seed dev test check check-client schema schema-check
+.PHONY: help install up migrate seed dev test check check-client schema \
+	schema-check module-structure

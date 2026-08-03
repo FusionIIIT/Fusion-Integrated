@@ -1,0 +1,52 @@
+# Celery beat for fusion-platform.
+#
+# EXACTLY ONE HOST may run this. Two schedulers double every tick: two drains of
+# the same outbox, two stats rebuilds, offers expired twice. The outbox claim
+# makes a duplicate send harmless, but nothing makes a duplicate *scheduler*
+# harmless, so this is an operational rule the unit cannot enforce.
+#
+# Beat only dispatches. Without at least one worker on default, notifications
+# and reports, the messages queue and expire silently.
+#
+#   install:  cp ops/systemd/*.service /etc/systemd/system/
+#             systemctl daemon-reload
+#             systemctl enable --now fusion-platform-beat
+#   verify:   journalctl -u fusion-platform-beat -f
+
+[Unit]
+Description=Fusion platform Celery beat (scheduler)
+After=network-online.target redis-broker.service
+Wants=network-online.target
+# Beat without a worker is a queue that fills up and expires.
+After=fusion-platform-worker@default.service
+
+[Service]
+Type=simple
+User=fusion
+Group=fusion
+WorkingDirectory=/srv/fusion/platform/current
+EnvironmentFile=/etc/fusion/platform.env
+ExecStart=/srv/fusion/platform/venv/bin/celery -A config beat \
+  --loglevel=INFO \
+  --schedule=/var/lib/fusion/celerybeat-schedule
+
+Restart=always
+RestartSec=5
+
+# The schedule file is beat's only state: it records when each entry last fired,
+# so a restart does not replay a missed tick as a burst.
+RuntimeDirectory=fusion
+StateDirectory=fusion
+ReadWritePaths=/var/lib/fusion
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+MemoryMax=300M
+
+[Install]
+WantedBy=multi-user.target

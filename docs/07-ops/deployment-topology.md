@@ -202,9 +202,19 @@ systemctl enable --now fusion-platform-worker@default        # concurrency 4, pr
 systemctl enable --now fusion-platform-worker@notifications  # concurrency 4, prefetch 4
 systemctl enable --now fusion-platform-worker@reports        # concurrency 2, prefetch 1
 systemctl enable --now fusion-platform-worker@ingest         # concurrency 1, prefetch 1  ← deliberate
-systemctl enable --now fusion-platform-beat
+systemctl enable --now fusion-platform-beat                  # exactly ONE host
 systemctl enable --now fusion-iam-worker@iam                 # concurrency 2
 ```
+
+The units are real files rather than snippets: `ops/systemd/fusion-platform-beat.service` and
+`ops/systemd/fusion-platform-worker@.service`. Install and enable them with
+[runbooks/enable-scheduled-work.md](runbooks/enable-scheduled-work.md), which covers the pre-flight
+check that matters most — turning on the drain sends every pending outbox row at once, and on a
+seeded or restored database those rows may name real students.
+
+Beat runs on **exactly one host**. Two of them double every tick — two drains of the same outbox,
+two stats rebuilds. The schedule itself lives in `modules/<name>/schedule.py` and is merged by
+`config/celery.py`, so a module that is not installed contributes no timers.
 
 `ingest` at concurrency 1 with prefetch 1 is a capacity decision, not a default: a 300-student declaration is
 roughly 1,500 ERP queries, and serializing it keeps the ERP's pool comfortable even when two batches are
