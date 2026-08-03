@@ -2,12 +2,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, useCallback, useContext, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { http, setCsrfToken, setUnauthorizedHandler } from "../lib/http";
+import { errorStatus, http, setCsrfToken, setUnauthorizedHandler } from "../lib/http";
 import type { Session } from "./types";
 
 interface AuthValue {
   session: Session | null;
-  status: "loading" | "authenticated" | "anonymous";
+  /** `unavailable` is "we could not ask", which is not the same as signed out. */
+  status: "loading" | "authenticated" | "anonymous" | "unavailable";
   can: (permission: string) => boolean;
   hasModule: (code: string) => boolean;
   logout: () => Promise<void>;
@@ -21,7 +22,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const { data, isPending, isError } = useQuery({
     queryKey: ["session"],
-    queryFn: async () => (await http.get<Session>("/me")).data,
+    queryFn: async () => {
+      try {
+        return (await http.get<Session>("/me")).data;
+      } catch (e) {
+        // 401 is the answer "nobody", not a failure; anything else is one, and
+        // treating the two alike told users the IAM being down was a logout.
+        if (errorStatus(e) === 401) return null;
+        throw e;
+      }
+    },
     retry: false,
     staleTime: 5 * 60_000,
     refetchOnWindowFocus: true,
@@ -46,17 +56,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       /* best effort — the cookie is cleared server-side either way */
     }
     setCsrfToken("");
-    qc.clear();
+    qc.setQueryData(["session"], null);
+    qc.removeQueries({ predicate: (q) => q.queryKey[0] !== "session" });
     navigate("/login");
   }, [navigate, qc]);
 
   const value = useMemo<AuthValue>(() => {
-    const session = (isError ? null : data) ?? null;
+    const session = data ?? null;
     const perms = new Set(session?.permissions ?? []);
     const mods = new Set(session?.modules ?? []);
     return {
       session,
-      status: isPending ? "loading" : session ? "authenticated" : "anonymous",
+      status: isPending ? "loading"
+        : isError ? "unavailable"
+        : session ? "authenticated" : "anonymous",
       // UX only. Every one of these has a server-side counterpart; hiding a
       // button is not an authorization control.
       can: (p) => perms.has(p),

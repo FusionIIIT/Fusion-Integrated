@@ -64,6 +64,10 @@ export async function readBlobError(e: unknown): Promise<unknown> {
   return e;
 }
 
+export function errorStatus(e: unknown): number | undefined {
+  return (e as { response?: { status?: number } })?.response?.status;
+}
+
 export function requestId(e: unknown): string | undefined {
   return (e as { response?: { data?: { error?: { request_id?: string } } } })
     ?.response?.data?.error?.request_id;

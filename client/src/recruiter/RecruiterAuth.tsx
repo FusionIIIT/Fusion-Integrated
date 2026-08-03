@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo } from "react";
-import { Center, Loader } from "@mantine/core";
+import { Alert, Center, Loader, Text } from "@mantine/core";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 
 import {
@@ -9,7 +9,7 @@ import {
 
 interface Value {
   session: RecruiterSession | null;
-  status: "loading" | "authenticated" | "anonymous";
+  status: "loading" | "authenticated" | "anonymous" | "unavailable";
   logout: () => void;
 }
 
@@ -36,10 +36,12 @@ export function RecruiterAuthProvider({ children }: { children: React.ReactNode 
   }, [navigate]);
 
   const value = useMemo<Value>(() => {
-    const session = (isError ? null : data) ?? null;
+    const session = data ?? null;
     return {
       session,
-      status: isPending ? "loading" : session ? "authenticated" : "anonymous",
+      status: isPending ? "loading"
+        : isError ? "unavailable"
+        : session ? "authenticated" : "anonymous",
       logout: () => logoutMutation.mutate(undefined, {
         onSettled: () => navigate("/recruiter/login", { replace: true }),
       }),
@@ -61,6 +63,19 @@ export function RequireRecruiter({ children }: { children: React.ReactNode }) {
 
   if (status === "loading") {
     return <Center h="100vh"><Loader /></Center>;
+  }
+  // Not a logout: signing in again cannot work while the server is unreachable.
+  if (status === "unavailable") {
+    return (
+      <Center h="100vh" p="md">
+        <Alert color="red" title="Cannot verify your session" maw={460}>
+          <Text size="sm">
+            The portal could not be reached, so it is not known whether you are
+            signed in. You have not been signed out — reload once it is back.
+          </Text>
+        </Alert>
+      </Center>
+    );
   }
   if (status === "anonymous") {
     return <Navigate to="/recruiter/login" replace state={{ from: location }} />;
