@@ -25,6 +25,51 @@ grants are how an access-control system becomes unauditable: within a year nobod
 revoke an offer?" without a full-table scan and a guess. If someone needs a capability, either their role
 gets it or a new role exists.
 
+### One basic role, any number of additional roles
+
+Roles are not interchangeable, and treating them as one flat list is what lets a student be made Dean
+Academic.
+
+| | Basic role | Additional roles |
+|---|---|---|
+| How many | exactly one | any number, including none |
+| Where from | ERP `globals_extrainfo.user_type` | ERP `globals_holdsdesignation` |
+| Assignable | no — it is what a person *is* | yes |
+| Values | `student`, `faculty`, `staff` | the 113 designations |
+
+The basic role is a role like any other in the grant tables — `RolePermission(designation="faculty", …)`
+resolves for every faculty member without an ERP row saying so. Before this rule existed, 14 permissions
+and 6 module grants were declared against `faculty` and reached nobody, and 121 staff who hold no
+designation had no role at all.
+
+`active_role` defaults to the first additional role and falls back to the basic role, so a Junior
+Assistant lands in their office rather than on a generic staff view.
+
+### Who may hold what
+
+`iam_role` catalogues each designation as a **rank**, an **office** or a **functional** role, and records
+which basic roles may hold it:
+
+| Category | Example | May be held by |
+|---|---|---|
+| `basic` | `student` | itself |
+| `rank` | Professor, Associate Professor | faculty |
+| `office` | Dean Academic, HOD (CSE) | faculty |
+| `office` | acadadmin, Registrar, Junior Assistant | faculty or staff |
+| `functional` | co-ordinator, Convenor, mess_committee | anyone, students included |
+
+The functional row is the point: a student cannot be a Professor but can be a club co-ordinator.
+
+`sync_identity` checks every projected assignment against the catalogue and writes what fails to
+`iam_role_violation`. It **reports** by default and only withholds the role when
+`IAM_ENFORCE_ROLE_POLICY` is on — the catalogue is a claim about institute practice, and refusing before
+that claim is confirmed would revoke access from whoever it is wrong about. An uncatalogued designation
+is allowed, because the academic office adds designations without telling this service.
+
+Two live violations exist today: `23BCS265` (student) holds Dean Academic, which grants 54 permissions
+including `curriculum.course.manage`; `ntripathi` (staff) holds Assistant Professor. Enforcing reduces
+the first to 18.
+
 **Two independent checks on every request:**
 
 | Check | Question | Source | Cost |
