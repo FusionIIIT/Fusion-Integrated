@@ -8,9 +8,11 @@ from core.api.exceptions import BadRequestError, ConflictError
 from modules.leave.domain.categories import Category
 from modules.leave.domain.counting import Half
 from modules.leave.domain.state_machine import State
+from modules.leave.models import AuthorityRule, LeaveRequest
 from modules.leave.selectors import balances
 from modules.leave.services import requests as service
-from modules.leave.tests.factories import credit, setup_all
+from modules.leave.tests import factories
+from modules.leave.tests.factories import YEAR, credit, setup_all
 
 pytestmark = pytest.mark.django_db
 
@@ -30,7 +32,7 @@ def apply_cl(day=date(2026, 9, 1), **kw):
         starts_on=day,
         ends_on=kw.pop("ends_on", day),
         reason="personal",
-        faculty=kw.pop("faculty", False),
+        unit="CSE", faculty=kw.pop("faculty", False),
         **kw,
     )
 
@@ -74,7 +76,7 @@ class TestValidation:
                 starts_on=date(2026, 9, 1),
                 ends_on=date(2026, 9, 30),
                 reason="long",
-                faculty=False,
+                unit="CSE", faculty=False,
             )
         assert exc.value.code == "insufficient_balance"
 
@@ -114,7 +116,7 @@ class TestValidation:
                 starts_on=date(2026, 9, 1),
                 ends_on=date(2026, 9, 5),
                 reason="break",
-                faculty=True,
+                unit="CSE", faculty=True,
             )
         assert exc.value.code == "outside_vacation_period"
 
@@ -126,7 +128,7 @@ class TestValidation:
             starts_on=date(2026, 6, 1),
             ends_on=date(2026, 6, 7),
             reason="break",
-            faculty=True,
+            unit="CSE", faculty=True,
         )
         # BR-EL-011. Vacation leave counts continuously, so seven calendar days.
         assert r.requested_days == D(7)
@@ -140,7 +142,7 @@ class TestCounting:
             starts_on=date(2026, 8, 10),
             ends_on=date(2026, 8, 17),
             reason="travel",
-            faculty=False,
+            unit="CSE", faculty=False,
         )
         assert r.requested_days == D(8)
 
@@ -151,7 +153,7 @@ class TestCounting:
             starts_on=date(2026, 8, 10),
             ends_on=date(2026, 8, 17),
             reason="travel",
-            faculty=False,
+            unit="CSE", faculty=False,
         )
         # 15 August is a closed holiday and the weekend does not count.
         assert r.requested_days == D(6)
@@ -160,3 +162,39 @@ class TestCounting:
         before = balances.available(USER, 2026, Category.CL)
         apply_cl()
         assert balances.available(USER, 2026, Category.CL) == before
+
+
+class TestAnApplicantWithNoUnit:
+    """A request nobody can see is worse than a request that was refused."""
+
+    def test_applying_without_a_department_is_refused_at_the_door(self):
+        factories.setup_all(601)
+
+        with pytest.raises(BadRequestError, match="no department"):
+            service.submit(
+                user_id=601, category=Category.CL,
+                starts_on=date(YEAR, 3, 2), ends_on=date(YEAR, 3, 3),
+                reason="Personal", faculty=False, unit="")
+
+    def test_nothing_is_left_behind_by_the_refusal(self):
+        factories.setup_all(601)
+        with pytest.raises(BadRequestError):
+            service.submit(
+                user_id=601, category=Category.CL,
+                starts_on=date(YEAR, 3, 2), ends_on=date(YEAR, 3, 3),
+                reason="Personal", faculty=False, unit="")
+
+        assert not LeaveRequest.objects.exists()
+
+    def test_a_self_sanctioning_role_needs_no_unit(self):
+        policy, _ = factories.setup_all(601)
+        AuthorityRule.objects.filter(
+            policy_id=policy.pk, category=Category.CL.value).update(self_sanction=True)
+
+        created = service.submit(
+            user_id=601, category=Category.CL,
+            starts_on=date(YEAR, 3, 2), ends_on=date(YEAR, 3, 3),
+            reason="Personal", faculty=False, unit="")
+
+        # Nobody else reviews it, so there is no queue to go missing from.
+        assert created.state == State.AWAITING_SELF_SANCTION.value

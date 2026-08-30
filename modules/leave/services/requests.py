@@ -168,6 +168,15 @@ def submit(
     route = authority.route_for(
         rule, category, substitute_required=substitute_user_id is not None
     )
+    if not unit and not route.self_sanction:
+        # The review queue is keyed on the unit, so a request without one would
+        # be accepted, enter the workflow, and appear in nobody's queue. Better
+        # refused at the door than lost silently for a fortnight.
+        raise BadRequestError(
+            "Your record has no department, so there is no unit head to review "
+            "this. Ask the establishment section to set it before applying.",
+            code="applicant_has_no_unit",
+        )
 
     station = station or {}
     request = LeaveRequest.objects.create(
