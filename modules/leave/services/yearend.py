@@ -12,12 +12,12 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from django.db import transaction
+from django.db import IntegrityError, transaction
 
 from core.api.exceptions import ConflictError
 from modules.leave.domain.categories import Category
 from modules.leave.domain.entitlement import Balance, close_year
-from modules.leave.models import EntryReason, LedgerEntry
+from modules.leave.models import EntryReason, LedgerEntry, YearEndClosure
 from modules.leave.selectors import balances
 from modules.leave.selectors import policy as policy_selector
 
@@ -30,18 +30,26 @@ _CLOSING = (
 
 
 def already_closed(user_id: int, year: int) -> bool:
-    return LedgerEntry.objects.filter(
-        user_id=user_id, year=year, reason__in=_CLOSING
-    ).exists()
+    """Read the closure record, not the entries it happened to write.
+
+    An account that only carried forward wrote nothing into the closing year,
+    so inferring the close from its own side effects missed it entirely and a
+    second run doubled the opening balance.
+    """
+    return YearEndClosure.objects.filter(user_id=user_id, year=year).exists()
 
 
 @transaction.atomic
 def close(*, user_id: int, year: int, faculty: bool) -> dict[str, Decimal]:
     """Settle the year and open the next one. Returns what moved."""
-    if already_closed(user_id, year):
+    try:
+        closure = YearEndClosure.objects.create(user_id=user_id, year=year)
+    except IntegrityError as exc:
+        # The unique constraint, not a prior read: two schedulers racing get one
+        # closure and one refusal rather than two sets of entries.
         raise ConflictError(
             f"{year} is already closed for this employee.", code="year_already_closed"
-        )
+        ) from exc
 
     from datetime import date
 
@@ -100,12 +108,17 @@ def close(*, user_id: int, year: int, faculty: bool) -> dict[str, Decimal]:
             )
     LedgerEntry.objects.bulk_create(rows)
 
-    return {
+    moved = {
         "lapsed": sum(outcome.lapsed.values()),
         "carried": sum(outcome.carried.values()),
         "converted_vl": outcome.converted_vl,
         "el_from_conversion": outcome.el_from_conversion,
     }
+    closure.policy_id = policy.pk
+    for field, value in moved.items():
+        setattr(closure, field, value)
+    closure.save(update_fields=[*moved, "policy_id", "updated_at"])
+    return moved
 
 
 @transaction.atomic
@@ -146,6 +159,16 @@ def revoke_credit(*, user_id: int, year: int, actor_user_id: int, note: str) -> 
     already been approved for is a decision about that person's leave, not a
     bookkeeping correction.
     """
+    if already_closed(user_id, year):
+        # Closing has already lapsed, converted and carried this credit into the
+        # next year. Reversing the credit alone would leave the balance negative
+        # and the next year's opening standing on days that no longer exist.
+        raise ConflictError(
+            f"{year} is closed for this employee. The credit has already been "
+            "lapsed, converted or carried forward, so it cannot be reversed on "
+            "its own.",
+            code="year_already_closed",
+        )
     credited = list(
         LedgerEntry.objects.filter(
             user_id=user_id, year=year, reason=EntryReason.ANNUAL_CREDIT

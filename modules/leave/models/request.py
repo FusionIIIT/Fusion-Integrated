@@ -43,6 +43,14 @@ class LeaveRequest(TimeStampedModel, UserScopedModel):
 
     #: Set when the leave is one an earlier request extended.
     extends_request_id = models.IntegerField(null=True, blank=True, db_index=True)
+
+    #: A proposed extension, while it is being decided. Held in fields rather
+    #: than in the remark text: the date is what approval has to apply, and a
+    #: decision cannot depend on parsing a sentence somebody typed.
+    extension_to = models.DateField(null=True, blank=True)
+    extension_days = models.DecimalField(
+        max_digits=6, decimal_places=2, null=True, blank=True
+    )
     resumed_on = models.DateField(null=True, blank=True)
     decided_at = models.DateTimeField(null=True, blank=True)
 

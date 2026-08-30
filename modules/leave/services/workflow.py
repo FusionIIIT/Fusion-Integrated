@@ -24,7 +24,13 @@ from modules.leave.domain.state_machine import (
     is_terminal,
     resolve,
 )
-from modules.leave.models import EntryReason, LeaveRequest, LedgerEntry, RequestTransition
+from modules.leave.models import (
+    EntryReason,
+    LeaveRequest,
+    LedgerEntry,
+    RequestTransition,
+    YearEndClosure,
+)
 from modules.leave.services import sla
 
 
@@ -129,6 +135,19 @@ def _refuse_self_decision(
 
 
 def _record(request: LeaveRequest, movements: list[Movement]) -> None:
+    year = request.starts_on.year
+    if YearEndClosure.objects.filter(user_id=request.user_id, year=year).exists():
+        # The year has been lapsed, converted and carried forward. Booking into
+        # it now changes a balance the next year's opening was computed from,
+        # and nothing recomputes that opening -- the correction has to be a
+        # deliberate one, not a side effect of approving a December request in
+        # January.
+        raise ConflictError(
+            f"{year} has been closed for this employee, so nothing further can "
+            "be charged to it. The leave administrator has to settle this "
+            "against the closed year explicitly.",
+            code="year_already_closed",
+        )
     LedgerEntry.objects.bulk_create(
         [
             LedgerEntry(

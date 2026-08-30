@@ -10,7 +10,11 @@ from modules.leave.models.calendar import (
     HolidayCalendar,
     VacationPeriod,
 )
-from modules.leave.models.ledger import EntryReason, LedgerEntry
+from modules.leave.models.ledger import (
+    EntryReason,
+    LedgerEntry,
+    YearEndClosure,
+)
 from modules.leave.models.policy import (  # noqa: F401
     CATEGORY_CHOICES,
     CategoryRule,
@@ -43,4 +47,5 @@ __all__ = [
     "SlaRule",
     "SubstituteNomination",
     "VacationPeriod",
+    "YearEndClosure",
 ]
