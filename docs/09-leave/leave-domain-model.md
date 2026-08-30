@@ -34,11 +34,18 @@ steps are needed, and skipping the third is the easy mistake: a policy that gran
 nobody anything until a credit row exists, because the balance is a **sum of the ledger**.
 
 ```
-manage.py seed_modules          # register the module so the grant can be given
 manage.py sync_directory        # pull the payroll into the local projection
 manage.py seed_leave_policy     # policy + routing + a minimal calendar, published
 manage.py leave_credit_year 2026
+manage.py seed_modules          # last: this is what makes Leave visible
+manage.py leave_readiness       # says yes, or exactly what is still missing
 ```
+
+**`seed_modules` comes last, and it checks.** The module declares its prerequisites in
+`registry.readiness()`, and until they are met it registers as `planned` rather than `active` — which
+keeps it out of every sidebar and off every route. A module that advertises itself and then refuses
+every application reads as a broken system; one nobody can see yet reads as a rollout in progress. The
+deploy runs `leave_readiness` and reports, without failing the release.
 
 `sync_directory` comes first and is not optional. It reconciles in **both** directions — it brings
 people in and retires anyone the identity service no longer calls an employee, because a projection
@@ -185,6 +192,23 @@ one account after a correction.
 > A bug worth remembering: the conversion silently vanished for faculty with no existing `EL` row,
 > because the balance selector only returns categories that have entries. The close now seeds every
 > policy category plus `EL` before settling.
+
+---
+
+## The clock, not a person — SF
+
+Three of a request's transitions are the passage of time rather than anybody's decision: leave starts
+on its start date, reaches its end date, and opens for resumption. `manage.py leave_advance`, and the
+`leave.advance_lifecycle` beat task, are what make those happen.
+
+Nothing invoked them at first, and the consequences were not confined to a request sitting in the wrong
+state. Approved leave never became `ONGOING`, so it stayed **cancellable after the employee had already
+gone**; extension is only reachable while the leave runs, so it was unreachable entirely; resumption
+never opened, so nothing ever closed and no early return ever restored a day.
+
+It runs at 00:05 and again at 06:15. The second pass is not redundancy for its own sake — the
+transitions are calendar days rather than moments, the operation is idempotent, and one pass takes a
+request the whole way, so the morning run silently covers a worker that was down overnight.
 
 ---
 

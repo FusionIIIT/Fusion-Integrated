@@ -3,6 +3,9 @@
 Nav items carry `required_permission` and the server filters before sending, so
 a link a role cannot use never reaches the browser.
 """
+#: `status` is what this module would be once its data exists. seed_modules
+#: downgrades it to `planned` while readiness() reports anything missing, so a
+#: deploy cannot put Leave in the sidebar before it can accept an application.
 MODULE = {
     "code": "leave", "label": "Leave", "icon": "FaRegCalendarCheck",
     "base_path": "/leave", "nav_section": "Leave", "sort_order": 20,
@@ -124,3 +127,58 @@ NAV_ITEMS = [
      "to": "/leave/policy", "required_permission": "leave.policy.manage",
      "sort_order": 90},
 ]
+
+
+def readiness() -> list[str]:
+    """What is still missing before this module can accept an application.
+
+    Returning anything keeps the module registered but inactive, so it stays
+    out of every sidebar and off every route until it works. A module that
+    advertises itself and then refuses every application is worse than one
+    nobody can see: the first is a fault report, the second is a deployment
+    still in progress.
+
+    Read at deploy time by seed_modules, and by `manage.py leave_readiness`.
+    """
+    from datetime import date
+
+    from modules.directory.models import UserRef
+    from modules.leave.models import AuthorityRule, EntryReason, LedgerEntry
+    from modules.leave.selectors import policy as policy_selector
+
+    today = date.today()
+    missing: list[str] = []
+
+    try:
+        effective = policy_selector.effective_policy(today)
+    except policy_selector.NoEffectivePolicy:
+        return [(
+            "no leave policy is published for today — run seed_leave_policy, or "
+            "draft and publish one under Policy & Calendar"
+        )]
+
+    try:
+        policy_selector.effective_calendar(today.year)
+    except policy_selector.NoEffectivePolicy:
+        missing.append(
+            f"no holiday calendar is published for {today.year} — without one no "
+            "application can be counted")
+
+    if not AuthorityRule.objects.filter(policy_id=effective.pk).exists():
+        missing.append(
+            f"policy {effective.version} has no authority rules, so no application "
+            "has anywhere to go")
+
+    if not UserRef.objects.filter(kind__in=("faculty", "staff"), is_active=True).exists():
+        missing.append("the employee directory is empty — run sync_directory")
+
+    credited = LedgerEntry.objects.filter(
+        year=today.year, reason=EntryReason.ANNUAL_CREDIT
+    ).exists()
+    if not credited:
+        missing.append(
+            f"nobody has been credited their {today.year} entitlement — run "
+            f"leave_credit_year {today.year}, or every application is refused for "
+            "insufficient balance")
+
+    return missing
