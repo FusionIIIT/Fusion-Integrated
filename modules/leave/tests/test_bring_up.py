@@ -4,7 +4,7 @@ This is the path nobody exercises until the day it is deployed, which is why it
 is pinned here: the module shipped once with no way to create a policy and a
 500 when there was not one.
 """
-from datetime import date
+from datetime import date, timedelta
 from io import StringIO
 
 import pytest
@@ -47,6 +47,16 @@ def staff_directory(stub_iam):
     # A student is not an employee and takes no employee leave.
     UserRef.objects.create(user_id=1001, username="s1", display_name="Student",
                            kind="student", department="CSE")
+
+
+def next_monday(weeks: int = 1) -> date:
+    """A real application is for leave not yet taken, so these tests are too.
+
+    The seeded policy allows no back-dating, which is the point: fixed past
+    dates here would be testing a path the institute does not permit.
+    """
+    today = date.today()
+    return today + timedelta(days=(7 - today.weekday()) % 7 or 7) + timedelta(weeks=weeks - 1)
 
 
 def run(cmd, *args) -> str:
@@ -152,7 +162,7 @@ class TestConfiguringItThroughItsOwnApi:
 
 class TestTheSeedCommand:
     def test_it_puts_a_policy_calendar_and_routing_in_force(self, staff_directory):
-        output = run("seed_leave_policy", "--year", "2026")
+        output = run("seed_leave_policy", "--year", str(next_monday().year))
 
         assert "ready to accept applications" in output
         assert LeavePolicy.objects.filter(published=True).count() == 1
@@ -160,7 +170,7 @@ class TestTheSeedCommand:
         assert AuthorityRule.objects.count() == len(list(Category))
 
     def test_it_seeds_the_figures_the_specification_states(self, staff_directory):
-        run("seed_leave_policy", "--year", "2026")
+        run("seed_leave_policy", "--year", str(next_monday().year))
 
         policy = LeavePolicy.objects.get(published=True)
         entitlement = {
@@ -176,7 +186,7 @@ class TestTheSeedCommand:
         assert entitlement[("VL", True)] == 60
 
     def test_it_refuses_to_run_over_a_configured_institute(self, staff_directory):
-        run("seed_leave_policy", "--year", "2026")
+        run("seed_leave_policy", "--year", str(next_monday().year))
 
         output = run("seed_leave_policy", "--year", "2027")
 
@@ -196,12 +206,12 @@ class TestTheSeedCommand:
 
 class TestCreditingTheYear:
     def test_entitlement_is_zero_until_it_is_credited(self, staff_directory):
-        run("seed_leave_policy", "--year", "2026")
+        run("seed_leave_policy", "--year", str(next_monday().year))
 
         assert balances.balance_for(STAFF, 2026, Category.CL).available == 0
 
     def test_crediting_gives_everyone_their_entitlement(self, staff_directory):
-        run("seed_leave_policy", "--year", "2026")
+        run("seed_leave_policy", "--year", str(next_monday().year))
 
         run("leave_credit_year", "2026")
 
@@ -209,7 +219,7 @@ class TestCreditingTheYear:
         assert balances.balance_for(STAFF, 2026, Category.EL).available == 30
 
     def test_faculty_get_vacation_leave_instead_of_earned_leave(self, staff_directory):
-        run("seed_leave_policy", "--year", "2026")
+        run("seed_leave_policy", "--year", str(next_monday().year))
 
         run("leave_credit_year", "2026")
 
@@ -217,7 +227,7 @@ class TestCreditingTheYear:
         assert balances.balance_for(FACULTY, 2026, Category.EL).available == 0
 
     def test_students_are_not_employees(self, staff_directory):
-        run("seed_leave_policy", "--year", "2026")
+        run("seed_leave_policy", "--year", str(next_monday().year))
 
         output = run("leave_credit_year", "2026")
 
@@ -227,7 +237,7 @@ class TestCreditingTheYear:
     def test_running_it_again_credits_only_the_people_who_were_missed(
         self, staff_directory
     ):
-        run("seed_leave_policy", "--year", "2026")
+        run("seed_leave_policy", "--year", str(next_monday().year))
         run("leave_credit_year", "2026")
         UserRef.objects.create(user_id=503, username="u503", display_name="New",
                                kind="staff", department="ECE")
@@ -239,7 +249,7 @@ class TestCreditingTheYear:
         assert balances.balance_for(STAFF, 2026, Category.CL).available == 8
 
     def test_a_dry_run_writes_nothing(self, staff_directory):
-        run("seed_leave_policy", "--year", "2026")
+        run("seed_leave_policy", "--year", str(next_monday().year))
 
         output = run("leave_credit_year", "2026", "--dry-run")
 
@@ -251,7 +261,7 @@ class TestCreditingTheYear:
             run("leave_credit_year", "2026")
 
     def test_an_empty_directory_says_what_to_run_first(self):
-        run("seed_leave_policy", "--year", "2026")
+        run("seed_leave_policy", "--year", str(next_monday().year))
 
         with pytest.raises(CommandError, match="sync_identity"):
             run("leave_credit_year", "2026")
@@ -259,13 +269,15 @@ class TestCreditingTheYear:
 
 class TestTheWholeWayThrough:
     def test_seed_credit_apply_approve(self, stub_iam, staff_directory):
-        run("seed_leave_policy", "--year", "2026")
+        run("seed_leave_policy", "--year", str(next_monday().year))
         run("leave_credit_year", "2026")
 
         applicant = client(stub_iam, STAFF, ("leave.request.create",
                                              "leave.request.view_self"))
+        start = next_monday()
         created = applicant.post("/api/v1/leave/requests", {
-            "category": "CL", "starts_on": "2026-03-02", "ends_on": "2026-03-03",
+            "category": "CL", "starts_on": str(start),
+            "ends_on": str(start + timedelta(days=1)),
             "reason": "Personal work"}, format="json")
         assert created.status_code == 201
         assert created.json()["state"] == "AWAITING_UNIT_HEAD"
@@ -283,14 +295,16 @@ class TestTheWholeWayThrough:
     def test_the_seeded_policy_counts_casual_leave_as_working_days(
         self, stub_iam, staff_directory
     ):
-        run("seed_leave_policy", "--year", "2026")
+        run("seed_leave_policy", "--year", str(next_monday().year))
         run("leave_credit_year", "2026")
         c = client(stub_iam, STAFF, ("leave.request.create",))
 
-        # Monday 2 March to Monday 9 March: CL skips the weekend, so 6 not 8.
+        # Monday to the following Monday: CL skips the weekend, so 6 not 8.
+        start = next_monday()
         created = c.post("/api/v1/leave/requests", {
-            "category": "CL", "starts_on": str(date(2026, 3, 2)),
-            "ends_on": str(date(2026, 3, 9)), "reason": "Personal"}, format="json")
+            "category": "CL", "starts_on": str(start),
+            "ends_on": str(start + timedelta(days=7)),
+            "reason": "Personal"}, format="json")
 
         assert created.status_code == 201
         assert created.json()["requested_days"] == "6.00"
@@ -300,7 +314,7 @@ class TestTheProjectionGate:
     """Crediting acts on every employee, so a partial directory must stop it."""
 
     def test_it_refuses_when_the_directory_is_short(self, stub_iam, staff_directory):
-        run("seed_leave_policy", "--year", "2026")
+        run("seed_leave_policy", "--year", str(next_monday().year))
         fake = stub_iam(make_session())
         # The identity service knows somebody this service has never seen.
         fake.employees = [
@@ -318,7 +332,7 @@ class TestTheProjectionGate:
         A stale row standing in for a missing one keeps the totals equal, which
         is exactly the case a count comparison cannot see.
         """
-        run("seed_leave_policy", "--year", "2026")
+        run("seed_leave_policy", "--year", str(next_monday().year))
         fake = stub_iam(make_session())
         held = list(UserRef.objects.filter(kind__in=("faculty", "staff")))
         fake.employees = [
@@ -334,7 +348,7 @@ class TestTheProjectionGate:
     def test_the_override_is_explicit_and_says_what_it_skipped(
         self, stub_iam, staff_directory
     ):
-        run("seed_leave_policy", "--year", "2026")
+        run("seed_leave_policy", "--year", str(next_monday().year))
         fake = stub_iam(make_session())
         fake.employees = [
             *UserRef.objects.filter(kind__in=("faculty", "staff")),
@@ -352,7 +366,7 @@ class TestTheProjectionGate:
     ):
         from fusion_auth.client import IamUnavailable
 
-        run("seed_leave_policy", "--year", "2026")
+        run("seed_leave_policy", "--year", str(next_monday().year))
         fake = stub_iam(make_session())
 
         def unreachable(**kwargs):
@@ -367,7 +381,7 @@ class TestTheProjectionGate:
     def test_naming_somebody_absent_is_an_error_not_a_silent_skip(
         self, stub_iam, staff_directory
     ):
-        run("seed_leave_policy", "--year", "2026")
+        run("seed_leave_policy", "--year", str(next_monday().year))
         stub_iam(make_session())
 
         with pytest.raises(CommandError, match="Not in the directory"):
@@ -382,7 +396,7 @@ class TestRevokingAWrongCredit:
     """
 
     def _credited_a_non_employee(self):
-        run("seed_leave_policy", "--year", "2026")
+        run("seed_leave_policy", "--year", str(next_monday().year))
         run("leave_credit_year", "2026")
         # They then turn out not to be an employee at all.
         UserRef.objects.filter(user_id=STAFF).update(kind="unknown")

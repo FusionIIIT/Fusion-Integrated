@@ -12,9 +12,34 @@ from django.utils import timezone
 from core.api.exceptions import ConflictError, NotFoundError
 from modules.leave.domain import authority
 from modules.leave.domain.categories import Category
+from modules.leave.domain.entitlement import has_sufficient_balance
 from modules.leave.domain.state_machine import Actor, Event, State
-from modules.leave.models import AuthorityRule, EntryReason, LeaveRequest, SubstituteNomination
+from modules.leave.models import (
+    AuthorityRule,
+    EntryReason,
+    LeaveRequest,
+    LedgerEntry,
+    SubstituteNomination,
+)
+from modules.leave.selectors import balances
 from modules.leave.services.workflow import Movement, apply_event
+
+
+def _refuse_if_unaffordable(request: LeaveRequest) -> None:
+    category = Category(request.category)
+    # Lock the person's ledger for this year so two approvals cannot both read
+    # the balance before either has written to it.
+    LedgerEntry.objects.select_for_update().filter(
+        user_id=request.user_id, year=request.starts_on.year, category=category.value
+    ).exists()
+    held = balances.balance_for(request.user_id, request.starts_on.year, category)
+    if not has_sufficient_balance(held, request.requested_days):
+        raise ConflictError(
+            f"{request.requested_days} day(s) needed but {held.available} left in "
+            f"{category.value}. Another request has been approved since this one "
+            "was made.",
+            code="insufficient_balance",
+        )
 
 
 def _route_for(request: LeaveRequest) -> authority.Route:
@@ -127,10 +152,19 @@ def sanction(
     )
 
 
+@transaction.atomic
 def _approve(
     request: LeaveRequest, actor: Actor, actor_user_id: int, event: Event, remark: str
 ) -> LeaveRequest:
-    """Deduct the days and record the approval in one transaction."""
+    """Deduct the days and record the approval in one transaction.
+
+    The balance is checked again here, not only at submission. Nothing is held
+    while a request is pending, so two requests can each be affordable when
+    they are made and unaffordable together -- approve both and the balance
+    goes negative with no rule having visibly been broken. The check belongs
+    where the days actually move.
+    """
+    _refuse_if_unaffordable(request)
     return apply_event(
         request,
         event,

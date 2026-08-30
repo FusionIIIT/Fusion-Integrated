@@ -23,6 +23,10 @@ def make_policy(**overrides) -> LeavePolicy:
         version=overrides.pop("version", "2026.1"),
         effective_from=overrides.pop("effective_from", date(YEAR, 1, 1)),
         published=True,
+        # These tests work in fixed dates inside YEAR so the arithmetic stays
+        # readable, and YEAR drifts into the past as time passes. The
+        # back-dating rule has its own tests against the real default of 0.
+        max_backdate_days=overrides.pop("max_backdate_days", 100_000),
         **overrides,
     )
     for category, credit, carries, faculty in (
