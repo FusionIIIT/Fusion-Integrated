@@ -64,3 +64,38 @@ class LedgerEntry(TimeStampedModel, UserScopedModel):
 
     def __str__(self) -> str:
         return f"{self.user_id} {self.year} {self.category} {self.days:+}"
+
+
+class YearEndClosure(TimeStampedModel, UserScopedModel):
+    """That a leave year was settled for somebody, recorded once.
+
+    Closing used to be inferred from the entries it wrote, which failed for an
+    account whose only outcome was a carry-forward: nothing recognisable landed
+    in the closing year, so the close was invisible and running it again
+    doubled the opening balance. Inferring a fact from its side effects works
+    until a case produces no side effect worth recognising.
+
+    The unique constraint is the real guard. It makes a second close impossible
+    at the database rather than unlikely in the application, so two schedulers
+    racing produce one closure and one loser, not two sets of entries.
+    """
+
+    year = models.IntegerField(db_index=True)
+    policy_id = models.IntegerField(null=True, blank=True)
+    lapsed = models.DecimalField(max_digits=9, decimal_places=2, default=0)
+    carried = models.DecimalField(max_digits=9, decimal_places=2, default=0)
+    converted_vl = models.DecimalField(max_digits=9, decimal_places=2, default=0)
+    el_from_conversion = models.DecimalField(max_digits=9, decimal_places=2, default=0)
+    closed_by_user_id = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        db_table = "leave_year_end_closure"
+        ordering = ["user_id", "year"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user_id", "year"], name="leave_year_closed_once"
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.user_id} closed {self.year}"

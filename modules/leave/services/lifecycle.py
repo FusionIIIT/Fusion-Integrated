@@ -28,6 +28,7 @@ from modules.leave.models import (
     AuthorityRule,
     EntryReason,
     LeaveRequest,
+    LedgerEntry,
     SubstituteNomination,
 )
 from modules.leave.selectors import balances
@@ -204,8 +205,9 @@ def request_extension(
         if substitute_user_id is not None
         else State.EXTENSION_AWAITING_UNIT_HEAD
     )
-    request.actual_days = extra
-    request.save(update_fields=["actual_days", "updated_at"])
+    request.extension_to = new_end
+    request.extension_days = extra
+    request.save(update_fields=["extension_to", "extension_days", "updated_at"])
     return apply_event(
         request,
         Event.REQUEST_EXTENSION,
@@ -249,8 +251,9 @@ def decide_extension(
 ) -> LeaveRequest:
     """BW-EL-07 and BW-EL-08. Either way the leave carries on running."""
     if not approve:
-        request.actual_days = None
-        request.save(update_fields=["actual_days", "updated_at"])
+        request.extension_to = None
+        request.extension_days = None
+        request.save(update_fields=["extension_to", "extension_days", "updated_at"])
         return apply_event(
             request,
             Event.EXTENSION_REFUSE,
@@ -259,7 +262,29 @@ def decide_extension(
             remark=remark,
         )
 
-    extra = request.actual_days or ZERO
+    if request.extension_to is None:
+        raise ConflictError(
+            "This request has no extension awaiting a decision.",
+            code="no_extension_pending",
+        )
+    extra = request.extension_days or ZERO
+
+    # Nothing is held while the extension is decided, so the days can have been
+    # spent elsewhere in the meantime. Checked here, under a lock, for the same
+    # reason ordinary approval is.
+    category = Category(request.category)
+    LedgerEntry.objects.select_for_update().filter(
+        user_id=request.user_id, year=request.starts_on.year, category=category.value
+    ).exists()
+    held = balances.balance_for(request.user_id, request.starts_on.year, category)
+    if extra > held.available:
+        raise ConflictError(
+            f"{extra} additional day(s) needed but {held.available} left in "
+            f"{category.value}.",
+            code="insufficient_balance",
+        )
+
+    granted_to = request.extension_to
     updated = apply_event(
         request,
         Event.EXTENSION_GRANT,
@@ -275,11 +300,20 @@ def decide_extension(
             )
         ],
     )
-    if new_end is not None:
-        updated.ends_on = new_end
+    # The end date comes from what was applied for, not from an argument the
+    # caller may not have. Passing new_end again is accepted only to override
+    # deliberately, and it must still be later than the leave it extends.
+    if new_end is not None and new_end <= updated.ends_on:
+        raise BadRequestError(
+            "A granted extension must end after the approved leave.",
+            code="extension_not_longer",
+        )
+    updated.ends_on = new_end or granted_to
     updated.requested_days = updated.requested_days + extra
-    updated.actual_days = None
-    updated.save(update_fields=["ends_on", "requested_days", "actual_days", "updated_at"])
+    updated.extension_to = None
+    updated.extension_days = None
+    updated.save(update_fields=[
+        "ends_on", "requested_days", "extension_to", "extension_days", "updated_at"])
     return updated
 
 
