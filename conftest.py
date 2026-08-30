@@ -15,6 +15,8 @@ class FakeIam:
 
     def __init__(self, session=None, users=None, standings=None):
         self.session, self.users = session, users or {}
+        #: Override to make the identity service disagree with the projection.
+        self.employees = None
         self.standings = standings or {}
         self.calls = []
         self.login_result = "tok-123"      # override per test
@@ -44,6 +46,30 @@ class FakeIam:
 
     def search_users(self, q="", kind=None, limit=25):
         return list(self.users.values())[:limit]
+
+    def employee_page(self, *, limit=500, offset=0):
+        rows = self._employees()
+        return {"count": len(rows), "limit": limit, "offset": offset,
+                "results": rows[offset:offset + limit]}
+
+    def count_employees(self):
+        return len(self._employees())
+
+    def iter_employees(self, *, page_size=500):
+        yield from self._employees()
+
+    def _employees(self):
+        """Whoever the test put in `users` who is not a student.
+
+        Defaults to the directory rows the test already created, so a test that
+        never thinks about employees still sees a consistent institute rather
+        than an empty one.
+        """
+        if self.employees is not None:
+            return list(self.employees)
+        from modules.directory.models import UserRef
+        return list(UserRef.objects.filter(
+            kind__in=("faculty", "staff"), is_active=True))
 
     def academic_directory(self, **filters):
         self.calls.append(("academic_directory", tuple(sorted(filters.items()))))

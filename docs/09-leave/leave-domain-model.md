@@ -35,9 +35,17 @@ nobody anything until a credit row exists, because the balance is a **sum of the
 
 ```
 manage.py seed_modules          # register the module so the grant can be given
+manage.py sync_directory        # pull the payroll into the local projection
 manage.py seed_leave_policy     # policy + routing + a minimal calendar, published
 manage.py leave_credit_year 2026
 ```
+
+`sync_directory` comes first and is not optional. The directory projection normally fills in lazily as
+screens ask for names, so it routinely holds a fraction of the institute; crediting against that would
+report success and leave most of the staff with nothing. `leave_credit_year` therefore asks the identity
+service **which** employees it knows and refuses if any are missing, naming them. It compares identities
+rather than counts, because a stale row standing in for a missing one keeps the totals equal — which is
+exactly the case the guard exists to catch.
 
 `seed_leave_policy` transcribes the entitlements from BR-EL-002 to BR-EL-009 — it does not choose them.
 Read them against the ordinance before a real year opens, and supersede the version rather than editing
