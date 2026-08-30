@@ -11,6 +11,7 @@ Run it after sync_identity on the IAM, and whenever staff join.
 from django.core.management.base import BaseCommand, CommandError
 
 from fusion_auth.client import IamUnavailable, get_client
+from modules.directory.contracts import held_employee_ids
 from modules.directory.models import UserRef
 from modules.directory.services.sync import upsert
 
@@ -22,6 +23,20 @@ class Command(BaseCommand):
         parser.add_argument("--page-size", type=int, default=500)
         parser.add_argument("--dry-run", action="store_true",
                             help="Report what would change and write nothing.")
+
+    def _retire(self, stale: set[int]) -> int:
+        """Bring across the current record of anyone who has stopped being an
+        employee upstream.
+
+        Upserting alone never removes anybody: a projection that only grows
+        keeps treating a reclassified account as staff forever, and leave would
+        go on crediting them. Their real record is fetched rather than guessed,
+        so the row ends up saying whatever the identity service now says.
+        """
+        if not stale:
+            return 0
+        current = get_client().get_users(sorted(stale))
+        return upsert(current.values())
 
     def handle(self, *args, **opts) -> None:
         before = UserRef.objects.filter(kind__in=("faculty", "staff")).count()
@@ -49,10 +64,12 @@ class Command(BaseCommand):
 
         rejected: list[tuple[int, str]] = []
         written = upsert(fetched, rejected=rejected)
+        retired = self._retire(held_employee_ids() - {r.user_id for r in fetched})
         after = UserRef.objects.filter(kind__in=("faculty", "staff")).count()
         self.stdout.write(
             f"  reported  {len(fetched)}\n"
             f"  written   {written}\n"
+            f"  retired   {retired}   (no longer employees upstream)\n"
             f"  employees {before} -> {after}\n")
         if rejected:
             self.stdout.write(self.style.ERROR(

@@ -10,10 +10,12 @@ running it again after new staff join credits only the people who were missed.
 """
 from django.core.management.base import BaseCommand, CommandError
 
+from core.api.exceptions import ConflictError
 from modules.directory.contracts import (
-    employees_missing_from_projection,
+    employee_projection_disagreement,
     get_employees,
 )
+from modules.leave.models import EntryReason, LedgerEntry
 from modules.leave.selectors.policy import NoEffectivePolicy
 from modules.leave.services import yearend
 
@@ -28,10 +30,52 @@ class Command(BaseCommand):
         parser.add_argument("--dry-run", action="store_true",
                             help="Report who would be credited and write nothing.")
         parser.add_argument(
+            "--revoke", action="store_true",
+            help="Reverse the credit for people this directory no longer calls "
+                 "employees. Writes reversing entries; refuses where any of it "
+                 "has been used.")
+        parser.add_argument(
             "--accept-incomplete", action="store_true",
             help="Credit everyone the directory holds even though it is short of "
                  "what the identity service reports. Use when the shortfall is "
                  "known and being fixed elsewhere.")
+
+    def _revoke(self, year: int, dry: bool) -> None:
+        """Take back what was credited to people who are not employees.
+
+        The counterpart to crediting too widely, which is easy to do while the
+        directory is still catching up with the institute.
+        """
+        entitled = {e.user_id for e in get_employees()}
+        credited = set(
+            LedgerEntry.objects.filter(year=year, reason=EntryReason.ANNUAL_CREDIT)
+            .order_by().values_list("user_id", flat=True).distinct()
+        )
+        wrongly = sorted(credited - entitled)
+        if not wrongly:
+            self.stdout.write(self.style.SUCCESS(
+                f"  every {year} credit belongs to a current employee"))
+            return
+
+        self.stdout.write(f"  credited but not employees: {len(wrongly)}")
+        if dry:
+            self.stdout.write(f"    {wrongly[:20]}")
+            self.stdout.write(self.style.WARNING("  dry run — nothing was written"))
+            return
+
+        reversed_rows = refused = 0
+        for user_id in wrongly:
+            try:
+                reversed_rows += yearend.revoke_credit(
+                    user_id=user_id, year=year, actor_user_id=0,
+                    note=f"not an employee at the {year} credit")
+            except ConflictError as exc:
+                refused += 1
+                self.stderr.write(self.style.ERROR(f"    {user_id}: {exc.message}"))
+        self.stdout.write(
+            f"  reversed  {reversed_rows} entr(y/ies)\n"
+            f"  refused   {refused}   (leave already used — settle by hand)\n")
+        self.stdout.write(self.style.SUCCESS("  credits reversed"))
 
     def _everyone(self, *, accept_incomplete: bool) -> list:
         """Every employee, or nothing.
@@ -47,17 +91,26 @@ class Command(BaseCommand):
             raise CommandError(
                 "The directory holds no employees. Run sync_identity on the IAM, "
                 "then populate this service's projection, before crediting.")
-        missing = employees_missing_from_projection()
-        if missing == []:
-            return employees
-        if missing is None:
+        disagreement = employee_projection_disagreement()
+        if disagreement is None:
             described = "the identity service is unreachable, so completeness is unknown"
         else:
-            described = (
-                f"{len(missing)} employee(s) the identity service knows are not in "
-                f"this directory: {missing[:10]}"
-                + (" ..." if len(missing) > 10 else "")
-            )
+            missing, stale = disagreement
+            if not missing and not stale:
+                return employees
+            parts = []
+            if missing:
+                parts.append(
+                    f"{len(missing)} the identity service knows and this directory "
+                    f"does not: {missing[:10]}" + (" ..." if len(missing) > 10 else ""))
+            if stale:
+                # Crediting these would hand entitlement to people who are no
+                # longer employees, which is the more expensive direction.
+                parts.append(
+                    f"{len(stale)} this directory still calls employees and the "
+                    f"identity service does not: {stale[:10]}"
+                    + (" ..." if len(stale) > 10 else ""))
+            described = "; ".join(parts)
         if not accept_incomplete:
             raise CommandError(
                 f"{described}. Crediting now would leave them with no entitlement "
@@ -68,6 +121,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **opts) -> None:
         year, dry = opts["year"], opts["dry_run"]
+        if opts["revoke"]:
+            self._revoke(year, dry)
+            return
         if opts["users"]:
             wanted = set(opts["users"])
             employees = [e for e in get_employees() if e.user_id in wanted]

@@ -131,3 +131,53 @@ def credit_year(*, user_id: int, year: int, faculty: bool) -> int:
     ]
     LedgerEntry.objects.bulk_create(rows)
     return len(rows)
+
+
+@transaction.atomic
+def revoke_credit(*, user_id: int, year: int, actor_user_id: int, note: str) -> int:
+    """Undo a year's credit for somebody who should never have had it.
+
+    Written as reversing entries, not deletions. The ledger is the record of
+    what happened, and "we credited this person and then established they were
+    not an employee" is part of what happened -- an audit a year later has to
+    be able to see the mistake and the correction, not a tidy absence.
+
+    Refuses once any of it has been spent: taking back days somebody has
+    already been approved for is a decision about that person's leave, not a
+    bookkeeping correction.
+    """
+    credited = list(
+        LedgerEntry.objects.filter(
+            user_id=user_id, year=year, reason=EntryReason.ANNUAL_CREDIT
+        ).exclude(pk__in=_already_reversed(user_id, year))
+    )
+    if not credited:
+        return 0
+
+    spent = LedgerEntry.objects.filter(
+        user_id=user_id, year=year, reason=EntryReason.CONSUMED
+    ).exists()
+    if spent:
+        raise ConflictError(
+            f"{user_id} has already used leave in {year}. Revoking the credit "
+            "would leave a negative balance; settle the leave first.",
+            code="credit_already_spent",
+        )
+
+    LedgerEntry.objects.bulk_create([
+        LedgerEntry(
+            user_id=user_id, year=year, category=entry.category, days=-entry.days,
+            reason=EntryReason.CORRECTION, policy_id=entry.policy_id,
+            reverses_id=entry.pk, recorded_by_user_id=actor_user_id, note=note,
+        )
+        for entry in credited
+    ])
+    return len(credited)
+
+
+def _already_reversed(user_id: int, year: int) -> set[int]:
+    return set(
+        LedgerEntry.objects.filter(
+            user_id=user_id, year=year, reason=EntryReason.CORRECTION
+        ).exclude(reverses_id=None).values_list("reverses_id", flat=True)
+    )

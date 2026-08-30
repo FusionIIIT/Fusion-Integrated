@@ -40,12 +40,22 @@ manage.py seed_leave_policy     # policy + routing + a minimal calendar, publish
 manage.py leave_credit_year 2026
 ```
 
-`sync_directory` comes first and is not optional. The directory projection normally fills in lazily as
+`sync_directory` comes first and is not optional. It reconciles in **both** directions — it brings
+people in and retires anyone the identity service no longer calls an employee, because a projection
+that only ever grows keeps crediting someone who was reclassified upstream. The directory projection normally fills in lazily as
 screens ask for names, so it routinely holds a fraction of the institute; crediting against that would
 report success and leave most of the staff with nothing. `leave_credit_year` therefore asks the identity
 service **which** employees it knows and refuses if any are missing, naming them. It compares identities
 rather than counts, because a stale row standing in for a missing one keeps the totals equal — which is
 exactly the case the guard exists to catch.
+
+### Undoing a credit
+
+`leave_credit_year <year> --revoke` reverses the entitlement of anyone who has been credited and is not
+an employee. It writes reversing entries linked by `reverses_id`, never deletions: an audit has to be
+able to see the mistake and the correction, not a tidy absence. It refuses where any of the leave has
+already been used — taking back days somebody was approved for is a decision about their leave, not a
+bookkeeping correction.
 
 `seed_leave_policy` transcribes the entitlements from BR-EL-002 to BR-EL-009 — it does not choose them.
 Read them against the ordinance before a real year opens, and supersede the version rather than editing
