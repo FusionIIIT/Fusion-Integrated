@@ -13,7 +13,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.api.exceptions import NotFoundError
+from core.api.exceptions import BadRequestError, NotFoundError
 from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.directory import contracts as directory
 from modules.leave.api import serializers as s
@@ -113,6 +113,7 @@ class ApplyView(APIView):
             half=Half(data["half"]) if data.get("half") else None,
             substitute_user_id=data.get("substitute_user_id"),
             station=data.get("station"),
+            evidence_reference=data.get("evidence_reference", ""),
         )
         return Response(
             s.LeaveRequestSerializer(created).data, status=status.HTTP_201_CREATED
@@ -389,7 +390,7 @@ class MyBalanceView(APIView):
 
     @extend_schema(responses=s.BalanceSerializer(many=True))
     def get(self, request):
-        year = int(request.query_params.get("year", date.today().year))
+        year = _int_param(request, "year", default=date.today().year)
         held = balances.balances_for(_actor(request).user_id, year)
         return Response(
             [
@@ -410,8 +411,8 @@ class StatementView(APIView):
 
     @extend_schema(responses=s.LedgerEntrySerializer(many=True))
     def get(self, request, category: str):
-        year = int(request.query_params.get("year", date.today().year))
-        rows = balances.statement(_actor(request).user_id, year, Category(category))
+        year = _int_param(request, "year", default=date.today().year)
+        rows = balances.statement(_actor(request).user_id, year, _category(category))
         return Response(s.LedgerEntrySerializer(rows, many=True).data)
 
 
@@ -420,8 +421,14 @@ class BalanceDirectoryView(APIView):
 
     @extend_schema(responses=s.BalanceSerializer(many=True))
     def get(self, request):
-        user_id = int(request.query_params["user_id"])
-        year = int(request.query_params.get("year", date.today().year))
+        user_id = _int_param(request, "user_id", required=True)
+        year = _int_param(request, "year", default=date.today().year)
+        actor = _actor(request)
+        if not scoping.may_read_balance_of(
+                actor, _unit(request), _unit_of(user_id)):
+            # Not found rather than forbidden, for the same reason the request
+            # list answers that way: a refusal confirms the person exists here.
+            raise NotFoundError("No leave account you can see for that employee.")
         held = balances.balances_for(user_id, year)
         return Response(
             [
@@ -583,6 +590,40 @@ def _policy(pk: int) -> LeavePolicy:
     if found is None:
         raise NotFoundError("No such policy version.")
     return found
+
+
+def _category(raw: str) -> Category:
+    """A category from the URL. An unknown one is a 400, not a ValueError."""
+    try:
+        return Category(raw)
+    except ValueError as exc:
+        known = ", ".join(c.value for c in Category)
+        raise BadRequestError(
+            f"{raw!r} is not a leave category. Expected one of: {known}.",
+            code="unknown_category") from exc
+
+
+def _unit_of(user_id: int) -> str:
+    known = directory.get_users([user_id]).get(user_id)
+    return known.department if known else ""
+
+
+def _int_param(request, name: str, *, default=None, required: bool = False) -> int:
+    """A query parameter that must be a number.
+
+    int() on raw input turns a typo into a 500. These are user input like any
+    other and deserve a 400 that says which parameter is wrong.
+    """
+    raw = request.query_params.get(name)
+    if raw in (None, ""):
+        if required:
+            raise BadRequestError(f"{name} is required.", code="missing_parameter")
+        return default
+    try:
+        return int(raw)
+    except (TypeError, ValueError) as exc:
+        raise BadRequestError(
+            f"{name} must be a whole number.", code="invalid_parameter") from exc
 
 
 def _calendar(pk: int) -> HolidayCalendar:

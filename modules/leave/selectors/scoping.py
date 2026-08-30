@@ -80,6 +80,25 @@ def _queue(states, viewer_user_id: int) -> QuerySet[LeaveRequest]:
     )
 
 
+def sees_whole_institute(principal) -> bool:
+    """Whether this role acts on people from anywhere, or only their own unit."""
+    return principal.has_any_permission(*INSTITUTE_WIDE)
+
+
+def may_read_balance_of(principal, viewer_unit: str, subject_unit: str) -> bool:
+    """BR-EL-019 scoping, applied to a figure rather than to a list.
+
+    A unit head holds leave.balance.view so they can see what their own people
+    have left. The same permission let them read anybody's, because the
+    directory endpoint took a user id and applied no scope at all -- the
+    protection the request list is careful about was simply absent one endpoint
+    over.
+    """
+    if sees_whole_institute(principal):
+        return True
+    return bool(viewer_unit) and viewer_unit == subject_unit
+
+
 def review_queue(unit: str, viewer_user_id: int) -> QuerySet[LeaveRequest]:
     """A unit head reviews their own unit, and not their own leave.
 

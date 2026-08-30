@@ -98,6 +98,17 @@ def category_policies(
     return out
 
 
+def requires_evidence(policy: LeavePolicy, category: Category, *, faculty: bool) -> bool:
+    """BR-EL-001. Whether this category needs a certificate from this employee."""
+    rule = (
+        CategoryRule.objects.filter(policy=policy, category=category.value)
+        .filter(Q(applies_to_faculty__isnull=True) | Q(applies_to_faculty=faculty))
+        .order_by("applies_to_faculty")
+        .first()
+    )
+    return bool(rule and rule.requires_evidence)
+
+
 def conversion_settings(policy: LeavePolicy) -> tuple[ConversionRounding, TailPolicy]:
     return (
         ConversionRounding(policy.vl_to_el_rounding),

@@ -85,6 +85,7 @@ def validate(
     ends_on: date,
     half: Half | None,
     faculty: bool,
+    evidence_reference: str = "",
     ignore_request_id: int | None = None,
 ) -> tuple[Decimal, int, int]:
     """Check a request against the effective policy. Returns days, policy, calendar."""
@@ -106,6 +107,25 @@ def validate(
             f"back {allowed} day(s). Leave already taken is entered by the leave "
             "administrator against the written sanction, not applied for here.",
             code="starts_in_the_past",
+        )
+
+    # BR-EL-001. The policy says which categories this kind of employee may
+    # take at all. The flag existed on the rule and nothing consulted it, so a
+    # staff member with any VL balance at all -- a correction, an opening
+    # figure -- could request faculty-only vacation leave.
+    applicable = policy_selector.category_policies(effective, faculty=faculty)
+    if category not in applicable:
+        raise BadRequestError(
+            f"{category.value} is not available to you under the leave policy in "
+            "force.",
+            code="category_not_applicable",
+        )
+    if policy_selector.requires_evidence(effective, category, faculty=faculty) and not (
+            evidence_reference or "").strip():
+        raise BadRequestError(
+            f"{category.value} needs a supporting certificate or letter. Quote its "
+            "reference on the application.",
+            code="evidence_required",
         )
 
     if category is Category.RH:
@@ -165,6 +185,7 @@ def submit(
     half: Half | None = None,
     substitute_user_id: int | None = None,
     station: dict | None = None,
+    evidence_reference: str = "",
 ) -> LeaveRequest:
     """Create a request and put it into the workflow. EL-UC-001."""
     days, policy_id, calendar_id = validate(
@@ -174,6 +195,7 @@ def submit(
         ends_on=ends_on,
         half=half,
         faculty=faculty,
+        evidence_reference=evidence_reference,
     )
     if substitute_user_id == user_id:
         raise BadRequestError(
@@ -219,6 +241,7 @@ def submit(
         ends_on=ends_on,
         half=half.value if half else "",
         reason=reason,
+        evidence_reference=evidence_reference.strip(),
         requested_days=days,
         policy_id=policy_id,
         calendar_id=calendar_id,

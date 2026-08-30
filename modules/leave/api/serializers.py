@@ -17,6 +17,8 @@ class StationSerializer(serializers.Serializer):
 
 class ApplyLeaveSerializer(serializers.Serializer):
     category = serializers.ChoiceField(choices=CATEGORIES)
+    evidence_reference = serializers.CharField(
+        max_length=120, required=False, allow_blank=True, default="")
     starts_on = serializers.DateField()
     ends_on = serializers.DateField()
     reason = serializers.CharField(max_length=2000)
@@ -55,6 +57,7 @@ class ResumptionSerializer(serializers.Serializer):
 
 
 class LeaveTransitionSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
     from_state = serializers.CharField()
     to_state = serializers.CharField()
     event = serializers.CharField()
@@ -70,8 +73,10 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
         model = LeaveRequest
         fields = [
             "id", "user_id", "category", "state", "starts_on", "ends_on", "half",
-            "reason", "requested_days", "actual_days", "station_leave",
-            "station_destination", "resumed_on", "decided_at", "created_at",
+            "reason", "evidence_reference", "requested_days", "actual_days",
+            "station_leave", "station_destination", "extension_to",
+            "unit_head_recommended", "sanctioning_designation", "resumed_on",
+            "decided_at", "created_at",
         ]
         read_only_fields = fields
 
@@ -102,6 +107,7 @@ class PolicySerializer(serializers.Serializer):
     vl_to_el_ratio = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
     vl_to_el_rounding = serializers.CharField(read_only=True)
     early_return_tail = serializers.CharField(read_only=True)
+    max_backdate_days = serializers.IntegerField(read_only=True)
 
 
 class CategoryRuleSerializer(serializers.Serializer):
@@ -159,6 +165,7 @@ class DraftPolicySerializer(serializers.Serializer):
         max_digits=5, decimal_places=2, required=False, allow_null=True)
     vl_to_el_rounding = serializers.CharField(required=False, allow_blank=True, default="")
     early_return_tail = serializers.CharField(required=False, allow_blank=True, default="")
+    max_backdate_days = serializers.IntegerField(required=False, allow_null=True)
 
 
 class DraftCategoryRuleSerializer(serializers.Serializer):
