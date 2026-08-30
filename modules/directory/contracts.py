@@ -66,28 +66,37 @@ def get_employees() -> list[UserDTO]:
     ]
 
 
-def employees_missing_from_projection() -> list[int] | None:
-    """Which employees the identity service knows and this service does not.
+def held_employee_ids() -> set[int]:
+    return set(
+        UserRef.objects.filter(
+            kind__in=("faculty", "staff"), is_active=True
+        ).values_list("user_id", flat=True)
+    )
+
+
+def employee_projection_disagreement() -> tuple[list[int], list[int]] | None:
+    """Where this service and the identity service disagree about the payroll.
+
+    Returns (missing, stale): people the identity service calls employees and
+    this one has not got, and people this one still calls employees and the
+    identity service no longer does. **Both** matter. Checking only the first
+    leaves a projection that has never dropped anybody -- someone reclassified
+    upstream stays an employee here forever and keeps drawing entitlement.
 
     Compares identities, not counts. A count comparison passes whenever the two
     totals happen to agree, which is exactly the case this guard exists to
-    catch: the right number of the wrong people. One stale row standing in for
-    a missing one is invisible to a count and obvious to a set.
+    catch: the right number of the wrong people.
 
     Returns None when the identity service cannot be reached -- a caller about
     to act on "all employees" must not read an unreachable directory as
     agreement.
     """
-    held = set(
-        UserRef.objects.filter(
-            kind__in=("faculty", "staff"), is_active=True
-        ).values_list("user_id", flat=True)
-    )
+    held = held_employee_ids()
     try:
         known = {r.user_id for r in get_client().iter_employees()}
     except IamUnavailable:
         return None
-    return sorted(known - held)
+    return sorted(known - held), sorted(held - known)
 
 
 def search(q: str = "", kind: str | None = None, limit: int = 25) -> list[UserDTO]:
