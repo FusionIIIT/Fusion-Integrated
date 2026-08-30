@@ -15,7 +15,13 @@ from rest_framework.test import APIClient
 from conftest import make_session
 from modules.directory.models import UserRef
 from modules.leave.domain.categories import Category
-from modules.leave.models import AuthorityRule, HolidayCalendar, LeavePolicy
+from modules.leave.models import (
+    AuthorityRule,
+    EntryReason,
+    HolidayCalendar,
+    LeavePolicy,
+    LedgerEntry,
+)
 from modules.leave.selectors import balances
 
 pytestmark = pytest.mark.django_db
@@ -366,3 +372,76 @@ class TestTheProjectionGate:
 
         with pytest.raises(CommandError, match="Not in the directory"):
             run("leave_credit_year", "2026", "--user", "424242")
+
+
+class TestRevokingAWrongCredit:
+    """Crediting too widely is easy while the directory is catching up.
+
+    The correction is a reversing entry, never a deletion: an audit has to be
+    able to see the mistake and the fix, not a tidy absence.
+    """
+
+    def _credited_a_non_employee(self):
+        run("seed_leave_policy", "--year", "2026")
+        run("leave_credit_year", "2026")
+        # They then turn out not to be an employee at all.
+        UserRef.objects.filter(user_id=STAFF).update(kind="unknown")
+
+    def test_it_finds_credits_that_belong_to_nobody(self, stub_iam, staff_directory):
+        self._credited_a_non_employee()
+
+        output = run("leave_credit_year", "2026", "--revoke", "--dry-run")
+
+        assert "credited but not employees: 1" in output
+        assert "nothing was written" in output
+        assert balances.balance_for(STAFF, 2026, Category.CL).available == 8
+
+    def test_reversing_takes_the_balance_back_to_nothing(self, stub_iam, staff_directory):
+        self._credited_a_non_employee()
+
+        run("leave_credit_year", "2026", "--revoke")
+
+        assert balances.balance_for(STAFF, 2026, Category.CL).available == 0
+
+    def test_the_original_credit_is_still_on_the_record(self, stub_iam, staff_directory):
+        self._credited_a_non_employee()
+
+        run("leave_credit_year", "2026", "--revoke")
+
+        rows = LedgerEntry.objects.filter(user_id=STAFF, year=2026, category="CL")
+        assert rows.count() == 2
+        credit = rows.get(reason=EntryReason.ANNUAL_CREDIT)
+        correction = rows.get(reason=EntryReason.CORRECTION)
+        assert correction.days == -credit.days
+        assert correction.reverses_id == credit.pk
+
+    def test_it_is_idempotent(self, stub_iam, staff_directory):
+        self._credited_a_non_employee()
+        run("leave_credit_year", "2026", "--revoke")
+        before = LedgerEntry.objects.count()
+
+        run("leave_credit_year", "2026", "--revoke")
+
+        assert LedgerEntry.objects.count() == before
+
+    def test_it_refuses_where_the_leave_has_already_been_used(
+        self, stub_iam, staff_directory
+    ):
+        self._credited_a_non_employee()
+        LedgerEntry.objects.create(
+            user_id=STAFF, year=2026, category="CL", days=-2,
+            reason=EntryReason.CONSUMED)
+
+        run("leave_credit_year", "2026", "--revoke")
+
+        # Taking back days somebody was approved for is a decision about their
+        # leave, not a bookkeeping correction.
+        assert not LedgerEntry.objects.filter(
+            user_id=STAFF, reason=EntryReason.CORRECTION).exists()
+
+    def test_a_real_employee_is_left_alone(self, stub_iam, staff_directory):
+        self._credited_a_non_employee()
+
+        run("leave_credit_year", "2026", "--revoke")
+
+        assert balances.balance_for(FACULTY, 2026, Category.VL).available == 60
