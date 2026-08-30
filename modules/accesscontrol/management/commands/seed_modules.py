@@ -29,9 +29,25 @@ class Command(BaseCommand):
             spec = getattr(reg, "MODULE", None)
             if not spec:
                 continue
+
+            # A module may declare what it needs before it can work. Until that
+            # is true it registers as planned, which keeps it out of every
+            # sidebar and off every route: a module that advertises itself and
+            # then refuses every request is worse than one nobody can see.
+            unmet = list(getattr(reg, "readiness", list)() or [])
+            defaults = {k: v for k, v in spec.items() if k != "code"}
+            if unmet:
+                defaults["status"] = "planned"
+
             module, _ = Module.objects.update_or_create(
-                code=spec["code"], defaults={k: v for k, v in spec.items() if k != "code"}
+                code=spec["code"], defaults=defaults
             )
+            if unmet:
+                self.stdout.write(self.style.WARNING(
+                    f"  {spec['code']}: registered but NOT active — "
+                    f"{len(unmet)} prerequisite(s) unmet:"))
+                for reason in unmet:
+                    self.stdout.write(self.style.WARNING(f"      {reason}"))
             for item in getattr(reg, "NAV_ITEMS", []):
                 NavItem.objects.update_or_create(
                     code=item["code"],
