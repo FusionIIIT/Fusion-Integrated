@@ -1,0 +1,90 @@
+"""Fixtures: a published policy, a calendar and an authority configuration."""
+from datetime import date
+from decimal import Decimal
+
+from modules.leave.domain.categories import Category
+from modules.leave.models import (
+    AuthorityRule,
+    CategoryRule,
+    EntryReason,
+    Holiday,
+    HolidayCalendar,
+    LeavePolicy,
+    LedgerEntry,
+    VacationPeriod,
+)
+
+YEAR = 2026
+D = Decimal
+
+
+def make_policy(**overrides) -> LeavePolicy:
+    policy = LeavePolicy.objects.create(
+        version=overrides.pop("version", "2026.1"),
+        effective_from=overrides.pop("effective_from", date(YEAR, 1, 1)),
+        published=True,
+        **overrides,
+    )
+    for category, credit, carries, faculty in (
+        (Category.CL, 8, False, None),
+        (Category.RH, 2, False, None),
+        (Category.SCL, 15, False, None),
+        (Category.EL, 30, True, False),
+        (Category.EL, 0, True, True),
+        (Category.COL, 20, True, None),
+        (Category.VL, 60, False, True),
+    ):
+        CategoryRule.objects.create(
+            policy=policy,
+            category=category.value,
+            annual_credit=D(credit),
+            carries_forward=carries,
+            applies_to_faculty=faculty,
+        )
+    return policy
+
+
+def make_calendar(year: int = YEAR) -> HolidayCalendar:
+    calendar = HolidayCalendar.objects.create(year=year, version="1", published=True)
+    Holiday.objects.create(calendar=calendar, day=date(year, 8, 15), name="Independence Day")
+    Holiday.objects.create(
+        calendar=calendar, day=date(year, 10, 2), name="Optional festival", restricted=True
+    )
+    VacationPeriod.objects.create(
+        calendar=calendar,
+        name="Summer",
+        starts_on=date(year, 5, 15),
+        ends_on=date(year, 6, 30),
+    )
+    return calendar
+
+
+def make_authority(policy, **overrides) -> None:
+    """Unit head final for CL and RH; everything else escalates."""
+    for category in Category:
+        higher = category not in (Category.CL, Category.RH)
+        AuthorityRule.objects.create(
+            policy_id=policy.pk,
+            category=category.value,
+            establishment_step=higher and overrides.get("establishment_step", True),
+            sanctioning_designation="Registrar" if higher else "",
+        )
+
+
+def credit(user_id: int, category: Category, days, year: int = YEAR) -> LedgerEntry:
+    return LedgerEntry.objects.create(
+        user_id=user_id,
+        year=year,
+        category=category.value,
+        days=D(days),
+        reason=EntryReason.ANNUAL_CREDIT,
+    )
+
+
+def setup_all(user_id: int = 501):
+    policy = make_policy()
+    calendar = make_calendar()
+    make_authority(policy)
+    for category, days in ((Category.CL, 8), (Category.EL, 30), (Category.COL, 20)):
+        credit(user_id, category, days)
+    return policy, calendar
