@@ -37,38 +37,44 @@ quarterly grep for single-consumer kernel code is a maintenance task, not a nice
 
 ## Inventory
 
+> **Status of this document.** It describes the shared kernel as designed. Entries
+> marked *(planned)* are not implemented yet, and sections marked *(not yet built)*
+> do not exist in the tree. Check the directory before importing from it. Of the
+> modules listed below, 8 are built and 17 are planned.
+
+
 ### `core/db/`
 
 | Module | Contents | Notes |
 |---|---|---|
-| `fields.py` | `PIIField`, `SensitivePIIField`, `EncryptedField`, `MoneyField` | **PII classification is structural, not a comment.** `SensitivePIIField` marks DOB, phone, address, category, gender, medical. The structlog redactor and the export-audit check both read this classification, so marking a field is what makes it protected. `MoneyField` is `Decimal(12,2)` and refuses float assignment. |
+| `fields.py` *(planned)* | `PIIField`, `SensitivePIIField`, `EncryptedField`, `MoneyField` | **PII classification is structural, not a comment.** `SensitivePIIField` marks DOB, phone, address, category, gender, medical. The structlog redactor and the export-audit check both read this classification, so marking a field is what makes it protected. `MoneyField` is `Decimal(12,2)` and refuses float assignment. |
 | `mixins.py` | `TimeStampedModel`, `SoftDeleteModel`, `AuditedModel` | `SoftDeleteModel` is for anything referenced across a boundary — a hard delete would leave dangling ids, since cross-boundary refs are unconstrained integers ([ADR-0013](../01-architecture/adr/0013-no-cross-module-foreign-keys.md)). |
-| `functions.py` | `Uuid7()`, `JsonbPath()`, `PercentileCont()` | Postgres expressions Django lacks. `PercentileCont` is how placement medians are computed in one aggregate rather than in Python. |
-| `introspection.py` | `introspect_columns(table)` | Builds a shadow model from `information_schema`. This is the mechanical guard against hazard **H2** — the legacy `globals_moduleaccess` has columns added by raw DDL that no migration knows about. |
-| `routers.py` | `ErpReadOnlyRouter` | Routes `erpshadow` models to the `erp` alias, `allow_migrate = False` always. Defence in depth; the actual control is the `platform_erp_ro` Postgres role. |
+| `functions.py` *(planned)* | `Uuid7()`, `JsonbPath()`, `PercentileCont()` | Postgres expressions Django lacks. `PercentileCont` is how placement medians are computed in one aggregate rather than in Python. |
+| `introspection.py` *(planned)* | `introspect_columns(table)` | Builds a shadow model from `information_schema`. This is the mechanical guard against hazard **H2** — the legacy `globals_moduleaccess` has columns added by raw DDL that no migration knows about. |
+| `routers.py` *(planned)* | `ErpReadOnlyRouter` | Routes `erpshadow` models to the `erp` alias, `allow_migrate = False` always. Defence in depth; the actual control is the `platform_erp_ro` Postgres role. |
 | `sql/` | The **only** place `raw()` is permitted | Parameterized, one file per query, each with a docstring saying why the ORM cannot express it. CI greps for `raw()`/`extra()`/`RawSQL` outside this directory. |
 
 ### `core/api/`
 
 | Module | Contents | Notes |
 |---|---|---|
-| `defaults.py` | the shared `REST_FRAMEWORK` block | A new module inherits correct pagination, throttling, error handling and deny-by-default permissions **whether or not its author thought about it**. This is the highest-value file in `core/`. |
+| `defaults.py` *(planned)* | the shared `REST_FRAMEWORK` block | A new module inherits correct pagination, throttling, error handling and deny-by-default permissions **whether or not its author thought about it**. This is the highest-value file in `core/`. |
 | `pagination.py` | `CursorPagination` | Cursor, not offset — offset pagination on a concurrently-written table silently skips and duplicates rows. No `count` by default; `COUNT(*)` is a sequential scan. |
 | `exceptions.py` | `handler()` | Maps domain errors → the one error envelope. **No view builds an error response by hand.** Also where `request_id` is injected, so a user can read an id off a toast and support can grep it. |
-| `filters.py` | `StrictFilterSet` | An unknown query parameter is a **422**, not silently ignored. Silent ignoring is how a typo becomes "the filter didn't work in production". |
+| `filters.py` *(planned)* | `StrictFilterSet` | An unknown query parameter is a **422**, not silently ignored. Silent ignoring is how a typo becomes "the filter didn't work in production". |
 | `throttling.py` | `ScopedUserThrottle` | Redis-backed, so counters are shared across gunicorn workers. An in-memory throttle with 5 workers is a 5× throttle. |
-| `idempotency.py` | `@idempotent` | Backs `Idempotency-Key`. Same key + same body → the stored response; same key + different body → **409**. Makes a double-click safe. |
-| `hydrate.py` | `attach(rows, mapping, attr)` | Attaches a `contracts` mapping to serializer context. Exists because `select_related` cannot cross a module boundary, and hand-rolling this per module is how N+1s reappear. |
+| `idempotency.py` *(planned)* | `@idempotent` | Backs `Idempotency-Key`. Same key + same body → the stored response; same key + different body → **409**. Makes a double-click safe. |
+| `hydrate.py` *(planned)* | `attach(rows, mapping, attr)` | Attaches a `contracts` mapping to serializer context. Exists because `select_related` cannot cross a module boundary, and hand-rolling this per module is how N+1s reappear. |
 | `schema.py` | drf-spectacular hooks | Enum naming, the error-envelope component, module tagging. |
 
-### `core/events/`
+### `core/events/`  *(not yet built)*
 
 | Module | Contents |
 |---|---|
-| `outbox.py` | `OutboxEvent`, `emit()`. Writes **inside** the caller's transaction — the whole point ([ADR-0006](../01-architecture/adr/0006-outbox-plus-celery-for-integration-events.md)). |
-| `inbox.py` | `InboxEvent`, `@idempotent_consumer`. Records `dedupe_key` before acting, so redelivery is a no-op. |
-| `publisher.py` | `publish_outbox` beat task. `SELECT ... FOR UPDATE SKIP LOCKED`, so multiple publishers are safe. |
-| `registry.py` | `subscribe(topic, handler)`. Also enforces the **no-cycles** rule in the producer/consumer graph. |
+| `outbox.py` *(planned)* | `OutboxEvent`, `emit()`. Writes **inside** the caller's transaction — the whole point ([ADR-0006](../01-architecture/adr/0006-outbox-plus-celery-for-integration-events.md)). |
+| `inbox.py` *(planned)* | `InboxEvent`, `@idempotent_consumer`. Records `dedupe_key` before acting, so redelivery is a no-op. |
+| `publisher.py` *(planned)* | `publish_outbox` beat task. `SELECT ... FOR UPDATE SKIP LOCKED`, so multiple publishers are safe. |
+| `registry.py` *(planned)* | `subscribe(topic, handler)`. Also enforces the **no-cycles** rule in the producer/consumer graph. |
 
 ### `core/files/`
 
@@ -76,14 +82,14 @@ quarterly grep for single-consumer kernel code is a maintenance task, not a nice
 |---|---|
 | `validators.py` | Extension allowlist ∩ magic-byte sniff (`python-magic`) ∩ size cap ∩ filename sanitized to `[A-Za-z0-9._-]`. **All four**, because each alone is bypassable. |
 | `storage.py` | UUID-keyed storage, never the user's filename. Serves via `X-Accel-Redirect` with `Content-Disposition: attachment` and `nosniff`. |
-| `scanning.py` | ClamAV in a Celery task, gating download; `pikepdf` sanitize pass stripping embedded JavaScript from PDFs. |
+| `scanning.py` *(planned)* | ClamAV in a Celery task, gating download; `pikepdf` sanitize pass stripping embedded JavaScript from PDFs. |
 
-### `core/rules/`
+### `core/rules/`  *(not yet built)*
 
 | Module | Contents |
 |---|---|
-| `ast.py` | The rule AST as a pydantic discriminated union. Shared because eligibility (placement), entitlement (leave) and approval routing (HR) are the same evaluation problem over different vocabularies. |
-| `engine.py` | `evaluate(rule, facts) -> Outcome`. **Fail-closed**: unknown field, missing fact or an error ⇒ `False` with an explicit reason, never true-by-default. Returns per-rule outcomes so a user sees *"CPI 6.8 < 7.0 required"* rather than "not eligible". |
+| `ast.py` *(planned)* | The rule AST as a pydantic discriminated union. Shared because eligibility (placement), entitlement (leave) and approval routing (HR) are the same evaluation problem over different vocabularies. |
+| `engine.py` *(planned)* | `evaluate(rule, facts) -> Outcome`. **Fail-closed**: unknown field, missing fact or an error ⇒ `False` with an explicit reason, never true-by-default. Returns per-rule outcomes so a user sees *"CPI 6.8 < 7.0 required"* rather than "not eligible". |
 
 The **field vocabulary** is supplied by the calling module, not by `core`. That is what keeps this
 domain-free and passes admission test #2.
@@ -92,9 +98,9 @@ domain-free and passes admission test #2.
 
 | Module | Contents |
 |---|---|
-| `logging.py` | structlog → JSON on stdout. The PII redaction processor reads `core/db/fields` classifications and recursively redacts `{password, token, otp, secret, authorization, cookie, phone, address, date_of_birth, category, aadhaar}`. |
+| `logging.py` *(planned)* | structlog → JSON on stdout. The PII redaction processor reads `core/db/fields` classifications and recursively redacts `{password, token, otp, secret, authorization, cookie, phone, address, date_of_birth, category, aadhaar}`. |
 | `middleware.py` | `RequestIDMiddleware` — accepts nginx's `$request_id`, else generates a UUIDv7, stores it in a contextvar, echoes it in the response header **and** the error envelope. |
-| `metrics.py` | django-prometheus registry plus the domain counters listed in [observability.md](../06-crosscutting/observability.md). |
+| `metrics.py` *(planned)* | django-prometheus registry plus the domain counters listed in [observability.md](../06-crosscutting/observability.md). |
 
 ---
 
