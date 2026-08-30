@@ -44,14 +44,17 @@ class NoAuthorityConfigured(Exception):
 
 
 def _matches(
-    rule: AuthorityCandidate, category: Category, unit: str, designation: str,
+    rule: AuthorityCandidate,
+    category: Category,
+    unit: str,
+    designations: frozenset[str],
     faculty: bool,
 ) -> bool:
     if rule.category is not category:
         return False
     if rule.unit and rule.unit != unit:
         return False
-    if rule.designation and rule.designation != designation:
+    if rule.designation and rule.designation not in designations:
         return False
     return not (
         rule.applies_to_faculty is not None and rule.applies_to_faculty is not faculty
@@ -62,7 +65,7 @@ def select_rule(
     candidates: list[AuthorityCandidate],
     category: Category,
     unit: str,
-    designation: str,
+    designations: frozenset[str] | set[str] | str,
     faculty: bool,
 ) -> AuthorityCandidate:
     """The most specific matching rule.
@@ -72,9 +75,11 @@ def select_rule(
     specificity on the row wins over both, which is the escape hatch for a case
     the ordering does not anticipate.
     """
-    matches = [
-        r for r in candidates if _matches(r, category, unit, designation, faculty)
-    ]
+    # A person holds several designations at once -- a chair and an office --
+    # and the rule that names their office should win over one that names their
+    # rank. Matching against the whole set is what makes that possible.
+    held = frozenset({designations} if isinstance(designations, str) else designations)
+    matches = [r for r in candidates if _matches(r, category, unit, held, faculty)]
     if not matches:
         raise NoAuthorityConfigured(
             f"no authority rule for {category.value} in unit {unit!r}"
@@ -101,7 +106,21 @@ def route_for(
     else:
         first = State.AWAITING_UNIT_HEAD
 
-    unit_head_final = not needs_higher_sanction(category)
+    # BR-EL-018 sets the floor: SCL, EL, COL and VL go above the unit head. The
+    # configured rule decides who, and may escalate a category that the floor
+    # would have left with the unit head. Deriving this from the category alone
+    # ignored the configuration entirely -- a rule naming the Registrar for
+    # casual leave had no effect, and one naming nobody for earned leave still
+    # escalated to a state no rule could resolve.
+    above_unit_head = needs_higher_sanction(category) or bool(
+        rule.sanctioning_designation)
+    if needs_higher_sanction(category) and not (
+            rule.sanctioning_designation or rule.self_sanction):
+        raise NoAuthorityConfigured(
+            f"{category.value} requires sanction above the unit head, but the rule "
+            f"for unit {rule.unit or 'any'!r} names no sanctioning designation")
+
+    unit_head_final = not above_unit_head
     return Route(
         first_state=first,
         establishment_step=rule.establishment_step and not unit_head_final,

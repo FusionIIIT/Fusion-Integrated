@@ -41,9 +41,16 @@ ACTIVE_STATES = tuple(
 )
 
 
-def _candidates(policy_id: int, category: Category) -> list[authority.AuthorityCandidate]:
-    rows = AuthorityRule.objects.filter(policy_id=policy_id, category=category.value)
-    return [
+def _candidates(
+    policy_id: int, category: Category
+) -> tuple[list[authority.AuthorityCandidate], dict[int, int]]:
+    """The candidate rules, and which database row each came from.
+
+    The row id travels alongside so the selected rule can be recorded on the
+    request; the domain object deliberately knows nothing about the table.
+    """
+    rows = list(AuthorityRule.objects.filter(policy_id=policy_id, category=category.value))
+    candidates = [
         authority.AuthorityCandidate(
             category=Category(r.category),
             unit=r.unit,
@@ -56,6 +63,7 @@ def _candidates(policy_id: int, category: Category) -> list[authority.AuthorityC
         )
         for r in rows
     ]
+    return candidates, {id(c): r.pk for c, r in zip(candidates, rows, strict=True)}
 
 
 def existing_periods(user_id: int, ignore_request_id: int | None = None) -> list[Period]:
@@ -153,7 +161,7 @@ def submit(
     reason: str,
     faculty: bool,
     unit: str = "",
-    designation: str = "",
+    designations: frozenset[str] | set[str] | tuple[str, ...] = (),
     half: Half | None = None,
     substitute_user_id: int | None = None,
     station: dict | None = None,
@@ -186,9 +194,9 @@ def submit(
                 code="substitute_unavailable",
             )
 
-    rule = authority.select_rule(
-        _candidates(policy_id, category), category, unit, designation, faculty
-    )
+    candidates, rule_ids = _candidates(policy_id, category)
+    held = frozenset(designations)
+    rule = authority.select_rule(candidates, category, unit, held, faculty)
     route = authority.route_for(
         rule, category, substitute_required=substitute_user_id is not None
     )
@@ -215,6 +223,12 @@ def submit(
         policy_id=policy_id,
         calendar_id=calendar_id,
         unit=unit,
+        authority_rule_id=rule_ids.get(id(rule)),
+        applicant_designation=rule.designation or next(iter(sorted(held)), ""),
+        sanctioning_designation=route.sanctioning_designation,
+        establishment_step=route.establishment_step,
+        unit_head_is_final=route.unit_head_is_final,
+        self_sanction=route.self_sanction,
         station_leave=bool(station),
         station_destination=station.get("destination", ""),
         station_from=station.get("from"),

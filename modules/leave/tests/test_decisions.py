@@ -15,6 +15,9 @@ from modules.leave.tests.factories import setup_all
 
 pytestmark = pytest.mark.django_db
 
+#: The factory routes everything above the unit head to the Registrar.
+REGISTRAR = frozenset({"Registrar"})
+
 USER, HEAD, ESTT, AUTH, SUB = 501, 601, 602, 603, 777
 D = Decimal
 
@@ -93,7 +96,8 @@ class TestHigherSanction:
         r = decisions.unit_head_decides(request=r, actor_user_id=HEAD, approve=True)
         r = decisions.establishment_routes(request=r, actor_user_id=ESTT)
         assert r.state == State.AWAITING_FINAL_SANCTION.value
-        r = decisions.sanction(request=r, actor_user_id=AUTH, approve=True)
+        r = decisions.sanction(request=r, actor_user_id=AUTH, approve=True,
+                                actor_designations=REGISTRAR)
         assert r.state == State.APPROVED_NOT_STARTED.value
         assert balances.available(USER, 2026, Category.EL) == D(30) - D(5)
 
@@ -101,7 +105,8 @@ class TestHigherSanction:
         r = el_request()
         r = decisions.unit_head_decides(request=r, actor_user_id=HEAD, approve=True)
         r = decisions.establishment_routes(request=r, actor_user_id=ESTT)
-        r = decisions.sanction(request=r, actor_user_id=AUTH, approve=True)
+        r = decisions.sanction(request=r, actor_user_id=AUTH, approve=True,
+                                actor_designations=REGISTRAR)
         actors = [t.actor_user_id for t in r.transitions.order_by("id")]
         assert actors == [USER, HEAD, ESTT, AUTH]
 

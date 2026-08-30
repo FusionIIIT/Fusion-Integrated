@@ -29,6 +29,21 @@ class LeaveRequest(TimeStampedModel, UserScopedModel):
     actual_days = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
 
     policy_id = models.IntegerField(null=True, blank=True)
+
+    #: The approval path, resolved once at submission and then obeyed.
+    #:
+    #: Re-deriving it at each decision reproduced neither the designation nor
+    #: the faculty flag the applicant had, so a later step could resolve a
+    #: different rule from the one the request actually entered -- and nothing
+    #: recorded which rule that was, so the route could not be explained after
+    #: the fact either. BR-EL-019 wants the path to be a property of the
+    #: request, not a recomputation.
+    authority_rule_id = models.IntegerField(null=True, blank=True)
+    applicant_designation = models.CharField(max_length=120, blank=True)
+    sanctioning_designation = models.CharField(max_length=120, blank=True)
+    establishment_step = models.BooleanField(default=False)
+    unit_head_is_final = models.BooleanField(default=False)
+    self_sanction = models.BooleanField(default=False)
     calendar_id = models.IntegerField(null=True, blank=True)
     #: The applicant's department, as the directory spells it. A name
     #: rather than a surrogate id, because that is what this institute
