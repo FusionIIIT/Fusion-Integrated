@@ -30,7 +30,7 @@ def configured():
 def approved_el():
     r = service.submit(
         user_id=USER, category=Category.EL, starts_on=START, ends_on=END,
-        reason="travel", faculty=False,
+        reason="travel", unit="CSE", faculty=False,
     )
     r = decisions.unit_head_decides(request=r, actor_user_id=HEAD, approve=True)
     r = decisions.establishment_routes(request=r, actor_user_id=ESTT)
@@ -103,7 +103,7 @@ class TestExtension:
     def test_casual_leave_cannot_be_extended(self, configured):
         r = service.submit(
             user_id=USER, category=Category.CL, starts_on=date(2026, 9, 1),
-            ends_on=date(2026, 9, 1), reason="x", faculty=False,
+            ends_on=date(2026, 9, 1), reason="x", unit="CSE", faculty=False,
         )
         r = decisions.unit_head_decides(request=r, actor_user_id=HEAD, approve=True)
         r = lifecycle.begin(request=r)

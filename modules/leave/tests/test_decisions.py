@@ -31,7 +31,7 @@ def cl_request(**kw):
         starts_on=date(2026, 9, 1),
         ends_on=date(2026, 9, 2),
         reason="personal",
-        faculty=False,
+        unit="CSE", faculty=False,
         **kw,
     )
 
@@ -43,7 +43,7 @@ def el_request(**kw):
         starts_on=date(2026, 9, 7),
         ends_on=date(2026, 9, 11),
         reason="travel",
-        faculty=False,
+        unit="CSE", faculty=False,
         **kw,
     )
 
