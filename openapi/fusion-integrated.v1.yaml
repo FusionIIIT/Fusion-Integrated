@@ -79,6 +79,31 @@ paths:
                 items:
                   $ref: '#/components/schemas/Calendar'
           description: ''
+    post:
+      operationId: v1_leave_admin_calendars_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DraftCalendar'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DraftCalendar'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DraftCalendar'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calendar'
+          description: ''
   /api/v1/leave/admin/calendars/{id}/holidays:
     get:
       operationId: v1_leave_admin_calendars_holidays_list
@@ -247,6 +272,31 @@ paths:
                 items:
                   $ref: '#/components/schemas/Policy'
           description: ''
+    post:
+      operationId: v1_leave_admin_policies_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DraftPolicy'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DraftPolicy'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DraftPolicy'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+          description: ''
   /api/v1/leave/admin/policies/{id}/publish:
     post:
       operationId: v1_leave_admin_policies_publish_create
@@ -288,6 +338,37 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CategoryRule'
+          description: ''
+    post:
+      operationId: v1_leave_admin_policies_rules_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DraftCategoryRule'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DraftCategoryRule'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DraftCategoryRule'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryRule'
           description: ''
   /api/v1/leave/balances:
     get:
@@ -3195,6 +3276,71 @@ components:
         * `certificate` - certificate
         * `offer_letter` - offer_letter
         * `other` - other
+    DraftCalendar:
+      type: object
+      properties:
+        year:
+          type: integer
+          maximum: 2200
+          minimum: 2000
+        version:
+          type: string
+          maxLength: 32
+      required:
+      - version
+      - year
+    DraftCategoryRule:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        annual_credit:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+        carries_forward:
+          type: boolean
+          default: false
+        carry_forward_cap:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          nullable: true
+        applies_to_faculty:
+          type: boolean
+          nullable: true
+        requires_evidence:
+          type: boolean
+          default: false
+      required:
+      - annual_credit
+      - category
+    DraftPolicy:
+      type: object
+      properties:
+        version:
+          type: string
+          maxLength: 32
+        effective_from:
+          type: string
+          format: date
+        note:
+          type: string
+          default: ''
+        vl_to_el_ratio:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          nullable: true
+        vl_to_el_rounding:
+          type: string
+          default: ''
+        early_return_tail:
+          type: string
+          default: ''
+      required:
+      - effective_from
+      - version
     EligibilityFailure:
       type: object
       properties:

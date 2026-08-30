@@ -434,6 +434,15 @@ class PolicyAdminView(APIView):
         rows = LeavePolicy.objects.order_by("-effective_from")
         return Response(s.PolicySerializer(rows, many=True).data)
 
+    @extend_schema(request=s.DraftPolicySerializer, responses=s.PolicySerializer)
+    def post(self, request):
+        body = s.DraftPolicySerializer(data=request.data)
+        body.is_valid(raise_exception=True)
+        drafted = administration.draft_policy(**body.validated_data)
+        return Response(
+            s.PolicySerializer(drafted).data, status=status.HTTP_201_CREATED
+        )
+
 
 class PolicyRulesView(APIView):
     permission_classes = [MODULE, HasPermission(P_POLICY)]
@@ -443,17 +452,28 @@ class PolicyRulesView(APIView):
         rows = CategoryRule.objects.filter(policy_id=pk).order_by("category")
         return Response(s.CategoryRuleSerializer(rows, many=True).data)
 
+    @extend_schema(
+        request=s.DraftCategoryRuleSerializer, responses=s.CategoryRuleSerializer
+    )
+    def post(self, request, pk: int):
+        body = s.DraftCategoryRuleSerializer(data=request.data)
+        body.is_valid(raise_exception=True)
+        data = dict(body.validated_data)
+        saved = administration.set_category_rule(
+            policy=_policy(pk), category=Category(data.pop("category")), **data
+        )
+        return Response(
+            s.CategoryRuleSerializer(saved).data, status=status.HTTP_201_CREATED
+        )
+
 
 class PolicyPublishView(APIView):
     permission_classes = [MODULE, HasPermission(P_POLICY)]
 
     @extend_schema(request=None, responses=s.PolicySerializer)
     def post(self, request, pk: int):
-        policy = LeavePolicy.objects.filter(pk=pk).first()
-        if policy is None:
-            raise NotFoundError("No such policy version.")
         published = administration.publish_policy(
-            policy=policy, actor_user_id=_actor(request).user_id
+            policy=_policy(pk), actor_user_id=_actor(request).user_id
         )
         return Response(s.PolicySerializer(published).data)
 
@@ -465,6 +485,15 @@ class CalendarAdminView(APIView):
     def get(self, request):
         rows = HolidayCalendar.objects.order_by("-year", "-version")
         return Response(s.CalendarSerializer(rows, many=True).data)
+
+    @extend_schema(request=s.DraftCalendarSerializer, responses=s.CalendarSerializer)
+    def post(self, request):
+        body = s.DraftCalendarSerializer(data=request.data)
+        body.is_valid(raise_exception=True)
+        drafted = administration.draft_calendar(**body.validated_data)
+        return Response(
+            s.CalendarSerializer(drafted).data, status=status.HTTP_201_CREATED
+        )
 
 
 class CalendarHolidaysView(APIView):
@@ -536,6 +565,13 @@ class OfflineRecordView(APIView):
         return Response(
             s.LeaveRequestSerializer(recorded).data, status=status.HTTP_201_CREATED
         )
+
+
+def _policy(pk: int) -> LeavePolicy:
+    found = LeavePolicy.objects.filter(pk=pk).first()
+    if found is None:
+        raise NotFoundError("No such policy version.")
+    return found
 
 
 def _calendar(pk: int) -> HolidayCalendar:

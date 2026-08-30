@@ -50,6 +50,21 @@ def user_ids_in_discipline(discipline: str) -> list[int]:
     )
 
 
+def get_employees() -> list[UserDTO]:
+    """Everyone on the payroll: faculty and staff, not students.
+
+    Leave, payroll and anything else that acts on employees needs the whole
+    set rather than a page of it, so this is deliberately unpaginated and
+    deliberately not the display search below.
+    """
+    return [
+        _to_dto(r)
+        for r in UserRef.objects.filter(
+            kind__in=("faculty", "staff"), is_active=True
+        ).order_by("user_id")
+    ]
+
+
 def search(q: str = "", kind: str | None = None, limit: int = 25) -> list[UserDTO]:
     qs = UserRef.objects.filter(is_active=True)
     if kind:

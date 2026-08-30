@@ -27,6 +27,36 @@ still be defensible in twenty years, which is what shapes most of the decisions 
 
 ---
 
+## Bringing the module up
+
+The module is inert until a policy and a calendar are published and the year is credited. All three
+steps are needed, and skipping the third is the easy mistake: a policy that grants 8 casual leave grants
+nobody anything until a credit row exists, because the balance is a **sum of the ledger**.
+
+```
+manage.py seed_modules          # register the module so the grant can be given
+manage.py seed_leave_policy     # policy + routing + a minimal calendar, published
+manage.py leave_credit_year 2026
+```
+
+`seed_leave_policy` transcribes the entitlements from BR-EL-002 to BR-EL-009 — it does not choose them.
+Read them against the ordinance before a real year opens, and supersede the version rather than editing
+it. It refuses to run if a policy is already published, so it cannot overwrite a configured institute.
+`--draft-only` writes everything without publishing, for review first.
+
+Holidays and vacation periods are institute data and are added under **Policy & Calendar**. Until a
+vacation period exists, `VL` cannot be applied for; until restricted holidays are published, neither
+can `RH`.
+
+Everything the seed does is also available through the API to anyone holding `leave.policy.manage` or
+`leave.calendar.manage`, so an institute that wants nothing seeded can configure it from the screens.
+
+> **If nothing is published**, every application is refused with `409 no_effective_policy` and a message
+> naming who has to act. It used to be a 500; `NoEffectivePolicy` is a `DomainError` precisely because a
+> fresh install is the state in which the first person clicks Apply.
+
+---
+
 ## Leave categories
 
 BR-EL-002 to BR-EL-009. The figures below are **the current policy's**, not constants in the code.
