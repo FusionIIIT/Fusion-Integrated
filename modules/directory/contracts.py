@@ -8,6 +8,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from fusion_auth.client import IamUnavailable, get_client
 from modules.directory.models import UserRef
 from modules.directory.services.sync import ensure_users_cached
 
@@ -63,6 +64,30 @@ def get_employees() -> list[UserDTO]:
             kind__in=("faculty", "staff"), is_active=True
         ).order_by("user_id")
     ]
+
+
+def employees_missing_from_projection() -> list[int] | None:
+    """Which employees the identity service knows and this service does not.
+
+    Compares identities, not counts. A count comparison passes whenever the two
+    totals happen to agree, which is exactly the case this guard exists to
+    catch: the right number of the wrong people. One stale row standing in for
+    a missing one is invisible to a count and obvious to a set.
+
+    Returns None when the identity service cannot be reached -- a caller about
+    to act on "all employees" must not read an unreachable directory as
+    agreement.
+    """
+    held = set(
+        UserRef.objects.filter(
+            kind__in=("faculty", "staff"), is_active=True
+        ).values_list("user_id", flat=True)
+    )
+    try:
+        known = {r.user_id for r in get_client().iter_employees()}
+    except IamUnavailable:
+        return None
+    return sorted(known - held)
 
 
 def search(q: str = "", kind: str | None = None, limit: int = 25) -> list[UserDTO]:

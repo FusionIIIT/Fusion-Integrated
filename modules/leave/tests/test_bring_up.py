@@ -26,7 +26,14 @@ ADMIN = 900
 
 
 @pytest.fixture
-def staff_directory():
+def staff_directory(stub_iam):
+    """A small institute, with the identity service agreeing about who is in it.
+
+    The fixture installs the fake as well as the rows: crediting asks the
+    identity service whether this directory is complete, so a test that seeds
+    only the projection is testing against an institute the two disagree about.
+    """
+    stub_iam(make_session())
     for uid, kind in ((FACULTY, "faculty"), (STAFF, "staff"), (ADMIN, "staff")):
         UserRef.objects.create(
             user_id=uid, username=f"u{uid}", display_name=f"User {uid}",
@@ -281,3 +288,81 @@ class TestTheWholeWayThrough:
 
         assert created.status_code == 201
         assert created.json()["requested_days"] == "6.00"
+
+
+class TestTheProjectionGate:
+    """Crediting acts on every employee, so a partial directory must stop it."""
+
+    def test_it_refuses_when_the_directory_is_short(self, stub_iam, staff_directory):
+        run("seed_leave_policy", "--year", "2026")
+        fake = stub_iam(make_session())
+        # The identity service knows somebody this service has never seen.
+        fake.employees = [
+            *UserRef.objects.filter(kind__in=("faculty", "staff")),
+            UserRef(user_id=9999, username="ghost", display_name="Ghost",
+                    kind="staff", department="ME"),
+        ]
+
+        with pytest.raises(CommandError, match=r"\[9999\]"):
+            run("leave_credit_year", "2026")
+
+    def test_a_count_that_matches_is_not_enough(self, stub_iam, staff_directory):
+        """The gate compares who, not how many.
+
+        A stale row standing in for a missing one keeps the totals equal, which
+        is exactly the case a count comparison cannot see.
+        """
+        run("seed_leave_policy", "--year", "2026")
+        fake = stub_iam(make_session())
+        held = list(UserRef.objects.filter(kind__in=("faculty", "staff")))
+        fake.employees = [
+            *held[:-1],
+            UserRef(user_id=9999, username="ghost", display_name="Ghost",
+                    kind="staff", department="ME"),
+        ]
+        assert len(fake.employees) == len(held)
+
+        with pytest.raises(CommandError, match=r"\[9999\]"):
+            run("leave_credit_year", "2026")
+
+    def test_the_override_is_explicit_and_says_what_it_skipped(
+        self, stub_iam, staff_directory
+    ):
+        run("seed_leave_policy", "--year", "2026")
+        fake = stub_iam(make_session())
+        fake.employees = [
+            *UserRef.objects.filter(kind__in=("faculty", "staff")),
+            UserRef(user_id=9999, username="ghost", display_name="Ghost",
+                    kind="staff", department="ME"),
+        ]
+
+        output = run("leave_credit_year", "2026", "--accept-incomplete")
+
+        assert "9999" in output
+        assert balances.balance_for(STAFF, 2026, Category.CL).available == 8
+
+    def test_an_unreachable_identity_service_is_not_agreement(
+        self, stub_iam, staff_directory
+    ):
+        from fusion_auth.client import IamUnavailable
+
+        run("seed_leave_policy", "--year", "2026")
+        fake = stub_iam(make_session())
+
+        def unreachable(**kwargs):
+            raise IamUnavailable("down")
+            yield
+
+        fake.iter_employees = unreachable
+
+        with pytest.raises(CommandError, match="unreachable"):
+            run("leave_credit_year", "2026")
+
+    def test_naming_somebody_absent_is_an_error_not_a_silent_skip(
+        self, stub_iam, staff_directory
+    ):
+        run("seed_leave_policy", "--year", "2026")
+        stub_iam(make_session())
+
+        with pytest.raises(CommandError, match="Not in the directory"):
+            run("leave_credit_year", "2026", "--user", "424242")

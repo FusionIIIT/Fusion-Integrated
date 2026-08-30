@@ -28,15 +28,44 @@ def ensure_users_cached(user_ids: Iterable[int]) -> int:
     return upsert(fetched.values())
 
 
-def upsert(refs) -> int:
-    rows = [
-        UserRef(
+#: Column widths, read off the model so they cannot drift from the migration.
+_LIMITS = {
+    f.name: f.max_length
+    for f in UserRef._meta.get_fields()
+    if getattr(f, "max_length", None)
+}
+
+
+def unstorable(ref) -> str:
+    """The first field this row will not fit into, or empty if it fits.
+
+    Upstream data is not always clean -- one identity record has an entire
+    tab-separated import line in its username. Letting that raise takes the
+    whole sync down and leaves every other employee unsynced, so a bad row is
+    identified and skipped rather than allowed to abort the run. It is not
+    truncated: username is an identifier, and a shortened one is a wrong one.
+    """
+    for field, cap in _LIMITS.items():
+        value = getattr(ref, field, "") or ""
+        if isinstance(value, str) and len(value) > cap:
+            return f"{field} is {len(value)} characters, the column holds {cap}"
+    return ""
+
+
+def upsert(refs, *, rejected: list | None = None) -> int:
+    rows = []
+    for r in refs:
+        problem = unstorable(r)
+        if problem:
+            log.warning("directory.row_rejected user=%s %s", r.user_id, problem)
+            if rejected is not None:
+                rejected.append((r.user_id, problem))
+            continue
+        rows.append(UserRef(
             user_id=r.user_id, username=r.username, display_name=r.display_name,
             kind=r.kind or "student", email=r.email, department=r.department,
             programme=r.programme, discipline=r.discipline, batch_year=r.batch_year,
-        )
-        for r in refs
-    ]
+        ))
     if not rows:
         return 0
     UserRef.objects.bulk_create(
