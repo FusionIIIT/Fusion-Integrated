@@ -103,6 +103,7 @@ class ApplyView(APIView):
         actor = _actor(request)
         created = request_service.submit(
             user_id=actor.user_id,
+            designations=frozenset(getattr(actor, "roles", ())),
             category=Category(data["category"]),
             starts_on=data["starts_on"],
             ends_on=data["ends_on"],
@@ -290,7 +291,11 @@ class SanctionView(APIView):
             )
         else:
             updated = decisions.sanction(
-                request=found, actor_user_id=actor.user_id, approve=approve, remark=remark
+                request=found,
+                actor_user_id=actor.user_id,
+                approve=approve,
+                actor_designations=frozenset(getattr(actor, "roles", ())),
+                remark=remark,
             )
         return Response(s.LeaveRequestSerializer(updated).data)
 

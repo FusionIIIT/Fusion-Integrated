@@ -21,6 +21,9 @@ from modules.leave.tests import factories
 from modules.leave.tests.factories import YEAR
 
 pytestmark = pytest.mark.django_db
+
+#: The factory routes everything above the unit head to the Registrar.
+REGISTRAR = frozenset({"Registrar"})
 U = 701
 
 
@@ -62,7 +65,8 @@ def test_extension_moves_the_end_date():
     if r.state == State.AWAITING_ESTABLISHMENT.value:
         r = decisions.establishment_routes(request=r, actor_user_id=901)
     if r.state == State.AWAITING_FINAL_SANCTION.value:
-        r = decisions.sanction(request=r, actor_user_id=902, approve=True)
+        r = decisions.sanction(request=r, actor_user_id=902, approve=True,
+                                actor_designations=REGISTRAR)
     r.state = State.ONGOING.value
     r.save(update_fields=["state"])
     r = lifecycle.request_extension(request=r, actor_user_id=U, new_end=date(YEAR, 8, 20))
@@ -128,7 +132,8 @@ def test_an_extension_charges_only_the_additional_days():
     if r.state == State.AWAITING_ESTABLISHMENT.value:
         r = decisions.establishment_routes(request=r, actor_user_id=901)
     if r.state == State.AWAITING_FINAL_SANCTION.value:
-        r = decisions.sanction(request=r, actor_user_id=902, approve=True)
+        r = decisions.sanction(request=r, actor_user_id=902, approve=True,
+                                actor_designations=REGISTRAR)
     original = r.requested_days
     r.state = State.ONGOING.value
     r.save(update_fields=["state"])
@@ -163,7 +168,8 @@ def test_a_refused_extension_leaves_the_leave_as_it_was():
     if r.state == State.AWAITING_ESTABLISHMENT.value:
         r = decisions.establishment_routes(request=r, actor_user_id=901)
     if r.state == State.AWAITING_FINAL_SANCTION.value:
-        r = decisions.sanction(request=r, actor_user_id=902, approve=True)
+        r = decisions.sanction(request=r, actor_user_id=902, approve=True,
+                                actor_designations=REGISTRAR)
     r.state = State.ONGOING.value
     r.save(update_fields=["state"])
     r = lifecycle.request_extension(request=r, actor_user_id=U,

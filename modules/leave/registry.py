@@ -52,9 +52,22 @@ _ADMIN = [
     "leave.offline.record",
 ]
 
-#: Keyed by the designation name as it exists in globals_designation.
+#: Keyed by the designation name as it exists in globals_designation, plus the
+#: two basic roles.
+#:
+#: IAM puts the basic role -- `faculty` or `staff` -- into every employee's role
+#: list by definition, because the ERP records it as extrainfo.user_type and has
+#: no designation row for it. Leaving them out meant an employee who holds no
+#: designation got no module and no permissions at all: most of the institute
+#: could not apply for leave.
 ROLE_GRANTS = {
-    "Professor": _UNIT_HEAD,
+    "faculty": _EMPLOYEE,
+    "staff": _EMPLOYEE,
+
+    # A chair is not an office. Review and the balance directory belong to the
+    # HOD designations below, which are held by the handful of people who
+    # actually run a department.
+    "Professor": _EMPLOYEE,
     "Associate Professor": _EMPLOYEE,
     "Assistant Professor": _EMPLOYEE,
     "Junior Assistant": _EMPLOYEE,

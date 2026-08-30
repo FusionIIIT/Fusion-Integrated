@@ -15,7 +15,6 @@ from modules.leave.domain.categories import Category
 from modules.leave.domain.entitlement import has_sufficient_balance
 from modules.leave.domain.state_machine import Actor, Event, State
 from modules.leave.models import (
-    AuthorityRule,
     EntryReason,
     LeaveRequest,
     LedgerEntry,
@@ -23,6 +22,39 @@ from modules.leave.models import (
 )
 from modules.leave.selectors import balances
 from modules.leave.services.workflow import Movement, apply_event
+
+
+def _refuse_wrong_authority(
+    request: LeaveRequest,
+    actor_user_id: int,
+    actor_designations: frozenset[str] | set[str] | tuple[str, ...],
+) -> None:
+    """BR-EL-019, BR-EL-020. The named authority decides, not any authority.
+
+    The permission says somebody may sanction leave; the authority rule says
+    whose leave. Checking only the permission let any sanctioner act on any
+    request at the final stage, so a Dean could sanction leave the rule routed
+    to the Registrar and the trail would show it as correctly authorised.
+    """
+    if request.self_sanction:
+        # BR-EL-020. The route exists so that this person's own leave has
+        # somewhere to go; anybody else reaching it is the failure.
+        if actor_user_id != request.user_id:
+            raise ConflictError(
+                "This request is on the self-sanction route and is decided by the "
+                "applicant alone.",
+                code="not_the_self_sanctioner",
+            )
+        return
+
+    required = request.sanctioning_designation
+    if not required:
+        return                          # the configuration names nobody in particular
+    if required not in set(actor_designations):
+        raise ConflictError(
+            f"This request is sanctioned by the {required}, which you do not hold.",
+            code="not_the_sanctioning_authority",
+        )
 
 
 def _refuse_if_unaffordable(request: LeaveRequest) -> None:
@@ -43,25 +75,19 @@ def _refuse_if_unaffordable(request: LeaveRequest) -> None:
 
 
 def _route_for(request: LeaveRequest) -> authority.Route:
-    category = Category(request.category)
-    rows = AuthorityRule.objects.filter(
-        policy_id=request.policy_id, category=request.category
+    """The route the request entered, read back rather than recomputed.
+
+    Recomputing it here used an empty designation and faculty=False regardless
+    of the applicant, so a later step could resolve a different rule from the
+    one the request was admitted under.
+    """
+    return authority.Route(
+        first_state=State(request.state),
+        establishment_step=request.establishment_step,
+        sanctioning_designation=request.sanctioning_designation,
+        self_sanction=request.self_sanction,
+        unit_head_is_final=request.unit_head_is_final,
     )
-    candidates = [
-        authority.AuthorityCandidate(
-            category=Category(r.category),
-            unit=r.unit,
-            designation=r.designation,
-            applies_to_faculty=r.applies_to_faculty,
-            establishment_step=r.establishment_step,
-            sanctioning_designation=r.sanctioning_designation,
-            self_sanction=r.self_sanction,
-            specificity=r.specificity,
-        )
-        for r in rows
-    ]
-    rule = authority.select_rule(candidates, category, request.unit, "", False)
-    return authority.route_for(rule, category, substitute_required=False)
 
 
 @transaction.atomic
@@ -136,9 +162,15 @@ def establishment_routes(
 
 
 def sanction(
-    *, request: LeaveRequest, actor_user_id: int, approve: bool, remark: str = ""
+    *,
+    request: LeaveRequest,
+    actor_user_id: int,
+    approve: bool,
+    actor_designations: frozenset[str] | set[str] | tuple[str, ...] = (),
+    remark: str = "",
 ) -> LeaveRequest:
     """EL-UC-005. The last decision, and the only one that moves a balance."""
+    _refuse_wrong_authority(request, actor_user_id, actor_designations)
     if not approve:
         return apply_event(
             request,

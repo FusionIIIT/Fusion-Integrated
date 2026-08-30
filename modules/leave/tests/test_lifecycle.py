@@ -15,6 +15,9 @@ from modules.leave.tests.factories import setup_all
 
 pytestmark = pytest.mark.django_db
 
+#: The factory routes everything above the unit head to the Registrar.
+REGISTRAR = frozenset({"Registrar"})
+
 USER, HEAD, ESTT, AUTH = 501, 601, 602, 603
 D = Decimal
 
@@ -34,7 +37,8 @@ def approved_el():
     )
     r = decisions.unit_head_decides(request=r, actor_user_id=HEAD, approve=True)
     r = decisions.establishment_routes(request=r, actor_user_id=ESTT)
-    return decisions.sanction(request=r, actor_user_id=AUTH, approve=True)
+    return decisions.sanction(request=r, actor_user_id=AUTH, approve=True,
+                                actor_designations=REGISTRAR)
 
 
 class TestCancellation:
