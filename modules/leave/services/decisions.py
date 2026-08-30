@@ -125,17 +125,33 @@ def substitute_responds(
 def unit_head_decides(
     *, request: LeaveRequest, actor_user_id: int, approve: bool, remark: str = ""
 ) -> LeaveRequest:
-    """EL-UC-003. Final for CL and RH; a recommendation for everything else."""
+    """EL-UC-003, BR-EL-017. Final for CL and RH; a recommendation otherwise."""
+    route = _route_for(request)
+    request.unit_head_recommended = approve
+    request.save(update_fields=["unit_head_recommended", "updated_at"])
+
     if not approve:
+        if route.unit_head_is_final:
+            return apply_event(
+                request,
+                Event.UNIT_HEAD_REJECT,
+                Actor.UNIT_HEAD,
+                actor_user_id=actor_user_id,
+                remark=remark,
+            )
+        # BR-EL-017. For SCL, EL, COL and VL the unit head records Recommended
+        # or Not Recommended and routes onward; the final refusal is the
+        # competent authority's to make. Rejecting here ended the request at a
+        # step that has no authority to end it.
         return apply_event(
             request,
-            Event.UNIT_HEAD_REJECT,
+            Event.UNIT_HEAD_RECOMMEND,
             Actor.UNIT_HEAD,
             actor_user_id=actor_user_id,
-            remark=remark,
+            target=authority.after_unit_head(route),
+            remark=f"Not recommended. {remark}".strip(),
         )
 
-    route = _route_for(request)
     if route.unit_head_is_final:
         return _approve(request, Actor.UNIT_HEAD, actor_user_id, Event.UNIT_HEAD_APPROVE, remark)
     return apply_event(

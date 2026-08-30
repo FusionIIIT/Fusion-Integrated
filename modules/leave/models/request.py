@@ -66,6 +66,9 @@ class LeaveRequest(TimeStampedModel, UserScopedModel):
     extension_days = models.DecimalField(
         max_digits=6, decimal_places=2, null=True, blank=True
     )
+    #: BR-EL-017. What the unit head recorded, for the categories where their
+    #: view is a recommendation and not the decision. Null until they act.
+    unit_head_recommended = models.BooleanField(null=True, blank=True)
     resumed_on = models.DateField(null=True, blank=True)
     decided_at = models.DateTimeField(null=True, blank=True)
 

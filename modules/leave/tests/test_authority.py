@@ -162,3 +162,142 @@ class TestOnlyTheNamedAuthoritySanctions:
             actor_designations=frozenset({"Professor", "Registrar"}))
 
         assert updated.state == State.APPROVED_NOT_STARTED.value
+
+
+class TestDirectorSelfSanction:
+    """BR-EL-020. The route exists so this person's own leave has somewhere to
+    go, which makes it the one case where deciding your own request is right."""
+
+    def _self_route(self, user_id=U):
+        policy, _ = factories.setup_all(user_id)
+        AuthorityRule.objects.filter(
+            policy_id=policy.pk, category=Category.CL.value
+        ).update(self_sanction=True)
+        factories.credit(user_id, Category.CL, 8)
+        r = service.submit(user_id=user_id, category=Category.CL,
+                           starts_on=date(YEAR, 3, 2), ends_on=date(YEAR, 3, 3),
+                           reason="x", unit="CSE", faculty=False,
+                           designations=DIRECTOR)
+        assert r.state == State.AWAITING_SELF_SANCTION.value
+        return r
+
+    def test_the_applicant_can_see_their_own_self_sanction_request(self):
+        from modules.leave.selectors import scoping
+
+        r = self._self_route()
+
+        # Regression: the general "not your own request" rule hid this, leaving
+        # the Director the only person unable to see theirs.
+        assert [x.pk for x in scoping.sanction_queue(U)] == [r.pk]
+
+    def test_the_applicant_can_sanction_it(self):
+        r = self._self_route()
+
+        updated = decisions.sanction(request=r, actor_user_id=U, approve=True,
+                                     actor_designations=DIRECTOR)
+
+        assert updated.state == State.APPROVED_NOT_STARTED.value
+
+    def test_nobody_else_sees_it_in_their_queue(self):
+        from modules.leave.selectors import scoping
+
+        self._self_route()
+
+        assert list(scoping.sanction_queue(902)) == []
+
+    def test_nobody_else_can_sanction_it(self):
+        r = self._self_route()
+
+        with pytest.raises(ConflictError, match="decided by the applicant"):
+            decisions.sanction(request=r, actor_user_id=902, approve=True,
+                               actor_designations=REGISTRAR)
+
+    def test_an_ordinary_request_is_still_hidden_from_its_applicant(self):
+        from modules.leave.selectors import scoping
+
+        factories.setup_all(U)
+        factories.credit(U, Category.EL, 30)
+        r = service.submit(user_id=U, category=Category.EL, starts_on=date(YEAR, 3, 2),
+                           ends_on=date(YEAR, 3, 3), reason="x", unit="CSE",
+                           faculty=False, designations=REGISTRAR)
+        r = decisions.unit_head_decides(request=r, actor_user_id=900, approve=True)
+        if r.state == State.AWAITING_ESTABLISHMENT.value:
+            r = decisions.establishment_routes(request=r, actor_user_id=901)
+
+        # The applicant happens to be the Registrar. That is not a self-sanction
+        # route, so it is still somebody else's decision.
+        assert list(scoping.sanction_queue(U)) == []
+
+
+class TestNotRecommended:
+    """BR-EL-017. The unit head does not make the final rejection for the
+    categories that need higher sanction; they record a view and route on."""
+
+    def _at_unit_head(self, category):
+        factories.setup_all(U)
+        factories.credit(U, category, 30)
+        return service.submit(
+            user_id=U, category=category, starts_on=date(YEAR, 3, 2),
+            ends_on=date(YEAR, 3, 3), reason="x", unit="CSE", faculty=False,
+            designations=frozenset({"Assistant Professor"}))
+
+    def test_a_negative_view_on_earned_leave_routes_onward(self):
+        r = self._at_unit_head(Category.EL)
+
+        updated = decisions.unit_head_decides(
+            request=r, actor_user_id=900, approve=False, remark="Peak teaching")
+
+        assert updated.state != State.REJECTED.value
+        assert updated.state in (State.AWAITING_ESTABLISHMENT.value,
+                                 State.AWAITING_FINAL_SANCTION.value)
+
+    def test_the_negative_view_is_recorded_not_just_narrated(self):
+        r = self._at_unit_head(Category.EL)
+
+        updated = decisions.unit_head_decides(
+            request=r, actor_user_id=900, approve=False, remark="Peak teaching")
+
+        assert updated.unit_head_recommended is False
+
+    def test_the_trail_says_not_recommended(self):
+        r = self._at_unit_head(Category.EL)
+
+        updated = decisions.unit_head_decides(
+            request=r, actor_user_id=900, approve=False, remark="Peak teaching")
+
+        last = updated.transitions.order_by("id").last()
+        assert last.event == "UNIT_HEAD_RECOMMEND"
+        assert "Not recommended" in last.remark
+
+    def test_the_authority_still_makes_the_refusal(self):
+        r = self._at_unit_head(Category.EL)
+        r = decisions.unit_head_decides(request=r, actor_user_id=900, approve=False)
+        if r.state == State.AWAITING_ESTABLISHMENT.value:
+            r = decisions.establishment_routes(request=r, actor_user_id=901)
+
+        refused = decisions.sanction(request=r, actor_user_id=902, approve=False,
+                                     actor_designations=REGISTRAR)
+
+        assert refused.state == State.REJECTED.value
+
+    def test_a_not_recommended_request_can_still_be_granted(self):
+        # The recommendation informs the authority; it does not bind them.
+        r = self._at_unit_head(Category.EL)
+        r = decisions.unit_head_decides(request=r, actor_user_id=900, approve=False)
+        if r.state == State.AWAITING_ESTABLISHMENT.value:
+            r = decisions.establishment_routes(request=r, actor_user_id=901)
+
+        granted = decisions.sanction(request=r, actor_user_id=902, approve=True,
+                                     actor_designations=REGISTRAR)
+
+        assert granted.state == State.APPROVED_NOT_STARTED.value
+        assert granted.unit_head_recommended is False
+
+    def test_casual_leave_is_still_rejected_outright_by_the_unit_head(self):
+        r = self._at_unit_head(Category.CL)
+
+        updated = decisions.unit_head_decides(
+            request=r, actor_user_id=900, approve=False, remark="No")
+
+        # Here the unit head IS the competent authority, so the refusal is final.
+        assert updated.state == State.REJECTED.value

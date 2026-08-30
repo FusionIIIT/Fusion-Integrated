@@ -6,7 +6,7 @@ rather than a refusal that confirms it exists.
 """
 from __future__ import annotations
 
-from django.db.models import QuerySet
+from django.db.models import Q, QuerySet
 
 from modules.leave.domain.state_machine import State
 from modules.leave.models import LeaveRequest, SubstituteNomination
@@ -50,7 +50,12 @@ def visible_to(principal, unit: str = "") -> QuerySet[LeaveRequest]:
 
 
 def _queue(states, viewer_user_id: int) -> QuerySet[LeaveRequest]:
-    """A work queue never contains the viewer's own request.
+    """A work queue never contains the viewer's own request, bar one case.
+
+    Self-sanction (BR-EL-020) is the exception the general rule broke: the route
+    exists precisely so that this person's own leave has somewhere to go, and
+    excluding their own request left the Director as the one person unable to
+    see theirs while every other sanctioner could.
 
     The viewer is required, like the unit and for the same reason: an optional
     one defaults to "show everything" the moment a caller forgets it, and the
@@ -61,8 +66,18 @@ def _queue(states, viewer_user_id: int) -> QuerySet[LeaveRequest]:
     work somebody is expected to do, and putting something unactionable in it
     is its own defect.
     """
-    return LeaveRequest.objects.filter(state__in=states).exclude(
-        user_id=viewer_user_id)
+    mine_on_the_self_route = Q(
+        user_id=viewer_user_id, state=State.AWAITING_SELF_SANCTION.value,
+        self_sanction=True)
+    return (
+        LeaveRequest.objects.filter(state__in=states)
+        # Your own leave, unless the route is the one made for it.
+        .exclude(Q(user_id=viewer_user_id) & ~mine_on_the_self_route)
+        # Somebody else's self-sanction is nobody else's work: it sits in a
+        # shared state, so without this every generic sanctioner was offered
+        # the Director's leave.
+        .exclude(Q(self_sanction=True) & ~Q(user_id=viewer_user_id))
+    )
 
 
 def review_queue(unit: str, viewer_user_id: int) -> QuerySet[LeaveRequest]:
