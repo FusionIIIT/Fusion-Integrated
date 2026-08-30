@@ -79,11 +79,34 @@ carries nor lapses outright — it converts, and whatever the conversion does no
 
 ---
 
+## The balance cannot go negative
+
+Nothing is held against a pending request — that is deliberate, so an approval that never comes does not
+keep days hostage. It also means two requests can each be affordable when they are made and unaffordable
+together.
+
+So the balance is checked **twice**: at submission, for early feedback, and again at final approval where
+the days actually move, under a lock on that person's ledger for the year. The second check is the one
+that matters; the first is a courtesy.
+
+---
+
+## Leave in the past
+
+An application may reach back `max_backdate_days`, which defaults to **0**. Leave that genuinely happened
+before it was recorded goes in through EL-UC-016 instead — entered by the leave administrator against the
+written sanction, not applied for retrospectively by the person who took it.
+
+---
+
 ## Overlap
 
 BR-EL-012. A new request may not overlap leave the employee already holds, pending or approved. The one
 exception is two half days on the same date: a first-half and a second-half casual leave do not clash
 with each other, but either clashes with a full day.
+
+The same check runs against the **nominated substitute**. Somebody who is themselves away over those
+days covers nothing, and accepting the nomination would only surface as duties going unperformed.
 
 `first_conflict()` returns the offending period so the refusal can name it — *"this overlaps leave you
 already hold from 2 March to 4 March"* rather than "overlapping leave".

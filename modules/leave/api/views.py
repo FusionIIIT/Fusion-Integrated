@@ -190,7 +190,7 @@ class ReviewQueueView(APIView):
 
     @extend_schema(responses=s.LeaveRequestSerializer(many=True))
     def get(self, request):
-        rows = scoping.review_queue(_unit(request))
+        rows = scoping.review_queue(_unit(request), _actor(request).user_id)
         return Response(s.LeaveRequestSerializer(rows, many=True).data)
 
 
@@ -226,7 +226,9 @@ class RoutingQueueView(APIView):
     @extend_schema(responses=s.LeaveRequestSerializer(many=True))
     def get(self, request):
         return Response(
-            s.LeaveRequestSerializer(scoping.routing_queue(), many=True).data
+            s.LeaveRequestSerializer(
+                scoping.routing_queue(_actor(request).user_id), many=True
+            ).data
         )
 
 
@@ -261,7 +263,9 @@ class SanctionQueueView(APIView):
     @extend_schema(responses=s.LeaveRequestSerializer(many=True))
     def get(self, request):
         return Response(
-            s.LeaveRequestSerializer(scoping.sanction_queue(), many=True).data
+            s.LeaveRequestSerializer(
+                scoping.sanction_queue(_actor(request).user_id), many=True
+            ).data
         )
 
 
@@ -348,7 +352,9 @@ class ResumptionQueueView(APIView):
     @extend_schema(responses=s.LeaveRequestSerializer(many=True))
     def get(self, request):
         return Response(
-            s.LeaveRequestSerializer(scoping.resumption_queue(), many=True).data
+            s.LeaveRequestSerializer(
+                scoping.resumption_queue(_actor(request).user_id), many=True
+            ).data
         )
 
 

@@ -68,6 +68,7 @@ def apply_event(
             f"{move.event.value} is performed by {move.actor.value}, not {actor_role.value}.",
             code="wrong_actor",
         )
+    _refuse_self_decision(locked, source, move, actor_role, actor_user_id)
 
     locked.state = move.target.value
     if is_terminal(move.target):
@@ -92,6 +93,39 @@ def apply_event(
     if on_applied is not None:
         on_applied(locked)
     return locked
+
+
+def _refuse_self_decision(
+    request: LeaveRequest,
+    source: State,
+    move,
+    actor_role: Actor,
+    actor_user_id: int | None,
+) -> None:
+    """Nobody decides their own leave.
+
+    A unit head is an employee too, and their own request lands in the queue
+    they work from. Without this a head could approve their own leave, and an
+    establishment officer could route and sanction theirs, with the trail
+    showing an approval that looks exactly like any other.
+
+    The one exception is written into the workflow rather than assumed: the
+    self-sanction route (BR-EL-020) exists so that the Director's own leave has
+    somewhere to go. It is reached only from a state the authority
+    configuration put the request in.
+    """
+    if actor_user_id is None or actor_user_id != request.user_id:
+        return
+    if actor_role in (Actor.EMPLOYEE, Actor.SCHEDULER):
+        return                              # their own request, their own action
+    if source is State.AWAITING_SELF_SANCTION:
+        return                              # BR-EL-020, deliberately
+
+    raise ConflictError(
+        "You cannot decide your own leave request. It has to be actioned by "
+        "somebody else in the approval path.",
+        code="self_decision",
+    )
 
 
 def _record(request: LeaveRequest, movements: list[Movement]) -> None:

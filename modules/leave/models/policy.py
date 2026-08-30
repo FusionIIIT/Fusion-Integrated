@@ -31,6 +31,12 @@ class LeavePolicy(TimeStampedModel):
         choices=[(r.value, r.value) for r in ConversionRounding],
         default=ConversionRounding.EXACT_HALF.value,
     )
+    #: How far back an application may reach. Zero means not at all, which is
+    #: the safe default: EL-UC-016 already exists as the sanctioned route for
+    #: leave that genuinely happened before it was recorded, and it is done by
+    #: an administrator against written evidence rather than by the applicant.
+    max_backdate_days = models.PositiveIntegerField(default=0)
+
     # BR-EL-028. Whether a closed tail is restored when duty resumes early.
     early_return_tail = models.CharField(
         max_length=32,

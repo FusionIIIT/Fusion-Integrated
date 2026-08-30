@@ -90,6 +90,16 @@ def validate(
     effective = policy_selector.effective_policy(starts_on)
     calendar = policy_selector.effective_calendar(starts_on.year)
 
+    behind = (date.today() - starts_on).days
+    if behind > effective.max_backdate_days:
+        allowed = effective.max_backdate_days
+        raise BadRequestError(
+            f"This leave started {behind} day(s) ago and applications may reach "
+            f"back {allowed} day(s). Leave already taken is entered by the leave "
+            "administrator against the written sanction, not applied for here.",
+            code="starts_in_the_past",
+        )
+
     if category is Category.RH:
         allowed = policy_selector.restricted_days(calendar)
         if starts_on not in allowed or starts_on != ends_on:
@@ -161,6 +171,20 @@ def submit(
         raise BadRequestError(
             "An employee cannot stand in for themselves.", code="substitute_is_applicant"
         )
+    if substitute_user_id is not None:
+        # A substitute holds your responsibilities while you are away, so one
+        # who is themselves away over the same days covers nothing. The system
+        # accepted this, and the gap would only show up when the duties went
+        # unperformed.
+        busy = first_conflict(
+            Period(starts_on, ends_on, half), existing_periods(substitute_user_id)
+        )
+        if busy is not None:
+            raise ConflictError(
+                f"The employee you nominated is on leave from {busy.start} to "
+                f"{busy.end} and cannot stand in. Nominate somebody else.",
+                code="substitute_unavailable",
+            )
 
     rule = authority.select_rule(
         _candidates(policy_id, category), category, unit, designation, faculty

@@ -49,26 +49,42 @@ def visible_to(principal, unit: str = "") -> QuerySet[LeaveRequest]:
     return mine(principal.user_id)
 
 
-def review_queue(unit: str) -> QuerySet[LeaveRequest]:
-    """A unit head reviews their own unit and nobody else's.
+def _queue(states, viewer_user_id: int) -> QuerySet[LeaveRequest]:
+    """A work queue never contains the viewer's own request.
+
+    The viewer is required, like the unit and for the same reason: an optional
+    one defaults to "show everything" the moment a caller forgets it, and the
+    thing it would then show is a head their own leave with an Approve button
+    beside it.
+
+    The service refuses a self-decision regardless, but a queue is a list of
+    work somebody is expected to do, and putting something unactionable in it
+    is its own defect.
+    """
+    return LeaveRequest.objects.filter(state__in=states).exclude(
+        user_id=viewer_user_id)
+
+
+def review_queue(unit: str, viewer_user_id: int) -> QuerySet[LeaveRequest]:
+    """A unit head reviews their own unit, and not their own leave.
 
     The unit is required rather than optional. An optional one defaults to
     "every unit" the moment a caller forgets it, and a widened queue is the
     kind of mistake that reads as working software.
     """
-    return LeaveRequest.objects.filter(state__in=REVIEW_STATES, unit=unit)
+    return _queue(REVIEW_STATES, viewer_user_id).filter(unit=unit)
 
 
-def routing_queue() -> QuerySet[LeaveRequest]:
-    return LeaveRequest.objects.filter(state__in=ROUTING_STATES)
+def routing_queue(viewer_user_id: int) -> QuerySet[LeaveRequest]:
+    return _queue(ROUTING_STATES, viewer_user_id)
 
 
-def sanction_queue() -> QuerySet[LeaveRequest]:
-    return LeaveRequest.objects.filter(state__in=SANCTION_STATES)
+def sanction_queue(viewer_user_id: int) -> QuerySet[LeaveRequest]:
+    return _queue(SANCTION_STATES, viewer_user_id)
 
 
-def resumption_queue() -> QuerySet[LeaveRequest]:
-    return LeaveRequest.objects.filter(state__in=RESUMPTION_STATES)
+def resumption_queue(viewer_user_id: int) -> QuerySet[LeaveRequest]:
+    return _queue(RESUMPTION_STATES, viewer_user_id)
 
 
 def nominations_for(substitute_user_id: int) -> QuerySet[SubstituteNomination]:

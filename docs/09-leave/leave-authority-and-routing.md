@@ -99,6 +99,30 @@ genuinely act on requests from anywhere.
 the moment a caller forgets it, and a widened queue is the kind of mistake that reads as working
 software.
 
+## Nobody decides their own leave
+
+A unit head is an employee too, and their own request lands in the queue they work from. Without a rule
+they could approve it, and the trail would show an approval indistinguishable from any other.
+
+`apply_event` refuses any decision where the actor is the applicant, whatever the role — review,
+routing, sanction, resumption verification. It is enforced at the workflow choke point rather than in
+each service, because a rule repeated in six places is a rule missing from the seventh.
+
+Two exceptions, both deliberate:
+
+- **The applicant acting on their own request** — withdrawing, renominating, reporting resumption. Those
+  are `EMPLOYEE` actions on their own leave, which is the normal case.
+- **Self-sanction (BR-EL-020)** — the Director's own leave has to go somewhere. It is reached only from
+  `AWAITING_SELF_SANCTION`, a state the authority configuration put the request in, so it cannot be
+  reached by accident from an ordinary route.
+
+The queues exclude the viewer's own request as well. The service would refuse the decision anyway, but a
+queue is a list of work somebody is expected to do, and offering a head their own leave with an Approve
+button beside it is its own defect. `viewer_user_id` is a **required** argument for the same reason
+`unit` is.
+
+---
+
 ### Where the unit comes from
 
 IAM's session carries no organisational unit, so the API resolves it from
