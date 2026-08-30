@@ -33,6 +33,68 @@ from modules.leave.models import (
 from modules.leave.selectors import policy as policy_selector
 
 
+def draft_policy(
+    *,
+    version: str,
+    effective_from: date,
+    note: str = "",
+    vl_to_el_ratio: Decimal | None = None,
+    vl_to_el_rounding: str = "",
+    early_return_tail: str = "",
+) -> LeavePolicy:
+    """Start a new version. It governs nothing until it is published."""
+    if LeavePolicy.objects.filter(version=version).exists():
+        raise ConflictError(f"Version {version} already exists.", code="version_taken")
+    fields = {"version": version, "effective_from": effective_from, "note": note}
+    if vl_to_el_ratio is not None:
+        fields["vl_to_el_ratio"] = vl_to_el_ratio
+    if vl_to_el_rounding:
+        fields["vl_to_el_rounding"] = vl_to_el_rounding
+    if early_return_tail:
+        fields["early_return_tail"] = early_return_tail
+    return LeavePolicy.objects.create(published=False, **fields)
+
+
+def set_category_rule(
+    *,
+    policy: LeavePolicy,
+    category: Category,
+    annual_credit: Decimal,
+    carries_forward: bool = False,
+    carry_forward_cap: Decimal | None = None,
+    applies_to_faculty: bool | None = None,
+    requires_evidence: bool = False,
+) -> CategoryRule:
+    """Add or replace one category's entitlement on an unpublished version."""
+    if policy.published:
+        raise ConflictError(
+            "A published policy cannot be edited. Draft a new version instead.",
+            code="policy_published",
+        )
+    rule, _ = CategoryRule.objects.update_or_create(
+        policy=policy,
+        category=category.value,
+        applies_to_faculty=applies_to_faculty,
+        defaults={
+            "annual_credit": annual_credit,
+            "carries_forward": carries_forward,
+            "carry_forward_cap": carry_forward_cap,
+            "requires_evidence": requires_evidence,
+        },
+    )
+    return rule
+
+
+def draft_calendar(*, year: int, version: str) -> HolidayCalendar:
+    """Start a year's calendar. Holidays go in before it is published."""
+    if HolidayCalendar.objects.filter(year=year, version=version).exists():
+        raise ConflictError(
+            f"Version {version} of the {year} calendar already exists.",
+            code="version_taken",
+        )
+    return HolidayCalendar.objects.create(year=year, version=version, published=False)
+
+
 @transaction.atomic
 def publish_policy(*, policy: LeavePolicy, actor_user_id: int) -> LeavePolicy:
     """Put a drafted version in force and close the one it supersedes."""

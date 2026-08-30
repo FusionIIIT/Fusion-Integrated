@@ -149,3 +149,29 @@ class OfflineRecordSerializer(serializers.Serializer):
     faculty = serializers.BooleanField(default=False)
     unit = serializers.CharField(max_length=80, allow_blank=True, required=False)
     note = serializers.CharField(max_length=250, allow_blank=True, required=False)
+
+
+class DraftPolicySerializer(serializers.Serializer):
+    version = serializers.CharField(max_length=32)
+    effective_from = serializers.DateField()
+    note = serializers.CharField(allow_blank=True, required=False, default="")
+    vl_to_el_ratio = serializers.DecimalField(
+        max_digits=5, decimal_places=2, required=False, allow_null=True)
+    vl_to_el_rounding = serializers.CharField(required=False, allow_blank=True, default="")
+    early_return_tail = serializers.CharField(required=False, allow_blank=True, default="")
+
+
+class DraftCategoryRuleSerializer(serializers.Serializer):
+    category = serializers.ChoiceField(choices=CATEGORIES)
+    annual_credit = serializers.DecimalField(max_digits=6, decimal_places=2)
+    carries_forward = serializers.BooleanField(default=False)
+    carry_forward_cap = serializers.DecimalField(
+        max_digits=6, decimal_places=2, required=False, allow_null=True)
+    applies_to_faculty = serializers.BooleanField(required=False, allow_null=True,
+                                                  default=None)
+    requires_evidence = serializers.BooleanField(default=False)
+
+
+class DraftCalendarSerializer(serializers.Serializer):
+    year = serializers.IntegerField(min_value=2000, max_value=2200)
+    version = serializers.CharField(max_length=32)

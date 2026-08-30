@@ -10,14 +10,22 @@ from datetime import date
 
 from django.db.models import Q
 
+from core.api.exceptions import ConflictError
 from modules.leave.domain.categories import Category
 from modules.leave.domain.counting import Calendar, TailPolicy
 from modules.leave.domain.entitlement import CategoryPolicy, ConversionRounding
 from modules.leave.models import CategoryRule, Holiday, HolidayCalendar, LeavePolicy
 
 
-class NoEffectivePolicy(Exception):
-    """Nothing is published for the date, so no decision can be justified."""
+class NoEffectivePolicy(ConflictError):
+    """Nothing is published for the date, so no decision can be justified.
+
+    A DomainError rather than a bare exception: this is the state a fresh
+    install is in, and the first person to click Apply should be told what is
+    missing and who fixes it, not handed a 500.
+    """
+
+    code = "no_effective_policy"
 
 
 def effective_policy(on: date) -> LeavePolicy:
@@ -28,7 +36,11 @@ def effective_policy(on: date) -> LeavePolicy:
         .first()
     )
     if policy is None:
-        raise NoEffectivePolicy(f"no published leave policy in force on {on}")
+        raise NoEffectivePolicy(
+            f"No leave policy is published for {on}. "
+            "The leave administrator must publish one before leave can be "
+            "applied for."
+        )
     return policy
 
 
@@ -39,7 +51,11 @@ def effective_calendar(year: int) -> HolidayCalendar:
         .first()
     )
     if calendar is None:
-        raise NoEffectivePolicy(f"no published holiday calendar for {year}")
+        raise NoEffectivePolicy(
+            f"No holiday calendar is published for {year}. "
+            "The leave administrator must publish one before leave can be "
+            "applied for."
+        )
     return calendar
 
 
