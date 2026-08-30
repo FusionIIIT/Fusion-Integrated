@@ -19,6 +19,16 @@ if (!window.matchMedia) {
   }) as MediaQueryList;
 }
 
+// Mantine's ScrollArea observes its viewport; jsdom has no ResizeObserver, and
+// without this every table that scrolls throws on mount.
+if (!globalThis.ResizeObserver) {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver;
+}
+
 // jsdom implements neither, and the download path calls both.
 if (!URL.createObjectURL) {
   URL.createObjectURL = () => "blob:test";
