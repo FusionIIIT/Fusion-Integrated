@@ -2776,6 +2776,10 @@ components:
       properties:
         category:
           $ref: '#/components/schemas/CategoryEnum'
+        evidence_reference:
+          type: string
+          default: ''
+          maxLength: 120
         starts_on:
           type: string
           format: date
@@ -3338,6 +3342,9 @@ components:
         early_return_tail:
           type: string
           default: ''
+        max_backdate_days:
+          type: integer
+          nullable: true
       required:
       - effective_from
       - version
@@ -3701,6 +3708,9 @@ components:
         reason:
           type: string
           readOnly: true
+        evidence_reference:
+          type: string
+          readOnly: true
         requested_days:
           type: string
           format: decimal
@@ -3716,6 +3726,18 @@ components:
           type: boolean
           readOnly: true
         station_destination:
+          type: string
+          readOnly: true
+        extension_to:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        unit_head_recommended:
+          type: boolean
+          readOnly: true
+          nullable: true
+        sanctioning_designation:
           type: string
           readOnly: true
         resumed_on:
@@ -3738,19 +3760,25 @@ components:
       - created_at
       - decided_at
       - ends_on
+      - evidence_reference
+      - extension_to
       - half
       - id
       - reason
       - requested_days
       - resumed_on
+      - sanctioning_designation
       - starts_on
       - state
       - station_destination
       - station_leave
+      - unit_head_recommended
       - user_id
     LeaveTransition:
       type: object
       properties:
+        id:
+          type: integer
         from_state:
           type: string
         to_state:
@@ -3775,6 +3803,7 @@ components:
       - created_at
       - event
       - from_state
+      - id
       - remark
       - to_state
       - workflow_ref
@@ -4393,10 +4422,14 @@ components:
         early_return_tail:
           type: string
           readOnly: true
+        max_backdate_days:
+          type: integer
+          readOnly: true
       required:
       - early_return_tail
       - effective_from
       - id
+      - max_backdate_days
       - published
       - version
       - vl_to_el_ratio

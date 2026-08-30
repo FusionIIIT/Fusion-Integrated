@@ -22,6 +22,11 @@ class LeaveRequest(TimeStampedModel, UserScopedModel):
     #: BR-EL-010. Set only for a half-day casual leave, which is a single date.
     half = models.CharField(max_length=8, choices=HALF_CHOICES, blank=True)
     reason = models.TextField()
+    #: BR-EL-001. Where the category rule demands supporting evidence, what it
+    #: is: a certificate or letter reference. A reference rather than a file --
+    #: the paper lives in the establishment section either way, and requiring a
+    #: number is enforceable now without an upload pipeline that is not built.
+    evidence_reference = models.CharField(max_length=120, blank=True)
 
     #: Charged days as computed at submission, and again at closure. Both are
     #: kept: the difference is what early resumption returned.

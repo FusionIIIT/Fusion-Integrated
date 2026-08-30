@@ -41,6 +41,7 @@ def draft_policy(
     vl_to_el_ratio: Decimal | None = None,
     vl_to_el_rounding: str = "",
     early_return_tail: str = "",
+    max_backdate_days: int | None = None,
 ) -> LeavePolicy:
     """Start a new version. It governs nothing until it is published."""
     if LeavePolicy.objects.filter(version=version).exists():
@@ -52,6 +53,8 @@ def draft_policy(
         fields["vl_to_el_rounding"] = vl_to_el_rounding
     if early_return_tail:
         fields["early_return_tail"] = early_return_tail
+    if max_backdate_days is not None:
+        fields["max_backdate_days"] = max_backdate_days
     return LeavePolicy.objects.create(published=False, **fields)
 
 
