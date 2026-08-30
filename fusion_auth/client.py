@@ -233,6 +233,31 @@ class IamClient:
         payload = self._get("iam/v1/academics/filters")
         return payload or {"disciplines": [], "batch_years": [], "programmes": []}
 
+    def employee_page(self, *, limit: int = 500, offset: int = 0) -> dict:
+        """One page of the payroll. Returns the total, so a caller can tell a
+        complete answer from a truncated one."""
+        payload = self._get("iam/v1/directory/users",
+                            params={"employees": 1, "limit": limit, "offset": offset})
+        if not isinstance(payload, dict):
+            raise IamUnavailable("directory returned no page")
+        return payload
+
+    def count_employees(self) -> int:
+        return int(self.employee_page(limit=1).get("count", 0))
+
+    def iter_employees(self, *, page_size: int = 500):
+        offset = 0
+        while True:
+            page = self.employee_page(limit=page_size, offset=offset)
+            rows = page.get("results", [])
+            for row in rows:
+                ref = self._to_ref(row)
+                if ref:
+                    yield ref
+            offset += len(rows)
+            if not rows or offset >= int(page.get("count", 0)):
+                return
+
     def search_users(self, q: str = "", kind: str | None = None,
                      limit: int = 25) -> list[UserRef]:
         params = {"q": q, "limit": limit}
