@@ -36,7 +36,12 @@ allow_indirect_imports = true
 name = domain/ must not import Django, DRF or Celery
 type = forbidden
 source_modules =
+# Every module's domain, not just the first one written. Listing only
+# placement made this pass vacuously for leave, whose domain went unchecked
+# from the day it was created until an import of core.api.exceptions -- which
+# reaches DRF -- was added to it without anything objecting.
     modules.placement.domain
+    modules.leave.domain
 forbidden_modules =
     django
     rest_framework
