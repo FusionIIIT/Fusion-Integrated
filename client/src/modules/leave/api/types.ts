@@ -60,7 +60,7 @@ export interface ApplyPayload {
   reason: string;
   half?: Half | null;
   substitute_user_id?: number | null;
-  station?: { destination: string; from: string; to: string } | null;
+  station?: { destination: string; from_date: string; to_date: string } | null;
 }
 
 export interface Policy {

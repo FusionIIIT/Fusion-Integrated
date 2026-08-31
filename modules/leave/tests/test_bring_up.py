@@ -108,6 +108,19 @@ class TestConfiguringItThroughItsOwnApi:
             "category": "CL", "annual_credit": "8.00"}, format="json")
         assert rule.status_code == 201
 
+        # Entitlement without an approval path is not publishable, and the API
+        # can now say so before anybody tries.
+        gaps = c.get(f"/api/v1/leave/admin/policies/{policy_id}/readiness").json()
+        assert gaps["ready"] is False
+        assert c.post(f"/api/v1/leave/admin/policies/{policy_id}/publish"
+                      ).status_code == 400
+
+        route = c.post(f"/api/v1/leave/admin/policies/{policy_id}/authority",
+                       {"category": "CL"}, format="json")
+        assert route.status_code == 201
+        assert c.get(
+            f"/api/v1/leave/admin/policies/{policy_id}/readiness").json()["ready"]
+
         published = c.post(f"/api/v1/leave/admin/policies/{policy_id}/publish")
         assert published.status_code == 200
         assert published.json()["published"] is True
@@ -131,6 +144,8 @@ class TestConfiguringItThroughItsOwnApi:
         pid = drafted.json()["id"]
         c.post(f"/api/v1/leave/admin/policies/{pid}/rules",
                {"category": "CL", "annual_credit": "8.00"}, format="json")
+        c.post(f"/api/v1/leave/admin/policies/{pid}/authority",
+               {"category": "CL"}, format="json")
         c.post(f"/api/v1/leave/admin/policies/{pid}/publish")
 
         refused = c.post(f"/api/v1/leave/admin/policies/{pid}/rules",

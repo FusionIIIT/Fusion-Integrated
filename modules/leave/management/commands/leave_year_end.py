@@ -38,6 +38,21 @@ class Command(BaseCommand):
             raise CommandError(f"No leave accounts carry entries for {year}.")
 
         faculty = self._faculty(people)
+        unclassified = [uid for uid in people if uid not in faculty]
+        if unclassified:
+            # Closing is destructive and the classification decides what
+            # happens: faculty vacation converts to earned leave, everybody
+            # else's lapses. Defaulting an unknown answer to "not faculty"
+            # silently destroyed up to sixty days a head, and --credit-next
+            # would then have granted them the wrong entitlement for the new
+            # year on top.
+            raise CommandError(
+                f"{len(unclassified)} employee(s) could not be classified as "
+                f"faculty or not: {unclassified[:10]}"
+                + (" ..." if len(unclassified) > 10 else "")
+                + ". Closing decides what converts and what lapses, so it will "
+                "not guess. Run sync_directory, or name the people to close "
+                "with --user.")
         closed = skipped = failed = 0
         totals = {"lapsed": 0, "carried": 0, "converted_vl": 0}
 
@@ -45,11 +60,11 @@ class Command(BaseCommand):
             try:
                 with transaction.atomic():
                     moved = yearend.close(
-                        user_id=user_id, year=year, faculty=faculty.get(user_id, False))
+                        user_id=user_id, year=year, faculty=faculty[user_id])
                     if opts["credit_next"]:
                         yearend.credit_year(
                             user_id=user_id, year=year + 1,
-                            faculty=faculty.get(user_id, False))
+                            faculty=faculty[user_id])
                     if dry:
                         transaction.set_rollback(True)
                 closed += 1
@@ -89,7 +104,12 @@ class Command(BaseCommand):
 
     def _faculty(self, user_ids: list[int]) -> dict[int, bool]:
         """One batched directory call. Faculty carry VL and convert it; nobody
-        else does, so getting this wrong changes what people are owed."""
+        else does, so getting this wrong changes what people are owed.
+
+        Anyone the directory does not return is simply absent from this map,
+        and the caller refuses rather than assuming. A missing answer is not a
+        negative one.
+        """
         return {
             uid: dto.kind == "faculty" for uid, dto in get_users(user_ids).items()
         }

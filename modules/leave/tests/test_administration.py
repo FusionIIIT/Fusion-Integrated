@@ -28,12 +28,15 @@ EMPLOYEE = 501
 
 
 def _draft_policy(version="2027.1", effective_from=date(2027, 1, 1)) -> LeavePolicy:
+    """A version that is actually publishable: entitlement AND a way to approve it."""
     policy = LeavePolicy.objects.create(
         version=version, effective_from=effective_from, published=False
     )
     CategoryRule.objects.create(
-        policy=policy, category=Category.CL.value, annual_credit=D(8), carries_forward=False
+        policy=policy, category=Category.CL.value, annual_credit=D(8),
+        carries_forward=False
     )
+    administration.set_authority_rule(policy=policy, category=Category.CL)
     return policy
 
 
@@ -59,6 +62,39 @@ class TestPolicyPublication:
         )
         with pytest.raises(BadRequestError, match="no category rules"):
             administration.publish_policy(policy=empty, actor_user_id=ADMIN)
+
+    def test_entitlement_without_an_approval_path_is_refused(self):
+        """The gap that produced a 500 for whoever applied first."""
+        policy = LeavePolicy.objects.create(
+            version="2029.1", effective_from=date(2029, 1, 1), published=False)
+        CategoryRule.objects.create(
+            policy=policy, category=Category.CL.value, annual_credit=D(8),
+            carries_forward=False)
+
+        with pytest.raises(BadRequestError, match="nowhere to go"):
+            administration.publish_policy(policy=policy, actor_user_id=ADMIN)
+
+    def test_a_category_needing_higher_sanction_needs_a_named_sanctioner(self):
+        policy = LeavePolicy.objects.create(
+            version="2030.1", effective_from=date(2030, 1, 1), published=False)
+        CategoryRule.objects.create(
+            policy=policy, category=Category.EL.value, annual_credit=D(30),
+            carries_forward=True)
+        administration.set_authority_rule(policy=policy, category=Category.EL)
+
+        with pytest.raises(BadRequestError, match="no rule for it names"):
+            administration.publish_policy(policy=policy, actor_user_id=ADMIN)
+
+    def test_the_gaps_can_be_read_before_publishing(self):
+        policy = LeavePolicy.objects.create(
+            version="2031.1", effective_from=date(2031, 1, 1), published=False)
+        CategoryRule.objects.create(
+            policy=policy, category=Category.CL.value, annual_credit=D(8),
+            carries_forward=False)
+
+        assert administration.policy_gaps(policy) != []
+        administration.set_authority_rule(policy=policy, category=Category.CL)
+        assert administration.policy_gaps(policy) == []
 
     def test_publishing_twice_is_refused(self):
         policy = _draft_policy()

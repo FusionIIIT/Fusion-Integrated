@@ -20,10 +20,12 @@ from modules.leave.api import serializers as s
 from modules.leave.domain.categories import Category
 from modules.leave.domain.counting import Half
 from modules.leave.models import (
+    AuthorityRule,
     CategoryRule,
     Holiday,
     HolidayCalendar,
     LeavePolicy,
+    SlaRule,
     VacationPeriod,
 )
 from modules.leave.selectors import balances, scoping
@@ -150,6 +152,31 @@ class WithdrawView(APIView):
             request=_mine(request, pk),
             actor_user_id=actor.user_id,
             remark=body.validated_data.get("remark", ""),
+        )
+        return Response(s.LeaveRequestSerializer(updated).data)
+
+
+class RenominateView(APIView):
+    """EL-UC-006. Somebody else, after the first substitute declined.
+
+    The service and the serializer both existed and no route reached them, so
+    the only way out of APPLICANT_ACTION_REQUIRED was to withdraw the request
+    entirely -- and an extension stuck in its own version of that state had no
+    way out at all, because withdrawing an extension is not the same as
+    abandoning leave already running.
+    """
+
+    permission_classes = [MODULE, HasPermission(P_CREATE)]
+
+    @extend_schema(request=s.RenominateSerializer, responses=s.LeaveRequestSerializer)
+    def post(self, request, pk: int):
+        body = s.RenominateSerializer(data=request.data)
+        body.is_valid(raise_exception=True)
+        actor = _actor(request)
+        updated = decisions.renominate(
+            request=_mine(request, pk),
+            actor_user_id=actor.user_id,
+            substitute_user_id=body.validated_data["substitute_user_id"],
         )
         return Response(s.LeaveRequestSerializer(updated).data)
 
@@ -494,6 +521,54 @@ class PolicyPublishView(APIView):
             policy=_policy(pk), actor_user_id=_actor(request).user_id
         )
         return Response(s.PolicySerializer(published).data)
+
+
+class PolicyAuthorityView(APIView):
+    permission_classes = [MODULE, HasPermission(P_POLICY)]
+
+    @extend_schema(responses=s.AuthorityRuleSerializer(many=True))
+    def get(self, request, pk: int):
+        rows = AuthorityRule.objects.filter(policy_id=pk).order_by(
+            "category", "-specificity")
+        return Response(s.AuthorityRuleSerializer(rows, many=True).data)
+
+    @extend_schema(request=s.AuthorityRuleSerializer,
+                   responses=s.AuthorityRuleSerializer)
+    def post(self, request, pk: int):
+        body = s.AuthorityRuleSerializer(data=request.data)
+        body.is_valid(raise_exception=True)
+        data = dict(body.validated_data)
+        saved = administration.set_authority_rule(
+            policy=_policy(pk), category=Category(data.pop("category")), **data)
+        return Response(
+            s.AuthorityRuleSerializer(saved).data, status=status.HTTP_201_CREATED)
+
+
+class PolicySlaView(APIView):
+    permission_classes = [MODULE, HasPermission(P_POLICY)]
+
+    @extend_schema(responses=s.SlaRuleSerializer(many=True))
+    def get(self, request, pk: int):
+        rows = SlaRule.objects.filter(policy_id=pk).order_by("state")
+        return Response(s.SlaRuleSerializer(rows, many=True).data)
+
+    @extend_schema(request=s.SlaRuleSerializer, responses=s.SlaRuleSerializer)
+    def post(self, request, pk: int):
+        body = s.SlaRuleSerializer(data=request.data)
+        body.is_valid(raise_exception=True)
+        saved = administration.set_sla_rule(policy=_policy(pk), **body.validated_data)
+        return Response(s.SlaRuleSerializer(saved).data, status=status.HTTP_201_CREATED)
+
+
+class PolicyReadinessView(APIView):
+    """What still has to be added before this version can be published."""
+
+    permission_classes = [MODULE, HasPermission(P_POLICY)]
+
+    @extend_schema(responses=s.PolicyGapSerializer)
+    def get(self, request, pk: int):
+        gaps = administration.policy_gaps(_policy(pk))
+        return Response({"ready": not gaps, "gaps": gaps})
 
 
 class CalendarAdminView(APIView):

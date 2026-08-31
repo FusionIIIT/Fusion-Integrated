@@ -13,9 +13,15 @@ function iso(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-/** Reporting a return to duty. Returning early is the interesting case: the
- *  unused days go back to the balance, so the date entered here is not a
- *  formality. */
+/** Reporting a return to duty.
+ *
+ *  The date is the FIRST DAY BACK AT WORK, not the last day of leave — the
+ *  backend charges leave up to the day before it. Defaulting to the sanctioned
+ *  end date, and refusing anything later, told the server that somebody who
+ *  finished on the 17th and returned on the 18th had come back a day early,
+ *  and handed them back days they had used.
+ *
+ *  Returning genuinely early is the interesting case: those days do go back. */
 export function ResumptionModal({ request, onClose }: {
   request: LeaveRequest | null;
   onClose: () => void;
@@ -24,12 +30,17 @@ export function ResumptionModal({ request, onClose }: {
   const [day, setDay] = useState<Date | null>(null);
   const [remark, setRemark] = useState("");
 
-  useEffect(() => {
-    if (request) setDay(new Date(`${request.ends_on}T00:00:00`));
-  }, [request]);
+  /** The day after the sanctioned end: a normal return, and the default. */
+  const normalReturn = request
+    ? new Date(new Date(`${request.ends_on}T00:00:00`).getTime() + 86_400_000)
+    : null;
 
-  const early = Boolean(request && day && iso(day) <= request.ends_on
-    && iso(day) !== request.ends_on);
+  useEffect(() => {
+    if (normalReturn) setDay(normalReturn);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [request?.id]);
+
+  const early = Boolean(request && day && iso(day) <= request.ends_on);
 
   function send() {
     if (!request || !day) return;
@@ -63,13 +74,17 @@ export function ResumptionModal({ request, onClose }: {
     >
       <Stack gap="sm">
         <DateInput
-          label="Date you resumed duty" value={day} onChange={setDay}
-          maxDate={request ? new Date(`${request.ends_on}T00:00:00`) : undefined}
+          label="First day back at work" value={day} onChange={setDay}
+          description={request
+            ? `Leave was sanctioned to ${formatDay(request.ends_on)}, so a normal return is the next working day.`
+            : undefined}
+          minDate={request ? new Date(`${request.starts_on}T00:00:00`) : undefined}
+          maxDate={normalReturn ?? undefined}
         />
         {early && (
           <Alert color="teal" variant="light">
-            You returned before the sanctioned end date. The unused days go back
-            to your balance once this is verified.
+            That is before the end of your sanctioned leave. The unused days go
+            back to your balance once this is verified.
           </Alert>
         )}
         <Textarea

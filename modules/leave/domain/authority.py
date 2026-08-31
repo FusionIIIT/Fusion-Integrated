@@ -40,7 +40,12 @@ class Route:
 
 
 class NoAuthorityConfigured(Exception):
-    """Nothing matches, so there is nobody to send the request to."""
+    """Nothing matches, so there is nobody to send the request to.
+
+    Reachable from an ordinary application whenever the policy in force is
+    incomplete, so it must not surface as a 500. The service layer translates
+    it; the domain stays free of anything that knows what an HTTP status is.
+    """
 
 
 def _matches(
@@ -82,7 +87,9 @@ def select_rule(
     matches = [r for r in candidates if _matches(r, category, unit, held, faculty)]
     if not matches:
         raise NoAuthorityConfigured(
-            f"no authority rule for {category.value} in unit {unit!r}"
+            f"No approval path is configured for {category.value} in "
+            f"{unit or 'your unit'}. The leave administrator has to add an "
+            "authority rule before this leave can be applied for."
         )
 
     def weight(r: AuthorityCandidate) -> tuple[int, int, int, int]:
@@ -117,8 +124,9 @@ def route_for(
     if needs_higher_sanction(category) and not (
             rule.sanctioning_designation or rule.self_sanction):
         raise NoAuthorityConfigured(
-            f"{category.value} requires sanction above the unit head, but the rule "
-            f"for unit {rule.unit or 'any'!r} names no sanctioning designation")
+            f"{category.value} must be sanctioned above the unit head, but the rule "
+            f"for {rule.unit or 'any unit'} names no sanctioning designation. The "
+            "leave administrator has to complete it.")
 
     unit_head_final = not above_unit_head
     return Route(
