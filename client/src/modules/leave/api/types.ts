@@ -105,3 +105,28 @@ export interface VacationPeriod {
   starts_on: string;
   ends_on: string;
 }
+
+export interface AuthorityRule {
+  id: number;
+  category: Category;
+  unit: string;
+  designation: string;
+  applies_to_faculty: boolean | null;
+  establishment_step: boolean;
+  sanctioning_designation: string;
+  self_sanction: boolean;
+  specificity: number;
+}
+
+export interface SlaRule {
+  id: number;
+  state: string;
+  remind_after_hours: number;
+  escalate_after_hours: number;
+  escalate_to_designation: string;
+}
+
+export interface PolicyReadiness {
+  ready: boolean;
+  gaps: string[];
+}

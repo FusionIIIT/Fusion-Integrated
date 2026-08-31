@@ -58,6 +58,9 @@ class UserRef:
     programme: str = ""
     discipline: str = ""
     batch_year: int | None = None
+    #: Defaults True so an older identity service, which does not send it, keeps
+    #: working -- but a service that does send it can now retire somebody.
+    is_active: bool = True
     extra: dict[str, Any] = field(default_factory=dict)
 
 
@@ -192,10 +195,11 @@ class IamClient:
             programme=r.get("programme", "") or "",
             discipline=r.get("discipline", "") or "",
             batch_year=r.get("batch_year"),
+            is_active=bool(r.get("is_active", True)),
             extra={k: v for k, v in r.items()
                    if k not in {"user_id", "id", "username", "display_name", "name",
                                 "kind", "email", "department", "programme",
-                                "discipline", "batch_year"}},
+                                "discipline", "batch_year", "is_active"}},
         )
 
     # -- academic standing (declared CPI) ---------------------------------

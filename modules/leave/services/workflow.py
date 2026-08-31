@@ -95,7 +95,7 @@ def apply_event(
         _record(locked, movements)
     # The clock belongs to the state, so it moves with it rather than being
     # something each caller has to remember to wind.
-    sla.on_state_change(locked, move.target)
+    sla.on_state_change(locked, move.target, source)
     if on_applied is not None:
         on_applied(locked)
     return locked

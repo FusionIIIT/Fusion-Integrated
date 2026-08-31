@@ -37,7 +37,9 @@ def collect() -> dict:
                 {"code": code, "label": label}
                 for code, label in getattr(reg, "PERMISSIONS", [])
             ],
-            "system_permissions": sorted(getattr(reg, "SYSTEM_PERMISSIONS", [])),
+            "system_permissions": sorted(
+                _codes(cfg.name, "SYSTEM_PERMISSIONS",
+                       getattr(reg, "SYSTEM_PERMISSIONS", []))),
             # Enforced by narrowing a queryset rather than by refusing a
             # request. Holding one widens what you see; not holding it shows
             # you less. There is no endpoint to check it in, so the
@@ -209,6 +211,22 @@ def render_catalogue(manifest: dict) -> str:
                    else ", ".join(f"`{d}`" for d in holders[p["code"]]))
             lines.append(f"| `{p['code']}` | {p['label']} | {who} |")
     return "\n".join(lines) + "\n"
+
+
+def _codes(module: str, field: str, declared) -> list[str]:
+    """Permission codes, and a refusal if they are not plain strings.
+
+    One module declared these as (code, label) pairs while every other used
+    bare codes. The manifest then carried a nested array, the code never
+    reached the permission catalogue, and nothing noticed -- the check that
+    exists to keep the manifest honest was itself shape-blind.
+    """
+    wrong = [d for d in declared if not isinstance(d, str)]
+    if wrong:
+        raise CommandError(
+            f"{module}.{field} must be a list of permission code strings; got "
+            f"{wrong[0]!r}. A (code, label) pair belongs in PERMISSIONS, not here.")
+    return list(declared)
 
 
 class Command(BaseCommand):
