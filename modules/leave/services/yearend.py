@@ -142,8 +142,19 @@ def credit_year(*, user_id: int, year: int, faculty: bool) -> int:
         for category, setting in settings.items()
         if setting.annual_credit > ZERO and category.value not in existing
     ]
-    LedgerEntry.objects.bulk_create(rows)
-    return len(rows)
+    if not rows:
+        return 0
+    before = LedgerEntry.objects.filter(
+        user_id=user_id, year=year, reason=EntryReason.ANNUAL_CREDIT
+    ).count()
+    # ignore_conflicts leans on the unique constraint rather than on the read
+    # above: the read makes the common case cheap, the constraint makes the
+    # concurrent case correct.
+    LedgerEntry.objects.bulk_create(rows, ignore_conflicts=True)
+    after = LedgerEntry.objects.filter(
+        user_id=user_id, year=year, reason=EntryReason.ANNUAL_CREDIT
+    ).count()
+    return after - before
 
 
 @transaction.atomic

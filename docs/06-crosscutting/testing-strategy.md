@@ -39,6 +39,31 @@ realistic rather than aspirational.
 
 ---
 
+## Concurrency
+
+A lock proved sequentially is not proved. "Do it, do it again, see the refusal" shows the check exists;
+it cannot produce the case the check is for, which is two callers reading the same state before either
+has written to it.
+
+`modules/leave/tests/test_concurrency.py` runs real threads on real connections under
+`django_db(transaction=True)`, released together on a `threading.Barrier`. The usual per-test
+transaction would hide each thread's writes from the others and the tests would pass without touching
+what they are about.
+
+It found one defect the sequential tests could not: `credit_year` was idempotent by reading before
+writing, so two workers both saw nothing credited and both credited, and everybody ended the day with
+twice their entitlement. The fix is a partial unique constraint scoped to `ANNUAL_CREDIT` — the read
+stays, so the common case costs no exception, but the constraint is what makes it correct.
+
+It also confirmed two locks that do hold: the year-end closure's unique constraint, and the
+`select_for_update` on the ledger during approval.
+
+**Worth knowing about that second one.** It locks the rows a balance is computed from, and locking rows
+that do not exist locks nothing. It holds here because a balance is only ever non-zero when credit rows
+exist, so anything affordable has something to lock. That is a property of the data rather than of the
+code, and it deserves a real mutex if the ledger ever gains a path to a positive balance with no rows
+behind it.
+
 ## Factories are the only way to create data
 
 ```python
