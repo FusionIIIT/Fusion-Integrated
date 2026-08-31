@@ -65,12 +65,17 @@ def upsert(refs, *, rejected: list | None = None) -> int:
             user_id=r.user_id, username=r.username, display_name=r.display_name,
             kind=r.kind or "student", email=r.email, department=r.department,
             programme=r.programme, discipline=r.discipline, batch_year=r.batch_year,
+            is_active=getattr(r, "is_active", True),
         ))
     if not rows:
         return 0
     UserRef.objects.bulk_create(
         rows, update_conflicts=True, unique_fields=["user_id"],
+        # is_active belongs here: without it a deactivated account stayed
+        # active in this projection for ever, and every scope keyed on
+        # is_active kept answering yes.
         update_fields=["username", "display_name", "kind", "email", "department",
-                       "programme", "discipline", "batch_year", "updated_at"],
+                       "programme", "discipline", "batch_year", "is_active",
+                       "updated_at"],
     )
     return len(rows)
