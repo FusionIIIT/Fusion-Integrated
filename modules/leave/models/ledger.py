@@ -54,6 +54,16 @@ class LedgerEntry(TimeStampedModel, UserScopedModel):
             models.CheckConstraint(
                 condition=~models.Q(days=0), name="leave_ledger_no_zero_entry"
             ),
+            # A year's entitlement is credited once per category. This was a
+            # read-then-write in the service, which two workers pass together:
+            # both saw nothing credited and both credited, and everybody ended
+            # the day with twice their leave. The constraint makes it
+            # impossible rather than unlikely.
+            models.UniqueConstraint(
+                fields=["user_id", "year", "category"],
+                condition=models.Q(reason="ANNUAL_CREDIT"),
+                name="leave_ledger_one_annual_credit",
+            ),
         ]
         indexes = [
             models.Index(

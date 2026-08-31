@@ -38,13 +38,23 @@ def test_closing_a_carry_only_account_twice_is_refused():
 
 
 def test_a_movement_cannot_be_booked_into_a_closed_year():
+    """The December request approved in January.
+
+    It is submitted while the year is open, so its days are still unused when
+    closing carries them forward. Approving it afterwards would charge a year
+    whose lapse and carry-forward have already been computed, and nothing
+    recomputes the opening balance that charge invalidates.
+    """
     factories.setup_all(U)
+    pending = service.submit(
+        user_id=U, category=Category.CL, starts_on=date(YEAR, 12, 28),
+        ends_on=date(YEAR, 12, 29), reason="x", unit="CSE", faculty=False,
+        designations=frozenset({"Assistant Professor"}))
+
     yearend.close(user_id=U, year=YEAR, faculty=False)
-    factories.credit(U, Category.CL, 8, year=YEAR)
-    r = service.submit(user_id=U, category=Category.CL, starts_on=date(YEAR, 12, 28),
-                       ends_on=date(YEAR, 12, 29), reason="x", unit="CSE", faculty=False)
-    with pytest.raises(ConflictError):
-        decisions.unit_head_decides(request=r, actor_user_id=900, approve=True)
+
+    with pytest.raises(ConflictError, match="has been closed"):
+        decisions.unit_head_decides(request=pending, actor_user_id=900, approve=True)
 
 
 def test_revoking_after_close_is_refused():

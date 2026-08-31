@@ -76,13 +76,24 @@ def make_authority(policy, **overrides) -> None:
 
 
 def credit(user_id: int, category: Category, days, year: int = YEAR) -> LedgerEntry:
-    return LedgerEntry.objects.create(
+    """Put this person on `days` of this category.
+
+    Sets rather than adds, and is safe to call twice. The ledger allows one
+    annual credit per category per year -- so a helper that appended a second
+    one was writing state the service can never produce, and started failing
+    the moment the database began enforcing it.
+    """
+    entry, created = LedgerEntry.objects.get_or_create(
         user_id=user_id,
         year=year,
         category=category.value,
-        days=D(days),
         reason=EntryReason.ANNUAL_CREDIT,
+        defaults={"days": D(days)},
     )
+    if not created and entry.days != D(days):
+        entry.days = D(days)
+        entry.save(update_fields=["days", "updated_at"])
+    return entry
 
 
 def setup_all(user_id: int = 501):

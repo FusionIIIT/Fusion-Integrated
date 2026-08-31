@@ -19,6 +19,7 @@ from modules.leave.models import (
     LeaveRequest,
     LedgerEntry,
     SubstituteNomination,
+    YearEndClosure,
 )
 from modules.leave.selectors import balances
 from modules.leave.services.workflow import Movement, apply_event
@@ -54,6 +55,17 @@ def _refuse_wrong_authority(
         raise ConflictError(
             f"This request is sanctioned by the {required}, which you do not hold.",
             code="not_the_sanctioning_authority",
+        )
+
+
+def _refuse_if_year_closed(request: LeaveRequest) -> None:
+    year = request.starts_on.year
+    if YearEndClosure.objects.filter(user_id=request.user_id, year=year).exists():
+        raise ConflictError(
+            f"{year} has been closed for this employee, so nothing further can be "
+            "charged to it. The leave administrator has to settle this against the "
+            "closed year explicitly.",
+            code="year_already_closed",
         )
 
 
@@ -212,6 +224,11 @@ def _approve(
     goes negative with no rule having visibly been broken. The check belongs
     where the days actually move.
     """
+    # Order matters for the message, not the outcome. A settled year is the
+    # more fundamental fact -- closing has already lapsed or carried these days
+    # -- and "insufficient balance" would send the reader looking for a spend
+    # that never happened. The ledger write refuses it either way.
+    _refuse_if_year_closed(request)
     _refuse_if_unaffordable(request)
     return apply_event(
         request,
