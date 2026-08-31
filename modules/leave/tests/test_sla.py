@@ -165,3 +165,67 @@ class TestProcessing:
 
         clock = SlaClock.objects.get(request=request)
         assert clock.remind_at - clock.started_at == timedelta(hours=1)
+
+
+class TestASelfTransitionDoesNotResetTheClock:
+    """BR-EL-032, BR-EL-033. Querying a resumption is not a fresh task.
+
+    Every transition stopped and recreated the clock, so an establishment query
+    -- modelled as a self-transition -- erased the time already spent waiting
+    and bought another full window. Repeat it and the deadline never arrives.
+    """
+
+    def _awaiting_verification(self, policy):
+        SlaRule.objects.get_or_create(
+            policy_id=policy.pk,
+            state=State.AWAITING_RESUMPTION_VERIFICATION.value,
+            defaults={"remind_after_hours": 24, "escalate_after_hours": 48})
+        request = make_request(policy)
+        request.state = State.AWAITING_RESUMPTION_VERIFICATION.value
+        request.save(update_fields=["state"])
+        return sla.on_state_change(
+            request, State.AWAITING_RESUMPTION_VERIFICATION)
+
+    def test_the_original_clock_survives(self, policy):
+        clock = self._awaiting_verification(policy)
+        started = clock.started_at
+
+        again = sla.on_state_change(
+            clock.request,
+            State.AWAITING_RESUMPTION_VERIFICATION,
+            source=State.AWAITING_RESUMPTION_VERIFICATION)
+
+        assert again.pk == clock.pk
+        assert again.started_at == started
+
+    def test_the_deadline_is_not_pushed_out(self, policy):
+        clock = self._awaiting_verification(policy)
+        escalate_at = clock.escalate_at
+
+        sla.on_state_change(
+            clock.request,
+            State.AWAITING_RESUMPTION_VERIFICATION,
+            source=State.AWAITING_RESUMPTION_VERIFICATION)
+
+        clock.refresh_from_db()
+        assert clock.escalate_at == escalate_at
+
+    def test_only_one_clock_is_ever_running(self, policy):
+        clock = self._awaiting_verification(policy)
+
+        for _ in range(3):
+            sla.on_state_change(
+                clock.request,
+                State.AWAITING_RESUMPTION_VERIFICATION,
+                source=State.AWAITING_RESUMPTION_VERIFICATION)
+
+        assert SlaClock.objects.filter(stopped_at__isnull=True).count() == 1
+
+    def test_a_real_move_still_starts_a_new_one(self, policy):
+        clock = self._awaiting_verification(policy)
+
+        sla.on_state_change(clock.request, State.AWAITING_UNIT_HEAD,
+                            source=State.AWAITING_RESUMPTION_VERIFICATION)
+
+        clock.refresh_from_db()
+        assert clock.stopped_at is not None

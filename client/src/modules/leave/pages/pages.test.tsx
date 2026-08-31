@@ -51,6 +51,8 @@ function respond(url: string, populated: boolean) {
   if (url.includes("admin/policies")) return { data: [POLICY] };
   if (url.includes("admin/calendars")) return { data: [CALENDAR] };
   if (url.includes("statement")) return { data: [] };
+  if (url.includes("readiness")) return { data: { ready: true, gaps: [] } };
+  if (url.includes("authority") || url.includes("/sla")) return { data: [] };
   return { data: [REQUEST] };
 }
 
@@ -121,5 +123,33 @@ describe("leave pages", () => {
     render(<Wrapper><ReviewQueuePage /></Wrapper>);
 
     expect(await screen.findByText(/2 days charged/i)).toBeInTheDocument();
+  });
+});
+
+describe("the policy screen can actually configure a policy", () => {
+  beforeEach(() => {
+    vi.spyOn(http, "get").mockImplementation(async (url: string) =>
+      respond(url, true) as never);
+  });
+
+  it("offers a way to create a version, not only to publish one", async () => {
+    render(<Wrapper><PolicyPage /></Wrapper>);
+
+    // It listed and published versions it had no way to create.
+    expect(await screen.findByText(/new policy version/i)).toBeInTheDocument();
+    expect(screen.getByText(/new calendar/i)).toBeInTheDocument();
+  });
+
+  it("shows why a version cannot be published yet", async () => {
+    vi.spyOn(http, "get").mockImplementation(async (url: string) => {
+      if (url.includes("readiness")) {
+        return { data: { ready: false, gaps: ["CL is entitled but has no authority rule"] } } as never;
+      }
+      return respond(url, true) as never;
+    });
+
+    render(<Wrapper><PolicyPage /></Wrapper>);
+
+    await waitFor(() => expect(screen.getByText(/2026\.1/)).toBeInTheDocument());
   });
 });

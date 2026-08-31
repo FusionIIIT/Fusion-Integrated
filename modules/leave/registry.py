@@ -27,8 +27,13 @@ PERMISSIONS = [
     ("leave.offline.record", "Record leave sanctioned outside the system"),
 ]
 
+#: Performed by a scheduled task, so no designation holds them. Plain codes,
+#: like every other module: a (code, label) pair here produced a nested array
+#: in the manifest and the code never reached the permission catalogue.
 SYSTEM_PERMISSIONS = [
-    ("leave.yearend.run", "Run the year-end lapse, carry-forward and conversion"),
+    "leave.yearend.run",
+    "leave.lifecycle.advance",
+    "leave.sla.process",
 ]
 
 #: Enforced by narrowing the queryset rather than by refusing the request.

@@ -52,8 +52,21 @@ def _responsible(request: LeaveRequest, state: State) -> int | None:
     return None
 
 
-def on_state_change(request: LeaveRequest, target: State) -> SlaClock | None:
-    """Stop whatever was running and start the next clock, if the state has one."""
+def on_state_change(
+    request: LeaveRequest, target: State, source: State | None = None
+) -> SlaClock | None:
+    """Stop whatever was running and start the next clock, if the state has one.
+
+    A transition back into the state it came from is not a new task. Querying a
+    resumption is modelled as a self-transition, and restarting the clock there
+    erased the time the establishment had already spent holding it and pushed
+    the reminder and escalation deadlines out again -- every query bought
+    another full window, which is the opposite of what an SLA is for.
+    """
+    if source is not None and source is target:
+        return SlaClock.objects.filter(
+            request=request, state=target.value, stopped_at__isnull=True
+        ).first()
     stop(request)
     if is_terminal(target) or request.policy_id is None:
         return None

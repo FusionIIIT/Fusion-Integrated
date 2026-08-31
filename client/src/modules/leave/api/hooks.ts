@@ -9,8 +9,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { http } from "../../../lib/http";
 import type {
-  ApplyPayload, Balance, Calendar, CategoryRule, Holiday, LeaveRequest,
-  LedgerEntry, Policy, Transition, VacationPeriod,
+  ApplyPayload, AuthorityRule, Balance, Calendar, CategoryRule, Holiday,
+  LeaveRequest, LedgerEntry, Policy, PolicyReadiness, SlaRule, Transition,
+  VacationPeriod,
 } from "./types";
 
 const KEY = "leave";
@@ -30,6 +31,9 @@ export const keys = {
   directory: (userId?: number) => [KEY, "directory", userId] as const,
   policies: () => [KEY, "policies"] as const,
   policyRules: (id: number) => [KEY, "policy-rules", id] as const,
+  policyAuthority: (id: number) => [KEY, "policy-authority", id] as const,
+  policySla: (id: number) => [KEY, "policy-sla", id] as const,
+  policyReadiness: (id: number) => [KEY, "policy-readiness", id] as const,
   calendars: () => [KEY, "calendars"] as const,
   holidays: (id: number) => [KEY, "holidays", id] as const,
   vacations: (id: number) => [KEY, "vacations", id] as const,
@@ -211,6 +215,124 @@ export function usePolicyRules(id: number | null) {
     queryFn: async () => (await http.get<CategoryRule[]>(
       `/leave/admin/policies/${id}/rules`)).data,
     enabled: id != null,
+  });
+}
+
+export function useDraftPolicy() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: async (body: {
+      version: string; effective_from: string; note?: string;
+      max_backdate_days?: number | null;
+    }) => (await http.post<Policy>("/leave/admin/policies", body)).data,
+    onSuccess: invalidate,
+  });
+}
+
+export function useSetCategoryRule(policyId: number) {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: async (body: Partial<CategoryRule>) =>
+      (await http.post<CategoryRule>(
+        `/leave/admin/policies/${policyId}/rules`, body)).data,
+    onSuccess: invalidate,
+  });
+}
+
+export function useAuthorityRules(id: number | null) {
+  return useQuery({
+    queryKey: keys.policyAuthority(id!),
+    queryFn: async () => (await http.get<AuthorityRule[]>(
+      `/leave/admin/policies/${id}/authority`)).data,
+    enabled: id != null,
+  });
+}
+
+export function useSetAuthorityRule(policyId: number) {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: async (body: Partial<AuthorityRule>) =>
+      (await http.post<AuthorityRule>(
+        `/leave/admin/policies/${policyId}/authority`, body)).data,
+    onSuccess: invalidate,
+  });
+}
+
+export function useSlaRules(id: number | null) {
+  return useQuery({
+    queryKey: keys.policySla(id!),
+    queryFn: async () =>
+      (await http.get<SlaRule[]>(`/leave/admin/policies/${id}/sla`)).data,
+    enabled: id != null,
+  });
+}
+
+export function useSetSlaRule(policyId: number) {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: async (body: Partial<SlaRule>) =>
+      (await http.post<SlaRule>(`/leave/admin/policies/${policyId}/sla`, body)).data,
+    onSuccess: invalidate,
+  });
+}
+
+/** What still has to be added before this version can go into force. Shown
+ *  beside Publish so the reason is visible before the button is pressed. */
+export function usePolicyReadiness(id: number | null) {
+  return useQuery({
+    queryKey: keys.policyReadiness(id!),
+    queryFn: async () => (await http.get<PolicyReadiness>(
+      `/leave/admin/policies/${id}/readiness`)).data,
+    enabled: id != null,
+  });
+}
+
+export function useDraftCalendar() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: async (body: { year: number; version: string }) =>
+      (await http.post<Calendar>("/leave/admin/calendars", body)).data,
+    onSuccess: invalidate,
+  });
+}
+
+export function useAddHoliday(calendarId: number) {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: async (body: { day: string; name: string; restricted: boolean }) =>
+      (await http.post<Holiday>(
+        `/leave/admin/calendars/${calendarId}/holidays`, body)).data,
+    onSuccess: invalidate,
+  });
+}
+
+export function useAddVacation(calendarId: number) {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: async (body: { name: string; starts_on: string; ends_on: string }) =>
+      (await http.post<VacationPeriod>(
+        `/leave/admin/calendars/${calendarId}/vacations`, body)).data,
+    onSuccess: invalidate,
+  });
+}
+
+export function useRenominate() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: async ({ id, substitute_user_id }: {
+      id: number; substitute_user_id: number;
+    }) => (await http.post<LeaveRequest>(
+      `/leave/requests/${id}/renominate`, { substitute_user_id })).data,
+    onSuccess: invalidate,
+  });
+}
+
+export function useRecordOffline() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: async (body: Record<string, unknown>) =>
+      (await http.post<LeaveRequest>("/leave/admin/offline", body)).data,
+    onSuccess: invalidate,
   });
 }
 

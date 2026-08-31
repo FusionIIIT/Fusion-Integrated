@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  Badge, Button, Card, Container, Group, Stack, Tabs, Text,
+  Alert, Badge, Button, Card, Container, Group, Stack, Tabs, Text,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { FaCog, FaRegCalendarAlt } from "react-icons/fa";
@@ -11,11 +11,13 @@ import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { formatDay } from "../components/PeriodCell";
 import {
-  useCalendars, useHolidays, usePolicies, usePolicyRules, usePublishCalendar,
-  usePublishPolicy, useVacations,
+  useAuthorityRules, useCalendars, useDraftCalendar, useDraftPolicy, useHolidays,
+  usePolicies, usePolicyReadiness, usePolicyRules, usePublishCalendar,
+  usePublishPolicy, useSlaRules, useVacations,
 } from "../api/hooks";
+import { NewCalendarModal, NewPolicyModal } from "../components/PolicyModals";
 import type {
-  Calendar, CategoryRule, Holiday, Policy, VacationPeriod,
+  AuthorityRule, Calendar, CategoryRule, Holiday, Policy, SlaRule, VacationPeriod,
 } from "../api/types";
 
 /** Entitlement, counting and the calendar are configuration, not code. A
@@ -29,8 +31,15 @@ export default function PolicyPage() {
   const [policyId, setPolicyId] = useState<number | null>(null);
   const [calendarId, setCalendarId] = useState<number | null>(null);
   const rules = usePolicyRules(policyId);
+  const authority = useAuthorityRules(policyId);
+  const slaRules = useSlaRules(policyId);
+  const readiness = usePolicyReadiness(policyId);
   const holidays = useHolidays(calendarId);
   const vacations = useVacations(calendarId);
+  const draftPolicy = useDraftPolicy();
+  const draftCalendar = useDraftCalendar();
+  const [newPolicy, setNewPolicy] = useState(false);
+  const [newCalendar, setNewCalendar] = useState(false);
 
   if (policies.error) {
     return <Container size="xl"><ErrorState error={policies.error} /></Container>;
@@ -52,6 +61,14 @@ export default function PolicyPage() {
       <PageHeader
         title="Policy & Calendar"
         subtitle="What the module counts, credits and treats as a working day"
+        action={
+          <Group gap="sm">
+            <Button variant="default" onClick={() => setNewCalendar(true)}>
+              New calendar
+            </Button>
+            <Button onClick={() => setNewPolicy(true)}>New policy version</Button>
+          </Group>
+        }
       />
 
       <Tabs defaultValue="policy">
@@ -113,6 +130,16 @@ export default function PolicyPage() {
               />
             </Card>
 
+            {policyId && readiness.data && !readiness.data.ready && (
+              <Alert color="orange" variant="light" title="Not ready to publish">
+                <Stack gap={4}>
+                  {readiness.data.gaps.map((g) => (
+                    <Text key={g} size="sm">{g}</Text>
+                  ))}
+                </Stack>
+              </Alert>
+            )}
+
             {policyId && (
               <Card padding="lg">
                 <Text fw={600} mb="md">Entitlement by category</Text>
@@ -133,6 +160,60 @@ export default function PolicyPage() {
                         : r.applies_to_faculty ? "faculty" : "non-faculty" },
                   ]}
                   empty={{ icon: FaCog, title: "This version defines no rules" }}
+                />
+              </Card>
+            )}
+
+            {policyId && (
+              <Card padding="lg">
+                <Text fw={600} mb="md">Who approves</Text>
+                <DataTable<AuthorityRule>
+                  rows={authority.data ?? []} loading={authority.isPending}
+                  rowKey={(r) => r.id} minWidth={860}
+                  columns={[
+                    { key: "category", header: "Category", render: (r) => r.category },
+                    { key: "unit", header: "Unit",
+                      render: (r) => r.unit || "any" },
+                    { key: "designation", header: "Applicant",
+                      render: (r) => r.designation || "anyone" },
+                    { key: "path", header: "Path",
+                      render: (r) => r.self_sanction
+                        ? "self-sanction"
+                        : [r.establishment_step ? "establishment" : null,
+                           r.sanctioning_designation || "unit head is final"]
+                          .filter(Boolean).join(" then ") },
+                  ]}
+                  empty={{
+                    icon: FaCog,
+                    title: "No approval path configured",
+                    description: "Applications against this version would have "
+                      + "nowhere to go, so it cannot be published.",
+                  }}
+                />
+              </Card>
+            )}
+
+            {policyId && (
+              <Card padding="lg">
+                <Text fw={600} mb="md">Reminders and escalation</Text>
+                <DataTable<SlaRule>
+                  rows={slaRules.data ?? []} loading={slaRules.isPending}
+                  rowKey={(r) => r.id} minWidth={720}
+                  columns={[
+                    { key: "state", header: "Waiting in",
+                      render: (r) => r.state.toLowerCase().replace(/_/g, " ") },
+                    { key: "remind", header: "Remind after", align: "right",
+                      render: (r) => `${r.remind_after_hours} h` },
+                    { key: "escalate", header: "Escalate after", align: "right",
+                      render: (r) => `${r.escalate_after_hours} h` },
+                    { key: "to", header: "Escalate to",
+                      render: (r) => r.escalate_to_designation || "the next step" },
+                  ]}
+                  empty={{
+                    icon: FaCog,
+                    title: "Nothing is chased in this version",
+                    description: "A state with no rule is not SLA-controlled.",
+                  }}
                 />
               </Card>
             )}
@@ -227,6 +308,17 @@ export default function PolicyPage() {
           </Stack>
         </Tabs.Panel>
       </Tabs>
+
+      <NewPolicyModal
+        opened={newPolicy} onClose={() => setNewPolicy(false)}
+        submitting={draftPolicy.isPending}
+        onSubmit={(body) => publish(draftPolicy.mutateAsync(body), "The draft")}
+      />
+      <NewCalendarModal
+        opened={newCalendar} onClose={() => setNewCalendar(false)}
+        submitting={draftCalendar.isPending}
+        onSubmit={(body) => publish(draftCalendar.mutateAsync(body), "The calendar")}
+      />
     </Container>
   );
 }
