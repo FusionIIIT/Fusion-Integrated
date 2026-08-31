@@ -95,6 +95,15 @@ def validate(
         raise BadRequestError(
             f"{category.value} cannot be taken as a half day.", code="half_day_not_allowed"
         )
+    if half is not None and starts_on != ends_on:
+        # The domain refuses this with a bare ValueError, which would surface as
+        # a 500. It is reachable from an ordinary form: choose a half day, then
+        # widen the dates.
+        raise BadRequestError(
+            "A half day is a single date. Clear the half-day option, or apply for "
+            "one day.",
+            code="half_day_over_several_days",
+        )
 
     effective = policy_selector.effective_policy(starts_on)
     calendar = policy_selector.effective_calendar(starts_on.year)
@@ -218,10 +227,16 @@ def submit(
 
     candidates, rule_ids = _candidates(policy_id, category)
     held = frozenset(designations)
-    rule = authority.select_rule(candidates, category, unit, held, faculty)
-    route = authority.route_for(
-        rule, category, substitute_required=substitute_user_id is not None
-    )
+    try:
+        rule = authority.select_rule(candidates, category, unit, held, faculty)
+        route = authority.route_for(
+            rule, category, substitute_required=substitute_user_id is not None
+        )
+    except authority.NoAuthorityConfigured as exc:
+        # An incomplete policy is an administrative gap, not the applicant's
+        # mistake, and it reaches them through an ordinary application. Say what
+        # is missing rather than returning a 500.
+        raise ConflictError(str(exc), code="no_authority_configured") from exc
     if not unit and not route.self_sanction:
         # The review queue is keyed on the unit, so a request without one would
         # be accepted, enter the workflow, and appear in nobody's queue. Better

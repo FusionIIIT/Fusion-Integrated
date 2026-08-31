@@ -55,7 +55,7 @@ export default function MyLeavePage() {
       <PageHeader
         title="My Leave"
         subtitle="Everything you have applied for, and where each request stands"
-        action={<Button onClick={() => navigate("../apply")}>Apply for leave</Button>}
+        action={<Button onClick={() => navigate("apply")}>Apply for leave</Button>}
       />
 
       <SimpleGrid cols={{ base: 2, sm: 3, lg: 6 }} mb="lg">

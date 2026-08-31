@@ -16,10 +16,15 @@ from django.db import transaction
 from django.utils import timezone
 
 from core.api.exceptions import BadRequestError, ConflictError
-from modules.leave.domain.categories import Category, allows_half_day
+from modules.leave.domain.categories import (
+    Category,
+    allows_half_day,
+    needs_higher_sanction,
+)
 from modules.leave.domain.counting import Half, chargeable_days
 from modules.leave.domain.state_machine import Actor, Event, State
 from modules.leave.models import (
+    AuthorityRule,
     CategoryRule,
     EntryReason,
     Holiday,
@@ -28,6 +33,7 @@ from modules.leave.models import (
     LeaveRequest,
     LedgerEntry,
     RequestTransition,
+    SlaRule,
     VacationPeriod,
 )
 from modules.leave.selectors import policy as policy_selector
@@ -69,11 +75,7 @@ def set_category_rule(
     requires_evidence: bool = False,
 ) -> CategoryRule:
     """Add or replace one category's entitlement on an unpublished version."""
-    if policy.published:
-        raise ConflictError(
-            "A published policy cannot be edited. Draft a new version instead.",
-            code="policy_published",
-        )
+    _refuse_if_policy_published(policy)
     rule, _ = CategoryRule.objects.update_or_create(
         policy=policy,
         category=category.value,
@@ -88,6 +90,72 @@ def set_category_rule(
     return rule
 
 
+def set_authority_rule(
+    *,
+    policy: LeavePolicy,
+    category: Category,
+    unit: str = "",
+    designation: str = "",
+    applies_to_faculty: bool | None = None,
+    establishment_step: bool = False,
+    sanctioning_designation: str = "",
+    self_sanction: bool = False,
+    specificity: int = 0,
+) -> AuthorityRule:
+    """BR-EL-019. Who reviews and who sanctions, for one case.
+
+    There was no way to create one of these outside the shell, so a policy
+    drafted through the API could never be completed through it.
+    """
+    _refuse_if_policy_published(policy)
+    rule, _ = AuthorityRule.objects.update_or_create(
+        policy_id=policy.pk, category=category.value, unit=unit,
+        designation=designation,
+        defaults={
+            "applies_to_faculty": applies_to_faculty,
+            "establishment_step": establishment_step,
+            "sanctioning_designation": sanctioning_designation,
+            "self_sanction": self_sanction,
+            "specificity": specificity,
+        },
+    )
+    return rule
+
+
+def set_sla_rule(
+    *,
+    policy: LeavePolicy,
+    state: str,
+    remind_after_hours: int,
+    escalate_after_hours: int,
+    escalate_to_designation: str = "",
+) -> SlaRule:
+    """BR-EL-032, BR-EL-033. How long this state may sit before somebody is told."""
+    _refuse_if_policy_published(policy)
+    if escalate_after_hours <= remind_after_hours:
+        raise BadRequestError(
+            "Escalation has to come after the reminder, not before it.",
+            code="thresholds_out_of_order",
+        )
+    rule, _ = SlaRule.objects.update_or_create(
+        policy_id=policy.pk, state=state,
+        defaults={
+            "remind_after_hours": remind_after_hours,
+            "escalate_after_hours": escalate_after_hours,
+            "escalate_to_designation": escalate_to_designation,
+        },
+    )
+    return rule
+
+
+def _refuse_if_policy_published(policy: LeavePolicy) -> None:
+    if policy.published:
+        raise ConflictError(
+            "A published policy cannot be edited. Draft a new version instead.",
+            code="policy_published",
+        )
+
+
 def draft_calendar(*, year: int, version: str) -> HolidayCalendar:
     """Start a year's calendar. Holidays go in before it is published."""
     if HolidayCalendar.objects.filter(year=year, version=version).exists():
@@ -98,15 +166,63 @@ def draft_calendar(*, year: int, version: str) -> HolidayCalendar:
     return HolidayCalendar.objects.create(year=year, version=version, published=False)
 
 
+def policy_gaps(policy: LeavePolicy) -> list[str]:
+    """What would fail if this version governed an application today.
+
+    Publishing used to need one category rule and nothing else, so a version
+    could go into force entitling people to leave that had no approval path.
+    The application then failed deep in the domain, and the person applying saw
+    a server error for somebody else's incomplete configuration. A policy is
+    executable or it is not ready.
+    """
+    entitled = {
+        Category(c)
+        for c in CategoryRule.objects.filter(policy=policy)
+        .values_list("category", flat=True)
+        .distinct()
+    }
+    if not entitled:
+        return ["it has no category rules, so it would entitle nobody to anything"]
+
+    routed = set(
+        AuthorityRule.objects.filter(policy_id=policy.pk)
+        .values_list("category", flat=True)
+        .distinct()
+    )
+    gaps = []
+    for category in sorted(entitled, key=lambda c: c.value):
+        if category.value not in routed:
+            gaps.append(
+                f"{category.value} is entitled but has no authority rule, so an "
+                "application for it would have nowhere to go")
+            continue
+        # A category that must be sanctioned above the unit head needs somebody
+        # named; otherwise the request reaches a state no rule can resolve.
+        if not needs_higher_sanction(category):
+            continue
+        rules = AuthorityRule.objects.filter(
+            policy_id=policy.pk, category=category.value)
+        resolvable = (
+            rules.exclude(sanctioning_designation="").exists()
+            or rules.filter(self_sanction=True).exists()
+        )
+        if not resolvable:
+            gaps.append(
+                f"{category.value} must be sanctioned above the unit head but no "
+                "rule for it names a sanctioning designation")
+    return gaps
+
+
 @transaction.atomic
 def publish_policy(*, policy: LeavePolicy, actor_user_id: int) -> LeavePolicy:
     """Put a drafted version in force and close the one it supersedes."""
     if policy.published:
         raise ConflictError("This policy version is already published.", code="published")
-    if not CategoryRule.objects.filter(policy=policy).exists():
+    incomplete = policy_gaps(policy)
+    if incomplete:
         raise BadRequestError(
-            "A policy version with no category rules would entitle nobody to anything.",
-            code="policy_has_no_rules",
+            "This version cannot be published yet: " + "; ".join(incomplete),
+            code="policy_incomplete",
         )
 
     previous = (

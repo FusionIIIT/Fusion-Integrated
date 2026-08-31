@@ -14,6 +14,11 @@ urlpatterns = [
     path("requests/<int:pk>/withdraw", views.WithdrawView.as_view(), name="withdraw"),
     path("requests/<int:pk>/cancel", views.CancellationView.as_view(), name="cancel"),
     path("requests/<int:pk>/extend", views.ExtensionView.as_view(), name="extend"),
+    path(
+        "requests/<int:pk>/renominate",
+        views.RenominateView.as_view(),
+        name="renominate",
+    ),
     path("requests/<int:pk>/resumption", views.ResumptionView.as_view(), name="resumption"),
     path("nominations", views.NominationsView.as_view(), name="nominations"),
     path(
@@ -41,6 +46,18 @@ urlpatterns = [
         "admin/policies/<int:pk>/publish",
         views.PolicyPublishView.as_view(),
         name="policy-publish",
+    ),
+    path(
+        "admin/policies/<int:pk>/authority",
+        views.PolicyAuthorityView.as_view(),
+        name="policy-authority",
+    ),
+    path("admin/policies/<int:pk>/sla", views.PolicySlaView.as_view(),
+         name="policy-sla"),
+    path(
+        "admin/policies/<int:pk>/readiness",
+        views.PolicyReadinessView.as_view(),
+        name="policy-readiness",
     ),
     path("admin/calendars", views.CalendarAdminView.as_view(), name="calendars"),
     path(

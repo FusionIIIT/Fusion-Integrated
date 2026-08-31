@@ -182,3 +182,33 @@ class DraftCategoryRuleSerializer(serializers.Serializer):
 class DraftCalendarSerializer(serializers.Serializer):
     year = serializers.IntegerField(min_value=2000, max_value=2200)
     version = serializers.CharField(max_length=32)
+
+
+class AuthorityRuleSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    category = serializers.ChoiceField(choices=CATEGORIES)
+    unit = serializers.CharField(max_length=80, allow_blank=True, required=False,
+                                 default="")
+    designation = serializers.CharField(max_length=120, allow_blank=True,
+                                        required=False, default="")
+    applies_to_faculty = serializers.BooleanField(required=False, allow_null=True,
+                                                  default=None)
+    establishment_step = serializers.BooleanField(default=False)
+    sanctioning_designation = serializers.CharField(
+        max_length=120, allow_blank=True, required=False, default="")
+    self_sanction = serializers.BooleanField(default=False)
+    specificity = serializers.IntegerField(default=0)
+
+
+class SlaRuleSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    state = serializers.CharField(max_length=40)
+    remind_after_hours = serializers.IntegerField(min_value=1)
+    escalate_after_hours = serializers.IntegerField(min_value=1)
+    escalate_to_designation = serializers.CharField(
+        max_length=120, allow_blank=True, required=False, default="")
+
+
+class PolicyGapSerializer(serializers.Serializer):
+    ready = serializers.BooleanField()
+    gaps = serializers.ListField(child=serializers.CharField())

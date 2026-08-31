@@ -47,6 +47,8 @@ export default function ApplyPage() {
 
   const single = SINGLE_DAY.has(category);
   const end = single ? from : to;
+  const oneDay = Boolean(from && end && iso(from) === iso(end));
+  const canTakeHalfDay = HALF_DAY.has(category) && oneDay;
   const available = balances.data?.find((b) => b.category === category)?.available;
   const incomplete = !from || !end || reason.trim().length < 5;
 
@@ -57,10 +59,14 @@ export default function ApplyPage() {
       starts_on: iso(from),
       ends_on: iso(end),
       reason: reason.trim(),
-      half: HALF_DAY.has(category) ? half : null,
+      // Cleared rather than merely hidden: leaving it set once the period grew
+      // sent a half-day flag with a multi-day request, which the counting rules
+      // reject with a bare ValueError -- a 500 for a control the user could no
+      // longer see.
+      half: canTakeHalfDay ? half : null,
       substitute_user_id: substitute === "" ? null : Number(substitute),
       station: station && destination.trim()
-        ? { destination: destination.trim(), from: iso(from), to: iso(end) }
+        ? { destination: destination.trim(), from_date: iso(from), to_date: iso(end) }
         : null,
     })
       .then(() => {
@@ -113,7 +119,7 @@ export default function ApplyPage() {
             )}
           </Grid>
 
-          {HALF_DAY.has(category) && from && iso(from) === iso(end ?? from) && (
+          {canTakeHalfDay && (
             <Select
               label="Half day (optional)" clearable value={half}
               onChange={(v) => setHalf(v as Half | null)}

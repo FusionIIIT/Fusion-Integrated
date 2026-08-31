@@ -297,6 +297,59 @@ paths:
               schema:
                 $ref: '#/components/schemas/Policy'
           description: ''
+  /api/v1/leave/admin/policies/{id}/authority:
+    get:
+      operationId: v1_leave_admin_policies_authority_list
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuthorityRule'
+          description: ''
+    post:
+      operationId: v1_leave_admin_policies_authority_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorityRule'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthorityRule'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuthorityRule'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorityRule'
+          description: ''
   /api/v1/leave/admin/policies/{id}/publish:
     post:
       operationId: v1_leave_admin_policies_publish_create
@@ -316,6 +369,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Policy'
+          description: ''
+  /api/v1/leave/admin/policies/{id}/readiness:
+    get:
+      operationId: v1_leave_admin_policies_readiness_retrieve
+      description: What still has to be added before this version can be published.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyGap'
           description: ''
   /api/v1/leave/admin/policies/{id}/rules:
     get:
@@ -369,6 +443,59 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CategoryRule'
+          description: ''
+  /api/v1/leave/admin/policies/{id}/sla:
+    get:
+      operationId: v1_leave_admin_policies_sla_list
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SlaRule'
+          description: ''
+    post:
+      operationId: v1_leave_admin_policies_sla_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SlaRule'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SlaRule'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SlaRule'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlaRule'
           description: ''
   /api/v1/leave/balances:
     get:
@@ -587,6 +714,46 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/Extension'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/renominate:
+    post:
+      operationId: v1_leave_requests_renominate_create
+      description: |-
+        EL-UC-006. Somebody else, after the first substitute declined.
+
+        The service and the serializer both existed and no route reached them, so
+        the only way out of APPLICANT_ACTION_REQUIRED was to withdraw the request
+        entirely -- and an extension stuck in its own version of that state had no
+        way out at all, because withdrawing an extension is not the same as
+        abandoning leave already running.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Renominate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Renominate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Renominate'
         required: true
       security:
       - iamSession: []
@@ -2857,6 +3024,41 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    AuthorityRule:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        unit:
+          type: string
+          default: ''
+          maxLength: 80
+        designation:
+          type: string
+          default: ''
+          maxLength: 120
+        applies_to_faculty:
+          type: boolean
+          nullable: true
+        establishment_step:
+          type: boolean
+          default: false
+        sanctioning_designation:
+          type: string
+          default: ''
+          maxLength: 120
+        self_sanction:
+          type: boolean
+          default: false
+        specificity:
+          type: integer
+          default: 0
+      required:
+      - category
+      - id
     Balance:
       type: object
       properties:
@@ -4434,6 +4636,18 @@ components:
       - version
       - vl_to_el_ratio
       - vl_to_el_rounding
+    PolicyGap:
+      type: object
+      properties:
+        ready:
+          type: boolean
+        gaps:
+          type: array
+          items:
+            type: string
+      required:
+      - gaps
+      - ready
     ProfileDocument:
       type: object
       description: |-
@@ -4787,6 +5001,13 @@ components:
         remark:
           type: string
           maxLength: 2000
+    Renominate:
+      type: object
+      properties:
+        substitute_user_id:
+          type: integer
+      required:
+      - substitute_user_id
     Resume:
       type: object
       description: 'PC-UC-002: the profile rendered as a structured resume.'
@@ -5017,6 +5238,30 @@ components:
       - id
       - kind
       - username
+    SlaRule:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        state:
+          type: string
+          maxLength: 40
+        remind_after_hours:
+          type: integer
+          minimum: 1
+        escalate_after_hours:
+          type: integer
+          minimum: 1
+        escalate_to_designation:
+          type: string
+          default: ''
+          maxLength: 120
+      required:
+      - escalate_after_hours
+      - id
+      - remind_after_hours
+      - state
     SourceEnum:
       enum:
       - campus
