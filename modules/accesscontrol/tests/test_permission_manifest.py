@@ -46,3 +46,41 @@ def test_the_committed_manifest_matches_the_registries():
         call_command("permission_manifest", check=True)
     except CommandError as exc:                            # pragma: no cover
         pytest.fail(str(exc))
+
+
+def test_system_permissions_must_be_bare_codes():
+    """The check that keeps the manifest honest was itself shape-blind.
+
+    One module declared these as (code, label) pairs while every other used
+    bare codes. The manifest carried a nested array, the code never reached the
+    permission catalogue, and nothing objected.
+    """
+    from modules.accesscontrol.management.commands.permission_manifest import _codes
+
+    with pytest.raises(CommandError, match="permission code strings"):
+        _codes("modules.example", "SYSTEM_PERMISSIONS",
+               [("m.thing.do", "Do the thing")])
+
+
+def test_bare_codes_are_accepted():
+    from modules.accesscontrol.management.commands.permission_manifest import _codes
+
+    assert _codes("modules.example", "SYSTEM_PERMISSIONS", ["m.thing.do"]) == [
+        "m.thing.do"]
+
+
+def test_every_module_declares_system_permissions_the_same_way():
+    """Read from the real registries, so a new module cannot drift."""
+    from importlib import import_module
+
+    from django.apps import apps
+
+    for cfg in apps.get_app_configs():
+        if not cfg.name.startswith("modules."):
+            continue
+        try:
+            reg = import_module(f"{cfg.name}.registry")
+        except ModuleNotFoundError:
+            continue
+        declared = getattr(reg, "SYSTEM_PERMISSIONS", [])
+        assert all(isinstance(d, str) for d in declared), cfg.name
