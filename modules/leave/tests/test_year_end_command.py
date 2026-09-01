@@ -114,3 +114,50 @@ def test_crediting_the_next_year_is_opt_in(accounts):
 def test_a_year_with_no_accounts_is_an_error_not_a_silent_success(accounts):
     with pytest.raises(CommandError, match="No leave accounts"):
         run("1999")
+
+
+class TestItRefusesToGuessWhoIsFaculty:
+    """The classification decides what is destroyed.
+
+    Faculty vacation converts to earned leave; everybody else's lapses. The
+    command read the flag with a default of False, so an employee the directory
+    failed to return had up to sixty days lapsed instead of converted -- during
+    the one operation that cannot be undone -- and --credit-next would then have
+    granted them the wrong entitlement for the new year on top.
+    """
+
+    def test_an_unclassified_employee_stops_the_run(self, accounts, stub_iam):
+        # The directory no longer knows one of the people holding a leave account.
+        UserRef.objects.filter(user_id=FACULTY).delete()
+
+        with pytest.raises(CommandError, match="could not be classified"):
+            run(str(YEAR))
+
+    def test_it_names_who_is_missing(self, accounts, stub_iam):
+        UserRef.objects.filter(user_id=FACULTY).delete()
+
+        with pytest.raises(CommandError, match=str(FACULTY)):
+            run(str(YEAR))
+
+    def test_nothing_is_written_when_it_refuses(self, accounts, stub_iam):
+        UserRef.objects.filter(user_id=FACULTY).delete()
+        before = LedgerEntry.objects.count()
+
+        with pytest.raises(CommandError):
+            run(str(YEAR))
+
+        assert LedgerEntry.objects.count() == before
+
+    def test_naming_only_the_known_employees_still_works(self, accounts, stub_iam):
+        UserRef.objects.filter(user_id=FACULTY).delete()
+
+        output = run(str(YEAR), "--user", str(STAFF))
+
+        assert "closed      1" in output
+
+    def test_a_faculty_member_the_directory_knows_still_converts(self, accounts):
+        run(str(YEAR))
+
+        # The guard must not have made the ordinary case stricter.
+        assert LedgerEntry.objects.filter(
+            user_id=FACULTY, reason=EntryReason.CONVERTED_IN).exists()
