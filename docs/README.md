@@ -17,7 +17,7 @@ review date in its front matter.
 | **About to write a backend module** | [Platform structure](03-platform/platform-structure.md) → [Module authoring guide](03-platform/module-authoring-guide.md) → [Shared kernel reference](03-platform/shared-kernel-reference.md) → [API conventions](01-architecture/api-conventions.md) → [Testing strategy](06-crosscutting/testing-strategy.md) |
 | **About to write a frontend module** | [Frontend architecture](05-frontend/frontend-architecture.md) → [Design system](05-frontend/design-system.md) → [Navigation contract](05-frontend/navigation-contract.md) → [Module authoring guide (frontend)](05-frontend/module-authoring-guide-frontend.md) → [State & data fetching](05-frontend/state-and-data-fetching.md) |
 | **Working on auth / roles / permissions** | [IAM domain model](02-iam/iam-domain-model.md) → [RBAC model](02-iam/rbac-model.md) → [Token & session design](02-iam/token-and-session-design.md) → [Legacy compatibility & ERP projection](02-iam/legacy-compatibility-and-erp-projection.md) |
-| **Working on Leave (ELM)** | [Leave domain model](09-leave/leave-domain-model.md) → [Counting & entitlement](09-leave/leave-counting-and-entitlement.md) → [State machine](09-leave/leave-state-machine.md) → [Authority, routing & scope](09-leave/leave-authority-and-routing.md) |
+| **Working on Leave (ELM)** | [ELM reference](09-leave/ELM_REFERENCE.md) → [Leave domain model](09-leave/leave-domain-model.md) → [Counting & entitlement](09-leave/leave-counting-and-entitlement.md) → [State machine](09-leave/leave-state-machine.md) → [Authority, routing & scope](09-leave/leave-authority-and-routing.md) |
 | **Working on Placement Cell** | [Placement domain model](04-placement/placement-domain-model.md) → [Academic snapshot integration](04-placement/academic-snapshot-integration.md) → [Application state machine](04-placement/application-state-machine.md) → [Eligibility rules spec](04-placement/eligibility-rules-spec.md) → [Offer & tier policy](04-placement/offer-and-tier-policy.md) |
 | **On call / operating the system** | [Deployment topology](07-ops/deployment-topology.md) → [Environments](07-ops/environments.md) → [Runbooks](07-ops/runbooks/) → [Observability](06-crosscutting/observability.md) |
 | **Reviewing a pull request** | [API conventions](01-architecture/api-conventions.md) → [Platform structure](03-platform/platform-structure.md) (the boundary rules) → [Security baseline](06-crosscutting/security-baseline.md) → the relevant [ADR](01-architecture/adr/) |
@@ -109,6 +109,7 @@ review date in its front matter.
 ### 09 — Leave (ELM)
 | Doc | Scope |
 |---|---|
+| [ELM_REFERENCE.md](09-leave/ELM_REFERENCE.md) | **All 32 business rules and 16 use cases, each linked to the line that decides it.** Start here when teaching. |
 | [leave-domain-model.md](09-leave/leave-domain-model.md) | Categories, tables, the ledger, year end, SLA |
 | [leave-counting-and-entitlement.md](09-leave/leave-counting-and-entitlement.md) | **The arithmetic.** Read before changing a figure or answering a disputed balance. |
 | [leave-state-machine.md](09-leave/leave-state-machine.md) | All 46 transitions, generated from the code, with their workflow citations |

@@ -6,6 +6,9 @@ last-reviewed: 2026-08-31
 
 # Leave Domain Model
 
+> Looking for a specific business rule or use case? **[The ELM reference](ELM_REFERENCE.md)**
+> lists all 32 rules and 16 use cases with a link to the line that decides each one.
+
 Employee Leave Management, built from the ELM specification set v1.2/v1.3. Every rule below cites the
 document it comes from; nothing here is invented policy.
 

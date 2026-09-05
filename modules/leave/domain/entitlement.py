@@ -71,6 +71,8 @@ def carry_forward(policy: CategoryPolicy, closing: Decimal) -> Decimal:
     return min(closing, policy.carry_forward_cap)
 
 
+#: BR-EL-008. The EL a conversion produces is ordinary EL: it lands in the
+#: same balance, carries forward with it, and can be taken like any other.
 def convert_vl_to_el(
     unused_vl: Decimal,
     ratio: Decimal,

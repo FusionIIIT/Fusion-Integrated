@@ -39,6 +39,7 @@ from modules.leave.models import (
 from modules.leave.selectors import policy as policy_selector
 
 
+#: EL-UC-014. Maintaining the policy parameters, BR-EL-030.
 def draft_policy(
     *,
     version: str,
@@ -156,6 +157,7 @@ def _refuse_if_policy_published(policy: LeavePolicy) -> None:
         )
 
 
+#: EL-UC-015. Maintaining the holiday and RH calendar, BR-EL-031.
 def draft_calendar(*, year: int, version: str) -> HolidayCalendar:
     """Start a year's calendar. Holidays go in before it is published."""
     if HolidayCalendar.objects.filter(year=year, version=version).exists():

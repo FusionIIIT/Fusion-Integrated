@@ -1,0 +1,320 @@
+{
+ "business_rules": {
+  "BR-EL-001": "The policy, not the code, decides which categories reach which employee. A staff member cannot request faculty-only vacation leave even holding a balance.",
+  "BR-EL-002": "Casual leave is a flat 8 a year and does not survive December. Nothing carries, so the year-end simply lapses whatever is left.",
+  "BR-EL-003": "Restricted holidays are 2 a year and must name a date the calendar published. Choosing an arbitrary day is refused at submission.",
+  "BR-EL-004": "Up to 15 special casual leave a year for an admissible purpose. Admissibility is a human judgement, so the module enforces the ceiling and leaves the decision to the authority.",
+  "BR-EL-005": "Non-faculty earn 30 a year and unused days carry forward, which is why EL is the category the year-end has to think hardest about.",
+  "BR-EL-006": "Faculty get vacation leave instead of earned leave, and it must fall inside a published vacation period.",
+  "BR-EL-007": "Unused vacation leave converts to earned leave at the policy's ratio. Neither the ratio nor the rounding is hardcoded — a test passes 3:1 to prove it.",
+  "BR-EL-008": "Converted days are ordinary earned leave: same balance, carries forward, available to take.",
+  "BR-EL-009": "Commuted leave is 20 a year and carries forward.",
+  "BR-EL-010": "Only casual leave may be taken as a half day, and only on a single date. The database enforces the single date, not just the form.",
+  "BR-EL-011": "The counting rule that is most often got wrong. For EL, COL and VL a weekend inside the leave is charged; for CL, RH and SCL it is not. Monday to Monday is 8 days of EL and 6 of CL.",
+  "BR-EL-012": "A new request may not overlap leave already held, pending or approved. The one exception is two opposite half days on the same date.",
+  "BR-EL-013": "Being away from headquarters travels inside the application rather than beside it, so a request carries its own station details.",
+  "BR-EL-014": "Where a substitute is required, nothing moves until they answer. The request waits rather than proceeding on an assumption.",
+  "BR-EL-015": "A declined nomination returns the request to the applicant, who nominates somebody else or withdraws.",
+  "BR-EL-016": "Casual and restricted leave end with the unit head. They are the competent authority for those categories.",
+  "BR-EL-017": "For SCL, EL, COL and VL the unit head records Recommended or Not Recommended and routes onward. **They do not make the final rejection.**",
+  "BR-EL-018": "Those four categories go above the unit head. The category sets the floor; the configuration decides who.",
+  "BR-EL-019": "Who reviews and who sanctions is configuration, not code. A reorganisation is a row, not a deployment.",
+  "BR-EL-020": "When the Director applies, their own leave takes the self-sanction route — the one case where deciding your own request is correct.",
+  "BR-EL-021": "A pending request may be modified before final approval, with revalidation and superseded tasks. **Not implemented** — see the gaps section.",
+  "BR-EL-022": "A pending request may be withdrawn at any point before approval, by the applicant.",
+  "BR-EL-023": "Approved leave is cancelled by the authority that granted it, not unilaterally by the applicant.",
+  "BR-EL-024": "Revised leave after a cancellation is a fresh application. An approved leave is never edited in place, which is why cancellation is terminal.",
+  "BR-EL-025": "Extension applies to leave already running, and only the additional days are charged.",
+  "BR-EL-027": "Resumption is reported by the employee and verified by the establishment before anything is settled.",
+  "BR-EL-028": "Returning early does not automatically return every unused day — what happens to the tail is a policy choice, because two readings are defensible.",
+  "BR-EL-029": "Leave sanctioned on paper is brought onto the record as synchronisation, explicitly not a second approval.",
+  "BR-EL-030": "A decision is judged against the policy in force when it was taken. Policy is never edited; a revision is a new version with its own effective date.",
+  "BR-EL-031": "The same for the calendar: the published version in force governs, and a replacement supersedes rather than overwrites.",
+  "BR-EL-032": "An SLA-controlled task that is still pending at its reminder threshold gets the responsible user reminded.",
+  "BR-EL-033": "Still pending at the escalation threshold, and it goes to the configured authority, logged."
+ },
+ "use_cases": {
+  "EL-UC-001": "The entry point. Everything the policy has to say about eligibility, counting and overlap is checked here, once, before anything is written.",
+  "EL-UC-002": "The nominated substitute accepts or declines. Routing waits on this.",
+  "EL-UC-003": "The unit head's step: a decision for CL and RH, a recommendation for everything else.",
+  "EL-UC-004": "The establishment section forwards a recommended request to the competent authority. It routes; it does not decide.",
+  "EL-UC-005": "The final decision, and the only point at which a balance moves.",
+  "EL-UC-006": "A fresh substitute after the first declined, so a request is not lost to one person's unavailability.",
+  "EL-UC-007": "Withdrawing a request that has not yet been approved.",
+  "EL-UC-008": "Asking to cancel leave that has already been granted — a request, not an action.",
+  "EL-UC-009": "Extending leave while it runs. Only the incremental days are charged.",
+  "EL-UC-010": "Reporting the return to duty. The date is the first day back, not the last day of leave.",
+  "EL-UC-011": "The establishment verifies the reported resumption, which is what closes the request and restores any unused days.",
+  "EL-UC-012": "Seeing your own balance and history — and the entries behind the figure, not just the figure.",
+  "EL-UC-013": "A printable application. **Not implemented** — see the gaps section.",
+  "EL-UC-014": "Maintaining the entitlement figures and the counting rules, as a new policy version.",
+  "EL-UC-015": "Maintaining the holidays, restricted holidays and vacation periods.",
+  "EL-UC-016": "Recording leave sanctioned outside the system. Deliberately not a workflow — it is bookkeeping, not approval."
+ },
+ "scheduled_functions": {
+  "SF-EL-001": "Closes a leave year: lapse what does not carry, convert unused vacation leave, carry the rest forward. Idempotent per employee and year, and --dry-run rehearses it inside a rolled-back transaction.",
+  "SF-EL-002": "Reminds, then escalates, whoever a request is waiting on. A clock already reminded is not reminded again."
+ },
+ "groups": [
+  {
+   "title": "Entitlement — how many days exist",
+   "blurb": "What each category grants, whether it survives the year, and how vacation leave becomes earned leave. Every figure here is a database row, not a constant.",
+   "ids": [
+    "BR-EL-001",
+    "BR-EL-002",
+    "BR-EL-003",
+    "BR-EL-004",
+    "BR-EL-005",
+    "BR-EL-006",
+    "BR-EL-007",
+    "BR-EL-008",
+    "BR-EL-009"
+   ]
+  },
+  {
+   "title": "Counting — how many days a request costs",
+   "blurb": "The arithmetic. Read this group before answering a disputed balance.",
+   "ids": [
+    "BR-EL-010",
+    "BR-EL-011",
+    "BR-EL-012",
+    "BR-EL-013"
+   ]
+  },
+  {
+   "title": "Substitution — who holds the work",
+   "blurb": "A substitute is required for some leave, and their consent gates the whole route.",
+   "ids": [
+    "BR-EL-014",
+    "BR-EL-015"
+   ]
+  },
+  {
+   "title": "Authority — who decides",
+   "blurb": "The rules that make the approval path configuration rather than code.",
+   "ids": [
+    "BR-EL-016",
+    "BR-EL-017",
+    "BR-EL-018",
+    "BR-EL-019",
+    "BR-EL-020"
+   ]
+  },
+  {
+   "title": "Lifecycle — changing a request after it exists",
+   "blurb": "Withdrawal, cancellation, extension and resumption. The distinction that matters: before approval it is yours to withdraw; after approval it is the authority's to cancel.",
+   "ids": [
+    "BR-EL-021",
+    "BR-EL-022",
+    "BR-EL-023",
+    "BR-EL-024",
+    "BR-EL-025",
+    "BR-EL-027",
+    "BR-EL-028",
+    "BR-EL-029"
+   ]
+  },
+  {
+   "title": "Policy and calendar — what governs a decision",
+   "blurb": "Effective dating. A decision is judged against what was in force when it was taken.",
+   "ids": [
+    "BR-EL-030",
+    "BR-EL-031"
+   ]
+  },
+  {
+   "title": "Service levels — what happens when nobody acts",
+   "blurb": "Reminders and escalation for a task left pending.",
+   "ids": [
+    "BR-EL-032",
+    "BR-EL-033"
+   ]
+  }
+ ],
+ "journey": "\n```\n                      ┌─ substitute declines ─→ renominate (EL-UC-006)\n                      │                         or withdraw  (EL-UC-007)\n   apply              ▼\n EL-UC-001 ──→ substitute consent ──→ unit head ──┬─→ APPROVED   (CL, RH)\n               EL-UC-002              EL-UC-003   │   BR-EL-016\n               BR-EL-014/015          BR-EL-017   │\n                                                  └─→ establishment ──→ sanction\n                                                      EL-UC-004         EL-UC-005\n                                                      BR-EL-018         BR-EL-019/020\n                                                                             │\n   ┌─────────────────────────────────────────────────────────────────────────┘\n   ▼         (the only point a balance moves)\n APPROVED ──[clock]──→ ONGOING ──[clock]──→ resumption ──→ verified ──→ CLOSED\n                          │                  EL-UC-010     EL-UC-011\n                          │                                BR-EL-027/028\n                          ├─→ cancel  EL-UC-008  BR-EL-023\n                          └─→ extend  EL-UC-009  BR-EL-025\n```\n",
+ "gaps": [
+  {
+   "id": "BR-EL-021",
+   "name": "Modify a pending request",
+   "note": "Not implemented. There is no edit path: a pending request is withdrawn and re-applied for. That satisfies the intent (revalidation, superseded tasks) by construction, but it is not the same as the rule, and it costs the applicant a resubmission. Worth building before a real season."
+  },
+  {
+   "id": "EL-UC-013",
+   "name": "Obtain a printable leave application",
+   "note": "Not implemented. No PDF or print view exists. The data is all present, so this is presentation work rather than domain work."
+  },
+  {
+   "id": "BR-EL-026",
+   "name": "—",
+   "note": "**This rule does not exist.** The specification numbers 32 rules and skips 026. All 32 are defined and all 32 are cited; there is no orphan. The gap in the numbering is upstream and was left alone deliberately rather than renumbered, so the ids in this repository match the documents you were given."
+  },
+  {
+   "id": "CW-EL-02 … CW-EL-05",
+   "name": "Composite workflows",
+   "note": "Not cited directly, by design. A composite is a composition of basis workflows, and the code cites the basis rows (`BW-EL-nn`) it actually implements. `CW-EL-01` appears once, where the specification names it as the related workflow for a fresh application after cancellation."
+  },
+  {
+   "id": "WF-EL-06 / 07 / 08",
+   "name": "Retired as workflows",
+   "note": "The specification retires these on purpose. Offline recording is record synchronisation (EL-UC-016 + BR-EL-029), and year-end and SLA are scheduled functions (SF-EL-001, SF-EL-002). None of them is a multi-actor collaboration, so none is modelled as one."
+  }
+ ],
+ "file_map": [
+  {
+   "layer": "`domain/`",
+   "blurb": "Framework-free. The rules, as pure Python — no Django import, which is what keeps them testable without a database.",
+   "files": [
+    {
+     "name": "categories.py",
+     "desc": "which category behaves how"
+    },
+    {
+     "name": "counting.py",
+     "desc": "chargeable days, early return"
+    },
+    {
+     "name": "entitlement.py",
+     "desc": "credits, lapse, carry-forward, conversion"
+    },
+    {
+     "name": "overlap.py",
+     "desc": "clashes, and the half-day exception"
+    },
+    {
+     "name": "state_machine.py",
+     "desc": "23 states, 46 transitions, every row cited"
+    },
+    {
+     "name": "authority.py",
+     "desc": "which rule applies and what route it implies"
+    }
+   ]
+  },
+  {
+   "layer": "`models/`",
+   "blurb": "The tables. 12 of them, 12 database check constraints.",
+   "files": [
+    {
+     "name": "policy.py",
+     "desc": "LeavePolicy, CategoryRule"
+    },
+    {
+     "name": "calendar.py",
+     "desc": "HolidayCalendar, Holiday, VacationPeriod"
+    },
+    {
+     "name": "ledger.py",
+     "desc": "LedgerEntry — append-only, no balance column anywhere"
+    },
+    {
+     "name": "request.py",
+     "desc": "LeaveRequest, SubstituteNomination"
+    },
+    {
+     "name": "workflow.py",
+     "desc": "RequestTransition, AuthorityRule, SlaRule, SlaClock"
+    }
+   ]
+  },
+  {
+   "layer": "`selectors/`",
+   "blurb": "Every read. Scope lives here, as queryset narrowing.",
+   "files": [
+    {
+     "name": "balances.py",
+     "desc": "a balance is a sum of the ledger"
+    },
+    {
+     "name": "policy.py",
+     "desc": "which policy and calendar govern a date"
+    },
+    {
+     "name": "scoping.py",
+     "desc": "who may see what"
+    }
+   ]
+  },
+  {
+   "layer": "`services/`",
+   "blurb": "Every write. Transaction boundaries.",
+   "files": [
+    {
+     "name": "requests.py",
+     "desc": "validate and submit"
+    },
+    {
+     "name": "workflow.py",
+     "desc": "apply_event — the single choke point"
+    },
+    {
+     "name": "decisions.py",
+     "desc": "review, routing, sanction, withdrawal"
+    },
+    {
+     "name": "lifecycle.py",
+     "desc": "cancellation, extension, resumption"
+    },
+    {
+     "name": "yearend.py",
+     "desc": "close and credit a year"
+    },
+    {
+     "name": "scheduler.py",
+     "desc": "what the calendar does on its own"
+    },
+    {
+     "name": "sla.py",
+     "desc": "reminders and escalation"
+    },
+    {
+     "name": "administration.py",
+     "desc": "policy, calendar and offline recording"
+    }
+   ]
+  },
+  {
+   "layer": "`api/`",
+   "blurb": "Thin. Two gates on every endpoint, then straight to a service.",
+   "files": [
+    {
+     "name": "views.py",
+     "desc": "every endpoint"
+    },
+    {
+     "name": "serializers.py",
+     "desc": "the wire shapes"
+    },
+    {
+     "name": "urls.py",
+     "desc": "the routes"
+    }
+   ]
+  },
+  {
+   "layer": "`tests/`",
+   "blurb": "Where a rule's behaviour is pinned.",
+   "files": [
+    {
+     "name": "test_counting.py",
+     "desc": "the arithmetic"
+    },
+    {
+     "name": "test_authority.py",
+     "desc": "BR-EL-017, 019, 020"
+    },
+    {
+     "name": "test_loopholes.py",
+     "desc": "what the module must refuse"
+    },
+    {
+     "name": "test_ledger_integrity.py",
+     "desc": "running the accounting twice"
+    },
+    {
+     "name": "test_concurrency.py",
+     "desc": "two transactions at once"
+    }
+   ]
+  }
+ ]
+}
