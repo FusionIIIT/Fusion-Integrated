@@ -296,6 +296,9 @@ TRANSITIONS: tuple[Transition, ...] = (
     ),
 )
 
+#: BR-EL-024. Cancellation is terminal, so an approved leave is never edited
+#: in place -- revised leave is a fresh application, which is why CW-EL-01 is
+#: named as the related workflow rather than a branch of cancellation.
 TERMINAL: frozenset[State] = frozenset(
     {State.CLOSED, State.REJECTED, State.WITHDRAWN, State.CANCELLED}
 )

@@ -24,7 +24,9 @@ from modules.leave.services import administration
 
 D = Decimal
 
-# BR-EL-002 to BR-EL-009. (category, annual credit, carries, cap, faculty-only)
+# BR-EL-002 (CL), BR-EL-003 (RH), BR-EL-004 (SCL), BR-EL-005 (staff EL),
+# BR-EL-006 (VL), BR-EL-007 (conversion), BR-EL-009 (COL).
+# (category, annual credit, carries, cap, faculty-only)
 ENTITLEMENTS = [
     (Category.CL, D(8), False, None, None),
     (Category.RH, D(2), False, None, None),
