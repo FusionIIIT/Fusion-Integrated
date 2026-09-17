@@ -21,8 +21,7 @@ const CATEGORIES: { value: Category; label: string }[] = [
   { value: "VL", label: "Vacation Leave" },
 ];
 
-/** BR-EL-010. Only casual leave is taken in halves; offering the control for
- *  the others invites a request the server will reject. */
+/** BR-EL-010: only casual leave is taken in halves. */
 const HALF_DAY = new Set<Category>(["CL"]);
 /** BR-EL-001. A single named date, chosen from the published calendar. */
 const SINGLE_DAY = new Set<Category>(["RH"]);
@@ -59,10 +58,7 @@ export default function ApplyPage() {
       starts_on: iso(from),
       ends_on: iso(end),
       reason: reason.trim(),
-      // Cleared rather than merely hidden: leaving it set once the period grew
-      // sent a half-day flag with a multi-day request, which the counting rules
-      // reject with a bare ValueError -- a 500 for a control the user could no
-      // longer see.
+      // Cleared, not just hidden: a stale half-day on a multi-day request is refused.
       half: canTakeHalfDay ? half : null,
       substitute_user_id: substitute === "" ? null : Number(substitute),
       station: station && destination.trim()

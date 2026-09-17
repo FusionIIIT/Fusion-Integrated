@@ -23,9 +23,7 @@ def make_policy(**overrides) -> LeavePolicy:
         version=overrides.pop("version", "2026.1"),
         effective_from=overrides.pop("effective_from", date(YEAR, 1, 1)),
         published=True,
-        # These tests work in fixed dates inside YEAR so the arithmetic stays
-        # readable, and YEAR drifts into the past as time passes. The
-        # back-dating rule has its own tests against the real default of 0.
+        # Fixed dates keep the arithmetic readable; back-dating has its own tests.
         max_backdate_days=overrides.pop("max_backdate_days", 100_000),
         **overrides,
     )
@@ -76,13 +74,7 @@ def make_authority(policy, **overrides) -> None:
 
 
 def credit(user_id: int, category: Category, days, year: int = YEAR) -> LedgerEntry:
-    """Put this person on `days` of this category.
-
-    Sets rather than adds, and is safe to call twice. The ledger allows one
-    annual credit per category per year -- so a helper that appended a second
-    one was writing state the service can never produce, and started failing
-    the moment the database began enforcing it.
-    """
+    """Put this person on `days` of this category."""
     entry, created = LedgerEntry.objects.get_or_create(
         user_id=user_id,
         year=year,

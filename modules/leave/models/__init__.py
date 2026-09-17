@@ -1,10 +1,4 @@
-"""Leave tables, split by aggregate.
-
-Institute people are referenced by plain `user_id` integers, never foreign
-keys — there is no user table in this database.
-
-Import from `modules.leave.models` as usual; the split is internal.
-"""
+"""Leave tables, split by aggregate."""
 from modules.leave.models.calendar import (
     Holiday,
     HolidayCalendar,

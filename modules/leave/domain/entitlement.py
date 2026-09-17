@@ -1,16 +1,4 @@
-"""Annual credit, lapse, carry-forward and year-end conversion.
-
-Every quantity here arrives as an argument. The figures in the current policy —
-8 CL, 2 RH, 15 SCL, 30 EL, 60 VL, 20 COL, two VL to one EL — are this year's
-settings and are read from the effective policy row, so a revised ordinance is
-a new policy row rather than a code change and last year's decisions can still
-be explained from last year's row.
-
-BR-EL-007 permits fractional VL to EL conversion but does not say what to do
-with the remainder of an odd balance. `ConversionRounding` makes that a stated
-choice with a default of keeping the exact half, which is what "fractional
-conversion is permitted" most plainly means.
-"""
+"""Annual credit, lapse, carry-forward and year-end conversion."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -71,18 +59,13 @@ def carry_forward(policy: CategoryPolicy, closing: Decimal) -> Decimal:
     return min(closing, policy.carry_forward_cap)
 
 
-#: BR-EL-008. The EL a conversion produces is ordinary EL: it lands in the
-#: same balance, carries forward with it, and can be taken like any other.
+#: BR-EL-008: converted EL is ordinary EL and carries forward with it.
 def convert_vl_to_el(
     unused_vl: Decimal,
     ratio: Decimal,
     rounding: ConversionRounding = ConversionRounding.EXACT_HALF,
 ) -> Decimal:
-    """BR-EL-007. Unused vacation leave becomes earned leave at year end.
-
-    `ratio` is how many VL buy one EL, so the current 2 VL : 1 EL is a ratio of
-    two.
-    """
+    """BR-EL-007. Unused vacation leave becomes earned leave at year end."""
     if unused_vl <= ZERO:
         return ZERO
     if ratio <= ZERO:
@@ -112,12 +95,7 @@ def close_year(
     vl_to_el_ratio: Decimal | None = None,
     rounding: ConversionRounding = ConversionRounding.EXACT_HALF,
 ) -> YearEndOutcome:
-    """Settle every category at year end.
-
-    Vacation leave is converted before earned leave is carried forward, so the
-    earned leave a conversion produces carries into the new year with the rest
-    of the balance rather than waiting a year to become useful.
-    """
+    """Settle every category at year end."""
     lapsed: dict[Category, Decimal] = {}
     carried: dict[Category, Decimal] = {}
     converted_vl = ZERO

@@ -1,8 +1,6 @@
 import { Badge } from "@mantine/core";
 
-/** One state to one colour, module-wide. The shared StatusBadge maps the
- *  placement vocabulary; leave has its own, and mixing them made the same
- *  request read as two different things on two screens. */
+/** One state to one colour, module-wide. */
 const COLORS: Record<string, string> = {
   DRAFT: "gray",
   AWAITING_SUBSTITUTE: "yellow",

@@ -58,8 +58,7 @@ class UserRef:
     programme: str = ""
     discipline: str = ""
     batch_year: int | None = None
-    #: Defaults True so an older identity service, which does not send it, keeps
-    #: working -- but a service that does send it can now retire somebody.
+    #: Defaults True so an identity service that does not send it still works.
     is_active: bool = True
     extra: dict[str, Any] = field(default_factory=dict)
 
@@ -238,8 +237,7 @@ class IamClient:
         return payload or {"disciplines": [], "batch_years": [], "programmes": []}
 
     def employee_page(self, *, limit: int = 500, offset: int = 0) -> dict:
-        """One page of the payroll. Returns the total, so a caller can tell a
-        complete answer from a truncated one."""
+        """One page of the payroll."""
         payload = self._get("iam/v1/directory/users",
                             params={"employees": 1, "limit": limit, "offset": offset})
         if not isinstance(payload, dict):

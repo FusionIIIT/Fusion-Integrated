@@ -1,10 +1,4 @@
-"""A balance is scoped like a request list, not like a public figure.
-
-Every unit head holds leave.balance.view so they can see what their own people
-have left. The directory endpoint took a user id and applied no scope at all,
-so the same permission read anybody's balance in the institute -- the care
-taken over the request list stopped one endpoint short.
-"""
+"""A balance is scoped like a request list, not like a public figure."""
 import pytest
 from rest_framework.test import APIClient
 

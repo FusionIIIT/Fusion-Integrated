@@ -1,10 +1,4 @@
-/** Data access for the leave module.
- *
- *  A decision taken in one queue changes what the other queues hold, so every
- *  mutation invalidates the whole module rather than guessing which key moved.
- *  These lists are short; a stale queue that still shows a decided request is
- *  a worse failure than one extra fetch.
- */
+/** Data access for the leave module. */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { http } from "../../../lib/http";
@@ -276,8 +270,7 @@ export function useSetSlaRule(policyId: number) {
   });
 }
 
-/** What still has to be added before this version can go into force. Shown
- *  beside Publish so the reason is visible before the button is pressed. */
+/** What still has to be added before this version can go into force. */
 export function usePolicyReadiness(id: number | null) {
   return useQuery({
     queryKey: keys.policyReadiness(id!),

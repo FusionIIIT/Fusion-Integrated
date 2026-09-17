@@ -1,12 +1,4 @@
-"""The states a leave request moves through, and who may move it.
-
-Transcribed from the twelve basis workflows BW-EL-01 to BW-EL-12. The table is
-the specification: a transition absent from it cannot be performed, so an
-illegal move is not something the service layer has to remember to refuse.
-
-Each row carries the workflow it came from so a reader can go back to the
-document, and the use case that performs it.
-"""
+"""The states a leave request moves through, and who may move it."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -237,12 +229,7 @@ TRANSITIONS: tuple[Transition, ...] = (
         S.EXTENSION_APPLICANT_ACTION_REQUIRED,
         A.SUBSTITUTE, "BW-EL-07", "EL-UC-002",
     ),
-    # Derived, not transcribed. BW-EL-07 row 4 enters Extension Applicant Action
-    # Required and no row leaves it, which strands the request. The main flow
-    # settles the same situation in BW-EL-02 and BW-EL-11/12 by letting the
-    # applicant renominate or give up, so the same two exits are provided here.
-    # Withdrawing abandons the extension only; the leave already running is
-    # untouched, matching the rejected-extension outcome in row 9.
+    # Derived: BW-EL-07 row 4 has no exit; exits mirror BW-EL-02, BW-EL-11, BW-EL-12.
     Transition(
         S.EXTENSION_APPLICANT_ACTION_REQUIRED, E.RENOMINATE,
         S.EXTENSION_AWAITING_SUBSTITUTE,
@@ -296,9 +283,7 @@ TRANSITIONS: tuple[Transition, ...] = (
     ),
 )
 
-#: BR-EL-024. Cancellation is terminal, so an approved leave is never edited
-#: in place -- revised leave is a fresh application, which is why CW-EL-01 is
-#: named as the related workflow rather than a branch of cancellation.
+#: BR-EL-024: cancellation is terminal; revised leave is a fresh CW-EL-01 application.
 TERMINAL: frozenset[State] = frozenset(
     {State.CLOSED, State.REJECTED, State.WITHDRAWN, State.CANCELLED}
 )
@@ -318,12 +303,7 @@ def permitted(source: State, event: Event) -> tuple[Transition, ...]:
 
 
 def resolve(source: State, event: Event, target: State | None = None) -> Transition:
-    """The transition to apply, or a refusal.
-
-    Several rows share a source and event and differ only in target, because the
-    hierarchy decides where a recommendation goes next. The caller supplies the
-    target it resolved from the authority configuration.
-    """
+    """The transition to apply, or a refusal."""
     options = permitted(source, event)
     if not options:
         raise IllegalTransition(f"{event.value} is not permitted from {source.value}")

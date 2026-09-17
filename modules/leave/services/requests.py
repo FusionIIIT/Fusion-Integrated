@@ -1,9 +1,4 @@
-"""Creating a leave request and putting it into the workflow.
-
-Validation happens here, once, before anything is written: category
-eligibility, balance, calendar, overlap. A request that reaches the workflow
-has already been checked against the policy in force.
-"""
+"""Creating a leave request and putting it into the workflow."""
 from __future__ import annotations
 
 from datetime import date
@@ -44,11 +39,7 @@ ACTIVE_STATES = tuple(
 def _candidates(
     policy_id: int, category: Category
 ) -> tuple[list[authority.AuthorityCandidate], dict[int, int]]:
-    """The candidate rules, and which database row each came from.
-
-    The row id travels alongside so the selected rule can be recorded on the
-    request; the domain object deliberately knows nothing about the table.
-    """
+    """The candidate rules, and which database row each came from."""
     rows = list(AuthorityRule.objects.filter(policy_id=policy_id, category=category.value))
     candidates = [
         authority.AuthorityCandidate(
@@ -96,9 +87,7 @@ def validate(
             f"{category.value} cannot be taken as a half day.", code="half_day_not_allowed"
         )
     if half is not None and starts_on != ends_on:
-        # The domain refuses this with a bare ValueError, which would surface as
-        # a 500. It is reachable from an ordinary form: choose a half day, then
-        # widen the dates.
+        # The domain refuses this with a bare ValueError, which would surface as a 500.
         raise BadRequestError(
             "A half day is a single date. Clear the half-day option, or apply for "
             "one day.",
@@ -118,10 +107,7 @@ def validate(
             code="starts_in_the_past",
         )
 
-    # BR-EL-001. The policy says which categories this kind of employee may
-    # take at all. The flag existed on the rule and nothing consulted it, so a
-    # staff member with any VL balance at all -- a correction, an opening
-    # figure -- could request faculty-only vacation leave.
+    # BR-EL-001. The policy says which categories this kind of employee may take at all.
     applicable = policy_selector.category_policies(effective, faculty=faculty)
     if category not in applicable:
         raise BadRequestError(
@@ -211,10 +197,7 @@ def submit(
             "An employee cannot stand in for themselves.", code="substitute_is_applicant"
         )
     if substitute_user_id is not None:
-        # A substitute holds your responsibilities while you are away, so one
-        # who is themselves away over the same days covers nothing. The system
-        # accepted this, and the gap would only show up when the duties went
-        # unperformed.
+        # A substitute who is away over the same days covers nothing.
         busy = first_conflict(
             Period(starts_on, ends_on, half), existing_periods(substitute_user_id)
         )
@@ -233,14 +216,10 @@ def submit(
             rule, category, substitute_required=substitute_user_id is not None
         )
     except authority.NoAuthorityConfigured as exc:
-        # An incomplete policy is an administrative gap, not the applicant's
-        # mistake, and it reaches them through an ordinary application. Say what
-        # is missing rather than returning a 500.
+        # An incomplete policy is an admin gap: report it, not a 500.
         raise ConflictError(str(exc), code="no_authority_configured") from exc
     if not unit and not route.self_sanction:
-        # The review queue is keyed on the unit, so a request without one would
-        # be accepted, enter the workflow, and appear in nobody's queue. Better
-        # refused at the door than lost silently for a fortnight.
+        # Without a unit the request would sit in nobody's queue.
         raise BadRequestError(
             "Your record has no department, so there is no unit head to review "
             "this. Ask the establishment section to set it before applying.",

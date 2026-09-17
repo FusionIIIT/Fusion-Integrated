@@ -1,9 +1,4 @@
-"""Resolving which policy and which calendar govern a decision.
-
-BR-EL-030, BR-EL-031. A request is judged against what was published and in
-force on the day it is decided, not against whatever is current when someone
-later opens the record.
-"""
+"""Resolving which policy and which calendar govern a decision."""
 from __future__ import annotations
 
 from datetime import date
@@ -18,12 +13,7 @@ from modules.leave.models import CategoryRule, Holiday, HolidayCalendar, LeavePo
 
 
 class NoEffectivePolicy(ConflictError):
-    """Nothing is published for the date, so no decision can be justified.
-
-    A DomainError rather than a bare exception: this is the state a fresh
-    install is in, and the first person to click Apply should be told what is
-    missing and who fixes it, not handed a 500.
-    """
+    """Nothing is published for the date, so no decision can be justified."""
 
     code = "no_effective_policy"
 

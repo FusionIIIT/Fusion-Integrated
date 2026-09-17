@@ -1,11 +1,4 @@
-"""BR-EL-001. The policy decides which categories reach which employee.
-
-applies_to_faculty and requires_evidence were defined on the rule, exposed in
-the admin API, and consulted by nothing. A staff member with any vacation
-balance at all -- an opening figure, a correction -- could request faculty-only
-vacation leave, and a category demanding a certificate could be granted without
-one.
-"""
+"""BR-EL-001. The policy decides which categories reach which employee."""
 from datetime import date
 
 import pytest

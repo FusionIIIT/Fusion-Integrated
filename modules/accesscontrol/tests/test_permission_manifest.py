@@ -49,12 +49,7 @@ def test_the_committed_manifest_matches_the_registries():
 
 
 def test_system_permissions_must_be_bare_codes():
-    """The check that keeps the manifest honest was itself shape-blind.
-
-    One module declared these as (code, label) pairs while every other used
-    bare codes. The manifest carried a nested array, the code never reached the
-    permission catalogue, and nothing objected.
-    """
+    """The check that keeps the manifest honest was itself shape-blind."""
     from modules.accesscontrol.management.commands.permission_manifest import _codes
 
     with pytest.raises(CommandError, match="permission code strings"):

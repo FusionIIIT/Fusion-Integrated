@@ -10,9 +10,7 @@ export function formatDay(iso: string) {
   return FMT.format(new Date(`${iso}T00:00:00`));
 }
 
-/** The period and what it costs. The charged figure is shown beside the dates
- *  because for EL a weekend inside the leave is charged and for CL it is not,
- *  and that difference is the single most common question about a request. */
+/** The period and what it costs. */
 export function PeriodCell({ request }: { request: LeaveRequest }) {
   const single = request.starts_on === request.ends_on;
   const days = Number(request.actual_days ?? request.requested_days);

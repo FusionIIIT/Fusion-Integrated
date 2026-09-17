@@ -1,5 +1,4 @@
-/** Shapes the leave endpoints return. Kept narrow on purpose: a field the UI
- *  does not render is a field the server is free to change. */
+/** Shapes the leave endpoints return. */
 
 export type Category = "CL" | "RH" | "SCL" | "EL" | "COL" | "VL";
 export type Half = "FIRST" | "SECOND";

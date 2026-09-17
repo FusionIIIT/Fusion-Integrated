@@ -1,9 +1,4 @@
-"""Closed days, restricted holidays and vacation periods.
-
-BR-EL-031. Date validation and continuous counting are judged against the
-calendar published for the year in question, so a calendar is versioned the
-same way policy is and past decisions stay explicable.
-"""
+"""Closed days, restricted holidays and vacation periods."""
 from django.db import models
 
 from core.db.mixins import TimeStampedModel
@@ -56,10 +51,7 @@ class Holiday(TimeStampedModel):
 
 
 class VacationPeriod(TimeStampedModel):
-    """A published vacation window. BR-EL-006, BR-EL-022.
-
-    Vacation leave may be availed only inside one of these.
-    """
+    """A published vacation window."""
 
     calendar = models.ForeignKey(
         HolidayCalendar, on_delete=models.CASCADE, related_name="vacation_periods"

@@ -44,12 +44,7 @@ def test_the_username_is_not_truncated_to_make_it_fit():
 
 
 class TestRetiringStaleEmployees:
-    """Upserting alone never removes anybody.
-
-    Somebody reclassified upstream would stay an employee here forever and go
-    on drawing leave entitlement, and nothing about the sync's output would
-    suggest anything was wrong.
-    """
+    """Upserting alone never removes anybody."""
 
     def test_the_projection_drops_people_who_stopped_being_employees(self, stub_iam):
         from io import StringIO

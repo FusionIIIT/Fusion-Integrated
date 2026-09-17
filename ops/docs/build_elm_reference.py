@@ -1,15 +1,5 @@
 #!/usr/bin/env python
-"""Regenerate docs/09-leave/ELM_REFERENCE.md.
-
-    python ops/docs/build_elm_reference.py
-
-Nothing on that page is typed by hand except the one-line explanations, and
-those live in elm_reference_notes.json beside this file. The rule statements
-come out of the .docx specifications in ELM/, so they cannot drift from the
-documents; the code links are file-and-line read from the tree, so they cannot
-drift from the code. Both go stale the moment either moves, which is why this
-is a script and not a page somebody maintains.
-"""
+"""Regenerate docs/09-leave/ELM_REFERENCE.md."""
 from __future__ import annotations
 
 import json
@@ -23,9 +13,7 @@ ELM = ROOT.parent / "ELM"
 OUT = ROOT / "docs" / "09-leave" / "ELM_REFERENCE.md"
 NOTES = pathlib.Path(__file__).with_name("elm_reference_notes.json")
 
-#: Where a reader should land first. A rule is best read where it is decided,
-#: which is the domain; a use case is a thing somebody does, so it is best read
-#: in the service that carries it out.
+#: Where a reader should land first.
 RULE_ORDER = ("/domain/", "/services/", "/models/", "/selectors/", "/api/",
               "/management/", "client/", "/tests/")
 USECASE_ORDER = ("/services/", "/api/", "/domain/", "/models/", "/selectors/",

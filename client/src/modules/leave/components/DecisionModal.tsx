@@ -5,8 +5,7 @@ import { FormModal } from "../../../ui/components/FormModal";
 import type { LeaveRequest } from "../api/types";
 import { formatDay } from "./PeriodCell";
 
-/** Approve or refuse, with a remark. A refusal requires one: "rejected" with
- *  no stated reason is the complaint this module exists to stop generating. */
+/** Approve or refuse, with a remark. */
 export function DecisionModal({
   request, approve, onClose, onConfirm, submitting, error, verb = "Approve",
 }: {

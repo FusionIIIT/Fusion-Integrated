@@ -1,9 +1,4 @@
-"""SF-EL-002. Remind, then escalate, whoever a request is waiting on.
-
-Run it on a schedule — every fifteen minutes is ample, since the thresholds are
-in hours. Running it more often than that costs one query and changes nothing:
-a clock already reminded is not reminded again.
-"""
+"""SF-EL-002. Remind, then escalate, whoever a request is waiting on."""
 from django.core.management.base import BaseCommand
 
 from modules.leave.models import SlaClock

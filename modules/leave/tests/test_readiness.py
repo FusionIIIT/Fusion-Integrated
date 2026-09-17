@@ -1,11 +1,4 @@
-"""A module that cannot work does not appear.
-
-ELM was marked active in its registry and the deploy ran only seed_modules, so
-a normal deployment put Leave in every employee's sidebar before a policy, a
-calendar or a single credited day existed. Every screen led to a request that
-could not succeed, which reads as a broken system rather than an unfinished
-rollout.
-"""
+"""A module that cannot work does not appear."""
 from datetime import date
 from io import StringIO
 
@@ -44,8 +37,7 @@ class TestAFreshInstall:
         assert readiness() != []
 
     def test_it_says_the_policy_first_because_nothing_else_matters_without_one(self):
-        # Everything downstream is judged against the policy, so reporting five
-        # failures when one causes them is noise.
+        # A missing policy explains everything else, so it is reported alone.
         assert len(readiness()) == 1
         assert "no leave policy is published" in readiness()[0]
 
@@ -80,8 +72,7 @@ class TestEachPrerequisite:
         fully_ready()
         LedgerEntry.objects.filter(reason=EntryReason.ANNUAL_CREDIT).delete()
 
-        # Otherwise every application is refused for insufficient balance, which
-        # looks like a bug rather than an unfinished setup.
+        # Otherwise every application fails for balance, which looks like a bug.
         assert any("entitlement" in r for r in readiness())
 
     def test_a_missing_calendar_for_this_year_is_not_ready(self):

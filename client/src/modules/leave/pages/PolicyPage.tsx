@@ -20,9 +20,7 @@ import type {
   AuthorityRule, Calendar, CategoryRule, Holiday, Policy, SlaRule, VacationPeriod,
 } from "../api/types";
 
-/** Entitlement, counting and the calendar are configuration, not code. A
- *  published version is never edited — it is superseded — because requests
- *  already decided cite the version they were decided under. */
+/** Entitlement, counting and the calendar are configuration, not code. */
 export default function PolicyPage() {
   const policies = usePolicies();
   const calendars = useCalendars();

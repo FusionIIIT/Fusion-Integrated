@@ -1,11 +1,4 @@
-"""Placement domain tables, split by aggregate.
-
-Institute people are referenced by plain `user_id` integers, never foreign
-keys — there is no user table in this database. Recruiters are the exception:
-they are local rows, scoped to one company.
-
-Import from `modules.placement.models` as before; the split is internal.
-"""
+"""Placement domain tables, split by aggregate."""
 from modules.placement.models.announcements import (
     Announcement,
     ConductIncident,

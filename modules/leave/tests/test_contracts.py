@@ -1,10 +1,4 @@
-"""What other modules are told about an absence.
-
-get_absences recognised only the settled states, so a request under
-cancellation or extension review disappeared from the answer while its approval
-was still in force. A scheduling consumer would have assigned somebody whose
-leave had not been cancelled, or who had already gone.
-"""
+"""What other modules are told about an absence."""
 from datetime import date
 
 import pytest

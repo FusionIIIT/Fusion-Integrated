@@ -1,11 +1,4 @@
-/** Every page renders.
- *
- *  The hooks were tested and the types checked, but nothing had ever executed
- *  a component — a bad Mantine prop or a null dereference in a cell renderer
- *  typechecks fine and throws on mount. Each page is rendered twice: empty,
- *  which is what a new deployment looks like, and populated, which is the path
- *  the cell renderers actually run on.
- */
+/** Every page renders. */
 import { MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -43,8 +36,7 @@ const POLICY = {
 };
 const CALENDAR = { id: 1, year: 2026, version: "1", published: true };
 
-/** One shape per URL, so a page that fetches several lists gets sane data for
- *  each rather than the same array everywhere. */
+/** One response shape per URL, so every list a page fetches gets sane data. */
 function respond(url: string, populated: boolean) {
   if (!populated) return { data: [] };
   if (url.includes("balances") || url.includes("me/balances")) return { data: [BALANCE] };

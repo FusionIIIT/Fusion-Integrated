@@ -1,15 +1,4 @@
-"""Put the specification's own figures in force so a fresh install works.
-
-Without a published policy and calendar the module is inert: every application
-is refused because there is nothing to judge it against. This writes the
-entitlements exactly as BR-EL-002 to BR-EL-009 state them, and a minimal
-calendar containing only weekends' worth of nothing -- holidays are institute
-data and are added through the calendar screen.
-
-The figures here are transcribed from the specification, not chosen. Read them
-against the ordinance before a real year opens, and supersede this version
-rather than editing it.
-"""
+"""Put the specification's own figures in force so a fresh install works."""
 from contextlib import suppress
 from datetime import date
 from decimal import Decimal
@@ -24,9 +13,7 @@ from modules.leave.services import administration
 
 D = Decimal
 
-# BR-EL-002 (CL), BR-EL-003 (RH), BR-EL-004 (SCL), BR-EL-005 (staff EL),
-# BR-EL-006 (VL), BR-EL-007 (conversion), BR-EL-009 (COL).
-# (category, annual credit, carries, cap, faculty-only)
+# BR-EL-002, BR-EL-003, BR-EL-004, BR-EL-005, BR-EL-006, BR-EL-007, BR-EL-009
 ENTITLEMENTS = [
     (Category.CL, D(8), False, None, None),
     (Category.RH, D(2), False, None, None),
@@ -113,8 +100,7 @@ class Command(BaseCommand):
         if existing:
             return existing
         calendar = administration.draft_calendar(year=year, version="1")
-        # A calendar cannot be published empty, and Republic Day is the one
-        # fixed holiday that needs no local decision.
+        # A calendar cannot be published empty; Republic Day needs no local decision.
         administration.add_holiday(
             calendar=calendar, day=date(year, 1, 26), name="Republic Day")
         return calendar

@@ -1,10 +1,4 @@
-"""Ways out of the states a request can get stuck in.
-
-Every one of these has a service and a serializer; some had no route, so the
-only exit from a declined nomination was to abandon the request. For an
-extension there was no exit at all -- withdrawing an extension is not the same
-as abandoning leave that is already running.
-"""
+"""Ways out of the states a request can get stuck in."""
 from datetime import date
 
 import pytest

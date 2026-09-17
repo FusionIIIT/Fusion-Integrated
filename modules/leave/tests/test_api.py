@@ -1,10 +1,4 @@
-"""The two gates, and the scope behind them.
-
-The permission decides whether an endpoint answers at all; the queryset decides
-what it answers with. Both are tested here, because a correct permission over a
-queryset that was never narrowed is the failure that looks like working
-software.
-"""
+"""The two gates, and the scope behind them."""
 import pytest
 from rest_framework.test import APIClient
 

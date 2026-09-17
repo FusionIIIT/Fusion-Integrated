@@ -1,10 +1,4 @@
-"""The accounting must survive being run twice, late, or out of order.
-
-Every case here was reproduced as a defect before it was fixed. They share a
-shape: the happy path writes the right entries, and the damage only appears
-when the same operation happens a second time, or after the year it belongs to
-has been settled.
-"""
+"""The accounting must survive being run twice, late, or out of order."""
 from datetime import date
 from decimal import Decimal as D
 
@@ -38,13 +32,7 @@ def test_closing_a_carry_only_account_twice_is_refused():
 
 
 def test_a_movement_cannot_be_booked_into_a_closed_year():
-    """The December request approved in January.
-
-    It is submitted while the year is open, so its days are still unused when
-    closing carries them forward. Approving it afterwards would charge a year
-    whose lapse and carry-forward have already been computed, and nothing
-    recomputes the opening balance that charge invalidates.
-    """
+    """The December request approved in January."""
     factories.setup_all(U)
     pending = service.submit(
         user_id=U, category=Category.CL, starts_on=date(YEAR, 12, 28),
@@ -94,11 +82,7 @@ def test_extension_moves_the_end_date():
 
 
 def test_a_carry_only_close_is_still_recorded_as_closed():
-    """The case that made closing look un-run.
-
-    An account whose only outcome is a carry-forward writes nothing into the
-    closing year, so a close inferred from its own entries was invisible.
-    """
+    """The case that made closing look un-run."""
     factories.make_policy()
     factories.credit(U, Category.EL, 10)
 

@@ -13,15 +13,7 @@ function iso(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-/** Reporting a return to duty.
- *
- *  The date is the FIRST DAY BACK AT WORK, not the last day of leave — the
- *  backend charges leave up to the day before it. Defaulting to the sanctioned
- *  end date, and refusing anything later, told the server that somebody who
- *  finished on the 17th and returned on the 18th had come back a day early,
- *  and handed them back days they had used.
- *
- *  Returning genuinely early is the interesting case: those days do go back. */
+/** Reporting a return to duty. */
 export function ResumptionModal({ request, onClose }: {
   request: LeaveRequest | null;
   onClose: () => void;

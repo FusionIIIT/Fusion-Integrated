@@ -1,9 +1,4 @@
-"""What each role may see.
-
-Scope is a queryset, not a check after the fact: an employee's list is narrowed
-to their own rows, so asking for somebody else's request returns nothing found
-rather than a refusal that confirms it exists.
-"""
+"""What each role may see."""
 from __future__ import annotations
 
 from django.db.models import Q, QuerySet
@@ -35,13 +30,7 @@ INSTITUTE_WIDE = (
 
 
 def visible_to(principal, unit: str = "") -> QuerySet[LeaveRequest]:
-    """Everything this person may open.
-
-    A unit head sees their own unit, not the institute. Holding
-    `leave.balance.view` is not enough on its own: every unit head holds it, and
-    reading it as institute-wide would let one department open another's leave
-    records.
-    """
+    """Everything this person may open."""
     if principal.has_any_permission(*INSTITUTE_WIDE):
         return LeaveRequest.objects.all()
     if principal.has_any_permission("leave.request.review") and unit:
@@ -50,22 +39,7 @@ def visible_to(principal, unit: str = "") -> QuerySet[LeaveRequest]:
 
 
 def _queue(states, viewer_user_id: int) -> QuerySet[LeaveRequest]:
-    """A work queue never contains the viewer's own request, bar one case.
-
-    Self-sanction (BR-EL-020) is the exception the general rule broke: the route
-    exists precisely so that this person's own leave has somewhere to go, and
-    excluding their own request left the Director as the one person unable to
-    see theirs while every other sanctioner could.
-
-    The viewer is required, like the unit and for the same reason: an optional
-    one defaults to "show everything" the moment a caller forgets it, and the
-    thing it would then show is a head their own leave with an Approve button
-    beside it.
-
-    The service refuses a self-decision regardless, but a queue is a list of
-    work somebody is expected to do, and putting something unactionable in it
-    is its own defect.
-    """
+    """A work queue never contains the viewer's own request, bar one case."""
     mine_on_the_self_route = Q(
         user_id=viewer_user_id, state=State.AWAITING_SELF_SANCTION.value,
         self_sanction=True)
@@ -73,9 +47,7 @@ def _queue(states, viewer_user_id: int) -> QuerySet[LeaveRequest]:
         LeaveRequest.objects.filter(state__in=states)
         # Your own leave, unless the route is the one made for it.
         .exclude(Q(user_id=viewer_user_id) & ~mine_on_the_self_route)
-        # Somebody else's self-sanction is nobody else's work: it sits in a
-        # shared state, so without this every generic sanctioner was offered
-        # the Director's leave.
+        # Somebody else's self-sanction belongs in nobody else's queue.
         .exclude(Q(self_sanction=True) & ~Q(user_id=viewer_user_id))
     )
 
@@ -86,26 +58,14 @@ def sees_whole_institute(principal) -> bool:
 
 
 def may_read_balance_of(principal, viewer_unit: str, subject_unit: str) -> bool:
-    """BR-EL-019 scoping, applied to a figure rather than to a list.
-
-    A unit head holds leave.balance.view so they can see what their own people
-    have left. The same permission let them read anybody's, because the
-    directory endpoint took a user id and applied no scope at all -- the
-    protection the request list is careful about was simply absent one endpoint
-    over.
-    """
+    """BR-EL-019 scoping, applied to a figure rather than to a list."""
     if sees_whole_institute(principal):
         return True
     return bool(viewer_unit) and viewer_unit == subject_unit
 
 
 def review_queue(unit: str, viewer_user_id: int) -> QuerySet[LeaveRequest]:
-    """A unit head reviews their own unit, and not their own leave.
-
-    The unit is required rather than optional. An optional one defaults to
-    "every unit" the moment a caller forgets it, and a widened queue is the
-    kind of mistake that reads as working software.
-    """
+    """A unit head reviews their own unit, and not their own leave."""
     return _queue(REVIEW_STATES, viewer_user_id).filter(unit=unit)
 
 

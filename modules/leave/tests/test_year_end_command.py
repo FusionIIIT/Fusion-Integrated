@@ -117,14 +117,7 @@ def test_a_year_with_no_accounts_is_an_error_not_a_silent_success(accounts):
 
 
 class TestItRefusesToGuessWhoIsFaculty:
-    """The classification decides what is destroyed.
-
-    Faculty vacation converts to earned leave; everybody else's lapses. The
-    command read the flag with a default of False, so an employee the directory
-    failed to return had up to sixty days lapsed instead of converted -- during
-    the one operation that cannot be undone -- and --credit-next would then have
-    granted them the wrong entitlement for the new year on top.
-    """
+    """The classification decides what is destroyed."""
 
     def test_an_unclassified_employee_stops_the_run(self, accounts, stub_iam):
         # The directory no longer knows one of the people holding a leave account.

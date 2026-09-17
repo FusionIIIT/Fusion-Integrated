@@ -1,8 +1,4 @@
-"""Whether a requested period collides with leave the person already holds.
-
-BR-EL-012. Two half-day CL on one date are not a collision when they occupy
-different halves, which is the only case where a date can be shared.
-"""
+"""Whether a requested period collides with leave the person already holds."""
 from __future__ import annotations
 
 from dataclasses import dataclass

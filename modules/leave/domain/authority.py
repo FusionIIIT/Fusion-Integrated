@@ -1,10 +1,4 @@
-"""Where a request goes after it is submitted, and who ends it.
-
-BR-EL-016 to BR-EL-020. The path depends on the category, the applicant's unit
-and their designation. Nothing here names an office: the candidate rules are
-supplied by the caller from configuration, and this decides which one applies
-and what it implies.
-"""
+"""Where a request goes after it is submitted, and who ends it."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -40,12 +34,7 @@ class Route:
 
 
 class NoAuthorityConfigured(Exception):
-    """Nothing matches, so there is nobody to send the request to.
-
-    Reachable from an ordinary application whenever the policy in force is
-    incomplete, so it must not surface as a 500. The service layer translates
-    it; the domain stays free of anything that knows what an HTTP status is.
-    """
+    """Nothing matches, so there is nobody to send the request to."""
 
 
 def _matches(
@@ -73,16 +62,8 @@ def select_rule(
     designations: frozenset[str] | set[str] | str,
     faculty: bool,
 ) -> AuthorityCandidate:
-    """The most specific matching rule.
-
-    Ties are broken by how much the rule actually constrains, so a rule naming
-    a unit and a designation beats one naming only the category. An explicit
-    specificity on the row wins over both, which is the escape hatch for a case
-    the ordering does not anticipate.
-    """
-    # A person holds several designations at once -- a chair and an office --
-    # and the rule that names their office should win over one that names their
-    # rank. Matching against the whole set is what makes that possible.
+    """The most specific matching rule."""
+    # People hold a rank and an office at once, so match the whole set.
     held = frozenset({designations} if isinstance(designations, str) else designations)
     matches = [r for r in candidates if _matches(r, category, unit, held, faculty)]
     if not matches:
@@ -113,12 +94,7 @@ def route_for(
     else:
         first = State.AWAITING_UNIT_HEAD
 
-    # BR-EL-018 sets the floor: SCL, EL, COL and VL go above the unit head. The
-    # configured rule decides who, and may escalate a category that the floor
-    # would have left with the unit head. Deriving this from the category alone
-    # ignored the configuration entirely -- a rule naming the Registrar for
-    # casual leave had no effect, and one naming nobody for earned leave still
-    # escalated to a state no rule could resolve.
+    # BR-EL-018 sets the floor: SCL, EL, COL and VL go above the unit head.
     above_unit_head = needs_higher_sanction(category) or bool(
         rule.sanctioning_designation)
     if needs_higher_sanction(category) and not (

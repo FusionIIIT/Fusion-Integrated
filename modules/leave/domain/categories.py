@@ -1,10 +1,4 @@
-"""The leave categories and the properties that distinguish them.
-
-Categories are named here because the code branches on them; every *quantity*
-attached to a category — entitlement, conversion ratio, whether it lapses — is
-policy and lives in the database, not here. A grant of 8 CL is this year's
-figure, not a fact about the world.
-"""
+"""The leave categories and the properties that distinguish them."""
 from __future__ import annotations
 
 from enum import StrEnum

@@ -1,17 +1,4 @@
-"""Moving leave along as the calendar does, with nobody clicking anything.
-
-Approved leave has to start on its start date, reach its end date, and open for
-resumption, and none of those are decisions -- they are the passage of time.
-Nothing invoked them, so an approved request stayed APPROVED_NOT_STARTED for
-ever: it never became ONGOING, so it could still be cancelled after the
-employee had already gone; extension, which is only reachable while the leave
-runs, could never be requested at all; and resumption never opened, so nothing
-ever closed and no balance was ever restored.
-
-Every move still goes through the transition table like any other, with
-SCHEDULER as the actor, so the trail shows what the clock did as plainly as
-what a person did.
-"""
+"""Moving leave along as the calendar does, with nobody clicking anything."""
 from __future__ import annotations
 
 import logging
@@ -58,11 +45,7 @@ def due_to_end(on: date) -> list[LeaveRequest]:
 
 
 def advance(on: date | None = None) -> AdvanceReport:
-    """One pass over everything the calendar has caught up with.
-
-    Each request moves in its own transaction: one that cannot move -- a policy
-    withdrawn underneath it, say -- must not hold up the rest of the institute.
-    """
+    """One pass over everything the calendar has caught up with."""
     on = on or date.today()
     started = ended = failed = 0
 

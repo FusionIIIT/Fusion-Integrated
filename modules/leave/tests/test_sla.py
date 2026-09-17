@@ -168,12 +168,7 @@ class TestProcessing:
 
 
 class TestASelfTransitionDoesNotResetTheClock:
-    """BR-EL-032, BR-EL-033. Querying a resumption is not a fresh task.
-
-    Every transition stopped and recreated the clock, so an establishment query
-    -- modelled as a self-transition -- erased the time already spent waiting
-    and bought another full window. Repeat it and the deadline never arrives.
-    """
+    """BR-EL-032, BR-EL-033. Querying a resumption is not a fresh task."""
 
     def _awaiting_verification(self, policy):
         SlaRule.objects.get_or_create(

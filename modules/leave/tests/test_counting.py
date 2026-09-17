@@ -56,12 +56,7 @@ class TestHalfDay:
 
 
 class TestEarlyReturn:
-    """BR-EL-028, and the question the specification does not settle.
-
-    Approved Mon to Mon, eight continuous days. The employee comes back on the
-    Monday, so the last day away was Sunday. Whether the weekend was spent on
-    leave is a policy choice, and the two answers differ by two days of balance.
-    """
+    """BR-EL-028, and the question the specification does not settle."""
 
     def test_default_trims_the_closed_tail(self):
         assert actual_days_on_early_return(

@@ -1,15 +1,4 @@
-"""Two transactions at once, actually run at once.
-
-Every claim about a lock elsewhere in this module is proved sequentially: do a
-thing, do it again, see the refusal. That proves the check exists, not that it
-holds when two workers reach it together -- and "the second caller reads the
-balance before the first has written it" is exactly the case a sequential test
-cannot produce.
-
-These use real threads and real connections, so `transaction=True`: the usual
-per-test transaction would hide every thread's writes from every other and the
-tests would pass without touching the thing they are about.
-"""
+"""Two transactions at once, actually run at once."""
 from __future__ import annotations
 
 import threading
@@ -34,11 +23,7 @@ U = 701
 
 
 def in_parallel(*callables):
-    """Run each callable in its own thread, released together.
-
-    The barrier is what makes this a race rather than two sequential calls that
-    happen to be on different threads.
-    """
+    """Run each callable in its own thread, released together."""
     gate = threading.Barrier(len(callables))
     outcomes: list = [None] * len(callables)
 
@@ -156,8 +141,7 @@ class TestCreditingTwiceAtOnce:
 
 
 class TestApprovingTwoRequestsAtOnce:
-    """The case the sequential test cannot make: both read the balance before
-    either has written to it."""
+    """Both read the balance before either writes, which only threads can produce."""
 
     def _two_pending(self, available: int, each_days: int):
         factories.setup_all(999)
@@ -233,11 +217,7 @@ class TestApprovingTwoRequestsAtOnce:
 
 
 def test_the_database_itself_refuses_a_second_annual_credit():
-    """Not the service's read, the constraint.
-
-    The service still checks first, because the common case should not cost an
-    exception. But the check is a courtesy and the constraint is the guarantee.
-    """
+    """Not the service's read, the constraint."""
     from django.db import IntegrityError
 
     factories.make_policy()
@@ -250,11 +230,7 @@ def test_the_database_itself_refuses_a_second_annual_credit():
 
 
 def test_a_correction_against_a_credited_category_is_still_allowed():
-    """The constraint is scoped to ANNUAL_CREDIT, so the ledger stays append-only.
-
-    A blanket unique constraint would have made reversing a credit impossible,
-    which is the one thing the ledger exists to allow.
-    """
+    """The constraint is scoped to ANNUAL_CREDIT, so the ledger stays append-only."""
     factories.make_policy()
     factories.credit(U, Category.CL, 8)
     original = LedgerEntry.objects.get(

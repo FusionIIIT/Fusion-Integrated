@@ -214,13 +214,7 @@ def render_catalogue(manifest: dict) -> str:
 
 
 def _codes(module: str, field: str, declared) -> list[str]:
-    """Permission codes, and a refusal if they are not plain strings.
-
-    One module declared these as (code, label) pairs while every other used
-    bare codes. The manifest then carried a nested array, the code never
-    reached the permission catalogue, and nothing noticed -- the check that
-    exists to keep the manifest honest was itself shape-blind.
-    """
+    """Permission codes, and a refusal if they are not plain strings."""
     wrong = [d for d in declared if not isinstance(d, str)]
     if wrong:
         raise CommandError(

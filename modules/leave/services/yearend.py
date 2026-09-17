@@ -1,13 +1,4 @@
-"""Closing a leave year for one employee.
-
-SF-EL-001, BR-EL-007. Lapse what does not carry, carry what does, and convert
-unused vacation leave. Every movement is a ledger row, so a year that was
-closed wrongly can be corrected by reversing entries rather than by editing
-figures nobody can later explain.
-
-The run is idempotent per employee and year: it refuses to close a year that
-already carries closing entries.
-"""
+"""Closing a leave year for one employee."""
 from __future__ import annotations
 
 from decimal import Decimal
@@ -30,12 +21,7 @@ _CLOSING = (
 
 
 def already_closed(user_id: int, year: int) -> bool:
-    """Read the closure record, not the entries it happened to write.
-
-    An account that only carried forward wrote nothing into the closing year,
-    so inferring the close from its own side effects missed it entirely and a
-    second run doubled the opening balance.
-    """
+    """Read the closure record, not the entries it happened to write."""
     return YearEndClosure.objects.filter(user_id=user_id, year=year).exists()
 
 
@@ -45,8 +31,7 @@ def close(*, user_id: int, year: int, faculty: bool) -> dict[str, Decimal]:
     try:
         closure = YearEndClosure.objects.create(user_id=user_id, year=year)
     except IntegrityError as exc:
-        # The unique constraint, not a prior read: two schedulers racing get one
-        # closure and one refusal rather than two sets of entries.
+        # The unique constraint, not a prior read, stops a double close.
         raise ConflictError(
             f"{year} is already closed for this employee.", code="year_already_closed"
         ) from exc
@@ -57,8 +42,7 @@ def close(*, user_id: int, year: int, faculty: bool) -> dict[str, Decimal]:
     rounding, _ = policy_selector.conversion_settings(policy)
     category_policies = policy_selector.category_policies(policy, faculty=faculty)
     held = balances.balances_for(user_id, year)
-    # A category the policy grants but the employee never touched still has to
-    # be settled, and vacation converts into an EL balance that may not exist.
+    # Settle untouched categories, and give conversion an EL balance.
     for category in category_policies:
         held.setdefault(category, Balance(category=category))
     held.setdefault(Category.EL, Balance(category=Category.EL))
@@ -147,9 +131,7 @@ def credit_year(*, user_id: int, year: int, faculty: bool) -> int:
     before = LedgerEntry.objects.filter(
         user_id=user_id, year=year, reason=EntryReason.ANNUAL_CREDIT
     ).count()
-    # ignore_conflicts leans on the unique constraint rather than on the read
-    # above: the read makes the common case cheap, the constraint makes the
-    # concurrent case correct.
+    # The read keeps the common case cheap; the constraint makes races safe.
     LedgerEntry.objects.bulk_create(rows, ignore_conflicts=True)
     after = LedgerEntry.objects.filter(
         user_id=user_id, year=year, reason=EntryReason.ANNUAL_CREDIT
@@ -159,21 +141,9 @@ def credit_year(*, user_id: int, year: int, faculty: bool) -> int:
 
 @transaction.atomic
 def revoke_credit(*, user_id: int, year: int, actor_user_id: int, note: str) -> int:
-    """Undo a year's credit for somebody who should never have had it.
-
-    Written as reversing entries, not deletions. The ledger is the record of
-    what happened, and "we credited this person and then established they were
-    not an employee" is part of what happened -- an audit a year later has to
-    be able to see the mistake and the correction, not a tidy absence.
-
-    Refuses once any of it has been spent: taking back days somebody has
-    already been approved for is a decision about that person's leave, not a
-    bookkeeping correction.
-    """
+    """Undo a year's credit for somebody who should never have had it."""
     if already_closed(user_id, year):
-        # Closing has already lapsed, converted and carried this credit into the
-        # next year. Reversing the credit alone would leave the balance negative
-        # and the next year's opening standing on days that no longer exist.
+        # Closing has already lapsed, converted and carried this credit into the next year.
         raise ConflictError(
             f"{year} is closed for this employee. The credit has already been "
             "lapsed, converted or carried forward, so it cannot be reversed on "

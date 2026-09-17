@@ -19,9 +19,7 @@ import {
 } from "../api/hooks";
 import type { LeaveRequest } from "../api/types";
 
-/** Before approval a request is withdrawn; after approval it is cancelled,
- *  which is a decision somebody else takes. Offering the wrong one is how a
- *  user comes to believe approved leave can be undone unilaterally. */
+/** Withdraw before approval; after it, cancellation is somebody else's decision. */
 const WITHDRAWABLE = new Set([
   "AWAITING_SUBSTITUTE", "APPLICANT_ACTION_REQUIRED", "AWAITING_UNIT_HEAD",
   "AWAITING_ESTABLISHMENT", "AWAITING_FINAL_SANCTION", "AWAITING_SELF_SANCTION",

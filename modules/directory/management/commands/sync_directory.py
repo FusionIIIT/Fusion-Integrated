@@ -1,13 +1,4 @@
-"""Pull the payroll into the local projection.
-
-The projection normally fills in lazily, one batch of ids at a time, as screens
-ask for names. That is right for display and wrong for anything that acts on
-"every employee": leave credits a year's entitlement to all of them, and a
-projection holding whoever happened to be looked at would credit a fraction of
-the institute and report success.
-
-Run it after sync_identity on the IAM, and whenever staff join.
-"""
+"""Pull the payroll into the local projection."""
 from django.core.management.base import BaseCommand, CommandError
 
 from fusion_auth.client import IamUnavailable, get_client
@@ -25,14 +16,7 @@ class Command(BaseCommand):
                             help="Report what would change and write nothing.")
 
     def _retire(self, stale: set[int]) -> int:
-        """Bring across the current record of anyone who has stopped being an
-        employee upstream.
-
-        Upserting alone never removes anybody: a projection that only grows
-        keeps treating a reclassified account as staff forever, and leave would
-        go on crediting them. Their real record is fetched rather than guessed,
-        so the row ends up saying whatever the identity service now says.
-        """
+        """Bring across the current record of anyone who has stopped being an employee upstream."""
         if not stale:
             return 0
         current = get_client().get_users(sorted(stale))

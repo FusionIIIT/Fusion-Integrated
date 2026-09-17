@@ -1,14 +1,4 @@
-"""Every movement of leave balance, as an append-only ledger.
-
-There is no balance column anywhere in this module. A balance is the sum of
-this table, which means it can always be recomputed, always explained entry by
-entry, and cannot silently drift the way a counter edited from several places
-eventually does. A wrong entry is corrected by a reversing entry, so the record
-of what happened survives the correction.
-
-This is the choice most likely to matter in ten years: a disputed balance can
-be answered from the rows rather than argued about.
-"""
+"""Every movement of leave balance, as an append-only ledger."""
 from django.db import models
 
 from core.db.mixins import TimeStampedModel, UserScopedModel
@@ -36,11 +26,9 @@ class LedgerEntry(TimeStampedModel, UserScopedModel):
     days = models.DecimalField(max_digits=7, decimal_places=2)
     reason = models.CharField(max_length=24, choices=EntryReason.choices)
 
-    #: The request this movement belongs to, where one applies. A plain integer
-    #: for consistency with the module's other cross-references.
+    #: The request this movement belongs to, where one applies.
     request_id = models.IntegerField(null=True, blank=True, db_index=True)
-    #: The policy version the movement was computed under, so the arithmetic
-    #: can be re-derived even after the policy changes.
+    #: The policy version this was computed under, so it can be re-derived.
     policy_id = models.IntegerField(null=True, blank=True)
     #: Set when this entry reverses an earlier one; the original is never edited.
     reverses_id = models.IntegerField(null=True, blank=True)
@@ -54,11 +42,7 @@ class LedgerEntry(TimeStampedModel, UserScopedModel):
             models.CheckConstraint(
                 condition=~models.Q(days=0), name="leave_ledger_no_zero_entry"
             ),
-            # A year's entitlement is credited once per category. This was a
-            # read-then-write in the service, which two workers pass together:
-            # both saw nothing credited and both credited, and everybody ended
-            # the day with twice their leave. The constraint makes it
-            # impossible rather than unlikely.
+            # A year's entitlement is credited once per category.
             models.UniqueConstraint(
                 fields=["user_id", "year", "category"],
                 condition=models.Q(reason="ANNUAL_CREDIT"),
@@ -77,18 +61,7 @@ class LedgerEntry(TimeStampedModel, UserScopedModel):
 
 
 class YearEndClosure(TimeStampedModel, UserScopedModel):
-    """That a leave year was settled for somebody, recorded once.
-
-    Closing used to be inferred from the entries it wrote, which failed for an
-    account whose only outcome was a carry-forward: nothing recognisable landed
-    in the closing year, so the close was invisible and running it again
-    doubled the opening balance. Inferring a fact from its side effects works
-    until a case produces no side effect worth recognising.
-
-    The unique constraint is the real guard. It makes a second close impossible
-    at the database rather than unlikely in the application, so two schedulers
-    racing produce one closure and one loser, not two sets of entries.
-    """
+    """That a leave year was settled for somebody, recorded once."""
 
     year = models.IntegerField(db_index=True)
     policy_id = models.IntegerField(null=True, blank=True)

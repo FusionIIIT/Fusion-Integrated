@@ -1,11 +1,4 @@
-"""SF: the calendar moves leave along, and nothing else does.
-
-Nothing invoked these transitions, so an approved request stayed
-APPROVED_NOT_STARTED for ever. That is not one bug but four: it never became
-ONGOING, so it stayed cancellable after the employee had gone; extension is
-only reachable while the leave runs, so it was unreachable; resumption never
-opened; and nothing ever closed or restored a balance.
-"""
+"""The calendar moves approved leave along, and nothing else does."""
 from datetime import date
 from io import StringIO
 
@@ -112,8 +105,7 @@ class TestAdvancing:
         factories.setup_all(999)
         r = approved(date(YEAR, 3, 2), date(YEAR, 3, 6))
 
-        # Nothing ran for a fortnight. One pass takes it the whole way, because
-        # the end sweep runs after the start sweep and sees what it just moved.
+        # Nothing ran for a fortnight; one pass must take it the whole way.
         report = scheduler.advance(date(YEAR, 3, 20))
 
         r.refresh_from_db()
@@ -128,8 +120,7 @@ class TestWhatAdvancingUnblocks:
         scheduler.advance(date(YEAR, 3, 2))
         r.refresh_from_db()
 
-        # Before, leave stayed APPROVED_NOT_STARTED for ever and so stayed
-        # cancellable long after the employee had gone.
+        # It used to stay cancellable long after the employee had gone.
         with pytest.raises(ConflictError):
             lifecycle.request_cancellation(request=r, actor_user_id=U)
 

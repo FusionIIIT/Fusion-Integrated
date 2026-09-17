@@ -10,21 +10,13 @@ from modules.leave.domain.state_machine import State
 from modules.leave.models import LeaveRequest
 from modules.leave.selectors import balances
 
-#: Every state in which an approval is in force, whatever else is being decided
-#: about the request at the same time.
-#:
-#: Asking for a cancellation, or for an extension, does not undo the approval
-#: already granted -- the employee is still going, or has already gone. Listing
-#: only the settled states meant a request under either kind of review vanished
-#: from this answer, and a scheduling consumer would happily assign somebody
-#: whose leave has not been cancelled.
+#: Every state in which an approval is still in force.
 ABSENT_STATES = (
     State.APPROVED_NOT_STARTED.value,
     State.ONGOING.value,
     State.AWAITING_RESUMPTION.value,
     State.AWAITING_RESUMPTION_VERIFICATION.value,
-    # Cancellation under consideration: still approved until somebody says
-    # otherwise.
+    # Cancellation under consideration: still approved until somebody says otherwise.
     State.CANCELLATION_UNIT_HEAD.value,
     State.CANCELLATION_ESTABLISHMENT.value,
     State.CANCELLATION_FINAL.value,
@@ -43,8 +35,7 @@ class OnLeaveDTO:
     category: str
     starts_on: date
     ends_on: date
-    #: True while a cancellation or an extension is being decided. The absence
-    #: still stands; a consumer that cares can say "away, subject to review".
+    #: True while a cancellation or an extension is being decided.
     under_review: bool = False
 
 
@@ -56,11 +47,7 @@ class LeaveBalanceDTO:
 
 
 def get_absences(user_ids: Sequence[int], on: date) -> dict[int, OnLeaveDTO]:
-    """Who among these people is away on this date.
-
-    Another module asking "can this person be scheduled" wants one call for the
-    whole list, so the answer is keyed by user.
-    """
+    """Who among these people is away on this date."""
     ids = {int(i) for i in user_ids if i is not None}
     if not ids:
         return {}

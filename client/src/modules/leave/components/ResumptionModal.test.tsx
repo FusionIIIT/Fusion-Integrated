@@ -1,10 +1,4 @@
-/** The resumption date is the FIRST DAY BACK, not the last day of leave.
- *
- *  The modal defaulted to the sanctioned end date and refused anything later,
- *  so somebody who finished on the 17th and returned on the 18th could only
- *  report the 17th — which the backend reads as returning a day early, and
- *  hands back days that were used.
- */
+/** The resumption date is the FIRST DAY BACK, not the last day of leave. */
 import { MantineProvider } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
@@ -58,8 +52,7 @@ describe("ResumptionModal", () => {
 
     await userEvent.click(await screen.findByRole("button", { name: /report/i }));
 
-    // Leave ran to the 17th, so a normal return is the 18th. Sending the 17th
-    // would be read as an early return.
+    // Leave ran to the 17th, so a normal return is the 18th.
     await waitFor(() => expect(post).toHaveBeenCalledWith(
       "/leave/requests/7/resumption",
       expect.objectContaining({ resumed_on: "2026-08-18" }),
@@ -73,9 +66,7 @@ describe("ResumptionModal", () => {
       </Wrapper>,
     );
 
-    // Not pinned to a date format: formatDay follows the runtime locale, and
-    // asserting one spelling of 17 August would fail on somebody else's machine.
-    // The subtitle also mentions the end date, so match the field's own hint.
+    // Not pinned to a date format, which follows the runtime locale.
     expect(await screen.findByText(/normal return is the next working day/i))
       .toBeInTheDocument();
   });
