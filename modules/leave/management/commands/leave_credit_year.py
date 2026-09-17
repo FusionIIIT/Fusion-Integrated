@@ -1,13 +1,4 @@
-"""Credit a year's entitlement to every employee.
-
-The counterpart to leave_year_end. A policy that grants 8 casual leave grants
-nobody anything until this has run: the balance is a sum of ledger rows, and
-without a credit row the sum is zero and every application is refused for
-insufficient balance.
-
-Run it once when a year opens. It is idempotent per employee and category, so
-running it again after new staff join credits only the people who were missed.
-"""
+"""Credit a year's entitlement to every employee."""
 from django.core.management.base import BaseCommand, CommandError
 
 from core.api.exceptions import ConflictError
@@ -41,11 +32,7 @@ class Command(BaseCommand):
                  "known and being fixed elsewhere.")
 
     def _revoke(self, year: int, dry: bool) -> None:
-        """Take back what was credited to people who are not employees.
-
-        The counterpart to crediting too widely, which is easy to do while the
-        directory is still catching up with the institute.
-        """
+        """Take back what was credited to people who are not employees."""
         entitled = {e.user_id for e in get_employees()}
         credited = set(
             LedgerEntry.objects.filter(year=year, reason=EntryReason.ANNUAL_CREDIT)
@@ -78,14 +65,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("  credits reversed"))
 
     def _everyone(self, *, accept_incomplete: bool) -> list:
-        """Every employee, or nothing.
-
-        The directory is a projection that fills in as people are looked up, so
-        it is routinely a fraction of the institute. Crediting whoever happens
-        to be cached would report success and quietly leave most of the staff
-        with no entitlement -- which surfaces months later as one person unable
-        to apply, not as a failed command.
-        """
+        """Every employee, or nothing."""
         employees = get_employees()
         if not employees:
             raise CommandError(
@@ -104,8 +84,7 @@ class Command(BaseCommand):
                     f"{len(missing)} the identity service knows and this directory "
                     f"does not: {missing[:10]}" + (" ..." if len(missing) > 10 else ""))
             if stale:
-                # Crediting these would hand entitlement to people who are no
-                # longer employees, which is the more expensive direction.
+                # Crediting non-employees is the more expensive mistake.
                 parts.append(
                     f"{len(stale)} this directory still calls employees and the "
                     f"identity service does not: {stale[:10]}"

@@ -1,12 +1,4 @@
-"""Maintaining the policy, the calendar, and leave that happened off-system.
-
-A published policy or calendar is never edited. Correcting one means
-superseding it with a new version, because requests already decided cite the
-version they were decided under and that citation has to keep meaning what it
-said. The same reasoning drives offline recording: rather than editing a
-balance, it writes the request and the ledger movement that would have existed
-had the leave been applied for here.
-"""
+"""Maintaining the policy, the calendar, and leave that happened off-system."""
 from __future__ import annotations
 
 from datetime import date
@@ -103,11 +95,7 @@ def set_authority_rule(
     self_sanction: bool = False,
     specificity: int = 0,
 ) -> AuthorityRule:
-    """BR-EL-019. Who reviews and who sanctions, for one case.
-
-    There was no way to create one of these outside the shell, so a policy
-    drafted through the API could never be completed through it.
-    """
+    """BR-EL-019. Who reviews and who sanctions, for one case."""
     _refuse_if_policy_published(policy)
     rule, _ = AuthorityRule.objects.update_or_create(
         policy_id=policy.pk, category=category.value, unit=unit,
@@ -169,14 +157,7 @@ def draft_calendar(*, year: int, version: str) -> HolidayCalendar:
 
 
 def policy_gaps(policy: LeavePolicy) -> list[str]:
-    """What would fail if this version governed an application today.
-
-    Publishing used to need one category rule and nothing else, so a version
-    could go into force entitling people to leave that had no approval path.
-    The application then failed deep in the domain, and the person applying saw
-    a server error for somebody else's incomplete configuration. A policy is
-    executable or it is not ready.
-    """
+    """What would fail if this version governed an application today."""
     entitled = {
         Category(c)
         for c in CategoryRule.objects.filter(policy=policy)
@@ -198,8 +179,7 @@ def policy_gaps(policy: LeavePolicy) -> list[str]:
                 f"{category.value} is entitled but has no authority rule, so an "
                 "application for it would have nowhere to go")
             continue
-        # A category that must be sanctioned above the unit head needs somebody
-        # named; otherwise the request reaches a state no rule can resolve.
+        # A higher-sanction category needs a named sanctioner or it strands.
         if not needs_higher_sanction(category):
             continue
         rules = AuthorityRule.objects.filter(
@@ -309,15 +289,7 @@ def record_offline(
     unit: str = "",
     note: str = "",
 ) -> LeaveRequest:
-    """Bring leave sanctioned on paper onto the record. EL-UC-016, BR-EL-029.
-
-    This is the one path that does not go through the workflow, because the
-    specification retires it as a workflow on purpose: the leave was already
-    sanctioned elsewhere and re-approving it here would be a second approval.
-    The request is therefore born closed, carrying its ledger movement and the
-    name of whoever entered it, so a balance can always be traced to either a
-    decision this system took or a decision it was told about.
-    """
+    """EL-UC-016, BR-EL-029: bring leave sanctioned on paper onto the record."""
     if ends_on < starts_on:
         raise BadRequestError("Leave cannot end before it starts.", code="period_invalid")
     if half is not None and not allows_half_day(category):

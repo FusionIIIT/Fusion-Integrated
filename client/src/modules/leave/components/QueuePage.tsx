@@ -28,9 +28,7 @@ interface Props {
   onDecide: (id: number, approve: boolean, remark: string) => Promise<unknown>;
 }
 
-/** The four review queues differ in their heading and in which service call
- *  they make. Everything else — the table, the history drawer, the remark
- *  modal — is identical, and four copies of it would drift apart. */
+/** The four review queues differ in their heading and in which service call they make. */
 export function QueuePage({
   title, subtitle, emptyTitle, emptyDescription, rows, loading, error,
   approveLabel, refuseLabel, submitting, onDecide,

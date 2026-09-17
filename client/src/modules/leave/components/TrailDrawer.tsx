@@ -3,8 +3,7 @@ import { Drawer, Loader, Stack, Text, Timeline } from "@mantine/core";
 import { useTrail } from "../api/hooks";
 import { label } from "./StateBadge";
 
-/** The whole history of one request. Answers "who has it now, and who has
- *  already seen it" without anyone having to ask the establishment section. */
+/** The whole history of one request. */
 export function TrailDrawer({ requestId, onClose }: {
   requestId: number | null;
   onClose: () => void;

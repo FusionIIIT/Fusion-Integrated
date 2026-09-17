@@ -109,12 +109,7 @@ class TestSpecifiedPaths:
 
 
 class TestDerivedTransitions:
-    """The two rows the specification omits, marked as derived.
-
-    BW-EL-07 row 4 leads to Extension Applicant Action Required and nothing
-    leads out. These exits mirror the main flow and are labelled so they can be
-    replaced when the specification settles the case.
-    """
+    """The two rows the specification omits, marked as derived."""
 
     def test_the_declined_extension_can_be_renominated(self):
         t = resolve(State.EXTENSION_APPLICANT_ACTION_REQUIRED, Event.RENOMINATE)

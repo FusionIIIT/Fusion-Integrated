@@ -1,18 +1,4 @@
-"""How many days a leave interval charges against a balance.
-
-BR-EL-011 splits the categories in two. EL, COL and VL are counted
-continuously: once the leave starts, the intervening weekend or closed holiday
-is part of it and is charged. CL, SCL and RH are counted only on the days
-actually taken.
-
-The spec settles the ordinary case and leaves one question open, which
-`TailPolicy` makes explicit rather than deciding by accident. When an employee
-on continuous leave returns early (BR-EL-028), the unused portion is restored.
-If the last worked day is a Friday, is the following weekend restored with the
-rest of the interval, or was it already consumed? Both readings are defensible
-and the answer changes a balance, so it is a stored policy choice with a stated
-default rather than a line of code somebody has to find.
-"""
+"""How many days a leave interval charges against a balance."""
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -35,9 +21,7 @@ class Half(StrEnum):
 class TailPolicy(StrEnum):
     """What happens to a non-working tail when leave is cut short."""
 
-    #: Charge up to the last working day taken. A Friday return restores the
-    #: weekend. This is the default: the employee was at work on Monday, so the
-    #: weekend was not spent on leave.
+    #: Charge up to the last working day taken.
     TRIM_TO_LAST_WORKING_DAY = "TRIM_TO_LAST_WORKING_DAY"
     #: Charge every calendar day up to the resumption date.
     CHARGE_TO_RESUMPTION = "CHARGE_TO_RESUMPTION"
@@ -94,11 +78,7 @@ def actual_days_on_early_return(
     calendar: Calendar,
     policy: TailPolicy = TailPolicy.TRIM_TO_LAST_WORKING_DAY,
 ) -> Decimal:
-    """Days actually charged when duty resumes before the approved end.
-
-    BR-EL-028. `resumed_on` is the first day back at work, so the leave ran to
-    the day before it.
-    """
+    """Days actually charged when duty resumes before the approved end."""
     if resumed_on <= start:
         return Decimal(0)
     if resumed_on > approved_end:

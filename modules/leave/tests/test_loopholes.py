@@ -1,14 +1,4 @@
-"""Things the module must refuse, written as an attacker would try them.
-
-Each of these was probed against the implementation rather than imagined. Four
-were open when first run: a unit head approving their own leave, their own
-request sitting in their own queue, leave applied for in the past, and a
-balance overdrawn by approving two affordable requests together. A fifth --
-nominating a substitute who is themselves away -- was open in the second pass.
-
-They live together because the property they share is what matters: each is a
-rule that no single test of the happy path would ever exercise.
-"""
+"""Things the module must refuse, written as an attacker would try them."""
 import contextlib
 from datetime import date, timedelta
 
@@ -95,8 +85,7 @@ def test_somebody_else_cannot_withdraw_your_request():
 
 
 class TestNobodyDecidesTheirOwnLeave:
-    """The hole that mattered most: a head is an employee too, and their own
-    request lands in the queue they work from."""
+    """A head is an employee too, and their request lands in their own queue."""
 
     def _own_request(self, head=601):
         factories.setup_all(999)
@@ -168,8 +157,7 @@ class TestTheBalanceCannotGoNegative:
 
         factories.setup_all(999)
         factories.credit(APPLICANT, Category.CL, 2)
-        # Both are submitted while both are still affordable -- nothing is held
-        # against a pending request, which is what makes the race possible.
+        # Both are submitted while still affordable, which makes the race.
         pending = [
             service.submit(user_id=APPLICANT, category=Category.CL, starts_on=start,
                            ends_on=start + timedelta(days=1), reason="x",

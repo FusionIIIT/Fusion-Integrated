@@ -22,27 +22,16 @@ class LeaveRequest(TimeStampedModel, UserScopedModel):
     #: BR-EL-010. Set only for a half-day casual leave, which is a single date.
     half = models.CharField(max_length=8, choices=HALF_CHOICES, blank=True)
     reason = models.TextField()
-    #: BR-EL-001. Where the category rule demands supporting evidence, what it
-    #: is: a certificate or letter reference. A reference rather than a file --
-    #: the paper lives in the establishment section either way, and requiring a
-    #: number is enforceable now without an upload pipeline that is not built.
+    #: BR-EL-001: the certificate or letter reference a category may demand.
     evidence_reference = models.CharField(max_length=120, blank=True)
 
-    #: Charged days as computed at submission, and again at closure. Both are
-    #: kept: the difference is what early resumption returned.
+    #: Charged days as computed at submission, and again at closure.
     requested_days = models.DecimalField(max_digits=6, decimal_places=2)
     actual_days = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
 
     policy_id = models.IntegerField(null=True, blank=True)
 
     #: The approval path, resolved once at submission and then obeyed.
-    #:
-    #: Re-deriving it at each decision reproduced neither the designation nor
-    #: the faculty flag the applicant had, so a later step could resolve a
-    #: different rule from the one the request actually entered -- and nothing
-    #: recorded which rule that was, so the route could not be explained after
-    #: the fact either. BR-EL-019 wants the path to be a property of the
-    #: request, not a recomputation.
     authority_rule_id = models.IntegerField(null=True, blank=True)
     applicant_designation = models.CharField(max_length=120, blank=True)
     sanctioning_designation = models.CharField(max_length=120, blank=True)
@@ -50,9 +39,7 @@ class LeaveRequest(TimeStampedModel, UserScopedModel):
     unit_head_is_final = models.BooleanField(default=False)
     self_sanction = models.BooleanField(default=False)
     calendar_id = models.IntegerField(null=True, blank=True)
-    #: The applicant's department, as the directory spells it. A name
-    #: rather than a surrogate id, because that is what this institute
-    #: actually keys an organisational unit on.
+    #: The applicant's department, as the directory spells it.
     unit = models.CharField(max_length=80, blank=True, db_index=True)
 
     #: BR-EL-013. Station leave travels inside the application, not beside it.
@@ -64,15 +51,12 @@ class LeaveRequest(TimeStampedModel, UserScopedModel):
     #: Set when the leave is one an earlier request extended.
     extends_request_id = models.IntegerField(null=True, blank=True, db_index=True)
 
-    #: A proposed extension, while it is being decided. Held in fields rather
-    #: than in the remark text: the date is what approval has to apply, and a
-    #: decision cannot depend on parsing a sentence somebody typed.
+    #: A proposed extension, while it is being decided.
     extension_to = models.DateField(null=True, blank=True)
     extension_days = models.DecimalField(
         max_digits=6, decimal_places=2, null=True, blank=True
     )
-    #: BR-EL-017. What the unit head recorded, for the categories where their
-    #: view is a recommendation and not the decision. Null until they act.
+    #: BR-EL-017: the unit head's view, where it is a recommendation.
     unit_head_recommended = models.BooleanField(null=True, blank=True)
     resumed_on = models.DateField(null=True, blank=True)
     decided_at = models.DateTimeField(null=True, blank=True)

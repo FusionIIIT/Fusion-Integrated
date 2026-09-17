@@ -1,13 +1,4 @@
-"""What happens to leave after it is approved.
-
-Cancellation before it starts, extension while it runs, and resumption when it
-ends. BR-EL-023 to BR-EL-028.
-
-Approved leave is never edited in place. Cancelling returns the whole charge,
-extending adds only the incremental days, and resuming early returns the
-unused tail. Each is a separate ledger entry, so the history of a leave reads
-as a sequence of events rather than a final figure.
-"""
+"""What happens to leave after it is approved."""
 from __future__ import annotations
 
 from datetime import date
@@ -164,11 +155,7 @@ def request_extension(
     substitute_user_id: int | None = None,
     remark: str = "",
 ) -> LeaveRequest:
-    """BR-EL-025. Additional time on leave already running.
-
-    Only earned, commuted and vacation leave may be extended, and only the
-    incremental days are charged; the original approval is left as it stands.
-    """
+    """BR-EL-025. Additional time on leave already running."""
     if request.user_id != actor_user_id:
         raise ConflictError("Only the applicant may extend.", code="not_applicant")
     category = Category(request.category)
@@ -269,9 +256,7 @@ def decide_extension(
         )
     extra = request.extension_days or ZERO
 
-    # Nothing is held while the extension is decided, so the days can have been
-    # spent elsewhere in the meantime. Checked here, under a lock, for the same
-    # reason ordinary approval is.
+    # Nothing is held while an extension is decided, so recheck the balance.
     category = Category(request.category)
     LedgerEntry.objects.select_for_update().filter(
         user_id=request.user_id, year=request.starts_on.year, category=category.value
@@ -300,9 +285,7 @@ def decide_extension(
             )
         ],
     )
-    # The end date comes from what was applied for, not from an argument the
-    # caller may not have. Passing new_end again is accepted only to override
-    # deliberately, and it must still be later than the leave it extends.
+    # The end date comes from what was applied for, not from an argument the caller may not have.
     if new_end is not None and new_end <= updated.ends_on:
         raise BadRequestError(
             "A granted extension must end after the approved leave.",
@@ -367,11 +350,7 @@ def query_resumption(
 def verify_resumption(
     *, request: LeaveRequest, actor_user_id: int, remark: str = ""
 ) -> LeaveRequest:
-    """BR-EL-027, BR-EL-028. Close the leave and return anything unused.
-
-    SRS-EL-086 is the reason the restoration happens here and not when the
-    employee reports: nothing is returned until the return is verified.
-    """
+    """BR-EL-027, BR-EL-028. Close the leave and return anything unused."""
     category = Category(request.category)
     resumed_on = request.resumed_on
     movements: list[Movement] = []

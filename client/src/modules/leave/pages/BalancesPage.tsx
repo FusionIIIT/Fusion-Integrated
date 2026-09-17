@@ -11,9 +11,7 @@ import { formatDay } from "../components/PeriodCell";
 import { useBalanceDirectory, useMyBalances, useStatement } from "../api/hooks";
 import type { Balance, LedgerEntry } from "../api/types";
 
-/** Two things on one screen: the totals, and the entries that produced them.
- *  A figure nobody can explain is a figure that gets disputed, so the rows are
- *  one click away rather than a support request away. */
+/** Two things on one screen: the totals, and the entries that produced them. */
 export default function BalancesPage() {
   const [userId, setUserId] = useState<number | "">("");
   const [category, setCategory] = useState<string | null>(null);

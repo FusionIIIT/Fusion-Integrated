@@ -1,11 +1,5 @@
-"""What the server tells the shell about this module (ADR-0010).
-
-Nav items carry `required_permission` and the server filters before sending, so
-a link a role cannot use never reaches the browser.
-"""
-#: `status` is what this module would be once its data exists. seed_modules
-#: downgrades it to `planned` while readiness() reports anything missing, so a
-#: deploy cannot put Leave in the sidebar before it can accept an application.
+"""What the server tells the shell about this module (ADR-0010)."""
+#: `status` is what this module would be once its data exists.
 MODULE = {
     "code": "leave", "label": "Leave", "icon": "FaRegCalendarCheck",
     "base_path": "/leave", "nav_section": "Leave", "sort_order": 20,
@@ -27,9 +21,7 @@ PERMISSIONS = [
     ("leave.offline.record", "Record leave sanctioned outside the system"),
 ]
 
-#: Performed by a scheduled task, so no designation holds them. Plain codes,
-#: like every other module: a (code, label) pair here produced a nested array
-#: in the manifest and the code never reached the permission catalogue.
+#: Performed by a scheduled task, so no designation holds them.
 SYSTEM_PERMISSIONS = [
     "leave.yearend.run",
     "leave.lifecycle.advance",
@@ -60,21 +52,12 @@ _ADMIN = [
     "leave.offline.record",
 ]
 
-#: Keyed by the designation name as it exists in globals_designation, plus the
-#: two basic roles.
-#:
-#: IAM puts the basic role -- `faculty` or `staff` -- into every employee's role
-#: list by definition, because the ERP records it as extrainfo.user_type and has
-#: no designation row for it. Leaving them out meant an employee who holds no
-#: designation got no module and no permissions at all: most of the institute
-#: could not apply for leave.
+#: Keyed by the designation name as it exists in globals_designation, plus the two basic roles.
 ROLE_GRANTS = {
     "faculty": _EMPLOYEE,
     "staff": _EMPLOYEE,
 
-    # A chair is not an office. Review and the balance directory belong to the
-    # HOD designations below, which are held by the handful of people who
-    # actually run a department.
+    # A chair is not an office; review sits with the HODs below.
     "Professor": _EMPLOYEE,
     "Associate Professor": _EMPLOYEE,
     "Assistant Professor": _EMPLOYEE,
@@ -135,16 +118,7 @@ NAV_ITEMS = [
 
 
 def readiness() -> list[str]:
-    """What is still missing before this module can accept an application.
-
-    Returning anything keeps the module registered but inactive, so it stays
-    out of every sidebar and off every route until it works. A module that
-    advertises itself and then refuses every application is worse than one
-    nobody can see: the first is a fault report, the second is a deployment
-    still in progress.
-
-    Read at deploy time by seed_modules, and by `manage.py leave_readiness`.
-    """
+    """What is still missing before this module can accept an application."""
     from datetime import date
 
     from modules.directory.models import UserRef

@@ -37,14 +37,7 @@ _LIMITS = {
 
 
 def unstorable(ref) -> str:
-    """The first field this row will not fit into, or empty if it fits.
-
-    Upstream data is not always clean -- one identity record has an entire
-    tab-separated import line in its username. Letting that raise takes the
-    whole sync down and leaves every other employee unsynced, so a bad row is
-    identified and skipped rather than allowed to abort the run. It is not
-    truncated: username is an identifier, and a shortened one is a wrong one.
-    """
+    """The first field this row will not fit into, or empty if it fits."""
     for field, cap in _LIMITS.items():
         value = getattr(ref, field, "") or ""
         if isinstance(value, str) and len(value) > cap:
@@ -71,9 +64,7 @@ def upsert(refs, *, rejected: list | None = None) -> int:
         return 0
     UserRef.objects.bulk_create(
         rows, update_conflicts=True, unique_fields=["user_id"],
-        # is_active belongs here: without it a deactivated account stayed
-        # active in this projection for ever, and every scope keyed on
-        # is_active kept answering yes.
+        # Without is_active a deactivated account would stay active here.
         update_fields=["username", "display_name", "kind", "email", "department",
                        "programme", "discipline", "batch_year", "is_active",
                        "updated_at"],

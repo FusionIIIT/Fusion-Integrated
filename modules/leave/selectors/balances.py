@@ -1,9 +1,4 @@
-"""Balances, derived from the ledger rather than stored.
-
-Every figure here is a sum over `leave_ledger_entry`. Nothing caches it. The
-cost is one grouped query; the return is that a balance can always be explained
-by listing the rows behind it, and can never disagree with them.
-"""
+"""Balances, derived from the ledger rather than stored."""
 from __future__ import annotations
 
 from decimal import Decimal
@@ -48,8 +43,7 @@ def balances_for(user_id: int, year: int) -> dict[Category, Balance]:
     for row in rows:
         category = Category(row["category"])
         credited = (row["credited"] or ZERO) + (row["corrected"] or ZERO)
-        # Consumption, lapse and conversion out are stored as negative days, so
-        # they subtract by addition and the ledger always sums to the balance.
+        # Outgoing movements are negative, so the ledger sums to the balance.
         spent = -(
             (row["consumed"] or ZERO)
             + (row["offline"] or ZERO)

@@ -1,9 +1,4 @@
-"""The audit trail, and the hierarchy that routes a request.
-
-Every state change is appended here. Together with the ledger this answers the
-two questions asked years later about any leave: what happened to it, and who
-decided.
-"""
+"""The audit trail, and the hierarchy that routes a request."""
 from django.db import models
 
 from core.db.mixins import TimeStampedModel
@@ -40,18 +35,11 @@ class RequestTransition(TimeStampedModel):
 
 
 class AuthorityRule(TimeStampedModel):
-    """BR-EL-019. Who reviews and who sanctions, as configuration.
-
-    The path is resolved from the applicant's unit, their designation and the
-    leave category. Naming the offices in code would mean a reorganisation
-    becomes a deployment; here it is a row.
-    """
+    """BR-EL-019. Who reviews and who sanctions, as configuration."""
 
     policy_id = models.IntegerField(db_index=True)
     category = models.CharField(max_length=8, choices=CATEGORY_CHOICES)
-    #: Empty matches any unit or any designation, so a general rule needs
-    #: one row. Empty rather than null: a null defeats the unique constraint
-    #: below on Postgres, and two conflicting general rules could then coexist.
+    #: Empty matches any unit or any designation, so a general rule needs one row.
     unit = models.CharField(max_length=80, blank=True)
     designation = models.CharField(max_length=120, blank=True)
     applies_to_faculty = models.BooleanField(null=True, blank=True)
@@ -86,19 +74,13 @@ class AuthorityRule(TimeStampedModel):
 
 
 class SlaRule(TimeStampedModel):
-    """BR-EL-032, BR-EL-033. How long a state may sit before someone is told.
-
-    Thresholds hang off the policy version, so tightening them is a new policy
-    rather than a deployment, and a request decided last year can still be
-    judged against the deadline that applied to it.
-    """
+    """BR-EL-032, BR-EL-033. How long a state may sit before someone is told."""
 
     policy_id = models.IntegerField(db_index=True)
     state = models.CharField(max_length=40, choices=STATE_CHOICES)
     remind_after_hours = models.PositiveIntegerField()
     escalate_after_hours = models.PositiveIntegerField()
-    #: Who hears about it when the deadline passes. Empty escalates to whoever
-    #: the authority configuration names as the next step.
+    #: Who hears about it when the deadline passes.
     escalate_to_designation = models.CharField(max_length=120, blank=True)
 
     class Meta:

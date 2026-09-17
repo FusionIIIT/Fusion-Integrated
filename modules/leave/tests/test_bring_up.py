@@ -1,9 +1,4 @@
-"""Getting the module from an empty database to accepting an application.
-
-This is the path nobody exercises until the day it is deployed, which is why it
-is pinned here: the module shipped once with no way to create a policy and a
-500 when there was not one.
-"""
+"""Getting the module from an empty database to accepting an application."""
 from datetime import date, timedelta
 from io import StringIO
 
@@ -33,12 +28,7 @@ ADMIN = 900
 
 @pytest.fixture
 def staff_directory(stub_iam):
-    """A small institute, with the identity service agreeing about who is in it.
-
-    The fixture installs the fake as well as the rows: crediting asks the
-    identity service whether this directory is complete, so a test that seeds
-    only the projection is testing against an institute the two disagree about.
-    """
+    """A small institute, with the identity service agreeing about who is in it."""
     stub_iam(make_session())
     for uid, kind in ((FACULTY, "faculty"), (STAFF, "staff"), (ADMIN, "staff")):
         UserRef.objects.create(
@@ -50,11 +40,7 @@ def staff_directory(stub_iam):
 
 
 def next_monday(weeks: int = 1) -> date:
-    """A real application is for leave not yet taken, so these tests are too.
-
-    The seeded policy allows no back-dating, which is the point: fixed past
-    dates here would be testing a path the institute does not permit.
-    """
+    """A real application is for leave not yet taken, so these tests are too."""
     today = date.today()
     return today + timedelta(days=(7 - today.weekday()) % 7 or 7) + timedelta(weeks=weeks - 1)
 
@@ -84,8 +70,7 @@ class TestAnUnconfiguredModule:
             "reason": "Personal work",
         }, format="json")
 
-        # Regression: this was a 500, because NoEffectivePolicy was not a
-        # DomainError and fell through the handler.
+        # Regression: NoEffectivePolicy used to surface as a 500.
         assert response.status_code == 409
         body = response.json()["error"]
         assert body["code"] == "no_effective_policy"
@@ -108,8 +93,7 @@ class TestConfiguringItThroughItsOwnApi:
             "category": "CL", "annual_credit": "8.00"}, format="json")
         assert rule.status_code == 201
 
-        # Entitlement without an approval path is not publishable, and the API
-        # can now say so before anybody tries.
+        # Entitlement without an approval path is not publishable.
         gaps = c.get(f"/api/v1/leave/admin/policies/{policy_id}/readiness").json()
         assert gaps["ready"] is False
         assert c.post(f"/api/v1/leave/admin/policies/{policy_id}/publish"
@@ -342,11 +326,7 @@ class TestTheProjectionGate:
             run("leave_credit_year", "2026")
 
     def test_a_count_that_matches_is_not_enough(self, stub_iam, staff_directory):
-        """The gate compares who, not how many.
-
-        A stale row standing in for a missing one keeps the totals equal, which
-        is exactly the case a count comparison cannot see.
-        """
+        """The gate compares who, not how many."""
         run("seed_leave_policy", "--year", str(next_monday().year))
         fake = stub_iam(make_session())
         held = list(UserRef.objects.filter(kind__in=("faculty", "staff")))
@@ -404,11 +384,7 @@ class TestTheProjectionGate:
 
 
 class TestRevokingAWrongCredit:
-    """Crediting too widely is easy while the directory is catching up.
-
-    The correction is a reversing entry, never a deletion: an audit has to be
-    able to see the mistake and the fix, not a tidy absence.
-    """
+    """Crediting too widely is easy while the directory is catching up."""
 
     def _credited_a_non_employee(self):
         run("seed_leave_policy", "--year", str(next_monday().year))
@@ -463,8 +439,7 @@ class TestRevokingAWrongCredit:
 
         run("leave_credit_year", "2026", "--revoke")
 
-        # Taking back days somebody was approved for is a decision about their
-        # leave, not a bookkeeping correction.
+        # Taking back approved days is a leave decision, not bookkeeping.
         assert not LedgerEntry.objects.filter(
             user_id=STAFF, reason=EntryReason.CORRECTION).exists()
 

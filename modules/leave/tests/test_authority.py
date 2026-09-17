@@ -1,12 +1,4 @@
-"""BR-EL-019, BR-EL-020. The path is resolved once and then obeyed.
-
-Two defects sat here. The route was recomputed at each decision from an empty
-designation and faculty=False, so a later step could resolve a different rule
-from the one the request was admitted under, and nothing recorded which rule
-that had been. And the named sanctioning authority was computed but never
-checked, so any principal holding leave.request.sanction could sanction any
-request at the final stage.
-"""
+"""BR-EL-019, BR-EL-020. The path is resolved once and then obeyed."""
 from datetime import date
 
 import pytest
@@ -51,8 +43,7 @@ class TestSelectingTheRule:
         chosen = select_rule([rank, office], Category.EL, "CSE",
                              frozenset({"Professor", "HOD (CSE)"}), False)
 
-        # A person holds both at once; matching only one designation could not
-        # express that, and picked whichever was passed.
+        # A person holds both, which a single designation cannot express.
         assert chosen.sanctioning_designation in ("Director", "Registrar")
         assert chosen in (rank, office)
 
@@ -73,8 +64,7 @@ class TestWhoIsFinal:
                                     sanctioning_designation="Registrar"),
                           Category.CL, substitute_required=False)
 
-        # Casual leave normally ends with the unit head; the rule says otherwise
-        # and the rule is the configuration.
+        # The configured rule escalates leave the unit head would otherwise end.
         assert route.unit_head_is_final is False
 
     def test_the_unit_head_is_final_when_the_rule_names_nobody(self):
@@ -165,8 +155,7 @@ class TestOnlyTheNamedAuthoritySanctions:
 
 
 class TestDirectorSelfSanction:
-    """BR-EL-020. The route exists so this person's own leave has somewhere to
-    go, which makes it the one case where deciding your own request is right."""
+    """BR-EL-020: the one case where deciding your own request is right."""
 
     def _self_route(self, user_id=U):
         policy, _ = factories.setup_all(user_id)
@@ -186,8 +175,7 @@ class TestDirectorSelfSanction:
 
         r = self._self_route()
 
-        # Regression: the general "not your own request" rule hid this, leaving
-        # the Director the only person unable to see theirs.
+        # Regression: the Director could not see their own request.
         assert [x.pk for x in scoping.sanction_queue(U)] == [r.pk]
 
     def test_the_applicant_can_sanction_it(self):
@@ -224,14 +212,12 @@ class TestDirectorSelfSanction:
         if r.state == State.AWAITING_ESTABLISHMENT.value:
             r = decisions.establishment_routes(request=r, actor_user_id=901)
 
-        # The applicant happens to be the Registrar. That is not a self-sanction
-        # route, so it is still somebody else's decision.
+        # The applicant happens to be the Registrar.
         assert list(scoping.sanction_queue(U)) == []
 
 
 class TestNotRecommended:
-    """BR-EL-017. The unit head does not make the final rejection for the
-    categories that need higher sanction; they record a view and route on."""
+    """BR-EL-017: the unit head records a view and routes on."""
 
     def _at_unit_head(self, category):
         factories.setup_all(U)

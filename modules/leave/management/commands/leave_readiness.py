@@ -1,8 +1,4 @@
-"""Say whether Leave can accept an application, and what is missing if not.
-
-The same check seed_modules runs at deploy time, available on its own so the
-answer can be had without a deploy.
-"""
+"""Say whether Leave can accept an application, and what is missing if not."""
 from django.core.management.base import BaseCommand
 
 from modules.accesscontrol.models import Module

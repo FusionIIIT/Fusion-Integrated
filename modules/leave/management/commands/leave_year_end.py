@@ -1,14 +1,4 @@
-"""SF-EL-001. Close a leave year across everyone who holds a leave account.
-
-A management command as well as a scheduled job, because the year-end run is
-the one piece of this module that people will want to rehearse on a copy of
-the data before letting it touch the real thing. `--dry-run` exists for exactly
-that, and `--user` narrows it to one employee when a single account has to be
-re-run after a correction.
-
-The per-employee close is idempotent: an account already settled for the year
-is skipped rather than settled twice.
-"""
+"""SF-EL-001. Close a leave year across everyone who holds a leave account."""
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
@@ -40,12 +30,7 @@ class Command(BaseCommand):
         faculty = self._faculty(people)
         unclassified = [uid for uid in people if uid not in faculty]
         if unclassified:
-            # Closing is destructive and the classification decides what
-            # happens: faculty vacation converts to earned leave, everybody
-            # else's lapses. Defaulting an unknown answer to "not faculty"
-            # silently destroyed up to sixty days a head, and --credit-next
-            # would then have granted them the wrong entitlement for the new
-            # year on top.
+            # Classification decides whether VL converts or lapses, so never guess.
             raise CommandError(
                 f"{len(unclassified)} employee(s) could not be classified as "
                 f"faculty or not: {unclassified[:10]}"
@@ -94,22 +79,14 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f"  {year} closed"))
 
     def _accounts(self, year: int) -> list[int]:
-        # order_by() clears the model's Meta.ordering, which Django would
-        # otherwise add to the SELECT and defeat the DISTINCT, enumerating an
-        # employee once per ledger row.
+        # order_by() clears Meta.ordering, which would defeat DISTINCT.
         return sorted(
             LedgerEntry.objects.filter(year=year).order_by()
             .values_list("user_id", flat=True).distinct()
         )
 
     def _faculty(self, user_ids: list[int]) -> dict[int, bool]:
-        """One batched directory call. Faculty carry VL and convert it; nobody
-        else does, so getting this wrong changes what people are owed.
-
-        Anyone the directory does not return is simply absent from this map,
-        and the caller refuses rather than assuming. A missing answer is not a
-        negative one.
-        """
+        """One batched directory call."""
         return {
             uid: dto.kind == "faculty" for uid, dto in get_users(user_ids).items()
         }

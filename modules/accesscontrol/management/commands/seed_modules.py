@@ -30,10 +30,7 @@ class Command(BaseCommand):
             if not spec:
                 continue
 
-            # A module may declare what it needs before it can work. Until that
-            # is true it registers as planned, which keeps it out of every
-            # sidebar and off every route: a module that advertises itself and
-            # then refuses every request is worse than one nobody can see.
+            # A module may declare what it needs before it can work.
             unmet = list(getattr(reg, "readiness", list)() or [])
             defaults = {k: v for k, v in spec.items() if k != "code"}
             if unmet:

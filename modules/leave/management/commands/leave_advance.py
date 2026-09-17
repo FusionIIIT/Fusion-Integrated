@@ -1,11 +1,4 @@
-"""Advance approved leave as the calendar has moved.
-
-A management command as well as a Celery task, so the module works before a
-broker does: a cron entry calling this is a perfectly good production setup,
-and it is how the backlog gets cleared after the worker has been down.
-
-Idempotent -- a request that has already moved is simply not due.
-"""
+"""Advance approved leave as the calendar has moved."""
 from datetime import date
 
 from django.core.management.base import BaseCommand

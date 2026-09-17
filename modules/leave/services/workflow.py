@@ -1,11 +1,4 @@
-"""Moving a request through the workflow.
-
-Every state change goes through `apply_event`. It refuses anything the
-transition table does not contain, writes the trail, and lets the caller attach
-balance movements to the same transaction. A state change and the ledger
-entries it causes either both happen or neither does, so a balance can never
-reflect a decision that was not recorded.
-"""
+"""Moving a request through the workflow."""
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -93,8 +86,7 @@ def apply_event(
     )
     if movements:
         _record(locked, movements)
-    # The clock belongs to the state, so it moves with it rather than being
-    # something each caller has to remember to wind.
+    # The SLA clock follows the state, so no caller has to wind it.
     sla.on_state_change(locked, move.target, source)
     if on_applied is not None:
         on_applied(locked)
@@ -108,18 +100,7 @@ def _refuse_self_decision(
     actor_role: Actor,
     actor_user_id: int | None,
 ) -> None:
-    """Nobody decides their own leave.
-
-    A unit head is an employee too, and their own request lands in the queue
-    they work from. Without this a head could approve their own leave, and an
-    establishment officer could route and sanction theirs, with the trail
-    showing an approval that looks exactly like any other.
-
-    The one exception is written into the workflow rather than assumed: the
-    self-sanction route (BR-EL-020) exists so that the Director's own leave has
-    somewhere to go. It is reached only from a state the authority
-    configuration put the request in.
-    """
+    """Nobody decides their own leave."""
     if actor_user_id is None or actor_user_id != request.user_id:
         return
     if actor_role in (Actor.EMPLOYEE, Actor.SCHEDULER):
@@ -137,11 +118,7 @@ def _refuse_self_decision(
 def _record(request: LeaveRequest, movements: list[Movement]) -> None:
     year = request.starts_on.year
     if YearEndClosure.objects.filter(user_id=request.user_id, year=year).exists():
-        # The year has been lapsed, converted and carried forward. Booking into
-        # it now changes a balance the next year's opening was computed from,
-        # and nothing recomputes that opening -- the correction has to be a
-        # deliberate one, not a side effect of approving a December request in
-        # January.
+        # The year has been lapsed, converted and carried forward.
         raise ConflictError(
             f"{year} has been closed for this employee, so nothing further can "
             "be charged to it. The leave administrator has to settle this "

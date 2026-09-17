@@ -1,9 +1,4 @@
-"""Review, sanction, withdrawal and the substitute's answer.
-
-The balance moves at one point only: final approval. Nothing is deducted while
-a request is pending, so a withdrawal or a rejection needs no reversal and
-cannot leave a balance short.
-"""
+"""Review, sanction, withdrawal and the substitute's answer."""
 from __future__ import annotations
 
 from django.db import transaction
@@ -30,16 +25,9 @@ def _refuse_wrong_authority(
     actor_user_id: int,
     actor_designations: frozenset[str] | set[str] | tuple[str, ...],
 ) -> None:
-    """BR-EL-019, BR-EL-020. The named authority decides, not any authority.
-
-    The permission says somebody may sanction leave; the authority rule says
-    whose leave. Checking only the permission let any sanctioner act on any
-    request at the final stage, so a Dean could sanction leave the rule routed
-    to the Registrar and the trail would show it as correctly authorised.
-    """
+    """BR-EL-019, BR-EL-020. The named authority decides, not any authority."""
     if request.self_sanction:
-        # BR-EL-020. The route exists so that this person's own leave has
-        # somewhere to go; anybody else reaching it is the failure.
+        # BR-EL-020: only the applicant acts on the self-sanction route.
         if actor_user_id != request.user_id:
             raise ConflictError(
                 "This request is on the self-sanction route and is decided by the "
@@ -71,8 +59,7 @@ def _refuse_if_year_closed(request: LeaveRequest) -> None:
 
 def _refuse_if_unaffordable(request: LeaveRequest) -> None:
     category = Category(request.category)
-    # Lock the person's ledger for this year so two approvals cannot both read
-    # the balance before either has written to it.
+    # Lock this ledger so two approvals cannot both read the balance first.
     LedgerEntry.objects.select_for_update().filter(
         user_id=request.user_id, year=request.starts_on.year, category=category.value
     ).exists()
@@ -87,12 +74,7 @@ def _refuse_if_unaffordable(request: LeaveRequest) -> None:
 
 
 def _route_for(request: LeaveRequest) -> authority.Route:
-    """The route the request entered, read back rather than recomputed.
-
-    Recomputing it here used an empty designation and faculty=False regardless
-    of the applicant, so a later step could resolve a different rule from the
-    one the request was admitted under.
-    """
+    """The route the request entered, read back rather than recomputed."""
     return authority.Route(
         first_state=State(request.state),
         establishment_step=request.establishment_step,
@@ -151,10 +133,7 @@ def unit_head_decides(
                 actor_user_id=actor_user_id,
                 remark=remark,
             )
-        # BR-EL-017. For SCL, EL, COL and VL the unit head records Recommended
-        # or Not Recommended and routes onward; the final refusal is the
-        # competent authority's to make. Rejecting here ended the request at a
-        # step that has no authority to end it.
+        # BR-EL-017: Not Recommended routes onward; the authority refuses.
         return apply_event(
             request,
             Event.UNIT_HEAD_RECOMMEND,
@@ -216,18 +195,8 @@ def sanction(
 def _approve(
     request: LeaveRequest, actor: Actor, actor_user_id: int, event: Event, remark: str
 ) -> LeaveRequest:
-    """Deduct the days and record the approval in one transaction.
-
-    The balance is checked again here, not only at submission. Nothing is held
-    while a request is pending, so two requests can each be affordable when
-    they are made and unaffordable together -- approve both and the balance
-    goes negative with no rule having visibly been broken. The check belongs
-    where the days actually move.
-    """
-    # Order matters for the message, not the outcome. A settled year is the
-    # more fundamental fact -- closing has already lapsed or carried these days
-    # -- and "insufficient balance" would send the reader looking for a spend
-    # that never happened. The ledger write refuses it either way.
+    """Deduct the days and record the approval in one transaction."""
+    # Order matters for the message, not the outcome.
     _refuse_if_year_closed(request)
     _refuse_if_unaffordable(request)
     return apply_event(

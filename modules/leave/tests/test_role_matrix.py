@@ -1,11 +1,4 @@
-"""Who gets what, asserted rather than assumed.
-
-The grant map is the whole of ELM's authorization surface, and it is a dict
-literal -- nothing else in the module can tell you it is wrong. Two mistakes
-lived in it: no grant for the basic roles IAM gives every employee, so most of
-the institute could not apply at all; and review plus the balance directory
-attached to "Professor", which is a chair rather than an office.
-"""
+"""Who gets what, asserted rather than assumed."""
 import pytest
 
 from modules.leave import registry

@@ -59,12 +59,7 @@ class FakeIam:
         yield from self._employees()
 
     def _employees(self):
-        """Whoever the test put in `users` who is not a student.
-
-        Defaults to the directory rows the test already created, so a test that
-        never thinks about employees still sees a consistent institute rather
-        than an empty one.
-        """
+        """Whoever the test put in `users` who is not a student."""
         if self.employees is not None:
             return list(self.employees)
         from modules.directory.models import UserRef

@@ -1,9 +1,4 @@
-/** What the mutations actually send, and what they invalidate afterwards.
- *
- *  A decision taken in one queue changes the others, so a mutation that
- *  invalidates too little leaves a decided request sitting in a colleague's
- *  list. That is not visible in review, and it is what these pin.
- */
+/** What the mutations actually send, and what they invalidate afterwards. */
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
@@ -26,8 +21,7 @@ beforeEach(() => {
 
 describe("leave mutations", () => {
   it("posts an application to the collection, not to a person", async () => {
-    // The applicant comes from the credential; a user_id in the body is ignored
-    // by the server, and sending one here would suggest otherwise.
+    // The applicant comes from the credential, so the body never names one.
     const post = vi.spyOn(http, "post").mockResolvedValue({ data: { id: 1 } });
 
     const { result } = renderHook(() => useApply(), { wrapper });

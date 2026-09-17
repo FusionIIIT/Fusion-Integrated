@@ -1,9 +1,4 @@
-"""Leave endpoints.
-
-Two gates on every route: the module grant, then the permission. Ownership is
-enforced by narrowing the queryset, so a request belonging to somebody else is
-not found rather than refused.
-"""
+"""Leave endpoints."""
 from __future__ import annotations
 
 from datetime import date
@@ -47,8 +42,7 @@ P_POLICY = "leave.policy.manage"
 P_CALENDAR = "leave.calendar.manage"
 P_OFFLINE = "leave.offline.record"
 
-#: Opening one request. Which requests, and whose, is the queryset's job:
-#: any leave reader may ask, and sees only what their scope contains.
+#: Any leave reader may open a request; the queryset decides whose.
 P_READ = (P_VIEW_SELF, P_REVIEW, P_ROUTE, P_SANCTION, P_VERIFY, P_BALANCE)
 
 
@@ -57,13 +51,7 @@ def _actor(request):
 
 
 def _unit(request) -> str:
-    """The actor's department, from the directory rather than the credential.
-
-    IAM's session carries no organisational unit, so routing and the review
-    queue would silently fall back to "the whole institute" if this were read
-    off the principal. An unknown department gives an empty unit, which matches
-    nothing.
-    """
+    """The actor's department, from the directory rather than the credential."""
     actor = _actor(request)
     known = directory.get_users([actor.user_id]).get(actor.user_id)
     return known.department if known else ""
@@ -157,14 +145,7 @@ class WithdrawView(APIView):
 
 
 class RenominateView(APIView):
-    """EL-UC-006. Somebody else, after the first substitute declined.
-
-    The service and the serializer both existed and no route reached them, so
-    the only way out of APPLICANT_ACTION_REQUIRED was to withdraw the request
-    entirely -- and an extension stuck in its own version of that state had no
-    way out at all, because withdrawing an extension is not the same as
-    abandoning leave already running.
-    """
+    """EL-UC-006. Somebody else, after the first substitute declined."""
 
     permission_classes = [MODULE, HasPermission(P_CREATE)]
 
@@ -453,8 +434,7 @@ class BalanceDirectoryView(APIView):
         actor = _actor(request)
         if not scoping.may_read_balance_of(
                 actor, _unit(request), _unit_of(user_id)):
-            # Not found rather than forbidden, for the same reason the request
-            # list answers that way: a refusal confirms the person exists here.
+            # 404 rather than 403: a refusal confirms the person exists.
             raise NotFoundError("No leave account you can see for that employee.")
         held = balances.balances_for(user_id, year)
         return Response(
@@ -684,11 +664,7 @@ def _unit_of(user_id: int) -> str:
 
 
 def _int_param(request, name: str, *, default=None, required: bool = False) -> int:
-    """A query parameter that must be a number.
-
-    int() on raw input turns a typo into a 500. These are user input like any
-    other and deserve a 400 that says which parameter is wrong.
-    """
+    """A query parameter that must be a number."""
     raw = request.query_params.get(name)
     if raw in (None, ""):
         if required:

@@ -1,10 +1,4 @@
-"""The exact shapes the client sends, checked against the serializers.
-
-Typechecking proves the client is internally consistent, not that it agrees
-with the server. Station leave was rejected on every submission because the two
-sides spelled the same two dates differently, and nothing on either side could
-notice.
-"""
+"""The exact shapes the client sends, checked against the serializers."""
 from datetime import date
 
 import pytest

@@ -8,8 +8,7 @@ function iso(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-/** A version is drafted, filled in, and only then published. Nothing here puts
- *  anything into force — that is a separate, deliberate action. */
+/** A version is drafted, filled in, and only then published. */
 export function NewPolicyModal({ opened, onClose, onSubmit, submitting }: {
   opened: boolean;
   onClose: () => void;

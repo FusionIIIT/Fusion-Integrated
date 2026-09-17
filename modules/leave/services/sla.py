@@ -1,14 +1,4 @@
-"""SF-EL-002. Reminding the person a request is waiting on, then escalating.
-
-BR-EL-032, BR-EL-033. A clock starts when a request enters a state somebody
-has to act in, and stops the moment it leaves. Nothing is chased once the task
-is no longer pending, which is the difference between a useful reminder and
-the mail everybody filters away.
-
-The thresholds are policy, not constants. The reminder and the escalation are
-stamped on the clock as well as logged, so "we did tell them" is answerable
-from the record rather than from a mail server's logs.
-"""
+"""SF-EL-002. Reminding the person a request is waiting on, then escalating."""
 from __future__ import annotations
 
 import logging
@@ -32,12 +22,7 @@ class SlaReport:
 
 
 def _responsible(request: LeaveRequest, state: State) -> int | None:
-    """Who the clock is against, where the system can name one person.
-
-    A queue state is held by an office rather than an individual, so it stays
-    null and the queue itself is the assignment. A nomination is the exception:
-    exactly one person is being waited on.
-    """
+    """Who the clock is against, where the system can name one person."""
     if state in (State.AWAITING_SUBSTITUTE, State.EXTENSION_AWAITING_SUBSTITUTE):
         pending = SubstituteNomination.objects.filter(
             request=request, response=SubstituteNomination.Response.PENDING
@@ -55,14 +40,7 @@ def _responsible(request: LeaveRequest, state: State) -> int | None:
 def on_state_change(
     request: LeaveRequest, target: State, source: State | None = None
 ) -> SlaClock | None:
-    """Stop whatever was running and start the next clock, if the state has one.
-
-    A transition back into the state it came from is not a new task. Querying a
-    resumption is modelled as a self-transition, and restarting the clock there
-    erased the time the establishment had already spent holding it and pushed
-    the reminder and escalation deadlines out again -- every query bought
-    another full window, which is the opposite of what an SLA is for.
-    """
+    """Stop whatever was running and start the next clock, if the state has one."""
     if source is not None and source is target:
         return SlaClock.objects.filter(
             request=request, state=target.value, stopped_at__isnull=True

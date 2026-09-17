@@ -1,10 +1,4 @@
-"""Leave policy, effective-dated.
-
-BR-EL-030. A decision is judged against the policy in force when it was taken,
-so policy is never edited in place. A revised ordinance is a new version with
-its own effective date, and last year's approvals can still be explained from
-last year's row twenty years from now.
-"""
+"""Leave policy, effective-dated."""
 from django.db import models
 
 from core.db.mixins import TimeStampedModel
@@ -31,10 +25,7 @@ class LeavePolicy(TimeStampedModel):
         choices=[(r.value, r.value) for r in ConversionRounding],
         default=ConversionRounding.EXACT_HALF.value,
     )
-    #: How far back an application may reach. Zero means not at all, which is
-    #: the safe default: EL-UC-016 already exists as the sanctioned route for
-    #: leave that genuinely happened before it was recorded, and it is done by
-    #: an administrator against written evidence rather than by the applicant.
+    #: How far back an application may reach.
     max_backdate_days = models.PositiveIntegerField(default=0)
 
     # BR-EL-028. Whether a closed tail is restored when duty resumes early.
