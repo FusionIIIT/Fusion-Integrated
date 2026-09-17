@@ -52,12 +52,7 @@ def user_ids_in_discipline(discipline: str) -> list[int]:
 
 
 def get_employees() -> list[UserDTO]:
-    """Everyone on the payroll: faculty and staff, not students.
-
-    Leave, payroll and anything else that acts on employees needs the whole
-    set rather than a page of it, so this is deliberately unpaginated and
-    deliberately not the display search below.
-    """
+    """Everyone on the payroll: faculty and staff, not students."""
     return [
         _to_dto(r)
         for r in UserRef.objects.filter(
@@ -75,22 +70,7 @@ def held_employee_ids() -> set[int]:
 
 
 def employee_projection_disagreement() -> tuple[list[int], list[int]] | None:
-    """Where this service and the identity service disagree about the payroll.
-
-    Returns (missing, stale): people the identity service calls employees and
-    this one has not got, and people this one still calls employees and the
-    identity service no longer does. **Both** matter. Checking only the first
-    leaves a projection that has never dropped anybody -- someone reclassified
-    upstream stays an employee here forever and keeps drawing entitlement.
-
-    Compares identities, not counts. A count comparison passes whenever the two
-    totals happen to agree, which is exactly the case this guard exists to
-    catch: the right number of the wrong people.
-
-    Returns None when the identity service cannot be reached -- a caller about
-    to act on "all employees" must not read an unreachable directory as
-    agreement.
-    """
+    """Where this service and the identity service disagree about the payroll."""
     held = held_employee_ids()
     try:
         known = {r.user_id for r in get_client().iter_employees()}

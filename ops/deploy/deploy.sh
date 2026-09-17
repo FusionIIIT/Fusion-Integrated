@@ -79,9 +79,7 @@ log "registry and checks"
   "$VENV/bin/python" manage.py permission_manifest --check
   "$VENV/bin/python" manage.py check --deploy --fail-level WARNING )
 
-# A module whose data is not in place registers as planned and stays out of the
-# sidebar. That is deliberate, so this reports rather than fails the deploy --
-# the rest of the release must still go out.
+# A module whose data is not in place registers as planned and stays out of the sidebar.
 log "module readiness"
 ( set -a; . "/etc/fusion/$SVC.env"; set +a
   cd "$REL" && "$VENV/bin/python" manage.py leave_readiness ) || true

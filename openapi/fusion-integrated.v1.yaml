@@ -727,14 +727,7 @@ paths:
   /api/v1/leave/requests/{id}/renominate:
     post:
       operationId: v1_leave_requests_renominate_create
-      description: |-
-        EL-UC-006. Somebody else, after the first substitute declined.
-
-        The service and the serializer both existed and no route reached them, so
-        the only way out of APPLICANT_ACTION_REQUIRED was to withdraw the request
-        entirely -- and an extension stuck in its own version of that state had no
-        way out at all, because withdrawing an extension is not the same as
-        abandoning leave already running.
+      description: EL-UC-006. Somebody else, after the first substitute declined.
       parameters:
       - in: path
         name: id
