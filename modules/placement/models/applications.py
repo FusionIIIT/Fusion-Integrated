@@ -33,9 +33,6 @@ class Application(TimeStampedModel, UserScopedModel):
     semester_at_apply = models.PositiveSmallIntegerField(null=True, blank=True)
     standing_declared_seq_at_apply = models.IntegerField(null=True, blank=True)
     eligibility_snapshot = models.JSONField(default=dict, blank=True)
-
-    resume = models.ForeignKey("ProfileDocument", null=True, blank=True,
-                               on_delete=models.SET_NULL, related_name="+")
     cover_note = models.TextField(blank=True)
     applied_at = models.DateTimeField(null=True, blank=True)
     withdrawn_reason = models.CharField(max_length=300, blank=True)

@@ -11,14 +11,14 @@ from django.db import transaction
 
 from core.api.exceptions import ConflictError, NotFoundError
 from core.files import drive, validators
-from modules.placement.models import ProfileDocument, StudentProfile
-from modules.placement.services import profiles as profile_service
+from modules.placement.models import ProfileDocument
 
 log = logging.getLogger("fusion.placement.documents")
 
-KINDS = {"resume", "certificate", "offer_letter", "other"}
+#: No resume: a student keeps one on the ERP portal, not a copy here.
+KINDS = {"certificate", "offer_letter", "other"}
 
-MAX_DOCUMENTS_PER_PROFILE = 20
+MAX_DOCUMENTS_PER_STUDENT = 20
 
 
 @transaction.atomic
@@ -33,29 +33,21 @@ def attach_link(*, user_id: int, kind: str, url: str,
     except drive.InvalidDriveLink as exc:
         raise ConflictError(exc.message, code=exc.code) from exc
 
-    profile, _ = StudentProfile.objects.get_or_create(user_id=user_id)
-
-    if ProfileDocument.objects.filter(profile=profile, is_active=True).count() \
-            >= MAX_DOCUMENTS_PER_PROFILE:
+    if ProfileDocument.objects.filter(user_id=user_id, is_active=True).count() \
+            >= MAX_DOCUMENTS_PER_STUDENT:
         raise ConflictError(
-            f"You can keep at most {MAX_DOCUMENTS_PER_PROFILE} documents. "
+            f"You can keep at most {MAX_DOCUMENTS_PER_STUDENT} documents. "
             "Remove one before adding another.",
             code="too_many_documents")
 
     existing = ProfileDocument.objects.filter(
-        profile=profile, is_active=True, drive_file_id=ref.file_id,
+        user_id=user_id, is_active=True, drive_file_id=ref.file_id,
         kind=kind).first()
     if existing:
         return existing        # submitted twice, not two documents
 
-    if kind == "resume":
-        # Deactivated, not deleted: an application points at what it was sent with.
-        ProfileDocument.objects.filter(
-            profile=profile, kind="resume", is_active=True
-        ).update(is_active=False)
-
     document = ProfileDocument.objects.create(
-        profile=profile, user_id=user_id, kind=kind,
+        user_id=user_id, kind=kind,
         title=(title or "").strip()[:160] or _default_title(kind),
         original_filename=validators.sanitise_filename(title or "",
                                                        fallback=""),
@@ -64,15 +56,13 @@ def attach_link(*, user_id: int, kind: str, url: str,
         storage_key=None,
     )
 
-    # A resume is 25% of completeness — the difference between applying or not.
-    profile_service.recompute(user_id=user_id)
     log.info("placement.document.linked user=%s kind=%s file=%s",
              user_id, kind, ref.file_id)
     return document
 
 
 def _default_title(kind: str) -> str:
-    return {"resume": "Resume", "certificate": "Certificate",
+    return {"certificate": "Certificate",
             "offer_letter": "Offer letter"}.get(kind, "Document")
 
 
@@ -86,4 +76,3 @@ def remove(*, document_id: int, user_id: int) -> None:
         raise NotFoundError("No such document.")
     document.is_active = False
     document.save(update_fields=["is_active", "updated_at"])
-    profile_service.recompute(user_id=user_id)

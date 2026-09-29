@@ -9,58 +9,21 @@ from django.db import models
 
 from core.db.mixins import TimeStampedModel, UserScopedModel
 
-
 # -- Student placement profile (PC-UC-001, PC-BR-001) --------------------------
-class StudentProfile(TimeStampedModel, UserScopedModel):
-    """What a student maintains about themselves.
-
-    No academic facts here: CPI, credits and backlogs come from the IAM
-    projection, so a student can never type their own.
-    """
-
-    user_id = models.IntegerField(unique=True)      # narrower than the mixin
-
-    headline = models.CharField(max_length=160, blank=True)
-    about = models.TextField(blank=True)
-    phone = models.CharField(max_length=32, blank=True)
-    alternate_email = models.EmailField(blank=True)
-
-    skills = models.JSONField(default=list, blank=True)
-    achievements = models.JSONField(default=list, blank=True)
-    certifications = models.JSONField(default=list, blank=True)
-    experience = models.JSONField(default=list, blank=True)
-    projects = models.JSONField(default=list, blank=True)
-    education = models.JSONField(default=list, blank=True)
-
-    github_url = models.URLField(blank=True)
-    linkedin_url = models.URLField(blank=True)
-    portfolio_url = models.URLField(blank=True)
-
-    # Denormalised so an eligibility sweep does not recompute per student.
-    completeness_percent = models.PositiveSmallIntegerField(default=0)
-    is_complete = models.BooleanField(default=False, db_index=True)
-    missing_fields = models.JSONField(default=list, blank=True)
-
-    class Meta:
-        db_table = "placement_student_profile"
-
-    def __str__(self) -> str:
-        return f"profile u{self.user_id} ({self.completeness_percent}%)"
-
 
 class ProfileDocument(TimeStampedModel, UserScopedModel):
-    """A document a student has attached to their profile.
+    """A document a student has submitted to the placement office.
+
+    Offer letters and clearance paperwork. Not resumes: those are maintained
+    once on the ERP portal and reach here through the directory projection.
 
     New rows are Drive links; rows written before the switch hold uploaded
     bytes. The CHECK constraint allows exactly one, so the download view
     always knows which it is holding.
     """
 
-    KIND = [("resume", "Resume"), ("certificate", "Certificate"),
+    KIND = [("certificate", "Certificate"),
             ("offer_letter", "Offer letter"), ("other", "Other")]
-
-    profile = models.ForeignKey(StudentProfile, on_delete=models.CASCADE,
-                                related_name="documents")
     kind = models.CharField(max_length=20, choices=KIND, default="other")
     title = models.CharField(max_length=160, blank=True)
     #: Display only, sanitised on the way in.
@@ -81,8 +44,8 @@ class ProfileDocument(TimeStampedModel, UserScopedModel):
 
     class Meta:
         db_table = "placement_profile_document"
-        indexes = [models.Index(fields=["profile", "kind", "is_active"],
-                                name="document_profile_idx")]
+        indexes = [models.Index(fields=["user_id", "kind", "is_active"],
+                                name="document_user_idx")]
         constraints = [
             models.CheckConstraint(
                 condition=(

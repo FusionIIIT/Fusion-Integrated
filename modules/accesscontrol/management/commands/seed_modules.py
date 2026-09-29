@@ -19,6 +19,8 @@ class Command(BaseCommand):
     @transaction.atomic
     def handle(self, *args, **options):
         seeded = 0
+        declared: set[str] = set()
+        declared_items: set[str] = set()
         for cfg in apps.get_app_configs():
             if not cfg.name.startswith("modules."):
                 continue
@@ -39,6 +41,7 @@ class Command(BaseCommand):
             module, _ = Module.objects.update_or_create(
                 code=spec["code"], defaults=defaults
             )
+            declared.add(spec["code"])
             if unmet:
                 self.stdout.write(self.style.WARNING(
                     f"  {spec['code']}: registered but NOT active — "
@@ -51,6 +54,22 @@ class Command(BaseCommand):
                     defaults={**{k: v for k, v in item.items() if k != "code"},
                               "module": module},
                 )
+                declared_items.add(item["code"])
             seeded += 1
             self.stdout.write(f"  registered {spec['code']} ({spec['status']})")
+
+        self._retire(declared, declared_items)
         self.stdout.write(self.style.SUCCESS(f"{seeded} module(s) registered"))
+
+    def _retire(self, declared: set[str], declared_items: set[str]) -> None:
+        """Upserting alone leaves a deleted module registered and reachable forever."""
+        stale_items = NavItem.objects.exclude(code__in=declared_items)
+        for code in stale_items.values_list("code", flat=True):
+            self.stdout.write(self.style.WARNING(f"  dropped nav item {code}"))
+        stale_items.delete()
+
+        stale = Module.objects.exclude(code__in=declared).exclude(status="deprecated")
+        for code in stale.values_list("code", flat=True):
+            self.stdout.write(self.style.WARNING(
+                f"  {code}: no module declares it any more — marked deprecated"))
+        stale.update(status="deprecated")

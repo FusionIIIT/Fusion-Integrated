@@ -36,11 +36,11 @@ from modules.placement.models import (
 from modules.placement.selectors import scoping
 from modules.placement.services import announcements as announcement_service
 from modules.placement.services import applications as application_service
+from modules.placement.services import candidates
 from modules.placement.services import companies as company_service
 from modules.placement.services import interviews as interview_service
 from modules.placement.services import offers as offer_service
 from modules.placement.services import postings as posting_service
-from modules.placement.services import profiles as profile_service
 from modules.placement.services import recruiters as recruiter_service
 from modules.placement.services import stats as stats_service
 
@@ -302,61 +302,45 @@ class ApplyView(_Scoped, APIView):
 
 
 # -- Profile -------------------------------------------------------------------
-@extend_schema(request=s.StudentProfileSerializer,
-               responses=s.StudentProfileSerializer)
-class MyProfileView(_Scoped, APIView):
-    permission_classes = [MODULE, HasPermission(P_VIEW_SELF)]
-
-    def get(self, request):
-        actor = _actor(request)
-        profile = scoping.profiles_for(actor).filter(
-            user_id=actor.user_id).first()
-        if profile is None:
-            return Response({"user_id": actor.user_id, "exists": False,
-                             "completeness_percent": 0, "is_complete": False})
-        return Response(s.StudentProfileSerializer(profile).data)
-
-    def put(self, request):
-        actor = _actor(request)
-        payload = s.StudentProfileSerializer(data=request.data, partial=True)
-        payload.is_valid(raise_exception=True)
-        profile = profile_service.upsert(user_id=actor.user_id,
-                                         data=payload.validated_data)
-        return Response(s.StudentProfileSerializer(profile).data)
-
-
-@extend_schema(responses=s.ResumeSerializer)
+@extend_schema(responses=s.CandidateSerializer)
 class MyResumeView(_Scoped, APIView):
-    """PC-UC-002: a structured resume derived from the profile."""
+    """The student's own candidate record, including the resume they maintain
+    on the ERP portal."""
 
     permission_classes = [MODULE, HasPermission(P_VIEW_SELF)]
 
     def get(self, request):
         actor = _actor(request)
-        standing = None
-        try:
-            from modules.placement.services import facts
-            standing = (facts.academic_facts([actor.user_id])
-                        .get(actor.user_id, {}).get("_standing"))
-        except IamUnavailable:
-            standing = None          # the resume still renders, minus the CPI
-        return Response(profile_service.build_resume(
-            user_id=actor.user_id, standing=standing))
+        return Response(_candidate(actor.user_id))
 
 
-class ProfileDetailView(_Scoped, generics.RetrieveAPIView):
-    """A recruiter or the TPO reading a candidate's profile.
+@extend_schema(responses=s.CandidateSerializer)
+class ProfileDetailView(_Scoped, APIView):
+    """A recruiter or the TPO reading a candidate.
 
-    Scoped so a recruiter reaches only their own live applicants — see
-    selectors/scoping.profiles_for.
+    A recruiter reaches only their own live applicants — anyone else is a 404,
+    not a 403, because a 403 confirms the person exists.
     """
 
-    serializer_class = s.StudentProfileSerializer
     permission_classes = [MODULE]
-    lookup_field = "user_id"
 
-    def get_queryset(self):
-        return scoping.profiles_for(_actor(self.request))
+    def get(self, request, user_id: int):
+        actor = _actor(request)
+        if not scoping.may_read_candidate(actor, user_id):
+            raise NotFoundError("No such candidate.")
+        return Response(_candidate(user_id))
+
+
+def _candidate(user_id: int) -> dict:
+    """Assembled from the directory, with the CPI when the IAM answers."""
+    standing = None
+    try:
+        from modules.placement.services import facts
+        standing = (facts.academic_facts([user_id])
+                    .get(user_id, {}).get("_standing"))
+    except IamUnavailable:
+        standing = None              # the record still renders, minus the CPI
+    return candidates.candidate_record(user_id=user_id, standing=standing)
 
 
 # -- Companies -----------------------------------------------------------------

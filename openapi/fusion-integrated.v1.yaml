@@ -1050,6 +1050,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/Session'
           description: ''
+    patch:
+      operationId: v1_me_partial_update
+      description: Switch which designation the sidebar and screens present them as.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRole'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRole'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRole'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+          description: ''
   /api/v1/placement/announcements:
     get:
       operationId: v1_placement_announcements_list
@@ -2104,56 +2129,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/JobPosting'
           description: ''
-  /api/v1/placement/profile:
-    get:
-      operationId: v1_placement_profile_retrieve
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
-        `request.principal`.
-      tags:
-      - v1
-      security:
-      - recruiterSession: []
-      - iamSession: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StudentProfile'
-          description: ''
-    put:
-      operationId: v1_placement_profile_update
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
-        `request.principal`.
-      tags:
-      - v1
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/StudentProfile'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/StudentProfile'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/StudentProfile'
-      security:
-      - recruiterSession: []
-      - iamSession: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StudentProfile'
-          description: ''
   /api/v1/placement/profile/resume:
     get:
       operationId: v1_placement_profile_resume_retrieve
-      description: 'PC-UC-002: a structured resume derived from the profile.'
+      description: |-
+        The student's own candidate record, including the resume they maintain
+        on the ERP portal.
       tags:
       - v1
       security:
@@ -2164,16 +2145,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resume'
+                $ref: '#/components/schemas/Candidate'
           description: ''
   /api/v1/placement/profiles/{user_id}:
     get:
       operationId: v1_placement_profiles_retrieve
       description: |-
-        A recruiter or the TPO reading a candidate's profile.
+        A recruiter or the TPO reading a candidate.
 
-        Scoped so a recruiter reaches only their own live applicants — see
-        selectors/scoping.profiles_for.
+        A recruiter reaches only their own live applicants — anyone else is a 404,
+        not a 403, because a 403 confirms the person exists.
       parameters:
       - in: path
         name: user_id
@@ -2190,7 +2171,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StudentProfile'
+                $ref: '#/components/schemas/Candidate'
           description: ''
   /api/v1/placement/records:
     get:
@@ -3149,6 +3130,43 @@ components:
       - published
       - version
       - year
+    Candidate:
+      type: object
+      description: A person as the ERP portal and the IAM describe them. Read-only
+        here.
+      properties:
+        user_id:
+          type: integer
+        name:
+          type: string
+        roll_no:
+          type: string
+        email:
+          type: string
+        programme:
+          type: string
+        discipline:
+          type: string
+        batch_year:
+          type: integer
+          nullable: true
+        resume_link:
+          type: string
+        profile_completed:
+          type: boolean
+        academic:
+          nullable: true
+      required:
+      - academic
+      - batch_year
+      - discipline
+      - email
+      - name
+      - profile_completed
+      - programme
+      - resume_link
+      - roll_no
+      - user_id
     CategoryEnum:
       enum:
       - CL
@@ -4526,6 +4544,11 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PatchedRole:
+      type: object
+      properties:
+        active_role:
+          type: string
     PlacementRecordDetail:
       type: object
       description: A student's own record, with what rules 22 and 24 still want from
@@ -4689,13 +4712,11 @@ components:
       - title
     ProfileDocumentKindEnum:
       enum:
-      - resume
       - certificate
       - offer_letter
       - other
       type: string
       description: |-
-        * `resume` - Resume
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
@@ -5001,36 +5022,6 @@ components:
           type: integer
       required:
       - substitute_user_id
-    Resume:
-      type: object
-      description: 'PC-UC-002: the profile rendered as a structured resume.'
-      properties:
-        user_id:
-          type: integer
-        headline:
-          type: string
-        summary:
-          type: string
-        skills:
-          type: array
-          items:
-            type: string
-        education: {}
-        experience: {}
-        projects: {}
-        links: {}
-        standing:
-          nullable: true
-      required:
-      - education
-      - experience
-      - headline
-      - links
-      - projects
-      - skills
-      - standing
-      - summary
-      - user_id
     Resumption:
       type: object
       properties:
@@ -5357,78 +5348,6 @@ components:
       - destination
       - from_date
       - to_date
-    StudentProfile:
-      type: object
-      properties:
-        user_id:
-          type: integer
-          readOnly: true
-        headline:
-          type: string
-          maxLength: 160
-        about:
-          type: string
-        phone:
-          type: string
-          maxLength: 32
-        alternate_email:
-          oneOf:
-          - type: string
-            format: email
-            maxLength: 254
-          - type: string
-            maxLength: 0
-        skills: {}
-        achievements: {}
-        certifications: {}
-        experience: {}
-        projects: {}
-        education: {}
-        github_url:
-          oneOf:
-          - type: string
-            format: uri
-            maxLength: 200
-          - type: string
-            maxLength: 0
-        linkedin_url:
-          oneOf:
-          - type: string
-            format: uri
-            maxLength: 200
-          - type: string
-            maxLength: 0
-        portfolio_url:
-          oneOf:
-          - type: string
-            format: uri
-            maxLength: 200
-          - type: string
-            maxLength: 0
-        completeness_percent:
-          type: integer
-          readOnly: true
-        is_complete:
-          type: boolean
-          readOnly: true
-        missing_fields:
-          readOnly: true
-        documents:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProfileDocument'
-          readOnly: true
-        updated_at:
-          type: string
-          format: date-time
-          readOnly: true
-      required:
-      - completeness_percent
-      - documents
-      - is_complete
-      - missing_fields
-      - updated_at
-      - user_id
     SubmitOfferLetter:
       type: object
       properties:

@@ -3,6 +3,10 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Iterable
+from datetime import timedelta
+
+from django.conf import settings
+from django.utils import timezone
 
 from fusion_auth.client import IamUnavailable, get_client
 from modules.directory.models import UserRef
@@ -11,19 +15,22 @@ log = logging.getLogger("fusion.directory")
 
 
 def ensure_users_cached(user_ids: Iterable[int]) -> int:
-    """Pull anyone we have not seen yet. Never raises: a directory miss must
-    degrade a screen, not break the request that needed a name."""
+    """Pull anyone we have not seen recently enough. Never raises: a directory
+    miss must degrade a screen, not break the request that needed a name."""
     ids = {int(i) for i in user_ids if i is not None}
     if not ids:
         return 0
-    known = set(UserRef.objects.filter(user_id__in=ids).values_list("user_id", flat=True))
-    missing = ids - known
-    if not missing:
+    fresh_since = timezone.now() - timedelta(seconds=settings.DIRECTORY_MAX_AGE_SECONDS)
+    # Caching on first sight alone pins a person to the day they were first read.
+    fresh = set(UserRef.objects.filter(user_id__in=ids, synced_at__gte=fresh_since)
+                .values_list("user_id", flat=True))
+    stale = ids - fresh
+    if not stale:
         return 0
     try:
-        fetched = get_client().get_users(sorted(missing))
+        fetched = get_client().get_users(sorted(stale))
     except IamUnavailable as exc:
-        log.warning("directory.sync_failed missing=%d err=%s", len(missing), exc)
+        log.warning("directory.sync_failed stale=%d err=%s", len(stale), exc)
         return 0
     return upsert(fetched.values())
 
@@ -59,6 +66,8 @@ def upsert(refs, *, rejected: list | None = None) -> int:
             kind=r.kind or "student", email=r.email, department=r.department,
             programme=r.programme, discipline=r.discipline, batch_year=r.batch_year,
             is_active=getattr(r, "is_active", True),
+            resume_link=getattr(r, "resume_link", "") or "",
+            profile_completed=getattr(r, "profile_completed", False),
         ))
     if not rows:
         return 0
@@ -67,6 +76,6 @@ def upsert(refs, *, rejected: list | None = None) -> int:
         # Without is_active a deactivated account would stay active here.
         update_fields=["username", "display_name", "kind", "email", "department",
                        "programme", "discipline", "batch_year", "is_active",
-                       "updated_at"],
+                       "resume_link", "profile_completed", "updated_at"],
     )
     return len(rows)
