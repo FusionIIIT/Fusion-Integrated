@@ -16,7 +16,7 @@ from core.api import csrf
 from core.api.exceptions import AuthenticationFailedError as AuthFailed
 from core.api.exceptions import DomainError
 from fusion_auth.client import IamUnavailable, get_client
-from fusion_auth.serializers import LoginSerializer, OkSerializer, SessionSerializer
+from fusion_auth.serializers import LoginSerializer, OkSerializer, RoleSerializer, SessionSerializer
 from modules.accesscontrol import contracts as accesscontrol
 
 COOKIE_MAX_AGE = 12 * 60 * 60
@@ -92,10 +92,27 @@ class MeView(APIView):
             "roles": list(p.roles),
             "permissions": sorted(p.permissions),
             "modules": list(p.modules),
-            "navigation": accesscontrol.build_navigation(
+            # The IAM's sidebar spans every app; fall back if it has not published.
+            "navigation": list(p.navigation) or accesscontrol.build_navigation(
                 granted_module_codes=p.modules,
                 permissions=p.permissions,
             ),
             # Re-issued on every /me so a reloaded tab needs no second trip.
             "csrf_token": csrf.token_for(request.auth or ""),
         })
+
+    @extend_schema(request=RoleSerializer, responses=SessionSerializer)
+    def patch(self, request):
+        """Switch which designation the sidebar and screens present them as."""
+        role = (request.data.get("active_role") or "").strip()
+        try:
+            get_client().set_active_role(request.auth or "", role)
+        except ValueError as exc:
+            raise DomainError(str(exc), code="unknown_role") from exc
+        except IamUnavailable as exc:
+            return Response(
+                {"error": {"code": "iam_unavailable",
+                           "message": f"Identity service unavailable: {exc}",
+                           "details": [], "request_id": ""}},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        return self.get(request)

@@ -24,7 +24,6 @@ from modules.placement.models import (
     Offer,
     PlacementPolicy,
     PlacementRecord,
-    StudentProfile,
 )
 from modules.placement.services import clearance as service
 from modules.placement.services import documents as document_service
@@ -85,7 +84,6 @@ def campus_record(policy, company, user_id=STUDENT):
 
 
 def offer_letter(user_id=STUDENT):
-    StudentProfile.objects.get_or_create(user_id=user_id)
     return document_service.attach_link(
         user_id=user_id, kind="offer_letter", url=LINK, title="Signed offer")
 
@@ -153,15 +151,14 @@ class TestOfferLetter:
         assert service.no_dues_clearance(user_id=STUDENT).cleared is True
 
     def test_only_a_document_of_the_right_kind_counts(self, stub_iam, policy):
-        """A resume is not an offer letter, however it is named."""
+        """A certificate is not an offer letter, however it is named."""
         stub_iam()
         record = campus_record(policy, make_company())
-        StudentProfile.objects.get_or_create(user_id=STUDENT)
-        resume = document_service.attach_link(user_id=STUDENT, kind="resume",
-                                              url=LINK, title="CV")
+        other = document_service.attach_link(user_id=STUDENT, kind="certificate",
+                                             url=LINK, title="Offer letter")
         with pytest.raises(ConflictError) as exc:
             service.submit_offer_letter(record_id=record.pk, user_id=STUDENT,
-                                        document_id=resume.pk)
+                                        document_id=other.pk)
         assert exc.value.code == "wrong_document_kind"
 
     def test_someone_elses_record_is_a_404(self, stub_iam, policy):

@@ -119,7 +119,7 @@ Traceability only — the behaviour is there.
 | `PC-UC-007` | Automated notifications | notification outbox; all seven events in `PC-AFR-050`–`056` |
 | `PC-UC-021` | Company schedules an interview | `services/interviews.py` admits recruiters |
 | `PC-UC-022` | Company extends an offer | `services/offers.py` admits recruiters |
-| `PC-UC-023` | Resume from profile | `services/profiles.py` — mis-cited, see §3 |
+| `PC-UC-023` | Resume from profile | **deviation** — the resume is maintained on the ERP portal, see §6 |
 | `PC-UC-024` | Student statistics | `services/stats.py::student_view`, cited only as `PC-BR-016` — **partial**: past seasons unreachable from the UI, see G4 |
 
 All seven notification events were confirmed individually: posting published,
@@ -135,7 +135,7 @@ The code was written against an earlier use-case numbering.
 
 | Cited as | Means in v1.3 | Should be | Sites |
 |---|---|---|---|
-| `PC-UC-002` | Browse opportunities | `PC-UC-023` resume | 5 — `api/views.py`, `api/serializers.py`, `services/profiles.py` ×2, … |
+| `PC-UC-002` | Browse opportunities | `PC-UC-023` resume | resolved — those sites were deleted with the profile, see §6 |
 | `PC-UC-016` | Company shortlists | `PC-UC-022` extend offer | 1 — `services/offers.py` |
 
 Meanwhile the real `PC-UC-016` (company shortlisting) is implemented as the
@@ -161,7 +161,7 @@ Checked against the code, not just the citation.
 
 | Id | Rule | Evidence |
 |---|---|---|
-| `PC-BR-001` | Profile completeness before applying | `domain/profile_completeness.py`, enforced in `services/applications.py` |
+| `PC-BR-001` | Profile completeness before applying | answered by the ERP portal's `profile_completed`, enforced in `services/applications.py` — see §6 |
 | `PC-BR-002` | Eligibility before applying | `domain/eligibility.py`; criteria frozen on publish |
 | `PC-BR-003` | Posting content required | model constraint plus a data migration |
 | `PC-BR-004` | Eligibility vocabulary | closed vocabulary — an unknown field denies |
@@ -196,3 +196,36 @@ company participation (`companies_participated` and the by-company breakdown).
    Reports page.
 4. **G1 and G2 need decisions first** — who counts as an alumnus, and whether
    companies may register themselves. Neither should be built on a guess.
+
+---
+
+## 6. The placement profile was removed
+
+The module used to keep its own student profile — headline, about, skills,
+documents and a completeness percentage — and a resume uploaded into it. The
+ERP portal already holds all of that on its own profile page, so a student
+maintained two, and only the placement one gated applying.
+
+**What changed.** `StudentProfile`, `services/profiles.py` and
+`domain/profile_completeness.py` are gone. The resume and the completion flag
+are projected from the portal through the IAM into `modules/directory`, and
+placement reads them like any other person fact. Recruiters see the resume on
+the applicant row rather than behind a separate profile page.
+
+**What this means for the specification.**
+
+| Id | Was | Now |
+|---|---|---|
+| `PC-BR-001` | completeness computed here | the portal's `profile_completed`; the rule still holds, the answer comes from upstream |
+| `PC-UC-001` | student maintains a placement profile | **deviation** — one profile, on the portal |
+| `PC-UC-023` | a structured resume derived from the profile | **deviation** — a link the student maintains upstream, not generated data |
+
+**What was deliberately kept.** `ProfileDocument` survives, detached from the
+profile and keyed by `user_id` alone. It holds offer letters and clearance
+paperwork, which are placement's own and duplicate nothing — deleting it with
+the profile would have destroyed them. Its `resume` kind is gone.
+
+**Eligibility lost the `skills` criterion**, which had no source once the
+profile went; the IAM does not project skills. No posting used it. The
+`LIST_FIELDS` machinery stays, because a closed vocabulary is meant to be
+added to.

@@ -1,7 +1,7 @@
 """What the server tells the shell about this module (ADR-0010)."""
 #: `status` is what this module would be once its data exists.
 MODULE = {
-    "code": "leave", "label": "Leave", "icon": "FaRegCalendarCheck",
+    "code": "leave", "label": "Leave", "icon": "CalendarBlank",
     "base_path": "/leave", "nav_section": "Leave", "sort_order": 20,
     "status": "active",
 }
@@ -83,35 +83,35 @@ ROLE_GRANTS = {
 
 NAV_ITEMS = [
     # -- employee ---------------------------------------------------------
-    {"code": "leave.mine", "label": "My Leave", "icon": "FaRegCalendarCheck",
+    {"code": "leave.mine", "label": "My Leave", "icon": "CalendarBlank",
      "to": "/leave", "required_permission": "leave.request.view_self",
      "sort_order": 10},
-    {"code": "leave.apply", "label": "Apply", "icon": "FaPlusCircle",
+    {"code": "leave.apply", "label": "Apply", "icon": "PlusCircle",
      "to": "/leave/apply", "required_permission": "leave.request.create",
      "sort_order": 20},
-    {"code": "leave.substitute", "label": "Standing In", "icon": "FaUserFriends",
+    {"code": "leave.substitute", "label": "Standing In", "icon": "UsersThree",
      "to": "/leave/substitute", "required_permission": "leave.substitute.respond",
      "sort_order": 30},
 
     # -- unit head and above ----------------------------------------------
-    {"code": "leave.review", "label": "Review Queue", "icon": "FaClipboardCheck",
+    {"code": "leave.review", "label": "Review Queue", "icon": "Checks",
      "to": "/leave/review", "required_permission": "leave.request.review",
      "sort_order": 40},
-    {"code": "leave.route", "label": "Routing Queue", "icon": "FaShareSquare",
+    {"code": "leave.route", "label": "Routing Queue", "icon": "Export",
      "to": "/leave/routing", "required_permission": "leave.request.route",
      "sort_order": 50},
-    {"code": "leave.sanction", "label": "Sanction Queue", "icon": "FaStamp",
+    {"code": "leave.sanction", "label": "Sanction Queue", "icon": "Stamp",
      "to": "/leave/sanction", "required_permission": "leave.request.sanction",
      "sort_order": 60},
-    {"code": "leave.resumption", "label": "Resumptions", "icon": "FaUndo",
+    {"code": "leave.resumption", "label": "Resumptions", "icon": "ArrowsClockwise",
      "to": "/leave/resumptions", "required_permission": "leave.resumption.verify",
      "sort_order": 70},
 
     # -- administration ----------------------------------------------------
-    {"code": "leave.balances", "label": "Balances", "icon": "FaBalanceScale",
+    {"code": "leave.balances", "label": "Balances", "icon": "Gavel",
      "to": "/leave/balances", "required_permission": "leave.balance.view",
      "sort_order": 80},
-    {"code": "leave.policy", "label": "Policy & Calendar", "icon": "FaCog",
+    {"code": "leave.policy", "label": "Policy & Calendar", "icon": "Wrench",
      "to": "/leave/policy", "required_permission": "leave.policy.manage",
      "sort_order": 90},
 ]

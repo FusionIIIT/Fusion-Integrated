@@ -85,13 +85,10 @@ class DocumentDownloadView(APIView):
     def get(self, request, pk):
         actor = _actor(request)
 
-        # Narrowed by queryset, so a foreign document is absent, not forbidden.
-        readable_user_ids = scoping.profiles_for(actor).values("user_id")
-        document = (ProfileDocument.objects
-                    .filter(pk=pk, is_active=True,
-                            user_id__in=readable_user_ids)
-                    .first())
-        if document is None:
+        # A document this actor may not read is absent, not forbidden.
+        document = ProfileDocument.objects.filter(pk=pk, is_active=True).first()
+        if document is None or not scoping.may_read_candidate(actor,
+                                                              document.user_id):
             raise NotFoundError("No such document.")
 
         if getattr(actor, "kind", None) == "recruiter":

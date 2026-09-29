@@ -15,7 +15,10 @@ from django.core.management.base import BaseCommand, CommandError
 MANIFEST = Path(settings.BASE_DIR) / "registry" / "permissions.json"
 CATALOGUE = (Path(settings.BASE_DIR) / "docs" / "02-iam"
              / "permission-catalog.generated.md")
-VERSION = 1
+VERSION = 2
+
+#: Which service published this; the IAM scopes its writes to it.
+PUBLISHER = "integrated"
 
 
 def collect() -> dict:
@@ -59,7 +62,33 @@ def collect() -> dict:
                 for designation, codes in getattr(reg, "ROLE_GRANTS", {}).items()
                 if codes),
         }
-    return {"version": VERSION, "modules": modules}
+        nav = _nav(spec, getattr(reg, "NAV_ITEMS", []))
+        if nav:
+            modules[code]["nav"] = nav
+    return {"version": VERSION, "publisher": PUBLISHER, "modules": modules}
+
+
+#: Copied verbatim so a screen the IAM draws is the screen this module declares.
+_NAV_KEYS = ("label", "icon", "base_path", "nav_section", "sort_order", "status")
+_ITEM_KEYS = ("code", "label", "icon", "to", "required_permission", "sort_order")
+
+
+def _nav(spec: dict | None, items) -> dict | None:
+    """The sidebar this module contributes, for the IAM to serve to every app.
+
+    The DECLARED status, not the running one: this file is committed and diffed
+    by CI, so it must be a function of the code alone. Readiness is per
+    environment and is applied where it is known — see seed_modules.
+    """
+    if not spec:
+        return None                  # permissions but no screens; nothing to draw
+    nav = {k: spec[k] for k in _NAV_KEYS if k in spec}
+    nav["items"] = [
+        {k: item[k] for k in _ITEM_KEYS if k in item}
+        for item in sorted(items, key=lambda i: (i.get("sort_order", 100),
+                                                 i["code"]))
+    ]
+    return nav
 
 
 def problems(manifest: dict) -> list[str]:
