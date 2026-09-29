@@ -253,7 +253,8 @@ SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
 # W003: CSRF is enforced by core/api/csrf.py. See the note above MIDDLEWARE.
-SILENCED_SYSTEM_CHECKS = ["security.W003"]
+# W019: the portal frames these screens deliberately, and only same origin.
+SILENCED_SYSTEM_CHECKS = ["security.W003", "security.W019"]
 
 # Without this, nothing is configured and every INFO audit line is discarded.
 LOGGING = {
