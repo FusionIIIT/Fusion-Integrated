@@ -13,7 +13,7 @@ import { http, readBlobError } from "../../../lib/http";
 import type {
   Announcement, Applicant, Application, Company, EligibilityVerdict,
   InterviewRound, Offer, Page, Posting, ProfileDocument, StaffStats,
-  StudentProfile, StudentStats,
+  StudentStats,
 } from "./types";
 
 const KEY = "placement";
@@ -24,7 +24,6 @@ export const keys = {
   eligibility: (id: number) => [KEY, "eligibility", id] as const,
   applications: (f?: unknown) => [KEY, "applications", f] as const,
   offers: () => [KEY, "offers"] as const,
-  profile: () => [KEY, "profile"] as const,
   resume: () => [KEY, "resume"] as const,
   companies: () => [KEY, "companies"] as const,
   rounds: (postingId?: number) => [KEY, "rounds", postingId] as const,
@@ -167,30 +166,8 @@ export function useRespondToOffer() {
 }
 
 // -- Profile -------------------------------------------------------------------
-export function useMyProfile() {
-  return useQuery({
-    queryKey: keys.profile(),
-    queryFn: async () =>
-      (await http.get<StudentProfile>("/placement/profile")).data,
-  });
-}
 
-export function useSaveProfile() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (body: Record<string, unknown>) =>
-      (await http.put<StudentProfile>("/placement/profile", body)).data,
-    onSuccess: () => invalidateAll(qc),
-  });
-}
 
-export function useMyResume() {
-  return useQuery({
-    queryKey: keys.resume(),
-    queryFn: async () =>
-      (await http.get<Record<string, unknown>>("/placement/profile/resume")).data,
-  });
-}
 
 // -- Companies -----------------------------------------------------------------
 export function useCompanies() {

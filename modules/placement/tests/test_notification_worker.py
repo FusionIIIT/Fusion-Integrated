@@ -17,7 +17,6 @@ from modules.placement.models import (
     NotificationOutbox,
     PlacementPolicy,
     PlacementRegistration,
-    StudentProfile,
 )
 from modules.placement.services import notifications
 
@@ -184,13 +183,6 @@ class TestBroadcast:
         notifications.deliver_pending()
         assert NotificationOutbox.objects.count() == n
 
-    def test_a_profile_holder_counts_as_a_student_audience(self):
-        StudentProfile.objects.create(user_id=77)
-        notifications.enqueue(
-            topic="posting.published", dedupe_key="p:1",
-            recipient_email=notifications.BROADCAST_SENTINEL,
-            subject="s", body="b", payload={"audience": "students"})
-        assert notifications.deliver_pending().expanded == 1
 
     def test_an_empty_audience_is_not_an_error(self):
         notifications.enqueue(

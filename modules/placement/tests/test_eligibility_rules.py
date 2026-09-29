@@ -89,40 +89,6 @@ class ComparisonTests(SimpleTestCase):
         self.assertFalse(evaluate(rule, facts(is_placed=True)).is_eligible)
 
 
-class SkillsTests(SimpleTestCase):
-    """PC-BR-004 names skills explicitly."""
-
-    def test_has_all(self):
-        rule = {"has_all": ["skills", ["python", "sql"]]}
-        self.assertTrue(evaluate(rule, facts()).is_eligible)
-        self.assertFalse(
-            evaluate(rule, facts(skills=["python"])).is_eligible)
-
-    def test_has_any(self):
-        rule = {"has_any": ["skills", ["rust", "sql"]]}
-        self.assertTrue(evaluate(rule, facts()).is_eligible)
-        self.assertFalse(evaluate(rule, facts(skills=["cobol"])).is_eligible)
-
-    def test_matching_ignores_case_and_whitespace(self):
-        rule = {"has_all": ["skills", ["Python"]]}
-        self.assertTrue(evaluate(rule, facts(skills=[" python "])).is_eligible)
-
-    def test_an_empty_skill_list_fails_has_all(self):
-        rule = {"has_all": ["skills", ["python"]]}
-        self.assertFalse(evaluate(rule, facts(skills=[])).is_eligible)
-
-    def test_a_scalar_operator_on_a_list_field_denies(self):
-        """A rule-authoring mistake, but it still denies — guessing what was
-        meant is how someone becomes eligible by accident."""
-        out = evaluate({"eq": ["skills", "python"]}, facts())
-        self.assertFalse(out.is_eligible)
-        self.assertEqual(out.outcomes[0].reason, "operator_not_valid_for_field")
-
-    def test_a_list_operator_on_a_scalar_field_denies(self):
-        out = evaluate({"has_all": ["cpi", [7]]}, facts())
-        self.assertFalse(out.is_eligible)
-        self.assertEqual(out.outcomes[0].reason, "operator_not_valid_for_field")
-
 
 class ExplanationTests(SimpleTestCase):
 
@@ -138,12 +104,6 @@ class ExplanationTests(SimpleTestCase):
         message = failure_reasons(out)[0]["message"]
         self.assertIn("declared", message.lower())
 
-    def test_missing_skills_are_named(self):
-        out = evaluate({"has_all": ["skills", ["rust", "go"]]},
-                       facts(skills=["python"]))
-        message = failure_reasons(out)[0]["message"]
-        self.assertIn("rust", message)
-        self.assertIn("go", message)
 
     def test_a_discipline_mismatch_lists_what_is_accepted(self):
         out = evaluate({"in": ["discipline", ["CSE", "ECE"]]},

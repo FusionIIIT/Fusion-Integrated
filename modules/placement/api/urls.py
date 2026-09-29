@@ -39,7 +39,6 @@ urlpatterns = [
          name="placement-document-download"),
 
     # profile
-    path("profile", v.MyProfileView.as_view(), name="placement-my-profile"),
     path("profile/resume", v.MyResumeView.as_view(), name="placement-my-resume"),
     path("profiles/<int:user_id>", v.ProfileDetailView.as_view(),
          name="placement-profile"),
