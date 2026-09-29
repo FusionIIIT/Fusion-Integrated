@@ -2,7 +2,7 @@
 
 Each has one owner: academic facts from the IAM's declared-CPI projection,
 identity from its directory, placement state from this module, skills from the
-student's profile.
+the ERP portal's profile.
 
 Gathered in a fixed number of queries however many students are asked about,
 and fail-closed — a student with no declared result has no academic facts, and
@@ -16,7 +16,7 @@ from decimal import Decimal, InvalidOperation
 
 from fusion_auth.client import IamUnavailable, get_client
 from modules.directory import contracts as directory
-from modules.placement.models import Application, PlacementRegistration, StudentProfile
+from modules.placement.models import Application, PlacementRegistration
 
 log = logging.getLogger("fusion.placement.facts")
 
@@ -70,8 +70,6 @@ def gather(user_ids: Sequence[int], *, policy) -> dict[int, dict]:
     academic = academic_facts(ids)
     people = directory.get_users(ids)
 
-    profiles = {p.user_id: p for p in
-                StudentProfile.objects.filter(user_id__in=ids)}
     registrations = {r.user_id: r for r in
                      PlacementRegistration.objects.filter(user_id__in=ids,
                                                           policy=policy)}
@@ -85,7 +83,6 @@ def gather(user_ids: Sequence[int], *, policy) -> dict[int, dict]:
     facts: dict[int, dict] = {}
     for uid in ids:
         person = people.get(uid)
-        profile = profiles.get(uid)
         reg = registrations.get(uid)
         f: dict = {
             "programme": getattr(person, "programme", None) or None,
@@ -94,8 +91,8 @@ def gather(user_ids: Sequence[int], *, policy) -> dict[int, dict]:
             "is_placed": accepted.get(uid, 0) > 0,
             "offer_count": accepted.get(uid, 0),
             "is_registered": bool(reg and reg.status == "registered"),
-            "skills": list(profile.skills) if profile else [],
-            "profile_complete": bool(profile and profile.is_complete),
+            # Completed on the ERP portal, which owns the profile.
+            "profile_complete": bool(getattr(person, "profile_completed", False)),
         }
         # Merged only if declared, so the rule denies with "missing_fact".
         f.update(academic.get(uid, {}))

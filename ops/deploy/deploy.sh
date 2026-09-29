@@ -79,6 +79,11 @@ log "registry and checks"
   "$VENV/bin/python" manage.py permission_manifest --check
   "$VENV/bin/python" manage.py check --deploy --fail-level WARNING )
 
+# A module whose data is not in place registers as planned and stays out of the sidebar.
+log "module readiness"
+( set -a; . "/etc/fusion/$SVC.env"; set +a
+  cd "$REL" && "$VENV/bin/python" manage.py leave_readiness ) || true
+
 log "swap"
 PYTHON="$VENV/bin/python" swap_symlink "$REL" "$ROOT/current"
 [ -n "$PREVIOUS" ] && printf '%s\n' "$PREVIOUS" > "$ROOT/previous"

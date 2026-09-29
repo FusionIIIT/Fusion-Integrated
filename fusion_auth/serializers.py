@@ -49,3 +49,7 @@ class SessionSerializer(serializers.Serializer):
     modules = serializers.ListField(child=serializers.CharField())
     navigation = NavGroupSerializer(many=True)
     csrf_token = serializers.CharField()
+
+
+class RoleSerializer(serializers.Serializer):
+    active_role = serializers.CharField(allow_blank=True)
