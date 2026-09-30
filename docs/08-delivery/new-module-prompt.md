@@ -1,13 +1,3 @@
----
-owner: platform-lead
-status: authoritative
-last-reviewed: 2026-09-30
-purpose: >
-  The single prompt used to start any new Fusion-Integrated module from its BR/UC
-  specification. Copy §0–§9 verbatim into a new session, fill the five blanks in §0,
-  and change nothing else. Uniformity across modules is the point of the document.
----
-
 # New module — the starting prompt
 
 Two modules are already built to this shape: `modules/placement` (largest, the reference)
@@ -600,40 +590,3 @@ Not "tests pass". All of it:
 --- PROMPT ENDS ---
 
 ---
-
-## Appendix — why each rule is in there
-
-Short notes for whoever maintains this document. Every one of these is a bug that actually
-happened in Placement or Leave.
-
-| Rule | The incident |
-|---|---|
-| Add your module to *every* `.importlinter` contract | `domain-is-pure-python` listed only `modules.placement.domain`, so leave's domain was never checked and had drifted. |
-| Domain raises plain exceptions, services translate | A bare `Exception` in leave's domain meant a fresh install returned 500 on the very first Apply. |
-| Never name a flag `--version` | `seed_leave_policy --version` collided with Django's own flag and threw at parser construction — the command could not be invoked at all. |
-| Concurrency tests with real threads | `credit_year` read-then-wrote with no lock and double-credited. 631 green tests did not see it. |
-| Constraints in the database, not Python | The fix for the above was a partial unique constraint plus `ignore_conflicts`, not a Python guard. |
-| Compare identities, not counts | A completeness check passed at "229 vs 229" while one person was genuinely missing. The same count-vs-identity mistake was made twice. |
-| Sync must retire, not only upsert | `sync_directory` only ever inserted, so it held 230 employees while the IAM reported 175. |
-| Query parameters are hostile | `?year=abc` returned 500 until `_int_param` was added. |
-| One choke point per state change | Leave's scheduler gap was four bugs at once, all because nothing owned the transition into `ONGOING`. |
-| The adversarial five | Unit head approving own leave; own request in own queue; balance going negative; unlimited back-dating; a substitute who is themselves away. All found by probing, none by the suite. |
-| Verify generated links resolve | A fabricated `BW-EL-13` citation was written for a workflow the spec deliberately retires. |
-| Wait for `tsc` | A failing client typecheck was committed because `npm test` output was read before the typecheck finished. |
-| Every nav item needs `required_permission` | Navigation was built from the union of a person's permissions, so somebody who was both a student and an office holder saw My Applications and My Offers while acting as the office. |
-| `ROLE_GRANTS` decides visibility | `acadadmin` was granted the placement coordinator's permissions "for review", which put Placement Cell in the academic section's sidebar until it was revoked. |
-| Icons from the shell's own set | Module icons were named for `react-icons`; the shell renders Phosphor, so every one of them drew a grey circle. |
-| Regenerating the manifest is not seeding | A grant removed from `ROLE_GRANTS` stayed live in the IAM until `seed_iam_permissions` was re-run. |
-| One shell, not two | A second sidebar and a second student profile were built here before the portal became the shell; both had already drifted from the originals when they were deleted. |
-| `X_FRAME_OPTIONS` and the embed | `DENY` blocks the portal from framing these pages. It works in dev only because the dev server sends no header, so the break appears first in production. |
-| Test the ordinary user first | An acting-role rule returned "the first office held". Every test account also held an office, so all of them passed; a student holding only `student` resolved to no role and was refused by 175 endpoints. It reached production. |
-| A fail-closed check names who it refuses | Same bug, stated as a design rule: the refusal was correct for an unknown role and wrong for an empty one. |
-| Read the unit before editing the config | Production loaded a settings module in `/etc/fusion` that imported `development.py`. Every hardening edit to `production.py` was inert, and it took three outages to notice. |
-| `active (running)` proves nothing | systemd reported both services healthy while one had a placeholder for a database password; gunicorn's master starts fine and the failure is per request. |
-| Rotate a shared credential in one pass | The database role is used by the portal and by the IAM's two connections. Updated at different times, it looked like three separate incidents. |
-| A placeholder copied literally | `<new password>` was written into a live `.env`, and the verification command used the same placeholder, so the failure it produced pointed away from the cause. |
-| A fixture is not the ERP | `sync_identity` started reading two tables `fusion-dev.dump` does not carry, called unguarded as its first step, and every login in the lab failed before a single user projected. Fixed by treating an absent projected table as absent data, not a crash. |
-| A hardcoded sidebar array is a coordination point, not a self-service step | `INTEGRATED_MODULES` in `Fusion-client` needs a manual entry per module. Seeding the IAM's grants was mistaken for the whole job more than once; it is half of it. |
-| `--no-verify` does not generalise | Written for `Fusion-client`'s husky hook, it was carried into this repo's own prompt, which has no pre-commit hook to bypass — the instruction did nothing, and would have hidden a real lint failure had one ever existed. |
-| Creating a role was untested since the shadow model was written | `globals_moduleaccess` has two `NOT NULL` columns (`thesis_research`, `database`) the IAM's Django model never declared. Every call to the console's own "create a role" 500'd, on `main`, until a lab need for a new designation actually exercised it. |
-| A serializer.is_valid() with no else is a silent partial write | The same endpoint returned `201` whether or not the second of its two rows actually saved, because nothing branched on the second check. The first row — the role itself — was real; the second sometimes was not, and the response could not tell you which. |
