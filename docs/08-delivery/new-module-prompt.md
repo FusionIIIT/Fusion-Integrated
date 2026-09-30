@@ -4,7 +4,7 @@ status: authoritative
 last-reviewed: 2026-09-30
 purpose: >
   The single prompt used to start any new Fusion-Integrated module from its BR/UC
-  specification. Copy §0–§9 verbatim into a new session, fill the four blanks in §0,
+  specification. Copy §0–§9 verbatim into a new session, fill the five blanks in §0,
   and change nothing else. Uniformity across modules is the point of the document.
 ---
 
@@ -15,8 +15,9 @@ and `modules/leave` (most rule-dense, the reference for state machines and ledge
 A third module that does not look like them is a defect, not a style choice.
 
 **How to use this:** copy everything from the `--- PROMPT BEGINS ---` line to the
-`--- PROMPT ENDS ---` line into a fresh session. Fill in the four bracketed blanks in §0.
-Do not summarise it, do not trim it — the length is what keeps modules identical.
+`--- PROMPT ENDS ---` line into a fresh session. Fill in the five bracketed blanks in §0 —
+including `[ENVIRONMENT]`, since §1's reading list depends on it. Do not summarise it, do
+not trim it — the length is what keeps modules identical.
 
 ---
 
@@ -31,11 +32,69 @@ Build the **[MODULE_NAME]** module in `Fusion-Integrated`, from its specificatio
 - Specification id prefixes: **[ID_PREFIX]** (e.g. `PC-BR-`, `PC-UC-` for Placement;
   `BR-EL-`, `EL-UC-` for Leave).
 - Module code / URL segment: **[module_code]** (lowercase, singular-ish, no underscores).
+- Environment: **[ENVIRONMENT]** — `full-platform` or `module-only`. See below; get this
+  wrong and §1's reading list sends you after files that do not exist on this machine.
 
 This is production code for an institute that will run it for years. "The tests pass" is
 not the finish line — §8 is.
 
 Work in phases. **Do not write a line of application code before Phase 2 is approved by me.**
+
+### Stop conditions
+
+Two rules that sit above everything else in this document, because everything else is
+negotiable and these are not.
+
+**Stop and report, do not proceed, when:** a required file or spec document is missing or
+unreachable; two spec documents contradict each other; a spec rule and the platform's
+architecture conflict (§9 restates this — it is here because it is the most common case);
+or you would otherwise have to guess the intended behaviour rather than read it. Guessing
+and building on the guess is the failure mode every incident in the appendix traces back to
+in the end. Report the specific thing that is missing or contradictory; do not reconstruct
+what you think was probably meant.
+
+**The one conflict you resolve yourself, silently, no exception:** if following the spec or
+matching the reference modules would weaken security or cross a data-isolation boundary —
+expose one person's rows to another, skip a permission gate, write to `fusionlab`, add a
+credential to a tracked file — refuse it and say why. This is the only priority ordering in
+this document; it does not extend to architecture-vs-spec disagreements, which are always
+escalated, never decided.
+
+### Which environment you are building in
+
+Two shapes exist, and they are not a spectrum — check `ls ~/Fusion 2>/dev/null` (or wherever
+the repos sit) before assuming either.
+
+**`full-platform`** — `Fusion`, `Fusion-client`, `Fusion_System_Administrator` and
+`Fusion-Integrated` all checked out, `fusionlab` restored from a production dump or the full
+dev fixture. This is the platform lead's machine. §1's shell-reading list is read as written.
+
+**`module-only`** — only `Fusion_System_Administrator` and `Fusion-Integrated`, and
+`fusionlab` restored from nothing but the public `fusion-dev.dump` (`Fusion-README`). This is
+the lab. Four things follow, all through the rest of this document:
+
+- **No `Fusion-client`, no `Fusion` (legacy) checkout, ever.** §1 names two files that live
+  only in `Fusion-client`; do not try to read them — they are not on this machine. The
+  self-contained contract is given in §1 instead of the file paths, so nothing about your
+  module's correctness depends on that repo existing here.
+- **Fusion-Integrated's own `client/` is the complete way to build and demo a module.** It
+  runs standalone (`make dev` + `cd client && npm run dev`), needs no portal, and is not a
+  fallback — it is where you will do all of Phase 5 either way. What you cannot do here is
+  see your module framed inside the real sidebar; that is a `full-platform`-only check, in
+  §6's last item, and it is fine to defer it.
+- **`fusionlab` is a fixture, not the ERP.** It carries the ~19 tables `fusion-dev.dump`
+  ships (`auth_user`, `globals_*`, `programme_curriculum_{batch,course,curriculum,
+  discipline,programme}`, the examination and grade tables — check `\dt` if in doubt) and
+  nothing else. A field the IAM projects can legitimately be empty here — an academic
+  standing, a resume link, a department — because the synthetic data does not populate it,
+  not because your code is wrong. Write for that: never let an absent optional field 500 a
+  request. `iam/erp_source.py::all_student_profiles` is the concrete example — it now reads
+  two tables this fixture does not carry, and skips each independently rather than failing
+  the whole projection.
+- **A role your spec needs that the fixture does not have is yours to provision, not to wait
+  on.** There is no academic office in a lab. `Fusion_System_Administrator`'s admin console
+  creates and assigns a real designation with two calls — see §3's "Where roles and
+  permissions live" for the exact endpoints. Nothing about this needs `Fusion-client`.
 
 ---
 
@@ -72,14 +131,41 @@ mid-task.
 **The shell you are plugging into**
 This app draws no sidebar of its own. `Fusion-client` is the shell for every Fusion module
 and owns the sidebar, the header and the role switcher; your module contributes pages and
-nothing else. Read:
-- `Fusion-client/src/ui/nav/navigation.js` — how a plugged module is placed and expanded.
-- `Fusion-client/src/ui/routing/PluggedModule.jsx` and this app's `isEmbedded()` in
-  `client/src/app/Shell.tsx` — the frame the pages render in, and what they suppress
-  while framed.
+nothing else. What you read depends on §0's environment:
+
+**Always — this repo, always present:**
+- `client/src/app/Shell.tsx` — `isEmbedded()`. Framed pages render only `<Outlet/>`; nothing
+  else about the shell exists in this repo, and nothing here requires `Fusion-client`:
+  ```ts
+  export function isEmbedded(): boolean {
+    // Being framed is the reliable signal; an internal redirect drops the query.
+    try {
+      if (window.self !== window.top) return true;
+    } catch {
+      return true;                 // cross-origin parent; only a frame can throw
+    }
+    return new URLSearchParams(window.location.search).get("embed") === "1";
+  }
+  ```
 - `Fusion_System_Administrator/Backend/backend/iam/services.py` — `modules_by_designation`
   and `navigation_by_designation`. Both the module list and the sidebar are split **per
-  designation**; a person acting as one role must never see another role's screens.
+  designation**; a person acting as one role must never see another role's screens. The IAM
+  is present in both environments.
+
+**`full-platform` only:**
+- `Fusion-client/src/ui/nav/navigation.js` — how a plugged module is placed and expanded, and
+  where `INTEGRATED_MODULES` lives: a **hand-maintained array**, one entry per module
+  (`id`, `label`, `icon`, `to`, `section`), separate from anything your `registry.py`
+  publishes. Seeding the IAM makes your module *grantable*; it does not make it appear in the
+  real sidebar. That needs this one entry added, by whoever has this repo checked out. Record
+  the exact fields for it in the blueprint's (e) so it is ready to hand over — in
+  `module-only`, this is the one piece of your module you cannot finish yourself.
+- `Fusion-client/src/ui/routing/PluggedModule.jsx` — the iframe that frames your pages and
+  appends `?embed=1`.
+
+In `module-only`, treat both of those as read about, not read: this section already tells
+you what they do. Verify everything else through this repo's own `client/`, which needs
+neither of them.
 
 **The specification**
 Read every document in the spec folder. Build an inventory before you interpret anything:
@@ -156,7 +242,10 @@ transition must be *inexpressible*, not merely rejected. See
 and `ROLE_GRANTS` keyed by real designation names.
 
 **e. Endpoint list.** Method, path under `/api/v1/[module_code]/`, the two gates it sits
-behind, what it returns, and which rule ids it enforces.
+behind, what it returns, and which rule ids it enforces. In `module-only`, also write the
+`Fusion-client` sidebar entry this module needs (`id`, `label`, `icon`, `to`, `section`) —
+you cannot add it yourself, so it must be a clean, complete instruction someone else can
+paste into `INTEGRATED_MODULES` without guessing.
 
 **f. Contracts.** What `modules/[module_code]/contracts.py` will expose to other modules,
 and what you need added to theirs. Every getter is **plural** — `get_x(ids: Sequence[int])`
@@ -192,9 +281,18 @@ Rules that follow from it:
   that silently reaches nobody. Copy the spelling from the ERP, do not retype it.
 - **`student`, `faculty` and `staff` are held by definition**, not assigned, and carry no ERP
   row. Grant to them directly when a permission belongs to everyone of that kind.
-- **A genuinely new role is not yours to create.** If the spec needs a designation that does
-  not exist, it is created in the ERP by the academic office and arrives here through
-  `sync_identity`. Raise it as an open question in (h); do not invent a local one.
+- **Requesting a new role and provisioning one for your own testing are different acts.**
+  Whether the institute should have a "Leave Grievance Officer" post is not yours to decide —
+  raise it as an open question in (h), and in production it is created in the ERP by the
+  academic office. But you still need that designation to *exist* to test against it, in
+  either environment, and waiting on the academic office is not how you do that in dev.
+
+  The write path is `Fusion_System_Administrator`'s own admin console, not a database edit:
+  `POST /api/create-role/` (a new `globals_designation` row, operator account, `is_staff` on
+  `system_db`) then `PUT /api/update-user-roles/` (assigns it to any test account). Run
+  `sync_identity` — or just log that account back in, since a stale projection now refreshes
+  itself on login — and the role is live in its session. This works identically in
+  `full-platform` and `module-only`; it needs neither `Fusion-client` nor a real institute.
 - **Granting a module is a visibility decision.** Do not grant your module to a role "so they
   can look" — it puts your module in that role's sidebar permanently.
 - **Permissions are `<module_code>.<singular_noun>.<verb>`**, the verb from the closed list in
@@ -232,6 +330,11 @@ write to the ERP, so the ERP ends up with two writers and no owner; and the mome
 services compute the same fact from the same rows, the institute has two answers to a
 question that has one. Placement's eligibility rule needs a CPI and asks for it; it does not
 know which tables a CPI is made of, and that is deliberate.
+
+In `module-only`, expect every one of these calls to answer with less than
+`full-platform` would give — `fusion-dev.dump` is a fixture, not the ERP, and a sparse
+answer is correct behaviour for it. Test the absent case deliberately; do not treat "it
+returned nothing on my machine" as a bug to route around.
 
 Stop here. Wait for my approval.
 
@@ -330,6 +433,17 @@ That convenience is also the trap, so three rules come with it:
 
 Required, not optional:
 
+- **The ordinary case, first and by name.** Before the clever tests, write the one for the
+  person the module is actually for: the student who holds nothing but `student`, the
+  employee with one posting, the row with no optional fields set. Interesting accounts get
+  tested because they are interesting; the plain ones carry the traffic. A rule that reads
+  "the first office they hold" looks right against every account you built to exercise it
+  and refuses every ordinary user in production.
+- **A refusal you add must name who it now refuses.** When you introduce a check that fails
+  closed, write down the set it excludes and confirm each is meant to be excluded. Both of
+  this platform's fail-closed guards needed a floor: the one that refuses a mass
+  deactivation, and the one that decides an acting role. Fail closed on the unknown case,
+  not on the empty one.
 - **Domain tests** with no database. Every branch of every rule.
 - **State machine tests**: assert that every illegal transition is *refused*, enumerated
   from the transition table rather than hand-picked.
@@ -377,7 +491,14 @@ routes.tsx          the route table nav_matches_routes.py reads
   the API 500s is a defect.
 - Never render a control the user's permissions do not allow — navigation arrives from the
   server already filtered (ADR-0010), and the same must be true inside the page.
-- Commit the client with `--no-verify`; the husky hook fails on pre-existing lint.
+- `make check-client` (`typecheck && test && build`) is this repo's actual client gate —
+  run it before every commit. There is no pre-commit hook here to bypass; `--no-verify` is
+  a `Fusion-client` habit and does nothing useful in this one.
+- **`full-platform` only, and only once code is otherwise done:** confirm the module framed
+  inside the real portal, not only in this repo's own `client/`. Add the sidebar entry from
+  blueprint (e) to `Fusion-client`'s `INTEGRATED_MODULES`, open it there, and check the icon
+  renders (Phosphor, not `react-icons` — a name from the wrong set draws a grey circle) and
+  that the role switcher shows only what that role was granted.
 
 ---
 
@@ -401,6 +522,31 @@ routes.tsx          the route table nav_matches_routes.py reads
   of `docs/09-leave/ELM_REFERENCE.md` via a script under `ops/docs/`, so that every rule and
   use case links to the code that enforces it and the links are **verified to resolve**.
 
+### Changing anything on a running server
+
+These are not module rules; they are how this platform has actually broken. Each one cost
+hours on the day it was learned.
+
+- **Find out what the process loads before you edit a file.** `systemctl show <unit> -p
+  Environment` and the unit's `ExecStart` are the only authority. This platform's portal
+  runs a settings module in `/etc/fusion` that imports `development.py`, so every edit to
+  `production.py` was inert — three rounds of downtime before anybody checked.
+- **A service being up is not the service working.** `systemctl status` reported `active
+  (running)` while the IAM held a placeholder where its password should be, because the
+  master process starts fine and the failure is per request. Verify with a request and read
+  the status code. Where the service listens on a unix socket, `curl --unix-socket`; a port
+  you assumed is a port you have not checked.
+- **Say the rollback out loud before you make the change**, and keep it to one line. A copy
+  of the file you are about to replace, taken first, is usually the whole plan.
+- **A credential more than one service uses changes everywhere in one pass.** Rotating the
+  database role broke the portal and the IAM at different minutes because they were updated
+  separately; each looked like a fresh incident. List every consumer first — unit files,
+  every `.env`, `.pgpass` — then change them together.
+- **Never paste a real secret into a command you did not write yourself.** A placeholder
+  copied literally put `<new password>` into a live config, and the test that should have
+  caught it used the same placeholder, so it "failed" for the wrong reason and sent the
+  diagnosis sideways.
+
 ---
 
 ## §8 — Definition of done
@@ -423,6 +569,13 @@ Not "tests pass". All of it:
    All work is committed under my own GitHub identity.
 9. No production data — no roll numbers, names or person ids — in any commit message, PR
    body, issue or doc.
+10. **No credential in a file the repository tracks** — not a password, key, token or app
+    password, not "temporarily", not with a comment saying to change it later. They are read
+    from the environment. The legacy portal shipped a database password, a mail password and
+    a `SECRET_KEY` this way, and the key signed production's session cookies while sitting in
+    a public repo for anyone to read.
+11. **The plain user is tested**, not only the one with an interesting set of roles. §5's
+    first rule.
 
 ---
 
@@ -432,6 +585,11 @@ Not "tests pass". All of it:
   once does not carry forward to the next piece of work.
 - Do not touch `Fusion/FusionIIIT/Fusion/settings/common.py` or anything in the legacy
   Fusion app. Only the active modules are in scope.
+- **Your module is `modules/[module_code]/`, `client/src/modules/[module_code]/`, its own
+  tests and its own doc folder — nothing else is yours by default.** A change to `core/`, to
+  another module, to a shared config file, or to CI itself may be genuinely necessary; when
+  it is, name the file and the reason and wait, the same as any other approval gate here. Do
+  not fold it into the same commit as your module unasked, however small it looks.
 - Do not claim something works because a test is green. Run it, look at the result, and
   report what you actually saw — including the parts that failed.
 - If a spec rule and the platform's architecture genuinely conflict, stop and tell me.
@@ -468,3 +626,14 @@ happened in Placement or Leave.
 | Regenerating the manifest is not seeding | A grant removed from `ROLE_GRANTS` stayed live in the IAM until `seed_iam_permissions` was re-run. |
 | One shell, not two | A second sidebar and a second student profile were built here before the portal became the shell; both had already drifted from the originals when they were deleted. |
 | `X_FRAME_OPTIONS` and the embed | `DENY` blocks the portal from framing these pages. It works in dev only because the dev server sends no header, so the break appears first in production. |
+| Test the ordinary user first | An acting-role rule returned "the first office held". Every test account also held an office, so all of them passed; a student holding only `student` resolved to no role and was refused by 175 endpoints. It reached production. |
+| A fail-closed check names who it refuses | Same bug, stated as a design rule: the refusal was correct for an unknown role and wrong for an empty one. |
+| Read the unit before editing the config | Production loaded a settings module in `/etc/fusion` that imported `development.py`. Every hardening edit to `production.py` was inert, and it took three outages to notice. |
+| `active (running)` proves nothing | systemd reported both services healthy while one had a placeholder for a database password; gunicorn's master starts fine and the failure is per request. |
+| Rotate a shared credential in one pass | The database role is used by the portal and by the IAM's two connections. Updated at different times, it looked like three separate incidents. |
+| A placeholder copied literally | `<new password>` was written into a live `.env`, and the verification command used the same placeholder, so the failure it produced pointed away from the cause. |
+| A fixture is not the ERP | `sync_identity` started reading two tables `fusion-dev.dump` does not carry, called unguarded as its first step, and every login in the lab failed before a single user projected. Fixed by treating an absent projected table as absent data, not a crash. |
+| A hardcoded sidebar array is a coordination point, not a self-service step | `INTEGRATED_MODULES` in `Fusion-client` needs a manual entry per module. Seeding the IAM's grants was mistaken for the whole job more than once; it is half of it. |
+| `--no-verify` does not generalise | Written for `Fusion-client`'s husky hook, it was carried into this repo's own prompt, which has no pre-commit hook to bypass — the instruction did nothing, and would have hidden a real lint failure had one ever existed. |
+| Creating a role was untested since the shadow model was written | `globals_moduleaccess` has two `NOT NULL` columns (`thesis_research`, `database`) the IAM's Django model never declared. Every call to the console's own "create a role" 500'd, on `main`, until a lab need for a new designation actually exercised it. |
+| A serializer.is_valid() with no else is a silent partial write | The same endpoint returned `201` whether or not the second of its two rows actually saved, because nothing branched on the second check. The first row — the role itself — was real; the second sometimes was not, and the response could not tell you which. |
