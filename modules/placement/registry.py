@@ -137,5 +137,4 @@ ROLE_GRANTS = {
     "placement_officer": _OFFICER,
     "placement_chairman": _CHAIRMAN,
     "Dean Academic": _CHAIRMAN,
-    "acadadmin": _COORDINATOR,
 }
