@@ -1,7 +1,7 @@
 ---
 owner: platform-lead
 status: authoritative
-last-reviewed: 2026-09-29
+last-reviewed: 2026-09-30
 purpose: >
   The single prompt used to start any new Fusion-Integrated module from its BR/UC
   specification. Copy §0–§9 verbatim into a new session, fill the four blanks in §0,
@@ -68,6 +68,18 @@ mid-task.
 - `core/` in full — `api/exceptions.py`, `api/pagination.py`, `api/csrf.py`,
   `api/throttling.py`, `db/mixins.py`. Anything already here you must reuse, not reinvent.
 - `client/src/modules/placement/` and `client/src/modules/leave/` — the frontend shape.
+
+**The shell you are plugging into**
+This app draws no sidebar of its own. `Fusion-client` is the shell for every Fusion module
+and owns the sidebar, the header and the role switcher; your module contributes pages and
+nothing else. Read:
+- `Fusion-client/src/ui/nav/navigation.js` — how a plugged module is placed and expanded.
+- `Fusion-client/src/ui/routing/PluggedModule.jsx` and this app's `isEmbedded()` in
+  `client/src/app/Shell.tsx` — the frame the pages render in, and what they suppress
+  while framed.
+- `Fusion_System_Administrator/Backend/backend/iam/services.py` — `modules_by_designation`
+  and `navigation_by_designation`. Both the module list and the sidebar are split **per
+  designation**; a person acting as one role must never see another role's screens.
 
 **The specification**
 Read every document in the spec folder. Build an inventory before you interpret anything:
@@ -157,6 +169,70 @@ does not run.
 **h. Open questions.** Anything the spec does not settle. Do not guess and do not build on
 a guess.
 
+### Where roles and permissions live — settle this before writing (d)
+
+Your module defines **permissions**. It does not define roles, and it owns no access-control
+table of any kind. Three databases, three owners, nothing duplicated:
+
+| Database | Owns | Your module |
+|---|---|---|
+| `fusionlab` (ERP) | people, and which designations they hold | never writes it, never queries it |
+| `fusion_system_db` (IAM) | designation → permission, designation → module, module → nav | seeds rows into it, through the manifest only |
+| `fusion_integrated` | your business tables | yours, and **no auth tables in it** |
+
+If you find yourself adding a `Role`, `Permission`, `UserRole` or `ModuleAccess` model, stop:
+that table already exists in the IAM and a second copy is the thing this architecture exists
+to prevent. The same applies if your module is told to live in `fusionlab` under its own
+schema — where the *business* tables sit has no bearing on this; RBAC is the IAM's either way.
+
+Rules that follow from it:
+
+- **Roles are institute-wide, not per-module.** `ROLE_GRANTS` is keyed by designation names
+  exactly as `globals_designation` spells them — they are the join key, so a typo is a grant
+  that silently reaches nobody. Copy the spelling from the ERP, do not retype it.
+- **`student`, `faculty` and `staff` are held by definition**, not assigned, and carry no ERP
+  row. Grant to them directly when a permission belongs to everyone of that kind.
+- **A genuinely new role is not yours to create.** If the spec needs a designation that does
+  not exist, it is created in the ERP by the academic office and arrives here through
+  `sync_identity`. Raise it as an open question in (h); do not invent a local one.
+- **Granting a module is a visibility decision.** Do not grant your module to a role "so they
+  can look" — it puts your module in that role's sidebar permanently.
+- **Permissions are `<module_code>.<singular_noun>.<verb>`**, the verb from the closed list in
+  `docs/02-iam/rbac-model.md`. `manage` is an escape hatch; expect to justify it.
+- **Only the acting role counts.** Somebody holding two designations gets the permissions of
+  one of them at a time, and the sidebar is built per role from that role's own grants. Design
+  for the role, never for the person.
+- **Permissions decide the verb, scoping decides the rows.** A coordinator limited to one
+  department holds the *same* permissions as an unlimited one; the difference lives in
+  `selectors/scoping.py`. Never encode a scope as a permission.
+- **Publishing is two steps, and the second is the one people forget.** `make permissions`
+  writes `registry/permissions.json`; the IAM only applies it when
+  `seed_iam_permissions --manifest <path>` runs. Seeding is authoritative for the modules the
+  manifest names — a grant you delete is revoked — and scoped to your publisher, so it cannot
+  disturb another service's grants. Read what it prints; it names every revoke.
+
+### ERP facts your module needs — list them in (f)
+
+Your module will need things the ERP owns: a CPI, a department, a batch, the staff
+directory. It reads none of them from `fusionlab`. The IAM holds the only connection to
+that database, as unmanaged models, and exposes what it projects:
+
+| You need | Ask | Never |
+|---|---|---|
+| who this is, what they may do | the session on the request | — |
+| a person's name, kind, discipline | `get_users`, `search_users` | a join to `auth_user` |
+| a student's CPI or result standing | `get_academic_standings` | reading the grade tables |
+| the student or staff directory | `academic_directory`, `iter_employees` | a second database alias |
+| your own data | your models in `fusion_integrated` | — |
+
+If the field you need is not exposed, **the deliverable is an addition to the IAM's
+projection and API**, listed in (f) as a dependency — not a `fusionlab` connection from your
+module. Two reasons, and the second is the one that bites: a module with that connection can
+write to the ERP, so the ERP ends up with two writers and no owner; and the moment two
+services compute the same fact from the same rows, the institute has two answers to a
+question that has one. Placement's eligibility rule needs a CPI and asks for it; it does not
+know which tables a CPI is made of, and that is deliberate.
+
 Stop here. Wait for my approval.
 
 ---
@@ -204,7 +280,15 @@ explicitly, and a module you forget to add is a module that is **never checked**
   the module grant first, then the permission. Query parameters are hostile input: an
   unparseable `?year=abc` is a **400, never a 500**.
 - **`registry.py`** as designed in Phase 2. `nav_matches_routes.py` will fail CI if a nav
-  entry has no client route or a route has no nav entry.
+  entry has no client route or a route has no nav entry. Two further rules, because the
+  IAM now builds each role's sidebar from that role alone:
+  - **Every nav item carries a `required_permission`.** An item without one appears for
+    every role the module is granted to, which is how student screens reached an office.
+  - **`ROLE_GRANTS` is the visibility decision, not a convenience.** A role that should see
+    none of your screens does not belong in it — granting it "so they can look" puts your
+    module in their sidebar permanently.
+  - Icons come from the Phosphor set `Fusion-client` renders. A name from another icon pack
+    draws a grey circle and nothing else.
 - **`schedule.py`** exports `BEAT_SCHEDULE` and `TASK_ROUTES`; register both in
   `config/celery.py`. Each module owns its own timers so a module stays removable.
 - **Management commands** for anything an operator must do: seeding policy, a readiness
@@ -220,6 +304,30 @@ comments and docstrings alike. A docstring that restates the function name is no
 ## §5 — Phase 4: tests that would actually catch a bug
 
 Mirror `modules/placement/tests/` — one file per concern, named for the concern.
+
+**How a test gets a principal.** The suite runs with no network and no IAM: `conftest.py`
+gives you `stub_iam`, which swaps the IAM client for an in-memory fake, and `make_session`
+/ `make_principal`, which mint a session carrying exactly the `permissions`, `modules`,
+`roles` and `active_role` you name. You never seed the IAM to write a test, and a test that
+needs a running `Fusion_System_Administrator` is a test written wrong.
+
+That convenience is also the trap, so three rules come with it:
+
+- **Every positive test needs its negative twin.** The fake hands out whatever permission
+  set you ask for, so "the coordinator can review" proves nothing on its own. The test that
+  matters is the principal *without* the code getting a 403.
+- **Permission strings in a test are free-form text.** A typo'd code is granted by the fake
+  and denied in production — the test passes and the feature is broken. Assert the codes
+  your tests use are the ones `registry.PERMISSIONS` declares, in a test that fails when
+  they drift apart.
+- **Both gates, separately.** A principal with the module grant but not the permission, and
+  one with the permission but not the module grant. They are different refusals and only
+  one of them is usually implemented.
+- **One test for the role switch**: a principal holding two designations must get the acting
+  role's view only. That leak reached production once already.
+- When the real `IamClient` grows a method, add it to `FakeIam` in the same commit. A fake
+  that has drifted is worse than no fake, because the suite stays green while the seam moves.
+
 Required, not optional:
 
 - **Domain tests** with no database. Every branch of every rule.
@@ -258,6 +366,11 @@ pages/              one file per route
 routes.tsx          the route table nav_matches_routes.py reads
 ```
 
+- **Build pages, not an application.** `Fusion-client` supplies the sidebar, the header,
+  the role switcher and the profile. Your module renders inside it, so it must not ship a
+  second one of any of those — two shells means icons, roles and sections kept in step
+  twice, and they drift. Anything the portal already owns (the student profile, the resume,
+  the notification bell) is not yours to reimplement.
 - Use the shared axios instance `client/src/lib/http.ts`. It already carries the session
   cookie and the CSRF header. Do not create a second one.
 - Every page must render a real empty state and a real error state. "Loading…" forever when
@@ -272,6 +385,12 @@ routes.tsx          the route table nav_matches_routes.py reads
 
 - `make schema` — regenerate and **commit** `openapi/fusion-integrated.v1.yaml`. CI diffs it.
 - `make permissions` — regenerate `registry/permissions.json`, which the IAM seeds from.
+  Regenerating is half the job: the IAM only revokes a dropped grant when it is re-seeded
+  with `manage.py seed_iam_permissions --manifest <path>`. Run it and read what it says it
+  revoked.
+- `manage.py check --deploy --fail-level WARNING` runs in CI, so a security warning fails
+  the build. If your module needs a setting Django warns about, silence that one check by
+  id with the reason on the line above it — do not weaken the setting.
 - Migrations: reviewed by hand. A data migration that backfills must be idempotent and must
   state what it does when run against an empty table.
 - Deployment order must be documented and must work: `migrate` → `seed_modules` → grants →
@@ -343,3 +462,9 @@ happened in Placement or Leave.
 | The adversarial five | Unit head approving own leave; own request in own queue; balance going negative; unlimited back-dating; a substitute who is themselves away. All found by probing, none by the suite. |
 | Verify generated links resolve | A fabricated `BW-EL-13` citation was written for a workflow the spec deliberately retires. |
 | Wait for `tsc` | A failing client typecheck was committed because `npm test` output was read before the typecheck finished. |
+| Every nav item needs `required_permission` | Navigation was built from the union of a person's permissions, so somebody who was both a student and an office holder saw My Applications and My Offers while acting as the office. |
+| `ROLE_GRANTS` decides visibility | `acadadmin` was granted the placement coordinator's permissions "for review", which put Placement Cell in the academic section's sidebar until it was revoked. |
+| Icons from the shell's own set | Module icons were named for `react-icons`; the shell renders Phosphor, so every one of them drew a grey circle. |
+| Regenerating the manifest is not seeding | A grant removed from `ROLE_GRANTS` stayed live in the IAM until `seed_iam_permissions` was re-run. |
+| One shell, not two | A second sidebar and a second student profile were built here before the portal became the shell; both had already drifted from the originals when they were deleted. |
+| `X_FRAME_OPTIONS` and the embed | `DENY` blocks the portal from framing these pages. It works in dev only because the dev server sends no header, so the break appears first in production. |
