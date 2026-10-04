@@ -104,15 +104,18 @@ story.append(para(
     "specific module, and every one of them is something you do, not something that happens "
     "for you.", body_style))
 
-story.append(step_heading(1, "Find out your assignment"))
-story.append(para("You have to ask your mentor for these before you open anything else:", body_style))
+story.append(step_heading(1, "Confirm your assignment"))
+story.append(para(
+    "You already have these three things, given to you along with this guide. Before you "
+    "open anything else, you have to make sure you actually have all three written down "
+    "— do not start Step 2 on a half-remembered version of any of them:", body_style))
 story.extend(numbered([
     "<b>Module name</b> — what you are building.",
     "<b>Spec folder path</b> — where the BR (business rules), UC (use cases), and workflow "
     "documents for your module live. If this does not exist yet, you have to say so now — "
     "writing a module against a spec you wrote yourself is not this exercise.",
-    "<b>Module code</b> — a short, lowercase, singular-ish slug for it (no underscores). "
-    "You have to agree this with your mentor — do not invent it on your own.",
+    "<b>Module code</b> — a short, lowercase, singular-ish slug for it (no underscores), "
+    "already agreed for your module. Do not change it on your own.",
 ]))
 story.append(para(
     "Do not guess any of these. Getting one wrong — especially the environment value in "
@@ -159,11 +162,11 @@ story.append(para(
     "Open <font name='Courier'>new-module-prompt.md</font> but do not paste it yet. You have to "
     "write down the five values that go in its §0 first, using what you got in Step 1:", body_style))
 table_data = [
-    [Paragraph("Blank", cell_head_style), Paragraph("Your value", cell_head_style), Paragraph("How you get it", cell_head_style)],
-    [Paragraph("MODULE_NAME", code_style), Paragraph("you fill this in", cell_style), Paragraph("you asked your mentor in Step 1", cell_style)],
-    [Paragraph("SPEC_FOLDER_PATH", code_style), Paragraph("you fill this in", cell_style), Paragraph("you asked your mentor in Step 1", cell_style)],
+    [Paragraph("Blank", cell_head_style), Paragraph("Your value", cell_head_style), Paragraph("Where it came from", cell_head_style)],
+    [Paragraph("MODULE_NAME", code_style), Paragraph("you fill this in", cell_style), Paragraph("already given to you — Step 1", cell_style)],
+    [Paragraph("SPEC_FOLDER_PATH", code_style), Paragraph("you fill this in", cell_style), Paragraph("already given to you — Step 1", cell_style)],
     [Paragraph("ID_PREFIX", code_style), Paragraph("you fill this in", cell_style), Paragraph("you read it off the spec documents yourself, once you have the folder", cell_style)],
-    [Paragraph("module_code", code_style), Paragraph("you fill this in", cell_style), Paragraph("you agreed it with your mentor in Step 1", cell_style)],
+    [Paragraph("module_code", code_style), Paragraph("you fill this in", cell_style), Paragraph("already given to you — Step 1", cell_style)],
     [Paragraph("ENVIRONMENT", code_style), Paragraph("module-only", cell_style), Paragraph("fixed — this is the value for every student assignment", cell_style)],
 ]
 tbl = Table(table_data, colWidths=[3.6 * cm, 2.9 * cm, PAGE_W - 6.5 * cm])

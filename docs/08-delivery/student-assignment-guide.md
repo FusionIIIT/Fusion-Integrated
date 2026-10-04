@@ -17,16 +17,18 @@ You have to follow these steps in order. Do not skip ahead to Step 5 because you
 what the prompt says — Steps 1 through 4 are what make the prompt work *for your specific
 module*, and every one of them is something you do, not something that happens for you.
 
-## Step 1 — Find out your assignment
+## Step 1 — Confirm your assignment
 
-You have to ask your mentor for these before you open anything else:
+You already have these three things, given to you along with this guide. Before you open
+anything else, you have to make sure you actually have all three written down — do not start
+Step 2 on a half-remembered version of any of them:
 
 - **Module name** — what you are building.
 - **Spec folder path** — where the BR (business rules), UC (use cases), and workflow
   documents for your module live. If this does not exist yet, you have to say so now —
   writing a module against a spec you wrote yourself is not this exercise.
-- **Module code** — a short, lowercase, singular-ish slug for it (no underscores). You have
-  to agree this with your mentor — do not invent it on your own.
+- **Module code** — a short, lowercase, singular-ish slug for it (no underscores), already
+  agreed for your module. Do not change it on your own.
 
 Do not guess any of these. Getting one wrong — especially the environment value in Step 4 —
 sends you reading for files that do not exist on your machine.
@@ -68,12 +70,12 @@ You have to confirm all of this before you go further:
 Open [`new-module-prompt.md`](new-module-prompt.md) but do not paste it yet. You have to
 write down the five values that go in its §0 first, using what you got in Step 1:
 
-| Blank | Your value | How you get it |
+| Blank | Your value | Where it came from |
 |---|---|---|
-| `MODULE_NAME` | _you fill this in_ | you asked your mentor in Step 1 |
-| `SPEC_FOLDER_PATH` | _you fill this in_ | you asked your mentor in Step 1 |
+| `MODULE_NAME` | _you fill this in_ | already given to you — Step 1 |
+| `SPEC_FOLDER_PATH` | _you fill this in_ | already given to you — Step 1 |
 | `ID_PREFIX` | _you fill this in_ | you read it off the spec documents yourself, once you have the folder |
-| `module_code` | _you fill this in_ | you agreed it with your mentor in Step 1 |
+| `module_code` | _you fill this in_ | already given to you — Step 1 |
 | `ENVIRONMENT` | `module-only` | fixed — this is the value for every student assignment |
 
 You have to fill these into the prompt text itself before you paste it. Do not paste the
