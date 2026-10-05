@@ -1,8 +1,7 @@
 # New module — the starting prompt
 
-Two modules are already built to this shape: `modules/placement` (largest, the reference)
-and `modules/leave` (most rule-dense, the reference for state machines and ledgers).
-A third module that does not look like them is a defect, not a style choice.
+One module is already built to this shape: `modules/placement` — the reference. A new
+module that does not look like it is a defect, not a style choice.
 
 **How to use this:** copy everything from the `--- PROMPT BEGINS ---` line to the
 `--- PROMPT ENDS ---` line into a fresh session. Fill in the five bracketed blanks in §0 —
@@ -19,12 +18,11 @@ steps before the previous phase's approval gate (where one exists) has actually 
 
 Build the **[MODULE_NAME]** module in `Fusion-Integrated`, from its specification set at
 **[SPEC_FOLDER_PATH]**, to the same standard and the same shape as the existing
-`modules/placement` and `modules/leave` modules.
+`modules/placement` module.
 
 ### Step 0.1 — Confirm what you are building
 
-- Specification id prefixes: **[ID_PREFIX]** (e.g. `PC-BR-`, `PC-UC-` for Placement;
-  `BR-EL-`, `EL-UC-` for Leave).
+- Specification id prefixes: **[ID_PREFIX]** (e.g. `PC-BR-`, `PC-UC-` for Placement).
 - Module code / URL segment: **[module_code]** (lowercase, singular-ish, no underscores).
 
 This is production code for an institute that will run it for years. "The tests pass" is
@@ -113,13 +111,12 @@ not fix it mid-task.
 
 ### Step 1.2 — Read the reference implementations
 
-- `modules/placement/` in full — this is the shape you are copying.
-- `modules/leave/` in full — read `domain/state_machine.py`, `services/workflow.py`,
-  `selectors/scoping.py` and `models/ledger.py` closely even if your module has no ledger.
-  They demonstrate the choke-point pattern you will need.
+- `modules/placement/` in full — this is the shape you are copying. Read
+  `domain/clearance.py`, `services/offers.py` and `selectors/` closely even if your module
+  has nothing like them yet — they demonstrate the choke-point pattern you will need.
 - `core/` in full — `api/exceptions.py`, `api/pagination.py`, `api/csrf.py`,
   `api/throttling.py`, `db/mixins.py`. Anything already here you must reuse, not reinvent.
-- `client/src/modules/placement/` and `client/src/modules/leave/` — the frontend shape.
+- `client/src/modules/placement/` — the frontend shape.
 
 ### Step 1.3 — Read the shell you are plugging into
 
@@ -242,7 +239,7 @@ nothing in the module needs a clock, say so explicitly.
 ### Step 2.7 — Money / quota / balance
 
 If the module counts anything a person can spend, it is an **append-only ledger**, not a
-balance column. Corrections are reversing entries. See `modules/leave/models/ledger.py`.
+balance column. Corrections are reversing entries, never an edit to a past row.
 
 ### Step 2.8 — Policy
 
@@ -276,7 +273,7 @@ enforcing in Python. Anything that must hold under concurrency belongs in the da
 
 A **declarative transition table** — a data structure listing (state, event, actor) → state.
 Not a chain of `if` statements. An illegal transition must be *inexpressible*, not merely
-rejected. See `modules/leave/domain/state_machine.py`.
+rejected.
 
 ### Step 3.4 (d) — Permission list
 
@@ -402,7 +399,7 @@ modules/[module_code]/
 ├── selectors/        all reads, including scoping.py
 ├── services/         all writes, one file per use-case family
 ├── api/              views.py serializers.py urls.py (+ permissions.py if it needs
-│                    its own gate classes — placement has one, leave does not)
+│                    its own gate classes if it needs one)
 ├── management/commands/
 ├── migrations/
 └── tests/
@@ -433,10 +430,9 @@ endpoint starts from it.
 Owns every write. Rules:
 
 - One transactional choke point per state change. If there is a workflow, *all* movement
-  goes through one function (`modules/leave/services/workflow.py::apply_event` is the
-  model to copy) that takes `select_for_update`, refuses a terminal source state, refuses
-  the wrong actor, writes the audit trail, and emits any ledger entry — in one
-  transaction. Two paths into the same state is how the rules drift apart.
+  goes through one function that takes `select_for_update`, refuses a terminal source
+  state, refuses the wrong actor, writes the audit trail, and emits any ledger entry — in
+  one transaction. Two paths into the same state is how the rules drift apart.
 - Raise `DomainError` subclasses from `core/api/exceptions.py` with a `code=`. The message
   is read by a person at IIITDMJ; write it as a sentence that tells them what to do next.
 - **Order the refusals deliberately.** When two checks can both fail, the one whose message
@@ -646,15 +642,15 @@ against an empty table.
 ### Step 7.5 — Document and prove the deployment order
 
 Deployment order must be documented and must work: `migrate` → `seed_modules` → grants →
-your readiness command. A readiness command that names the **unmet prerequisites** (as
-`leave_readiness` does) is required; "module is not ready" without saying why is not.
+your readiness command. A readiness command that names the **unmet prerequisites** is
+required; "module is not ready" without saying why is not.
 
 ### Step 7.6 — Write the module's docs
 
 Write the module's docs under `docs/[NN]-[module_code]/`: domain model, state machine,
-and whatever else has a genuine reader. Then generate the teaching reference in the shape
-of `docs/09-leave/ELM_REFERENCE.md` via a script under `ops/docs/`, so that every rule and
-use case links to the code that enforces it and the links are **verified to resolve**.
+and whatever else has a genuine reader. Then generate a teaching reference tracing every
+rule and use case to the code that enforces it, via a script under `ops/docs/`, so that
+every link is **verified to resolve**.
 
 ### Changing anything on a running server
 

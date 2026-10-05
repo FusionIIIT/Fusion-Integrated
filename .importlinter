@@ -38,15 +38,14 @@ type = forbidden
 source_modules =
 # Every module's domain, not just the first one written.
     modules.placement.domain
-    modules.leave.domain
 forbidden_modules =
     django
     rest_framework
     celery
 
 # NOTE on `devtools`: it is intentionally NOT listed as a module anywhere in
-# this file. Seeding fixtures is cross-cutting by nature — it touches placement,
-# hr, leave and directory at once — so it is a tool, not a bounded context. It
+# this file. Seeding fixtures is cross-cutting by nature — it touches placement
+# and directory at once — so it is a tool, not a bounded context. It
 # is installed in dev/test settings only. Declaring the exemption here keeps it
 # visible instead of it quietly becoming a back door.
 

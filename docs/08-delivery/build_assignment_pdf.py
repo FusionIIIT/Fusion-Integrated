@@ -123,8 +123,8 @@ story.append(para(
 
 story.append(step_heading(2, "Read your own module's requirement specification documents"))
 story.append(para(
-    "<font name='Courier'>modules/placement</font> and <font name='Courier'>modules/leave</font> "
-    "are reference modules the <b>prompt</b> already tells the AI to read, as part of its own "
+    "<font name='Courier'>modules/placement</font> "
+    "is the reference module the <b>prompt</b> already tells the AI to read, as part of its own "
     "Phase 0 (Step 1.2) — that reading is the AI's job, not yours, and you do not need to open "
     "that code yourself.", body_style))
 story.append(para(
@@ -154,7 +154,7 @@ story.append(para("You have to confirm all of this before you go further:", body
 story.extend(checklist([
     "<font name='Courier'>docker compose up</font> brings up postgres, redis, the IAM and the platform, all healthy",
     "<font name='Courier'>cd client &amp;&amp; npm run dev</font> runs standalone — this is where you will demo your module",
-    "You can log in with a test account and see <font name='Courier'>modules/placement</font> and <font name='Courier'>modules/leave</font> working, so you know the fixture is actually loaded",
+    "You can log in with a test account and see <font name='Courier'>modules/placement</font> working, so you know the fixture is actually loaded",
 ]))
 
 story.append(step_heading(4, "Fill in the prompt's five blanks, before you paste anything"))

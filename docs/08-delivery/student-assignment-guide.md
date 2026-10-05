@@ -35,9 +35,9 @@ sends you reading for files that do not exist on your machine.
 
 ## Step 2 — Read your own module's requirement specification documents
 
-`modules/placement` (Placement Cell) and `modules/leave` are reference modules the **prompt**
-already tells the AI to read, as part of its own Phase 0 (Step 1.2) — that reading is the
-AI's job, not yours, and you do not need to open that code yourself.
+`modules/placement` (Placement Cell) is the reference module the **prompt** already tells
+the AI to read, as part of its own Phase 0 (Step 1.2) — that reading is the AI's job, not
+yours, and you do not need to open that code yourself.
 
 Your job here is different: you have to read every BR (business rule), UC (use case), and
 workflow document in your `SPEC_FOLDER_PATH` yourself, before you ever open the prompt. You
@@ -62,8 +62,8 @@ You have to confirm all of this before you go further:
 
 - [ ] `docker compose up` brings up postgres, redis, the IAM and the platform, all healthy
 - [ ] `cd client && npm run dev` runs standalone — this is where you will demo your module
-- [ ] You can log in with a test account and see `modules/placement` and `modules/leave`
-      working, so you know the fixture is actually loaded
+- [ ] You can log in with a test account and see `modules/placement` working, so you know
+      the fixture is actually loaded
 
 ## Step 4 — Fill in the prompt's five blanks, before you paste anything
 
