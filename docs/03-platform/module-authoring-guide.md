@@ -1,7 +1,4 @@
 ---
-owner: platform-lead
-status: authoritative
-last-reviewed: 2026-08-01
 test-of-this-doc: >
   A developer who has never seen the repo should be able to follow this unaided and end with a
   working, granted, tested module. If they need to ask a question, this document has a gap — fix it.

@@ -1,7 +1,4 @@
 ---
-owner: security-owner
-status: authoritative
-last-reviewed: 2026-08-01
 method: STRIDE over the six highest-value flows
 revisit: quarterly, and on any new external integration
 ---

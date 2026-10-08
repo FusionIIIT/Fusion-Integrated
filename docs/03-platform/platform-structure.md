@@ -1,7 +1,4 @@
 ---
-owner: platform-lead
-status: authoritative
-last-reviewed: 2026-08-01
 enforced-by: .importlinter, ops/checks/no_cross_module_fk.py, ruff, mypy — all in CI
 ---
 

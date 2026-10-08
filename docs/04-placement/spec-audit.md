@@ -1,9 +1,3 @@
----
-owner: placement-lead
-status: draft
-last-reviewed: 2026-09-17
----
-
 # Placement Cell — specification audit
 
 The Placement module measured against the PCMS specification set **v1.3 FINAL**

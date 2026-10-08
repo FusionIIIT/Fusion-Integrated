@@ -1,9 +1,3 @@
----
-owner: security-owner
-status: authoritative
-last-reviewed: 2026-08-01
----
-
 # Security Baseline
 
 Every item has an **owner** and a **verification method**. An item nobody verifies is an aspiration, not a

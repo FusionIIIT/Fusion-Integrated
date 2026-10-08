@@ -1,9 +1,3 @@
----
-owner: platform-lead
-status: authoritative
-last-reviewed: 2026-08-01
----
-
 # Glossary
 
 The project's ubiquitous language. These words mean **exactly** this in code, in documents, in API

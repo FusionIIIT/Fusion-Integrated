@@ -1,7 +1,4 @@
 ---
-owner: platform-lead
-status: authoritative
-last-reviewed: 2026-08-01
 note: >
   Durations are estimates for a small team. The GATES are not estimates — a phase does not close until its
   gate holds, regardless of the calendar.

@@ -1,9 +1,3 @@
----
-owner: iam-lead
-status: design
-last-reviewed: 2026-08-03
----
-
 # Permission Catalog
 
 > **This file is the intended taxonomy, not the implemented one.** It was

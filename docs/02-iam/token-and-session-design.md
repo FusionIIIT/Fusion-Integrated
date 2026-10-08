@@ -1,9 +1,3 @@
----
-owner: iam-lead
-status: authoritative
-last-reviewed: 2026-08-01
----
-
 # Token & Session Design
 
 Concrete mechanics of login, tokens, refresh, revocation and idle handling. Decisions and their rationale
