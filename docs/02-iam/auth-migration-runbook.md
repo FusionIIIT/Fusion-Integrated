@@ -1,7 +1,4 @@
 ---
-owner: iam-lead
-status: authoritative
-last-reviewed: 2026-08-01
 audience: whoever is running the cutover, at the time they are running it
 ---
 

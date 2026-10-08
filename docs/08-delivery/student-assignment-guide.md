@@ -1,7 +1,4 @@
 ---
-owner: platform-lead
-status: authoritative
-last-reviewed: 2026-10-04
 purpose: >
   How a student picks up a new-module assignment and runs new-module-prompt.md end to end.
   This is the wrapper around that prompt, not a replacement for it — read both.

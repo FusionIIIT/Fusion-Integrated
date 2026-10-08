@@ -1,9 +1,3 @@
----
-owner: platform-lead
-status: authoritative
-last-reviewed: 2026-08-01
----
-
 # Testing Strategy
 
 The starting point matters here. **The existing estate has effectively no tests**: all 31

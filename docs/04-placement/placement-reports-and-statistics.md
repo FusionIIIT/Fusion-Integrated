@@ -1,9 +1,3 @@
----
-owner: placement-lead
-status: authoritative
-last-reviewed: 2026-08-01
----
-
 # Placement Reports & Statistics
 
 **Statistics are materialized, never computed on request.** The public dashboard reads only

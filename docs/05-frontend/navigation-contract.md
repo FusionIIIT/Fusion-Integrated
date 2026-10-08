@@ -1,9 +1,3 @@
----
-owner: frontend-lead
-status: authoritative
-last-reviewed: 2026-08-01
----
-
 # Navigation Contract
 
 `GET /app/api/iam/v1/me` returns navigation **already filtered and already in render shape**. The client does

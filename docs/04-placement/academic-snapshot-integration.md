@@ -1,7 +1,4 @@
 ---
-owner: platform-lead
-status: authoritative
-last-reviewed: 2026-08-01
 criticality: >
   Read this fully before touching anything CPI-shaped. Every claim about legacy behaviour was verified
   by reading the code at the cited path:line on 2026-08-01. The grade semantics in §1 are

@@ -1,7 +1,4 @@
 ---
-owner: platform-lead
-status: authoritative
-last-reviewed: 2026-08-01
 note: >
   Every claim here was verified by reading the code at the cited path:line on 2026-08-01.
   Citations are relative to /Users/vikrant/Documents/Fusion/. If you find a stale citation,

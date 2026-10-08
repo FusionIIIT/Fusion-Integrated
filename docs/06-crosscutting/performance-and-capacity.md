@@ -1,7 +1,4 @@
 ---
-owner: platform-lead
-status: authoritative
-last-reviewed: 2026-08-01
 note: >
   Load-test results are committed into this file per phase. A phase cannot close without them —
   see definition-of-done.md.
