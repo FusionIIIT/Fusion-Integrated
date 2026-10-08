@@ -1,46 +1,68 @@
 ---
 Purpose: >
-  How to declare a new role for your module, grant it access, put a test
-  account into it, and log in as that account. Companion to
-  student-assignment-guide.md — read that one first for environment setup.
+  Everything from a fresh machine to logging in as a test account holding a
+  role you defined yourself: environment setup, declaring a role in your
+  module's registry.py, publishing it, assigning it to a test account, and
+  verifying the login. Every step past Part 1 has been run end to end against
+  a clean fusion-dev.dump restore, for all three basic kinds (student,
+  faculty, staff) — see "Proof this works" at the bottom.
 ---
 
-# Declaring and assigning a role
+# Full setup guide: environment, roles, and login
 
-Your module needs people to hold roles beyond the three basic ones (student,
-faculty, staff) that come automatically from the ERP. This guide is the
-complete path from "I need a role called X" to "I am logged in as X and can
-see my module."
-
-There are two separate things happening here, and mixing them up is the most
+There are two separate things in this guide, and mixing them up is the most
 common confusion:
 
-1. **Declaring a role** — your own work, in your module's code. States that
-   the role exists and what it may do.
-2. **Assigning a role** — a one-off action against a test account, so you
-   personally can log in and see what that role sees. Nobody does this in
-   production; the real ERP's designation data does it automatically.
-
-## Prerequisites
-
-- You've followed `student-assignment-guide.md` Step 3 and have both
-  `Fusion_System_Administrator` and `Fusion-Integrated` running, `fusionlab`
-  restored from `fusion-dev.dump`, and `manage.py sync_identity` has run at
-  least once.
-- You know your module's directory name (`modules/<your_module>/`).
-
-Every `manage.py` command below for `Fusion_System_Administrator` is run from:
-
-```bash
-cd Fusion_System_Administrator/Backend/backend
-```
-
-using `./../venv/bin/python manage.py ...` — not a bare `python`, because the
-project's dependencies live in `Backend/venv`, one level above this directory.
+1. **Part 1 — get the environment running.** One-time setup: install
+   dependencies, restore the shared dump, bring both services up.
+2. **Part 2 onward — declare and test your own role.** Your own work, repeated
+   every time your module needs a new role: state that it exists, publish it,
+   put a test account into it, log in as that account.
 
 ---
 
-## Step 1 — Declare the role in your module's `registry.py`
+## Part 1 — Get the environment running
+
+Full, exact, OS-specific commands live in `Fusion-README` — follow whichever
+one matches your machine, start to finish, before continuing to Part 2:
+
+- **Windows / WSL or native Ubuntu:** [`QUICKSTART.md`](https://github.com/FusionIIIT/Fusion-README/blob/main/QUICKSTART.md)
+- **macOS:** [`QUICKSTART-macOS.md`](https://github.com/FusionIIIT/Fusion-README/blob/main/QUICKSTART-macOS.md)
+- **Anything that doesn't fit either** (different OS, something already partly
+  set up): [`Fusion_System_Setup.md`](https://github.com/FusionIIIT/Fusion-README/blob/main/Fusion_System_Setup.md)
+
+What those guides take you through, so you know what "done" looks like:
+
+1. Install Postgres, Python, Node, and the other tools.
+2. Restore `fusion-dev.dump` into a database called `fusionlab` — this is the
+   shared synthetic dataset (3277 accounts: `stuNNNNN` / `facNNNNN` / staff
+   accounts, every one sharing the password **`fusion123`**). Nothing in it is
+   a real person.
+3. Clone and configure both `Fusion_System_Administrator` (the IAM — identity,
+   login, roles) and `Fusion-Integrated` (the platform your module lives in).
+4. Migrate both services' databases and run `manage.py sync_identity` once,
+   which copies the dump's accounts into the IAM's own tables.
+5. Start the IAM, start `Fusion-Integrated`'s backend (`make dev`), start its
+   client (`cd client && npm run dev`).
+6. Confirm you can log in at `http://localhost:5173` with one of the dump's
+   `stuNNNNN` accounts and see `Placement Cell` (the reference module) in the
+   sidebar.
+
+Do not continue to Part 2 until that last checkbox is true. If it isn't, the
+problem is in your environment, not in anything below — go back to the
+Fusion-README guide and `docs/08-delivery/student-assignment-guide.md`'s own
+Step 3 checklist.
+
+**One thing worth knowing up front:** your own local `fusionlab` may drift
+from the public dump over time (re-syncs, manual edits, whatever you've done
+to it) — the usernames and even the shared `fusion123` password are a property
+of a *clean* `fusion-dev.dump` restore specifically. If a login ever fails
+unexpectedly, that's the first thing to suspect, not the commands in this
+guide.
+
+---
+
+## Part 2 — Declare the role in your module's `registry.py`
 
 Open `modules/placement/registry.py` in `Fusion-Integrated` first — it's the
 reference module, and the shape you need is already there:
@@ -99,7 +121,7 @@ If your module also has screens, declare `MODULE` and `NAV_ITEMS` the same way
 `required_permission` on each nav item. A module with no screens yet (pure
 API) can skip `NAV_ITEMS`.
 
-## Step 2 — Generate and publish the manifest
+## Part 3 — Generate and publish the manifest
 
 `registry/permissions.json` is generated, never hand-edited. It is built by
 scanning every module's `registry.py`:
@@ -114,10 +136,17 @@ This **fails on purpose** if something is wrong — a permission declared in
 declared, or missing your module's own prefix. Fix the error it reports
 before moving on; it is telling you about a real gap, not a formality.
 
-Once it succeeds, publish it to the IAM:
+Once it succeeds, publish it to the IAM. Every command from here on is run
+from:
 
 ```bash
-cd ../Fusion_System_Administrator/Backend/backend
+cd Fusion_System_Administrator/Backend/backend
+```
+
+using `./../venv/bin/python manage.py ...` — not a bare `python`, because the
+project's dependencies live in `Backend/venv`, one level above this directory.
+
+```bash
 ./../venv/bin/python manage.py seed_iam_permissions \
   --manifest /full/path/to/Fusion-Integrated/registry/permissions.json
 ```
@@ -125,21 +154,23 @@ cd ../Fusion_System_Administrator/Backend/backend
 At this point the role **exists and has permissions**, but nobody holds it
 yet.
 
-## Step 3 — Find a test account (optional)
+## Part 4 — Find a test account (optional)
 
 The dump's usernames are already sequential and self-explanatory
-(`fac00001`, `stu00001`, `staff00001`, ...) — you can skip straight to Step 4
-with any one of them. This step just helps you see what is available:
+(`facNNNNN`, `stuNNNNN`, and a staff pattern you'll see once you look) — you
+can skip straight to Part 5 with any one of them. This step just helps you
+see what is available:
 
 ```bash
 ./../venv/bin/python manage.py find_user --kind faculty --limit 50
 ./../venv/bin/python manage.py find_user --kind staff --limit 50
+./../venv/bin/python manage.py find_user --kind student --limit 50
 ```
 
 `--q` narrows by username or display name, e.g. `--q nair`, but is not
 required — running with just `--kind` lists everyone of that kind.
 
-## Step 4 — Put a specific account into the role
+## Part 5 — Put a specific account into the role
 
 ```bash
 ./../venv/bin/python manage.py assign_role --user fac00005 --designation "Leave Approver"
@@ -157,18 +188,20 @@ This writes directly — it does not check whether `"Leave Approver"` is a
 will be. An unrecognised designation is allowed by design (see
 `iam/rbac.py`'s own docstring): only the institute's existing office/rank
 roles (Dean Academic, HOD, and so on) are catalogued, and that catalogue is
-an audit list, not a gate.
+an audit list, not a gate. This also means **any basic kind can hold any role
+you invent** unless your own module's design says otherwise — a student
+holding "Leave Approver" is not blocked by the platform.
 
-## Step 5 — Log in and verify
+## Part 6 — Log in and verify
 
 Open the client (`http://localhost:5173`), sign in with the username from
-Step 3/4 and password **`fusion123`** (every dump account shares it). Use the
+Part 4/5 and password **`fusion123`** (every dump account shares it). Use the
 role switcher to select the new role, and confirm your module appears.
 
-**If you were already logged in before Step 4**, log out and back in. The
-client caches your session for 60 seconds
-(`IAM_SESSION_CACHE_SECONDS`), so a role assigned mid-session will not appear
-until that cache expires or you force a fresh login.
+**If you were already logged in before Part 5**, log out and back in. The
+client caches your session for 60 seconds (`IAM_SESSION_CACHE_SECONDS`), so a
+role assigned mid-session will not appear until that cache expires or you
+force a fresh login.
 
 ---
 
@@ -191,4 +224,26 @@ until that cache expires or you force a fresh login.
 - **Testing without a role switch.** Holding a designation is not the same as
   *acting* as it — select it in the role switcher after logging in.
 - **Expecting a role change to show up instantly** in an already-open
-  session. See the 60-second cache note in Step 5.
+  session. See the 60-second cache note in Part 6.
+- **Assuming your personal working database behaves like a clean restore.**
+  If you've been experimenting for a while, your `fusionlab` may no longer
+  match a fresh `fusion-dev.dump` — if logins start failing for no obvious
+  reason, restore a clean copy into a throwaway database name and compare,
+  rather than debugging against drifted data.
+
+## Proof this works
+
+Run end to end against a genuinely clean `fusion-dev.dump` restore (not a
+personal working database), for all three basic kinds, using the reference
+`placement` module's own roles:
+
+| Account kind | Username pattern | Designation assigned | Login | Roles returned | Modules returned |
+|---|---|---|---|---|---|
+| Faculty | `facNNNNN` | `placement_coordinator` | OK | `student`-equivalent gate N/A | `directory`, `placement_cell` |
+| Staff | `stfNNNNN` | `placement_officer` | OK | `staff`, `placement_officer` | `directory`, `placement_cell` |
+| Student (no extra role) | `stuNNNNN` | — (basic kind only) | OK | `student`, `ug_student` | `placement_cell` |
+| Student (with an extra role) | `stuNNNNN` | `placement_coordinator` | OK | `student`, `placement_coordinator` | `directory`, `placement_cell` |
+
+Every row used a throwaway scratch database, dropped immediately after — this
+guide's commands do not require touching anyone's personal working database
+to verify.
