@@ -63,6 +63,251 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/leave/applications:
+    get:
+      operationId: leave_applications_list
+      description: The caller's own leave applications, and the way to file a new
+        one.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+    post:
+      operationId: v1_leave_applications_create
+      description: The caller's own leave applications, and the way to file a new
+        one.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveApply'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveApply'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveApply'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/leave/applications/{id}:
+    get:
+      operationId: v1_leave_applications_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/leave/applications/{id}/cancel:
+    post:
+      operationId: v1_leave_applications_cancel_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/leave/applications/{id}/decide:
+    post:
+      operationId: v1_leave_applications_decide_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Decide'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Decide'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Decide'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/leave/applications/{id}/withdraw:
+    post:
+      operationId: v1_leave_applications_withdraw_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/leave/balances:
+    get:
+      operationId: v1_leave_balances_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveBalance'
+          description: ''
+  /api/v1/leave/holidays:
+    get:
+      operationId: v1_leave_holidays_list
+      description: Maintain the published holiday / restricted-holiday calendar.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Holiday'
+          description: ''
+    post:
+      operationId: v1_leave_holidays_create
+      description: Maintain the published holiday / restricted-holiday calendar.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Holiday'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Holiday'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Holiday'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Holiday'
+          description: ''
+  /api/v1/leave/inbox:
+    get:
+      operationId: v1_leave_inbox_list
+      description: Requests awaiting a decision, for a Unit Head / Sanctioning Authority.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/leave/substitute/{id}/respond:
+    post:
+      operationId: v1_leave_substitute_respond_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubstituteRespond'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubstituteRespond'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubstituteRespond'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -2082,6 +2327,22 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CategoryEnum:
+      enum:
+      - cl
+      - rh
+      - scl
+      - el
+      - col
+      - vl
+      type: string
+      description: |-
+        * `cl` - Casual Leave
+        * `rh` - Restricted Holiday
+        * `scl` - Special Casual Leave
+        * `el` - Earned Leave
+        * `col` - Commuted Leave
+        * `vl` - Vacation Leave
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2315,6 +2576,16 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    Decide:
+      type: object
+      properties:
+        approve:
+          type: boolean
+        note:
+          type: string
+          maxLength: 2000
+      required:
+      - approve
     Detail:
       type: object
       properties:
@@ -2423,6 +2694,35 @@ components:
       - fee_reference
       - season
       - user_id
+    Holiday:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        date:
+          type: string
+          format: date
+        kind:
+          allOf:
+          - $ref: '#/components/schemas/HolidayKindEnum'
+          default: holiday
+        label:
+          type: string
+          maxLength: 120
+        is_published:
+          type: boolean
+      required:
+      - date
+      - id
+    HolidayKindEnum:
+      enum:
+      - holiday
+      - restricted
+      type: string
+      description: |-
+        * `holiday` - Closed holiday
+        * `restricted` - Restricted holiday
     IncidentRecorded:
       type: object
       properties:
@@ -2637,6 +2937,153 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        half:
+          $ref: '#/components/schemas/LeaveApplicationHalfEnum'
+        purpose:
+          type: string
+          maxLength: 2000
+        station_leave:
+          nullable: true
+        substitute_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        substitute_status:
+          $ref: '#/components/schemas/SubstituteStatusEnum'
+        status:
+          $ref: '#/components/schemas/LeaveApplicationStatusEnum'
+        chargeable_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,1})?$
+        decided_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          nullable: true
+        decision_note:
+          type: string
+          maxLength: 2000
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - category
+      - created_at
+      - end_date
+      - id
+      - start_date
+      - updated_at
+      - user_id
+    LeaveApplicationHalfEnum:
+      enum:
+      - full
+      - first
+      - second
+      type: string
+      description: |-
+        * `full` - Full day
+        * `first` - First half
+        * `second` - Second half
+    LeaveApplicationStatusEnum:
+      enum:
+      - submitted
+      - approved
+      - rejected
+      - withdrawn
+      - cancelled
+      type: string
+      description: |-
+        * `submitted` - submitted
+        * `approved` - approved
+        * `rejected` - rejected
+        * `withdrawn` - withdrawn
+        * `cancelled` - cancelled
+    LeaveApply:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        half:
+          allOf:
+          - $ref: '#/components/schemas/LeaveApplyHalfEnum'
+          default: full
+        purpose:
+          type: string
+          maxLength: 2000
+        station_leave: {}
+        substitute_user_id:
+          type: integer
+          nullable: true
+      required:
+      - category
+      - end_date
+      - start_date
+    LeaveApplyHalfEnum:
+      enum:
+      - full
+      - first
+      - second
+      type: string
+      description: |-
+        * `full` - full
+        * `first` - first
+        * `second` - second
+    LeaveBalance:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        entitled:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,1})?$
+        used:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,1})?$
+        available:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,1})?$
+          readOnly: true
+      required:
+      - available
+      - category
     LiftSanction:
       type: object
       properties:
@@ -3698,6 +4145,25 @@ components:
           type: integer
       required:
       - document_id
+    SubstituteRespond:
+      type: object
+      properties:
+        accept:
+          type: boolean
+      required:
+      - accept
+    SubstituteStatusEnum:
+      enum:
+      - none
+      - pending
+      - accepted
+      - declined
+      type: string
+      description: |-
+        * `none` - none
+        * `pending` - pending
+        * `accepted` - accepted
+        * `declined` - declined
     TopicEnum:
       enum:
       - drive
