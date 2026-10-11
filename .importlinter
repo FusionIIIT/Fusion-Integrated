@@ -13,10 +13,16 @@ name = Modules may reach each other ONLY through contracts.py
 type = forbidden
 source_modules =
     modules.placement
+    modules.elm
     modules.directory
     modules.accesscontrol
 forbidden_modules =
     modules.placement.models
+    modules.elm.models
+    modules.elm.services
+    modules.elm.selectors
+    modules.elm.api
+    modules.elm.domain
     modules.placement.services
     modules.placement.selectors
     modules.placement.api
@@ -38,6 +44,7 @@ type = forbidden
 source_modules =
 # Every module's domain, not just the first one written.
     modules.placement.domain
+    modules.elm.domain
 forbidden_modules =
     django
     rest_framework
@@ -56,6 +63,16 @@ source_modules = core
 forbidden_modules =
     modules
     fusion_auth
+
+[importlinter:contract:elm-layers]
+name = Layering inside ELM
+type = layers
+layers =
+    modules.elm.api
+    modules.elm.services
+    modules.elm.selectors
+    modules.elm.models
+    modules.elm.domain
 
 [importlinter:contract:placement-layers]
 name = Layering inside placement

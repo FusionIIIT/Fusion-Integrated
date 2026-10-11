@@ -19,7 +19,7 @@ This service holds **no user table**. Identity, RBAC and common directory data
                  ▼
         Fusion-Integrated                ← this repo
         owns fusion_integrated
-        backend  →  placement  (more modules later)
+        backend  →  placement + ELM pilot
         client   →  the shell: one login, one sidebar
         holds only user_id references — no user table
 ```
@@ -49,6 +49,8 @@ make check            # everything CI runs
 ```
 
 Requires Python 3.12, [uv](https://docs.astral.sh/uv/) and Docker.
+
+The API-only Employee Leave Management pilot is documented in [modules/elm/README.md](modules/elm/README.md). Its local Qwen workflow is in [docs/elm-local-qwen-workflow.md](docs/elm-local-qwen-workflow.md).
 
 ---
 
