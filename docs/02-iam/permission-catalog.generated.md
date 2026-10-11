@@ -13,6 +13,19 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.application.create` | Submit a leave application | `Employee`, `faculty`, `staff` |
+| `elm.balance.accrue` | Annual accrual task | _service only_ |
+| `elm.application.view` | See leave applications | `Employee`, `Leave Administrator`, `Leave Approver`, `faculty`, `staff` |
+| `elm.application.approve` | Approve or reject a leave application | `Leave Administrator`, `Leave Approver` |
+| `elm.application.delete` | Withdraw or cancel your own leave application | `Employee`, `faculty`, `staff` |
+| `elm.balance.view` | See leave balances | `Employee`, `Leave Administrator`, `Leave Approver`, `faculty`, `staff` |
+| `elm.balance.manage` | Grant and adjust leave balances | `Leave Administrator` |
+| `elm.policy.manage` | Configure leave types, holidays and entitlements | `Leave Administrator` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

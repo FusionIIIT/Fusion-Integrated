@@ -34,6 +34,138 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "elm": {
+      "grants": {
+        "Employee": [
+          "elm.application.create",
+          "elm.application.delete",
+          "elm.application.view",
+          "elm.balance.view"
+        ],
+        "Leave Administrator": [
+          "elm.application.approve",
+          "elm.application.view",
+          "elm.balance.manage",
+          "elm.balance.view",
+          "elm.policy.manage"
+        ],
+        "Leave Approver": [
+          "elm.application.approve",
+          "elm.application.view",
+          "elm.balance.view"
+        ],
+        "faculty": [
+          "elm.application.create",
+          "elm.application.delete",
+          "elm.application.view",
+          "elm.balance.view"
+        ],
+        "staff": [
+          "elm.application.create",
+          "elm.application.delete",
+          "elm.application.view",
+          "elm.balance.view"
+        ]
+      },
+      "module_grants": [
+        "Employee",
+        "Leave Administrator",
+        "Leave Approver",
+        "faculty",
+        "staff"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "CalendarBlank",
+        "items": [
+          {
+            "code": "elm.apply",
+            "icon": "FilePlus",
+            "label": "Apply for Leave",
+            "required_permission": "elm.application.create",
+            "sort_order": 10,
+            "to": "/leave/apply"
+          },
+          {
+            "code": "elm.mine",
+            "icon": "Suitcase",
+            "label": "My Leaves",
+            "required_permission": "elm.application.view",
+            "sort_order": 20,
+            "to": "/leave/mine"
+          },
+          {
+            "code": "elm.balance",
+            "icon": "Scales",
+            "label": "My Balances",
+            "required_permission": "elm.balance.view",
+            "sort_order": 30,
+            "to": "/leave/balance"
+          },
+          {
+            "code": "elm.approvals",
+            "icon": "Checks",
+            "label": "Approvals",
+            "required_permission": "elm.application.approve",
+            "sort_order": 40,
+            "to": "/leave/approvals"
+          },
+          {
+            "code": "elm.admin",
+            "icon": "SlidersHorizontal",
+            "label": "Leave Setup",
+            "required_permission": "elm.policy.manage",
+            "sort_order": 90,
+            "to": "/leave/admin"
+          }
+        ],
+        "label": "Leave Management",
+        "nav_section": "Leave",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "elm.application.create",
+          "label": "Submit a leave application"
+        },
+        {
+          "code": "elm.balance.accrue",
+          "label": "Annual accrual task"
+        },
+        {
+          "code": "elm.application.view",
+          "label": "See leave applications"
+        },
+        {
+          "code": "elm.application.approve",
+          "label": "Approve or reject a leave application"
+        },
+        {
+          "code": "elm.application.delete",
+          "label": "Withdraw or cancel your own leave application"
+        },
+        {
+          "code": "elm.balance.view",
+          "label": "See leave balances"
+        },
+        {
+          "code": "elm.balance.manage",
+          "label": "Grant and adjust leave balances"
+        },
+        {
+          "code": "elm.policy.manage",
+          "label": "Configure leave types, holidays and entitlements"
+        }
+      ],
+      "scope_permissions": [
+        "elm.application.view",
+        "elm.balance.view"
+      ],
+      "system_permissions": [
+        "elm.balance.accrue"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

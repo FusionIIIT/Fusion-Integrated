@@ -63,6 +63,358 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/elm/applications:
+    get:
+      operationId: v1_elm_applications_list
+      description: Own requests for an applicant; everything for an approver.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveApplicationList'
+          description: ''
+  /api/v1/elm/applications/{id}:
+    get:
+      operationId: v1_elm_applications_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/applications/{id}/history:
+    get:
+      operationId: v1_elm_applications_history_list
+      description: The append-only trail, for "why is my request at this status?".
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveEvent'
+          description: ''
+  /api/v1/elm/applications/{id}/transition:
+    post:
+      operationId: v1_elm_applications_transition_create
+      description: 'The single write path: decide, withdraw or cancel.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveTransition'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveTransition'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveTransition'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/applications/submit:
+    post:
+      operationId: v1_elm_applications_submit_create
+      description: Submits a request; the rules refuse before any row exists.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveApplicationCreate'
+            examples:
+              TwoDaysOfCasualLeave:
+                value:
+                  leave_type_id: 1
+                  start_date: '2026-04-20'
+                  end_date: '2026-04-21'
+                  reason: Family function
+                summary: Two days of casual leave
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveApplicationCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveApplicationCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/approvals:
+    get:
+      operationId: v1_elm_approvals_list
+      description: Pending requests in scope; never the approver's own (BR-08).
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveApplicationList'
+          description: ''
+  /api/v1/elm/balances:
+    get:
+      operationId: v1_elm_balances_list
+      description: Own buckets; an approver may ask for one person's.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Balance'
+          description: ''
+  /api/v1/elm/balances/grant:
+    post:
+      operationId: v1_elm_balances_grant_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BalanceAdjustment'
+            examples:
+              CreditThreeCompensatoryDays:
+                value:
+                  user_id: 1001
+                  leave_type_id: 4
+                  year: 2026
+                  days: '3.0'
+                  note: Worked the verification weekend
+                summary: Credit three compensatory days
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BalanceAdjustment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BalanceAdjustment'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          description: No response body
+  /api/v1/elm/holidays:
+    get:
+      operationId: v1_elm_holidays_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Holiday'
+          description: ''
+  /api/v1/elm/holidays/{id}:
+    delete:
+      operationId: v1_elm_holidays_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/elm/holidays/create:
+    post:
+      operationId: v1_elm_holidays_create_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HolidayWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HolidayWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HolidayWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Holiday'
+          description: ''
+  /api/v1/elm/types:
+    get:
+      operationId: v1_elm_types_list
+      description: Every leave type effective today — what the apply form can offer.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveType'
+          description: ''
+  /api/v1/elm/types/{id}/{action}:
+    post:
+      operationId: v1_elm_types_create
+      description: Retire or restore one version of a type.
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveType'
+          description: ''
+  /api/v1/elm/types/create:
+    post:
+      operationId: v1_elm_types_create_create
+      description: A changed entitlement is a new version, never an edit.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveTypeWrite'
+            examples:
+              ANewCasual-leaveVersion:
+                value:
+                  code: CL
+                  name: Casual Leave
+                  annual_entitlement_days: '8.0'
+                  allows_half_day: true
+                  effective_from: '2026-04-01'
+                summary: A new casual-leave version
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveTypeWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveTypeWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveType'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1993,6 +2345,62 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    Balance:
+      type: object
+      description: Reads selectors.queries.Balance, which is a dataclass, not a model.
+      properties:
+        user_id:
+          type: integer
+        leave_type_code:
+          type: string
+        leave_type_name:
+          type: string
+        entitled_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,1})?$
+        used_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,1})?$
+        available_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,1})?$
+      required:
+      - available_days
+      - entitled_days
+      - leave_type_code
+      - leave_type_name
+      - used_days
+      - user_id
+    BalanceAdjustment:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        leave_type_id:
+          type: integer
+        year:
+          type: integer
+          maximum: 2100
+          minimum: 2000
+        days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        note:
+          type: string
+          maxLength: 300
+      required:
+      - days
+      - leave_type_id
+      - note
+      - user_id
+      - year
+    BlankEnum:
+      enum:
+      - ''
     BulkOutcome:
       type: object
       properties:
@@ -2423,6 +2831,43 @@ components:
       - fee_reference
       - season
       - user_id
+    HalfDayPartEnum:
+      enum:
+      - first
+      - second
+      type: string
+      description: |-
+        * `first` - First half
+        * `second` - Second half
+    Holiday:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        date:
+          type: string
+          format: date
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+      required:
+      - date
+      - id
+      - name
+    HolidayWrite:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        name:
+          type: string
+          maxLength: 80
+      required:
+      - date
+      - name
     IncidentRecorded:
       type: object
       properties:
@@ -2637,6 +3082,254 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        applicant_name:
+          type: string
+          readOnly: true
+        leave_type:
+          allOf:
+          - $ref: '#/components/schemas/LeaveType'
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+          readOnly: true
+        end_date:
+          type: string
+          format: date
+          readOnly: true
+        days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          readOnly: true
+        is_half_day:
+          type: boolean
+          readOnly: true
+        half_day_part:
+          allOf:
+          - $ref: '#/components/schemas/HalfDayPartEnum'
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/LeaveApplicationStatusEnum'
+          readOnly: true
+          default: pending
+        decided_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decision_note:
+          type: string
+          readOnly: true
+        allowed_transitions:
+          type: array
+          items:
+            type: string
+          description: |-
+            State machine *and* permission, so a control is never rendered for
+            an action the server would refuse (Step 6.4).
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - allowed_transitions
+      - applicant_name
+      - created_at
+      - days
+      - decided_at
+      - decided_by_user_id
+      - decision_note
+      - end_date
+      - half_day_part
+      - id
+      - is_half_day
+      - leave_type
+      - reason
+      - start_date
+      - status
+      - user_id
+    LeaveApplicationCreate:
+      type: object
+      properties:
+        leave_type_id:
+          type: integer
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        is_half_day:
+          type: boolean
+          default: false
+        half_day_part:
+          default: ''
+          oneOf:
+          - $ref: '#/components/schemas/HalfDayPartEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        reason:
+          type: string
+          default: ''
+          maxLength: 2000
+      required:
+      - end_date
+      - leave_type_id
+      - start_date
+    LeaveApplicationStatusEnum:
+      enum:
+      - pending
+      - approved
+      - rejected
+      - withdrawn
+      - cancelled
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `withdrawn` - Withdrawn
+        * `cancelled` - Cancelled
+    LeaveEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        from_status:
+          type: string
+          readOnly: true
+        to_status:
+          type: string
+          readOnly: true
+        actor_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        actor_name:
+          type: string
+          readOnly: true
+        note:
+          type: string
+          readOnly: true
+        at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actor_name
+      - actor_user_id
+      - at
+      - from_status
+      - id
+      - note
+      - to_status
+    LeaveTransition:
+      type: object
+      description: |-
+        Named for this module: a bare `TransitionSerializer` collides with
+        placement's in the generated schema (drf-spectacular derives component
+        names from class names alone).
+      properties:
+        to_status:
+          $ref: '#/components/schemas/ToStatusEnum'
+        note:
+          type: string
+          default: ''
+          maxLength: 300
+      required:
+      - to_status
+    LeaveType:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        annual_entitlement_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          readOnly: true
+        counts_calendar_days:
+          type: boolean
+          readOnly: true
+        allows_half_day:
+          type: boolean
+          readOnly: true
+        requires_reason:
+          type: boolean
+          readOnly: true
+        effective_from:
+          type: string
+          format: date
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+      required:
+      - allows_half_day
+      - annual_entitlement_days
+      - code
+      - counts_calendar_days
+      - effective_from
+      - id
+      - is_active
+      - name
+      - requires_reason
+    LeaveTypeWrite:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 12
+        name:
+          type: string
+          maxLength: 60
+        annual_entitlement_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          default: '0.0'
+        counts_calendar_days:
+          type: boolean
+          default: false
+        allows_half_day:
+          type: boolean
+          default: false
+        requires_reason:
+          type: boolean
+          default: false
+        effective_from:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - code
+      - name
     LiftSanction:
       type: object
       properties:
@@ -2981,6 +3674,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedLeaveApplicationList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveApplication'
     PaginatedOfferList:
       type: object
       required:
@@ -3698,6 +4410,20 @@ components:
           type: integer
       required:
       - document_id
+    ToStatusEnum:
+      enum:
+      - approved
+      - cancelled
+      - pending
+      - rejected
+      - withdrawn
+      type: string
+      description: |-
+        * `approved` - approved
+        * `cancelled` - cancelled
+        * `pending` - pending
+        * `rejected` - rejected
+        * `withdrawn` - withdrawn
     TopicEnum:
       enum:
       - drive
