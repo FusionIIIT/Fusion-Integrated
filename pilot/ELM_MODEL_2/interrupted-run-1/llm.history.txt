@@ -1,0 +1,1859 @@
+TO LLM 2026-10-11T21:45:46
+-------
+SYSTEM Act as an expert software developer.
+SYSTEM Take requests for changes to the supplied code.
+SYSTEM If the request is ambiguous, ask questions.
+SYSTEM Reply in English.
+SYSTEM 
+SYSTEM Once you understand the request you MUST:
+SYSTEM 1. Determine if any code changes are needed.
+SYSTEM 2. Explain any needed changes.
+SYSTEM 3. If changes are needed, output a copy of each file that needs changes.
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return the entire content of the updated file.
+SYSTEM You MUST use this *file listing* format:
+SYSTEM 
+SYSTEM path/to/filename.js
+SYSTEM ```
+SYSTEM // entire file content ...
+SYSTEM // ... goes in between
+SYSTEM ```
+SYSTEM 
+SYSTEM Every *file listing* MUST use this format:
+SYSTEM - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+SYSTEM - Second line: opening ```
+SYSTEM - ... entire content of the file ...
+SYSTEM - Final line: closing ```
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+SYSTEM *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+SYSTEM Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+SYSTEM 
+SYSTEM Reply in English.
+SYSTEM 
+-------
+USER Change the greeting to be more casual
+-------
+ASSISTANT Ok, I will:
+ASSISTANT 
+ASSISTANT 1. Switch the greeting text from "Hello" to "Hey".
+ASSISTANT 
+ASSISTANT show_greeting.py
+ASSISTANT ```
+ASSISTANT import sys
+ASSISTANT 
+ASSISTANT def greeting(name):
+ASSISTANT     print(f"Hey {name}")
+ASSISTANT 
+ASSISTANT if __name__ == '__main__':
+ASSISTANT     greeting(sys.argv[1])
+ASSISTANT ```
+-------
+USER I switched to a new code base. Please don't consider the above files or try to edit them any longer.
+-------
+ASSISTANT Ok.
+-------
+USER Here are some READ ONLY files, provided for your reference.
+USER Do not edit these files!
+USER 
+USER ../elm_specs_md/pilot_kit/chunks/problem_statement.md
+USER ```
+USER # Employee Leave Management (ELM)
+USER 
+USER Synchronized Problem Statement and Controlled Context
+USER 
+USER Status: FINAL SYNCHRONIZED BASELINE | Version 1.4
+USER 
+USER > Revision basis
+USER This final synchronized baseline incorporates the 18 domain adjudications made after the Phase-2 materials, the coherent-CFR / atomic-AFR requirements arrangement, and the finalized UC/WF formalism. The historical SRS-EL-001…107 set remains the immutable as-administered student baseline and is preserved through the companion crosswalk.
+USER 
+USER ## 1. Context
+USER 
+USER Fusion is the institute ERP used to provide administrative, academic, student, and related services. Users may hold one or more roles, and access to ELM capabilities is controlled through role-based permissions.
+USER 
+USER ELM supports leave-related activities for institute employees. Employees are Faculty or Staff, each with a designation and an organizational unit such as a Department, Section, or Office. Each organizational unit has a Unit Head. Depending on leave type and hierarchy, the Unit Head either gives the final decision or reviews and records Recommended / Not Recommended before the request moves through the applicable higher-sanction path.
+USER 
+USER ## 2. Leave categories and Station Leave
+USER 
+USER ELM supports CL, RH, SCL, EL, COL, and VL. Station Leave permission/details are captured within the same leave application when the employee will be outside Jabalpur; Station Leave is not a separate leave-request process.
+USER 
+USER ## 3. Entitlement, applicability, and carry-forward
+USER 
+USER CL: 8 days/year for each employee; first-half and second-half CL are supported; an approved half day consumes 0.5 CL day; unused CL does not carry forward.
+USER 
+USER RH: 2 days/year for each employee; an RH request must correspond to an applicable Restricted Holiday in the currently effective published holiday/RH calendar; unused RH does not carry forward.
+USER 
+USER SCL: up to 15 days/year for each employee for a special purpose considered admissible by the applicable Sanctioning Authority; no separate encoded admissibility rule is required in this baseline; unused SCL does not carry forward.
+USER 
+USER EL: non-faculty employees receive 30 days/year directly; unused EL carries forward.
+USER 
+USER VL: faculty receive 60 VL associated with vacation periods supplied through the institute Academic Calendar. VL may be availed only during an applicable vacation period. At year end, all unused VL converts to EL at 2 VL : 1 EL, including fractional conversion. VL itself does not carry forward; converted EL is credited to the faculty member’s EL balance, may carry forward, and may later be availed.
+USER 
+USER COL: 20 days/year in this baseline for each eligible employee; COL is medical/balance-controlled leave, supporting medical evidence may be required where applicable, and unused COL carries forward.
+USER 
+USER ## 4. Leave-day counting
+USER 
+USER For EL, COL, and VL, leave is counted continuously across the approved leave interval. Intervening weekends and closed holidays within the interval count as leave days. This continuing-count rule does not apply to CL, SCL, or RH.
+USER 
+USER ## 5. Applying for leave and validation
+USER 
+USER The employee submits one leave application containing leave category, requested period, purpose/reason, and other required information. Station Leave details are included in the same application when applicable.
+USER 
+USER Before a new request is allowed to proceed, ELM validates the employee’s leave-category eligibility, available entitlement/balance, applicable leave-counting and calendar conditions, and impermissible overlap with the employee’s active pending or approved leave. First-half and second-half CL on the same date are not treated as overlapping when they occupy different halves.
+USER 
+USER Leave-policy parameters do not use a draft/publish/effective-version lifecycle in this baseline. Validation uses the current configured leave-policy parameters. Date and RH validation use the currently effective published holiday/RH calendar.
+USER 
+USER ## 6. Substitute / responsibility coverage
+USER 
+USER When responsibility coverage is required, the applicant nominates one substitute. The substitute must be another employee, must not be the applicant, and must not have overlapping pending or approved leave during the responsibility period.
+USER 
+USER The nominated substitute may accept or decline the assignment. Required substitute consent must be accepted before approval routing continues. If the substitute declines, the applicant may nominate another eligible substitute or withdraw the pending request.
+USER 
+USER ## 7. Review, sanction, and decision communication
+USER 
+USER For CL and RH, including associated Station Leave, the request is routed to the applicant’s Unit Head and the Unit Head is the final authority.
+USER 
+USER For SCL, EL, COL, and VL, the Unit Head reviews the request and records Recommended or Not Recommended. Not Recommended is not a final rejection for these categories. The request then proceeds through the configured hierarchy to the appropriate final Sanctioning Authority.
+USER 
+USER The processing/sanctioning path is resolved from the applicant, organizational unit, designation/role, leave category, and current hierarchy configuration. Named roles may include Deputy Registrar (Estt.), Dean, Registrar, and Director. An Establishment processing step occurs where configured. The Director’s own leave follows the Director-specific self-sanction rule.
+USER 
+USER On a final decision, the decision is recorded and the employee is notified. On final approval, the employee’s leave record/account is also updated. Intermediate decisions and state changes need not generate general notifications; the employee can inspect them through leave status/history.
+USER 
+USER ## 8. Pending request, withdrawal, and approved-leave cancellation
+USER 
+USER A submitted pending leave request is not modified in place. If a change is required before final approval, the employee may withdraw the pending request and submit a new application if needed.
+USER 
+USER A pending request may be withdrawn immediately at any time before final approval. Upon successful withdrawal, the withdrawal becomes effective immediately, all remaining approval processing for that request terminates, later approve/reject actions are prevented, and the concerned roles are informed.
+USER 
+USER After final approval, withdrawal is no longer available. Before the approved leave begins, the employee may request cancellation. Cancellation follows the same applicable hierarchy as the original leave and the approved leave is not edited in place. If cancellation is finally approved, the leave is marked Cancelled and any leave balance already deducted for the approval is restored or adjusted accordingly. If cancellation is rejected, the original approved leave remains unchanged. If revised leave is still required after cancellation, a fresh application is submitted.
+USER 
+USER Once leave has begun, pre-start cancellation no longer applies; change is handled through the applicable extension or resumption process.
+USER 
+USER ## 9. Extension
+USER 
+USER An employee already on ongoing EL, COL, or VL may request additional leave time. The extension is validated using the applicable eligibility, balance, substitute, calendar, and approval conditions; required substitute consent is obtained before approval routing continues; and the extension follows the applicable Unit Head and configured higher-sanction path.
+USER 
+USER When an extension is approved, only the incremental additional leave period is posted and the original approved leave remains the base. When an extension is rejected, the original approved leave remains unchanged.
+USER 
+USER ## 10. Resumption
+USER 
+USER Resumption is supported for EL, COL, and VL. After returning, the employee submits the actual resumption date and required resumption details through ELM for review by the applicable Sanctioning Authority.
+USER 
+USER When the employee resumes on the approved end date, the Sanctioning Authority reviews the resumption and no adjustment is made to the approved leave period or leave balance. When the employee resumes earlier or later than the approved end date, ELM records the actual leave period after review, adjusts the leave balance accordingly, and synchronizes the relevant leave/attendance records.
+USER 
+USER ## 11. Inquiry and employee-accessible records
+USER 
+USER ELM provides employees with access to their current leave balances and leave-account/request history, including request status and recorded final decisions. ELM also provides an employee-accessible printable/exportable representation of a leave application.
+USER 
+USER ## 12. Administrative functions and calendars
+USER 
+USER Authorized administrative roles maintain leave-policy parameters, the relevant hierarchy configuration, and leave records where authorized. Policy parameters do not require a draft/publish/effective-version lifecycle; ELM uses the current configured policy and hierarchy values.
+USER 
+USER Authorized administrative roles create, revise, and publish the holiday/RH calendar. Date/RH validation uses the currently effective published holiday/RH calendar until a replacement is published.
+USER 
+USER Vacation periods used for VL are supplied through the institute Academic Calendar, which is maintained outside ELM by the appropriate academic module/service and is assumed to be available to ELM.
+USER 
+USER Authorized Leave Administrators may retrospectively record leave already sanctioned through an authorized paper/offline process where ELM could not be used because of illness, connectivity, server unavailability, or another acceptable reason. The entry captures sanction/reference evidence, is validated for record consistency, and updates the relevant leave balance/history. This is record synchronization, not a second approval workflow.
+USER 
+USER ## 13. Event-triggered year-end processing
+USER 
+USER When the configured year-end boundary is reached, ELM applies the defined category outcomes: unused CL, RH, and SCL lapse; unused faculty VL is converted to EL; EL and COL carry forward according to policy. The resulting leave-account transactions are recorded and processing exceptions are reported. The year-end boundary is an event trigger, not an ELM actor.
+USER 
+USER ## 14. SLA
+USER 
+USER Actionable workflow tasks use configurable reminder and escalation thresholds. When a task is assigned, the assigned user is notified. If the task is still pending at the reminder threshold, the responsible user is reminded and the action is logged; no reminder is issued if the task is no longer pending. If the task remains pending past the escalation threshold, ELM notifies or escalates to the configured higher/responsible authority and logs the escalation; no escalation is issued if the task is no longer pending.
+USER 
+USER ## 15. Scope boundary
+USER 
+USER This ELM baseline limits leave categories to CL, RH, SCL, EL, COL, VL, and Station Leave as defined above. Other leave types and low-level design/implementation details are outside this requirements baseline. The Academic Calendar is an external dependency for VL vacation-period data.
+USER 
+USER ## Appendix A — Actor, Role, and External Dependency Registry
+USER 
+USER | ID | Preferred term | Responsibility |
+USER |---|---|---|
+USER | ACT-01 | Employee | Faculty or Staff member applying for and managing own leave. |
+USER | ACT-02 | Substitute / Responsibility Holder | Employee nominated to accept responsibility during the applicant’s absence. |
+USER | ACT-03 | Unit Head | Head of Department/Section/Office; final authority for CL/RH or reviewer/recommender for higher-sanction leave. |
+USER | ACT-04 | Deputy Registrar (Estt.) / Establishment Processing Role | Performs establishment-level verification/routing/record functions where configured. |
+USER | ACT-05 | Dean | Competent authority where applicable. |
+USER | ACT-06 | Registrar | Competent authority where applicable. |
+USER | ACT-07 | Director | Highest competent authority; Director-specific self-sanction rule applies. |
+USER | ACT-08 | Leave Administrator | Maintains authorized ELM configuration/records and records offline-sanctioned leave where authorized. |
+USER | EXT-01 | Academic Calendar service/module | External source of published vacation periods used for VL applicability. |
+USER | EVT-01 | Year-end boundary | Event trigger for EL-UC-020 year-end leave processing; not an actor. |
+USER | EVT-02 | Configured SLA threshold reached | Event trigger for EL-UC-021 SLA threshold processing; not an actor. |
+USER 
+USER Faculty and Staff are employee categories. Unit Head, Substitute, Leave Administrator, Deputy Registrar (Estt.), Dean, Registrar, and Director are roles/authorities. EXT-01 is an external information dependency rather than an ELM actor performing a leave workflow action. EVT-01 and EVT-02 are event triggers; they initiate event-triggered use cases but are not actors.
+USER 
+USER ## Appendix B — Controlled Glossary
+USER 
+USER - **Term:** Meaning
+USER - **Employee:** Faculty or Staff member using ELM for own leave activity.
+USER - **Applicant:** Employee whose leave request is being processed.
+USER - **Unit Head:** Head of the applicant’s Department, Section, or Office.
+USER - **Substitute / Responsibility Holder:** One eligible employee nominated to carry responsibility during the applicant’s absence.
+USER - **Sanctioning Authority:** Competent authority with final approval/rejection power for the applicable routed request.
+USER - **Station Leave:** Permission/details associated with leaving Jabalpur, captured inside the same leave application.
+USER - **Withdrawal:** Immediate termination of a pending request before final approval, including termination of remaining approval processing.
+USER - **Cancellation:** Pre-start reversal request for an approved leave, processed through the applicable hierarchy.
+USER - **Extension:** Request for additional leave time while EL/COL/VL is ongoing.
+USER - **Resumption:** Employee declaration of actual return to duty after EL/COL/VL, reviewed by the applicable Sanctioning Authority.
+USER - **Early resumption:** Return before the approved end date, followed after review by actual-period/balance adjustment.
+USER - **Late resumption:** Return after the approved end date, followed after review by actual-period/balance adjustment.
+USER - **Offline-sanctioned leave:** Leave already authorized through a valid paper/offline route and later entered into ELM for synchronization with sanction/reference evidence.
+USER - **SLA:** Configurable response-time expectation for actionable workflow tasks, with pending-only reminder and escalation.
+USER ```
+-------
+ASSISTANT Ok, I will use these files as references.
+-------
+USER Here are summaries of some files present in my git repository.
+USER Do not propose changes to these files, treat them as *read-only*.
+USER If you need to edit any of these files, ask me to *add them to the chat* first.
+USER 
+USER client/src/lib/http.ts:
+USER ⋮
+USER │export function setUnauthorizedHandler(fn: () => void) {
+USER │  onUnauthorized = fn;
+USER ⋮
+USER │export async function readBlobError(e: unknown): Promise<unknown> {
+USER │  const res = (e as { response?: { data?: unknown } })?.response;
+USER │  if (res?.data instanceof Blob) {
+USER │    try {
+USER │      res.data = JSON.parse(await res.data.text());
+USER │    } catch {
+USER │      res.data = undefined;             // an HTML page, not our envelope
+USER │    }
+USER │  }
+USER │  return e;
+USER ⋮
+USER │export function errorStatus(e: unknown): number | undefined {
+USER │  return (e as { response?: { status?: number } })?.response?.status;
+USER ⋮
+USER 
+USER client/src/modules/placement/api/hooks.ts:
+USER ⋮
+USER │export type ExportKind = "applications" | "placements";
+USER │
+USER ⋮
+USER 
+USER client/src/modules/placement/api/types.ts:
+USER ⋮
+USER │export interface CompanyBrief {
+USER │  id: number;
+USER │  name: string;
+USER │  slug: string;
+USER │  sector: string;
+USER │  /** Policy rules 2.B and 10 turn on this, not on the free-text `sector`. */
+USER │  sector_kind: "it" | "core" | "other";
+USER │  website: string;
+USER │  hq_city: string;
+USER │  tier_rank: number | null;
+USER ⋮
+USER │export type PostingStatus =
+USER │  | "draft" | "pending_approval" | "published" | "closed"
+USER ⋮
+USER │export type ApplicationStatus =
+USER │  | "draft" | "submitted" | "under_review" | "shortlisted"
+USER │  | "interview_scheduled" | "selected" | "rejected" | "withdrawn"
+USER │  | "auto_withdrawn" | "offer_issued" | "offer_accepted" | "offer_declined"
+USER ⋮
+USER │export interface Candidate {
+USER │  user_id: number;
+USER │  name: string;
+USER │  roll_no: string;
+USER │  discipline: string;
+USER │  programme: string;
+USER │  batch_year: number | null;
+USER ⋮
+USER │export interface AcademicStanding {
+USER │  semester: number | null;
+USER │  semester_type: string | null;
+USER │  declared_seq: number | null;
+USER │  synced_at: string | null;
+USER │  computed_by: string | null;
+USER ⋮
+USER 
+USER client/src/modules/placement/components/NewPostingModal.tsx:
+USER ⋮
+USER │                hideControls placeholder="Unlimited"
+USER │              />
+USER │            </Field>
+USER │            <Field span={12}>
+USER │              <DateTimePicker
+USER │                label="Applications close" value={closesAt}
+USER │                onChange={setClosesAt} clearable minDate={new Date()}
+USER │                placeholder="Select a date and time"
+USER ⋮
+USER 
+USER client/src/ui/components/DataTable.tsx:
+USER ⋮
+USER │export interface Column<T> {
+USER │  key: string;
+USER │  header: string;
+USER │  align?: "left" | "right";
+USER │  render?: (row: T) => React.ReactNode;
+USER ⋮
+USER │export type RowKey = string | number;
+USER │
+USER │export interface Selection<T> {
+USER │  selected: Set<RowKey>;
+USER │  onChange: (next: Set<RowKey>) => void;
+USER │  /** Rows that cannot be acted on — a terminal application, say. They render a
+USER │   *  disabled box rather than vanishing, so the count still adds up. */
+USER │  isSelectable?: (row: T) => boolean;
+USER ⋮
+USER 
+USER client/src/ui/components/PageHeader.tsx:
+USER ⋮
+USER │export function PageHeader({ title, subtitle, action }: {
+USER │  title: string;
+USER │  subtitle?: string;
+USER │  action?: React.ReactNode;
+USER ⋮
+USER 
+USER client/src/ui/components/StatusBadge.tsx:
+USER ⋮
+USER │export function StatusBadge({ status }: { status: string }) {
+USER │  return (
+USER │    <Badge color={COLORS[status] ?? "gray"} variant="light" size="sm">
+USER │      {status.replace(/_/g, " ")}
+USER │    </Badge>
+USER │  );
+USER ⋮
+USER 
+USER client/src/ui/layout/AppShellLayout.tsx:
+USER ⋮
+USER │export interface NavGroupItem {
+USER │  code: string;
+USER │  label: string;
+USER │  icon?: string;
+USER │  to?: string;
+USER │  app?: string;
+USER │  links?: NavLinkItem[];
+USER ⋮
+USER 
+USER client/src/ui/layout/BottomNav.tsx:
+USER ⋮
+USER │interface ItemProps {
+USER │  label: string;
+USER │  icon: IconType;
+USER │  active?: boolean;
+USER │  onClick: () => void;
+USER ⋮
+USER 
+USER conftest.py:
+USER ⋮
+USER │class FakeIam:
+USER │    """Mirrors IamClient exactly. If the real client grows a method, add it
+USER ⋮
+USER │    def employee_page(self, *, limit=500, offset=0):
+USER ⋮
+USER 
+USER core/api/csrf.py:
+USER ⋮
+USER │def token_for(session_value: str) -> str:
+USER ⋮
+USER 
+USER core/api/csv.py:
+USER ⋮
+USER │def sanitise_cell(value: Any) -> str:
+USER ⋮
+USER 
+USER core/api/exceptions.py:
+USER ⋮
+USER │class NotFoundError(DomainError):
+USER ⋮
+USER │class ConflictError(DomainError):
+USER ⋮
+USER 
+USER core/observability/middleware.py:
+USER ⋮
+USER │def get_request_id() -> str:
+USER ⋮
+USER 
+USER fusion_auth/client.py:
+USER ⋮
+USER │class IamUnavailable(Exception):
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class IamSession:
+USER ⋮
+USER │class IamClient:
+USER │    def __init__(self, base_url: str | None = None, token: str | None = None,
+USER ⋮
+USER │    def employee_page(self, *, limit: int = 500, offset: int = 0) -> dict:
+USER ⋮
+USER 
+USER fusion_auth/principal.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Principal:
+USER │    user_id: int
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/accesscontrol/models.py:
+USER ⋮
+USER │class Module(TimeStampedModel):
+USER │    STATUS = [("planned", "Planned"), ("active", "Active"),
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER │class NavItem(TimeStampedModel):
+USER │    """A link inside a module. Hidden unless the caller holds
+USER │    `required_permission`, so two roles can share a module and still see
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/directory/models.py:
+USER ⋮
+USER │class UserRef(TimeStampedModel):
+USER │    KIND_CHOICES = [
+USER │        ("student", "Student"), ("faculty", "Faculty"),
+USER │        ("staff", "Staff"), ("operator", "Operator"),
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/placement/authentication.py:
+USER ⋮
+USER │def hash_token(raw: str) -> str:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class RecruiterPrincipal:
+USER ⋮
+USER 
+USER modules/placement/domain/conduct.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Recommendation:
+USER ⋮
+USER 
+USER modules/placement/domain/registration.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Terms:
+USER ⋮
+USER 
+USER modules/placement/domain/state_machine.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Transition:
+USER ⋮
+USER 
+USER modules/placement/models/announcements.py:
+USER ⋮
+USER │class Announcement(TimeStampedModel):
+USER │    """PC-BR-017 bounds the topics. PC-BR-018 keeps history, so withdrawal
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER │class NotificationOutbox(TimeStampedModel):
+USER │    """A notification PCMS decided to send (PC-BR-021).
+USER │
+USER │    Written in the same transaction as the event that caused it and drained by
+USER │    a separate worker, so an offer and its email commit together or not at all.
+USER │    `dedupe_key` makes redelivery idempotent.
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER │class PlacementStatsSnapshot(TimeStampedModel):
+USER │    """Materialised aggregate for the statistics screens (PC-UC-011/012).
+USER │
+USER │    Reports read snapshots, never transactional tables, so a busy stats page
+USER │    cannot slow down an application deadline.
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER │class ConductIncident(TimeStampedModel, UserScopedModel):
+USER │    """One recorded breach of the code of conduct (rules 18, 19, 21).
+USER │
+USER │    The ladder is derived by counting these, never by a stored tally that could
+USER │    drift. A waived incident stays on the record and stops counting, because
+USER │    rule 19's escape hatch — "the student may inform the placement cell in
+USER │    writing" — is a decision someone made and should remain visible.
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/placement/models/applications.py:
+USER ⋮
+USER │class Application(TimeStampedModel, UserScopedModel):
+USER │    STATUS = [
+USER │        ("draft", "Draft"), ("submitted", "Submitted"),
+USER │        ("under_review", "Under review"), ("shortlisted", "Shortlisted"),
+USER │        ("interview_scheduled", "Interview scheduled"),
+USER │        ("selected", "Selected"),
+USER │        ("rejected", "Rejected"), ("withdrawn", "Withdrawn"),
+USER │        ("auto_withdrawn", "Withdrawn automatically"),
+USER │        ("offer_issued", "Offer issued"), ("offer_accepted", "Offer accepted"),
+USER │        ("offer_declined", "Offer declined"), ("offer_expired", "Offer expired"),
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER │class ApplicationTransition(models.Model):
+USER │    """Append-only audit of every status change (PC-BR-008)."""
+USER │
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/placement/models/offers.py:
+USER ⋮
+USER │class Offer(TimeStampedModel, UserScopedModel):
+USER │    STATUS = [("issued", "Issued"), ("accepted", "Accepted"),
+USER │              ("declined", "Declined"), ("revoked", "Revoked"),
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER │class PlacementRecord(TimeStampedModel, UserScopedModel):
+USER │    """Written when an offer is accepted (PC-BR-014).
+USER │
+USER │    The partial unique index is the backstop: even bypassing the service, a
+USER │    student cannot hold two active placements in one season.
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/placement/selectors/scoping.py:
+USER ⋮
+USER │def _is_recruiter(actor) -> bool:
+USER ⋮
+USER │def _is_alumni(actor) -> bool:
+USER ⋮
+-------
+ASSISTANT Ok, I won't try and edit those files without asking first.
+-------
+USER Don't try and edit any existing code without asking me to add the files to the chat!
+USER Tell me which files in my repo are the most likely to **need changes** to solve the requests I make, and then stop so I can add them to the chat.
+USER Only include the files that are most likely to actually need to be edited.
+USER Don't include files that might contain relevant context, just files that will need to be changed.
+-------
+ASSISTANT Ok, based on your requests I will suggest which files need to be edited and then stop and wait for your approval.
+-------
+USER The supplied ELM specification artifact in this chat is the read-only problem statement file.
+USER 
+USER Inspect the provided Fusion ERP base repository and the supplied Employee Leave Management (ELM) specification artifacts.
+USER 
+USER Implement the ELM module as an integrated module of the existing Fusion ERP system.
+USER 
+USER Reuse the authentication/login, role-management mechanism, common UI/layout/navigation, backend structure, database configuration, shared components, and other common functionality already available in the Fusion Base Code.
+USER 
+USER Do not unnecessarily rebuild or replace common functionality already present in Fusion.
+USER 
+USER Implement the required ELM frontend and backend functionality, including appropriate data models, services, APIs/routes, UI components/pages, role-dependent behavior, database changes, and integration with the existing Fusion structure.
+USER 
+USER First understand the existing repository and the supplied specifications, and then make the necessary repository-level changes.
+USER 
+USER Attempt to build/run or otherwise verify the resulting implementation where possible.
+USER 
+USER 
+USER To suggest changes to a file you MUST return the entire content of the updated file.
+USER You MUST use this *file listing* format:
+USER 
+USER path/to/filename.js
+USER ```
+USER // entire file content ...
+USER // ... goes in between
+USER ```
+USER 
+USER Every *file listing* MUST use this format:
+USER - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+USER - Second line: opening ```
+USER - ... entire content of the file ...
+USER - Final line: closing ```
+USER 
+USER To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+USER *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+USER Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+USER 
+USER Reply in English.
+USER 
+LLM RESPONSE 2026-10-11T21:46:41
+ASSISTANT Ok, I will:
+ASSISTANT 
+ASSISTANT 1. Determine if any code changes are needed.
+ASSISTANT 2. Explain any needed changes.
+ASSISTANT 3. If changes are needed, output a *file listing* for each file that needs changes.
+ASSISTANT 
+ASSISTANT show_greeting.py
+ASSISTANT ```
+ASSISTANT import sys
+ASSISTANT 
+ASSISTANT def greeting(name):
+ASSISTANT     print(f"Hey {name}")
+ASSISTANT 
+ASSISTANT if __name__ == '__main__':
+ASSISTANT     greeting(sys.argv[1])
+ASSISTANT ```
+TO LLM 2026-10-11T21:46:57
+-------
+SYSTEM Act as an expert software developer.
+SYSTEM Take requests for changes to the supplied code.
+SYSTEM If the request is ambiguous, ask questions.
+SYSTEM Reply in English.
+SYSTEM 
+SYSTEM Once you understand the request you MUST:
+SYSTEM 1. Determine if any code changes are needed.
+SYSTEM 2. Explain any needed changes.
+SYSTEM 3. If changes are needed, output a copy of each file that needs changes.
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return the entire content of the updated file.
+SYSTEM You MUST use this *file listing* format:
+SYSTEM 
+SYSTEM path/to/filename.js
+SYSTEM ```
+SYSTEM // entire file content ...
+SYSTEM // ... goes in between
+SYSTEM ```
+SYSTEM 
+SYSTEM Every *file listing* MUST use this format:
+SYSTEM - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+SYSTEM - Second line: opening ```
+SYSTEM - ... entire content of the file ...
+SYSTEM - Final line: closing ```
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+SYSTEM *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+SYSTEM Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+SYSTEM 
+SYSTEM Reply in English.
+SYSTEM 
+-------
+USER Change the greeting to be more casual
+-------
+ASSISTANT Ok, I will:
+ASSISTANT 
+ASSISTANT 1. Switch the greeting text from "Hello" to "Hey".
+ASSISTANT 
+ASSISTANT show_greeting.py
+ASSISTANT ```
+ASSISTANT import sys
+ASSISTANT 
+ASSISTANT def greeting(name):
+ASSISTANT     print(f"Hey {name}")
+ASSISTANT 
+ASSISTANT if __name__ == '__main__':
+ASSISTANT     greeting(sys.argv[1])
+ASSISTANT ```
+-------
+USER I switched to a new code base. Please don't consider the above files or try to edit them any longer.
+-------
+ASSISTANT Ok.
+-------
+USER Here are some READ ONLY files, provided for your reference.
+USER Do not edit these files!
+USER 
+USER modules/placement/registry.py
+USER ```
+USER """What the server tells the shell about this module (ADR-0010).
+USER 
+USER Nav items carry `required_permission` and the server filters before sending —
+USER the client does zero filtering, so a link a role cannot use never reaches the
+USER browser at all.
+USER """
+USER MODULE = {
+USER     "code": "placement_cell", "label": "Placement Cell", "icon": "Briefcase",
+USER     "base_path": "/placement", "nav_section": "Placement", "sort_order": 10,
+USER     "status": "active",
+USER }
+USER 
+USER NAV_ITEMS = [
+USER     # -- student: registration first, because rule 1 gates everything below ---
+USER     {"code": "placement.registration", "label": "Season Registration",
+USER      "icon": "Checks", "to": "/placement/registration",
+USER      "required_permission": "placement_cell.registration.self",
+USER      "sort_order": 5},
+USER     {"code": "placement.postings", "label": "Opportunities",
+USER      "icon": "ClipboardText", "to": "/placement/postings",
+USER      "required_permission": "placement_cell.job_posting.view", "sort_order": 10},
+USER     {"code": "placement.mine", "label": "My Applications",
+USER      "icon": "UserCheck", "to": "/placement/mine",
+USER      "required_permission": "placement_cell.application.view_self",
+USER      "sort_order": 20},
+USER     {"code": "placement.offers", "label": "My Offers",
+USER      "icon": "Signature", "to": "/placement/offers",
+USER      "required_permission": "placement_cell.offer.respond", "sort_order": 30},
+USER 
+USER     # -- staff (TPO / chairman) -------------------------------------------
+USER     {"code": "placement.registrations", "label": "Registrations",
+USER      "icon": "Checks", "to": "/placement/registration-approvals",
+USER      "required_permission": "placement_cell.registration.manage",
+USER      "sort_order": 55},
+USER     {"code": "placement.applications", "label": "Applications",
+USER      "icon": "Users", "to": "/placement/applications",
+USER      "required_permission": "placement_cell.application.view", "sort_order": 50},
+USER     {"code": "placement.companies", "label": "Companies",
+USER      "icon": "Buildings", "to": "/placement/companies",
+USER      "required_permission": "placement_cell.company.manage", "sort_order": 60},
+USER     {"code": "placement.interviews", "label": "Interviews",
+USER      "icon": "CalendarBlank", "to": "/placement/interviews",
+USER      "required_permission": "placement_cell.interview.schedule",
+USER      "sort_order": 70},
+USER     {"code": "placement.announcements", "label": "Announcements",
+USER      "icon": "Megaphone", "to": "/placement/announcements",
+USER      "required_permission": "placement_cell.announcement.publish",
+USER      "sort_order": 80},
+USER     {"code": "placement.cpi", "label": "Student CPI",
+USER      "icon": "GraduationCap", "to": "/placement/students-cpi",
+USER      "required_permission": "placement_cell.academic_directory.view",
+USER      "sort_order": 85},
+USER     {"code": "placement.reports", "label": "Reports",
+USER      "icon": "ChartBar", "to": "/placement/reports",
+USER      "required_permission": "placement_cell.report.view", "sort_order": 90},
+USER ]
+USER 
+USER #: Every permission this module recognises; ROLE_GRANTS below says who holds each.
+USER PERMISSIONS = [
+USER     ("placement_cell.job_posting.view", "See job postings"),
+USER     ("placement_cell.job_posting.manage", "Create and publish postings"),
+USER     ("placement_cell.application.view", "See all applications"),
+USER     ("placement_cell.application.view_self", "See one's own applications"),
+USER     ("placement_cell.application.create", "Apply to a posting"),
+USER     ("placement_cell.application.review", "Shortlist and reject applications"),
+USER     ("placement_cell.application.delete", "Withdraw an application"),
+USER     ("placement_cell.application.auto_withdraw", "System auto-withdrawal"),
+USER     ("placement_cell.interview.schedule", "Schedule interview rounds"),
+USER     ("placement_cell.offer.issue", "Extend an offer"),
+USER     ("placement_cell.offer.respond", "Accept or decline an offer"),
+USER     ("placement_cell.offer.revoke", "Revoke an issued offer"),
+USER     ("placement_cell.offer.expire", "System offer expiry"),
+USER     ("placement_cell.company.manage", "Register and approve companies"),
+USER     ("placement_cell.announcement.publish", "Publish announcements"),
+USER     ("placement_cell.report.view", "See operational reports"),
+USER     ("placement_cell.registration.debar",
+USER      "Record conduct incidents and impose placement sanctions"),
+USER     ("placement_cell.registration.manage",
+USER      "Approve late registrations and re-registrations"),
+USER     ("placement_cell.registration.self",
+USER      "Register yourself for a placement season"),
+USER     ("placement_cell.record.manage",
+USER      "Record off-campus placements and chase offer letters"),
+USER     ("placement_cell.academic_directory.view",
+USER      "Browse every student's declared CPI"),
+USER ]
+USER 
+USER #: Performed by a service or a scheduled task, so no designation holds them.
+USER SYSTEM_PERMISSIONS = [
+USER     "placement_cell.application.auto_withdraw",
+USER     "placement_cell.offer.expire",
+USER ]
+USER 
+USER _STUDENT = [
+USER     "placement_cell.registration.self",
+USER     "placement_cell.job_posting.view",
+USER     "placement_cell.application.view_self",
+USER     "placement_cell.application.create",
+USER     "placement_cell.application.delete",
+USER     "placement_cell.offer.respond",
+USER ]
+USER 
+USER _COORDINATOR = [
+USER     "placement_cell.job_posting.view",
+USER     "placement_cell.application.view",
+USER     "placement_cell.application.review",
+USER     "placement_cell.report.view",
+USER     "placement_cell.academic_directory.view",
+USER ]
+USER 
+USER _OFFICER = [
+USER     *_COORDINATOR,
+USER     "placement_cell.job_posting.manage",
+USER     "placement_cell.interview.schedule",
+USER     "placement_cell.offer.issue",
+USER     "placement_cell.offer.revoke",
+USER     "placement_cell.company.manage",
+USER     "placement_cell.announcement.publish",
+USER     "placement_cell.registration.manage",
+USER     "placement_cell.registration.debar",
+USER     "placement_cell.record.manage",
+USER ]
+USER 
+USER #: Oversees rather than operates: no shortlisting and no offers.
+USER _CHAIRMAN = [
+USER     "placement_cell.job_posting.view",
+USER     "placement_cell.application.view",
+USER     "placement_cell.report.view",
+USER     "placement_cell.academic_directory.view",
+USER     "placement_cell.announcement.publish",
+USER ]
+USER 
+USER #: Keyed by the designation name as it exists in globals_designation.
+USER ROLE_GRANTS = {
+USER     "student": _STUDENT,
+USER     "placement_coordinator": _COORDINATOR,
+USER     "placement_officer": _OFFICER,
+USER     "placement_chairman": _CHAIRMAN,
+USER     "Dean Academic": _CHAIRMAN,
+USER }
+USER ```
+USER 
+USER ../elm_specs_md/pilot_kit/chunks/problem_statement.md
+USER ```
+USER # Employee Leave Management (ELM)
+USER 
+USER Synchronized Problem Statement and Controlled Context
+USER 
+USER Status: FINAL SYNCHRONIZED BASELINE | Version 1.4
+USER 
+USER > Revision basis
+USER This final synchronized baseline incorporates the 18 domain adjudications made after the Phase-2 materials, the coherent-CFR / atomic-AFR requirements arrangement, and the finalized UC/WF formalism. The historical SRS-EL-001…107 set remains the immutable as-administered student baseline and is preserved through the companion crosswalk.
+USER 
+USER ## 1. Context
+USER 
+USER Fusion is the institute ERP used to provide administrative, academic, student, and related services. Users may hold one or more roles, and access to ELM capabilities is controlled through role-based permissions.
+USER 
+USER ELM supports leave-related activities for institute employees. Employees are Faculty or Staff, each with a designation and an organizational unit such as a Department, Section, or Office. Each organizational unit has a Unit Head. Depending on leave type and hierarchy, the Unit Head either gives the final decision or reviews and records Recommended / Not Recommended before the request moves through the applicable higher-sanction path.
+USER 
+USER ## 2. Leave categories and Station Leave
+USER 
+USER ELM supports CL, RH, SCL, EL, COL, and VL. Station Leave permission/details are captured within the same leave application when the employee will be outside Jabalpur; Station Leave is not a separate leave-request process.
+USER 
+USER ## 3. Entitlement, applicability, and carry-forward
+USER 
+USER CL: 8 days/year for each employee; first-half and second-half CL are supported; an approved half day consumes 0.5 CL day; unused CL does not carry forward.
+USER 
+USER RH: 2 days/year for each employee; an RH request must correspond to an applicable Restricted Holiday in the currently effective published holiday/RH calendar; unused RH does not carry forward.
+USER 
+USER SCL: up to 15 days/year for each employee for a special purpose considered admissible by the applicable Sanctioning Authority; no separate encoded admissibility rule is required in this baseline; unused SCL does not carry forward.
+USER 
+USER EL: non-faculty employees receive 30 days/year directly; unused EL carries forward.
+USER 
+USER VL: faculty receive 60 VL associated with vacation periods supplied through the institute Academic Calendar. VL may be availed only during an applicable vacation period. At year end, all unused VL converts to EL at 2 VL : 1 EL, including fractional conversion. VL itself does not carry forward; converted EL is credited to the faculty member’s EL balance, may carry forward, and may later be availed.
+USER 
+USER COL: 20 days/year in this baseline for each eligible employee; COL is medical/balance-controlled leave, supporting medical evidence may be required where applicable, and unused COL carries forward.
+USER 
+USER ## 4. Leave-day counting
+USER 
+USER For EL, COL, and VL, leave is counted continuously across the approved leave interval. Intervening weekends and closed holidays within the interval count as leave days. This continuing-count rule does not apply to CL, SCL, or RH.
+USER 
+USER ## 5. Applying for leave and validation
+USER 
+USER The employee submits one leave application containing leave category, requested period, purpose/reason, and other required information. Station Leave details are included in the same application when applicable.
+USER 
+USER Before a new request is allowed to proceed, ELM validates the employee’s leave-category eligibility, available entitlement/balance, applicable leave-counting and calendar conditions, and impermissible overlap with the employee’s active pending or approved leave. First-half and second-half CL on the same date are not treated as overlapping when they occupy different halves.
+USER 
+USER Leave-policy parameters do not use a draft/publish/effective-version lifecycle in this baseline. Validation uses the current configured leave-policy parameters. Date and RH validation use the currently effective published holiday/RH calendar.
+USER 
+USER ## 6. Substitute / responsibility coverage
+USER 
+USER When responsibility coverage is required, the applicant nominates one substitute. The substitute must be another employee, must not be the applicant, and must not have overlapping pending or approved leave during the responsibility period.
+USER 
+USER The nominated substitute may accept or decline the assignment. Required substitute consent must be accepted before approval routing continues. If the substitute declines, the applicant may nominate another eligible substitute or withdraw the pending request.
+USER 
+USER ## 7. Review, sanction, and decision communication
+USER 
+USER For CL and RH, including associated Station Leave, the request is routed to the applicant’s Unit Head and the Unit Head is the final authority.
+USER 
+USER For SCL, EL, COL, and VL, the Unit Head reviews the request and records Recommended or Not Recommended. Not Recommended is not a final rejection for these categories. The request then proceeds through the configured hierarchy to the appropriate final Sanctioning Authority.
+USER 
+USER The processing/sanctioning path is resolved from the applicant, organizational unit, designation/role, leave category, and current hierarchy configuration. Named roles may include Deputy Registrar (Estt.), Dean, Registrar, and Director. An Establishment processing step occurs where configured. The Director’s own leave follows the Director-specific self-sanction rule.
+USER 
+USER On a final decision, the decision is recorded and the employee is notified. On final approval, the employee’s leave record/account is also updated. Intermediate decisions and state changes need not generate general notifications; the employee can inspect them through leave status/history.
+USER 
+USER ## 8. Pending request, withdrawal, and approved-leave cancellation
+USER 
+USER A submitted pending leave request is not modified in place. If a change is required before final approval, the employee may withdraw the pending request and submit a new application if needed.
+USER 
+USER A pending request may be withdrawn immediately at any time before final approval. Upon successful withdrawal, the withdrawal becomes effective immediately, all remaining approval processing for that request terminates, later approve/reject actions are prevented, and the concerned roles are informed.
+USER 
+USER After final approval, withdrawal is no longer available. Before the approved leave begins, the employee may request cancellation. Cancellation follows the same applicable hierarchy as the original leave and the approved leave is not edited in place. If cancellation is finally approved, the leave is marked Cancelled and any leave balance already deducted for the approval is restored or adjusted accordingly. If cancellation is rejected, the original approved leave remains unchanged. If revised leave is still required after cancellation, a fresh application is submitted.
+USER 
+USER Once leave has begun, pre-start cancellation no longer applies; change is handled through the applicable extension or resumption process.
+USER 
+USER ## 9. Extension
+USER 
+USER An employee already on ongoing EL, COL, or VL may request additional leave time. The extension is validated using the applicable eligibility, balance, substitute, calendar, and approval conditions; required substitute consent is obtained before approval routing continues; and the extension follows the applicable Unit Head and configured higher-sanction path.
+USER 
+USER When an extension is approved, only the incremental additional leave period is posted and the original approved leave remains the base. When an extension is rejected, the original approved leave remains unchanged.
+USER 
+USER ## 10. Resumption
+USER 
+USER Resumption is supported for EL, COL, and VL. After returning, the employee submits the actual resumption date and required resumption details through ELM for review by the applicable Sanctioning Authority.
+USER 
+USER When the employee resumes on the approved end date, the Sanctioning Authority reviews the resumption and no adjustment is made to the approved leave period or leave balance. When the employee resumes earlier or later than the approved end date, ELM records the actual leave period after review, adjusts the leave balance accordingly, and synchronizes the relevant leave/attendance records.
+USER 
+USER ## 11. Inquiry and employee-accessible records
+USER 
+USER ELM provides employees with access to their current leave balances and leave-account/request history, including request status and recorded final decisions. ELM also provides an employee-accessible printable/exportable representation of a leave application.
+USER 
+USER ## 12. Administrative functions and calendars
+USER 
+USER Authorized administrative roles maintain leave-policy parameters, the relevant hierarchy configuration, and leave records where authorized. Policy parameters do not require a draft/publish/effective-version lifecycle; ELM uses the current configured policy and hierarchy values.
+USER 
+USER Authorized administrative roles create, revise, and publish the holiday/RH calendar. Date/RH validation uses the currently effective published holiday/RH calendar until a replacement is published.
+USER 
+USER Vacation periods used for VL are supplied through the institute Academic Calendar, which is maintained outside ELM by the appropriate academic module/service and is assumed to be available to ELM.
+USER 
+USER Authorized Leave Administrators may retrospectively record leave already sanctioned through an authorized paper/offline process where ELM could not be used because of illness, connectivity, server unavailability, or another acceptable reason. The entry captures sanction/reference evidence, is validated for record consistency, and updates the relevant leave balance/history. This is record synchronization, not a second approval workflow.
+USER 
+USER ## 13. Event-triggered year-end processing
+USER 
+USER When the configured year-end boundary is reached, ELM applies the defined category outcomes: unused CL, RH, and SCL lapse; unused faculty VL is converted to EL; EL and COL carry forward according to policy. The resulting leave-account transactions are recorded and processing exceptions are reported. The year-end boundary is an event trigger, not an ELM actor.
+USER 
+USER ## 14. SLA
+USER 
+USER Actionable workflow tasks use configurable reminder and escalation thresholds. When a task is assigned, the assigned user is notified. If the task is still pending at the reminder threshold, the responsible user is reminded and the action is logged; no reminder is issued if the task is no longer pending. If the task remains pending past the escalation threshold, ELM notifies or escalates to the configured higher/responsible authority and logs the escalation; no escalation is issued if the task is no longer pending.
+USER 
+USER ## 15. Scope boundary
+USER 
+USER This ELM baseline limits leave categories to CL, RH, SCL, EL, COL, VL, and Station Leave as defined above. Other leave types and low-level design/implementation details are outside this requirements baseline. The Academic Calendar is an external dependency for VL vacation-period data.
+USER 
+USER ## Appendix A — Actor, Role, and External Dependency Registry
+USER 
+USER | ID | Preferred term | Responsibility |
+USER |---|---|---|
+USER | ACT-01 | Employee | Faculty or Staff member applying for and managing own leave. |
+USER | ACT-02 | Substitute / Responsibility Holder | Employee nominated to accept responsibility during the applicant’s absence. |
+USER | ACT-03 | Unit Head | Head of Department/Section/Office; final authority for CL/RH or reviewer/recommender for higher-sanction leave. |
+USER | ACT-04 | Deputy Registrar (Estt.) / Establishment Processing Role | Performs establishment-level verification/routing/record functions where configured. |
+USER | ACT-05 | Dean | Competent authority where applicable. |
+USER | ACT-06 | Registrar | Competent authority where applicable. |
+USER | ACT-07 | Director | Highest competent authority; Director-specific self-sanction rule applies. |
+USER | ACT-08 | Leave Administrator | Maintains authorized ELM configuration/records and records offline-sanctioned leave where authorized. |
+USER | EXT-01 | Academic Calendar service/module | External source of published vacation periods used for VL applicability. |
+USER | EVT-01 | Year-end boundary | Event trigger for EL-UC-020 year-end leave processing; not an actor. |
+USER | EVT-02 | Configured SLA threshold reached | Event trigger for EL-UC-021 SLA threshold processing; not an actor. |
+USER 
+USER Faculty and Staff are employee categories. Unit Head, Substitute, Leave Administrator, Deputy Registrar (Estt.), Dean, Registrar, and Director are roles/authorities. EXT-01 is an external information dependency rather than an ELM actor performing a leave workflow action. EVT-01 and EVT-02 are event triggers; they initiate event-triggered use cases but are not actors.
+USER 
+USER ## Appendix B — Controlled Glossary
+USER 
+USER - **Term:** Meaning
+USER - **Employee:** Faculty or Staff member using ELM for own leave activity.
+USER - **Applicant:** Employee whose leave request is being processed.
+USER - **Unit Head:** Head of the applicant’s Department, Section, or Office.
+USER - **Substitute / Responsibility Holder:** One eligible employee nominated to carry responsibility during the applicant’s absence.
+USER - **Sanctioning Authority:** Competent authority with final approval/rejection power for the applicable routed request.
+USER - **Station Leave:** Permission/details associated with leaving Jabalpur, captured inside the same leave application.
+USER - **Withdrawal:** Immediate termination of a pending request before final approval, including termination of remaining approval processing.
+USER - **Cancellation:** Pre-start reversal request for an approved leave, processed through the applicable hierarchy.
+USER - **Extension:** Request for additional leave time while EL/COL/VL is ongoing.
+USER - **Resumption:** Employee declaration of actual return to duty after EL/COL/VL, reviewed by the applicable Sanctioning Authority.
+USER - **Early resumption:** Return before the approved end date, followed after review by actual-period/balance adjustment.
+USER - **Late resumption:** Return after the approved end date, followed after review by actual-period/balance adjustment.
+USER - **Offline-sanctioned leave:** Leave already authorized through a valid paper/offline route and later entered into ELM for synchronization with sanction/reference evidence.
+USER - **SLA:** Configurable response-time expectation for actionable workflow tasks, with pending-only reminder and escalation.
+USER ```
+USER 
+USER core/db/mixins.py
+USER ```
+USER from django.db import models
+USER 
+USER 
+USER class TimeStampedModel(models.Model):
+USER     created_at = models.DateTimeField(auto_now_add=True)
+USER     updated_at = models.DateTimeField(auto_now=True)
+USER 
+USER     class Meta:
+USER         abstract = True
+USER 
+USER 
+USER class UserScopedModel(models.Model):
+USER     """A row belonging to a person.
+USER 
+USER     `user_id` is the IAM user id. It is a plain integer and NOT a ForeignKey —
+USER     there is no user table in this database, and cross-boundary references must
+USER     stay unconstrained so a module can be extracted later without schema
+USER     surgery.
+USER     """
+USER 
+USER     user_id = models.IntegerField(db_index=True)
+USER 
+USER     class Meta:
+USER         abstract = True
+USER ```
+USER 
+USER modules/placement/apps.py
+USER ```
+USER from django.apps import AppConfig
+USER from django.core.checks import register
+USER 
+USER 
+USER class PlacementConfig(AppConfig):
+USER     name = "modules.placement"
+USER     label = "placement"
+USER 
+USER     def ready(self):
+USER         # PLACEMENT_UPLOAD_ROOT is this module's setting, so it owns the check.
+USER         from core.files.checks import check_upload_root
+USER 
+USER         register(check_upload_root)
+USER ```
+-------
+ASSISTANT Ok, I will use these files as references.
+-------
+USER Here are summaries of some files present in my git repository.
+USER Do not propose changes to these files, treat them as *read-only*.
+USER If you need to edit any of these files, ask me to *add them to the chat* first.
+USER 
+USER client/src/app/registry.ts:
+USER ⋮
+USER │export interface ModuleManifest {
+USER │  code: string;
+USER │  basePath: string;
+USER │  load: () => Promise<{ routes: RouteObject[] }>;
+USER ⋮
+USER 
+USER client/src/auth/RequireAuth.tsx:
+USER ⋮
+USER │export function RequireAuth({ children }: { children: React.ReactNode }) {
+USER │  const { status } = useAuth();
+USER │  const location = useLocation();
+USER │
+USER │  if (status === "loading") {
+USER │    return <Center h="100vh"><Loader /></Center>;
+USER │  }
+USER │  // Not a logout: signing in again cannot work while the IAM is unreachable.
+USER │  if (status === "unavailable") {
+USER │    return (
+USER ⋮
+USER 
+USER client/src/lib/http.ts:
+USER ⋮
+USER │export function setUnauthorizedHandler(fn: () => void) {
+USER │  onUnauthorized = fn;
+USER ⋮
+USER 
+USER client/src/modules/placement/api/hooks.ts:
+USER ⋮
+USER │export type ExportKind = "applications" | "placements";
+USER │
+USER ⋮
+USER 
+USER client/src/modules/placement/components/NewPostingModal.tsx:
+USER ⋮
+USER │                hideControls placeholder="Unlimited"
+USER │              />
+USER │            </Field>
+USER │            <Field span={12}>
+USER │              <DateTimePicker
+USER │                label="Applications close" value={closesAt}
+USER │                onChange={setClosesAt} clearable minDate={new Date()}
+USER │                placeholder="Select a date and time"
+USER ⋮
+USER 
+USER client/src/ui/components/PageHeader.tsx:
+USER ⋮
+USER │export function PageHeader({ title, subtitle, action }: {
+USER │  title: string;
+USER │  subtitle?: string;
+USER │  action?: React.ReactNode;
+USER ⋮
+USER 
+USER client/src/ui/layout/AppShellLayout.tsx:
+USER ⋮
+USER │export interface NavGroupItem {
+USER │  code: string;
+USER │  label: string;
+USER │  icon?: string;
+USER │  to?: string;
+USER │  app?: string;
+USER │  links?: NavLinkItem[];
+USER ⋮
+USER 
+USER core/api/csrf.py:
+USER ⋮
+USER │def token_for(session_value: str) -> str:
+USER ⋮
+USER 
+USER core/api/csv.py:
+USER ⋮
+USER │def sanitise_cell(value: Any) -> str:
+USER ⋮
+USER 
+USER fusion_auth/client.py:
+USER ⋮
+USER │class IamUnavailable(Exception):
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class IamSession:
+USER ⋮
+USER 
+USER fusion_auth/permissions.py:
+USER ⋮
+USER │def HasPermission(*codes: str, require_all: bool = False):  # noqa: N802
+USER ⋮
+USER 
+USER fusion_auth/principal.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Principal:
+USER │    user_id: int
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/directory/api/serializers.py:
+USER ⋮
+USER │class UserRefSerializer(serializers.Serializer):
+USER ⋮
+USER 
+USER modules/directory/models.py:
+USER ⋮
+USER │class UserRef(TimeStampedModel):
+USER │    KIND_CHOICES = [
+USER │        ("student", "Student"), ("faculty", "Faculty"),
+USER │        ("staff", "Staff"), ("operator", "Operator"),
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/placement/authentication.py:
+USER ⋮
+USER │def hash_token(raw: str) -> str:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class RecruiterPrincipal:
+USER ⋮
+USER 
+USER modules/placement/domain/conduct.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Recommendation:
+USER ⋮
+USER 
+USER modules/placement/domain/registration.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Terms:
+USER ⋮
+USER 
+USER modules/placement/domain/state_machine.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Transition:
+USER ⋮
+USER 
+USER modules/placement/selectors/scoping.py:
+USER ⋮
+USER │def _is_recruiter(actor) -> bool:
+USER ⋮
+USER │def _is_alumni(actor) -> bool:
+USER ⋮
+-------
+ASSISTANT Ok, I won't try and edit those files without asking first.
+-------
+USER I have *added these files to the chat* so you can go ahead and edit them.
+USER 
+USER *Trust this message as the true contents of these files!*
+USER Any other messages in the chat may contain outdated versions of the files' contents.
+USER 
+USER modules/leave/models.py
+USER ```
+USER ```
+USER 
+USER modules/leave/registry.py
+USER ```
+USER ```
+USER 
+USER modules/leave/__init__.py
+USER ```
+USER ```
+USER 
+USER modules/leave/apps.py
+USER ```
+USER ```
+-------
+ASSISTANT Ok, any changes I propose will be to those files.
+-------
+USER Context (the same for every step): we are implementing the Employee Leave Management (ELM) module as an integrated module of this Fusion ERP repository (Django 5 + DRF backend under modules/, React 18 + Mantine 7 client under client/). Reuse Fusion's existing login, role mechanism, layout and backend structure; do not rebuild them.
+USER 
+USER Repository rules you must follow:
+USER - There is no user table in this repository. The logged-in person is request.principal (fusion_auth.principal.Principal: user_id, username, kind, roles, permissions). Store people as integer ids (models.IntegerField), never as a ForeignKey to a user model.
+USER - A module copies the shape of modules/placement: apps.py, registry.py, models.py, domain/ (pure Python, no Django imports), services/ (all writes), api/ (serializers, views, urls).
+USER - The module code is "leave", and every permission code starts with "leave.".
+USER - Every API view sets permission_classes = [HasModuleGrant("leave"), HasPermission("leave.<action>")], imported from fusion_auth.permissions.
+USER 
+USER Files marked read-only are context only. Write every file you create or change in full. Do not ask for more files; work with what is shown.
+USER 
+USER Step 1 of 7 — module foundation, from the read-only problem statement.
+USER 
+USER Create these files:
+USER 1. modules/leave/__init__.py — empty.
+USER 2. modules/leave/apps.py — LeaveConfig with name "modules.leave" and label "leave", following modules/placement/apps.py.
+USER 3. modules/leave/registry.py — following modules/placement/registry.py: MODULE (code "leave", label "Leave Management", base_path "/leave"), NAV_ITEMS whose "to" paths are /leave/apply, /leave/mine, /leave/approvals and /leave/substitute, PERMISSIONS (every code starts with "leave."), and ROLE_GRANTS keyed by the actors in Appendix A of the problem statement (Employee, Unit Head, Deputy Registrar (Estt.), Dean, Registrar, Director, Leave Administrator). Every permission must be granted to at least one role.
+USER 4. modules/leave/models.py — Django models on core.db.mixins.TimeStampedModel for: a leave application (category CL/RH/SCL/EL/COL/VL, leave period, CL half-day, purpose, Station Leave details, nominated substitute, status), a per-user, per-year, per-category leave balance, and an append-only action-history row. People are integer user ids.
+USER 
+USER 
+USER To suggest changes to a file you MUST return the entire content of the updated file.
+USER You MUST use this *file listing* format:
+USER 
+USER path/to/filename.js
+USER ```
+USER // entire file content ...
+USER // ... goes in between
+USER ```
+USER 
+USER Every *file listing* MUST use this format:
+USER - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+USER - Second line: opening ```
+USER - ... entire content of the file ...
+USER - Final line: closing ```
+USER 
+USER To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+USER *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+USER Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+USER 
+USER Reply in English.
+USER 
+LLM RESPONSE 2026-10-11T21:47:29
+ASSISTANT modules/leave/__init__.py
+ASSISTANT ```
+ASSISTANT """
+ASSISTANT Leave Management (ELM) module.
+ASSISTANT """
+ASSISTANT ```
+ASSISTANT ```python
+ASSISTANT # modules/leave/__init__.py
+ASSISTANT ```
+ASSISTANT ```
+TO LLM 2026-10-11T21:47:29
+-------
+SYSTEM Act as an expert software developer.
+SYSTEM Take requests for changes to the supplied code.
+SYSTEM If the request is ambiguous, ask questions.
+SYSTEM Reply in English.
+SYSTEM 
+SYSTEM Once you understand the request you MUST:
+SYSTEM 1. Determine if any code changes are needed.
+SYSTEM 2. Explain any needed changes.
+SYSTEM 3. If changes are needed, output a copy of each file that needs changes.
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return the entire content of the updated file.
+SYSTEM You MUST use this *file listing* format:
+SYSTEM 
+SYSTEM path/to/filename.js
+SYSTEM ```
+SYSTEM // entire file content ...
+SYSTEM // ... goes in between
+SYSTEM ```
+SYSTEM 
+SYSTEM Every *file listing* MUST use this format:
+SYSTEM - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+SYSTEM - Second line: opening ```
+SYSTEM - ... entire content of the file ...
+SYSTEM - Final line: closing ```
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+SYSTEM *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+SYSTEM Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+SYSTEM 
+SYSTEM Reply in English.
+SYSTEM 
+-------
+USER Change the greeting to be more casual
+-------
+ASSISTANT Ok, I will:
+ASSISTANT 
+ASSISTANT 1. Switch the greeting text from "Hello" to "Hey".
+ASSISTANT 
+ASSISTANT show_greeting.py
+ASSISTANT ```
+ASSISTANT import sys
+ASSISTANT 
+ASSISTANT def greeting(name):
+ASSISTANT     print(f"Hey {name}")
+ASSISTANT 
+ASSISTANT if __name__ == '__main__':
+ASSISTANT     greeting(sys.argv[1])
+ASSISTANT ```
+-------
+USER I switched to a new code base. Please don't consider the above files or try to edit them any longer.
+-------
+ASSISTANT Ok.
+-------
+USER Here are some READ ONLY files, provided for your reference.
+USER Do not edit these files!
+USER 
+USER modules/placement/registry.py
+USER ```
+USER """What the server tells the shell about this module (ADR-0010).
+USER 
+USER Nav items carry `required_permission` and the server filters before sending —
+USER the client does zero filtering, so a link a role cannot use never reaches the
+USER browser at all.
+USER """
+USER MODULE = {
+USER     "code": "placement_cell", "label": "Placement Cell", "icon": "Briefcase",
+USER     "base_path": "/placement", "nav_section": "Placement", "sort_order": 10,
+USER     "status": "active",
+USER }
+USER 
+USER NAV_ITEMS = [
+USER     # -- student: registration first, because rule 1 gates everything below ---
+USER     {"code": "placement.registration", "label": "Season Registration",
+USER      "icon": "Checks", "to": "/placement/registration",
+USER      "required_permission": "placement_cell.registration.self",
+USER      "sort_order": 5},
+USER     {"code": "placement.postings", "label": "Opportunities",
+USER      "icon": "ClipboardText", "to": "/placement/postings",
+USER      "required_permission": "placement_cell.job_posting.view", "sort_order": 10},
+USER     {"code": "placement.mine", "label": "My Applications",
+USER      "icon": "UserCheck", "to": "/placement/mine",
+USER      "required_permission": "placement_cell.application.view_self",
+USER      "sort_order": 20},
+USER     {"code": "placement.offers", "label": "My Offers",
+USER      "icon": "Signature", "to": "/placement/offers",
+USER      "required_permission": "placement_cell.offer.respond", "sort_order": 30},
+USER 
+USER     # -- staff (TPO / chairman) -------------------------------------------
+USER     {"code": "placement.registrations", "label": "Registrations",
+USER      "icon": "Checks", "to": "/placement/registration-approvals",
+USER      "required_permission": "placement_cell.registration.manage",
+USER      "sort_order": 55},
+USER     {"code": "placement.applications", "label": "Applications",
+USER      "icon": "Users", "to": "/placement/applications",
+USER      "required_permission": "placement_cell.application.view", "sort_order": 50},
+USER     {"code": "placement.companies", "label": "Companies",
+USER      "icon": "Buildings", "to": "/placement/companies",
+USER      "required_permission": "placement_cell.company.manage", "sort_order": 60},
+USER     {"code": "placement.interviews", "label": "Interviews",
+USER      "icon": "CalendarBlank", "to": "/placement/interviews",
+USER      "required_permission": "placement_cell.interview.schedule",
+USER      "sort_order": 70},
+USER     {"code": "placement.announcements", "label": "Announcements",
+USER      "icon": "Megaphone", "to": "/placement/announcements",
+USER      "required_permission": "placement_cell.announcement.publish",
+USER      "sort_order": 80},
+USER     {"code": "placement.cpi", "label": "Student CPI",
+USER      "icon": "GraduationCap", "to": "/placement/students-cpi",
+USER      "required_permission": "placement_cell.academic_directory.view",
+USER      "sort_order": 85},
+USER     {"code": "placement.reports", "label": "Reports",
+USER      "icon": "ChartBar", "to": "/placement/reports",
+USER      "required_permission": "placement_cell.report.view", "sort_order": 90},
+USER ]
+USER 
+USER #: Every permission this module recognises; ROLE_GRANTS below says who holds each.
+USER PERMISSIONS = [
+USER     ("placement_cell.job_posting.view", "See job postings"),
+USER     ("placement_cell.job_posting.manage", "Create and publish postings"),
+USER     ("placement_cell.application.view", "See all applications"),
+USER     ("placement_cell.application.view_self", "See one's own applications"),
+USER     ("placement_cell.application.create", "Apply to a posting"),
+USER     ("placement_cell.application.review", "Shortlist and reject applications"),
+USER     ("placement_cell.application.delete", "Withdraw an application"),
+USER     ("placement_cell.application.auto_withdraw", "System auto-withdrawal"),
+USER     ("placement_cell.interview.schedule", "Schedule interview rounds"),
+USER     ("placement_cell.offer.issue", "Extend an offer"),
+USER     ("placement_cell.offer.respond", "Accept or decline an offer"),
+USER     ("placement_cell.offer.revoke", "Revoke an issued offer"),
+USER     ("placement_cell.offer.expire", "System offer expiry"),
+USER     ("placement_cell.company.manage", "Register and approve companies"),
+USER     ("placement_cell.announcement.publish", "Publish announcements"),
+USER     ("placement_cell.report.view", "See operational reports"),
+USER     ("placement_cell.registration.debar",
+USER      "Record conduct incidents and impose placement sanctions"),
+USER     ("placement_cell.registration.manage",
+USER      "Approve late registrations and re-registrations"),
+USER     ("placement_cell.registration.self",
+USER      "Register yourself for a placement season"),
+USER     ("placement_cell.record.manage",
+USER      "Record off-campus placements and chase offer letters"),
+USER     ("placement_cell.academic_directory.view",
+USER      "Browse every student's declared CPI"),
+USER ]
+USER 
+USER #: Performed by a service or a scheduled task, so no designation holds them.
+USER SYSTEM_PERMISSIONS = [
+USER     "placement_cell.application.auto_withdraw",
+USER     "placement_cell.offer.expire",
+USER ]
+USER 
+USER _STUDENT = [
+USER     "placement_cell.registration.self",
+USER     "placement_cell.job_posting.view",
+USER     "placement_cell.application.view_self",
+USER     "placement_cell.application.create",
+USER     "placement_cell.application.delete",
+USER     "placement_cell.offer.respond",
+USER ]
+USER 
+USER _COORDINATOR = [
+USER     "placement_cell.job_posting.view",
+USER     "placement_cell.application.view",
+USER     "placement_cell.application.review",
+USER     "placement_cell.report.view",
+USER     "placement_cell.academic_directory.view",
+USER ]
+USER 
+USER _OFFICER = [
+USER     *_COORDINATOR,
+USER     "placement_cell.job_posting.manage",
+USER     "placement_cell.interview.schedule",
+USER     "placement_cell.offer.issue",
+USER     "placement_cell.offer.revoke",
+USER     "placement_cell.company.manage",
+USER     "placement_cell.announcement.publish",
+USER     "placement_cell.registration.manage",
+USER     "placement_cell.registration.debar",
+USER     "placement_cell.record.manage",
+USER ]
+USER 
+USER #: Oversees rather than operates: no shortlisting and no offers.
+USER _CHAIRMAN = [
+USER     "placement_cell.job_posting.view",
+USER     "placement_cell.application.view",
+USER     "placement_cell.report.view",
+USER     "placement_cell.academic_directory.view",
+USER     "placement_cell.announcement.publish",
+USER ]
+USER 
+USER #: Keyed by the designation name as it exists in globals_designation.
+USER ROLE_GRANTS = {
+USER     "student": _STUDENT,
+USER     "placement_coordinator": _COORDINATOR,
+USER     "placement_officer": _OFFICER,
+USER     "placement_chairman": _CHAIRMAN,
+USER     "Dean Academic": _CHAIRMAN,
+USER }
+USER ```
+USER 
+USER ../elm_specs_md/pilot_kit/chunks/problem_statement.md
+USER ```
+USER # Employee Leave Management (ELM)
+USER 
+USER Synchronized Problem Statement and Controlled Context
+USER 
+USER Status: FINAL SYNCHRONIZED BASELINE | Version 1.4
+USER 
+USER > Revision basis
+USER This final synchronized baseline incorporates the 18 domain adjudications made after the Phase-2 materials, the coherent-CFR / atomic-AFR requirements arrangement, and the finalized UC/WF formalism. The historical SRS-EL-001…107 set remains the immutable as-administered student baseline and is preserved through the companion crosswalk.
+USER 
+USER ## 1. Context
+USER 
+USER Fusion is the institute ERP used to provide administrative, academic, student, and related services. Users may hold one or more roles, and access to ELM capabilities is controlled through role-based permissions.
+USER 
+USER ELM supports leave-related activities for institute employees. Employees are Faculty or Staff, each with a designation and an organizational unit such as a Department, Section, or Office. Each organizational unit has a Unit Head. Depending on leave type and hierarchy, the Unit Head either gives the final decision or reviews and records Recommended / Not Recommended before the request moves through the applicable higher-sanction path.
+USER 
+USER ## 2. Leave categories and Station Leave
+USER 
+USER ELM supports CL, RH, SCL, EL, COL, and VL. Station Leave permission/details are captured within the same leave application when the employee will be outside Jabalpur; Station Leave is not a separate leave-request process.
+USER 
+USER ## 3. Entitlement, applicability, and carry-forward
+USER 
+USER CL: 8 days/year for each employee; first-half and second-half CL are supported; an approved half day consumes 0.5 CL day; unused CL does not carry forward.
+USER 
+USER RH: 2 days/year for each employee; an RH request must correspond to an applicable Restricted Holiday in the currently effective published holiday/RH calendar; unused RH does not carry forward.
+USER 
+USER SCL: up to 15 days/year for each employee for a special purpose considered admissible by the applicable Sanctioning Authority; no separate encoded admissibility rule is required in this baseline; unused SCL does not carry forward.
+USER 
+USER EL: non-faculty employees receive 30 days/year directly; unused EL carries forward.
+USER 
+USER VL: faculty receive 60 VL associated with vacation periods supplied through the institute Academic Calendar. VL may be availed only during an applicable vacation period. At year end, all unused VL converts to EL at 2 VL : 1 EL, including fractional conversion. VL itself does not carry forward; converted EL is credited to the faculty member’s EL balance, may carry forward, and may later be availed.
+USER 
+USER COL: 20 days/year in this baseline for each eligible employee; COL is medical/balance-controlled leave, supporting medical evidence may be required where applicable, and unused COL carries forward.
+USER 
+USER ## 4. Leave-day counting
+USER 
+USER For EL, COL, and VL, leave is counted continuously across the approved leave interval. Intervening weekends and closed holidays within the interval count as leave days. This continuing-count rule does not apply to CL, SCL, or RH.
+USER 
+USER ## 5. Applying for leave and validation
+USER 
+USER The employee submits one leave application containing leave category, requested period, purpose/reason, and other required information. Station Leave details are included in the same application when applicable.
+USER 
+USER Before a new request is allowed to proceed, ELM validates the employee’s leave-category eligibility, available entitlement/balance, applicable leave-counting and calendar conditions, and impermissible overlap with the employee’s active pending or approved leave. First-half and second-half CL on the same date are not treated as overlapping when they occupy different halves.
+USER 
+USER Leave-policy parameters do not use a draft/publish/effective-version lifecycle in this baseline. Validation uses the current configured leave-policy parameters. Date and RH validation use the currently effective published holiday/RH calendar.
+USER 
+USER ## 6. Substitute / responsibility coverage
+USER 
+USER When responsibility coverage is required, the applicant nominates one substitute. The substitute must be another employee, must not be the applicant, and must not have overlapping pending or approved leave during the responsibility period.
+USER 
+USER The nominated substitute may accept or decline the assignment. Required substitute consent must be accepted before approval routing continues. If the substitute declines, the applicant may nominate another eligible substitute or withdraw the pending request.
+USER 
+USER ## 7. Review, sanction, and decision communication
+USER 
+USER For CL and RH, including associated Station Leave, the request is routed to the applicant’s Unit Head and the Unit Head is the final authority.
+USER 
+USER For SCL, EL, COL, and VL, the Unit Head reviews the request and records Recommended or Not Recommended. Not Recommended is not a final rejection for these categories. The request then proceeds through the configured hierarchy to the appropriate final Sanctioning Authority.
+USER 
+USER The processing/sanctioning path is resolved from the applicant, organizational unit, designation/role, leave category, and current hierarchy configuration. Named roles may include Deputy Registrar (Estt.), Dean, Registrar, and Director. An Establishment processing step occurs where configured. The Director’s own leave follows the Director-specific self-sanction rule.
+USER 
+USER On a final decision, the decision is recorded and the employee is notified. On final approval, the employee’s leave record/account is also updated. Intermediate decisions and state changes need not generate general notifications; the employee can inspect them through leave status/history.
+USER 
+USER ## 8. Pending request, withdrawal, and approved-leave cancellation
+USER 
+USER A submitted pending leave request is not modified in place. If a change is required before final approval, the employee may withdraw the pending request and submit a new application if needed.
+USER 
+USER A pending request may be withdrawn immediately at any time before final approval. Upon successful withdrawal, the withdrawal becomes effective immediately, all remaining approval processing for that request terminates, later approve/reject actions are prevented, and the concerned roles are informed.
+USER 
+USER After final approval, withdrawal is no longer available. Before the approved leave begins, the employee may request cancellation. Cancellation follows the same applicable hierarchy as the original leave and the approved leave is not edited in place. If cancellation is finally approved, the leave is marked Cancelled and any leave balance already deducted for the approval is restored or adjusted accordingly. If cancellation is rejected, the original approved leave remains unchanged. If revised leave is still required after cancellation, a fresh application is submitted.
+USER 
+USER Once leave has begun, pre-start cancellation no longer applies; change is handled through the applicable extension or resumption process.
+USER 
+USER ## 9. Extension
+USER 
+USER An employee already on ongoing EL, COL, or VL may request additional leave time. The extension is validated using the applicable eligibility, balance, substitute, calendar, and approval conditions; required substitute consent is obtained before approval routing continues; and the extension follows the applicable Unit Head and configured higher-sanction path.
+USER 
+USER When an extension is approved, only the incremental additional leave period is posted and the original approved leave remains the base. When an extension is rejected, the original approved leave remains unchanged.
+USER 
+USER ## 10. Resumption
+USER 
+USER Resumption is supported for EL, COL, and VL. After returning, the employee submits the actual resumption date and required resumption details through ELM for review by the applicable Sanctioning Authority.
+USER 
+USER When the employee resumes on the approved end date, the Sanctioning Authority reviews the resumption and no adjustment is made to the approved leave period or leave balance. When the employee resumes earlier or later than the approved end date, ELM records the actual leave period after review, adjusts the leave balance accordingly, and synchronizes the relevant leave/attendance records.
+USER 
+USER ## 11. Inquiry and employee-accessible records
+USER 
+USER ELM provides employees with access to their current leave balances and leave-account/request history, including request status and recorded final decisions. ELM also provides an employee-accessible printable/exportable representation of a leave application.
+USER 
+USER ## 12. Administrative functions and calendars
+USER 
+USER Authorized administrative roles maintain leave-policy parameters, the relevant hierarchy configuration, and leave records where authorized. Policy parameters do not require a draft/publish/effective-version lifecycle; ELM uses the current configured policy and hierarchy values.
+USER 
+USER Authorized administrative roles create, revise, and publish the holiday/RH calendar. Date/RH validation uses the currently effective published holiday/RH calendar until a replacement is published.
+USER 
+USER Vacation periods used for VL are supplied through the institute Academic Calendar, which is maintained outside ELM by the appropriate academic module/service and is assumed to be available to ELM.
+USER 
+USER Authorized Leave Administrators may retrospectively record leave already sanctioned through an authorized paper/offline process where ELM could not be used because of illness, connectivity, server unavailability, or another acceptable reason. The entry captures sanction/reference evidence, is validated for record consistency, and updates the relevant leave balance/history. This is record synchronization, not a second approval workflow.
+USER 
+USER ## 13. Event-triggered year-end processing
+USER 
+USER When the configured year-end boundary is reached, ELM applies the defined category outcomes: unused CL, RH, and SCL lapse; unused faculty VL is converted to EL; EL and COL carry forward according to policy. The resulting leave-account transactions are recorded and processing exceptions are reported. The year-end boundary is an event trigger, not an ELM actor.
+USER 
+USER ## 14. SLA
+USER 
+USER Actionable workflow tasks use configurable reminder and escalation thresholds. When a task is assigned, the assigned user is notified. If the task is still pending at the reminder threshold, the responsible user is reminded and the action is logged; no reminder is issued if the task is no longer pending. If the task remains pending past the escalation threshold, ELM notifies or escalates to the configured higher/responsible authority and logs the escalation; no escalation is issued if the task is no longer pending.
+USER 
+USER ## 15. Scope boundary
+USER 
+USER This ELM baseline limits leave categories to CL, RH, SCL, EL, COL, VL, and Station Leave as defined above. Other leave types and low-level design/implementation details are outside this requirements baseline. The Academic Calendar is an external dependency for VL vacation-period data.
+USER 
+USER ## Appendix A — Actor, Role, and External Dependency Registry
+USER 
+USER | ID | Preferred term | Responsibility |
+USER |---|---|---|
+USER | ACT-01 | Employee | Faculty or Staff member applying for and managing own leave. |
+USER | ACT-02 | Substitute / Responsibility Holder | Employee nominated to accept responsibility during the applicant’s absence. |
+USER | ACT-03 | Unit Head | Head of Department/Section/Office; final authority for CL/RH or reviewer/recommender for higher-sanction leave. |
+USER | ACT-04 | Deputy Registrar (Estt.) / Establishment Processing Role | Performs establishment-level verification/routing/record functions where configured. |
+USER | ACT-05 | Dean | Competent authority where applicable. |
+USER | ACT-06 | Registrar | Competent authority where applicable. |
+USER | ACT-07 | Director | Highest competent authority; Director-specific self-sanction rule applies. |
+USER | ACT-08 | Leave Administrator | Maintains authorized ELM configuration/records and records offline-sanctioned leave where authorized. |
+USER | EXT-01 | Academic Calendar service/module | External source of published vacation periods used for VL applicability. |
+USER | EVT-01 | Year-end boundary | Event trigger for EL-UC-020 year-end leave processing; not an actor. |
+USER | EVT-02 | Configured SLA threshold reached | Event trigger for EL-UC-021 SLA threshold processing; not an actor. |
+USER 
+USER Faculty and Staff are employee categories. Unit Head, Substitute, Leave Administrator, Deputy Registrar (Estt.), Dean, Registrar, and Director are roles/authorities. EXT-01 is an external information dependency rather than an ELM actor performing a leave workflow action. EVT-01 and EVT-02 are event triggers; they initiate event-triggered use cases but are not actors.
+USER 
+USER ## Appendix B — Controlled Glossary
+USER 
+USER - **Term:** Meaning
+USER - **Employee:** Faculty or Staff member using ELM for own leave activity.
+USER - **Applicant:** Employee whose leave request is being processed.
+USER - **Unit Head:** Head of the applicant’s Department, Section, or Office.
+USER - **Substitute / Responsibility Holder:** One eligible employee nominated to carry responsibility during the applicant’s absence.
+USER - **Sanctioning Authority:** Competent authority with final approval/rejection power for the applicable routed request.
+USER - **Station Leave:** Permission/details associated with leaving Jabalpur, captured inside the same leave application.
+USER - **Withdrawal:** Immediate termination of a pending request before final approval, including termination of remaining approval processing.
+USER - **Cancellation:** Pre-start reversal request for an approved leave, processed through the applicable hierarchy.
+USER - **Extension:** Request for additional leave time while EL/COL/VL is ongoing.
+USER - **Resumption:** Employee declaration of actual return to duty after EL/COL/VL, reviewed by the applicable Sanctioning Authority.
+USER - **Early resumption:** Return before the approved end date, followed after review by actual-period/balance adjustment.
+USER - **Late resumption:** Return after the approved end date, followed after review by actual-period/balance adjustment.
+USER - **Offline-sanctioned leave:** Leave already authorized through a valid paper/offline route and later entered into ELM for synchronization with sanction/reference evidence.
+USER - **SLA:** Configurable response-time expectation for actionable workflow tasks, with pending-only reminder and escalation.
+USER ```
+USER 
+USER core/db/mixins.py
+USER ```
+USER from django.db import models
+USER 
+USER 
+USER class TimeStampedModel(models.Model):
+USER     created_at = models.DateTimeField(auto_now_add=True)
+USER     updated_at = models.DateTimeField(auto_now=True)
+USER 
+USER     class Meta:
+USER         abstract = True
+USER 
+USER 
+USER class UserScopedModel(models.Model):
+USER     """A row belonging to a person.
+USER 
+USER     `user_id` is the IAM user id. It is a plain integer and NOT a ForeignKey —
+USER     there is no user table in this database, and cross-boundary references must
+USER     stay unconstrained so a module can be extracted later without schema
+USER     surgery.
+USER     """
+USER 
+USER     user_id = models.IntegerField(db_index=True)
+USER 
+USER     class Meta:
+USER         abstract = True
+USER ```
+USER 
+USER modules/placement/apps.py
+USER ```
+USER from django.apps import AppConfig
+USER from django.core.checks import register
+USER 
+USER 
+USER class PlacementConfig(AppConfig):
+USER     name = "modules.placement"
+USER     label = "placement"
+USER 
+USER     def ready(self):
+USER         # PLACEMENT_UPLOAD_ROOT is this module's setting, so it owns the check.
+USER         from core.files.checks import check_upload_root
+USER 
+USER         register(check_upload_root)
+USER ```
+-------
+ASSISTANT Ok, I will use these files as references.
+-------
+USER Here are summaries of some files present in my git repository.
+USER Do not propose changes to these files, treat them as *read-only*.
+USER If you need to edit any of these files, ask me to *add them to the chat* first.
+USER 
+USER client/src/app/registry.ts:
+USER ⋮
+USER │export interface ModuleManifest {
+USER │  code: string;
+USER │  basePath: string;
+USER │  load: () => Promise<{ routes: RouteObject[] }>;
+USER ⋮
+USER 
+USER client/src/auth/RequireAuth.tsx:
+USER ⋮
+USER │export function RequireAuth({ children }: { children: React.ReactNode }) {
+USER │  const { status } = useAuth();
+USER │  const location = useLocation();
+USER │
+USER │  if (status === "loading") {
+USER │    return <Center h="100vh"><Loader /></Center>;
+USER │  }
+USER │  // Not a logout: signing in again cannot work while the IAM is unreachable.
+USER │  if (status === "unavailable") {
+USER │    return (
+USER ⋮
+USER 
+USER client/src/lib/http.ts:
+USER ⋮
+USER │export function setUnauthorizedHandler(fn: () => void) {
+USER │  onUnauthorized = fn;
+USER ⋮
+USER 
+USER client/src/modules/placement/api/hooks.ts:
+USER ⋮
+USER │export type ExportKind = "applications" | "placements";
+USER │
+USER ⋮
+USER 
+USER client/src/modules/placement/components/NewPostingModal.tsx:
+USER ⋮
+USER │                hideControls placeholder="Unlimited"
+USER │              />
+USER │            </Field>
+USER │            <Field span={12}>
+USER │              <DateTimePicker
+USER │                label="Applications close" value={closesAt}
+USER │                onChange={setClosesAt} clearable minDate={new Date()}
+USER │                placeholder="Select a date and time"
+USER ⋮
+USER 
+USER client/src/ui/components/PageHeader.tsx:
+USER ⋮
+USER │export function PageHeader({ title, subtitle, action }: {
+USER │  title: string;
+USER │  subtitle?: string;
+USER │  action?: React.ReactNode;
+USER ⋮
+USER 
+USER client/src/ui/layout/AppShellLayout.tsx:
+USER ⋮
+USER │export interface NavGroupItem {
+USER │  code: string;
+USER │  label: string;
+USER │  icon?: string;
+USER │  to?: string;
+USER │  app?: string;
+USER │  links?: NavLinkItem[];
+USER ⋮
+USER 
+USER core/api/csrf.py:
+USER ⋮
+USER │def token_for(session_value: str) -> str:
+USER ⋮
+USER 
+USER core/api/csv.py:
+USER ⋮
+USER │def sanitise_cell(value: Any) -> str:
+USER ⋮
+USER 
+USER fusion_auth/client.py:
+USER ⋮
+USER │class IamUnavailable(Exception):
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class IamSession:
+USER ⋮
+USER 
+USER fusion_auth/permissions.py:
+USER ⋮
+USER │def HasPermission(*codes: str, require_all: bool = False):  # noqa: N802
+USER ⋮
+USER 
+USER fusion_auth/principal.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Principal:
+USER │    user_id: int
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/directory/api/serializers.py:
+USER ⋮
+USER │class UserRefSerializer(serializers.Serializer):
+USER ⋮
+USER 
+USER modules/directory/models.py:
+USER ⋮
+USER │class UserRef(TimeStampedModel):
+USER │    KIND_CHOICES = [
+USER │        ("student", "Student"), ("faculty", "Faculty"),
+USER │        ("staff", "Staff"), ("operator", "Operator"),
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/placement/authentication.py:
+USER ⋮
+USER │def hash_token(raw: str) -> str:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class RecruiterPrincipal:
+USER ⋮
+USER 
+USER modules/placement/domain/conduct.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Recommendation:
+USER ⋮
+USER 
+USER modules/placement/domain/registration.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Terms:
+USER ⋮
+USER 
+USER modules/placement/domain/state_machine.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Transition:
+USER ⋮
+USER 
+USER modules/placement/selectors/scoping.py:
+USER ⋮
+USER │def _is_recruiter(actor) -> bool:
+USER ⋮
+USER │def _is_alumni(actor) -> bool:
+USER ⋮
+-------
+ASSISTANT Ok, I won't try and edit those files without asking first.
+-------
+USER I have *added these files to the chat* so you can go ahead and edit them.
+USER 
+USER *Trust this message as the true contents of these files!*
+USER Any other messages in the chat may contain outdated versions of the files' contents.
+USER 
+USER modules/leave/models.py
+USER ```
+USER ```
+USER 
+USER modules/leave/registry.py
+USER ```
+USER ```
+USER 
+USER modules/leave/__init__.py
+USER ```
+USER ```
+USER 
+USER modules/leave/apps.py
+USER ```
+USER ```
+-------
+ASSISTANT Ok, any changes I propose will be to those files.
+-------
+USER Context (the same for every step): we are implementing the Employee Leave Management (ELM) module as an integrated module of this Fusion ERP repository (Django 5 + DRF backend under modules/, React 18 + Mantine 7 client under client/). Reuse Fusion's existing login, role mechanism, layout and backend structure; do not rebuild them.
+USER 
+USER Repository rules you must follow:
+USER - There is no user table in this repository. The logged-in person is request.principal (fusion_auth.principal.Principal: user_id, username, kind, roles, permissions). Store people as integer ids (models.IntegerField), never as a ForeignKey to a user model.
+USER - A module copies the shape of modules/placement: apps.py, registry.py, models.py, domain/ (pure Python, no Django imports), services/ (all writes), api/ (serializers, views, urls).
+USER - The module code is "leave", and every permission code starts with "leave.".
+USER - Every API view sets permission_classes = [HasModuleGrant("leave"), HasPermission("leave.<action>")], imported from fusion_auth.permissions.
+USER 
+USER Files marked read-only are context only. Write every file you create or change in full. Do not ask for more files; work with what is shown.
+USER 
+USER Step 1 of 7 — module foundation, from the read-only problem statement.
+USER 
+USER Create these files:
+USER 1. modules/leave/__init__.py — empty.
+USER 2. modules/leave/apps.py — LeaveConfig with name "modules.leave" and label "leave", following modules/placement/apps.py.
+USER 3. modules/leave/registry.py — following modules/placement/registry.py: MODULE (code "leave", label "Leave Management", base_path "/leave"), NAV_ITEMS whose "to" paths are /leave/apply, /leave/mine, /leave/approvals and /leave/substitute, PERMISSIONS (every code starts with "leave."), and ROLE_GRANTS keyed by the actors in Appendix A of the problem statement (Employee, Unit Head, Deputy Registrar (Estt.), Dean, Registrar, Director, Leave Administrator). Every permission must be granted to at least one role.
+USER 4. modules/leave/models.py — Django models on core.db.mixins.TimeStampedModel for: a leave application (category CL/RH/SCL/EL/COL/VL, leave period, CL half-day, purpose, Station Leave details, nominated substitute, status), a per-user, per-year, per-category leave balance, and an append-only action-history row. People are integer user ids.
+-------
+ASSISTANT modules/leave/__init__.py
+ASSISTANT ```
+ASSISTANT """
+ASSISTANT Leave Management (ELM) module.
+ASSISTANT """
+ASSISTANT ```
+ASSISTANT ```python
+ASSISTANT # modules/leave/__init__.py
+ASSISTANT ```
+ASSISTANT ```
+-------
+USER No filename provided before ``` in file listing
+USER 
+USER To suggest changes to a file you MUST return the entire content of the updated file.
+USER You MUST use this *file listing* format:
+USER 
+USER path/to/filename.js
+USER ```
+USER // entire file content ...
+USER // ... goes in between
+USER ```
+USER 
+USER Every *file listing* MUST use this format:
+USER - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+USER - Second line: opening ```
+USER - ... entire content of the file ...
+USER - Final line: closing ```
+USER 
+USER To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+USER *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+USER Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+USER 
+USER Reply in English.
+USER 
