@@ -13,6 +13,25 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave_elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave_elm.balance.view` | View personal leave balances | `Employee`, `HOD`, `Leave Approver`, `Registrar` |
+| `leave_elm.application.view_self` | View own leave applications | `Employee`, `HOD`, `Leave Approver`, `Registrar` |
+| `leave_elm.application.apply` | Apply for leave | `Employee`, `HOD`, `Leave Approver`, `Registrar` |
+| `leave_elm.application.cancel` | Cancel own leave application | `Employee`, `HOD`, `Leave Approver`, `Registrar` |
+| `leave_elm.application.view` | View leave applications (all) | `HOD`, `Leave Approver`, `Registrar` |
+| `leave_elm.application.recommend` | Recommend leave approval | `HOD`, `Leave Approver`, `Registrar` |
+| `leave_elm.application.approve` | Approve leave request | `HOD`, `Registrar` |
+| `leave_elm.application.reject` | Reject leave request | `HOD`, `Registrar` |
+| `leave_elm.substitute.view_self` | View own substitute responses | `Employee`, `HOD`, `Leave Approver`, `Registrar` |
+| `leave_elm.substitute.respond` | Respond to substitute request | `Employee`, `HOD`, `Leave Approver`, `Registrar` |
+| `leave_elm.substitute.approve` | Approve substitute coverage | `Employee` |
+| `leave_elm.substitute.decline` | Decline substitute coverage | `Employee` |
+| `leave_elm.report.view` | View leave reports | `Employee`, `HOD`, `Leave Approver`, `Registrar` |
+| `leave_elm.bulk.action` | Perform bulk leave actions | `Registrar` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
