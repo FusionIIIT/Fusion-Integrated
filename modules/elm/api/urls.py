@@ -1,0 +1,171 @@
+"""URL routes for the ELM module."""
+from django.urls import path
+
+from modules.elm.api import views as v
+
+urlpatterns = [
+    # Balances
+    path(
+        "balances",
+        v.LeaveBalanceListView.as_view(),
+        name="elm-balances",
+    ),
+    # Applications
+    path(
+        "applications",
+        v.LeaveApplicationListCreateView.as_view(),
+        name="elm-applications",
+    ),
+    path(
+        "applications/<int:pk>",
+        v.LeaveApplicationDetailView.as_view(),
+        name="elm-application-detail",
+    ),
+    path(
+        "applications/<int:pk>/export",
+        v.LeaveApplicationExportView.as_view(),
+        name="elm-application-export",
+    ),
+    path(
+        "applications/<int:pk>/withdraw",
+        v.LeaveApplicationWithdrawView.as_view(),
+        name="elm-application-withdraw",
+    ),
+    # Substitute
+    path(
+        "substitute/requests/<int:pk>/respond",
+        v.SubstituteResponseView.as_view(),
+        name="elm-substitute-respond",
+    ),
+    path(
+        "applications/<int:pk>/substitute-replace",
+        v.SubstituteReplaceView.as_view(),
+        name="elm-substitute-replace",
+    ),
+    # Workflow Reviews
+    path(
+        "reviews/unit-head/<int:pk>/decision",
+        v.UnitHeadReviewView.as_view(),
+        name="elm-unit-head-decision",
+    ),
+    path(
+        "reviews/establishment/<int:pk>/forward",
+        v.EstablishmentRouteView.as_view(),
+        name="elm-establishment-forward",
+    ),
+    path(
+        "reviews/sanction/<int:pk>/decision",
+        v.SanctionDecisionView.as_view(),
+        name="elm-sanction-decision",
+    ),
+    # Cancellation (CW-EL-02)
+    path(
+        "applications/<int:pk>/cancel",
+        v.CancellationRequestView.as_view(),
+        name="elm-cancellation-request",
+    ),
+    path(
+        "cancellations/<int:pk>/unit-head-review",
+        v.CancellationUnitHeadReviewView.as_view(),
+        name="elm-cancellation-unit-head",
+    ),
+    path(
+        "cancellations/<int:pk>/establishment-forward",
+        v.CancellationEstablishmentRouteView.as_view(),
+        name="elm-cancellation-establishment",
+    ),
+    path(
+        "cancellations/<int:pk>/final-decision",
+        v.CancellationFinalDecisionView.as_view(),
+        name="elm-cancellation-final",
+    ),
+    # Extension (CW-EL-03)
+    path(
+        "applications/<int:pk>/extend",
+        v.ExtensionRequestView.as_view(),
+        name="elm-extension-request",
+    ),
+    path(
+        "extensions/<int:pk>/unit-head-review",
+        v.ExtensionUnitHeadReviewView.as_view(),
+        name="elm-extension-unit-head",
+    ),
+    path(
+        "extensions/<int:pk>/final-decision",
+        v.ExtensionFinalDecisionView.as_view(),
+        name="elm-extension-final",
+    ),
+    # Resumption (CW-EL-04)
+    path(
+        "applications/<int:pk>/resume",
+        v.ResumptionSubmitView.as_view(),
+        name="elm-resumption-submit",
+    ),
+    path(
+        "resumptions/<int:pk>/review",
+        v.ResumptionReviewView.as_view(),
+        name="elm-resumption-review",
+    ),
+    # Tasks
+    path(
+        "tasks/pending",
+        v.WorkflowTaskListView.as_view(),
+        name="elm-tasks-pending",
+    ),
+    # Administration
+    path(
+        "admin/policy",
+        v.AdminPolicyConfigView.as_view(),
+        name="elm-admin-policy",
+    ),
+    path(
+        "admin/calendars",
+        v.AdminHolidayCalendarView.as_view(),
+        name="elm-admin-calendars",
+    ),
+    path(
+        "admin/calendars/<int:pk>/publish",
+        v.AdminHolidayCalendarPublishView.as_view(),
+        name="elm-admin-calendar-publish",
+    ),
+    path(
+        "admin/calendars/<int:pk>/holidays",
+        v.AdminHolidayCreateView.as_view(),
+        name="elm-admin-holiday-create",
+    ),
+    path(
+        "admin/vacation-periods",
+        v.AdminVacationPeriodView.as_view(),
+        name="elm-admin-vacation-periods",
+    ),
+    path(
+        "admin/hierarchies",
+        v.AdminApprovalHierarchyView.as_view(),
+        name="elm-admin-hierarchies",
+    ),
+    path(
+        "admin/sla-thresholds",
+        v.AdminSlaThresholdView.as_view(),
+        name="elm-admin-sla-thresholds",
+    ),
+    path(
+        "admin/offline-leaves",
+        v.AdminOfflineLeaveView.as_view(),
+        name="elm-admin-offline-leaves",
+    ),
+    path(
+        "admin/records/<int:pk>",
+        v.AdminRecordMaintenanceView.as_view(),
+        name="elm-admin-record-maintenance",
+    ),
+    path(
+        "admin/year-end-process",
+        v.AdminYearEndProcessView.as_view(),
+        name="elm-admin-year-end-process",
+    ),
+    path(
+        "admin/process-sla",
+        v.AdminProcessSlaView.as_view(),
+        name="elm-admin-process-sla",
+    ),
+]

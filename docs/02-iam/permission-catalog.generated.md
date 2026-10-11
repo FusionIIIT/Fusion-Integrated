@@ -13,6 +13,25 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.leave.apply` | Apply for leave | `Dean Academic`, `Director`, `HOD`, `Registrar`, `acadadmin`, `dean`, `deputy_registrar`, `director`, `dr_estt`, `faculty`, `leave_admin`, `registrar`, `staff`, `unit_head` |
+| `elm.leave.view_self` | View own leave applications and balances | `Dean Academic`, `Director`, `HOD`, `Registrar`, `acadadmin`, `dean`, `deputy_registrar`, `director`, `dr_estt`, `faculty`, `leave_admin`, `registrar`, `staff`, `unit_head` |
+| `elm.leave.withdraw` | Withdraw own pending leave application | `Dean Academic`, `Director`, `HOD`, `Registrar`, `acadadmin`, `dean`, `deputy_registrar`, `director`, `dr_estt`, `faculty`, `leave_admin`, `registrar`, `staff`, `unit_head` |
+| `elm.leave.cancel` | Request cancellation of approved leave | `Dean Academic`, `Director`, `HOD`, `Registrar`, `acadadmin`, `dean`, `deputy_registrar`, `director`, `dr_estt`, `faculty`, `leave_admin`, `registrar`, `staff`, `unit_head` |
+| `elm.leave.extend` | Request extension of ongoing leave | `Dean Academic`, `Director`, `HOD`, `Registrar`, `acadadmin`, `dean`, `deputy_registrar`, `director`, `dr_estt`, `faculty`, `leave_admin`, `registrar`, `staff`, `unit_head` |
+| `elm.leave.resume` | Submit resumption of duty | `Dean Academic`, `Director`, `HOD`, `Registrar`, `acadadmin`, `dean`, `deputy_registrar`, `director`, `dr_estt`, `faculty`, `leave_admin`, `registrar`, `staff`, `unit_head` |
+| `elm.substitute.respond` | Respond to substitute requests | `Dean Academic`, `Director`, `HOD`, `Registrar`, `acadadmin`, `dean`, `deputy_registrar`, `director`, `dr_estt`, `faculty`, `leave_admin`, `registrar`, `staff`, `unit_head` |
+| `elm.review.unit_head` | Review leave requests at Unit Head level | `HOD`, `acadadmin`, `leave_admin`, `unit_head` |
+| `elm.review.establishment` | Verify and route higher-sanction requests at Establishment | `acadadmin`, `deputy_registrar`, `dr_estt`, `leave_admin` |
+| `elm.sanction.decide` | Make final sanctioning decisions | `Dean Academic`, `Director`, `Registrar`, `acadadmin`, `dean`, `director`, `leave_admin`, `registrar` |
+| `elm.admin.manage` | Manage ELM policies, calendars, records, and SLA | `acadadmin`, `deputy_registrar`, `dr_estt`, `leave_admin` |
+| `elm.leave.view_all` | View all employee leave records | `Dean Academic`, `Director`, `Registrar`, `acadadmin`, `dean`, `deputy_registrar`, `director`, `dr_estt`, `leave_admin`, `registrar` |
+| `elm.sla.process` | Trigger SLA threshold processing | _service only_ |
+| `elm.year_end.process` | Trigger year-end leave balance processing | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
