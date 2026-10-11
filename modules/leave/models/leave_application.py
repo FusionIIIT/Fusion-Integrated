@@ -1,0 +1,1 @@
+# Placeholder model for leave application
