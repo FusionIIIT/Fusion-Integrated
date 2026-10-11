@@ -1,3 +1,9 @@
+---
+owner: frontend-lead
+status: authoritative
+last-reviewed: 2026-08-01
+---
+
 # State & Data Fetching
 
 **There is no global store.** Nearly everything the old client kept in Redux is server state, and belongs in

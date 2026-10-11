@@ -1,3 +1,9 @@
+---
+owner: platform-lead
+status: authoritative
+last-reviewed: 2026-08-01
+---
+
 # Shared Kernel Reference
 
 `core/` is the code every module may depend on. It is deliberately small, because a shared kernel is the

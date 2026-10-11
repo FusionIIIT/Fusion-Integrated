@@ -1,4 +1,7 @@
 ---
+owner: frontend-lead
+status: authoritative
+last-reviewed: 2026-08-01
 verified-by: Playwright screenshot baselines captured from the live /sysadmin/ client
 ---
 

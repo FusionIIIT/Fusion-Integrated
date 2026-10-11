@@ -1,3 +1,9 @@
+---
+owner: frontend-lead
+status: authoritative
+last-reviewed: 2026-08-01
+---
+
 # Frontend Architecture
 
 One SPA, one login, one sidebar. Monorepo rationale:

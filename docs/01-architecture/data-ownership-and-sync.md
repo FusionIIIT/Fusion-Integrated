@@ -1,3 +1,9 @@
+---
+owner: platform-lead
+status: authoritative
+last-reviewed: 2026-08-01
+---
+
 # Data Ownership & Synchronization
 
 **The governing rule: every fact has exactly one writer.** Everything else is a projection, a

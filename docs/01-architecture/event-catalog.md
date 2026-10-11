@@ -1,4 +1,7 @@
 ---
+owner: platform-lead
+status: authoritative
+last-reviewed: 2026-08-01
 enforced-by: >
   Contract tests assert that every topic listed here has a pydantic model in
   packages/fusion_contracts, and that every model in fusion_contracts appears here.

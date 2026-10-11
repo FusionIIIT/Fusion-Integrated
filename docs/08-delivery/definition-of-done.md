@@ -1,3 +1,9 @@
+---
+owner: platform-lead
+status: authoritative
+last-reviewed: 2026-08-01
+---
+
 # Definition of Done
 
 Three levels: a **pull request**, a **module**, a **phase**. Each is a gate, not a guideline — "done" means the

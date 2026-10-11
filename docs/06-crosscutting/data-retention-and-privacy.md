@@ -1,3 +1,9 @@
+---
+owner: security-owner
+status: authoritative
+last-reviewed: 2026-08-01
+---
+
 # Data Retention & Privacy
 
 The system holds personal data for ~3,300 students and staff: identity, contact details, academic standing,

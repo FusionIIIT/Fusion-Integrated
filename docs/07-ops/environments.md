@@ -1,3 +1,9 @@
+---
+owner: ops
+status: authoritative
+last-reviewed: 2026-08-01
+---
+
 # Environments
 
 Four: **local**, **test** (CI), **staging**, **production**. The differences are deliberate and listed here so

@@ -1,3 +1,9 @@
+---
+owner: placement-lead
+status: authoritative
+last-reviewed: 2026-08-01
+---
+
 # Job Posting Lifecycle
 
 A posting's status machine, its approval flow, and the rule-locking that happens on publish.
