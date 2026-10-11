@@ -34,6 +34,113 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "elm": {
+      "grants": {
+        "director": [
+          "elm.leave.approve",
+          "elm.leave.create",
+          "elm.leave.manage",
+          "elm.leave.substitute",
+          "elm.leave.view_self"
+        ],
+        "faculty": [
+          "elm.leave.create",
+          "elm.leave.substitute",
+          "elm.leave.view_self"
+        ],
+        "staff": [
+          "elm.leave.create",
+          "elm.leave.substitute",
+          "elm.leave.view_self"
+        ],
+        "unit_head": [
+          "elm.leave.approve",
+          "elm.leave.create",
+          "elm.leave.substitute",
+          "elm.leave.view_self"
+        ]
+      },
+      "module_grants": [
+        "director",
+        "faculty",
+        "staff",
+        "unit_head"
+      ],
+      "nav": {
+        "base_path": "/elm",
+        "icon": "CalendarBlank",
+        "items": [
+          {
+            "code": "elm.mine",
+            "icon": "CalendarBlank",
+            "label": "My Leaves",
+            "required_permission": "elm.leave.view_self",
+            "sort_order": 10,
+            "to": "/elm/mine"
+          },
+          {
+            "code": "elm.apply",
+            "icon": "PlusCircle",
+            "label": "Apply Leave",
+            "required_permission": "elm.leave.create",
+            "sort_order": 20,
+            "to": "/elm/apply"
+          },
+          {
+            "code": "elm.approvals",
+            "icon": "CheckCircle",
+            "label": "Approvals",
+            "required_permission": "elm.leave.approve",
+            "sort_order": 30,
+            "to": "/elm/approvals"
+          },
+          {
+            "code": "elm.substitutes",
+            "icon": "Users",
+            "label": "Substitute Requests",
+            "required_permission": "elm.leave.substitute",
+            "sort_order": 40,
+            "to": "/elm/substitutes"
+          },
+          {
+            "code": "elm.balances",
+            "icon": "ChartBar",
+            "label": "Leave Balances",
+            "required_permission": "elm.leave.view_self",
+            "sort_order": 50,
+            "to": "/elm/balances"
+          }
+        ],
+        "label": "Leave Management",
+        "nav_section": "Leave",
+        "sort_order": 25,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "elm.leave.view_self",
+          "label": "View own leave applications and balances"
+        },
+        {
+          "code": "elm.leave.create",
+          "label": "Apply for leave"
+        },
+        {
+          "code": "elm.leave.approve",
+          "label": "Review and approve leave applications"
+        },
+        {
+          "code": "elm.leave.substitute",
+          "label": "Respond to substitute requests"
+        },
+        {
+          "code": "elm.leave.manage",
+          "label": "Administrative leave management"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
