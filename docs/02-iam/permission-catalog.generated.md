@@ -13,6 +13,20 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave.request.view_self` | View own leave requests, balance and inbox | `Dean`, `Dean Academic`, `Deputy Registrar (Estt.)`, `Director`, `HOD`, `Leave Administrator`, `Leave Approver`, `Registrar`, `faculty`, `hr_officer`, `staff` |
+| `leave.request.create` | Apply for leave, extension, cancellation, resumption | `Dean`, `Dean Academic`, `Deputy Registrar (Estt.)`, `Director`, `HOD`, `Leave Administrator`, `Leave Approver`, `Registrar`, `faculty`, `hr_officer`, `staff` |
+| `leave.request.delete` | Withdraw own pending leave request | `Dean`, `Dean Academic`, `Deputy Registrar (Estt.)`, `Director`, `HOD`, `Leave Administrator`, `Leave Approver`, `Registrar`, `faculty`, `hr_officer`, `staff` |
+| `leave.request.view` | View leave requests within administrative scope | `Dean`, `Dean Academic`, `Deputy Registrar (Estt.)`, `Director`, `HOD`, `Leave Administrator`, `Leave Approver`, `Registrar`, `hr_officer` |
+| `leave.request.approve` | Approve, recommend or reject leave requests | `Dean`, `Dean Academic`, `Deputy Registrar (Estt.)`, `Director`, `HOD`, `Leave Administrator`, `Leave Approver`, `Registrar`, `hr_officer` |
+| `leave.balance.update` | Adjust leave balances and record offline leave | `Leave Administrator`, `hr_officer` |
+| `leave.type.manage` | Configure leave policies, calendars and SLA thresholds | `Leave Administrator`, `hr_officer` |
+| `leave.system.yearend` | Execute year-end balance processing | _service only_ |
+| `leave.system.sla` | Process SLA threshold reminders and escalations | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

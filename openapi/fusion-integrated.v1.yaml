@@ -63,6 +63,81 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/leave/admin/:
+    post:
+      operationId: v1_leave_admin_create
+      description: Stub view declaring administrative balance update and policy management
+        permissions.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveActionResponse'
+          description: ''
+  /api/v1/leave/applications/:
+    post:
+      operationId: v1_leave_applications_create
+      description: Stub view declaring leave creation and withdrawal permissions.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveActionResponse'
+          description: ''
+    delete:
+      operationId: v1_leave_applications_destroy
+      description: Stub view declaring leave creation and withdrawal permissions.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveActionResponse'
+          description: ''
+  /api/v1/leave/approvals/:
+    post:
+      operationId: v1_leave_approvals_create
+      description: Stub view declaring leave approval permissions.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveActionResponse'
+          description: ''
+  /api/v1/leave/health/:
+    get:
+      operationId: v1_leave_health_retrieve
+      description: Health and status endpoint for Employee Leave Management.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveHealthResponse'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -2637,6 +2712,23 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveActionResponse:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    LeaveHealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        module:
+          type: string
+      required:
+      - module
+      - status
     LiftSanction:
       type: object
       properties:
