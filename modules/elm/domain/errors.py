@@ -1,0 +1,2 @@
+class LeaveRequestError(Exception):
+    pass

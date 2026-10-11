@@ -1,0 +1,3 @@
+"""
+Employee Leave Management module.
+"""
