@@ -1,4 +1,5 @@
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -13,6 +14,7 @@ from modules.leave.api.serializers import (
 )
 
 
+@extend_schema(responses=LeaveTypeSerializer(many=True))
 class LeaveTypeListView(APIView):
     permission_classes = [HasModuleGrant("leave")]
 
@@ -21,6 +23,7 @@ class LeaveTypeListView(APIView):
         return Response(LeaveTypeSerializer(types, many=True).data)
 
 
+@extend_schema(responses=LeaveBalanceSerializer(many=True))
 class MyLeaveBalancesView(APIView):
     permission_classes = [HasModuleGrant("leave"), HasPermission("leave.balance.view")]
 
@@ -30,8 +33,19 @@ class MyLeaveBalancesView(APIView):
         return Response(LeaveBalanceSerializer(balances, many=True).data)
 
 
+@extend_schema(methods=["GET"], responses=LeaveRequestSerializer(many=True))
+@extend_schema(
+    methods=["POST"], request=LeaveRequestSerializer, responses=LeaveRequestSerializer
+)
 class MyLeaveRequestsView(APIView):
     permission_classes = [HasModuleGrant("leave"), HasPermission("leave.application.view_self")]
+
+    def get_permissions(self):
+        # POST creates an application, which the "Apply Leave" nav gates on
+        # leave.application.create; listing remains view_self.
+        if self.request.method == "POST":
+            return [HasModuleGrant("leave"), HasPermission("leave.application.create")]
+        return super().get_permissions()
 
     def get(self, request):
         user_id = request.principal.user_id
@@ -58,6 +72,7 @@ class MyLeaveRequestsView(APIView):
         return Response(LeaveRequestSerializer(leave_req).data, status=status.HTTP_201_CREATED)
 
 
+@extend_schema(request=None, responses=LeaveRequestSerializer)
 class CancelLeaveRequestView(APIView):
     permission_classes = [HasModuleGrant("leave"), HasPermission("leave.application.cancel")]
 
@@ -78,6 +93,7 @@ class CancelLeaveRequestView(APIView):
         return Response(LeaveRequestSerializer(leave_req).data)
 
 
+@extend_schema(responses=LeaveRequestSerializer(many=True))
 class PendingApprovalsView(APIView):
     permission_classes = [HasModuleGrant("leave"), HasPermission("leave.application.approve")]
 
@@ -87,6 +103,7 @@ class PendingApprovalsView(APIView):
         return Response(LeaveRequestSerializer(pending, many=True).data)
 
 
+@extend_schema(request=LeaveApprovalSerializer, responses=LeaveRequestSerializer)
 class LeaveApprovalView(APIView):
     permission_classes = [HasModuleGrant("leave"), HasPermission("leave.application.approve")]
 
