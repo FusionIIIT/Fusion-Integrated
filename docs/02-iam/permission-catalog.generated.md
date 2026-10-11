@@ -13,6 +13,21 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.leave_request.view` | See one's own leave balances and history | `faculty`, `staff` |
+| `elm.leave_request.create` | Apply, withdraw, cancel, extend, resume, and answer substitute requests | `faculty`, `staff` |
+| `elm.leave_task.view` | See leave tasks assigned to you | `Dean (P&D)`, `Dean (R&D)`, `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `SectionHead_HR`, `SectionHead_IWD`, `SectionHead_PS`, `SectionHead_RSPC` |
+| `elm.leave_request.review` | Unit Head decision or recommendation | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `SectionHead_HR`, `SectionHead_IWD`, `SectionHead_PS`, `SectionHead_RSPC` |
+| `elm.leave_request.assign` | Establishment verification and routing | `Deputy Registrar` |
+| `elm.leave_request.approve` | Final sanction and resumption review | `Dean (P&D)`, `Dean (R&D)`, `Dean Academic`, `Deputy Registrar`, `Director`, `Registrar` |
+| `elm.policy.update` | Maintain leave policy, hierarchy and SLA | `hradmin` |
+| `elm.holiday_calendar.publish` | Maintain and publish the holiday/RH calendar | `hradmin` |
+| `elm.leave_record.create` | Record offline-sanctioned leave and corrections | `hradmin` |
+| `elm.leave_account.update` | System year-end and SLA processing | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
