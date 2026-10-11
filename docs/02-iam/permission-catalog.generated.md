@@ -13,6 +13,18 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave_elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave_elm.application.view` | See leave applications | `Employee`, `Leave Approver`, `acadadmin`, `establishment`, `faculty`, `staff`, `unit_head` |
+| `leave_elm.application.apply` | Submit a leave application | `Employee`, `acadadmin`, `faculty`, `staff` |
+| `leave_elm.application.withdraw` | Withdraw a pending leave application | `Employee`, `acadadmin`, `faculty`, `staff` |
+| `leave_elm.application.approve` | Approve or reject a leave application | `Leave Approver`, `acadadmin`, `establishment`, `unit_head` |
+| `leave_elm.substitute.respond` | Respond to a substitute request | `Employee`, `acadadmin`, `faculty`, `staff` |
+| `leave_elm.balance.view` | View leave balances | `Employee`, `Leave Approver`, `acadadmin`, `establishment`, `faculty`, `staff`, `unit_head` |
+| `leave_elm.calendar.view` | View the holiday calendar | `Employee`, `Leave Approver`, `acadadmin`, `establishment`, `faculty`, `staff`, `unit_head` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
