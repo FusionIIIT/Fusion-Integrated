@@ -1,0 +1,102 @@
+"""Event-triggered work: year-end (EL-UC-020) and SLA thresholds (EL-UC-021)."""
+from __future__ import annotations
+
+import logging
+from datetime import date, timedelta
+from decimal import Decimal
+
+from django.db import transaction
+from django.utils import timezone
+
+from modules.elm.domain import policy
+from modules.elm.domain import state_machine as sm
+from modules.elm.models import ApprovalStep, LedgerEntry, RequestEvent, SlaPolicy
+from modules.elm.selectors import accounts as acc
+from modules.elm.services import accounts as ledger
+from modules.elm.services.requests import notify
+
+log = logging.getLogger("fusion.elm.scheduled")
+
+
+def _once(user_id: int, category: str, year: int, kind: str, days: Decimal,
+          note: str) -> None:
+    if days:
+        LedgerEntry.objects.get_or_create(
+            user_id=user_id, category=category, year=year, kind=kind,
+            defaults={"days": days, "note": note})
+
+
+def year_end(year: int) -> dict:
+    """BR-EL-002..009. Idempotent: every entry is once-a-year by constraint."""
+    users = (LedgerEntry.objects.filter(year=year)
+             .values_list("user_id", flat=True).distinct())
+    done, failed = 0, []
+    for uid in users:
+        try:
+            with transaction.atomic():
+                ledger.lock_account(uid)
+                bal = acc.balances(uid, year)
+                for cat in policy.LAPSING:
+                    _once(uid, cat, year, LedgerEntry.LAPSE, -bal[cat],
+                          "Unused leave lapses")
+                vl = bal[policy.VL]
+                _once(uid, policy.VL, year, LedgerEntry.CONVERSION_OUT, -vl,
+                      "Unused VL converted to EL")
+                for cat in policy.CARRY_FORWARD:
+                    _once(uid, cat, year + 1, LedgerEntry.CARRY_FORWARD, bal[cat],
+                          f"Carried forward from {year}")
+                _once(uid, policy.EL, year + 1, LedgerEntry.CONVERSION_IN,
+                      policy.vl_to_el(vl), f"From {vl} unused VL of {year}")
+            done += 1
+        except Exception as exc:
+            log.exception("elm.year_end.failed user=%s", uid)
+            failed.append({"user_id": uid, "error": str(exc)})
+    return {"year": year, "processed": done, "exceptions": failed}
+
+
+def _sweep(due, mark: str, recipient, message: str, note: str) -> int:
+    count = 0
+    for step_id in due.values_list("id", flat=True):
+        with transaction.atomic():
+            step = (ApprovalStep.objects.select_for_update()
+                    .select_related("request").get(pk=step_id))
+            if step.status != ApprovalStep.ACTIVE or getattr(step, mark):
+                continue
+            setattr(step, mark, timezone.now())
+            step.save(update_fields=[mark, "updated_at"])
+            req = step.request
+            notify(recipient(step), message.format(category=req.category), req)
+            RequestEvent.objects.create(request=req, actor_role=sm.SYSTEM,
+                                        note=note)
+            count += 1
+    return count
+
+
+def sla_sweep(now=None) -> dict:
+    """BR-EL-032/033: remind, then escalate, only while the step is active."""
+    now = now or timezone.now()
+    sla = SlaPolicy.objects.order_by("-created_at", "-id").first()
+    if sla is None:
+        return {"reminded": 0, "escalated": 0, "skipped": "no SLA configured"}
+    active = ApprovalStep.objects.filter(status=ApprovalStep.ACTIVE)
+    reminded = _sweep(
+        active.filter(reminded_at__isnull=True,
+                      assigned_at__lte=now - timedelta(hours=sla.reminder_hours)),
+        "reminded_at", lambda step: step.assignee_id,
+        "Reminder: a {category} request is still waiting for your action.",
+        "SLA reminder")
+    escalated = 0
+    if sla.escalation_user_id:
+        # ponytail: notification-only escalation; rerouting needs a rule.
+        escalated = _sweep(
+            active.filter(escalated_at__isnull=True,
+                          assigned_at__lte=now - timedelta(
+                              hours=sla.escalation_hours)),
+            "escalated_at", lambda step: sla.escalation_user_id,
+            "Escalation: a {category} request has waited past its SLA.",
+            "SLA escalation")
+    return {"reminded": reminded, "escalated": escalated}
+
+
+def previous_year(today: date | None = None) -> int:
+    return (today or timezone.localdate()).year - 1
