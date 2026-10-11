@@ -1,0 +1,111 @@
+"""ELM API URLs, mounted under /api/v1/elm/."""
+from django.urls import path
+
+from modules.elm.api import exports
+from modules.elm.api import views as v
+
+urlpatterns = [
+    # employee self-service
+    path("me", v.MeView.as_view(), name="elm-me"),
+    path("balances", v.BalanceListView.as_view(),
+         name="elm-balances"),
+    path("requests", v.ApplicationListView.as_view(),
+         name="elm-requests"),
+    path("requests/<int:pk>", v.ApplicationDetailView.as_view(),
+         name="elm-request"),
+    path("requests/<int:pk>/submit",
+         v.ApplicationSubmitView.as_view(),
+         name="elm-request-submit"),
+    path("requests/<int:pk>/withdraw",
+         v.ApplicationWithdrawView.as_view(),
+         name="elm-request-withdraw"),
+    path("requests/<int:pk>/substitute",
+         v.ApplicationSubstituteView.as_view(),
+         name="elm-request-substitute"),
+    path("requests/<int:pk>/decide",
+         v.RequestDecideView.as_view(),
+         name="elm-request-decide"),
+
+    # substitute / responsibility holder
+    path("substitute-tasks",
+         v.SubstituteTaskListView.as_view(),
+         name="elm-substitute-tasks"),
+    path("substitute-tasks/<int:pk>/respond",
+         v.SubstituteTaskRespondView.as_view(),
+         name="elm-substitute-respond"),
+
+    # decision seats
+    path("queue", v.QueueListView.as_view(),
+         name="elm-queue"),
+    path("tasks/<int:pk>", v.TaskDetailView.as_view(),
+         name="elm-task"),
+    path("tasks/<int:pk>/decide",
+         v.TaskDecideView.as_view(),
+         name="elm-task-decide"),
+
+    # cancellation and extension
+    path("cancellations",
+         v.CancellationCreateView.as_view(),
+         name="elm-cancellations"),
+    path("extensions",
+         v.ExtensionCreateView.as_view(),
+         name="elm-extensions"),
+
+    # resumption
+    path("resumptions",
+         v.ResumptionCreateView.as_view(),
+         name="elm-resumptions"),
+    path("resumptions/<int:pk>/review",
+         v.ResumptionReviewView.as_view(),
+         name="elm-resumption-review"),
+
+    # records
+    path("records", v.RecordListView.as_view(),
+         name="elm-records"),
+    path("records/offline",
+         v.OfflineRecordCreateView.as_view(),
+         name="elm-records-offline"),
+    path("calendar", v.CalendarView.as_view(),
+         name="elm-calendar"),
+    path("exports/requests/<int:pk>",
+         exports.ExportApplicationView.as_view(),
+         name="elm-export-request"),
+
+    # configuration
+    path("admin/policy",
+         v.AdminPolicyView.as_view(),
+         name="elm-admin-policy"),
+    path("admin/hierarchy",
+         v.AdminHierarchyListView.as_view(),
+         name="elm-admin-hierarchy"),
+    path("admin/sla",
+         v.AdminSlaListView.as_view(),
+         name="elm-admin-sla"),
+    path("admin/calendar",
+         v.AdminCalendarListView.as_view(),
+         name="elm-admin-calendar"),
+    path("admin/calendar/<int:pk>/publish",
+         v.AdminCalendarPublishView.as_view(),
+         name="elm-admin-calendar-publish"),
+    path("admin/calendar/<int:pk>/holidays",
+         v.AdminHolidayUpsertView.as_view(),
+         name="elm-admin-calendar-holidays"),
+    path("admin/units",
+         v.AdminUnitListView.as_view(),
+         name="elm-admin-units"),
+    path("admin/units/<str:code>/head",
+         v.AdminUnitHeadView.as_view(),
+         name="elm-admin-unit-head"),
+    path("admin/profiles",
+         v.AdminProfileView.as_view(),
+         name="elm-admin-profiles"),
+    path("admin/vacations",
+         v.AdminVacationListView.as_view(),
+         name="elm-admin-vacations"),
+    path("year-end", v.YearEndView.as_view(),
+         name="elm-year-end"),
+    path("admin/records/<int:pk>/maintain",
+         v.AdminRecordMaintainView.as_view(),
+         name="elm-admin-record-maintain"),    path("sla/sweep", v.SlaSweepView.as_view(),
+         name="elm-sla-sweep"),
+]

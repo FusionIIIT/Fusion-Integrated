@@ -13,6 +13,33 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.leave.apply` | Apply for leave | `Assistant Professor`, `Associate Professor`, `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Faculty`, `Head of Department`, `Professor`, `Registrar`, `Staff` |
+| `elm.leave.view_self` | View own leave balances and history | `Assistant Professor`, `Associate Professor`, `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Faculty`, `Head of Department`, `Professor`, `Registrar`, `Staff` |
+| `elm.leave.withdraw` | Withdraw a pending leave request | `Assistant Professor`, `Associate Professor`, `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Faculty`, `Head of Department`, `Professor`, `Registrar`, `Staff` |
+| `elm.leave.nominate` | Nominate or replace a substitute | `Assistant Professor`, `Associate Professor`, `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Faculty`, `Head of Department`, `Professor`, `Registrar`, `Staff` |
+| `elm.leave.cancel` | Request cancellation of approved leave | `Assistant Professor`, `Associate Professor`, `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Faculty`, `Head of Department`, `Professor`, `Registrar`, `Staff` |
+| `elm.leave.extend` | Request extension of ongoing EL/COL/VL | `Assistant Professor`, `Associate Professor`, `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Faculty`, `Head of Department`, `Professor`, `Registrar`, `Staff` |
+| `elm.leave.resume` | Submit resumption of duty | `Assistant Professor`, `Associate Professor`, `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Faculty`, `Head of Department`, `Professor`, `Registrar`, `Staff` |
+| `elm.substitute.respond` | Accept or decline a substitute assignment | `Assistant Professor`, `Associate Professor`, `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Faculty`, `Head of Department`, `Professor`, `Registrar`, `Staff` |
+| `elm.review.unit_head` | Review leave requests at the Unit Head | `Head of Department` |
+| `elm.review.establishment` | Verify and route higher-sanction requests | `Deputy Registrar (Estt.)` |
+| `elm.sanction.final` | Make the final sanctioning decision | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar` |
+| `elm.resume.review` | Review a resumption of duty | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar` |
+| `elm.records.view` | View leave records within authorized scope | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Head of Department`, `Leave Administrator`, `Registrar` |
+| `elm.records.offline` | Record already-sanctioned offline leave | `Leave Administrator` |
+| `elm.records.maintain` | Maintain authorized leave records | `Leave Administrator` |
+| `elm.config.policy` | Maintain leave-policy parameters | `Leave Administrator` |
+| `elm.config.hierarchy` | Maintain sanctioning hierarchy configuration | `Leave Administrator` |
+| `elm.config.calendar` | Maintain and publish the holiday/RH calendar | `Leave Administrator` |
+| `elm.config.units` | Maintain organizational units and Unit Heads | `Leave Administrator` |
+| `elm.config.vacation` | Maintain the vacation-period projection | `Leave Administrator` |
+| `elm.config.sla` | Configure workflow SLA thresholds | `Leave Administrator` |
+| `elm.yearend.run` | Trigger year-end leave processing | `Leave Administrator` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
