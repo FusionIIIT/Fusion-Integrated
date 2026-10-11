@@ -13,6 +13,16 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.application.self` | Apply for and manage one's own leave | `Director`, `Employee`, `faculty`, `staff` |
+| `elm.task.act` | Respond to an assigned leave task in the active role | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Employee`, `Registrar`, `Substitute`, `Unit Head`, `faculty`, `staff` |
+| `elm.notification.self` | Read one's own leave notifications | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Employee`, `Leave Administrator`, `Registrar`, `Substitute`, `Unit Head`, `faculty`, `staff` |
+| `elm.configuration.manage` | Maintain leave policy, hierarchy, calendars and SLA | `Leave Administrator` |
+| `elm.record.manage` | Maintain records and synchronize already-sanctioned offline leave | `Leave Administrator` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
