@@ -201,3 +201,20 @@ Then: offers and selection rounds, the declared-CPI integration.
 
 Design documents — architecture, ADRs, the RBAC model, the placement domain and
 the academic-snapshot contract — are in [`docs/`](docs/).
+
+
+## Employee Leave Management (ELM) pilot
+
+The ELM pilot is mounted at `/api/v1/elm/` and has a client route at `/elm`.
+The initial API supports listing visible leave requests, submitting a request,
+and explicit approve, reject, and cancel actions. Requests are scoped to the
+employee linked to the authenticated IAM `user_id`, unless the principal has
+the `elm.leave.view_all` permission. A missing employee-to-IAM mapping returns
+a validation error rather than accepting an employee id from the client.
+
+Before treating this as a complete assignment implementation, confirm the
+module's BR/UC/workflow specification and approved IAM role-to-permission
+mapping. Those specifications were not included in this archive, so ELM's
+`ROLE_GRANTS` is intentionally empty rather than inventing institutional roles.
+Run `make migrate`, `make seed`, `make check`, and the client build in the
+intended Fusion environment before merging.
