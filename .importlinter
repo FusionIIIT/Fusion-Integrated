@@ -15,6 +15,8 @@ source_modules =
     modules.placement
     modules.directory
     modules.accesscontrol
+    modules.hr
+    modules.leave
 forbidden_modules =
     modules.placement.models
     modules.placement.services
@@ -25,6 +27,16 @@ forbidden_modules =
     modules.directory.services
     modules.directory.api
     modules.accesscontrol.models
+    modules.hr.models
+    modules.hr.services
+    modules.hr.selectors
+    modules.hr.api
+    modules.hr.domain
+    modules.leave.models
+    modules.leave.services
+    modules.leave.selectors
+    modules.leave.api
+    modules.leave.domain
 # DIRECT imports only. contracts.py legitimately imports its OWN module's
 # models and services, so following the chain transitively would make this
 # contract impossible to satisfy. What we forbid is a module reaching straight
@@ -38,6 +50,8 @@ type = forbidden
 source_modules =
 # Every module's domain, not just the first one written.
     modules.placement.domain
+    modules.hr.domain
+    modules.leave.domain
 forbidden_modules =
     django
     rest_framework
@@ -66,3 +80,23 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+
+[importlinter:contract:hr-layers]
+name = Layering inside hr
+type = layers
+layers =
+    modules.hr.api
+    modules.hr.services
+    modules.hr.selectors
+    modules.hr.models
+    modules.hr.domain
+
+[importlinter:contract:leave-layers]
+name = Layering inside leave
+type = layers
+layers =
+    modules.leave.api
+    modules.leave.services
+    modules.leave.selectors
+    modules.leave.models
+    modules.leave.domain
