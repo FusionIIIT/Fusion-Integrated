@@ -34,6 +34,74 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "leave_elm": {
+      "grants": {
+        "Employee": [
+          "leave_elm.application.apply",
+          "leave_elm.application.view"
+        ],
+        "Leave Approver": [
+          "leave_elm.application.approve",
+          "leave_elm.application.view"
+        ],
+        "faculty": [
+          "leave_elm.application.apply",
+          "leave_elm.application.view"
+        ],
+        "staff": [
+          "leave_elm.application.apply",
+          "leave_elm.application.view"
+        ]
+      },
+      "module_grants": [
+        "Employee",
+        "Leave Approver",
+        "faculty",
+        "staff"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "FaCalendarCheck",
+        "items": [
+          {
+            "code": "leave.applications",
+            "icon": "FaCalendarAlt",
+            "label": "Leave Requests",
+            "required_permission": "leave_elm.application.view",
+            "sort_order": 10,
+            "to": "/leave/applications"
+          },
+          {
+            "code": "leave.approvals",
+            "icon": "FaCheckCircle",
+            "label": "Sanction Queue",
+            "required_permission": "leave_elm.application.approve",
+            "sort_order": 20,
+            "to": "/leave/approvals"
+          }
+        ],
+        "label": "Leave Management",
+        "nav_section": "Leave",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "leave_elm.application.view",
+          "label": "View leave requests and balances"
+        },
+        {
+          "code": "leave_elm.application.apply",
+          "label": "Submit a leave request"
+        },
+        {
+          "code": "leave_elm.application.approve",
+          "label": "Sanction or reject a leave request"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
