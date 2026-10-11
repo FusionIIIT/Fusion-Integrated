@@ -278,6 +278,85 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "elm": {
+      "code": "elm",
+      "label": "Leave Management",
+      "description": "Employee Leave Management and approval workflows",
+      "icon": "CalendarIcon",
+      "default_route": "/elm",
+      "permissions": [
+        {
+          "code": "elm.view_leaves",
+          "label": "View Leaves",
+          "description": "Can view own leave balances and history"
+        },
+        {
+          "code": "elm.apply_leave",
+          "label": "Apply for Leave",
+          "description": "Can submit leave applications and nominate substitutes"
+        },
+        {
+          "code": "elm.approve_leave",
+          "label": "Approve Leave",
+          "description": "Can approve or reject leave requests as recommending/sanctioning authority"
+        },
+        {
+          "code": "elm.manage_policy",
+          "label": "Manage Leave Policy",
+          "description": "Can configure institute leave rules and credit annual quotas"
+        }
+      ],
+      "role_grants": [
+        {
+          "role_code": "faculty",
+          "permissions": [
+            "elm.view_leaves",
+            "elm.apply_leave"
+          ]
+        },
+        {
+          "role_code": "staff",
+          "permissions": [
+            "elm.view_leaves",
+            "elm.apply_leave"
+          ]
+        },
+        {
+          "role_code": "hod",
+          "permissions": [
+            "elm.view_leaves",
+            "elm.apply_leave",
+            "elm.approve_leave"
+          ]
+        },
+        {
+          "role_code": "director",
+          "permissions": [
+            "elm.view_leaves",
+            "elm.apply_leave",
+            "elm.approve_leave",
+            "elm.manage_policy"
+          ]
+        },
+        {
+          "role_code": "admin",
+          "permissions": [
+            "elm.view_leaves",
+            "elm.apply_leave",
+            "elm.approve_leave",
+            "elm.manage_policy"
+          ]
+        }
+      ],
+      "module_grants": [
+        "faculty",
+        "staff",
+        "hod",
+        "director",
+        "admin"
+      ],
+      "scope_permissions": []
     }
   },
   "publisher": "integrated",
