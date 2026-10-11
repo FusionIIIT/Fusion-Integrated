@@ -4,6 +4,7 @@
  *  module gets no route at all, so deep-linking it 404s rather than rendering
  *  blank. `load` must be a STATIC import() literal or Vite cannot split it. */
 import type { RouteObject } from "react-router-dom";
+import { Elm } from './modules/elm';
 
 export interface ModuleManifest {
   code: string;
@@ -18,3 +19,5 @@ export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
     load: () => import("../modules/placement/routes"),
   },
 };
+
+export default Elm;

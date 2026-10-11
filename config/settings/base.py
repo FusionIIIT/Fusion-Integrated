@@ -92,8 +92,14 @@ DOMAIN_MODULES = [
     "modules.placement",
 ]
 
-INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
-                  + PLATFORM_MODULES + DOMAIN_MODULES)
+INSTALLED_APPS = (
+    DJANGO_APPS + 
+    THIRD_PARTY_APPS + 
+    LOCAL_APPS + 
+    PLATFORM_MODULES + 
+    DOMAIN_MODULES + 
+    ('elm.apps.ElmConfig',)
+)
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
