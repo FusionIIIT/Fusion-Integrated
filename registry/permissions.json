@@ -34,6 +34,59 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "leave_elm": {
+      "grants": {
+        "Employee": [
+          "leave_elm.application.apply",
+          "leave_elm.application.view"
+        ],
+        "Leave Approver": [
+          "leave_elm.application.view"
+        ]
+      },
+      "module_grants": [
+        "Employee",
+        "Leave Approver"
+      ],
+      "nav": {
+        "base_path": "/leave-elm",
+        "icon": "CalendarCheck",
+        "items": [
+          {
+            "code": "leave_elm.applications",
+            "icon": "Calendar",
+            "label": "My Leave Applications",
+            "required_permission": "leave_elm.application.view",
+            "sort_order": 10,
+            "to": "/leave-elm/applications"
+          },
+          {
+            "code": "leave_elm.apply",
+            "icon": "CalendarPlus",
+            "label": "Apply for Leave",
+            "required_permission": "leave_elm.application.apply",
+            "sort_order": 20,
+            "to": "/leave-elm/applications/new"
+          }
+        ],
+        "label": "Employee Leave Management",
+        "nav_section": "Employee Services",
+        "sort_order": 30,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "leave_elm.application.view",
+          "label": "View one's own leave applications"
+        },
+        {
+          "code": "leave_elm.application.apply",
+          "label": "Submit a leave application"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
