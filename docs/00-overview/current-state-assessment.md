@@ -71,6 +71,9 @@ WebOPAC with BeautifulSoup) · `iwdModuleV2` (22) · `estate_module` (5) · `sch
 `research_procedures` (7) · `filetracking` (2) · `notifications_extension` (0) · `department` (3) ·
 `counselling_cell` (9) · `recruitment` (24, near-empty views) · `feeds` (11) · `otheracademic` (7).
 
+This describes the legacy estate. The new ELM module is a fresh design against the synchronized
+ELM requirements bundle; it does not port the deprecated `leave` or `establishment` models.
+
 **14 of these have no DRF `api/` layer at all** and are still pure Django templates:
 `establishment`, `estate_module`, `finance_accounts`, `income_expenditure`, `hostel_management`,
 `iwdModuleV2`, `library`, `office_module`, `otheracademic`, `recruitment`, `scholarships`,

@@ -168,14 +168,17 @@ being exactly right ([academic-snapshot-integration.md](../04-placement/academic
 
 ---
 
-## Phase 6 — HR + Leave *(4–5 weeks)*
+## Phase 6 — HR + Employee Leave Management *(4–5 weeks)*
 
 Same eight-step module recipe. Parallelizable after 5c, since the platform patterns are then settled.
 
-Leave consumes `hr.contracts.get_employments(user_ids)`. Neither reads the other's tables.
-
-**Fresh domain design** — the deprecated `establishment` (19 models), `hr2` (12) and `leave` (14) apps are not
-ported ([NG2](../00-overview/vision-and-scope.md#non-goals)).
+ELM is a fresh implementation of the synchronized ELM specifications in the repository-level
+specification bundle. It consumes employment facts through `hr.contracts.get_employments(user_ids)`;
+neither module reads the other's tables. The old `establishment`, `hr2`, and `leave` apps are not
+ported. The phase gate covers all categories and balances, substitute consent, the configured
+authority paths, cancellation/extension/resumption, offline record synchronization, calendars,
+year-end accounting, role authorization, and pending-only SLA reminders and escalation. See the
+[ELM traceability reference](../09-leave/ELM_REFERENCE.md) and [accounting rules](../09-leave/leave-counting-and-entitlement.md).
 
 ---
 

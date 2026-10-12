@@ -278,6 +278,202 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "leave_management": {
+      "grants": {
+        "Faculty": [
+          "leave_management.request.view_self",
+          "leave_management.balance.view_self",
+          "leave_management.request.create",
+          "leave_management.request.withdraw",
+          "leave_management.request.cancel",
+          "leave_management.substitute.respond"
+        ],
+        "Staff": [
+          "leave_management.request.view_self",
+          "leave_management.balance.view_self",
+          "leave_management.request.create",
+          "leave_management.request.withdraw",
+          "leave_management.request.cancel",
+          "leave_management.substitute.respond"
+        ],
+        "Unit Head": [
+          "leave_management.request.view_self",
+          "leave_management.balance.view_self",
+          "leave_management.workflow.task.view",
+          "leave_management.workflow.task.decide",
+          "leave_management.request.view_all"
+        ],
+        "Substitute": [
+          "leave_management.request.view_self",
+          "leave_management.substitute.respond"
+        ],
+        "Deputy Registrar (Estt.)": [
+          "leave_management.workflow.task.view",
+          "leave_management.workflow.task.decide",
+          "leave_management.request.view_all"
+        ],
+        "Dean": [
+          "leave_management.workflow.task.view",
+          "leave_management.workflow.task.decide",
+          "leave_management.request.view_all"
+        ],
+        "Registrar": [
+          "leave_management.workflow.task.view",
+          "leave_management.workflow.task.decide",
+          "leave_management.request.view_all"
+        ],
+        "Director": [
+          "leave_management.workflow.task.view",
+          "leave_management.workflow.task.decide",
+          "leave_management.request.view_all",
+          "leave_management.request.view_self",
+          "leave_management.balance.view_self",
+          "leave_management.request.create",
+          "leave_management.request.withdraw",
+          "leave_management.request.cancel"
+        ],
+        "Leave Administrator": [
+          "leave_management.request.view_all",
+          "leave_management.balance.view_all",
+          "leave_management.policy.view",
+          "leave_management.policy.manage",
+          "leave_management.calendar.view",
+          "leave_management.calendar.manage",
+          "leave_management.records.manage",
+          "leave_management.sla.manage",
+          "leave_management.routing.manage"
+        ]
+      },
+      "module_grants": [
+        "Faculty",
+        "Staff",
+        "Unit Head",
+        "Substitute",
+        "Deputy Registrar (Estt.)",
+        "Dean",
+        "Registrar",
+        "Director",
+        "Leave Administrator"
+      ],
+      "permissions": [
+        {
+          "code": "leave_management.request.view_self",
+          "label": "View own leave requests"
+        },
+        {
+          "code": "leave_management.request.view_all",
+          "label": "View all leave requests"
+        },
+        {
+          "code": "leave_management.request.create",
+          "label": "Create and submit own leave requests"
+        },
+        {
+          "code": "leave_management.request.withdraw",
+          "label": "Withdraw own pending requests"
+        },
+        {
+          "code": "leave_management.request.cancel",
+          "label": "Request cancellation of own approved leave"
+        },
+        {
+          "code": "leave_management.balance.view_self",
+          "label": "View own leave balances and account history"
+        },
+        {
+          "code": "leave_management.balance.view_all",
+          "label": "View employee leave balances"
+        },
+        {
+          "code": "leave_management.substitute.respond",
+          "label": "Accept or decline a substitute assignment"
+        },
+        {
+          "code": "leave_management.workflow.task.view",
+          "label": "View assigned leave workflow tasks"
+        },
+        {
+          "code": "leave_management.workflow.task.decide",
+          "label": "Review or decide assigned leave workflow tasks"
+        },
+        {
+          "code": "leave_management.policy.view",
+          "label": "View current leave policy"
+        },
+        {
+          "code": "leave_management.policy.manage",
+          "label": "Maintain current leave policy parameters"
+        },
+        {
+          "code": "leave_management.calendar.view",
+          "label": "View published holiday calendars"
+        },
+        {
+          "code": "leave_management.calendar.manage",
+          "label": "Maintain and publish holiday calendars"
+        },
+        {
+          "code": "leave_management.records.manage",
+          "label": "Maintain authorized leave records and enter already sanctioned offline leave"
+        },
+        {
+          "code": "leave_management.sla.manage",
+          "label": "Configure workflow reminder and escalation thresholds"
+        },
+        {
+          "code": "leave_management.routing.manage",
+          "label": "Maintain current authority routing configuration"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "Calendar",
+        "items": [
+          {
+            "code": "leave.mine",
+            "label": "My Leave",
+            "icon": "Calendar",
+            "to": "/leave",
+            "required_permission": "leave_management.request.view_self",
+            "sort_order": 10
+          },
+          {
+            "code": "leave.tasks",
+            "label": "Leave Tasks",
+            "icon": "Checks",
+            "to": "/leave/tasks",
+            "required_permission": "leave_management.workflow.task.view",
+            "sort_order": 20
+          },
+          {
+            "code": "leave.substitutions",
+            "label": "Substitute Requests",
+            "icon": "UserCheck",
+            "to": "/leave/substitutions",
+            "required_permission": "leave_management.substitute.respond",
+            "sort_order": 25
+          },
+          {
+            "code": "leave.balances",
+            "label": "Leave Balances",
+            "icon": "Wallet",
+            "to": "/leave/balances",
+            "required_permission": "leave_management.balance.view_self",
+            "sort_order": 30
+          },
+          {
+            "code": "leave.calendar",
+            "label": "Holiday Calendar",
+            "icon": "CalendarBlank",
+            "to": "/leave/calendar",
+            "required_permission": "leave_management.calendar.view",
+            "sort_order": 40
+          }
+        ]
+      }
     }
   },
   "publisher": "integrated",
