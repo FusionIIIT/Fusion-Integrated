@@ -14,9 +14,26 @@ class Migration(migrations.Migration):
             model_name='profiledocument',
             name='profile',
         ),
-        migrations.RemoveIndex(
-            model_name='profiledocument',
-            name='document_profile_idx',
+        migrations.SeparateDatabaseAndState(
+            # Postgres drops the index with the column; SQLite rebuilds the
+            # table and the bare DROP INDEX would then fail. IF EXISTS makes
+            # this a no-op on either backend.
+            database_operations=[
+                migrations.RunSQL(
+                    sql='DROP INDEX IF EXISTS "document_profile_idx";',
+                    reverse_sql=(
+                        'CREATE INDEX "document_profile_idx" '
+                        'ON "placement_profile_document" '
+                        '("profile_id", "kind", "is_active");'
+                    ),
+                ),
+            ],
+            state_operations=[
+                migrations.RemoveIndex(
+                    model_name='profiledocument',
+                    name='document_profile_idx',
+                ),
+            ],
         ),
         migrations.RemoveField(
             model_name='application',
