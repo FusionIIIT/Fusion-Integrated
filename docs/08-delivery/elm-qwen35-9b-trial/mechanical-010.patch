@@ -1,0 +1,26 @@
+--- client/src/modules/leave_elm/json-editor.tsx
++++ client/src/modules/leave_elm/json-editor.tsx
+@@ -1,6 +1,6 @@
+ import { useState } from 'react';
+-import { Group, Stack, Text, Button, ActionIcon, Divider, SimpleGrid, Tooltip } from '@mantine/core';
+-import { Plus, Trash, Edit } from 'react-icons/rx';
++import { Group, Stack, Text, Button, ActionIcon, SimpleGrid, TextInput } from '@mantine/core';
++import { RxTrash as Trash, RxPencil2 as Edit } from 'react-icons/rx';
+ 
+ export function useJsonEditor(value: any, onChange: (value: any) => void) {
+   const [editMode, setEditMode] = useState(false);
+@@ -13,10 +13,12 @@
+     setItems([...items, { key: '', value: '' }]);
+   };
+ 
++  void addField;
++
+   const updateField = (index: number, field: 'key' | 'value', val: string) => {
+     const newItems = [...items];
+-    if (field === 'key') newItems[index].key = val;
+-    else newItems[index].value = val;
++    if (field === 'key') newItems[index]!.key = val;
++    else newItems[index]!.value = val;
+     setItems(newItems);
+   };
+ 

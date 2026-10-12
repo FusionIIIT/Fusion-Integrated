@@ -1,0 +1,30 @@
+from typing import Optional, List
+from django.db.models import QuerySet
+from modules.leave_elm.models import LeaveApplication, LeaveBalance, WorkflowTask, SLAEventLog, LeavePolicy, HolidayCalendar, VacationPeriod, OrganizationalUnit
+
+
+def get_application_by_id(application_id: int, user_id: Optional[int] = None) -> Optional[LeaveApplication]:
+    if user_id is not None:
+        return LeaveApplication.objects.filter(id=application_id, user_id=user_id).first()
+    return LeaveApplication.objects.filter(id=application_id).first()
+
+
+def get_own_applications(user_id: int) -> QuerySet[LeaveApplication]:
+    return LeaveApplication.objects.filter(user_id=user_id)
+
+
+def get_own_balances(user_id: int) -> List[LeaveBalance]:
+    return list(LeaveBalance.objects.filter(user_id=user_id))
+
+
+def get_assigned_tasks(user_id: int) -> QuerySet[WorkflowTask]:
+    return WorkflowTask.objects.filter(assigned_to_user_id=user_id, status__in=['PENDING', 'IN_PROGRESS'])
+
+
+def get_current_policy() -> LeavePolicy:
+    return LeavePolicy.objects.first()
+
+
+def get_notifications(user_id: int) -> List[SLAEventLog]:
+    tasks = WorkflowTask.objects.filter(assigned_to_user_id=user_id, status='PENDING')
+    return list(SLAEventLog.objects.filter(task__in=tasks, event_type__in=['ESCALATION', 'REMINDER']))

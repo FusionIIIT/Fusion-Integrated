@@ -1,0 +1,78 @@
+--- modules/leave_elm/api/serializers.py
++++ modules/leave_elm/api/serializers.py
+@@ -5,7 +5,7 @@
+ from modules.leave_elm.models import (
+     LeaveApplication, LeaveBalance, WorkflowTask,
+     SLAEventLog, HolidayCalendar, VacationPeriod,
+-    OrganizationalUnit, LeaveHierarchy, LeaveHierarchyStep
++    OrganizationalUnit, LeaveHierarchy, LeaveHierarchyStep, LeavePolicy
+ )
+ 
+ class LeaveApplicationSerializer(serializers.ModelSerializer):
+--- modules/leave_elm/api/views.py
++++ modules/leave_elm/api/views.py
+@@ -6,6 +6,7 @@
+ from decimal import Decimal
+ from typing import Optional
+ 
++from .serializers import LeaveApplicationSerializer, WorkflowTaskSerializer
+ from fusion_auth.principal import Principal
+ from modules.leave_elm.models import (
+     LeaveApplication, LeaveBalance, WorkflowTask, SLAEventLog,
+--- modules/leave_elm/api/urls.py
++++ modules/leave_elm/api/urls.py
+@@ -5,22 +5,22 @@
+ app_name = 'leave_elm'
+ 
+ urlpatterns = [
+-    path('', LeaveAPI.as_view(), name='root'),
+-    path('mine/', LeaveAPI.as_view(actions=['get']), name='mine'),
+-    path('apply/', LeaveAPI.as_view(actions=['post']), name='apply'),
+-    path('<int:id>/', LeaveAPI.as_view(), name='detail'),
+-    path('<int:id>/withdraw/', LeaveAPI.as_view(actions=['post']), name='withdraw'),
+-    path('<int:id>/cancel/', LeaveAPI.as_view(actions=['post']), name='cancel'),
+-    path('<int:id>/extend/', LeaveAPI.as_view(actions=['post']), name='extend'),
+-    path('<int:id>/resumption/', LeaveAPI.as_view(actions=['post']), name='resumption'),
+-    path('balances/', LeaveAPI.as_view(actions=['get']), name='balances'),
+-    path('history/', LeaveAPI.as_view(actions=['get']), name='history'),
+-    path('queue/', LeaveAPI.as_view(actions=['get']), name='queue'),
+-    path('<int:id>/substitute/accept/', LeaveAPI.as_view(actions=['post']), name='substitute_accept'),
+-    path('<int:id>/substitute/decline/', LeaveAPI.as_view(actions=['post']), name='substitute_decline'),
+-    path('<int:id>/review/', LeaveAPI.as_view(actions=['post']), name='review'),
+-    path('policy/', LeaveAPI.as_view(actions=['get']), name='policy'),
+-    path('calendar/', LeaveAPI.as_view(actions=['get']), name='calendar'),
+-    path('offline-record/', LeaveAPI.as_view(actions=['post']), name='offline_record'),
+-    path('notifications/', LeaveAPI.as_view(actions=['get']), name='notifications'),
++    path('', LeaveAPI.as_view({'get': 'mine'}), name='root'),
++    path('mine/', LeaveAPI.as_view({'get': 'mine'}), name='mine'),
++    path('apply/', LeaveAPI.as_view({'post': 'apply'}), name='apply'),
++    path('<int:id>/', LeaveAPI.as_view({'get': 'details'}), name='detail'),
++    path('<int:id>/withdraw/', LeaveAPI.as_view({'post': 'withdraw'}), name='withdraw'),
++    path('<int:id>/cancel/', LeaveAPI.as_view({'post': 'cancel'}), name='cancel'),
++    path('<int:id>/extend/', LeaveAPI.as_view({'post': 'extend'}), name='extend'),
++    path('<int:id>/resumption/', LeaveAPI.as_view({'post': 'resumption'}), name='resumption'),
++    path('balances/', LeaveAPI.as_view({'get': 'balances'}), name='balances'),
++    path('history/', LeaveAPI.as_view({'get': 'history'}), name='history'),
++    path('queue/', LeaveAPI.as_view({'get': 'queue'}), name='queue'),
++    path('<int:id>/substitute/accept/', LeaveAPI.as_view({'post': 'substitute_accept'}), name='substitute_accept'),
++    path('<int:id>/substitute/decline/', LeaveAPI.as_view({'post': 'substitute_decline'}), name='substitute_decline'),
++    path('<int:id>/review/', LeaveAPI.as_view({'post': 'review'}), name='review'),
++    path('policy/', LeaveAPI.as_view({'get': 'policy'}), name='policy'),
++    path('calendar/', LeaveAPI.as_view({'get': 'calendar'}), name='calendar'),
++    path('offline-record/', LeaveAPI.as_view({'post': 'offline_record'}), name='offline_record'),
++    path('notifications/', LeaveAPI.as_view({'get': 'notifications'}), name='notifications'),
+ ]
+--- modules/leave_elm/schedule.py
++++ modules/leave_elm/schedule.py
+@@ -1,10 +1,4 @@
+ """Task routing and schedule configuration."""
+-TASK_ROUTES = {
+-    'check_sla_tasks': 'modules.leave_elm.tasks.check_sla_tasks',
+-    'process_year_end_leave_accounts': 'modules.leave_elm.tasks.process_year_end_leave_accounts',
+-}
++TASK_ROUTES = {'modules.leave_elm.tasks.check_sla_tasks': {'queue': 'default'}, 'modules.leave_elm.tasks.process_year_end_leave_accounts': {'queue': 'default'}}
+ 
+-BEAT_SCHEDULE = [
+-    {'task': 'check_sla_tasks', 'schedule': 3600.0},
+-    {'task': 'process_year_end_leave_accounts', 'schedule': 86400.0},
+-]+BEAT_SCHEDULE = {'leave_elm.check_sla_tasks': {'task': 'modules.leave_elm.tasks.check_sla_tasks', 'schedule': 3600.0}, 'leave_elm.process_year_end_leave_accounts': {'task': 'modules.leave_elm.tasks.process_year_end_leave_accounts', 'schedule': 86400.0}}

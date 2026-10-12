@@ -1,0 +1,589 @@
+
+## foundation-python-compilation
+2026-10-12T16:23:20.743915+00:00
+Command: .venv/bin/python -m compileall -q modules/leave_elm
+
+Exit code: 0; 0.05 seconds
+
+## foundation-django-registration
+2026-10-12T16:23:24.915494+00:00
+Command: .venv/bin/python manage.py check
+SystemCheckError: System check identified some issues:
+
+ERRORS:
+leave_elm.LeaveApplication.category: (fields.E009) 'max_length' is too small to fit the longest value in 'choices' (3 characters).
+
+System check identified 1 issue (0 silenced).
+
+Exit code: 1; 0.65 seconds
+
+## foundation-registration-corrected
+2026-10-12T16:24:04.448283+00:00
+Command: .venv/bin/python manage.py check
+System check identified no issues (0 silenced).
+
+Exit code: 0; 0.57 seconds
+
+## generate-elm-schema
+2026-10-12T16:24:08.633083+00:00
+Command: .venv/bin/python manage.py makemigrations leave_elm --noinput
+Migrations for 'leave_elm':
+  modules/leave_elm/migrations/0001_initial.py
+    + Create model HolidayCalendar
+    + Create model LeaveHierarchy
+    + Create model LeavePolicy
+    + Create model OrganizationalUnit
+    + Create model VacationPeriod
+    + Create model LeaveApplication
+    + Create model LeaveBalance
+    + Create model ResumptionRecord
+    + Create model WorkflowTask
+    + Create model SLAEventLog
+    + Create model Holiday
+    + Create model LeaveHierarchyStep
+    + Create model LeaveTransaction
+    + Create index idx_task_assigned_status on field(s) assigned_to_user_id, status of model workflowtask
+    + Create index idx_task_app_status on field(s) application, status of model workflowtask
+
+Exit code: 0; 0.48 seconds
+
+## isolated-foundation-schema-install
+2026-10-12T16:24:48.505605+00:00
+Command: .venv/bin/python manage.py migrate --noinput --skip-checks
+Operations to perform:
+  Apply all migrations: accesscontrol, auth, contenttypes, directory, leave_elm
+Running migrations:
+  Applying accesscontrol.0001_initial... OK
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying directory.0001_initial... OK
+  Applying directory.0002_userref_profile_completed_userref_resume_link... OK
+  Applying leave_elm.0001_initial... OK
+
+Exit code: 0; 0.21 seconds
+
+## foundation-contract-compilation
+2026-10-12T16:26:09.218595+00:00
+Command: .venv/bin/python -m compileall -q modules/leave_elm
+
+Exit code: 0; 0.04 seconds
+
+## plural-contract-interface-check
+2026-10-12T17:13:41.529808+00:00
+Command: .venv/bin/python ops/checks/contracts_are_plural.py
+singular contract getter: modules/leave_elm/contracts.py:77 get_holidays(year: int)
+singular contract getter: modules/leave_elm/contracts.py:92 get_vacation_periods(year: int)
+
+Contract getters must be plural — take a sequence of ids.
+
+Exit code: 1; 0.03 seconds
+
+## plural-contract-interface-corrected
+2026-10-12T17:14:58.150524+00:00
+Command: .venv/bin/python ops/checks/contracts_are_plural.py
+all contract getters are plural
+
+Exit code: 0; 0.03 seconds
+
+## service-syntax-check
+2026-10-12T17:17:38.913590+00:00
+Command: .venv/bin/python -m compileall -q modules/leave_elm
+
+Exit code: 0; 0.04 seconds
+
+## service-selector-import-check
+2026-10-12T17:21:45.974700+00:00
+Command: .venv/bin/python -c import django; django.setup(); import modules.leave_elm.services.leave; import modules.leave_elm.selectors.leave; print("Service and selector imports passed")
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "<USER_HOME>/.codex/worktrees/elm-qwen35-9b/Fusion-Integrated/modules/leave_elm/services/leave.py", line 18, in <module>
+    from modules.leave_elm.domain.policy import (
+  File "<USER_HOME>/.codex/worktrees/elm-qwen35-9b/Fusion-Integrated/modules/leave_elm/domain/__init__.py", line 13, in <module>
+    from .leave_application import (
+ModuleNotFoundError: No module named 'modules.leave_elm.domain.leave_application'
+
+Exit code: 1; 0.54 seconds
+
+## service-selector-import-corrected
+2026-10-12T17:22:20.274503+00:00
+Command: .venv/bin/python -c import django; django.setup(); import modules.leave_elm.services.leave; import modules.leave_elm.selectors.leave; print("Service and selector imports passed")
+Service and selector imports passed
+
+Exit code: 0; 0.4 seconds
+
+## backend-api-registration
+2026-10-12T17:28:12.363838+00:00
+Command: .venv/bin/python manage.py check
+Traceback (most recent call last):
+  File "<USER_HOME>/.codex/worktrees/elm-qwen35-9b/Fusion-Integrated/manage.py", line 9, in <module>
+    execute_from_command_line(sys.argv)
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 436, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 420, in run_from_argv
+    self.execute(*args, **cmd_options)
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 464, in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/commands/check.py", line 81, in handle
+    self.check(
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 496, in check
+    all_issues = checks.run_checks(
+                 ^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/checks/registry.py", line 89, in run_checks
+    new_errors = check(app_configs=app_configs, databases=databases)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/checks/urls.py", line 16, in check_url_config
+    return check_resolver(resolver)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/checks/urls.py", line 26, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 531, in check
+    for pattern in self.url_patterns:
+                   ^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 718, in url_patterns
+    patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+                       ^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 711, in urlconf_module
+    return import_module(self.urlconf_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<LOCAL_RUNTIME>/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "<USER_HOME>/.codex/worktrees/elm-qwen35-9b/Fusion-Integrated/config/urls.py", line 19, in <module>
+    path("api/v1/leave/", include("modules.leave_elm.api.urls")),
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/conf.py", line 39, in include
+    urlconf_module = import_module(urlconf_module)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<LOCAL_RUNTIME>/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "<USER_HOME>/.codex/worktrees/elm-qwen35-9b/Fusion-Integrated/modules/leave_elm/api/urls.py", line 8, in <module>
+    path('', LeaveAPI.as_view(), name='root'),
+             ^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/rest_framework/viewsets.py", line 83, in as_view
+    raise TypeError("The `actions` argument must be provided when "
+TypeError: The `actions` argument must be provided when calling `.as_view()` on a ViewSet. For example `.as_view({'get': 'list'})`
+
+Exit code: 1; 0.55 seconds
+
+## backend-api-registration-corrected
+2026-10-12T17:29:15.851193+00:00
+Command: .venv/bin/python manage.py check
+System check identified no issues (0 silenced).
+
+Exit code: 0; 0.44 seconds
+
+## backend-python-compilation
+2026-10-12T17:29:34.542348+00:00
+Command: .venv/bin/python -m compileall -q modules/leave_elm
+
+Exit code: 0; 0.03 seconds
+
+## schema-model-drift
+2026-10-12T17:29:37.067198+00:00
+Command: .venv/bin/python manage.py makemigrations leave_elm --check --dry-run
+No changes detected in app 'leave_elm'
+
+Exit code: 0; 0.56 seconds
+
+## isolated-elm-schema-install
+2026-10-12T17:29:40.240103+00:00
+Command: .venv/bin/python manage.py migrate --noinput
+Operations to perform:
+  Apply all migrations: accesscontrol, auth, contenttypes, directory, leave_elm
+Running migrations:
+  No migrations to apply.
+
+Exit code: 0; 0.82 seconds
+
+## full-baseline-schema-install
+2026-10-12T17:29:44.755096+00:00
+Command: .venv/bin/python manage.py migrate --noinput
+Operations to perform:
+  Apply all migrations: accesscontrol, auth, contenttypes, directory, leave_elm, placement
+Running migrations:
+  Applying accesscontrol.0001_initial... OK
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying directory.0001_initial... OK
+  Applying directory.0002_userref_profile_completed_userref_resume_link... OK
+  Applying leave_elm.0001_initial... OK
+  Applying placement.0001_initial... OK
+  Applying placement.0002_announcement_companycontact_interviewround_and_more... OK
+  Applying placement.0003_remove_placementpolicy_dream_threshold_lpa_and_more... OK
+  Applying placement.0004_document_drive_link... OK
+  Applying placement.0005_outbox_claim... OK
+  Applying placement.0006_conduct_incidents... OK
+  Applying placement.0007_registration_flow... OK
+  Applying placement.0008_post_offer_obligations... OK
+  Applying placement.0009_remove_profiledocument_profile_and_more...Traceback (most recent call last):
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such index: document_profile_idx
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<USER_HOME>/.codex/worktrees/elm-qwen35-9b/Fusion-Integrated/manage.py", line 9, in <module>
+    execute_from_command_line(sys.argv)
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 436, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 420, in run_from_argv
+    self.execute(*args, **cmd_options)
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 464, in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 111, in wrapper
+    res = handle_func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/commands/migrate.py", line 353, in handle
+    post_migrate_state = executor.migrate(
+                         ^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/migrations/executor.py", line 135, in migrate
+    state = self._migrate_all_forwards(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/migrations/executor.py", line 167, in _migrate_all_forwards
+    state = self.apply_migration(
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/migrations/executor.py", line 255, in apply_migration
+    state = migration.apply(state, schema_editor)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/migrations/migration.py", line 132, in apply
+    operation.database_forwards(
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/migrations/operations/models.py", line 1015, in database_forwards
+    schema_editor.remove_index(model, index)
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/backends/base/schema.py", line 578, in remove_index
+    self.execute(index.remove_sql(model, self))
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/backends/base/schema.py", line 204, in execute
+    cursor.execute(sql, params)
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: no such index: document_profile_idx
+
+Exit code: 1; 1.36 seconds
+
+## registered-import-boundaries
+2026-10-12T17:29:54.798059+00:00
+Command: .venv/bin/lint-imports
+
+╔══╗─────────▶╔╗ ╔╗      ╔╗◀───┐
+╚╣╠╝◀─────┐  ╔╝╚╗║║────▶╔╝╚╗   │
+ ║║   ╔══╦══╦╩╗╔╝║║  ╔╦═╩╗╔╝╔═╦══╗
+ ║║╔══╣╔╗║╔╗║╔╣║ ║║ ╔╬╣╔╗║║ ║│║╔═╝
+╔╣╠╣║║║╚╝║╚╝║║║╚╗║╚═╝║║║║║╚╗║═╣║
+╚══╩╩╩╣╔═╩══╩╝╚═╝╚═══╩╩╝╚╩═╩╩═╩╝
+  └──▶║║                    ▲ 
+      ╚╝────────────────────┘
+
+
+---------
+Contracts
+---------
+
+Analyzed 220 files, 655 dependencies.
+-------------------------------------
+
+Modules may reach each other ONLY through contracts.py KEPT
+domain/ must not import Django, DRF or Celery KEPT
+core/ must not import any module KEPT
+Layering inside placement KEPT
+Layering inside ELM KEPT
+
+Contracts: 5 kept, 0 broken.
+
+Exit code: 0; 0.21 seconds
+
+## isolated-module-registration
+2026-10-12T17:29:59.177179+00:00
+Command: .venv/bin/python manage.py seed_modules
+  registered leave_elm (active)
+1 module(s) registered
+
+Exit code: 0; 0.42 seconds
+
+## cross-module-schema-boundaries
+2026-10-12T17:30:25.786120+00:00
+Command: .venv/bin/python -c import django; django.setup(); from django.apps import apps; models=list(apps.get_app_config("leave_elm").get_models()); bad=[f"{m.__name__}.{f.name}" for m in models for f in m._meta.fields if f.is_relation and f.related_model._meta.app_label != "leave_elm"]; assert not bad,bad; print(f"{len(models)} ELM models; no cross-module foreign keys")
+13 ELM models; no cross-module foreign keys
+
+Exit code: 0; 0.23 seconds
+
+## backend-task-imports
+2026-10-12T17:30:28.973287+00:00
+Command: .venv/bin/python -c import django; django.setup(); import modules.leave_elm.tasks; from config.celery import app; assert isinstance(app.conf.beat_schedule,dict); print("Task imports and schedule configuration passed")
+Task imports and schedule configuration passed
+
+Exit code: 0; 1.04 seconds
+
+## api-schema-generation
+2026-10-12T17:30:31.835080+00:00
+Command: .venv/bin/python manage.py spectacular --file /private/tmp/elm-qwen35-openapi.yaml --validate
+Warning: operationId "v1_leave_retrieve" has collisions [('/api/v1/leave/', 'get'), ('/api/v1/leave/{id}/', 'get')]. resolving with numeral suffixes.
+
+Schema generation summary:
+Warnings: 1 (1 unique)
+Errors:   0 (0 unique)
+
+
+Exit code: 0; 0.79 seconds
+
+## permission-manifest-registration
+2026-10-12T17:30:51.400705+00:00
+Command: .venv/bin/python manage.py permission_manifest
+CommandError: permission manifest is invalid:
+  - leave_elm: leave_elm.calendar.manage is declared and granted, but no endpoint or service checks it — so the thing it names cannot be done at all. Either the feature is missing, or the permission is.
+  - leave_elm: leave_elm.hierarchy.manage is declared and granted, but no endpoint or service checks it — so the thing it names cannot be done at all. Either the feature is missing, or the permission is.
+  - leave_elm: leave_elm.leave.apply is declared and granted, but no endpoint or service checks it — so the thing it names cannot be done at all. Either the feature is missing, or the permission is.
+  - leave_elm: leave_elm.leave.approve is declared and granted, but no endpoint or service checks it — so the thing it names cannot be done at all. Either the feature is missing, or the permission is.
+  - leave_elm: leave_elm.leave.cancel is declared and granted, but no endpoint or service checks it — so the thing it names cannot be done at all. Either the feature is missing, or the permission is.
+  - leave_elm: leave_elm.leave.extend is declared and granted, but no endpoint or service checks it — so the thing it names cannot be done at all. Either the feature is missing, or the permission is.
+  - leave_elm: leave_elm.leave.reject is declared and granted, but no endpoint or service checks it — so the thing it names cannot be done at all. Either the feature is missing, or the permission is.
+  - leave_elm: leave_elm.leave.resumption is declared and granted, but no endpoint or service checks it — so the thing it names cannot be done at all. Either the feature is missing, or the permission is.
+  - leave_elm: leave_elm.leave.review is declared and granted, but no endpoint or service checks it — so the thing it names cannot be done at all. Either the feature is missing, or the permission is.
+  - leave_elm: leave_elm.leave.view is declared and granted, but no endpoint or service checks it — so the thing it names cannot be done at all. Either the feature is missing, or the permission is.
+  - leave_elm: leave_elm.leave.view_self is declared and granted, but no endpoint or service checks it — so the thing it names cannot be done at all. Either the feature is missing, or the permission is.
+  - leave_elm: leave_elm.leave.withdraw is declared and granted, but no endpoint or service checks it — so the thing it names cannot be done at all. Either the feature is missing, or the permission is.
+  - leave_elm: leave_elm.policy.manage is declared and granted, but no endpoint or service checks it — so the thing it names cannot be done at all. Either the feature is missing, or the permission is.
+  - leave_elm: leave_elm.record.maintain is declared and granted, but no endpoint or service checks it — so the thing it names cannot be done at all. Either the feature is missing, or the permission is.
+  - leave_elm: leave_elm.substitute.accept is declared and granted, but no endpoint or service checks it — so the thing it names cannot be done at all. Either the feature is missing, or the permission is.
+  - leave_elm: leave_elm.substitute.decline is declared and granted, but no endpoint or service checks it — so the thing it names cannot be done at all. Either the feature is missing, or the permission is.
+
+Exit code: 1; 0.58 seconds
+
+## frontend-first-typecheck
+2026-10-12T17:37:58.079474+00:00
+Command: <USER_HOME>/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/typescript/bin/tsc --noEmit
+src/modules/leave_elm/api/types.ts(1,39): error TS2307: Cannot find module '../models' or its corresponding type declarations.
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(1,10): error TS6133: 'useEffect' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(4,29): error TS6196: 'LeaveRequest' is declared but never used.
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(49,5): error TS2322: Type '(id: number, newSubId?: number) => Promise<AxiosResponse<any, { new_substitute_user_id: number | undefined; }, {}, any>>' is not assignable to type 'MutationFunction<AxiosResponse<any, { new_substitute_user_id: number | undefined; }, {}, any>, number>'.
+  Types of parameters 'newSubId' and 'context' are incompatible.
+    Type 'MutationFunctionContext' is not assignable to type 'number'.
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(81,30): error TS7006: Parameter 'task' implicitly has an 'any' type.
+src/modules/leave_elm/pages/MyLeavePage.tsx(3,65): error TS6133: 'Divider' is declared but its value is never read.
+src/modules/leave_elm/pages/MyLeavePage.tsx(6,55): error TS2305: Module '"../api/hooks"' has no exported member 'errorMessage'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(15,39): error TS2345: Argument of type '{}' is not assignable to parameter of type 'LeaveRequest'.
+  Type '{}' is missing the following properties from type 'LeaveRequest': category, start_date, end_date
+src/modules/leave_elm/pages/MyLeavePage.tsx(23,7): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(24,7): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(58,64): error TS2322: Type '{ children: string; onClick: () => void; active: boolean; }' is not assignable to type 'IntrinsicAttributes & ButtonProps & ComponentProp<"button"> & Omit<Omit<DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>, "ref">, "component" | keyof ButtonProps> & { ...; }'.
+  Property 'active' does not exist on type 'IntrinsicAttributes & ButtonProps & ComponentProp<"button"> & Omit<Omit<DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>, "ref">, "component" | keyof ButtonProps> & { ...; }'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(59,60): error TS2322: Type '{ children: string; onClick: () => void; active: boolean; }' is not assignable to type 'IntrinsicAttributes & ButtonProps & ComponentProp<"button"> & Omit<Omit<DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>, "ref">, "component" | keyof ButtonProps> & { ...; }'.
+  Property 'active' does not exist on type 'IntrinsicAttributes & ButtonProps & ComponentProp<"button"> & Omit<Omit<DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>, "ref">, "component" | keyof ButtonProps> & { ...; }'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(64,28): error TS2339: Property 'map' does not exist on type 'NoInfer<AxiosResponse<any, any, {}, any>>'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(64,33): error TS7006: Parameter 'app' implicitly has an 'any' type.
+src/modules/leave_elm/pages/MyLeavePage.tsx(85,24): error TS2339: Property 'map' does not exist on type 'NoInfer<AxiosResponse<any, any, {}, any>>'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(85,29): error TS7006: Parameter 'bal' implicitly has an 'any' type.
+src/modules/leave_elm/pages/MyLeavePage.tsx(98,39): error TS2345: Argument of type '(values: LeaveRequest) => void' is not assignable to parameter of type '(values: Values, event: FormEvent<HTMLFormElement> | undefined) => void'.
+  Types of parameters 'values' and 'values' are incompatible.
+    Type 'Values' is not assignable to type 'LeaveRequest'.
+      Type 'Record<string, any>' is missing the following properties from type 'LeaveRequest': category, start_date, end_date
+src/modules/leave_elm/pages/MyLeavePage.tsx(114,14): error TS2304: Cannot find name 'Textarea'.
+src/modules/leave_elm/routes.tsx(6,42): error TS2307: Cannot find module './pages/LeaveAdminPage' or its corresponding type declarations.
+
+Exit code: 2; 2.88 seconds
+
+## frontend-after-interface-corrections
+2026-10-12T17:40:16.175823+00:00
+Command: <USER_HOME>/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/typescript/bin/tsc --noEmit
+src/modules/leave_elm/api/types.ts(1,39): error TS2307: Cannot find module '../models' or its corresponding type declarations.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(2,63): error TS6133: 'NumberInput' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(2,76): error TS6133: 'Select' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(2,84): error TS6133: 'ActionIcon' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,31): error TS2307: Cannot find module '../../../lib/json-editor' or its corresponding type declarations.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(4,1): error TS6133: 'http' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(13,9): error TS6133: 'balancesQuery' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(36,8): error TS2322: Type '{ children: Element; title: string; subtitle: string; }' is not assignable to type 'IntrinsicAttributes & { title: string; subtitle?: string | undefined; action?: ReactNode; }'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & { title: string; subtitle?: string | undefined; action?: ReactNode; }'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(119,39): error TS2339: Property 'map' does not exist on type 'AxiosResponse<any, any, {}, any>'.
+
+Exit code: 2; 1.95 seconds
+
+## frontend-complete-typecheck
+2026-10-12T17:42:48.470292+00:00
+Command: <USER_HOME>/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/typescript/bin/tsc --noEmit
+src/modules/leave_elm/json-editor.tsx(2,50): error TS6133: 'Divider' is declared but its value is never read.
+src/modules/leave_elm/json-editor.tsx(2,71): error TS6133: 'Tooltip' is declared but its value is never read.
+src/modules/leave_elm/json-editor.tsx(3,10): error TS2305: Module '"react-icons/rx"' has no exported member 'Plus'.
+src/modules/leave_elm/json-editor.tsx(3,10): error TS6133: 'Plus' is declared but its value is never read.
+src/modules/leave_elm/json-editor.tsx(3,16): error TS2724: '"react-icons/rx"' has no exported member named 'Trash'. Did you mean 'RxTrash'?
+src/modules/leave_elm/json-editor.tsx(3,23): error TS2305: Module '"react-icons/rx"' has no exported member 'Edit'.
+src/modules/leave_elm/json-editor.tsx(12,9): error TS6133: 'addField' is declared but its value is never read.
+src/modules/leave_elm/json-editor.tsx(18,26): error TS2532: Object is possibly 'undefined'.
+src/modules/leave_elm/json-editor.tsx(19,10): error TS2532: Object is possibly 'undefined'.
+src/modules/leave_elm/json-editor.tsx(50,18): error TS2304: Cannot find name 'TextInput'.
+src/modules/leave_elm/json-editor.tsx(53,30): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/modules/leave_elm/json-editor.tsx(56,18): error TS2304: Cannot find name 'TextInput'.
+src/modules/leave_elm/json-editor.tsx(59,30): error TS7006: Parameter 'e' implicitly has an 'any' type.
+
+Exit code: 2; 1.59 seconds
+
+## frontend-final-typecheck
+2026-10-12T17:43:27.821860+00:00
+Command: <USER_HOME>/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/typescript/bin/tsc --noEmit
+
+Exit code: 0; 1.52 seconds
+
+## backend-final-registration
+2026-10-12T17:43:44.071932+00:00
+Command: .venv/bin/python manage.py check
+System check identified no issues (0 silenced).
+
+Exit code: 0; 0.62 seconds
+
+## frontend-production-build
+2026-10-12T17:43:44.752029+00:00
+Command: npm run build
+
+> build
+> tsc -b && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 1052 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                       0.53 kB │ gzip:   0.33 kB
+dist/assets/iiitdmj_logo-v9-ebxtE.png                30.89 kB
+dist/assets/IIITJ_logo-BnzEnV7U.webp                 64.62 kB
+dist/assets/index-B68ekXUP.css                      210.03 kB │ gzip:  31.37 kB
+dist/assets/create-event-handler-C3eq9ghx.js          0.07 kB │ gzip:   0.08 kB │ map:     0.67 kB
+dist/assets/get-base-value-JqT_q0U7.js                0.09 kB │ gzip:   0.11 kB │ map:     0.62 kB
+dist/assets/clamp-DTmYCdls.js                         0.15 kB │ gzip:   0.11 kB │ map:     0.80 kB
+dist/assets/PageHeader-v_ev6Nrm.js                    0.32 kB │ gzip:   0.24 kB │ map:     1.18 kB
+dist/assets/ErrorState-D3K8dncS.js                    0.35 kB │ gzip:   0.26 kB │ map:     1.26 kB
+dist/assets/StatusBadge-BAW9FDdd.js                   0.42 kB │ gzip:   0.30 kB │ map:     1.18 kB
+dist/assets/FormSection-DWq4H55I.js                   0.55 kB │ gzip:   0.33 kB │ map:     2.08 kB
+dist/assets/Paper-DHlmyivT.js                         0.65 kB │ gzip:   0.41 kB │ map:     3.57 kB
+dist/assets/CheckIcon-CE_IJjjE.js                     0.70 kB │ gzip:   0.41 kB │ map:     2.78 kB
+dist/assets/hooks-WkPpo9fQ.js                         0.72 kB │ gzip:   0.30 kB │ map:     4.25 kB
+dist/assets/Divider-rSCHxg0D.js                       0.84 kB │ gzip:   0.50 kB │ map:     4.16 kB
+dist/assets/CpiBadge-CyRaf445.js                      0.89 kB │ gzip:   0.52 kB │ map:     2.85 kB
+dist/assets/RecruiterLoginPage-DTOdZ7p_.js            0.98 kB │ gzip:   0.61 kB │ map:     3.54 kB
+dist/assets/routes-Cnm3lfb0.js                        1.12 kB │ gzip:   0.56 kB │ map:     1.12 kB
+dist/assets/Card-htpAiqOv.js                          1.26 kB │ gzip:   0.67 kB │ map:     7.44 kB
+dist/assets/List-B04shIQe.js                          1.49 kB │ gzip:   0.72 kB │ map:     8.17 kB
+dist/assets/Progress-DOZ0dw7H.js                      2.33 kB │ gzip:   0.99 kB │ map:    13.61 kB
+dist/assets/SimpleGrid-Bl6g8iZ4.js                    2.34 kB │ gzip:   0.97 kB │ map:    11.70 kB
+dist/assets/MyApplicationsPage-D8Rn9Rh3.js            2.57 kB │ gzip:   1.28 kB │ map:     7.15 kB
+dist/assets/Switch-wU5tEfxK.js                        2.75 kB │ gzip:   1.31 kB │ map:    12.59 kB
+dist/assets/LeaveTasksPage-BbAj3JYf.js                2.79 kB │ gzip:   1.01 kB │ map:     8.91 kB
+dist/assets/RegistrationApprovalsPage-TpeaYz0r.js     2.83 kB │ gzip:   1.43 kB │ map:     7.68 kB
+dist/assets/AcceptInvitePage-C_-sIwYu.js              3.01 kB │ gzip:   1.44 kB │ map:     9.43 kB
+dist/assets/Grid-CtKALTPn.js                          3.57 kB │ gzip:   1.43 kB │ map:    19.16 kB
+dist/assets/routes-BFmfvs8c.js                        3.57 kB │ gzip:   1.30 kB │ map:     3.55 kB
+dist/assets/Textarea-5yzx1gR4.js                      3.63 kB │ gzip:   1.66 kB │ map:    17.08 kB
+dist/assets/HistoryDrawer-1S72p08F.js                 3.74 kB │ gzip:   1.69 kB │ map:    16.39 kB
+dist/assets/FocusTrap-BYOQuxc2.js                     3.84 kB │ gzip:   1.63 kB │ map:    17.67 kB
+dist/assets/Table-BMSyIG-9.js                         4.02 kB │ gzip:   1.57 kB │ map:    18.14 kB
+dist/assets/Drawer-BXEXq1s_.js                        4.17 kB │ gzip:   1.42 kB │ map:    25.32 kB
+dist/assets/InterviewsPage-BgU6mX-0.js                4.18 kB │ gzip:   1.91 kB │ map:    11.69 kB
+dist/assets/AnnouncementsPage-w77NP4Mf.js             4.24 kB │ gzip:   1.86 kB │ map:    12.08 kB
+dist/assets/FormModal-GVpV35v6.js                     5.10 kB │ gzip:   1.84 kB │ map:    28.64 kB
+dist/assets/NativeScrollArea-DG5TJTX4.js              5.46 kB │ gzip:   2.16 kB │ map:    28.01 kB
+dist/assets/RecruiterInterviewsPage-M2ep1Lae.js       5.49 kB │ gzip:   2.36 kB │ map:    16.32 kB
+dist/assets/ReportsPage-B4PJ1Tl1.js                   5.63 kB │ gzip:   2.04 kB │ map:    15.94 kB
+dist/assets/RegistrationPage-DYY9gdR2.js              5.76 kB │ gzip:   2.33 kB │ map:    15.82 kB
+dist/assets/RecruiterApplicantsPage-vptZP_7_.js       5.89 kB │ gzip:   2.56 kB │ map:    16.69 kB
+dist/assets/RecruiterPostingsPage-DzPNKpQf.js         5.99 kB │ gzip:   2.47 kB │ map:    17.44 kB
+dist/assets/CompaniesPage-CTYzBeMz.js                 6.53 kB │ gzip:   2.65 kB │ map:    20.69 kB
+dist/assets/hooks-D-M2wT_-.js                         6.93 kB │ gzip:   1.77 kB │ map:    31.46 kB
+dist/assets/Popover-CNQxeaAu.js                       7.59 kB │ gzip:   3.10 kB │ map:    29.95 kB
+dist/assets/Menu-CiYfnWP5.js                          7.85 kB │ gzip:   2.95 kB │ map:    36.52 kB
+dist/assets/LeaveAdminPage-Cun8KhWq.js                7.98 kB │ gzip:   2.99 kB │ map:   468.02 kB
+dist/assets/ApplicationsPage-B8X0IsVV.js              8.09 kB │ gzip:   3.40 kB │ map:    24.85 kB
+dist/assets/DataTable-Cduh3L5P.js                     8.51 kB │ gzip:   3.15 kB │ map:    42.32 kB
+dist/assets/OffersPage-ww2k1nSD.js                    8.75 kB │ gzip:   3.19 kB │ map:    25.35 kB
+dist/assets/TagsInput-D3O6M0SX.js                     8.83 kB │ gzip:   3.34 kB │ map:    42.85 kB
+dist/assets/DateTimePicker-CIRG8H0h.js                8.90 kB │ gzip:   3.44 kB │ map:    36.58 kB
+dist/assets/StudentCpiPage-ElToL2_j.js               11.29 kB │ gzip:   4.41 kB │ map:    43.42 kB
+dist/assets/PostingsPage-DzDibfkc.js                 12.20 kB │ gzip:   4.68 kB │ map:    36.26 kB
+dist/assets/Select-Bn2fiBzu.js                       20.12 kB │ gzip:   6.50 kB │ map:    87.40 kB
+dist/assets/MyLeavePage-DcqEDOZd.js                  20.58 kB │ gzip:   7.35 kB │ map:    85.63 kB
+dist/assets/NumberInput-DqstyopP.js                  21.07 kB │ gzip:   8.11 kB │ map:   117.74 kB
+dist/assets/pick-calendar-levels-props-BzhtZT5i.js   43.72 kB │ gzip:  12.55 kB │ map:   153.03 kB
+dist/assets/index-dnsp4utU.js                       502.78 kB │ gzip: 162.46 kB │ map: 3,674.46 kB
+✓ built in 1.69s
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+Exit code: 0; 4.4 seconds
+
+## navigation-route-registration
+2026-10-12T17:43:59.538271+00:00
+Command: .venv/bin/python -c from pathlib import Path; from modules.leave_elm.registry import MODULE,NAV_ITEMS; import re; text=Path("client/src/modules/leave_elm/routes.tsx").read_text(); paths=set(re.findall(r"path: [\x27\x22]([^\x27\x22]+)",text)); assert all(n["to"] == MODULE["base_path"]+"/"+n["to"].rsplit("/",1)[-1] and n["to"].rsplit("/",1)[-1] in paths for n in NAV_ITEMS); registry=Path("client/src/app/registry.ts").read_text(); assert "leave_elm" in registry and "../modules/leave_elm/routes" in registry; print("Registered nav targets correspond to declared frontend routes")
+Registered nav targets correspond to declared frontend routes
+
+Exit code: 0; 0.03 seconds

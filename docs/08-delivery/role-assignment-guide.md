@@ -27,7 +27,6 @@ Full, exact, OS-specific commands live in `Fusion-README` — follow whichever
 one matches your machine, start to finish, before continuing to Part 2:
 
 - **Windows / WSL or native Ubuntu:** [`QUICKSTART.md`](https://github.com/FusionIIIT/Fusion-README/blob/main/QUICKSTART.md)
-- **macOS:** [`QUICKSTART-macOS.md`](https://github.com/FusionIIIT/Fusion-README/blob/main/QUICKSTART-macOS.md)
 - **Anything that doesn't fit either** (different OS, something already partly
   set up): [`Fusion_System_Setup.md`](https://github.com/FusionIIIT/Fusion-README/blob/main/Fusion_System_Setup.md)
 

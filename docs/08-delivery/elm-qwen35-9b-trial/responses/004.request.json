@@ -1,0 +1,15 @@
+{
+  "model": "qwen3.5:9b",
+  "system": "You are a local coding assistant. Follow CURRENT TASK after references. Return complete raw source for the one requested file. Do not claim tests or add provenance labels.",
+  "prompt": "REFERENCE MATERIAL ONLY\n\n\n### Repository file docs/08-delivery/elm-qwen35-9b-trial/model-field-interfaces.md\n```\nLeavePolicy: CL_DAYS, RH_DAYS, SCL_MAX_DAYS, EL_DAYS, COL_DAYS, VL_DAYS, VL_TO_EL_RATIO\nHolidayCalendar: year, is_effective, created_by_user_id\nHoliday: calendar, date, type, name\nVacationPeriod: year, start_date, end_date, name\nOrganizationalUnit: code, name, parent_unit_id, unit_head_user_id\nLeaveHierarchy: name, description\nLeaveHierarchyStep: hierarchy, order, role_code, is_establishment_step\nLeaveApplication: STATUS_CHOICES, category, user_id, start_date, end_date, purpose, station_leave_required, station_leave_details, substitute_user_id, substitute_consent_given, status, unit_head_user_id, hierarchy_step_order, final_decision_user_id, final_decision_date, final_decision_type, original_application_id, extension_incremental_days, actual_resumption_date, resumption_type, created_by_user_id, updated_by_user_id, submitted_by_user_id, withdrawn_by_user_id, cancelled_by_user_id\nLeaveBalance: user_id, effective_date, cl_balance, rh_balance, scl_balance, el_balance, col_balance, vl_balance\nLeaveTransaction: TRANSACTION_TYPE_CHOICES, application, user_id, transaction_type, category, quantity, balance_before, balance_after, reference_application_id, reference_transaction_id, processed_by_user_id, processed_at\nWorkflowTask: TASK_TYPE_CHOICES, application, task_type, assigned_to_user_id, role_code, status, reminder_threshold_seconds, escalation_threshold_seconds, last_reminder_sent_at, last_escalation_sent_at, completed_at, completed_by_user_id\nSLAEventLog: EVENT_TYPE_CHOICES, task, event_type, triggered_at, threshold_seconds, message\nResumptionRecord: application, user_id, actual_resumption_date, resumption_type, reviewed_by_user_id, reviewed_at, balance_adjustment\n\n```\n\n\nEND OF REFERENCES\n\nCURRENT TASK\n\nGenerate selectors/leave.py only, maximum60 lines. Reuse the exact current model names/fields. Provide get_application_by_id(application_id:int,user_id:Optional[int]=None), get_own_applications(user_id:int), get_own_balances(user_id:int), get_assigned_tasks(user_id:int), get_current_policy(), and get_notifications(user_id:int) using whatever actual event-log model is available. Return ORM querysets/model instances, imports own models from modules.leave_elm.models. Initial selector generation only; no model or service changes, workflow checks or business-rule repairs. Keep concise and complete.\n\nOutput file: modules/leave_elm/selectors/leave.py\nReturn only complete raw source code, without JSON, explanation or Markdown fences.\n",
+  "stream": true,
+  "keep_alive": "15m",
+  "options": {
+    "temperature": 0.2,
+    "seed": 42,
+    "num_ctx": 8192,
+    "num_batch": 128,
+    "num_predict": 1600
+  },
+  "think": false
+}

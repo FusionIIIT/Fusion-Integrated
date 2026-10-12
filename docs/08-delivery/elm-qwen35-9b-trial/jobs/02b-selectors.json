@@ -1,0 +1,19 @@
+{
+  "label": "Complete missing selectors",
+  "instruction": "Generate selectors/leave.py only, maximum60 lines. Reuse the exact current model names/fields. Provide get_application_by_id(application_id:int,user_id:Optional[int]=None), get_own_applications(user_id:int), get_own_balances(user_id:int), get_assigned_tasks(user_id:int), get_current_policy(), and get_notifications(user_id:int) using whatever actual event-log model is available. Return ORM querysets/model instances, imports own models from modules.leave_elm.models. Initial selector generation only; no model or service changes, workflow checks or business-rule repairs. Keep concise and complete.",
+  "allowed_paths": [
+    "modules/leave_elm/selectors/leave.py"
+  ],
+  "context_files": [
+    "docs/08-delivery/elm-qwen35-9b-trial/model-field-interfaces.md"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 1600,
+  "options": {
+    "temperature": 0.2,
+    "seed": 42,
+    "num_ctx": 8192,
+    "num_batch": 128
+  }
+}
