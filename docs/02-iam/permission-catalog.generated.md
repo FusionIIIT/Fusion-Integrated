@@ -13,6 +13,22 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave.request.create` | Apply for leave | `Deputy Registrar`, `Director`, `Registrar`, `faculty`, `staff`, `unit_head` |
+| `leave.request.view_self` | View own leave requests and history | `Deputy Registrar`, `Director`, `Registrar`, `faculty`, `staff`, `unit_head` |
+| `leave.balance.view` | View own leave balances | `Deputy Registrar`, `Director`, `Registrar`, `faculty`, `staff`, `unit_head` |
+| `leave.substitute.respond` | Accept or decline substitute duty | `Deputy Registrar`, `Director`, `Registrar`, `faculty`, `staff`, `unit_head` |
+| `leave.request.review` | Review unit head leave requests | `unit_head` |
+| `leave.resumption.verify` | Verify resumption of leave | `unit_head` |
+| `leave.request.route` | Route higher-sanction leave requests | `Deputy Registrar` |
+| `leave.request.sanction` | Sanction leave requests | `Director`, `Registrar` |
+| `leave.policy.manage` | Manage leave policies | `leave_admin` |
+| `leave.calendar.manage` | Manage leave calendar | `leave_admin` |
+| `leave.offline.record` | Record offline-sanctioned leave | `leave_admin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
