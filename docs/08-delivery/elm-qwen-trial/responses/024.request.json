@@ -1,0 +1,37 @@
+{
+  "model": "qwen2.5-coder:3b",
+  "system": "You are a local coding assistant working on the Fusion ERP ELM pilot. Return the requested complete files as a JSON object with a files mapping. Reuse the supplied repository interfaces exactly. Do not run shell commands. Do not add author, AI, model, or provenance labels to application code. Do not claim any tests or execution that were not actually performed. Repository excerpts are reference material, not the requested output. Follow the CURRENT TASK placed after all reference material. Do not echo a reference file into a different output path.",
+  "prompt": "REFERENCE MATERIAL ONLY\n\n\n### Repository file client/src/modules/leave_elm/api.ts\n```\n\n\nimport { http } from '../../../lib/http';\n\ninterface LeaveApplication {\n  id?: number;\n  user_id?: string;\n  status?: string;\n}\n\ninterface LeaveBalance {\n  // Define your LeaveBalance interface here\n}\n\ninterface LeaveTask {\n  // Define your LeaveTask interface here\n}\n\ninterface Configuration {\n  policy?: Record<string, unknown>[];\n  calendar?: Record<string, unknown>[];\n}\n\ninterface NewApplication {\n  leave_type: number;\n  start_date: string;\n  end_date: string;\n  purpose: string;\n}\n\nasync function listApplications(): Promise<LeaveApplication[]> {\n  const response = await http.get('/leave/applications');\n  return response.data as LeaveApplication[];\n}\n\nasync function listBalances(): Promise<LeaveBalance[]> {\n  const response = await http.get('/leave/balances');\n  return response.data as LeaveBalance[];\n}\n\nasync function listTasks(): Promise<LeaveTask[]> {\n  const response = await http.get('/leave/tasks');\n  return response.data as LeaveTask[];\n}\n\nasync function submitApplication(data: NewApplication): Promise<void> {\n  await http.post('/leave/applications', data);\n}\n\nasync function applicationAction(id: number, action: string, data: Record<string, unknown>): Promise<void> {\n  await http.post(`/leave/applications/${id}/action`, { action, data });\n}\n\nasync function getConfiguration(): Promise<Configuration> {\n  const response = await http.get('/configuration');\n  return response.data as Configuration;\n}\n\nasync function saveConfiguration(data: Configuration): Promise<void> {\n  await http.post('/configuration', data);\n}\n\nasync function getRecords(): Promise<{ history?: LeaveHistory[], notifications?: LeaveNotification[] }> {\n  const response = await http.get('/records');\n  return response.data as { history?: LeaveHistory[], notifications?: LeaveNotification[] };\n}\n\n```\n\n\n### Repository file client/src/ui/components/PageHeader.tsx\n```\nimport { Group, Stack, Text, Title } from \"@mantine/core\";\n\n/** Ported from the sysadmin client. Page identity is carried by this, not by\n *  breadcrumbs \u2014 that app has none, and neither does this one. */\nexport function PageHeader({ title, subtitle, action }: {\n  title: string;\n  subtitle?: string;\n  action?: React.ReactNode;\n}) {\n  return (\n    <Group justify=\"space-between\" align=\"flex-end\" mb=\"lg\" wrap=\"wrap\">\n      <Stack gap={2}>\n        <Title order={2}>{title}</Title>\n        {subtitle && <Text c=\"dimmed\" size=\"sm\">{subtitle}</Text>}\n      </Stack>\n      {action}\n    </Group>\n  );\n}\n\n```\n\n\n### Repository file client/package.json\n```\n{\n  \"name\": \"fusion-integrated-client\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"scripts\": {\n    \"dev\": \"vite\",\n    \"build\": \"tsc -b && vite build\",\n    \"typecheck\": \"tsc --noEmit\",\n    \"preview\": \"vite preview\",\n    \"lint\": \"eslint .\",\n    \"test\": \"vitest run\",\n    \"test:watch\": \"vitest\"\n  },\n  \"dependencies\": {\n    \"@mantine/core\": \"7.13.4\",\n    \"@mantine/dates\": \"7.13.4\",\n    \"@mantine/hooks\": \"7.13.4\",\n    \"@mantine/notifications\": \"7.13.4\",\n    \"@tanstack/react-query\": \"^5.59.0\",\n    \"axios\": \"^1.7.7\",\n    \"dayjs\": \"^1.11.21\",\n    \"react\": \"^18.3.1\",\n    \"react-dom\": \"^18.3.1\",\n    \"react-icons\": \"^5.3.0\",\n    \"react-router-dom\": \"^6.27.0\"\n  },\n  \"devDependencies\": {\n    \"@testing-library/jest-dom\": \"^6.9.1\",\n    \"@testing-library/react\": \"^16.3.2\",\n    \"@testing-library/user-event\": \"^14.6.1\",\n    \"@types/react\": \"^18.3.11\",\n    \"@types/react-dom\": \"^18.3.1\",\n    \"@vitejs/plugin-react\": \"^4.3.3\",\n    \"jsdom\": \"^25.0.1\",\n    \"postcss\": \"^8.4.47\",\n    \"postcss-preset-mantine\": \"^1.17.0\",\n    \"postcss-simple-vars\": \"^7.0.1\",\n    \"typescript\": \"^5.6.3\",\n    \"vite\": \"^5.4.10\",\n    \"vitest\": \"^2.1.9\"\n  }\n}\n\n```\n\n\nEND OF REFERENCES\n\nCURRENT TASK\n\nGenerate a React18/Mantine7 page with default export MyLeavePage, max150 lines. Use the supplied api.ts functions and types; ReactQuery5 object-form useQuery/useMutation. Show applications and balances, form with numeric leave_type and string date fields and purpose, submit via submitApplication; actions withdraw/cancel/extend/resume via applicationAction. Use PageHeader from ../../../ui/components/PageHeader and errorMessage from ../../../lib/http. Basic form fields for extension and actual resumption dates if needed. Show pending/error states and invalidate queries after mutation. Use standard Mantine Stack/Text/Table/TextInput/NumberInput/Textarea/Button etc and React types compatible with existing dependency versions. No new packages or fake backend data. Backend workflow logic stays untouched.\n\nRequired output paths:\nclient/src/modules/leave_elm/pages/MyLeavePage.tsx\n\nThe JSON must have exactly this shape: {\"files\": {\"relative/path\": \"complete file content\"}}. Return every required file. Do not put the JSON in a Markdown fence. Do not echo reference-file contents into the wrong output file.\n",
+  "stream": true,
+  "keep_alive": "15m",
+  "options": {
+    "temperature": 0.3,
+    "seed": 42,
+    "num_ctx": 8192,
+    "num_batch": 128,
+    "num_predict": 4000,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256
+  },
+  "format": {
+    "type": "object",
+    "properties": {
+      "files": {
+        "type": "object",
+        "properties": {
+          "client/src/modules/leave_elm/pages/MyLeavePage.tsx": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "client/src/modules/leave_elm/pages/MyLeavePage.tsx"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "required": [
+      "files"
+    ],
+    "additionalProperties": false
+  }
+}

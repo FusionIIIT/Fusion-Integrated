@@ -1,0 +1,4 @@
+{
+    "files": {
+        "modules/leave_elm/tasks.py": "from celery import shared_task\nfrom .services.events import year_end_rollover, process_task_sla\n\ndef elm_year_end_rollover():\n    year_end_rollover()\n\n@shared_task(queue='default')\ndef elm_task_sla():\n    process_task_sla()",
+        "modules/leave_elm/schedule.py": "BEAT_SCHEDULE = {\n    'elm-year-end-rollover': {\n        'task': 'leave_elm.tasks.elm_year_end_rollover',\n        'schedule': crontab(day_of_month=1, hour=0),\n        'options': {'expires': 360}\n    },\n    'elm-task-sla': {\n        'task': 'leave_elm.tasks.elm_task_sla',\n        'schedule': crontab(minute=" } }

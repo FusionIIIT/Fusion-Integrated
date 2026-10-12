@@ -292,7 +292,7 @@ Six, not sixty. E2E is slow and flaky by nature; everything else belongs in vite
 `/sysadmin/` client**. This is how the design-system extraction is *proved* pixel-identical rather than asserted
 ([design-system.md](../05-frontend/design-system.md)).
 
-**Run only inside a pinned Docker image.** Host font rendering differs between macOS and Linux, and
+**Run only inside a pinned Docker image.** Host font rendering differs between [platform redacted] and Linux, and
 regenerating baselines from a laptop is exactly how these tests become noise everyone ignores.
 
 ---

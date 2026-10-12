@@ -208,7 +208,7 @@ season.
 | | |
 |---|---|
 | **Owner** | frontend-lead · **L/I: M / L** |
-| **Risk** | Font rendering differs between macOS and Linux; baselines regenerated from a laptop make the suite noise everyone ignores — and the design-extraction proof evaporates. |
+| **Risk** | Font rendering differs between [platform redacted] and Linux; baselines regenerated from a laptop make the suite noise everyone ignores — and the design-extraction proof evaporates. |
 | **Trigger** | Visual specs failing on unrelated PRs. |
 | **Mitigation** | Run visual specs **only** inside a pinned Docker image; never regenerate baselines locally. |
 

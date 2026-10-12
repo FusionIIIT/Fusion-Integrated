@@ -1,0 +1,16 @@
+{
+  "model": "qwen2.5-coder:3b",
+  "system": "You are a local coding assistant. Follow CURRENT TASK after references. Return complete raw source for the one requested file. Do not claim tests or add provenance labels.",
+  "prompt": "REFERENCE MATERIAL ONLY\n\n\n\nEND OF REFERENCES\n\nCURRENT TASK\n\nGenerate only types.ts, max45 lines, exported TypeScript interfaces matching existing backend serializer/model fields: LeaveApplication(id:number,user_id:number,status:string,leave_type:number,start_date:string,end_date:string,purpose:string), LeaveBalance(id:number,user_id:number,leave_category:number,balance:string), LeaveTask(id:number,user_id:number,leave_application:number,task_type:string,status:string). LeaveTask title and description optional string for existing generated UI assumptions, without changing backend. LeaveHistory(id:number,status:string,decision:string) and LeaveNotification(id:number,message:string). No runtime code or business fixes.\n\nOutput file: client/src/modules/leave_elm/types.ts\nReturn only complete raw source code, without JSON, explanation or Markdown fences.\n",
+  "stream": true,
+  "keep_alive": "15m",
+  "options": {
+    "temperature": 0.2,
+    "seed": 42,
+    "num_ctx": 8192,
+    "num_batch": 128,
+    "num_predict": 900,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256
+  }
+}

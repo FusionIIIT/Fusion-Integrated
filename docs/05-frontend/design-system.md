@@ -314,7 +314,7 @@ improves.
 **Visual regression is the proof.** Playwright `expect(page).toHaveScreenshot()` at 3 breakpoints
 (`375`, `768`, `1440`), with baselines captured from the **live `/sysadmin/` client**.
 
-Run **only inside a pinned Docker image** — host font rendering differs between macOS and Linux, and
+Run **only inside a pinned Docker image** — host font rendering differs between [platform redacted] and Linux, and
 regenerating baselines from a laptop is how these tests become noise everyone ignores.
 
 Also asserted:

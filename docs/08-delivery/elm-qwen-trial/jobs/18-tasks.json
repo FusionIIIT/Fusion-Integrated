@@ -1,0 +1,21 @@
+{
+  "label": "Scheduled task and worker registration",
+  "instruction": "Generate tasks.py and schedule.py, max 50 lines total. tasks.py has Celery shared_task wrappers elm_year_end_rollover and elm_task_sla invoking existing services/events.py functions. schedule.py exports BEAT_SCHEDULE for annual rollover at Jan1 midnight and SLA each 15 minutes, and TASK_ROUTES mapping modules.leave_elm.tasks.* to queue default. Use the supplied Fusion Celery interfaces; wrappers only, no new business logic.",
+  "allowed_paths": [
+    "modules/leave_elm/tasks.py",
+    "modules/leave_elm/schedule.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/services/events.py",
+    "modules/placement/schedule.py",
+    "config/celery.py"
+  ],
+  "include_specs": false,
+  "num_predict": 1300,
+  "options": {
+    "temperature": 0.3,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}
