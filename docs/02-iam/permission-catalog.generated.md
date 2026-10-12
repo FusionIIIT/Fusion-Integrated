@@ -13,6 +13,18 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave.request.view_self` | View own leave requests and balance | `Assistant Professor`, `Associate Professor`, `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Junior Assistant`, `Professor`, `Registrar`, `Senior Assistant`, `Upper Division Clerk`, `acadadmin`, `dracad`, `faculty`, `staff` |
+| `leave.request.create` | Apply for, extend, resume and print own leave | `Assistant Professor`, `Associate Professor`, `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Junior Assistant`, `Professor`, `Registrar`, `Senior Assistant`, `Upper Division Clerk`, `acadadmin`, `dracad`, `faculty`, `staff` |
+| `leave.request.delete` | Withdraw or cancel own request | `Assistant Professor`, `Associate Professor`, `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Junior Assistant`, `Professor`, `Registrar`, `Senior Assistant`, `Upper Division Clerk`, `acadadmin`, `dracad`, `faculty`, `staff` |
+| `leave.request.view` | View leave requests, within scope | `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `acadadmin`, `dracad` |
+| `leave.request.approve` | Decide a routed leave task | `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `acadadmin`, `dracad` |
+| `leave.balance.update` | Adjust a leave balance or synchronise a record | `acadadmin` |
+| `leave.type.manage` | Configure leave policy, hierarchy, holiday calendar and SLA thresholds | `acadadmin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
