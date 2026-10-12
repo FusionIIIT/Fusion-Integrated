@@ -1,0 +1,127 @@
+import { useEffect, useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { http } from '../../../lib/http';
+import type { Notification, LeaveRequest } from '../api/types';
+import { PageHeader } from '../../../ui/components/PageHeader';
+
+const BASE = '/leave';
+
+export default function LeaveTasksPage() {
+  const queryClient = useQueryClient();
+  const [selectedTask, setSelectedTask] = useState<Notification | null>(null);
+  const [decision, setDecision] = useState<string>('');
+  const [substituteId, setSubstituteId] = useState<number | undefined>();
+
+  const { data: tasks } = useQuery({
+    queryKey: ['leave', 'queue'],
+    queryFn: () => http.get(`${BASE}/queue`),
+  });
+
+  const approveMutation = useMutation({
+    mutationFn: (id: number) => http.post(`${BASE}/${id}/review`, { decision: 'APPROVED' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leave', 'queue'] });
+      setDecision('');
+      setSelectedTask(null);
+    },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: (id: number) => http.post(`${BASE}/${id}/review`, { decision: 'REJECTED' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leave', 'queue'] });
+      setDecision('');
+      setSelectedTask(null);
+    },
+  });
+
+  const acceptSubstituteMutation = useMutation({
+    mutationFn: (id: number) => http.post(`${BASE}/${id}/substitute/accept`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leave', 'queue'] });
+      setDecision('');
+      setSubstituteId(undefined);
+      setSelectedTask(null);
+    },
+  });
+
+  const declineSubstituteMutation = useMutation({
+    mutationFn: (id: number, newSubId?: number) => 
+      http.post(`${BASE}/${id}/substitute/decline`, { new_substitute_user_id: newSubId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leave', 'queue'] });
+      setDecision('');
+      setSubstituteId(undefined);
+      setSelectedTask(null);
+    },
+  });
+
+  const handleReview = (id: number) => {
+    if (!decision) return;
+    if (decision === 'APPROVED') approveMutation.mutate(id);
+    else rejectMutation.mutate(id);
+  };
+
+  const handleSubstituteAction = () => {
+    if (!selectedTask) return;
+    if (substituteId !== undefined) acceptSubstituteMutation.mutate(selectedTask.id);
+    else declineSubstituteMutation.mutate(selectedTask.id, substituteId);
+  };
+
+  if (!tasks?.data) return <div>Loading...</div>;
+
+  return (
+    <>
+      <PageHeader title="Leave Tasks" subtitle="Pending actions for your queue" />
+      <div style={{ padding: '1rem' }}>
+        {tasks.data.length === 0 ? (
+          <p>No pending tasks.</p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {tasks.data.map((task) => (
+              <div key={task.id} style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '4px' }}>
+                <h3>Task ID: {task.id}</h3>
+                <p>Type: {task.task_type}</p>
+                <p>Status: {task.status}</p>
+                
+                {task.task_type === 'REVIEW' ? (
+                  <>
+                    <p>Decision:</p>
+                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                      <button onClick={() => setDecision('APPROVED')} disabled={!!decision}>Approve</button>
+                      <button onClick={() => setDecision('REJECTED')} disabled={!!decision}>Reject</button>
+                    </div>
+                    {decision && (
+                      <button onClick={() => handleReview(task.id)} style={{ marginTop: '1rem' }}>
+                        Confirm Decision
+                      </button>
+                    )}
+                  </>
+                ) : task.task_type === 'SUBSTITUTE' ? (
+                  <>
+                    <p>Current Substitute: {task.substitute_user_id || 'None'}</p>
+                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                      <button onClick={() => setSubstituteId(undefined)} disabled={substituteId !== undefined}>Accept</button>
+                      <button onClick={() => setSubstituteId(0)}>Decline (No New)</button>
+                    </div>
+                    {substituteId !== undefined && (
+                      <>
+                        <p>New Substitute ID: {substituteId}</p>
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                          <button onClick={handleSubstituteAction}>Confirm Accept</button>
+                          <button onClick={() => setSubstituteId(undefined)}>Cancel</button>
+                        </div>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <p>Action required for this task type.</p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}

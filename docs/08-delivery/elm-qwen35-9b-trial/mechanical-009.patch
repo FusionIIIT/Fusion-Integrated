@@ -1,0 +1,46 @@
+--- client/src/modules/leave_elm/pages/LeaveAdminPage.tsx
++++ client/src/modules/leave_elm/pages/LeaveAdminPage.tsx
+@@ -1,7 +1,6 @@
+ import { useState } from 'react';
+-import { Group, Stack, Text, Title, Paper, Button, TextInput, NumberInput, Select, ActionIcon, Divider, SimpleGrid } from '@mantine/core';
+-import { useJsonEditor } from '../../../lib/json-editor';
+-import { http } from '../../../lib/http';
++import { Group, Stack, Text, Title, Paper, Button, TextInput, Divider, SimpleGrid } from '@mantine/core';
++import { useJsonEditor } from '../json-editor';
+ import { PageHeader } from '../../../ui/components/PageHeader';
+ import { usePolicy, useCalendar, useLeaveBalances, useNotifications, useOfflineRecord } from '../api/hooks';
+ 
+@@ -10,7 +9,7 @@
+   
+   const policyQuery = usePolicy();
+   const calendarQuery = useCalendar();
+-  const balancesQuery = useLeaveBalances();
++  useLeaveBalances();
+   const notificationsQuery = useNotifications(1); // Admin user ID placeholder
+   const offlineMutation = useOfflineRecord();
+ 
+@@ -33,13 +32,13 @@
+ 
+   return (
+     <>
+-      <PageHeader title="Leave Administration" subtitle="Manage policies, calendars, and records">
++      <PageHeader title="Leave Administration" subtitle="Manage policies, calendars, and records" action={
+         <Group gap="sm">
+           <Button variant="outline" onClick={() => setActiveTab('policy')}>Policy</Button>
+           <Button variant={activeTab === 'calendar' ? 'filled' : 'outline'} onClick={() => setActiveTab('calendar')}>Calendar</Button>
+           <Button variant={activeTab === 'records' ? 'filled' : 'outline'} onClick={() => setActiveTab('records')}>Records</Button>
+         </Group>
+-      </PageHeader>
++      } />
+ 
+       {activeTab === 'policy' && (
+         <Paper p="md" withBorder shadow="sm">
+@@ -116,7 +115,7 @@
+ 
+             <Text c="dimmed">Notifications:</Text>
+             {notificationsQuery.data ? (
+-              notificationsQuery.data.map((notif: any) => (
++              notificationsQuery.data.data.map((notif: any) => (
+                 <Paper key={notif.id} p="sm" withBorder radius="md">
+                   <Group justify="space-between">
+                     <Stack gap={1}>

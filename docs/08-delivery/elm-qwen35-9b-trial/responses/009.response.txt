@@ -1,0 +1,146 @@
+import { useState } from 'react';
+import { Group, Stack, Text, Title, Paper, Button, TextInput, NumberInput, Select, ActionIcon, Divider, SimpleGrid } from '@mantine/core';
+import { useJsonEditor } from '../../../lib/json-editor';
+import { http } from '../../../lib/http';
+import { PageHeader } from '../../../ui/components/PageHeader';
+import { usePolicy, useCalendar, useLeaveBalances, useNotifications, useOfflineRecord } from '../api/hooks';
+
+export default function LeaveAdminPage() {
+  const [activeTab, setActiveTab] = useState<'policy' | 'calendar' | 'records'>('policy');
+  
+  const policyQuery = usePolicy();
+  const calendarQuery = useCalendar();
+  const balancesQuery = useLeaveBalances();
+  const notificationsQuery = useNotifications(1); // Admin user ID placeholder
+  const offlineMutation = useOfflineRecord();
+
+  if (policyQuery.isLoading || calendarQuery.isLoading) return <Text>Loading...</Text>;
+  if (!policyQuery.data || !calendarQuery.data) return <Text>Error loading data</Text>;
+
+  const policy: any = policyQuery.data;
+  const calendar: any = calendarQuery.data;
+
+  const handlePolicyUpdate = (newPolicy: any) => {
+    // In a real scenario, this would be an API call. Here we just log or show feedback.
+    console.log('Updating policy:', newPolicy);
+    offlineMutation.mutate({ category: 'CL', start_date: new Date().toISOString(), end_date: new Date().toISOString(), reference_number: 'POLICY_UPDATE' });
+  };
+
+  const handleCalendarUpdate = (newCalendar: any) => {
+    console.log('Updating calendar:', newCalendar);
+    offlineMutation.mutate({ category: 'CL', start_date: new Date().toISOString(), end_date: new Date().toISOString(), reference_number: 'CALENDAR_UPDATE' });
+  };
+
+  return (
+    <>
+      <PageHeader title="Leave Administration" subtitle="Manage policies, calendars, and records">
+        <Group gap="sm">
+          <Button variant="outline" onClick={() => setActiveTab('policy')}>Policy</Button>
+          <Button variant={activeTab === 'calendar' ? 'filled' : 'outline'} onClick={() => setActiveTab('calendar')}>Calendar</Button>
+          <Button variant={activeTab === 'records' ? 'filled' : 'outline'} onClick={() => setActiveTab('records')}>Records</Button>
+        </Group>
+      </PageHeader>
+
+      {activeTab === 'policy' && (
+        <Paper p="md" withBorder shadow="sm">
+          <Title order={3} mb="md">Leave Policy Configuration</Title>
+          <Stack gap="md">
+            <Text c="dimmed">Current Policy Data:</Text>
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+              {Object.entries(policy).map(([key, value]) => (
+                <Paper key={key} p="sm" withBorder radius="md">
+                  <Text size="xs" c="dimmed">{key}</Text>
+                  <Text fw={500}>{typeof value === 'number' ? value : JSON.stringify(value)}</Text>
+                </Paper>
+              ))}
+            </SimpleGrid>
+            
+            <Divider my="md" />
+            
+            <Group justify="space-between">
+              <Text c="dimmed">Edit Policy (Simulation):</Text>
+              <Stack gap="sm">
+                {useJsonEditor(policy, handlePolicyUpdate)}
+              </Stack>
+            </Group>
+          </Stack>
+        </Paper>
+      )}
+
+      {activeTab === 'calendar' && (
+        <Paper p="md" withBorder shadow="sm">
+          <Title order={3} mb="md">Calendar Configuration</Title>
+          <Stack gap="md">
+            <Text c="dimmed">Current Calendar Data:</Text>
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+              <Paper p="sm" withBorder radius="md">
+                <Text size="xs" c="dimmed">Year</Text>
+                <Text fw={500}>{calendar.year}</Text>
+              </Paper>
+              <Paper p="sm" withBorder radius="md">
+                <Text size="xs" c="dimmed">Effective</Text>
+                <Text fw={500}>{calendar.is_effective ? 'Yes' : 'No'}</Text>
+              </Paper>
+            </SimpleGrid>
+
+            <Divider my="md" />
+
+            <Group justify="space-between">
+              <Text c="dimmed">Edit Calendar (Simulation):</Text>
+              <Stack gap="sm">
+                {useJsonEditor(calendar, handleCalendarUpdate)}
+              </Stack>
+            </Group>
+          </Stack>
+        </Paper>
+      )}
+
+      {activeTab === 'records' && (
+        <Paper p="md" withBorder shadow="sm">
+          <Title order={3} mb="md">Offline Records & Notifications</Title>
+          
+          <Stack gap="md">
+            <Group justify="space-between">
+              <Text c="dimmed">Create Offline Record:</Text>
+              <SimpleGrid cols={{ base: 1, md: 4 }} spacing="xs">
+                <TextInput label="Category" placeholder="CL" />
+                <TextInput label="Start Date" type="date" />
+                <TextInput label="End Date" type="date" />
+                <Button onClick={() => offlineMutation.mutate({ category: 'CL', start_date: new Date().toISOString(), end_date: new Date().toISOString() })}>
+                  Submit Record
+                </Button>
+              </SimpleGrid>
+            </Group>
+
+            <Divider my="md" />
+
+            <Text c="dimmed">Notifications:</Text>
+            {notificationsQuery.data ? (
+              notificationsQuery.data.map((notif: any) => (
+                <Paper key={notif.id} p="sm" withBorder radius="md">
+                  <Group justify="space-between">
+                    <Stack gap={1}>
+                      <Text fw={500}>{notif.task_type}</Text>
+                      <Text size="xs" c="dimmed">User: {notif.assigned_to_user_id}</Text>
+                    </Stack>
+                    <Text size="xs" c="dimmed">{new Date(notif.last_reminder_sent_at).toLocaleString()}</Text>
+                  </Group>
+                </Paper>
+              ))
+            ) : (
+              <Text c="dimmed">No notifications available.</Text>
+            )}
+
+            {offlineMutation.isPending && (
+              <Text c="yellow" size="sm">Submitting offline record...</Text>
+            )}
+            
+            {offlineMutation.error && (
+              <Text c="red" size="sm">Error: {offlineMutation.error.message}</Text>
+            )}
+          </Stack>
+        </Paper>
+      )}
+    </>
+  );
+}

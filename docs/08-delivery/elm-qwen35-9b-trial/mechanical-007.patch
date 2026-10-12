@@ -1,0 +1,28 @@
+--- client/src/modules/leave_elm/api/hooks.ts
++++ client/src/modules/leave_elm/api/hooks.ts
+@@ -1,5 +1,6 @@
+-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+-import { http, errorMessage } from '../../lib/http';
++import { useQuery, useMutation } from '@tanstack/react-query';
++import { http } from '../../../lib/http';
++import type { LeaveRequest } from './types';
+ 
+ const BASE = '/leave';
+ 
+@@ -10,7 +11,7 @@
+   });
+ }
+ 
+-export function useApplyLeave(data: LeaveRequest) {
++export function useApplyLeave(_data: LeaveRequest) {
+   return useMutation({
+     mutationFn: (d: LeaveRequest) => http.post(`${BASE}/apply`, d),
+   });
+--- client/src/modules/leave_elm/api/types.ts
++++ client/src/modules/leave_elm/api/types.ts
+@@ -1,4 +1,4 @@
+-import type { LeaveApplication, LeaveBalance, WorkflowTask } from '../models';
++import type { LeaveApplication } from '../models';
+ 
+ export interface LeaveRequest {
+   category: string;

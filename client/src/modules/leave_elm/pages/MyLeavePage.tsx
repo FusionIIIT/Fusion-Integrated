@@ -1,0 +1,124 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Group, Stack, Paper, Button, Text, Alert, Loader, Box, Textarea } from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { DateInput } from '@mantine/dates';
+import { useMyLeave, useApplyLeave, useLeaveBalances } from '../api/hooks';
+import { errorMessage } from '../../../lib/http';
+import type { LeaveRequest } from '../api/types';
+
+export default function MyLeavePage() {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'applications' | 'balances'>('applications');
+
+  const { data: applications, isLoading: loadingApps, error: appsError } = useMyLeave();
+  const { data: balances, isLoading: loadingBalances, error: balancesError } = useLeaveBalances();
+  const applyMutation = useApplyLeave({});
+
+  const form = useForm<LeaveRequest>({
+    ...{ schema: {
+      required: ['category', 'start_date', 'end_date'],
+    } },
+    initialValues: {
+      category: '',
+      start_date: new Date().toISOString().split('T')[0]!,
+      end_date: new Date(Date.now() + 86400000).toISOString().split('T')[0]!,
+    },
+  });
+
+  const handleSubmit = (values: LeaveRequest) => {
+    applyMutation.mutate(values);
+  };
+
+  if (loadingApps || loadingBalances) return <Loader size="xl" />;
+
+  return (
+    <>
+      <Group justify="space-between" align="flex-end" mb="lg">
+        <Stack gap={2}>
+          <Text fw={700} fz="h2">My Leave</Text>
+          <Text c="dimmed" size="sm">Manage your leave applications and balances</Text>
+        </Stack>
+      </Group>
+
+      <Box mb="md">
+        <Button variant="outline" onClick={() => navigate('/leave/apply')} disabled={loadingApps}>
+          New Application
+        </Button>
+      </Box>
+
+      {appsError && (
+        <Alert color="red" title="Failed to load applications">{errorMessage(appsError)}</Alert>
+      )}
+      {balancesError && (
+        <Alert color="red" title="Failed to load balances">{errorMessage(balancesError)}</Alert>
+      )}
+
+      <Paper p="md" withBorder shadow="sm">
+        <Group justify="center" mb="xl">
+          <Button onClick={() => setActiveTab('applications')} data-active={activeTab === 'applications'}>Applications</Button>
+          <Button onClick={() => setActiveTab('balances')} data-active={activeTab === 'balances'}>Balances</Button>
+        </Group>
+
+        {activeTab === 'applications' && (
+          <Stack gap="sm">
+            {applications?.data?.map((app: { id: number | string; category: string; start_date: string; end_date: string }) => (
+              <Paper key={app.id} p="md" withBorder shadow="xs">
+                <Group justify="space-between">
+                  <Box w="100%">
+                    <Text fw={500}>{app.category}</Text>
+                    <Text c="dimmed">{app.start_date} to {app.end_date}</Text>
+                  </Box>
+                  <Group gap="xs">
+                    <Button size="sm" variant="light">View</Button>
+                    <Button size="sm" variant="light">Withdraw</Button>
+                    <Button size="sm" variant="light">Cancel</Button>
+                    <Button size="sm" variant="light">Extend</Button>
+                  </Group>
+                </Group>
+              </Paper>
+            ))}
+          </Stack>
+        )}
+
+        {activeTab === 'balances' && (
+          <Stack gap="sm">
+            {balances?.data?.map((bal: { category: string; remaining_days: number }) => (
+              <Paper key={bal.category} p="md" withBorder shadow="xs">
+                <Group justify="space-between">
+                  <Text fw={500}>{bal.category}</Text>
+                  <Text>{bal.remaining_days} days</Text>
+                </Group>
+              </Paper>
+            ))}
+          </Stack>
+        )}
+      </Paper>
+
+      <Paper p="md" withBorder shadow="sm">
+        <form onSubmit={form.onSubmit(handleSubmit)}>
+          <Stack gap="md">
+            <Text fw={500}>New Application</Text>
+            <Group w="100%">
+              <select {...form.getInputProps('category')} style={{ flex: 1 }}>
+                <option value="">Select Category</option>
+                <option value="CL">Casual Leave</option>
+                <option value="RH">Sick Leave</option>
+                <option value="SCL">Special Casual Leave</option>
+                <option value="EL">Encouraged Leave</option>
+                <option value="COL">Compensatory Leave</option>
+                <option value="VL">Voluntary Leave</option>
+              </select>
+              <DateInput label="Start Date" {...form.getInputProps('start_date')} />
+              <DateInput label="End Date" {...form.getInputProps('end_date')} />
+            </Group>
+            <Textarea label="Purpose" {...form.getInputProps('purpose')} />
+            <Button type="submit" disabled={applyMutation.isPending || !form.isValid}>
+              {applyMutation.isPending ? 'Submitting...' : 'Submit Application'}
+            </Button>
+          </Stack>
+        </form>
+      </Paper>
+    </>
+  );
+}

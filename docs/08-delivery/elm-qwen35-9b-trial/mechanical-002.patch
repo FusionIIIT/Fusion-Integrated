@@ -1,0 +1,20 @@
+--- generated/contracts.py
++++ integrated/contracts.py
+@@ -74,7 +74,7 @@
+     return list(result.values())
+ 
+ 
+-def get_holidays(year: int) -> List[Dict[str, Any]]:
++def _get_holidays(year: int) -> List[Dict[str, Any]]:
+     """Retrieve holidays for a given year."""
+     calendar = HolidayCalendar.objects.filter(year=year, is_effective=True).first()
+     if not calendar:
+@@ -89,7 +89,7 @@
+     ]
+ 
+ 
+-def get_vacation_periods(year: int) -> List[Dict[str, Any]]:
++def _get_vacation_periods(year: int) -> List[Dict[str, Any]]:
+     """Retrieve vacation periods for a given year."""
+     return [
+         {

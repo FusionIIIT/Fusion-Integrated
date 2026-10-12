@@ -1,0 +1,83 @@
+--- config/urls.py
++++ config/urls.py
+@@ -16,6 +16,7 @@
+     path("api/v1/", include("fusion_auth.urls")),
+     path("api/v1/directory/", include("modules.directory.api.urls")),
+     path("api/v1/placement/", include("modules.placement.api.urls")),
++    path("api/v1/leave/", include("modules.leave_elm.api.urls")),
+     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="docs"),
+ ]
+--- config/celery.py
++++ config/celery.py
+@@ -9,11 +9,13 @@
+     TASK_ROUTES as PLACEMENT_ROUTES,
+ )
+ 
++from modules.leave_elm.schedule import BEAT_SCHEDULE as ELM_SCHEDULE, TASK_ROUTES as ELM_ROUTES
++
+ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.dev")
+ app = Celery("fusion_integrated")
+ app.config_from_object("django.conf:settings", namespace="CELERY")
+ app.autodiscover_tasks()
+ 
+ # Each module owns its timers; this only merges them, so modules stay removable.
+-app.conf.beat_schedule = {**PLACEMENT_SCHEDULE}
+-app.conf.task_routes = {**PLACEMENT_ROUTES}
++app.conf.beat_schedule = {**PLACEMENT_SCHEDULE, **ELM_SCHEDULE}
++app.conf.task_routes = {**PLACEMENT_ROUTES, **ELM_ROUTES}
+--- client/src/app/registry.ts
++++ client/src/app/registry.ts
+@@ -12,6 +12,11 @@
+ }
+ 
+ export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
++  leave_elm: {
++    code: "leave_elm",
++    basePath: "/leave",
++    load: () => import("../modules/leave_elm/routes"),
++  },
+   placement_cell: {
+     code: "placement_cell",
+     basePath: "/placement",
+--- .importlinter
++++ .importlinter
+@@ -12,10 +12,16 @@
+ name = Modules may reach each other ONLY through contracts.py
+ type = forbidden
+ source_modules =
++    modules.leave_elm
+     modules.placement
+     modules.directory
+     modules.accesscontrol
+ forbidden_modules =
++    modules.leave_elm.models
++    modules.leave_elm.services
++    modules.leave_elm.selectors
++    modules.leave_elm.api
++    modules.leave_elm.domain
+     modules.placement.models
+     modules.placement.services
+     modules.placement.selectors
+@@ -38,6 +44,7 @@
+ source_modules =
+ # Every module's domain, not just the first one written.
+     modules.placement.domain
++    modules.leave_elm.domain
+ forbidden_modules =
+     django
+     rest_framework
+@@ -66,3 +73,13 @@
+     modules.placement.selectors
+     modules.placement.models
+     modules.placement.domain
++
++[importlinter:contract:elm-layers]
++name = Layering inside ELM
++type = layers
++layers =
++    modules.leave_elm.api
++    modules.leave_elm.services
++    modules.leave_elm.selectors
++    modules.leave_elm.models
++    modules.leave_elm.domain
