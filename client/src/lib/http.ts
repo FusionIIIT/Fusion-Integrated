@@ -72,3 +72,21 @@ export function requestId(e: unknown): string | undefined {
   return (e as { response?: { data?: { error?: { request_id?: string } } } })
     ?.response?.data?.error?.request_id;
 }
+
+export function filenameFromDisposition(h: string | unknown): string | undefined {
+  if (!h || typeof h !== "string") return undefined;
+  const m = h.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/i);
+  if (!m || !m[1]) return undefined;
+  return decodeURIComponent(m[1].replace(/^\s+|\s+$/g, ""));
+}
+
+export function saveBlob(blob: Blob, name: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
