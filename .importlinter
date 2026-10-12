@@ -13,6 +13,7 @@ name = Modules may reach each other ONLY through contracts.py
 type = forbidden
 source_modules =
     modules.placement
+    modules.elm
     modules.directory
     modules.accesscontrol
 forbidden_modules =
@@ -25,6 +26,8 @@ forbidden_modules =
     modules.directory.services
     modules.directory.api
     modules.accesscontrol.models
+    modules.elm.models
+    modules.elm.api
 # DIRECT imports only. contracts.py legitimately imports its OWN module's
 # models and services, so following the chain transitively would make this
 # contract impossible to satisfy. What we forbid is a module reaching straight
