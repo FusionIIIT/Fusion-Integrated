@@ -82,6 +82,9 @@ LOCAL_APPS = [
 ]
 
 # Each module is an independent Django app: own tables, migrations and contract.
+#: Independent Django apps. Each module owns its tables, migrations and URL
+#: routes; nothing in one module may reach into another except through its
+#: own module-specific API, and `core/` may not import a module at all.
 PLATFORM_MODULES = [
     "modules.directory",         # who people are, projected from IAM
     "modules.accesscontrol",     # which modules a role may enter
@@ -90,6 +93,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.elm",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
