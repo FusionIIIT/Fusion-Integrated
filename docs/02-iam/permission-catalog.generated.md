@@ -13,6 +13,28 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave_management`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave_management.request.view_self` | View own leave requests | `Faculty`, `Staff`, `Unit Head`, `Substitute`, `Director` |
+| `leave_management.request.view_all` | View all leave requests | `Unit Head`, `Deputy Registrar (Estt.)`, `Dean`, `Registrar`, `Director`, `Leave Administrator` |
+| `leave_management.request.create` | Create and submit own leave requests | `Faculty`, `Staff`, `Director` |
+| `leave_management.request.withdraw` | Withdraw own pending requests | `Faculty`, `Staff`, `Director` |
+| `leave_management.request.cancel` | Request cancellation of own approved leave | `Faculty`, `Staff`, `Director` |
+| `leave_management.balance.view_self` | View own leave balances and account history | `Faculty`, `Staff`, `Unit Head`, `Director` |
+| `leave_management.balance.view_all` | View employee leave balances | `Leave Administrator` |
+| `leave_management.substitute.respond` | Accept or decline a substitute assignment | `Faculty`, `Staff`, `Substitute` |
+| `leave_management.workflow.task.view` | View assigned leave workflow tasks | `Unit Head`, `Deputy Registrar (Estt.)`, `Dean`, `Registrar`, `Director` |
+| `leave_management.workflow.task.decide` | Review or decide assigned leave workflow tasks | `Unit Head`, `Deputy Registrar (Estt.)`, `Dean`, `Registrar`, `Director` |
+| `leave_management.policy.view` | View current leave policy | `Leave Administrator` |
+| `leave_management.policy.manage` | Maintain current leave policy parameters | `Leave Administrator` |
+| `leave_management.calendar.view` | View published holiday calendars | `Leave Administrator` |
+| `leave_management.calendar.manage` | Maintain and publish holiday calendars | `Leave Administrator` |
+| `leave_management.records.manage` | Maintain authorized leave records and enter already sanctioned offline leave | `Leave Administrator` |
+| `leave_management.sla.manage` | Configure workflow reminder and escalation thresholds | `Leave Administrator` |
+| `leave_management.routing.manage` | Maintain current authority routing configuration | `Leave Administrator` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

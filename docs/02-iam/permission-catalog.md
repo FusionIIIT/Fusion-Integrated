@@ -142,17 +142,27 @@ No write permissions exist by design. The platform never writes academic data
 | `hr.employment.manage` | Create or end an appointment | ⚠️ |
 | `hr.export.pii` | Export employee-identifying data | ⚠️ |
 
-## `leave` *(Phase 6)*
+## `leave_management` — Employee Leave Management
 
 | Code | Description | ⚠️ |
 |---|---|---|
-| `leave.request.view_self` | View own leave requests and balance | |
-| `leave.request.create` | Apply for leave | |
-| `leave.request.delete` | Cancel own pending request | |
-| `leave.request.view` | View leave requests, within scope | |
-| `leave.request.approve` | Approve or reject a leave request | |
-| `leave.balance.update` | Adjust a leave balance | ⚠️ |
-| `leave.type.manage` | Configure leave types and entitlement rules | |
+| `leave_management.request.view_self` | View own leave requests | |
+| `leave_management.request.view_all` | View all leave requests | |
+| `leave_management.request.create` | Create and submit own leave requests | |
+| `leave_management.request.withdraw` | Withdraw own pending requests | |
+| `leave_management.request.cancel` | Request cancellation of own approved leave | |
+| `leave_management.balance.view_self` | View own leave balances and account history | |
+| `leave_management.balance.view_all` | View employee leave balances | |
+| `leave_management.substitute.respond` | Accept or decline a substitute assignment | |
+| `leave_management.workflow.task.view` | View assigned leave workflow tasks | |
+| `leave_management.workflow.task.decide` | Review or decide assigned leave workflow tasks | |
+| `leave_management.policy.view` | View current leave policy | |
+| `leave_management.policy.manage` | Maintain current leave policy parameters | |
+| `leave_management.calendar.view` | View published holiday calendars | |
+| `leave_management.calendar.manage` | Maintain and publish holiday calendars | |
+| `leave_management.records.manage` | Maintain authorized records and record offline-signed leave | ⚠️ |
+| `leave_management.sla.manage` | Configure workflow SLA thresholds | |
+| `leave_management.routing.manage` | Maintain current authority routing | ⚠️ |
 
 ## `sysops` *(Phase 7 — absorbed from the console)*
 
@@ -181,9 +191,9 @@ No write permissions exist by design. The platform never writes academic data
 | `academics` | 4 | 1 |
 | `placement_cell` | 36 | 11 |
 | `hr` | 5 | 2 |
-| `leave` | 7 | 1 |
+| `leave_management` | 17 | 2 |
 | `sysops` | 10 | 3 |
-| **Total** | **80** | **27** |
+| **Total** | **90** | **28** |
 
 ## Built-in role assignments
 

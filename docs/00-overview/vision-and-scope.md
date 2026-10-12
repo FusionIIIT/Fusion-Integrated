@@ -65,6 +65,14 @@ Chosen deliberately as the first vertical slice: it is student-facing, it has a 
 (postings → eligibility → applications → rounds → offers), it forces the academic-integration
 problem to be solved properly, and it is small enough to finish.
 
+### 5. Employee Leave Management
+
+ELM is a fresh domain module governed by the synchronized specifications in the repository's
+`ELM_Specifications_Bundle_v1.4_FINAL`. The legacy `leave` app is reference material only: its
+models and workflows are not copied. The new module owns leave requests, workflow tasks, calendars,
+and an append-only leave-account ledger; employee identity and employment facts remain projections
+from the platform's identity and HR contracts. See [ELM reference](../09-leave/ELM_REFERENCE.md).
+
 ## Non-goals
 
 These are as binding as the goals. A request to do any of them goes through a design document first,
@@ -73,7 +81,7 @@ and probably gets declined.
 | # | Non-goal | Why |
 |---|---|---|
 | **NG1** | **No multi-tenancy.** No `tenant_id`, no per-tenant schemas, no subdomain routing. | One institute. Tenancy would tax every table, every queryset and every migration for a second institute that does not exist. Revisit only if one actually appears. → [ADR-0011](../01-architecture/adr/0011-no-multi-tenancy.md) |
-| **NG2** | **No port of the 26 deprecated non-academic apps.** | They are deprecated for good reason. As one concrete example: the old placement module filters students on `Student.cpi`, a column that is permanently `0.0` because nothing has ever written a computed value to it. Porting that code would port its bugs. We design fresh. |
+| **NG2** | **No port of the 26 deprecated non-academic apps.** | Legacy apps remain unported. New modules, including ELM, are fresh implementations based on their current authoritative requirements; their legacy code is not a design contract. |
 | **NG3** | **No rewrite of the academic monolith in this programme.** | The five live academic apps stay exactly where they are. We add token validation and a one-way role projection; we change nothing else about how they work. Absorption is a later, separately-scoped programme. |
 | **NG4** | **No microservices.** Two new deployables, not twelve. | At this scale microservices buy distributed transactions, eventual-consistency bugs and an operations burden, and buy nothing back. Boundaries are enforced in-process so extraction stays cheap if it is ever justified. → [ADR-0001](../01-architecture/adr/0001-modular-monolith-over-microservices.md) |
 | **NG5** | **Placement does not compute CPI.** Ever. | The ERP's `calculate_cpi_for_student` has subtle, load-bearing semantics (grade `S` earns credit but is excluded from the average; `X` and `CD` are excluded entirely; **`F` earns 2.0 points and its credit**; dedup by course code; swayam replacement chains). Reimplementing it would produce a second, disagreeing CPI. We snapshot the ERP's own output. → [academic-snapshot-integration.md](../04-placement/academic-snapshot-integration.md) |
