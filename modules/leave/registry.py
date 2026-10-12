@@ -18,7 +18,17 @@ MODULE = {
     "status": "active",
 }
 
-NAV_ITEMS = []
+NAV_ITEMS = [
+    {"code": "leave.mine", "label": "My Leave", "icon": "FaCalendarAlt",
+     "to": "/leave/mine", "required_permission": "leave.request.view_self",
+     "sort_order": 10},
+    {"code": "leave.approvals", "label": "Leave Approvals", "icon": "FaCheckDouble",
+     "to": "/leave/approvals", "required_permission": "leave.request.view_self",
+     "sort_order": 20},
+    {"code": "leave.holidays", "label": "Holiday Calendar", "icon": "FaClipboardList",
+     "to": "/leave/holidays", "required_permission": "leave.request.view_self",
+     "sort_order": 30},
+]
 
 PERMISSIONS = [
     ("leave.request.create", "Apply for leave"),
