@@ -34,6 +34,98 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "leave_elm": {
+      "grants": {
+        "Faculty": [
+          "leave_elm.balance.view_self",
+          "leave_elm.request.apply",
+          "leave_elm.request.view_self"
+        ],
+        "Leave Administrator": [
+          "leave_elm.balance.view_self",
+          "leave_elm.request.apply",
+          "leave_elm.request.review",
+          "leave_elm.request.view_self"
+        ],
+        "Staff": [
+          "leave_elm.balance.view_self",
+          "leave_elm.request.apply",
+          "leave_elm.request.view_self"
+        ],
+        "Unit Head": [
+          "leave_elm.balance.view_self",
+          "leave_elm.request.apply",
+          "leave_elm.request.review",
+          "leave_elm.request.view_self"
+        ],
+        "employee": [
+          "leave_elm.balance.view_self",
+          "leave_elm.request.apply",
+          "leave_elm.request.view_self"
+        ]
+      },
+      "module_grants": [
+        "Faculty",
+        "Leave Administrator",
+        "Staff",
+        "Unit Head",
+        "employee"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "Calendar",
+        "items": [
+          {
+            "code": "elm.requests",
+            "icon": "Calendar",
+            "label": "My Leave Requests",
+            "required_permission": "leave_elm.request.view_self",
+            "sort_order": 10,
+            "to": "/leave/requests"
+          },
+          {
+            "code": "elm.balances",
+            "icon": "Wallet",
+            "label": "My Leave Balance",
+            "required_permission": "leave_elm.balance.view_self",
+            "sort_order": 20,
+            "to": "/leave/balances"
+          },
+          {
+            "code": "elm.queue",
+            "icon": "ClipboardList",
+            "label": "Leave Approval Queue",
+            "required_permission": "leave_elm.request.review",
+            "sort_order": 30,
+            "to": "/leave/queue"
+          }
+        ],
+        "label": "Employee Leave Management",
+        "nav_section": "Employee",
+        "sort_order": 40,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "leave_elm.request.view_self",
+          "label": "View own leave requests"
+        },
+        {
+          "code": "leave_elm.request.apply",
+          "label": "Apply for leave"
+        },
+        {
+          "code": "leave_elm.request.review",
+          "label": "Review leave requests"
+        },
+        {
+          "code": "leave_elm.balance.view_self",
+          "label": "View own leave balances"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
