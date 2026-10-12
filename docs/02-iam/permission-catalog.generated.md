@@ -13,6 +13,29 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.leave_request.view_self` | See and manage one's own leave | `faculty`, `staff` |
+| `elm.leave_request.create` | Apply for leave | `faculty`, `staff` |
+| `elm.leave_request.withdraw` | Withdraw a pending leave request | `faculty`, `staff` |
+| `elm.leave_request.cancel` | Request cancellation of approved leave | `faculty`, `staff` |
+| `elm.leave_request.extension` | Request extension of ongoing leave | `faculty`, `staff` |
+| `elm.leave_request.resumption` | Record return to duty after leave | `faculty`, `staff` |
+| `elm.leave_request.view` | See leave requests across the module | `acadadmin`, `dean`, `deputy_registrar`, `director`, `establishment`, `leave_admin`, `registrar`, `unit_head` |
+| `elm.leave_request.review` | Review and recommend leave as unit head | `deputy_registrar`, `establishment`, `unit_head` |
+| `elm.leave_request.establishment` | Verify leave against establishment | `deputy_registrar`, `establishment` |
+| `elm.leave_request.sanction` | Grant or refuse final sanction | `dean`, `director`, `registrar` |
+| `elm.leave_request.print` | Print and export leave records | `acadadmin`, `faculty`, `leave_admin`, `staff` |
+| `elm.substitute.respond` | Accept or decline a substitute nomination | `faculty`, `staff` |
+| `elm.leave_account.view` | See leave balances and the ledger | `acadadmin`, `dean`, `deputy_registrar`, `director`, `establishment`, `faculty`, `leave_admin`, `registrar`, `staff`, `unit_head` |
+| `elm.policy.manage` | Configure leave types and entitlements | `acadadmin`, `leave_admin` |
+| `elm.calendar.manage` | Publish holidays and vacation periods | `acadadmin`, `leave_admin` |
+| `elm.record.manage` | Manage the leave records of all employees | `acadadmin`, `leave_admin` |
+| `elm.offline.record` | Record a paper-sanctioned leave offline | `acadadmin`, `leave_admin` |
+| `elm.sla.manage` | Configure SLA thresholds and run processing | `acadadmin`, `leave_admin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
