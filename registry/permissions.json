@@ -34,6 +34,105 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "leave": {
+      "grants": {
+        "faculty": [
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.view_self"
+        ],
+        "hr_officer": [
+          "leave.balance.update",
+          "leave.request.approve",
+          "leave.request.view",
+          "leave.type.manage"
+        ],
+        "staff": [
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.view_self"
+        ]
+      },
+      "module_grants": [
+        "faculty",
+        "hr_officer",
+        "staff"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "Calendar",
+        "items": [
+          {
+            "code": "leave.dashboard",
+            "icon": "CalendarEvent",
+            "label": "Leave Dashboard",
+            "required_permission": "leave.request.view_self",
+            "sort_order": 10,
+            "to": "/leave"
+          },
+          {
+            "code": "leave.requests",
+            "icon": "List",
+            "label": "My Leave Requests",
+            "required_permission": "leave.request.view_self",
+            "sort_order": 20,
+            "to": "/leave/requests"
+          },
+          {
+            "code": "leave.review",
+            "icon": "ClipboardCheck",
+            "label": "Review Requests",
+            "required_permission": "leave.request.approve",
+            "sort_order": 30,
+            "to": "/leave/review"
+          },
+          {
+            "code": "leave.balances",
+            "icon": "Wallet",
+            "label": "Leave Balances",
+            "required_permission": "leave.balance.update",
+            "sort_order": 40,
+            "to": "/leave/balances"
+          }
+        ],
+        "label": "Leave",
+        "nav_section": "People",
+        "sort_order": 40,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "leave.request.view_self",
+          "label": "View own leave requests and balance"
+        },
+        {
+          "code": "leave.request.create",
+          "label": "Apply for leave"
+        },
+        {
+          "code": "leave.request.delete",
+          "label": "Cancel own pending request"
+        },
+        {
+          "code": "leave.request.view",
+          "label": "View leave requests, within scope"
+        },
+        {
+          "code": "leave.request.approve",
+          "label": "Approve or reject a leave request"
+        },
+        {
+          "code": "leave.balance.update",
+          "label": "Adjust a leave balance"
+        },
+        {
+          "code": "leave.type.manage",
+          "label": "Configure leave types and entitlement rules"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
