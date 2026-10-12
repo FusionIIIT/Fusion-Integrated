@@ -1,0 +1,14 @@
+from django.urls import path
+from .views import (
+    LeaveTypeListView, LeaveTypeDetailView,
+    LeaveBalanceListView,
+    LeaveListView, LeaveDetailView
+)
+
+urlpatterns = [
+    path('types/', LeaveTypeListView.as_view(), name='leave-type-list-create'),
+    path('types/<int:pk>/', LeaveTypeDetailView.as_view(), name='leave-type-detail'),
+    path('balances/', LeaveBalanceListView.as_view(), name='leave-balance-list'),
+    path('', LeaveListView.as_view(), name='leave-list-create'),
+    path('<int:pk>/', LeaveDetailView.as_view(), name='leave-detail'),
+]
