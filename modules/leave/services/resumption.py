@@ -28,7 +28,7 @@ def submit_resumption(*, actor, request_id: int, resumed_on: date) -> Resumption
         outcome = "normal"
     else:
         outcome = "late"
-    resumption = Resumption.objects.create(
+    return Resumption.objects.create(
         request=request,
         resumed_on=resumed_on,
         outcome=outcome,
@@ -36,7 +36,6 @@ def submit_resumption(*, actor, request_id: int, resumed_on: date) -> Resumption
         reviewed_by_user_id=None,
         reviewed_at=None,
     )
-    return resumption
 
 
 @transaction.atomic

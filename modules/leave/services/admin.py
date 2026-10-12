@@ -18,7 +18,7 @@ def save_policy(
 ) -> LeavePolicy:
     """EL-UC-014, BR-EL-029: Save or update a leave policy."""
     authz.require(actor, P_SAVE_POLICY)
-    policy, created = LeavePolicy.objects.update_or_create(
+    policy, _created = LeavePolicy.objects.update_or_create(
         category=category,
         defaults={
             "annual_entitlement": annual_entitlement,
@@ -34,7 +34,7 @@ def save_policy(
 def save_unit(*, actor, name, unit_head_user_id) -> OrgUnit:
     """EL-UC-014, BR-EL-029: Save or update an organizational unit."""
     authz.require(actor, P_SAVE_UNIT)
-    unit, created = OrgUnit.objects.update_or_create(
+    unit, _created = OrgUnit.objects.update_or_create(
         name=name, defaults={"unit_head_user_id": unit_head_user_id}
     )
     return unit
@@ -78,7 +78,7 @@ def ensure_balances(*, user_id, year) -> list[LeaveBalance]:
 
     balances = []
     for category, entitlement in ENTITLEMENT.items():
-        balance, created = LeaveBalance.objects.get_or_create(
+        balance, _created = LeaveBalance.objects.get_or_create(
             user_id=user_id, year=year, category=category, defaults={"entitled": entitlement}
         )
         balances.append(balance)

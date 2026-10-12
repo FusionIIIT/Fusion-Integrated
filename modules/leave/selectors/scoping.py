@@ -6,35 +6,30 @@ from modules.leave.models import LeaveBalance, LeaveRequest
 
 
 def requests_for(actor) -> QuerySet[LeaveRequest]:
-    """EL-UC-001/007/008/010, BR-EL-011, BR-EL-012, BR-EL-015, BR-EL-016, BR-EL-017, BR-EL-018, BR-EL-019, BR-EL-020, BR-EL-021, BR-EL-022, BR-EL-023, BR-EL-024, BR-EL-025, BR-EL-027, BR-EL-028, BR-EL-029, BR-EL-030, BR-EL-031, BR-EL-032, BR-EL-033, BR-EL-034, BR-EL-035, BR-EL-036, BR-EL-037, BR-EL-038
-
-    Returns a queryset of LeaveRequests for the given actor based on their role and permissions.
-    """
+    """Requests the actor may see, decided in one place (BR-EL-036)."""
     if not hasattr(actor, "user_id"):
         return LeaveRequest.objects.none()
 
+    if actor.has_permission("leave.offline.record"):
+        return LeaveRequest.objects.select_related("unit")
+
     own_id = actor.user_id
+    q = Q(user_id=own_id) | Q(substitute_user_id=own_id)
 
-    if actor.has_permission("leave.request.create"):
-        return LeaveRequest.objects.filter(
-            Q(unit__unit_head_user_id=own_id)
-            | Q(substitute_user_id=own_id)
-            | Q(status="routing")
-            | Q(status="sanction")
-        )
+    if actor.has_permission("leave.request.review"):
+        q |= Q(unit__unit_head_user_id=own_id)
+    if actor.has_permission("leave.request.route"):
+        q |= Q(status="routing")
+    if actor.has_permission("leave.request.sanction"):
+        q |= Q(status="sanction")
 
-    return LeaveRequest.objects.none()
+    return LeaveRequest.objects.filter(q).select_related("unit")
 
 
 def resumptions_for(actor) -> QuerySet[LeaveRequest]:
-    """EL-UC-011, BR-EL-011, BR-EL-012, BR-EL-015, BR-EL-016, BR-EL-017, BR-EL-018, BR-EL-019, BR-EL-020, BR-EL-021, BR-EL-022, BR-EL-023, BR-EL-024, BR-EL-025, BR-EL-027, BR-EL-028, BR-EL-029, BR-EL-030, BR-EL-031, BR-EL-032, BR-EL-033, BR-EL-034, BR-EL-035, BR-EL-036, BR-EL-037, BR-EL-038
-
-    Returns a queryset of LeaveRequests for resumption review for the given actor based on their role and permissions.
-    """
+    """Resumptions the actor may see (EL-UC-011, BR-EL-027, BR-EL-036)."""
     if not hasattr(actor, "user_id"):
         return LeaveRequest.objects.none()
-
-    own_id = actor.user_id
 
     if actor.has_permission("leave.resumption.verify"):
         return LeaveRequest.objects.filter(Q(status="routing") | Q(status="sanction"))
@@ -43,10 +38,7 @@ def resumptions_for(actor) -> QuerySet[LeaveRequest]:
 
 
 def balances_for(actor) -> QuerySet[LeaveBalance]:
-    """EL-UC-012, BR-EL-011, BR-EL-012, BR-EL-015, BR-EL-016, BR-EL-017, BR-EL-018, BR-EL-019, BR-EL-020, BR-EL-021, BR-EL-022, BR-EL-023, BR-EL-024, BR-EL-025, BR-EL-027, BR-EL-028, BR-EL-029, BR-EL-030, BR-EL-031, BR-EL-032, BR-EL-033, BR-EL-034, BR-EL-035, BR-EL-036, BR-EL-037, BR-EL-038
-
-    Returns a queryset of LeaveBalances for the given actor based on their role and permissions.
-    """
+    """The actor's own leave balances (EL-UC-012, BR-EL-036)."""
     if not hasattr(actor, "user_id"):
         return LeaveBalance.objects.none()
 

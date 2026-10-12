@@ -3,16 +3,16 @@ from __future__ import annotations
 from django.db import transaction
 from django.utils import timezone
 
-from core.api.exceptions import ConflictError
+from core.api.exceptions import ConflictError, NotFoundError
 from modules.leave.domain.categories import is_eligible
 from modules.leave.domain.counting import count_days
 from modules.leave.domain.state_machine import assert_transition
-from modules.leave.models import LeaveBalance, LeaveRequest, RequestAction
+from modules.leave.models import Holiday, LeaveBalance, LeaveRequest, RequestAction
 from modules.leave.services import authz
+from modules.leave.services.admin import ensure_balances
 
 P_APPLY = "leave.request.create"
-P_WITHDRAW = "leave.request.withdraw"
-P_CANCEL = "leave.request.cancel"
+P_WITHDRAW = P_CANCEL = "leave.request.create"
 P_SUBSTITUTE_RESPONSE = "leave.substitute.respond"
 
 
@@ -41,15 +41,15 @@ def apply(
         )
 
     holidays = set(
-        holiday.date
-        for holiday in LeaveRequest.objects.filter(
-            start_date__lte=end_date, end_date__gte=start_date
-        ).values_list("start_date", flat=True)
+        Holiday.objects.filter(
+            is_published=True, date__gte=start_date, date__lte=end_date
+        ).values_list("date", flat=True)
     )
     days = count_days(category, start_date, end_date, is_half_day, holidays)
 
-    balance = LeaveBalance.objects.get(
-        user_id=actor.user_id, year=timezone.now().year, category=category
+    ensure_balances(user_id=actor.user_id, year=start_date.year)
+    balance = LeaveBalance.objects.select_for_update().get(
+        user_id=actor.user_id, year=start_date.year, category=category
     )
     if balance.entitled - balance.used < days:
         raise ConflictError(
@@ -136,8 +136,9 @@ def request_cancellation(*, actor, request_id) -> LeaveRequest:
     request.decision_note = "Cancelled by user"
     request.save(update_fields=["status", "decided_at", "decided_by_user_id", "decision_note"])
 
-    balance = LeaveBalance.objects.get(
-        user_id=actor.user_id, year=timezone.now().year, category=request.category
+    ensure_balances(user_id=request.user_id, year=request.start_date.year)
+    balance = LeaveBalance.objects.select_for_update().get(
+        user_id=request.user_id, year=request.start_date.year, category=request.category
     )
     balance.used -= request.days
     balance.save(update_fields=["used"])
@@ -158,24 +159,28 @@ def respond_substitute(*, actor, request_id, accept: bool) -> LeaveRequest:
     """EL-UC-002, BR-EL-015"""
     authz.require(actor, P_SUBSTITUTE_RESPONSE)
 
-    request = LeaveRequest.objects.select_for_update().get(
-        pk=request_id, substitute_user_id=actor.user_id, status="substitute_pending"
+    request = (
+        LeaveRequest.objects.select_for_update()
+        .filter(pk=request_id, substitute_user_id=actor.user_id, status="substitute_pending")
+        .first()
     )
-    assert_transition(request.status, "unit_review" if accept else "substitute_response")
+    if request is None:
+        raise NotFoundError("No such substitute request.", code="not_found")
 
-    request.substitute_status = "accepted" if accept else "declined"
-    request.decided_at = timezone.now()
-    request.decided_by_user_id = actor.user_id
-    request.decision_note = "Substitute response" if accept else "Substitute declined"
-    request.save(
-        update_fields=["substitute_status", "decided_at", "decided_by_user_id", "decision_note"]
-    )
+    from_status = request.status
+    if accept:
+        request.substitute_status = "accepted"
+        request.status = "unit_review"
+    else:
+        request.substitute_status = "declined"
+
+    request.save(update_fields=["substitute_status", "status", "updated_at"])
 
     RequestAction.objects.create(
         request=request,
         actor_user_id=actor.user_id,
-        action="substitute_response",
-        from_status=request.status,
+        action="substitute_accepted" if accept else "substitute_declined",
+        from_status=from_status,
         to_status=request.status,
     )
 

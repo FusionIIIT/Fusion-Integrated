@@ -62,13 +62,9 @@ class LeaveRequest(TimeStampedModel, UserScopedModel):
 
     class Meta:
         db_table = "leave_request"
-        constraints = [
-            models.UniqueConstraint(
-                fields=["user_id", "start_date"], name="request_user_start_idx"
-            ),
-        ]
         indexes = [
             models.Index(fields=["status"], name="leave_request_status_idx"),
+            models.Index(fields=["user_id", "start_date"], name="leave_request_user_start_idx"),
         ]
 
     def __str__(self) -> str:

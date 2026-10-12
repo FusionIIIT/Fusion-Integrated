@@ -9,7 +9,7 @@ from modules.leave.domain.categories import CONTINUOUS
 def count_days(
     category: str, start: date, end: date, is_half_day: bool, holidays: set[date]
 ) -> Decimal:
-    """Count leave days based on category, start, end, is_half_day, and holidays (EL-UC-001/BR-EL-010, BR-EL-011)."""
+    """Leave days in the interval (BR-EL-010, BR-EL-011)."""
     if is_half_day:
         return Decimal("0.5")
 

@@ -52,33 +52,29 @@ class RequestListView(generics.ListCreateAPIView):
 
 
 class RequestWithdrawView(APIView):
-    permission_classes = [MODULE, REQUEST_PERMISSIONS]
+    permission_classes = [MODULE, HasPermission("leave.request.create")]
 
     @extend_schema(request=s.WithdrawSerializer, responses=s.LeaveRequestSerializer)
     def post(self, request, pk):
         payload = s.WithdrawSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
-        request_obj = applications.withdraw(
-            request_id=pk, actor=_actor(request), reason=payload.validated_data["reason"]
-        )
+        request_obj = applications.withdraw(request_id=pk, actor=_actor(request))
         return Response(s.LeaveRequestSerializer(request_obj).data)
 
 
 class RequestCancelView(APIView):
-    permission_classes = [MODULE, REQUEST_PERMISSIONS]
+    permission_classes = [MODULE, HasPermission("leave.request.create")]
 
     @extend_schema(request=s.WithdrawSerializer, responses=s.LeaveRequestSerializer)
     def post(self, request, pk):
         payload = s.WithdrawSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
-        request_obj = applications.request_cancellation(
-            request_id=pk, actor=_actor(request), reason=payload.validated_data["reason"]
-        )
+        request_obj = applications.request_cancellation(request_id=pk, actor=_actor(request))
         return Response(s.LeaveRequestSerializer(request_obj).data)
 
 
 class SubstituteResponseView(APIView):
-    permission_classes = [MODULE, REQUEST_PERMISSIONS]
+    permission_classes = [MODULE, HasPermission("leave.substitute.respond")]
 
     @extend_schema(request=s.SubstituteResponseSerializer, responses=s.LeaveRequestSerializer)
     def post(self, request, pk):
@@ -91,7 +87,7 @@ class SubstituteResponseView(APIView):
 
 
 class RequestReviewView(APIView):
-    permission_classes = [MODULE, REQUEST_PERMISSIONS]
+    permission_classes = [MODULE, HasPermission("leave.request.review")]
 
     @extend_schema(request=s.ReviewSerializer, responses=s.LeaveRequestSerializer)
     def post(self, request, pk):
@@ -101,26 +97,30 @@ class RequestReviewView(APIView):
             request_id=pk,
             actor=_actor(request),
             outcome=payload.validated_data["outcome"],
-            note=payload.validated_data.get("note"),
+            note=payload.validated_data.get("note", ""),
+            scope=scoping.requests_for(_actor(request)),
         )
         return Response(s.LeaveRequestSerializer(request_obj).data)
 
 
 class RequestRouteView(APIView):
-    permission_classes = [MODULE, REQUEST_PERMISSIONS]
+    permission_classes = [MODULE, HasPermission("leave.request.route")]
 
     @extend_schema(request=s.RouteSerializer, responses=s.LeaveRequestSerializer)
     def post(self, request, pk):
         payload = s.RouteSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         request_obj = decisions.route(
-            request_id=pk, actor=_actor(request), note=payload.validated_data.get("note")
+            request_id=pk,
+            actor=_actor(request),
+            note=payload.validated_data.get("note", ""),
+            scope=scoping.requests_for(_actor(request)),
         )
         return Response(s.LeaveRequestSerializer(request_obj).data)
 
 
 class RequestSanctionView(APIView):
-    permission_classes = [MODULE, REQUEST_PERMISSIONS]
+    permission_classes = [MODULE, HasPermission("leave.request.sanction")]
 
     @extend_schema(request=s.SanctionSerializer, responses=s.LeaveRequestSerializer)
     def post(self, request, pk):
@@ -130,13 +130,14 @@ class RequestSanctionView(APIView):
             request_id=pk,
             actor=_actor(request),
             decision=payload.validated_data["decision"],
-            note=payload.validated_data.get("note"),
+            note=payload.validated_data.get("note", ""),
+            scope=scoping.requests_for(_actor(request)),
         )
         return Response(s.LeaveRequestSerializer(request_obj).data)
 
 
 class ResumptionSubmitView(APIView):
-    permission_classes = [MODULE, REQUEST_PERMISSIONS]
+    permission_classes = [MODULE, HasPermission("leave.request.create")]
 
     @extend_schema(request=s.ResumptionSubmitSerializer, responses=s.ResumptionSerializer)
     def post(self, request, pk):
