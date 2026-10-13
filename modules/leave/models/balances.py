@@ -13,7 +13,7 @@ class LeaveBalance(TimeStampedModel, UserScopedModel):
         ("RH", "Restricted Holiday"),
         ("SCL", "Special Casual Leave"),
         ("EL", "Earned Leave"),
-        ("COL", "Compensatory Leave"),
+        ("COL", "Commuted Leave"),
         ("VL", "Vacation Leave"),
     ]
 

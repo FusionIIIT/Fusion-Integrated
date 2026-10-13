@@ -63,6 +63,536 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/leave/balances:
+    get:
+      operationId: v1_leave_balances_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveBalance'
+          description: ''
+  /api/v1/leave/holidays:
+    get:
+      operationId: v1_leave_holidays_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedHolidayWriteList'
+          description: ''
+    post:
+      operationId: v1_leave_holidays_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HolidayWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HolidayWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HolidayWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HolidayWrite'
+          description: ''
+  /api/v1/leave/offline-records:
+    post:
+      operationId: v1_leave_offline_records_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfflineRecord'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OfflineRecord'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OfflineRecord'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/policies:
+    get:
+      operationId: v1_leave_policies_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPolicyWriteList'
+          description: ''
+    post:
+      operationId: v1_leave_policies_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolicyWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PolicyWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PolicyWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyWrite'
+          description: ''
+  /api/v1/leave/requests:
+    get:
+      operationId: v1_leave_requests_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveRequestList'
+          description: ''
+    post:
+      operationId: v1_leave_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/cancel:
+    post:
+      operationId: v1_leave_requests_cancel_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveWithdraw'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveWithdraw'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveWithdraw'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/resumption:
+    post:
+      operationId: v1_leave_requests_resumption_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResumptionSubmit'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResumptionSubmit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResumptionSubmit'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resumption'
+          description: ''
+  /api/v1/leave/requests/{id}/review:
+    post:
+      operationId: v1_leave_requests_review_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Review'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Review'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/route:
+    post:
+      operationId: v1_leave_requests_route_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Route'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Route'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Route'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/sanction:
+    post:
+      operationId: v1_leave_requests_sanction_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sanction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Sanction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Sanction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/substitute-response:
+    post:
+      operationId: v1_leave_requests_substitute_response_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/withdraw:
+    post:
+      operationId: v1_leave_requests_withdraw_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveWithdraw'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveWithdraw'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveWithdraw'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/resumptions:
+    get:
+      operationId: v1_leave_resumptions_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResumptionList'
+          description: ''
+  /api/v1/leave/resumptions/{id}/review:
+    post:
+      operationId: v1_leave_resumptions_review_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResumptionReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResumptionReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResumptionReview'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resumption'
+          description: ''
+  /api/v1/leave/units:
+    get:
+      operationId: v1_leave_units_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUnitWriteList'
+          description: ''
+    post:
+      operationId: v1_leave_units_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnitWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UnitWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UnitWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnitWrite'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1763,6 +2293,26 @@ components:
       - semester
       - semester_type
       - user_id
+    ActionEnum:
+      enum:
+      - create
+      - withdraw
+      - cancel
+      - resume
+      - substitute_response
+      - review
+      - route
+      - sanction
+      type: string
+      description: |-
+        * `create` - Create
+        * `withdraw` - Withdraw
+        * `cancel` - Cancel
+        * `resume` - Resume
+        * `substitute_response` - Substitute Response
+        * `review` - Review
+        * `route` - Route
+        * `sanction` - Sanction
     AddCandidates:
       type: object
       properties:
@@ -1928,6 +2478,16 @@ components:
         * `offer_accepted` - Offer accepted
         * `offer_declined` - Offer declined
         * `offer_expired` - Offer expired
+    AppliesToEnum:
+      enum:
+      - all
+      - faculty
+      - staff
+      type: string
+      description: |-
+        * `all` - all
+        * `faculty` - faculty
+        * `staff` - staff
     Apply:
       type: object
       properties:
@@ -2315,6 +2875,14 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DecisionEnum:
+      enum:
+      - approve
+      - reject
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
     Detail:
       type: object
       properties:
@@ -2423,6 +2991,25 @@ components:
       - fee_reference
       - season
       - user_id
+    HolidayWrite:
+      type: object
+      description: EL-UC-015, BR-EL-034
+      properties:
+        date:
+          type: string
+          format: date
+        name:
+          type: string
+          maxLength: 120
+        is_restricted:
+          type: boolean
+        is_published:
+          type: boolean
+      required:
+      - date
+      - is_published
+      - is_restricted
+      - name
     IncidentRecorded:
       type: object
       properties:
@@ -2637,6 +3224,175 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveBalance:
+      type: object
+      description: EL-UC-012, BR-EL-034
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/LeaveCategoryEnum'
+          readOnly: true
+        entitled:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          readOnly: true
+        used:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          readOnly: true
+        available:
+          type: number
+          format: double
+          readOnly: true
+      required:
+      - available
+      - category
+      - entitled
+      - id
+      - used
+      - user_id
+      - year
+    LeaveCategoryEnum:
+      enum:
+      - CL
+      - RH
+      - SCL
+      - EL
+      - COL
+      - VL
+      type: string
+      description: |-
+        * `CL` - Casual Leave
+        * `RH` - Restricted Holiday
+        * `SCL` - Special Casual Leave
+        * `EL` - Earned Leave
+        * `COL` - Commuted Leave
+        * `VL` - Vacation Leave
+    LeaveRequest:
+      type: object
+      description: EL-UC-001, BR-EL-034
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        category:
+          $ref: '#/components/schemas/LeaveCategoryEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        is_half_day:
+          type: boolean
+        half_session:
+          type: string
+          maxLength: 10
+        days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        purpose:
+          type: string
+        station_leave:
+          type: boolean
+        station_address:
+          type: string
+          maxLength: 200
+        substitute_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        substitute_status:
+          allOf:
+          - $ref: '#/components/schemas/SubstituteStatusEnum'
+          readOnly: true
+        unit:
+          type: integer
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/LeaveRequestStatusEnum'
+          readOnly: true
+        recommendation:
+          type: string
+          readOnly: true
+        decided_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decision_note:
+          type: string
+          readOnly: true
+        is_offline:
+          type: boolean
+          readOnly: true
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/RequestAction'
+          readOnly: true
+      required:
+      - actions
+      - category
+      - days
+      - decided_at
+      - decided_by_user_id
+      - decision_note
+      - end_date
+      - id
+      - is_offline
+      - purpose
+      - recommendation
+      - start_date
+      - status
+      - substitute_status
+      - user_id
+    LeaveRequestStatusEnum:
+      enum:
+      - substitute_pending
+      - unit_review
+      - routing
+      - sanction
+      - approved
+      - rejected
+      - withdrawn
+      - cancelled
+      type: string
+      description: |-
+        * `substitute_pending` - Substitute Pending
+        * `unit_review` - Unit Review
+        * `routing` - Routing
+        * `sanction` - Sanction
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `withdrawn` - Withdrawn
+        * `cancelled` - Cancelled
+    LeaveWithdraw:
+      type: object
+      properties:
+        note:
+          type: string
     LiftSanction:
       type: object
       properties:
@@ -2864,6 +3620,32 @@ components:
         * `revoked` - Revoked
         * `superseded` - Superseded
         * `expired` - Expired
+    OfflineRecord:
+      type: object
+      description: EL-UC-016, BR-EL-034
+      properties:
+        user_id:
+          type: integer
+        category:
+          $ref: '#/components/schemas/LeaveCategoryEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        note:
+          type: string
+      required:
+      - category
+      - days
+      - end_date
+      - start_date
+      - user_id
     Ok:
       type: object
       properties:
@@ -2943,6 +3725,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Company'
+    PaginatedHolidayWriteList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/HolidayWrite'
     PaginatedInterviewRoundList:
       type: object
       required:
@@ -2981,6 +3782,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedLeaveRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveRequest'
     PaginatedOfferList:
       type: object
       required:
@@ -3000,6 +3820,63 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PaginatedPolicyWriteList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyWrite'
+    PaginatedResumptionList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Resumption'
+    PaginatedUnitWriteList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UnitWrite'
     PatchedJobPosting:
       type: object
       properties:
@@ -3145,6 +4022,28 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    PolicyWrite:
+      type: object
+      description: EL-UC-014, BR-EL-034
+      properties:
+        category:
+          $ref: '#/components/schemas/LeaveCategoryEnum'
+        annual_entitlement:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        carries_forward:
+          type: boolean
+        applies_to:
+          $ref: '#/components/schemas/AppliesToEnum'
+        is_active:
+          type: boolean
+      required:
+      - annual_entitlement
+      - applies_to
+      - carries_forward
+      - category
+      - is_active
     ProfileDocument:
       type: object
       description: |-
@@ -3466,6 +4365,142 @@ components:
       - message
       - reason
       - route
+    RequestAction:
+      type: object
+      description: EL-UC-002, BR-EL-034
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        request:
+          type: integer
+          readOnly: true
+        actor_user_id:
+          type: integer
+          readOnly: true
+        action:
+          allOf:
+          - $ref: '#/components/schemas/ActionEnum'
+          readOnly: true
+        from_status:
+          type: string
+          readOnly: true
+        to_status:
+          type: string
+          readOnly: true
+        note:
+          type: string
+          readOnly: true
+      required:
+      - action
+      - actor_user_id
+      - from_status
+      - id
+      - note
+      - request
+      - to_status
+    Resumption:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        request:
+          type: integer
+          readOnly: true
+        resumed_on:
+          type: string
+          format: date
+          readOnly: true
+        outcome:
+          allOf:
+          - $ref: '#/components/schemas/ResumptionOutcomeEnum'
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ResumptionStatusEnum'
+          readOnly: true
+        reviewed_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        reviewed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - outcome
+      - request
+      - resumed_on
+      - reviewed_at
+      - reviewed_by_user_id
+      - status
+    ResumptionOutcomeEnum:
+      enum:
+      - normal
+      - early
+      - late
+      type: string
+      description: |-
+        * `normal` - Normal
+        * `early` - Early
+        * `late` - Late
+    ResumptionReview:
+      type: object
+      description: EL-UC-011, BR-EL-034
+      properties:
+        accept:
+          type: boolean
+      required:
+      - accept
+    ResumptionStatusEnum:
+      enum:
+      - submitted
+      - accepted
+      - rejected
+      type: string
+      description: |-
+        * `submitted` - Submitted
+        * `accepted` - Accepted
+        * `rejected` - Rejected
+    ResumptionSubmit:
+      type: object
+      description: EL-UC-011, BR-EL-034
+      properties:
+        resumed_on:
+          type: string
+          format: date
+      required:
+      - resumed_on
+    Review:
+      type: object
+      description: EL-UC-003, BR-EL-034
+      properties:
+        outcome:
+          $ref: '#/components/schemas/ReviewOutcomeEnum'
+        note:
+          type: string
+      required:
+      - outcome
+    ReviewOutcomeEnum:
+      enum:
+      - approve
+      - reject
+      - recommend
+      - not_recommend
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
+        * `recommend` - recommend
+        * `not_recommend` - not_recommend
     RoundOutcome:
       type: object
       properties:
@@ -3539,6 +4574,22 @@ components:
         * `absent` - Absent
         * `passed` - Passed
         * `failed` - Failed
+    Route:
+      type: object
+      description: EL-UC-004, BR-EL-034
+      properties:
+        note:
+          type: string
+    Sanction:
+      type: object
+      description: EL-UC-005, BR-EL-034
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        note:
+          type: string
+      required:
+      - decision
     SanctionEnum:
       enum:
       - bar_next_two
@@ -3698,6 +4749,26 @@ components:
           type: integer
       required:
       - document_id
+    SubstituteResponse:
+      type: object
+      description: EL-UC-002, BR-EL-034
+      properties:
+        accept:
+          type: boolean
+      required:
+      - accept
+    SubstituteStatusEnum:
+      enum:
+      - not_required
+      - pending
+      - accepted
+      - declined
+      type: string
+      description: |-
+        * `not_required` - Not Required
+        * `pending` - Pending
+        * `accepted` - Accepted
+        * `declined` - Declined
     TopicEnum:
       enum:
       - drive
@@ -3769,6 +4840,18 @@ components:
       - application_id
       - redacted
       - results
+    UnitWrite:
+      type: object
+      description: EL-UC-014, BR-EL-034
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        unit_head_user_id:
+          type: integer
+      required:
+      - name
+      - unit_head_user_id
     UserRef:
       type: object
       properties:

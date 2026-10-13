@@ -231,6 +231,10 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    # Two modules each have a `category` choice set; name them apart.
+    "ENUM_NAME_OVERRIDES": {
+        "LeaveCategoryEnum": "modules.leave.models.requests.LeaveRequest.CATEGORY_CHOICES",
+    },
 }
 
 CORS_ALLOW_ALL_ORIGINS = False

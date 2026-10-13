@@ -54,9 +54,9 @@ class RequestListView(generics.ListCreateAPIView):
 class RequestWithdrawView(APIView):
     permission_classes = [MODULE, HasPermission("leave.request.create")]
 
-    @extend_schema(request=s.WithdrawSerializer, responses=s.LeaveRequestSerializer)
+    @extend_schema(request=s.LeaveWithdrawSerializer, responses=s.LeaveRequestSerializer)
     def post(self, request, pk):
-        payload = s.WithdrawSerializer(data=request.data)
+        payload = s.LeaveWithdrawSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         request_obj = applications.withdraw(request_id=pk, actor=_actor(request))
         return Response(s.LeaveRequestSerializer(request_obj).data)
@@ -65,9 +65,9 @@ class RequestWithdrawView(APIView):
 class RequestCancelView(APIView):
     permission_classes = [MODULE, HasPermission("leave.request.create")]
 
-    @extend_schema(request=s.WithdrawSerializer, responses=s.LeaveRequestSerializer)
+    @extend_schema(request=s.LeaveWithdrawSerializer, responses=s.LeaveRequestSerializer)
     def post(self, request, pk):
-        payload = s.WithdrawSerializer(data=request.data)
+        payload = s.LeaveWithdrawSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         request_obj = applications.request_cancellation(request_id=pk, actor=_actor(request))
         return Response(s.LeaveRequestSerializer(request_obj).data)

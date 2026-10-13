@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 
 from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.leave.api import serializers as s
-from modules.leave.models import Holiday, LeavePolicy, OrgUnit
+from modules.leave.models import Holiday, LeaveBalance, LeavePolicy, OrgUnit
 from modules.leave.selectors import scoping
 from modules.leave.services import admin
 
@@ -57,6 +57,8 @@ class BalanceListView(generics.ListAPIView):
 
     def get_queryset(self):
         actor = _actor(self.request)
+        if getattr(self, "swagger_fake_view", False) or actor is None:
+            return LeaveBalance.objects.none()
         admin.ensure_balances(user_id=actor.user_id, year=timezone.localdate().year)
         return scoping.balances_for(actor)
 

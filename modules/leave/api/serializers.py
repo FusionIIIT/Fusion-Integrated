@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from decimal import Decimal
+
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
@@ -72,7 +76,8 @@ class LeaveBalanceSerializer(serializers.ModelSerializer):
         )
         read_only_fields = fields
 
-    def get_available(self, obj):
+    @extend_schema_field(OpenApiTypes.DECIMAL)
+    def get_available(self, obj) -> Decimal:
         return obj.entitled - obj.used
 
 
@@ -140,7 +145,7 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
 class ApplySerializer(serializers.Serializer):
     """EL-UC-001, BR-EL-034"""
 
-    category = serializers.ChoiceField(choices=["CL", "RH", "SCL", "EL", "COL", "VL"])
+    category = serializers.ChoiceField(choices=LeaveRequest.CATEGORY_CHOICES)
     start_date = serializers.DateField()
     end_date = serializers.DateField()
     purpose = serializers.CharField()
@@ -194,7 +199,7 @@ class ResumptionReviewSerializer(serializers.Serializer):
 class PolicyWriteSerializer(serializers.Serializer):
     """EL-UC-014, BR-EL-034"""
 
-    category = serializers.ChoiceField(choices=["CL", "RH", "SCL", "EL", "COL", "VL"])
+    category = serializers.ChoiceField(choices=LeaveRequest.CATEGORY_CHOICES)
     annual_entitlement = serializers.DecimalField(max_digits=5, decimal_places=1)
     carries_forward = serializers.BooleanField()
     applies_to = serializers.ChoiceField(choices=["all", "faculty", "staff"])
@@ -221,7 +226,7 @@ class OfflineRecordSerializer(serializers.Serializer):
     """EL-UC-016, BR-EL-034"""
 
     user_id = serializers.IntegerField()
-    category = serializers.ChoiceField(choices=["CL", "RH", "SCL", "EL", "COL", "VL"])
+    category = serializers.ChoiceField(choices=LeaveRequest.CATEGORY_CHOICES)
     start_date = serializers.DateField()
     end_date = serializers.DateField()
     days = serializers.DecimalField(max_digits=5, decimal_places=1)
@@ -244,5 +249,5 @@ class ResumptionSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class WithdrawSerializer(serializers.Serializer):
+class LeaveWithdrawSerializer(serializers.Serializer):
     note = serializers.CharField(required=False, allow_blank=True)
