@@ -10,7 +10,7 @@ from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.leave.api import serializers as s
 from modules.leave.models import Holiday, LeaveBalance, LeavePolicy, OrgUnit
 from modules.leave.selectors import scoping
-from modules.leave.services import admin
+from modules.leave.services import admin, resumption
 
 MODULE = HasModuleGrant("leave")
 REQUEST_PERMISSIONS = HasPermission(
@@ -44,8 +44,11 @@ class ResumptionReviewView(APIView):
     def post(self, request, pk):
         payload = s.ResumptionReviewSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
-        resumption_obj = admin.review_resumption(
-            request_id=pk, actor=_actor(request), accept=payload.validated_data["accept"]
+        resumption_obj = resumption.review_resumption(
+            actor=_actor(request),
+            scope=scoping.resumptions_for(_actor(request)),
+            resumption_id=pk,
+            accept=payload.validated_data["accept"],
         )
         return Response(s.ResumptionSerializer(resumption_obj).data)
 
@@ -64,36 +67,63 @@ class BalanceListView(generics.ListAPIView):
 
 
 class PolicyListView(generics.ListCreateAPIView):
-    serializer_class = s.PolicyWriteSerializer
+    serializer_class = s.LeavePolicySerializer
     permission_classes = [MODULE]
 
     def get_queryset(self):
         return LeavePolicy.objects.all()
 
-    def perform_create(self, serializer):
-        serializer.save(actor=_actor(self.request))
+    def get_permissions(self):
+        """Module users may read; writing needs leave.policy.manage (BR-EL-036, BR-EL-037)."""
+        if self.request.method in ("GET", "HEAD", "OPTIONS"):
+            return [MODULE()]
+        return [MODULE(), HasPermission("leave.policy.manage")()]
+
+    def create(self, request, *args, **kwargs):
+        payload = s.PolicyWriteSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        obj = admin.save_policy(actor=_actor(request), **payload.validated_data)
+        return Response(s.LeavePolicySerializer(obj).data, status=status.HTTP_201_CREATED)
 
 
 class UnitListView(generics.ListCreateAPIView):
-    serializer_class = s.UnitWriteSerializer
+    serializer_class = s.OrgUnitSerializer
     permission_classes = [MODULE]
 
     def get_queryset(self):
         return OrgUnit.objects.all()
 
-    def perform_create(self, serializer):
-        serializer.save(actor=_actor(self.request))
+    def get_permissions(self):
+        """Module users may read; writing needs leave.policy.manage (BR-EL-036, BR-EL-037)."""
+        if self.request.method in ("GET", "HEAD", "OPTIONS"):
+            return [MODULE()]
+        return [MODULE(), HasPermission("leave.policy.manage")()]
+
+    def create(self, request, *args, **kwargs):
+        payload = s.UnitWriteSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        obj = admin.save_unit(actor=_actor(request), **payload.validated_data)
+        return Response(s.OrgUnitSerializer(obj).data, status=status.HTTP_201_CREATED)
 
 
 class HolidayListView(generics.ListCreateAPIView):
-    serializer_class = s.HolidayWriteSerializer
+    serializer_class = s.HolidaySerializer
     permission_classes = [MODULE]
 
     def get_queryset(self):
         return Holiday.objects.all()
 
-    def perform_create(self, serializer):
-        serializer.save(actor=_actor(self.request))
+    def get_permissions(self):
+        """Module users may read; writing needs leave.calendar.manage (BR-EL-036, BR-EL-037)."""
+        if self.request.method in ("GET", "HEAD", "OPTIONS"):
+            return [MODULE()]
+        return [MODULE(), HasPermission("leave.calendar.manage")()]
+
+    def create(self, request, *args, **kwargs):
+        payload = s.HolidayWriteSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        obj = admin.add_holiday(actor=_actor(request), **payload.validated_data)
+        return Response(s.HolidaySerializer(obj).data, status=status.HTTP_201_CREATED)
 
 
 class OfflineRecordView(APIView):

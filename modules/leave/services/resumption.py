@@ -39,14 +39,16 @@ def submit_resumption(*, actor, request_id: int, resumed_on: date) -> Resumption
 
 
 @transaction.atomic
-def review_resumption(*, actor, resumption_id: int, accept: bool) -> Resumption:
+def review_resumption(*, actor, scope, resumption_id: int, accept: bool) -> Resumption:
     """EL-UC-011, BR-EL-028: Review a submitted resumption."""
     authz.require(actor, P_REVIEW_RESUMPTION)
+    if not scope.filter(pk=resumption_id).exists():
+        raise NotFoundError("No such resumption.")
     resumption = Resumption.objects.select_for_update().filter(pk=resumption_id).first()
     if resumption is None:
         raise NotFoundError("No such resumption.")
     if resumption.status != "submitted":
-        raise ConflictError("Only submitted resumptions can be reviewed.")
+        raise ConflictError("Only submitted resumptions can be reviewed.", code="not_submitted")
     resumption.status = "accepted" if accept else "rejected"
     resumption.reviewed_by_user_id = actor.user_id
     resumption.reviewed_at = timezone.now()

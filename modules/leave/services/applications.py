@@ -125,16 +125,22 @@ def request_cancellation(*, actor, request_id) -> LeaveRequest:
     """EL-UC-007, BR-EL-023"""
     authz.require(actor, P_CANCEL)
 
-    request = LeaveRequest.objects.select_for_update().get(
-        pk=request_id, user_id=actor.user_id, status="approved", start_date__gt=timezone.now()
+    request = (
+        LeaveRequest.objects.select_for_update()
+        .filter(pk=request_id, user_id=actor.user_id)
+        .first()
     )
-    assert_transition(request.status, "cancelled")
+    if request is None:
+        raise NotFoundError("No such leave request.", code="not_found")
+    if request.status != "approved":
+        raise ConflictError("Only approved leave can be cancelled.", code="not_approved")
+    if request.start_date <= timezone.localdate():
+        raise ConflictError("Leave that has started cannot be cancelled.", code="already_started")
 
+    from_status = request.status
+    assert_transition(request.status, "cancelled")
     request.status = "cancelled"
-    request.decided_at = timezone.now()
-    request.decided_by_user_id = actor.user_id
-    request.decision_note = "Cancelled by user"
-    request.save(update_fields=["status", "decided_at", "decided_by_user_id", "decision_note"])
+    request.save(update_fields=["status", "updated_at"])
 
     ensure_balances(user_id=request.user_id, year=request.start_date.year)
     balance = LeaveBalance.objects.select_for_update().get(
@@ -147,8 +153,8 @@ def request_cancellation(*, actor, request_id) -> LeaveRequest:
         request=request,
         actor_user_id=actor.user_id,
         action="cancel",
-        from_status=request.status,
-        to_status=request.status,
+        from_status=from_status,
+        to_status="cancelled",
     )
 
     return request

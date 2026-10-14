@@ -23,7 +23,7 @@ def save_policy(
         defaults={
             "annual_entitlement": annual_entitlement,
             "carries_forward": carries_forward,
-            applies_to: applies_to,
+            "applies_to": applies_to,
             "is_active": is_active,
         },
     )
@@ -41,10 +41,10 @@ def save_unit(*, actor, name, unit_head_user_id) -> OrgUnit:
 
 
 @transaction.atomic
-def add_holiday(*, actor, date, name, is_restricted=False, is_published=True) -> None:
+def add_holiday(*, actor, date, name, is_restricted=False, is_published=True) -> Holiday:
     """EL-UC-015, BR-EL-030: Add a holiday to the calendar."""
     authz.require(actor, P_ADD_HOLIDAY)
-    Holiday.objects.create(
+    return Holiday.objects.create(
         date=date,
         name=name,
         is_restricted=is_restricted,
@@ -53,10 +53,12 @@ def add_holiday(*, actor, date, name, is_restricted=False, is_published=True) ->
 
 
 @transaction.atomic
-def record_offline_leave(*, actor, user_id, category, start_date, end_date, days, note="") -> None:
+def record_offline_leave(
+    *, actor, user_id, category, start_date, end_date, days, note=""
+) -> LeaveRequest:
     """EL-UC-016, BR-EL-029: Record offline-sanctioned leave."""
     authz.require(actor, P_RECORD_OFFLINE_LEAVE)
-    LeaveRequest.objects.create(
+    leave_request = LeaveRequest.objects.create(
         user_id=user_id,
         category=category,
         start_date=start_date,
@@ -70,6 +72,7 @@ def record_offline_leave(*, actor, user_id, category, start_date, end_date, days
         used=days,
         updated_at=timezone.now(),
     )
+    return leave_request
 
 
 def ensure_balances(*, user_id, year) -> list[LeaveBalance]:

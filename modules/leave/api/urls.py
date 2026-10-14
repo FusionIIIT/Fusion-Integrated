@@ -36,15 +36,9 @@ urlpatterns = [
     path("balances", a.BalanceListView.as_view(), name="leave-balances"),
     # policies
     path("policies", a.PolicyListView.as_view(), name="leave-policies"),
-    path("policies", a.PolicyListView.as_view(), name="leave-policies"),
-    path("policies", a.PolicyListView.as_view(), name="leave-policies"),
     # units
     path("units", a.UnitListView.as_view(), name="leave-units"),
-    path("units", a.UnitListView.as_view(), name="leave-units"),
-    path("units", a.UnitListView.as_view(), name="leave-units"),
     # holidays
-    path("holidays", a.HolidayListView.as_view(), name="leave-holidays"),
-    path("holidays", a.HolidayListView.as_view(), name="leave-holidays"),
     path("holidays", a.HolidayListView.as_view(), name="leave-holidays"),
     # offline-records
     path("offline-records", a.OfflineRecordView.as_view(), name="leave-offline-records"),

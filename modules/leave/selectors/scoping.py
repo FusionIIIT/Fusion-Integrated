@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from django.db.models import Q, QuerySet
 
-from modules.leave.models import LeaveBalance, LeaveRequest
+from modules.leave.models import LeaveBalance, LeaveRequest, Resumption
 
 
 def requests_for(actor) -> QuerySet[LeaveRequest]:
@@ -26,15 +26,20 @@ def requests_for(actor) -> QuerySet[LeaveRequest]:
     return LeaveRequest.objects.filter(q).select_related("unit")
 
 
-def resumptions_for(actor) -> QuerySet[LeaveRequest]:
+def resumptions_for(actor) -> QuerySet[Resumption]:
     """Resumptions the actor may see (EL-UC-011, BR-EL-027, BR-EL-036)."""
     if not hasattr(actor, "user_id"):
-        return LeaveRequest.objects.none()
+        return Resumption.objects.none()
 
+    if actor.has_permission("leave.offline.record"):
+        return Resumption.objects.select_related("request")
+
+    own_id = actor.user_id
+    q = Q(request__user_id=own_id)
     if actor.has_permission("leave.resumption.verify"):
-        return LeaveRequest.objects.filter(Q(status="routing") | Q(status="sanction"))
+        q |= Q(request__unit__unit_head_user_id=own_id)
 
-    return LeaveRequest.objects.none()
+    return Resumption.objects.filter(q).select_related("request")
 
 
 def balances_for(actor) -> QuerySet[LeaveBalance]:

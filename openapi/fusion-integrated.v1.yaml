@@ -104,7 +104,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedHolidayWriteList'
+                $ref: '#/components/schemas/PaginatedHolidayList'
           description: ''
     post:
       operationId: v1_leave_holidays_create
@@ -114,14 +114,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/HolidayWrite'
+              $ref: '#/components/schemas/Holiday'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/HolidayWrite'
+              $ref: '#/components/schemas/Holiday'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/HolidayWrite'
-        required: true
+              $ref: '#/components/schemas/Holiday'
       security:
       - iamSession: []
       responses:
@@ -129,7 +128,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HolidayWrite'
+                $ref: '#/components/schemas/Holiday'
           description: ''
   /api/v1/leave/offline-records:
     post:
@@ -182,7 +181,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedPolicyWriteList'
+                $ref: '#/components/schemas/PaginatedLeavePolicyList'
           description: ''
     post:
       operationId: v1_leave_policies_create
@@ -192,14 +191,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PolicyWrite'
+              $ref: '#/components/schemas/LeavePolicy'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PolicyWrite'
+              $ref: '#/components/schemas/LeavePolicy'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PolicyWrite'
-        required: true
+              $ref: '#/components/schemas/LeavePolicy'
       security:
       - iamSession: []
       responses:
@@ -207,7 +205,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PolicyWrite'
+                $ref: '#/components/schemas/LeavePolicy'
           description: ''
   /api/v1/leave/requests:
     get:
@@ -566,7 +564,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedUnitWriteList'
+                $ref: '#/components/schemas/PaginatedOrgUnitList'
           description: ''
     post:
       operationId: v1_leave_units_create
@@ -576,14 +574,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UnitWrite'
+              $ref: '#/components/schemas/OrgUnit'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/UnitWrite'
+              $ref: '#/components/schemas/OrgUnit'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UnitWrite'
-        required: true
+              $ref: '#/components/schemas/OrgUnit'
       security:
       - iamSession: []
       responses:
@@ -591,7 +588,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnitWrite'
+                $ref: '#/components/schemas/OrgUnit'
           description: ''
   /api/v1/me:
     get:
@@ -2485,9 +2482,9 @@ components:
       - staff
       type: string
       description: |-
-        * `all` - all
-        * `faculty` - faculty
-        * `staff` - staff
+        * `all` - All
+        * `faculty` - Faculty
+        * `staff` - Staff
     Apply:
       type: object
       properties:
@@ -2991,22 +2988,29 @@ components:
       - fee_reference
       - season
       - user_id
-    HolidayWrite:
+    Holiday:
       type: object
       description: EL-UC-015, BR-EL-034
       properties:
+        id:
+          type: integer
+          readOnly: true
         date:
           type: string
           format: date
+          readOnly: true
         name:
           type: string
-          maxLength: 120
+          readOnly: true
         is_restricted:
           type: boolean
+          readOnly: true
         is_published:
           type: boolean
+          readOnly: true
       required:
       - date
+      - id
       - is_published
       - is_restricted
       - name
@@ -3279,6 +3283,39 @@ components:
         * `EL` - Earned Leave
         * `COL` - Commuted Leave
         * `VL` - Vacation Leave
+    LeavePolicy:
+      type: object
+      description: EL-UC-014, BR-EL-034
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/LeaveCategoryEnum'
+          readOnly: true
+        annual_entitlement:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          readOnly: true
+        carries_forward:
+          type: boolean
+          readOnly: true
+        applies_to:
+          allOf:
+          - $ref: '#/components/schemas/AppliesToEnum'
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+      required:
+      - annual_entitlement
+      - applies_to
+      - carries_forward
+      - category
+      - id
+      - is_active
     LeaveRequest:
       type: object
       description: EL-UC-001, BR-EL-034
@@ -3668,6 +3705,23 @@ components:
           maxLength: 300
       required:
       - season
+    OrgUnit:
+      type: object
+      description: EL-UC-014, BR-EL-034
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        unit_head_user_id:
+          type: integer
+          readOnly: true
+      required:
+      - id
+      - name
+      - unit_head_user_id
     PaginatedAnnouncementList:
       type: object
       required:
@@ -3725,7 +3779,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Company'
-    PaginatedHolidayWriteList:
+    PaginatedHolidayList:
       type: object
       required:
       - results
@@ -3743,7 +3797,7 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/HolidayWrite'
+            $ref: '#/components/schemas/Holiday'
     PaginatedInterviewRoundList:
       type: object
       required:
@@ -3782,6 +3836,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedLeavePolicyList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeavePolicy'
     PaginatedLeaveRequestList:
       type: object
       required:
@@ -3820,7 +3893,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
-    PaginatedPolicyWriteList:
+    PaginatedOrgUnitList:
       type: object
       required:
       - results
@@ -3838,7 +3911,7 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/PolicyWrite'
+            $ref: '#/components/schemas/OrgUnit'
     PaginatedResumptionList:
       type: object
       required:
@@ -3858,25 +3931,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Resumption'
-    PaginatedUnitWriteList:
-      type: object
-      required:
-      - results
-      properties:
-        next:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
-        previous:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/UnitWrite'
     PatchedJobPosting:
       type: object
       properties:
@@ -4022,28 +4076,6 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
-    PolicyWrite:
-      type: object
-      description: EL-UC-014, BR-EL-034
-      properties:
-        category:
-          $ref: '#/components/schemas/LeaveCategoryEnum'
-        annual_entitlement:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
-        carries_forward:
-          type: boolean
-        applies_to:
-          $ref: '#/components/schemas/AppliesToEnum'
-        is_active:
-          type: boolean
-      required:
-      - annual_entitlement
-      - applies_to
-      - carries_forward
-      - category
-      - is_active
     ProfileDocument:
       type: object
       description: |-
@@ -4840,18 +4872,6 @@ components:
       - application_id
       - redacted
       - results
-    UnitWrite:
-      type: object
-      description: EL-UC-014, BR-EL-034
-      properties:
-        name:
-          type: string
-          maxLength: 120
-        unit_head_user_id:
-          type: integer
-      required:
-      - name
-      - unit_head_user_id
     UserRef:
       type: object
       properties:
