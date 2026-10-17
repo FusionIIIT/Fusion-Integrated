@@ -13,6 +13,17 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave.request.view_self` | View own leave requests and balance | `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (ME)`, `HOD (NS)`, `HOD (SM)`, `Registrar`, `faculty`, `staff` |
+| `leave.request.create` | Apply for leave | `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (ME)`, `HOD (NS)`, `HOD (SM)`, `Registrar`, `faculty`, `staff` |
+| `leave.request.delete` | Withdraw own pending request | `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (ME)`, `HOD (NS)`, `HOD (SM)`, `Registrar`, `faculty`, `staff` |
+| `leave.request.view` | View leave requests awaiting a decision | `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (ME)`, `HOD (NS)`, `HOD (SM)`, `Registrar` |
+| `leave.request.review` | Recommend leave, and decide CL/RH as Unit Head | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (ME)`, `HOD (NS)`, `HOD (SM)` |
+| `leave.request.approve` | Sanction or reject leave as Sanctioning Authority | `Director`, `Registrar` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

@@ -63,6 +63,146 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/elm/balances:
+    get:
+      operationId: v1_elm_balances_list
+      parameters:
+      - in: query
+        name: year
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveBalance'
+          description: ''
+  /api/v1/elm/requests:
+    get:
+      operationId: v1_elm_requests_list
+      description: Employees see their own requests; reviewers see the queue.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: mine
+        schema:
+          type: boolean
+        description: Only the caller's own requests
+      - in: query
+        name: status
+        schema:
+          type: string
+        description: Filter by status
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveRequestList'
+          description: ''
+  /api/v1/elm/requests/{id}:
+    get:
+      operationId: v1_elm_requests_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/requests/{id}/transition:
+    post:
+      operationId: v1_elm_requests_transition_create
+      description: |-
+        Recommend, approve, reject or withdraw. Who may do which is decided by
+        the state machine, not here.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveTransition'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveTransition'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveTransition'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/requests/apply:
+    post:
+      operationId: v1_elm_requests_apply_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveApply'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveApply'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveApply'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1993,6 +2133,9 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BlankEnum:
+      enum:
+      - ''
     BulkOutcome:
       type: object
       properties:
@@ -2082,6 +2225,22 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CategoryEnum:
+      enum:
+      - CL
+      - RH
+      - SCL
+      - EL
+      - COL
+      - VL
+      type: string
+      description: |-
+        * `CL` - CL
+        * `RH` - RH
+        * `SCL` - SCL
+        * `EL` - EL
+        * `COL` - COL
+        * `VL` - VL
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2637,6 +2796,215 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveApply:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        half:
+          default: ''
+          oneOf:
+          - $ref: '#/components/schemas/LeaveApplyHalfEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        reason:
+          type: string
+          maxLength: 2000
+        is_station_leave:
+          type: boolean
+          default: false
+        station_address:
+          type: string
+          default: ''
+          maxLength: 300
+        station_contact:
+          type: string
+          default: ''
+          maxLength: 30
+      required:
+      - category
+      - end_date
+      - reason
+      - start_date
+    LeaveApplyHalfEnum:
+      enum:
+      - first
+      - second
+      type: string
+      description: "* `` - \n* `first` - first\n* `second` - second"
+    LeaveBalance:
+      type: object
+      properties:
+        category:
+          type: string
+        credited:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        availed:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        reserved:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        available:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+      required:
+      - available
+      - availed
+      - category
+      - credited
+      - reserved
+    LeaveHistory:
+      type: object
+      properties:
+        from_status:
+          type: string
+          maxLength: 16
+        to_status:
+          type: string
+          maxLength: 16
+        actor_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        remarks:
+          type: string
+          maxLength: 500
+        at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actor_user_id
+      - at
+      - from_status
+      - to_status
+    LeaveRequest:
+      type: object
+      description: |-
+        Read shape. `allowed_transitions` is computed for the caller, so the UI
+        shows only the buttons that would succeed.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        applicant_user_id:
+          type: integer
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/CategoryEnum'
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+          readOnly: true
+        end_date:
+          type: string
+          format: date
+          readOnly: true
+        half:
+          readOnly: true
+          oneOf:
+          - $ref: '#/components/schemas/LeaveRequestHalfEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/LeaveRequestStatusEnum'
+          readOnly: true
+        is_station_leave:
+          type: boolean
+          readOnly: true
+        station_address:
+          type: string
+          readOnly: true
+        station_contact:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        allowed_transitions:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveHistory'
+          readOnly: true
+      required:
+      - allowed_transitions
+      - applicant_user_id
+      - category
+      - created_at
+      - days
+      - end_date
+      - half
+      - history
+      - id
+      - is_station_leave
+      - reason
+      - start_date
+      - station_address
+      - station_contact
+      - status
+    LeaveRequestHalfEnum:
+      enum:
+      - first
+      - second
+      type: string
+      description: |-
+        * `` - None
+        * `first` - First
+        * `second` - Second
+    LeaveRequestStatusEnum:
+      enum:
+      - pending
+      - recommended
+      - not_recommended
+      - approved
+      - rejected
+      - withdrawn
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `recommended` - Recommended
+        * `not_recommended` - Not Recommended
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `withdrawn` - Withdrawn
+    LeaveTransition:
+      type: object
+      properties:
+        to_status:
+          $ref: '#/components/schemas/ToStatusEnum'
+        remarks:
+          type: string
+          default: ''
+          maxLength: 500
+      required:
+      - to_status
     LiftSanction:
       type: object
       properties:
@@ -2981,6 +3349,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedLeaveRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveRequest'
     PaginatedOfferList:
       type: object
       required:
@@ -3698,6 +4085,20 @@ components:
           type: integer
       required:
       - document_id
+    ToStatusEnum:
+      enum:
+      - recommended
+      - not_recommended
+      - approved
+      - rejected
+      - withdrawn
+      type: string
+      description: |-
+        * `recommended` - recommended
+        * `not_recommended` - not_recommended
+        * `approved` - approved
+        * `rejected` - rejected
+        * `withdrawn` - withdrawn
     TopicEnum:
       enum:
       - drive
