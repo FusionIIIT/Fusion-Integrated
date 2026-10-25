@@ -13,6 +13,17 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.leave.view_self` | View one's own leave applications and balances | `Dean Academic`, `Director`, `HOD`, `Registrar`, `faculty`, `placement_chairman`, `placement_coordinator`, `placement_officer`, `staff`, `student` |
+| `elm.leave.apply` | Apply for leave and station leave | `Dean Academic`, `Director`, `HOD`, `Registrar`, `faculty`, `placement_chairman`, `placement_coordinator`, `placement_officer`, `staff`, `student` |
+| `elm.leave.withdraw` | Withdraw pending leave application | `Dean Academic`, `Director`, `HOD`, `Registrar`, `faculty`, `placement_chairman`, `placement_coordinator`, `placement_officer`, `staff`, `student` |
+| `elm.leave.substitute_respond` | Accept or decline nominated substitute role | `Dean Academic`, `Director`, `HOD`, `Registrar`, `faculty`, `placement_chairman`, `placement_coordinator`, `placement_officer`, `staff`, `student` |
+| `elm.leave.review_unit_head` | Review and recommend/approve leave as Unit Head | `Dean Academic`, `Director`, `HOD`, `Registrar`, `placement_chairman` |
+| `elm.leave.sanction` | Sanction or reject leave applications | `Dean Academic`, `Director`, `HOD`, `Registrar`, `placement_chairman` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
