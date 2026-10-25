@@ -1,137 +1,238 @@
+
+from datetime import date, datetime
+from decimal import Decimal
+
 from django.db import transaction
 from django.utils import timezone
-from .models import LeaveBalance, LeaveRequest
-from datetime import timedelta
+from django.utils.dateparse import parse_date
 
-def apply_leave(user_id, leave_type_id, start_date_str, end_date_str, reason=None):
-    """
-    Initiates a new leave request.
-    
-    Args:
-        user_id (int): ID of the employee applying for leave.
-        leave_type_id (int): ID of the leave type (e.g., Sick, Annual).
-        start_date_str (str): Start date in 'YYYY-MM-DD' format.
-        end_date_str (str): End date in 'YYYY-MM-DD' format.
-        reason (str, optional): Brief reason for the leave.
+from .models import (
+    EmployeeOfficeAssignment,
+    LeaveBalance,
+    LeaveRequest,
+    LeaveType,
+)
 
-    Returns:
-        dict: A dictionary containing either the created request ID or an error message.
-    """
-    try:
-        from django.utils.dateparse import parse_date
-        
-        start_date = parse_date(start_date_str)
-        end_date = parse_date(end_date_str)
-        
-        if not start_date or not end_date:
-            return {"error": "Invalid date format provided."}
 
-        request = LeaveRequest.objects.create(
+def _parse_leave_date(value):
+    """Accept a date object or an ISO YYYY-MM-DD string."""
+    if isinstance(value, datetime):
+        return value.date()
+
+    if isinstance(value, date):
+        return value
+
+    if isinstance(value, str):
+        return parse_date(value)
+
+    return None
+
+
+def _calendar_days(start_date, end_date):
+    """Return inclusive calendar-day count."""
+    return Decimal((end_date - start_date).days + 1)
+
+
+
+def apply_leave(
+    user_id,
+    leave_type_id,
+    start_date_str,
+    end_date_str,
+    reason=None,
+):
+    """Create a pending leave request for an IAM employee ID."""
+    start_date = _parse_leave_date(start_date_str)
+    end_date = _parse_leave_date(end_date_str)
+
+    if not start_date or not end_date:
+        return {"error": "Invalid date format. Use YYYY-MM-DD."}
+
+    if end_date < start_date:
+        return {"error": "End date cannot be before start date."}
+
+    # Find the employee's office from the admin-managed assignment.
+    assignment = (
+        EmployeeOfficeAssignment.objects
+        .select_related("office")
+        .filter(
             user_id=user_id,
-            leave_type_id=leave_type_id,
-            start_date=start_date,
-            end_date=end_date,
-            reason=reason or "",
-            status='PENDING'
+            is_active=True,
+            office__is_active=True,
         )
-        
-        return {"id": request.id, "status": "submitted", "message": "Leave request submitted successfully."}
-    
-    except Exception as e:
-        return {"error": f"Failed to create leave request: {str(e)}"}
+        .first()
+    )
 
-def process_leave_approval(request_id, approver_user=None):
-    """
-    Processes the approval of a leave request and deducts the balance.
-    
-    Args:
-        request_id (int): ID of the leave request to approve.
-        approver_user (User instance, optional): The user performing the approval 
-                                                 (used for logging). Defaults to None.
-
-    Returns:
-        dict: A dictionary containing either success status/deduction info or error details.
-    """
-    try:
-        request = LeaveRequest.objects.get(id=request_id)
-        
-        if request.status != 'PENDING':
-            return {"error": f"This request cannot be approved (Current Status: {request.status})."}
-
-        days_to_deduct = (request.end_date - request.start_date).days + 1
-        leave_type_name = request.leave_type.name
-        
-        with transaction.atomic():
-            # Retrieve and update balance
-            balance_record, created = LeaveBalance.objects.get_or_create(
-                user=request.user,
-                leave_type=request.leave_type
+    if assignment is None:
+        return {
+            "error": (
+                "No active office assignment exists for this employee. "
+                "Please contact the administrator."
             )
-            
-            if not created:
-                old_balance = balance_record.current_balance
-                new_balance = old_balance - days_to_deduct
-                
-                # Optional: Prevent negative balances? 
-                # If logic requires blocking requests with insufficient balance before save:
-                # if new_balance < 0: raise ValidationError("Insufficient leave balance.")
-
-                balance_record.current_balance = new_balance
-                balance_record.save(update_fields=['current_balance'])
-            
-            # Update request status
-            request.status = 'APPROVED'
-            request.approved_by = approver_user if approver_user else None
-            # request.approval_date = timezone.now() # If you want to store exact approval time
-            
-            request.save(update_fields=['status', 'approved_by', 'approval_date'])
-
-        return {
-            "status": "success",
-            "request_id": request_id,
-            "message": f"Leave request approved. {leave_type_name} balance deducted.",
-            "previous_balance": old_balance if not created else None, 
-            "current_balance": balance_record.current_balance
         }
 
-    except LeaveRequest.DoesNotExist:
-        return {"error": "Leave request not found."}
-    except ValueError:
-        return {"error": "Invalid dates in the leave request configuration."}
-    except Exception as e:
-        return {"error": f"Error processing approval: {str(e)}"}
-
-def process_leave_rejection(request_id, reason=None):
-    """
-    Rejects a pending leave request.
-    
-    Args:
-        request_id (int): ID of the leave request to reject.
-        reason (str, optional): Reason for rejection (stored or logged).
-
-    Returns:
-        dict: Success or error message.
-    """
     try:
-        request = LeaveRequest.objects.get(id=request_id)
-        
-        if request.status != 'PENDING':
-            return {"error": f"This request cannot be rejected (Current Status: {request.status})."}
+        leave_type = LeaveType.objects.get(pk=leave_type_id)
+    except LeaveType.DoesNotExist:
+        return {"error": "Leave type not found."}
 
-        request.status = 'REJECTED'
-        # Optionally store reason if the model field exists and is writable here
-        # request.rejection_reason = reason 
-        
-        request.save(update_fields=['status']) # Add rejection_reason to fields if implemented in model
+    days_requested = _calendar_days(start_date, end_date)
+
+    balance = LeaveBalance.objects.filter(
+        user_id=user_id,
+        leave_type=leave_type,
+    ).first()
+
+    if balance is None:
+        return {"error": "No balance record exists for this leave type."}
+
+    if balance.current_balance < days_requested:
+        return {
+            "error": (
+                f"Insufficient balance. Available: "
+                f"{balance.current_balance}; requested: {days_requested}."
+            )
+        }
+
+    leave_request = LeaveRequest.objects.create(
+        user_id=user_id,
+        office=assignment.office,
+        leave_type=leave_type,
+        start_date=start_date,
+        end_date=end_date,
+        reason=reason or "",
+        status="PENDING",
+    )
+
+    return {
+        "id": leave_request.id,
+        "status": leave_request.status,
+        "message": "Leave request submitted successfully.",
+    }
+
+def process_leave_approval(request_id, approver_id):
+    """Approve a pending request and deduct its balance exactly once.
+
+    The caller must enforce the relevant IAM approval permission.
+    """
+    if not isinstance(approver_id, int) or approver_id <= 0:
+        return {"error": "A valid IAM approver ID is required."}
+
+    with transaction.atomic():
+        try:
+            leave_request = (
+                LeaveRequest.objects
+                .select_for_update()
+                .select_related("leave_type")
+                .get(pk=request_id)
+            )
+        except LeaveRequest.DoesNotExist:
+            return {"error": "Leave request not found."}
+
+        if leave_request.status != "PENDING":
+            return {
+                "error": (
+                    "This request cannot be approved. "
+                    f"Current status: {leave_request.status}."
+                )
+            }
+
+        days_to_deduct = _calendar_days(
+            leave_request.start_date,
+            leave_request.end_date,
+        )
+
+        try:
+            balance = (
+                LeaveBalance.objects
+                .select_for_update()
+                .get(
+                    user_id=leave_request.user_id,
+                    leave_type=leave_request.leave_type,
+                )
+            )
+        except LeaveBalance.DoesNotExist:
+            return {"error": "No balance record exists for this leave type."}
+
+        previous_balance = balance.current_balance
+
+        if previous_balance < days_to_deduct:
+            return {
+                "error": (
+                    f"Insufficient balance. Available: {previous_balance}; "
+                    f"required: {days_to_deduct}."
+                )
+            }
+
+        balance.current_balance = previous_balance - days_to_deduct
+        balance.save(update_fields=["current_balance", "updated_at"])
+
+        leave_request.status = "APPROVED"
+        leave_request.approver_id = approver_id
+        leave_request.approval_date = timezone.now()
+        leave_request.save(
+            update_fields=[
+                "status",
+                "approver_id",
+                "approval_date",
+                "updated_at",
+            ]
+        )
 
         return {
             "status": "success",
-            "request_id": request_id,
-            "message": f"Leave request rejected.",
-            "reason": reason or ""
+            "request_id": leave_request.pk,
+            "message": (
+                f"{leave_request.leave_type.name} leave approved. "
+                "Balance deducted."
+            ),
+            "previous_balance": previous_balance,
+            "current_balance": balance.current_balance,
         }
 
-    except LeaveRequest.DoesNotExist:
-        return {"error": "Leave request not found."}
-    except Exception as e:
-        return {"error": f"Error processing rejection: {str(e)}"}
+
+def process_leave_rejection(request_id, approver_id, reason=None):
+    """Reject a pending request without deducting leave balance.
+
+    The current LeaveRequest model has no rejection-reason field.
+    The reason argument is accepted for compatibility but is not persisted.
+    The caller must enforce the relevant IAM approval permission.
+    """
+    if not isinstance(approver_id, int) or approver_id <= 0:
+        return {"error": "A valid IAM approver ID is required."}
+
+    with transaction.atomic():
+        try:
+            leave_request = (
+                LeaveRequest.objects
+                .select_for_update()
+                .get(pk=request_id)
+            )
+        except LeaveRequest.DoesNotExist:
+            return {"error": "Leave request not found."}
+
+        if leave_request.status != "PENDING":
+            return {
+                "error": (
+                    "This request cannot be rejected. "
+                    f"Current status: {leave_request.status}."
+                )
+            }
+
+        leave_request.status = "REJECTED"
+        leave_request.approver_id = approver_id
+        leave_request.approval_date = timezone.now()
+        leave_request.save(
+            update_fields=[
+                "status",
+                "approver_id",
+                "approval_date",
+                "updated_at",
+            ]
+        )
+
+        return {
+            "status": "success",
+            "request_id": leave_request.pk,
+            "message": "Leave request rejected.",
+        }
