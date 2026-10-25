@@ -15,6 +15,13 @@ class EmployeeLeaveSerializer(serializers.ModelSerializer):
         fields = ['id', 'applicant', 'applicant_name', 'leave_type', 'start_date', 'end_date', 'duration_days', 'is_half_day', 'half_day_slot', 'purpose', 'status', 'applied_on', 'unit_head_remarks', 'station_leave']
         read_only_fields = ['applicant', 'status', 'applied_on']
 
+    def validate(self, attrs):
+        start = attrs.get('start_date')
+        end = attrs.get('end_date')
+        if start and end and start > end:
+            raise serializers.ValidationError({'end_date': 'End date cannot be earlier than start date.'})
+        return attrs
+
 class LeaveBalanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeaveBalance
