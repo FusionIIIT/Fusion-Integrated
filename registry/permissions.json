@@ -34,6 +34,121 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "leave": {
+      "grants": {
+        "admin": [
+          "leave.application.approve",
+          "leave.application.cancel",
+          "leave.application.create",
+          "leave.application.view_self",
+          "leave.balance.manage",
+          "leave.balance.view"
+        ],
+        "dean": [
+          "leave.application.approve",
+          "leave.application.cancel",
+          "leave.application.create",
+          "leave.application.view_self",
+          "leave.balance.view"
+        ],
+        "faculty": [
+          "leave.application.cancel",
+          "leave.application.create",
+          "leave.application.view_self",
+          "leave.balance.view"
+        ],
+        "hod": [
+          "leave.application.approve",
+          "leave.application.cancel",
+          "leave.application.create",
+          "leave.application.view_self",
+          "leave.balance.view"
+        ],
+        "staff": [
+          "leave.application.cancel",
+          "leave.application.create",
+          "leave.application.view_self",
+          "leave.balance.view"
+        ]
+      },
+      "module_grants": [
+        "admin",
+        "dean",
+        "faculty",
+        "hod",
+        "staff"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "Calendar",
+        "items": [
+          {
+            "code": "leave.apply",
+            "icon": "CalendarPlus",
+            "label": "Apply Leave",
+            "required_permission": "leave.application.create",
+            "sort_order": 10,
+            "to": "/leave/apply"
+          },
+          {
+            "code": "leave.my_leaves",
+            "icon": "CalendarCheck",
+            "label": "My Leaves",
+            "required_permission": "leave.application.view_self",
+            "sort_order": 20,
+            "to": "/leave/mine"
+          },
+          {
+            "code": "leave.balances",
+            "icon": "Clock",
+            "label": "Leave Balances",
+            "required_permission": "leave.balance.view",
+            "sort_order": 30,
+            "to": "/leave/balances"
+          },
+          {
+            "code": "leave.approvals",
+            "icon": "CheckSquare",
+            "label": "Pending Approvals",
+            "required_permission": "leave.application.approve",
+            "sort_order": 40,
+            "to": "/leave/approvals"
+          }
+        ],
+        "label": "Leave Management",
+        "nav_section": "HR & Admin",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "leave.application.view_self",
+          "label": "View own leave applications"
+        },
+        {
+          "code": "leave.application.create",
+          "label": "Apply for leave"
+        },
+        {
+          "code": "leave.application.cancel",
+          "label": "Cancel own pending leave"
+        },
+        {
+          "code": "leave.application.approve",
+          "label": "Approve or reject leave applications"
+        },
+        {
+          "code": "leave.balance.view",
+          "label": "View leave balances"
+        },
+        {
+          "code": "leave.balance.manage",
+          "label": "Allocate and manage employee leave balances"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
