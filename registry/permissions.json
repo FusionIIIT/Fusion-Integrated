@@ -34,6 +34,142 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "leave_module": {
+      "grants": {
+        "Dean": [
+          "leave_module.request.create",
+          "leave_module.request.review",
+          "leave_module.request.view_self",
+          "leave_module.substitute.respond"
+        ],
+        "Director": [
+          "leave_module.request.create",
+          "leave_module.request.review",
+          "leave_module.request.view_self",
+          "leave_module.substitute.respond"
+        ],
+        "HOD": [
+          "leave_module.request.create",
+          "leave_module.request.review",
+          "leave_module.request.view_self",
+          "leave_module.substitute.respond"
+        ],
+        "Leave Administrator": [
+          "leave_module.admin.manage",
+          "leave_module.request.view_self"
+        ],
+        "Registrar": [
+          "leave_module.request.create",
+          "leave_module.request.review",
+          "leave_module.request.view_self",
+          "leave_module.substitute.respond"
+        ],
+        "acadadmin": [
+          "leave_module.admin.manage",
+          "leave_module.request.view_self"
+        ],
+        "faculty": [
+          "leave_module.request.create",
+          "leave_module.request.view_self",
+          "leave_module.substitute.respond"
+        ],
+        "staff": [
+          "leave_module.request.create",
+          "leave_module.request.view_self",
+          "leave_module.substitute.respond"
+        ],
+        "student": [
+          "leave_module.request.create",
+          "leave_module.request.view_self",
+          "leave_module.substitute.respond"
+        ]
+      },
+      "module_grants": [
+        "Dean",
+        "Director",
+        "HOD",
+        "Leave Administrator",
+        "Registrar",
+        "acadadmin",
+        "faculty",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "CalendarBlank",
+        "items": [
+          {
+            "code": "leave.apply",
+            "icon": "CalendarPlus",
+            "label": "Apply for Leave",
+            "required_permission": "leave_module.request.create",
+            "sort_order": 10,
+            "to": "/leave/apply"
+          },
+          {
+            "code": "leave.mine",
+            "icon": "CalendarCheck",
+            "label": "My Leaves & Balances",
+            "required_permission": "leave_module.request.view_self",
+            "sort_order": 20,
+            "to": "/leave/mine"
+          },
+          {
+            "code": "leave.substitute",
+            "icon": "UserCheck",
+            "label": "Substitute Requests",
+            "required_permission": "leave_module.substitute.respond",
+            "sort_order": 30,
+            "to": "/leave/substitute"
+          },
+          {
+            "code": "leave.approvals",
+            "icon": "Checks",
+            "label": "Leave Approvals",
+            "required_permission": "leave_module.request.review",
+            "sort_order": 40,
+            "to": "/leave/approvals"
+          },
+          {
+            "code": "leave.admin",
+            "icon": "Gear",
+            "label": "Leave Administration",
+            "required_permission": "leave_module.admin.manage",
+            "sort_order": 50,
+            "to": "/leave/admin"
+          }
+        ],
+        "label": "Leave Management",
+        "nav_section": "Administration",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "leave_module.request.create",
+          "label": "Apply for leave"
+        },
+        {
+          "code": "leave_module.request.view_self",
+          "label": "View own leave requests and balances"
+        },
+        {
+          "code": "leave_module.substitute.respond",
+          "label": "Accept or decline substitute requests"
+        },
+        {
+          "code": "leave_module.request.review",
+          "label": "Review, recommend, or sanction leave requests"
+        },
+        {
+          "code": "leave_module.admin.manage",
+          "label": "Maintain leave policies, calendars, and records"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

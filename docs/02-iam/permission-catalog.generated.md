@@ -13,6 +13,16 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave_module`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave_module.request.create` | Apply for leave | `Dean`, `Director`, `HOD`, `Registrar`, `faculty`, `staff`, `student` |
+| `leave_module.request.view_self` | View own leave requests and balances | `Dean`, `Director`, `HOD`, `Leave Administrator`, `Registrar`, `acadadmin`, `faculty`, `staff`, `student` |
+| `leave_module.substitute.respond` | Accept or decline substitute requests | `Dean`, `Director`, `HOD`, `Registrar`, `faculty`, `staff`, `student` |
+| `leave_module.request.review` | Review, recommend, or sanction leave requests | `Dean`, `Director`, `HOD`, `Registrar` |
+| `leave_module.admin.manage` | Maintain leave policies, calendars, and records | `Leave Administrator`, `acadadmin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
