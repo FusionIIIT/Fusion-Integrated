@@ -44,3 +44,41 @@ class LeaveApplicationCreateSerializer(serializers.ModelSerializer):
             "station_address",
             "substitute_user_id",
         )
+
+    def validate(self, attrs):
+        start_date = attrs.get("start_date")
+        end_date = attrs.get("end_date")
+        leave_type = attrs.get("leave_type")
+        is_half_day = attrs.get("is_half_day", False)
+        is_station_leave = attrs.get("is_station_leave", False)
+        station_address = attrs.get("station_address", "")
+        substitute_user_id = attrs.get("substitute_user_id")
+
+        if start_date and end_date and start_date > end_date:
+            raise serializers.ValidationError(
+                {"end_date": "end_date must be on or after start_date."}
+            )
+
+        if is_half_day:
+            if leave_type != "CL":
+                raise serializers.ValidationError(
+                    {"is_half_day": "Half-day leave is only permitted for Casual Leave (CL)."}
+                )
+            if start_date != end_date:
+                raise serializers.ValidationError(
+                    {"is_half_day": "Half-day leave must be for a single date."}
+                )
+
+        if is_station_leave and not station_address.strip():
+            raise serializers.ValidationError(
+                {"station_address": "Station address is required when station leave is requested."}
+            )
+
+        request = self.context.get("request")
+        actor = getattr(request, "principal", None)
+        if actor and substitute_user_id and substitute_user_id == actor.user_id:
+            raise serializers.ValidationError(
+                {"substitute_user_id": "Applicant cannot nominate themselves as substitute."}
+            )
+
+        return attrs

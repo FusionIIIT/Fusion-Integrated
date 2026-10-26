@@ -22,6 +22,11 @@ urlpatterns = [
         name="application-withdraw",
     ),
     path(
+        "applications/<int:pk>/cancel/",
+        views.LeaveCancelView.as_view(),
+        name="application-cancel",
+    ),
+    path(
         "applications/<int:pk>/substitute-respond/",
         views.SubstituteRespondView.as_view(),
         name="substitute-respond",

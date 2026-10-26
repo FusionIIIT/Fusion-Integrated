@@ -17,9 +17,11 @@ class LeaveType(models.TextChoices):
 class LeaveStatus(models.TextChoices):
     PENDING_SUBSTITUTE = "PENDING_SUBSTITUTE", "Pending Substitute"
     PENDING_APPROVAL = "PENDING_APPROVAL", "Pending Approval"
+    PENDING_HIGHER_APPROVAL = "PENDING_HIGHER_APPROVAL", "Pending Higher Approval"
     APPROVED = "APPROVED", "Approved"
     REJECTED = "REJECTED", "Rejected"
     WITHDRAWN = "WITHDRAWN", "Withdrawn"
+    CANCELLED = "CANCELLED", "Cancelled"
 
 
 class LeaveBalance(TimeStampedModel, UserScopedModel):
