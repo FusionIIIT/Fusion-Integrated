@@ -43,13 +43,13 @@ class InterviewRound(TimeStampedModel):
             models.UniqueConstraint(fields=["posting", "seq"],
                                     name="round_unique_seq_per_posting"),
             models.CheckConstraint(
-                condition=Q(ends_at__isnull=True)
+                check=Q(ends_at__isnull=True)
                 | Q(ends_at__gt=models.F("starts_at")),
                 name="round_time_valid",
             ),
             # Online needs a link, offline needs a venue.
             models.CheckConstraint(
-                condition=(Q(mode="online") & ~Q(meeting_url=""))
+                check=(Q(mode="online") & ~Q(meeting_url=""))
                 | (Q(mode="offline") & ~Q(venue="")),
                 name="round_has_a_location",
             ),

@@ -96,7 +96,7 @@ class PolicyCategory(TimeStampedModel):
             models.UniqueConstraint(fields=["policy", "group", "number"],
                                     name="policy_category_unique"),
             models.CheckConstraint(
-                condition=Q(ctc_min__isnull=True) | Q(ctc_max__isnull=True)
+                check=Q(ctc_min__isnull=True) | Q(ctc_max__isnull=True)
                 | Q(ctc_max__gte=models.F("ctc_min")),
                 name="policy_category_band_valid"),
         ]

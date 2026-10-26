@@ -1,4 +1,25 @@
-"""Permissions this module recognises. No nav: it has no screens of its own."""
+"""Directory permissions and the read-only directory screen."""
+
+MODULE = {
+    "code": "directory",
+    "label": "Directory",
+    "icon": "Users",
+    "base_path": "/directory",
+    "nav_section": "Institute Services",
+    "sort_order": 15,
+    "status": "active",
+}
+
+NAV_ITEMS = [
+    {
+        "code": "directory.users",
+        "label": "People Directory",
+        "icon": "Users",
+        "to": "/directory",
+        "required_permission": "directory.user.search",
+        "sort_order": 10,
+    },
+]
 
 PERMISSIONS = [
     ("directory.user.search", "Search the institute directory"),

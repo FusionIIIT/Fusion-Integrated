@@ -12,9 +12,19 @@ export interface ModuleManifest {
 }
 
 export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
+  directory: {
+    code: "directory",
+    basePath: "/directory",
+    load: () => import("../modules/directory/routes"),
+  },
   placement_cell: {
     code: "placement_cell",
     basePath: "/placement",
     load: () => import("../modules/placement/routes"),
+  },
+  leave_elm: {
+    code: "leave_elm",
+    basePath: "/leave",
+    load: () => import("../modules/leave/routes"),
   },
 };

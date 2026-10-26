@@ -95,11 +95,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='jobposting',
-            constraint=models.CheckConstraint(condition=models.Q(models.Q(('status', 'published'), _negated=True), ('eligibility_rule_locked_at__isnull', False), _connector='OR'), name='posting_published_has_locked_rule'),
+            constraint=models.CheckConstraint(check=models.Q(models.Q(('status', 'published'), _negated=True), ('eligibility_rule_locked_at__isnull', False), _connector='OR'), name='posting_published_has_locked_rule'),
         ),
         migrations.AddConstraint(
             model_name='jobposting',
-            constraint=models.CheckConstraint(condition=models.Q(('closes_at__isnull', True), ('opens_at__isnull', True), ('closes_at__gt', models.F('opens_at')), _connector='OR'), name='posting_window_valid'),
+            constraint=models.CheckConstraint(check=models.Q(('closes_at__isnull', True), ('opens_at__isnull', True), ('closes_at__gt', models.F('opens_at')), _connector='OR'), name='posting_window_valid'),
         ),
         migrations.AddIndex(
             model_name='application',
