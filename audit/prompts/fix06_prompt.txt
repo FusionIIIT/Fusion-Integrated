@@ -1,0 +1,7 @@
+Update only this ELM API views file with Fusion IAM permission enforcement. Return a unified diff only.
+- Follow the existing placement API style: import HasModuleGrant and HasPermission; require module grant "leave" and an action-specific permission on every view/action.
+- Use these exact codes: GET accounts and GET own requests => leave.request.view_self; POST requests => leave.request.create; substitute action => leave.substitute.review; unit-head action => leave.request.review; establishment route => leave.request.assign; sanction decision => leave.request.approve; withdraw => leave.request.delete; resumption SUBMIT => leave.resumption.create; resumption REVIEW => leave.resumption.review.
+- For the two mixed-method/action views, enforce the permission for the actual method/action; do not allow either permission to authorize both actions.
+- Stop trusting X-User-Id and X-User-Role headers or fallback identities. Derive actor id from request.principal.user_id and applicant_role from its kind.
+- Keep existing URL/view behavior and service calls otherwise. Do not add features or edit other files.
+Current file:

@@ -34,6 +34,238 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "leave": {
+      "grants": {
+        "dean": [
+          "leave.request.approve",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.view",
+          "leave.request.view_self",
+          "leave.resumption.create",
+          "leave.resumption.review",
+          "leave.substitute.review"
+        ],
+        "deputy_registrar": [
+          "leave.request.assign",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.view",
+          "leave.request.view_self",
+          "leave.resumption.create",
+          "leave.substitute.review"
+        ],
+        "director": [
+          "leave.request.approve",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.review",
+          "leave.request.view",
+          "leave.request.view_self",
+          "leave.resumption.create",
+          "leave.resumption.review",
+          "leave.substitute.review"
+        ],
+        "faculty": [
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.view_self",
+          "leave.resumption.create",
+          "leave.substitute.review"
+        ],
+        "hod": [
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.review",
+          "leave.request.view",
+          "leave.request.view_self",
+          "leave.resumption.create",
+          "leave.substitute.review"
+        ],
+        "leave_administrator": [
+          "leave.calendar.publish",
+          "leave.policy.manage",
+          "leave.record.manage",
+          "leave.request.view",
+          "leave.request.view_self"
+        ],
+        "registrar": [
+          "leave.request.approve",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.view",
+          "leave.request.view_self",
+          "leave.resumption.create",
+          "leave.resumption.review",
+          "leave.substitute.review"
+        ],
+        "staff": [
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.view_self",
+          "leave.resumption.create",
+          "leave.substitute.review"
+        ],
+        "unit_head": [
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.review",
+          "leave.request.view",
+          "leave.request.view_self",
+          "leave.resumption.create",
+          "leave.substitute.review"
+        ]
+      },
+      "module_grants": [
+        "dean",
+        "deputy_registrar",
+        "director",
+        "faculty",
+        "hod",
+        "leave_administrator",
+        "registrar",
+        "staff",
+        "unit_head"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "CalendarBlank",
+        "items": [
+          {
+            "code": "leave.apply",
+            "icon": "CalendarPlus",
+            "label": "Apply Leave",
+            "required_permission": "leave.request.create",
+            "sort_order": 10,
+            "to": "/leave/apply"
+          },
+          {
+            "code": "leave.history",
+            "icon": "ClockCounterClockwise",
+            "label": "My Leaves & Balances",
+            "required_permission": "leave.request.view_self",
+            "sort_order": 20,
+            "to": "/leave/history"
+          },
+          {
+            "code": "leave.substitute_tasks",
+            "icon": "UserSwitch",
+            "label": "Substitute Tasks",
+            "required_permission": "leave.substitute.review",
+            "sort_order": 30,
+            "to": "/leave/substitute"
+          },
+          {
+            "code": "leave.unit_head",
+            "icon": "CheckSquare",
+            "label": "Unit Head Approvals",
+            "required_permission": "leave.request.review",
+            "sort_order": 40,
+            "to": "/leave/unit-head"
+          },
+          {
+            "code": "leave.establishment",
+            "icon": "FileSearch",
+            "label": "Establishment Routing",
+            "required_permission": "leave.request.assign",
+            "sort_order": 50,
+            "to": "/leave/establishment"
+          },
+          {
+            "code": "leave.sanctioning",
+            "icon": "Stamp",
+            "label": "Sanction Decisions",
+            "required_permission": "leave.request.approve",
+            "sort_order": 60,
+            "to": "/leave/sanction"
+          },
+          {
+            "code": "leave.resumption_queue",
+            "icon": "ArrowCounterClockwise",
+            "label": "Resumption Reviews",
+            "required_permission": "leave.resumption.review",
+            "sort_order": 70,
+            "to": "/leave/resumptions"
+          },
+          {
+            "code": "leave.admin_policy",
+            "icon": "GearSix",
+            "label": "ELM Policy & Calendars",
+            "required_permission": "leave.policy.manage",
+            "sort_order": 80,
+            "to": "/leave/admin/policy"
+          },
+          {
+            "code": "leave.offline_sync",
+            "icon": "Database",
+            "label": "Offline Leave Sync",
+            "required_permission": "leave.record.manage",
+            "sort_order": 90,
+            "to": "/leave/admin/offline-sync"
+          }
+        ],
+        "label": "Leave Management (ELM)",
+        "nav_section": "Human Resources",
+        "sort_order": 15,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "leave.request.create",
+          "label": "Apply for leave or request extension of ongoing leave"
+        },
+        {
+          "code": "leave.request.view_self",
+          "label": "View own leave history, balances, and export own applications"
+        },
+        {
+          "code": "leave.request.view",
+          "label": "View leave requests in your approval queue"
+        },
+        {
+          "code": "leave.request.delete",
+          "label": "Withdraw a pending request or request cancellation of approved leave"
+        },
+        {
+          "code": "leave.request.review",
+          "label": "Unit Head review, decision or recommendation"
+        },
+        {
+          "code": "leave.request.assign",
+          "label": "Establishment verification and routing to the sanctioning authority"
+        },
+        {
+          "code": "leave.request.approve",
+          "label": "Make final sanctioning decisions"
+        },
+        {
+          "code": "leave.resumption.create",
+          "label": "Submit duty resumption after EL, COL or VL"
+        },
+        {
+          "code": "leave.resumption.review",
+          "label": "Review duty resumption declarations"
+        },
+        {
+          "code": "leave.substitute.review",
+          "label": "Accept or decline a nominated substitute responsibility"
+        },
+        {
+          "code": "leave.policy.manage",
+          "label": "Configure leave policy, hierarchy and SLA thresholds"
+        },
+        {
+          "code": "leave.calendar.publish",
+          "label": "Maintain and publish the holiday and RH calendar"
+        },
+        {
+          "code": "leave.record.manage",
+          "label": "Record already-sanctioned offline leave and maintain leave records"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

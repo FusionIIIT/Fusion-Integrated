@@ -1,0 +1,102 @@
+```diff
+--- modules/leave/api/views.py
++++ modules/leave/api/views.py
+@@ -1,6 +1,9 @@
+ """REST API endpoints for ELM module - Model 2 (Qwen 14B)."""
+ from django.core.exceptions import ValidationError
++from fusion_auth.permissions import HasModuleGrant, HasPermission
+ from rest_framework import status
+ from rest_framework.response import Response
+ from rest_framework.views import APIView
+ 
+@@ -9,6 +12,8 @@
+ )
+ from modules.leave.selectors import leave_selectors
+ from modules.leave.services import leave_services
+ 
++MODULE = HasModuleGrant("leave")
++
+ class LeaveAccountListView(APIView):
+     """EL-UC-012: View employee's current leave balances."""
+     def get(self, request):
+@@ -34,6 +39,8 @@
+ 
+ class LeaveRequestListView(APIView):
+     """EL-UC-001 & EL-UC-012: Apply for leave or list user's leave requests."""
++    permission_classes = [MODULE, HasPermission("leave.request.view_self")]
++
+     def get(self, request):
+         user_id = request.headers.get("X-User-Id", "fac_001")
+         requests = leave_selectors.get_user_leave_requests(user_id=user_id)
+@@ -45,6 +52,8 @@
+ 
+     def post(self, request):
+         user_id = request.headers.get("X-User-Id", "fac_001")
++        role = request.headers.get("X-User-Role", "faculty")
+         d = request.data
+         try:
+             req = leave_services.submit_leave_request(
+@@ -67,6 +76,8 @@
+ 
+ class SubstituteActionView(APIView):
+     """EL-UC-002: Substitute Accept or Decline."""
++    permission_classes = [MODULE]
++
+     def post(self, request, pk):
+         sub_id = request.headers.get("X-User-Id", "sub_001")
+         accept = request.data.get("accept", True)
+@@ -84,6 +95,8 @@
+ 
+ class UnitHeadActionView(APIView):
+     """EL-UC-003: Unit head approve/reject (CL/RH) or recommend (higher sanction)."""
++    permission_classes = [MODULE]
++
+     def post(self, request, pk):
+         uh_id = request.headers.get("X-User-Id", "hod_cse")
+         action = request.data.get("action")
+@@ -104,6 +117,8 @@
+ 
+ class EstablishmentRouteView(APIView):
+     """EL-UC-004: Establishment routing."""
++    permission_classes = [MODULE]
++
+     def post(self, request, pk):
+         est_id = request.headers.get("X-User-Id", "est_officer")
+         remarks = request.data.get("remarks", "")
+@@ -123,6 +138,8 @@
+ 
+ class SanctionActionView(APIView):
+     """EL-UC-005: Final Sanctioning Decision."""
++    permission_classes = [MODULE]
++
+     def post(self, request, pk):
+         sanction_id = request.headers.get("X-User-Id", "dean_faculty")
+         approve = request.data.get("approve", True)
+@@ -143,6 +160,8 @@
+ 
+ class WithdrawRequestView(APIView):
+     """EL-UC-007: Immediate withdrawal."""
++    permission_classes = [MODULE]
++
+     def post(self, request, pk):
+         user_id = request.headers.get("X-User-Id", "fac_001")
+         try:
+@@ -159,6 +178,24 @@
+ 
+ class ResumptionActionView(APIView):
+     """EL-UC-010 & EL-UC-011: Resumption submission and review."""
++    permission_classes = [MODULE]
++
++    def get_permissions(self):
++        action = self.request.data.get("action")
++        if action == "SUBMIT":
++            return [MODULE(), HasPermission("resumption.create")()]
++        elif action == "REVIEW":
++            return [MODULE(), HasPermission("resumption.review")()]
++        else:
++            return [MODULE(), HasPermission("leave.permission.invalid")]
++
+     def post(self, request, pk):
+         sub_action = request.data.get("action")  # 'SUBMIT' or 'REVIEW'
+         user_id = request.headers.get("X-User-Id", "fac_001")
+```

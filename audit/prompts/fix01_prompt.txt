@@ -1,0 +1,40 @@
+Rewrite the Django registry file below. Reply with the COMPLETE updated file in one Python code block and nothing else.
+
+1. Change MODULE["code"] from "leave_management" to "leave". Keep all other MODULE keys unchanged.
+2. Replace PERMISSIONS with exactly these 13 (code, label) tuples, in this order:
+   ("leave.request.create", "Apply for leave or request extension of ongoing leave"),
+   ("leave.request.view_self", "View own leave history, balances, and export own applications"),
+   ("leave.request.view", "View leave requests in your approval queue"),
+   ("leave.request.delete", "Withdraw a pending request or request cancellation of approved leave"),
+   ("leave.request.review", "Unit Head review, decision or recommendation"),
+   ("leave.request.assign", "Establishment verification and routing to the sanctioning authority"),
+   ("leave.request.approve", "Make final sanctioning decisions"),
+   ("leave.resumption.create", "Submit duty resumption after EL, COL or VL"),
+   ("leave.resumption.review", "Review duty resumption declarations"),
+   ("leave.substitute.review", "Accept or decline a nominated substitute responsibility"),
+   ("leave.policy.manage", "Configure leave policy, hierarchy and SLA thresholds"),
+   ("leave.calendar.publish", "Maintain and publish the holiday and RH calendar"),
+   ("leave.record.manage", "Record already-sanctioned offline leave and maintain leave records"),
+3. In NAV_ITEMS and ROLE_GRANTS, replace every old code with the new one:
+   elm.leave.apply, elm.leave.extend -> leave.request.create
+   elm.leave.view_self -> leave.request.view_self
+   elm.leave.withdraw, elm.leave.cancel -> leave.request.delete
+   elm.review.unit_head -> leave.request.review
+   elm.review.establishment -> leave.request.assign
+   elm.sanction.decide -> leave.request.approve
+   elm.leave.resume -> leave.resumption.create
+   elm.resumption.review -> leave.resumption.review
+   elm.substitute.respond -> leave.substitute.review
+   elm.admin.policy -> leave.policy.manage
+   elm.admin.offline_sync -> leave.record.manage
+   No "elm." string may remain anywhere in the file.
+4. A list must not contain the same code twice.
+5. Role grants after the change:
+   - faculty and staff: leave.request.create, leave.request.view_self, leave.request.delete, leave.resumption.create, leave.substitute.review.
+   - unit_head and hod: the faculty list plus leave.request.review and leave.request.view.
+   - deputy_registrar: the faculty list plus leave.request.assign and leave.request.view.
+   - dean and registrar: the faculty list plus leave.request.approve, leave.resumption.review and leave.request.view.
+   - director: the dean list plus leave.request.review.
+   - leave_administrator: ONLY leave.request.view_self, leave.request.view, leave.policy.manage, leave.calendar.publish, leave.record.manage. An administrator must not review or approve leave.
+6. Keep the role names (dictionary keys) unchanged. Do not invent roles or permissions.
+7. Keep NAV_ITEMS codes, labels, icons, routes and sort orders unchanged. Keep every line under 100 characters.

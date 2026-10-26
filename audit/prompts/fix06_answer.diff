@@ -1,0 +1,119 @@
+```diff
+from django.core.exceptions import ValidationError
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
++from fusion_iam.decorators import HasModuleGrant, HasPermission
++
++@HasModuleGrant("leave")
+class LeaveAccountListView(APIView):
+    """EL-UC-012: View employee's current leave balances."""
++   @HasPermission("leave.request.view_self")
+    def get(self, request):
+        user_id = request.principal.user_id
+        year = int(request.query_params.get("year", 2026))
+        accounts = leave_selectors.get_user_accounts(user_id=user_id, year=year)
+        serializer = LeaveAccountSerializer(accounts, many=True)
+        return Response(serializer.data)
+
+
++@HasModuleGrant("leave")
+class LeaveRequestListView(APIView):
+    """EL-UC-001 & EL-UC-012: Apply for leave or list user's leave requests."""
++   @HasPermission("leave.request.view_self")
+    def get(self, request):
+        user_id = request.principal.user_id
+        requests = leave_selectors.get_user_leave_requests(user_id=user_id)
+        serializer = LeaveRequestSerializer(requests, many=True)
+        return Response(serializer.data)
+
++   @HasPermission("leave.request.create")
+    def post(self, request):
+        user_id = request.principal.user_id
+        role = request.principal.kind  # Assuming kind represents the role
+        d = request.data
+        try:
+            req = leave_services.submit_leave_request(
+                applicant_id=user_id,
+                applicant_role=role,
+                category=d.get("category"),
+                start_date=d.get("start_date"),
+                end_date=d.get("end_date"),
+                purpose=d.get("purpose", ""),
+                is_half_day=d.get("is_half_day", False),
+                half_day_type=d.get("half_day_type"),
+                is_station_leave=d.get("is_station_leave", False),
+                station_destination=d.get("station_destination"),
+                station_address=d.get("station_address"),
+                substitute_id=d.get("substitute_id"),
+                unit_head_id=d.get("unit_head_id", "hod_cse"),
+                sanctioning_authority_id=d.get("sanctioning_authority_id", "dean_faculty"),
+            )
+            return Response(LeaveRequestSerializer(req).data, status=status.HTTP_201_CREATED)
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
++@HasModuleGrant("leave")
+class SubstituteActionView(APIView):
+    """EL-UC-002: Substitute Accept or Decline."""
++   @HasPermission("leave.substitute.review")
+    def post(self, request, pk):
+        sub_id = request.principal.user_id
+        accept = request.data.get("accept", True)
+        try:
+            req = leave_services.process_substitute_response(pk, sub_id, accept)
+            return Response(LeaveRequestSerializer(req).data)
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
++@HasModuleGrant("leave")
+class UnitHeadActionView(APIView):
+    """EL-UC-003: Unit head approve/reject (CL/RH) or recommend (higher sanction)."""
++   @HasPermission("leave.request.review")
+    def post(self, request, pk):
+        uh_id = request.principal.user_id
+        action = request.data.get("action")
+        remarks = request.data.get("remarks", "")
+        est_configured = request.data.get("establishment_configured", False)
+        try:
+            req = leave_services.review_unit_head(pk, uh_id, action, remarks, est_configured)
+            return Response(LeaveRequestSerializer(req).data)
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
++@HasModuleGrant("leave")
+class EstablishmentRouteView(APIView):
+    """EL-UC-004: Establishment routing."""
++   @HasPermission("leave.request.assign")
+    def post(self, request, pk):
+        est_id = request.principal.user_id
+        remarks = request.data.get("remarks", "")
+        try:
+            req = leave_services.route_establishment(pk, est_id, remarks)
+            return Response(LeaveRequestSerializer(req).data)
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
++@HasModuleGrant("leave")
+class SanctionActionView(APIView):
+    """EL-UC-005: Final Sanctioning Decision."""
++   @HasPermission("leave.request.approve")
+    def post(self, request, pk):
+        sanction_id = request.principal.user_id
+        approve = request.data.get("approve", True)
+        remarks = request.data.get("remarks", "")
+        try:
+            req = leave_services.sanction_decision(pk, sanction_id, approve, remarks)
+            return Response(LeaveRequestSerializer(req).data)
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
++@HasModuleGrant("leave")
+class WithdrawRequestView(APIView):
+    """EL-UC-007: Immediate

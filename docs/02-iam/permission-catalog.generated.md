@@ -13,6 +13,24 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave.request.create` | Apply for leave or request extension of ongoing leave | `dean`, `deputy_registrar`, `director`, `faculty`, `hod`, `registrar`, `staff`, `unit_head` |
+| `leave.request.view_self` | View own leave history, balances, and export own applications | `dean`, `deputy_registrar`, `director`, `faculty`, `hod`, `leave_administrator`, `registrar`, `staff`, `unit_head` |
+| `leave.request.view` | View leave requests in your approval queue | `dean`, `deputy_registrar`, `director`, `hod`, `leave_administrator`, `registrar`, `unit_head` |
+| `leave.request.delete` | Withdraw a pending request or request cancellation of approved leave | `dean`, `deputy_registrar`, `director`, `faculty`, `hod`, `registrar`, `staff`, `unit_head` |
+| `leave.request.review` | Unit Head review, decision or recommendation | `director`, `hod`, `unit_head` |
+| `leave.request.assign` | Establishment verification and routing to the sanctioning authority | `deputy_registrar` |
+| `leave.request.approve` | Make final sanctioning decisions | `dean`, `director`, `registrar` |
+| `leave.resumption.create` | Submit duty resumption after EL, COL or VL | `dean`, `deputy_registrar`, `director`, `faculty`, `hod`, `registrar`, `staff`, `unit_head` |
+| `leave.resumption.review` | Review duty resumption declarations | `dean`, `director`, `registrar` |
+| `leave.substitute.review` | Accept or decline a nominated substitute responsibility | `dean`, `deputy_registrar`, `director`, `faculty`, `hod`, `registrar`, `staff`, `unit_head` |
+| `leave.policy.manage` | Configure leave policy, hierarchy and SLA thresholds | `leave_administrator` |
+| `leave.calendar.publish` | Maintain and publish the holiday and RH calendar | `leave_administrator` |
+| `leave.record.manage` | Record already-sanctioned offline leave and maintain leave records | `leave_administrator` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

@@ -1,0 +1,37 @@
+from django.urls import path
+
+from modules.leave.api import views
+
+urlpatterns = [
+    path("accounts/", views.LeaveAccountListView.as_view(), name="elm-accounts"),
+    path("requests/", views.LeaveRequestListView.as_view(), name="elm-requests"),
+    path("requests/inbox/", views.LeaveInboxView.as_view(), name="elm-inbox"),
+    path("requests/<int:pk>/record/", views.LeaveRecordCorrectionView.as_view(),
+         name="elm-record-correction"),
+    path("admin/policy/", views.LeavePolicyConfigView.as_view(), name="elm-policy-list"),
+    path("admin/policy/<str:category>/", views.LeavePolicyConfigView.as_view(),
+         name="elm-policy-detail"),
+    path("admin/hierarchy/", views.LeaveHierarchyConfigView.as_view(), name="elm-hierarchy"),
+    path("admin/sla/", views.LeaveSLAConfigView.as_view(), name="elm-sla-list"),
+    path("admin/sla/<str:task_code>/", views.LeaveSLAConfigView.as_view(), name="elm-sla-detail"),
+    path("admin/calendar/", views.HolidayCalendarReleaseView.as_view(),
+         name="elm-calendar-releases"),
+    path("admin/calendar/<int:pk>/", views.HolidayCalendarReleaseView.as_view(),
+         name="elm-calendar-revise"),
+    path("admin/calendar/<int:pk>/publish/", views.PublishHolidayCalendarView.as_view(),
+         name="elm-calendar-publish"),
+    path("admin/offline-sync/", views.OfflineLeaveSyncView.as_view(),
+         name="elm-offline-sync"),
+    path("requests/<int:pk>/substitute-action/", views.SubstituteActionView.as_view(),
+         name="elm-substitute-action"),
+    path("requests/<int:pk>/unit-head-action/", views.UnitHeadActionView.as_view(),
+         name="elm-unit-head-action"),
+    path("requests/<int:pk>/establishment-route/", views.EstablishmentRouteView.as_view(),
+         name="elm-establishment-route"),
+    path("requests/<int:pk>/sanction-decision/", views.SanctionActionView.as_view(),
+         name="elm-sanction-decision"),
+    path("requests/<int:pk>/withdraw/", views.WithdrawRequestView.as_view(),
+         name="elm-withdraw"),
+    path("requests/<int:pk>/resumption/", views.ResumptionActionView.as_view(),
+         name="elm-resumption"),
+]

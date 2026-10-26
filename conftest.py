@@ -89,11 +89,11 @@ class FakeIam:
 
 
 def make_session(user_id=1001, permissions=(), modules=(), kind="student",
-                 roles=("student",), active_role="student"):
+                 roles=("student",), active_role="student", department=""):
     return IamSession(
         user_id=user_id, username=f"u{user_id}", display_name=f"User {user_id}",
         kind=kind, active_role=active_role, roles=tuple(roles),
-        permissions=frozenset(permissions), modules=tuple(modules),
+        permissions=frozenset(permissions), modules=tuple(modules), department=department,
     )
 
 

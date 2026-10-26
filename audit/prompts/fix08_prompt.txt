@@ -1,0 +1,11 @@
+Return a complete unified diff for modules/leave/api/views.py only. Key API facts: HasModuleGrant("leave") returns a DRF permission CLASS. HasPermission("code") also returns a permission CLASS. Existing project usage is `permission_classes = [MODULE, HasPermission("placement_cell.application.view_self")]`. For dynamic selection inside APIView.get_permissions, instantiate them: `return [HasModuleGrant("leave")(), HasPermission(code)()]`. Do not define a custom BasePermission. Do not call permission classes directly with request. Do not use decorators.
+
+Add `from fusion_auth.permissions import HasModuleGrant, HasPermission` and `MODULE = HasModuleGrant("leave")`.
+Set permission_classes on LeaveAccountListView to module + `leave.request.view_self`.
+On LeaveRequestListView implement get_permissions: GET => module + `leave.request.view_self`; POST => module + `leave.request.create`; other methods => module only (DRF will return 405).
+All other views use class permission_classes with module and respectively: substitute `leave.substitute.review`; unit-head `leave.request.review`; establishment `leave.request.assign`; sanction `leave.request.approve`; withdraw `leave.request.delete`.
+ResumptionActionView.get_permissions: action SUBMIT => `leave.resumption.create`; action REVIEW => `leave.resumption.review`; any other action => module + HasPermission("leave.permission.invalid") so denied.
+In all handlers use principal-derived ids (`str(request.principal.user_id)`); for applicant role use `request.principal.kind`. Remove all X-User-Id/X-User-Role reads and hardcoded identity fallbacks. Preserve all existing service calls and responses otherwise.
+Use ONLY the real permission API above. Return the full diff including file headers. Do not omit the bottom of the file.
+
+CURRENT FILE:

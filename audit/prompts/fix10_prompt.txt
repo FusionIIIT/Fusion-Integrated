@@ -1,0 +1,10 @@
+Write pytest API tests for the current modules/leave/api/views.py permission behavior. Use APIClient, the shared `stub_iam` fixture, and `make_session` from conftest.py, like modules/directory/tests/test_search_api.py. Output the complete test file only, no fences, under 120 lines.
+Cover:
+1. Missing leave module grant is denied even when the permission is present.
+2. GET /api/v1/leave/requests/ requires leave.request.view_self; create alone is denied.
+3. POST /api/v1/leave/requests/ requires leave.request.create; view_self alone is denied.
+4. Resumption action SUBMIT and REVIEW each deny a caller holding only the other action's permission; an unknown action is denied even when both are held.
+5. A caller with leave.request.view_self sees only their own account/request rows, even if they send a spoofed X-User-Id header. Use real LeaveAccount and LeaveRequest rows and the authenticated principal id.
+Use safe API payloads and do not call service methods on permission-denied requests. Use permission code strings exactly as written. Test module name is "leave".
+Auth fixture signature: `make_session(user_id=1001, permissions=(), modules=(), kind="student", roles=("student",), active_role="student")`.
+Example: `stub_iam(make_session(user_id=42, permissions=("leave.request.view_self",), modules=("leave",), kind="faculty"))`; APIClient credentials use `HTTP_AUTHORIZATION="Token abc"`.

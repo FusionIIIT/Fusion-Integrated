@@ -1,0 +1,8 @@
+Replace only ROLE_GRANTS. Reply with a complete Python ROLE_GRANTS dictionary assignment, and nothing else. Use literal lists for every role; do not use helper-list expansion. Preserve exactly these nine keys and these exact lists:
+faculty = staff = ["leave.request.create", "leave.request.view_self", "leave.request.delete", "leave.resumption.create", "leave.substitute.review"]
+unit_head = hod = faculty list + ["leave.request.review", "leave.request.view"]
+deputy_registrar = faculty list + ["leave.request.assign", "leave.request.view"]
+dean = registrar = faculty list + ["leave.request.approve", "leave.resumption.review", "leave.request.view"]
+director = dean list + ["leave.request.review"]
+leave_administrator = ["leave.request.view_self", "leave.request.view", "leave.policy.manage", "leave.calendar.publish", "leave.record.manage"]
+Use the fully expanded lists, no aliases. No other permissions, no duplicates. Current ROLE_GRANTS follows:

@@ -1,0 +1,10 @@
+Produce a complete unified diff for modules/leave/api/views.py only. Use real project APIs exactly as shown:
+from fusion_auth.permissions import HasModuleGrant, HasPermission
+MODULE = HasModuleGrant("leave")
+A view uses permission_classes = [MODULE, HasPermission("leave.request.create")]. Do not use decorators or fusion_iam imports.
+
+Requirements: module grant "leave" on every endpoint. Accounts GET and own-request GET require leave.request.view_self. Requests POST requires leave.request.create. Substitute POST requires leave.substitute.review. Unit-head POST requires leave.request.review. Establishment POST requires leave.request.assign. Sanction POST requires leave.request.approve. Withdraw POST requires leave.request.delete. Resumption POST must require leave.resumption.create only for action SUBMIT and leave.resumption.review only for action REVIEW; invalid action must not be authorized. Implement method/action-specific checks with APIView.get_permissions() and permission-class instances.
+Replace all X-User-Id/X-User-Role headers and fallback identities with request.principal fields. Actor ids should be str(request.principal.user_id); applicant_role should be request.principal.kind. Preserve service calls and response handling otherwise.
+Return a complete applicable diff with --- a/modules/leave/api/views.py and +++ b/modules/leave/api/views.py headers. No prose or fences.
+
+Current file:

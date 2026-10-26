@@ -1,0 +1,124 @@
+```diff
+--- a/modules/leave/api/views.py
++++ b/modules/leave/api/views.py
+@@ -1,6 +1,7 @@
+ """REST API endpoints for ELM module - Model 2 (Qwen 14B)."""
+ from django.core.exceptions import ValidationError
++from rest_framework.permissions import BasePermission
+ from rest_framework.response import Response
+ from rest_framework.views import APIView
+
+@@ -9,6 +10,35 @@ from modules.leave.selectors import leave_selectors
+ from modules.leave.services import leave_services
+
+
++class HasActionPermission(BasePermission):
++    def has_permission(self, request, view):
++        action = getattr(view, 'action', None)
++        if action == 'get':
++            return HasModuleGrant("leave") and HasPermission("leave.request.view_self")(request)
++        elif action == 'post' and isinstance(view, LeaveRequestListView):
++            return HasModuleGrant("leave") and HasPermission("leave.request.create")(request)
++        elif action == 'post' and isinstance(view, SubstituteActionView):
++            return HasModuleGrant("leave") and HasPermission("leave.substitute.review")(request)
++        elif action == 'post' and isinstance(view, UnitHeadActionView):
++            return HasModuleGrant("leave") and HasPermission("leave.request.review")(request)
++        elif action == 'post' and isinstance(view, EstablishmentRouteView):
++            return HasModuleGrant("leave") and HasPermission("leave.request.assign")(request)
++        elif action == 'post' and isinstance(view, SanctionActionView):
++            return HasModuleGrant("leave") and HasPermission("leave.request.approve")(request)
++        elif action == 'post' and isinstance(view, WithdrawRequestView):
++            return HasModuleGrant("leave") and HasPermission("leave.request.delete")(request)
++        elif action == 'post' and isinstance(view, ResumptionActionView):
++            sub_action = request.data.get("action")
++            if sub_action == "SUBMIT":
++                return HasModuleGrant("leave") and HasPermission("leave.resumption.create")(request)
++            elif sub_action == "REVIEW":
++                return HasModuleGrant("leave") and HasPermission("leave.resumption.review")(request)
++        return False
++
++
+ class LeaveAccountListView(APIView):
+     """EL-UC-012: View employee's current leave balances."""
+     permission_classes = [HasModuleGrant("leave"), HasActionPermission]
+@@ -17,8 +47,7 @@ class LeaveAccountListView(APIView):
+         year = int(request.query_params.get("year", 2026))
+         accounts = leave_selectors.get_user_accounts(user_id=user_id, year=year)
+         serializer = LeaveAccountSerializer(accounts, many=True)
+-        return Response(serializer.data)
++        return Response(serializer.data)
+
+
+ class LeaveRequestListView(APIView):
+     """EL-UC-001 & EL-UC-012: Apply for leave or list user's leave requests."""
+@@ -26,8 +55,7 @@ class LeaveRequestListView(APIView):
+         requests = leave_selectors.get_user_leave_requests(user_id=user_id)
+         serializer = LeaveRequestSerializer(requests, many=True)
+         return Response(serializer.data)
+-
++    
+     def post(self, request):
+         user_id = str(request.principal.user_id)
+         role = request.principal.kind
+@@ -47,8 +75,7 @@ class SubstituteActionView(APIView):
+         sub_id = str(request.principal.user_id)
+         accept = request.data.get("accept", True)
+         try:
+-            req = leave_services.process_substitute_response(pk, sub_id, accept)
++            req = leave_services.process_substitute_response(pk, sub_id, accept)
+             return Response(LeaveRequestSerializer(req).data)
+         except ValidationError as e:
+             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+@@ -57,8 +84,7 @@ class UnitHeadActionView(APIView):
+     """EL-UC-003: Unit head approve/reject (CL/RH) or recommend (higher sanction)."""
+     permission_classes = [HasModuleGrant("leave"), HasActionPermission]
+ 
+@@ -69,8 +95,7 @@ class UnitHeadActionView(APIView):
+         uh_id = str(request.principal.user_id)
+         action = request.data.get("action")
+         remarks = request.data.get("remarks", "")
+-        est_configured = request.data.get("establishment_configured", False)
++        est_configured = request.data.get("establishment_configured", False)
+         try:
+             req = leave_services.review_unit_head(pk, uh_id, action, remarks, est_configured)
+             return Response(LeaveRequestSerializer(req).data)
+@@ -79,8 +104,7 @@ class EstablishmentRouteView(APIView):
+     """EL-UC-004: Establishment routing."""
+     permission_classes = [HasModuleGrant("leave"), HasActionPermission]
+ 
+@@ -91,8 +115,7 @@ class EstablishmentRouteView(APIView):
+         est_id = str(request.principal.user_id)
+         remarks = request.data.get("remarks", "")
+         try:
+-            req = leave_services.route_establishment(pk, est_id, remarks)
++            req = leave_services.route_establishment(pk, est_id, remarks)
+             return Response(LeaveRequestSerializer(req).data)
+         except ValidationError as e:
+             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+@@ -101,8 +124,7 @@ class SanctionActionView(APIView):
+     """EL-UC-005: Final Sanctioning Decision."""
+     permission_classes = [HasModuleGrant("leave"), HasActionPermission]
+ 
+@@ -113,8 +135,7 @@ class SanctionActionView(APIView):
+         sanction_id = str(request.principal.user_id)
+         approve = request.data.get("approve", True)
+         remarks = request.data.get("remarks", "")
+-        try:
++        try:
+             req = leave_services.sanction_decision(pk, sanction_id, approve, remarks)
+             return Response(LeaveRequestSerializer(req).data)
+         except ValidationError as e:
+@@ -123,8 +144,7 @@ class WithdrawRequestView(APIView):
+     """EL-UC-007: Immediate withdrawal."""
+     permission_classes = [HasModuleGrant("leave"), HasActionPermission]
+ 
+@@ -135,8 +155,7 @@ class WithdrawRequestView(APIView):
+         user_id = str(request.principal.user_id)
+         try:
+             req = leave_services.withdraw_request(pk, user_id)
+-            return Response(LeaveRequestSerializer(req).data)
++            return Response(LeaveRequestSerializer(req).data)
+         except ValidationError as e:
+             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+@@ -145,8 +164,7 @@ class ResumptionActionView(APIView):
+     """EL-UC-

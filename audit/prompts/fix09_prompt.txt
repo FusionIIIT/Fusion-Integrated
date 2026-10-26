@@ -1,0 +1,11 @@
+Return a corrected unified diff for modules/leave/api/views.py only, against the CURRENT file below. Use these exact facts:
+1. The file already imports rest_framework.response.Response and rest_framework.views.APIView. Do not add duplicate imports.
+2. Add `from fusion_auth.permissions import HasModuleGrant, HasPermission` and `MODULE = HasModuleGrant("leave")`.
+3. Permission class usage: class-level `permission_classes = [MODULE, HasPermission("leave.request.view_self")]`; for dynamic permissions use class instances in `get_permissions`, e.g. `return [MODULE(), HasPermission("leave.request.create")()]`.
+4. Every endpoint requires module grant "leave". Exact action codes: account GET and own-request GET view_self; request POST create; substitute POST substitute.review; unit-head POST request.review; establishment POST request.assign; sanction POST request.approve; withdraw POST request.delete; resumption action SUBMIT resumption.create; resumption action REVIEW resumption.review.
+5. LeaveRequestListView.get_permissions selects GET/POST codes by request.method. ResumptionActionView.get_permissions selects by self.request.data action. Put no permission logic/returns inside `post`; it must execute the existing service call.
+6. Invalid resumption action receives `HasPermission("leave.permission.invalid")` and is denied.
+7. Use principal user id as str; applicant role from principal.kind. No identity/role headers or hardcoded fallbacks.
+Do not use BasePermission, decorators, fusion_iam, or custom permission classes. Preserve service calls and responses.
+Output a complete applicable diff with headers and include the entire ResumptionActionView through EOF. No fences or prose.
+CURRENT FILE:
