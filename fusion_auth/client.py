@@ -289,6 +289,19 @@ class IamClient:
             if not rows or offset >= int(page.get("count", 0)):
                 return
 
+    def get_designation_holders(self, designations: Sequence[str]) -> dict[str, list[UserRef]]:
+        """Who currently holds each designation, batched; an unheld one maps to an empty list."""
+        names = sorted({d.strip() for d in designations if d and d.strip()})
+        if not names:
+            return {}
+        payload = self._get("iam/v1/directory/holders",
+                            params={"designations": "|".join(names)})
+        if not isinstance(payload, dict):
+            raise IamUnavailable("the holders lookup returned nothing")
+        found = payload.get("results", {}) or {}
+        return {name: [u for u in (self._to_ref(r) for r in found.get(name, [])) if u]
+                for name in names}
+
     def search_users(self, q: str = "", kind: str | None = None,
                      limit: int = 25) -> list[UserRef]:
         params = {"q": q, "limit": limit}

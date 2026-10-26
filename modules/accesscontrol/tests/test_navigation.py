@@ -80,8 +80,7 @@ def test_seed_modules_retires_a_module_no_code_declares_any_more():
 
 
 def test_seed_modules_drops_a_nav_item_its_registry_no_longer_declares():
-    m = _module(code="leave")
-    NavItem.objects.create(module=m, code="leave.queue", label="Queue",
-                           to="/leave/queue")
+    m = _module(code="hr")
+    NavItem.objects.create(module=m, code="hr.queue", label="Queue", to="/hr/queue")
     call_command("seed_modules", stdout=StringIO())
-    assert not NavItem.objects.filter(code="leave.queue").exists()
+    assert not NavItem.objects.filter(code="hr.queue").exists()

@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.leave",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -230,6 +231,19 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    # Two modules may both have a `status`; naming each set keeps the schema stable.
+    "ENUM_NAME_OVERRIDES": {
+        "LeaveRequestStatusEnum": "modules.leave.models.requests.LeaveRequest.STATUS",
+        "LeaveRequestKindEnum": "modules.leave.models.requests.LeaveRequest.KIND",
+        "LeaveHalfEnum": "modules.leave.models.requests.LeaveRequest.HALF",
+        "LeaveSourceEnum": "modules.leave.models.requests.LeaveRequest.SOURCE",
+        "LeaveSubstitutionStatusEnum": "modules.leave.models.requests.Substitution.STATUS",
+        "LeaveResumptionStatusEnum": "modules.leave.models.requests.Resumption.STATUS",
+        "LeaveCalendarStatusEnum": "modules.leave.models.configuration.HolidayCalendar.STATUS",
+        "LeaveHolidayKindEnum": "modules.leave.models.configuration.Holiday.KIND",
+        "LeaveYearEndStatusEnum": "modules.leave.models.operations.YearEndRun.STATUS",
+        "LeaveEntryTypeEnum": "modules.leave.models.ledger.LedgerEntry.ENTRY_TYPES",
+    },
 }
 
 CORS_ALLOW_ALL_ORIGINS = False

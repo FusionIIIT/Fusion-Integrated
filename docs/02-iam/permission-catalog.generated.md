@@ -13,6 +13,31 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave.request.create` | Apply for leave, and ask to cancel, extend or resume it | `faculty`, `staff` |
+| `leave.request.view` | See one's own leave requests | `faculty`, `staff` |
+| `leave.request.revoke` | Withdraw one's own pending request | `faculty`, `staff` |
+| `leave.request.export` | Print or export a leave application | `Dean (P&D)`, `Dean (R&D)`, `Dean Academic`, `Dean_s`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `SectionHead_HR`, `SectionHead_IWD`, `SectionHead_PS`, `SectionHead_RSPC`, `dean_rspc`, `faculty`, `hradmin`, `staff` |
+| `leave.balance.view` | See one's own balances and ledger | `faculty`, `staff` |
+| `leave.substitution.review` | Accept or decline covering for a colleague | `faculty`, `staff` |
+| `leave.request.review` | Review leave as a Unit Head, and see an approvals queue | `Dean (P&D)`, `Dean (R&D)`, `Dean Academic`, `Dean_s`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `SectionHead_HR`, `SectionHead_IWD`, `SectionHead_PS`, `SectionHead_RSPC`, `dean_rspc` |
+| `leave.request.assign` | Verify and route higher-sanction leave (Establishment) | `Deputy Registrar` |
+| `leave.request.approve` | Sanction or reject leave as the final authority | `Dean (P&D)`, `Dean (R&D)`, `Dean Academic`, `Dean_s`, `Deputy Registrar`, `Director`, `Registrar`, `dean_rspc` |
+| `leave.resumption.review` | Review a resumption of duty | `Dean (P&D)`, `Dean (R&D)`, `Dean Academic`, `Dean_s`, `Deputy Registrar`, `Director`, `Registrar`, `dean_rspc` |
+| `leave.policy.update` | Revise the leave policy parameters | `hradmin` |
+| `leave.hierarchy.update` | Revise Unit Heads and sanctioning routes | `hradmin` |
+| `leave.calendar.update` | Edit the holiday calendar and vacation periods | `hradmin` |
+| `leave.calendar.publish` | Publish a holiday calendar | `hradmin` |
+| `leave.sla.update` | Set response deadlines and escalation | `hradmin` |
+| `leave.record.view` | See every employee's leave record | `hradmin` |
+| `leave.record.import` | Record leave sanctioned offline | `hradmin` |
+| `leave.record.update` | Correct a balance by an administrative entry | `hradmin` |
+| `leave.ledger.manage` | System year-end and annual credit | _service only_ |
+| `leave.task.assign` | System SLA reassignment | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

@@ -13,9 +13,15 @@ name = Modules may reach each other ONLY through contracts.py
 type = forbidden
 source_modules =
     modules.placement
+    modules.leave
     modules.directory
     modules.accesscontrol
 forbidden_modules =
+    modules.leave.models
+    modules.leave.services
+    modules.leave.selectors
+    modules.leave.api
+    modules.leave.domain
     modules.placement.models
     modules.placement.services
     modules.placement.selectors
@@ -38,6 +44,7 @@ type = forbidden
 source_modules =
 # Every module's domain, not just the first one written.
     modules.placement.domain
+    modules.leave.domain
 forbidden_modules =
     django
     rest_framework
@@ -66,3 +73,13 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+
+[importlinter:contract:leave-layers]
+name = Layering inside leave
+type = layers
+layers =
+    modules.leave.api
+    modules.leave.services
+    modules.leave.selectors
+    modules.leave.models
+    modules.leave.domain
