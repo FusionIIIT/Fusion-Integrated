@@ -34,6 +34,158 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "elm": {
+      "grants": {
+        "Leave Administrator": [
+          "elm.account.view_self",
+          "elm.calendar.manage",
+          "elm.hierarchy.manage",
+          "elm.offline.record",
+          "elm.policy.manage",
+          "elm.request.create",
+          "elm.request.view_self",
+          "elm.task.view"
+        ],
+        "faculty": [
+          "elm.account.view_self",
+          "elm.request.create",
+          "elm.request.view_self",
+          "elm.task.view"
+        ],
+        "staff": [
+          "elm.account.view_self",
+          "elm.request.create",
+          "elm.request.view_self",
+          "elm.task.view"
+        ]
+      },
+      "module_grants": [
+        "Leave Administrator",
+        "faculty",
+        "staff"
+      ],
+      "nav": {
+        "base_path": "/elm",
+        "icon": "CalendarCheck",
+        "items": [
+          {
+            "code": "elm.apply",
+            "icon": "PencilSimple",
+            "label": "Apply for Leave",
+            "required_permission": "elm.request.create",
+            "sort_order": 5,
+            "to": "/elm/apply"
+          },
+          {
+            "code": "elm.mine",
+            "icon": "ClipboardText",
+            "label": "My Leave",
+            "required_permission": "elm.request.view_self",
+            "sort_order": 10,
+            "to": "/elm/mine"
+          },
+          {
+            "code": "elm.balance",
+            "icon": "ChartBar",
+            "label": "Balance and History",
+            "required_permission": "elm.account.view_self",
+            "sort_order": 20,
+            "to": "/elm/balance"
+          },
+          {
+            "code": "elm.inbox",
+            "icon": "Tray",
+            "label": "Inbox",
+            "required_permission": "elm.task.view",
+            "sort_order": 30,
+            "to": "/elm/inbox"
+          },
+          {
+            "code": "elm.policy",
+            "icon": "Gear",
+            "label": "Leave Policy",
+            "required_permission": "elm.policy.manage",
+            "sort_order": 60,
+            "to": "/elm/admin/policy"
+          },
+          {
+            "code": "elm.hierarchy",
+            "icon": "TreeStructure",
+            "label": "Approval Hierarchy",
+            "required_permission": "elm.hierarchy.manage",
+            "sort_order": 65,
+            "to": "/elm/admin/hierarchy"
+          },
+          {
+            "code": "elm.calendar",
+            "icon": "CalendarBlank",
+            "label": "Holiday Calendar",
+            "required_permission": "elm.calendar.manage",
+            "sort_order": 70,
+            "to": "/elm/admin/calendar"
+          },
+          {
+            "code": "elm.offline",
+            "icon": "Signature",
+            "label": "Record Offline Leave",
+            "required_permission": "elm.offline.record",
+            "sort_order": 80,
+            "to": "/elm/admin/offline"
+          }
+        ],
+        "label": "Employee Leave",
+        "nav_section": "Leave",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "elm.request.create",
+          "label": "Apply for, modify, withdraw, cancel, extend and resume own leave"
+        },
+        {
+          "code": "elm.request.view_self",
+          "label": "See and print own leave applications"
+        },
+        {
+          "code": "elm.account.view_self",
+          "label": "See own leave balances and account history"
+        },
+        {
+          "code": "elm.task.view",
+          "label": "See and act on workflow tasks assigned to you"
+        },
+        {
+          "code": "elm.policy.manage",
+          "label": "Create, revise and publish leave policy"
+        },
+        {
+          "code": "elm.hierarchy.manage",
+          "label": "Create, revise and publish the approval hierarchy"
+        },
+        {
+          "code": "elm.calendar.manage",
+          "label": "Create, revise and publish the holiday and RH calendar"
+        },
+        {
+          "code": "elm.offline.record",
+          "label": "Record offline-sanctioned leave"
+        },
+        {
+          "code": "elm.year_end.run",
+          "label": "Year-end processing"
+        },
+        {
+          "code": "elm.sla.run",
+          "label": "SLA reminders and escalation"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "elm.sla.run",
+        "elm.year_end.run"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
