@@ -13,6 +13,14 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.approve.unit_head` | Approve leave at unit-head stage | `HOD (CSE)` |
+| `elm.approve.hierarchy` | Approve leave at higher-authority stage | `Registrar` |
+| `elm.approve.director` | Approve leave at director stage | `Director` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

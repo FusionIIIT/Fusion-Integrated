@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Leave List</h1>
+  <ul>
+    {% for leave in leaves %}
+      <li>{{ leave.employee.username }} - {{ leave.leave_type.name }} - {{ leave.start_date }} - {{ leave.end_date }}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}
