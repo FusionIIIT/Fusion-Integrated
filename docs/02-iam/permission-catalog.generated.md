@@ -13,6 +13,18 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave.application.view` | See leave applications | `Dean Academic`, `Director`, `Employee`, `Leave Approver`, `Registrar`, `Unit Head`, `acadadmin`, `faculty`, `staff` |
+| `leave.application.create` | Apply for leave | `Dean Academic`, `Director`, `Employee`, `Leave Approver`, `Registrar`, `Unit Head`, `acadadmin`, `faculty`, `staff` |
+| `leave.application.review` | Review and recommend leave applications | `Dean Academic`, `Director`, `Leave Approver`, `Registrar`, `Unit Head`, `acadadmin` |
+| `leave.application.approve` | Sanction or reject leave applications | `Dean Academic`, `Director`, `Leave Approver`, `Registrar`, `Unit Head`, `acadadmin` |
+| `leave.application.delete` | Withdraw a leave application | `Dean Academic`, `Director`, `Employee`, `Leave Approver`, `Registrar`, `Unit Head`, `acadadmin`, `faculty`, `staff` |
+| `leave.substitute.respond` | Accept or decline standing in for someone | `Dean Academic`, `Director`, `Employee`, `Leave Approver`, `Registrar`, `Unit Head`, `acadadmin`, `faculty`, `staff` |
+| `leave.balance.view` | See leave balances across employees | `Dean Academic`, `Director`, `Leave Approver`, `Registrar`, `Unit Head`, `acadadmin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
