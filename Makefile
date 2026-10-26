@@ -1,16 +1,19 @@
 .DEFAULT_GOAL := help
 PY := .venv/bin/python
+PGHOST ?= 127.0.0.1
+PGPORT ?= 5432
 export DJANGO_SETTINGS_MODULE ?= config.settings.dev
 
 help:  ## show this help
 	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk -F':.*?## ' '{printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
 
 install:  ## create the venv and install everything
-	uv venv --python 3.12 .venv
+	@if [ ! -x "$(PY)" ]; then uv venv --python 3.12 .venv; fi
 	uv pip install --python $(PY) -e ".[dev]"
 
-up:  ## start postgres + redis
-	docker compose up -d
+up:  ## start local PostgreSQL without Docker
+	@pg_isready -q -h "$(PGHOST)" -p "$(PGPORT)" || sudo service postgresql start
+	@pg_isready -h "$(PGHOST)" -p "$(PGPORT)"
 
 migrate:  ## apply migrations
 	$(PY) manage.py migrate
@@ -18,6 +21,7 @@ migrate:  ## apply migrations
 seed:  ## register modules and load sample data
 	$(PY) manage.py seed_modules
 	$(PY) manage.py seed_demo
+	$(PY) manage.py seed_leave_demo
 
 dev:  ## run the server
 	$(PY) manage.py runserver 0.0.0.0:8002

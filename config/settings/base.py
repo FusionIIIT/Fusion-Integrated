@@ -76,9 +76,10 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
 ]
 
-# No models. Installed so its AppConfig runs and registers the session checks.
+# Local auth and shared event infrastructure.
 LOCAL_APPS = [
     "fusion_auth",
+    "core.events.apps.EventsConfig",
 ]
 
 # Each module is an independent Django app: own tables, migrations and contract.
@@ -90,6 +91,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.leave",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -230,6 +232,20 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "LeaveStatusEnum": "modules.leave.models.LeaveStatus",
+        "SubstituteRequestStatusEnum": [
+            ("pending", "Pending"),
+            ("accepted", "Accepted"),
+            ("declined", "Declined"),
+        ],
+        "YearEndProcessingStatusEnum": [
+            ("pending", "Pending"),
+            ("running", "Running"),
+            ("completed", "Completed"),
+            ("failed", "Failed"),
+        ],
+    },
 }
 
 CORS_ALLOW_ALL_ORIGINS = False
