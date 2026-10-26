@@ -13,6 +13,22 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.request.view_self` | View own leave requests, balances and history | `director`, `elm_admin`, `employee`, `establishment_officer`, `faculty`, `staff`, `unit_head` |
+| `elm.request.create` | Submit leave, extension and resumption requests | `director`, `elm_admin`, `employee`, `faculty`, `staff` |
+| `elm.request.withdraw` | Withdraw own pending leave requests | `director`, `elm_admin`, `employee`, `faculty`, `staff` |
+| `elm.substitute.respond` | Accept or decline substitute assignments | `director`, `elm_admin`, `employee`, `faculty`, `staff` |
+| `elm.workflow.review` | Review assigned leave workflow tasks | `director`, `elm_admin`, `establishment_officer`, `unit_head` |
+| `elm.policy.manage` | Manage current leave policy and approval routes | `elm_admin` |
+| `elm.calendar.manage` | Manage and publish holiday calendars | `elm_admin` |
+| `elm.account.manage` | Maintain leave accounts and authorized records | `elm_admin` |
+| `elm.report.export` | Export a leave representation or report | `director`, `elm_admin`, `employee`, `faculty`, `staff` |
+| `elm.sla.manage` | Configure service-level reminders and escalation | `elm_admin` |
+| `elm.system.process` | Run scheduled year-end and SLA processing | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
