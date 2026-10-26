@@ -55,6 +55,54 @@ class Command(BaseCommand):
                           "eligibility_snapshot": {"is_eligible": True},
                           "applied_at": timezone.now()})
 
+        # --- Leave module fixtures ---
+        from decimal import Decimal
+        from modules.leave.models import ApprovingAuthority, LeaveBalance, LeaveRequest
+        from modules.leave.services.balances import ensure_balances_for_user
+
+        # Seed approving authorities
+        for auth_uid, role, dept in [
+            (9001, "HOD", "CSE"),
+            (9002, "Registrar", ""),
+            (9003, "Director", ""),
+        ]:
+            ApprovingAuthority.objects.update_or_create(
+                user_id=auth_uid,
+                defaults={"role": role, "department": dept, "is_active": True},
+            )
+
+        # Seed balances for demo users
+        for uid in [1001, 1002, 1003, 9001]:
+            ensure_balances_for_user(uid)
+
+        # Seed sample leave requests
+        LeaveRequest.objects.get_or_create(
+            user_id=1001,
+            leave_type="casual",
+            start_date=timezone.now().date() + timedelta(days=5),
+            end_date=timezone.now().date() + timedelta(days=6),
+            defaults={
+                "duration_days": Decimal("2.0"),
+                "justification": "Attending national robotics symposium",
+                "status": LeaveRequest.Status.PENDING_CURRENT_AUTHORITY,
+                "current_authority_id": 9001,
+                "current_authority_role": "HOD",
+            },
+        )
+        LeaveRequest.objects.get_or_create(
+            user_id=1002,
+            leave_type="medical",
+            start_date=timezone.now().date() - timedelta(days=10),
+            end_date=timezone.now().date() - timedelta(days=8),
+            defaults={
+                "duration_days": Decimal("3.0"),
+                "justification": "Recovering from viral fever and medical observation",
+                "status": LeaveRequest.Status.APPROVED,
+                "current_authority_id": 9001,
+                "current_authority_role": "HOD",
+            },
+        )
+
 
 
         self.stdout.write(self.style.SUCCESS("demo data loaded"))
