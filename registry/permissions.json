@@ -34,6 +34,88 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "leave": {
+      "grants": {
+        "Employee": [
+          "leave.application.apply",
+          "leave.application.view"
+        ],
+        "Leave Approver": [
+          "leave.application.approve",
+          "leave.application.view"
+        ],
+        "faculty": [
+          "leave.application.apply",
+          "leave.application.approve",
+          "leave.application.view"
+        ],
+        "staff": [
+          "leave.application.apply",
+          "leave.application.view"
+        ],
+        "student": [
+          "leave.application.apply",
+          "leave.application.view"
+        ]
+      },
+      "module_grants": [
+        "Employee",
+        "Leave Approver",
+        "faculty",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "CalendarBlank",
+        "items": [
+          {
+            "code": "leave.apply",
+            "icon": "CalendarPlus",
+            "label": "Apply Leave",
+            "required_permission": "leave.application.apply",
+            "sort_order": 10,
+            "to": "/leave/apply"
+          },
+          {
+            "code": "leave.applications",
+            "icon": "CalendarBlank",
+            "label": "My Applications",
+            "required_permission": "leave.application.view",
+            "sort_order": 20,
+            "to": "/leave/applications"
+          },
+          {
+            "code": "leave.approvals",
+            "icon": "Checks",
+            "label": "Leave Approvals",
+            "required_permission": "leave.application.approve",
+            "sort_order": 30,
+            "to": "/leave/approvals"
+          }
+        ],
+        "label": "Leave Management",
+        "nav_section": "Administration",
+        "sort_order": 25,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "leave.application.view",
+          "label": "See leave applications"
+        },
+        {
+          "code": "leave.application.apply",
+          "label": "Submit a leave application"
+        },
+        {
+          "code": "leave.application.approve",
+          "label": "Approve or reject a leave application"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
