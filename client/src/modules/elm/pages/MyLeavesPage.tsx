@@ -1,3 +1,5 @@
+import RequestsPage from "../components/RequestsPage";
+
 export default function MyLeavesPage() {
-  return <div>My Leaves page component</div>;
+  return <RequestsPage title="My leave applications" task="mine" />;
 }
