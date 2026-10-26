@@ -1,0 +1,167 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+
+\definecolor{fusionnavy}{RGB}{27, 42, 74}
+\definecolor{fusionblue}{RGB}{34, 112, 184}
+\definecolor{codebg}{RGB}{245, 247, 250}
+\definecolor{darkgray}{RGB}{60, 60, 60}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=fusionnavy,
+    filecolor=fusionblue,
+    urlcolor=fusionblue,
+    citecolor=fusionnavy
+}
+
+\titleformat{\section}{\large\bfseries\color{fusionnavy}}{\thesection}{1em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{fusionblue}}{\thesubsection}{1em}{}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\footnotesize \color{darkgray} Fusion ERP Lab — Assignment \#6 \& \#6B Technical Report}
+\rhead{\footnotesize \color{darkgray} Roll: 24BCS151 | IIITDM Jabalpur}
+\cfoot{\thepage}
+
+\begin{document}
+
+\begin{center}
+    {\LARGE \textbf{\color{fusionnavy} Fusion ERP Lab — Assignment \#6 \& \#6B}}\\[0.4em]
+    {\large \textbf{A Pilot Study \& Engineering Report: Implementing and Integrating the Employee Leave Management (ELM) Module Using Local Code-LLMs and Human-AI Pair Engineering}}\\[0.8em]
+    \textbf{Student Name:} Mohit Jain \quad\textbar\quad \textbf{Roll Number:} 24BCS151 \quad\textbar\quad \textbf{Email:} 24bcs151@iiitdmj.ac.in\\
+    \textit{PDPM Indian Institute of Information Technology, Design and Manufacturing, Jabalpur}\\[0.4em]
+    \textbf{Date:} October 2026 \quad\textbar\quad \textbf{Target Repository:} \href{https://github.com/FusionIIIT/Fusion-Integrated}{FusionIIIT/Fusion-Integrated}
+\end{center}
+\vspace{-0.5em}
+\hrule
+\vspace{1.2em}
+
+\section{Executive Summary}
+This report documents the two-phase experimental study conducted for Fusion ERP Lab Assignments \#6 and \#6B. In **Phase 1**, two locally deployable code language models—**Qwen 2.5 Coder 7B** and **DeepSeek Coder 6.7B**—were evaluated under identical task instructions to implement the Employee Leave Management (ELM) module inside the unified Fusion Base Code. In **Phase 2**, the Qwen 2.5 Coder implementation was selected as the superior starting point and progressively reviewed, tested, corrected, and integrated into a reliable, deployment-ready state adhering to Fusion ERP's multi-database architecture and Mantine UI standards.
+
+All platform verification gates, including \texttt{make check} (Ruff, import-linter, ops checks, schema checks, and 387 pytests) and \texttt{make check-client} (TypeScript strict check, Vitest suite, and Vite production bundle), pass with zero errors.
+
+\section{Baseline Architecture \& Integration Context}
+Fusion ERP enforces strict architectural boundaries to support a scalable, modular institute management system:
+\begin{itemize}[noitemsep,topsep=2pt]
+    \item \textbf{Multi-Database Identity Separation:} Authentication and user identity live in an independent IAM service and database (\texttt{fusion\_system\_db}). Module business tables live in \texttt{fusion\_integrated}. Therefore, direct Django foreign keys to \texttt{User} or \texttt{Principal} are illegal; all person references must use plain integer \texttt{user\_id} via \texttt{core.db.mixins.UserScopedModel}.
+    \item \textbf{Server-Driven RBAC Navigation:} The frontend draws no hardcoded navigation. Routes and sidebar items are rendered dynamically based on permissions published in \texttt{registry.py} and seeded into the IAM service via \texttt{seed\_iam\_permissions}.
+    \item \textbf{Layering \& Contracts:} Logic must be decoupled into domain services (\texttt{services.py}) for state mutations, selectors (\texttt{selectors.py}) for scoped reads, and plural contracts (\texttt{contracts.py}). Cross-module imports are enforced by CI through \texttt{.importlinter}.
+    \item \textbf{Frontend Design System:} The client uses Mantine UI (\texttt{@mantine/core}, \texttt{@tabler/icons-react}) and TanStack React Query hooks connected via a centralized HTTP client carrying session cookies and CSRF headers.
+\end{itemize}
+
+\section{Phase 1: Local Code-LLM Pilot Evaluation}
+
+\subsection{Experimental Setup}
+\begin{itemize}[noitemsep,topsep=2pt]
+    \item \textbf{Operating System:} Linux x86\_64 (Ubuntu-based)
+    \item \textbf{Inference Runtime:} Ollama (v0.86.2 runtime via Aider CLI tool)
+    \item \textbf{Context Configuration:} 2048 repo-map tokens, full ELM specification loaded read-only (\texttt{../ELM\_FULL\_SPECS.txt}), core settings and URL configurations.
+    \item \textbf{Common Task Prompt:} Instructed the model to inspect the Fusion Base repository and ELM specs, reuse existing login, role management, common UI and backend infrastructure, and implement the necessary data models, services, APIs, and frontend pages.
+\end{itemize}
+
+\subsection{Model 1 Evaluation: Qwen 2.5 Coder 7B (\texttt{ollama/qwen2.5-coder:7b})}
+\begin{itemize}[noitemsep,topsep=2pt]
+    \item \textbf{Observed Behavior:} The model successfully understood that both backend and frontend components were needed. It attempted a repository-wide generation, outputting definitions for models (\texttt{LeaveBalance}, \texttt{LeaveApplication}, \texttt{SubstituteRequest}, \texttt{HolidayCalendar}), views, serializers, URLs, and React components.
+    \item \textbf{Limitations \& Defects:}
+    \begin{enumerate}[noitemsep,topsep=1pt]
+        \item Context window saturation: Chat context reached 32,806 tokens, exceeding the 32,768 limit.
+        \item Patch format failure: The model generated markdown code blocks rather than Aider's diff blocks, requiring manual extraction into commit \texttt{fce52c6}.
+        \item Architectural mismatches: Used direct \texttt{ForeignKey(Principal)} relations; used unstyled HTML \texttt{<table>} elements instead of Mantine components; lacked \texttt{registry.py} RBAC declarations.
+    \end{enumerate}
+    \item \textbf{Initial Build/Run Status:} Code generated and integrated, but does not run successfully.
+\end{itemize}
+
+\subsection{Model 2 Evaluation: DeepSeek Coder 6.7B (\texttt{ollama/deepseek-coder:6.7b})}
+\begin{itemize}[noitemsep,topsep=2pt]
+    \item \textbf{Observed Behavior:} DeepSeek Coder explicitly refused repository-level generation, stating: \textit{"As per your request, I can't provide a full implementation here due to complexity and size of the project."} When asked about \texttt{manage.py}, it hallucinated that the file was unrelated to software development.
+    \item \textbf{Fallback:} Under a subsequent prompt, it produced a minimal Django snippet in chat relying on \texttt{django.contrib.auth.models.User}. It produced zero frontend code and no service layer.
+    \item \textbf{Initial Build/Run Status:} Could not obtain a usable integrated implementation.
+\end{itemize}
+
+\subsection{Selection Rationale for Phase 2}
+Qwen 2.5 Coder 7B was selected because it made a genuine, multi-file full-stack implementation attempt. It provided a structured foundation that could be systematically refactored, whereas DeepSeek Coder required complete manual construction from scratch.
+
+\section{Phase 2: Systematic Review, Testing, and Improvement}
+
+\subsection{Step 1 \& 2: Understand and Build/Run Engineering}
+Initial testing identified that running the system locally required three concurrent processes: IAM backend (port 8001), Fusion Base backend (port 8002), and Vite frontend (port 5173).
+\begin{itemize}[noitemsep,topsep=2pt]
+    \item \textbf{Environment Collision:} \texttt{DJANGO\_SETTINGS\_MODULE} from Fusion Base leaked into the IAM service, crashing it with \texttt{ModuleNotFoundError: No module named 'config'}.
+    \item \textbf{HTTPS Redirection:} Host shell variable \texttt{DEBUG=release} caused Django to enforce \texttt{SECURE\_SSL\_REDIRECT}, causing port 8001 connection refused errors.
+    \item \textbf{Solution:} Created a unified orchestrator script (\texttt{run.sh} / \texttt{make run}) that isolates subshell environments, forces \texttt{DEBUG=True}, manages background process traps, and includes HTTP readiness polling.
+\end{itemize}
+
+\subsection{Step 3 \& 4: Review and Problem Identification}
+A thorough code and specification review revealed 10 major defects:
+\begin{enumerate}[noitemsep,topsep=2pt]
+    \item \textbf{Illegal Cross-Database Foreign Keys:} \texttt{ForeignKey(Principal)} broke Postgres multi-database isolation.
+    \item \textbf{Missing RBAC \& Navigation:} No \texttt{modules/elm/registry.py} existed; IAM permissions were never seeded.
+    \item \textbf{Boundary Contract Violations:} \texttt{modules.elm} was absent from \texttt{.importlinter}.
+    \item \textbf{Layering Degradation:} Business logic was coupled directly inside DRF viewsets.
+    \item \textbf{Frontend Incompatibility:} Generic HTML tables lacked Mantine styling and responsive layouts.
+    \item \textbf{Absence of Test Coverage:} Zero unit, integration, or client tests existed.
+    \item \textbf{Schema Gaps:} Missing DRF Spectacular \texttt{@extend\_schema} decorators triggered OpenAPI build warnings.
+\end{enumerate}
+
+\subsection{Step 5 \& 6: Code Improvement and Verification}
+Through systematic human developer implementation assisted by targeted prompt queries, the following commits were engineered on branch \texttt{feat/elm-phase2}:
+\begin{itemize}[noitemsep,topsep=2pt]
+    \item \textbf{Commit 1 (\texttt{882dcac}):} Converted models to \texttt{UserScopedModel} (indexed \texttt{user\_id} integer), updated \texttt{.importlinter}, and generated clean migration \texttt{0001\_initial.py}.
+    \item \textbf{Commit 2 (\texttt{8a93790}):} Implemented \texttt{services.py} (leave application, balance checks, cancellations, substitute workflow), \texttt{selectors.py} (scoping), \texttt{registry.py}, and 7 pytest test cases.
+    \item \textbf{Commit 3 (\texttt{76302ba}):} Rebuilt client using Mantine UI (\texttt{MyLeavesPage}, \texttt{LeaveBalancesPage}, \texttt{LeaveApprovalsPage}, \texttt{HolidayCalendarPage}), React Query hooks, and Vitest test suite.
+    \item \textbf{Commit 4--7 (\texttt{c1d37cb}, \texttt{7f2406e}, \texttt{275bd42}, \texttt{49e2822}):} Unified runner script, resolved port 8001/8002 settings isolation, added faculty/staff role grants, and automated IAM permission seeding.
+    \item \textbf{Commit 8 (\texttt{7c9a0fd}):} Documented Phase 2 interaction logs, issue logs, and verification evidence.
+\end{itemize}
+
+\section{Verification Evidence \& Quality Gates Summary}
+\begin{table}[h!]
+\centering
+\small
+\begin{tabularx}{\textwidth}{l p{7.5cm} c}
+\toprule
+\textbf{Quality Gate / Check} & \textbf{Scope \& Command Executed} & \textbf{Result} \\
+\midrule
+Django System Check & \texttt{manage.py check} & \textbf{Passed} (0 issues) \\
+Migrations Verification & \texttt{manage.py makemigrations --check --dry-run} & \textbf{Passed} (Clean) \\
+Python Code Style & \texttt{ruff check .} & \textbf{Passed} (0 warnings) \\
+Architecture Boundaries & \texttt{lint-imports} (4 contracts, 212 files analyzed) & \textbf{Passed} (4 kept, 0 broken) \\
+Cross-Module Foreign Keys & \texttt{ops/checks/no\_cross\_module\_fk.py} & \textbf{Passed} (Clean) \\
+Contract Signatures & \texttt{ops/checks/contracts\_are\_plural.py} & \textbf{Passed} (Clean) \\
+Route \& Nav Alignment & \texttt{ops/checks/nav\_matches\_routes.py} & \textbf{Passed} (In sync) \\
+Permission Manifest & \texttt{manage.py permission\_manifest --check} & \textbf{Passed} (In sync) \\
+OpenAPI Specification & \texttt{make schema-check} & \textbf{Passed} (Matches code) \\
+Backend Test Suite & \texttt{pytest} (387 platform \& ELM tests) & \textbf{Passed} (387 passed) \\
+Client Type Safety & \texttt{tsc --noEmit} & \textbf{Passed} (0 errors) \\
+Frontend Unit Tests & \texttt{vitest run} (37 client tests, 5 files) & \textbf{Passed} (37 passed) \\
+Production Bundle Build & \texttt{vite build} & \textbf{Passed} (Clean build) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Key Learnings on Human-AI Software Engineering}
+\begin{enumerate}[noitemsep,topsep=2pt]
+    \item \textbf{Context Limits in Local LLMs:} 7B parameter models running locally on standard developer hardware hit severe context window degradations (32k token limits) when fed full repositories and extensive specification documents.
+    \item \textbf{Prompt Granularity:} Broad, unconstrained prompts (\textit{"Implement the whole ELM module"}) trigger hallucinations and boilerplate standard Django code. Prompting must be broken down layer-by-layer (models $\rightarrow$ services $\rightarrow$ permissions $\rightarrow$ UI).
+    \item \textbf{Irreplaceability of Human Architectural Judgment:} Local LLMs cannot infer non-standard architectural conventions (e.g., multi-database identity isolation, server-driven RBAC navigation) unless guided by explicit human oversight and reference implementations.
+\end{enumerate}
+
+\section{Submission Links \& Artifacts}
+\begin{itemize}[noitemsep,topsep=2pt]
+    \item \textbf{Phase 2 Final ELM Branch:} \href{https://github.com/mohitjaint/Fusion-Integrated/tree/feat/elm-phase2}{mohitjaint/Fusion-Integrated (Branch: feat/elm-phase2)}
+    \item \textbf{Phase 2 ELM Module Code:} \href{https://github.com/mohitjaint/Fusion-Integrated/tree/feat/elm-phase2/modules/elm}{modules/elm/}
+    \item \textbf{Phase 2 AI Interaction Log:} \href{https://github.com/mohitjaint/Fusion-Integrated/blob/feat/elm-phase2/evaluation\_evidence/phase2\_ai\_interaction\_log.md}{phase2\_ai\_interaction\_log.md}
+    \item \textbf{Phase 2 Verification Evidence:} \href{https://github.com/mohitjaint/Fusion-Integrated/blob/feat/elm-phase2/evaluation\_evidence/phase2\_verification\_evidence.md}{phase2\_verification\_evidence.md}
+    \item \textbf{Phase 2 Issue \& Improvement Log:} \href{https://github.com/mohitjaint/Fusion-Integrated/blob/feat/elm-phase2/evaluation\_evidence/phase2\_issue\_improvement\_log.md}{phase2\_issue\_improvement\_log.md}
+    \item \textbf{Pull Request to Main:} \href{https://github.com/FusionIIIT/Fusion-Integrated/pulls}{FusionIIIT/Fusion-Integrated (PR: Assignment 6B)}
+\end{itemize}
+
+\end{document}

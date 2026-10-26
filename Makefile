@@ -22,6 +22,9 @@ seed:  ## register modules and load sample data
 dev:  ## run the server
 	$(PY) manage.py runserver 0.0.0.0:8002
 
+run:  ## run IAM backend, integrated backend, and client in one command
+	@./run.sh
+
 test:  ## run the test suite
 	$(PY) -m pytest
 
@@ -57,5 +60,5 @@ schema-check:  ## the committed schema must match the code
 		|| { echo "$(SCHEMA) is stale — run 'make schema'"; exit 1; }
 	@echo "openapi schema matches the code"
 
-.PHONY: help install up migrate seed dev test check check-client schema \
+.PHONY: help install up migrate seed dev run test check check-client schema \
 	schema-check permissions module-structure

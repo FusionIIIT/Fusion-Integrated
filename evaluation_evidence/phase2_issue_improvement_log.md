@@ -1,0 +1,19 @@
+# Phase 2 — Issue & Improvement Log
+
+This log tracks all meaningful issues identified during the review and testing of the Phase-1 ELM implementation, along with the engineering actions taken to resolve them.
+
+---
+
+| Issue ID | Category | Problem Description | Root Cause | Engineering Resolution | Status |
+| :--- | :--- | :--- | :--- | :--- | :---: |
+| **ISSUE-01** | Architecture / DB | Direct foreign keys to `Principal` / `User`. | Fusion identity is managed by a distinct database (`fusion_system_db`); cross-database foreign keys break relational integrity in Django. | Replaced `models.ForeignKey(Principal)` with `core.db.mixins.UserScopedModel` using integer `user_id`. Regenerated `0001_initial.py`. | **Resolved** |
+| **ISSUE-02** | Security / RBAC | ELM module missing from navigation sidebar; no access control. | No `modules/elm/registry.py` existed, and permissions were never published to the manifest or seeded into IAM. | Created `registry.py` defining `MODULE`, `NAV_ITEMS`, `PERMISSIONS`, and `ROLE_GRANTS` (mapped to `faculty` and `staff`). Seeded IAM with `seed_iam_permissions`. | **Resolved** |
+| **ISSUE-03** | Boundaries / Linter | CI failure under `lint-imports`. | `.importlinter` did not include `modules.elm` in contract checks (`domain-is-pure-python` and `modules-only-touch-contracts`). | Updated `.importlinter` configuration to formally register and enforce boundary rules for `modules.elm`. | **Resolved** |
+| **ISSUE-04** | Architecture / Layering | Monolithic views mixing queries, validation, and serialization. | Phase 1 model placed raw ORM queries and inline logic directly inside DRF viewsets without separation of concerns. | Separated logic into `services.py` (writes & transactions), `selectors.py` (reads & scoping), and `serializers.py` with directory contract enrichment. | **Resolved** |
+| **ISSUE-05** | Frontend / UI | Non-standard raw HTML tables (`<table>`, `<tr>`) and unstyled inputs. | Phase 1 model output generic web markup instead of utilizing the institute's Mantine design system. | Built full Mantine UI pages (`MyLeavesPage`, `LeaveBalancesPage`, `LeaveApprovalsPage`, `HolidayCalendarPage`) with tabs, badges, modals, and notifications. | **Resolved** |
+| **ISSUE-06** | Frontend / API | Unsafe API data fetching and lack of error handling. | Frontend components used raw axios calls without caching, mutation synchronization, or CSRF headers. | Implemented TanStack Query hooks in `client/src/modules/elm/api/hooks.ts` using the shared HTTP client `client/src/lib/http`. | **Resolved** |
+| **ISSUE-07** | DevOps / Runtime | IAM backend crashed on startup with `ModuleNotFoundError: No module named 'config'`. | `Makefile` exported `DJANGO_SETTINGS_MODULE` which leaked into the IAM service's environment when run concurrently. | Isolated subshell environments in `run.sh` and explicitly set `DJANGO_SETTINGS_MODULE="backend.settings"` for IAM. | **Resolved** |
+| **ISSUE-08** | DevOps / Runtime | Connection refused on IAM login (port 8001). | Ambient `DEBUG=release` environment variable caused Django to enforce HTTPS redirection on port 8001. | Explicitly enforced `DEBUG="True"` and `SECURE_SSL_REDIRECT="False"` in `run.sh` and added a readiness probe polling loop. | **Resolved** |
+| **ISSUE-09** | Quality / Testing | Zero tests existed for backend or frontend. | Phase-1 code generation produced no test suites. | Added 7 pytest unit and integration tests (`modules/elm/tests/test_elm.py`) and Vitest hook tests (`client/src/modules/elm/api/hooks.test.tsx`). | **Resolved** |
+| **ISSUE-10** | API Documentation | `drf-spectacular` schema warnings during `make schema-check`. | DRF views lacked explicit serializer and response annotations. | Added `@extend_schema` decorators to all view methods and regenerated `openapi/fusion-integrated.v1.yaml`. | **Resolved** |
+

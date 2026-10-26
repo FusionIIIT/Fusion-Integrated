@@ -1,0 +1,669 @@
+Detected dumb terminal, disabling fancy input and pretty output.
+
+You can skip this check with --no-gitignore
+Added .aider* to .gitignore
+Aider v0.86.2
+Model: ollama/qwen2.5-coder:7b with whole edit format
+Git repo: .git with 360 files
+Repo-map: using 2048 tokens, auto refresh
+Added ../ELM_FULL_SPECS.txt to the chat (read-only).
+
+
+config/settings/base.py
+
+config/urls.py
+Initial repo scan can be slow in larger repos, but only happens once.
+Scanning repo:   0%|          | 0/360 [00:00<?, ?it/s]Scanning repo:   4%|▎         | 13/360 [00:00<00:11, 29.48it/s]Scanning repo:   6%|▌         | 21/360 [00:00<00:08, 41.34it/s]Scanning repo:   8%|▊         | 30/360 [00:00<00:06, 50.60it/s]Scanning repo:  10%|█         | 37/360 [00:00<00:07, 45.33it/s]Scanning repo:  12%|█▏        | 43/360 [00:00<00:06, 45.32it/s]Scanning repo:  14%|█▎        | 49/360 [00:01<00:06, 45.94it/s]Scanning repo:  16%|█▌        | 56/360 [00:01<00:05, 50.79it/s]Scanning repo:  17%|█▋        | 62/360 [00:01<00:05, 51.06it/s]Scanning repo:  19%|█▉        | 68/360 [00:01<00:06, 45.72it/s]Scanning repo:  20%|██        | 73/360 [00:01<00:06, 44.37it/s]Scanning repo:  22%|██▏       | 79/360 [00:01<00:05, 47.38it/s]Scanning repo:  25%|██▍       | 89/360 [00:01<00:04, 60.68it/s]Scanning repo:  28%|██▊       | 100/360 [00:01<00:04, 64.31it/s]Scanning repo:  31%|███       | 112/360 [00:02<00:03, 76.77it/s]Scanning repo:  47%|████▋     | 168/360 [00:02<00:00, 201.62it/s]Scanning repo:  59%|█████▉    | 212/360 [00:02<00:00, 188.99it/s]Scanning repo:  66%|██████▌   | 237/360 [00:02<00:00, 201.49it/s]Scanning repo:  72%|███████▏  | 260/360 [00:02<00:00, 201.27it/s]Scanning repo:  78%|███████▊  | 282/360 [00:02<00:00, 179.69it/s]Scanning repo:  84%|████████▍ | 302/360 [00:02<00:00, 172.60it/s]Scanning repo:  89%|████████▉ | 321/360 [00:03<00:00, 154.75it/s]Scanning repo:  94%|█████████▍| 338/360 [00:03<00:00, 137.38it/s]Scanning repo: 100%|██████████| 360/360 [00:03<00:00, 106.87it/s]
+Your estimated chat context of 32,806 tokens exceeds the 32,768 token limit for 
+ollama/qwen2.5-coder:7b!
+To reduce the chat context:
+- Use /drop to remove unneeded files from the chat
+- Use /clear to clear the chat history
+- Break your code into smaller files
+It's probably safe to try and send the request, most providers won't charge if 
+the context limit is exceeded.
+To integrate the Employee Leave Management (ELM) module into the existing Fusion ERP system, we need to follow a structured approach. We'll start by setting up the backend and frontend components as per the provided specifications.
+
+### Step 1: Set Up the Backend
+
+#### Create the ELM Module Directory
+
+First, create the necessary directory structure for the ELM module:
+
+```bash
+mkdir -p modules/elm
+```
+
+#### Define Models
+
+Create a `models.py` file in the `modules/elm` directory to define the data models:
+
+```python
+# modules/elm/models.py
+from django.db import models
+from fusion_auth.models import Principal
+
+class LeaveBalance(models.Model):
+    user = models.ForeignKey(Principal, on_delete=models.CASCADE)
+    leave_type = models.CharField(max_length=10)  # CL, RH, SCL, EL, VL, COL
+    balance = models.IntegerField()
+
+class LeaveApplication(models.Model):
+    STATUS_CHOICES = [
+        ('draft', 'Draft'),
+        ('pending_unit_head', 'Pending Unit Head Approval'),
+        ('pending_establishment', 'Pending Establishment Approval'),
+        ('pending_authority', 'Pending Authority Approval'),
+        ('approved', 'Approved'),
+        ('cancelled', 'Cancelled'),
+        ('rejected', 'Rejected'),
+    ]
+    user = models.ForeignKey(Principal, on_delete=models.CASCADE)
+    leave_type = models.CharField(max_length=10)  # CL, RH, SCL, EL, VL, COL
+    start_date = models.DateField()
+    end_date = models.DateField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    station_leave = models.BooleanField(default=False)
+
+class SubstituteRequest(models.Model):
+    leave_application = models.ForeignKey(LeaveApplication, on_delete=models.CASCADE)
+    substitute_user = models.ForeignKey(Principal, on_delete=models.CASCADE)
+    approved = models.BooleanField(default=False)
+
+class HolidayCalendar(models.Model):
+    date = models.DateField()
+    description = models.CharField(max_length=255)
+
+class LeavePolicy(models.Model)
+    leave_type = models.CharField(max_length=10)  # CL, RH, SCL, EL, VL, COL
+    max_days = models.IntegerField()
+```
+
+#### Define Services
+
+Create a `services.py` file to define the business logic:
+
+```python
+# modules/elm/services.py
+from .models import LeaveApplication, SubstituteRequest, LeaveBalance
+
+def apply_leave(user, leave_type, start_date, end_date, station_leave=False):
+    leave_application = LeaveApplication.objects.create(
+        user=user,
+        leave_type=leave_type,
+        start_date=start_date,
+        end_date=end_date,
+        station_leave=station_leave
+    )
+    return leave_application
+
+def approve_leave(leave_application):
+    if leave_application.status == 'pending_unit_head':
+        leave_application.status = 'approved'
+        leave_application.save()
+    elif leave_application.status == 'pending_establishment':
+        leave_application.status = 'approved'
+        leave_application.save()
+    elif leave_application.status == 'pending_authority':
+        leave_application.status = 'approved'
+        leave_application.save()
+
+def cancel_leave(leave_application):
+    if leave_application.status in ['draft', 'pending_unit_head']:
+        leave_application.status = 'cancelled'
+        leave_application.save()
+
+def request_substitute(leave_application, substitute_user):
+    SubstituteRequest.objects.create(
+        leave_application=leave_application,
+        substitute_user=substitute_user
+    )
+
+def approve_substitute(substitute_request):
+    if not substitute_request.approved:
+        substitute_request.approved = True
+        substitute_request.save()
+```
+
+#### Define API Endpoints
+
+Create a `views.py` file to define the API endpoints:
+
+```python
+# modules/elm/views.py
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from .models import LeaveApplication, SubstituteRequest
+from .serializers import LeaveApplicationSerializer, SubstituteRequestSerializer
+
+class LeaveApplicationViewSet(viewsets.ModelViewSet):
+    queryset = LeaveApplication.objects.all()
+    serializer_class = LeaveApplicationSerializer
+
+class SubstituteRequestViewSet(viewsets.ModelViewSet):
+    queryset = SubstituteRequest.objects.all()
+    serializer_class = SubstituteRequestSerializer
+```
+
+Create a `serializers.py` file to define the serializers:
+
+```python
+# modules/elm/serializers.py
+from rest_framework import serializers
+from .models import LeaveApplication, SubstituteRequest
+
+class LeaveApplicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeaveApplication
+        fields = '__all__'
+
+class SubstituteRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubstituteRequest
+        fields = '__all__'
+```
+
+#### Define Migrations
+
+Create a `migrations` directory and generate the initial migration:
+
+```bash
+python manage.py makemigrations elm
+```
+
+Edit the generated migration file to create the necessary tables.
+
+#### Register Module in Fusion ERP
+
+Update `config/settings/base.py` to include the ELM module:
+
+```python
+INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+                  + PLATFORM_MODULES + DOMAIN_MODULES + ["modules.elm"])
+```
+
+Mount URLs in `config/urls.py`:
+
+```python
+urlpatterns = [
+    path("api/v1/", include("fusion_auth.urls")),
+    path("api/v1/directory/", include("modules.directory.api.urls")),
+    path("api/v1/placement/", include("modules.placement.api.urls")),
+    path("api/v1/elm/", include("modules.elm.api.urls")),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="docs"),
+]
+```
+
+#### Register Module in Access Control
+
+Run the seed_modules command to register the ELM module:
+
+```bash
+python manage.py seed_modules
+```
+
+### Step 2: Set Up the Frontend
+
+Create a `client/src/modules/elm` directory and add the necessary components:
+
+#### Create Components
+
+Create a `LeaveApplicationForm.tsx` component for leave application submission:
+
+```tsx
+// client/src/modules/elm/components/LeaveApplicationForm.tsx
+import React, { useState } from 'react';
+import { useAuth } from '../auth/AuthProvider';
+
+const LeaveApplicationForm: React.FC = () => {
+  const [leaveType, setLeaveType] = useState('CL');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [stationLeave, setStationLeave] = useState(false);
+  const { user } = useAuth();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // Call API to submit leave application
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        Leave Type:
+        <select value={leaveType} onChange={(e) => setLeaveType(e.target.value)}>
+          <option value="CL">Casual Leave</option>
+          <option value="RH">Recess Half</option>
+          {/* Add other leave types */}
+        </select>
+      </label>
+      <label>
+        Start Date:
+        <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+      </label>
+      <label>
+        End Date:
+        <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+      </label>
+      <label>
+        Station Leave:
+        <input type="checkbox" checked={stationLeave} onChange={(e) => setStationLeave(e.target.checked)} />
+      </label>
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
+export default LeaveApplicationForm;
+```
+
+Create a `LeaveBalanceDashboard.tsx` component for displaying leave balances:
+
+```tsx
+// client/src/modules/elm/components/LeaveBalanceDashboard.tsx
+import React from 'react';
+import { useAuth } from '../auth/AuthProvider';
+
+const LeaveBalanceDashboard: React.FC = () => {
+  const { user } = useAuth();
+
+  // Fetch leave balance data from API
+
+  return (
+    <div>
+      <h2>Leave Balance</h2>
+      {/* Display leave balances */}
+    </div>
+  );
+};
+
+export default LeaveBalanceDashboard;
+```
+
+Create a `LeaveApprovalQueue.tsx` component for the approval queue:
+
+```tsx
+// client/src/modules/elm/components/LeaveApprovalQueue.tsx
+import React from 'react';
+import { useAuth } from '../auth/AuthProvider';
+
+const LeaveApprovalQueue: React.FC = () => {
+  const { user } = useAuth();
+
+  // Fetch leave applications for approval
+
+  return (
+    <div>
+      <h2>Leave Approval Queue</h2>
+      {/* Display leave applications and allow approvals */}
+    </div>
+  );
+};
+
+export default LeaveApprovalQueue;
+```
+
+Create a `HolidayCalendar.tsx` component for managing the holiday calendar:
+
+```tsx
+// client/src/modules/elm/components/HolidayCalendar.tsx
+import React from 'react';
+import { useAuth } from '../auth/AuthProvider';
+
+const HolidayCalendar: React.FC = () => {
+  const { user } = useAuth();
+
+  // Fetch and manage holiday calendar data
+
+  return (
+    <div>
+      <h2>Holiday Calendar</h2>
+      {/* Display and edit holiday calendar */}
+    </div>
+  );
+};
+
+export default HolidayCalendar;
+```
+
+Create a `LeaveHistory.tsx` component for displaying leave history:
+
+```tsx
+// client/src/modules/elm/components/LeaveHistory.tsx
+import React from 'react';
+import { useAuth } from '../auth/AuthProvider';
+
+const LeaveHistory: React.FC = () => {
+  const { user } = useAuth();
+
+  // Fetch and display leave history
+
+  return (
+    <div>
+      <h2>Leave History</h2>
+      {/* Display leave history */}
+    </div>
+  );
+};
+
+export default LeaveHistory;
+```
+
+#### Integrate with Existing Routing and Navigation
+
+Update the `client/src/app/registry.ts` to include the ELM module:
+
+```typescript
+// client/src/app/registry.ts
+import { ModuleManifest } from './types';
+
+const modules: ModuleManifest[] = [
+  // Other modules
+  {
+    code: 'elm',
+    basePath: '/api/v1/elm/',
+    load: () => import('./modules/elm'),
+  },
+];
+
+export default modules;
+```
+
+Update the `client/src/ui/layout/AppShellLayout.tsx` to include the ELM module in the navigation:
+
+```tsx
+// client/src/ui/layout/AppShellLayout.tsx
+import React from 'react';
+import { useAuth } from '../auth/AuthProvider';
+
+const AppShellLayout: React.FC = ({ children }) => {
+  const { user } = useAuth();
+
+  return (
+    <div>
+      {/* Navigation bar */}
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/directory">Directory</a></li>
+          <li><a href="/placement">Placement</a></li>
+          {user && user.permissions.includes('elm_access') && (
+            <li><a href="/elm">ELM</a></li>
+          )}
+        </ul>
+      </nav>
+      {/* Main content */}
+      <main>{children}</main>
+    </div>
+  );
+};
+
+export default AppShellLayout;
+```
+
+#### Role-Based UI
+
+Ensure that the components are only accessible to users with the appropriate permissions:
+
+```tsx
+// client/src/modules/elm/components/LeaveApplicationForm.tsx
+import React from 'react';
+import { useAuth } from '../auth/AuthProvider';
+
+const LeaveApplicationForm: React.FC = () => {
+  const { user } = useAuth();
+
+  if (!user || !user.permissions.includes('elm_access')) {
+    return <div>Access Denied</div>;
+  }
+
+  // Component implementation
+};
+
+export default LeaveApplicationForm;
+```
+
+### Step 3: Run and Verify the Implementation
+
+Run the Django development server:
+
+```bash
+python manage.py runserver
+```
+
+Navigate to `http://localhost:8000/elm` in your browser to see the ELM module.
+
+Ensure that all features are working as expected, including leave application submission, approval workflow, balance tracking, and other functionalities.
+
+### Conclusion
+
+This initial implementation sets up the backend and frontend for the Employee Leave Management (ELM) module. The next steps would involve further refinement, testing, and integration with other parts of the Fusion ERP system.
+Tokens: 33k sent, 2.6k received.
+
+client/src/app/registry.ts
+
+client/src/ui/layout/AppShellLayout.tsx
+
+manage.py
+Your estimated chat context of 39,571 tokens exceeds the 32,768 token limit for 
+ollama/qwen2.5-coder:7b!
+To reduce the chat context:
+- Use /drop to remove unneeded files from the chat
+- Use /clear to clear the chat history
+- Break your code into smaller files
+It's probably safe to try and send the request, most providers won't charge if 
+the context limit is exceeded.
+Great! I've reviewed the files you've added. Let's proceed with the implementation of the Employee Leave Management (ELM) module in the Fusion ERP system.
+
+### Step 4: Implement Remaining Features
+
+We'll continue by implementing the remaining features, such as leave balance tracking, approval workflow, and other functionalities.
+
+#### Create Models for Leave Balance Tracking
+
+Update `models.py` to include models for leave balance tracking:
+
+```python
+# modules/elm/models.py
+from django.db import models
+from fusion_auth.models import Principal
+
+class LeaveBalance(models.Model):
+    user = models.ForeignKey(Principal, on_delete=models.CASCADE)
+    leave_type = models.CharField(max_length=10)  # CL, RH, SCL, EL, VL, COL
+    balance = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.user.name} - {self.leave_type}: {self.balance}"
+```
+
+#### Create Services for Leave Balance Management
+
+Create a `services.py` file to manage leave balances:
+
+```python
+# modules/elm/services.py
+from .models import LeaveBalance, LeaveApplication
+
+def update_leave_balance(user, leave_type, days):
+    balance, created = LeaveBalance.objects.get_or_create(user=user, leave_type=leave_type)
+    if created:
+        balance.balance = 0
+    balance.balance += days
+    balance.save()
+
+def deduct_leave_balance(user, leave_type, days):
+    balance = LeaveBalance.objects.get(user=user, leave_type=leave_type)
+    balance.balance -= days
+    balance.save()
+```
+
+#### Create API Endpoints for Leave Balance Management
+
+Create a `views.py` file to define the API endpoints for leave balance management:
+
+```python
+# modules/elm/views.py
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from .models import LeaveBalance
+from .serializers import LeaveBalanceSerializer
+
+class LeaveBalanceViewSet(viewsets.ModelViewSet):
+    queryset = LeaveBalance.objects.all()
+    serializer_class = LeaveBalanceSerializer
+```
+
+Create a `serializers.py` file to define the serializers for leave balance management:
+
+```python
+# modules/elm/serializers.py
+from rest_framework import serializers
+from .models import LeaveBalance
+
+class LeaveBalanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeaveBalance
+        fields = '__all__'
+```
+
+#### Update Migrations
+
+Run the following commands to create and apply migrations:
+
+```bash
+python manage.py makemigrations elm
+python manage.py migrate
+```
+
+### Step 5: Implement Frontend Components for Leave Balance Tracking
+
+Create a `LeaveBalanceDashboard.tsx` component to display leave balances:
+
+```tsx
+// client/src/modules/elm/components/LeaveBalanceDashboard.tsx
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '../auth/AuthProvider';
+
+const LeaveBalanceDashboard: React.FC = () => {
+  const [leaveBalances, setLeaveBalances] = useState([]);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    // Fetch leave balances data from API
+    fetch(`/api/v1/elm/leavebalance/`)
+      .then(response => response.json())
+      .then(data => setLeaveBalances(data));
+  }, [user]);
+
+  return (
+    <div>
+      <h2>Leave Balance</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Leave Type</th>
+            <th>Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          {leaveBalances.map(balance => (
+            <tr key={balance.id}>
+              <td>{balance.user.name}</td>
+              <td>{balance.leave_type}</td>
+              <td>{balance.balance}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default LeaveBalanceDashboard;
+```
+
+### Step 6: Integrate with Existing Routing and Navigation
+
+Update the `client/src/app/registry.ts` to include the ELM module:
+
+```typescript
+// client/src/app/registry.ts
+import { ModuleManifest } from './types';
+
+const modules: ModuleManifest[] = [
+  // Other modules
+  {
+    code: 'elm',
+    basePath: '/api/v1/elm/',
+    load: () => import('./modules/elm'),
+  },
+];
+
+export default modules;
+```
+
+Update the `client/src/ui/layout/AppShellLayout.tsx` to include the ELM module in the navigation:
+
+```tsx
+// client/src/ui/layout/AppShellLayout.tsx
+import React from 'react';
+import { useAuth } from '../auth/AuthProvider';
+
+const AppShellLayout: React.FC = ({ children }) => {
+  const { user } = useAuth();
+
+  return (
+    <div>
+      {/* Navigation bar */}
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/directory">Directory</a></li>
+          <li><a href="/placement">Placement</a></li>
+          {user && user.permissions.includes('elm_access') && (
+            <li><a href="/elm">ELM</a></li>
+          )}
+        </ul>
+      </nav>
+      {/* Main content */}
+      <main>{children}</main>
+    </div>
+  );
+};
+
+export default AppShellLayout;
+```
+
+### Step 7: Run and Verify the Implementation
+
+Run the Django development server:
+
+```bash
+python manage.py runserver
+```
+
+Navigate to `http://localhost:8000/elm` in your browser to see the ELM module.
+
+Ensure that all features are working as expected, including leave application submission, approval workflow, balance tracking, and other functionalities.
+
+### Conclusion
+
+This initial implementation sets up the backend and frontend for the Employee Leave Management (ELM) module. The next steps would involve further refinement, testing, and integration with other parts of the Fusion ERP system.
+
+If you have any specific issues or need further assistance, feel free to let me know!
+Tokens: 40k sent, 1.3k received.
+The LLM did not conform to the edit format.
+https://aider.chat/docs/troubleshooting/edit-errors.html
+
+No filename provided before ``` in file listing
+Your estimated chat context of 40,843 tokens exceeds the 32,768 token limit for 
+ollama/qwen2.5-coder:7b!
+To reduce the chat context:
+- Use /drop to remove unneeded files from the chat
+- Use /clear to clear the chat history
+- Break your code into smaller files
+It's probably safe to try and send the request, most providers won't charge if 
+the context limit is exceeded.

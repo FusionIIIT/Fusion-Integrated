@@ -63,6 +63,195 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/elm/applications/:
+    get:
+      operationId: v1_elm_applications_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+    post:
+      operationId: v1_elm_applications_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplyLeaveInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ApplyLeaveInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ApplyLeaveInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/applications/{id}/cancel/:
+    post:
+      operationId: v1_elm_applications_cancel_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/applications/{id}/review/:
+    post:
+      operationId: v1_elm_applications_review_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewLeaveInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReviewLeaveInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReviewLeaveInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/approvals/:
+    get:
+      operationId: v1_elm_approvals_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/balances/:
+    get:
+      operationId: v1_elm_balances_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveBalance'
+          description: ''
+  /api/v1/elm/holidays/:
+    get:
+      operationId: v1_elm_holidays_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HolidayCalendar'
+          description: ''
+  /api/v1/elm/substitutes/:
+    get:
+      operationId: v1_elm_substitutes_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubstituteRequest'
+          description: ''
+  /api/v1/elm/substitutes/{id}/respond/:
+    post:
+      operationId: v1_elm_substitutes_respond_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponseInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponseInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponseInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubstituteRequest'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1763,6 +1952,14 @@ components:
       - semester
       - semester_type
       - user_id
+    ActionEnum:
+      enum:
+      - APPROVED
+      - REJECTED
+      type: string
+      description: |-
+        * `APPROVED` - APPROVED
+        * `REJECTED` - REJECTED
     AddCandidates:
       type: object
       properties:
@@ -1942,6 +2139,31 @@ components:
           nullable: true
       required:
       - posting_id
+    ApplyLeaveInput:
+      type: object
+      properties:
+        leave_type:
+          type: string
+          maxLength: 10
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        reason:
+          type: string
+        station_leave:
+          type: boolean
+          default: false
+        substitute_user_id:
+          type: integer
+          nullable: true
+      required:
+      - end_date
+      - leave_type
+      - reason
+      - start_date
     ApplySanction:
       type: object
       properties:
@@ -2423,6 +2645,27 @@ components:
       - fee_reference
       - season
       - user_id
+    HolidayCalendar:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        date:
+          type: string
+          format: date
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        is_rh:
+          type: boolean
+          readOnly: true
+      required:
+      - date
+      - description
+      - id
+      - is_rh
     IncidentRecorded:
       type: object
       properties:
@@ -2637,6 +2880,115 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        applicant_name:
+          type: string
+          readOnly: true
+        leave_type:
+          type: string
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+          readOnly: true
+        end_date:
+          type: string
+          format: date
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/LeaveApplicationStatusEnum'
+          readOnly: true
+        station_leave:
+          type: boolean
+          readOnly: true
+        substitute_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        substitute_name:
+          type: string
+          nullable: true
+          readOnly: true
+        reviewed_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        review_remarks:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - applicant_name
+      - created_at
+      - end_date
+      - id
+      - leave_type
+      - reason
+      - review_remarks
+      - reviewed_by_user_id
+      - start_date
+      - station_leave
+      - status
+      - substitute_name
+      - substitute_user_id
+      - updated_at
+      - user_id
+    LeaveApplicationStatusEnum:
+      enum:
+      - PENDING
+      - APPROVED
+      - REJECTED
+      - CANCELLED
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
+        * `CANCELLED` - Cancelled
+    LeaveBalance:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        leave_type:
+          type: string
+          readOnly: true
+        balance:
+          type: integer
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - balance
+      - id
+      - leave_type
+      - updated_at
+      - user_id
     LiftSanction:
       type: object
       properties:
@@ -3466,6 +3818,16 @@ components:
       - message
       - reason
       - route
+    ReviewLeaveInput:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+        remarks:
+          type: string
+          default: ''
+      required:
+      - action
     RoundOutcome:
       type: object
       properties:
@@ -3698,6 +4060,49 @@ components:
           type: integer
       required:
       - document_id
+    SubstituteRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        leave_application:
+          type: integer
+          readOnly: true
+        substitute_user_id:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/SubstituteRequestStatusEnum'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - leave_application
+      - status
+      - substitute_user_id
+    SubstituteRequestStatusEnum:
+      enum:
+      - PENDING
+      - ACCEPTED
+      - REJECTED
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `ACCEPTED` - Accepted
+        * `REJECTED` - Rejected
+    SubstituteResponseInput:
+      type: object
+      properties:
+        accept:
+          type: boolean
+      required:
+      - accept
     TopicEnum:
       enum:
       - drive
