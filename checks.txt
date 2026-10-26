@@ -1,0 +1,263 @@
+System check identified no issues (0 silenced).
+---1 
+No changes detected
+---2 
+I001 [*] Import block is un-sorted or un-formatted
+ --> modules\elm\api\serializers.py:1:1
+  |
+1 | / from rest_framework import serializers
+2 | | from modules.elm.models import LeaveApplication, LeaveBalance
+  | |_____________________________________________________________^
+help: Organize imports
+  |
+1 | from rest_framework import serializers
+2 +
+3 | from modules.elm.models import LeaveApplication, LeaveBalance
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> modules\elm\api\urls.py:1:1
+  |
+1 | / from django.urls import path
+2 | | from modules.elm.api.views import LeaveBalanceListView, LeaveDecisionView, LeaveQueueView, LeaveRequestListView
+  | |_______________________________________________________________________________________________________________^
+3 |
+4 |   urlpatterns = [
+  |
+help: Organize imports
+   |
+1  | from django.urls import path
+   - from modules.elm.api.views import LeaveBalanceListView, LeaveDecisionView, LeaveQueueView, LeaveRequestListView
+2  |
+3  + from modules.elm.api.views import (
+4  +     LeaveBalanceListView,
+5  +     LeaveDecisionView,
+6  +     LeaveQueueView,
+7  +     LeaveRequestListView,
+8  + )
+9  +
+10 | urlpatterns = [
+   |
+
+E501 Line too long (111 > 100)
+ --> modules\elm\api\urls.py:2:101
+  |
+1 | from django.urls import path
+2 | from modules.elm.api.views import LeaveBalanceListView, LeaveDecisionView, LeaveQueueView, LeaveRequestListView
+  |                                                                                                     ^^^^^^^^^^^
+3 |
+4 | urlpatterns = [
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> modules\elm\api\views.py:1:1
+   |
+ 1 | / from django.utils import timezone
+ 2 | | from rest_framework import status
+ 3 | | from rest_framework.exceptions import NotFound, PermissionDenied
+ 4 | | from rest_framework.response import Response
+ 5 | | from rest_framework.views import APIView
+ 6 | | from rest_framework.permissions import IsAuthenticated
+ 7 | |
+ 8 | | from fusion_auth.permissions import HasModuleGrant, HasPermission
+ 9 | | from modules.elm.api.serializers import LeaveBalanceSerializer, LeaveRequestCreateSerializer, LeaveRequestSerializer
+10 | | from modules.elm.models import LeaveAction, LeaveApplication, LeaveBalance
+   | |__________________________________________________________________________^
+11 |
+12 |   MODULE = HasModuleGrant("leave_elm")
+   |
+help: Organize imports
+   |
+3  | from rest_framework.exceptions import NotFound, PermissionDenied
+4  + from rest_framework.permissions import IsAuthenticated
+5  | from rest_framework.response import Response
+6  | from rest_framework.views import APIView
+   - from rest_framework.permissions import IsAuthenticated
+7  |
+8  | from fusion_auth.permissions import HasModuleGrant, HasPermission
+   - from modules.elm.api.serializers import LeaveBalanceSerializer, LeaveRequestCreateSerializer, LeaveRequestSerializer
+9  + from modules.elm.api.serializers import (
+10 +     LeaveBalanceSerializer,
+11 +     LeaveRequestCreateSerializer,
+12 +     LeaveRequestSerializer,
+13 + )
+14 | from modules.elm.models import LeaveAction, LeaveApplication, LeaveBalance
+   |
+
+F401 [*] `rest_framework.permissions.IsAuthenticated` imported but unused
+ --> modules\elm\api\views.py:6:40
+  |
+4 | from rest_framework.response import Response
+5 | from rest_framework.views import APIView
+6 | from rest_framework.permissions import IsAuthenticated
+  |                                        ^^^^^^^^^^^^^^^
+7 |
+8 | from fusion_auth.permissions import HasModuleGrant, HasPermission
+  |
+help: Remove unused import: `rest_framework.permissions.IsAuthenticated`
+  |
+5 | from rest_framework.views import APIView
+  - from rest_framework.permissions import IsAuthenticated
+6 |
+  |
+
+E501 Line too long (116 > 100)
+  --> modules\elm\api\views.py:9:101
+   |
+ 8 | from fusion_auth.permissions import HasModuleGrant, HasPermission
+ 9 | from modules.elm.api.serializers import LeaveBalanceSerializer, LeaveRequestCreateSerializer, LeaveRequestSerializer
+   |                                                                                                     ^^^^^^^^^^^^^^^^
+10 | from modules.elm.models import LeaveAction, LeaveApplication, LeaveBalance
+   |
+
+E501 Line too long (106 > 100)
+  --> modules\elm\api\views.py:23:101
+   |
+22 | class LeaveRequestListView(APIView):
+23 |     permission_classes = [MODULE, HasPermission("leave_elm.request.view_self", "leave_elm.request.apply")]
+   |                                                                                                     ^^^^^^
+24 |
+25 |     def get(self, request):
+   |
+
+E501 Line too long (132 > 100)
+  --> modules\elm\api\views.py:61:101
+   |
+59 |         obj.decision_note = request.data.get("note", "")
+60 |         obj.save(update_fields=["status", "decision_note"])
+61 |         LeaveAction.objects.create(application=obj, actor_user_id=current_user_id(request), action=decision, note=obj.decision_note)
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+62 |         return Response(LeaveRequestSerializer(obj).data)
+   |
+
+E501 Line too long (112 > 100)
+  --> modules\elm\api\views.py:69:101
+   |
+68 |     def get(self, request):
+69 |         balances = LeaveBalance.objects.filter(user_id=current_user_id(request), year=timezone.localdate().year)
+   |                                                                                                     ^^^^^^^^^^^^
+70 |         return Response(LeaveBalanceSerializer(balances, many=True).data)
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> modules\elm\models\leave.py:1:1
+  |
+1 | from django.db import models
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: Organize imports
+  |
+2 |
+  -
+3 | LEAVE_TYPES = [
+  |
+
+E501 Line too long (103 > 100)
+  --> modules\elm\models\leave.py:21:101
+   |
+19 |         ("withdrawn", "Withdrawn"),
+20 |     ]
+21 |     PART_CHOICES = [("full", "Full day"), ("first_half", "First half"), ("second_half", "Second half")]
+   |                                                                                                     ^^^
+22 |
+23 |     user_id = models.PositiveBigIntegerField(db_index=True)
+   |
+
+DJ008 Model does not define `__str__` method
+  --> modules\elm\models\leave.py:43:7
+   |
+43 | class LeaveBalance(models.Model):
+   |       ^^^^^^^^^^^^
+44 |     user_id = models.PositiveBigIntegerField(db_index=True)
+45 |     year = models.PositiveSmallIntegerField()
+   |
+
+DJ008 Model does not define `__str__` method
+  --> modules\elm\models\leave.py:59:7
+   |
+59 | class LeaveAction(models.Model):
+   |       ^^^^^^^^^^^
+60 |     application = models.ForeignKey(LeaveApplication, on_delete=models.CASCADE, related_name="actions")
+61 |     actor_user_id = models.PositiveBigIntegerField(null=True, blank=True)
+   |
+
+E501 Line too long (103 > 100)
+  --> modules\elm\models\leave.py:60:101
+   |
+59 | class LeaveAction(models.Model):
+60 |     application = models.ForeignKey(LeaveApplication, on_delete=models.CASCADE, related_name="actions")
+   |                                                                                                     ^^^
+61 |     actor_user_id = models.PositiveBigIntegerField(null=True, blank=True)
+62 |     action = models.CharField(max_length=24)
+   |
+
+E501 Line too long (102 > 100)
+  --> modules\elm\registry.py:13:101
+   |
+11 | NAV_ITEMS = [
+12 |     {"code": "elm.requests", "label": "My Leave Requests", "icon": "Calendar",
+13 |      "to": "/leave/requests", "required_permission": "leave_elm.request.view_self", "sort_order": 10},
+   |                                                                                                     ^^
+14 |     {"code": "elm.balances", "label": "My Leave Balance", "icon": "Wallet",
+15 |      "to": "/leave/balances", "required_permission": "leave_elm.balance.view_self", "sort_order": 20},
+   |
+
+E501 Line too long (102 > 100)
+  --> modules\elm\registry.py:15:101
+   |
+13 |      "to": "/leave/requests", "required_permission": "leave_elm.request.view_self", "sort_order": 10},
+14 |     {"code": "elm.balances", "label": "My Leave Balance", "icon": "Wallet",
+15 |      "to": "/leave/balances", "required_permission": "leave_elm.balance.view_self", "sort_order": 20},
+   |                                                                                                     ^^
+16 |     {"code": "elm.queue", "label": "Leave Approval Queue", "icon": "ClipboardList",
+17 |      "to": "/leave/queue", "required_permission": "leave_elm.request.review", "sort_order": 30},
+   |
+
+RUF005 Consider `[*_EMPLOYEE, "leave_elm.request.review"]` instead of concatenation
+  --> modules\elm\registry.py:32:13
+   |
+30 |     "leave_elm.balance.view_self",
+31 | ]
+32 | _REVIEWER = _EMPLOYEE + ["leave_elm.request.review"]
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+33 |
+34 | ROLE_GRANTS = {
+   |
+help: Replace with `[*_EMPLOYEE, "leave_elm.request.review"]`
+   |
+31 | ]
+   - _REVIEWER = _EMPLOYEE + ["leave_elm.request.review"]
+32 + _REVIEWER = [*_EMPLOYEE, "leave_elm.request.review"]
+33 |
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+Found 17 errors.
+[*] 5 fixable with `--fix` (1 unsafe fix available with `--fix --unsafe-fixes`).
+---3 
+=============
+Import Linter
+=============
+
+
+---------
+Contracts
+---------
+
+Analyzed 212 files, 612 dependencies.
+-------------------------------------
+
+Modules may reach each other ONLY through contracts.py KEPT
+domain/ must not import Django, DRF or Celery KEPT
+core/ must not import any module KEPT
+Layering inside placement KEPT
+
+Contracts: 4 kept, 0 broken.
+---4 
+no cross-module foreign keys
+---5 
+all contract getters are plural
+---6 
+nav items and client routes agree
+---7 
+permission manifest matches the registries
+---8
