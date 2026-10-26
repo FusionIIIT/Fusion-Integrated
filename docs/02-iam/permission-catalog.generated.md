@@ -13,6 +13,25 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave_elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave_elm.application.view` | See leave applications | `Director`, `Employee`, `Leave Approver`, `acadadmin`, `establishment`, `faculty`, `staff`, `unit_head` |
+| `leave_elm.application.apply` | Submit a leave application | `Employee`, `acadadmin`, `establishment`, `faculty`, `staff` |
+| `leave_elm.application.withdraw` | Withdraw a pending leave application | `Employee`, `acadadmin`, `establishment`, `faculty`, `staff` |
+| `leave_elm.application.approve` | Approve or reject a leave application | `Director`, `Leave Approver`, `acadadmin`, `establishment`, `unit_head` |
+| `leave_elm.application.cancel` | Cancel an approved leave application | `Employee`, `acadadmin`, `establishment`, `faculty`, `staff` |
+| `leave_elm.cancellation.review` | Review leave cancellation requests | `Director`, `Leave Approver`, `acadadmin`, `establishment`, `unit_head` |
+| `leave_elm.extension.apply` | Submit a leave extension request | `Employee`, `acadadmin`, `establishment`, `faculty`, `staff` |
+| `leave_elm.resumption.submit` | Submit duty resumption after leave | `Employee`, `acadadmin`, `establishment`, `faculty`, `staff` |
+| `leave_elm.resumption.review` | Review duty resumption | `Director`, `Leave Approver`, `acadadmin`, `establishment`, `unit_head` |
+| `leave_elm.rollover.execute` | Execute year-end leave balance rollover | `acadadmin`, `establishment` |
+| `leave_elm.offline.record` | Record offline-sanctioned leave | `acadadmin`, `establishment` |
+| `leave_elm.substitute.respond` | Respond to a substitute request | `Employee`, `acadadmin`, `establishment`, `faculty`, `staff` |
+| `leave_elm.balance.view` | View leave balances | `Director`, `Employee`, `Leave Approver`, `acadadmin`, `establishment`, `faculty`, `staff`, `unit_head` |
+| `leave_elm.calendar.view` | View the holiday calendar | `Director`, `Employee`, `Leave Approver`, `acadadmin`, `establishment`, `faculty`, `staff`, `unit_head` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
