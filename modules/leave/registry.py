@@ -10,6 +10,9 @@ PERMISSIONS = [
     ("leave.request.create", "Apply for leave"),
     ("leave.request.delete", "Cancel own pending leave request"),
     ("leave.request.approve", "Approve or reject a leave request"),
+    ("leave.balance.update", "Adjust a leave balance"),
+    ("leave.calendar.manage", "Create a holiday calendar"),
+    ("leave.calendar.publish", "Publish a holiday calendar"),
 ]
 
 _EMPLOYEE = [
@@ -20,8 +23,14 @@ _EMPLOYEE = [
 _UNIT_HEAD = [
     "leave.request.approve",
 ]
+_LEAVE_ADMIN = [
+    "leave.balance.update",
+    "leave.calendar.manage",
+    "leave.calendar.publish",
+]
 
 ROLE_GRANTS = {
     "Employee": _EMPLOYEE,
     "Unit Head": _UNIT_HEAD,
+    "Leave Administrator": _LEAVE_ADMIN,
 }

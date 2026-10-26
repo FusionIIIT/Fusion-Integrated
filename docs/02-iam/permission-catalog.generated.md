@@ -21,6 +21,9 @@ For the intended taxonomy of modules not yet built, see
 | `leave.request.create` | Apply for leave | `Employee` |
 | `leave.request.delete` | Cancel own pending leave request | `Employee` |
 | `leave.request.approve` | Approve or reject a leave request | `Unit Head` |
+| `leave.balance.update` | Adjust a leave balance | `Leave Administrator` |
+| `leave.calendar.manage` | Create a holiday calendar | `Leave Administrator` |
+| `leave.calendar.publish` | Publish a holiday calendar | `Leave Administrator` |
 
 ## `placement_cell`
 
