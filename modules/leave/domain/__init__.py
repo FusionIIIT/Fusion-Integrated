@@ -1,0 +1,1 @@
+"""Leave domain logic package."""
