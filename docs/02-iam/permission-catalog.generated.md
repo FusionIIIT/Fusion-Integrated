@@ -13,6 +13,15 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.leave.view_self` | View own leave applications and balances | `faculty`, `staff` |
+| `elm.leave.apply` | Apply for leave | `faculty`, `staff` |
+| `elm.leave.withdraw_self` | Withdraw own eligible leave applications | `faculty`, `staff` |
+| `elm.leave.substitute_respond` | Accept or decline substitute requests | `faculty`, `staff` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

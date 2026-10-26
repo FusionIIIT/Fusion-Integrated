@@ -78,7 +78,7 @@ THIRD_PARTY_APPS = [
 
 # No models. Installed so its AppConfig runs and registers the session checks.
 LOCAL_APPS = [
-    "fusion_auth",
+    "fusion_auth","modules.elm",
 ]
 
 # Each module is an independent Django app: own tables, migrations and contract.
