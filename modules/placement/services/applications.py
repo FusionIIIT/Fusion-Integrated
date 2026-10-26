@@ -119,7 +119,22 @@ def _guard(name: str, *, application, reason: str, actor) -> None:
                 code="profile_incomplete")
 
     if name == "is_eligible":
-        snapshot = application.eligibility_snapshot or {}
+        policy = PlacementPolicy.objects.filter(
+            season=application.posting.placement_year).first()
+        if policy is None:
+            raise ConflictError(
+                f"No placement policy is configured for {application.posting.placement_year}.",
+                code="policy_missing")
+
+        # Eligibility evaluations are a cache. Re-read the current academic and
+        # registration facts at the submission boundary, then freeze that
+        # decision onto the application for later review and appeals.
+        snapshot = evaluate_for(posting=application.posting,
+                                user_id=application.user_id, policy=policy)
+        application.eligibility_snapshot = snapshot
+        application.cpi_at_apply = snapshot.get("cpi")
+        application.semester_at_apply = snapshot.get("semester")
+        application.standing_declared_seq_at_apply = snapshot.get("declared_seq")
         if not snapshot.get("is_eligible"):
             raise ConflictError("You are not eligible for this posting.",
                                 code="not_eligible",
@@ -168,7 +183,10 @@ def transition(*, application_id: int, to_status: str, actor,
     touched = ["status", "updated_at"]
     if to_status == sm.SUBMITTED:
         app.applied_at = timezone.now()
-        touched.append("applied_at")
+        touched.extend([
+            "applied_at", "eligibility_snapshot", "cpi_at_apply",
+            "semester_at_apply", "standing_declared_seq_at_apply",
+        ])
     if to_status in (sm.WITHDRAWN, sm.AUTO_WITHDRAWN) and reason:
         app.withdrawn_reason = reason[:300]
         touched.append("withdrawn_reason")
