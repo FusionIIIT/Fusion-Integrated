@@ -84,6 +84,7 @@ LOCAL_APPS = [
 # Each module is an independent Django app: own tables, migrations and contract.
 PLATFORM_MODULES = [
     "modules.directory",         # who people are, projected from IAM
+        "modules.elm",               # ELM module
     "modules.accesscontrol",     # which modules a role may enter
 ]
 

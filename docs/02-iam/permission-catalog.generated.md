@@ -13,6 +13,21 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.request.create` | Apply for, modify, withdraw, cancel, extend and resume own leave | `Leave Administrator`, `faculty`, `staff` |
+| `elm.request.view_self` | See and print own leave applications | `Leave Administrator`, `faculty`, `staff` |
+| `elm.account.view_self` | See own leave balances and account history | `Leave Administrator`, `faculty`, `staff` |
+| `elm.task.view` | See and act on workflow tasks assigned to you | `Leave Administrator`, `faculty`, `staff` |
+| `elm.policy.manage` | Create, revise and publish leave policy | `Leave Administrator` |
+| `elm.hierarchy.manage` | Create, revise and publish the approval hierarchy | `Leave Administrator` |
+| `elm.calendar.manage` | Create, revise and publish the holiday and RH calendar | `Leave Administrator` |
+| `elm.offline.record` | Record offline-sanctioned leave | `Leave Administrator` |
+| `elm.year_end.run` | Year-end processing | _service only_ |
+| `elm.sla.run` | SLA reminders and escalation | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
