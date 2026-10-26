@@ -75,7 +75,10 @@ fi
 log "registry and checks"
 ( set -a; . "/etc/fusion/$SVC.env"; set +a
   cd "$REL"
+  "$VENV/bin/python" manage.py leave_seed
   "$VENV/bin/python" manage.py seed_modules
+  "$VENV/bin/python" manage.py leave_readiness \
+    || printf '  leave: registered as planned until the items above are done\n'
   "$VENV/bin/python" manage.py permission_manifest --check
   "$VENV/bin/python" manage.py check --deploy --fail-level WARNING )
 

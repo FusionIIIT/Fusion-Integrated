@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Leave application #{{ req.pk }}</title>
+<style>
+  body { font-family: Georgia, serif; max-width: 760px; margin: 2rem auto; color: #111; }
+  h1 { font-size: 1.3rem; margin-bottom: 0; }
+  .sub { color: #555; margin-top: .2rem; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+  th, td { border: 1px solid #999; padding: .4rem .6rem; text-align: left; vertical-align: top; }
+  th { width: 34%; background: #f3f3f3; }
+  .foot { color: #666; font-size: .8rem; margin-top: 2rem; }
+  @media print { body { margin: 0; } }
+</style>
+</head>
+<body>
+<h1>Indian Institute of Information Technology, Design and Manufacturing, Jabalpur</h1>
+<p class="sub">{{ req.get_kind_display }} — {{ category_label }} — application #{{ req.pk }}</p>
+<table>
+  <tr><th>Employee</th><td>{{ person.display_name|default:req.user_id }}{% if person.username %} ({{ person.username }}){% endif %}</td></tr>
+  <tr><th>Category</th><td>{{ person.kind|default:req.applicant_kind|capfirst }}, {{ req.applicant_department|default:"—" }}</td></tr>
+  <tr><th>Leave</th><td>{{ category_label }} ({{ req.category }})</td></tr>
+  <tr><th>Period</th><td>{{ req.start_date }} to {{ req.end_date }}{% if req.half %} ({{ req.get_half_display }}){% endif %} — {{ req.days }} day(s)</td></tr>
+  <tr><th>Purpose</th><td>{{ req.purpose|default:"—" }}</td></tr>
+  {% if req.station_leave %}<tr><th>Station Leave</th><td>{{ req.station_from }} to {{ req.station_to }}, {{ req.station_address }}</td></tr>{% endif %}
+  {% if req.evidence_reference %}<tr><th>Evidence</th><td>{{ req.evidence_reference }}</td></tr>{% endif %}
+  {% for s in substitutions %}<tr><th>Substitute</th><td>user {{ s.substitute_user_id }} — {{ s.get_status_display }}</td></tr>{% endfor %}
+  <tr><th>Status</th><td>{{ req.get_status_display }}</td></tr>
+  {% if req.unit_head_outcome %}<tr><th>Unit Head</th><td>{{ req.unit_head_outcome|capfirst }}</td></tr>{% endif %}
+  {% if req.decision %}<tr><th>Final decision</th><td>{{ req.decision|capfirst }} by {{ req.decided_role }} on {{ req.decided_at|date:"Y-m-d H:i" }}{% if req.decision_remarks %} — {{ req.decision_remarks }}{% endif %}</td></tr>{% endif %}
+  {% if req.source == "offline" %}<tr><th>Offline sanction</th><td>{{ req.offline_reference }}</td></tr>{% endif %}
+</table>
+<table>
+  <tr><th>When</th><th>What</th></tr>
+  {% for e in events %}<tr><td>{{ e.at|date:"Y-m-d H:i" }}</td><td>{{ e.event }}{% if e.actor_role %} ({{ e.actor_role }}){% endif %}{% if e.remarks %} — {{ e.remarks }}{% endif %}</td></tr>{% endfor %}
+</table>
+<p class="foot">Generated from Fusion Leave on {{ generated_at|date:"Y-m-d H:i" }}.</p>
+</body>
+</html>

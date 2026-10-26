@@ -23,6 +23,9 @@ class FakeIam:
         self.login_error = None
         self.standings_error = None
         self.directory_error = None
+        #: designation -> [UserRef]; override per test.
+        self.holders = {}
+        self.holders_error = None
         self.directory = {"count": 0, "limit": 50, "offset": 0, "results": []}
         self.filters = {"disciplines": [], "batch_years": [], "programmes": []}
 
@@ -46,6 +49,13 @@ class FakeIam:
 
     def search_users(self, q="", kind=None, limit=25):
         return list(self.users.values())[:limit]
+
+    def get_designation_holders(self, designations):
+        names = sorted({d for d in designations if d})
+        self.calls.append(("get_designation_holders", tuple(names)))
+        if self.holders_error:
+            raise self.holders_error
+        return {n: list(self.holders.get(n, [])) for n in names}
 
     def employee_page(self, *, limit=500, offset=0):
         rows = self._employees()

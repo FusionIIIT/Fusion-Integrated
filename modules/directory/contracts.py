@@ -8,9 +8,11 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from django.db.models import Q
+
 from fusion_auth.client import IamUnavailable, get_client
 from modules.directory.models import UserRef
-from modules.directory.services.sync import ensure_users_cached
+from modules.directory.services.sync import ensure_users_cached, upsert
 
 
 @dataclass(frozen=True)
@@ -81,6 +83,30 @@ def employee_projection_disagreement() -> tuple[list[int], list[int]] | None:
     except IamUnavailable:
         return None
     return sorted(known - held), sorted(held - known)
+
+
+def get_designation_holders(designations: Sequence[str]) -> dict[str, list[UserDTO]]:
+    """Who holds each designation now, asked of the IAM; raises IamUnavailable rather than guess."""
+    found = get_client().get_designation_holders(list(designations))
+    upsert(ref for refs in found.values() for ref in refs)
+    return {name: [_ref_to_dto(r) for r in refs if r.is_active]
+            for name, refs in found.items()}
+
+
+def _ref_to_dto(r) -> UserDTO:
+    return UserDTO(
+        user_id=r.user_id, username=r.username, display_name=r.display_name,
+        kind=r.kind, email=r.email, department=r.department, programme=r.programme,
+        discipline=r.discipline, batch_year=r.batch_year,
+    )
+
+
+def search_employees(q: str = "", limit: int = 20) -> list[UserDTO]:
+    """Serving faculty and staff whose name or username matches."""
+    qs = UserRef.objects.filter(kind__in=("faculty", "staff"), is_active=True)
+    if q:
+        qs = qs.filter(Q(display_name__icontains=q) | Q(username__icontains=q))
+    return [_to_dto(r) for r in qs.order_by("display_name")[:limit]]
 
 
 def search(q: str = "", kind: str | None = None, limit: int = 25) -> list[UserDTO]:
