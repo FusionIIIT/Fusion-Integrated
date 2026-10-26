@@ -55,6 +55,51 @@ class Command(BaseCommand):
                           "eligibility_snapshot": {"is_eligible": True},
                           "applied_at": timezone.now()})
 
+        # --- ELM Fixtures ---
+        from modules.elm.models import (
+            ApprovalHierarchy,
+            HolidayCalendar,
+            LeaveAccount,
+            LeavePolicyConfig,
+            SlaThresholdConfig,
+        )
 
+        LeavePolicyConfig.objects.update_or_create(id=1, defaults={"is_active": True})
+        cal, _ = HolidayCalendar.objects.update_or_create(
+            year=timezone.now().year,
+            defaults={"label": f"Annual Calendar {timezone.now().year}", "is_published": True},
+        )
+        ApprovalHierarchy.objects.update_or_create(
+            id=1,
+            defaults={
+                "department": "",
+                "designation": "",
+                "leave_category": "",
+                "unit_head_user_id": 9001,
+                "sanctioning_authority_user_id": 9001,
+                "sanctioning_authority_role": "Director",
+                "is_active": True,
+            },
+        )
+        for tt, rh, eh in [
+            ("substitute_response", 24, 48),
+            ("unit_head_review", 48, 96),
+            ("establishment_routing", 48, 96),
+            ("final_sanction", 72, 120),
+        ]:
+            SlaThresholdConfig.objects.update_or_create(
+                task_type=tt,
+                defaults={"reminder_threshold_hours": rh, "escalation_threshold_hours": eh},
+            )
+
+        # Faculty account for 9001
+        from decimal import Decimal
+        for cat, bal in [("CL", "8.00"), ("RH", "2.00"), ("EL", "30.00"), ("VL", "60.00")]:
+            LeaveAccount.objects.update_or_create(
+                user_id=9001,
+                year=timezone.now().year,
+                category=cat,
+                defaults={"credited": Decimal(bal), "balance": Decimal(bal)},
+            )
 
         self.stdout.write(self.style.SUCCESS("demo data loaded"))
