@@ -34,6 +34,95 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "leave_elm": {
+      "grants": {
+        "Employee": [
+          "leave_elm.application.apply",
+          "leave_elm.application.cancel",
+          "leave_elm.application.view",
+          "leave_elm.application.withdraw"
+        ],
+        "HOD": [
+          "leave_elm.application.approve",
+          "leave_elm.application.cancel",
+          "leave_elm.application.view"
+        ],
+        "Leave Approver": [
+          "leave_elm.application.approve",
+          "leave_elm.application.cancel",
+          "leave_elm.application.view"
+        ],
+        "faculty": [
+          "leave_elm.application.apply",
+          "leave_elm.application.cancel",
+          "leave_elm.application.view",
+          "leave_elm.application.withdraw"
+        ],
+        "staff": [
+          "leave_elm.application.apply",
+          "leave_elm.application.cancel",
+          "leave_elm.application.view",
+          "leave_elm.application.withdraw"
+        ]
+      },
+      "module_grants": [
+        "Employee",
+        "HOD",
+        "Leave Approver",
+        "faculty",
+        "staff"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "FaCalendarCheck",
+        "items": [
+          {
+            "code": "leave.applications",
+            "icon": "FaCalendarAlt",
+            "label": "My Leave",
+            "required_permission": "leave_elm.application.view",
+            "sort_order": 10,
+            "to": "/leave/applications"
+          },
+          {
+            "code": "leave.approvals",
+            "icon": "FaCheckCircle",
+            "label": "Approvals",
+            "required_permission": "leave_elm.application.approve",
+            "sort_order": 20,
+            "to": "/leave/approvals"
+          }
+        ],
+        "label": "Leave Management",
+        "nav_section": "Leave",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "leave_elm.application.view",
+          "label": "See leave applications and balances"
+        },
+        {
+          "code": "leave_elm.application.apply",
+          "label": "Submit a leave application"
+        },
+        {
+          "code": "leave_elm.application.approve",
+          "label": "Approve or reject a leave application"
+        },
+        {
+          "code": "leave_elm.application.withdraw",
+          "label": "Withdraw a pending leave application"
+        },
+        {
+          "code": "leave_elm.application.cancel",
+          "label": "Cancel an approved leave application"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
