@@ -1,0 +1,5 @@
+import { Container, Card, Group, Text, Badge, Button, Stack } from "@mantine/core";
+import { useNavigate } from "react-router-dom";
+import { useLeaves, useWithdrawLeave } from "../api";
+import { PageHeader } from "../../../ui/components/PageHeader";
+export default function ElmHomePage(){const q=useLeaves();const nav=useNavigate();const wd=useWithdrawLeave();return <Container size="lg"><PageHeader title="Employee Leave Management" subtitle="Apply, track and manage your leave" action={<Button onClick={()=>nav("apply")}>Apply for Leave</Button>}/><Stack>{q.data?.map(r=><Card key={r.id} withBorder><Group justify="space-between"><div><Text fw={600}>{r.category} · {r.start_date} to {r.end_date}</Text><Text size="sm" c="dimmed">{r.days} day(s) · {r.reason||"No reason provided"}</Text></div><Group><Badge>{r.status.replaceAll("_"," ")}</Badge>{!["approved","rejected","withdrawn","cancelled"].includes(r.status)&&<Button size="xs" variant="light" color="orange" onClick={()=>wd.mutate(r.id)}>Withdraw</Button>}</Group></Group></Card>)}</Stack></Container>}
