@@ -2,7 +2,7 @@
 
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
@@ -14,12 +14,17 @@ from modules.elm.api.serializers import (
     DecisionInputSerializer,
     ElmLeaveApplicationSerializer,
     EventSerializer,
+    ExtensionInputSerializer,
     HolidaySerializer,
     LeaveTypeInfoSerializer,
+    OfflineLeaveInputSerializer,
     ProfileSerializer,
+    ReplaceSubstituteInputSerializer,
+    ResumptionInputSerializer,
+    RolloverInputSerializer,
 )
-from modules.elm.domain.policy import DEFAULT_ENTITLEMENTS
-from modules.elm.models import EmployeeLeaveProfile, Holiday
+from modules.elm.domain.policy import DEFAULT_ENTITLEMENTS, is_director
+from modules.elm.models import EmployeeLeaveProfile, Holiday, LeaveApplication
 from modules.elm.selectors.queries import (
     get_employee_application,
     list_approval_queue,
@@ -30,9 +35,14 @@ from modules.elm.selectors.queries import (
 )
 from modules.elm.services.leave import (
     allot_balance,
-    cancel_approved,
     decide,
+    record_offline_leave,
+    replace_substitute,
+    request_cancellation,
+    request_extension,
+    rollover_balances,
     submit,
+    submit_resumption,
     upsert_holiday,
     upsert_profile,
     withdraw,
@@ -109,12 +119,51 @@ class CancelView(GenericAPIView):
     def post(self, request, pk: int):
         remarks = str(request.data.get("remarks", "")).strip()
         return Response(
-            self.get_serializer(cancel_approved(request.principal, pk, remarks=remarks)).data
+            self.get_serializer(
+                request_cancellation(request.principal, pk, remarks=remarks)
+            ).data
         )
 
 
+class ReplaceSubstituteView(GenericAPIView):
+    permission_classes = [MODULE, APPLY]
+    serializer_class = ElmLeaveApplicationSerializer
+
+    def post(self, request, pk: int):
+        form = ReplaceSubstituteInputSerializer(data=request.data)
+        form.is_valid(raise_exception=True)
+        obj = replace_substitute(
+            request.principal,
+            pk,
+            new_substitute_user_id=form.validated_data["substitute_user_id"],
+        )
+        return Response(self.get_serializer(obj).data)
+
+
+class ExtensionView(GenericAPIView):
+    permission_classes = [MODULE, APPLY]
+    serializer_class = ElmLeaveApplicationSerializer
+
+    def post(self, request, pk: int):
+        form = ExtensionInputSerializer(data=request.data)
+        form.is_valid(raise_exception=True)
+        obj = request_extension(request.principal, pk, form.validated_data)
+        return Response(self.get_serializer(obj).data, status=status.HTTP_201_CREATED)
+
+
+class ResumptionView(GenericAPIView):
+    permission_classes = [MODULE, APPLY]
+    serializer_class = ElmLeaveApplicationSerializer
+
+    def post(self, request, pk: int):
+        form = ResumptionInputSerializer(data=request.data)
+        form.is_valid(raise_exception=True)
+        obj = submit_resumption(request.principal, pk, **form.validated_data)
+        return Response(self.get_serializer(obj).data)
+
+
 class ApprovalQueueView(GenericAPIView):
-    permission_classes = [MODULE, REVIEW]
+    permission_classes = [MODULE, VIEW]
     serializer_class = ElmLeaveApplicationSerializer
 
     def get(self, request):
@@ -123,12 +172,27 @@ class ApprovalQueueView(GenericAPIView):
 
 
 class DecisionView(GenericAPIView):
-    permission_classes = [MODULE, REVIEW]
+    permission_classes = [MODULE, VIEW]
     serializer_class = ElmLeaveApplicationSerializer
 
     def post(self, request, pk: int):
         form = DecisionInputSerializer(data=request.data)
         form.is_valid(raise_exception=True)
+        action = form.validated_data["action"]
+
+        if action not in ("accept_substitute", "decline_substitute"):
+            has_approve = request.principal.has_permission("leave_elm.application.approve")
+            if not has_approve:
+                profile = EmployeeLeaveProfile.objects.filter(
+                    user_id=request.principal.user_id
+                ).first()
+                is_dir = profile is not None and is_director(profile.designation)
+                app = LeaveApplication.objects.filter(pk=pk).first()
+                if not (
+                    is_dir and app is not None and app.employee_id == request.principal.user_id
+                ):
+                    raise PermissionDenied("You do not have approval privileges.")
+
         obj = decide(request.principal, pk, **form.validated_data)
         return Response(self.get_serializer(obj).data)
 
@@ -190,3 +254,24 @@ class HolidaysAdminView(GenericAPIView):
         form.is_valid(raise_exception=True)
         obj = upsert_holiday(form.validated_data)
         return Response(self.get_serializer(obj).data)
+
+
+class RolloverView(GenericAPIView):
+    permission_classes = [MODULE, ADMIN]
+
+    def post(self, request):
+        form = RolloverInputSerializer(data=request.data)
+        form.is_valid(raise_exception=True)
+        result = rollover_balances(request.principal, form.validated_data["year"])
+        return Response(result)
+
+
+class OfflineLeaveView(GenericAPIView):
+    permission_classes = [MODULE, ADMIN]
+    serializer_class = ElmLeaveApplicationSerializer
+
+    def post(self, request):
+        form = OfflineLeaveInputSerializer(data=request.data)
+        form.is_valid(raise_exception=True)
+        obj = record_offline_leave(request.principal, form.validated_data)
+        return Response(self.get_serializer(obj).data, status=status.HTTP_201_CREATED)

@@ -80,6 +80,15 @@ def remaining(allotted: Decimal, used: Decimal, requested: Decimal) -> Decimal:
     return available - requested
 
 
+def is_director(designation: str) -> bool:
+    return bool(designation and designation.strip().lower() == "director")
+
+
+def validate_substitute_nomination(applicant_id: int, substitute_id: int) -> None:
+    if applicant_id == substitute_id:
+        raise ValueError("Applicant cannot be their own substitute.")
+
+
 def convert_vl_to_el(
     unavailed_vl: Decimal,
     current_el: Decimal,
@@ -87,7 +96,8 @@ def convert_vl_to_el(
 ) -> tuple[Decimal, Decimal]:
     if unavailed_vl < 0 or current_el < 0 or max_el <= 0:
         raise ValueError("Balances and caps must be non-negative.")
-    raw_credit = unavailed_vl // Decimal("2")
+    raw_credit = unavailed_vl / Decimal("2")
     room = max(Decimal("0"), max_el - current_el)
     credited = min(raw_credit, room)
     return credited, current_el + credited
+

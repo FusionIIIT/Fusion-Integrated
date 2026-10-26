@@ -40,6 +40,7 @@ class ElmLeaveApplicationSerializer(serializers.ModelSerializer):
             "resumed_at",
             "is_offline",
             "sanction_reference",
+            "original_application_id",
             "created_at",
             "updated_at",
         )
@@ -69,9 +70,59 @@ class DecisionInputSerializer(serializers.Serializer):
             "not_recommend",
             "accept_substitute",
             "decline_substitute",
+            "approve_cancellation",
+            "reject_cancellation",
+            "review_resumption",
         ]
     )
     remarks = serializers.CharField(required=False, allow_blank=True, max_length=2000, default="")
+
+
+class ReplaceSubstituteInputSerializer(serializers.Serializer):
+    substitute_user_id = serializers.IntegerField(min_value=1)
+
+
+class ExtensionInputSerializer(serializers.Serializer):
+    extended_end_date = serializers.DateField()
+    reason = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=2000,
+        default="Extension of ongoing leave",
+        trim_whitespace=True,
+    )
+    substitute_user_id = serializers.IntegerField(required=False, allow_null=True, default=None)
+    station_leave = serializers.BooleanField(required=False, default=False)
+    station_location = serializers.CharField(
+        required=False, allow_blank=True, max_length=255, default=""
+    )
+
+
+class ResumptionInputSerializer(serializers.Serializer):
+    resumption_date = serializers.DateField()
+    remarks = serializers.CharField(required=False, allow_blank=True, max_length=2000, default="")
+
+
+class RolloverInputSerializer(serializers.Serializer):
+    year = serializers.IntegerField(min_value=2000, max_value=2100)
+
+
+class OfflineLeaveInputSerializer(serializers.Serializer):
+    employee_id = serializers.IntegerField(min_value=1)
+    category = serializers.ChoiceField(choices=["CL", "RH", "SCL", "EL", "COL", "VL"])
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()
+    half_day = serializers.ChoiceField(
+        choices=["NONE", "FIRST", "SECOND"], required=False, default="NONE"
+    )
+    reason = serializers.CharField(
+        required=False, allow_blank=True, max_length=2000, default="Offline sanctioned leave"
+    )
+    sanction_reference = serializers.CharField(max_length=255, trim_whitespace=True)
+    station_leave = serializers.BooleanField(required=False, default=False)
+    station_location = serializers.CharField(
+        required=False, allow_blank=True, max_length=255, default=""
+    )
 
 
 class BalanceSerializer(serializers.ModelSerializer):

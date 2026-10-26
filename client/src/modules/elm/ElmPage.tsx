@@ -84,6 +84,50 @@ function DataTable({
   );
 }
 
+export function getApprovalActionOptions(item: Item): string[] {
+  const status = String(item.status ?? "");
+  const category = String(item.category ?? "");
+  const isHigherSanction = ["EL", "COL", "VL", "SCL"].includes(category);
+  const isDirectorSelf = Boolean(
+    item.employee_id &&
+    item.employee_id === item.sanction_authority_id &&
+    (!item.unit_head_id || item.unit_head_id === item.employee_id)
+  );
+
+  if (status === "AWAITING_SUB") {
+    return ["accept_substitute", "decline_substitute"];
+  }
+
+  if (status === "AWAITING_CANCEL") {
+    if (isDirectorSelf || !isHigherSanction) {
+      return ["approve_cancellation", "reject_cancellation"];
+    }
+    const hasRecommendation = ["RECOMMENDED", "NOT_RECOMMENDED"].includes(
+      String(item.recommendation ?? "")
+    );
+    return hasRecommendation
+      ? ["approve_cancellation", "reject_cancellation"]
+      : ["recommend", "not_recommend"];
+  }
+
+  if (status === "AWAITING_RESUMPTION") {
+    return ["review_resumption"];
+  }
+
+  if (status === "PENDING") {
+    if (isDirectorSelf || !isHigherSanction) {
+      return ["approve", "reject"];
+    }
+    return ["recommend", "not_recommend"];
+  }
+
+  if (status === "RECOMMENDED") {
+    return ["approve", "reject"];
+  }
+
+  return [];
+}
+
 export default function ElmPage({ view }: { view: View }) {
   const queryClient = useQueryClient();
   const [error, setError] = useState("");
@@ -109,6 +153,17 @@ export default function ElmPage({ view }: { view: View }) {
   const [holidayName, setHolidayName] = useState("");
   const [holidayKind, setHolidayKind] = useState("RH");
   const [published, setPublished] = useState(false);
+  const [replacementSubs, setReplacementSubs] = useState<Record<string, string>>({});
+  const [extendDates, setExtendDates] = useState<Record<string, string>>({});
+  const [resumptionDates, setResumptionDates] = useState<Record<string, string>>({});
+  const [rolloverYear, setRolloverYear] = useState(String(new Date().getFullYear()));
+  const [offlineEmployeeId, setOfflineEmployeeId] = useState("");
+  const [offlineCategory, setOfflineCategory] = useState("EL");
+  const [offlineStartDate, setOfflineStartDate] = useState("");
+  const [offlineEndDate, setOfflineEndDate] = useState("");
+  const [offlineHalfDay, setOfflineHalfDay] = useState("NONE");
+  const [offlineReason, setOfflineReason] = useState("");
+  const [offlineSanctionRef, setOfflineSanctionRef] = useState("");
 
   const query = useQuery({
     queryKey: ["leave-elm", view],
@@ -162,13 +217,8 @@ export default function ElmPage({ view }: { view: View }) {
   };
 
   const actions = (item: Item) => {
-    const status = String(item.status);
-    const options =
-      status === "AWAITING_SUB"
-        ? ["accept_substitute", "decline_substitute"]
-        : status === "RECOMMENDED" || ["CL", "RH"].includes(String(item.category))
-          ? ["approve", "reject"]
-          : ["recommend", "not_recommend"];
+    const options = getApprovalActionOptions(item);
+    if (!options.length) return null;
     return (
       <Group gap="xs" wrap="nowrap">
         {options.map((action) => (
@@ -279,6 +329,49 @@ export default function ElmPage({ view }: { view: View }) {
             rows={results("results")}
             actions={(item) => {
               const status = String(item.status);
+              if (status === "ACTION_REQUIRED") {
+                const currentSubId = replacementSubs[String(item.id)] ?? "";
+                return (
+                  <Group gap="xs" wrap="nowrap">
+                    <TextInput
+                      placeholder="New substitute ID"
+                      size="xs"
+                      type="number"
+                      style={{ width: 140 }}
+                      value={currentSubId}
+                      onChange={(e) =>
+                        setReplacementSubs((prev) => ({
+                          ...prev,
+                          [String(item.id)]: e.currentTarget.value,
+                        }))
+                      }
+                    />
+                    <Button
+                      size="xs"
+                      variant="light"
+                      color="blue"
+                      loading={mutation.isPending}
+                      disabled={!currentSubId.trim() || Number(currentSubId) <= 0}
+                      onClick={() =>
+                        submit(`/elm/applications/${item.id}/substitute`, {
+                          substitute_user_id: Number(currentSubId),
+                        })
+                      }
+                    >
+                      Replace Substitute
+                    </Button>
+                    <Button
+                      size="xs"
+                      variant="light"
+                      color="red"
+                      loading={mutation.isPending}
+                      onClick={() => submit(`/elm/applications/${item.id}/withdraw`, {})}
+                    >
+                      Withdraw
+                    </Button>
+                  </Group>
+                );
+              }
               if (["AWAITING_SUB", "PENDING", "RECOMMENDED"].includes(status)) {
                 return (
                   <Button
@@ -293,16 +386,83 @@ export default function ElmPage({ view }: { view: View }) {
                 );
               }
               if (status === "APPROVED") {
+                const isOngoingEligible = ["EL", "COL", "VL"].includes(String(item.category ?? ""));
+                const itemId = String(item.id);
+                const extDate = extendDates[itemId] ?? "";
+                const resumeDate = resumptionDates[itemId] ?? "";
                 return (
-                  <Button
-                    size="xs"
-                    variant="light"
-                    color="orange"
-                    loading={mutation.isPending}
-                    onClick={() => submit(`/elm/applications/${item.id}/cancel`, {})}
-                  >
-                    Cancel
-                  </Button>
+                  <Stack gap="xs">
+                    <Group gap="xs" wrap="nowrap">
+                      <Button
+                        size="xs"
+                        variant="light"
+                        color="orange"
+                        loading={mutation.isPending}
+                        onClick={() => submit(`/elm/applications/${item.id}/cancel`, {})}
+                      >
+                        Cancel
+                      </Button>
+                    </Group>
+                    {isOngoingEligible && (
+                      <Group gap="xs" wrap="nowrap">
+                        <TextInput
+                          placeholder="Extended end date"
+                          size="xs"
+                          type="date"
+                          style={{ width: 140 }}
+                          value={extDate}
+                          onChange={(e) =>
+                            setExtendDates((prev) => ({
+                              ...prev,
+                              [itemId]: e.currentTarget.value,
+                            }))
+                          }
+                        />
+                        <Button
+                          size="xs"
+                          variant="light"
+                          color="indigo"
+                          loading={mutation.isPending}
+                          disabled={!extDate}
+                          onClick={() =>
+                            submit(`/elm/applications/${item.id}/extend`, {
+                              extended_end_date: extDate,
+                              reason: "Extension of ongoing leave",
+                            })
+                          }
+                        >
+                          Extend
+                        </Button>
+                        <TextInput
+                          placeholder="Resumption date"
+                          size="xs"
+                          type="date"
+                          style={{ width: 140 }}
+                          value={resumeDate}
+                          onChange={(e) =>
+                            setResumptionDates((prev) => ({
+                              ...prev,
+                              [itemId]: e.currentTarget.value,
+                            }))
+                          }
+                        />
+                        <Button
+                          size="xs"
+                          variant="light"
+                          color="teal"
+                          loading={mutation.isPending}
+                          disabled={!resumeDate}
+                          onClick={() =>
+                            submit(`/elm/applications/${item.id}/resume`, {
+                              resumption_date: resumeDate,
+                            })
+                          }
+                        >
+                          Resume
+                        </Button>
+                      </Group>
+                    )}
+                  </Stack>
                 );
               }
               return null;
@@ -460,6 +620,111 @@ export default function ElmPage({ view }: { view: View }) {
                   Save calendar date
                 </Button>
                 <DataTable rows={results("holidays")} />
+              </Stack>
+            </Card>
+            <Card withBorder>
+              <Stack>
+                <Title order={4}>Year-End Leave Balance Rollover (EL-UC-020)</Title>
+                <Text size="sm" c="dimmed">
+                  Executes the statutory annual leave rollover: lapses CL, RH, and SCL; converts unused faculty VL to EL at 2:1 ratio (fractional); and carries forward non-faculty EL (up to 300 cap) and COL (+20).
+                </Text>
+                <Group>
+                  <TextInput
+                    label="Rollover Year"
+                    type="number"
+                    value={rolloverYear}
+                    onChange={(e) => setRolloverYear(e.currentTarget.value)}
+                  />
+                  <Button
+                    mt={24}
+                    loading={mutation.isPending}
+                    onClick={() =>
+                      submit("/elm/admin/rollover", {
+                        year: Number(rolloverYear),
+                      })
+                    }
+                  >
+                    Execute Year-End Rollover
+                  </Button>
+                </Group>
+              </Stack>
+            </Card>
+            <Card withBorder>
+              <Stack>
+                <Title order={4}>Record Offline-Sanctioned Leave (BR-EL-029 / EL-UC-016)</Title>
+                <Text size="sm" c="dimmed">
+                  Record offline paper-sanctioned leave directly. Synchronizes leave records and deducts balance without initiating a second approval workflow.
+                </Text>
+                <Group grow>
+                  <TextInput
+                    label="Employee IAM User ID"
+                    type="number"
+                    value={offlineEmployeeId}
+                    onChange={(e) => setOfflineEmployeeId(e.currentTarget.value)}
+                  />
+                  <Select
+                    label="Leave type"
+                    data={LEAVE_TYPES}
+                    value={offlineCategory}
+                    onChange={(v) => setOfflineCategory(v ?? "EL")}
+                  />
+                </Group>
+                <Group grow>
+                  <TextInput
+                    label="Start date"
+                    type="date"
+                    value={offlineStartDate}
+                    onChange={(e) => setOfflineStartDate(e.currentTarget.value)}
+                  />
+                  <TextInput
+                    label="End date"
+                    type="date"
+                    value={offlineEndDate}
+                    onChange={(e) => setOfflineEndDate(e.currentTarget.value)}
+                  />
+                  {offlineCategory === "CL" && (
+                    <Select
+                      label="Leave portion"
+                      data={[
+                        { value: "NONE", label: "Full day" },
+                        { value: "FIRST", label: "First half" },
+                        { value: "SECOND", label: "Second half" },
+                      ]}
+                      value={offlineHalfDay}
+                      onChange={(v) => setOfflineHalfDay(v ?? "NONE")}
+                    />
+                  )}
+                </Group>
+                <Group grow>
+                  <TextInput
+                    label="Sanction Reference (required)"
+                    placeholder="e.g. EST/2026/EL-042"
+                    value={offlineSanctionRef}
+                    onChange={(e) => setOfflineSanctionRef(e.currentTarget.value)}
+                  />
+                  <TextInput
+                    label="Purpose / reason"
+                    value={offlineReason}
+                    onChange={(e) => setOfflineReason(e.currentTarget.value)}
+                  />
+                </Group>
+                <Button
+                  loading={mutation.isPending}
+                  disabled={!offlineEmployeeId || !offlineStartDate || !offlineEndDate || !offlineSanctionRef}
+                  onClick={() =>
+                    submit("/elm/admin/offline-leave", {
+                      employee_id: Number(offlineEmployeeId),
+                      category: offlineCategory,
+                      start_date: offlineStartDate,
+                      end_date: offlineEndDate,
+                      half_day: offlineCategory === "CL" ? offlineHalfDay : "NONE",
+                      reason: offlineReason,
+                      sanction_reference: offlineSanctionRef,
+                    })
+                  }
+                >
+                  Record Offline Sanctioned Leave
+                </Button>
               </Stack>
             </Card>
           </Stack>

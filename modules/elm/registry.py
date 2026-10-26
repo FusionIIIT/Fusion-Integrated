@@ -40,7 +40,7 @@ NAV_ITEMS = [
         "label": "Approvals",
         "icon": "UserCheck",
         "to": "/leave/approvals",
-        "required_permission": "leave_elm.application.approve",
+        "required_permission": "leave_elm.application.view",
         "sort_order": 40,
     },
     {

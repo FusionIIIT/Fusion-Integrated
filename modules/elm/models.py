@@ -87,12 +87,15 @@ class LeaveApplication(models.Model):
         default="NOT_REQUIRED",
     )
     status = models.CharField(
-        max_length=16,
+        max_length=20,
         choices=[
             ("AWAITING_SUB", "Awaiting substitute"),
+            ("ACTION_REQUIRED", "Action required"),
             ("PENDING", "Pending"),
             ("RECOMMENDED", "Under higher sanction"),
             ("APPROVED", "Approved"),
+            ("AWAITING_CANCEL", "Awaiting cancellation"),
+            ("AWAITING_RESUMPTION", "Awaiting resumption review"),
             ("REJECTED", "Rejected"),
             ("WITHDRAWN", "Withdrawn"),
             ("CANCELLED", "Cancelled"),
@@ -109,6 +112,7 @@ class LeaveApplication(models.Model):
     resumed_at = models.DateField(null=True, blank=True)
     is_offline = models.BooleanField(default=False)
     sanction_reference = models.CharField(max_length=255, blank=True)
+    original_application_id = models.PositiveIntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
