@@ -1,0 +1,236 @@
+OAP — WORKFLOW SPECIFICATIONS
+Other Academic Procedures (OAP) • Final Synchronized Baseline
+Workflow Derivation Summary
+Workflow eligibility remains derived from validated state-changing UCs. Informational View/Track/Download UCs, notification/reminder services, and supervisor/TA assignment-recording UCs remain outside workflow transition steps unless they themselves create the relevant business-state transition. The nine Basis Workflows and four Composite Workflows remain semantically valid. This pass preserves every authoritative STT unchanged and corrects only explicit CFR/AFR/UC/BR trace metadata.
+BW-OAP-01 — Leave Application – Approved
+Authoritative State-Transition Table
+BW-OAP-02 — Leave Application – Rejected
+Authoritative State-Transition Table
+CW-OAP-01 — Leave Application Decision
+Authoritative State-Transition Table
+BW-OAP-03 — Bonafide Request – Approved
+Authoritative State-Transition Table
+BW-OAP-04 — Bonafide Request – Rejected
+Authoritative State-Transition Table
+CW-OAP-02 — Bonafide Request Decision
+Authoritative State-Transition Table
+BW-OAP-05 — No-Dues Clearance – Cleared
+Authoritative State-Transition Table
+BW-OAP-06 — No-Dues Clearance – Dues Outstanding
+Authoritative State-Transition Table
+CW-OAP-03 — No-Dues Clearance
+Authoritative State-Transition Table
+BW-OAP-07 — Assistantship Claim – Approved and Processed
+Authoritative State-Transition Table
+BW-OAP-08 — Assistantship Claim – Rejected by HoD
+Authoritative State-Transition Table
+CW-OAP-04 — Assistantship Claim Processing
+Authoritative State-Transition Table
+BW-OAP-09 — Graduate Seminar Scheduling
+Authoritative State-Transition Table
+Version | v1.4
+Status | FINAL
+Basis | Validated UC v1.4 + BR v1.4 + RR(CFR/AFR) v1.2 under DIRECT_FINAL_v2
+Workflow ID | Name | Type | Participants | Constituent Workflows
+BW-OAP-01 | Leave Application – Approved | Basis | Student, HoD | —
+BW-OAP-02 | Leave Application – Rejected | Basis | Student, HoD | —
+CW-OAP-01 | Leave Application Decision | Composite | Student, HoD | BW-OAP-01; BW-OAP-02
+BW-OAP-03 | Bonafide Request – Approved | Basis | Student, Academic Administrator | —
+BW-OAP-04 | Bonafide Request – Rejected | Basis | Student, Academic Administrator | —
+CW-OAP-02 | Bonafide Request Decision | Composite | Student, Academic Administrator | BW-OAP-03; BW-OAP-04
+BW-OAP-05 | No-Dues Clearance – Cleared | Basis | Student, Seven Mandatory Clearance Authorities, Academic Administrator | —
+BW-OAP-06 | No-Dues Clearance – Dues Outstanding | Basis | Student, Seven Mandatory Clearance Authorities | —
+CW-OAP-03 | No-Dues Clearance | Composite | Student, Library, Hostel, Mess, respective Department, Lab, Academic Section, Student Section clearance authorities, Academic Administrator | BW-OAP-05; BW-OAP-06
+BW-OAP-07 | Assistantship Claim – Approved and Processed | Basis | PG Student, Thesis Supervisor, TA Supervisor, Department Administrator, HoD, Academic Administrator | —
+BW-OAP-08 | Assistantship Claim – Rejected by HoD | Basis | PG Student, Thesis Supervisor, TA Supervisor, Department Administrator, HoD | —
+CW-OAP-04 | Assistantship Claim Processing | Composite | PG Student, Thesis Supervisor, TA Supervisor, Department Administrator, HoD, Academic Administrator | BW-OAP-07; BW-OAP-08
+BW-OAP-09 | Graduate Seminar Scheduling | Basis | PG Student, Department Administrator | —
+Field | Details
+Type | Basis
+Purpose / Scope | Successful leave path from student submission to HoD approval.
+Trigger | Student submits a leave application.
+Participants | Student, HoD
+Constituent Workflows | —
+Related Workflows | BW-OAP-02; CW-OAP-01
+Related CFRs / key AFRs | 
+Related UCs | OA-UC-01, OA-UC-03
+Related BRs | OA-BR-01, OA-BR-11
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No submitted leave application | Student | OA-UC-01 Submit Leave Application | Submission succeeds | Submitted – Awaiting HoD Decision | OA-BR-01
+2 | Submitted – Awaiting HoD Decision | HoD | OA-UC-03 Review and Decide Leave Application | Outcome = Approved | Approved | OA-BR-11
+Field | Details
+Type | Basis
+Purpose / Scope | Leave path ending in HoD rejection.
+Trigger | Student submits a leave application.
+Participants | Student, HoD
+Constituent Workflows | —
+Related Workflows | BW-OAP-01; CW-OAP-01
+Related CFRs / key AFRs | 
+Related UCs | OA-UC-01, OA-UC-03
+Related BRs | OA-BR-01, OA-BR-11
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No submitted leave application | Student | OA-UC-01 Submit Leave Application | Submission succeeds | Submitted – Awaiting HoD Decision | OA-BR-01
+2 | Submitted – Awaiting HoD Decision | HoD | OA-UC-03 Review and Decide Leave Application | Outcome = Rejected | Rejected | OA-BR-11
+Field | Details
+Type | Composite
+Purpose / Scope | Composite view of the two legitimate HoD decision outcomes.
+Trigger | Student submits a leave application.
+Participants | Student, HoD
+Constituent Workflows | BW-OAP-01; BW-OAP-02
+Related Workflows | —
+Related CFRs / key AFRs | 
+Related UCs | OA-UC-01, OA-UC-03
+Related BRs | OA-BR-01, OA-BR-11
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No submitted leave application | Student | OA-UC-01 Submit Leave Application | Submission succeeds | Submitted – Awaiting HoD Decision | OA-BR-01
+2 | Submitted – Awaiting HoD Decision | HoD | OA-UC-03 Review and Decide Leave Application | Outcome = Approved | Approved | OA-BR-11
+3 | Submitted – Awaiting HoD Decision | HoD | OA-UC-03 Review and Decide Leave Application | Outcome = Rejected | Rejected | OA-BR-11
+Field | Details
+Type | Basis
+Purpose / Scope | Bonafide request path ending in approval.
+Trigger | Student submits a bonafide request.
+Participants | Student, Academic Administrator
+Constituent Workflows | —
+Related Workflows | BW-OAP-04; CW-OAP-02
+Related CFRs / key AFRs | 
+Related UCs | OA-UC-11, OA-UC-12
+Related BRs | OA-BR-21, OA-BR-22
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No submitted bonafide request | Student | OA-UC-11 Request Bonafide Certificate | Submission succeeds | Submitted – Awaiting Academic Administrator | OA-BR-21
+2 | Submitted – Awaiting Academic Administrator | Academic Administrator | OA-UC-12 Verify and Decide Bonafide Request | Outcome = Approved | Approved – Certificate Available | OA-BR-21; OA-BR-22
+Field | Details
+Type | Basis
+Purpose / Scope | Bonafide request path ending in rejection.
+Trigger | Student submits a bonafide request.
+Participants | Student, Academic Administrator
+Constituent Workflows | —
+Related Workflows | BW-OAP-03; CW-OAP-02
+Related CFRs / key AFRs | 
+Related UCs | OA-UC-11, OA-UC-12
+Related BRs | OA-BR-21
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No submitted bonafide request | Student | OA-UC-11 Request Bonafide Certificate | Submission succeeds | Submitted – Awaiting Academic Administrator | OA-BR-21
+2 | Submitted – Awaiting Academic Administrator | Academic Administrator | OA-UC-12 Verify and Decide Bonafide Request | Outcome = Rejected | Rejected | OA-BR-21
+Field | Details
+Type | Composite
+Purpose / Scope | Composite view of bonafide approval and rejection.
+Trigger | Student submits a bonafide request.
+Participants | Student, Academic Administrator
+Constituent Workflows | BW-OAP-03; BW-OAP-04
+Related Workflows | —
+Related CFRs / key AFRs | 
+Related UCs | OA-UC-11, OA-UC-12
+Related BRs | OA-BR-21, OA-BR-22
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No submitted bonafide request | Student | OA-UC-11 Request Bonafide Certificate | Submission succeeds | Submitted – Awaiting Academic Administrator | OA-BR-21
+2 | Submitted – Awaiting Academic Administrator | Academic Administrator | OA-UC-12 Verify and Decide Bonafide Request | Outcome = Approved | Approved – Certificate Available | OA-BR-21; OA-BR-22
+3 | Submitted – Awaiting Academic Administrator | Academic Administrator | OA-UC-12 Verify and Decide Bonafide Request | Outcome = Rejected | Rejected | OA-BR-21
+Field | Details
+Type | Basis
+Purpose / Scope | Successful no-dues path through parallel authority verification and Academic Administrator finalization.
+Trigger | Student initiates no-dues clearance.
+Participants | Student, Seven Mandatory Clearance Authorities, Academic Administrator
+Constituent Workflows | —
+Related Workflows | BW-OAP-06; CW-OAP-03
+Related CFRs / key AFRs | 
+Related UCs | OA-UC-21, OA-UC-22, OA-UC-23
+Related BRs | OA-BR-31, OA-BR-32, OA-BR-33, OA-BR-34
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No active clearance case | Student | OA-UC-21 Initiate No-Dues Clearance | Initiation succeeds; request routed to all seven mandatory authorities | Verification In Progress | OA-BR-31; OA-BR-32
+2 | Verification In Progress | Any mandatory clearance authority | OA-UC-22 Verify No-Dues Clearance | One of seven authorities records its result; other required verifications remain | Verification In Progress | OA-BR-31; OA-BR-32
+3 | Verification In Progress | Last remaining mandatory clearance authority | OA-UC-22 Verify No-Dues Clearance | All seven verifications complete AND all seven results = Clear | Verification Complete – All Clear | OA-BR-33
+4 | Verification Complete – All Clear | Academic Administrator | OA-UC-23 Finalize No-Dues Clearance | All seven mandatory clearances are clear; finalization confirmed | Finalized – Certificate Available | OA-BR-33; OA-BR-34
+Field | Details
+Type | Basis
+Purpose / Scope | No-dues path in which required verification completes but at least one domain is not clear.
+Trigger | Student initiates no-dues clearance.
+Participants | Student, Seven Mandatory Clearance Authorities
+Constituent Workflows | —
+Related Workflows | BW-OAP-05; CW-OAP-03
+Related CFRs / key AFRs | 
+Related UCs | OA-UC-21, OA-UC-22
+Related BRs | OA-BR-31, OA-BR-32, OA-BR-33
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No active clearance case | Student | OA-UC-21 Initiate No-Dues Clearance | Initiation succeeds; request routed to all seven mandatory authorities | Verification In Progress | OA-BR-31; OA-BR-32
+2 | Verification In Progress | Any mandatory clearance authority | OA-UC-22 Verify No-Dues Clearance | One of seven authorities records its result; other required verifications remain | Verification In Progress | OA-BR-31; OA-BR-32
+3 | Verification In Progress | Last remaining mandatory clearance authority | OA-UC-22 Verify No-Dues Clearance | All seven verifications complete AND at least one result = Dues Outstanding | Verification Complete – Dues Outstanding | OA-BR-33
+Field | Details
+Type | Composite
+Purpose / Scope | Composite view of parallel authority verification and the cleared/not-clear decision.
+Trigger | Student initiates no-dues clearance.
+Participants | Student, Library, Hostel, Mess, respective Department, Lab, Academic Section, Student Section clearance authorities, Academic Administrator
+Constituent Workflows | BW-OAP-05; BW-OAP-06
+Related Workflows | —
+Related CFRs / key AFRs | 
+Related UCs | OA-UC-21, OA-UC-22, OA-UC-23
+Related BRs | OA-BR-31, OA-BR-32, OA-BR-33, OA-BR-34
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No active clearance case | Student | OA-UC-21 Initiate No-Dues Clearance | Initiation succeeds; request routed to all seven mandatory authorities | Verification In Progress | OA-BR-31; OA-BR-32
+2 | Verification In Progress | Any of the seven mandatory clearance authorities | OA-UC-22 Verify No-Dues Clearance | Each authority records its own result; verification order may vary | Verification In Progress | OA-BR-31; OA-BR-32
+3 | Verification In Progress | Last remaining mandatory clearance authority | OA-UC-22 Verify No-Dues Clearance | All seven verifications complete AND all seven clear | Verification Complete – All Clear | OA-BR-33
+4 | Verification In Progress | Last remaining mandatory clearance authority | OA-UC-22 Verify No-Dues Clearance | All seven verifications complete AND any result shows dues/obligations outstanding | Verification Complete – Dues Outstanding | OA-BR-33
+5 | Verification Complete – All Clear | Academic Administrator | OA-UC-23 Finalize No-Dues Clearance | Finalization confirmed after seven clear results | Finalized – Certificate Available | OA-BR-33; OA-BR-34
+Field | Details
+Type | Basis
+Purpose / Scope | Assistantship path from PG submission through verification/review/approval to stipend processing.
+Trigger | PG student submits assistantship claim.
+Participants | PG Student, Thesis Supervisor, TA Supervisor, Department Administrator, HoD, Academic Administrator
+Constituent Workflows | —
+Related Workflows | BW-OAP-08; CW-OAP-04
+Related CFRs / key AFRs | 
+Related UCs | OA-UC-31, OA-UC-33, OA-UC-34, OA-UC-35, OA-UC-36
+Related BRs | OA-BR-41, OA-BR-42, OA-BR-46, OA-BR-52, OA-BR-43, OA-BR-44, OA-BR-45
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No submitted claim | PG Student | OA-UC-31 Submit Assistantship Claim | Submission succeeds and both supervisor roles resolve | Awaiting Dual Supervisor Verification | OA-BR-41; OA-BR-42; OA-BR-46
+2 | Awaiting Dual Supervisor Verification | Thesis Supervisor or TA Supervisor | OA-UC-33 Verify Assistantship Claim | First required supervisor-role verification recorded | Awaiting Other Supervisor Verification | OA-BR-42; OA-BR-52
+3 | Awaiting Other Supervisor Verification | Other required supervisor role | OA-UC-33 Verify Assistantship Claim | Second required role-verification recorded; both complete | Awaiting Department Review | OA-BR-42; OA-BR-43; OA-BR-52
+4 | Awaiting Department Review | Department Administrator | OA-UC-34 Review and Forward Assistantship Claim | Review completed and forwarded | Awaiting HoD Decision | OA-BR-43; OA-BR-46
+5 | Awaiting HoD Decision | HoD | OA-UC-35 Decide Assistantship Claim | Outcome = Approved | Approved – Awaiting Stipend Processing | OA-BR-44; OA-BR-45
+6 | Approved – Awaiting Stipend Processing | Academic Administrator | OA-UC-36 Process Stipend Disbursement | Processing completed | Stipend Processed | OA-BR-45; OA-BR-46
+Field | Details
+Type | Basis
+Purpose / Scope | Assistantship path ending in the rejection outcome explicitly assigned to HoD in the PS.
+Trigger | PG student submits assistantship claim.
+Participants | PG Student, Thesis Supervisor, TA Supervisor, Department Administrator, HoD
+Constituent Workflows | —
+Related Workflows | BW-OAP-07; CW-OAP-04
+Related CFRs / key AFRs | 
+Related UCs | OA-UC-31, OA-UC-33, OA-UC-34, OA-UC-35
+Related BRs | OA-BR-41, OA-BR-42, OA-BR-46, OA-BR-52, OA-BR-43, OA-BR-44
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No submitted claim | PG Student | OA-UC-31 Submit Assistantship Claim | Submission succeeds and both supervisor roles resolve | Awaiting Dual Supervisor Verification | OA-BR-41; OA-BR-42; OA-BR-46
+2 | Awaiting Dual Supervisor Verification | Thesis Supervisor or TA Supervisor | OA-UC-33 Verify Assistantship Claim | First required supervisor-role verification recorded | Awaiting Other Supervisor Verification | OA-BR-42; OA-BR-52
+3 | Awaiting Other Supervisor Verification | Other required supervisor role | OA-UC-33 Verify Assistantship Claim | Second required role-verification recorded; both complete | Awaiting Department Review | OA-BR-42; OA-BR-43; OA-BR-52
+4 | Awaiting Department Review | Department Administrator | OA-UC-34 Review and Forward Assistantship Claim | Review completed and forwarded | Awaiting HoD Decision | OA-BR-43; OA-BR-46
+5 | Awaiting HoD Decision | HoD | OA-UC-35 Decide Assistantship Claim | Outcome = Rejected | Rejected | OA-BR-44
+Field | Details
+Type | Composite
+Purpose / Scope | Composite view of the approved and HoD-rejected assistantship paths.
+Trigger | PG student submits assistantship claim.
+Participants | PG Student, Thesis Supervisor, TA Supervisor, Department Administrator, HoD, Academic Administrator
+Constituent Workflows | BW-OAP-07; BW-OAP-08
+Related Workflows | —
+Related CFRs / key AFRs | 
+Related UCs | OA-UC-31, OA-UC-33, OA-UC-34, OA-UC-35, OA-UC-36
+Related BRs | OA-BR-41, OA-BR-42, OA-BR-46, OA-BR-52, OA-BR-43, OA-BR-44, OA-BR-45
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No submitted claim | PG Student | OA-UC-31 Submit Assistantship Claim | Submission succeeds and both supervisor roles resolve | Awaiting Dual Supervisor Verification | OA-BR-41; OA-BR-42; OA-BR-46
+2 | Awaiting Dual Supervisor Verification | Thesis Supervisor or TA Supervisor | OA-UC-33 Verify Assistantship Claim | First required supervisor-role verification recorded | Awaiting Other Supervisor Verification | OA-BR-42; OA-BR-52
+3 | Awaiting Other Supervisor Verification | Other required supervisor role | OA-UC-33 Verify Assistantship Claim | Second required role-verification recorded; both complete | Awaiting Department Review | OA-BR-42; OA-BR-43; OA-BR-52
+4 | Awaiting Department Review | Department Administrator | OA-UC-34 Review and Forward Assistantship Claim | Review completed and forwarded | Awaiting HoD Decision | OA-BR-43; OA-BR-46
+5 | Awaiting HoD Decision | HoD | OA-UC-35 Decide Assistantship Claim | Outcome = Approved | Approved – Awaiting Stipend Processing | OA-BR-44; OA-BR-45
+6 | Awaiting HoD Decision | HoD | OA-UC-35 Decide Assistantship Claim | Outcome = Rejected | Rejected | OA-BR-44
+7 | Approved – Awaiting Stipend Processing | Academic Administrator | OA-UC-36 Process Stipend Disbursement | Processing completed | Stipend Processed | OA-BR-45; OA-BR-46
+Field | Details
+Type | Basis
+Purpose / Scope | PG seminar request through Department Administrator scheduling.
+Trigger | PG student submits seminar scheduling request.
+Participants | PG Student, Department Administrator
+Constituent Workflows | —
+Related Workflows | —
+Related CFRs / key AFRs | 
+Related UCs | OA-UC-51, OA-UC-53
+Related BRs | OA-BR-61, OA-BR-62
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No submitted seminar request | PG Student | OA-UC-51 Request Graduate Seminar Scheduling | Submission succeeds | Awaiting Scheduling | OA-BR-61; OA-BR-62
+2 | Awaiting Scheduling | Department Administrator | OA-UC-53 Schedule Graduate Seminar | Scheduling succeeds | Scheduled | OA-BR-62

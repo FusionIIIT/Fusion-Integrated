@@ -1,0 +1,406 @@
+OAP — USE CASE SPECIFICATIONS
+Other Academic Procedures (OAP) • Final Synchronized Baseline
+Stable UC IDs are preserved wherever their actor goal/service remains valid. All actor-triggered UCs explicitly use UC Type = Actor-triggered. OA-UC-91 and OA-UC-92 are retained as meaningful services but are reclassified as Event-triggered with Primary Actor = N.A. — Event-triggered. The system under specification is not modeled as its own primary or supporting actor. Historical retired UCs remain retired as previously resolved.
+OA-UC-01 — Submit Leave Application
+OA-UC-03 — Review and Decide Leave Application
+OA-UC-04 — Track Leave Status
+OA-UC-11 — Request Bonafide Certificate
+OA-UC-12 — Verify and Decide Bonafide Request
+OA-UC-13 — Download Bonafide Certificate
+OA-UC-14 — Track Bonafide Request Status
+OA-UC-21 — Initiate No-Dues Clearance
+OA-UC-22 — Verify No-Dues Clearance
+OA-UC-23 — Finalize No-Dues Clearance
+OA-UC-24 — Track No-Dues Progress
+OA-UC-25 — Download No-Dues Certificate
+OA-UC-31 — Submit Assistantship Claim
+OA-UC-33 — Verify Assistantship Claim
+OA-UC-34 — Review and Forward Assistantship Claim
+OA-UC-35 — Decide Assistantship Claim
+OA-UC-36 — Process Stipend Disbursement
+OA-UC-37 — Track Assistantship Claim Status
+OA-UC-41 — Record Thesis Supervisor Assignment
+OA-UC-42 — Record TA Assignment
+OA-UC-51 — Request Graduate Seminar Scheduling
+OA-UC-53 — Schedule Graduate Seminar
+OA-UC-54 — View Graduate Seminar Schedule
+OA-UC-91 — Send Event Notification
+OA-UC-92 — Send Pending-Action Reminder
+Version | v1.4
+Status | FINAL
+Basis | PS v1.4 + RR(CFR/AFR) v1.2 + DIRECT_FINAL_v2; stable UC IDs preserved
+UC Type | Actor-triggered
+Primary Actor | Student (UG/PG)
+Supporting Actors / Systems | N/A
+Goal / Description | Submit a leave application for HoD review, with supporting documents where needed.
+Trigger | Student chooses to submit a leave application.
+Preconditions | • Student is authorized to use student OAP functions.
+Main Success Scenario | M1. Student opens the leave application function. M2. System presents the leave-request input. M3. Student enters the leave request details. M4. Student optionally attaches supporting documents. M5. Student submits the application. M6. System records the application as submitted and makes it available to the appropriate HoD. M7. System triggers the required submission notification.
+Alternative Flows | A1: The student submits no supporting document; the request is still accepted because supporting documents are optional.
+Exception Flows | E1: Required request data cannot be recorded; the system reports the failure and does not create a submitted application.
+Success Postcondition | A submitted leave application exists and is available to the HoD.
+Failure / Minimal Guarantee | No submitted leave application is created.
+Related Business Rules | OA-BR-01, OA-BR-03
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-OAP-01, BW-OAP-02, CW-OAP-01
+Notes / TODO | No file-size/type, overlap, duplicate-request, or Academic-Administrator routing rule is assumed.
+UC Type | Actor-triggered
+Primary Actor | Head of Department (HoD)
+Supporting Actors / Systems | Student
+Goal / Description | Review a submitted leave application and approve or reject it.
+Trigger | A submitted leave application is available to the HoD.
+Preconditions | • HoD is authorized for the relevant leave application. • Leave application has been submitted.
+Main Success Scenario | M1. HoD opens a submitted leave application. M2. System displays the application and any supplied supporting information. M3. HoD reviews the application. M4. HoD records an Approve or Reject decision. M5. System records the decision and updates the application status. M6. System triggers the required decision notification to the student.
+Alternative Flows | A1: HoD rejects the application; the resulting status is Rejected rather than Approved.
+Exception Flows | E1: The decision cannot be persisted; the prior application state is retained and the system reports the failure.
+Success Postcondition | The leave application is Approved or Rejected by the HoD.
+Failure / Minimal Guarantee | The prior submitted state and data remain available.
+Related Business Rules | OA-BR-01, OA-BR-03, OA-BR-11
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-OAP-01, BW-OAP-02, CW-OAP-01
+Notes / TODO | No intermediate Academic-Administrator review, duration threshold, attendance update, or mandatory-rejection-remarks policy is assumed.
+UC Type | Actor-triggered
+Primary Actor | Student (UG/PG)
+Supporting Actors / Systems | N/A
+Goal / Description | View current leave status and request history.
+Trigger | Student opens leave tracking/history.
+Preconditions | • Student is authorized to view own leave records.
+Main Success Scenario | M1. Student opens leave tracking. M2. System retrieves the student’s leave applications. M3. System displays current status and available request history. M4. Student may open an individual application for its recorded details/history.
+Alternative Flows | None identified from accepted baseline.
+Exception Flows | E1: No leave records exist; system displays an empty history.
+Success Postcondition | Student can view available leave status/history.
+Failure / Minimal Guarantee | No leave data is changed.
+Related Business Rules | OA-BR-01
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | Informational UC; excluded from workflow state-transition steps.
+UC Type | Actor-triggered
+Primary Actor | Student (UG/PG)
+Supporting Actors / Systems | Academic Administrator
+Goal / Description | Submit a bonafide certificate request for Academic Administrator verification.
+Trigger | Student chooses to request a bonafide certificate.
+Preconditions | • Student is authorized to use student OAP functions.
+Main Success Scenario | M1. Student opens the bonafide request function. M2. System presents the request input. M3. Student submits the request. M4. System records the request as submitted. M5. System makes the request available to the Academic Administrator. M6. System triggers the required submission notification.
+Alternative Flows | None identified from accepted baseline.
+Exception Flows | E1: Request cannot be recorded; system reports the failure and does not create a submitted request.
+Success Postcondition | A submitted bonafide request is available to the Academic Administrator.
+Failure / Minimal Guarantee | No submitted bonafide request is created.
+Related Business Rules | OA-BR-01, OA-BR-03, OA-BR-21
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-OAP-03, BW-OAP-04, CW-OAP-02
+Notes / TODO | No duplicate-request, purpose, validity-period, or withdrawal policy is assumed.
+UC Type | Actor-triggered
+Primary Actor | Academic Administrator
+Supporting Actors / Systems | Student
+Goal / Description | Verify a bonafide request and approve or reject it.
+Trigger | A submitted bonafide request is available for verification.
+Preconditions | • Academic Administrator is authorized for bonafide processing. • Bonafide request has been submitted.
+Main Success Scenario | M1. Academic Administrator opens a submitted bonafide request. M2. System displays the request and relevant student information available to the role. M3. Academic Administrator verifies the request. M4. Academic Administrator records an Approve or Reject decision. M5. System updates the request status. M6. For approval, system makes the certificate available for the downstream download function. M7. System triggers the required decision notification.
+Alternative Flows | A1: Academic Administrator rejects the request; no approved certificate becomes downloadable.
+Exception Flows | E1: Decision cannot be saved; the request remains in its prior state.
+Success Postcondition | Request is Approved or Rejected.
+Failure / Minimal Guarantee | Prior request state is retained.
+Related Business Rules | OA-BR-01, OA-BR-03, OA-BR-21, OA-BR-22
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-OAP-03, BW-OAP-04, CW-OAP-02
+Notes / TODO | Digital-signature, 30-day validity, and mandatory remarks are not established by the PS.
+UC Type | Actor-triggered
+Primary Actor | Student (UG/PG)
+Supporting Actors / Systems | N/A
+Goal / Description | Download an approved bonafide certificate.
+Trigger | Student opens available bonafide certificates or follows an availability notification.
+Preconditions | • The student owns an approved bonafide request. • The approved certificate is available for download.
+Main Success Scenario | M1. Student opens the approved bonafide certificate. M2. System verifies access to the student’s certificate. M3. System provides the certificate for direct download. M4. Student downloads the certificate.
+Alternative Flows | None identified from accepted baseline.
+Exception Flows | E1: Certificate is not approved/available; system does not provide the download.
+Success Postcondition | Student obtains the approved certificate.
+Failure / Minimal Guarantee | No protected certificate is disclosed.
+Related Business Rules | OA-BR-01, OA-BR-22
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | Informational/output UC; download itself is excluded from workflow state transitions.
+UC Type | Actor-triggered
+Primary Actor | Student (UG/PG)
+Supporting Actors / Systems | N/A
+Goal / Description | Monitor the current status of submitted bonafide certificate requests.
+Trigger | Student opens bonafide request tracking.
+Preconditions | • Student is authorized to view own bonafide requests.
+Main Success Scenario | M1. Student opens bonafide request tracking. M2. System retrieves the student’s bonafide requests. M3. System displays the current status of each request.
+Alternative Flows | None identified from accepted baseline.
+Exception Flows | E1: No requests exist; system displays an empty list.
+Success Postcondition | Student can monitor available bonafide request status.
+Failure / Minimal Guarantee | No request state is changed.
+Related Business Rules | OA-BR-01
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | New UC added because this actor capability appears in the PS but was absent from the old UC set.
+UC Type | Actor-triggered
+Primary Actor | Student (UG/PG)
+Supporting Actors / Systems | Library, Hostel, Mess, respective Department, Lab, Academic Section, and Student Section clearance authorities
+Goal / Description | Start no-dues clearance and route verification in parallel to all seven mandatory clearance authorities.
+Trigger | Student chooses to initiate no-dues clearance.
+Preconditions | • Student is authorized to use student OAP functions.
+Main Success Scenario | M1. Student initiates a no-dues clearance request. M2. System records the clearance request. M3. System identifies the seven mandatory clearance authorities: Library, Hostel, Mess, respective Department, Lab, Academic Section, and Student Section. M4. System sends the verification request to all seven authorities in parallel. M5. System triggers the required submission notification.
+Alternative Flows | None identified from accepted baseline.
+Exception Flows | E1: Clearance request cannot be recorded/routed; system reports failure without claiming successful initiation.
+Success Postcondition | No-dues clearance is initiated and verification is pending with all seven mandatory authorities.
+Failure / Minimal Guarantee | No successfully initiated clearance case is claimed.
+Related Business Rules | OA-BR-01, OA-BR-03, OA-BR-31, OA-BR-32
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-OAP-05, BW-OAP-06, CW-OAP-03
+Notes / TODO | All seven clearance domains are mandatory for every student in this baseline.
+UC Type | Actor-triggered
+Primary Actor | Institutional Clearance Authority
+Supporting Actors / Systems | Student, Academic Administrator
+Goal / Description | Record the student’s clearance result for the authority’s own domain.
+Trigger | An authority receives or opens a pending no-dues verification.
+Preconditions | • Authority is authorized for its clearance domain. • A no-dues request is awaiting that authority’s verification.
+Main Success Scenario | M1. Authority opens the pending no-dues request. M2. System displays the information relevant to that authority’s domain. M3. Authority checks the relevant institutional records. M4. Authority records its clearance result for the domain. M5. System stores that authority’s result without overwriting the other six authority statuses. M6. When all seven mandatory verifications are complete, system makes the consolidated case available to Academic Administrator. M7. System triggers the required completion/update notification when applicable.
+Alternative Flows | A1: The authority records that dues/obligations remain outstanding; the domain is not marked clear.
+Exception Flows | E1: Verification cannot be saved; the prior domain status remains unchanged.
+Success Postcondition | The authority-specific clearance status is recorded.
+Failure / Minimal Guarantee | No false clearance state is recorded.
+Related Business Rules | OA-BR-01, OA-BR-03, OA-BR-31, OA-BR-32, OA-BR-33
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-OAP-05, BW-OAP-06, CW-OAP-03
+Notes / TODO | One UC is instantiated by each of the seven mandatory domains: Library, Hostel, Mess, respective Department, Lab, Academic Section, and Student Section. No fixed verification timeout/reminder interval is assumed.
+UC Type | Actor-triggered
+Primary Actor | Academic Administrator
+Supporting Actors / Systems | Student
+Goal / Description | Review the consolidated seven-authority no-dues results and finalize clearance only when all seven required clearances are clear.
+Trigger | All seven mandatory no-dues authority verifications have been completed.
+Preconditions | • Academic Administrator is authorized for no-dues finalization. • All seven mandatory authority verifications are complete.
+Main Success Scenario | M1. Academic Administrator opens the consolidated clearance case. M2. System displays results from Library, Hostel, Mess, respective Department, Lab, Academic Section, and Student Section. M3. System evaluates whether all seven results are clear. M4. Academic Administrator confirms finalization when all seven results are clear. M5. System records the finalized clearance. M6. System makes the no-dues certificate available for download. M7. System triggers the required completion/certificate-availability notification.
+Alternative Flows | A1: One or more of the seven mandatory authorities reports outstanding dues/obligations; finalization as no-dues is not permitted and the case remains unresolved until the relevant clearance becomes clear.
+Exception Flows | E1: Finalization cannot be persisted; previous statuses are retained.
+Success Postcondition | No-dues clearance is finalized only after all seven mandatory clearances are recorded as clear.
+Failure / Minimal Guarantee | No certificate is released without valid finalization.
+Related Business Rules | OA-BR-01, OA-BR-03, OA-BR-33, OA-BR-34
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-OAP-05, CW-OAP-03
+Notes / TODO | Certificate file format/template is not fixed by the PS.
+UC Type | Actor-triggered
+Primary Actor | Student (UG/PG)
+Supporting Actors / Systems | N/A
+Goal / Description | View no-dues status by authority and overall progress.
+Trigger | Student opens no-dues tracking.
+Preconditions | • Student is authorized to view own no-dues cases.
+Main Success Scenario | M1. Student opens no-dues progress. M2. System retrieves the student’s no-dues case. M3. System displays the status reported by each applicable authority and the overall case status.
+Alternative Flows | None identified from accepted baseline.
+Exception Flows | E1: No no-dues case exists; system displays no active progress.
+Success Postcondition | Student can view current no-dues progress.
+Failure / Minimal Guarantee | No clearance data is changed.
+Related Business Rules | OA-BR-01, OA-BR-32
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | Informational UC; excluded from workflow steps.
+UC Type | Actor-triggered
+Primary Actor | Student (UG/PG)
+Supporting Actors / Systems | N/A
+Goal / Description | Download the finalized no-dues certificate.
+Trigger | Student opens a finalized no-dues certificate or follows an availability notification.
+Preconditions | • Student owns a finalized no-dues clearance. • Certificate is available for download.
+Main Success Scenario | M1. Student opens the finalized certificate. M2. System verifies access. M3. System provides the certificate for download. M4. Student downloads the certificate.
+Alternative Flows | None identified from accepted baseline.
+Exception Flows | E1: Clearance is not finalized; system does not provide the certificate.
+Success Postcondition | Student obtains the finalized no-dues certificate.
+Failure / Minimal Guarantee | No protected/unfinalized certificate is disclosed.
+Related Business Rules | OA-BR-01, OA-BR-34
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | Download is not a workflow state-changing step.
+UC Type | Actor-triggered
+Primary Actor | PG Student
+Supporting Actors / Systems | Thesis Supervisor, TA Supervisor
+Goal / Description | Submit an assistantship claim for mandatory verification by both the assigned Thesis Supervisor and assigned TA Supervisor.
+Trigger | PG student chooses to submit an assistantship claim.
+Preconditions | • Student is within PG scope. • An assigned Thesis Supervisor and an assigned TA Supervisor can be resolved for the claimant.
+Main Success Scenario | M1. PG student opens assistantship claim submission. M2. System accepts the claim information. M3. Student submits the claim. M4. System records the submitted claim. M5. System routes the claim to both the assigned Thesis Supervisor and assigned TA Supervisor for role-specific verification. M6. System triggers the required submission notification.
+Alternative Flows | None identified from accepted baseline.
+Exception Flows | E1: Either required supervisor role cannot be resolved; the system cannot complete dual-supervisor routing and shall not represent the claim as ready for verification.
+Success Postcondition | Claim is submitted and awaiting both Thesis Supervisor and TA Supervisor role-verifications.
+Failure / Minimal Guarantee | No false routed state is recorded.
+Related Business Rules | OA-BR-01, OA-BR-03, OA-BR-41, OA-BR-42, OA-BR-46
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-OAP-07, BW-OAP-08, CW-OAP-04
+Notes / TODO | Claim period format, duplicate checks, attachment rules, and withdrawal are not established by the PS.
+UC Type | Actor-triggered
+Primary Actor | Assigned Thesis Supervisor or Assigned TA Supervisor
+Supporting Actors / Systems | other required Supervisor role, Department Administrator
+Goal / Description | Verify an assistantship claim in the actor’s assigned Thesis Supervisor or TA Supervisor role.
+Trigger | A submitted claim is routed to the actor in a required supervisor role.
+Preconditions | • The actor is the claimant’s assigned Thesis Supervisor or assigned TA Supervisor. • The verification for that supervisor role is pending.
+Main Success Scenario | M1. Supervisor opens the pending claim. M2. System displays the claim information and the supervisor role being exercised. M3. Supervisor reviews the claim. M4. Supervisor records verification for that role. M5. System stores the role-specific verification independently. M6. If the other required supervisor-role verification is still pending, the claim remains awaiting the other verification. M7. Once both Thesis Supervisor and TA Supervisor verifications are recorded, system makes the claim available to the Department Administrator. M8. System triggers the relevant notification.
+Alternative Flows | A1: The same faculty member holds both Thesis Supervisor and TA Supervisor roles. The two role-verification obligations remain distinct and both must be satisfied before department review.
+Exception Flows | E1: Supervisor cannot verify the claim; no verified state is recorded. The PS does not specify a supervisor rejection or return path.
+Success Postcondition | The actor’s supervisor-role verification is recorded; the claim advances to Department Administrator review only when both required role-verifications are complete.
+Failure / Minimal Guarantee | Claim remains not verified.
+Related Business Rules | OA-BR-01, OA-BR-03, OA-BR-42, OA-BR-43, OA-BR-46, OA-BR-52
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-OAP-07, BW-OAP-08, CW-OAP-04
+Notes / TODO | No order is prescribed between Thesis Supervisor and TA Supervisor verification. No supervisor rejection/return path is established by the baseline.
+UC Type | Actor-triggered
+Primary Actor | Department Administrator
+Supporting Actors / Systems | HoD
+Goal / Description | Review a claim after both required supervisor-role verifications and forward it to the HoD.
+Trigger | A claim with both Thesis Supervisor and TA Supervisor verifications becomes available to Department Administrator.
+Preconditions | • Both Thesis Supervisor and TA Supervisor role-verifications are complete.
+Main Success Scenario | M1. Department Administrator opens the dually verified claim. M2. System displays the claim and both supervisor-role verifications. M3. Department Administrator reviews the claim. M4. Department Administrator forwards the reviewed claim to the HoD. M5. System records the forwarding state and triggers the relevant notification.
+Alternative Flows | None identified from accepted baseline.
+Exception Flows | E1: Claim cannot be forwarded; it remains at the department-review stage. The PS does not define a reject/send-back outcome for Department Administrator.
+Success Postcondition | Claim is awaiting HoD decision.
+Failure / Minimal Guarantee | Claim remains at department review.
+Related Business Rules | OA-BR-01, OA-BR-03, OA-BR-43, OA-BR-46
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-OAP-07, BW-OAP-08, CW-OAP-04
+Notes / TODO | Old Send Back/Reject path removed.
+UC Type | Actor-triggered
+Primary Actor | Head of Department (HoD)
+Supporting Actors / Systems | Academic Administrator, PG Student
+Goal / Description | Approve or reject a reviewed assistantship claim.
+Trigger | A reviewed claim is forwarded to the HoD.
+Preconditions | • Claim has completed both Thesis Supervisor and TA Supervisor verifications and Department Administrator review.
+Main Success Scenario | M1. HoD opens the pending claim. M2. System displays the claim and prior verification/review information. M3. HoD records Approve or Reject. M4. System records the decision. M5. If approved, system makes the claim available to Academic Administrator for stipend processing. M6. System triggers the required decision notification.
+Alternative Flows | A1: HoD rejects the claim; no stipend-processing handoff occurs.
+Exception Flows | E1: Decision cannot be persisted; prior claim state is retained.
+Success Postcondition | Claim is HoD Approved or Rejected.
+Failure / Minimal Guarantee | Prior state is retained.
+Related Business Rules | OA-BR-01, OA-BR-03, OA-BR-44, OA-BR-45, OA-BR-46
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-OAP-07, BW-OAP-08, CW-OAP-04
+Notes / TODO | HoD is the only rejection decision explicitly established in the PS for this flow.
+UC Type | Actor-triggered
+Primary Actor | Academic Administrator
+Supporting Actors / Systems | PG Student
+Goal / Description | Process stipend disbursement for a HoD-approved claim.
+Trigger | A HoD-approved assistantship claim becomes available for stipend processing.
+Preconditions | • Claim is approved by the HoD.
+Main Success Scenario | M1. Academic Administrator opens the approved claim. M2. System displays the approved claim and approval history needed for processing. M3. Academic Administrator performs the OAP stipend-processing action. M4. System records the processing outcome. M5. System triggers the relevant notification.
+Alternative Flows | None identified from accepted baseline.
+Exception Flows | E1: Processing cannot be completed; the claim remains approved but not processed.
+Success Postcondition | OAP records the stipend disbursement as processed.
+Failure / Minimal Guarantee | The claim is not falsely marked processed.
+Related Business Rules | OA-BR-01, OA-BR-03, OA-BR-45, OA-BR-46
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-OAP-07, CW-OAP-04
+Notes / TODO | No finance/payroll integration or transaction-reference requirement is assumed.
+UC Type | Actor-triggered
+Primary Actor | PG Student
+Supporting Actors / Systems | N/A
+Goal / Description | Track an assistantship claim across processing stages.
+Trigger | PG student opens assistantship claim tracking.
+Preconditions | • Student is authorized to view own assistantship claims.
+Main Success Scenario | M1. Student opens claim tracking. M2. System retrieves the student’s claims. M3. System displays current stage/status for each claim. M4. Student opens a claim to view available stage history.
+Alternative Flows | None identified from accepted baseline.
+Exception Flows | E1: No claims exist; system displays an empty list.
+Success Postcondition | Student can view claim progress.
+Failure / Minimal Guarantee | No claim state is changed.
+Related Business Rules | OA-BR-01
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | Informational UC; excluded from workflow steps.
+UC Type | Actor-triggered
+Primary Actor | Department Administrator
+Supporting Actors / Systems | Faculty, PG Student
+Goal / Description | Record a thesis-supervisor assignment based on a departmental decision.
+Trigger | A departmental thesis-supervisor assignment decision is available for recording.
+Preconditions | • Department Administrator is authorized to record the assignment.
+Main Success Scenario | M1. Department Administrator opens supervisor assignment. M2. System presents the relevant student and eligible faculty data available to the role. M3. Department Administrator records the departmental assignment. M4. System saves the student–supervisor mapping.
+Alternative Flows | None identified from accepted baseline.
+Exception Flows | E1: Assignment cannot be saved; previous assignment data is retained.
+Success Postcondition | The departmental thesis-supervisor assignment is recorded.
+Failure / Minimal Guarantee | No incorrect assignment is recorded.
+Related Business Rules | OA-BR-01, OA-BR-51, OA-BR-52
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | Corrected from the old UC, which incorrectly tied supervisor assignment to a seminar request.
+UC Type | Actor-triggered
+Primary Actor | Department Administrator
+Supporting Actors / Systems | PG Student, Faculty Member
+Goal / Description | Record a departmental TA assignment that associates a PG student as Teaching Assistant with a course/subject, a faculty member, or both.
+Trigger | A departmental TA-assignment decision is available for recording.
+Preconditions | • Department Administrator is authorized to record TA assignments.
+Main Success Scenario | M1. Department Administrator opens TA assignment. M2. System presents the relevant PG student and available course/subject and faculty assignment targets. M3. Department Administrator records the departmental TA assignment to a course/subject, a faculty member, or both, as specified by the departmental decision. M4. System saves the TA assignment.
+Alternative Flows | None identified from accepted baseline.
+Exception Flows | E1: Assignment cannot be saved; prior data is retained.
+Success Postcondition | The departmental TA assignment is recorded with its specified course/subject and/or faculty association.
+Failure / Minimal Guarantee | No incorrect assignment is recorded.
+Related Business Rules | OA-BR-01, OA-BR-51
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | The faculty association, when present, may provide the TA Supervisor mapping used by assistantship processing. A course-only assignment does not by itself imply a specific faculty mapping in this specification.
+UC Type | Actor-triggered
+Primary Actor | PG Student
+Supporting Actors / Systems | Department Administrator
+Goal / Description | Request scheduling of a graduate seminar.
+Trigger | PG student chooses to request graduate seminar scheduling.
+Preconditions | • Student is within PG scope.
+Main Success Scenario | M1. PG student opens seminar scheduling request. M2. System presents the request input. M3. Student submits the scheduling request. M4. System records the request and makes it available to Department Administrator. M5. System triggers the required submission notification.
+Alternative Flows | None identified from accepted baseline.
+Exception Flows | E1: Request cannot be recorded; no submitted scheduling request is created.
+Success Postcondition | A seminar scheduling request awaits Department Administrator action.
+Failure / Minimal Guarantee | No false submitted state is recorded.
+Related Business Rules | OA-BR-01, OA-BR-03, OA-BR-61, OA-BR-62
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-OAP-09
+Notes / TODO | Old UC incorrectly allowed UG students and added unsupported abstract/preferred-time/supervisor fields.
+UC Type | Actor-triggered
+Primary Actor | Department Administrator
+Supporting Actors / Systems | PG Student, Faculty
+Goal / Description | Schedule and log a requested graduate seminar.
+Trigger | A PG seminar scheduling request is available.
+Preconditions | • Department Administrator is authorized to schedule seminars.
+Main Success Scenario | M1. Department Administrator opens a pending seminar scheduling request. M2. Department Administrator determines the seminar schedule using institute process/policy. M3. Department Administrator records the scheduled seminar. M4. System updates the seminar scheduling record/history. M5. System triggers relevant notifications.
+Alternative Flows | None identified from accepted baseline.
+Exception Flows | E1: A schedule cannot be recorded; request remains awaiting scheduling.
+Success Postcondition | The graduate seminar is scheduled and logged.
+Failure / Minimal Guarantee | No false scheduled state is recorded.
+Related Business Rules | OA-BR-01, OA-BR-03, OA-BR-62
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-OAP-09
+Notes / TODO | No separate approval step, conflict-check rule, or withdrawal/reschedule rule is established by the PS.
+UC Type | Actor-triggered
+Primary Actor | PG Student / Faculty
+Supporting Actors / Systems | N/A
+Goal / Description | View scheduled graduate seminars.
+Trigger | Authorized user opens the graduate seminar schedule.
+Preconditions | • User is a PG student or faculty member.
+Main Success Scenario | M1. User opens the seminar schedule. M2. System retrieves scheduled seminar information. M3. System displays the schedule to the authorized user.
+Alternative Flows | None identified from accepted baseline.
+Exception Flows | E1: No scheduled seminars exist; system displays an empty schedule.
+Success Postcondition | Authorized user can view the available seminar schedule.
+Failure / Minimal Guarantee | No seminar data is changed.
+Related Business Rules | OA-BR-01, OA-BR-63
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | Informational UC; excluded from workflow steps.
+UC Type | Event-triggered
+Primary Actor | N.A. — Event-triggered
+Supporting Actors / Systems | Relevant OAP actors
+Goal / Description | Send a required OAP event notification through the supported channels.
+Trigger | A notification-triggering OAP event occurs.
+Preconditions | • A relevant notification obligation exists and recipients can be determined.
+Main Success Scenario | M1. System detects the notification-triggering event. M2. System determines relevant recipient(s). M3. System generates the event notification. M4. System sends the notification as a system-generated alert and email.
+Alternative Flows | None identified from accepted baseline.
+Exception Flows | E1: A channel delivery fails; system shall not falsely report successful delivery for that channel.
+Success Postcondition | Required notification is issued through the supported channels.
+Failure / Minimal Guarantee | The underlying business event remains recorded even if notification delivery fails.
+Related Business Rules | OA-BR-03
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | SMS and user-configurable delivery channels removed because they are not in the PS.
+UC Type | Event-triggered
+Primary Actor | N.A. — Event-triggered
+Supporting Actors / Systems | Responsible OAP actor
+Goal / Description | Send a reminder for a pending OAP action.
+Trigger | The configured reminder condition for a pending OAP action is met.
+Preconditions | • An OAP action is pending and institute reminder policy/configuration identifies it as due for reminder.
+Main Success Scenario | M1. System identifies a pending action meeting the configured reminder condition. M2. System identifies the responsible actor. M3. System sends a reminder as a system-generated alert and email.
+Alternative Flows | None identified from accepted baseline.
+Exception Flows | E1: Reminder delivery fails; pending business state is unchanged.
+Success Postcondition | Responsible actor receives or is sent the configured reminder.
+Failure / Minimal Guarantee | No business request is advanced solely because a reminder failed.
+Related Business Rules | OA-BR-03
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | No fixed daily times, per-process thresholds, or escalation schedule is established by the PS.
