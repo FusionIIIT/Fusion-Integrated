@@ -63,6 +63,260 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/elm/leave-balances/:
+    get:
+      operationId: v1_elm_leave_balances_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveBalanceList'
+          description: ''
+  /api/v1/elm/leave-requests/:
+    get:
+      operationId: v1_elm_leave_requests_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveRequestList'
+          description: ''
+    post:
+      operationId: v1_elm_leave_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/leave-requests/{id}/:
+    get:
+      operationId: v1_elm_leave_requests_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+    put:
+      operationId: v1_elm_leave_requests_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+    patch:
+      operationId: v1_elm_leave_requests_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLeaveRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLeaveRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLeaveRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+    delete:
+      operationId: v1_elm_leave_requests_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/elm/leave-types/:
+    get:
+      operationId: v1_elm_leave_types_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveTypeList'
+          description: ''
+  /api/v1/elm/substitute-responses/:
+    get:
+      operationId: v1_elm_substitute_responses_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSubstituteResponseList'
+          description: ''
+    post:
+      operationId: v1_elm_substitute_responses_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubstituteResponse'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -2637,6 +2891,70 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveBalance:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        leave_type:
+          type: integer
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        balance:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+      - id
+      - leave_type
+      - user_id
+    LeaveRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        leave_type:
+          type: integer
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        reason:
+          type: string
+        status:
+          type: string
+          readOnly: true
+          default: pending
+      required:
+      - end_date
+      - id
+      - leave_type
+      - reason
+      - start_date
+      - status
+      - user_id
+    LeaveType:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+      required:
+      - id
+      - name
     LiftSanction:
       type: object
       properties:
@@ -2981,6 +3299,63 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedLeaveBalanceList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveBalance'
+    PaginatedLeaveRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveRequest'
+    PaginatedLeaveTypeList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveType'
     PaginatedOfferList:
       type: object
       required:
@@ -3000,6 +3375,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PaginatedSubstituteResponseList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubstituteResponse'
     PatchedJobPosting:
       type: object
       properties:
@@ -3080,6 +3474,30 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PatchedLeaveRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        leave_type:
+          type: integer
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        reason:
+          type: string
+        status:
+          type: string
+          readOnly: true
+          default: pending
     PatchedRole:
       type: object
       properties:
@@ -3466,6 +3884,14 @@ components:
       - message
       - reason
       - route
+    ResponseEnum:
+      enum:
+      - accepted
+      - rejected
+      type: string
+      description: |-
+        * `accepted` - accepted
+        * `rejected` - rejected
     RoundOutcome:
       type: object
       properties:
@@ -3698,6 +4124,25 @@ components:
           type: integer
       required:
       - document_id
+    SubstituteResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        leave_request:
+          type: integer
+        substitute_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        response:
+          $ref: '#/components/schemas/ResponseEnum'
+      required:
+      - id
+      - leave_request
+      - response
+      - substitute_user_id
     TopicEnum:
       enum:
       - drive
