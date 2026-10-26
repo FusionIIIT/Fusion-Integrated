@@ -13,6 +13,21 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave.request.create` | Apply for leave | `Dean Academic`, `Director`, `HOD`, `Registrar`, `admin`, `dr_establishment`, `establishment_officer`, `faculty`, `hr_officer`, `leave_admin`, `staff` |
+| `leave.request.view_self` | View own leave requests and balance | `Dean Academic`, `Director`, `HOD`, `Registrar`, `admin`, `dr_establishment`, `establishment_officer`, `faculty`, `hr_officer`, `leave_admin`, `staff` |
+| `leave.request.delete` | Withdraw or cancel own leave request | `Dean Academic`, `Director`, `HOD`, `Registrar`, `admin`, `dr_establishment`, `establishment_officer`, `faculty`, `hr_officer`, `leave_admin`, `staff` |
+| `leave.request.substitute` | Respond to substitute responsibility requests | `Dean Academic`, `Director`, `HOD`, `Registrar`, `admin`, `dr_establishment`, `establishment_officer`, `faculty`, `hr_officer`, `leave_admin`, `staff` |
+| `leave.request.view` | View leave requests within scope | `Dean Academic`, `Director`, `HOD`, `Registrar`, `admin`, `dr_establishment`, `establishment_officer`, `hr_officer`, `leave_admin` |
+| `leave.request.approve` | Review and approve leave requests | `Dean Academic`, `Director`, `HOD`, `Registrar`, `admin`, `dr_establishment`, `establishment_officer`, `hr_officer`, `leave_admin` |
+| `leave.balance.update` | Adjust or seed employee leave balances | `admin`, `dr_establishment`, `establishment_officer`, `hr_officer`, `leave_admin` |
+| `leave.type.manage` | Configure leave policies, hierarchies and calendars | `admin`, `leave_admin` |
+| `leave.calendar.view` | View holiday and vacation calendar | `Dean Academic`, `Director`, `HOD`, `Registrar`, `admin`, `dr_establishment`, `establishment_officer`, `faculty`, `hr_officer`, `leave_admin`, `staff` |
+| `leave.offline.record` | Record already-sanctioned offline leave | `admin`, `dr_establishment`, `establishment_officer`, `hr_officer`, `leave_admin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

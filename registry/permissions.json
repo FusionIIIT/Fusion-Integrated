@@ -34,6 +34,244 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "leave": {
+      "grants": {
+        "Dean Academic": [
+          "leave.calendar.view",
+          "leave.request.approve",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.substitute",
+          "leave.request.view",
+          "leave.request.view_self"
+        ],
+        "Director": [
+          "leave.calendar.view",
+          "leave.request.approve",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.substitute",
+          "leave.request.view",
+          "leave.request.view_self"
+        ],
+        "HOD": [
+          "leave.calendar.view",
+          "leave.request.approve",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.substitute",
+          "leave.request.view",
+          "leave.request.view_self"
+        ],
+        "Registrar": [
+          "leave.calendar.view",
+          "leave.request.approve",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.substitute",
+          "leave.request.view",
+          "leave.request.view_self"
+        ],
+        "admin": [
+          "leave.balance.update",
+          "leave.calendar.view",
+          "leave.offline.record",
+          "leave.request.approve",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.substitute",
+          "leave.request.view",
+          "leave.request.view_self",
+          "leave.type.manage"
+        ],
+        "dr_establishment": [
+          "leave.balance.update",
+          "leave.calendar.view",
+          "leave.offline.record",
+          "leave.request.approve",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.substitute",
+          "leave.request.view",
+          "leave.request.view_self"
+        ],
+        "establishment_officer": [
+          "leave.balance.update",
+          "leave.calendar.view",
+          "leave.offline.record",
+          "leave.request.approve",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.substitute",
+          "leave.request.view",
+          "leave.request.view_self"
+        ],
+        "faculty": [
+          "leave.calendar.view",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.substitute",
+          "leave.request.view_self"
+        ],
+        "hr_officer": [
+          "leave.balance.update",
+          "leave.calendar.view",
+          "leave.offline.record",
+          "leave.request.approve",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.substitute",
+          "leave.request.view",
+          "leave.request.view_self"
+        ],
+        "leave_admin": [
+          "leave.balance.update",
+          "leave.calendar.view",
+          "leave.offline.record",
+          "leave.request.approve",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.substitute",
+          "leave.request.view",
+          "leave.request.view_self",
+          "leave.type.manage"
+        ],
+        "staff": [
+          "leave.calendar.view",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.substitute",
+          "leave.request.view_self"
+        ],
+        "student": []
+      },
+      "module_grants": [
+        "Dean Academic",
+        "Director",
+        "HOD",
+        "Registrar",
+        "admin",
+        "dr_establishment",
+        "establishment_officer",
+        "faculty",
+        "hr_officer",
+        "leave_admin",
+        "staff"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "FaCalendarCheck",
+        "items": [
+          {
+            "code": "leave.apply",
+            "icon": "FaPlusCircle",
+            "label": "Apply Leave",
+            "required_permission": "leave.request.create",
+            "sort_order": 10,
+            "to": "/leave/apply"
+          },
+          {
+            "code": "leave.mine",
+            "icon": "FaListAlt",
+            "label": "My Requests",
+            "required_permission": "leave.request.view_self",
+            "sort_order": 20,
+            "to": "/leave/mine"
+          },
+          {
+            "code": "leave.balances",
+            "icon": "FaChartPie",
+            "label": "Leave Balances",
+            "required_permission": "leave.request.view_self",
+            "sort_order": 30,
+            "to": "/leave/balances"
+          },
+          {
+            "code": "leave.substitute",
+            "icon": "FaUserCheck",
+            "label": "Substitute Tasks",
+            "required_permission": "leave.request.substitute",
+            "sort_order": 40,
+            "to": "/leave/substitute"
+          },
+          {
+            "code": "leave.approvals",
+            "icon": "FaTasks",
+            "label": "Leave Approvals",
+            "required_permission": "leave.request.approve",
+            "sort_order": 50,
+            "to": "/leave/approvals"
+          },
+          {
+            "code": "leave.calendar",
+            "icon": "FaCalendarAlt",
+            "label": "Holiday Calendar",
+            "required_permission": "leave.calendar.view",
+            "sort_order": 60,
+            "to": "/leave/calendar"
+          },
+          {
+            "code": "leave.admin",
+            "icon": "FaCogs",
+            "label": "Leave Admin",
+            "required_permission": "leave.type.manage",
+            "sort_order": 70,
+            "to": "/leave/admin"
+          }
+        ],
+        "label": "Leave Management",
+        "nav_section": "Administration",
+        "sort_order": 25,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "leave.request.create",
+          "label": "Apply for leave"
+        },
+        {
+          "code": "leave.request.view_self",
+          "label": "View own leave requests and balance"
+        },
+        {
+          "code": "leave.request.delete",
+          "label": "Withdraw or cancel own leave request"
+        },
+        {
+          "code": "leave.request.substitute",
+          "label": "Respond to substitute responsibility requests"
+        },
+        {
+          "code": "leave.request.view",
+          "label": "View leave requests within scope"
+        },
+        {
+          "code": "leave.request.approve",
+          "label": "Review and approve leave requests"
+        },
+        {
+          "code": "leave.balance.update",
+          "label": "Adjust or seed employee leave balances"
+        },
+        {
+          "code": "leave.type.manage",
+          "label": "Configure leave policies, hierarchies and calendars"
+        },
+        {
+          "code": "leave.calendar.view",
+          "label": "View holiday and vacation calendar"
+        },
+        {
+          "code": "leave.offline.record",
+          "label": "Record already-sanctioned offline leave"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "leave.sla.process",
+        "leave.yearend.process"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
