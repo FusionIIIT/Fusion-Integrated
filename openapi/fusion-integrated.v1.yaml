@@ -63,6 +63,180 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/elm/approvals:
+    get:
+      operationId: v1_elm_approvals_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/my-requests:
+    get:
+      operationId: v1_elm_my_requests_list
+      description: |-
+        Listing and submitting share a URL but are different capabilities:
+        view_self only lets you see your own requests, create is what actually
+        lets you submit one. Each method is gated on its own permission.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+    post:
+      operationId: v1_elm_my_requests_create
+      description: |-
+        Listing and submitting share a URL but are different capabilities:
+        view_self only lets you see your own requests, create is what actually
+        lets you submit one. Each method is gated on its own permission.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/requests/{id}/cancel:
+    post:
+      operationId: v1_elm_requests_cancel_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/requests/{id}/decide:
+    post:
+      operationId: v1_elm_requests_decide_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Decision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Decision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Decision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/requests/{id}/substitute-response:
+    post:
+      operationId: v1_elm_requests_substitute_response_create
+      description: |-
+        Any authenticated principal may respond if they are the nominated
+        substitute — gated in the service layer (service checks
+        substitute_user_id == acting user), not by a leave-request permission,
+        since the substitute need not hold any ELM permission at all.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/requests/{id}/withdraw:
+    post:
+      operationId: v1_elm_requests_withdraw_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -2082,6 +2256,22 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CategoryEnum:
+      enum:
+      - CL
+      - RH
+      - SCL
+      - EL
+      - COL
+      - VL
+      type: string
+      description: |-
+        * `CL` - Casual Leave
+        * `RH` - Restricted Holiday
+        * `SCL` - Special Casual Leave
+        * `EL` - Earned Leave
+        * `COL` - Commuted Leave
+        * `VL` - Vacation Leave
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2315,6 +2505,16 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    Decision:
+      type: object
+      properties:
+        approve:
+          type: boolean
+        remarks:
+          type: string
+          default: ''
+      required:
+      - approve
     Detail:
       type: object
       properties:
@@ -2423,6 +2623,16 @@ components:
       - fee_reference
       - season
       - user_id
+    HalfDayEnum:
+      enum:
+      - none
+      - first_half
+      - second_half
+      type: string
+      description: |-
+        * `none` - Full day
+        * `first_half` - First half
+        * `second_half` - Second half
     IncidentRecorded:
       type: object
       properties:
@@ -2637,6 +2847,68 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        applicant_user_id:
+          type: integer
+          readOnly: true
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        half_day:
+          allOf:
+          - $ref: '#/components/schemas/HalfDayEnum'
+          default: none
+        station_leave:
+          type: boolean
+          default: false
+        station_leave_details:
+          type: string
+        reason:
+          type: string
+        status:
+          type: string
+          readOnly: true
+        unit_head_user_id:
+          type: integer
+        unit_head_remarks:
+          type: string
+          readOnly: true
+        substitute_user_id:
+          type: integer
+          nullable: true
+        substitute_consent:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - applicant_user_id
+      - category
+      - created_at
+      - end_date
+      - id
+      - start_date
+      - status
+      - substitute_consent
+      - unit_head_remarks
+      - unit_head_user_id
+      - updated_at
     LiftSanction:
       type: object
       properties:
@@ -3698,6 +3970,13 @@ components:
           type: integer
       required:
       - document_id
+    SubstituteResponse:
+      type: object
+      properties:
+        accept:
+          type: boolean
+      required:
+      - accept
     TopicEnum:
       enum:
       - drive

@@ -34,6 +34,90 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "elm": {
+      "grants": {
+        "employee": [
+          "elm.leave_request.cancel",
+          "elm.leave_request.create",
+          "elm.leave_request.view_self",
+          "elm.leave_request.withdraw"
+        ],
+        "unit_head": [
+          "elm.leave_request.cancel",
+          "elm.leave_request.create",
+          "elm.leave_request.decide",
+          "elm.leave_request.view",
+          "elm.leave_request.view_self",
+          "elm.leave_request.withdraw"
+        ]
+      },
+      "module_grants": [
+        "employee",
+        "unit_head"
+      ],
+      "nav": {
+        "base_path": "/elm",
+        "icon": "CalendarCheck",
+        "items": [
+          {
+            "code": "elm.my_requests",
+            "icon": "ClipboardText",
+            "label": "My Leave Requests",
+            "required_permission": "elm.leave_request.view_self",
+            "sort_order": 10,
+            "to": "/elm/my-requests"
+          },
+          {
+            "code": "elm.apply",
+            "icon": "CalendarPlus",
+            "label": "Apply for Leave",
+            "required_permission": "elm.leave_request.create",
+            "sort_order": 20,
+            "to": "/elm/apply"
+          },
+          {
+            "code": "elm.approvals",
+            "icon": "Checks",
+            "label": "Leave Approvals",
+            "required_permission": "elm.leave_request.decide",
+            "sort_order": 30,
+            "to": "/elm/approvals"
+          }
+        ],
+        "label": "Employee Leave Management",
+        "nav_section": "Leave",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "elm.leave_request.create",
+          "label": "Submit a leave request for oneself"
+        },
+        {
+          "code": "elm.leave_request.view_self",
+          "label": "View one's own leave requests"
+        },
+        {
+          "code": "elm.leave_request.view",
+          "label": "View leave requests routed to one's role"
+        },
+        {
+          "code": "elm.leave_request.decide",
+          "label": "Record a Unit Head decision on a routed request"
+        },
+        {
+          "code": "elm.leave_request.withdraw",
+          "label": "Withdraw one's own pending request"
+        },
+        {
+          "code": "elm.leave_request.cancel",
+          "label": "Cancel one's own approved, not-yet-started leave"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

@@ -13,6 +13,17 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.leave_request.create` | Submit a leave request for oneself | `employee`, `unit_head` |
+| `elm.leave_request.view_self` | View one's own leave requests | `employee`, `unit_head` |
+| `elm.leave_request.view` | View leave requests routed to one's role | `unit_head` |
+| `elm.leave_request.decide` | Record a Unit Head decision on a routed request | `unit_head` |
+| `elm.leave_request.withdraw` | Withdraw one's own pending request | `employee`, `unit_head` |
+| `elm.leave_request.cancel` | Cancel one's own approved, not-yet-started leave | `employee`, `unit_head` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
