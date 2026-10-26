@@ -38,6 +38,7 @@ type = forbidden
 source_modules =
 # Every module's domain, not just the first one written.
     modules.placement.domain
+    modules.elm.domain
 forbidden_modules =
     django
     rest_framework
@@ -66,3 +67,17 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+
+[importlinter:contract:elm-module-boundaries]
+name = ELM reaches other modules only through their contracts
+type = forbidden
+source_modules = modules.elm
+forbidden_modules =
+    modules.directory.models
+    modules.directory.services
+    modules.directory.api
+    modules.accesscontrol.models
+    modules.placement.models
+    modules.placement.services
+    modules.placement.api
+allow_indirect_imports = true

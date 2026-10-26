@@ -1,3 +1,7 @@
+# ELM Phase 2 working copy
+
+Read [the ELM setup and verification guide](docs/elm-phase2/GUIDE.md) first. This working copy preserves and improves the supplied Phase-1 module. Live IAM and PostgreSQL verification remain required.
+
 # Fusion-Integrated
 
 The non-academic platform. **Placement Cell** first; more modules later.

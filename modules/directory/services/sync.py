@@ -22,8 +22,10 @@ def ensure_users_cached(user_ids: Iterable[int]) -> int:
         return 0
     fresh_since = timezone.now() - timedelta(seconds=settings.DIRECTORY_MAX_AGE_SECONDS)
     # Caching on first sight alone pins a person to the day they were first read.
-    fresh = set(UserRef.objects.filter(user_id__in=ids, synced_at__gte=fresh_since)
-                .values_list("user_id", flat=True))
+    # Zero TTL explicitly disables reuse, even on clocks with coarse timestamp resolution.
+    fresh = (set(UserRef.objects.filter(user_id__in=ids, synced_at__gte=fresh_since)
+                 .values_list("user_id", flat=True))
+             if settings.DIRECTORY_MAX_AGE_SECONDS > 0 else set())
     stale = ids - fresh
     if not stale:
         return 0
