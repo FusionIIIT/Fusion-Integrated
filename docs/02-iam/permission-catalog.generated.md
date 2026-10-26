@@ -13,6 +13,24 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.application.view_self` | View own leave applications | `faculty`, `staff`, `student` |
+| `elm.application.create` | Apply for leave | `faculty`, `staff`, `student` |
+| `elm.application.withdraw` | Withdraw own pending leave application | `faculty`, `staff`, `student` |
+| `elm.application.view` | View employee leave applications | `Dean Academic`, `admin`, `unit_head` |
+| `elm.application.recommend` | Recommend leave applications | `admin`, `unit_head` |
+| `elm.application.approve` | Approve or reject leave applications | `Dean Academic`, `admin`, `unit_head` |
+| `elm.balance.view_self` | View own leave balances | `Dean Academic`, `admin`, `faculty`, `staff`, `student`, `unit_head` |
+| `elm.balance.manage` | Manage employee leave balances | `admin` |
+| `elm.policy.manage` | Manage leave types and policies | `admin` |
+| `elm.calendar.manage` | Manage leave calendar | `admin` |
+| `elm.substitute.respond` | Accept or decline substitute requests | `faculty`, `staff` |
+| `elm.leave.record_offline` | Record offline-sanctioned leave | `admin` |
+| `elm.leave.process_year_end` | Process year-end leave carry-forward | `admin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

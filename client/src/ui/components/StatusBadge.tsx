@@ -6,6 +6,7 @@ const COLORS: Record<string, string> = {
   shortlisted: "violet", offer_issued: "orange", offer_accepted: "green",
   offer_declined: "gray", rejected: "red", withdrawn: "gray",
   published: "green", closed: "gray", cancelled: "red", active: "green",
+  pending: "yellow", recommended: "blue", approved: "green",
 };
 
 export function StatusBadge({ status }: { status: string }) {
