@@ -63,6 +63,73 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/leave/applications:
+    get:
+      operationId: v1_leave_applications_retrieve
+      description: View to list leave applications - protected by leave_elm.application.view.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/leave/apply:
+    post:
+      operationId: v1_leave_apply_create
+      description: View to submit leave application - protected by leave_elm.application.apply.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveApplication'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveApplication'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveApplication'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/leave/approve:
+    post:
+      operationId: v1_leave_approve_create
+      description: View to approve/reject leave application - protected by leave_elm.application.approve.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveApplication'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveApplication'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveApplication'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -2637,6 +2704,18 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - status
     LiftSanction:
       type: object
       properties:
