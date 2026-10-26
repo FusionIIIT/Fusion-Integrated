@@ -12,16 +12,21 @@ from enum import StrEnum
 
 
 class LeaveStatus(StrEnum):
-    SUBMITTED = "submitted"      # routed; awaiting substitute consent or decision
-    APPROVED = "approved"        # final, balance deducted
-    REJECTED = "rejected"        # final
-    WITHDRAWN = "withdrawn"      # applicant pulled it before a final decision
-    CANCELLED = "cancelled"      # approved leave reversed before it began
+    SUBMITTED = "submitted"                    # awaiting substitute consent or decision
+    FORWARDED = "forwarded"                    # recommended by Unit Head; awaiting sanction
+    APPROVED = "approved"                      # final, balance deducted
+    REJECTED = "rejected"                      # final
+    WITHDRAWN = "withdrawn"                    # applicant pulled it before a final decision
+    CANCELLATION_REQUESTED = "cancel_req"      # cancellation requested before start
+    CANCELLED = "cancelled"                    # approved leave reversed and balance restored
+    RESUMPTION_REQUESTED = "res_req"           # employee returned and submitted resumption
+    RESUMED = "resumed"                        # resumption reviewed and synchronized
 
     @property
     def is_final(self) -> bool:
         return self in (LeaveStatus.APPROVED, LeaveStatus.REJECTED,
-                        LeaveStatus.WITHDRAWN, LeaveStatus.CANCELLED)
+                        LeaveStatus.WITHDRAWN, LeaveStatus.CANCELLED,
+                        LeaveStatus.RESUMED)
 
 
 class SubstituteStatus(StrEnum):
@@ -39,19 +44,42 @@ class Transition:
 
 
 TRANSITIONS: tuple[Transition, ...] = (
+    # Creation
     Transition(None, LeaveStatus.SUBMITTED,
                permission="elm.application.create"),
+    # Direct decision (CL/RH at Unit Head, or Director self-sanction)
     Transition(LeaveStatus.SUBMITTED, LeaveStatus.APPROVED,
                permission="elm.application.decide"),
     Transition(LeaveStatus.SUBMITTED, LeaveStatus.REJECTED,
                permission="elm.application.decide"),
+    # Unit Head recommendation for higher-sanction categories (SCL, EL, COL, VL)
+    Transition(LeaveStatus.SUBMITTED, LeaveStatus.FORWARDED,
+               permission="elm.application.recommend"),
+    # Higher sanction decision
+    Transition(LeaveStatus.FORWARDED, LeaveStatus.APPROVED,
+               permission="elm.application.decide"),
+    Transition(LeaveStatus.FORWARDED, LeaveStatus.REJECTED,
+               permission="elm.application.decide"),
+    # Immediate withdrawal at any point before final approval
     Transition(LeaveStatus.SUBMITTED, LeaveStatus.WITHDRAWN,
                permission="elm.application.withdraw"),
-    Transition(LeaveStatus.APPROVED, LeaveStatus.CANCELLED,
+    Transition(LeaveStatus.FORWARDED, LeaveStatus.WITHDRAWN,
+               permission="elm.application.withdraw"),
+    # Pre-start cancellation workflow
+    Transition(LeaveStatus.APPROVED, LeaveStatus.CANCELLATION_REQUESTED,
                permission="elm.application.cancel"),
+    Transition(LeaveStatus.CANCELLATION_REQUESTED, LeaveStatus.CANCELLED,
+               permission="elm.application.decide"),
+    Transition(LeaveStatus.CANCELLATION_REQUESTED, LeaveStatus.APPROVED,
+               permission="elm.application.decide"),
+    # Resumption workflow
+    Transition(LeaveStatus.APPROVED, LeaveStatus.RESUMPTION_REQUESTED,
+               permission="elm.application.resume"),
+    Transition(LeaveStatus.RESUMPTION_REQUESTED, LeaveStatus.RESUMED,
+               permission="elm.application.decide"),
 )
 
-TERMINAL = {LeaveStatus.REJECTED, LeaveStatus.WITHDRAWN, LeaveStatus.CANCELLED}
+TERMINAL = {LeaveStatus.REJECTED, LeaveStatus.WITHDRAWN, LeaveStatus.CANCELLED, LeaveStatus.RESUMED}
 
 
 def transition_for(frm: LeaveStatus | None, to: LeaveStatus) -> Transition:

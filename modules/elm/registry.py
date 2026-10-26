@@ -30,15 +30,16 @@ PERMISSIONS = [
     ("elm.application.create", "Apply for leave"),
     ("elm.application.withdraw", "Withdraw a pending leave request"),
     ("elm.application.cancel", "Cancel an approved leave before it begins"),
+    ("elm.application.resume", "Report return to duty after approved leave"),
     ("elm.application.view", "View leave applications within scope"),
+    ("elm.application.recommend", "Recommend or not recommend higher-sanction leave"),
     ("elm.application.decide", "Approve or reject a leave request"),
     ("elm.substitute.respond", "Accept or decline a substitute nomination"),
     ("elm.balance.view_self", "View one's own leave balances"),
     ("elm.admin.manage", "Maintain leave policy and holiday calendar"),
+    ("elm.admin.offline", "Record authorized offline-sanctioned leave"),
 ]
 
-#: Performed by a service or scheduled task, so no designation holds them.
-#: (Year-end processing is deferred in this pilot, so nothing is listed yet.)
 SYSTEM_PERMISSIONS = []
 
 _EMPLOYEE = [
@@ -46,11 +47,18 @@ _EMPLOYEE = [
     "elm.application.create",
     "elm.application.withdraw",
     "elm.application.cancel",
+    "elm.application.resume",
     "elm.balance.view_self",
     "elm.substitute.respond",
 ]
 
-_AUTHORITY = [
+_UNIT_HEAD = [
+    "elm.application.view",
+    "elm.application.recommend",
+    "elm.application.decide",
+]
+
+_SANCTIONING = [
     "elm.application.view",
     "elm.application.decide",
 ]
@@ -58,24 +66,21 @@ _AUTHORITY = [
 _ADMIN = [
     "elm.application.view",
     "elm.admin.manage",
+    "elm.admin.offline",
 ]
 
-#: Keyed by the designation name as it exists in globals_designation. The basic
-#: roles faculty/staff hold the self-service surface; heads and officers hold the
-#: decision surface. `student` is a pilot convenience so the seeded demo account
-#: can exercise the module — the baseline limits ELM to faculty and staff.
 ROLE_GRANTS = {
     "faculty": _EMPLOYEE,
     "staff": _EMPLOYEE,
     "student": _EMPLOYEE,
-    "HOD (CSE)": _AUTHORITY,
-    "HOD (ECE)": _AUTHORITY,
-    "HOD (ME)": _AUTHORITY,
-    "HOD (NS)": _AUTHORITY,
-    "HOD (Design)": _AUTHORITY,
-    "HOD (Liberal Arts)": _AUTHORITY,
-    "Dean Academic": [*_AUTHORITY, *_ADMIN],
-    "Deputy Registrar": [*_AUTHORITY, *_ADMIN],
-    "Registrar": [*_AUTHORITY, *_ADMIN],
-    "Director": _AUTHORITY,
+    "HOD (CSE)": [*_EMPLOYEE, *_UNIT_HEAD],
+    "HOD (ECE)": [*_EMPLOYEE, *_UNIT_HEAD],
+    "HOD (ME)": [*_EMPLOYEE, *_UNIT_HEAD],
+    "HOD (NS)": [*_EMPLOYEE, *_UNIT_HEAD],
+    "HOD (Design)": [*_EMPLOYEE, *_UNIT_HEAD],
+    "HOD (Liberal Arts)": [*_EMPLOYEE, *_UNIT_HEAD],
+    "Dean Academic": [*_EMPLOYEE, *_SANCTIONING, *_ADMIN],
+    "Deputy Registrar": [*_EMPLOYEE, *_SANCTIONING, *_ADMIN],
+    "Registrar": [*_EMPLOYEE, *_SANCTIONING, *_ADMIN],
+    "Director": [*_EMPLOYEE, *_SANCTIONING],
 }

@@ -122,7 +122,7 @@ TEMPLATES = [
 # One database, owned by this service; person data comes from modules.directory.
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": env("DB_ENGINE", "django.db.backends.postgresql"),
         "NAME": env("DB_NAME", "fusion_integrated"),
         "USER": env("DB_USER", "fusion_admin"),
         "PASSWORD": env("DB_PASSWORD", ""),

@@ -48,10 +48,27 @@ class HolidayCalendar(models.Model):
         return f"{self.date} {self.kind}"
 
 
+class VacationCalendar(models.Model):
+    """Academic calendar vacation periods for faculty VL (EXT-01, BR-EL-006)."""
+
+    name = models.CharField(max_length=120)
+    start_date = models.DateField(db_index=True)
+    end_date = models.DateField(db_index=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "elm_vacation_calendar"
+        ordering = ["start_date"]
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.start_date} to {self.end_date})"
+
+
 class LeaveApplication(TimeStampedModel):
     """One employee's leave request, from submission to a final decision."""
 
     user_id = models.IntegerField(db_index=True)
+    department = models.CharField(max_length=64, blank=True, default="", db_index=True)
     category = models.CharField(max_length=8, choices=CATEGORY_CHOICES)
     start_date = models.DateField()
     end_date = models.DateField()
@@ -67,14 +84,29 @@ class LeaveApplication(TimeStampedModel):
                                          choices=SUBSTITUTE_CHOICES,
                                          default=SubstituteStatus.NONE.value)
 
-    status = models.CharField(max_length=12, choices=STATUS_CHOICES,
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES,
                               default=LeaveStatus.SUBMITTED.value)
     chargeable_days = models.DecimalField(max_digits=6, decimal_places=1,
                                           default=Decimal("0"))
 
+    # Unit Head recommendation (for SCL, EL, COL, VL higher sanction)
+    recommended_by_user_id = models.IntegerField(null=True, blank=True)
+    recommended_at = models.DateTimeField(null=True, blank=True)
+    recommendation = models.CharField(max_length=20, blank=True, default="")
+    recommendation_note = models.TextField(max_length=2000, blank=True, default="")
+
+    # Sanctioning Authority final decision
     decided_by_user_id = models.IntegerField(null=True, blank=True)
     decided_at = models.DateTimeField(null=True, blank=True)
     decision_note = models.TextField(max_length=2000, blank=True)
+
+    # Resumption of Duty (EL-UC-010, BR-EL-027, BR-EL-028)
+    actual_resumption_date = models.DateField(null=True, blank=True)
+    resumption_note = models.TextField(max_length=2000, blank=True, default="")
+
+    # Retrospective offline sanction synchronization (EL-UC-016, BR-EL-029)
+    is_offline_record = models.BooleanField(default=False)
+    offline_sanction_reference = models.CharField(max_length=200, blank=True, default="")
 
     class Meta:
         db_table = "elm_application"
@@ -84,6 +116,8 @@ class LeaveApplication(TimeStampedModel):
                          name="elm_app_user_recent_idx"),
             models.Index(fields=["status", "start_date"],
                          name="elm_app_status_date_idx"),
+            models.Index(fields=["department", "status"],
+                         name="elm_app_dept_status_idx"),
         ]
         constraints = [
             models.CheckConstraint(condition=Q(category__in=_CATEGORY_VALUES),
@@ -114,7 +148,7 @@ class LeaveBalance(models.Model):
             models.UniqueConstraint(fields=["user_id", "year", "category"],
                                     name="elm_balance_unique"),
             models.CheckConstraint(condition=Q(category__in=_CATEGORY_VALUES),
-                                   name="elm_balance_category_valid"),
+                                    name="elm_balance_category_valid"),
         ]
 
     def __str__(self) -> str:
@@ -132,18 +166,22 @@ class LeaveTransaction(models.Model):
     APPROVED = "approved"
     CANCELLED = "cancelled"
     CONVERSION = "conversion"
+    RESUMPTION = "resumption"
+    OFFLINE = "offline"
     REASON_CHOICES = [
         (OPENING, "Opening entitlement"),
         (APPROVED, "Approved leave"),
         (CANCELLED, "Cancelled leave restored"),
         (CONVERSION, "Year-end conversion"),
+        (RESUMPTION, "Resumption adjustment"),
+        (OFFLINE, "Offline sanctioned leave"),
     ]
 
     user_id = models.IntegerField(db_index=True)
     year = models.IntegerField(db_index=True)
     category = models.CharField(max_length=8, choices=CATEGORY_CHOICES)
     amount = models.DecimalField(max_digits=7, decimal_places=1)
-    reason = models.CharField(max_length=12, choices=REASON_CHOICES)
+    reason = models.CharField(max_length=16, choices=REASON_CHOICES)
     application_id = models.IntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 

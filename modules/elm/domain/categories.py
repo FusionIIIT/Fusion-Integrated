@@ -85,6 +85,19 @@ def supports_half_day(category: LeaveCategory) -> bool:
     return category in _HALF_DAY_CAPABLE
 
 
+#: Categories requiring higher sanction (Unit Head recommends; Dean/Registrar/Director sanctions)
+_HIGHER_SANCTION = {
+    LeaveCategory.SCL,
+    LeaveCategory.EL,
+    LeaveCategory.COL,
+    LeaveCategory.VL,
+}
+
+
+def requires_higher_sanction(category: LeaveCategory) -> bool:
+    return category in _HIGHER_SANCTION
+
+
 def count_days(category: LeaveCategory, start: date, end: date, *,
                half: str = "full", holidays: frozenset[date] = frozenset(),
                weekend_days: tuple[int, ...] = DEFAULT_WEEKEND_DAYS) -> Decimal:
@@ -93,21 +106,23 @@ def count_days(category: LeaveCategory, start: date, end: date, *,
     - Continuous categories (EL/COL/VL) charge every calendar day, weekends and
       holidays included.
     - CL/SCL/RH skip weekends and closed holidays.
-    - A half-day CL charges 0.5, regardless of which half.
+    - A half-day CL charges 0.5, must be on a single date, regardless of which half.
     """
     if end < start:
         raise ValueError("end date precedes start date")
 
-    if half != "full" and not supports_half_day(category):
-        raise ValueError(f"{category.label} does not support half-day requests")
+    if half != "full":
+        if not supports_half_day(category):
+            raise ValueError(f"{category.label} does not support half-day requests")
+        if start != end:
+            raise ValueError("Half-day leave must be for a single date")
+        return Decimal("0.5")
 
     if is_continuous(category):
         days = (end - start).days + 1
     else:
         days = _working_days(start, end, holidays, weekend_days)
 
-    if half != "full":
-        return Decimal("0.5")
     return Decimal(days)
 
 
