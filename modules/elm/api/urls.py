@@ -1,8 +1,17 @@
-from django.urls import path, include
-from .views import LeavePolicyViewSet, HolidayCalendarViewSet
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
 
+from .views import (
+    HolidayCalendarViewSet,
+    LeaveApplicationViewSet,
+    LeavePolicyViewSet,
+)
+
+router = DefaultRouter()
+router.register(r"policies", LeavePolicyViewSet, basename="elm-policies")
+router.register(r"holidays", HolidayCalendarViewSet, basename="elm-holidays")
+router.register(r"leave-applications", LeaveApplicationViewSet, basename="elm-leave-applications")
 
 urlpatterns = [
-    path("policies/", LeavePolicyViewSet.as_view(), name="policies"),
-    path("holidays/", HolidayCalendarViewSet.as_view(), name="holidays"),
+    path("", include(router.urls)),
 ]
