@@ -13,6 +13,23 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.application.view_self` | View one's own leave applications | `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `faculty`, `staff`, `student` |
+| `elm.application.create` | Apply for leave | `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `faculty`, `staff`, `student` |
+| `elm.application.withdraw` | Withdraw a pending leave request | `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `faculty`, `staff`, `student` |
+| `elm.application.cancel` | Cancel an approved leave before it begins | `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `faculty`, `staff`, `student` |
+| `elm.application.resume` | Report return to duty after approved leave | `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `faculty`, `staff`, `student` |
+| `elm.application.view` | View leave applications within scope | `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar` |
+| `elm.application.recommend` | Recommend or not recommend higher-sanction leave | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)` |
+| `elm.application.decide` | Approve or reject a leave request | `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar` |
+| `elm.substitute.respond` | Accept or decline a substitute nomination | `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `faculty`, `staff`, `student` |
+| `elm.balance.view_self` | View one's own leave balances | `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `faculty`, `staff`, `student` |
+| `elm.admin.manage` | Maintain leave policy and holiday calendar | `Dean Academic`, `Deputy Registrar`, `Registrar` |
+| `elm.admin.offline` | Record authorized offline-sanctioned leave | `Dean Academic`, `Deputy Registrar`, `Registrar` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
