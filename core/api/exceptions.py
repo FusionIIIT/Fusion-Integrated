@@ -40,6 +40,14 @@ class BadRequestError(DomainError):
     message = "The request could not be understood."
 
 
+class ValidationError(DomainError):
+    """A well-formed request that violates a business rule."""
+
+    code = "validation_error"
+    status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+    message = "The submitted data was not valid."
+
+
 class NotFoundError(DomainError):
     code = "not_found"
     status_code = status.HTTP_404_NOT_FOUND
