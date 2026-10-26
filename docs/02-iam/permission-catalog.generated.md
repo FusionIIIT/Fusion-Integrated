@@ -13,6 +13,23 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.leave.view_self` | View own leave balances and history | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `ELM Administrator`, `Employee`, `Establishment`, `Faculty`, `Registrar`, `Staff`, `Unit Head` |
+| `elm.leave.apply` | Apply for leave and related actions | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Employee`, `Establishment`, `Faculty`, `Registrar`, `Staff`, `Unit Head` |
+| `elm.leave.withdraw` | Withdraw a pending leave request | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Employee`, `Establishment`, `Faculty`, `Registrar`, `Staff`, `Unit Head` |
+| `elm.leave.substitute_respond` | Respond to substitute requests | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Employee`, `Establishment`, `Faculty`, `Registrar`, `Staff`, `Unit Head` |
+| `elm.leave.review` | Review leave requests as Unit Head | `Unit Head` |
+| `elm.leave.process` | Process and route higher-sanction requests | `Deputy Registrar (Estt.)`, `Establishment` |
+| `elm.leave.sanction` | Make final leave sanction decisions | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar` |
+| `elm.leave.view_all` | View employee leave accounts and requests | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `ELM Administrator`, `Establishment`, `Registrar` |
+| `elm.config.manage` | Maintain leave policy and routing | `ELM Administrator` |
+| `elm.calendar.manage` | Maintain and publish leave calendars | `ELM Administrator` |
+| `elm.record.manage` | Maintain authorized leave records | `ELM Administrator` |
+| `elm.leave.year_end` | Run year-end leave-account processing | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
