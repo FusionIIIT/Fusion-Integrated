@@ -305,7 +305,11 @@ _client: IamClient | None = None
 def get_client() -> IamClient:
     global _client                                             # noqa: PLW0603
     if _client is None:
-        _client = IamClient()
+        if getattr(settings, "DEV_MOCK_IAM", False):
+            from fusion_auth.mock import DevMockIamClient
+            _client = DevMockIamClient()
+        else:
+            _client = IamClient()
     return _client
 
 
