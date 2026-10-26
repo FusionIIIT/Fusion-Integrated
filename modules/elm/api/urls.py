@@ -1,43 +1,32 @@
+"""URL routes for ELM's supported API surface."""
+
 from django.urls import path
 
-from modules.elm.api import views as elm_views
+from modules.elm.api import views
 
 urlpatterns = [
-    # Leave applications
-    path("applications", elm_views.LeaveApplicationListView.as_view(),
-         name="elm-application-list"),
-    path("applications/apply", elm_views.LeaveApplicationCreateView.as_view(),
-         name="elm-apply"),
-    path("applications/<int:pk>/transition",
-         elm_views.LeaveApplicationTransitionView.as_view(),
-         name="elm-application-transition"),
-    path("applications/<int:pk>/history",
-         elm_views.LeaveApplicationHistoryView.as_view(),
-         name="elm-application-history"),
-    path("applications/bulk-transition",
-         elm_views.LeaveApplicationBulkTransitionView.as_view(),
-         name="elm-application-bulk-transition"),
-
-    # Leave balance
-    path("balance", elm_views.EmployeeLeaveBalanceListView.as_view(),
-         name="elm-balance"),
-
-    # Leave status/history
-    path("history", elm_views.LeaveHistoryListView.as_view(),
-         name="elm-history"),
-
-    # Substitute nominations
-    path("substitutes", elm_views.SubstituteNominationListView.as_view(),
-         name="elm-substitute-list"),
-    path("substitutes/<int:pk>/accept",
-         elm_views.SubstituteAcceptView.as_view(),
-         name="elm-substitute-accept"),
-
-    # SLA thresholds
-    path("sla", elm_views.SLAStatusView.as_view(),
-         name="elm-sla-status"),
-
-    # Year-end processing
-    path("year-end", elm_views.YearEndProcessingView.as_view(),
-         name="elm-year-end"),
+    path("categories", views.LeaveCategoryListView.as_view(), name="elm-categories"),
+    path("applications", views.LeaveApplicationListView.as_view(), name="elm-applications"),
+    path(
+        "applications/<int:pk>",
+        views.LeaveApplicationDetailView.as_view(),
+        name="elm-application-detail",
+    ),
+    path(
+        "applications/<int:pk>/transition",
+        views.LeaveApplicationTransitionView.as_view(),
+        name="elm-application-transition",
+    ),
+    path(
+        "applications/<int:pk>/withdraw",
+        views.LeaveApplicationWithdrawView.as_view(),
+        name="elm-application-withdraw",
+    ),
+    path(
+        "applications/<int:pk>/history",
+        views.LeaveApplicationHistoryView.as_view(),
+        name="elm-application-history",
+    ),
+    path("balance", views.EmployeeLeaveBalanceListView.as_view(), name="elm-balance"),
+    path("history", views.LeaveHistoryListView.as_view(), name="elm-history"),
 ]

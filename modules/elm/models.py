@@ -4,8 +4,8 @@ from django.db import models
 
 from core.db.mixins import TimeStampedModel, UserScopedModel
 
-
 # -- Leave Category -----------------------------------------------------------
+
 
 class LeaveCategory(models.Model):
     """Predefined leave categories configured for the institute."""
@@ -13,8 +13,7 @@ class LeaveCategory(models.Model):
     code = models.CharField(max_length=16, unique=True)  # e.g. "CL", "EL", "VL", "COL", "RH", "SCL"
     label = models.CharField(max_length=80)
     entitlement_days = models.PositiveSmallIntegerField(
-        help_text="Default annual entitlement per employee",
-        default=0
+        help_text="Default annual entitlement per employee", default=0
     )
     carry_forward = models.BooleanField(
         default=False,
@@ -35,20 +34,20 @@ class LeaveCategory(models.Model):
 
 # -- Employee Leave Balance / Account -----------------------------------------
 
+
 class EmployeeLeaveBalance(TimeStampedModel, UserScopedModel):
     """Each employee's remaining entitlement and deducted balance per leave category."""
 
-    leave_category = models.ForeignKey(LeaveCategory, on_delete=models.CASCADE,
-                                       related_name="balances")
+    leave_category = models.ForeignKey(
+        LeaveCategory, on_delete=models.CASCADE, related_name="balances"
+    )
     # user_id is inherited from UserScopedModel as a plain integer
 
     remaining_days = models.DecimalField(
-        max_digits=5, decimal_places=2,
-        help_text="Days still available (may be fractional)"
+        max_digits=5, decimal_places=2, help_text="Days still available (may be fractional)"
     )
     used_days = models.DecimalField(
-        max_digits=5, decimal_places=2,
-        help_text="Days consumed so far this year"
+        max_digits=5, decimal_places=2, help_text="Days consumed so far this year"
     )
 
     class Meta:
@@ -61,6 +60,7 @@ class EmployeeLeaveBalance(TimeStampedModel, UserScopedModel):
 
 
 # -- Leave Application --------------------------------------------------------
+
 
 class LeaveApplication(TimeStampedModel, UserScopedModel):
     """An employee's request for leave."""
@@ -77,12 +77,15 @@ class LeaveApplication(TimeStampedModel, UserScopedModel):
         ("cancelled", "Cancelled"),
     ]
 
-    leave_category = models.ForeignKey(LeaveCategory, on_delete=models.CASCADE,
-                                       related_name="applications")
+    status = models.CharField(max_length=32, choices=STATUS, default="submitted")
+    leave_category = models.ForeignKey(
+        LeaveCategory, on_delete=models.CASCADE, related_name="applications"
+    )
     requested_start = models.DateField()
     requested_end = models.DateField()
     halftype = models.CharField(
-        max_length=8, blank=True,
+        max_length=8,
+        blank=True,
         help_text="FIRST_HALF or SECOND_HALF — for CL half-day support",
     )
     purpose = models.TextField()
@@ -90,8 +93,13 @@ class LeaveApplication(TimeStampedModel, UserScopedModel):
         default=False,
         help_text="Whether employee will be outside Jabalpur",
     )
+    station_leave_details = models.TextField(
+        blank=True,
+        help_text="Travel/location details required when Station Leave applies",
+    )
     substitute_nominated = models.IntegerField(
-        null=True, blank=True,
+        null=True,
+        blank=True,
         help_text="user_id of nominated substitute, if applicable",
     )
     substitute_accepted = models.BooleanField(
@@ -104,17 +112,21 @@ class LeaveApplication(TimeStampedModel, UserScopedModel):
         ordering = ["-created_at"]
 
     def __str__(self) -> str:
-        return f"app#{self.pk} u{self.user_id} {self.leave_category.code} " \
-               f"{self.requested_start}–{self.requested_end}"
+        return (
+            f"app#{self.pk} u{self.user_id} {self.leave_category.code} "
+            f"{self.requested_start}-{self.requested_end}"
+        )
 
 
 # -- Leave Application Transition (audit trail) -----------------------------
 
+
 class LeaveApplicationTransition(models.Model):
     """Append-only audit of every status change on a leave application."""
 
-    application = models.ForeignKey(LeaveApplication, on_delete=models.CASCADE,
-                                    related_name="transitions")
+    application = models.ForeignKey(
+        LeaveApplication, on_delete=models.CASCADE, related_name="transitions"
+    )
     from_status = models.CharField(max_length=32)
     to_status = models.CharField(max_length=32)
     actor_user_id = models.IntegerField(null=True, blank=True)
@@ -132,11 +144,13 @@ class LeaveApplicationTransition(models.Model):
 
 # -- Substitute (for responsibility coverage) -------------------------------
 
+
 class SubstituteNomination(models.Model):
     """A nominated substitute for responsibility coverage during leave."""
 
-    application = models.ForeignKey(LeaveApplication, on_delete=models.CASCADE,
-                                    related_name="substitute_nominations")
+    application = models.ForeignKey(
+        LeaveApplication, on_delete=models.CASCADE, related_name="substitute_nominations"
+    )
     substitute_user_id = models.IntegerField()
     nominated_by_user_id = models.IntegerField()  # the applicant
     accepted = models.BooleanField(default=False)

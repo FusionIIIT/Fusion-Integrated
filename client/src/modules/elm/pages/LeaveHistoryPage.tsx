@@ -1,37 +1,45 @@
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { LeaveApplication } from "../api/types";
-import { getApprovedLeaveYears } from "../api/selectors";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
+import { errorMessage } from "../../../lib/http";
+import { getApplications } from "../api/api";
+import type { LeaveApplication } from "../api/types";
 
 export const LeaveHistoryPage = () => {
-  const { userId } = useParams();
-  const [years, setYears] = useState<string[]>([]);
+  const [applications, setApplications] = useState<LeaveApplication[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (userId) {
-      const yearsData = getApprovedLeaveYears(userId);
-      setYears(yearsData.map((y: any) => y.year));
-    }
-    setLoading(false);
-  }, [userId]);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+    getApplications()
+      .then(setApplications)
+      .catch((cause: unknown) => setError(errorMessage(cause)))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
-    <div className="leave-history-page">
+    <main className="leave-history-page">
       <h2>Leave History</h2>
-      {years.length === 0 ? (
-        <p>No approved leave found.</p>
+      {error && <p role="alert">{error}</p>}
+      {loading ? <p>Loading history…</p> : applications.length === 0 ? (
+        <p>No leave records found.</p>
       ) : (
-        <ul>
-          {years.map((year) => (
-            <li key={year}>{year} leave records</li>
-          ))}
-        </ul>
+        <table>
+          <thead><tr>
+            <th>Type</th><th>Period</th><th>Status / decision</th><th>Record</th>
+          </tr></thead>
+          <tbody>
+            {applications.map((app) => (
+              <tr key={app.id}>
+                <td>{app.leave_category_code}</td>
+                <td>{app.requested_start} – {app.requested_end}</td>
+                <td>{app.status.replaceAll("_", " ")}</td>
+                <td><Link to={`/elm/print-application/${app.id}`}>View / print</Link></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
-    </div>
+    </main>
   );
 };

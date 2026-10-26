@@ -1,5 +1,19 @@
-"""ELM's public surface."""from __future__ import annotations
+"""Public service contract for Employee Leave Management."""
 
-from collections.abc import Iterable, Sequence
+from modules.elm.services import (
+    approve_leave_application,
+    can_apply_leave,
+    get_leave_category,
+    process_unit_head_review,
+    submit_leave_application,
+    withdraw_leave_application,
+)
 
-from modules.elm.models import LeaveCategory, LeaveApplication, EmployeeLeaveBalance
+__all__ = [
+    "approve_leave_application",
+    "can_apply_leave",
+    "get_leave_category",
+    "process_unit_head_review",
+    "submit_leave_application",
+    "withdraw_leave_application",
+]

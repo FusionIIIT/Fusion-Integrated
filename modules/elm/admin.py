@@ -1,6 +1,12 @@
 from django.contrib import admin
 
-from modules.elm.models import LeaveCategory, EmployeeLeaveBalance, LeaveApplication, LeaveApplicationTransition, SubstituteNomination
+from modules.elm.models import (
+    EmployeeLeaveBalance,
+    LeaveApplication,
+    LeaveApplicationTransition,
+    LeaveCategory,
+    SubstituteNomination,
+)
 
 
 @admin.register(LeaveCategory)
@@ -21,8 +27,13 @@ class EmployeeLeaveBalanceAdmin(admin.ModelAdmin):
 @admin.register(LeaveApplication)
 class LeaveApplicationAdmin(admin.ModelAdmin):
     list_display = [
-        "id", "user_id", "leave_category", "requested_start",
-        "requested_end", "status", "substitute_accepted"
+        "id",
+        "user_id",
+        "leave_category",
+        "requested_start",
+        "requested_end",
+        "status",
+        "substitute_accepted",
     ]
     list_filter = ["status", "leave_category"]
     search_fields = ["user_id", "leave_category__code", "purpose"]

@@ -1,45 +1,44 @@
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { getEmployeeBalance } from "../api/selectors";
+import { useEffect, useState } from "react";
+
+import { errorMessage } from "../../../lib/http";
+import { getEmployeeBalance } from "../api/api";
+import type { EmployeeLeaveBalance } from "../api/types";
 
 export const LeaveBalancePage = () => {
-  const { userId } = useParams();
-  const [balances, setBalances] = useState<any[]>([]);
+  const [balances, setBalances] = useState<EmployeeLeaveBalance[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (userId) {
-      const balanceData = getEmployeeBalance(userId);
-      setBalances(Object.values(balanceData));
-    }
-    setLoading(false);
-  }, [userId]);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+    getEmployeeBalance()
+      .then(setBalances)
+      .catch((cause: unknown) => setError(errorMessage(cause)))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
-    <div className="leave-balance-page">
-      <h2>Leave Balance</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Leave Type</th>
-            <th>Remaining</th>
-            <th>Used</th>
-          </tr>
-        </thead>
-        <tbody>
-          {balances.map((b) => (
-            <tr key={b.leave_category.code}>
-              <td>{b.leave_category.code}: {b.leave_category.label}</td>
-              <td>{b.remaining_days}</td>
-              <td>{b.used_days}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <main className="leave-balance-page">
+      <h2>My Leave Balance</h2>
+      {error && <p role="alert">{error}</p>}
+      {loading ? <p>Loading balances…</p> : (
+        <table>
+          <thead><tr>
+            <th>Leave type</th><th>Entitlement</th><th>Used</th>
+            <th>Remaining</th><th>Carry forward</th>
+          </tr></thead>
+          <tbody>
+            {balances.map((balance) => (
+              <tr key={balance.leave_category_code}>
+                <td>{balance.leave_category_code}: {balance.leave_category_label}</td>
+                <td>{balance.entitlement_days}</td>
+                <td>{balance.used_days}</td>
+                <td>{balance.remaining_days}</td>
+                <td>{balance.carry_forward ? "Yes" : "No"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </main>
   );
 };

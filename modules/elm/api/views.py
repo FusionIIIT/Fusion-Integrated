@@ -1,263 +1,242 @@
-"""ELM API views — HTTP endpoints for the Employee Leave Management module."""from __future__ import annotations
+"""Authenticated HTTP endpoints for the Employee Leave Management module."""
 
-import datetime
-
-from rest_framework import status
-from django.utils import timezone
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework import serializers, status
 from rest_framework.response import Response
-from rest_framework.request import Request
-from django.db.models import F, Q
-from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
 
-from modules.elm.models import (
-    LeaveCategory,
-    EmployeeLeaveBalance,
-    LeaveApplication,
-    LeaveApplicationTransition,
-    SubstituteNomination,
-)
+from core.api.exceptions import NotFoundError, PermissionDeniedError
+from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.elm.contracts import (
-    submit_leave_application,
-    process_unit_head_review,
     approve_leave_application,
+    process_unit_head_review,
+    submit_leave_application,
     withdraw_leave_application,
-    can_apply_leave,
 )
-from modules.elm.services import (
-    get_leave_category,
+from modules.elm.models import LeaveApplicationTransition
+from modules.elm.selectors import (
+    get_application,
+    get_applications,
     get_employee_balance,
-    get_pending_applications,
-    get_approved_leave_years,
-    get_substitute_nominations,
-    get_sla_status,
+    get_leave_categories,
 )
 
+MODULE = HasModuleGrant("elm")
+P_VIEW = "elm.application.view"
+P_CREATE = "elm.application.create"
+P_REVIEW = "elm.application.review"
+P_SANCTION = "elm.application.sanction"
+P_WITHDRAW = "elm.application.withdraw"
 
-# -- Leave Application Endpoints -----------------------------------------------
 
-@api_view(["GET", "POST"])
-def LeaveApplicationListView(request: Request) -> Response:
-    """List or create leave applications."""
-    if request.method == "GET":
-        user_id = request.query_params.get("user_id")
-        if user_id:
-            apps = get_pending_applications(int(user_id))
-        else:
-            # In production, this would be filtered by authenticated user
-            apps = []
-        return Response([{
-            "id": a.id,
-            "status": a.status,
-            "leave_category": a.leave_category.code,
-            "requested_start": a.requested_start,
-            "requested_end": a.requested_end,
-            "purpose": a.purpose,
-        } for a in apps])
-
-    # POST — create a new leave application
-    from django.db import models
-    user_id = request.data.get("user_id")
-    leave_category_code = request.data.get("leave_category_code")
-    requested_start = request.data.get("requested_start")
-    requested_end = request.data.get("requested_end")
-    purpose = request.data.get("purpose", "")
-    halftype = request.data.get("halftype", "")
-    station_leave = request.data.get("station_leave", False)
-
-    # Validate eligibility
-    eligibility = can_apply_leave(user_id, leave_category_code,
-                                  requested_start, requested_end)
-    if not eligibility["allowed"]:
-        return Response({"error": eligibility["reason"]},
-                        status=status.HTTP_400_BAD_REQUEST)
-
-    application = submit_leave_application(
-        user_id=user_id,
-        leave_category_code=leave_category_code,
-        requested_start=requested_start,
-        requested_end=requested_end,
-        purpose=purpose,
-        halftype=halftype,
-        station_leave=station_leave,
+class LeaveApplicationInput(serializers.Serializer):
+    leave_category_code = serializers.CharField(max_length=16)
+    requested_start = serializers.DateField()
+    requested_end = serializers.DateField()
+    purpose = serializers.CharField(max_length=4000, allow_blank=False, trim_whitespace=True)
+    halftype = serializers.ChoiceField(
+        choices=("", "FIRST_HALF", "SECOND_HALF"), required=False, default=""
+    )
+    station_leave = serializers.BooleanField(required=False, default=False)
+    station_leave_details = serializers.CharField(
+        max_length=2000, required=False, allow_blank=True, default=""
     )
 
-    return Response({
-        "id": application.id,
-        "status": application.status,
-        "message": "Leave application submitted successfully",
-    }, status=status.HTTP_201_CREATED)
+    def validate(self, attrs):
+        if attrs["station_leave"] and not attrs["station_leave_details"].strip():
+            raise serializers.ValidationError(
+                {"station_leave_details": "Enter the station-leave destination/details."}
+            )
+        if not attrs["station_leave"]:
+            attrs["station_leave_details"] = ""
+        return attrs
 
 
-@api_view(["POST"])
-def LeaveApplicationApplyView(request: Request) -> Response:
-    """Handle leave application submission (alias for POST /applications)."""
-    return LeaveApplicationListView(request)
+class DecisionInput(serializers.Serializer):
+    outcome = serializers.ChoiceField(choices=("approve", "reject", "recommend", "not_recommend"))
+    reason = serializers.CharField(max_length=300, required=False, allow_blank=True)
 
 
-@api_view(["POST"])
-def LeaveApplicationTransitionView(request: Request, pk: int) -> Response:
-    """Process a status transition on a leave application."""
-    application = get_object_or_404(LeaveApplication, pk=pk)
-    data = request.data
-    recommended = data.get("recommended", None)
-    actor_user_id = data.get("actor_user_id")
-    actor_label = data.get("actor_label", "")
+def _actor(request):
+    return request.principal
 
-    if recommended is not None:
-        # Unit Head review
-        new_app = process_unit_head_review(
-            application, bool(recommended),
-            actor_user_id, actor_label,
+
+def _application_json(app):
+    return {
+        "id": app.pk,
+        "user_id": app.user_id,
+        "leave_category_code": app.leave_category.code,
+        "leave_category_label": app.leave_category.label,
+        "requested_start": app.requested_start.isoformat(),
+        "requested_end": app.requested_end.isoformat(),
+        "purpose": app.purpose,
+        "halftype": app.halftype,
+        "station_leave": app.station_leave,
+        "station_leave_details": app.station_leave_details,
+        "status": app.status,
+        "created_at": app.created_at.isoformat(),
+    }
+
+
+def _own_application(application_id, owner_id):
+    app = get_application(application_id)
+    if app is None or app.user_id != owner_id:
+        raise NotFoundError("Leave application not found.")
+    return app
+
+
+class LeaveCategoryListView(APIView):
+    permission_classes = [MODULE, HasPermission(P_CREATE)]
+
+    def get(self, request):
+        categories = get_leave_categories()
+        return Response(
+            [
+                {
+                    "code": category.code,
+                    "label": category.label,
+                    "entitlement_days": category.entitlement_days,
+                    "carry_forward": category.carry_forward,
+                    "continuous_counting": category.continuous_counting,
+                }
+                for category in categories
+            ]
         )
-    else:
-        # Could be approval/ rejection from higher authority
-        next_role = data.get("next_role", "")
-        new_app = approve_leave_application(
-            application, next_role, actor_user_id, actor_label,
+
+
+class LeaveApplicationListView(APIView):
+    def get_permissions(self):
+        permission = P_CREATE if self.request.method == "POST" else P_VIEW
+        return [MODULE(), HasPermission(permission)()]
+
+    def get(self, request):
+        actor = _actor(request)
+        return Response([_application_json(app) for app in get_applications(actor.user_id)])
+
+    def post(self, request):
+        actor = _actor(request)
+        payload = LeaveApplicationInput(data=request.data)
+        payload.is_valid(raise_exception=True)
+        data = payload.validated_data
+        app = submit_leave_application(
+            user_id=actor.user_id,
+            employee_kind=actor.kind,
+            category_code=data["leave_category_code"],
+            start=data["requested_start"],
+            end=data["requested_end"],
+            purpose=data["purpose"],
+            half_type=data["halftype"],
+            station_leave=data["station_leave"],
+            station_leave_details=data["station_leave_details"],
         )
-
-    return Response({
-        "id": new_app.id,
-        "status": new_app.status,
-    })
+        return Response(_application_json(app), status=status.HTTP_201_CREATED)
 
 
-@api_view(["POST"])
-def LeaveApplicationHistoryView(request: Request, pk: int) -> Response:
-    """Get transition history for a leave application."""
-    application = get_object_or_404(LeaveApplication, pk=pk)
-    transitions = list(application.transitions.all().order_by("-at"))
-    return Response({
-        "application_id": application.id,
-        "transitions": [{
-            "from_status": t.from_status,
-            "to_status": t.to_status,
-            "actor_label": t.actor_label,
-            "at": str(t.at),
-            "reason": t.reason,
-        } for t in transitions],
-    })
+class LeaveApplicationDetailView(APIView):
+    permission_classes = [MODULE, HasPermission(P_VIEW)]
+
+    def get(self, request, pk):
+        return Response(_application_json(_own_application(pk, _actor(request).user_id)))
 
 
-@api_view(["POST"])
-def LeaveApplicationBulkTransitionView(request: Request) -> Response:
-    """Bulk transition of leave applications (e.g., SLA escalation)."""
-    data = request.data
-    application_ids = data.get("application_ids", [])
-    next_status = data.get("next_status")
-    actor_user_id = data.get("actor_user_id")
-    actor_label = data.get("actor_label", "")
+class LeaveApplicationTransitionView(APIView):
+    def get_permissions(self):
+        return [MODULE(), HasPermission(P_REVIEW, P_SANCTION)()]
 
-    results = []
-    for app_id in application_ids:
-        application = get_object_or_404(LeaveApplication, pk=app_id)
-        application.status = next_status
-        application.save(update_fields=["status"])
+    def post(self, request, pk):
+        actor = _actor(request)
+        payload = DecisionInput(data=request.data)
+        payload.is_valid(raise_exception=True)
+        outcome = payload.validated_data["outcome"]
+        reason = payload.validated_data.get("reason", "")
+        app = get_application(pk)
+        if app is None:
+            raise NotFoundError("Leave application not found.")
 
-        LeaveApplicationTransition.objects.create(
-            application=application,
-            from_status=next_status if hasattr(application, 'status') else "",
-            to_status=next_status,
-            actor_user_id=actor_user_id,
-            actor_label=actor_label,
-            reason="Bulk transition via SLA/escalation",
+        if app.leave_category.code in {"CL", "RH"} or outcome in {"recommend", "not_recommend"}:
+            if not actor.has_permission(P_REVIEW):
+                raise PermissionDeniedError()
+            app = process_unit_head_review(pk, outcome, actor.user_id, actor.display_name, reason)
+        else:
+            if not actor.has_permission(P_SANCTION):
+                raise PermissionDeniedError()
+            app = approve_leave_application(pk, outcome, actor.user_id, actor.display_name, reason)
+        return Response(_application_json(app))
+
+
+class LeaveApplicationWithdrawView(APIView):
+    permission_classes = [MODULE, HasPermission(P_WITHDRAW)]
+
+    def post(self, request, pk):
+        app = withdraw_leave_application(pk, _actor(request).user_id)
+        return Response(_application_json(app))
+
+
+class LeaveApplicationHistoryView(APIView):
+    permission_classes = [MODULE, HasPermission(P_VIEW)]
+
+    def get(self, request, pk):
+        app = _own_application(pk, _actor(request).user_id)
+        transitions = LeaveApplicationTransition.objects.filter(application=app).order_by(
+            "at", "pk"
         )
-        results.append({"id": app_id, "status": next_status})
-
-    return Response({"results": results})
-
-
-# -- Leave Balance Endpoints -------------------------------------------------
-
-@api_view(["GET"])
-def EmployeeLeaveBalanceListView(request: Request) -> Response:
-    """Get leave balance for the authenticated user."""
-    user_id = request.query_params.get("user_id")
-    if not user_id:
-        return Response({"error": "user_id required"},
-                        status=status.HTTP_400_BAD_REQUEST)
-
-    balances = get_employee_balance(int(user_id))
-    return Response({
-        "user_id": int(user_id),
-        "balances": {
-            bc: {
-                "remaining_days": b.remaining_days,
-                "used_days": b.used_days,
-                "entitlement_days": b.leave_category.entitlement_days,
-                "carry_forward": b.leave_category.carry_forward,
+        return Response(
+            {
+                "application_id": app.pk,
+                "transitions": [
+                    {
+                        "from_status": row.from_status,
+                        "to_status": row.to_status,
+                        "actor_label": row.actor_label,
+                        "at": row.at.isoformat(),
+                        "reason": row.reason,
+                    }
+                    for row in transitions
+                ],
             }
-            for bc, b in balances.items()
-        }
-    })
+        )
 
 
-# -- Leave History Endpoints -------------------------------------------------
+class EmployeeLeaveBalanceListView(APIView):
+    permission_classes = [MODULE, HasPermission("elm.balance.view")]
 
-@api_view(["GET"])
-def LeaveHistoryListView(request: Request) -> Response:
-    """Get approved leave history for a user."""
-    user_id = request.query_params.get("user_id")
-    if not user_id:
-        return Response({"error": "user_id required"},
-                        status=status.HTTP_400_BAD_REQUEST)
-
-    years = get_approved_leave_years(int(user_id))
-    return Response({
-        "user_id": int(user_id),
-        "approved_years": years,
-    })
-
-
-# -- Substitute Nomination Endpoints -----------------------------------------
-
-@api_view(["GET"])
-def SubstituteNominationListView(request: Request, pk: int) -> Response:
-    """Get pending substitute nominations for an application."""
-    nominations = get_substitute_nominations(pk)
-    return Response({
-        "application_id": pk,
-        "nominations": [{
-            "substitute_user_id": n.substitute_user_id,
-            "accepted": n.accepted,
-        } for n in nominations],
-    })
-
-
-@api_view(["POST"])
-def SubstituteAcceptView(request: Request, pk: int) -> Response:
-    """Accept or decline a substitute nomination."""
-    nomination = get_object_or_404(SubstituteNomination, pk=pk)
-    accepted = request.data.get("accepted", False)
-
-    nomination.accepted = accepted
-    if accepted:
-        nomination.accepted_at = datetime.datetime.now()
-    nomination.save()
-
-    return Response({
-        "substitute_user_id": nomination.substitute_user_id,
-        "accepted": nomination.accepted,
-    })
+    def get(self, request):
+        actor = _actor(request)
+        balances = get_employee_balance(actor.user_id)
+        categories = get_leave_categories()
+        applicable = [
+            category
+            for category in categories
+            if (category.code != "VL" or actor.kind == "faculty")
+            and (category.code != "EL" or actor.kind == "staff")
+        ]
+        return Response(
+            {
+                "user_id": actor.user_id,
+                "balances": {
+                    category.code: {
+                        "leave_category_code": category.code,
+                        "leave_category_label": category.label,
+                        "remaining_days": str(
+                            balances[category.code].remaining_days
+                            if category.code in balances
+                            else category.entitlement_days
+                        ),
+                        "used_days": str(
+                            balances[category.code].used_days if category.code in balances else 0
+                        ),
+                        "entitlement_days": category.entitlement_days,
+                        "carry_forward": category.carry_forward,
+                    }
+                    for category in applicable
+                },
+            }
+        )
 
 
-# -- SLA Status Endpoint ----------------------------------------------------
+class LeaveHistoryListView(APIView):
+    permission_classes = [MODULE, HasPermission("elm.history.view")]
 
-@api_view(["GET"])
-def SLAStatusView(request: Request) -> Response:
-    """Get SLA threshold configuration."""
-    return Response(get_sla_status())
-
-
-# -- Year-End Processing Endpoint -------------------------------------------
-
-@api_view(["POST"])
-def YearEndProcessingView(request: Request) -> Response:
-    """Trigger year-end leave processing (CL/RH/SCL lapse, VL->EL conversion, EL/COL carry-forward)."""
-    # This is a simplified version - real implementation would
-    # iterate over all employees and apply category outcomes
-    return Response({
-        "message": "Year-end processing triggered",
-        "note": "Full implementation applies category outcomes per specifications",
-    })
+    def get(self, request):
+        return Response(
+            [_application_json(app) for app in get_applications(_actor(request).user_id)]
+        )

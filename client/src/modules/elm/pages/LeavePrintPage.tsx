@@ -1,48 +1,47 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { LeaveApplication } from "../api/types";
+
+import { errorMessage } from "../../../lib/http";
+import { getApplication } from "../api/api";
+import type { LeaveApplication } from "../api/types";
 
 export const LeavePrintPage = () => {
   const { applicationId } = useParams();
   const [application, setApplication] = useState<LeaveApplication | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    // In a full implementation, this would fetch the application by ID
-    // For now, simulate with placeholder data
-    setApplication({
-      id: Number(applicationId),
-      user_id: 1,
-      leave_category: { code: "EL", label: "Earned Leave" },
-      requested_start: new Date(),
-      requested_end: new Date(),
-      purpose: "Annual leave",
-      status: "sanctioned",
-      created_at: new Date(),
-    });
-    setLoading(false);
+    if (!applicationId || !/^\d+$/.test(applicationId)) {
+      setError("Invalid application number.");
+      setLoading(false);
+      return;
+    }
+    getApplication(Number(applicationId))
+      .then(setApplication)
+      .catch((cause: unknown) => setError(errorMessage(cause)))
+      .finally(() => setLoading(false));
   }, [applicationId]);
 
-  if (loading) {
-    return <div>Loading application...</div>;
-  }
-
-  if (!application) {
-    return <div>Application not found.</div>;
-  }
+  if (loading) return <p>Loading application…</p>;
+  if (error) return <p role="alert">{error}</p>;
+  if (!application) return <p>Application not found.</p>;
 
   return (
-    <div className="leave-print-page">
-      <h2>Leave Application Print</h2>
-      <div className="application-details">
-        <p><strong>Employee ID:</strong> {application.user_id}</p>
-        <p><strong>Leave Type:</strong> {application.leave_category.code}</p>
-        <p><strong>Purpose:</strong> {application.purpose}</p>
-        <p><strong>Period:</strong> {application.requested_start.toLocaleDateString()}
-          - {application.requested_end.toLocaleDateString()}</p>
-        <p><strong>Status:</strong> {application.status}</p>
-      </div>
-      <button className="btn-print" onClick="window.print()">Print Application</button>
-    </div>
+    <main className="leave-print-page">
+      <h2>Leave Application</h2>
+      <dl>
+        <dt>Application number</dt><dd>{application.id}</dd>
+        <dt>Leave type</dt>
+        <dd>{application.leave_category_code}: {application.leave_category_label}</dd>
+        <dt>Period</dt><dd>{application.requested_start} to {application.requested_end}</dd>
+        <dt>Purpose</dt><dd>{application.purpose}</dd>
+        <dt>Status</dt><dd>{application.status.replaceAll("_", " ")}</dd>
+        {application.station_leave && (
+          <><dt>Station Leave details</dt><dd>{application.station_leave_details}</dd></>
+        )}
+      </dl>
+      <button type="button" onClick={() => window.print()}>Print application</button>
+    </main>
   );
 };
