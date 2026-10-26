@@ -66,8 +66,7 @@ paths:
   /api/v1/leave/admin/:
     post:
       operationId: v1_leave_admin_create
-      description: Stub view declaring administrative balance update and policy management
-        permissions.
+      description: Administrative endpoints for leave balance updates and policy management.
       tags:
       - v1
       security:
@@ -78,25 +77,109 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LeaveActionResponse'
+          description: ''
+  /api/v1/leave/admin/offline/:
+    post:
+      operationId: v1_leave_admin_offline_create
+      description: Record authorized offline-sanctioned leave (BR-EL-029).
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfflineLeaveCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OfflineLeaveCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OfflineLeaveCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
           description: ''
   /api/v1/leave/applications/:
     post:
       operationId: v1_leave_applications_create
-      description: Stub view declaring leave creation and withdrawal permissions.
+      description: Submit a leave application or withdraw (CFR-EL-002, EL-UC-001).
       tags:
       - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveApplicationCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveApplicationCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveApplicationCreate'
+        required: true
       security:
       - iamSession: []
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LeaveActionResponse'
+                $ref: '#/components/schemas/LeaveRequest'
           description: ''
     delete:
       operationId: v1_leave_applications_destroy
-      description: Stub view declaring leave creation and withdrawal permissions.
+      description: Submit a leave application or withdraw (CFR-EL-002, EL-UC-001).
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: integer
+        description: ID of the leave request to withdraw
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/approvals/:
+    get:
+      operationId: v1_leave_approvals_list
+      description: Retrieve pending leave approvals assigned to or authorized for
+        the actor.
+      parameters:
+      - in: query
+        name: status
+        schema:
+          type: string
+        description: Request status
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+    post:
+      operationId: v1_leave_approvals_create
+      description: Retrieve pending leave approvals assigned to or authorized for
+        the actor.
       tags:
       - v1
       security:
@@ -108,10 +191,114 @@ paths:
               schema:
                 $ref: '#/components/schemas/LeaveActionResponse'
           description: ''
-  /api/v1/leave/approvals/:
+  /api/v1/leave/approvals/{id}/resumption/:
     post:
-      operationId: v1_leave_approvals_create
-      description: Stub view declaring leave approval permissions.
+      operationId: v1_leave_approvals_resumption_create
+      description: Review duty resumption records where authorized.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResumptionReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResumptionReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResumptionReview'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResumptionRecord'
+          description: ''
+  /api/v1/leave/approvals/{id}/review/:
+    post:
+      operationId: v1_leave_approvals_review_create
+      description: Record Unit Head recommendation or decision.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveReview'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/approvals/{id}/sanction/:
+    post:
+      operationId: v1_leave_approvals_sanction_create
+      description: Record final sanction decision by Sanctioning Authority.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveSanction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveSanction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveSanction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/balances/:
+    get:
+      operationId: v1_leave_balances_list
+      description: Retrieve leave balances for the authenticated employee.
+      parameters:
+      - in: query
+        name: year
+        schema:
+          type: integer
+        description: Calendar year
       tags:
       - v1
       security:
@@ -121,7 +308,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LeaveActionResponse'
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveBalance'
           description: ''
   /api/v1/leave/health/:
     get:
@@ -137,6 +326,255 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LeaveHealthResponse'
+          description: ''
+  /api/v1/leave/requests/:
+    get:
+      operationId: v1_leave_requests_list
+      description: Retrieve leave request history for the authenticated employee.
+      parameters:
+      - in: query
+        name: status
+        schema:
+          type: string
+        description: Request status
+      - in: query
+        name: year
+        schema:
+          type: integer
+        description: Calendar year
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/:
+    get:
+      operationId: v1_leave_requests_retrieve
+      description: Retrieve details of a single leave application with object-level
+        isolation.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/cancel/:
+    post:
+      operationId: v1_leave_requests_cancel_create
+      description: Request cancellation of approved leave before its start date (CW-EL-02).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveCancel'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveCancel'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveCancel'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/extend/:
+    post:
+      operationId: v1_leave_requests_extend_create
+      description: Request an eligible extension of ongoing leave (CW-EL-03).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveExtend'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveExtend'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveExtend'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/resume/:
+    post:
+      operationId: v1_leave_requests_resume_create
+      description: Submit duty resumption details (CW-EL-04).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveResume'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveResume'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveResume'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResumptionRecord'
+          description: ''
+  /api/v1/leave/requests/{id}/withdraw/:
+    post:
+      operationId: v1_leave_requests_withdraw_create
+      description: Request withdrawal of an eligible pending application (BR-EL-022,
+        EL-UC-007).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveWithdraw'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveWithdraw'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveWithdraw'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/substitute/nominations/:
+    get:
+      operationId: v1_leave_substitute_nominations_list
+      description: Retrieve pending substitute nominations for the authenticated user.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubstituteNomination'
+          description: ''
+  /api/v1/leave/substitute/nominations/{id}/respond/:
+    post:
+      operationId: v1_leave_substitute_nominations_respond_create
+      description: Accept or decline a substitute nomination (BR-EL-014, EL-UC-002).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubstituteNomination'
+          description: ''
+  /api/v1/leave/types/:
+    get:
+      operationId: v1_leave_types_list
+      description: List active leave types and their basic rules.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveType'
           description: ''
   /api/v1/me:
     get:
@@ -2068,6 +2506,9 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BlankEnum:
+      enum:
+      - ''
     BulkOutcome:
       type: object
       properties:
@@ -2120,6 +2561,14 @@ components:
       required:
       - application_ids
       - to_status
+    CadreEnum:
+      enum:
+      - faculty
+      - staff
+      type: string
+      description: |-
+        * `faculty` - Faculty
+        * `staff` - Staff
     Candidate:
       type: object
       description: A person as the ERP portal and the IAM describe them. Read-only
@@ -2498,6 +2947,14 @@ components:
       - fee_reference
       - season
       - user_id
+    HalfDayPeriodEnum:
+      enum:
+      - first_half
+      - second_half
+      type: string
+      description: |-
+        * `first_half` - First Half
+        * `second_half` - Second Half
     IncidentRecorded:
       type: object
       properties:
@@ -2717,8 +3174,113 @@ components:
       properties:
         status:
           type: string
+        message:
+          type: string
+          default: ''
       required:
       - status
+    LeaveApplicationCreate:
+      type: object
+      properties:
+        leave_type_code:
+          type: string
+          maxLength: 10
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        reason:
+          type: string
+        is_half_day:
+          type: boolean
+          default: false
+        half_day_period:
+          type: string
+          default: ''
+          maxLength: 15
+        is_station_leave:
+          type: boolean
+          default: false
+        station_departure_date:
+          type: string
+          format: date
+          nullable: true
+        station_arrival_date:
+          type: string
+          format: date
+          nullable: true
+        station_destination:
+          type: string
+          default: ''
+          maxLength: 150
+        substitute_user_id:
+          type: integer
+          nullable: true
+        address_during_leave:
+          type: string
+          default: ''
+        contact_number:
+          type: string
+          default: ''
+          maxLength: 30
+      required:
+      - end_date
+      - leave_type_code
+      - reason
+      - start_date
+    LeaveBalance:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        credited_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        used_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        available_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        leave_type:
+          allOf:
+          - $ref: '#/components/schemas/LeaveTypeSummary'
+          readOnly: true
+      required:
+      - id
+      - leave_type
+      - year
+    LeaveCancel:
+      type: object
+      properties:
+        reason:
+          type: string
+      required:
+      - reason
+    LeaveExtend:
+      type: object
+      properties:
+        extension_end_date:
+          type: string
+          format: date
+        reason:
+          type: string
+        substitute_user_id:
+          type: integer
+          nullable: true
+      required:
+      - extension_end_date
+      - reason
     LeaveHealthResponse:
       type: object
       properties:
@@ -2729,6 +3291,262 @@ components:
       required:
       - module
       - status
+    LeaveRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        application_number:
+          type: string
+          maxLength: 32
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        cadre:
+          $ref: '#/components/schemas/CadreEnum'
+        department:
+          type: string
+          maxLength: 80
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        is_half_day:
+          type: boolean
+        half_day_period:
+          oneOf:
+          - $ref: '#/components/schemas/HalfDayPeriodEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        requested_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        reason:
+          type: string
+        address_during_leave:
+          type: string
+        contact_number:
+          type: string
+          maxLength: 30
+        is_station_leave:
+          type: boolean
+        station_departure_date:
+          type: string
+          format: date
+          nullable: true
+        station_arrival_date:
+          type: string
+          format: date
+          nullable: true
+        station_destination:
+          type: string
+          maxLength: 150
+        status:
+          type: string
+          maxLength: 50
+        current_handler_role:
+          type: string
+          maxLength: 50
+        unit_head_recommendation:
+          oneOf:
+          - $ref: '#/components/schemas/UnitHeadRecommendationEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        unit_head_remarks:
+          type: string
+        cancellation_reason:
+          type: string
+        cancellation_requested_at:
+          type: string
+          format: date-time
+          nullable: true
+        extension_end_date:
+          type: string
+          format: date
+          nullable: true
+        extension_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          nullable: true
+        extension_reason:
+          type: string
+        actual_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          nullable: true
+        excess_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          nullable: true
+        requires_admin_review:
+          type: boolean
+        reconciliation_status:
+          $ref: '#/components/schemas/ReconciliationStatusEnum'
+        is_offline_record:
+          type: boolean
+        offline_sanction_reference:
+          type: string
+          maxLength: 100
+        offline_sanctioned_by:
+          type: string
+          maxLength: 100
+        offline_sanctioned_date:
+          type: string
+          format: date
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        leave_type:
+          allOf:
+          - $ref: '#/components/schemas/LeaveTypeSummary'
+          readOnly: true
+      required:
+      - application_number
+      - cadre
+      - created_at
+      - end_date
+      - id
+      - leave_type
+      - reason
+      - requested_days
+      - start_date
+      - user_id
+    LeaveResume:
+      type: object
+      properties:
+        actual_resumption_date:
+          type: string
+          format: date
+        remarks:
+          type: string
+          default: ''
+      required:
+      - actual_resumption_date
+    LeaveReview:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/LeaveReviewDecisionEnum'
+        remarks:
+          type: string
+          default: ''
+      required:
+      - decision
+    LeaveReviewDecisionEnum:
+      enum:
+      - approve
+      - reject
+      - recommend
+      - not_recommend
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
+        * `recommend` - recommend
+        * `not_recommend` - not_recommend
+    LeaveSanction:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/LeaveSanctionDecisionEnum'
+        remarks:
+          type: string
+          default: ''
+      required:
+      - decision
+    LeaveSanctionDecisionEnum:
+      enum:
+      - approve
+      - reject
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
+    LeaveType:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        code:
+          type: string
+          maxLength: 10
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        is_continuous_count:
+          type: boolean
+        max_consecutive_days:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+        allows_half_day:
+          type: boolean
+        requires_substitute:
+          type: boolean
+        allows_extension:
+          type: boolean
+        carries_forward:
+          type: boolean
+        lapses_at_year_end:
+          type: boolean
+        requires_medical_certificate:
+          type: boolean
+        is_active:
+          type: boolean
+      required:
+      - code
+      - created_at
+      - id
+      - name
+      - updated_at
+    LeaveTypeSummary:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 10
+        name:
+          type: string
+          maxLength: 100
+        is_continuous_count:
+          type: boolean
+        allows_half_day:
+          type: boolean
+        requires_substitute:
+          type: boolean
+        allows_extension:
+          type: boolean
+        carries_forward:
+          type: boolean
+      required:
+      - code
+      - name
+    LeaveWithdraw:
+      type: object
+      properties:
+        remarks:
+          type: string
+          default: ''
     LiftSanction:
       type: object
       properties:
@@ -2763,6 +3581,16 @@ components:
       description: |-
         * `online` - Online
         * `offline` - Offline
+    NatureEnum:
+      enum:
+      - normal
+      - early
+      - late
+      type: string
+      description: |-
+        * `normal` - Normal
+        * `early` - Early
+        * `late` - Late
     NavGroup:
       type: object
       description: |-
@@ -2956,6 +3784,47 @@ components:
         * `revoked` - Revoked
         * `superseded` - Superseded
         * `expired` - Expired
+    OfflineLeaveCreate:
+      type: object
+      properties:
+        employee_user_id:
+          type: integer
+        leave_type_code:
+          type: string
+          maxLength: 10
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        reason:
+          type: string
+        offline_sanction_reference:
+          type: string
+          maxLength: 100
+        offline_sanctioned_by:
+          type: string
+          maxLength: 100
+        offline_sanctioned_date:
+          type: string
+          format: date
+        is_half_day:
+          type: boolean
+          default: false
+        half_day_period:
+          type: string
+          default: ''
+          maxLength: 15
+      required:
+      - employee_user_id
+      - end_date
+      - leave_type_code
+      - offline_sanction_reference
+      - offline_sanctioned_by
+      - offline_sanctioned_date
+      - reason
+      - start_date
     Ok:
       type: object
       properties:
@@ -3312,6 +4181,16 @@ components:
       - message
       - rule
       - sanction
+    ReconciliationStatusEnum:
+      enum:
+      - none
+      - pending_admin_policy
+      - synchronized
+      type: string
+      description: |-
+        * `none` - None
+        * `pending_admin_policy` - Pending Admin Policy
+        * `synchronized` - Synchronized
     RecordIncident:
       type: object
       properties:
@@ -3558,6 +4437,74 @@ components:
       - message
       - reason
       - route
+    ResumptionRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        request_id:
+          type: integer
+          readOnly: true
+        expected_date:
+          type: string
+          format: date
+        actual_resumption_date:
+          type: string
+          format: date
+        nature:
+          $ref: '#/components/schemas/NatureEnum'
+        difference_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        remarks:
+          type: string
+        reviewed_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+        decision:
+          $ref: '#/components/schemas/ResumptionRecordDecisionEnum'
+      required:
+      - actual_resumption_date
+      - expected_date
+      - id
+      - nature
+      - request_id
+    ResumptionRecordDecisionEnum:
+      enum:
+      - pending
+      - approved
+      - rejected
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `approved` - Approved
+        * `rejected` - Rejected
+    ResumptionReview:
+      type: object
+      properties:
+        decision:
+          allOf:
+          - $ref: '#/components/schemas/ResumptionReviewDecisionEnum'
+          default: approved
+        remarks:
+          type: string
+          default: ''
+    ResumptionReviewDecisionEnum:
+      enum:
+      - approved
+      - rejected
+      type: string
+      description: |-
+        * `approved` - approved
+        * `rejected` - rejected
     RoundOutcome:
       type: object
       properties:
@@ -3790,6 +4737,64 @@ components:
           type: integer
       required:
       - document_id
+    SubstituteNomination:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        substitute_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          $ref: '#/components/schemas/SubstituteNominationStatusEnum'
+        remarks:
+          type: string
+        responded_at:
+          type: string
+          format: date-time
+          nullable: true
+        sequence:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        request:
+          allOf:
+          - $ref: '#/components/schemas/LeaveRequest'
+          readOnly: true
+      required:
+      - id
+      - request
+      - substitute_user_id
+    SubstituteNominationStatusEnum:
+      enum:
+      - pending
+      - accepted
+      - declined
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `accepted` - Accepted
+        * `declined` - Declined
+    SubstituteResponse:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/SubstituteResponseDecisionEnum'
+        remarks:
+          type: string
+          default: ''
+      required:
+      - decision
+    SubstituteResponseDecisionEnum:
+      enum:
+      - accepted
+      - declined
+      type: string
+      description: |-
+        * `accepted` - accepted
+        * `declined` - declined
     TopicEnum:
       enum:
       - drive
@@ -3861,6 +4866,14 @@ components:
       - application_id
       - redacted
       - results
+    UnitHeadRecommendationEnum:
+      enum:
+      - recommended
+      - not_recommended
+      type: string
+      description: |-
+        * `recommended` - Recommended
+        * `not_recommended` - Not Recommended
     UserRef:
       type: object
       properties:

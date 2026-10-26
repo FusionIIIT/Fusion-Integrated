@@ -2,6 +2,7 @@
 
 Implements BR-EL-002 through BR-EL-009.
 """
+
 from __future__ import annotations
 
 from decimal import Decimal
@@ -11,7 +12,7 @@ STANDARD_QUOTAS: dict[str, dict[str, Decimal]] = {
         "CL": Decimal("8.0"),
         "RH": Decimal("2.0"),
         "SCL": Decimal("15.0"),
-        "EL": Decimal("0.0"),     # Faculty receive EL via VL conversion
+        "EL": Decimal("0.0"),  # Faculty receive EL via VL conversion
         "COL": Decimal("20.0"),
         "VL": Decimal("60.0"),
     },
@@ -19,7 +20,7 @@ STANDARD_QUOTAS: dict[str, dict[str, Decimal]] = {
         "CL": Decimal("8.0"),
         "RH": Decimal("2.0"),
         "SCL": Decimal("15.0"),
-        "EL": Decimal("30.0"),    # Non-faculty receive 30 EL directly
+        "EL": Decimal("30.0"),  # Non-faculty receive 30 EL directly
         "COL": Decimal("20.0"),
         "VL": Decimal("0.0"),
     },

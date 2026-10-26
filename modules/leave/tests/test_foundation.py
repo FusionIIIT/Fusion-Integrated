@@ -1,3 +1,4 @@
+import pytest
 from django.apps import apps
 
 from modules.leave.contracts import LeaveSummaryDTO, get_leave_summaries
@@ -10,6 +11,7 @@ def test_leave_app_config_registered():
     assert config.label == "leave"
 
 
+@pytest.mark.django_db
 def test_leave_contract_plural_signature():
     summaries = get_leave_summaries([101, 102])
     assert len(summaries) == 2

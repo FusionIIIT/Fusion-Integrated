@@ -3,6 +3,7 @@
 Implements all 17 Basis Workflows (BW-EL-01..17) and 4 Composite Workflows
 (CW-EL-01..04) from Workflow Specifications v1.6.
 """
+
 from __future__ import annotations
 
 

@@ -2,6 +2,7 @@
 
 Implements BR-EL-010 (half-day CL) and BR-EL-011 (continuous-day counting).
 """
+
 from __future__ import annotations
 
 from datetime import date, timedelta

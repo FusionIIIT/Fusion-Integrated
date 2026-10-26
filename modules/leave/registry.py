@@ -36,7 +36,6 @@ NAV_ITEMS = [
         "required_permission": "leave.request.view_self",
         "sort_order": 30,
     },
-
     # -- Approver / Authority items --
     {
         "code": "leave.approvals",
@@ -54,7 +53,6 @@ NAV_ITEMS = [
         "required_permission": "leave.request.approve",
         "sort_order": 50,
     },
-
     # -- Administrator items --
     {
         "code": "leave.calendar",
