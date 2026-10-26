@@ -34,6 +34,296 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "leave": {
+      "grants": {
+        "Dean Academic": [
+          "leave.application.cancel",
+          "leave.application.create",
+          "leave.application.extend",
+          "leave.application.resume",
+          "leave.application.review",
+          "leave.application.sanction",
+          "leave.application.view_self",
+          "leave.application.withdraw",
+          "leave.calendar.view",
+          "leave.substitute.respond"
+        ],
+        "Dean Faculty": [
+          "leave.application.cancel",
+          "leave.application.create",
+          "leave.application.extend",
+          "leave.application.resume",
+          "leave.application.review",
+          "leave.application.sanction",
+          "leave.application.view_self",
+          "leave.application.withdraw",
+          "leave.calendar.view",
+          "leave.substitute.respond"
+        ],
+        "HOD": [
+          "leave.application.cancel",
+          "leave.application.create",
+          "leave.application.extend",
+          "leave.application.resume",
+          "leave.application.review",
+          "leave.application.view_self",
+          "leave.application.withdraw",
+          "leave.calendar.view",
+          "leave.substitute.respond"
+        ],
+        "academic_calendar": [
+          "leave.calendar.vacation_sync"
+        ],
+        "admin": [
+          "leave.admin.manage",
+          "leave.application.cancel",
+          "leave.application.create",
+          "leave.application.extend",
+          "leave.application.resume",
+          "leave.application.review",
+          "leave.application.sanction",
+          "leave.application.view_self",
+          "leave.application.withdraw",
+          "leave.calendar.manage",
+          "leave.calendar.vacation_sync",
+          "leave.calendar.view",
+          "leave.substitute.respond"
+        ],
+        "dean": [
+          "leave.application.cancel",
+          "leave.application.create",
+          "leave.application.extend",
+          "leave.application.resume",
+          "leave.application.review",
+          "leave.application.sanction",
+          "leave.application.view_self",
+          "leave.application.withdraw",
+          "leave.calendar.view",
+          "leave.substitute.respond"
+        ],
+        "deputy_registrar": [
+          "leave.application.cancel",
+          "leave.application.create",
+          "leave.application.extend",
+          "leave.application.resume",
+          "leave.application.review",
+          "leave.application.view_self",
+          "leave.application.withdraw",
+          "leave.calendar.view",
+          "leave.substitute.respond"
+        ],
+        "director": [
+          "leave.application.cancel",
+          "leave.application.create",
+          "leave.application.extend",
+          "leave.application.resume",
+          "leave.application.review",
+          "leave.application.sanction",
+          "leave.application.view_self",
+          "leave.application.withdraw",
+          "leave.calendar.view",
+          "leave.substitute.respond"
+        ],
+        "faculty": [
+          "leave.application.cancel",
+          "leave.application.create",
+          "leave.application.extend",
+          "leave.application.resume",
+          "leave.application.view_self",
+          "leave.application.withdraw",
+          "leave.calendar.view",
+          "leave.substitute.respond"
+        ],
+        "leave_admin": [
+          "leave.admin.manage",
+          "leave.application.cancel",
+          "leave.application.create",
+          "leave.application.extend",
+          "leave.application.resume",
+          "leave.application.review",
+          "leave.application.sanction",
+          "leave.application.view_self",
+          "leave.application.withdraw",
+          "leave.calendar.manage",
+          "leave.calendar.vacation_sync",
+          "leave.calendar.view",
+          "leave.substitute.respond"
+        ],
+        "registrar": [
+          "leave.application.cancel",
+          "leave.application.create",
+          "leave.application.extend",
+          "leave.application.resume",
+          "leave.application.review",
+          "leave.application.sanction",
+          "leave.application.view_self",
+          "leave.application.withdraw",
+          "leave.calendar.view",
+          "leave.substitute.respond"
+        ],
+        "staff": [
+          "leave.application.cancel",
+          "leave.application.create",
+          "leave.application.extend",
+          "leave.application.resume",
+          "leave.application.view_self",
+          "leave.application.withdraw",
+          "leave.calendar.view",
+          "leave.substitute.respond"
+        ],
+        "unit_head": [
+          "leave.application.cancel",
+          "leave.application.create",
+          "leave.application.extend",
+          "leave.application.resume",
+          "leave.application.review",
+          "leave.application.view_self",
+          "leave.application.withdraw",
+          "leave.calendar.view",
+          "leave.substitute.respond"
+        ]
+      },
+      "module_grants": [
+        "Dean Academic",
+        "Dean Faculty",
+        "HOD",
+        "academic_calendar",
+        "admin",
+        "dean",
+        "deputy_registrar",
+        "director",
+        "faculty",
+        "leave_admin",
+        "registrar",
+        "staff",
+        "unit_head"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "CalendarBlank",
+        "items": [
+          {
+            "code": "leave.apply",
+            "icon": "CalendarPlus",
+            "label": "Apply for Leave",
+            "required_permission": "leave.application.create",
+            "sort_order": 10,
+            "to": "/leave/apply"
+          },
+          {
+            "code": "leave.mine",
+            "icon": "CalendarCheck",
+            "label": "My Leaves",
+            "required_permission": "leave.application.view_self",
+            "sort_order": 20,
+            "to": "/leave/mine"
+          },
+          {
+            "code": "leave.balances",
+            "icon": "Wallet",
+            "label": "Balances & History",
+            "required_permission": "leave.application.view_self",
+            "sort_order": 30,
+            "to": "/leave/balances"
+          },
+          {
+            "code": "leave.substitutes",
+            "icon": "UserSwitch",
+            "label": "Substitute Requests",
+            "required_permission": "leave.substitute.respond",
+            "sort_order": 40,
+            "to": "/leave/substitutes"
+          },
+          {
+            "code": "leave.calendar",
+            "icon": "Calendar",
+            "label": "Holidays & RH",
+            "required_permission": "leave.calendar.view",
+            "sort_order": 50,
+            "to": "/leave/calendar"
+          },
+          {
+            "code": "leave.approvals",
+            "icon": "CheckSquareOffset",
+            "label": "Leave Approvals",
+            "required_permission": "leave.application.review",
+            "sort_order": 60,
+            "to": "/leave/approvals"
+          },
+          {
+            "code": "leave.admin",
+            "icon": "GearSix",
+            "label": "Leave Administration",
+            "required_permission": "leave.admin.manage",
+            "sort_order": 70,
+            "to": "/leave/admin"
+          }
+        ],
+        "label": "Leave Management",
+        "nav_section": "Leave",
+        "sort_order": 15,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "leave.application.create",
+          "label": "Apply for leave"
+        },
+        {
+          "code": "leave.application.view_self",
+          "label": "View own applications and balance history"
+        },
+        {
+          "code": "leave.application.withdraw",
+          "label": "Withdraw own pending application"
+        },
+        {
+          "code": "leave.application.cancel",
+          "label": "Request cancellation of approved leave"
+        },
+        {
+          "code": "leave.application.extend",
+          "label": "Request leave extension"
+        },
+        {
+          "code": "leave.application.resume",
+          "label": "Submit return to duty resumption"
+        },
+        {
+          "code": "leave.substitute.respond",
+          "label": "Accept or decline nominated responsibility"
+        },
+        {
+          "code": "leave.application.review",
+          "label": "Review and recommend leave requests"
+        },
+        {
+          "code": "leave.application.sanction",
+          "label": "Sanction or reject leave requests"
+        },
+        {
+          "code": "leave.calendar.view",
+          "label": "View published holiday and RH calendars"
+        },
+        {
+          "code": "leave.calendar.manage",
+          "label": "Publish and edit holiday and RH calendars"
+        },
+        {
+          "code": "leave.calendar.vacation_sync",
+          "label": "Synchronize vacation periods from Academic Calendar"
+        },
+        {
+          "code": "leave.admin.manage",
+          "label": "Manage leave policies, records, and offline entries"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "leave.sla.process",
+        "leave.year_end.process"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
