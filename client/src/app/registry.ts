@@ -1,4 +1,4 @@
-/** Frontend module registry.
+﻿/** Frontend module registry.
  *
  *  `code` MUST match accesscontrol_module.code on the server. An ungranted
  *  module gets no route at all, so deep-linking it 404s rather than rendering
@@ -16,5 +16,10 @@ export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
     code: "placement_cell",
     basePath: "/placement",
     load: () => import("../modules/placement/routes"),
+  },
+  leave: {
+    code: "leave",
+    basePath: "/leave",
+    load: () => import("../modules/leave/routes"),
   },
 };
