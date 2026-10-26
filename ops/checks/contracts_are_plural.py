@@ -13,6 +13,18 @@ SEQ_HINTS = ("Sequence", "Iterable", "list", "List", "set", "tuple", "Collection
 EXEMPT = {"build_navigation", "active_module_codes", "search"}
 
 
+def _node_to_str(node) -> str:
+    if hasattr(ast, "unparse"):
+        return ast.unparse(node)
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Subscript):
+        return _node_to_str(node.value)
+    if isinstance(node, ast.Attribute):
+        return node.attr
+    return ""
+
+
 def main() -> int:
     bad = []
     for path in sorted(pathlib.Path("modules").glob("*/contracts.py")):
@@ -28,7 +40,7 @@ def main() -> int:
             if not args:
                 continue
             first = args[0]
-            ann = ast.unparse(first.annotation) if first.annotation else ""
+            ann = _node_to_str(first.annotation) if first.annotation else ""
             if not any(h in ann for h in SEQ_HINTS):
                 bad.append(f"{path}:{node.lineno} {node.name}({first.arg}: {ann or '?'})")
 
