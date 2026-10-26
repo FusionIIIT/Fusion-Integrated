@@ -63,6 +63,235 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/elm/approvals/:
+    get:
+      operationId: v1_elm_approvals_list
+      summary: List requests assigned to the active approver role
+      tags:
+      - ELM
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/approvals/{id}/decision/:
+    post:
+      operationId: v1_elm_approvals_decision_create
+      summary: Approve, reject, or forward a leave request
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - ELM
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApproverDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ApproverDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ApproverDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/balances/:
+    get:
+      operationId: v1_elm_balances_list
+      summary: List the authenticated employee's leave balances
+      tags:
+      - ELM
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveBalance'
+          description: ''
+  /api/v1/elm/leaves/:
+    get:
+      operationId: v1_elm_leaves_list
+      summary: List the authenticated employee's leave requests
+      tags:
+      - ELM
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+    post:
+      operationId: v1_elm_leaves_create
+      summary: Submit a leave request
+      tags:
+      - ELM
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/leaves/{id}/substitute/:
+    post:
+      operationId: v1_elm_leaves_substitute_create
+      summary: Nominate a replacement after substitute decline
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - ELM
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubstituteReplacement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubstituteReplacement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubstituteReplacement'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/leaves/{id}/withdraw/:
+    post:
+      operationId: v1_elm_leaves_withdraw_create
+      summary: Withdraw an eligible leave request
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - ELM
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveWithdraw'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveWithdraw'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveWithdraw'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/substitute-queue/:
+    get:
+      operationId: v1_elm_substitute_queue_list
+      summary: List requests assigned to the authenticated substitute
+      tags:
+      - ELM
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/substitute-queue/{id}/decision/:
+    post:
+      operationId: v1_elm_substitute_queue_decision_create
+      summary: Accept or decline a substitute assignment
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - ELM
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubstituteDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubstituteDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubstituteDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1981,6 +2210,19 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    ApproverDecision:
+      type: object
+      properties:
+        approve:
+          type: boolean
+        remarks:
+          type: string
+          default: ''
+        forward_higher:
+          type: boolean
+          default: false
+      required:
+      - approve
     AudienceEnum:
       enum:
       - students
@@ -1993,6 +2235,9 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BlankEnum:
+      enum:
+      - ''
     BulkOutcome:
       type: object
       properties:
@@ -2423,6 +2668,14 @@ components:
       - fee_reference
       - season
       - user_id
+    HalfDaySessionEnum:
+      enum:
+      - FN
+      - AN
+      type: string
+      description: |-
+        * `FN` - Forenoon
+        * `AN` - Afternoon
     IncidentRecorded:
       type: object
       properties:
@@ -2637,6 +2890,294 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveActionLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        actor_user_id:
+          type: string
+          maxLength: 64
+        actor_role:
+          type: string
+          maxLength: 64
+        action:
+          type: string
+          maxLength: 32
+        remarks:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - action
+      - actor_role
+      - actor_user_id
+      - id
+    LeaveBalance:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user_id:
+          type: string
+          readOnly: true
+        leave_type:
+          allOf:
+          - $ref: '#/components/schemas/LeaveTypeEnum'
+          readOnly: true
+        year:
+          type: integer
+          readOnly: true
+        credited:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          readOnly: true
+        availed:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          readOnly: true
+        pending:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          readOnly: true
+        balance:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          readOnly: true
+      required:
+      - availed
+      - balance
+      - credited
+      - id
+      - leave_type
+      - pending
+      - user_id
+      - year
+    LeaveCreate:
+      type: object
+      properties:
+        leave_type:
+          $ref: '#/components/schemas/LeaveTypeEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        duration_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,1})?$
+        reason:
+          type: string
+          maxLength: 1000
+        is_half_day:
+          type: boolean
+          default: false
+        half_day_session:
+          default: ''
+          oneOf:
+          - $ref: '#/components/schemas/HalfDaySessionEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        station_leave:
+          type: boolean
+          default: false
+        station_leave_address:
+          type: string
+          default: ''
+          maxLength: 2000
+        out_of_station_from:
+          type: string
+          format: date
+          nullable: true
+        out_of_station_to:
+          type: string
+          format: date
+          nullable: true
+        substitute_id:
+          oneOf:
+          - type: string
+            default: ''
+            maxLength: 64
+            pattern: ^\d+$
+          - type: string
+            maxLength: 0
+      required:
+      - duration_days
+      - end_date
+      - leave_type
+      - reason
+      - start_date
+    LeaveRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        applicant_user_id:
+          type: string
+          readOnly: true
+        applicant_role:
+          type: string
+          readOnly: true
+        leave_type:
+          allOf:
+          - $ref: '#/components/schemas/LeaveTypeEnum'
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+          readOnly: true
+        end_date:
+          type: string
+          format: date
+          readOnly: true
+        duration_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,1})?$
+          readOnly: true
+        is_half_day:
+          type: boolean
+          readOnly: true
+        half_day_session:
+          type: string
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        station_leave:
+          type: boolean
+          readOnly: true
+        station_leave_address:
+          type: string
+          readOnly: true
+        out_of_station_from:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        out_of_station_to:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        substitute_user_id:
+          type: string
+          readOnly: true
+        substitute_status:
+          allOf:
+          - $ref: '#/components/schemas/SubstituteStatusEnum'
+          readOnly: true
+        substitute_remarks:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/LeaveRequestStatusEnum'
+          readOnly: true
+        current_approver_role:
+          type: string
+          readOnly: true
+        rejection_reason:
+          type: string
+          readOnly: true
+        unit_head_recommendation:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        action_logs:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveActionLog'
+          readOnly: true
+      required:
+      - action_logs
+      - applicant_role
+      - applicant_user_id
+      - created_at
+      - current_approver_role
+      - duration_days
+      - end_date
+      - half_day_session
+      - id
+      - is_half_day
+      - leave_type
+      - out_of_station_from
+      - out_of_station_to
+      - reason
+      - rejection_reason
+      - start_date
+      - station_leave
+      - station_leave_address
+      - status
+      - substitute_remarks
+      - substitute_status
+      - substitute_user_id
+      - unit_head_recommendation
+      - updated_at
+    LeaveRequestStatusEnum:
+      enum:
+      - DRAFT
+      - PENDING_SUBSTITUTE
+      - PENDING_UNIT_HEAD
+      - PENDING_AUTHORITY
+      - APPLICANT_ACTION_REQUIRED
+      - APPROVED
+      - REJECTED
+      - WITHDRAWN
+      - CANCELLED
+      type: string
+      description: |-
+        * `DRAFT` - Draft
+        * `PENDING_SUBSTITUTE` - Pending Substitute Acceptance
+        * `PENDING_UNIT_HEAD` - Pending Unit Head Recommendation
+        * `PENDING_AUTHORITY` - Pending Sanctioning Authority
+        * `APPLICANT_ACTION_REQUIRED` - Applicant Action Required
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
+        * `WITHDRAWN` - Withdrawn by Applicant
+        * `CANCELLED` - Cancelled
+    LeaveTypeEnum:
+      enum:
+      - CL
+      - RH
+      - SCL
+      - EL
+      - COL
+      - VL
+      type: string
+      description: |-
+        * `CL` - Casual Leave
+        * `RH` - Restricted Holiday
+        * `SCL` - Special Casual Leave
+        * `EL` - Earned Leave
+        * `COL` - Commuted Leave
+        * `VL` - Vacation Leave
+    LeaveWithdraw:
+      type: object
+      properties:
+        reason:
+          type: string
+          default: ''
+          maxLength: 1000
     LiftSanction:
       type: object
       properties:
@@ -3698,6 +4239,37 @@ components:
           type: integer
       required:
       - document_id
+    SubstituteDecision:
+      type: object
+      properties:
+        accept:
+          type: boolean
+        remarks:
+          type: string
+          default: ''
+      required:
+      - accept
+    SubstituteReplacement:
+      type: object
+      properties:
+        substitute_id:
+          type: string
+          maxLength: 64
+          pattern: ^\d+$
+      required:
+      - substitute_id
+    SubstituteStatusEnum:
+      enum:
+      - NOT_REQUIRED
+      - PENDING
+      - ACCEPTED
+      - REJECTED
+      type: string
+      description: |-
+        * `NOT_REQUIRED` - Not Required
+        * `PENDING` - Pending Response
+        * `ACCEPTED` - Accepted
+        * `REJECTED` - Declined
     TopicEnum:
       enum:
       - drive
