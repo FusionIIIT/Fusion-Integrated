@@ -1,0 +1,577 @@
+.venv/bin/python manage.py check
+System check identified no issues (0 silenced).
+.venv/bin/python manage.py makemigrations --check --dry-run
+No changes detected
+.venv/bin/ruff check .
+I001 [*] Import block is un-sorted or un-formatted
+  --> modules/elm/api/views.py:1:1
+   |
+ 1 | / from datetime import date
+ 2 | |
+ 3 | | from drf_spectacular.utils import extend_schema
+ 4 | | from rest_framework import status
+ 5 | | from rest_framework.exceptions import NotFound
+ 6 | | from rest_framework.response import Response
+ 7 | | from rest_framework.views import APIView
+ 8 | |
+ 9 | | from core.api.exceptions import BadRequestError
+10 | | from fusion_auth.permissions import HasPermission
+11 | | from modules.directory.models import UserRef
+12 | | from modules.elm import services
+13 | | from modules.elm.api.serializers import (
+14 | |     ApplyInputSerializer, LeaveApplicationSerializer, LeaveBalanceSerializer)
+15 | | from modules.elm.models import LeaveApplication, LeaveApplicationStatus
+   | |_______________________________________________________________________^
+help: Organize imports
+   |
+13 | from modules.elm.api.serializers import (
+   -     ApplyInputSerializer, LeaveApplicationSerializer, LeaveBalanceSerializer)
+14 +     ApplyInputSerializer,
+15 +     LeaveApplicationSerializer,
+16 +     LeaveBalanceSerializer,
+17 + )
+18 | from modules.elm.models import LeaveApplication, LeaveApplicationStatus
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> modules/elm/apps.py:1:1
+  |
+1 | from django.apps import AppConfig
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2 |
+3 | class ElmConfig(AppConfig):
+  |
+help: Organize imports
+  |
+2 |
+3 +
+4 | class ElmConfig(AppConfig):
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> modules/elm/domain.py:1:1
+  |
+1 | from decimal import Decimal
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2 |
+3 | def leave_days(start_date, end_date, half_day):
+  |
+help: Organize imports
+  |
+2 |
+3 +
+4 | def leave_days(start_date, end_date, half_day):
+  |
+
+W293 Blank line contains whitespace
+  --> modules/elm/domain.py:25:1
+   |
+23 |     """
+24 |     Validate if the requested days are within the entitlement.
+25 |     
+   | ^^^^
+26 |     :param requested: The number of days requested as a Decimal.
+27 |     :param entitled: The total entitled days as a Decimal.
+   |
+help: Remove whitespace from blank line
+
+W293 Blank line contains whitespace
+  --> modules/elm/domain.py:37:1
+   |
+35 |     """
+36 |     Validate if the leave date is in the list of published holidays.
+37 |     
+   | ^^^^
+38 |     :param leave_date: The leave date as a datetime.date object.
+39 |     :param published_rh_dates: A set of published holiday dates as datetime.date objects.
+   |
+help: Remove whitespace from blank line
+
+W293 Blank line contains whitespace
+  --> modules/elm/domain.py:48:1
+   |
+46 |     """
+47 |     Validate if the SCL request is within the allowed limits.
+48 |     
+   | ^^^^
+49 |     :param requested: The number of days requested as a Decimal.
+50 |     :param used_this_year: The number of days already used this year as a Decimal.
+   |
+help: Remove whitespace from blank line
+
+W293 Blank line contains whitespace
+  --> modules/elm/domain.py:60:1
+   |
+58 |     """
+59 |     Calculate the amount to lapse at year-end for CL and RH.
+60 |     
+   | ^^^^
+61 |     :param entitled: The total entitled days as a Decimal.
+62 |     :param used: The number of days already used as a Decimal.
+   |
+help: Remove whitespace from blank line
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> modules/elm/models.py:1:1
+  |
+1 | / from django.db import models
+2 | | from decimal import Decimal
+3 | | from modules.directory.models import UserRef
+  | |____________________________________________^
+4 |
+5 |   ANNUAL_ENTITLEMENT = {
+  |
+help: Organize imports
+  |
+1 + from decimal import Decimal
+2 +
+3 | from django.db import models
+  - from decimal import Decimal
+4 +
+5 | from modules.directory.models import UserRef
+  |
+
+F401 [*] `decimal.Decimal` imported but unused
+ --> modules/elm/models.py:2:21
+  |
+1 | from django.db import models
+2 | from decimal import Decimal
+  |                     ^^^^^^^
+3 | from modules.directory.models import UserRef
+  |
+help: Remove unused import: `decimal.Decimal`
+  |
+1 | from django.db import models
+  - from decimal import Decimal
+2 | from modules.directory.models import UserRef
+  |
+
+DJ008 Model does not define `__str__` method
+  --> modules/elm/models.py:16:7
+   |
+14 |     SCL = 'SCL', 'Special Casual Leave'
+15 |
+16 | class LeaveBalance(models.Model):
+   |       ^^^^^^^^^^^^
+17 |     user = models.ForeignKey(UserRef, on_delete=models.PROTECT)
+18 |     year = models.IntegerField()
+   |
+
+DJ008 Model does not define `__str__` method
+  --> modules/elm/models.py:27:7
+   |
+25 |         unique_together = ('user', 'year', 'leave_type')
+26 |
+27 | class RestrictedHoliday(models.Model):
+   |       ^^^^^^^^^^^^^^^^^
+28 |     year = models.IntegerField()
+29 |     date = models.DateField(unique=True)
+   |
+
+DJ008 Model does not define `__str__` method
+  --> modules/elm/models.py:40:7
+   |
+38 |     CANCELLED = 'CANCELLED', 'Cancelled'
+39 |
+40 | class LeaveApplication(models.Model):
+   |       ^^^^^^^^^^^^^^^^
+41 |     user = models.ForeignKey(UserRef, on_delete=models.PROTECT)
+42 |     leave_type = models.CharField(max_length=3, choices=LeaveType.choices)
+   |
+
+DJ008 Model does not define `__str__` method
+  --> modules/elm/models.py:64:7
+   |
+62 |     created_at = models.DateTimeField(auto_now_add=True)
+63 |
+64 | class LeaveTransaction(models.Model):
+   |       ^^^^^^^^^^^^^^^^
+65 |     balance = models.ForeignKey(LeaveBalance, on_delete=models.CASCADE)
+66 |     application = models.ForeignKey(LeaveApplication, on_delete=models.SET_NULL, null=True)
+   |
+
+RUF005 Consider `[*_EMPLOYEE, "elm.leave.approve"]` instead of concatenation
+  --> modules/elm/registry.py:12:13
+   |
+11 | _EMPLOYEE = ["elm.leave.apply", "elm.leave.view"]
+12 | _APPROVER = _EMPLOYEE + ["elm.leave.approve"]
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+13 |
+14 | #: Keyed by the designation name as it exists in globals_designation.
+   |
+help: Replace with `[*_EMPLOYEE, "elm.leave.approve"]`
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> modules/elm/services.py:1:1
+   |
+ 1 | / from decimal import Decimal
+ 2 | |
+ 3 | | from django.db import transaction
+ 4 | | from django.db.models import Sum
+ 5 | |
+ 6 | | from modules.elm.domain import (
+ 7 | |     half_days_overlap, leave_days, validate_balance, validate_rh_date,
+ 8 | |     validate_scl, year_end_lapse)
+ 9 | | from modules.elm.models import (
+10 | |     LeaveApplication, LeaveBalance, LeaveTransaction, RestrictedHoliday)
+11 | |
+12 | | from django.db import transaction, IntegrityError
+13 | | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+14 | | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   | |______________________________________________________________________________________________________________________________^
+15 |
+16 |   def ensure_balances(user, year):
+   |
+help: Organize imports
+   |
+2  |
+   - from django.db import transaction
+3  + from django.db import IntegrityError, transaction
+4  | from django.db.models import Sum
+5  |
+6  | from modules.elm.domain import (
+   -     half_days_overlap, leave_days, validate_balance, validate_rh_date,
+   -     validate_scl, year_end_lapse)
+7  +     half_days_overlap,
+8  +     leave_days,
+9  +     validate_balance,
+10 +     validate_rh_date,
+11 +     validate_scl,
+12 +     year_end_lapse,
+13 + )
+14 | from modules.elm.models import (
+   -     LeaveApplication, LeaveBalance, LeaveTransaction, RestrictedHoliday)
+15 +     ANNUAL_ENTITLEMENT,
+16 +     LeaveApplication,
+17 +     LeaveBalance,
+18 +     LeaveTransaction,
+19 +     RestrictedHoliday,
+20 + )
+21 |
+   - from django.db import transaction, IntegrityError
+   - from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+   - from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+22 |
+   |
+
+F811 [*] Redefinition of unused `transaction` from line 3
+  --> modules/elm/services.py:12:23
+   |
+10 |     LeaveApplication, LeaveBalance, LeaveTransaction, RestrictedHoliday)
+11 |
+12 | from django.db import transaction, IntegrityError
+   |                       ^^^^^^^^^^^ `transaction` redefined here
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+14 | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   |
+  ::: modules/elm/services.py:3:23
+   |
+ 1 | from decimal import Decimal
+ 2 |
+ 3 | from django.db import transaction
+   |                       ----------- previous definition of `transaction` here
+ 4 | from django.db.models import Sum
+   |
+help: Remove definition: `transaction`
+   |
+11 |
+   - from django.db import transaction, IntegrityError
+12 + from django.db import IntegrityError
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+   |
+
+F401 [*] `django.db.IntegrityError` imported but unused
+  --> modules/elm/services.py:12:36
+   |
+10 |     LeaveApplication, LeaveBalance, LeaveTransaction, RestrictedHoliday)
+11 |
+12 | from django.db import transaction, IntegrityError
+   |                                    ^^^^^^^^^^^^^^
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+14 | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   |
+help: Remove unused import: `django.db.IntegrityError`
+   |
+11 |
+   - from django.db import transaction, IntegrityError
+12 + from django.db import transaction
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+   |
+
+F811 [*] Redefinition of unused `LeaveBalance` from line 10
+  --> modules/elm/services.py:13:32
+   |
+ 8 |     validate_scl, year_end_lapse)
+ 9 | from modules.elm.models import (
+10 |     LeaveApplication, LeaveBalance, LeaveTransaction, RestrictedHoliday)
+   |                       ------------ previous definition of `LeaveBalance` here
+11 |
+12 | from django.db import transaction, IntegrityError
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+   |                                ^^^^^^^^^^^^ `LeaveBalance` redefined here
+14 | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   |
+help: Remove definition: `LeaveBalance`
+   |
+12 | from django.db import transaction, IntegrityError
+   - from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+13 + from modules.elm.models import ANNUAL_ENTITLEMENT
+14 | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   |
+
+F811 [*] Redefinition of unused `RestrictedHoliday` from line 10
+  --> modules/elm/services.py:13:46
+   |
+ 8 |     validate_scl, year_end_lapse)
+ 9 | from modules.elm.models import (
+10 |     LeaveApplication, LeaveBalance, LeaveTransaction, RestrictedHoliday)
+   |                                                       ----------------- previous definition of `RestrictedHoliday` here
+11 |
+12 | from django.db import transaction, IntegrityError
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+   |                                              ^^^^^^^^^^^^^^^^^ `RestrictedHoliday` redefined here
+14 | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   |
+help: Remove definition: `RestrictedHoliday`
+   |
+12 | from django.db import transaction, IntegrityError
+   - from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+13 + from modules.elm.models import ANNUAL_ENTITLEMENT
+14 | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   |
+
+F811 [*] Redefinition of unused `LeaveApplication` from line 10
+  --> modules/elm/services.py:13:65
+   |
+ 8 |     validate_scl, year_end_lapse)
+ 9 | from modules.elm.models import (
+10 |     LeaveApplication, LeaveBalance, LeaveTransaction, RestrictedHoliday)
+   |     ---------------- previous definition of `LeaveApplication` here
+11 |
+12 | from django.db import transaction, IntegrityError
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+   |                                                                 ^^^^^^^^^^^^^^^^ `LeaveApplication` redefined here
+14 | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   |
+help: Remove definition: `LeaveApplication`
+   |
+12 | from django.db import transaction, IntegrityError
+   - from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+13 + from modules.elm.models import ANNUAL_ENTITLEMENT
+14 | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   |
+
+F811 [*] Redefinition of unused `LeaveTransaction` from line 10
+  --> modules/elm/services.py:13:83
+   |
+ 8 |     validate_scl, year_end_lapse)
+ 9 | from modules.elm.models import (
+10 |     LeaveApplication, LeaveBalance, LeaveTransaction, RestrictedHoliday)
+   |                                     ---------------- previous definition of `LeaveTransaction` here
+11 |
+12 | from django.db import transaction, IntegrityError
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+   |                                                                                   ^^^^^^^^^^^^^^^^ `LeaveTransaction` redefined here
+14 | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   |
+help: Remove definition: `LeaveTransaction`
+   |
+12 | from django.db import transaction, IntegrityError
+   - from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+13 + from modules.elm.models import ANNUAL_ENTITLEMENT
+14 | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   |
+
+E501 Line too long (118 > 100)
+  --> modules/elm/services.py:13:101
+   |
+12 | from django.db import transaction, IntegrityError
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^
+14 | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   |
+
+F811 [*] Redefinition of unused `leave_days` from line 7
+  --> modules/elm/services.py:14:32
+   |
+12 | from django.db import transaction, IntegrityError
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+14 | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   |                                ^^^^^^^^^^ `leave_days` redefined here
+15 |
+16 | def ensure_balances(user, year):
+   |
+  ::: modules/elm/services.py:7:24
+   |
+ 6 | from modules.elm.domain import (
+ 7 |     half_days_overlap, leave_days, validate_balance, validate_rh_date,
+   |                        ---------- previous definition of `leave_days` here
+ 8 |     validate_scl, year_end_lapse)
+ 9 | from modules.elm.models import (
+   |
+help: Remove definition: `leave_days`
+   |
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+   - from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+14 |
+   |
+
+F811 [*] Redefinition of unused `half_days_overlap` from line 7
+  --> modules/elm/services.py:14:44
+   |
+12 | from django.db import transaction, IntegrityError
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+14 | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   |                                            ^^^^^^^^^^^^^^^^^ `half_days_overlap` redefined here
+15 |
+16 | def ensure_balances(user, year):
+   |
+  ::: modules/elm/services.py:7:5
+   |
+ 6 | from modules.elm.domain import (
+ 7 |     half_days_overlap, leave_days, validate_balance, validate_rh_date,
+   |     ----------------- previous definition of `half_days_overlap` here
+ 8 |     validate_scl, year_end_lapse)
+ 9 | from modules.elm.models import (
+   |
+help: Remove definition: `half_days_overlap`
+   |
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+   - from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+14 |
+   |
+
+F811 [*] Redefinition of unused `validate_balance` from line 7
+  --> modules/elm/services.py:14:63
+   |
+12 | from django.db import transaction, IntegrityError
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+14 | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   |                                                               ^^^^^^^^^^^^^^^^ `validate_balance` redefined here
+15 |
+16 | def ensure_balances(user, year):
+   |
+  ::: modules/elm/services.py:7:36
+   |
+ 6 | from modules.elm.domain import (
+ 7 |     half_days_overlap, leave_days, validate_balance, validate_rh_date,
+   |                                    ---------------- previous definition of `validate_balance` here
+ 8 |     validate_scl, year_end_lapse)
+ 9 | from modules.elm.models import (
+   |
+help: Remove definition: `validate_balance`
+   |
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+   - from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+14 |
+   |
+
+F811 [*] Redefinition of unused `validate_rh_date` from line 7
+  --> modules/elm/services.py:14:81
+   |
+12 | from django.db import transaction, IntegrityError
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+14 | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   |                                                                                 ^^^^^^^^^^^^^^^^ `validate_rh_date` redefined here
+15 |
+16 | def ensure_balances(user, year):
+   |
+  ::: modules/elm/services.py:7:54
+   |
+ 6 | from modules.elm.domain import (
+ 7 |     half_days_overlap, leave_days, validate_balance, validate_rh_date,
+   |                                                      ---------------- previous definition of `validate_rh_date` here
+ 8 |     validate_scl, year_end_lapse)
+ 9 | from modules.elm.models import (
+   |
+help: Remove definition: `validate_rh_date`
+   |
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+   - from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+14 |
+   |
+
+F811 [*] Redefinition of unused `validate_scl` from line 8
+  --> modules/elm/services.py:14:99
+   |
+12 | from django.db import transaction, IntegrityError
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+14 | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   |                                                                                                   ^^^^^^^^^^^^ `validate_scl` redefined here
+15 |
+16 | def ensure_balances(user, year):
+   |
+  ::: modules/elm/services.py:8:5
+   |
+ 6 | from modules.elm.domain import (
+ 7 |     half_days_overlap, leave_days, validate_balance, validate_rh_date,
+ 8 |     validate_scl, year_end_lapse)
+   |     ------------ previous definition of `validate_scl` here
+ 9 | from modules.elm.models import (
+10 |     LeaveApplication, LeaveBalance, LeaveTransaction, RestrictedHoliday)
+   |
+help: Remove definition: `validate_scl`
+   |
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+   - from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+14 |
+   |
+
+E501 Line too long (126 > 100)
+  --> modules/elm/services.py:14:101
+   |
+12 | from django.db import transaction, IntegrityError
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+14 | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+15 |
+16 | def ensure_balances(user, year):
+   |
+
+F811 [*] Redefinition of unused `year_end_lapse` from line 8
+  --> modules/elm/services.py:14:113
+   |
+12 | from django.db import transaction, IntegrityError
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+14 | from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+   |                                                                                                                 ^^^^^^^^^^^^^^ `year_end_lapse` redefined here
+15 |
+16 | def ensure_balances(user, year):
+   |
+  ::: modules/elm/services.py:8:19
+   |
+ 6 | from modules.elm.domain import (
+ 7 |     half_days_overlap, leave_days, validate_balance, validate_rh_date,
+ 8 |     validate_scl, year_end_lapse)
+   |                   -------------- previous definition of `year_end_lapse` here
+ 9 | from modules.elm.models import (
+10 |     LeaveApplication, LeaveBalance, LeaveTransaction, RestrictedHoliday)
+   |
+help: Remove definition: `year_end_lapse`
+   |
+13 | from modules.elm.models import LeaveBalance, RestrictedHoliday, LeaveApplication, LeaveTransaction, ANNUAL_ENTITLEMENT
+   - from modules.elm.domain import leave_days, half_days_overlap, validate_balance, validate_rh_date, validate_scl, year_end_lapse
+14 |
+   |
+
+RUF059 Unpacked variable `created` is never used
+  --> modules/elm/services.py:19:18
+   |
+17 |     balances = []
+18 |     for leave_type in ANNUAL_ENTITLEMENT:
+19 |         balance, created = LeaveBalance.objects.get_or_create(
+   |                  ^^^^^^^
+20 |             user=user,
+21 |             year=year,
+   |
+help: Prefix it with an underscore or any other dummy variable pattern
+
+Found 30 errors.
+[*] 18 fixable with the `--fix` option (6 hidden fixes can be enabled with the `--unsafe-fixes` option).
+make: *** [Makefile:31: check] Error 1
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 55%]
+........................................................................ [ 74%]
+........................................................................ [ 93%]
+...........................                                              [100%]

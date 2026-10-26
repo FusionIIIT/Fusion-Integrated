@@ -13,6 +13,18 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.leave.apply` | Apply for, modify, withdraw and cancel one's own leave | `Dean Academic`, `Deputy Registrar`, `Director`, `Employee`, `Leave Administrator`, `Registrar`, `Unit Head`, `acadadmin` |
+| `elm.leave.view` | View one's own leave, balances and notifications | `Dean Academic`, `Deputy Registrar`, `Director`, `Employee`, `Leave Administrator`, `Registrar`, `Unit Head`, `acadadmin` |
+| `elm.leave.review` | Unit Head: review leave in one's unit and verify resumption | `Unit Head` |
+| `elm.leave.route` | Establishment: route higher-sanction leave to its authority | `Deputy Registrar` |
+| `elm.leave.sanction` | Take the final sanction decision on higher-sanction leave | `Dean Academic`, `Registrar` |
+| `elm.leave.self_sanction` | Director: sanction one's own leave | `Director` |
+| `elm.leave.administer` | Record offline leave, maintain the calendar, run year end | `Leave Administrator`, `acadadmin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

@@ -1,0 +1,51 @@
+.venv/bin/python manage.py check
+System check identified no issues (0 silenced).
+.venv/bin/python manage.py makemigrations --check --dry-run
+No changes detected
+.venv/bin/ruff check .
+All checks passed!
+.venv/bin/lint-imports
+
+╔══╗─────────▶╔╗ ╔╗      ╔╗◀───┐
+╚╣╠╝◀─────┐  ╔╝╚╗║║────▶╔╝╚╗   │
+ ║║   ╔══╦══╦╩╗╔╝║║  ╔╦═╩╗╔╝╔═╦══╗
+ ║║╔══╣╔╗║╔╗║╔╣║ ║║ ╔╬╣╔╗║║ ║│║╔═╝
+╔╣╠╣║║║╚╝║╚╝║║║╚╗║╚═╝║║║║║╚╗║═╣║
+╚══╩╩╩╣╔═╩══╩╝╚═╝╚═══╩╩╝╚╩═╩╩═╩╝
+  └──▶║║                    ▲ 
+      ╚╝────────────────────┘
+
+
+---------
+Contracts
+---------
+
+Analyzed 215 files, 626 dependencies.
+-------------------------------------
+
+Modules may reach each other ONLY through contracts.py KEPT
+domain/ must not import Django, DRF or Celery KEPT
+core/ must not import any module KEPT
+Layering inside placement KEPT
+
+Contracts: 4 kept, 0 broken.
+.venv/bin/python ops/checks/no_cross_module_fk.py
+no cross-module foreign keys
+.venv/bin/python ops/checks/contracts_are_plural.py
+all contract getters are plural
+.venv/bin/python ops/checks/nav_matches_routes.py
+nav items and client routes agree
+.venv/bin/python manage.py permission_manifest --check
+permission manifest matches the registries
+make schema-check
+make[1]: Entering directory '/home/anish/Documents/Fusion/Fusion-Integrated'
+openapi schema matches the code
+make[1]: Leaving directory '/home/anish/Documents/Fusion/Fusion-Integrated'
+.venv/bin/python -m pytest -q
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 55%]
+........................................................................ [ 74%]
+........................................................................ [ 93%]
+...........................                                              [100%]
+exit: 0
