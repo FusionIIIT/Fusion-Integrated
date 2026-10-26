@@ -13,6 +13,23 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave_elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave_elm.application.view_self` | View own leave balances and history | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Employee`, `Leave Administrator`, `Leave Approver`, `Registrar`, `Unit Head` |
+| `leave_elm.application.apply` | Apply for leave | `Director`, `Employee`, `Leave Administrator` |
+| `leave_elm.application.withdraw` | Withdraw pending leave | `Employee`, `Leave Administrator` |
+| `leave_elm.application.cancel` | Request cancellation of approved leave | `Employee`, `Leave Administrator` |
+| `leave_elm.application.extend` | Request extension of ongoing leave | `Employee`, `Leave Administrator` |
+| `leave_elm.application.resume` | Submit resumption of duty | `Employee`, `Leave Administrator` |
+| `leave_elm.workflow.substitute` | Respond to substitute requests | `Leave Administrator` |
+| `leave_elm.workflow.review` | Review assigned leave tasks | `Dean`, `Deputy Registrar (Estt.)`, `Leave Administrator`, `Leave Approver`, `Registrar`, `Unit Head` |
+| `leave_elm.workflow.sanction` | Make final sanctioning decisions | `Dean`, `Director`, `Leave Administrator`, `Registrar` |
+| `leave_elm.configuration.manage` | Maintain leave configuration | `Leave Administrator` |
+| `leave_elm.records.manage` | Maintain authorized leave records | `Leave Administrator` |
+| `leave_elm.year_end.process` | Process leave year end | `Leave Administrator` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

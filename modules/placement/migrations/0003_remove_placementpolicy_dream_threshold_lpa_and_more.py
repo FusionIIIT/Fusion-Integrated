@@ -128,7 +128,7 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'policy categories',
                 'db_table': 'placement_policy_category',
                 'ordering': ['group', 'number'],
-                'constraints': [models.UniqueConstraint(fields=('policy', 'group', 'number'), name='policy_category_unique'), models.CheckConstraint(condition=models.Q(('ctc_min__isnull', True), ('ctc_max__isnull', True), ('ctc_max__gte', models.F('ctc_min')), _connector='OR'), name='policy_category_band_valid')],
+                'constraints': [models.UniqueConstraint(fields=('policy', 'group', 'number'), name='policy_category_unique'), models.CheckConstraint(check=models.Q(('ctc_min__isnull', True), ('ctc_max__isnull', True), ('ctc_max__gte', models.F('ctc_min')), _connector='OR'), name='policy_category_band_valid')],
             },
         ),
     ]

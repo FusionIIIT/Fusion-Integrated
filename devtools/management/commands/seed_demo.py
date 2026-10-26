@@ -39,6 +39,7 @@ class Command(BaseCommand):
         posting, _ = JobPosting.objects.update_or_create(
             company=acme, title="SDE-1", placement_year="2026-27",
             defaults={
+                "description": "Build scalable backend services, work with product teams, and ship reliable APIs for student placement workflows.",
                 "ctc_lpa": "18.00", "seats": 4, "status": "published",
                 "eligibility_rule": {"all": [{"gte": ["cpi", 7.0]},
                                              {"in": ["discipline", ["CSE", "ECE"]]}]},

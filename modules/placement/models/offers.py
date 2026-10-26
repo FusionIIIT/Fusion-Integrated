@@ -96,7 +96,7 @@ class PlacementRecord(TimeStampedModel, UserScopedModel):
             ),
             # Both null on a campus record would make the source field a lie.
             models.CheckConstraint(
-                condition=(
+                check=(
                     Q(source="campus", offer__isnull=False, posting__isnull=False)
                     | Q(source="off_campus", offer__isnull=True,
                         posting__isnull=True)

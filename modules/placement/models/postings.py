@@ -65,18 +65,18 @@ class JobPosting(TimeStampedModel):
         constraints = [
             # PC-BR-002: publishing freezes the rule under applicants.
             models.CheckConstraint(
-                condition=~Q(status="published")
+                check=~Q(status="published")
                 | Q(eligibility_rule_locked_at__isnull=False),
                 name="posting_published_has_locked_rule",
             ),
             # PC-BR-003.
             models.CheckConstraint(
-                condition=~Q(status="published")
+                check=~Q(status="published")
                 | (~Q(description="") & Q(closes_at__isnull=False)),
                 name="posting_published_has_required_content",
             ),
             models.CheckConstraint(
-                condition=Q(closes_at__isnull=True) | Q(opens_at__isnull=True)
+                check=Q(closes_at__isnull=True) | Q(opens_at__isnull=True)
                 | Q(closes_at__gt=models.F("opens_at")),
                 name="posting_window_valid",
             ),
