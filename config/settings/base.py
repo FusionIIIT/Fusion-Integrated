@@ -89,6 +89,7 @@ PLATFORM_MODULES = [
 
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
+    "modules.leave",
     "modules.placement",
 ]
 
