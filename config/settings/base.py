@@ -233,7 +233,9 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
     "ENUM_NAME_OVERRIDES": {
         "ElmLeaveCategoryEnum": "modules.elm.domain.rules.CATEGORIES",
-        "ElmProcessingRoleEnum": ["Unit Head", "Deputy Registrar (Estt.)", "Dean", "Registrar", "Director"],
+        "ElmProcessingRoleEnum": [
+            "Unit Head", "Deputy Registrar (Estt.)", "Dean", "Registrar", "Director"
+        ],
     },
 }
 

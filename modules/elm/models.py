@@ -27,8 +27,13 @@ class HolidayCalendar(TimeStampedModel):
     published = models.BooleanField(default=False)
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=["year"], condition=models.Q(published=True),
-                                                name="elm_one_published_calendar")]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["year"],
+                condition=models.Q(published=True),
+                name="elm_one_published_calendar",
+            )
+        ]
 
 
 class Account(TimeStampedModel):
@@ -44,17 +49,24 @@ class Account(TimeStampedModel):
     year_end_processed = models.BooleanField(default=False)
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=["user_id", "year"], name="elm_account_user_year")]
-        constraints += [models.CheckConstraint(condition=models.Q(**{f"{c.lower()}__gte": 0}),
-                                               name=f"elm_balance_{c.lower()}_nonnegative")
-                        for c in CATEGORIES]
+        constraints = [
+            models.UniqueConstraint(fields=["user_id", "year"], name="elm_account_user_year")
+        ]
+        constraints += [
+            models.CheckConstraint(
+                condition=models.Q(**{f"{c.lower()}__gte": 0}),
+                name=f"elm_balance_{c.lower()}_nonnegative",
+            )
+            for c in CATEGORIES
+        ]
 
 
 class Application(TimeStampedModel):
     user_id = models.PositiveIntegerField()
     kind = models.CharField(max_length=16, default="leave")
-    parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.PROTECT,
-                               related_name="changes")
+    parent = models.ForeignKey(
+        "self", null=True, blank=True, on_delete=models.PROTECT, related_name="changes"
+    )
     category = models.CharField(max_length=3, choices=[(c, c) for c in CATEGORIES])
     start_date = models.DateField()
     end_date = models.DateField()
@@ -76,11 +88,19 @@ class Application(TimeStampedModel):
     resumption_reviewed = models.BooleanField(default=False)
 
     class Meta:
-        indexes = [models.Index(fields=["user_id", "-id"], name="elm_application_owner_idx"),
-                   models.Index(fields=["user_id", "status", "start_date", "effective_end_date"],
-                                name="elm_application_overlap_idx")]
-        constraints = [models.CheckConstraint(condition=models.Q(end_date__gte=models.F("start_date")),
-                                               name="elm_application_valid_dates")]
+        indexes = [
+            models.Index(fields=["user_id", "-id"], name="elm_application_owner_idx"),
+            models.Index(
+                fields=["user_id", "status", "start_date", "effective_end_date"],
+                name="elm_application_overlap_idx",
+            ),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(end_date__gte=models.F("start_date")),
+                name="elm_application_valid_dates",
+            )
+        ]
 
 
 class WorkflowTask(TimeStampedModel):
@@ -96,10 +116,16 @@ class WorkflowTask(TimeStampedModel):
     reassign_on_escalation = models.BooleanField(default=False)
 
     class Meta:
-        indexes = [models.Index(fields=["user_id", "role", "pending", "-id"],
-                                name="elm_task_assignee_idx")]
-        constraints = [models.UniqueConstraint(fields=["application"], condition=models.Q(pending=True),
-                                                name="elm_one_pending_task")]
+        indexes = [
+            models.Index(fields=["user_id", "role", "pending", "-id"], name="elm_task_assignee_idx")
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["application"],
+                condition=models.Q(pending=True),
+                name="elm_one_pending_task",
+            )
+        ]
 
 
 class LedgerEntry(TimeStampedModel):

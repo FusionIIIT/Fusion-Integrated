@@ -1,8 +1,16 @@
 from django.db.models import Prefetch, Q
 
 from modules.elm.models import (
-    Account, Application, AttendanceOutbox, AuditEntry, EmployeeConfiguration,
-    HolidayCalendar, LedgerEntry, Notification, Policy, WorkflowTask,
+    Account,
+    Application,
+    AttendanceOutbox,
+    AuditEntry,
+    EmployeeConfiguration,
+    HolidayCalendar,
+    LedgerEntry,
+    Notification,
+    Policy,
+    WorkflowTask,
 )
 
 
@@ -12,7 +20,11 @@ def applications_for(actor):
     if actor is None:
         return qs.none()
     if not actor.has_permission("elm.record.manage"):
-        own = Q(user_id=actor.user_id) if actor.has_permission("elm.application.self") else Q(pk__in=[])
+        own = (
+            Q(user_id=actor.user_id)
+            if actor.has_permission("elm.application.self")
+            else Q(pk__in=[])
+        )
         assigned = Q(tasks__user_id=actor.user_id, tasks__role=actor.active_role)
         qs = qs.filter(own | assigned).distinct()
     return qs.prefetch_related(
@@ -24,8 +36,11 @@ def applications_for(actor):
 def tasks_for(actor):
     if actor is None:
         return WorkflowTask.objects.none()
-    return WorkflowTask.objects.filter(user_id=actor.user_id, role=actor.active_role,
-                                       pending=True).select_related("application").order_by("-id")
+    return (
+        WorkflowTask.objects.filter(user_id=actor.user_id, role=actor.active_role, pending=True)
+        .select_related("application")
+        .order_by("-id")
+    )
 
 
 def accounts_for(actor):
@@ -35,7 +50,11 @@ def accounts_for(actor):
 def entries_for(actor):
     if actor is None:
         return LedgerEntry.objects.none()
-    return LedgerEntry.objects.filter(account__user_id=actor.user_id).select_related("account").order_by("-id")
+    return (
+        LedgerEntry.objects.filter(account__user_id=actor.user_id)
+        .select_related("account")
+        .order_by("-id")
+    )
 
 
 def notifications_for(actor):
@@ -45,7 +64,9 @@ def notifications_for(actor):
 
 
 def configuration():
-    return {"policy": Policy.objects.first(),
-            "employees": EmployeeConfiguration.objects.order_by("user_id"),
-            "calendars": HolidayCalendar.objects.order_by("-id"),
-            "attendance_outbox": AttendanceOutbox.objects.filter(delivered_at=None).order_by("id")}
+    return {
+        "policy": Policy.objects.first(),
+        "employees": EmployeeConfiguration.objects.order_by("user_id"),
+        "calendars": HolidayCalendar.objects.order_by("-id"),
+        "attendance_outbox": AttendanceOutbox.objects.filter(delivered_at=None).order_by("id"),
+    }

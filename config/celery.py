@@ -3,7 +3,6 @@ import os
 from celery import Celery
 
 from modules.elm.schedule import BEAT_SCHEDULE as ELM_SCHEDULE
-
 from modules.placement.schedule import (
     BEAT_SCHEDULE as PLACEMENT_SCHEDULE,
 )

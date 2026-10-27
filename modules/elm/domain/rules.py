@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import timedelta
 from decimal import Decimal
 
 CATEGORIES = ("CL", "RH", "SCL", "EL", "COL", "VL")
@@ -23,16 +23,22 @@ def count_days(category, start, end, half, calendars, weekdays):
     # BR-EL-003, BR-EL-010, BR-EL-011, BR-EL-031.
     if category not in CATEGORIES:
         raise RuleViolation("invalid_category", "Choose CL, RH, SCL, EL, COL, or VL.")
+    if half not in ("full", "first", "second"):
+        raise RuleViolation("invalid_half", "Choose a full day, first half, or second half.")
     if half != "full" and (category != "CL" or start != end):
         raise RuleViolation("invalid_half", "Only single-date CL supports a half day.")
     result = {}
     for day in dates(start, end):
         calendar = calendars.get(day.year)
         if calendar is None:
-            raise RuleViolation("calendar_missing", f"Publish the holiday/RH calendar for {day.year}.")
+            raise RuleViolation(
+                "calendar_missing", f"Publish the holiday/RH calendar for {day.year}."
+            )
         closed = day.weekday() in weekdays or day.isoformat() in calendar["holidays"]
         if category == "RH" and day.isoformat() not in calendar["restricted_holidays"]:
-            raise RuleViolation("invalid_rh", "Every requested RH date must be a published restricted holiday.")
+            raise RuleViolation(
+                "invalid_rh", "Every requested RH date must be a published restricted holiday."
+            )
         if category in CONTINUOUS or category == "RH" or not closed:
             amount = Decimal("1") if half == "full" else Decimal("0.5")
             result[day.year] = result.get(day.year, Decimal("0")) + amount
@@ -45,15 +51,21 @@ def overlaps(start, end, half, other_start, other_end, other_half):
     # BR-EL-012: opposite CL halves are the only interval overlap exception.
     if start > other_end or end < other_start:
         return False
-    return not (start == end == other_start == other_end
-                and {half, other_half} == {"first", "second"})
+    return not (
+        start == end == other_start == other_end and {half, other_half} == {"first", "second"}
+    )
 
 
 def entitlements(kind):
-    # BR-EL-002–009.
-    return {"CL": Decimal("8"), "RH": Decimal("2"), "SCL": Decimal("15"),
-            "EL": Decimal("30") if kind == "staff" else Decimal("0"),
-            "COL": Decimal("20"), "VL": Decimal("60") if kind == "faculty" else Decimal("0")}
+    # BR-EL-002-009.
+    return {
+        "CL": Decimal("8"),
+        "RH": Decimal("2"),
+        "SCL": Decimal("15"),
+        "EL": Decimal("30") if kind == "staff" else Decimal("0"),
+        "COL": Decimal("20"),
+        "VL": Decimal("60") if kind == "faculty" else Decimal("0"),
+    }
 
 
 def allowed_decisions(stage, category, request_kind):

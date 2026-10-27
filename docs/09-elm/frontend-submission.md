@@ -1,5 +1,11 @@
 # Employee Leave Management frontend submission
 
+For the current Assignment 6B branch, dedicated offline-entry and reference-correction
+forms are now available at `/elm/records`, cursor pagination is repaired, and 13 ELM
+frontend tests are included in the passing 48-test frontend suite. See
+[the Phase-2 record](assignment6b-review.md). The initial-client description below
+is retained as Phase-1 history.
+
 The React ELM module reuses the existing Fusion shell, authentication context,
 CSRF-aware HTTP client, Mantine controls, notifications, and error display.
 

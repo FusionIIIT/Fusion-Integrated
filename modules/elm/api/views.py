@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -18,22 +18,42 @@ READ = HasPermission("elm.application.self", "elm.task.act", "elm.record.manage"
 
 class ScopedView(generics.GenericAPIView):
     def get_serializer_context(self):
-        return {**super().get_serializer_context(), "actor": getattr(self.request, "principal", None)}
+        return {
+            **super().get_serializer_context(),
+            "actor": getattr(self.request, "principal", None),
+        }
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            "scope",
+            str,
+            enum=["all", "mine"],
+            description="Filter to the applicant before pagination.",
+        )
+    ]
+)
 class Applications(ScopedView, generics.ListAPIView):
     permission_classes = [MODULE, READ]
     serializer_class = s.ApplicationSerializer
 
     def get_queryset(self):
-        return q.applications_for(getattr(self.request, "principal", None))
+        actor = getattr(self.request, "principal", None)
+        queryset = q.applications_for(actor)
+        if self.request.query_params.get("scope") == "mine" and actor is not None:
+            queryset = queryset.filter(user_id=actor.user_id)
+        return queryset
 
     @extend_schema(request=s.SubmitSerializer, responses={201: s.ApplicationSerializer})
     def post(self, request):
         payload = s.SubmitSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         app = w.submit(actor=request.principal, data=payload.validated_data)
-        return Response(self.get_serializer(q.applications_for(request.principal).get(pk=app.pk)).data, status=201)
+        return Response(
+            self.get_serializer(q.applications_for(request.principal).get(pk=app.pk)).data,
+            status=201,
+        )
 
 
 class ApplicationDetail(ScopedView, generics.RetrieveAPIView):
@@ -59,13 +79,21 @@ class Action(ScopedView):
         elif action == "replace_substitute":
             if "substitute_id" not in data:
                 raise DomainError("Choose a replacement substitute.")
-            app = w.replace_substitute(actor=request.principal, application_id=pk,
-                                       revision=data["revision"], substitute_id=data["substitute_id"])
+            app = w.replace_substitute(
+                actor=request.principal,
+                application_id=pk,
+                revision=data["revision"],
+                substitute_id=data["substitute_id"],
+            )
         else:
             data.pop("substitute_id", None)
             app = w.act(actor=request.principal, application_id=pk, action=action, **data)
-        return Response(s.ApplicationSerializer(q.applications_for(request.principal).get(pk=app.pk),
-                                                context=self.get_serializer_context()).data)
+        return Response(
+            s.ApplicationSerializer(
+                q.applications_for(request.principal).get(pk=app.pk),
+                context=self.get_serializer_context(),
+            ).data
+        )
 
 
 class Lifecycle(ScopedView):
@@ -77,8 +105,13 @@ class Lifecycle(ScopedView):
         payload = self.get_serializer(data=request.data)
         payload.is_valid(raise_exception=True)
         app = w.lifecycle(actor=request.principal, application_id=pk, **payload.validated_data)
-        return Response(s.ApplicationSerializer(q.applications_for(request.principal).get(pk=app.pk),
-                                                context=self.get_serializer_context()).data, status=201)
+        return Response(
+            s.ApplicationSerializer(
+                q.applications_for(request.principal).get(pk=app.pk),
+                context=self.get_serializer_context(),
+            ).data,
+            status=201,
+        )
 
 
 class Tasks(ScopedView, generics.ListAPIView):
@@ -124,13 +157,17 @@ class ReadNotification(APIView):
 
 
 class Employees(APIView):
-    permission_classes = [MODULE, READ, HasPermission("elm.application.self", "elm.configuration.manage")]
+    permission_classes = [
+        MODULE,
+        HasPermission("elm.application.self", "elm.configuration.manage", "elm.record.manage"),
+    ]
 
     @extend_schema(responses={200: None})
     def get(self, request):
         people = directory.get_employees()
-        return Response([{"user_id": p.user_id, "display_name": p.display_name, "kind": p.kind}
-                         for p in people])
+        return Response(
+            [{"user_id": p.user_id, "display_name": p.display_name, "kind": p.kind} for p in people]
+        )
 
 
 class Configuration(APIView):
@@ -139,10 +176,14 @@ class Configuration(APIView):
     @extend_schema(responses={200: None})
     def get(self, request):
         data = q.configuration()
-        return Response({"policy": s.PolicySerializer(data["policy"]).data if data["policy"] else None,
-                         "employees": s.EmployeeConfigurationSerializer(data["employees"], many=True).data,
-                         "calendars": s.CalendarSerializer(data["calendars"], many=True).data,
-                         "attendance_outbox": s.OutboxSerializer(data["attendance_outbox"], many=True).data})
+        return Response(
+            {
+                "policy": s.PolicySerializer(data["policy"]).data if data["policy"] else None,
+                "employees": s.EmployeeConfigurationSerializer(data["employees"], many=True).data,
+                "calendars": s.CalendarSerializer(data["calendars"], many=True).data,
+                "attendance_outbox": s.OutboxSerializer(data["attendance_outbox"], many=True).data,
+            }
+        )
 
     @extend_schema(request=s.ConfigurationSerializer, responses={204: None})
     def put(self, request):
@@ -193,12 +234,18 @@ class Export(APIView):
 
     @extend_schema(responses={(200, "text/plain"): str})
     def get(self, request, pk):
-        app = q.applications_for(request.principal).filter(pk=pk, user_id=request.principal.user_id).first()
+        app = (
+            q.applications_for(request.principal)
+            .filter(pk=pk, user_id=request.principal.user_id)
+            .first()
+        )
         if app is None:
             raise NotFoundError()
-        text = (f"Employee Leave Application #{app.pk}\nCategory: {app.category}\n"
-                f"Period: {app.start_date} to {app.effective_end_date}\nHalf: {app.half}\n"
-                f"Status: {app.status}\nPurpose: {app.reason}\nStation leave: {app.station_details}\n")
+        text = (
+            f"Employee Leave Application #{app.pk}\nCategory: {app.category}\n"
+            f"Period: {app.start_date} to {app.effective_end_date}\nHalf: {app.half}\n"
+            f"Status: {app.status}\nPurpose: {app.reason}\nStation leave: {app.station_details}\n"
+        )
         response = HttpResponse(text, content_type="text/plain; charset=utf-8")
         response["Content-Disposition"] = f'attachment; filename="leave-{app.pk}.txt"'
         return response

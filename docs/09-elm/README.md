@@ -1,5 +1,11 @@
 # Employee Leave Management generated implementation
 
+This branch contains Assignment 6B improvements. See
+[the Phase-2 review and verification record](assignment6b-review.md) for defects,
+tests, repairs and remaining deployment gates. The following sections retain the
+Phase-1 context; their statements about mechanical-only verification describe the
+original submission rather than the new Phase-2 work.
+
 This submission is a fresh integrated ELM implementation containing backend and
 frontend code in one pull request. It contains no implementation copied from the previous
 Llama or Qwen trial folders. See [the blueprint](elm-blueprint.md) for source versions,

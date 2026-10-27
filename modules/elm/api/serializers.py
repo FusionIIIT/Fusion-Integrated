@@ -3,8 +3,16 @@ from rest_framework import serializers
 
 from modules.elm.domain import rules
 from modules.elm.models import (
-    Account, Application, AttendanceOutbox, AuditEntry, EmployeeConfiguration,
-    HolidayCalendar, LedgerEntry, Notification, Policy, WorkflowTask,
+    Account,
+    Application,
+    AttendanceOutbox,
+    AuditEntry,
+    EmployeeConfiguration,
+    HolidayCalendar,
+    LedgerEntry,
+    Notification,
+    Policy,
+    WorkflowTask,
 )
 
 
@@ -21,8 +29,20 @@ class SubmitSerializer(serializers.Serializer):
 
 
 class ActionSerializer(serializers.Serializer):
-    action = serializers.ChoiceField(choices=("accept", "decline", "recommend", "not_recommend",
-                                             "forward", "approve", "reject", "review", "withdraw", "replace_substitute"))
+    action = serializers.ChoiceField(
+        choices=(
+            "accept",
+            "decline",
+            "recommend",
+            "not_recommend",
+            "forward",
+            "approve",
+            "reject",
+            "review",
+            "withdraw",
+            "replace_substitute",
+        )
+    )
     revision = serializers.IntegerField(min_value=1)
     reason = serializers.CharField(max_length=5000, allow_blank=True, default="")
     substitute_id = serializers.IntegerField(min_value=1, required=False)
@@ -48,10 +68,30 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Application
-        fields = ("id", "user_id", "kind", "parent_id", "category", "start_date", "end_date",
-                  "effective_end_date", "half", "reason", "station_leave", "station_details",
-                  "medical_reference", "substitute_id", "status", "days_by_year", "revision",
-                  "resumption_reviewed", "created_at", "history", "allowed_actions")
+        fields = (
+            "id",
+            "user_id",
+            "kind",
+            "parent_id",
+            "category",
+            "start_date",
+            "end_date",
+            "effective_end_date",
+            "half",
+            "reason",
+            "station_leave",
+            "station_details",
+            "medical_reference",
+            "substitute_id",
+            "status",
+            "days_by_year",
+            "revision",
+            "resumption_reviewed",
+            "offline_reference",
+            "created_at",
+            "history",
+            "allowed_actions",
+        )
 
     def get_allowed_actions(self, obj) -> list[str]:
         actor = self.context.get("actor")
@@ -65,9 +105,16 @@ class ApplicationSerializer(serializers.ModelSerializer):
                 actions.append("replace_substitute")
         if actor.has_permission("elm.task.act"):
             for task in obj.tasks.all():
-                if task.pending and task.user_id == actor.user_id and task.role == actor.active_role:
-                    if actor.user_id != obj.user_id or (task.role == "Director" and task.stage == "sanction"):
-                        actions.extend(rules.allowed_decisions(task.stage, obj.category, obj.kind))
+                if (
+                    task.pending
+                    and task.user_id == actor.user_id
+                    and task.role == actor.active_role
+                    and (
+                        actor.user_id != obj.user_id
+                        or (task.role == "Director" and task.stage == "sanction")
+                    )
+                ):
+                    actions.extend(rules.allowed_decisions(task.stage, obj.category, obj.kind))
         return actions
 
 
@@ -100,11 +147,20 @@ class NotificationSerializer(serializers.ModelSerializer):
 
 
 class PolicySerializer(serializers.ModelSerializer):
-    non_working_weekdays = serializers.ListField(child=serializers.IntegerField(min_value=0, max_value=6))
+    non_working_weekdays = serializers.ListField(
+        child=serializers.IntegerField(min_value=0, max_value=6), required=False
+    )
+    reminder_hours = serializers.IntegerField(min_value=1, required=False)
+    escalation_hours = serializers.IntegerField(min_value=1, required=False)
 
     class Meta:
         model = Policy
-        fields = ("non_working_weekdays", "require_col_evidence", "reminder_hours", "escalation_hours")
+        fields = (
+            "non_working_weekdays",
+            "require_col_evidence",
+            "reminder_hours",
+            "escalation_hours",
+        )
 
 
 class RouteStepSerializer(serializers.Serializer):
@@ -112,17 +168,31 @@ class RouteStepSerializer(serializers.Serializer):
     user_id = serializers.IntegerField(min_value=1)
     role = serializers.ChoiceField(choices=("Unit Head", *rules.AUTHORITY_ROLES))
     escalation_user_id = serializers.IntegerField(min_value=1, required=False)
-    escalation_role = serializers.ChoiceField(choices=("Unit Head", *rules.AUTHORITY_ROLES), required=False)
+    escalation_role = serializers.ChoiceField(
+        choices=("Unit Head", *rules.AUTHORITY_ROLES), required=False
+    )
     reassign_on_escalation = serializers.BooleanField(default=False)
 
 
 class EmployeeConfigurationSerializer(serializers.ModelSerializer):
-    eligible_categories = serializers.ListField(child=serializers.ChoiceField(choices=rules.CATEGORIES))
+    eligible_categories = serializers.ListField(
+        child=serializers.ChoiceField(choices=rules.CATEGORIES)
+    )
     routes = serializers.DictField(child=RouteStepSerializer(many=True))
 
     class Meta:
         model = EmployeeConfiguration
-        fields = ("user_id", "unit", "designation", "coverage_required", "eligible_categories", "routes")
+        fields = (
+            "user_id",
+            "unit",
+            "designation",
+            "coverage_required",
+            "eligible_categories",
+            "routes",
+        )
+        # The service performs an upsert keyed by IAM user ID. DRF's create-only
+        # UniqueValidator would otherwise reject every existing employee edit.
+        extra_kwargs = {"user_id": {"validators": [], "min_value": 1}}
 
 
 class ConfigurationSerializer(serializers.Serializer):

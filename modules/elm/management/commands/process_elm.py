@@ -12,6 +12,9 @@ class Command(BaseCommand):
         parser.add_argument("--year", type=int)
 
     def handle(self, *args, **options):
-        result = (process_year_end(options["year"]) if options["year"] is not None
-                  else {"notifications_issued": process_sla()})
+        result = (
+            process_year_end(options["year"])
+            if options["year"] is not None
+            else {"notifications_issued": process_sla()}
+        )
         self.stdout.write(json.dumps(result))
