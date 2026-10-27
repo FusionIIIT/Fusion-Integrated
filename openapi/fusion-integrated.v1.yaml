@@ -63,6 +63,154 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/leave/applications:
+    get:
+      operationId: v1_leave_applications_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/leave/applications/{id}:
+    get:
+      operationId: v1_leave_applications_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/leave/applications/{id}/history:
+    get:
+      operationId: v1_leave_applications_history_list
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveApplicationTransition'
+          description: ''
+  /api/v1/leave/applications/{id}/transition:
+    post:
+      operationId: v1_leave_applications_transition_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveApplicationTransitionInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveApplicationTransitionInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveApplicationTransitionInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/leave/applications/apply:
+    post:
+      operationId: v1_leave_applications_apply_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveApplicationCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveApplicationCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveApplicationCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/leave/balances:
+    get:
+      operationId: v1_leave_balances_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveBalance'
+          description: ''
+  /api/v1/leave/categories:
+    get:
+      operationId: v1_leave_categories_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveCategory'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -2101,6 +2249,22 @@ components:
       - cleared
       - message
       - user_id
+    CodeEnum:
+      enum:
+      - CL
+      - RH
+      - SCL
+      - EL
+      - COL
+      - VL
+      type: string
+      description: |-
+        * `CL` - Casual Leave
+        * `RH` - Restricted Holiday
+        * `SCL` - Special Casual Leave
+        * `EL` - Earned Leave
+        * `COL` - Commuted Leave
+        * `VL` - Vacation Leave
     Company:
       type: object
       properties:
@@ -2423,6 +2587,14 @@ components:
       - fee_reference
       - season
       - user_id
+    HalfDayEnum:
+      enum:
+      - first
+      - second
+      type: string
+      description: |-
+        * `first` - First half
+        * `second` - Second half
     IncidentRecorded:
       type: object
       properties:
@@ -2637,6 +2809,296 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/LeaveCategory'
+          readOnly: true
+        category_code:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/LeaveApplicationStatusEnum'
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+          readOnly: true
+        end_date:
+          type: string
+          format: date
+          readOnly: true
+        half_day:
+          allOf:
+          - $ref: '#/components/schemas/HalfDayEnum'
+          readOnly: true
+        days_charged:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          readOnly: true
+        balance_deducted:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        is_station_leave:
+          type: boolean
+          readOnly: true
+        station_details:
+          readOnly: true
+        substitute_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        substitute_response:
+          allOf:
+          - $ref: '#/components/schemas/SubstituteResponseEnum'
+          readOnly: true
+        recommendation:
+          allOf:
+          - $ref: '#/components/schemas/RecommendationEnum'
+          readOnly: true
+        applicant_is_director:
+          type: boolean
+          readOnly: true
+        withdrawn_reason:
+          type: string
+          readOnly: true
+        actual_resumption_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        resumption_status:
+          allOf:
+          - $ref: '#/components/schemas/ResumptionStatusEnum'
+          readOnly: true
+        allowed_transitions:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actual_resumption_date
+      - allowed_transitions
+      - applicant_is_director
+      - balance_deducted
+      - category
+      - category_code
+      - created_at
+      - days_charged
+      - end_date
+      - half_day
+      - id
+      - is_station_leave
+      - reason
+      - recommendation
+      - resumption_status
+      - start_date
+      - station_details
+      - status
+      - substitute_response
+      - substitute_user_id
+      - updated_at
+      - user_id
+      - withdrawn_reason
+    LeaveApplicationCreate:
+      type: object
+      properties:
+        category_code:
+          type: string
+          maxLength: 3
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        half_day:
+          type: string
+          default: ''
+          maxLength: 6
+        reason:
+          type: string
+        is_station_leave:
+          type: boolean
+          default: false
+        station_details:
+          type: object
+          additionalProperties: {}
+        substitute_user_id:
+          type: integer
+          nullable: true
+        applicant_is_director:
+          type: boolean
+          default: false
+        medical_evidence_ref:
+          type: string
+          default: ''
+          maxLength: 300
+      required:
+      - category_code
+      - end_date
+      - reason
+      - start_date
+    LeaveApplicationStatusEnum:
+      enum:
+      - awaiting_substitute
+      - applicant_action_required
+      - awaiting_unit_head
+      - awaiting_establishment
+      - awaiting_final_sanction
+      - awaiting_director_self_sanction
+      - approved
+      - rejected
+      - withdrawn
+      - cancellation_pending_unit_head
+      - cancellation_pending_establishment
+      - cancellation_pending_final
+      - cancelled
+      type: string
+      description: |-
+        * `awaiting_substitute` - Awaiting substitute response
+        * `applicant_action_required` - Applicant action required
+        * `awaiting_unit_head` - Awaiting Unit Head review
+        * `awaiting_establishment` - Awaiting Establishment routing
+        * `awaiting_final_sanction` - Awaiting final sanction decision
+        * `awaiting_director_self_sanction` - Awaiting Director self-sanction
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `withdrawn` - Withdrawn
+        * `cancellation_pending_unit_head` - Cancellation pending - Unit Head
+        * `cancellation_pending_establishment` - Cancellation pending - Establishment
+        * `cancellation_pending_final` - Cancellation pending - final decision
+        * `cancelled` - Cancelled
+    LeaveApplicationTransition:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        from_status:
+          type: string
+          readOnly: true
+        to_status:
+          type: string
+          readOnly: true
+        actor_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        actor_label:
+          type: string
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actor_label
+      - actor_user_id
+      - at
+      - from_status
+      - id
+      - reason
+      - to_status
+    LeaveApplicationTransitionInput:
+      type: object
+      properties:
+        to_status:
+          type: string
+          maxLength: 40
+        reason:
+          type: string
+          default: ''
+        recommendation:
+          type: string
+          default: ''
+        replacement_substitute_id:
+          type: integer
+          nullable: true
+      required:
+      - to_status
+    LeaveBalance:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/LeaveCategory'
+          readOnly: true
+        category_code:
+          type: string
+          readOnly: true
+        year:
+          type: integer
+          readOnly: true
+        balance_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        is_converted:
+          type: boolean
+          readOnly: true
+      required:
+      - balance_days
+      - category
+      - category_code
+      - id
+      - is_converted
+      - user_id
+      - year
+    LeaveCategory:
+      type: object
+      properties:
+        code:
+          allOf:
+          - $ref: '#/components/schemas/CodeEnum'
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        is_carry_forwardable:
+          type: boolean
+          readOnly: true
+      required:
+      - code
+      - description
+      - is_carry_forwardable
+      - name
     LiftSanction:
       type: object
       properties:
@@ -3220,6 +3682,14 @@ components:
       - message
       - rule
       - sanction
+    RecommendationEnum:
+      enum:
+      - recommended
+      - not_recommended
+      type: string
+      description: |-
+        * `recommended` - Recommended
+        * `not_recommended` - Not recommended
     RecordIncident:
       type: object
       properties:
@@ -3466,6 +3936,20 @@ components:
       - message
       - reason
       - route
+    ResumptionStatusEnum:
+      enum:
+      - none
+      - pending
+      - reviewed_no_adjustment
+      - reviewed_early
+      - reviewed_late
+      type: string
+      description: |-
+        * `none` - Not submitted
+        * `pending` - Review pending
+        * `reviewed_no_adjustment` - Reviewed - no adjustment
+        * `reviewed_early` - Reviewed - early return synchronized
+        * `reviewed_late` - Reviewed - late return synchronized
     RoundOutcome:
       type: object
       properties:
@@ -3698,6 +4182,16 @@ components:
           type: integer
       required:
       - document_id
+    SubstituteResponseEnum:
+      enum:
+      - pending
+      - accepted
+      - declined
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `accepted` - Accepted
+        * `declined` - Declined
     TopicEnum:
       enum:
       - drive

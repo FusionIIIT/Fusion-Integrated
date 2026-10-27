@@ -13,6 +13,20 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave_management`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave_management.application.view_self` | View own leave applications | `Dean Academic`, `Director`, `HOD (CSE)`, `Junior Assistant`, `Registrar`, `acadadmin`, `faculty` |
+| `leave_management.application.create` | Submit a leave request or cancellation | `Dean Academic`, `Director`, `HOD (CSE)`, `Junior Assistant`, `Registrar`, `acadadmin`, `faculty` |
+| `leave_management.application.respond` | Respond to substitute nomination | `Dean Academic`, `Director`, `HOD (CSE)`, `Junior Assistant`, `Registrar`, `acadadmin`, `faculty` |
+| `leave_management.application.view` | View all leave applications | `Dean Academic`, `Director`, `HOD (CSE)`, `Registrar`, `acadadmin` |
+| `leave_management.application.review` | Review and sanction leave applications | `Dean Academic`, `Director`, `HOD (CSE)`, `Registrar`, `acadadmin` |
+| `leave_management.application.delete` | Withdraw a leave application | `Dean Academic`, `Director`, `HOD (CSE)`, `Junior Assistant`, `Registrar`, `acadadmin`, `faculty` |
+| `leave_management.application.auto_withdraw` | System auto-withdrawal | _service only_ |
+| `leave_management.balance.view` | View leave balances | `Dean Academic`, `Director`, `HOD (CSE)`, `Junior Assistant`, `Registrar`, `acadadmin`, `faculty` |
+| `leave_management.balance.manage` | Manage leave balances (Admin) | `Registrar`, `acadadmin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
