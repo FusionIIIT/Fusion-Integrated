@@ -17,4 +17,9 @@ export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
     basePath: "/placement",
     load: () => import("../modules/placement/routes"),
   },
+  leave_elm: {
+    code: "leave_elm",
+    basePath: "/leave",
+    load: () => import("../modules/elm/routes"),
+  },
 };
