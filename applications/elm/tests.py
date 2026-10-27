@@ -1,76 +1,111 @@
-from django.contrib.auth.models import User, Permission
-from django.contrib.contenttypes.models import ContentType
-from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
+from datetime import timedelta
+from django.contrib.auth import get_user_model
+from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
-from applications.elm.models import LeaveApplication, LeaveBalance
+from rest_framework import status
+from applications.elm.models import LeaveApplication, LeaveBalance, LeaveBalanceHistory
 
-class ReviewLeaveViewTest(APITestCase):
+User = get_user_model()
+
+
+class ReviewLeaveViewTests(TestCase):
+
     def setUp(self):
-        # Create users
-        self.applicant = User.objects.create_user(username='applicant', password='applicant123')
-        self.reviewer = User.objects.create_user(username='reviewer', password='reviewer123')
+        # Create applicant and reviewer users
+        self.applicant = User.objects.create_user(username='applicant', password='password123')
+        self.reviewer = User.objects.create_user(username='reviewer', password='password123')
 
-        # Assign 'can_approve' permission to the reviewer
-        permission, created = Permission.objects.get_or_create(
-            codename='can_approve', 
-            content_type=ContentType.objects.get_for_model(LeaveApplication)
-        )
-        self.reviewer.user_permissions.add(permission)
-
-        # Create initial LeaveBalance record (5 days CL)
-        self.leave_balance = LeaveBalance.objects.create(
-            user=self.applicant, 
-            year=timezone.now().year, 
-            casual_leave=5
-        )
-
-        # Create AWAITING_UNIT_HEAD LeaveApplication (3 days duration)
-        self.leave = LeaveApplication.objects.create(
+        # Create LeaveApplication owned by applicant
+        self.leave_application = LeaveApplication.objects.create(
             applicant=self.applicant,
+            start_date=timezone.now().date(),
+            end_date=timezone.now().date() + timedelta(days=4),  # 5-day duration
             category='CL',
-            start_date=timezone.now().date() + timezone.timedelta(days=2),
-            end_date=timezone.now().date() + timezone.timedelta(days=4),
-            status='AWAITING_UNIT_HEAD'
+            status='PENDING'
+        )
+
+        # Create LeaveBalance for the applicant in the current year
+        self.leave_balance = LeaveBalance.objects.create(
+            user=self.applicant,
+            year=timezone.now().year,
+            casual_leave=10
         )
 
     def test_approve_leave_success(self):
-        self.client.force_authenticate(user=self.reviewer)
+        # Authenticate as reviewer (non-applicant)
+        self.client.force_login(self.reviewer)
+
+        payload = {'decision': 'approve', 'remarks': 'Approved by unit head'}
         response = self.client.post(
-            f'/leave/application/{self.leave.pk}/review/', 
-            {'decision': 'approve', 'remarks': 'Approved'}, 
-            format='json'
+            reverse('review_leave', args=[self.leave_application.id]),
+            data=payload,
+            content_type='application/json'
         )
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(LeaveApplication.objects.get(pk=self.leave.pk).status, 'APPROVED')
-        self.assertEqual(LeaveBalance.objects.get(user=self.applicant, year=timezone.now().year).casual_leave, 2)
+
+        # Check LeaveApplication status update
+        self.leave_application.refresh_from_db()
+        self.assertEqual(self.leave_application.status, 'APPROVED')
+
+        # Check LeaveBalance deduction (10 - 5 = 5)
+        self.leave_balance.refresh_from_db()
+        self.assertEqual(self.leave_balance.casual_leave, 5)
+
+        # Check LeaveBalanceHistory creation
+        self.assertTrue(
+            LeaveBalanceHistory.objects.filter(
+                applicant=self.applicant,
+                leave_application=self.leave_application,
+                category='CL',
+                previous_balance=10,
+                new_balance=5,
+                action_by=self.reviewer,
+                action='DEDUCT'
+            ).exists()
+        )
 
     def test_approve_leave_self_approval_forbidden(self):
-        self.client.force_authenticate(user=self.applicant)
+        # Authenticate as applicant trying to self-approve
+        self.client.force_login(self.applicant)
+
+        payload = {'decision': 'approve'}
         response = self.client.post(
-            f'/leave/application/{self.leave.pk}/review/', 
-            {'decision': 'approve', 'remarks': 'Approved'}, 
-            format='json'
+            reverse('review_leave', args=[self.leave_application.id]),
+            data=payload,
+            content_type='application/json'
         )
+
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.leave_application.refresh_from_db()
+        self.assertEqual(self.leave_application.status, 'PENDING')
 
     def test_approve_leave_insufficient_balance(self):
-        self.leave_balance.casual_leave = 1
+        # Set balance lower than requested duration (duration = 5 days)
+        self.leave_balance.casual_leave = 3
         self.leave_balance.save()
-        self.client.force_authenticate(user=self.reviewer)
+
+        self.client.force_login(self.reviewer)
+
+        payload = {'decision': 'approve'}
         response = self.client.post(
-            f'/leave/application/{self.leave.pk}/review/', 
-            {'decision': 'approve', 'remarks': 'Approved'}, 
-            format='json'
+            reverse('review_leave', args=[self.leave_application.id]),
+            data=payload,
+            content_type='application/json'
         )
+
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('Insufficient leave balance for approval.', response.data['error'])
+        self.assertEqual(response.json()['error'], 'Insufficient leave balance for approval.')
 
     def test_review_nonexistent_leave(self):
-        self.client.force_authenticate(user=self.reviewer)
+        self.client.force_login(self.reviewer)
+
+        payload = {'decision': 'approve'}
         response = self.client.post(
-            '/leave/application/999/review/', 
-            {'decision': 'approve', 'remarks': 'Approved'}, 
-            format='json'
+            reverse('review_leave', args=[99999]),
+            data=payload,
+            content_type='application/json'
         )
+
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
