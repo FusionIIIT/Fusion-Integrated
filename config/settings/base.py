@@ -76,7 +76,7 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
 ]
 
-# No models. Installed so its AppConfig runs and registers the session checks.
+# Platform apps that do not own domain tables.
 LOCAL_APPS = [
     "fusion_auth",
 ]
@@ -89,6 +89,7 @@ PLATFORM_MODULES = [
 
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
+    "modules.elm",
     "modules.placement",
 ]
 
@@ -142,6 +143,12 @@ IAM_API_PREFIX = env("IAM_API_PREFIX", "/api")
 IAM_SERVICE_TOKEN = env("IAM_SERVICE_TOKEN", "")
 IAM_TIMEOUT_SECONDS = env_int("IAM_TIMEOUT_SECONDS", 5)
 IAM_SESSION_CACHE_SECONDS = env_int("IAM_SESSION_CACHE_SECONDS", 60)
+
+# ELM fails closed until authoritative owning services are configured. These
+# are dotted paths to adapters implementing the contracts in modules.elm.services.
+ELM_SUBMISSION_ROUTING_RESOLVER = env("ELM_SUBMISSION_ROUTING_RESOLVER", "")
+ELM_BALANCE_PROVIDER = env("ELM_BALANCE_PROVIDER", "")
+ELM_VL_CALENDAR_PROVIDER = env("ELM_VL_CALENDAR_PROVIDER", "")
 IAM_AUTH_COOKIE_NAME = env("IAM_AUTH_COOKIE_NAME", "fusion_session")
 
 CACHES = {

@@ -63,6 +63,248 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/elm/:
+    get:
+      operationId: v1_elm_retrieve
+      description: The original authenticated metadata endpoint.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ELMMetadata'
+          description: ''
+  /api/v1/elm/requests/:
+    get:
+      operationId: v1_elm_requests_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveRequestList'
+          description: ''
+    post:
+      operationId: v1_elm_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveRequestSubmission'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveRequestSubmission'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveRequestSubmission'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequestSubmission'
+          description: ''
+  /api/v1/elm/requests/{id}/:
+    get:
+      operationId: v1_elm_requests_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/requests/{id}/decision/:
+    post:
+      operationId: v1_elm_requests_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/requests/{id}/substitute/:
+    post:
+      operationId: v1_elm_requests_substitute_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubstituteNomination'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubstituteNomination'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubstituteNomination'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/requests/{id}/substitute/respond/:
+    post:
+      operationId: v1_elm_requests_substitute_respond_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/requests/{id}/withdraw/:
+    post:
+      operationId: v1_elm_requests_withdraw_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveWithdrawal'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveWithdrawal'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveWithdrawal'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/requests/history/:
+    get:
+      operationId: v1_elm_requests_history_list
+      description: Read-only history alias with the same ownership and filter rules.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveRequestList'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1763,6 +2005,30 @@ components:
       - semester
       - semester_type
       - user_id
+    ActionEnum:
+      enum:
+      - SUBMITTED
+      - SUBSTITUTE_NOMINATED
+      - SUBSTITUTE_ACCEPTED
+      - SUBSTITUTE_DECLINED
+      - UNIT_HEAD_RECOMMENDED
+      - UNIT_HEAD_NOT_RECOMMENDED
+      - ESTABLISHMENT_PROCESSED
+      - APPROVED
+      - REJECTED
+      - WITHDRAWN
+      type: string
+      description: |-
+        * `SUBMITTED` - Submitted
+        * `SUBSTITUTE_NOMINATED` - Substitute nominated
+        * `SUBSTITUTE_ACCEPTED` - Substitute accepted
+        * `SUBSTITUTE_DECLINED` - Substitute declined
+        * `UNIT_HEAD_RECOMMENDED` - Unit Head recommended
+        * `UNIT_HEAD_NOT_RECOMMENDED` - Unit Head not recommended
+        * `ESTABLISHMENT_PROCESSED` - Establishment processed
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
+        * `WITHDRAWN` - Withdrawn
     AddCandidates:
       type: object
       properties:
@@ -2350,6 +2616,19 @@ components:
         * `certificate` - certificate
         * `offer_letter` - offer_letter
         * `other` - other
+    ELMMetadata:
+      type: object
+      properties:
+        label:
+          type: string
+        description:
+          type: string
+        version:
+          type: string
+      required:
+      - description
+      - label
+      - version
     EligibilityFailure:
       type: object
       properties:
@@ -2423,6 +2702,14 @@ components:
       - fee_reference
       - season
       - user_id
+    HalfDayEnum:
+      enum:
+      - FIRST
+      - SECOND
+      type: string
+      description: |-
+        * `FIRST` - First half
+        * `SECOND` - Second half
     IncidentRecorded:
       type: object
       properties:
@@ -2637,6 +2924,197 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveDecision:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/LeaveDecisionDecisionEnum'
+        reason:
+          type: string
+          default: ''
+      required:
+      - decision
+    LeaveDecisionDecisionEnum:
+      enum:
+      - RECOMMENDED
+      - NOT_RECOMMENDED
+      - PROCESSED
+      - APPROVED
+      - REJECTED
+      type: string
+      description: |-
+        * `RECOMMENDED` - RECOMMENDED
+        * `NOT_RECOMMENDED` - NOT_RECOMMENDED
+        * `PROCESSED` - PROCESSED
+        * `APPROVED` - APPROVED
+        * `REJECTED` - REJECTED
+    LeaveRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        leave_type:
+          allOf:
+          - $ref: '#/components/schemas/LeaveTypeEnum'
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+          readOnly: true
+        end_date:
+          type: string
+          format: date
+          readOnly: true
+        purpose:
+          type: string
+          readOnly: true
+        half_day:
+          readOnly: true
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/HalfDayEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        chargeable_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/LeaveRequestStatusEnum'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        workflow_actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveWorkflowAction'
+          readOnly: true
+      required:
+      - chargeable_days
+      - created_at
+      - end_date
+      - half_day
+      - id
+      - leave_type
+      - purpose
+      - start_date
+      - status
+      - submitted_at
+      - workflow_actions
+    LeaveRequestStatusEnum:
+      enum:
+      - DRAFT
+      - PENDING_SUBSTITUTE
+      - APPLICANT_ACTION_REQUIRED
+      - PENDING_UNIT_HEAD
+      - PENDING_ESTABLISHMENT
+      - PENDING_FINAL_DECISION
+      - PENDING_DIRECTOR_SANCTION
+      - APPROVED
+      - REJECTED
+      - WITHDRAWN
+      - CANCELLED
+      type: string
+      description: |-
+        * `DRAFT` - Draft
+        * `PENDING_SUBSTITUTE` - Pending substitute
+        * `APPLICANT_ACTION_REQUIRED` - Applicant action required
+        * `PENDING_UNIT_HEAD` - Pending Unit Head
+        * `PENDING_ESTABLISHMENT` - Pending establishment
+        * `PENDING_FINAL_DECISION` - Pending final decision
+        * `PENDING_DIRECTOR_SANCTION` - Pending Director sanction
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
+        * `WITHDRAWN` - Withdrawn
+        * `CANCELLED` - Cancelled
+    LeaveRequestSubmission:
+      type: object
+      properties:
+        leave_type:
+          $ref: '#/components/schemas/LeaveTypeEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        purpose:
+          type: string
+        half_day:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/HalfDayEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        substitute_user_id:
+          type: integer
+          minimum: 1
+      required:
+      - end_date
+      - leave_type
+      - purpose
+      - start_date
+    LeaveTypeEnum:
+      enum:
+      - CL
+      - RH
+      - SCL
+      - EL
+      - COL
+      - VL
+      type: string
+      description: |-
+        * `CL` - CL
+        * `RH` - RH
+        * `SCL` - SCL
+        * `EL` - EL
+        * `COL` - COL
+        * `VL` - VL
+    LeaveWithdrawal:
+      type: object
+      properties:
+        reason:
+          type: string
+          default: ''
+    LeaveWorkflowAction:
+      type: object
+      properties:
+        from_status:
+          type: string
+          readOnly: true
+        to_status:
+          type: string
+          readOnly: true
+        action:
+          allOf:
+          - $ref: '#/components/schemas/ActionEnum'
+          readOnly: true
+        actor_role:
+          type: string
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - actor_role
+      - at
+      - from_status
+      - reason
+      - to_status
     LiftSanction:
       type: object
       properties:
@@ -2732,6 +3210,9 @@ components:
       - is_late
       - message
       - record
+    NullEnum:
+      enum:
+      - null
     OffCampusRecord:
       type: object
       properties:
@@ -2981,6 +3462,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedLeaveRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveRequest'
     PaginatedOfferList:
       type: object
       required:
@@ -3698,6 +4198,32 @@ components:
           type: integer
       required:
       - document_id
+    SubstituteNomination:
+      type: object
+      properties:
+        substitute_user_id:
+          type: integer
+          minimum: 1
+      required:
+      - substitute_user_id
+    SubstituteResponse:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/SubstituteResponseDecisionEnum'
+        reason:
+          type: string
+          default: ''
+      required:
+      - decision
+    SubstituteResponseDecisionEnum:
+      enum:
+      - ACCEPTED
+      - DECLINED
+      type: string
+      description: |-
+        * `ACCEPTED` - ACCEPTED
+        * `DECLINED` - DECLINED
     TopicEnum:
       enum:
       - drive

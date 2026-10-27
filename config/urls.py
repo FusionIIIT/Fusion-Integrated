@@ -11,6 +11,7 @@ import core.api.schema  # noqa: F401  registers the auth schemes by import
 from core.api.health import healthz, readyz
 
 urlpatterns = [
+    path("api/v1/elm/", include("modules.elm.api.urls")),
     path("healthz", healthz, name="healthz"),
     path("readyz", readyz, name="readyz"),
     path("api/v1/", include("fusion_auth.urls")),
