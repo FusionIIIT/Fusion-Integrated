@@ -1,0 +1,46 @@
+.elm-print-sheet {
+  display: none;
+}
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  .elm-print-sheet,
+  .elm-print-sheet * {
+    visibility: visible !important;
+  }
+
+  .elm-print-sheet {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    color: #000;
+    font: 12pt/1.5 serif;
+  }
+
+  .elm-print-sheet h1 {
+    margin-bottom: 0.25in;
+    text-align: center;
+  }
+
+  .elm-print-sheet dl {
+    display: grid;
+    grid-template-columns: 1.5in 1fr;
+    gap: 0.08in 0.2in;
+  }
+
+  .elm-print-sheet dt {
+    font-weight: bold;
+  }
+
+  .elm-print-sheet dd {
+    margin: 0;
+  }
+
+  .elm-print-reason {
+    white-space: pre-wrap;
+  }
+}

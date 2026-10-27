@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fusion ERP Lab Assignment 6B — ELM Phase 2 Report</title>
+  <style>
+    @page { size: A4; margin: 18mm 17mm 18mm; }
+    * { box-sizing: border-box; }
+    body { color: #202b3c; font: 10pt/1.48 "Segoe UI", Arial, sans-serif; }
+    h1, h2, h3 { color: #183b67; line-height: 1.2; }
+    h1 { font-size: 25pt; margin: 0 0 8mm; }
+    h2 { font-size: 16pt; margin: 0 0 5mm; border-bottom: 1px solid #c8d6e8; padding-bottom: 2mm; }
+    h3 { font-size: 11pt; margin: 4mm 0 1.5mm; }
+    p { margin: 0 0 3mm; }
+    ul, ol { margin: 2mm 0 4mm; padding-left: 6mm; }
+    li { margin-bottom: 1.5mm; }
+    .cover { min-height: 240mm; display: flex; flex-direction: column; justify-content: center; }
+    .eyebrow { color: #3273b9; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+    .subtitle { font-size: 16pt; color: #52657d; margin-bottom: 10mm; }
+    .meta { border-left: 3px solid #3273b9; padding: 3mm 5mm; background: #f2f6fb; }
+    .callout { padding: 4mm; border: 1px solid #dfa43d; background: #fff8e9; margin: 4mm 0; }
+    .success { border-color: #4a9b70; background: #eef8f1; }
+    .small { font-size: 8.5pt; color: #52657d; }
+    .page { break-before: page; }
+    table { width: 100%; border-collapse: collapse; margin: 3mm 0 5mm; font-size: 8.7pt; }
+    th { background: #eaf0f8; color: #183b67; text-align: left; }
+    th, td { padding: 2mm; border: 1px solid #cbd4df; vertical-align: top; }
+    code { font: 8.5pt Consolas, monospace; background: #f1f3f5; padding: 0.3mm 1mm; }
+    a { color: #175ea8; text-decoration: none; }
+    footer { position: fixed; bottom: -10mm; font-size: 8pt; color: #68778a; }
+  </style>
+</head>
+<body>
+  <footer>Fusion ERP Lab Assignment 6B · ELM Phase 2 · 27 October 2026</footer>
+
+  <section class="cover">
+    <div class="eyebrow">Fusion ERP Lab Assignment 6B</div>
+    <h1>Phase 2 — Review, Test and Improve</h1>
+    <div class="subtitle">Employee Leave Management (ELM)</div>
+    <div class="meta">
+      <p><strong>Repository:</strong> Fusion-Integrated</p>
+      <p><strong>Phase-2 branch:</strong> <code>elm-phase2</code></p>
+      <p><strong>Phase-2 commit:</strong> <code>c3ab25c</code></p>
+      <p><strong>Preserved Phase-1 baseline:</strong> <code>d1cb96a</code></p>
+      <p><strong>Upstream pull request:</strong>
+        <a href="https://github.com/FusionIIIT/Fusion-Integrated/pull/359">FusionIIIT/Fusion-Integrated#359</a>
+      </p>
+      <p><strong>Verification date:</strong> 27 October 2026</p>
+    </div>
+    <div class="callout">
+      <strong>Conclusion:</strong> Phase 2 delivered and verified meaningful
+      improvements to employee self-service, request lifecycle integrity, and
+      overlap validation. ELM is not yet deployment-ready against the complete
+      specification; substantial business workflows and external contracts
+      remain unresolved.
+    </div>
+    <p class="small">Prepared from the Phase-2 implementation, automated test results,
+      local runtime checks, the supplied ELM specifications, and inspection of the
+      Administration package.</p>
+  </section>
+
+  <section class="page">
+    <h2>1. Objective and approach</h2>
+    <p>Assignment 6B asks the team to treat a Phase-1 AI-generated ELM module as
+      inherited software: understand it, test and review it against the complete
+      ELM specifications, improve it while preserving its original version, and
+      verify the result.</p>
+    <p>The inherited ELM implementation was a small backend leave-request API
+      without an employee-facing ELM workflow. Phase 2 continued from the
+      preserved Phase-1 baseline in a separate branch. The specifications were
+      reviewed for lifecycle, overlap, half-day, printable-application,
+      entitlement, calendar, hierarchy, substitute, and post-approval workflow
+      requirements.</p>
+    <h3>Specification sources reviewed</h3>
+    <ul>
+      <li>ELM Problem Statement v1.4</li>
+      <li>ELM Use Case Specifications v1.4</li>
+      <li>ELM Business Rule Specifications v1.4</li>
+      <li>ELM Functional Requirement Specification v1.5 and traceability materials</li>
+      <li>ELM Workflow Specifications v1.6</li>
+      <li>Fusion Base Code contracts and the supplied Fusion System Administrator package</li>
+    </ul>
+    <h3>Fusion integration surfaces changed</h3>
+    <ul>
+      <li>ELM server registry and role grants for employee leave-request capabilities.</li>
+      <li>Server-driven navigation and client route registration for the ELM page.</li>
+      <li>API serializers, viewset behavior, leave data model, event history, and migrations.</li>
+      <li>OpenAPI schema, generated permission catalogue, and repository README.</li>
+    </ul>
+    <h2>2. Improvements delivered</h2>
+    <table>
+      <thead><tr><th>Area</th><th>Change</th><th>Specification value</th></tr></thead>
+      <tbody>
+        <tr><td>Employee self-service</td><td>Employees can submit and view their own leave requests through the Fusion client.</td><td>Establishes an integrated user workflow rather than API-only functionality.</td></tr>
+        <tr><td>Request ownership</td><td>Queries are scoped to the authenticated employee; other users' requests are not exposed.</td><td>Protects employee request privacy and ownership.</td></tr>
+        <tr><td>Lifecycle integrity</td><td>Submitted requests cannot be updated or deleted. Employees can immediately withdraw only their own pending request.</td><td>Implements withdraw-and-resubmit behavior and prevents withdrawal after a decision.</td></tr>
+        <tr><td>Audit history</td><td>Submission and withdrawal transitions are persisted as events and returned with requests.</td><td>Provides an inspectable history for implemented state changes.</td></tr>
+        <tr><td>Overlap validation</td><td>Rejects date overlap with pending or approved leave. Rejected/withdrawn requests do not block new requests.</td><td>Implements active-leave non-overlap for whole-day requests.</td></tr>
+        <tr><td>Half-day CL</td><td>Supports full day, first half, or second half for a single-day Casual Leave; opposite halves can coexist.</td><td>Implements the specified same-date different-half CL exception, validated in API and database.</td></tr>
+        <tr><td>Printable application</td><td>Print view includes request number, employee ID, category, dates, reason, current status, submission timestamp, and event history.</td><td>Provides a printable representation for the implemented application data.</td></tr>
+        <tr><td>Contracts and verification</td><td>Updates permissions, navigation, migrations, OpenAPI, documentation, and regression tests.</td><td>Keeps the Fusion-facing contracts aligned with the implementation.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="page">
+    <h2>3. Verification results</h2>
+    <table>
+      <thead><tr><th>Check</th><th>Result</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Full backend test suite<br><code>.venv\Scripts\python.exe -m pytest -q</code></td><td><strong>PASS</strong></td><td>Complete repository pytest suite passed.</td></tr>
+        <tr><td>Client typecheck<br><code>cd client; npm run typecheck</code></td><td><strong>PASS</strong></td><td>No TypeScript diagnostics.</td></tr>
+        <tr><td>Client tests<br><code>cd client; npm test -- --run</code></td><td><strong>PASS</strong></td><td>4 files, 35 tests passed.</td></tr>
+        <tr><td>Production build<br><code>cd client; npm run build</code></td><td><strong>PASS</strong></td><td>Vite build succeeded; existing &gt;500 kB chunk warning remains.</td></tr>
+        <tr><td>Django configuration<br><code>manage.py check</code></td><td><strong>PASS</strong></td><td>No system-check issues.</td></tr>
+        <tr><td>Migration consistency<br><code>manage.py makemigrations --check --dry-run</code></td><td><strong>PASS</strong></td><td>No uncommitted model migrations detected.</td></tr>
+        <tr><td>Database migration<br><code>manage.py migrate --noinput</code></td><td><strong>PASS</strong></td><td>ELM migrations 0004 and 0005 applied to the configured local database.</td></tr>
+        <tr><td>ELM lint<br><code>ruff check modules/elm</code></td><td><strong>PASS</strong></td><td>No Ruff findings.</td></tr>
+        <tr><td>OpenAPI generation</td><td><strong>PASS</strong></td><td>Schema generated with warnings treated as failures.</td></tr>
+        <tr><td>Local frontend</td><td><strong>PASS</strong></td><td>Vite responded HTTP 200.</td></tr>
+        <tr><td>Local protected API</td><td><strong>EXPECTED 401</strong></td><td>Unauthenticated ELM API request was rejected as expected.</td></tr>
+      </tbody>
+    </table>
+    <h3>ELM-specific regression scenarios</h3>
+    <ul>
+      <li>Staff and faculty self-submission; submitted owner is taken from authenticated identity.</li>
+      <li>Requests belonging to another employee are not readable, withdrawn, or deleted by the caller.</li>
+      <li>Permission and module grants are enforced.</li>
+      <li>End date preceding start date is refused.</li>
+      <li>Overlaps with both pending and approved leave are refused; rejected leave does not block.</li>
+      <li>First-half and second-half single-day CL are accepted together; duplicate half and other overlaps are refused.</li>
+      <li>Half-day selection is refused for non-CL or multi-day requests.</li>
+      <li>Submitted requests are immutable; pending requests can be withdrawn and history records both transitions.</li>
+    </ul>
+  </section>
+
+  <section class="page">
+    <h2>4. Runtime and integration limitations</h2>
+    <div class="callout">
+      <strong>Authentication integration was not end-to-end verified.</strong>
+      The local app is configured to contact the ERP-user IAM at
+      <code>http://127.0.0.1:8001</code>. No service was listening on that port
+      during the local run. The supplied Administration package documents a
+      separate operator console and does not provide the ERP-user IAM login
+      contract required by this application.
+    </div>
+    <p>The backend started and passed Django checks. The frontend served successfully.
+      An unauthenticated call to the protected ELM endpoint returned 401, which
+      confirms the authorization boundary is active, but does not demonstrate a
+      successful logged-in user journey. The client lint script was not verified
+      in this run because the project's ESLint executable was unavailable in the
+      earlier check.</p>
+    <h2>5. Important unresolved specification gaps</h2>
+    <table>
+      <thead><tr><th>Gap</th><th>Impact / dependency</th></tr></thead>
+      <tbody>
+        <tr><td>Leave entitlements, balances, account history, lapse/carry-forward, and year-end conversion</td><td>Core financial/accounting-like leave correctness remains absent; requires policy rules and a ledger.</td></tr>
+        <tr><td>Holiday/RH and Academic Calendar vacation validation</td><td>Cannot safely validate RH dates or VL periods without authoritative published calendar services/data.</td></tr>
+        <tr><td>Unit Head and higher-sanction approval hierarchy</td><td>Department/designation data alone does not establish current Unit Head or route. No authoritative hierarchy contract was found; routing must not be guessed.</td></tr>
+        <tr><td>Substitute nomination, availability, consent, decline, and replacement</td><td>Required coverage gate before approval routing is absent.</td></tr>
+        <tr><td>Approver recommendations and final decisions</td><td>No actionable Unit Head / Establishment / Sanctioning Authority workflow exists.</td></tr>
+        <tr><td>Cancellation, extension, and resumption</td><td>Approved leave changes, balance adjustments, and attendance synchronization are absent.</td></tr>
+        <tr><td>Administrative maintenance, offline-sanctioned entries, SLA, and notifications</td><td>Configuration, retrospective integrity, pending-task escalation, and communications remain absent.</td></tr>
+      </tbody>
+    </table>
+    <h2>6. Overall assessment</h2>
+    <div class="callout success">
+      <strong>Phase-2 progress: verified partial improvement.</strong> The
+      inherited implementation now has a functional, authorization-scoped
+      employee request slice, stronger lifecycle and overlap rules, a printable
+      representation, and regression evidence. Phase 1 remains preserved at
+      <code>d1cb96a</code>; Phase 2 is at <code>c3ab25c</code>.
+    </div>
+    <p><strong>Deployment readiness: not achieved.</strong> Major leave rules,
+      approval workflows, calendar/hierarchy integrations, and authenticated
+      runtime validation remain open. No claim is made that the module satisfies
+      the complete ELM specification or is production-ready.</p>
+    <p>Detailed supporting files: <code>verification-evidence.md</code> and
+      <code>issue-improvement-log.md</code> in <code>docs/elm-phase2/</code>.</p>
+  </section>
+</body>
+</html>

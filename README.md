@@ -1,6 +1,6 @@
 # Fusion-Integrated
 
-The non-academic platform. **Placement Cell** first; more modules later.
+The non-academic platform. **Employee Leave Management and Placement Cell**.
 **Independent modules, one login.**
 
 This service holds **no user table**. Identity, RBAC and common directory data
@@ -19,7 +19,7 @@ This service holds **no user table**. Identity, RBAC and common directory data
                  ▼
         Fusion-Integrated                ← this repo
         owns fusion_integrated
-        backend  →  placement  (more modules later)
+        backend  →  ELM + Placement Cell
         client   →  the shell: one login, one sidebar
         holds only user_id references — no user table
 ```
@@ -130,6 +130,7 @@ fusion_auth/     the IAM client, Principal, authentication, the two permission g
 modules/
   directory/     local projection of IAM's user data (a cache with a table)
   accesscontrol/ module registry + the server-driven sidebar
+  elm/           employee leave requests and lifecycle
   placement/     companies, postings, applications, eligibility, state machine
 ops/checks/      the boundary enforcement scripts
 client/          the shell — Vite + React 18 + TS + Mantine 7.13
@@ -188,7 +189,21 @@ its migrations, then replacing its `contracts.py` callers with HTTP.
 
 Working today: the module system, both authorization gates, the server-driven
 sidebar, the directory projection, the placement application state machine with
-an append-only audit trail, and the client shell with login.
+an append-only audit trail, and the client shell with login. ELM currently
+supports employee leave-request submission, own-request history, and immediate
+withdrawal while pending, with server-side permissions and an append-only event
+trail. It rejects overlapping pending or approved leave and supports the
+specified opposite-half exception for single-day Casual Leave. Employees can
+print an application with its current status and recorded request history.
+Faculty and staff are both granted the employee capabilities.
+
+ELM is not yet complete against the full specification and should not be treated
+as deployment-ready: balances and entitlement rules, calendar validation,
+substitute handling, approval hierarchy and decisions, cancellation, extension,
+resumption, administrative configuration, year-end processing, and workflow
+assignment/decision/withdrawal notifications remain to be implemented. The
+current directory contract does not provide the organizational hierarchy needed
+to resolve Unit Heads and sanctioning authorities.
 
 **Blocking next step — the IAM side.** `Fusion_System_Administrator` currently
 authenticates operators only; its own router says so: *"this is what makes admin
