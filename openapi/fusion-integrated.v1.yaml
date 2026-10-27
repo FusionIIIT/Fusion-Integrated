@@ -63,6 +63,67 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/leave/requests:
+    get:
+      operationId: v1_leave_requests_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+    post:
+      operationId: v1_leave_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveRequestCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveRequestCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveRequestCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/withdraw:
+    post:
+      operationId: v1_leave_requests_withdraw_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -2637,6 +2698,122 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        category:
+          $ref: '#/components/schemas/LeaveRequestCategoryEnum'
+        starts_on:
+          type: string
+          format: date
+        ends_on:
+          type: string
+          format: date
+        cl_half:
+          $ref: '#/components/schemas/LeaveRequestClHalfEnum'
+        reason:
+          type: string
+          maxLength: 500
+        station_leave:
+          type: boolean
+        station_leave_details:
+          type: string
+          maxLength: 500
+        status:
+          $ref: '#/components/schemas/LeaveRequestStatusEnum'
+        withdrawn_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - category
+      - created_at
+      - ends_on
+      - id
+      - reason
+      - starts_on
+    LeaveRequestCategoryEnum:
+      enum:
+      - cl
+      - rh
+      type: string
+      description: |-
+        * `cl` - Casual Leave
+        * `rh` - Restricted Holiday
+    LeaveRequestClHalfEnum:
+      enum:
+      - full
+      - first
+      - second
+      type: string
+      description: |-
+        * `full` - Full day
+        * `first` - First half
+        * `second` - Second half
+    LeaveRequestCreate:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/LeaveRequestCreateCategoryEnum'
+        starts_on:
+          type: string
+          format: date
+        ends_on:
+          type: string
+          format: date
+        cl_half:
+          allOf:
+          - $ref: '#/components/schemas/LeaveRequestCreateClHalfEnum'
+          default: full
+        reason:
+          type: string
+          maxLength: 500
+        station_leave:
+          type: boolean
+          default: false
+        station_leave_details:
+          type: string
+          maxLength: 500
+      required:
+      - category
+      - ends_on
+      - reason
+      - starts_on
+    LeaveRequestCreateCategoryEnum:
+      enum:
+      - cl
+      - rh
+      type: string
+      description: |-
+        * `cl` - cl
+        * `rh` - rh
+    LeaveRequestCreateClHalfEnum:
+      enum:
+      - full
+      - first
+      - second
+      type: string
+      description: |-
+        * `full` - full
+        * `first` - first
+        * `second` - second
+    LeaveRequestStatusEnum:
+      enum:
+      - pending
+      - approved
+      - withdrawn
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `approved` - Approved
+        * `withdrawn` - Withdrawn
     LiftSanction:
       type: object
       properties:
