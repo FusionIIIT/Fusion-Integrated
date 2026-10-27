@@ -13,6 +13,15 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave.application.apply` | Apply for institute employee leave | `dean`, `director`, `faculty`, `hod`, `leave_admin`, `staff`, `unit_head` |
+| `leave.application.view_self` | View own leave applications, balances, and history | `dean`, `director`, `faculty`, `hod`, `leave_admin`, `staff`, `unit_head` |
+| `leave.application.review` | Review, recommend, and sanction employee leave applications | `dean`, `director`, `hod`, `leave_admin`, `unit_head` |
+| `leave.admin.manage` | Manage leave policies, holiday calendars, and offline synchronization | `leave_admin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
