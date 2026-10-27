@@ -13,6 +13,24 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.leave_request.view` | See one's own leave requests | `faculty`, `staff` |
+| `elm.leave_request.create` | Apply for leave or an extension | `faculty`, `staff` |
+| `elm.leave_request.update` | Modify, cancel or resume one's own leave | `faculty`, `staff` |
+| `elm.leave_request.delete` | Withdraw one's own pending request | `faculty`, `staff` |
+| `elm.substitution.review` | Accept or decline a substitute nomination | `faculty`, `staff` |
+| `elm.leave_balance.view` | See one's own balances and leave-account history | `faculty`, `staff` |
+| `elm.leave_request.review` | Review, recommend or forward routed leave | `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `SectionHead_HR`, `SectionHead_IWD`, `SectionHead_PS`, `SectionHead_RSPC` |
+| `elm.leave_request.approve` | Approve or reject leave as sanctioning authority | `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `SectionHead_HR`, `SectionHead_IWD`, `SectionHead_PS`, `SectionHead_RSPC` |
+| `elm.resumption.review` | Verify resumption of duty | `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `SectionHead_HR`, `SectionHead_IWD`, `SectionHead_PS`, `SectionHead_RSPC` |
+| `elm.policy.publish` | Create, revise and publish leave policy and hierarchy | `Leave Administrator` |
+| `elm.calendar.publish` | Create, revise and publish the holiday/RH calendar | `Leave Administrator` |
+| `elm.offline_record.create` | Record offline-sanctioned leave | `Leave Administrator` |
+| `elm.leave_account.view` | See any employee's leave account | `Leave Administrator` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
