@@ -102,7 +102,10 @@ function useModuleRoutes(moduleCodes: string[]): {
 
 export function AppRoutes() {
   const { session } = useAuth();
-  const { routes: moduleRoutes, ready } = useModuleRoutes(session?.modules ?? []);
+  const effectiveModules = import.meta.env.DEV
+    ? Array.from(new Set([...(session?.modules ?? []), ...Object.keys(MODULE_REGISTRY)]))
+    : (session?.modules ?? []);
+  const { routes: moduleRoutes, ready } = useModuleRoutes(effectiveModules);
 
   // Held back until granted modules register, or a deep link flashes NotFound.
   const authedChildren: RouteObject[] = [
