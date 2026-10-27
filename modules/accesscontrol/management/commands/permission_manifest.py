@@ -153,6 +153,17 @@ def known_gaps(manifest: dict) -> list[str]:
 #: immediately instead of joining a pile nobody counts. Deleting a line
 #: here is the definition of done for that feature.
 KNOWN_UNENFORCED = frozenset({
+    # ELM is explicitly marked "planned" and currently has no API endpoints.
+    # Keep these published permissions visible in the manifest while its
+    # workflow implementation is being built; remove each entry as its
+    # corresponding service or endpoint starts enforcing it.
+    "elm.leave_application.submit",
+    "elm.leave_application.withdraw",
+    "elm.substitute_consent.respond",
+    "elm.leave_application.review",
+    "elm.leave_application.route",
+    "elm.leave_application.finalize",
+    "elm.leave_application.self_sanction",
 })
 
 
