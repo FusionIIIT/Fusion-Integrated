@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.leave",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -229,6 +230,10 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "Fusion-Integrated API",
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
+    "ENUM_NAME_OVERRIDES": {
+        "LeaveApplicationCategory": "modules.leave.models.applications.LeaveApplication.CATEGORIES",
+        "LeaveCategory": ["CL", "RH", "SCL", "EL", "VL", "COL"],
+    },
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
