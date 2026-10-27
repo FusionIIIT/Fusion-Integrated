@@ -13,6 +13,22 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.leave.view_self` | View one's own leave balances and requests | `Dean`, `Dean Academic`, `Deputy Registrar`, `Director`, `HOD`, `Registrar`, `admin`, `faculty`, `leave_admin`, `staff`, `student` |
+| `elm.leave.apply` | Apply for leave and withdraw pending requests | `Dean`, `Dean Academic`, `Deputy Registrar`, `Director`, `HOD`, `Registrar`, `admin`, `faculty`, `leave_admin`, `staff` |
+| `elm.substitute.respond` | Accept or decline nominated substitute responsibilities | `Dean`, `Dean Academic`, `Deputy Registrar`, `Director`, `HOD`, `Registrar`, `admin`, `faculty`, `leave_admin`, `staff` |
+| `elm.leave.review` | Review and recommend routed leave requests | `Dean`, `Dean Academic`, `Deputy Registrar`, `Director`, `HOD`, `Registrar`, `admin` |
+| `elm.leave.sanction_unit_head` | Final approval authority for CL and RH requests | `HOD` |
+| `elm.establishment.route` | Establishment verification and routing | `Deputy Registrar` |
+| `elm.leave.sanction_final` | Competent final sanctioning authority for higher-sanction leave | `Dean`, `Dean Academic`, `Director`, `Registrar`, `admin` |
+| `elm.director.self_sanction` | Self-sanction approval for Director applicant | `Director` |
+| `elm.admin.manage` | Administrative leave records maintenance and policy configuration | `admin`, `leave_admin` |
+| `elm.offline.record` | Record already-sanctioned offline leave into the system | `admin`, `leave_admin` |
+| `elm.year_end.execute` | Execute year-end leave balance conversion and lapse | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

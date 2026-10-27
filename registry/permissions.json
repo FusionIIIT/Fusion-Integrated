@@ -34,6 +34,211 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "elm": {
+      "grants": {
+        "Dean": [
+          "elm.leave.apply",
+          "elm.leave.review",
+          "elm.leave.sanction_final",
+          "elm.leave.view_self",
+          "elm.substitute.respond"
+        ],
+        "Dean Academic": [
+          "elm.leave.apply",
+          "elm.leave.review",
+          "elm.leave.sanction_final",
+          "elm.leave.view_self",
+          "elm.substitute.respond"
+        ],
+        "Deputy Registrar": [
+          "elm.establishment.route",
+          "elm.leave.apply",
+          "elm.leave.review",
+          "elm.leave.view_self",
+          "elm.substitute.respond"
+        ],
+        "Director": [
+          "elm.director.self_sanction",
+          "elm.leave.apply",
+          "elm.leave.review",
+          "elm.leave.sanction_final",
+          "elm.leave.view_self",
+          "elm.substitute.respond"
+        ],
+        "HOD": [
+          "elm.leave.apply",
+          "elm.leave.review",
+          "elm.leave.sanction_unit_head",
+          "elm.leave.view_self",
+          "elm.substitute.respond"
+        ],
+        "Registrar": [
+          "elm.leave.apply",
+          "elm.leave.review",
+          "elm.leave.sanction_final",
+          "elm.leave.view_self",
+          "elm.substitute.respond"
+        ],
+        "admin": [
+          "elm.admin.manage",
+          "elm.leave.apply",
+          "elm.leave.review",
+          "elm.leave.sanction_final",
+          "elm.leave.view_self",
+          "elm.offline.record",
+          "elm.substitute.respond"
+        ],
+        "faculty": [
+          "elm.leave.apply",
+          "elm.leave.view_self",
+          "elm.substitute.respond"
+        ],
+        "leave_admin": [
+          "elm.admin.manage",
+          "elm.leave.apply",
+          "elm.leave.view_self",
+          "elm.offline.record",
+          "elm.substitute.respond"
+        ],
+        "staff": [
+          "elm.leave.apply",
+          "elm.leave.view_self",
+          "elm.substitute.respond"
+        ],
+        "student": [
+          "elm.leave.view_self"
+        ]
+      },
+      "module_grants": [
+        "Dean",
+        "Dean Academic",
+        "Deputy Registrar",
+        "Director",
+        "HOD",
+        "Registrar",
+        "admin",
+        "faculty",
+        "leave_admin",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/elm",
+        "icon": "CalendarBlank",
+        "items": [
+          {
+            "code": "elm.dashboard",
+            "icon": "House",
+            "label": "Dashboard",
+            "required_permission": "elm.leave.view_self",
+            "sort_order": 10,
+            "to": "/elm"
+          },
+          {
+            "code": "elm.apply",
+            "icon": "FilePlus",
+            "label": "Apply for Leave",
+            "required_permission": "elm.leave.apply",
+            "sort_order": 20,
+            "to": "/elm/apply"
+          },
+          {
+            "code": "elm.mine",
+            "icon": "UserCheck",
+            "label": "My Leaves",
+            "required_permission": "elm.leave.view_self",
+            "sort_order": 30,
+            "to": "/elm/mine"
+          },
+          {
+            "code": "elm.substitute",
+            "icon": "Users",
+            "label": "Substitute Requests",
+            "required_permission": "elm.substitute.respond",
+            "sort_order": 40,
+            "to": "/elm/substitute"
+          },
+          {
+            "code": "elm.approvals",
+            "icon": "CheckSquare",
+            "label": "Approvals Inbox",
+            "required_permission": "elm.leave.review",
+            "sort_order": 50,
+            "to": "/elm/approvals"
+          },
+          {
+            "code": "elm.balances",
+            "icon": "Coins",
+            "label": "Leave Balances",
+            "required_permission": "elm.leave.view_self",
+            "sort_order": 60,
+            "to": "/elm/balances"
+          },
+          {
+            "code": "elm.admin",
+            "icon": "Gear",
+            "label": "Administrative Records",
+            "required_permission": "elm.admin.manage",
+            "sort_order": 70,
+            "to": "/elm/admin"
+          }
+        ],
+        "label": "Employee Leave Management",
+        "nav_section": "HR",
+        "sort_order": 15,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "elm.leave.view_self",
+          "label": "View one's own leave balances and requests"
+        },
+        {
+          "code": "elm.leave.apply",
+          "label": "Apply for leave and withdraw pending requests"
+        },
+        {
+          "code": "elm.substitute.respond",
+          "label": "Accept or decline nominated substitute responsibilities"
+        },
+        {
+          "code": "elm.leave.review",
+          "label": "Review and recommend routed leave requests"
+        },
+        {
+          "code": "elm.leave.sanction_unit_head",
+          "label": "Final approval authority for CL and RH requests"
+        },
+        {
+          "code": "elm.establishment.route",
+          "label": "Establishment verification and routing"
+        },
+        {
+          "code": "elm.leave.sanction_final",
+          "label": "Competent final sanctioning authority for higher-sanction leave"
+        },
+        {
+          "code": "elm.director.self_sanction",
+          "label": "Self-sanction approval for Director applicant"
+        },
+        {
+          "code": "elm.admin.manage",
+          "label": "Administrative leave records maintenance and policy configuration"
+        },
+        {
+          "code": "elm.offline.record",
+          "label": "Record already-sanctioned offline leave into the system"
+        },
+        {
+          "code": "elm.year_end.execute",
+          "label": "Execute year-end leave balance conversion and lapse"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "elm.year_end.execute"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
