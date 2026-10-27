@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.leave",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -143,6 +144,10 @@ IAM_SERVICE_TOKEN = env("IAM_SERVICE_TOKEN", "")
 IAM_TIMEOUT_SECONDS = env_int("IAM_TIMEOUT_SECONDS", 5)
 IAM_SESSION_CACHE_SECONDS = env_int("IAM_SESSION_CACHE_SECONDS", 60)
 IAM_AUTH_COOKIE_NAME = env("IAM_AUTH_COOKIE_NAME", "fusion_session")
+
+# Optional provider adapters supplied by the institute's IAM/calendar systems.
+ELM_ACADEMIC_CALENDAR_PROVIDER = env("ELM_ACADEMIC_CALENDAR_PROVIDER", "")
+ELM_ATTENDANCE_PROVIDER = env("ELM_ATTENDANCE_PROVIDER", "")
 
 CACHES = {
     "default": (
