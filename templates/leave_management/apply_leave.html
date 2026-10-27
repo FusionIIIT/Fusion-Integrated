@@ -1,0 +1,33 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<h1>Apply for Leave</h1>
+
+{% if messages %}
+  {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+  <label>Start date <input type="date" name="start_date" required></label><br>
+  <label>End date <input type="date" name="end_date" required></label><br>
+  <label>Leave type
+    <select name="leave_type" required>
+      <option value="">Select</option>
+      {% for value, label in leave_types %}
+        <option value="{{ value }}">{{ label }}</option>
+      {% endfor %}
+    </select>
+  </label><br>
+  <label>Reason <textarea name="reason"></textarea></label><br>
+  <button type="submit">Submit leave request</button>
+</form>
+
+<h2>My applications</h2>
+<ul>
+{% for item in applications %}
+  <li>{{ item.start_date }} – {{ item.end_date }} | {{ item.get_leave_type_display }} | {{ item.get_status_display }}</li>
+{% empty %}
+  <li>No applications yet.</li>
+{% endfor %}
+</ul>
+{% endblock %}
