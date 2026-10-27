@@ -38,7 +38,7 @@ paths:
       tags:
       - v1
       security:
-      - iamSession: []
+      - {}
       responses:
         '200':
           content:
@@ -54,14 +54,168 @@ paths:
         directory data is owned by IAM and edited there.
       tags:
       - v1
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
+          description: ''
+  /api/v1/leave/balances/:
+    get:
+      operationId: v1_leave_balances_list
+      description: Retrieve personal leave balance cards (BR-EL-001..009).
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveBalanceList'
+          description: ''
+  /api/v1/leave/requests/:
+    get:
+      operationId: v1_leave_requests_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveRequestList'
+          description: ''
+  /api/v1/leave/requests/{id}/:
+    get:
+      operationId: v1_leave_requests_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/substitute-action/:
+    post:
+      operationId: v1_leave_requests_substitute_action_create
+      description: Consent gate for nominated substitutes (BR-EL-014, BR-EL-015).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubstituteAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubstituteAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubstituteAction'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/transition/:
+    post:
+      operationId: v1_leave_requests_transition_create
+      description: 'Execute lifecycle transition: recommendation, sanction, cancellation,
+        withdrawal.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveTransition'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveTransition'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveTransition'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/apply/:
+    post:
+      operationId: v1_leave_requests_apply_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveApply'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveApply'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveApply'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
           description: ''
   /api/v1/me:
     get:
@@ -72,7 +226,7 @@ paths:
       tags:
       - v1
       security:
-      - iamSession: []
+      - {}
       responses:
         '200':
           content:
@@ -97,7 +251,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PatchedRole'
       security:
-      - iamSession: []
+      - {}
       responses:
         '200':
           content:
@@ -128,7 +282,6 @@ paths:
       - v1
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -156,7 +309,6 @@ paths:
               $ref: '#/components/schemas/Announcement'
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '201':
           content:
@@ -192,7 +344,6 @@ paths:
         required: true
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -223,7 +374,6 @@ paths:
       - v1
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -245,7 +395,6 @@ paths:
       - v1
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -281,7 +430,6 @@ paths:
         required: true
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -311,7 +459,6 @@ paths:
         required: true
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -344,7 +491,6 @@ paths:
         required: true
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -375,7 +521,6 @@ paths:
       - v1
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -403,7 +548,6 @@ paths:
               $ref: '#/components/schemas/Company'
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '201':
           content:
@@ -443,7 +587,6 @@ paths:
               $ref: '#/components/schemas/Approval'
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -457,8 +600,6 @@ paths:
       description: GET  the incidents on record   POST a new one.
       tags:
       - v1
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -485,8 +626,6 @@ paths:
             schema:
               $ref: '#/components/schemas/RecordIncident'
         required: true
-      security:
-      - iamSession: []
       responses:
         '201':
           content:
@@ -518,8 +657,6 @@ paths:
             schema:
               $ref: '#/components/schemas/WaiveIncident'
         required: true
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -539,8 +676,6 @@ paths:
         internal review note.
       tags:
       - v1
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -568,8 +703,6 @@ paths:
             schema:
               $ref: '#/components/schemas/ApplySanction'
         required: true
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -595,8 +728,6 @@ paths:
             schema:
               $ref: '#/components/schemas/LiftSanction'
         required: true
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -614,7 +745,6 @@ paths:
       - v1
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -645,7 +775,6 @@ paths:
         required: true
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '201':
           content:
@@ -664,8 +793,6 @@ paths:
         required: true
       tags:
       - v1
-      security:
-      - iamSession: []
       responses:
         '204':
           description: No response body
@@ -685,7 +812,6 @@ paths:
       - v1
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '302':
           description: Redirect to the document. The Drive URL is disclosed here and
@@ -706,8 +832,6 @@ paths:
       description: Every application in the caller's scope, one row each.
       tags:
       - v1
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -723,8 +847,6 @@ paths:
       description: Who was placed where — the season's outcome, for the annual report.
       tags:
       - v1
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -757,7 +879,6 @@ paths:
       - v1
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -785,7 +906,6 @@ paths:
               $ref: '#/components/schemas/InterviewRound'
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '201':
           content:
@@ -821,7 +941,6 @@ paths:
         required: true
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -857,7 +976,6 @@ paths:
         required: true
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -888,7 +1006,6 @@ paths:
       - v1
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -924,7 +1041,6 @@ paths:
         required: true
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -954,7 +1070,6 @@ paths:
         required: true
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -985,7 +1100,6 @@ paths:
       - v1
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1013,7 +1127,6 @@ paths:
               $ref: '#/components/schemas/JobPosting'
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '201':
           content:
@@ -1037,7 +1150,6 @@ paths:
       - v1
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1071,7 +1183,6 @@ paths:
               $ref: '#/components/schemas/JobPosting'
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1105,7 +1216,6 @@ paths:
               $ref: '#/components/schemas/PatchedJobPosting'
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1127,7 +1237,6 @@ paths:
       - v1
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1151,7 +1260,6 @@ paths:
       - v1
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1169,7 +1277,6 @@ paths:
       - v1
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1195,7 +1302,6 @@ paths:
       - v1
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1209,8 +1315,6 @@ paths:
       description: The caller's own placements and what each still owes.
       tags:
       - v1
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1244,8 +1348,6 @@ paths:
             schema:
               $ref: '#/components/schemas/NotJoining'
         required: true
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1277,8 +1379,6 @@ paths:
             schema:
               $ref: '#/components/schemas/SubmitOfferLetter'
         required: true
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1292,8 +1392,6 @@ paths:
       description: Rule 24, for the caller. Scoped by the credential, never by a parameter.
       tags:
       - v1
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1323,8 +1421,6 @@ paths:
             schema:
               $ref: '#/components/schemas/OffCampusRecord'
         required: true
-      security:
-      - iamSession: []
       responses:
         '201':
           content:
@@ -1338,8 +1434,6 @@ paths:
       description: 'The office''s worklist: placed students who still owe a letter.'
       tags:
       - v1
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1395,7 +1489,6 @@ paths:
         required: true
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1437,7 +1530,6 @@ paths:
       - v1
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1453,7 +1545,6 @@ paths:
       - v1
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1468,8 +1559,6 @@ paths:
         filter.
       tags:
       - v1
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1497,8 +1586,6 @@ paths:
             schema:
               $ref: '#/components/schemas/Register'
         required: true
-      security:
-      - iamSession: []
       responses:
         '201':
           content:
@@ -1524,8 +1611,6 @@ paths:
             schema:
               $ref: '#/components/schemas/FeeApproval'
         required: true
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1553,8 +1638,6 @@ paths:
             schema:
               $ref: '#/components/schemas/OptOut'
         required: true
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1580,8 +1663,6 @@ paths:
             schema:
               $ref: '#/components/schemas/FeeApproval'
         required: true
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1595,8 +1676,6 @@ paths:
       description: Can I register, and on what terms? Read-only.
       tags:
       - v1
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1617,7 +1696,6 @@ paths:
       - v1
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1636,7 +1714,6 @@ paths:
       - v1
       security:
       - recruiterSession: []
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1650,8 +1727,6 @@ paths:
       description: GET /api/v1/placement/students/cpi
       tags:
       - v1
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -1665,8 +1740,6 @@ paths:
       description: The values actually present, so the UI hard-codes nothing.
       tags:
       - v1
-      security:
-      - iamSession: []
       responses:
         '200':
           content:
@@ -2082,6 +2155,22 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CategoryEnum:
+      enum:
+      - CL
+      - RH
+      - SCL
+      - EL
+      - COL
+      - VL
+      type: string
+      description: |-
+        * `CL` - Casual Leave
+        * `RH` - Restricted Holiday
+        * `SCL` - Special Casual Leave
+        * `EL` - Earned Leave
+        * `COL` - Commuted Leave
+        * `VL` - Vacation Leave
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2423,6 +2512,16 @@ components:
       - fee_reference
       - season
       - user_id
+    HalfDayPeriodEnum:
+      enum:
+      - none
+      - FN
+      - AN
+      type: string
+      description: |-
+        * `none` - Full Day
+        * `FN` - Forenoon
+        * `AN` - Afternoon
     IncidentRecorded:
       type: object
       properties:
@@ -2637,6 +2736,209 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveApply:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        half_day:
+          type: boolean
+          default: false
+        half_day_period:
+          allOf:
+          - $ref: '#/components/schemas/HalfDayPeriodEnum'
+          default: none
+        purpose:
+          type: string
+          default: ''
+        station_leave:
+          type: boolean
+          default: false
+        station_details:
+          type: string
+          default: ''
+        substitute_user_id:
+          type: integer
+          nullable: true
+      required:
+      - category
+      - end_date
+      - start_date
+    LeaveBalance:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        allocated:
+          type: number
+          format: double
+        used:
+          type: number
+          format: double
+        pending:
+          type: number
+          format: double
+        available:
+          type: number
+          format: double
+          readOnly: true
+      required:
+      - available
+      - category
+      - id
+      - user_id
+      - year
+    LeaveRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        half_day:
+          type: boolean
+        half_day_period:
+          $ref: '#/components/schemas/HalfDayPeriodEnum'
+        days_count:
+          type: number
+          format: double
+        purpose:
+          type: string
+        station_leave:
+          type: boolean
+        station_details:
+          type: string
+          maxLength: 300
+        substitute_user_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        substitute_status:
+          $ref: '#/components/schemas/SubstituteStatusEnum'
+        substitute_remarks:
+          type: string
+          maxLength: 300
+        unit_head_remarks:
+          type: string
+        authority_remarks:
+          type: string
+        rejection_reason:
+          type: string
+        status:
+          $ref: '#/components/schemas/LeaveStatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        transitions:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveTransitionHistory'
+          readOnly: true
+      required:
+      - category
+      - created_at
+      - end_date
+      - id
+      - start_date
+      - transitions
+      - updated_at
+      - user_id
+    LeaveStatusEnum:
+      enum:
+      - draft
+      - awaiting_substitute
+      - unit_head_queue
+      - establishment
+      - final_decision
+      - approved
+      - rejected
+      - withdrawn
+      - cancelled
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `awaiting_substitute` - Awaiting Substitute
+        * `unit_head_queue` - Unit Head Queue
+        * `establishment` - Establishment
+        * `final_decision` - Final Decision
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `withdrawn` - Withdrawn
+        * `cancelled` - Cancelled
+    LeaveTransition:
+      type: object
+      properties:
+        to_status:
+          $ref: '#/components/schemas/LeaveStatusEnum'
+        reason:
+          type: string
+          default: ''
+      required:
+      - to_status
+    LeaveTransitionHistory:
+      type: object
+      properties:
+        from_status:
+          type: string
+          maxLength: 24
+        to_status:
+          type: string
+          maxLength: 24
+        actor_user_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        reason:
+          type: string
+          maxLength: 300
+        at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - at
+      - from_status
+      - to_status
     LiftSanction:
       type: object
       properties:
@@ -2981,6 +3283,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedLeaveBalanceList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveBalance'
+    PaginatedLeaveRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveRequest'
     PaginatedOfferList:
       type: object
       required:
@@ -3698,6 +4038,28 @@ components:
           type: integer
       required:
       - document_id
+    SubstituteAction:
+      type: object
+      properties:
+        accept:
+          type: boolean
+        remarks:
+          type: string
+          default: ''
+      required:
+      - accept
+    SubstituteStatusEnum:
+      enum:
+      - none
+      - pending
+      - accepted
+      - declined
+      type: string
+      description: |-
+        * `none` - Not Required
+        * `pending` - Pending Consent
+        * `accepted` - Consent Accepted
+        * `declined` - Consent Declined
     TopicEnum:
       enum:
       - drive
@@ -3831,12 +4193,6 @@ components:
       required:
       - reason
   securitySchemes:
-    iamSession:
-      type: apiKey
-      in: header
-      name: Authorization
-      description: '`Token <value>` from the IAM, or the httpOnly `auth_token` cookie
-        the SPA carries.'
     recruiterSession:
       type: apiKey
       in: header

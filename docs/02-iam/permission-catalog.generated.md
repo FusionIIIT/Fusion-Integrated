@@ -13,6 +13,21 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.leave.view_self` | See one's own leave requests | `director`, `employee`, `sanctioning_authority`, `unit_head` |
+| `elm.leave.create` | Apply for leave | `director`, `employee`, `sanctioning_authority`, `unit_head` |
+| `elm.leave.withdraw` | Withdraw a pending leave request | `director`, `employee`, `sanctioning_authority`, `unit_head` |
+| `elm.leave.view` | See leave requests, within scope | `director`, `establishment`, `sanctioning_authority`, `unit_head` |
+| `elm.leave.recommend` | Recommend leave as unit head | `director`, `sanctioning_authority`, `unit_head` |
+| `elm.leave.verify` | Verify leave at establishment | `director`, `establishment`, `sanctioning_authority` |
+| `elm.leave.decide` | Approve or reject leave | `director`, `sanctioning_authority` |
+| `elm.leave.self_sanction` | Self-sanction leave as director | `director` |
+| `elm.leave.cancel` | Cancel approved leave | `director`, `employee`, `sanctioning_authority`, `unit_head` |
+| `elm.leave.report` | See leave reports | `director`, `establishment`, `sanctioning_authority` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
