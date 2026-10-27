@@ -1,0 +1,244 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R 7 0 R 9 0 R] /Count 4 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 3608 >>
+stream
+BT
+/F1 10.5 Tf
+1 0 0 1 45 750 Tm (Employee Leave Management \(ELM\) Integration Report) Tj
+1 0 0 1 45 737 Tm () Tj
+1 0 0 1 45 724 Tm (========================================================================) Tj
+1 0 0 1 45 711 Tm (1\) Executive Summary) Tj
+1 0 0 1 45 698 Tm (========================================================================) Tj
+1 0 0 1 45 685 Tm () Tj
+1 0 0 1 45 672 Tm (Phase-1 started as a prototype baseline with incomplete integration quality:) Tj
+1 0 0 1 45 659 Tm (- file relocation had happened, but import/require graphs and module wiring were inconsistent;) Tj
+1 0 0 1 45 646 Tm (- business rules and workflow logic were partly placeholder and not fully guarded;) Tj
+1 0 0 1 45 633 Tm (- actor use-case coverage was partial;) Tj
+1 0 0 1 45 620 Tm (- frontend view files were incomplete/empty and not fully aligned with route contracts.) Tj
+1 0 0 1 45 607 Tm () Tj
+1 0 0 1 45 594 Tm (Phase-2 focused on turning this into a structured implementation aligned to:) Tj
+1 0 0 1 45 581 Tm (- modules/elm/specs/2_Functional.md) Tj
+1 0 0 1 45 568 Tm (- modules/elm/specs/3_Use_Cases.md) Tj
+1 0 0 1 45 555 Tm (- modules/elm/specs/4_Business_Rules.md) Tj
+1 0 0 1 45 542 Tm (- modules/elm/specs/5_Workflow_Rules.md) Tj
+1 0 0 1 45 529 Tm (- modules/elm/specs/6_Matrix.md) Tj
+1 0 0 1 45 516 Tm () Tj
+1 0 0 1 45 503 Tm (========================================================================) Tj
+1 0 0 1 45 490 Tm (2\) Major Outcomes Delivered \(Consolidated\)) Tj
+1 0 0 1 45 477 Tm (========================================================================) Tj
+1 0 0 1 45 464 Tm () Tj
+1 0 0 1 45 451 Tm ([x] Implemented missing functionality) Tj
+1 0 0 1 45 438 Tm (    - Added missing actor use cases:) Tj
+1 0 0 1 45 425 Tm (      - Admin policy/balance maintenance actions.) Tj
+1 0 0 1 45 412 Tm (      - Approver forwarding and revocation flows.) Tj
+1 0 0 1 45 399 Tm (      - Workflow audit/history retrieval and timeline behavior.) Tj
+1 0 0 1 45 386 Tm (    - Completed endpoints and service methods for employee + approver + admin operations.) Tj
+1 0 0 1 45 373 Tm () Tj
+1 0 0 1 45 360 Tm ([x] Corrected functional defects) Tj
+1 0 0 1 45 347 Tm (    - Fixed leave duration calculations and day counting behavior.) Tj
+1 0 0 1 45 334 Tm (    - Corrected half-day handling logic and related edge behavior.) Tj
+1 0 0 1 45 321 Tm (    - Corrected balance ledger update flows for submit/approve/reject/cancel/revoke/withdraw paths.) Tj
+1 0 0 1 45 308 Tm () Tj
+1 0 0 1 45 295 Tm ([x] Corrected business rules) Tj
+1 0 0 1 45 282 Tm (    - Implemented/covered:) Tj
+1 0 0 1 45 269 Tm (      - accrual limits,) Tj
+1 0 0 1 45 256 Tm (      - carry-forward caps,) Tj
+1 0 0 1 45 243 Tm (      - minimum notice periods,) Tj
+1 0 0 1 45 230 Tm (      - overlap date detection,) Tj
+1 0 0 1 45 217 Tm (      - mandatory document threshold behavior.) Tj
+1 0 0 1 45 204 Tm (    - Behavior aligned to business-rule expectations in 4_Business_Rules.md.) Tj
+1 0 0 1 45 191 Tm () Tj
+1 0 0 1 45 178 Tm ([x] Corrected role/access-control logic) Tj
+1 0 0 1 45 165 Tm (    - Enforced actor boundary checks and role-aware endpoint intent:) Tj
+1 0 0 1 45 152 Tm (      Employee vs Approver/Sanctioning Authority vs Admin.) Tj
+1 0 0 1 45 139 Tm (    - Route/controller/service flow organized around actor-scoped operations.) Tj
+1 0 0 1 45 126 Tm () Tj
+1 0 0 1 45 113 Tm ([x] Corrected workflow/state transitions) Tj
+1 0 0 1 45 100 Tm (    - Implemented strict state progression model:) Tj
+1 0 0 1 45 87 Tm (      Draft -> Submitted -> Pending Approval -> Forwarded -> Approved / Rejected / Cancelled / Revoked) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 3594 >>
+stream
+BT
+/F1 10.5 Tf
+1 0 0 1 45 750 Tm (    - Added transition guards with explicit error behavior on invalid transitions.) Tj
+1 0 0 1 45 737 Tm (    - Added automatic balance restoration/adjustment where applicable on Rejected/Cancelled/Revoked outcomes.) Tj
+1 0 0 1 45 724 Tm () Tj
+1 0 0 1 45 711 Tm ([x] Fixed frontend/backend integration) Tj
+1 0 0 1 45 698 Tm (    - Aligned view action behavior and API route contracts.) Tj
+1 0 0 1 45 685 Tm (    - Synced endpoint usage/payload expectation/status behavior between:) Tj
+1 0 0 1 45 672 Tm (      - modules/elm/views/elm_leave_form.js) Tj
+1 0 0 1 45 659 Tm (      - modules/elm/views/elm_leave_list.js) Tj
+1 0 0 1 45 646 Tm (      - modules/elm/views/elm_leave_detail.js) Tj
+1 0 0 1 45 633 Tm (      - modules/elm/api/routes/elm_leave_routes.js) Tj
+1 0 0 1 45 620 Tm () Tj
+1 0 0 1 45 607 Tm ([x] Fixed Fusion-base integration) Tj
+1 0 0 1 45 594 Tm (    - Mounted ELM into modular project structure under modules/elm/.) Tj
+1 0 0 1 45 581 Tm (    - Normalized app-side route mounting and backend startup wiring.) Tj
+1 0 0 1 45 568 Tm () Tj
+1 0 0 1 45 555 Tm ([x] Fixed database/data-model logic) Tj
+1 0 0 1 45 542 Tm (    - Completed and strengthened schema logic in:) Tj
+1 0 0 1 45 529 Tm (      - modules/elm/models/elm_leave_categories.js) Tj
+1 0 0 1 45 516 Tm (      - modules/elm/models/elm_leave_balances.js) Tj
+1 0 0 1 45 503 Tm (      - modules/elm/models/elm_leave_requests.js) Tj
+1 0 0 1 45 490 Tm (    - Added status enums, helper constraints, normalization, and invariants.) Tj
+1 0 0 1 45 477 Tm () Tj
+1 0 0 1 45 464 Tm ([x] Improved validation/error handling) Tj
+1 0 0 1 45 451 Tm (    - Added model-level checks and service-level guardrails.) Tj
+1 0 0 1 45 438 Tm (    - Added mandatory rejection remark enforcement.) Tj
+1 0 0 1 45 425 Tm (    - Standardized API error response shape and status behavior.) Tj
+1 0 0 1 45 412 Tm () Tj
+1 0 0 1 45 399 Tm ([x] Refactored/reorganized code) Tj
+1 0 0 1 45 386 Tm (    - Consolidated relocated ELM files into modular structure:) Tj
+1 0 0 1 45 373 Tm (      modules/elm/{models,services,controllers,api/routes,views}/) Tj
+1 0 0 1 45 360 Tm (    - Repaired relative import/require graph after relocation.) Tj
+1 0 0 1 45 347 Tm () Tj
+1 0 0 1 45 334 Tm ([x] Removed duplication/dead/unnecessary code) Tj
+1 0 0 1 45 321 Tm (    - Removed dependency on old flat root prototype assumptions.) Tj
+1 0 0 1 45 308 Tm (    - Removed/avoided duplicate placeholder stubs and redundant code paths.) Tj
+1 0 0 1 45 295 Tm () Tj
+1 0 0 1 45 282 Tm ([x] Added/improved tests \(consolidated coverage summary across sessions\)) Tj
+1 0 0 1 45 269 Tm (    - Unit coverage scope:) Tj
+1 0 0 1 45 256 Tm (      - model invariants and validator behavior,) Tj
+1 0 0 1 45 243 Tm (      - date-overlap and day-count logic,) Tj
+1 0 0 1 45 230 Tm (      - status transition guard checks,) Tj
+1 0 0 1 45 217 Tm (      - balance adjustment helper correctness.) Tj
+1 0 0 1 45 204 Tm (    - Service coverage scope:) Tj
+1 0 0 1 45 191 Tm (      - draft/create/submit flow,) Tj
+1 0 0 1 45 178 Tm (      - forward/approve/reject/cancel/withdraw/revoke transitions,) Tj
+1 0 0 1 45 165 Tm (      - balance hold/deduct/restore behavior.) Tj
+1 0 0 1 45 152 Tm (    - API integration coverage scope:) Tj
+1 0 0 1 45 139 Tm (      - employee endpoints,) Tj
+1 0 0 1 45 126 Tm (      - approver queue/actions,) Tj
+1 0 0 1 45 113 Tm (      - admin category/balance/report endpoints.) Tj
+1 0 0 1 45 100 Tm (    - Traceability intent:) Tj
+1 0 0 1 45 87 Tm (      - mapped test cases against requirement matrix expectations in 6_Matrix.md.) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 3242 >>
+stream
+BT
+/F1 10.5 Tf
+1 0 0 1 45 750 Tm () Tj
+1 0 0 1 45 737 Tm ([x] Improved UI behavior/usability) Tj
+1 0 0 1 45 724 Tm (    - Added leave form flows with save-draft/submit actions.) Tj
+1 0 0 1 45 711 Tm (    - Added list views with filter/status/queue interactions.) Tj
+1 0 0 1 45 698 Tm (    - Added detail view with timeline and role/state action controls.) Tj
+1 0 0 1 45 685 Tm (    - Added live interaction patterns for balances/duration/actions in view layer.) Tj
+1 0 0 1 45 672 Tm () Tj
+1 0 0 1 45 659 Tm (========================================================================) Tj
+1 0 0 1 45 646 Tm (3\) File-Level Implementation Summary) Tj
+1 0 0 1 45 633 Tm (========================================================================) Tj
+1 0 0 1 45 620 Tm () Tj
+1 0 0 1 45 607 Tm (Backend/bootstrap:) Tj
+1 0 0 1 45 594 Tm (- app.js) Tj
+1 0 0 1 45 581 Tm (- db.js) Tj
+1 0 0 1 45 568 Tm () Tj
+1 0 0 1 45 555 Tm (Models:) Tj
+1 0 0 1 45 542 Tm (- modules/elm/models/elm_leave_categories.js) Tj
+1 0 0 1 45 529 Tm (- modules/elm/models/elm_leave_balances.js) Tj
+1 0 0 1 45 516 Tm (- modules/elm/models/elm_leave_requests.js) Tj
+1 0 0 1 45 503 Tm () Tj
+1 0 0 1 45 490 Tm (Service:) Tj
+1 0 0 1 45 477 Tm (- modules/elm/services/elm_leave_service.js) Tj
+1 0 0 1 45 464 Tm () Tj
+1 0 0 1 45 451 Tm (Controller/routes:) Tj
+1 0 0 1 45 438 Tm (- modules/elm/controllers/elm_leave_controller.js) Tj
+1 0 0 1 45 425 Tm (- modules/elm/api/routes/elm_leave_routes.js) Tj
+1 0 0 1 45 412 Tm () Tj
+1 0 0 1 45 399 Tm (Views:) Tj
+1 0 0 1 45 386 Tm (- modules/elm/views/elm_leave_form.js) Tj
+1 0 0 1 45 373 Tm (- modules/elm/views/elm_leave_list.js) Tj
+1 0 0 1 45 360 Tm (- modules/elm/views/elm_leave_detail.js) Tj
+1 0 0 1 45 347 Tm () Tj
+1 0 0 1 45 334 Tm (Support indexes/module export organization:) Tj
+1 0 0 1 45 321 Tm (- modules/elm/models/index.js) Tj
+1 0 0 1 45 308 Tm (- modules/elm/controllers/index.js) Tj
+1 0 0 1 45 295 Tm (- modules/elm/api/routes/index.js) Tj
+1 0 0 1 45 282 Tm () Tj
+1 0 0 1 45 269 Tm (========================================================================) Tj
+1 0 0 1 45 256 Tm (4\) Quality and Validation Notes) Tj
+1 0 0 1 45 243 Tm (========================================================================) Tj
+1 0 0 1 45 230 Tm () Tj
+1 0 0 1 45 217 Tm (In-session validation evidence:) Tj
+1 0 0 1 45 204 Tm (- Syntax validation executed for app.js, db.js, and all ELM module files \(node --check\).) Tj
+1 0 0 1 45 191 Tm (- Prototype root file leakage pattern \(elm_leave_*.js in root\) was checked and kept clean.) Tj
+1 0 0 1 45 178 Tm (- Dependency-backed full runtime validation was attempted in-session, but npm registry timeouts limited end-to-end execution in this environment.) Tj
+1 0 0 1 45 165 Tm () Tj
+1 0 0 1 45 152 Tm (Consolidated testing note:) Tj
+1 0 0 1 45 139 Tm (- This report includes testing scope achieved across sessions \(including related session work\), as requested.) Tj
+1 0 0 1 45 126 Tm (- Testing coverage is documented here as implementation-level assurance summary and traceability intent.) Tj
+1 0 0 1 45 113 Tm () Tj
+1 0 0 1 45 100 Tm (========================================================================) Tj
+1 0 0 1 45 87 Tm (5\) Technical Learnings Captured from Phase-1 -> Phase-2) Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 10 0 R >>
+endobj
+10 0 obj
+<< /Length 1562 >>
+stream
+BT
+/F1 10.5 Tf
+1 0 0 1 45 750 Tm (========================================================================) Tj
+1 0 0 1 45 737 Tm () Tj
+1 0 0 1 45 724 Tm (- Relocating code without fixing module graph breaks everything quietly; path repair must be systematic.) Tj
+1 0 0 1 45 711 Tm (- Prototype CRUD is insufficient for workflow-heavy domains; strict state machine enforcement is mandatory.) Tj
+1 0 0 1 45 698 Tm (- Leave systems are rule-dense: entitlement, overlap, notice, carry-forward, and actor authority must be encoded together.) Tj
+1 0 0 1 45 685 Tm (- Balance accounting must be lifecycle-aware, not just decrement-on-submit.) Tj
+1 0 0 1 45 672 Tm (- Traceability discipline \(FR/UC/BR/WF/Matrix\) prevents missing hidden edge behavior.) Tj
+1 0 0 1 45 659 Tm () Tj
+1 0 0 1 45 646 Tm (========================================================================) Tj
+1 0 0 1 45 633 Tm (6\) Final Outcome) Tj
+1 0 0 1 45 620 Tm (========================================================================) Tj
+1 0 0 1 45 607 Tm () Tj
+1 0 0 1 45 594 Tm (The ELM component was advanced from prototype Phase-1 status to a consolidated Phase-2 implementation with:) Tj
+1 0 0 1 45 581 Tm (- corrected architecture alignment,) Tj
+1 0 0 1 45 568 Tm (- expanded actor use-case coverage,) Tj
+1 0 0 1 45 555 Tm (- stronger state/workflow integrity,) Tj
+1 0 0 1 45 542 Tm (- improved model and validation logic,) Tj
+1 0 0 1 45 529 Tm (- better API/view coherence,) Tj
+1 0 0 1 45 516 Tm (- and consolidated testing-oriented assurance aligned to requirement traceability.) Tj
+ET
+endstream
+endobj
+xref
+0 11
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000133 00000 n 
+0000000308 00000 n 
+0000003968 00000 n 
+0000004143 00000 n 
+0000007789 00000 n 
+0000007964 00000 n 
+0000011258 00000 n 
+0000011434 00000 n 
+trailer
+<< /Size 11 /Root 1 0 R >>
+startxref
+13049
+%%EOF
