@@ -1,0 +1,40 @@
+setup: PUT reporting-lines/101 -> 200
+setup: PUT reporting-lines/102 -> 200
+setup: PUT reporting-lines/103 -> 200
+access check: an Employee calling the admin endpoint -> 403 (expected 403)
+navigation for emp: ['Apply for Leave', 'My Leaves', 'Substitute Requests']
+navigation for head: ['Apply for Leave', 'My Leaves', 'Substitute Requests', 'Leave Approvals']
+navigation for estt: ['Apply for Leave', 'My Leaves', 'Substitute Requests', 'Leave Approvals']
+navigation for registrar: ['Apply for Leave', 'My Leaves', 'Substitute Requests', 'Leave Approvals']
+navigation for admin: ['Apply for Leave', 'My Leaves', 'Substitute Requests']
+logged in as emp
+screenshot 01-employee-home-sidebar.png
+screenshot 02-apply-casual-leave-form.png
+screenshot 03-my-leaves-after-apply.png
+logged in as sub
+screenshot 04-substitute-request.png
+logged in as head
+screenshot 05-unit-head-approvals.png
+logged in as emp
+screenshot 06-my-leaves-approved-balance-updated.png
+logged in as head
+screenshot 07-unit-head-recommends-earned-leave.png
+logged in as estt
+screenshot 08-establishment-verifies.png
+logged in as registrar
+screenshot 09-registrar-sanctions.png
+logged in as emp
+screenshot 10-my-leaves-both-approved.png
+logged in as fac
+screenshot 11-faculty-earned-leave-refused.png
+logged in as sub
+sidebar links rendered for sub (Employee): ['Apply for Leave', 'My Leaves', 'Substitute Requests']
+screenshot 12-employee-sidebar-without-approvals.png
+logged in as head
+sidebar links rendered for head (Unit Head): ['Apply for Leave', 'My Leaves', 'Substitute Requests', 'Leave Approvals']
+screenshot 13-unit-head-sidebar-with-approvals.png
+logged in as admin
+no admin page at /leave/admin
+employee deciding a request -> 403 (expected 403: no review permission)
+establishment reading a request not assigned to them -> 404 (expected 404)
+employee balances -> 200: CL used 2.0, RH used 0.0, SCL used 0.0, EL used 5.0, COL used 0.0

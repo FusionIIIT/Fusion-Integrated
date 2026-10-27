@@ -1,0 +1,1435 @@
+I001 [*] Import block is un-sorted or un-formatted
+ --> modules/leave/api/serializers.py:1:1
+  |
+1 | / from rest_framework import serializers
+2 | |
+3 | | from modules.leave.models import HalfDay, LeaveAction, LeaveApplication, LeaveBalance, LeaveCategory, ReportingLine
+  | |___________________________________________________________________________________________________________________^
+help: Organize imports
+   |
+2  |
+   - from modules.leave.models import HalfDay, LeaveAction, LeaveApplication, LeaveBalance, LeaveCategory, ReportingLine
+3  + from modules.leave.models import (
+4  +     HalfDay,
+5  +     LeaveAction,
+6  +     LeaveApplication,
+7  +     LeaveBalance,
+8  +     LeaveCategory,
+9  +     ReportingLine,
+10 + )
+11 |
+   |
+
+E501 Line too long (115 > 100)
+ --> modules/leave/api/serializers.py:3:101
+  |
+1 | from rest_framework import serializers
+2 |
+3 | from modules.leave.models import HalfDay, LeaveAction, LeaveApplication, LeaveBalance, LeaveCategory, ReportingLine
+  |                                                                                                     ^^^^^^^^^^^^^^^
+
+E501 Line too long (157 > 100)
+  --> modules/leave/api/serializers.py:94:101
+   |
+92 | …
+93 | …
+94 | … ("recommended", "Recommended"), ("not_recommended", "Not Recommended"), ("verify", "Verify")],
+   |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+95 | …
+96 | …
+   |
+
+E501 Line too long (101 > 100)
+  --> modules/leave/api/urls.py:9:101
+   |
+ 7 | urlpatterns = [
+ 8 |     path("applications/", views.ApplicationListCreateView.as_view(), name="applications"),
+ 9 |     path("applications/<int:pk>/", views.ApplicationDetailView.as_view(), name="application-detail"),
+   |                                                                                                     ^
+10 |     path("applications/<int:pk>/withdraw/", views.WithdrawView.as_view(), name="withdraw-application"),
+11 |     path("applications/<int:pk>/cancel/", views.CancelView.as_view(), name="cancel-approved-leave"),
+   |
+
+E501 Line too long (103 > 100)
+  --> modules/leave/api/urls.py:10:101
+   |
+ 8 |     path("applications/", views.ApplicationListCreateView.as_view(), name="applications"),
+ 9 |     path("applications/<int:pk>/", views.ApplicationDetailView.as_view(), name="application-detail"),
+10 |     path("applications/<int:pk>/withdraw/", views.WithdrawView.as_view(), name="withdraw-application"),
+   |                                                                                                     ^^^
+11 |     path("applications/<int:pk>/cancel/", views.CancelView.as_view(), name="cancel-approved-leave"),
+12 |     path("applications/<int:pk>/substitute-response/", views.SubstituteResponseView.as_view(), name="respond-to-substitute"),
+   |
+
+E501 Line too long (125 > 100)
+  --> modules/leave/api/urls.py:12:101
+   |
+10 |     path("applications/<int:pk>/withdraw/", views.WithdrawView.as_view(), name="withdraw-application"),
+11 |     path("applications/<int:pk>/cancel/", views.CancelView.as_view(), name="cancel-approved-leave"),
+12 |     path("applications/<int:pk>/substitute-response/", views.SubstituteResponseView.as_view(), name="respond-to-substitute"),
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+13 |     path("applications/<int:pk>/replace-substitute/", views.ReplaceSubstituteView.as_view(), name="replace-substitute"),
+14 |     path("applications/<int:pk>/decide/", views.DecideView.as_view(), name="decide-application"),
+   |
+
+E501 Line too long (120 > 100)
+  --> modules/leave/api/urls.py:13:101
+   |
+11 |     path("applications/<int:pk>/cancel/", views.CancelView.as_view(), name="cancel-approved-leave"),
+12 |     path("applications/<int:pk>/substitute-response/", views.SubstituteResponseView.as_view(), name="respond-to-substitute"),
+13 |     path("applications/<int:pk>/replace-substitute/", views.ReplaceSubstituteView.as_view(), name="replace-substitute"),
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^
+14 |     path("applications/<int:pk>/decide/", views.DecideView.as_view(), name="decide-application"),
+15 |     path("inbox/", views.InboxView.as_view(), name="inbox"),
+   |
+
+E501 Line too long (101 > 100)
+  --> modules/leave/api/urls.py:17:101
+   |
+15 |     path("inbox/", views.InboxView.as_view(), name="inbox"),
+16 |     path("balances/", views.BalanceView.as_view(), name="balances"),
+17 |     path("reporting-lines/<int:user_id>/", views.ReportingLineView.as_view(), name="reporting-line"),
+   |                                                                                                     ^
+18 | ]
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> modules/leave/api/views.py:1:1
+   |
+ 1 | / from django.utils import timezone
+ 2 | | from drf_spectacular.utils import OpenApiParameter, extend_schema
+ 3 | | from rest_framework import status
+ 4 | | from rest_framework.response import Response
+ 5 | | from rest_framework.views import APIView
+ 6 | |
+ 7 | | from core.api.exceptions import NotFoundError
+ 8 | | from fusion_auth.permissions import HasModuleGrant, HasPermission
+ 9 | | from modules.leave import selectors
+10 | | from modules.leave.api.serializers import (
+11 | |     LeaveApplySerializer, DecisionSerializer, LeaveApplicationSerializer, LeaveBalanceSerializer,
+12 | |     ReplaceSubstituteSerializer, ReportingLineSerializer, SubstituteResponseSerializer,
+13 | | )
+14 | | from modules.leave.services import admin, applications, lifecycle
+   | |_________________________________________________________________^
+help: Organize imports
+   |
+10 | from modules.leave.api.serializers import (
+   -     LeaveApplySerializer, DecisionSerializer, LeaveApplicationSerializer, LeaveBalanceSerializer,
+   -     ReplaceSubstituteSerializer, ReportingLineSerializer, SubstituteResponseSerializer,
+11 +     DecisionSerializer,
+12 +     LeaveApplicationSerializer,
+13 +     LeaveApplySerializer,
+14 +     LeaveBalanceSerializer,
+15 +     ReplaceSubstituteSerializer,
+16 +     ReportingLineSerializer,
+17 +     SubstituteResponseSerializer,
+18 | )
+   |
+
+RET505 [*] Unnecessary `elif` after `return` statement
+  --> modules/leave/api/views.py:21:9
+   |
+19 |         if self.request.method == "GET":
+20 |             return [HasModuleGrant("leave")(), HasPermission("leave.application.view_own")()]
+21 |         elif self.request.method == "POST":
+   |         ^^^^
+22 |             return [HasModuleGrant("leave")(), HasPermission("leave.application.apply")()]
+23 |         return super().get_permissions()
+   |
+help: Remove unnecessary `elif`
+   |
+20 |             return [HasModuleGrant("leave")(), HasPermission("leave.application.view_own")()]
+   -         elif self.request.method == "POST":
+21 +         if self.request.method == "POST":
+22 |             return [HasModuleGrant("leave")(), HasPermission("leave.application.apply")()]
+   |
+
+E501 Line too long (110 > 100)
+  --> modules/leave/api/views.py:25:101
+   |
+23 |         return super().get_permissions()
+24 |
+25 |     @extend_schema(operation_id="v1_leave_applications_list", responses=LeaveApplicationSerializer(many=True))
+   |                                                                                                     ^^^^^^^^^^
+26 |     def get(self, request, *args, **kwargs):
+27 |         user_id = request.principal.user_id
+   |
+
+E501 Line too long (121 > 100)
+   --> modules/leave/api/views.py:105:101
+    |
+103 | @extend_schema(responses=LeaveApplicationSerializer(many=True))
+104 | class InboxView(APIView):
+105 |     permission_classes = [HasModuleGrant("leave"), HasPermission("leave.application.review", "leave.substitute.respond")]
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^
+106 |
+107 |     def get(self, request, *args, **kwargs):
+    |
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+   --> modules/leave/api/views.py:130:9
+    |
+128 |               if not request.principal.has_permission("leave.application.verify"):
+129 |                   raise NotFoundError("You do not have permission to decide at this stage.")
+130 | /         elif app.stage == "sanction":
+131 | |             if not request.principal.has_permission("leave.application.sanction"):
+    | |__________________________________________________________________________________^
+132 |                   raise NotFoundError("You do not have permission to decide at this stage.")
+    |
+help: Combine `if` statements using `and`
+
+E501 Line too long (119 > 100)
+   --> modules/leave/api/views.py:139:101
+    |
+139 | @extend_schema(parameters=[OpenApiParameter("year", int, required=False)], responses=LeaveBalanceSerializer(many=True))
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^^
+140 | class BalanceView(APIView):
+141 |     permission_classes = [HasModuleGrant("leave"), HasPermission("leave.application.view_own")]
+    |
+
+E501 Line too long (138 > 100)
+   --> modules/leave/api/views.py:167:101
+    |
+165 | …
+166 | …
+167 | …["unit_head_id"], data.get("establishment_id"), data.get("sanctioning_authority_id"))
+    |                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+168 | …
+169 | …
+    |
+
+UP035 `typing.Dict` is deprecated, use `dict` instead
+ --> modules/leave/domain/policy.py:8:1
+  |
+6 | from datetime import date, timedelta
+7 | from decimal import Decimal
+8 | from typing import Dict, Optional
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+PIE790 [*] Unnecessary `pass` statement
+  --> modules/leave/domain/policy.py:13:5
+   |
+11 | class PolicyError(Exception):
+12 |     """Domain policy error."""
+13 |     pass
+   |     ^^^^
+help: Remove unnecessary `pass`
+   |
+12 |     """Domain policy error."""
+   -     pass
+13 |
+   |
+
+UP006 [*] Use `dict` instead of `Dict` for type annotation
+  --> modules/leave/domain/policy.py:18:14
+   |
+16 | CATEGORIES = ("CL", "RH", "SCL", "EL", "COL", "VL")
+17 |
+18 | ENTITLEMENT: Dict[str, tuple] = {
+   |              ^^^^
+19 |     "CL": (Decimal("8"), True, True, False),  # BR-EL-002
+20 |     "RH": (Decimal("2"), True, True, False),  # BR-EL-003
+   |
+help: Replace with `dict`
+   |
+17 |
+   - ENTITLEMENT: Dict[str, tuple] = {
+18 + ENTITLEMENT: dict[str, tuple] = {
+19 |     "CL": (Decimal("8"), True, True, False),  # BR-EL-002
+   |
+
+UP045 [*] Use `X | None` for type annotations
+  --> modules/leave/domain/policy.py:30:46
+   |
+30 | def entitlement(category: str, kind: str) -> Optional[Decimal]:
+   |                                              ^^^^^^^^^^^^^^^^^
+31 |     """
+32 |     Return the annual leave entitlement for a category and kind.
+   |
+help: Convert to `X | None`
+   |
+29 |
+   - def entitlement(category: str, kind: str) -> Optional[Decimal]:
+30 + def entitlement(category: str, kind: str) -> Decimal | None:
+31 |     """
+   |
+
+W293 Blank line contains whitespace
+  --> modules/leave/domain/policy.py:33:1
+   |
+31 |     """
+32 |     Return the annual leave entitlement for a category and kind.
+33 |     
+   | ^^^^
+34 |     - kind="faculty" returns faculty allowance (or None if not eligible).
+35 |     - Any other kind (e.g., "staff", "employee", "") is treated as staff.
+   |
+help: Remove whitespace from blank line
+   |
+32 |     Return the annual leave entitlement for a category and kind.
+   -     
+33 +
+34 |     - kind="faculty" returns faculty allowance (or None if not eligible).
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+W293 Blank line contains whitespace
+  --> modules/leave/domain/policy.py:37:1
+   |
+35 |     - Any other kind (e.g., "staff", "employee", "") is treated as staff.
+36 |     - Returns None if the category is not supported or the user kind is ineligible.
+37 |     
+   | ^^^^
+38 |     BR-EL-001: Only supported categories allowed.
+39 |     BR-EL-005: EL is for non-faculty only (faculty_allowed=False).
+   |
+help: Remove whitespace from blank line
+   |
+36 |     - Returns None if the category is not supported or the user kind is ineligible.
+   -     
+37 +
+38 |     BR-EL-001: Only supported categories allowed.
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+W293 [*] Blank line contains whitespace
+  --> modules/leave/domain/policy.py:43:1
+   |
+41 |     if category not in CATEGORIES:
+42 |         raise PolicyError(f"Unknown leave category: {category}")  # BR-EL-001
+43 |     
+   | ^^^^
+44 |     days_per_year, faculty_allowed, staff_allowed, carries_forward = ENTITLEMENT[category]
+   |
+help: Remove whitespace from blank line
+   |
+42 |         raise PolicyError(f"Unknown leave category: {category}")  # BR-EL-001
+   -     
+43 +
+44 |     days_per_year, faculty_allowed, staff_allowed, carries_forward = ENTITLEMENT[category]
+   |
+
+RUF059 Unpacked variable `carries_forward` is never used
+  --> modules/leave/domain/policy.py:44:52
+   |
+42 |         raise PolicyError(f"Unknown leave category: {category}")  # BR-EL-001
+43 |     
+44 |     days_per_year, faculty_allowed, staff_allowed, carries_forward = ENTITLEMENT[category]
+   |                                                    ^^^^^^^^^^^^^^^
+45 |     
+46 |     is_faculty = kind == "faculty"
+   |
+help: Prefix it with an underscore or any other dummy variable pattern
+   |
+43 |     
+   -     days_per_year, faculty_allowed, staff_allowed, carries_forward = ENTITLEMENT[category]
+44 +     days_per_year, faculty_allowed, staff_allowed, _carries_forward = ENTITLEMENT[category]
+45 |     
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+W293 [*] Blank line contains whitespace
+  --> modules/leave/domain/policy.py:45:1
+   |
+44 |     days_per_year, faculty_allowed, staff_allowed, carries_forward = ENTITLEMENT[category]
+45 |     
+   | ^^^^
+46 |     is_faculty = kind == "faculty"
+   |
+help: Remove whitespace from blank line
+   |
+44 |     days_per_year, faculty_allowed, staff_allowed, carries_forward = ENTITLEMENT[category]
+   -     
+45 +
+46 |     is_faculty = kind == "faculty"
+   |
+
+W293 [*] Blank line contains whitespace
+  --> modules/leave/domain/policy.py:47:1
+   |
+46 |     is_faculty = kind == "faculty"
+47 |     
+   | ^^^^
+48 |     if is_faculty:
+49 |         if faculty_allowed:
+   |
+help: Remove whitespace from blank line
+   |
+46 |     is_faculty = kind == "faculty"
+   -     
+47 +
+48 |     if is_faculty:
+   |
+
+RET505 [*] Unnecessary `else` after `return` statement
+  --> modules/leave/domain/policy.py:51:9
+   |
+49 |         if faculty_allowed:
+50 |             return days_per_year
+51 |         else:
+   |         ^^^^
+52 |             return None  # EL is not for faculty
+53 |     else:
+   |
+help: Remove unnecessary `else`
+   |
+50 |             return days_per_year
+   -         else:
+   -             return None  # EL is not for faculty
+51 +         return None  # EL is not for faculty
+52 |     else:
+   |
+
+RET505 [*] Unnecessary `else` after `return` statement
+  --> modules/leave/domain/policy.py:57:9
+   |
+55 |         if staff_allowed:
+56 |             return days_per_year
+57 |         else:
+   |         ^^^^
+58 |             return None  # VL is not for staff (faculty_allowed=True, staff_allowed=False)
+   |
+help: Remove unnecessary `else`
+   |
+56 |             return days_per_year
+   -         else:
+   -             return None  # VL is not for staff (faculty_allowed=True, staff_allowed=False)
+57 +         return None  # VL is not for staff (faculty_allowed=True, staff_allowed=False)
+58 |
+   |
+
+W293 Blank line contains whitespace
+  --> modules/leave/domain/policy.py:64:1
+   |
+62 |     """
+63 |     Calculate the number of leave days consumed.
+64 |     
+   | ^^^^
+65 |     BR-EL-010: Half-day CL consumes 0.5 day (only for CL and when start==end).
+66 |     BR-EL-011: EL, COL, VL count every calendar day inclusive (weekends/holidays included).
+   |
+help: Remove whitespace from blank line
+   |
+63 |     Calculate the number of leave days consumed.
+   -     
+64 +
+65 |     BR-EL-010: Half-day CL consumes 0.5 day (only for CL and when start==end).
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+E501 Line too long (104 > 100)
+  --> modules/leave/domain/policy.py:67:101
+   |
+65 |     BR-EL-010: Half-day CL consumes 0.5 day (only for CL and when start==end).
+66 |     BR-EL-011: EL, COL, VL count every calendar day inclusive (weekends/holidays included).
+67 |                CL, RH, SCL count Monday to Friday only (no holiday calendar yet -> assume working days).
+   |                                                                                                     ^^^^
+68 |     
+69 |     Note: Since no external calendar service is imported, we assume the input dates represent
+   |
+
+W293 Blank line contains whitespace
+  --> modules/leave/domain/policy.py:68:1
+   |
+66 |     BR-EL-011: EL, COL, VL count every calendar day inclusive (weekends/holidays included).
+67 |                CL, RH, SCL count Monday to Friday only (no holiday calendar yet -> assume working days).
+68 |     
+   | ^^^^
+69 |     Note: Since no external calendar service is imported, we assume the input dates represent
+70 |     the requested interval. For CL/RH/SCL, we will perform a basic weekday check assuming
+   |
+help: Remove whitespace from blank line
+   |
+67 |                CL, RH, SCL count Monday to Friday only (no holiday calendar yet -> assume working days).
+   -     
+68 +
+69 |     Note: Since no external calendar service is imported, we assume the input dates represent
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+W293 [*] Blank line contains whitespace
+  --> modules/leave/domain/policy.py:75:1
+   |
+73 |     if start > end:
+74 |         raise PolicyError("End date must be on or after start date")  # Generic validation
+75 |     
+   | ^^^^
+76 |     if half_day != "none" and category not in ("CL",):
+77 |         raise PolicyError(f"Half-day consumption only applies to CL. Category: {category}")  # BR-EL-010
+   |
+help: Remove whitespace from blank line
+   |
+74 |         raise PolicyError("End date must be on or after start date")  # Generic validation
+   -     
+75 +
+76 |     if half_day != "none" and category not in ("CL",):
+   |
+
+E501 Line too long (104 > 100)
+  --> modules/leave/domain/policy.py:77:101
+   |
+76 |     if half_day != "none" and category not in ("CL",):
+77 |         raise PolicyError(f"Half-day consumption only applies to CL. Category: {category}")  # BR-EL-010
+   |                                                                                                     ^^^^
+78 |     
+79 |     if half_day != "none" and start != end:
+   |
+
+W293 [*] Blank line contains whitespace
+  --> modules/leave/domain/policy.py:78:1
+   |
+76 |     if half_day != "none" and category not in ("CL",):
+77 |         raise PolicyError(f"Half-day consumption only applies to CL. Category: {category}")  # BR-EL-010
+78 |     
+   | ^^^^
+79 |     if half_day != "none" and start != end:
+80 |         raise PolicyError("Half-day consumption only allowed for single-day requests")  # BR-EL-010
+   |
+help: Remove whitespace from blank line
+   |
+77 |         raise PolicyError(f"Half-day consumption only applies to CL. Category: {category}")  # BR-EL-010
+   -     
+78 +
+79 |     if half_day != "none" and start != end:
+   |
+
+W293 [*] Blank line contains whitespace
+  --> modules/leave/domain/policy.py:81:1
+   |
+79 |     if half_day != "none" and start != end:
+80 |         raise PolicyError("Half-day consumption only allowed for single-day requests")  # BR-EL-010
+81 |     
+   | ^^^^
+82 |     category_upper = category.upper()
+   |
+help: Remove whitespace from blank line
+   |
+80 |         raise PolicyError("Half-day consumption only allowed for single-day requests")  # BR-EL-010
+   -     
+81 +
+82 |     category_upper = category.upper()
+   |
+
+W293 [*] Blank line contains whitespace
+  --> modules/leave/domain/policy.py:83:1
+   |
+82 |     category_upper = category.upper()
+83 |     
+   | ^^^^
+84 |     if category_upper in CONTINUOUS:
+85 |         # BR-EL-011: EL, COL, VL count every calendar day inclusive.
+   |
+help: Remove whitespace from blank line
+   |
+82 |     category_upper = category.upper()
+   -     
+83 +
+84 |     if category_upper in CONTINUOUS:
+   |
+
+W293 [*] Blank line contains whitespace
+  --> modules/leave/domain/policy.py:97:1
+   |
+95 |                 days += Decimal("1")
+96 |             current += timedelta(days=1)
+97 |     
+   | ^^^^
+98 |     if half_day != "none":
+99 |         # Apply half-day consumption (0.5 day) directly per BR-EL-010
+   |
+help: Remove whitespace from blank line
+   |
+96 |             current += timedelta(days=1)
+   -     
+97 +
+98 |     if half_day != "none":
+   |
+
+W293 [*] Blank line contains whitespace
+   --> modules/leave/domain/policy.py:101:1
+    |
+ 99 |         # Apply half-day consumption (0.5 day) directly per BR-EL-010
+100 |         return Decimal("0.5")
+101 |     
+    | ^^^^
+102 |     return days
+    |
+help: Remove whitespace from blank line
+    |
+100 |         return Decimal("0.5")
+    -     
+101 +
+102 |     return days
+    |
+
+E501 Line too long (103 > 100)
+   --> modules/leave/domain/policy.py:105:101
+    |
+105 | def overlaps(a_start: date, a_end: date, a_half: str, b_start: date, b_end: date, b_half: str) -> bool:
+    |                                                                                                     ^^^
+106 |     """
+107 |     Check if two leave requests overlap.
+    |
+
+W293 Blank line contains whitespace
+   --> modules/leave/domain/policy.py:108:1
+    |
+106 |     """
+107 |     Check if two leave requests overlap.
+108 |     
+    | ^^^^
+109 |     True when the date ranges intersect, except a single shared date where both halves are set and different.
+110 |     BR-EL-012: Applicant non-overlap with half-day CL exception.
+    |
+help: Remove whitespace from blank line
+    |
+107 |     Check if two leave requests overlap.
+    -     
+108 +
+109 |     True when the date ranges intersect, except a single shared date where both halves are set and different.
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+E501 Line too long (109 > 100)
+   --> modules/leave/domain/policy.py:109:101
+    |
+107 |     Check if two leave requests overlap.
+108 |     
+109 |     True when the date ranges intersect, except a single shared date where both halves are set and different.
+    |                                                                                                     ^^^^^^^^^
+110 |     BR-EL-012: Applicant non-overlap with half-day CL exception.
+111 |     """
+    |
+
+W293 [*] Blank line contains whitespace
+   --> modules/leave/domain/policy.py:115:1
+    |
+113 |     # Intersection exists if: start_a <= end_b AND start_b <= end_a
+114 |     intersects = (a_start <= b_end) and (b_start <= a_end)
+115 |     
+    | ^^^^
+116 |     if not intersects:
+117 |         return False
+    |
+help: Remove whitespace from blank line
+    |
+114 |     intersects = (a_start <= b_end) and (b_start <= a_end)
+    -     
+115 +
+116 |     if not intersects:
+    |
+
+W293 [*] Blank line contains whitespace
+   --> modules/leave/domain/policy.py:118:1
+    |
+116 |     if not intersects:
+117 |         return False
+118 |     
+    | ^^^^
+119 |     # Check for the half-day exception on the same date
+120 |     # Exception applies only to CL (implied by context of BR-EL-012 regarding halves)
+    |
+help: Remove whitespace from blank line
+    |
+117 |         return False
+    -     
+118 +
+119 |     # Check for the half-day exception on the same date
+    |
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+   --> modules/leave/domain/policy.py:122:5
+    |
+120 |       # Exception applies only to CL (implied by context of BR-EL-012 regarding halves)
+121 |       # If both are on the same day and have different halves, they do NOT overlap.
+122 | /     if a_start == b_start:
+123 | |         if a_half != "none" and b_half != "none":
+124 | |             # Both are half-days on the same day
+125 | |             if a_half != b_half:
+    | |________________________________^
+126 |                   return False  # Different halves on same date -> non-overlapping
+    |
+help: Combine `if` statements using `and`
+    |
+121 |     # If both are on the same day and have different halves, they do NOT overlap.
+    -     if a_start == b_start:
+    -         if a_half != "none" and b_half != "none":
+    -             # Both are half-days on the same day
+    -             if a_half != b_half:
+    -                 return False  # Different halves on same date -> non-overlapping
+122 +     if a_start == b_start and a_half != "none" and b_half != "none":
+123 +         # Both are half-days on the same day
+124 +         if a_half != b_half:
+125 +             return False  # Different halves on same date -> non-overlapping
+126 |     
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+   --> modules/leave/domain/policy.py:123:9
+    |
+121 |       # If both are on the same day and have different halves, they do NOT overlap.
+122 |       if a_start == b_start:
+123 | /         if a_half != "none" and b_half != "none":
+124 | |             # Both are half-days on the same day
+125 | |             if a_half != b_half:
+    | |________________________________^
+126 |                   return False  # Different halves on same date -> non-overlapping
+    |
+help: Combine `if` statements using `and`
+
+W293 [*] Blank line contains whitespace
+   --> modules/leave/domain/policy.py:127:1
+    |
+125 |             if a_half != b_half:
+126 |                 return False  # Different halves on same date -> non-overlapping
+127 |     
+    | ^^^^
+128 |     return True
+    |
+help: Remove whitespace from blank line
+    |
+126 |                 return False  # Different halves on same date -> non-overlapping
+    -     
+127 +
+128 |     return True
+    |
+
+W293 Blank line contains whitespace
+   --> modules/leave/domain/policy.py:134:1
+    |
+132 |     """
+133 |     Determine if Unit Head has final decision power.
+134 |     
+    | ^^^^
+135 |     BR-EL-016: True for CL and RH.
+136 |     BR-EL-017: Others only get a recommendation.
+    |
+help: Remove whitespace from blank line
+    |
+133 |     Determine if Unit Head has final decision power.
+    -     
+134 +
+135 |     BR-EL-016: True for CL and RH.
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> modules/leave/models.py:1:1
+  |
+1 | / from decimal import Decimal
+2 | | from django.db import models
+3 | | from core.db.mixins import TimeStampedModel, UserScopedModel
+  | |____________________________________________________________^
+help: Organize imports
+  |
+1 | from decimal import Decimal
+2 +
+3 | from django.db import models
+4 +
+5 | from core.db.mixins import TimeStampedModel, UserScopedModel
+  |
+
+E501 Line too long (102 > 100)
+   --> modules/leave/models.py:99:101
+    |
+ 97 |     station_leave = models.BooleanField(default=False, verbose_name="Station Leave")
+ 98 |     station_address = models.TextField(blank=True, verbose_name="Station Address")
+ 99 |     substitute_id = models.IntegerField(null=True, blank=True, verbose_name="Nominated Substitute ID")
+    |                                                                                                     ^^
+100 |     substitute_status = models.CharField(
+101 |         max_length=15,
+    |
+
+E501 Line too long (101 > 100)
+   --> modules/leave/models.py:133:101
+    |
+132 |     def __str__(self) -> str:
+133 |         return f"{self.user_id}'s {self.category} application ({self.start_date} to {self.end_date})"
+    |                                                                                                     ^
+
+E501 Line too long (101 > 100)
+  --> modules/leave/registry.py:49:101
+   |
+47 |     ("leave.application.review", "Decide requests assigned to oneself at the Unit Head stage"),
+48 |     ("leave.application.verify", "Verify requests at the Establishment stage"),
+49 |     ("leave.application.sanction", "Sanction or refuse requests at the Sanctioning Authority stage"),
+   |                                                                                                     ^
+50 |     ("leave.admin.manage", "Maintain reporting lines"),
+51 | ]
+   |
+
+E501 Line too long (106 > 100)
+ --> modules/leave/selectors.py:8:101
+  |
+7 | def my_applications(user_id: int) -> QuerySet:
+8 |     """Return the leave applications belonging to a specific user, ordered by creation date descending."""
+  |                                                                                                     ^^^^^^
+9 |     return LeaveApplication.objects.prefetch_related("actions").filter(user_id=user_id).order_by("-created_at")
+  |
+
+E501 Line too long (111 > 100)
+ --> modules/leave/selectors.py:9:101
+  |
+7 | def my_applications(user_id: int) -> QuerySet:
+8 |     """Return the leave applications belonging to a specific user, ordered by creation date descending."""
+9 |     return LeaveApplication.objects.prefetch_related("actions").filter(user_id=user_id).order_by("-created_at")
+  |                                                                                                     ^^^^^^^^^^^
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+  --> modules/leave/selectors.py:28:5
+   |
+26 |           raise NotFoundError()
+27 |
+28 | /     if app.user_id != user_id and app.assignee_id != user_id:
+29 | |         # Check if the user is the nominated substitute
+30 | |         if app.substitute_id != user_id:
+   | |________________________________________^
+31 |               raise NotFoundError(f"Access denied to application {application_id}")
+   |
+help: Combine `if` statements using `and`
+
+E501 Line too long (127 > 100)
+  --> modules/leave/services/admin.py:9:101
+   |
+ 8 | @transaction.atomic
+ 9 | def set_reporting_line(user_id: int, unit_head_id: int, establishment_id=None, sanctioning_authority_id=None) -> ReportingLine:
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+10 |     """
+11 |     Update or create the reporting line for a user.
+   |
+
+W293 Blank line contains whitespace
+  --> modules/leave/services/admin.py:12:1
+   |
+10 |     """
+11 |     Update or create the reporting line for a user.
+12 |     
+   | ^^^^
+13 |     Raises LeaveError if unit_head_id is missing.
+14 |     """
+   |
+help: Remove whitespace from blank line
+   |
+11 |     Update or create the reporting line for a user.
+   -     
+12 +
+13 |     Raises LeaveError if unit_head_id is missing.
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+RUF059 Unpacked variable `created` is never used
+  --> modules/leave/services/admin.py:18:21
+   |
+16 |         raise LeaveError("Unit head ID cannot be empty.")
+17 |
+18 |     reporting_line, created = ReportingLine.objects.update_or_create(
+   |                     ^^^^^^^
+19 |         user_id=user_id,
+20 |         defaults={
+   |
+help: Prefix it with an underscore or any other dummy variable pattern
+   |
+17 |
+   -     reporting_line, created = ReportingLine.objects.update_or_create(
+18 +     reporting_line, _created = ReportingLine.objects.update_or_create(
+19 |         user_id=user_id,
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+W293 Blank line contains whitespace
+  --> modules/leave/services/admin.py:34:1
+   |
+32 |     """
+33 |     Ensure leave balances exist for all categories eligible for the given kind.
+34 |     
+   | ^^^^
+35 |     Returns a list of LeaveBalance objects ordered by category name.
+36 |     """
+   |
+help: Remove whitespace from blank line
+   |
+33 |     Ensure leave balances exist for all categories eligible for the given kind.
+   -     
+34 +
+35 |     Returns a list of LeaveBalance objects ordered by category name.
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+W293 [*] Blank line contains whitespace
+  --> modules/leave/services/admin.py:38:1
+   |
+36 |     """
+37 |     eligible_categories = []
+38 |     
+   | ^^^^
+39 |     for category in policy.CATEGORIES:
+40 |         entitlement = policy.entitlement(category, kind)
+   |
+help: Remove whitespace from blank line
+   |
+37 |     eligible_categories = []
+   -     
+38 +
+39 |     for category in policy.CATEGORIES:
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> modules/leave/services/applications.py:1:1
+   |
+ 1 | / from datetime import date
+ 2 | | from decimal import Decimal
+ 3 | | from typing import Optional
+ 4 | |
+ 5 | | from django.db import transaction
+ 6 | |
+ 7 | | from core.api.exceptions import BadRequestError, NotFoundError
+ 8 | | from modules.leave.domain import policy
+ 9 | | from modules.leave.models import (
+10 | |     LeaveAction, LeaveApplication, LeaveBalance, ReportingLine,
+11 | |     RequestKind, Stage, Status, SubstituteStatus,
+12 | | )
+   | |_^
+help: Organize imports
+   |
+9  | from modules.leave.models import (
+   -     LeaveAction, LeaveApplication, LeaveBalance, ReportingLine,
+   -     RequestKind, Stage, Status, SubstituteStatus,
+10 +     LeaveAction,
+11 +     LeaveApplication,
+12 +     LeaveBalance,
+13 +     ReportingLine,
+14 +     RequestKind,
+15 +     Stage,
+16 +     Status,
+17 +     SubstituteStatus,
+18 | )
+   |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  --> modules/leave/services/applications.py:41:9
+   |
+39 |         entitlement = policy.entitlement(category, kind)
+40 |     except policy.PolicyError as e:
+41 |         raise LeaveError(str(e))
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^
+42 |
+43 |     if entitlement is None:
+   |
+
+UP045 [*] Use `X | None` for type annotations
+  --> modules/leave/services/applications.py:64:82
+   |
+64 | def has_overlap(user_id: int, start: date, end: date, half_day: str, exclude_id: Optional[int] = None) -> bool:
+   |                                                                                  ^^^^^^^^^^^^^
+65 |     """Check if the user has an overlapping leave application.
+   |
+help: Convert to `X | None`
+   |
+63 |
+   - def has_overlap(user_id: int, start: date, end: date, half_day: str, exclude_id: Optional[int] = None) -> bool:
+64 + def has_overlap(user_id: int, start: date, end: date, half_day: str, exclude_id: int | None = None) -> bool:
+65 |     """Check if the user has an overlapping leave application.
+   |
+
+E501 Line too long (111 > 100)
+  --> modules/leave/services/applications.py:64:101
+   |
+64 | def has_overlap(user_id: int, start: date, end: date, half_day: str, exclude_id: Optional[int] = None) -> bool:
+   |                                                                                                     ^^^^^^^^^^^
+65 |     """Check if the user has an overlapping leave application.
+   |
+
+E501 Line too long (123 > 100)
+  --> modules/leave/services/applications.py:71:101
+   |
+69 |     """
+70 |     # Determine which categories count as "LEAVE" for overlap purposes (excluding CANCELLATION)
+71 |     leave_categories = [cat[0] for cat in LeaveApplication._meta.get_field('category').choices if cat[0] != 'CANCELLATION']
+   |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^
+72 |
+73 |     applications = LeaveApplication.objects.filter(
+   |
+
+E501 Line too long (106 > 100)
+  --> modules/leave/services/applications.py:86:101
+   |
+84 |     for app in applications:
+85 |         # Calculate overlap using policy logic
+86 |         is_overlapping = policy.overlaps(app.start_date, app.end_date, app.half_day, start, end, half_day)
+   |                                                                                                     ^^^^^^
+87 |         if is_overlapping:
+88 |             return True
+   |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> modules/leave/services/applications.py:134:9
+    |
+132 |         entitlement = policy.entitlement(category, kind)
+133 |     except policy.PolicyError as e:
+134 |         raise LeaveError(str(e))
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+135 |
+136 |     if entitlement is None:
+    |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> modules/leave/services/applications.py:143:9
+    |
+141 |         days = policy.count_days(category, start_date, end_date, half_day)
+142 |     except policy.PolicyError as e:
+143 |         raise LeaveError(str(e))
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+144 |
+145 |     if days <= 0:
+    |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> modules/leave/services/applications.py:152:9
+    |
+150 |         balance = get_balance(user_id, kind, category, start_date.year)
+151 |     except LeaveError as e:
+152 |         raise LeaveError(str(e))
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+153 |
+154 |     if balance.available < days:
+    |
+
+E501 Line too long (106 > 100)
+   --> modules/leave/services/applications.py:155:101
+    |
+154 |     if balance.available < days:
+155 |         raise LeaveError(f"Insufficient leave balance. Available: {balance.available}, Required: {days}.")
+    |                                                                                                     ^^^^^^
+156 |
+157 |     # 4. Check overlap (BR-EL-012)
+    |
+
+F541 [*] f-string without any placeholders
+   --> modules/leave/services/applications.py:241:24
+    |
+240 |     if app.assignee_id != actor_id:
+241 |         raise NotFound(f"Only the assigned substitute can respond to this application.")
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+242 |
+243 |     if app.status != Status.PENDING.value or app.stage != Stage.SUBSTITUTE.value:
+    |
+help: Remove extraneous `f` prefix
+    |
+240 |     if app.assignee_id != actor_id:
+    -         raise NotFound(f"Only the assigned substitute can respond to this application.")
+241 +         raise NotFound("Only the assigned substitute can respond to this application.")
+242 |
+    |
+
+E501 Line too long (125 > 100)
+   --> modules/leave/services/applications.py:244:101
+    |
+243 |     if app.status != Status.PENDING.value or app.stage != Stage.SUBSTITUTE.value:
+244 |         raise NotFound(f"Cannot respond to substitute request for application in status {app.status} and stage {app.stage}.")
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+245 |
+246 |     if accept:
+    |
+
+F541 [*] f-string without any placeholders
+   --> modules/leave/services/applications.py:272:24
+    |
+271 |     if app.user_id != actor_id:
+272 |         raise NotFound(f"Only the application owner can nominate a replacement substitute.")
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+273 |
+274 |     if app.status not in [Status.PENDING.value]:
+    |
+help: Remove extraneous `f` prefix
+    |
+271 |     if app.user_id != actor_id:
+    -         raise NotFound(f"Only the application owner can nominate a replacement substitute.")
+272 +         raise NotFound("Only the application owner can nominate a replacement substitute.")
+273 |
+    |
+
+E501 Line too long (107 > 100)
+   --> modules/leave/services/applications.py:278:101
+    |
+277 |     if app.substitute_status != SubstituteStatus.DECLINED.value:
+278 |         raise NotFound(f"Can only replace a declined substitute. Current status: {app.substitute_status}.")
+    |                                                                                                     ^^^^^^^
+279 |
+280 |     # Validate new substitute eligibility (simplified: not applicant, no overlap)
+    |
+
+F541 [*] f-string without any placeholders
+   --> modules/leave/services/applications.py:311:24
+    |
+310 |     if app.user_id != actor_id:
+311 |         raise NotFound(f"Only the application owner can withdraw this application.")
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+312 |
+313 |     if app.status != Status.PENDING.value:
+    |
+help: Remove extraneous `f` prefix
+    |
+310 |     if app.user_id != actor_id:
+    -         raise NotFound(f"Only the application owner can withdraw this application.")
+311 +         raise NotFound("Only the application owner can withdraw this application.")
+312 |
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> modules/leave/services/lifecycle.py:3:1
+   |
+ 1 |   """Leave decision and cancellation services (rewritten in Phase 2)."""
+ 2 |
+ 3 | / from decimal import Decimal
+ 4 | | from datetime import date
+ 5 | | from django.db import transaction
+ 6 | | from django.utils import timezone
+ 7 | |
+ 8 | | from modules.leave.domain import policy
+ 9 | | from modules.leave.models import LeaveApplication, LeaveBalance, RequestKind, Stage, Status
+10 | | from modules.leave.services.applications import LeaveError, NotFound, log_action, route_to_approver
+   | |___________________________________________________________________________________________________^
+help: Organize imports
+  |
+2 |
+3 + from datetime import date
+4 | from decimal import Decimal
+  - from datetime import date
+5 +
+6 | from django.db import transaction
+  |
+
+W293 Blank line contains whitespace
+  --> modules/leave/services/lifecycle.py:17:1
+   |
+15 |     """
+16 |     Process a decision at the current stage of a leave application.
+17 |     
+   | ^^^^
+18 |     - Load application with select_for_update.
+19 |     - Raise NotFound if not PENDING or actor is not assignee.
+   |
+help: Remove whitespace from blank line
+   |
+16 |     Process a decision at the current stage of a leave application.
+   -     
+17 +
+18 |     - Load application with select_for_update.
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+W293 [*] Blank line contains whitespace
+  --> modules/leave/services/lifecycle.py:49:1
+   |
+47 |             if decision not in ("approve", "reject"):
+48 |                 raise LeaveError(f"Unit Head must approve or reject for {category} leave.")
+49 |             
+   | ^^^^^^^^^^^^
+50 |             log_action(app, actor_id, decision, remark)
+51 |             finalize(app, actor_id, decision == "approve")
+   |
+help: Remove whitespace from blank line
+   |
+48 |                 raise LeaveError(f"Unit Head must approve or reject for {category} leave.")
+   -             
+49 +
+50 |             log_action(app, actor_id, decision, remark)
+   |
+
+RET505 [*] Unnecessary `else` after `return` statement
+  --> modules/leave/services/lifecycle.py:53:9
+   |
+51 |             finalize(app, actor_id, decision == "approve")
+52 |             return app
+53 |         else:
+   |         ^^^^
+54 |             # BR-EL-017: Others get a recommendation
+55 |             if decision not in ("recommended", "not_recommended"):
+   |
+help: Remove unnecessary `else`
+   |
+52 |             return app
+   -         else:
+   -             # BR-EL-017: Others get a recommendation
+   -             if decision not in ("recommended", "not_recommended"):
+   -                 raise LeaveError(f"Unit Head must recommend or not recommend for {category} leave.")
+53 +         # BR-EL-017: Others get a recommendation
+54 +         if decision not in ("recommended", "not_recommended"):
+55 +             raise LeaveError(f"Unit Head must recommend or not recommend for {category} leave.")
+56 |
+   -             # Store recommendation
+   -             app.unit_head_recommendation = decision
+   -             
+   -             # Route to next approver (Establishment or Sanctioning Authority) directly
+   -             if app.establishment_id:
+   -                 app.stage = Stage.ESTABLISHMENT.value
+   -                 app.assignee_id = app.establishment_id
+   -             else:
+   -                 app.stage = Stage.SANCTION.value
+   -                 app.assignee_id = app.sanctioning_authority_id or app.user_id
+   -             
+   -             app.save()
+   -             log_action(app, actor_id, decision, remark)
+57 +         # Store recommendation
+58 +         app.unit_head_recommendation = decision
+59 +         
+60 +         # Route to next approver (Establishment or Sanctioning Authority) directly
+61 +         if app.establishment_id:
+62 +             app.stage = Stage.ESTABLISHMENT.value
+63 +             app.assignee_id = app.establishment_id
+64 +         else:
+65 +             app.stage = Stage.SANCTION.value
+66 +             app.assignee_id = app.sanctioning_authority_id or app.user_id
+67 +         
+68 +         app.save()
+69 +         log_action(app, actor_id, decision, remark)
+70 |
+   |
+
+W293 [*] Blank line contains whitespace
+  --> modules/leave/services/lifecycle.py:60:1
+   |
+58 |             # Store recommendation
+59 |             app.unit_head_recommendation = decision
+60 |             
+   | ^^^^^^^^^^^^
+61 |             # Route to next approver (Establishment or Sanctioning Authority) directly
+62 |             if app.establishment_id:
+   |
+help: Remove whitespace from blank line
+   |
+59 |             app.unit_head_recommendation = decision
+   -             
+60 +
+61 |             # Route to next approver (Establishment or Sanctioning Authority) directly
+   |
+
+W293 [*] Blank line contains whitespace
+  --> modules/leave/services/lifecycle.py:68:1
+   |
+66 |                 app.stage = Stage.SANCTION.value
+67 |                 app.assignee_id = app.sanctioning_authority_id or app.user_id
+68 |             
+   | ^^^^^^^^^^^^
+69 |             app.save()
+70 |             log_action(app, actor_id, decision, remark)
+   |
+help: Remove whitespace from blank line
+   |
+67 |                 app.assignee_id = app.sanctioning_authority_id or app.user_id
+   -             
+68 +
+69 |             app.save()
+   |
+
+W293 [*] Blank line contains whitespace
+  --> modules/leave/services/lifecycle.py:76:1
+   |
+74 |         if decision != "verify":
+75 |             raise LeaveError("Establishment must verify the application.")
+76 |         
+   | ^^^^^^^^
+77 |         app.stage = Stage.SANCTION.value
+78 |         app.assignee_id = app.sanctioning_authority_id or app.user_id  # Handle self-sanction case
+   |
+help: Remove whitespace from blank line
+   |
+75 |             raise LeaveError("Establishment must verify the application.")
+   -         
+76 +
+77 |         app.stage = Stage.SANCTION.value
+   |
+
+W293 [*] Blank line contains whitespace
+  --> modules/leave/services/lifecycle.py:87:1
+   |
+85 |         if decision not in ("approve", "reject"):
+86 |             raise LeaveError("Sanctioning Authority must approve or reject.")
+87 |         
+   | ^^^^^^^^
+88 |         app.status = Status.APPROVED.value if decision == "approve" else Status.REJECTED.value
+89 |         app.stage = Stage.DONE.value
+   |
+help: Remove whitespace from blank line
+   |
+86 |             raise LeaveError("Sanctioning Authority must approve or reject.")
+   -         
+87 +
+88 |         app.status = Status.APPROVED.value if decision == "approve" else Status.REJECTED.value
+   |
+
+W293 [*] Blank line contains whitespace
+  --> modules/leave/services/lifecycle.py:95:1
+   |
+94 |         log_action(app, actor_id, "sanction_decision", f"{decision.capitalize()}d by {actor_id}.")
+95 |         
+   | ^^^^^^^^
+96 |         # Finalize the application (update balance)
+97 |         finalize(app, actor_id, decision == "approve")
+   |
+help: Remove whitespace from blank line
+   |
+94 |         log_action(app, actor_id, "sanction_decision", f"{decision.capitalize()}d by {actor_id}.")
+   -         
+95 +
+96 |         # Finalize the application (update balance)
+   |
+
+W293 Blank line contains whitespace
+   --> modules/leave/services/lifecycle.py:109:1
+    |
+107 |     """
+108 |     Finalize a leave application after approval/rejection.
+109 |     
+    | ^^^^
+110 |     - Set status to APPROVED/REJECTED, stage DONE, assignee None, decided_at.
+111 |     - On LEAVE approval: add days to user's LeaveBalance.used for the start year.
+    |
+help: Remove whitespace from blank line
+    |
+108 |     Finalize a leave application after approval/rejection.
+    -     
+109 +
+110 |     - Set status to APPROVED/REJECTED, stage DONE, assignee None, decided_at.
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+E501 Line too long (103 > 100)
+   --> modules/leave/services/lifecycle.py:112:101
+    |
+110 |     - Set status to APPROVED/REJECTED, stage DONE, assignee None, decided_at.
+111 |     - On LEAVE approval: add days to user's LeaveBalance.used for the start year.
+112 |     - On CANCELLATION approval: set parent status to CANCELLED and subtract parent's days from balance.
+    |                                                                                                     ^^^
+113 |     - Rejection: no balance change.
+114 |     """
+    |
+
+E501 Line too long (123 > 100)
+   --> modules/leave/services/lifecycle.py:121:101
+    |
+119 |     app.save()
+120 |
+121 |     log_action(app, actor_id, "finalize", f"Application {app.kind} finalized as {'approved' if approved else 'rejected'}.")
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^
+122 |
+123 |     # Handle balance updates based on kind and approval status
+    |
+
+W293 [*] Blank line contains whitespace
+   --> modules/leave/services/lifecycle.py:138:1
+    |
+136 |         # BR-EL-023: Cancellation of an approved LEAVE subtracts days from used
+137 |         parent_app = LeaveApplication.objects.get(id=app.parent_id)
+138 |         
+    | ^^^^^^^^
+139 |         # Ensure parent is a LEAVE request (cancellations of cancellations are not expected per workflow)
+140 |         if parent_app.kind != RequestKind.LEAVE.value:
+    |
+help: Remove whitespace from blank line
+    |
+137 |         parent_app = LeaveApplication.objects.get(id=app.parent_id)
+    -         
+138 +
+139 |         # Ensure parent is a LEAVE request (cancellations of cancellations are not expected per workflow)
+    |
+
+E501 Line too long (105 > 100)
+   --> modules/leave/services/lifecycle.py:139:101
+    |
+137 |         parent_app = LeaveApplication.objects.get(id=app.parent_id)
+138 |         
+139 |         # Ensure parent is a LEAVE request (cancellations of cancellations are not expected per workflow)
+    |                                                                                                     ^^^^^
+140 |         if parent_app.kind != RequestKind.LEAVE.value:
+141 |             raise LeaveError("Cannot cancel a cancellation request.")
+    |
+
+W293 [*] Blank line contains whitespace
+   --> modules/leave/services/lifecycle.py:148:1
+    |
+146 |             category=parent_app.category
+147 |         )
+148 |         
+    | ^^^^^^^^
+149 |         old_used = balance.used
+150 |         new_used = Decimal(str(old_used)) - Decimal(str(parent_app.days))
+    |
+help: Remove whitespace from blank line
+    |
+147 |         )
+    -         
+148 +
+149 |         old_used = balance.used
+    |
+
+W293 [*] Blank line contains whitespace
+   --> modules/leave/services/lifecycle.py:154:1
+    |
+152 |         if new_used < 0:
+153 |             new_used = Decimal("0")
+154 |             
+    | ^^^^^^^^^^^^
+155 |         balance.used = new_used
+156 |         balance.save()
+    |
+help: Remove whitespace from blank line
+    |
+153 |             new_used = Decimal("0")
+    -             
+154 +
+155 |         balance.used = new_used
+    |
+
+W293 Blank line contains whitespace
+   --> modules/leave/services/lifecycle.py:167:1
+    |
+165 |     """
+166 |     Request cancellation of an approved leave.
+167 |     
+    | ^^^^
+168 |     - Only the owner can request.
+169 |     - Only applicable to APPROVED LEAVE-kind requests where start_date > today.
+    |
+help: Remove whitespace from blank line
+    |
+166 |     Request cancellation of an approved leave.
+    -     
+167 +
+168 |     - Only the owner can request.
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+F541 [*] f-string without any placeholders
+   --> modules/leave/services/lifecycle.py:177:24
+    |
+175 |     # Check ownership
+176 |     if app.user_id != actor_id:
+177 |         raise NotFound(f"Only the owner can request cancellation for this application.")
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+178 |
+179 |     # Check kind and approval status
+    |
+help: Remove extraneous `f` prefix
+    |
+176 |     if app.user_id != actor_id:
+    -         raise NotFound(f"Only the owner can request cancellation for this application.")
+177 +         raise NotFound("Only the owner can request cancellation for this application.")
+178 |
+    |
+
+E501 Line too long (114 > 100)
+   --> modules/leave/services/lifecycle.py:220:101
+    |
+218 |     route_to_approver(cancellation)
+219 |
+220 |     log_action(app, actor_id, "request_cancellation", f"Requested cancellation for application {application_id}.")
+    |                                                                                                     ^^^^^^^^^^^^^^
+221 |
+222 |     return cancellation
+    |
+
+Found 92 errors.
+[*] 39 fixable with `--fix` (14 unsafe fixes available with `--fix --unsafe-fixes`).
+exit 1

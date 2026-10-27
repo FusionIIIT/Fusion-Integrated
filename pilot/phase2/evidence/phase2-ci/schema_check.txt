@@ -1,0 +1,693 @@
+--- openapi/fusion-integrated.v1.yaml	2026-10-22 17:25:48.414464120 +0000
++++ /tmp/openapi.check.yaml	2026-10-22 19:59:05.168130196 +0000
+@@ -63,6 +63,291 @@
+               schema:
+                 $ref: '#/components/schemas/UserSearchResult'
+           description: ''
++  /api/v1/leave/applications/:
++    get:
++      operationId: v1_leave_applications_list
++      tags:
++      - v1
++      security:
++      - iamSession: []
++      responses:
++        '200':
++          content:
++            application/json:
++              schema:
++                type: array
++                items:
++                  $ref: '#/components/schemas/LeaveApplication'
++          description: ''
++    post:
++      operationId: v1_leave_applications_create
++      tags:
++      - v1
++      requestBody:
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/LeaveApply'
++          application/x-www-form-urlencoded:
++            schema:
++              $ref: '#/components/schemas/LeaveApply'
++          multipart/form-data:
++            schema:
++              $ref: '#/components/schemas/LeaveApply'
++        required: true
++      security:
++      - iamSession: []
++      responses:
++        '201':
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/LeaveApplication'
++          description: ''
++  /api/v1/leave/applications/{id}/:
++    get:
++      operationId: v1_leave_applications_retrieve
++      parameters:
++      - in: path
++        name: id
++        schema:
++          type: integer
++        required: true
++      tags:
++      - v1
++      security:
++      - iamSession: []
++      responses:
++        '200':
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/LeaveApplication'
++          description: ''
++  /api/v1/leave/applications/{id}/cancel/:
++    post:
++      operationId: v1_leave_applications_cancel_create
++      parameters:
++      - in: path
++        name: id
++        schema:
++          type: integer
++        required: true
++      tags:
++      - v1
++      security:
++      - iamSession: []
++      responses:
++        '200':
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/LeaveApplication'
++          description: ''
++  /api/v1/leave/applications/{id}/decide/:
++    post:
++      operationId: v1_leave_applications_decide_create
++      parameters:
++      - in: path
++        name: id
++        schema:
++          type: integer
++        required: true
++      tags:
++      - v1
++      requestBody:
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/Decision'
++          application/x-www-form-urlencoded:
++            schema:
++              $ref: '#/components/schemas/Decision'
++          multipart/form-data:
++            schema:
++              $ref: '#/components/schemas/Decision'
++        required: true
++      security:
++      - iamSession: []
++      responses:
++        '200':
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/LeaveApplication'
++          description: ''
++  /api/v1/leave/applications/{id}/replace-substitute/:
++    post:
++      operationId: v1_leave_applications_replace_substitute_create
++      parameters:
++      - in: path
++        name: id
++        schema:
++          type: integer
++        required: true
++      tags:
++      - v1
++      requestBody:
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/ReplaceSubstitute'
++          application/x-www-form-urlencoded:
++            schema:
++              $ref: '#/components/schemas/ReplaceSubstitute'
++          multipart/form-data:
++            schema:
++              $ref: '#/components/schemas/ReplaceSubstitute'
++        required: true
++      security:
++      - iamSession: []
++      responses:
++        '200':
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/LeaveApplication'
++          description: ''
++  /api/v1/leave/applications/{id}/substitute-response/:
++    post:
++      operationId: v1_leave_applications_substitute_response_create
++      parameters:
++      - in: path
++        name: id
++        schema:
++          type: integer
++        required: true
++      tags:
++      - v1
++      requestBody:
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/SubstituteResponse'
++          application/x-www-form-urlencoded:
++            schema:
++              $ref: '#/components/schemas/SubstituteResponse'
++          multipart/form-data:
++            schema:
++              $ref: '#/components/schemas/SubstituteResponse'
++        required: true
++      security:
++      - iamSession: []
++      responses:
++        '200':
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/LeaveApplication'
++          description: ''
++  /api/v1/leave/applications/{id}/withdraw/:
++    post:
++      operationId: v1_leave_applications_withdraw_create
++      parameters:
++      - in: path
++        name: id
++        schema:
++          type: integer
++        required: true
++      tags:
++      - v1
++      security:
++      - iamSession: []
++      responses:
++        '200':
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/LeaveApplication'
++          description: ''
++  /api/v1/leave/balances/:
++    get:
++      operationId: v1_leave_balances_list
++      parameters:
++      - in: query
++        name: year
++        schema:
++          type: integer
++      tags:
++      - v1
++      security:
++      - iamSession: []
++      responses:
++        '200':
++          content:
++            application/json:
++              schema:
++                type: array
++                items:
++                  $ref: '#/components/schemas/LeaveBalance'
++          description: ''
++  /api/v1/leave/inbox/:
++    get:
++      operationId: v1_leave_inbox_list
++      tags:
++      - v1
++      security:
++      - iamSession: []
++      responses:
++        '200':
++          content:
++            application/json:
++              schema:
++                type: array
++                items:
++                  $ref: '#/components/schemas/LeaveApplication'
++          description: ''
++  /api/v1/leave/reporting-lines/{user_id}/:
++    get:
++      operationId: v1_leave_reporting_lines_retrieve
++      parameters:
++      - in: path
++        name: user_id
++        schema:
++          type: integer
++        required: true
++      tags:
++      - v1
++      security:
++      - iamSession: []
++      responses:
++        '200':
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/ReportingLine'
++          description: ''
++    put:
++      operationId: v1_leave_reporting_lines_update
++      parameters:
++      - in: path
++        name: user_id
++        schema:
++          type: integer
++        required: true
++      tags:
++      - v1
++      requestBody:
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/ReportingLine'
++          application/x-www-form-urlencoded:
++            schema:
++              $ref: '#/components/schemas/ReportingLine'
++          multipart/form-data:
++            schema:
++              $ref: '#/components/schemas/ReportingLine'
++        required: true
++      security:
++      - iamSession: []
++      responses:
++        '200':
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/ReportingLine'
++          description: ''
+   /api/v1/me:
+     get:
+       operationId: v1_me_retrieve
+@@ -2082,6 +2367,22 @@
+       - resume_link
+       - roll_no
+       - user_id
++    CategoryEnum:
++      enum:
++      - CL
++      - RH
++      - SCL
++      - EL
++      - COL
++      - VL
++      type: string
++      description: |-
++        * `CL` - Casual Leave
++        * `RH` - Restricted Holiday
++        * `SCL` - Special Casual Leave
++        * `EL` - Earned Leave
++        * `COL` - Compensatory / Balance Controlled Leave
++        * `VL` - Vacation Leave
+     Clearance:
+       type: object
+       description: Rule 24. `blocking` names each company, so a refusal is actionable.
+@@ -2315,6 +2616,30 @@
+         * `consent_failure` - Did not appear after consenting (r19)
+         * `code_of_conduct` - Code of conduct (r21)
+         * `misrepresentation` - False resume or unfair means (r18)
++    Decision:
++      type: object
++      properties:
++        decision:
++          $ref: '#/components/schemas/DecisionEnum'
++        remark:
++          type: string
++          default: ''
++      required:
++      - decision
++    DecisionEnum:
++      enum:
++      - approve
++      - reject
++      - recommended
++      - not_recommended
++      - verify
++      type: string
++      description: |-
++        * `approve` - Approve
++        * `reject` - Reject
++        * `recommended` - Recommended
++        * `not_recommended` - Not Recommended
++        * `verify` - Verify
+     Detail:
+       type: object
+       properties:
+@@ -2423,6 +2748,16 @@
+       - fee_reference
+       - season
+       - user_id
++    HalfDayEnum:
++      enum:
++      - none
++      - first
++      - second
++      type: string
++      description: |-
++        * `none` - None
++        * `first` - First half-day
++        * `second` - Second half-day
+     IncidentRecorded:
+       type: object
+       properties:
+@@ -2637,6 +2972,240 @@
+         * `in_progress` - Selection in progress
+         * `completed` - Completed
+         * `cancelled` - Cancelled
++    LeaveAction:
++      type: object
++      properties:
++        id:
++          type: integer
++          readOnly: true
++        actor_id:
++          type: integer
++          maximum: 2147483647
++          minimum: -2147483648
++        action:
++          type: string
++          maxLength: 40
++        remark:
++          type: string
++        created_at:
++          type: string
++          format: date-time
++          readOnly: true
++      required:
++      - action
++      - actor_id
++      - created_at
++      - id
++    LeaveApplication:
++      type: object
++      properties:
++        id:
++          type: integer
++          readOnly: true
++        user_id:
++          type: integer
++          readOnly: true
++        kind:
++          allOf:
++          - $ref: '#/components/schemas/LeaveApplicationKindEnum'
++          readOnly: true
++          title: Request Kind
++        parent:
++          type: integer
++          readOnly: true
++          nullable: true
++        category:
++          allOf:
++          - $ref: '#/components/schemas/CategoryEnum'
++          readOnly: true
++          title: Leave Category
++        start_date:
++          type: string
++          format: date
++          readOnly: true
++        end_date:
++          type: string
++          format: date
++          readOnly: true
++        half_day:
++          allOf:
++          - $ref: '#/components/schemas/HalfDayEnum'
++          readOnly: true
++        days:
++          type: string
++          format: decimal
++          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
++          readOnly: true
++        purpose:
++          type: string
++          readOnly: true
++          title: Purpose / Reason
++        station_leave:
++          type: boolean
++          readOnly: true
++        station_address:
++          type: string
++          readOnly: true
++        substitute_id:
++          type: integer
++          readOnly: true
++          nullable: true
++          title: Nominated Substitute ID
++        substitute_status:
++          allOf:
++          - $ref: '#/components/schemas/SubstituteStatusEnum'
++          readOnly: true
++        unit_head_id:
++          type: integer
++          readOnly: true
++        establishment_id:
++          type: integer
++          readOnly: true
++          nullable: true
++        sanctioning_authority_id:
++          type: integer
++          readOnly: true
++          nullable: true
++        unit_head_recommendation:
++          type: string
++          readOnly: true
++        stage:
++          allOf:
++          - $ref: '#/components/schemas/StageEnum'
++          readOnly: true
++        status:
++          allOf:
++          - $ref: '#/components/schemas/LeaveApplicationStatusEnum'
++          readOnly: true
++        assignee_id:
++          type: integer
++          readOnly: true
++          nullable: true
++        decided_at:
++          type: string
++          format: date-time
++          readOnly: true
++          nullable: true
++        created_at:
++          type: string
++          format: date-time
++          readOnly: true
++        actions:
++          type: array
++          items:
++            $ref: '#/components/schemas/LeaveAction'
++          readOnly: true
++      required:
++      - actions
++      - assignee_id
++      - category
++      - created_at
++      - days
++      - decided_at
++      - end_date
++      - establishment_id
++      - half_day
++      - id
++      - kind
++      - parent
++      - purpose
++      - sanctioning_authority_id
++      - stage
++      - start_date
++      - station_address
++      - station_leave
++      - status
++      - substitute_id
++      - substitute_status
++      - unit_head_id
++      - unit_head_recommendation
++      - user_id
++    LeaveApplicationKindEnum:
++      enum:
++      - leave
++      - cancellation
++      type: string
++      description: |-
++        * `leave` - Leave
++        * `cancellation` - Cancellation
++    LeaveApplicationStatusEnum:
++      enum:
++      - pending
++      - approved
++      - rejected
++      - withdrawn
++      - cancelled
++      type: string
++      description: |-
++        * `pending` - Pending
++        * `approved` - Approved
++        * `rejected` - Rejected
++        * `withdrawn` - Withdrawn
++        * `cancelled` - Cancelled
++    LeaveApply:
++      type: object
++      properties:
++        category:
++          $ref: '#/components/schemas/CategoryEnum'
++        start_date:
++          type: string
++          format: date
++        end_date:
++          type: string
++          format: date
++        half_day:
++          allOf:
++          - $ref: '#/components/schemas/HalfDayEnum'
++          default: none
++        purpose:
++          type: string
++        station_leave:
++          type: boolean
++          default: false
++        station_address:
++          type: string
++          default: ''
++        substitute_id:
++          type: integer
++          nullable: true
++      required:
++      - category
++      - end_date
++      - purpose
++      - start_date
++    LeaveBalance:
++      type: object
++      properties:
++        id:
++          type: integer
++          readOnly: true
++        category:
++          allOf:
++          - $ref: '#/components/schemas/CategoryEnum'
++          title: Leave Category
++        year:
++          type: integer
++          maximum: 2147483647
++          minimum: -2147483648
++        entitled:
++          type: string
++          format: decimal
++          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
++        used:
++          type: string
++          format: decimal
++          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
++        available:
++          type: string
++          format: decimal
++          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
++          readOnly: true
++      required:
++      - available
++      - category
++      - entitled
++      - id
++      - year
+     LiftSanction:
+       type: object
+       properties:
+@@ -3466,6 +4035,38 @@
+       - message
+       - reason
+       - route
++    ReplaceSubstitute:
++      type: object
++      properties:
++        substitute_id:
++          type: integer
++      required:
++      - substitute_id
++    ReportingLine:
++      type: object
++      properties:
++        user_id:
++          type: integer
++          maximum: 2147483647
++          minimum: -2147483648
++          readOnly: true
++        unit_head_id:
++          type: integer
++          maximum: 2147483647
++          minimum: -2147483648
++        establishment_id:
++          type: integer
++          maximum: 2147483647
++          minimum: -2147483648
++          nullable: true
++        sanctioning_authority_id:
++          type: integer
++          maximum: 2147483647
++          minimum: -2147483648
++          nullable: true
++      required:
++      - unit_head_id
++      - user_id
+     RoundOutcome:
+       type: object
+       properties:
+@@ -3691,6 +4292,20 @@
+       required:
+       - available
+       - season
++    StageEnum:
++      enum:
++      - substitute
++      - unit_head
++      - establishment
++      - sanction
++      - done
++      type: string
++      description: |-
++        * `substitute` - Substitute
++        * `unit_head` - Unit Head
++        * `establishment` - Establishment
++        * `sanction` - Sanctioning Authority
++        * `done` - Done
+     SubmitOfferLetter:
+       type: object
+       properties:
+@@ -3698,6 +4313,25 @@
+           type: integer
+       required:
+       - document_id
++    SubstituteResponse:
++      type: object
++      properties:
++        accept:
++          type: boolean
++      required:
++      - accept
++    SubstituteStatusEnum:
++      enum:
++      - not_required
++      - pending
++      - accepted
++      - declined
++      type: string
++      description: |-
++        * `not_required` - Not Required
++        * `pending` - Pending
++        * `accepted` - Accepted
++        * `declined` - Declined
+     TopicEnum:
+       enum:
+       - drive
+exit 1

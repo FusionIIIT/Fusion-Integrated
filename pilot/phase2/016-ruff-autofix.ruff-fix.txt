@@ -1,0 +1,215 @@
+11 files reformatted, 6 files left unchanged
+SIM102 Use a single `if` statement instead of nested `if` statements
+   --> modules/leave/api/views.py:140:9
+    |
+138 |               if not request.principal.has_permission("leave.application.verify"):
+139 |                   raise NotFoundError("You do not have permission to decide at this stage.")
+140 | /         elif app.stage == "sanction":
+141 | |             if not request.principal.has_permission("leave.application.sanction"):
+    | |__________________________________________________________________________________^
+142 |                   raise NotFoundError("You do not have permission to decide at this stage.")
+    |
+help: Combine `if` statements using `and`
+
+RUF059 Unpacked variable `carries_forward` is never used
+  --> modules/leave/domain/policy.py:43:52
+   |
+41 |         raise PolicyError(f"Unknown leave category: {category}")  # BR-EL-001
+42 |
+43 |     days_per_year, faculty_allowed, staff_allowed, carries_forward = ENTITLEMENT[category]
+   |                                                    ^^^^^^^^^^^^^^^
+44 |
+45 |     is_faculty = kind == "faculty"
+   |
+help: Prefix it with an underscore or any other dummy variable pattern
+   |
+42 |
+   -     days_per_year, faculty_allowed, staff_allowed, carries_forward = ENTITLEMENT[category]
+43 +     days_per_year, faculty_allowed, staff_allowed, _carries_forward = ENTITLEMENT[category]
+44 |
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+E501 Line too long (104 > 100)
+  --> modules/leave/domain/policy.py:63:101
+   |
+61 |     BR-EL-010: Half-day CL consumes 0.5 day (only for CL and when start==end).
+62 |     BR-EL-011: EL, COL, VL count every calendar day inclusive (weekends/holidays included).
+63 |                CL, RH, SCL count Monday to Friday only (no holiday calendar yet -> assume working days).
+   |                                                                                                     ^^^^
+64 |
+65 |     Note: Since no external calendar service is imported, we assume the input dates represent
+   |
+
+E501 Line too long (109 > 100)
+   --> modules/leave/domain/policy.py:109:101
+    |
+107 |     Check if two leave requests overlap.
+108 |
+109 |     True when the date ranges intersect, except a single shared date where both halves are set and different.
+    |                                                                                                     ^^^^^^^^^
+110 |     BR-EL-012: Applicant non-overlap with half-day CL exception.
+111 |     """
+    |
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+   --> modules/leave/domain/policy.py:122:5
+    |
+120 |       # Exception applies only to CL (implied by context of BR-EL-012 regarding halves)
+121 |       # If both are on the same day and have different halves, they do NOT overlap.
+122 | /     if a_start == b_start:
+123 | |         if a_half != "none" and b_half != "none":
+124 | |             # Both are half-days on the same day
+125 | |             if a_half != b_half:
+    | |________________________________^
+126 |                   return False  # Different halves on same date -> non-overlapping
+    |
+help: Combine `if` statements using `and`
+    |
+121 |     # If both are on the same day and have different halves, they do NOT overlap.
+    -     if a_start == b_start:
+    -         if a_half != "none" and b_half != "none":
+    -             # Both are half-days on the same day
+    -             if a_half != b_half:
+    -                 return False  # Different halves on same date -> non-overlapping
+122 +     if a_start == b_start and a_half != "none" and b_half != "none":
+123 +         # Both are half-days on the same day
+124 +         if a_half != b_half:
+125 +             return False  # Different halves on same date -> non-overlapping
+126 |
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+   --> modules/leave/domain/policy.py:123:9
+    |
+121 |       # If both are on the same day and have different halves, they do NOT overlap.
+122 |       if a_start == b_start:
+123 | /         if a_half != "none" and b_half != "none":
+124 | |             # Both are half-days on the same day
+125 | |             if a_half != b_half:
+    | |________________________________^
+126 |                   return False  # Different halves on same date -> non-overlapping
+    |
+help: Combine `if` statements using `and`
+
+E501 Line too long (106 > 100)
+  --> modules/leave/selectors.py:8:101
+   |
+ 7 | def my_applications(user_id: int) -> QuerySet:
+ 8 |     """Return the leave applications belonging to a specific user, ordered by creation date descending."""
+   |                                                                                                     ^^^^^^
+ 9 |     return (
+10 |         LeaveApplication.objects.prefetch_related("actions")
+   |
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+  --> modules/leave/selectors.py:34:5
+   |
+32 |           raise NotFoundError()
+33 |
+34 | /     if app.user_id != user_id and app.assignee_id != user_id:
+35 | |         # Check if the user is the nominated substitute
+36 | |         if app.substitute_id != user_id:
+   | |________________________________________^
+37 |               raise NotFoundError(f"Access denied to application {application_id}")
+   |
+help: Combine `if` statements using `and`
+
+RUF059 Unpacked variable `created` is never used
+  --> modules/leave/services/admin.py:20:21
+   |
+18 |         raise LeaveError("Unit head ID cannot be empty.")
+19 |
+20 |     reporting_line, created = ReportingLine.objects.update_or_create(
+   |                     ^^^^^^^
+21 |         user_id=user_id,
+22 |         defaults={
+   |
+help: Prefix it with an underscore or any other dummy variable pattern
+   |
+19 |
+   -     reporting_line, created = ReportingLine.objects.update_or_create(
+20 +     reporting_line, _created = ReportingLine.objects.update_or_create(
+21 |         user_id=user_id,
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  --> modules/leave/services/applications.py:46:9
+   |
+44 |         entitlement = policy.entitlement(category, kind)
+45 |     except policy.PolicyError as e:
+46 |         raise LeaveError(str(e))
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^
+47 |
+48 |     if entitlement is None:
+   |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> modules/leave/services/applications.py:147:9
+    |
+145 |         entitlement = policy.entitlement(category, kind)
+146 |     except policy.PolicyError as e:
+147 |         raise LeaveError(str(e))
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+148 |
+149 |     if entitlement is None:
+    |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> modules/leave/services/applications.py:156:9
+    |
+154 |         days = policy.count_days(category, start_date, end_date, half_day)
+155 |     except policy.PolicyError as e:
+156 |         raise LeaveError(str(e))
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+157 |
+158 |     if days <= 0:
+    |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> modules/leave/services/applications.py:165:9
+    |
+163 |         balance = get_balance(user_id, kind, category, start_date.year)
+164 |     except LeaveError as e:
+165 |         raise LeaveError(str(e))
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+166 |
+167 |     if balance.available < days:
+    |
+
+E501 Line too long (113 > 100)
+   --> modules/leave/services/applications.py:260:101
+    |
+258 |     if app.status != Status.PENDING.value or app.stage != Stage.SUBSTITUTE.value:
+259 |         raise NotFound(
+260 |             f"Cannot respond to substitute request for application in status {app.status} and stage {app.stage}."
+    |                                                                                                     ^^^^^^^^^^^^^
+261 |         )
+    |
+
+E501 Line too long (103 > 100)
+   --> modules/leave/services/lifecycle.py:112:101
+    |
+110 |     - Set status to APPROVED/REJECTED, stage DONE, assignee None, decided_at.
+111 |     - On LEAVE approval: add days to user's LeaveBalance.used for the start year.
+112 |     - On CANCELLATION approval: set parent status to CANCELLED and subtract parent's days from balance.
+    |                                                                                                     ^^^
+113 |     - Rejection: no balance change.
+114 |     """
+    |
+
+E501 Line too long (105 > 100)
+   --> modules/leave/services/lifecycle.py:142:101
+    |
+140 |         parent_app = LeaveApplication.objects.get(id=app.parent_id)
+141 |
+142 |         # Ensure parent is a LEAVE request (cancellations of cancellations are not expected per workflow)
+    |                                                                                                     ^^^^^
+143 |         if parent_app.kind != RequestKind.LEAVE.value:
+144 |             raise LeaveError("Cannot cancel a cancellation request.")
+    |
+
+Found 35 errors (19 fixed, 16 remaining).
+3 unsafe fixes available with `--fix --unsafe-fixes`.

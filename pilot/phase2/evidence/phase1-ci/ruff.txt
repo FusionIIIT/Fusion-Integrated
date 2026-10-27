@@ -1,0 +1,1066 @@
+F401 [*] `typing.Any` imported but unused
+ --> modules/leave/api/serializers.py:7:20
+  |
+5 | """
+6 |
+7 | from typing import Any, Dict, List, Optional
+  |                    ^^^
+8 | from rest_framework import serializers
+9 | from django.db.models import QuerySet
+  |
+help: Remove unused import
+  |
+6 |
+  - from typing import Any, Dict, List, Optional
+7 | from rest_framework import serializers
+  |
+
+F401 [*] `typing.Dict` imported but unused
+ --> modules/leave/api/serializers.py:7:25
+  |
+5 | """
+6 |
+7 | from typing import Any, Dict, List, Optional
+  |                         ^^^^
+8 | from rest_framework import serializers
+9 | from django.db.models import QuerySet
+  |
+help: Remove unused import
+  |
+6 |
+  - from typing import Any, Dict, List, Optional
+7 | from rest_framework import serializers
+  |
+
+F401 [*] `typing.List` imported but unused
+ --> modules/leave/api/serializers.py:7:31
+  |
+5 | """
+6 |
+7 | from typing import Any, Dict, List, Optional
+  |                               ^^^^
+8 | from rest_framework import serializers
+9 | from django.db.models import QuerySet
+  |
+help: Remove unused import
+  |
+6 |
+  - from typing import Any, Dict, List, Optional
+7 | from rest_framework import serializers
+  |
+
+F401 [*] `typing.Optional` imported but unused
+ --> modules/leave/api/serializers.py:7:37
+  |
+5 | """
+6 |
+7 | from typing import Any, Dict, List, Optional
+  |                                     ^^^^^^^^
+8 | from rest_framework import serializers
+9 | from django.db.models import QuerySet
+  |
+help: Remove unused import
+  |
+6 |
+  - from typing import Any, Dict, List, Optional
+7 | from rest_framework import serializers
+  |
+
+F401 [*] `django.db.models.QuerySet` imported but unused
+  --> modules/leave/api/serializers.py:9:30
+   |
+ 7 | from typing import Any, Dict, List, Optional
+ 8 | from rest_framework import serializers
+ 9 | from django.db.models import QuerySet
+   |                              ^^^^^^^^
+10 |
+11 | from modules.directory.serializers import UserRefSerializer
+   |
+help: Remove unused import: `django.db.models.QuerySet`
+  |
+8 | from rest_framework import serializers
+  - from django.db.models import QuerySet
+9 |
+  |
+
+F401 [*] `modules.directory.serializers.UserRefSerializer` imported but unused
+  --> modules/leave/api/serializers.py:11:43
+   |
+ 9 | from django.db.models import QuerySet
+10 |
+11 | from modules.directory.serializers import UserRefSerializer
+   |                                           ^^^^^^^^^^^^^^^^^
+12 | from modules.leave.models import (
+13 |     LeaveApplication,
+   |
+help: Remove unused import: `modules.directory.serializers.UserRefSerializer`
+   |
+10 |
+   - from modules.directory.serializers import UserRefSerializer
+11 | from modules.leave.models import (
+   |
+
+F401 [*] `django.urls.include` imported but unused
+ --> modules/leave/api/urls.py:6:31
+  |
+4 | """
+5 |
+6 | from django.urls import path, include
+  |                               ^^^^^^^
+7 | from rest_framework.routers import DefaultRouter
+  |
+help: Remove unused import: `django.urls.include`
+  |
+5 |
+  - from django.urls import path, include
+6 + from django.urls import path
+7 | from rest_framework.routers import DefaultRouter
+  |
+
+F401 [*] `rest_framework.mixins` imported but unused
+  --> modules/leave/api/views.py:8:38
+   |
+ 7 | from typing import Any
+ 8 | from rest_framework import generics, mixins, status
+   |                                      ^^^^^^
+ 9 | from rest_framework.decorators import action
+10 | from rest_framework.response import Response
+   |
+help: Remove unused import: `rest_framework.mixins`
+  |
+7 | from typing import Any
+  - from rest_framework import generics, mixins, status
+8 + from rest_framework import generics, status
+9 | from rest_framework.decorators import action
+  |
+
+F401 [*] `rest_framework.decorators.action` imported but unused
+  --> modules/leave/api/views.py:9:39
+   |
+ 7 | from typing import Any
+ 8 | from rest_framework import generics, mixins, status
+ 9 | from rest_framework.decorators import action
+   |                                       ^^^^^^
+10 | from rest_framework.response import Response
+11 | from django.db.models import Q
+   |
+help: Remove unused import: `rest_framework.decorators.action`
+  |
+8 | from rest_framework import generics, mixins, status
+  - from rest_framework.decorators import action
+9 | from rest_framework.response import Response
+  |
+
+F401 [*] `django.db.models.Q` imported but unused
+  --> modules/leave/api/views.py:11:30
+   |
+ 9 | from rest_framework.decorators import action
+10 | from rest_framework.response import Response
+11 | from django.db.models import Q
+   |                              ^
+12 |
+13 | from fusion_auth.permissions import HasModuleGrant, HasPermission
+   |
+help: Remove unused import: `django.db.models.Q`
+   |
+10 | from rest_framework.response import Response
+   - from django.db.models import Q
+11 |
+   |
+
+F401 [*] `modules.leave.domain.policy.get_categories_requiring_unit_head_decision` imported but unused
+  --> modules/leave/api/views.py:15:5
+   |
+13 | from fusion_auth.permissions import HasModuleGrant, HasPermission
+14 | from modules.leave.domain.policy import (
+15 |     get_categories_requiring_unit_head_decision,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+16 | )
+17 | from modules.leave.services.applications import (
+   |
+help: Remove unused import: `modules.leave.domain.policy.get_categories_requiring_unit_head_decision`
+   |
+13 | from fusion_auth.permissions import HasModuleGrant, HasPermission
+   - from modules.leave.domain.policy import (
+   -     get_categories_requiring_unit_head_decision,
+   - )
+14 | from modules.leave.services.applications import (
+   |
+
+F821 Undefined name `LeaveBalanceSerializer`
+   --> modules/leave/api/views.py:382:24
+    |
+381 |     permission_classes = [HasLeaveModuleGrant, HasPermission("leave.balance.view_self")]
+382 |     serializer_class = LeaveBalanceSerializer
+    |                        ^^^^^^^^^^^^^^^^^^^^^^
+383 |
+384 |     def get(self, request: Any, *args: Any, **kwargs: Any) -> Response:
+    |
+
+F821 Undefined name `LeaveActionHistorySerializer`
+   --> modules/leave/api/views.py:403:24
+    |
+402 |     permission_classes = [HasLeaveModuleGrant, HasPermission("leave.admin.manage")]
+403 |     serializer_class = LeaveActionHistorySerializer
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+404 |
+405 |     def get(self, request: Any, *args: Any, **kwargs: Any) -> Response:
+    |
+
+F401 [*] `dataclasses.field` imported but unused
+ --> modules/leave/domain/policy.py:6:36
+  |
+4 | """
+5 |
+6 | from dataclasses import dataclass, field
+  |                                    ^^^^^
+7 | from datetime import date
+8 | from enum import Enum
+  |
+help: Remove unused import: `dataclasses.field`
+  |
+5 |
+  - from dataclasses import dataclass, field
+6 + from dataclasses import dataclass
+7 | from datetime import date
+  |
+
+F841 Local variable `config` is assigned to but never used
+   --> modules/leave/domain/policy.py:186:5
+    |
+184 |     base_days = delta.days + 1
+185 |
+186 |     config = get_entitlement_config(category)
+    |     ^^^^^^
+187 |
+188 |     # Apply continuous counting rule (BR-EL-011)
+    |
+help: Remove assignment to unused variable `config`
+    |
+185 |
+    -     config = get_entitlement_config(category)
+186 +     get_entitlement_config(category)
+187 |
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+F401 [*] `core.db.mixins.TimeStampedModel` imported but unused
+ --> modules/leave/models.py:2:28
+  |
+1 | from django.db import models
+2 | from core.db.mixins import TimeStampedModel, UserScopedModel
+  |                            ^^^^^^^^^^^^^^^^
+help: Remove unused import: `core.db.mixins.TimeStampedModel`
+  |
+1 | from django.db import models
+  - from core.db.mixins import TimeStampedModel, UserScopedModel
+2 + from core.db.mixins import UserScopedModel
+3 |
+  |
+
+F401 [*] `typing.Tuple` imported but unused
+  --> modules/leave/services/applications.py:8:35
+   |
+ 7 | from datetime import date
+ 8 | from typing import Any, Optional, Tuple
+   |                                   ^^^^^
+ 9 |
+10 | from django.db import transaction, models
+   |
+help: Remove unused import: `typing.Tuple`
+  |
+7 | from datetime import date
+  - from typing import Any, Optional, Tuple
+8 + from typing import Any, Optional
+9 |
+  |
+
+F401 [*] `django.db.models` imported but unused
+  --> modules/leave/services/applications.py:10:36
+   |
+ 8 | from typing import Any, Optional, Tuple
+ 9 |
+10 | from django.db import transaction, models
+   |                                    ^^^^^^
+11 | from django.core.exceptions import ValidationError as DjangoValidationError
+   |
+help: Remove unused import: `django.db.models`
+   |
+9  |
+   - from django.db import transaction, models
+10 + from django.db import transaction
+11 | from django.core.exceptions import ValidationError as DjangoValidationError
+   |
+
+F401 [*] `modules.directory.models.UserRef` imported but unused
+  --> modules/leave/services/applications.py:13:38
+   |
+11 | from django.core.exceptions import ValidationError as DjangoValidationError
+12 |
+13 | from modules.directory.models import UserRef
+   |                                      ^^^^^^^
+14 | from modules.leave.domain.policy import (
+15 |     LeaveCategory,
+   |
+help: Remove unused import: `modules.directory.models.UserRef`
+   |
+12 |
+   - from modules.directory.models import UserRef
+13 | from modules.leave.domain.policy import (
+   |
+
+F401 [*] `modules.leave.domain.policy.LeaveCategory` imported but unused
+  --> modules/leave/services/applications.py:15:5
+   |
+13 | from modules.directory.models import UserRef
+14 | from modules.leave.domain.policy import (
+15 |     LeaveCategory,
+   |     ^^^^^^^^^^^^^
+16 |     calculate_consumed_days,
+17 |     check_applicant_overlap,
+   |
+help: Remove unused import
+   |
+14 | from modules.leave.domain.policy import (
+   -     LeaveCategory,
+   -     calculate_consumed_days,
+   -     check_applicant_overlap,
+15 |     requires_substitute,
+16 |     unit_head_decision_required,
+   -     get_categories_requiring_unit_head_decision,
+17 | )
+   |
+
+F401 [*] `modules.leave.domain.policy.calculate_consumed_days` imported but unused
+  --> modules/leave/services/applications.py:16:5
+   |
+14 | from modules.leave.domain.policy import (
+15 |     LeaveCategory,
+16 |     calculate_consumed_days,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^
+17 |     check_applicant_overlap,
+18 |     requires_substitute,
+   |
+help: Remove unused import
+   |
+14 | from modules.leave.domain.policy import (
+   -     LeaveCategory,
+   -     calculate_consumed_days,
+   -     check_applicant_overlap,
+15 |     requires_substitute,
+16 |     unit_head_decision_required,
+   -     get_categories_requiring_unit_head_decision,
+17 | )
+   |
+
+F401 [*] `modules.leave.domain.policy.check_applicant_overlap` imported but unused
+  --> modules/leave/services/applications.py:17:5
+   |
+15 |     LeaveCategory,
+16 |     calculate_consumed_days,
+17 |     check_applicant_overlap,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^
+18 |     requires_substitute,
+19 |     unit_head_decision_required,
+   |
+help: Remove unused import
+   |
+14 | from modules.leave.domain.policy import (
+   -     LeaveCategory,
+   -     calculate_consumed_days,
+   -     check_applicant_overlap,
+15 |     requires_substitute,
+16 |     unit_head_decision_required,
+   -     get_categories_requiring_unit_head_decision,
+17 | )
+   |
+
+F401 [*] `modules.leave.domain.policy.get_categories_requiring_unit_head_decision` imported but unused
+  --> modules/leave/services/applications.py:20:5
+   |
+18 |     requires_substitute,
+19 |     unit_head_decision_required,
+20 |     get_categories_requiring_unit_head_decision,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+21 | )
+22 | from modules.leave.models import (
+   |
+help: Remove unused import
+   |
+14 | from modules.leave.domain.policy import (
+   -     LeaveCategory,
+   -     calculate_consumed_days,
+   -     check_applicant_overlap,
+15 |     requires_substitute,
+16 |     unit_head_decision_required,
+   -     get_categories_requiring_unit_head_decision,
+17 | )
+   |
+
+F401 [*] `modules.leave.models.LeaveBalance` imported but unused
+  --> modules/leave/services/applications.py:24:5
+   |
+22 | from modules.leave.models import (
+23 |     LeaveApplication,
+24 |     LeaveBalance,
+   |     ^^^^^^^^^^^^
+25 |     LeaveActionHistory,
+26 |     LeaveCategory as ModelLeaveCategory,
+   |
+help: Remove unused import: `modules.leave.models.LeaveBalance`
+   |
+23 |     LeaveApplication,
+   -     LeaveBalance,
+24 |     LeaveActionHistory,
+   |
+
+F401 [*] `fusion_auth.permissions.HasPermission` imported but unused
+  --> modules/leave/services/applications.py:28:37
+   |
+26 |     LeaveCategory as ModelLeaveCategory,
+27 | )
+28 | from fusion_auth.permissions import HasPermission
+   |                                     ^^^^^^^^^^^^^
+help: Remove unused import: `fusion_auth.permissions.HasPermission`
+   |
+27 | )
+   - from fusion_auth.permissions import HasPermission
+28 |
+   |
+
+F841 Local variable `policy` is assigned to but never used
+  --> modules/leave/services/applications.py:91:9
+   |
+89 |     # Domain Validation
+90 |     try:
+91 |         policy = get_policy_config(category_enum)
+   |         ^^^^^^
+92 |         
+93 |         # Check balance (simplified: assume sufficient balance if created or updated by service)
+   |
+help: Remove assignment to unused variable `policy`
+   |
+90 |     try:
+   -         policy = get_policy_config(category_enum)
+91 +         get_policy_config(category_enum)
+92 |         
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+F541 [*] f-string without any placeholders
+   --> modules/leave/services/applications.py:129:25
+    |
+127 |             actor_id=actor_id,
+128 |             action_type="substitute_consent_required",
+129 |             description=f"Application submitted. Awaiting substitute consent.",
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+130 |         )
+131 |     else:
+    |
+help: Remove extraneous `f` prefix
+    |
+128 |             action_type="substitute_consent_required",
+    -             description=f"Application submitted. Awaiting substitute consent.",
+129 +             description="Application submitted. Awaiting substitute consent.",
+130 |         )
+    |
+
+F541 [*] f-string without any placeholders
+   --> modules/leave/services/applications.py:330:19
+    |
+328 |     # Per BR-EL-019, we resolve the competent authority. Here, we assume the next step is final sanction.
+329 |     new_status = 'under_review'  # Or a specific 'awaiting_final_sanction' if defined
+330 |     description = f"Establishment verified and routed to final Sanctioning Authority."
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+331 |
+332 |     application.status = new_status
+    |
+help: Remove extraneous `f` prefix
+    |
+329 |     new_status = 'under_review'  # Or a specific 'awaiting_final_sanction' if defined
+    -     description = f"Establishment verified and routed to final Sanctioning Authority."
+330 +     description = "Establishment verified and routed to final Sanctioning Authority."
+331 |
+    |
+
+F841 Local variable `history` is assigned to but never used
+   --> modules/leave/services/applications.py:496:5
+    |
+494 |     This function is transaction-safe as it's called within atomic blocks.
+495 |     """
+496 |     history = LeaveActionHistory.objects.create(
+    |     ^^^^^^^
+497 |         application=application,
+498 |         actor_id=actor_id,
+    |
+help: Remove assignment to unused variable `history`
+    |
+495 |     """
+    -     history = LeaveActionHistory.objects.create(
+496 +     LeaveActionHistory.objects.create(
+497 |         application=application,
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+F841 Local variable `history` is assigned to but never used
+   --> modules/leave/services/applications.py:524:9
+    |
+523 |         # Log the action
+524 |         history = LeaveActionHistory.objects.create(
+    |         ^^^^^^^
+525 |             application_id=application_id,
+526 |             actor_id=actor_id,
+    |
+help: Remove assignment to unused variable `history`
+    |
+523 |         # Log the action
+    -         history = LeaveActionHistory.objects.create(
+524 +         LeaveActionHistory.objects.create(
+525 |             application_id=application_id,
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+F821 Undefined name `ValidationError`
+   --> modules/leave/services/applications.py:532:12
+    |
+530 |     except LeaveApplication.DoesNotExist:
+531 |         raise ValueError(f"Application with ID {application_id} not found.")
+532 |     except ValidationError as e:
+    |            ^^^^^^^^^^^^^^^
+533 |         raise ValueError(str(e))
+    |
+
+F841 Local variable `history` is assigned to but never used
+   --> modules/leave/services/applications.py:548:9
+    |
+546 |         application.save()
+547 |         
+548 |         history = LeaveActionHistory.objects.create(
+    |         ^^^^^^^
+549 |             application_id=application_id,
+550 |             actor_id=actor_id,
+    |
+help: Remove assignment to unused variable `history`
+    |
+547 |         
+    -         history = LeaveActionHistory.objects.create(
+548 +         LeaveActionHistory.objects.create(
+549 |             application_id=application_id,
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+F841 Local variable `history` is assigned to but never used
+   --> modules/leave/services/applications.py:577:9
+    |
+575 |         application.save()
+576 |         
+577 |         history = LeaveActionHistory.objects.create(
+    |         ^^^^^^^
+578 |             application_id=application_id,
+579 |             actor_id=actor_id,
+    |
+help: Remove assignment to unused variable `history`
+    |
+576 |         
+    -         history = LeaveActionHistory.objects.create(
+577 +         LeaveActionHistory.objects.create(
+578 |             application_id=application_id,
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+F841 Local variable `history` is assigned to but never used
+   --> modules/leave/services/applications.py:602:9
+    |
+600 |         application.save()
+601 |         
+602 |         history = LeaveActionHistory.objects.create(
+    |         ^^^^^^^
+603 |             application_id=application_id,
+604 |             actor_id=actor_id,
+    |
+help: Remove assignment to unused variable `history`
+    |
+601 |         
+    -         history = LeaveActionHistory.objects.create(
+602 +         LeaveActionHistory.objects.create(
+603 |             application_id=application_id,
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+F841 Local variable `history` is assigned to but never used
+   --> modules/leave/services/applications.py:625:9
+    |
+623 |         application.save()
+624 |         
+625 |         history = LeaveActionHistory.objects.create(
+    |         ^^^^^^^
+626 |             application_id=application_id,
+627 |             actor_id=actor_id,
+    |
+help: Remove assignment to unused variable `history`
+    |
+624 |         
+    -         history = LeaveActionHistory.objects.create(
+625 +         LeaveActionHistory.objects.create(
+626 |             application_id=application_id,
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+F841 Local variable `history` is assigned to but never used
+   --> modules/leave/services/applications.py:649:9
+    |
+647 |         _update_balance_on_resumption(application, actor_id, actual_resumption_date)
+648 |         
+649 |         history = LeaveActionHistory.objects.create(
+    |         ^^^^^^^
+650 |             application_id=application_id,
+651 |             actor_id=actor_id,
+    |
+help: Remove assignment to unused variable `history`
+    |
+648 |         
+    -         history = LeaveActionHistory.objects.create(
+649 +         LeaveActionHistory.objects.create(
+650 |             application_id=application_id,
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+F401 [*] `django.db.models` imported but unused
+  --> modules/leave/services/lifecycle.py:10:36
+   |
+ 8 | from typing import List, Optional, Tuple
+ 9 |
+10 | from django.db import transaction, models
+   |                                    ^^^^^^
+11 | from django.core.exceptions import ValidationError as DjangoValidationError
+   |
+help: Remove unused import: `django.db.models`
+   |
+9  |
+   - from django.db import transaction, models
+10 + from django.db import transaction
+11 | from django.core.exceptions import ValidationError as DjangoValidationError
+   |
+
+F401 [*] `django.core.exceptions.ValidationError` imported but unused
+  --> modules/leave/services/lifecycle.py:11:55
+   |
+10 | from django.db import transaction, models
+11 | from django.core.exceptions import ValidationError as DjangoValidationError
+   |                                                       ^^^^^^^^^^^^^^^^^^^^^
+12 |
+13 | from fusion_auth.permissions import HasPermission
+   |
+help: Remove unused import: `django.core.exceptions.ValidationError`
+   |
+10 | from django.db import transaction, models
+   - from django.core.exceptions import ValidationError as DjangoValidationError
+11 |
+   |
+
+F401 [*] `fusion_auth.permissions.HasPermission` imported but unused
+  --> modules/leave/services/lifecycle.py:13:37
+   |
+11 | from django.core.exceptions import ValidationError as DjangoValidationError
+12 |
+13 | from fusion_auth.permissions import HasPermission
+   |                                     ^^^^^^^^^^^^^
+14 |
+15 | from modules.directory.models import UserRef
+   |
+help: Remove unused import: `fusion_auth.permissions.HasPermission`
+   |
+12 |
+   - from fusion_auth.permissions import HasPermission
+13 |
+   |
+
+F401 [*] `modules.directory.models.UserRef` imported but unused
+  --> modules/leave/services/lifecycle.py:15:38
+   |
+13 | from fusion_auth.permissions import HasPermission
+14 |
+15 | from modules.directory.models import UserRef
+   |                                      ^^^^^^^
+16 | from modules.leave.domain.policy import (
+17 |     LeaveCategory,
+   |
+help: Remove unused import: `modules.directory.models.UserRef`
+   |
+14 |
+   - from modules.directory.models import UserRef
+15 | from modules.leave.domain.policy import (
+   |
+
+F401 [*] `modules.leave.domain.policy.LeaveCategory` imported but unused
+  --> modules/leave/services/lifecycle.py:17:5
+   |
+15 | from modules.directory.models import UserRef
+16 | from modules.leave.domain.policy import (
+17 |     LeaveCategory,
+   |     ^^^^^^^^^^^^^
+18 |     calculate_consumed_days,
+19 |     check_applicant_overlap,
+   |
+help: Remove unused import
+   |
+16 | from modules.leave.domain.policy import (
+   -     LeaveCategory,
+17 |     calculate_consumed_days,
+   -     check_applicant_overlap,
+   -     requires_substitute,
+   -     unit_head_decision_required,
+   -     get_categories_requiring_unit_head_decision,
+18 | )
+   |
+
+F401 [*] `modules.leave.domain.policy.check_applicant_overlap` imported but unused
+  --> modules/leave/services/lifecycle.py:19:5
+   |
+17 |     LeaveCategory,
+18 |     calculate_consumed_days,
+19 |     check_applicant_overlap,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^
+20 |     requires_substitute,
+21 |     unit_head_decision_required,
+   |
+help: Remove unused import
+   |
+16 | from modules.leave.domain.policy import (
+   -     LeaveCategory,
+17 |     calculate_consumed_days,
+   -     check_applicant_overlap,
+   -     requires_substitute,
+   -     unit_head_decision_required,
+   -     get_categories_requiring_unit_head_decision,
+18 | )
+   |
+
+F401 [*] `modules.leave.domain.policy.requires_substitute` imported but unused
+  --> modules/leave/services/lifecycle.py:20:5
+   |
+18 |     calculate_consumed_days,
+19 |     check_applicant_overlap,
+20 |     requires_substitute,
+   |     ^^^^^^^^^^^^^^^^^^^
+21 |     unit_head_decision_required,
+22 |     get_categories_requiring_unit_head_decision,
+   |
+help: Remove unused import
+   |
+16 | from modules.leave.domain.policy import (
+   -     LeaveCategory,
+17 |     calculate_consumed_days,
+   -     check_applicant_overlap,
+   -     requires_substitute,
+   -     unit_head_decision_required,
+   -     get_categories_requiring_unit_head_decision,
+18 | )
+   |
+
+F401 [*] `modules.leave.domain.policy.unit_head_decision_required` imported but unused
+  --> modules/leave/services/lifecycle.py:21:5
+   |
+19 |     check_applicant_overlap,
+20 |     requires_substitute,
+21 |     unit_head_decision_required,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+22 |     get_categories_requiring_unit_head_decision,
+23 | )
+   |
+help: Remove unused import
+   |
+16 | from modules.leave.domain.policy import (
+   -     LeaveCategory,
+17 |     calculate_consumed_days,
+   -     check_applicant_overlap,
+   -     requires_substitute,
+   -     unit_head_decision_required,
+   -     get_categories_requiring_unit_head_decision,
+18 | )
+   |
+
+F401 [*] `modules.leave.domain.policy.get_categories_requiring_unit_head_decision` imported but unused
+  --> modules/leave/services/lifecycle.py:22:5
+   |
+20 |     requires_substitute,
+21 |     unit_head_decision_required,
+22 |     get_categories_requiring_unit_head_decision,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+23 | )
+24 | from modules.leave.models import (
+   |
+help: Remove unused import
+   |
+16 | from modules.leave.domain.policy import (
+   -     LeaveCategory,
+17 |     calculate_consumed_days,
+   -     check_applicant_overlap,
+   -     requires_substitute,
+   -     unit_head_decision_required,
+   -     get_categories_requiring_unit_head_decision,
+18 | )
+   |
+
+F401 [*] `modules.leave.models.LeaveBalance` imported but unused
+  --> modules/leave/services/lifecycle.py:26:5
+   |
+24 | from modules.leave.models import (
+25 |     LeaveApplication,
+26 |     LeaveBalance,
+   |     ^^^^^^^^^^^^
+27 |     LeaveActionHistory,
+28 |     LeaveCategory as ModelLeaveCategory,
+   |
+help: Remove unused import
+   |
+25 |     LeaveApplication,
+   -     LeaveBalance,
+   -     LeaveActionHistory,
+26 |     LeaveCategory as ModelLeaveCategory,
+   |
+
+F401 [*] `modules.leave.models.LeaveActionHistory` imported but unused
+  --> modules/leave/services/lifecycle.py:27:5
+   |
+25 |     LeaveApplication,
+26 |     LeaveBalance,
+27 |     LeaveActionHistory,
+   |     ^^^^^^^^^^^^^^^^^^
+28 |     LeaveCategory as ModelLeaveCategory,
+29 | )
+   |
+help: Remove unused import
+   |
+25 |     LeaveApplication,
+   -     LeaveBalance,
+   -     LeaveActionHistory,
+26 |     LeaveCategory as ModelLeaveCategory,
+   |
+
+F841 Local variable `category_enum` is assigned to but never used
+  --> modules/leave/services/lifecycle.py:63:5
+   |
+61 |     # we need to check who made the decision.
+62 |     
+63 |     category_enum = ModelLeaveCategory(application.category)
+   |     ^^^^^^^^^^^^^
+64 |     
+65 |     # Determine if this is a "final" decision point
+   |
+help: Remove assignment to unused variable `category_enum`
+   |
+62 |     
+   -     category_enum = ModelLeaveCategory(application.category)
+63 +     ModelLeaveCategory(application.category)
+64 |     
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+F841 Local variable `category_enum` is assigned to but never used
+   --> modules/leave/services/lifecycle.py:209:5
+    |
+207 |         raise ValueError(f"Cannot decide cancellation for application in status {cancellation_app.status}.")
+208 |
+209 |     category_enum = ModelLeaveCategory(cancellation_app.category)
+    |     ^^^^^^^^^^^^^
+210 |     
+211 |     if decision not in ['approve', 'reject']:
+    |
+help: Remove assignment to unused variable `category_enum`
+    |
+208 |
+    -     category_enum = ModelLeaveCategory(cancellation_app.category)
+209 +     ModelLeaveCategory(cancellation_app.category)
+210 |     
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+F541 [*] f-string without any placeholders
+   --> modules/leave/services/lifecycle.py:432:26
+    |
+430 |     # Check if category allows resumption review (EL, COL, VL)
+431 |     if category_enum not in [ModelLeaveCategory.EL, ModelLeaveCategory.COL, ModelLeaveCategory.VL]:
+432 |         raise ValueError(f"Resumption review is only applicable for EL, COL, or VL categories.")
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+433 |
+434 |     allowed_statuses = ['submitted']  # Assuming 'submitted' represents the resumption review state
+    |
+help: Remove extraneous `f` prefix
+    |
+431 |     if category_enum not in [ModelLeaveCategory.EL, ModelLeaveCategory.COL, ModelLeaveCategory.VL]:
+    -         raise ValueError(f"Resumption review is only applicable for EL, COL, or VL categories.")
+432 +         raise ValueError("Resumption review is only applicable for EL, COL, or VL categories.")
+433 |
+    |
+
+F811 [*] Redefinition of unused `LeaveBalance` from line 26
+   --> modules/leave/services/lifecycle.py:519:38
+    |
+517 |         List of tuples (category, available_days).
+518 |     """
+519 |     from modules.leave.models import LeaveBalance
+    |                                      ^^^^^^^^^^^^ `LeaveBalance` redefined here
+520 |     
+521 |     balances = LeaveBalance.objects.filter(
+    |
+   ::: modules/leave/services/lifecycle.py:26:5
+    |
+ 24 | from modules.leave.models import (
+ 25 |     LeaveApplication,
+ 26 |     LeaveBalance,
+    |     ------------ previous definition of `LeaveBalance` here
+ 27 |     LeaveActionHistory,
+ 28 |     LeaveCategory as ModelLeaveCategory,
+    |
+help: Remove definition: `LeaveBalance`
+    |
+518 |     """
+    -     from modules.leave.models import LeaveBalance
+519 |     
+    |
+
+F811 [*] Redefinition of unused `LeaveActionHistory` from line 27
+   --> modules/leave/services/lifecycle.py:546:38
+    |
+544 |         List of dictionaries containing history entries.
+545 |     """
+546 |     from modules.leave.models import LeaveActionHistory, LeaveApplication
+    |                                      ^^^^^^^^^^^^^^^^^^ `LeaveActionHistory` redefined here
+547 |     
+548 |     # Get all applications for the user
+    |
+   ::: modules/leave/services/lifecycle.py:27:5
+    |
+ 25 |     LeaveApplication,
+ 26 |     LeaveBalance,
+ 27 |     LeaveActionHistory,
+    |     ------------------ previous definition of `LeaveActionHistory` here
+ 28 |     LeaveCategory as ModelLeaveCategory,
+ 29 | )
+    |
+help: Remove definition: `LeaveActionHistory`
+    |
+545 |     """
+    -     from modules.leave.models import LeaveActionHistory, LeaveApplication
+546 +     from modules.leave.models import LeaveApplication
+547 |     
+    |
+
+F811 [*] Redefinition of unused `LeaveBalance` from line 26
+   --> modules/leave/services/lifecycle.py:592:38
+    |
+590 |     We'll update the balance for the category/year of the original leave (which should be same as cancellation_app).
+591 |     """
+592 |     from modules.leave.models import LeaveBalance
+    |                                      ^^^^^^^^^^^^ `LeaveBalance` redefined here
+593 |     
+594 |     # Determine year (simplified: use requested_from year)
+    |
+   ::: modules/leave/services/lifecycle.py:26:5
+    |
+ 24 | from modules.leave.models import (
+ 25 |     LeaveApplication,
+ 26 |     LeaveBalance,
+    |     ------------ previous definition of `LeaveBalance` here
+ 27 |     LeaveActionHistory,
+ 28 |     LeaveCategory as ModelLeaveCategory,
+    |
+help: Remove definition: `LeaveBalance`
+    |
+591 |     """
+    -     from modules.leave.models import LeaveBalance
+592 |     
+    |
+
+F401 [*] `datetime.timedelta` imported but unused
+   --> modules/leave/services/lifecycle.py:612:26
+    |
+610 |     # To be safe, let's calculate consumed days for the period and add them back.
+611 |     
+612 |     from datetime import timedelta
+    |                          ^^^^^^^^^
+613 |     
+614 |     start_date = cancellation_app.requested_from
+    |
+help: Remove unused import: `datetime.timedelta`
+    |
+611 |     
+    -     from datetime import timedelta
+612 |     
+    |
+
+F811 [*] Redefinition of unused `LeaveBalance` from line 26
+   --> modules/leave/services/lifecycle.py:661:38
+    |
+659 |         days: Number of days to adjust.
+660 |     """
+661 |     from modules.leave.models import LeaveBalance
+    |                                      ^^^^^^^^^^^^ `LeaveBalance` redefined here
+662 |     
+663 |     year = resumption_app.requested_from.year
+    |
+   ::: modules/leave/services/lifecycle.py:26:5
+    |
+ 24 | from modules.leave.models import (
+ 25 |     LeaveApplication,
+ 26 |     LeaveBalance,
+    |     ------------ previous definition of `LeaveBalance` here
+ 27 |     LeaveActionHistory,
+ 28 |     LeaveCategory as ModelLeaveCategory,
+    |
+help: Remove definition: `LeaveBalance`
+    |
+660 |     """
+    -     from modules.leave.models import LeaveBalance
+661 |     
+    |
+
+F811 [*] Redefinition of unused `LeaveActionHistory` from line 27
+   --> modules/leave/services/lifecycle.py:700:38
+    |
+698 |     This function is transaction-safe as it's called within atomic blocks.
+699 |     """
+700 |     from modules.leave.models import LeaveActionHistory
+    |                                      ^^^^^^^^^^^^^^^^^^ `LeaveActionHistory` redefined here
+701 |     
+702 |     history = LeaveActionHistory.objects.create(
+    |
+   ::: modules/leave/services/lifecycle.py:27:5
+    |
+ 25 |     LeaveApplication,
+ 26 |     LeaveBalance,
+ 27 |     LeaveActionHistory,
+    |     ------------------ previous definition of `LeaveActionHistory` here
+ 28 |     LeaveCategory as ModelLeaveCategory,
+ 29 | )
+    |
+help: Remove definition: `LeaveActionHistory`
+    |
+699 |     """
+    -     from modules.leave.models import LeaveActionHistory
+700 |     
+    |
+
+F841 Local variable `history` is assigned to but never used
+   --> modules/leave/services/lifecycle.py:702:5
+    |
+700 |     from modules.leave.models import LeaveActionHistory
+701 |     
+702 |     history = LeaveActionHistory.objects.create(
+    |     ^^^^^^^
+703 |         application=application,
+704 |         actor_id=actor_id,
+    |
+help: Remove assignment to unused variable `history`
+    |
+701 |     
+    -     history = LeaveActionHistory.objects.create(
+702 +     LeaveActionHistory.objects.create(
+703 |         application=application,
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+Found 57 errors.
+[*] 42 fixable with `--fix` (12 unsafe fixes available with `--fix --unsafe-fixes`).
+exit 1

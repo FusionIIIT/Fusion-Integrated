@@ -1,0 +1,14 @@
+TITLE: Rewrite URLs and the module registry (roles, permissions, nav)
+FORMAT: whole
+EDIT: modules/leave/api/urls.py modules/leave/registry.py
+READ: kit:phase2/DESIGN.md modules/leave/api/views.py modules/placement/registry.py
+LIMIT: 1500
+POST: permissions makemigrations
+---
+Review findings: Phase-1 registry.py declares permissions the views never check, has a sidebar link to /leave/admin with no client route (the nav check fails), and lists SYSTEM_PERMISSIONS that nothing performs; urls.py points at views that are being replaced.
+
+1. Replace modules/leave/api/urls.py: app_name = "leave" and urlpatterns for the views in modules/leave/api/views.py (read-only) at the paths listed in the "API" section of DESIGN.md: applications/, applications/<int:pk>/, applications/<int:pk>/withdraw/, applications/<int:pk>/cancel/, applications/<int:pk>/substitute-response/, applications/<int:pk>/replace-substitute/, applications/<int:pk>/decide/, inbox/, balances/, reporting-lines/<int:user_id>/.
+
+2. Replace modules/leave/registry.py following the shape of modules/placement/registry.py (read-only) and the "Permissions" section of DESIGN.md: MODULE (code "leave", label "Leave Management", icon "CalendarBlank", base_path "/leave", nav_section "Leave", sort_order 20, status "active"); NAV_ITEMS for exactly /leave/apply, /leave/mine, /leave/substitute and /leave/approvals with the required_permission given in DESIGN.md; PERMISSIONS listing exactly the seven codes with short labels; ROLE_GRANTS keyed "Employee", "Unit Head", "Deputy Registrar (Estt.)", "Dean", "Registrar", "Director", "Leave Administrator" with the grants in DESIGN.md. Do not define SYSTEM_PERMISSIONS.
+
+Write both files in full. Do not ask for more files.

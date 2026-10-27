@@ -1,0 +1,50 @@
+### ruff, full repository rule set, new module only
+127	W293   	[-] blank-line-with-whitespace
+ 94	E501   	[ ] line-too-long
+ 34	F401   	[*] unused-import
+ 32	W291   	[*] trailing-whitespace
+ 13	PIE790 	[*] unnecessary-placeholder
+ 12	F841   	[ ] unused-variable
+  8	B904   	[ ] raise-without-from-inside-except
+  7	UP045  	[*] non-pep604-annotation-optional
+  7	I001   	[*] unsorted-imports
+  5	UP035  	[ ] deprecated-import
+  5	F811   	[*] redefined-while-unused
+  3	F541   	[*] f-string-missing-placeholders
+  3	UP006  	[*] non-pep585-annotation
+  3	F821   	[ ] undefined-name
+  1	RUF013 	[ ] implicit-optional
+  1	PERF401	[ ] manual-list-comprehension
+  1	TRY301 	[ ] raise-within-try
+  1	RUF022 	[*] unsorted-dunder-all
+Found 357 errors.
+[*] 182 fixable with `--fix` (63 unsafe fixes available with `--fix --unsafe-fixes`).
+### pytest
+not run: the suite needs a running Postgres (Docker), which would not fit in 8 GB alongside the model
+### client build (tsc -b && vite build)
+src/modules/leave/pages/ApprovalsPage.tsx(48,32): error TS7006: Parameter 'app' implicitly has an 'any' type.
+src/modules/leave/pages/ApprovalsPage.tsx(61,36): error TS2322: Type '{ children: string; color: "blue"; leftIcon: Element; onClick: () => void; }' is not assignable to type 'IntrinsicAttributes & ButtonProps & ComponentProp<"button"> & Omit<Omit<DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>, "ref">, "component" | keyof ButtonProps> & { ...; }'.
+  Property 'leftIcon' does not exist on type 'IntrinsicAttributes & ButtonProps & ComponentProp<"button"> & Omit<Omit<DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>, "ref">, "component" | keyof ButtonProps> & { ...; }'.
+src/modules/leave/pages/ApprovalsPage.tsx(67,35): error TS2322: Type '{ children: string; color: "red"; leftIcon: Element; onClick: () => void; }' is not assignable to type 'IntrinsicAttributes & ButtonProps & ComponentProp<"button"> & Omit<Omit<DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>, "ref">, "component" | keyof ButtonProps> & { ...; }'.
+  Property 'leftIcon' does not exist on type 'IntrinsicAttributes & ButtonProps & ComponentProp<"button"> & Omit<Omit<DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>, "ref">, "component" | keyof ButtonProps> & { ...; }'.
+src/modules/leave/pages/MyLeavesPage.tsx(8,1): error TS6133: 'errorMessage' is declared but its value is never read.
+src/modules/leave/pages/MyLeavesPage.tsx(13,31): error TS2307: Cannot find module '../components/HistoryDrawer' or its corresponding type declarations.
+src/modules/leave/pages/MyLeavesPage.tsx(14,60): error TS2307: Cannot find module '../api/hooks' or its corresponding type declarations.
+src/modules/leave/pages/MyLeavesPage.tsx(15,33): error TS6196: 'LeaveBalance' is declared but never used.
+src/modules/leave/pages/MyLeavesPage.tsx(15,53): error TS2307: Cannot find module '../api/types' or its corresponding type declarations.
+src/modules/leave/pages/MyLeavesPage.tsx(19,42): error TS6133: 'balancesPending' is declared but its value is never read.
+src/modules/leave/pages/MyLeavesPage.tsx(20,9): error TS6198: All destructured elements are unused.
+src/modules/leave/pages/MyLeavesPage.tsx(25,21): error TS6133: 'app' is declared but its value is never read.
+src/modules/leave/pages/MyLeavesPage.tsx(32,19): error TS6133: 'app' is declared but its value is never read.
+src/modules/leave/pages/SubstituteRequestsPage.tsx(3,3): error TS6133: 'ActionIcon' is declared but its value is never read.
+src/modules/leave/pages/SubstituteRequestsPage.tsx(3,15): error TS6133: 'Button' is declared but its value is never read.
+src/modules/leave/pages/SubstituteRequestsPage.tsx(3,40): error TS6133: 'Group' is declared but its value is never read.
+src/modules/leave/pages/SubstituteRequestsPage.tsx(5,1): error TS6133: 'notifications' is declared but its value is never read.
+src/modules/leave/pages/SubstituteRequestsPage.tsx(6,1): error TS6192: All imports in import declaration are unused.
+src/modules/leave/pages/SubstituteRequestsPage.tsx(8,1): error TS6133: 'errorMessage' is declared but its value is never read.
+src/modules/leave/pages/SubstituteRequestsPage.tsx(10,1): error TS6133: 'ErrorState' is declared but its value is never read.
+src/modules/leave/pages/SubstituteRequestsPage.tsx(11,1): error TS6133: 'StatusBadge' is declared but its value is never read.
+src/modules/leave/pages/SubstituteRequestsPage.tsx(12,64): error TS2307: Cannot find module '../api/hooks' or its corresponding type declarations.
+src/modules/leave/pages/SubstituteRequestsPage.tsx(17,10): error TS6133: 'requestId' is declared but its value is never read.
+src/modules/leave/pages/SubstituteRequestsPage.tsx(17,21): error TS6133: 'setRequestId' is declared but its value is never read.
+[exit 1]

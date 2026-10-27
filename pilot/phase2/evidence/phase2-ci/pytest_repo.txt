@@ -1,0 +1,62 @@
+........................................................................ [ 18%]
+........................................................................ [ 36%]
+........................................................................ [ 54%]
+........................................................................ [ 72%]
+........F............................................................... [ 90%]
+......................................                                   [100%]
+=================================== FAILURES ===================================
+______________ test_the_committed_manifest_matches_the_registries ______________
+
+    def test_the_committed_manifest_matches_the_registries():
+        """Same assertion `make check` makes, so a stale file fails here too."""
+        try:
+>           call_command("permission_manifest", check=True)
+
+modules/accesscontrol/tests/test_permission_manifest.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../elm/.venv/lib/python3.12/site-packages/django/core/management/__init__.py:194: in call_command
+    return command.execute(*args, **defaults)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../elm/.venv/lib/python3.12/site-packages/django/core/management/base.py:464: in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <modules.accesscontrol.management.commands.permission_manifest.Command object at 0x7f2937342d50>
+args = ()
+opts = {'verbosity': 1, 'settings': None, 'pythonpath': None, 'traceback': False, ...}
+
+    def handle(self, *args, **opts):
+        manifest = collect()
+        found = problems(manifest)
+        if found:
+            raise CommandError("\n".join(["permission manifest is invalid:",
+                                          *(f"  - {p}" for p in found)]))
+    
+        artifacts = {MANIFEST: render(manifest),
+                     CATALOGUE: render_catalogue(manifest)}
+        if opts["check"]:
+            for path, body in artifacts.items():
+                current = path.read_text() if path.exists() else ""
+                if current != body:
+>                   raise CommandError(
+                        f"{path.relative_to(settings.BASE_DIR)} is stale — run "
+                        f"'make permissions'")
+E                   django.core.management.base.CommandError: docs/02-iam/permission-catalog.generated.md is stale — run 'make permissions'
+
+modules/accesscontrol/management/commands/permission_manifest.py:275: CommandError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_committed_manifest_matches_the_registries():
+        """Same assertion `make check` makes, so a stale file fails here too."""
+        try:
+            call_command("permission_manifest", check=True)
+        except CommandError as exc:                            # pragma: no cover
+>           pytest.fail(str(exc))
+E           Failed: docs/02-iam/permission-catalog.generated.md is stale — run 'make permissions'
+
+modules/accesscontrol/tests/test_permission_manifest.py:48: Failed
+=========================== short test summary info ============================
+FAILED modules/accesscontrol/tests/test_permission_manifest.py::test_the_committed_manifest_matches_the_registries
+exit 1

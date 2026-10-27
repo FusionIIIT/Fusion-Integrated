@@ -1,0 +1,72 @@
+F541 [*] f-string without any placeholders
+   --> modules/leave/services/applications.py:241:24
+    |
+240 |     if app.assignee_id != actor_id:
+241 |         raise NotFound(f"Only the assigned substitute can respond to this application.")
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+242 |
+243 |     if app.status != Status.PENDING.value or app.stage != Stage.SUBSTITUTE.value:
+    |
+help: Remove extraneous `f` prefix
+    |
+240 |     if app.assignee_id != actor_id:
+    -         raise NotFound(f"Only the assigned substitute can respond to this application.")
+241 +         raise NotFound("Only the assigned substitute can respond to this application.")
+242 |
+    |
+
+F541 [*] f-string without any placeholders
+   --> modules/leave/services/applications.py:272:24
+    |
+271 |     if app.user_id != actor_id:
+272 |         raise NotFound(f"Only the application owner can nominate a replacement substitute.")
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+273 |
+274 |     if app.status not in [Status.PENDING.value]:
+    |
+help: Remove extraneous `f` prefix
+    |
+271 |     if app.user_id != actor_id:
+    -         raise NotFound(f"Only the application owner can nominate a replacement substitute.")
+272 +         raise NotFound("Only the application owner can nominate a replacement substitute.")
+273 |
+    |
+
+F541 [*] f-string without any placeholders
+   --> modules/leave/services/applications.py:311:24
+    |
+310 |     if app.user_id != actor_id:
+311 |         raise NotFound(f"Only the application owner can withdraw this application.")
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+312 |
+313 |     if app.status != Status.PENDING.value:
+    |
+help: Remove extraneous `f` prefix
+    |
+310 |     if app.user_id != actor_id:
+    -         raise NotFound(f"Only the application owner can withdraw this application.")
+311 +         raise NotFound("Only the application owner can withdraw this application.")
+312 |
+    |
+
+F541 [*] f-string without any placeholders
+   --> modules/leave/services/lifecycle.py:177:24
+    |
+175 |     # Check ownership
+176 |     if app.user_id != actor_id:
+177 |         raise NotFound(f"Only the owner can request cancellation for this application.")
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+178 |
+179 |     # Check kind and approval status
+    |
+help: Remove extraneous `f` prefix
+    |
+176 |     if app.user_id != actor_id:
+    -         raise NotFound(f"Only the owner can request cancellation for this application.")
+177 +         raise NotFound("Only the owner can request cancellation for this application.")
+178 |
+    |
+
+Found 4 errors.
+[*] 4 fixable with `--fix`.
+exit 1
