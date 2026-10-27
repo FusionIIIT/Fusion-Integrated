@@ -63,6 +63,416 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/elm/accounts/:
+    get:
+      operationId: v1_elm_accounts_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+          description: ''
+  /api/v1/elm/applications/:
+    get:
+      operationId: v1_elm_applications_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: scope
+        schema:
+          type: string
+          enum:
+          - all
+          - mine
+        description: Filter to the applicant before pagination.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedElmApplicationList'
+          description: ''
+    post:
+      operationId: v1_elm_applications_create
+      parameters:
+      - in: query
+        name: scope
+        schema:
+          type: string
+          enum:
+          - all
+          - mine
+        description: Filter to the applicant before pagination.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Submit'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Submit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Submit'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElmApplication'
+          description: ''
+  /api/v1/elm/applications/{id}/:
+    get:
+      operationId: v1_elm_applications_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElmApplication'
+          description: ''
+  /api/v1/elm/applications/{id}/actions/:
+    post:
+      operationId: v1_elm_applications_actions_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Action'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Action'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Action'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElmApplication'
+          description: ''
+  /api/v1/elm/applications/{id}/correction/:
+    post:
+      operationId: v1_elm_applications_correction_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Correction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Correction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Correction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElmApplication'
+          description: ''
+  /api/v1/elm/applications/{id}/export/:
+    get:
+      operationId: v1_elm_applications_export_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            text/plain:
+              schema:
+                type: string
+          description: ''
+  /api/v1/elm/applications/{id}/lifecycle/:
+    post:
+      operationId: v1_elm_applications_lifecycle_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Lifecycle'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Lifecycle'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Lifecycle'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElmApplication'
+          description: ''
+  /api/v1/elm/calendars/:
+    post:
+      operationId: v1_elm_calendars_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Calendar'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Calendar'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Calendar'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calendar'
+          description: ''
+  /api/v1/elm/configuration/:
+    get:
+      operationId: v1_elm_configuration_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: v1_elm_configuration_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Configuration'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Configuration'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Configuration'
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/elm/employees/:
+    get:
+      operationId: v1_elm_employees_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/elm/ledger/:
+    get:
+      operationId: v1_elm_ledger_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLedgerList'
+          description: ''
+  /api/v1/elm/notifications/:
+    get:
+      operationId: v1_elm_notifications_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNotificationList'
+          description: ''
+  /api/v1/elm/notifications/{id}/read/:
+    post:
+      operationId: v1_elm_notifications_read_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/elm/offline/:
+    post:
+      operationId: v1_elm_offline_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Offline'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Offline'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Offline'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElmApplication'
+          description: ''
+  /api/v1/elm/tasks/:
+    get:
+      operationId: v1_elm_tasks_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTaskList'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1763,6 +2173,89 @@ components:
       - semester
       - semester_type
       - user_id
+    Account:
+      type: object
+      properties:
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        cl:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,7}(?:\.\d{0,2})?$
+        rh:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,7}(?:\.\d{0,2})?$
+        scl:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,7}(?:\.\d{0,2})?$
+        el:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,7}(?:\.\d{0,2})?$
+        col:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,7}(?:\.\d{0,2})?$
+        vl:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,7}(?:\.\d{0,2})?$
+        year_end_processed:
+          type: boolean
+      required:
+      - cl
+      - col
+      - el
+      - rh
+      - scl
+      - vl
+      - year
+    Action:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+        revision:
+          type: integer
+          minimum: 1
+        reason:
+          type: string
+          default: ''
+          maxLength: 5000
+        substitute_id:
+          type: integer
+          minimum: 1
+      required:
+      - action
+      - revision
+    ActionEnum:
+      enum:
+      - accept
+      - decline
+      - recommend
+      - not_recommend
+      - forward
+      - approve
+      - reject
+      - review
+      - withdraw
+      - replace_substitute
+      type: string
+      description: |-
+        * `accept` - accept
+        * `decline` - decline
+        * `recommend` - recommend
+        * `not_recommend` - not_recommend
+        * `forward` - forward
+        * `approve` - approve
+        * `reject` - reject
+        * `review` - review
+        * `withdraw` - withdraw
+        * `replace_substitute` - replace_substitute
     AddCandidates:
       type: object
       properties:
@@ -2045,6 +2538,33 @@ components:
       required:
       - application_ids
       - to_status
+    Calendar:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          maximum: 2200
+          minimum: 1900
+        holidays:
+          type: array
+          items:
+            type: string
+            format: date
+        restricted_holidays:
+          type: array
+          items:
+            type: string
+            format: date
+        published:
+          type: boolean
+      required:
+      - holidays
+      - id
+      - restricted_holidays
+      - year
     Candidate:
       type: object
       description: A person as the ERP portal and the IAM describe them. Read-only
@@ -2315,6 +2835,25 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    Configuration:
+      type: object
+      properties:
+        policy:
+          $ref: '#/components/schemas/Policy'
+        employee:
+          $ref: '#/components/schemas/EmployeeConfiguration'
+    Correction:
+      type: object
+      properties:
+        reason:
+          type: string
+          maxLength: 2000
+        reference:
+          type: string
+          maxLength: 300
+      required:
+      - reason
+      - reference
     Detail:
       type: object
       properties:
@@ -2407,6 +2946,151 @@ components:
       - season_decision
       - semester
       - standing
+    ElmApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        kind:
+          type: string
+          maxLength: 16
+        parent_id:
+          type: integer
+          nullable: true
+          readOnly: true
+        category:
+          $ref: '#/components/schemas/ElmLeaveCategoryEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        effective_end_date:
+          type: string
+          format: date
+        half:
+          type: string
+          maxLength: 6
+        reason:
+          type: string
+        station_leave:
+          type: boolean
+        station_details:
+          type: string
+        medical_reference:
+          type: string
+          maxLength: 300
+        substitute_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+        status:
+          type: string
+          maxLength: 24
+        days_by_year: {}
+        revision:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        resumption_reviewed:
+          type: boolean
+        offline_reference:
+          type: string
+          maxLength: 300
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/History'
+          readOnly: true
+        allowed_actions:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - allowed_actions
+      - category
+      - created_at
+      - effective_end_date
+      - end_date
+      - history
+      - id
+      - parent_id
+      - reason
+      - start_date
+      - user_id
+    ElmLeaveCategoryEnum:
+      enum:
+      - CL
+      - RH
+      - SCL
+      - EL
+      - COL
+      - VL
+      type: string
+      description: |-
+        * `CL` - CL
+        * `RH` - RH
+        * `SCL` - SCL
+        * `EL` - EL
+        * `COL` - COL
+        * `VL` - VL
+    ElmProcessingRoleEnum:
+      enum:
+      - Unit Head
+      - Deputy Registrar (Estt.)
+      - Dean
+      - Registrar
+      - Director
+      type: string
+      description: |-
+        * `Unit Head` - Unit Head
+        * `Deputy Registrar (Estt.)` - Deputy Registrar (Estt.)
+        * `Dean` - Dean
+        * `Registrar` - Registrar
+        * `Director` - Director
+    EmployeeConfiguration:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+        unit:
+          type: string
+          maxLength: 120
+        designation:
+          type: string
+          maxLength: 120
+        coverage_required:
+          type: boolean
+        eligible_categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ElmLeaveCategoryEnum'
+        routes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/RouteStep'
+      required:
+      - designation
+      - eligible_categories
+      - routes
+      - unit
+      - user_id
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2423,6 +3107,48 @@ components:
       - fee_reference
       - season
       - user_id
+    HalfEnum:
+      enum:
+      - full
+      - first
+      - second
+      type: string
+      description: |-
+        * `full` - full
+        * `first` - first
+        * `second` - second
+    History:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        action:
+          type: string
+          maxLength: 40
+        actor_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+        reason:
+          type: string
+        from_status:
+          type: string
+          maxLength: 24
+        to_status:
+          type: string
+          maxLength: 24
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - created_at
+      - from_status
+      - id
+      - to_status
     IncidentRecorded:
       type: object
       properties:
@@ -2637,6 +3363,69 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    Ledger:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          readOnly: true
+        application_id:
+          type: integer
+          nullable: true
+          readOnly: true
+        category:
+          type: string
+          maxLength: 3
+        delta:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,7}(?:\.\d{0,2})?$
+        operation:
+          type: string
+          maxLength: 32
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - application_id
+      - category
+      - created_at
+      - delta
+      - id
+      - operation
+      - year
+    Lifecycle:
+      type: object
+      properties:
+        kind:
+          $ref: '#/components/schemas/LifecycleKindEnum'
+        reason:
+          type: string
+          maxLength: 5000
+        end_date:
+          type: string
+          format: date
+        substitute_id:
+          type: integer
+          minimum: 1
+          nullable: true
+      required:
+      - kind
+      - reason
+    LifecycleKindEnum:
+      enum:
+      - cancellation
+      - extension
+      - resumption
+      type: string
+      description: |-
+        * `cancellation` - cancellation
+        * `extension` - extension
+        * `resumption` - resumption
     LiftSanction:
       type: object
       properties:
@@ -2732,6 +3521,29 @@ components:
       - is_late
       - message
       - record
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        application_id:
+          type: integer
+          readOnly: true
+        message:
+          type: string
+          maxLength: 300
+        read:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - application_id
+      - created_at
+      - id
+      - message
     OffCampusRecord:
       type: object
       properties:
@@ -2864,6 +3676,63 @@ components:
         * `revoked` - Revoked
         * `superseded` - Superseded
         * `expired` - Expired
+    Offline:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/ElmLeaveCategoryEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        half:
+          allOf:
+          - $ref: '#/components/schemas/HalfEnum'
+          default: full
+        reason:
+          type: string
+          maxLength: 5000
+        station_leave:
+          type: boolean
+          default: false
+        station_details:
+          type: string
+          default: ''
+          maxLength: 2000
+        medical_reference:
+          type: string
+          default: ''
+          maxLength: 300
+        substitute_id:
+          type: integer
+          minimum: 1
+          nullable: true
+        user_id:
+          type: integer
+          minimum: 1
+        offline_reference:
+          type: string
+          maxLength: 300
+        unavailability_reason:
+          type: string
+          maxLength: 2000
+        authority_id:
+          type: integer
+          minimum: 1
+        authority_role:
+          $ref: '#/components/schemas/ElmProcessingRoleEnum'
+      required:
+      - authority_id
+      - authority_role
+      - category
+      - end_date
+      - offline_reference
+      - reason
+      - start_date
+      - unavailability_reason
+      - user_id
     Ok:
       type: object
       properties:
@@ -2943,6 +3812,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Company'
+    PaginatedElmApplicationList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ElmApplication'
     PaginatedInterviewRoundList:
       type: object
       required:
@@ -2981,6 +3869,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedLedgerList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ledger'
+    PaginatedNotificationList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
     PaginatedOfferList:
       type: object
       required:
@@ -3000,6 +3926,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PaginatedTaskList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
     PatchedJobPosting:
       type: object
       properties:
@@ -3145,6 +4090,23 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    Policy:
+      type: object
+      properties:
+        non_working_weekdays:
+          type: array
+          items:
+            type: integer
+            maximum: 6
+            minimum: 0
+        require_col_evidence:
+          type: boolean
+        reminder_hours:
+          type: integer
+          minimum: 1
+        escalation_hours:
+          type: integer
+          minimum: 1
     ProfileDocument:
       type: object
       description: |-
@@ -3539,6 +4501,28 @@ components:
         * `absent` - Absent
         * `passed` - Passed
         * `failed` - Failed
+    RouteStep:
+      type: object
+      properties:
+        stage:
+          $ref: '#/components/schemas/StageEnum'
+        user_id:
+          type: integer
+          minimum: 1
+        role:
+          $ref: '#/components/schemas/ElmProcessingRoleEnum'
+        escalation_user_id:
+          type: integer
+          minimum: 1
+        escalation_role:
+          $ref: '#/components/schemas/ElmProcessingRoleEnum'
+        reassign_on_escalation:
+          type: boolean
+          default: false
+      required:
+      - role
+      - stage
+      - user_id
     SanctionEnum:
       enum:
       - bar_next_two
@@ -3691,6 +4675,54 @@ components:
       required:
       - available
       - season
+    StageEnum:
+      enum:
+      - unit_head
+      - establishment
+      - sanction
+      type: string
+      description: |-
+        * `unit_head` - unit_head
+        * `establishment` - establishment
+        * `sanction` - sanction
+    Submit:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/ElmLeaveCategoryEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        half:
+          allOf:
+          - $ref: '#/components/schemas/HalfEnum'
+          default: full
+        reason:
+          type: string
+          maxLength: 5000
+        station_leave:
+          type: boolean
+          default: false
+        station_details:
+          type: string
+          default: ''
+          maxLength: 2000
+        medical_reference:
+          type: string
+          default: ''
+          maxLength: 300
+        substitute_id:
+          type: integer
+          minimum: 1
+          nullable: true
+      required:
+      - category
+      - end_date
+      - reason
+      - start_date
     SubmitOfferLetter:
       type: object
       properties:
@@ -3698,6 +4730,31 @@ components:
           type: integer
       required:
       - document_id
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        application_id:
+          type: integer
+          readOnly: true
+        stage:
+          type: string
+          maxLength: 16
+        role:
+          type: string
+          maxLength: 120
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - application_id
+      - created_at
+      - id
+      - role
+      - stage
     TopicEnum:
       enum:
       - drive

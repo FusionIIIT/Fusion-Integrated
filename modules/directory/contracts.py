@@ -27,6 +27,7 @@ class UserDTO:
     #: Maintained on the ERP portal's profile page, read here.
     resume_link: str = ""
     profile_completed: bool = False
+    is_active: bool = True
 
 
 def _to_dto(r: UserRef) -> UserDTO:
@@ -34,7 +35,7 @@ def _to_dto(r: UserRef) -> UserDTO:
         user_id=r.user_id, username=r.username, display_name=r.display_name,
         kind=r.kind, email=r.email, department=r.department,
         programme=r.programme, discipline=r.discipline, batch_year=r.batch_year,
-        resume_link=r.resume_link, profile_completed=r.profile_completed,
+        resume_link=r.resume_link, profile_completed=r.profile_completed, is_active=r.is_active,
     )
 
 
