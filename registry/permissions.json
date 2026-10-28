@@ -34,6 +34,115 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "leave": {
+      "grants": {
+        "dean": [
+          "leave.application.apply",
+          "leave.application.review",
+          "leave.application.view_self"
+        ],
+        "director": [
+          "leave.application.apply",
+          "leave.application.review",
+          "leave.application.view_self"
+        ],
+        "faculty": [
+          "leave.application.apply",
+          "leave.application.view_self"
+        ],
+        "hod": [
+          "leave.application.apply",
+          "leave.application.review",
+          "leave.application.view_self"
+        ],
+        "leave_admin": [
+          "leave.admin.manage",
+          "leave.application.apply",
+          "leave.application.review",
+          "leave.application.view_self"
+        ],
+        "staff": [
+          "leave.application.apply",
+          "leave.application.view_self"
+        ],
+        "unit_head": [
+          "leave.application.apply",
+          "leave.application.review",
+          "leave.application.view_self"
+        ]
+      },
+      "module_grants": [
+        "dean",
+        "director",
+        "faculty",
+        "hod",
+        "leave_admin",
+        "staff",
+        "unit_head"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "FaCalendarAlt",
+        "items": [
+          {
+            "code": "leave.apply",
+            "icon": "FaClipboardList",
+            "label": "Apply for Leave",
+            "required_permission": "leave.application.apply",
+            "sort_order": 10,
+            "to": "/leave/apply"
+          },
+          {
+            "code": "leave.my_leaves",
+            "icon": "FaCalendarAlt",
+            "label": "My Leaves & Balances",
+            "required_permission": "leave.application.view_self",
+            "sort_order": 20,
+            "to": "/leave/my-leaves"
+          },
+          {
+            "code": "leave.substitute_inbox",
+            "icon": "FaUsers",
+            "label": "Substitute Requests",
+            "required_permission": "leave.application.view_self",
+            "sort_order": 30,
+            "to": "/leave/substitute"
+          },
+          {
+            "code": "leave.reviews",
+            "icon": "FaClipboardCheck",
+            "label": "Approval Queue",
+            "required_permission": "leave.application.review",
+            "sort_order": 40,
+            "to": "/leave/reviews"
+          }
+        ],
+        "label": "Employee Leave",
+        "nav_section": "HR",
+        "sort_order": 25,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "leave.application.apply",
+          "label": "Apply for institute employee leave"
+        },
+        {
+          "code": "leave.application.view_self",
+          "label": "View own leave applications, balances, and history"
+        },
+        {
+          "code": "leave.application.review",
+          "label": "Review, recommend, and sanction employee leave applications"
+        },
+        {
+          "code": "leave.admin.manage",
+          "label": "Manage leave policies, holiday calendars, and offline synchronization"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
