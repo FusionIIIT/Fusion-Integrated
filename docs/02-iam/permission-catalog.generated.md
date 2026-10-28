@@ -13,6 +13,25 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave_management`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave_management.leave.view_self` | See one's own leave and balances | `Faculty`, `HOD`, `Staff` |
+| `leave_management.leave.apply` | Apply for leave | `Faculty`, `HOD`, `Staff` |
+| `leave_management.leave.withdraw` | Withdraw a pending request | `Faculty`, `HOD`, `Staff` |
+| `leave_management.leave.cancel` | Request cancellation of approved leave | `Faculty`, `HOD`, `Staff` |
+| `leave_management.leave.extension` | Request an extension of ongoing leave | `Faculty`, `HOD`, `Staff` |
+| `leave_management.leave.resumption` | Report resumption of duty | `Faculty`, `HOD`, `Staff` |
+| `leave_management.substitute.respond` | Accept or decline a cover request | `Faculty`, `HOD`, `Staff` |
+| `leave_management.leave.view` | See leave requests within scope | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `HOD`, `Leave Administrator`, `Registrar` |
+| `leave_management.leave.review` | Record Recommended / Not Recommended | `HOD` |
+| `leave_management.leave.sanction` | Give the final sanction decision | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `HOD`, `Leave Administrator`, `Registrar` |
+| `leave_management.leave.record_offline` | Record already-sanctioned offline leave | `Dean`, `Deputy Registrar (Estt.)`, `Leave Administrator`, `Registrar` |
+| `leave_management.calendar.manage` | Maintain the holiday / RH calendar | `Dean`, `Deputy Registrar (Estt.)`, `Leave Administrator`, `Registrar` |
+| `leave_management.policy.manage` | Maintain leave-policy parameters | `Dean`, `Deputy Registrar (Estt.)`, `Leave Administrator`, `Registrar` |
+| `leave_management.report.view` | See leave reports and statistics | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `HOD`, `Leave Administrator`, `Registrar` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
