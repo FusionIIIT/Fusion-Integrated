@@ -6,6 +6,7 @@ from modules.elm.api.serializers import LeaveRequestSerializer
 
 
 class LeaveRequestListView(generics.ListCreateAPIView):
+    """List and create leave requests."""
     queryset = LeaveRequest.objects.all()
     serializer_class = LeaveRequestSerializer
 
@@ -18,5 +19,6 @@ class LeaveRequestListView(generics.ListCreateAPIView):
 
 
 class LeaveRequestDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Retrieve, update, or delete a specific leave request."""
     queryset = LeaveRequest.objects.all()
     serializer_class = LeaveRequestSerializer
