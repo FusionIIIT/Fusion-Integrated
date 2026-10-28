@@ -13,6 +13,29 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.request.create` | Submit leave requests | `Employee` |
+| `elm.request.modify` | Modify own pending leave requests | `Employee` |
+| `elm.request.view_self` | View own leave requests and balances | `Employee`, `Leave Administrator` |
+| `elm.request.review` | Review requests as Unit Head | `Unit Head` |
+| `elm.request.route` | Verify and route requests through Establishment | `Deputy Registrar (Estt.)` |
+| `elm.request.sanction` | Make final sanctioning decisions | `Dean`, `Director`, `Registrar` |
+| `elm.request.withdraw` | Withdraw own pending requests | `Employee` |
+| `elm.request.cancel` | Request cancellation of approved leave | `Employee` |
+| `elm.request.cancel_review` | Decide approved-leave cancellation | `Dean`, `Director`, `Registrar` |
+| `elm.request.extend` | Request extension of ongoing leave | `Employee` |
+| `elm.request.resume` | Submit resumption of duty | `Employee` |
+| `elm.request.verify_resume` | Verify resumption of duty | `Deputy Registrar (Estt.)`, `Unit Head` |
+| `elm.substitute.respond` | Accept or decline substitute assignment | `Substitute / Responsibility Holder` |
+| `elm.policy.manage` | Maintain and publish leave policy | `Leave Administrator` |
+| `elm.calendar.manage` | Maintain and publish holiday/RH calendar | `Leave Administrator` |
+| `elm.sla.remind` | Send SLA reminders | _service only_ |
+| `elm.sla.escalate` | Escalate overdue SLA tasks | _service only_ |
+| `elm.year_end.process` | Process annual leave balances | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

@@ -27,34 +27,52 @@ class Command(BaseCommand):
         ]:
             UserRef.objects.update_or_create(
                 user_id=uid,
-                defaults={"username": f"u{uid}", "display_name": name, "kind": kind,
-                          "discipline": disc,
-                          "batch_year": 2023 if kind == "student" else None},
+                defaults={
+                    "username": f"u{uid}",
+                    "display_name": name,
+                    "kind": kind,
+                    "discipline": disc,
+                    "batch_year": 2023 if kind == "student" else None,
+                },
             )
 
         acme, _ = Company.objects.update_or_create(
-            slug="acme", defaults={"name": "Acme Corp", "sector": "IT",
-                                       "tier_rank": 1, "status": "active"})
+            slug="acme",
+            defaults={"name": "Acme Corp", "sector": "IT", "tier_rank": 1, "status": "active"},
+        )
 
         posting, _ = JobPosting.objects.update_or_create(
-            company=acme, title="SDE-1", placement_year="2026-27",
+            company=acme,
+            title="SDE-1",
+            placement_year="2026-27",
             defaults={
-                "ctc_lpa": "18.00", "seats": 4, "status": "published",
-                "eligibility_rule": {"all": [{"gte": ["cpi", 7.0]},
-                                             {"in": ["discipline", ["CSE", "ECE"]]}]},
+                "ctc_lpa": "18.00",
+                "seats": 4,
+                "status": "published",
+                "description": "Software Development Engineer role for eligible 2026-27 students.",
+                "eligibility_rule": {
+                    "all": [
+                        {"gte": ["cpi", 7.0]},
+                        {"in": ["discipline", ["CSE", "ECE"]]},
+                    ]
+                },
                 "eligibility_rule_locked_at": timezone.now(),
                 "opens_at": timezone.now(),
                 "closes_at": timezone.now() + timedelta(days=14),
                 "created_by_user_id": 9001,
-            })
+            },
+        )
 
         for uid, status in [(1001, "submitted"), (1002, "under_review")]:
             Application.objects.update_or_create(
-                posting=posting, user_id=uid,
-                defaults={"status": status, "cpi_at_apply": "8.10",
-                          "eligibility_snapshot": {"is_eligible": True},
-                          "applied_at": timezone.now()})
-
-
+                posting=posting,
+                user_id=uid,
+                defaults={
+                    "status": status,
+                    "cpi_at_apply": "8.10",
+                    "eligibility_snapshot": {"is_eligible": True},
+                    "applied_at": timezone.now(),
+                },
+            )
 
         self.stdout.write(self.style.SUCCESS("demo data loaded"))

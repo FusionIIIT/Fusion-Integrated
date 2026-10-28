@@ -139,3 +139,8 @@ review date in its front matter.
 | `06-crosscutting/performance-and-capacity.md` | Load-test results are committed here per phase; a phase cannot close without them |
 | `03-platform/platform-structure.md` | The import-linter contracts it documents live in `.importlinter` and run in CI |
 | `05-frontend/design-system.md` | Playwright visual baselines prove the layout claims |
+
+
+## Employee Leave Management (draft)
+
+See [ELM blueprint and traceability](09-elm/elm-blueprint.md) for source inventory, requirement coverage, implementation status and unresolved IAM/policy blockers. ELM is not production-ready until its documented gates are closed.

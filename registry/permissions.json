@@ -34,6 +34,171 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "elm": {
+      "grants": {
+        "Dean": [
+          "elm.request.cancel_review",
+          "elm.request.sanction"
+        ],
+        "Deputy Registrar (Estt.)": [
+          "elm.request.route",
+          "elm.request.verify_resume"
+        ],
+        "Director": [
+          "elm.request.cancel_review",
+          "elm.request.sanction"
+        ],
+        "Employee": [
+          "elm.request.cancel",
+          "elm.request.create",
+          "elm.request.extend",
+          "elm.request.modify",
+          "elm.request.resume",
+          "elm.request.view_self",
+          "elm.request.withdraw"
+        ],
+        "Leave Administrator": [
+          "elm.calendar.manage",
+          "elm.policy.manage",
+          "elm.request.view_self"
+        ],
+        "Registrar": [
+          "elm.request.cancel_review",
+          "elm.request.sanction"
+        ],
+        "Substitute / Responsibility Holder": [
+          "elm.substitute.respond"
+        ],
+        "Unit Head": [
+          "elm.request.review",
+          "elm.request.verify_resume"
+        ]
+      },
+      "module_grants": [
+        "Dean",
+        "Deputy Registrar (Estt.)",
+        "Director",
+        "Employee",
+        "Leave Administrator",
+        "Registrar",
+        "Substitute / Responsibility Holder",
+        "Unit Head"
+      ],
+      "nav": {
+        "base_path": "/elm",
+        "icon": "CalendarCheck",
+        "items": [
+          {
+            "code": "elm.mine",
+            "icon": "CalendarDays",
+            "label": "My Leave",
+            "required_permission": "elm.request.view_self",
+            "sort_order": 10,
+            "to": "/elm/requests"
+          },
+          {
+            "code": "elm.tasks",
+            "icon": "ClipboardCheck",
+            "label": "Leave Tasks",
+            "required_permission": "elm.request.review",
+            "sort_order": 20,
+            "to": "/elm/tasks"
+          },
+          {
+            "code": "elm.policy",
+            "icon": "Settings2",
+            "label": "Leave Policy",
+            "required_permission": "elm.policy.manage",
+            "sort_order": 30,
+            "to": "/elm/policy"
+          }
+        ],
+        "label": "Employee Leave Management",
+        "nav_section": "Employee Services",
+        "sort_order": 30,
+        "status": "draft"
+      },
+      "permissions": [
+        {
+          "code": "elm.request.create",
+          "label": "Submit leave requests"
+        },
+        {
+          "code": "elm.request.modify",
+          "label": "Modify own pending leave requests"
+        },
+        {
+          "code": "elm.request.view_self",
+          "label": "View own leave requests and balances"
+        },
+        {
+          "code": "elm.request.review",
+          "label": "Review requests as Unit Head"
+        },
+        {
+          "code": "elm.request.route",
+          "label": "Verify and route requests through Establishment"
+        },
+        {
+          "code": "elm.request.sanction",
+          "label": "Make final sanctioning decisions"
+        },
+        {
+          "code": "elm.request.withdraw",
+          "label": "Withdraw own pending requests"
+        },
+        {
+          "code": "elm.request.cancel",
+          "label": "Request cancellation of approved leave"
+        },
+        {
+          "code": "elm.request.cancel_review",
+          "label": "Decide approved-leave cancellation"
+        },
+        {
+          "code": "elm.request.extend",
+          "label": "Request extension of ongoing leave"
+        },
+        {
+          "code": "elm.request.resume",
+          "label": "Submit resumption of duty"
+        },
+        {
+          "code": "elm.request.verify_resume",
+          "label": "Verify resumption of duty"
+        },
+        {
+          "code": "elm.substitute.respond",
+          "label": "Accept or decline substitute assignment"
+        },
+        {
+          "code": "elm.policy.manage",
+          "label": "Maintain and publish leave policy"
+        },
+        {
+          "code": "elm.calendar.manage",
+          "label": "Maintain and publish holiday/RH calendar"
+        },
+        {
+          "code": "elm.sla.remind",
+          "label": "Send SLA reminders"
+        },
+        {
+          "code": "elm.sla.escalate",
+          "label": "Escalate overdue SLA tasks"
+        },
+        {
+          "code": "elm.year_end.process",
+          "label": "Process annual leave balances"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "elm.sla.escalate",
+        "elm.sla.remind",
+        "elm.year_end.process"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

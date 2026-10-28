@@ -63,6 +63,367 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/elm/balances/me:
+    get:
+      operationId: elm_balance_me
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ELMBalanceResponse'
+          description: ''
+  /api/v1/elm/calendars:
+    get:
+      operationId: elm_calendars_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CalendarVersion'
+          description: ''
+    post:
+      operationId: elm_calendars_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalendarVersion'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CalendarVersion'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CalendarVersion'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarVersion'
+          description: ''
+  /api/v1/elm/calendars/{id}/publish:
+    post:
+      operationId: elm_calendar_publish
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarVersion'
+          description: ''
+  /api/v1/elm/policies:
+    get:
+      operationId: elm_policies_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeavePolicy'
+          description: ''
+    post:
+      operationId: elm_policies_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeavePolicy'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeavePolicy'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeavePolicy'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeavePolicy'
+          description: ''
+  /api/v1/elm/policies/{id}/publish:
+    post:
+      operationId: elm_policy_publish
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeavePolicy'
+          description: ''
+  /api/v1/elm/requests:
+    get:
+      operationId: elm_requests_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+    post:
+      operationId: elm_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveRequestCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveRequestCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveRequestCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/requests/{id}:
+    get:
+      operationId: elm_request_detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+    patch:
+      operationId: elm_request_modify
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLeaveRequestModify'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLeaveRequestModify'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLeaveRequestModify'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/requests/{id}/history:
+    get:
+      operationId: elm_request_history
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ELMHistoryEvent'
+          description: ''
+  /api/v1/elm/requests/{id}/related:
+    post:
+      operationId: elm_related_request_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RelatedRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RelatedRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RelatedRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/requests/{id}/substitute-response:
+    post:
+      operationId: elm_substitute_response
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/requests/{id}/transition:
+    post:
+      operationId: elm_request_transition
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ELMTransition'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ELMTransition'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ELMTransition'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/tasks/me:
+    get:
+      operationId: elm_tasks_me
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ELMMyTask'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -2045,6 +2406,55 @@ components:
       required:
       - application_ids
       - to_status
+    CalendarVersion:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        name:
+          type: string
+          maxLength: 120
+        version:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        effective_from:
+          type: string
+          format: date
+        effective_to:
+          type: string
+          format: date
+          nullable: true
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        published_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        holidays: {}
+        restricted_holidays: {}
+        vacation_periods: {}
+      required:
+      - created_at
+      - effective_from
+      - id
+      - name
+      - published_at
+      - published_by_user_id
+      - updated_at
+      - version
     Candidate:
       type: object
       description: A person as the ERP portal and the IAM describe them. Read-only
@@ -2082,6 +2492,22 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CategoryEnum:
+      enum:
+      - CL
+      - RH
+      - SCL
+      - EL
+      - COL
+      - VL
+      type: string
+      description: |-
+        * `CL` - CL
+        * `RH` - RH
+        * `SCL` - SCL
+        * `EL` - EL
+        * `COL` - COL
+        * `VL` - VL
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2350,6 +2776,79 @@ components:
         * `certificate` - certificate
         * `offer_letter` - offer_letter
         * `other` - other
+    ELMBalanceResponse:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        balances:
+          type: object
+          additionalProperties:
+            type: string
+      required:
+      - balances
+      - user_id
+    ELMHalfDayEnum:
+      enum:
+      - none
+      - first
+      - second
+      type: string
+      description: |-
+        * `none` - None
+        * `first` - First half
+        * `second` - Second half
+    ELMHistoryEvent:
+      type: object
+      properties:
+        event_type:
+          type: string
+        from_status:
+          type: string
+        to_status:
+          type: string
+        reason:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - created_at
+      - event_type
+      - from_status
+      - reason
+      - to_status
+    ELMMyTask:
+      type: object
+      properties:
+        id:
+          type: integer
+        request_id:
+          type: integer
+        task_type:
+          type: string
+        due_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - due_at
+      - id
+      - request_id
+      - task_type
+    ELMTransition:
+      type: object
+      properties:
+        target:
+          type: string
+          maxLength: 32
+        reason:
+          type: string
+          maxLength: 2000
+        recommendation:
+          $ref: '#/components/schemas/RecommendationEnum'
+      required:
+      - target
     EligibilityFailure:
       type: object
       properties:
@@ -2637,6 +3136,228 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeavePolicy:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        name:
+          type: string
+          maxLength: 120
+        version:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        effective_from:
+          type: string
+          format: date
+        effective_to:
+          type: string
+          format: date
+          nullable: true
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        published_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        parameters: {}
+        hierarchy: {}
+      required:
+      - created_at
+      - effective_from
+      - id
+      - name
+      - published_at
+      - published_by_user_id
+      - updated_at
+      - version
+    LeaveRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        kind:
+          allOf:
+          - $ref: '#/components/schemas/LeaveRequestKindEnum'
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/LeaveRequestStatusEnum'
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        half_day:
+          $ref: '#/components/schemas/ELMHalfDayEnum'
+        chargeable_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
+          readOnly: true
+        purpose:
+          type: string
+        station_leave:
+          type: boolean
+        station_leave_details: {}
+        substitute_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        substitute_response:
+          allOf:
+          - $ref: '#/components/schemas/SubstituteResponseEnum'
+          readOnly: true
+        medical_evidence_ref:
+          type: string
+          maxLength: 500
+        parent_request_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decision_reason:
+          type: string
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        actual_resumption_date:
+          type: string
+          format: date
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - category
+      - chargeable_days
+      - created_at
+      - decided_at
+      - decision_reason
+      - end_date
+      - id
+      - kind
+      - parent_request_id
+      - purpose
+      - start_date
+      - status
+      - submitted_at
+      - substitute_response
+      - updated_at
+      - user_id
+    LeaveRequestCreate:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        half_day:
+          allOf:
+          - $ref: '#/components/schemas/ELMHalfDayEnum'
+          default: none
+        purpose:
+          type: string
+          maxLength: 4000
+        station_leave:
+          type: boolean
+          default: false
+        station_leave_details:
+          type: object
+          additionalProperties: {}
+        substitute_user_id:
+          type: integer
+          minimum: 1
+        medical_evidence_ref:
+          type: string
+          maxLength: 500
+      required:
+      - category
+      - end_date
+      - purpose
+      - start_date
+    LeaveRequestKindEnum:
+      enum:
+      - leave
+      - cancellation
+      - extension
+      - resumption
+      - offline
+      type: string
+      description: |-
+        * `leave` - leave
+        * `cancellation` - cancellation
+        * `extension` - extension
+        * `resumption` - resumption
+        * `offline` - offline
+    LeaveRequestStatusEnum:
+      enum:
+      - draft
+      - awaiting_substitute
+      - unit_head_review
+      - establishment_review
+      - authority_review
+      - approved
+      - rejected
+      - withdrawn
+      - cancellation_pending
+      - cancelled
+      - extension_pending
+      - resumption_pending
+      - closed
+      type: string
+      description: |-
+        * `draft` - draft
+        * `awaiting_substitute` - awaiting_substitute
+        * `unit_head_review` - unit_head_review
+        * `establishment_review` - establishment_review
+        * `authority_review` - authority_review
+        * `approved` - approved
+        * `rejected` - rejected
+        * `withdrawn` - withdrawn
+        * `cancellation_pending` - cancellation_pending
+        * `cancelled` - cancelled
+        * `extension_pending` - extension_pending
+        * `resumption_pending` - resumption_pending
+        * `closed` - closed
     LiftSanction:
       type: object
       properties:
@@ -3080,6 +3801,34 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PatchedLeaveRequestModify:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        half_day:
+          $ref: '#/components/schemas/ELMHalfDayEnum'
+        purpose:
+          type: string
+          maxLength: 4000
+        station_leave:
+          type: boolean
+        station_leave_details:
+          type: object
+          additionalProperties: {}
+        substitute_user_id:
+          type: integer
+          minimum: 1
+          nullable: true
+        medical_evidence_ref:
+          type: string
+          maxLength: 500
     PatchedRole:
       type: object
       properties:
@@ -3220,6 +3969,14 @@ components:
       - message
       - rule
       - sanction
+    RecommendationEnum:
+      enum:
+      - recommended
+      - not_recommended
+      type: string
+      description: |-
+        * `recommended` - recommended
+        * `not_recommended` - not_recommended
     RecordIncident:
       type: object
       properties:
@@ -3466,6 +4223,41 @@ components:
       - message
       - reason
       - route
+    RelatedRequest:
+      type: object
+      properties:
+        kind:
+          $ref: '#/components/schemas/RelatedRequestKindEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        actual_resumption_date:
+          type: string
+          format: date
+        purpose:
+          type: string
+          maxLength: 4000
+        substitute_user_id:
+          type: integer
+          minimum: 1
+        medical_evidence_ref:
+          type: string
+          maxLength: 500
+      required:
+      - kind
+    RelatedRequestKindEnum:
+      enum:
+      - cancellation
+      - extension
+      - resumption
+      type: string
+      description: |-
+        * `cancellation` - cancellation
+        * `extension` - extension
+        * `resumption` - resumption
     RoundOutcome:
       type: object
       properties:
@@ -3698,6 +4490,23 @@ components:
           type: integer
       required:
       - document_id
+    SubstituteResponse:
+      type: object
+      properties:
+        accepted:
+          type: boolean
+      required:
+      - accepted
+    SubstituteResponseEnum:
+      enum:
+      - pending
+      - accepted
+      - declined
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `accepted` - Accepted
+        * `declined` - Declined
     TopicEnum:
       enum:
       - drive
