@@ -34,6 +34,78 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "elm": {
+      "grants": {
+        "Employee": [
+          "elm.leave.apply",
+          "elm.leave.cancel",
+          "elm.leave.view_self"
+        ],
+        "Leave Approver": [
+          "elm.leave.approve",
+          "elm.leave.view_pending"
+        ]
+      },
+      "module_grants": [
+        "Employee",
+        "Leave Approver"
+      ],
+      "nav": {
+        "base_path": "/elm",
+        "icon": "CalendarBlank",
+        "items": [
+          {
+            "code": "elm.apply",
+            "icon": "CalendarBlank",
+            "label": "Apply for Leave",
+            "required_permission": "elm.leave.apply",
+            "to": "/elm/apply"
+          },
+          {
+            "code": "elm.approve-leaves",
+            "icon": "Check",
+            "label": "Approve Leave Applications",
+            "required_permission": "elm.leave.approve",
+            "to": "/elm/approve-leaves"
+          },
+          {
+            "code": "elm.my-leaves",
+            "icon": "User",
+            "label": "My Leaves",
+            "required_permission": "elm.leave.view_self",
+            "to": "/elm/my-leaves"
+          }
+        ],
+        "label": "Leave Management",
+        "nav_section": "Leave",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "elm.leave.apply",
+          "label": "Apply for Leave"
+        },
+        {
+          "code": "elm.leave.view_self",
+          "label": "View Own Leave Applications"
+        },
+        {
+          "code": "elm.leave.cancel",
+          "label": "Cancel Leave Application"
+        },
+        {
+          "code": "elm.leave.view_pending",
+          "label": "View Pending Leave Applications"
+        },
+        {
+          "code": "elm.leave.approve",
+          "label": "Approve Leave Applications"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
