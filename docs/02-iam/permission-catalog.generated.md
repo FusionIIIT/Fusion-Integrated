@@ -13,6 +13,23 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `employee_leave`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `employee_leave.balance.view_self` | View own leave balances | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `establishment`, `faculty`, `leave_administrator`, `staff`, `unit_head` |
+| `employee_leave.request.create` | Apply for and manage own leave | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `establishment`, `faculty`, `leave_administrator`, `staff`, `unit_head` |
+| `employee_leave.request.view_self` | View own leave requests and history | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `establishment`, `faculty`, `leave_administrator`, `staff`, `unit_head` |
+| `employee_leave.request.view` | View leave requests in assigned workflow | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `establishment`, `leave_administrator`, `unit_head` |
+| `employee_leave.task.decide` | Act on assigned leave workflow tasks | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `establishment`, `leave_administrator`, `unit_head` |
+| `employee_leave.request.process` | Process leave and resumption requests | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `establishment`, `leave_administrator` |
+| `employee_leave.substitute.respond` | Respond to assigned substitute requests | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `establishment`, `faculty`, `leave_administrator`, `staff`, `unit_head` |
+| `employee_leave.calendar.manage` | Maintain and publish leave calendars | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `establishment`, `leave_administrator` |
+| `employee_leave.policy.manage` | Maintain leave policies and approval routes | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `establishment`, `leave_administrator` |
+| `employee_leave.employee.manage` | Maintain employee leave profiles and units | `Director`, `leave_administrator` |
+| `employee_leave.report.view` | View leave reports | `Director`, `leave_administrator` |
+| `employee_leave.year_end.process` | Run year-end leave processing | `Director`, `leave_administrator` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

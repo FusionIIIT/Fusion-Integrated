@@ -1,0 +1,72 @@
+.F.....FF..........                                                      [100%]
+================================== FAILURES ===================================
+____________ test_employee_without_module_grant_cannot_access_elm _____________
+
+client_for = <function client_for.<locals>.make_client at 0x000001CC84143420>
+
+    def test_employee_without_module_grant_cannot_access_elm(client_for):
+        client = client_for(100, ("employee_leave.request.view_self",))
+        response = client.get("/api/v1/elm/requests")
+>       assert response.status_code == 403
+E       assert 200 == 403
+E        +  where 200 = <Response status_code=200, "application/json">.status_code
+
+modules\elm\tests\test_api.py:58: AssertionError
+__________ test_cross_year_leave_uses_and_debits_each_years_balance ___________
+
+employee = <EmployeeProfile: EmployeeProfile object (100)>
+
+    def test_cross_year_leave_uses_and_debits_each_years_balance(employee):
+        request = _submit_cl(
+            starts_on=date(2027, 12, 30),
+            ends_on=date(2028, 1, 3),
+        )
+        assert request.requested_days == Decimal("3")
+        _approve(request)
+    
+        accounts = {
+            account.year: account.balance
+            for account in LeaveAccount.objects.filter(
+                user_id=100, category="CL", year__in=(2027, 2028))
+        }
+>       assert accounts == {2027: Decimal("7"), 2028: Decimal("7")}
+E       AssertionError: assert {2027: Decima...cimal('7.00')} == {2027: Decima... Decimal('7')}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {2027: Decimal('6.00')} != {2027: Decimal('7')}
+E         Use -v to get more diff
+
+modules\elm\tests\test_services.py:95: AssertionError
+____________________ test_cancellation_restores_all_debits ____________________
+
+employee = <EmployeeProfile: EmployeeProfile object (100)>
+
+    def test_cancellation_restores_all_debits(employee):
+        request = _submit_cl(
+            starts_on=date(2027, 12, 30),
+            ends_on=date(2028, 1, 3),
+        )
+        _approve(request)
+        cancellation = leave.request_cancellation(
+            request_id=request.pk, applicant_id=100, purpose="Plans changed")
+        _approve(cancellation)
+    
+        accounts = {
+            account.year: account.balance
+            for account in LeaveAccount.objects.filter(
+                user_id=100, category="CL", year__in=(2027, 2028))
+        }
+        assert accounts == {2027: Decimal("8"), 2028: Decimal("8")}
+>       assert cancellation.parent.status == "cancelled"
+E       AssertionError: assert 'approved' == 'cancelled'
+E         
+E         - cancelled
+E         + approved
+
+modules\elm\tests\test_services.py:120: AssertionError
+=========================== short test summary info ===========================
+FAILED modules/elm/tests/test_api.py::test_employee_without_module_grant_cannot_access_elm
+FAILED modules/elm/tests/test_services.py::test_cross_year_leave_uses_and_debits_each_years_balance
+FAILED modules/elm/tests/test_services.py::test_cancellation_restores_all_debits
+exit_code=1

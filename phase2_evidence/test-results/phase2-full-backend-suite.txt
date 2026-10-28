@@ -1,0 +1,39 @@
+...................F.................................................... [ 17%]
+........................................................................ [ 35%]
+........................................................................ [ 53%]
+........................................................................ [ 71%]
+........................................................................ [ 89%]
+...........................................                              [100%]
+================================== FAILURES ===================================
+____________ test_a_row_read_once_is_refetched_when_it_goes_stale _____________
+
+settings = <pytest_django.fixtures.Settings object at 0x000001F0B9AF5010>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001F0B9AF7320>
+
+    def test_a_row_read_once_is_refetched_when_it_goes_stale(settings, monkeypatch):
+        """Caching on first sight alone pins a resume to the day it was first read."""
+        settings.DIRECTORY_MAX_AGE_SECONDS = 0
+        UserRef.objects.create(user_id=7, username="a", display_name="A", kind="student")
+    
+        asked: list[list[int]] = []
+    
+        class _Client:
+            def get_users(self, ids):
+                asked.append(list(ids))
+                return {}
+    
+        def _client():
+            return _Client()
+    
+        monkeypatch.setattr(sync, "get_client", _client)
+        sync.ensure_users_cached([7])
+>       assert asked == [[7]]
+E       assert [] == [[7]]
+E         
+E         Right contains one more item: [7]
+E         Use -v to get more diff
+
+modules\directory\tests\test_sync.py:117: AssertionError
+=========================== short test summary info ===========================
+FAILED modules/directory/tests/test_sync.py::test_a_row_read_once_is_refetched_when_it_goes_stale
+exit_code=1
