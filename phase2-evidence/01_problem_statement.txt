@@ -1,0 +1,56 @@
+Employee Leave Management (ELM)
+Synchronized Problem Statement and Controlled Context
+Status: FINAL SYNCHRONIZED BASELINE | Version 1.4
+1. Context
+Fusion is the institute ERP used to provide administrative, academic, student, and related services. Users may hold one or more roles, and access to ELM capabilities is controlled through role-based permissions.
+ELM supports leave-related activities for institute employees. Employees are Faculty or Staff, each with a designation and an organizational unit such as a Department, Section, or Office. Each organizational unit has a Unit Head. Depending on leave type and hierarchy, the Unit Head either gives the final decision or reviews and records Recommended / Not Recommended before the request moves through the applicable higher-sanction path.
+2. Leave categories and Station Leave
+ELM supports CL, RH, SCL, EL, COL, and VL. Station Leave permission/details are captured within the same leave application when the employee will be outside Jabalpur; Station Leave is not a separate leave-request process.
+3. Entitlement, applicability, and carry-forward
+CL: 8 days/year for each employee; first-half and second-half CL are supported; an approved half day consumes 0.5 CL day; unused CL does not carry forward.
+RH: 2 days/year for each employee; an RH request must correspond to an applicable Restricted Holiday in the currently effective published holiday/RH calendar; unused RH does not carry forward.
+SCL: up to 15 days/year for each employee for a special purpose considered admissible by the applicable Sanctioning Authority; no separate encoded admissibility rule is required in this baseline; unused SCL does not carry forward.
+EL: non-faculty employees receive 30 days/year directly; unused EL carries forward.
+VL: faculty receive 60 VL associated with vacation periods supplied through the institute Academic Calendar. VL may be availed only during an applicable vacation period. At year end, all unused VL converts to EL at 2 VL : 1 EL, including fractional conversion. VL itself does not carry forward; converted EL is credited to the faculty member’s EL balance, may carry forward, and may later be availed.
+COL: 20 days/year in this baseline for each eligible employee; COL is medical/balance-controlled leave, supporting medical evidence may be required where applicable, and unused COL carries forward.
+4. Leave-day counting
+For EL, COL, and VL, leave is counted continuously across the approved leave interval. Intervening weekends and closed holidays within the interval count as leave days. This continuing-count rule does not apply to CL, SCL, or RH.
+5. Applying for leave and validation
+The employee submits one leave application containing leave category, requested period, purpose/reason, and other required information. Station Leave details are included in the same application when applicable.
+Before a new request is allowed to proceed, ELM validates the employee’s leave-category eligibility, available entitlement/balance, applicable leave-counting and calendar conditions, and impermissible overlap with the employee’s active pending or approved leave. First-half and second-half CL on the same date are not treated as overlapping when they occupy different halves.
+Leave-policy parameters do not use a draft/publish/effective-version lifecycle in this baseline. Validation uses the current configured leave-policy parameters. Date and RH validation use the currently effective published holiday/RH calendar.
+6. Substitute / responsibility coverage
+When responsibility coverage is required, the applicant nominates one substitute. The substitute must be another employee, must not be the applicant, and must not have overlapping pending or approved leave during the responsibility period.
+The nominated substitute may accept or decline the assignment. Required substitute consent must be accepted before approval routing continues. If the substitute declines, the applicant may nominate another eligible substitute or withdraw the pending request.
+7. Review, sanction, and decision communication
+For CL and RH, including associated Station Leave, the request is routed to the applicant’s Unit Head and the Unit Head is the final authority.
+For SCL, EL, COL, and VL, the Unit Head reviews the request and records Recommended or Not Recommended. Not Recommended is not a final rejection for these categories. The request then proceeds through the configured hierarchy to the appropriate final Sanctioning Authority.
+The processing/sanctioning path is resolved from the applicant, organizational unit, designation/role, leave category, and current hierarchy configuration. Named roles may include Deputy Registrar (Estt.), Dean, Registrar, and Director. An Establishment processing step occurs where configured. The Director’s own leave follows the Director-specific self-sanction rule.
+On a final decision, the decision is recorded and the employee is notified. On final approval, the employee’s leave record/account is also updated. Intermediate decisions and state changes need not generate general notifications; the employee can inspect them through leave status/history.
+8. Pending request, withdrawal, and approved-leave cancellation
+A submitted pending leave request is not modified in place. If a change is required before final approval, the employee may withdraw the pending request and submit a new application if needed.
+A pending request may be withdrawn immediately at any time before final approval. Upon successful withdrawal, the withdrawal becomes effective immediately, all remaining approval processing for that request terminates, later approve/reject actions are prevented, and the concerned roles are informed.
+After final approval, withdrawal is no longer available. Before the approved leave begins, the employee may request cancellation. Cancellation follows the same applicable hierarchy as the original leave and the approved leave is not edited in place. If cancellation is finally approved, the leave is marked Cancelled and any leave balance already deducted for the approval is restored or adjusted accordingly. If cancellation is rejected, the original approved leave remains unchanged. If revised leave is still required after cancellation, a fresh application is submitted.
+Once leave has begun, pre-start cancellation no longer applies; change is handled through the applicable extension or resumption process.
+9. Extension
+An employee already on ongoing EL, COL, or VL may request additional leave time. The extension is validated using the applicable eligibility, balance, substitute, calendar, and approval conditions; required substitute consent is obtained before approval routing continues; and the extension follows the applicable Unit Head and configured higher-sanction path.
+When an extension is approved, only the incremental additional leave period is posted and the original approved leave remains the base. When an extension is rejected, the original approved leave remains unchanged.
+10. Resumption
+Resumption is supported for EL, COL, and VL. After returning, the employee submits the actual resumption date and required resumption details through ELM for review by the applicable Sanctioning Authority.
+When the employee resumes on the approved end date, the Sanctioning Authority reviews the resumption and no adjustment is made to the approved leave period or leave balance. When the employee resumes earlier or later than the approved end date, ELM records the actual leave period after review, adjusts the leave balance accordingly, and synchronizes the relevant leave/attendance records.
+11. Inquiry and employee-accessible records
+ELM provides employees with access to their current leave balances and leave-account/request history, including request status and recorded final decisions. ELM also provides an employee-accessible printable/exportable representation of a leave application.
+12. Administrative functions and calendars
+Authorized administrative roles maintain leave-policy parameters, the relevant hierarchy configuration, and leave records where authorized. Policy parameters do not require a draft/publish/effective-version lifecycle; ELM uses the current configured policy and hierarchy values.
+Authorized administrative roles create, revise, and publish the holiday/RH calendar. Date/RH validation uses the currently effective published holiday/RH calendar until a replacement is published.
+Vacation periods used for VL are supplied through the institute Academic Calendar, which is maintained outside ELM by the appropriate academic module/service and is assumed to be available to ELM.
+Authorized Leave Administrators may retrospectively record leave already sanctioned through an authorized paper/offline process where ELM could not be used because of illness, connectivity, server unavailability, or another acceptable reason. The entry captures sanction/reference evidence, is validated for record consistency, and updates the relevant leave balance/history. This is record synchronization, not a second approval workflow.
+13. Event-triggered year-end processing
+When the configured year-end boundary is reached, ELM applies the defined category outcomes: unused CL, RH, and SCL lapse; unused faculty VL is converted to EL; EL and COL carry forward according to policy. The resulting leave-account transactions are recorded and processing exceptions are reported. The year-end boundary is an event trigger, not an ELM actor.
+14. SLA
+Actionable workflow tasks use configurable reminder and escalation thresholds. When a task is assigned, the assigned user is notified. If the task is still pending at the reminder threshold, the responsible user is reminded and the action is logged; no reminder is issued if the task is no longer pending. If the task remains pending past the escalation threshold, ELM notifies or escalates to the configured higher/responsible authority and logs the escalation; no escalation is issued if the task is no longer pending.
+15. Scope boundary
+This ELM baseline limits leave categories to CL, RH, SCL, EL, COL, VL, and Station Leave as defined above. Other leave types and low-level design/implementation details are outside this requirements baseline. The Academic Calendar is an external dependency for VL vacation-period data.
+Appendix A — Actor, Role, and External Dependency Registry
+Faculty and Staff are employee categories. Unit Head, Substitute, Leave Administrator, Deputy Registrar (Estt.), Dean, Registrar, and Director are roles/authorities. EXT-01 is an external information dependency rather than an ELM actor performing a leave workflow action. EVT-01 and EVT-02 are event triggers; they initiate event-triggered use cases but are not actors.
+Appendix B — Controlled Glossary

@@ -1,0 +1,976 @@
+
+# 2026-10-11 00:44:06.370607
++/ask Inspect the current Fusion-Integrated repository and the ELM_Specifications folder. Do not create, edit, delete, or fix any files. Identify the ELM requirements from the specification files, explain how the existing Fusion authentication, roles, frontend, backend, and database structure should be reused, and assess the current ELM implementation under modules/leave and client/src/modules/leave. List the most important missing or incomplete requirements and any obvious integration risks. Clearly distinguish what you verified by reading files from what you could not verify. Keep the answer concise and refer to specific file paths.
+
+# 2026-10-11 01:00:09.450802
++/ask Read only the files in ELM_Specifications. Summarize the required ELM features and list the specification filenames you actually read. Do not inspect the rest of the repository and do not modify any files.
+
+# 2026-10-11 01:02:23.711248
++/add ELM_Specifications
+
+# 2026-10-11 01:02:53.326865
++/read ELM_Specifications
+
+# 2026-10-11 01:05:09.978853
++/ask Using only the six read-only ELM specification files added to this chat, summarize the main ELM requirements. Organize the answer into:
++1. Main purpose of ELM
++2. Required features and workflows
++3. User roles and permissions
++4. Business rules and validations
++5. Important requirements from the traceability matrix
++6. Any requirements that are unclear or cannot be confirmed from the files
++
++List the exact filenames supporting your summary. Do not edit or create files. Do not invent requirements. Keep the answer concise and specific.
+
+# 2026-10-11 01:09:43.411275
++
++/read C:\Users\BHUVNE~1\AppData\Local\Temp\ELM_Spec_Text
++
+
+# 2026-10-11 01:13:16.149341
++/exit
+
+# 2026-10-11 01:14:21.449439
++
++/ask Based on the six ELM specification files loaded as read-only context, summarize the actual requirements under these headings:
++
++1. Problem statement and project scope
++2. Actors and roles
++3. Functional requirements
++4. Use cases and expected behavior
++5. Business rules and validations
++6. Workflows and their sequence of steps
++7. Traceability between requirements, use cases, business rules, and workflows
++
++For every major point, mention the exact source filename and any requirement/use-case/business-rule/workflow ID stated in that file. Do not invent IDs or requirements. If a detail is absent or unclear, explicitly say so. Do not modify any files.
++
+
+# 2026-10-11 01:14:51.057577
++N
+
+# 2026-10-11 01:15:24.962491
++/clear
+
+# 2026-10-11 01:15:32.443529
++/read C:\Users\BHUVNE~1\AppData\Local\Temp\ELM_Spec_Text\01_ELM_Problem_Statement_v1.4_FINAL.txt
+
+# 2026-10-11 01:15:52.053757
++
++/ask Summarize only the ELM problem statement currently loaded in read-only context. Give at most 10 bullet points covering the stated purpose, scope, users, and constraints. Use only information explicitly present in the file. Do not invent details or modify files.
++
+
+# 2026-10-11 01:16:35.252817
++N
+
+# 2026-10-11 01:16:40.966431
++/exit
+
+# 2026-10-11 01:17:00.240955
++/tokens
+
+# 2026-10-11 01:17:29.628459
++
++/ask Summarize the loaded ELM problem statement in at most 8 bullet points. Cover the stated purpose, scope, users, and constraints. Use only information explicitly present in the file. Mention any details the file does not specify. Do not modify any files.
++
+
+# 2026-10-11 01:24:20.851538
++
++/read C:\Users\BHUVNE~1\AppData\Local\Temp\ELM_Spec_Text\02_ELM_Functional_Requirement_Specification_v1.5_FINAL.txt
++
++/tokens
++
+
+# 2026-10-11 01:30:45.198094
++/exit
+
+# 2026-10-15 18:13:32.493768
++N
+
+# 2026-10-15 18:13:59.621493
++q
+
+# 2026-10-15 18:14:48.212469
++N
+
+# 2026-10-15 18:16:18.924595
++/exit
+
+# 2026-10-15 18:16:54.992634
++We are performing Phase 2 of the Fusion ERP Lab Assignment 6B: Review, Test and Improve the AI-Generated Employee Leave Management (ELM) module.
++
++IMPORTANT RULES:
++1. Do not modify any files yet. This is an inspection-only first pass.
++2. Work only in the current Phase-2 repository. Do not access or modify the separate Phase-1 submission.
++3. Inspect the actual repository and actual ELM specification files. Never invent file paths, requirements, test results, or defects.
++4. Identify the real ELM backend and frontend implementation, its existing tests, dependencies, and available verification commands.
++5. Compare the implementation against the supplied problem statement, functional requirements, use cases, business rules, traceability matrix, and workflow specifications.
++6. Report findings with exact file paths and relevant function/class names. Distinguish verified defects from suspected issues and untested behavior.
++7. Identify which checks can run without a working PostgreSQL server. Do not spend time installing Docker or changing database configuration.
++8. Do not claim that anything passed unless you actually ran it and observed the result.
++9. Keep the response concise and practical.
++
++First report:
++A. Actual ELM architecture and important files.
++B. Existing tests and verification commands.
++C. The first 3–5 evidence-backed issues or gaps to investigate, with file paths.
++D. The safest first small improvement to make after review.
++
++Do not edit files until I approve the plan.
+
+# 2026-10-15 18:55:17.772904
++N
+
+# 2026-10-16 02:31:08.076959
++/exit
+
+# 2026-10-16 02:34:05.812292
++/ask We are doing Assignment 6B Phase 2. Do not edit code. First inspect only the ELM specification package in the current repository. List the exact specification filenames that exist. Then inspect the problem statement document and summarize its stated purpose, scope, users, and expected ELM functionality. Use only content you actually read. If you cannot read a document format, say so instead of guessing. Do not inspect unrelated modules yet. Keep the response under 250 words.
+
+# 2026-10-16 02:36:17.282012
++/exit
+
+# 2026-10-16 02:38:44.745660
++/ask Assignment 6B Phase 2: review the existing ELM leave-request state machine. Read only the source file already added to this chat. Do not edit any files.
++
++Use these requirements from ELM Problem Statement v1.4 as review criteria:
++- A pending request can be withdrawn before final approval; withdrawal must terminate remaining approval processing and prevent later approval/rejection.
++- After final approval, withdrawal is unavailable. Before leave starts, cancellation must follow the applicable hierarchy.
++- For SCL, EL, COL and VL, Unit Head records Recommended or Not Recommended; Not Recommended is not a final rejection.
++- CL and RH go to the Unit Head for the final decision.
++- Extensions and resumptions are supported for EL, COL and VL, with the original approved leave preserved if an extension is rejected.
++
++Report the actual states and transitions defined in the file. Identify only specific mismatches that are demonstrable from this file. Clearly label anything that requires inspection of another file as unverified. Do not propose code changes yet. Keep the response under 300 words.
+
+# 2026-10-16 03:04:04.512239
++/ask Inspect the existing ELM withdrawal and cancellation implementation. Do not edit any files.
++
++Start by identifying which functions in the already-known repository handle withdrawal and cancellation. If their source files are not in this chat, tell me the exact file paths to add; do not guess their behavior.
++
++Use these requirements as review criteria:
++- A pending request may be withdrawn before final approval, and withdrawal must stop further processing.
++- Withdrawal is unavailable after final approval.
++- Cancellation of approved leave before its start date must follow the applicable approval hierarchy.
++- A cancellation rejection must leave the original approved leave unchanged.
++
++Report the exact functions and relevant conditions you find. Separate confirmed behavior from anything not yet verified. Keep the response under 250 words.
+
+# 2026-10-16 03:29:44.764544
++Y
+
+# 2026-10-23 18:40:05.556608
++
++/add modules/leave/models/requests.py
++
+
+# 2026-10-23 18:40:14.961702
++Y
+
+# 2026-10-25 21:58:51.337078
++/ask We are doing Fusion ERP Lab Assignment 6B Phase 2. Do not edit any files.
++
++First, inspect the repository and report:
++1. The ELM backend and frontend directories.
++2. The existing backend test directories.
++3. The exact files implementing leave-request state transitions, approval workflow, authorization, and leave balances.
++4. The existing evidence files under phase2-evidence.
++
++Use actual repository paths. Do not guess, do not change code, and keep the response under 250 words.
+
+# 2026-10-25 22:02:45.931034
++Y
+
+# 2026-10-25 22:03:30.486097
++N
+
+# 2026-10-25 22:03:45.100647
++Y
+
+# 2026-10-25 22:13:02.267898
++
++/ask Review the actual code in the two files added to this chat against the ELM requirements. Do not edit files yet.
++
++Inspect:
++1. Leave balance calculations, deductions, restoration and carry-forward.
++2. Authorization and whether invalid state transitions are blocked.
++3. Withdrawal and cancellation handling.
++4. Existing relevant tests and which test files should be inspected next.
++
++For each finding, cite the actual function or condition. Separate confirmed defects from behavior that cannot be verified using these two files. Do not guess or invent missing functionality.
++
++Finish by recommending one highest-priority, demonstrable issue to investigate and fix first. Keep the response under 350 words.
++
+
+# 2026-10-25 22:37:03.698940
++Proceed with the improvements you recommended for the ELM module. You are responsible for implementing the code changes.
++
++Before editing, inspect the relevant repository files and the ELM specifications to confirm the correct location and scope of each change. Do not assume year-end processing belongs in `balance()` if it is designed to be handled elsewhere.
++
++Prioritize:
++1. Correct implementation of year-end leave processing: CL/RH/SCL lapse, EL/COL carry forward, and faculty VL conversion to EL at 2:1, including fractional conversion.
++2. Recording all year-end adjustments in the ledger and reporting exceptions.
++3. Correct leave-balance reconciliation and transaction consistency.
++4. Authorization and state-transition correctness, preserving existing valid checks.
++
++Requirements:
++- Follow the supplied ELM specifications and existing project architecture.
++- Reuse existing functions and services where appropriate; avoid duplicate implementations.
++- Add or update focused automated tests for every genuine defect fixed.
++- Do not weaken or delete existing tests merely to make them pass.
++- Run the relevant tests and lint checks that are possible in this environment.
++- Do not claim a fix is verified unless the relevant test or check actually passes.
++- Preserve unrelated files and the separate Phase-1 implementation.
++- At the end, summarize each changed file, the reason for each change, tests run and their actual results, and any remaining issues.
++
++Implement the confirmed improvements now, rather than only giving recommendations.
+
+# 2026-10-25 23:07:49.966162
++N
+
+# 2026-10-25 23:07:52.429026
++Revise your proposed year_end_processing.py before creating it. Do not create the file yet.
++
++Correct these issues:
++1. Faculty VL converts to EL at 2 VL : 1 EL, so EL gained = VL balance / 2, including fractional conversion.
++2. Process CL, RH and SCL separately, and handle EL and COL separately. Do not invent combined categories such as "CL/RH/SCL" or "EL/COL".
++3. Inspect the actual LeaveBalance model, Posting type, ledger service, existing year-end code, and ELM specifications before designing the implementation.
++4. Ensure each balance change is consistent with ledger entries and is transaction-safe and idempotent (running year-end processing twice must not duplicate adjustments).
++5. Apply faculty eligibility and the correct year boundary. Do not apply faculty VL conversion to non-faculty employees.
++6. Add real automated tests. Do not report tests as passed unless you actually ran them and observed the result.
++
++First explain the corrected design and identify the relevant existing files. Then implement it using the existing project architecture.
+
+# 2026-10-25 23:41:19.174347
++Stop repeating the same file descriptions. Your previous response did not identify the actual implementation or provide code evidence.
++
++Perform a targeted repository investigation. Inspect these files and relevant nearby files:
++- modules/leave/models.py
++- modules/leave/services/ledger.py
++- modules/leave/domain/state_machine.py
++- modules/leave/tests/
++- any existing year-end, balance carry-forward, lapse, or VL conversion implementation.
++
++Use actual repository search to locate references to `carry forward`, `year end`, `year_end`, `VL`, `SCL`, `RH`, `reconcile`, and `LeaveBalance`.
++
++Return only:
++1. Exact file paths and function names that currently implement each year-end requirement.
++2. The actual leave-category values defined in the models.
++3. The Posting fields and ledger API signature.
++4. The relevant test file paths and existing test names.
++5. Any confirmed missing behavior, with a short code excerpt or precise code reference.
++
++Do not repeat file descriptions. Do not invent code, functions, test results, or categories. Do not edit files yet. If repository search is unavailable, say so explicitly and provide the exact files you could inspect.
+
+# 2026-10-26 00:23:17.042215
++Implement the confirmed missing year-end leave-processing behavior in the existing Fusion ELM repository.
++
++Before editing, inspect the actual LeaveBalance model, ledger implementation, leave-category usage, existing year-end test, and supplied ELM specifications. Do not assume that the functions balance(), reconcile(), post(), or reverse() themselves should contain the year-end workflow.
++
++Implement a dedicated year-end service following the existing project architecture and specifications.
++
++Requirements:
++- CL, RH and SCL balances must lapse at year-end.
++- EL and COL balances must carry forward according to the specification.
++- Eligible faculty's unused VL must convert to EL at 2 VL : 1 EL, so EL gained equals VL divided by 2, including fractional conversion.
++- Record each adjustment through the existing ledger API.
++- Make processing atomic and idempotent so rerunning it does not duplicate adjustments.
++- Preserve authorization, existing balance checks and unrelated behavior.
++- Add focused automated tests for each rule, repeat execution, and transaction rollback.
++- Run the relevant tests and report the actual commands and results. Do not invent passing results.
++
++Do not duplicate code or invent combined categories. Inspect the actual category values and ledger API before editing. Implement the changes now, then summarize the changed files and any remaining issues.
+
+# 2026-10-26 01:09:10.078681
++N
+
+# 2026-10-26 01:10:05.390073
++Do not create the proposed file yet. Your draft directly modifies LeaveBalance and then posts ledger entries, which risks double-applying adjustments. It also has inconsistent VL conversion assertions and incomplete imports.
++
++Inspect the existing ledger implementation and tests. Redesign year-end processing so every balance adjustment is applied exactly once through the existing ledger API, inside a transaction. Ensure rerunning the same year-end operation cannot duplicate adjustments. Use the actual model fields, category values, and posting kinds from the repository.
++
++Then implement the service and focused tests, including:
++- CL/RH/SCL lapse with valid non-zero ledger adjustments where applicable.
++- EL and COL carry-forward without double-crediting.
++- Faculty VL-to-EL conversion at VL / 2.
++- Non-faculty exclusion.
++- Idempotent rerun.
++- Transaction rollback on failure.
++
++Run the focused tests and report actual output. Do not claim success without executing the tests.
+
+# 2026-10-26 02:09:47.079772
++N
+
+# 2026-10-26 02:10:01.919248
++Switch to implementation only after inspecting the real repository files. Your previous proposed code is not safe: it changes balances directly and also posts ledger entries, which can double-apply adjustments. Its tests also contain incorrect VL assertions and missing imports.
++
++Please inspect the existing test_year_end_processing test and the ledger API. Then implement the dedicated year-end service and tests with:
++- All adjustments applied through the ledger API exactly once.
++- CL/RH/SCL lapse, EL/COL carry-forward, and faculty VL / 2 conversion to EL.
++- Transaction atomicity and idempotency.
++- Faculty eligibility checks using existing project data.
++- Correct imports and assertions.
++- Actual test execution and truthful results.
++
++Do not paste proposed source code into the chat as a substitute for editing the files. Make the actual file edits and show me the diff.
+
+# 2026-10-26 02:40:19.074840
++/add modules/leave/models.py
+
+# 2026-10-26 02:40:49.954071
++N
+
+# 2026-10-26 02:41:07.250607
++/exit
+
+# 2026-10-26 09:22:36.233840
++You are responsible for implementing Phase 2 improvements in this FusionIIIT leave module. Do the actual work in the repository; do not merely describe suggested code or provide snippets in chat.
++
++First inspect the existing implementation and relevant ELM specifications. Start with:
++- `modules/leave/services/year_end.py`
++- `modules/leave/domain/year_end.py`
++- `modules/leave/services/ledger.py`
++- `modules/leave/domain/state_machine.py`
++- Relevant leave models, management commands, and existing tests.
++
++Use the actual existing file paths. Do not create duplicate modules such as `models.py` or `year_end_processing.py` if the repository already has equivalent functionality.
++
++Then:
++1. Identify concrete defects or missing requirements supported by the existing code and ELM specifications.
++2. Implement the most valuable, narrowly scoped fixes in the actual source files.
++3. Add or update automated tests for the changed behaviour.
++4. Run relevant tests and available static checks. If a test cannot run because a service such as PostgreSQL is unavailable, report the exact command and error. Never claim a test passed unless you ran it and observed success.
++5. Inspect your final diff and fix any issues introduced by your changes.
++
++Important leave-year-end requirements to verify against the specifications:
++- CL, RH, and SCL do not carry forward.
++- EL and COL follow their specified carry-forward rules.
++- VL applies only to eligible faculty and the applicable academic-vacation rules; unused VL converts to EL at **2 VL days : 1 EL day**, including fractional conversion as specified.
++- VL itself does not carry forward.
++- Year-end processing must be transaction-safe and idempotent; do not double-update balances by both directly changing them and posting equivalent ledger entries.
++- Preserve existing architecture, permissions, audit history, and unrelated work.
++
++Do not invent model names, fields, ledger APIs, or test paths. Read the existing implementation before editing. Keep the changes reproducible and focused.
++
++At the end, report:
++- Actual files changed.
++- What was wrong and how it was fixed.
++- Tests and checks actually executed, with results.
++- Any remaining failures or unimplemented requirements.
++
++Make the edits now; do not stop after producing a plan.
+
+# 2026-10-26 09:23:05.094419
++Y
+
+# 2026-10-26 09:42:46.877964
++We are beginning Phase B of the FusionIIIT ELM assignment. Perform the Understand stage first. Do not edit any files yet.
++
++Inspect the actual Phase-1 implementation and the supplied ELM specifications. Examine the repository structure and identify the relevant frontend, backend, models/schema, APIs/routes, Fusion authentication and role integration, leave business rules, workflow/state transitions, and existing tests.
++
++Use the actual file paths in this repository. Compare the implementation with the ELM requirements. Identify:
++1. What is already implemented and appears consistent with the requirements.
++2. What is incomplete, missing, or potentially incorrect, with specific file/function evidence.
++3. Which issues are confirmed by code or existing test evidence, versus which still need runtime testing.
++4. The most important candidate issues to address in Phase B, prioritized by requirement impact, correctness, security, and feasibility.
++
++Read the relevant specification files available in the repository. Do not invent requirements or claim to have inspected files you could not access. Do not modify source files, generate code, or claim tests passed during this stage.
++
++Return a concise report with the files and requirements examined, the key findings, the evidence for each finding, and a recommended next step for the Build/Run stage.
+
+# 2026-10-26 09:55:09.129184
++Continue the Understand stage. Inspect only these two files first:
++- modules/leave/domain/state_machine.py
++- modules/leave/domain/year_end.py
++
++Read their actual contents. Summarize in at most 250 words:
++1. What each file does.
++2. Any specific potential mismatch with the ELM requirements, citing the function or rule involved.
++3. What other file or specification must be checked to confirm each suspected issue.
++
++Do not edit files or claim tests passed. Keep the answer concise so this local model can complete the request.
+
+# 2026-10-26 10:16:23.766054
++Continue the Understand stage. You have already summarized state_machine.py and domain/year_end.py. Now inspect only:
++- modules/leave/services/ledger.py
++- modules/leave/services/year_end.py
++
++Return at most 250 words. Explain how year-end processing is invoked, how balances are updated, how ledger entries are recorded, and whether transaction handling and idempotency are visibly implemented. Cite actual function names and code evidence. Do not edit files or claim tests passed. If you cannot read a file, say so instead of guessing.
+
+# 2026-10-26 10:38:06.038012
++Finish the Understand stage by verifying your earlier claims against the actual code. Do not edit any files yet.
++
++You previously claimed:
++- domain/year_end.py lacks category-specific carry-forward handling.
++- _convert_vacation does not support fractional conversion.
++- services/year_end.py lacks idempotency.
++- You later said services/year_end.py already skips people whose balances are marked processed.
++
++Resolve these contradictions by inspecting the actual function implementations. Quote or summarize the relevant conditions and calculations from the source, with file and function names. For each item, classify it as:
++1. Confirmed defect,
++2. Potential issue requiring specification or test confirmation, or
++3. Not a defect based on the inspected code.
++
++Also identify the relevant ELM specification file(s) available in this repository. Do not invent source details. Do not modify code or claim tests passed.
++
++Finish with a concise Understand-stage report and recommend the next action for Build/Run.
+
+# 2026-10-26 11:01:29.082929
++/exit
+
+# 2026-10-26 17:18:49.169438
++Begin the Build/Run stage for the FusionIIIT ELM Phase 2 task.
++
++Do not edit or create source files during this stage. Do not reset, delete, or overwrite any existing files.
++
++Inspect the project's setup instructions, dependency files, test configuration, and available scripts. Then run safe, relevant checks using actual commands:
++
++1. Check the Python version and whether the project's virtual environment and dependencies are available.
++2. Run the Django system check using the project's existing test settings, if appropriate.
++3. Run targeted Ruff/static checks for the leave module if Ruff is installed.
++4. Identify the existing tests relevant to the leave ledger and year-end processing.
++5. Determine which checks can run without PostgreSQL. Do not launch the entire database-dependent test suite if the database is unavailable.
++6. If any command fails, report the exact error and likely cause. Do not claim that a check passed unless its command actually completed successfully.
++
++Keep this stage read-only. Do not install packages, modify configuration, or fix code yet.
++
++At the end, report the commands actually executed, their results, checks passed or failed, environment limitations, and the smallest next action needed before implementation. Clearly distinguish verified results from assumptions.
+
+# 2026-10-26 17:26:25.351971
++Y
+
+# 2026-10-26 17:29:59.591188
++Continue the Build/Run stage for the FusionIIIT ELM Phase 2 task. Use the repository and terminal tools available to you to perform the work, rather than merely telling me what commands I should run.
++
++Keep this stage read-only. Do not edit source files or configuration.
++
++1. Run the Python version check using the project's virtual environment.
++2. Run the Django system check with the project's test settings.
++3. Run Ruff on modules/leave if it is installed.
++4. Inspect the repository to identify the existing leave ledger and year-end tests.
++5. Report the actual commands executed and their real outputs. If a check fails or is blocked by PostgreSQL, explain that using the observed error.
++6. Finish with a concise Build/Run summary and the next stage to perform.
++
++Do not invent outputs. Do not run the entire database-dependent test suite yet.
+
+# 2026-10-26 17:36:23.097286
++N
+
+# 2026-10-26 17:37:49.629428
++/exit
+
+# 2026-10-26 17:42:52.654254
++Continue the Build/Run stage. The verified environment results are Python 3.12.4, Django system check passed with zero issues, and Ruff reported 58 findings in modules/leave.
++
++Inspect the repository and identify the existing tests specifically related to the leave ledger and year-end processing. Report the exact test file paths and test names. Determine whether these tests require PostgreSQL, and recommend safe targeted test commands. Do not edit files, automatically fix lint findings, or claim tests passed unless they were actually run.
+
+# 2026-10-26 17:47:17.066506
++/ask You are running from the Fusion-Phase2-Qwen repository. Use the repository map and inspect the relevant files available in this working tree. Do not ask me to provide the repository again.
++
++Identify the exact existing test file paths and test names for:
++1. Leave ledger posting, reversal, balance and reconciliation.
++2. Leave year-end processing, carry-forward and vacation-leave conversion.
++
++For each test, state whether it requires PostgreSQL or can run independently. Recommend exact targeted test commands using the project's existing test configuration. Do not edit files, invent test names, or claim a test passed unless it was actually executed. If you cannot see a file's contents, tell me the exact path you need.
+
+# 2026-10-26 17:49:23.535363
++/map
+
+# 2026-10-26 17:49:32.005701
++/ask Look at the repository map and identify the leave module's ledger and year-end processing files. If the map is insufficient, tell me the exact file paths you need. Do not ask me to provide the whole repository. Do not edit files.
+
+# 2026-10-26 17:52:34.599825
++/exit
+
+# 2026-10-26 17:56:59.687323
++/ask We searched the repository for conventionally named Python test files. There are no matching test files under modules/leave. The discovered tests belong to core, fusion_auth, accesscontrol, directory, and placement.
++
++Continue the Build/Run investigation using the actual source files:
++- modules/leave/services/ledger.py
++- modules/leave/services/year_end.py
++- modules/leave/domain/year_end.py
++- modules/leave/domain/state_machine.py
++- modules/leave/management/commands/run_leave_year_end.py
++
++Inspect these files and determine:
++1. Whether there are any existing tests for ledger posting, reversal, reconciliation, year-end processing, or vacation-leave conversion elsewhere in the repository.
++2. Which test files, if any, cover these behaviors.
++3. Whether the existing tests require PostgreSQL.
++4. If no relevant tests exist, state that clearly and suggest the smallest useful tests to add later.
++
++Do not edit files. Do not invent test names or claim tests passed. Report only findings supported by files you can actually inspect.
+
+# 2026-10-26 17:57:51.030025
++Y
+
+# 2026-10-26 18:13:22.937931
++/ask Inspect config/settings/test.py and the existing test files under core/tests, fusion_auth/tests, modules/accesscontrol/tests, modules/directory/tests, and modules/placement/tests.
++
++Report:
++1. The database engine configured by config/settings/test.py.
++2. Which existing tests access the database and which appear not to.
++3. Whether the existing tests can run with the current environment, given that PostgreSQL was unavailable during the earlier test run.
++4. The safest small test command to run first.
++
++Do not edit files, change database settings, or claim tests passed without actual output. Distinguish confirmed findings from assumptions.
+
+# 2026-10-26 18:13:29.987312
++Y
+
+# 2026-10-26 18:31:11.815663
++N
+
+# 2026-10-26 18:45:08.866493
++/ask Recheck your previous Build/Run findings against the files currently added to the chat.
++
++1. In config/settings/test.py, identify the actual DATABASES configuration and the cache configuration separately.
++2. In core/tests/test_csrf.py, identify whether the tests access the database.
++3. Check whether core/tests/test_csv.py actually exists in this repository. Do not assume it exists.
++4. Recommend one safe, existing test command using the configured settings.
++5. Explain whether that command might still require PostgreSQL.
++
++Do not edit files. Do not claim tests passed unless they were run and actual output is available. Quote the relevant setting names and test class/function names.
+
+# 2026-10-26 19:06:25.328341
++/ask Investigate why running
++python manage.py test core.tests.test_csrf --settings=config.settings.test
++reported "Found 0 test(s)".
++
++Inspect the actual contents of core/tests/test_csrf.py and the package structure, including relevant __init__.py files. Identify whether the file contains discoverable test classes and methods, and whether the package is discoverable by Django.
++
++Do not edit or create files. Do not guess. Report the exact evidence and suggest the next diagnostic command.
+
+# 2026-10-26 20:00:43.643209
++We are continuing the FusionIIIT ELM Phase B assignment. Do not modify any files yet.
++
++We already ran:
++- `python manage.py check --settings=config.settings.test` — passed.
++- `ruff check modules/leave` — 58 findings.
++- `python manage.py test core.tests.test_csrf --settings=config.settings.test` — discovered 0 tests.
++
++Investigate why the existing CSRF tests were not discovered by Django's test runner. Check the repository's actual test configuration, installed pytest/pytest-django availability, test file structure, and fixtures. Do not assume a dependency is installed or that tests passed.
++
++Report:
++1. The exact cause supported by repository evidence.
++2. The safest command to run the existing CSRF tests without modifying project files.
++3. Any environment or database prerequisite.
++4. Whether this is an existing project/configuration issue or a new issue introduced during our work.
++
++Do not edit files, install packages, claim tests passed without actual output, or invent results.
+
+# 2026-10-26 20:26:55.373634
++N
+
+# 2026-10-26 21:37:51.703793
++Continue the FusionIIIT ELM Phase B assignment at the Review stage. Do not modify any files yet.
++
++Review the existing Leave module against the actual ELM specification documents available in this repository or workspace.
++
++Inspect the implementation and compare it with the applicable requirements for:
++- Leave categories, eligibility, balances, and carry-forward rules
++- Leave request lifecycle, approvals, withdrawal, cancellation, extension, and resumption
++- Role-based access control and actor permissions
++- Substitute selection and conflict checks
++- Year-end processing, ledger consistency, and idempotency
++- API/backend integration and validation
++- Existing test coverage
++
++Instructions:
++1. Locate and cite the actual specification files and relevant implementation files. If a specification is unavailable, say so.
++2. Identify concrete requirement-to-code gaps, with file paths and line references where possible.
++3. Separate confirmed defects from possible risks and missing test coverage.
++4. Prioritize the three most consequential findings and explain the evidence.
++5. Do not invent requirements, assume a feature is missing merely because its implementation is elsewhere, or claim tests passed without running them.
++6. Do not edit files or implement fixes in this review stage.
++
++Return a concise, evidence-based review that we can use for the Phase B Google Form.
+
+# 2026-10-26 22:19:09.049696
++Y
+
+# 2026-10-26 22:57:30.729213
++/code
+
+# 2026-10-26 22:57:47.108376
++Start implementing the Phase B Leave-module fixes now. Do not perform another broad review.
++
++First inspect the current code, tests, and available ELM specifications for these three findings:
++1. Carry-forward rules in `modules/leave/domain/year_end.py`.
++2. Extension/cancellation transitions in `modules/leave/domain/state_machine.py`.
++3. Actor-role permission enforcement and where authorization is actually checked.
++
++Implement the confirmed defects, starting with the highest-confidence issue. Follow the existing project conventions and the actual ELM requirements. Do not invent policies or change unrelated files.
++
++Important:
++- Preserve the distinction between CL, RH, SCL, EL, COL, and VL.
++- VL year-end conversion must follow the specified 2 VL : 1 EL ratio; do not reverse it.
++- Do not update balances directly as well as posting the same adjustment to the ledger.
++- Preserve transaction safety and idempotency.
++- Add or update focused tests for each behavior you change.
++- Do not weaken existing authorization checks.
++- If a finding cannot be confirmed from available requirements and code, explain why and leave that item unchanged rather than guessing.
++
++After editing, show the changed files and explain each change. Run the relevant available tests and checks; report exact outcomes, including failures or blocked tests. Do not claim success without actual output. Do not commit changes yet.
+
+# 2026-10-27 00:18:53.518319
++Proceed with the first implementation fix now: carry-forward rules.
++
++Inspect the actual current files and implement the carry-forward behavior in `modules/leave/domain/year_end.py`, following the existing policy and category definitions. Add focused tests in the existing year-end test location, using the project's actual test conventions.
++
++Do not just describe or print the existing code. Make real file edits and show the resulting diff. Preserve the VL-to-EL conversion ratio, ledger consistency, and idempotency. Do not edit the state machine yet. Run the focused tests if possible and report their actual output. Do not commit.
+
+# 2026-10-27 02:00:07.073234
++/exit
+
+# 2026-10-28 00:47:08.822207
++N
+
+# 2026-10-28 00:47:59.985544
++/exit
+
+# 2026-10-28 00:49:40.269954
++We are working on the Build/Run phase of Fusion-Integrated, focusing on the ELM/Leave module. Diagnose the actual repository and existing test results. Do not guess.
++
++Verified results:
++- Windows 11, Python 3.12.4, Django 5.2.18.
++- Settings: config.settings.test.
++- PostgreSQL 16 is running locally.
++- Django system check passed.
++- Database connection succeeded and all migrations completed.
++- Development server starts at http://127.0.0.1:8000/.
++- GET /healthz returns HTTP 200.
++- GET /readyz returns HTTP 200, with database and cache checks reporting OK.
++- GET /api/v1/leave/lifecycle returns not_authenticated because credentials were not provided.
++- GET / returns 404.
++- API docs are available at /api/docs/.
++
++Please:
++1. Inspect the repository's actual authentication code, URL routes, settings, and tests.
++2. Explain why the Leave API requires authentication and whether a test identity or mock authentication setup exists.
++3. Identify the next safe, read-only test we can run.
++4. Give exact PowerShell commands and explain expected results.
++5. Do not edit files, disable authentication, invent credentials, or modify database records without asking first.
++6. Clearly distinguish verified facts from hypotheses and preserve this prompt and the resulting steps for reproducibility.
++
++Start with diagnosis only; do not make code changes yet.
+
+# 2026-10-28 00:50:15.050146
++N
+
+# 2026-10-28 01:08:18.015776
++Y
+
+# 2026-10-28 01:27:51.299319
++Continue diagnosis only. Do not edit files.
++
++Inspect config/settings/test.py, fusion_auth/tests/runner.py, fusion_auth/client.py, fusion_auth/permissions.py, and modules/leave/tests/test_api.py.
++
++Verify from the actual code:
++1. Does FusionAuthTestRunner mock authentication or create a test identity?
++2. What exact authentication mechanism does the Leave API use?
++3. What does test_get_lifecycle actually test, and does it exist under that exact name?
++4. Give the exact PowerShell command to run only the relevant existing test.
++5. If the test needs setup, identify the minimum safe setup based on repository code.
++
++Do not assume that a test requires live credentials. Cite the relevant file paths and function/class names for each finding. Do not modify files or database records.
+
+# 2026-10-28 01:53:35.799042
++Your previous diagnosis contains a contradiction: you said test_get_lifecycle both exists and does not exist under that exact name.
++
++Do not edit any files. Inspect modules/leave/tests/test_api.py and fusion_auth/tests/runner.py directly.
++
++1. List the exact test class and method names related to the lifecycle endpoint.
++2. Explain whether the custom test runner contacts a real FusionAuth service, based on its actual implementation.
++3. Identify the exact command to run only the lifecycle test using this project's .venv and config.settings.test.
++4. Tell me what environment variables or services the test requires, based on code.
++5. Do not assume valid external credentials are necessary unless the code proves it.
+
+# 2026-10-28 02:26:01.499993
++/run .\.venv\Scripts\python.exe manage.py test modules.leave.tests.test_api.TestLeaveApiView.test_get_lifecycle --settings=config.settings.test
+
+# 2026-10-28 02:26:47.037168
++Y
+
+# 2026-10-28 02:27:00.843978
++What's wrong? Fix The lifecycle test command failed before executing the test:
++
++ModuleNotFoundError: No module named 'modules.leave.tests.test_api'
++
++Diagnose this import error using the actual repository. Do not edit files.
++
++1. Verify whether modules/leave/tests/test_api.py exists, and identify the actual test directory and filenames.
++2. Inspect the relevant __init__.py files and Django test discovery configuration.
++3. Determine the correct test label and exact PowerShell command for running the lifecycle test.
++4. If the test file is elsewhere or the class/method name differs, use the actual names found in the repository.
++5. Do not change authentication, create credentials, or modify database records.
++
++Report the verified file paths and command before asking me to run it.
+
+# 2026-10-28 09:58:26.806579
++Y
+
+# 2026-10-28 10:21:53.357716
++/exit
+
+# 2026-10-28 10:22:19.468590
++We verified that modules/leave/tests is empty and no test_get_lifecycle or TestLeaveApiView definitions were found in the repository's Python files. Do not repeat the previous incorrect test path.
++
++Inspect the actual Leave implementation and the available ELM specification files. Do not edit, create, delete, stage, or commit any files.
++
++Report:
++1. The actual Leave API routes and view classes/functions, with file paths.
++2. The implemented lifecycle behavior, based on the source code.
++3. The relevant ELM lifecycle requirements, quoting their exact document filenames and section identifiers.
++4. Any specific gaps between the implementation and requirements, with code evidence.
++5. Which existing tests can safely be run to establish the current baseline.
++6. A minimal test plan for the Leave lifecycle, without writing the tests yet.
++
++Clearly distinguish verified facts from assumptions. Do not invent requirements or claim tests passed unless you actually ran them.
+
+# 2026-10-28 10:52:48.478510
++Y
+
+# 2026-10-28 11:54:17.258200
++/exit
+
+# 2026-10-28 11:54:36.069755
++/add modules/leave/services/year_end.py
+
+# 2026-10-28 11:54:41.486421
++/add modules/leave/domain/year_end.py
+
+# 2026-10-28 11:54:45.623600
++/add modules/leave/services/ledger.py
+
+# 2026-10-28 11:54:51.224081
++/add modules/leave/models/accounts.py
+
+# 2026-10-28 11:54:56.090652
++/add modules/leave/models/policy.py
+
+# 2026-10-28 11:55:07.317420
++/ask Review the existing year-end processing implementation. Do not edit or create any files.
++
++Inspect the actual files added to this chat and report:
++
++1. How the existing service posts lapse, carry-forward, conversion, and entitlement entries.
++2. Whether the per-person exception handling can allow partial year-end changes to commit.
++3. Whether the current idempotency check is reliable, including concurrent runs.
++4. Whether the service correctly handles faculty-only VL conversion and policy carry-forward caps.
++5. The best existing location for year-end tests, based on the repository's test conventions.
++
++For every finding, cite the exact function and relevant code behavior. Distinguish confirmed defects from risks that require tests or additional code inspection. Do not propose a duplicate year-end service. Do not claim any tests have passed unless you actually ran them.
+
+# 2026-10-28 14:19:57.160302
++/ask Inspect only the current files already added. Do not edit anything.
++
++Confirm how to fix the interface between modules/leave/services/year_end.py and modules/leave/domain/year_end.py.
++
++The domain function signature is plan(policy, kind, balances, year). Its Outcome has category, kind, days, note. Its kind values are "lapse", "carry_forward", and "conversion".
++
++Identify the existing directory contract that supplies each employee's kind, and determine whether it is available in _run_for_person. Also identify how the year-end service should handle the absence of a next-year balance row. Give a concise answer, with no code edits.
+
+# 2026-10-28 16:40:52.446099
++/code Fix the existing year-end service in modules/leave/services/year_end.py to match the current domain interface in modules/leave/domain/year_end.py.
++
++Requirements:
++1. Call year_end_domain.plan with the correct four arguments in the correct order: policy, employee kind, balances, year.
++2. Obtain each employee's kind from the existing directory contract. Inspect the existing contract and adapt the service without inventing a new API.
++3. Map Outcome.kind values "lapse", "carry_forward", and "conversion" to the existing ledger posting constants. Use Outcome.category, Outcome.days, and Outcome.note appropriately.
++4. Preserve the existing ledger.post architecture. Do not write balances directly or create a duplicate year-end service.
++5. Do not create a next-year balance row merely to use its existence as the idempotency mechanism.
++6. Do not implement an unverified concurrency solution. Inspect the existing models and ledger before choosing how to prevent duplicate processing.
++7. Preserve dry_run behavior, the YearEndReport interface, the management command interface, and the existing policy-based entitlement logic.
++8. Make only the smallest necessary changes to the existing service. Do not create tests or other files in this step.
++9. Show the changes as a diff and explain any remaining risks. Do not claim tests passed unless you ran them.
+
+# 2026-10-28 17:52:27.811720
++In `modules/leave/services/year_end.py`, fix the unsupported call `directory.get_employee_kind(user_id)`.
++
++The public directory contract in `modules/directory/contracts.py` provides `get_employees() -> list[UserDTO]`, and each `UserDTO` has `user_id` and `kind`. It does not provide `get_employee_kind()`.
++
++Make the smallest change needed to obtain the correct employee kind for the given `user_id` using the existing directory contract. Preserve the existing year-end behavior and the corrected call signature `year_end_domain.plan(pol_domain, employee_kind, balances, year)`. Do not add a new directory API, change unrelated functions, or commit anything. Show me the diff.
+
+# 2026-10-28 17:53:24.245126
++Y
+
+# 2026-10-28 18:52:51.565513
++N
+
+# 2026-10-28 19:37:11.720761
++/exit
+
+# 2026-10-28 19:37:51.730026
++We are performing the Test stage for Phase 2 of the Fusion-Integrated assignment.
++
++Focus on the year-end leave service in `modules/leave/services/year_end.py` and its domain contract in `modules/leave/domain/year_end.py`. The recent changes make the service call `year_end_domain.plan(policy, employee_kind, balances, year)` and obtain employee kinds through the existing directory contract.
++
++Please perform a careful, test-focused review.
++
++1. Inspect the service, domain function, directory contract, relevant business rules, workflow specifications, and existing test conventions before making recommendations.
++2. Identify existing tests relevant to the Leave year-end service. Do not claim a test exists unless you find it.
++3. If practical, add focused automated tests for:
++   - The correct arguments and order passed to `plan`.
++   - Employee kind being obtained from the directory contract.
++   - Processing a selected employee or a list of employees.
++   - Dry-run behavior and report generation.
++   - Handling one employee's failure without stopping processing of other employees, if required by the documented business rule.
++   - Boundary, invalid-input, and negative cases supported by the actual implementation and specifications.
++4. Prefer isolated unit tests with mocks for directory, policy, balance, and domain dependencies where appropriate. Do not require a live database or external service unless the existing test architecture requires it.
++5. Run the focused tests you create or identify, then run Ruff and Python syntax checks on the changed Python files.
++6. Do not modify production code merely to make a test pass. If a real defect is found, explain it and propose the smallest justified fix before changing production code.
++7. Do not change Django settings, install system libraries, or repair unrelated Placement tests as part of this task.
++8. Do not commit, push, or alter Git remotes.
++9. At the end, report which tests were actually run, the exact results, any failures or environmental blockers, and which testing categories are genuinely covered: unit, business-rule, workflow/state-transition, boundary/negative-case, regression, integration/API, and existing project tests.
++
++Start by inspecting the relevant files and test conventions. Explain your proposed test plan before making edits. Do not claim that tests passed unless you ran them and saw the passing results.
+
+# 2026-10-28 19:37:55.384778
++Y
+
+# 2026-10-28 21:36:16.738065
++N
+
+# 2026-10-28 21:36:32.789647
++/exit
+
+# 2026-10-28 21:37:24.483338
++We are performing the Test stage for Phase 2 of the Fusion-Integrated assignment.
++
++Focus on the year-end leave service in `modules/leave/services/year_end.py` and its domain contract in `modules/leave/domain/year_end.py`. The recent changes make the service call `year_end_domain.plan(policy, employee_kind, balances, year)` and obtain employee kinds through the existing directory contract.
++
++Please perform a careful, test-focused review.
++
++1. Inspect the service, domain function, directory contract, relevant business rules, workflow specifications, and existing test conventions before making recommendations.
++2. Identify existing tests relevant to the Leave year-end service. Do not claim a test exists unless you find it.
++3. If practical, add focused automated tests for:
++   - The correct arguments and order passed to `plan`.
++   - Employee kind being obtained from the directory contract.
++   - Processing a selected employee or a list of employees.
++   - Dry-run behavior and report generation.
++   - Handling one employee's failure without stopping processing of other employees, if required by the documented business rule.
++   - Boundary, invalid-input, and negative cases supported by the actual implementation and specifications.
++4. Prefer isolated unit tests with mocks for directory, policy, balance, and domain dependencies where appropriate. Do not require a live database or external service unless the existing test architecture requires it.
++5. Run the focused tests you create or identify, then run Ruff and Python syntax checks on the changed Python files.
++6. Do not modify production code merely to make a test pass. If a real defect is found, explain it and propose the smallest justified fix before changing production code.
++7. Do not change Django settings, install system libraries, or repair unrelated Placement tests as part of this task.
++8. Do not commit, push, or alter Git remotes.
++9. At the end, report which tests were actually run, the exact results, any failures or environmental blockers, and which testing categories are genuinely covered: unit, business-rule, workflow/state-transition, boundary/negative-case, regression, integration/API, and existing project tests.
++
++Start by inspecting the relevant files and test conventions. Explain your proposed test plan before making edits. Do not claim that tests passed unless you ran them and saw the passing results.
+
+# 2026-10-28 21:37:27.312374
++Y
+
+# 2026-10-28 22:30:27.779839
++/clear
+
+# 2026-10-28 22:34:27.456205
++Inspect these two files only: `modules/leave/domain/year_end.py` and `modules/leave/services/year_end.py`. Do not edit files. Identify the exact function signatures, dependencies that need mocking, and any existing tests for these functions. Give a concise answer, under 500 words.
+
+# 2026-10-28 23:02:51.573647
++N
+
+# 2026-10-28 23:21:56.802128
++In `modules/leave/services/year_end.py` only, fix the mismatch between the domain and service interfaces. The domain `Outcome` has fields `category`, `kind`, `days`, and `note`, and `plan()` returns kinds `"lapse"`, `"carry_forward"`, and `"conversion"`. Update the service to use `decision.kind` and compare against those exact strings. Preserve all imports, function bodies, exception handling, and existing logic otherwise. Do not edit `modules/leave/domain/year_end.py`. Do not commit. After editing, show the diff only.
+
+# 2026-10-29 00:26:30.961536
++/exit
+
+# 2026-10-29 00:26:55.642513
++/ask Review this repository to identify meaningful problems in the Phase-1 implementation. Focus on functional correctness, business-rule implementation, service/domain interface mismatches, workflow/state transitions, validation and error handling, access control, integration with FusionIIIT, maintainability, and testing gaps.
++
++Inspect the relevant source code, ELM specifications, and existing tests before drawing conclusions. Prioritize problems that could cause incorrect behavior or violate specified requirements.
++
++For every finding, provide:
++1. A short problem title.
++2. The exact file and relevant function or line.
++3. The expected behavior, supported by a requirement or existing contract where possible.
++4. The actual behavior and evidence from the code or tests.
++5. The impact and severity.
++6. A minimal reproduction or test that could confirm the problem.
++
++Separate confirmed problems from possible risks and missing evidence. Do not invent requirements, do not report style preferences as bugs, and do not modify any files. Finish with the three most important confirmed problems and explain why they should be prioritized.
+
+# 2026-10-29 00:45:04.366890
++Y
+
+# 2026-10-29 01:04:54.817703
++Verify the three problems you just reported against the actual repository code and ELM specifications. Do not edit any files.
++
++For each finding:
++1. Read the relevant function and its callers.
++2. Identify the exact code that proves the claimed behavior.
++3. Check whether existing validation, permission checks, or exception handling already addresses the concern.
++4. Determine whether the proposed reproduction test would actually fail with the current implementation.
++5. If you cannot prove the problem, mark it unconfirmed and explain what evidence is missing.
++
++Pay special attention to:
++- modules/leave/services/sla.py: _AdminView.has_any_permission
++- modules/leave/api/views.py: LeaveRequestViewSet.create
++- modules/placement/services/clearance.py: no_dues_clearance
++
++Return only evidence-supported findings, with file paths and exact code references. Separate confirmed bugs from possible risks. Do not modify files.
+
+# 2026-10-29 01:58:09.461080
++N
+
+# 2026-10-29 02:13:26.743596
++/exit
+
+# 2026-10-29 02:13:58.153671
++/ask Qwen's earlier review identified three possible problems:
++
++1. Permission handling in modules/leave/services/sla.py, especially _AdminView.has_any_permission.
++2. Input validation in modules/leave/api/views.py, especially LeaveRequestViewSet.create.
++3. Exception handling in modules/placement/services/clearance.py, especially no_dues_clearance.
++
++Investigate each finding using the actual source code, callers, related tests, and existing project conventions.
++
++For each finding:
++- Identify the exact code and explain the evidence.
++- Classify it as a confirmed defect, a potential issue requiring more evidence, or a false positive.
++- Explain the impact if it is a real defect.
++- Identify the smallest safe fix and a regression test, if appropriate.
++
++Do not edit any files yet. In particular, check whether input validation is already implemented and whether permission checks or exception propagation are intentional according to the existing contracts. Do not invent missing requirements.
+
+# 2026-10-29 02:14:03.415776
++Y
+
+# 2026-10-29 02:59:32.435644
++Continue the DO/IMPROVE stage for the three problems identified during the previous code review.
++
++Before editing, inspect the current code, callers, related tests, and project conventions.
++
++1. `modules/leave/services/sla.py`: Verify whether `_AdminView.has_any_permission()` is incorrect. Do not change `any()` to `all()` unless the callers and intended permission behavior prove it is necessary.
++
++2. `modules/leave/api/views.py`: Verify whether `LeaveRequestViewSet.create()` has a real validation defect. It already calls `payload.is_valid(raise_exception=True)`, so inspect the serializer and tests before proposing any change.
++
++3. `modules/placement/services/clearance.py`: Verify whether `no_dues_clearance()` needs exception handling. Do not add a broad exception handler or convert database errors into not-found errors without evidence.
++
++For each problem:
++- State whether it is a confirmed defect, a potential issue, or a false positive.
++- If confirmed, make the smallest safe fix and add a focused regression test.
++- If not confirmed, do not modify the code; explain the evidence.
++- Do not change unrelated files or create duplicate tests.
++
++After any edits, run the relevant tests, Python compilation, and Ruff checks. Report the exact files changed, commands run, and actual results. Do not claim tests passed unless they did.
+
+# 2026-10-29 04:36:22.159264
++/ask Verify whether the Phase-2 changes in this repository actually improved the implementation rather than merely changing code.
++
++Do not edit, create, or delete any files.
++
++Inspect the current Git diff and compare the changed code with the original implementation wherever available, the relevant tests, and the ELM specifications.
++
++For every meaningful Phase-2 change:
++1. Identify the exact file, function, and behavior changed.
++2. Explain the original problem and the expected corrected behavior.
++3. Check whether the new implementation enforces the intended functional requirement, business rule, permission, or workflow.
++4. Identify relevant tests and determine whether they actually exercise the corrected behavior.
++5. Distinguish verified improvements from code changes whose behavioral benefit is not yet proven.
++6. Identify regressions or unrelated changes, if any.
++
++Do not assume that a code change is an improvement just because it looks reasonable. Do not claim a test passed unless you actually ran it and observed a successful result.
++
++Return a concise evidence-based report with file paths, test names, actual test results, and unresolved verification gaps.
