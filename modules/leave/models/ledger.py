@@ -20,7 +20,7 @@ class LeaveBalanceLedger(UserScopedModel, TimeStampedModel):
     """
     
     year = models.PositiveIntegerField()
-    category = models.CharField(max_length=2, choices=[
+    category = models.CharField(max_length=10, choices=[
         ('cl', 'Casual Leave'),
         ('rh', 'Half Leave'),
         ('scl', 'Sick Leave'),
@@ -52,7 +52,7 @@ class LeaveLedgerTransaction(UserScopedModel, TimeStampedModel):
     Every modification to LeaveBalanceLedger creates a corresponding transaction.
     """
     
-    category = models.CharField(max_length=2, choices=[
+    category = models.CharField(max_length=10, choices=[
         ('cl', 'Casual Leave'),
         ('rh', 'Half Leave'),
         ('scl', 'Sick Leave'),

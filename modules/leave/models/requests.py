@@ -31,7 +31,7 @@ class LeaveRequest(UserScopedModel, TimeStampedModel):
     Core leave request model with full workflow state tracking.
     """
     
-    category = models.CharField(max_length=2, choices=[
+    category = models.CharField(max_length=10, choices=[
         ('cl', 'Casual Leave'),
         ('rh', 'Half Leave'),
         ('scl', 'Sick Leave'),
