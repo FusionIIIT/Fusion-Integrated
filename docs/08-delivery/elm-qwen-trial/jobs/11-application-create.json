@@ -1,0 +1,20 @@
+{
+  "label": "Initial application creation service",
+  "instruction": "Generate the initial ELM submission service using the existing models. Exactly one function submit_application(actor, data) in services/applications.py, maximum 45 lines. data is serializer validated data with leave_type, start_date, end_date, purpose. Enforce the existing application.create permission via actor.has_permission, set user_id from Principal and record submission history/task using existing fields. Use transaction.atomic. Use the existing core.api.exceptions error interfaces. Do not redefine models or generate other operations. This is initial code generation, not correction of business logic.",
+  "allowed_paths": [
+    "modules/leave_elm/services/applications.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/models.py",
+    "fusion_auth/principal.py",
+    "core/api/exceptions.py"
+  ],
+  "include_specs": false,
+  "num_predict": 2400,
+  "options": {
+    "temperature": 0.3,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}
