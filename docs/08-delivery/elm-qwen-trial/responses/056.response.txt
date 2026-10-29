@@ -1,0 +1,77 @@
+```
+from django.db import models
+from decimal import Decimal
+from datetime import timezone
+
+from core.db.mixins import TimeStampedModel, UserScopedModel
+from .models import LeaveCategory, LeaveBalance, LeavePolicy, LeaveTask
+
+
+def year_end_rollover():
+    policy = LeavePolicy.objects.first()
+    
+    allocations = {
+        'CL': policy.cl_days if policy else 8,
+        'RH': policy.rh_days if policy else 2,
+        'SCL': policy.scl_days if policy else 15,
+        'EL': policy.el_days if policy else 30,
+        'COL': policy.col_days if policy else 20,
+        'VL': policy.vl_days if policy else 60
+    }
+    
+    user_ids = list(LeaveBalance.objects.values_list('user_id', flat=True).distinct())
+    
+    for uid in user_ids:
+        for cat_name in LEAVE_CATEGORY_NAMES:
+            cat, _ = LeaveCategory.objects.get_or_create(name=cat_name, defaults={'description': cat_name})
+            
+            bal, created = LeaveBalance.objects.get_or_create(user_id=uid, leave_category=cat, defaults={'balance': Decimal(str(allocations[cat_name]))})
+            
+            if not created:
+                if cat_name == 'EL':
+                    bal.balance = min(Decimal('300.00'), bal.balance + Decimal(str(allocations['EL'])))
+                elif cat_name != 'COL':
+                    bal.balance = Decimal(str(allocations[cat_name]))
+                
+                bal.save(update_fields=['balance', 'updated_at'])
+    
+    return {'users_processed': len(user_ids), 'balances_updated': len(user_ids) * len(LEAVE_CATEGORY_NAMES)}
+
+def process_task_sla(now=None):
+    now = now or timezone.now()
+    reminded = 0
+    escalated = 0
+    
+    threshold_days = {
+        'Reminder': 60,
+        'Escalation': 120
+    }
+    
+    tasks = LeaveTask.objects.select_related('leave_application').filter(status='Pending')
+    
+    for task in tasks:
+        elapsed_minutes = (now - task.created_at).total_seconds() / 60.0
+        
+        if elapsed_minutes >= float(task.escalation_threshold) and task.escalated_at is None:
+            task.escalated_at = now
+            task.save(update_fields=['escalated_at', 'updated_at'])
+            LeaveNotification.objects.create(
+                user_id=task.leave_application.user_id,
+                leave_application=task.leave_application,
+                message=f'SLA Escalation for task #{task.id}',
+                channel='in_app'
+            )
+            escalated += 1
+        elif elapsed_minutes >= float(task.reminder_threshold) and task.reminded_at is None:
+            task.reminded_at = now
+            task.save(update_fields=['reminded_at', 'updated_at'])
+            LeaveNotification.objects.create(
+                user_id=task.leave_application.user_id,
+                leave_application=task.leave_application,
+                message=f'SLA Reminder for task #{task.id}',
+                channel='in_app'
+            )
+            reminded += 1
+    
+    return {'reminded': reminded, 'escalated': escalated}
+```

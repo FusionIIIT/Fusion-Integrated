@@ -1,0 +1,19 @@
+{
+  "label": "Phase 2 repair models.py missing LeaveCalendar, LeavePolicyParameter, and LeaveApplication timestamps",
+  "instruction": "Fix modules/leave_elm/models.py where several fields and the last two model classes were accidentally omitted: (1) On LeaveApplication, keep all existing fields AND restore `approved_at = models.DateTimeField(null=True, blank=True)`, `cancelled_at = models.DateTimeField(null=True, blank=True)`, `extension_requested = models.BooleanField(default=False)`, `extension_approved = models.BooleanField(default=False)`, `extension_start_date = models.DateField(null=True, blank=True)`, `extension_end_date = models.DateField(null=True, blank=True)`, and `extension_approved_at = models.DateTimeField(null=True, blank=True)`, and rename `fitness_certificate_Reference` to lowercase `fitness_certificate_reference`. (2) At the bottom of the file, after LeaveResumption, restore `LeavePolicyParameter(TimeStampedModel, UserScopedModel)` with `name = models.CharField(max_length=100, unique=True)` and `value = models.JSONField(default=dict)`, and `LeaveCalendar(TimeStampedModel, UserScopedModel)` with `name = models.CharField(max_length=100, unique=True)` and `holidays = models.JSONField(default=list)`. Keep all other model classes and fields unchanged. Return the complete valid Python file.",
+  "allowed_paths": [
+    "modules/leave_elm/models.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/models.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 3200,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

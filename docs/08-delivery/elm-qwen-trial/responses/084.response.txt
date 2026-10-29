@@ -1,0 +1,125 @@
+```typescript
+import { useState } from 'react';
+import {
+  Badge,
+  Button,
+  Checkbox,
+  Grid,
+  Group,
+  Paper,
+  Select,
+  Stack,
+  Table,
+  Textarea,
+  TextInput,
+  Title,
+} from '@mantine/core';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { applicationAction, listApplications, listBalances, submitApplication, type LeaveApplication, type LeaveBalance, type NewApplication } from '../api';
+
+export const MyLeavePage = () => {
+  const queryClient = useQueryClient();
+  const [leaveType, setLeaveType] = useState<string>('CL');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
+  const [purpose, setPurpose] = useState<string>('');
+  const [stationLeave, setStationLeave] = useState<boolean>(false);
+  const [addressDuringLeave, setAddressDuringLeave] = useState<string>('');
+  const [contactNumber, setContactNumber] = useState<string>('');
+  const [academicSubId, setAcademicSubId] = useState<string>('');
+  const [adminSubId, setAdminSubId] = useState<string>('');
+  const [attachmentRef, setAttachmentRef] = useState<string>('');
+  
+  const { data: balances = [] } = useQuery<LeaveBalance[]>({ queryKey: ['leave', 'balances'], queryFn: listBalances });
+  const { data: applications = [] } = useQuery<LeaveApplication[]>({ queryKey: ['leave', 'applications'], queryFn: listApplications });
+
+  const submitMutation = useMutation({ mutationFn: (payload: NewApplication) => submitApplication(payload), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['leave'] }); setPurpose(''); } });
+  const actionMutation = useMutation({ mutationFn: (vars: { id: number; action: string }) => applicationAction(vars.id, vars.action, {}), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['leave'] }); } });
+
+  return (
+    <Grid>
+      {/* Leave Balances */}
+      <Grid.Col span={12}>
+        <Paper p="md" withBorder>
+          <Table striped highlightOnHover>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Category</Table.Th>
+                <Table.Th>Balance</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {balances.map((b) => (
+                <Table.Tr key={b.id}>
+                  <Table.Th>{b.leave_category_name ?? b.leave_category}</Table.Th>
+                  <Table.Td>{b.balance}</Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </Paper>
+      </Grid.Col>
+
+      {/* New Application Form */}
+      <Grid.Col span={12}>
+        <Paper p="md" withBorder>
+          <Stack gap="sm">
+            <Title order={3}>New Application</Title>
+            <Select label="Leave Type" data={['CL', 'RH', 'SCL', 'EL', 'COL', 'VL']} value={leaveType} onChange={(v) => setLeaveType(v ?? 'CL')} />
+            <TextInput label="Start Date" type="date" value={startDate} onChange={(e) => setStartDate(e.currentTarget.value)} />
+            <TextInput label="End Date" type="date" value={endDate} onChange={(e) => setEndDate(e.currentTarget.value)} />
+            <Textarea label="Purpose" value={purpose} onChange={(e) => setPurpose(e.currentTarget.value)} />
+            <Checkbox label="Station Leave Required" checked={stationLeave} onChange={(e) => setStationLeave(e.currentTarget.checked)} />
+            <TextInput label="Address During Leave" value={addressDuringLeave} onChange={(e) => setAddressDuringLeave(e.currentTarget.value)} />
+            <TextInput label="Contact Number" value={contactNumber} onChange={(e) => setContactNumber(e.currentTarget.value)} />
+            <TextInput label="Academic Substitute User ID" value={academicSubId} onChange={(e) => setAcademicSubId(e.currentTarget.value)} />
+            <TextInput label="Admin Substitute User ID" value={adminSubId} onChange={(e) => setAdminSubId(e.currentTarget.value)} />
+            <TextInput label="Attachment Reference" value={attachmentRef} onChange={(e) => setAttachmentRef(e.currentTarget.value)} />
+            <Button onClick={() => submitMutation.mutate({ leave_type: leaveType, start_date: startDate, end_date: endDate, purpose, station_leave_required: stationLeave, address_during_leave: addressDuringLeave, contact_number: contactNumber, academic_substitute_user_id: academicSubId ? Number(academicSubId) : null, admin_substitute_user_id: adminSubId ? Number(adminSubId) : null, attachment_reference: attachmentRef })}>Submit Application</Button>
+          </Stack>
+        </Paper>
+      </Grid.Col>
+
+      {/* Applications */}
+      <Grid.Col span={12}>
+        <Paper p="md" withBorder>
+          <Table striped highlightOnHover>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>ID</Table.Th>
+                <Table.Th>Leave Type</Table.Th>
+                <Table.Th>Dates</Table.Th>
+                <Table.Th>Working Days</Table.Th>
+                <Table.Th>Status</Table.Th>
+                <Table.Th>Action</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {applications.map((app) => (
+                <Table.Tr key={app.id}>
+                  <Table.Td>{app.id}</Table.Td>
+                  <Table.Td>{app.leave_type_name ?? app.leave_type}</Table.Td>
+                  <Table.Td>{`${app.start_date} - ${app.end_date}`}</Table.Td>
+                  <Table.Td>{app.working_days ?? '-'}</Table.Td>
+                  <Table.Td><Badge>{app.status}</Badge></Table.Td>
+                  <Table.Td>
+                    <Group gap="sm">
+                      <Button onClick={() => actionMutation.mutate({ id: app.id, action: 'withdraw' })}>Withdraw</Button>
+                      <Button onClick={() => actionMutation.mutate({ id: app.id, action: 'cancel' })}>Cancel</Button>
+                      <Button onClick={() => actionMutation.mutate({ id: app.id, action: 'extend' })}>Extend</Button>
+                      <Button onClick={() => actionMutation.mutate({ id: app.id, action: 'resume' })}>Resume</Button>
+                    </Group>
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </Paper>
+      </Grid.Col>
+    </Grid>
+  );
+};
+
+export default MyLeavePage;
+
+```

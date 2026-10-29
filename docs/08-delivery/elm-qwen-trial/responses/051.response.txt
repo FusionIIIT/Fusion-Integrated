@@ -1,0 +1,70 @@
+```
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema
+from drf_spectacular.types import OpenApiTypes
+from .services.queries import list_applications, own_balances, assigned_tasks, list_notifications
+from .services.applications import submit_application, act_on_application
+from .serializers import LeaveApplicationSerializer, LeaveBalanceSerializer, LeaveTaskSerializer, ActionRequestSerializer, LeaveHistorySerializer, LeaveNotificationSerializer
+from fusion_auth.permissions import IsAuthenticatedPrincipal, HasModuleGrant, HasPermission
+
+class NotificationListView(APIView):
+    permission_classes = [IsAuthenticatedPrincipal]
+
+    @extend_schema(responses={200: OpenApiTypes.OBJECT})
+    def get(self, request):
+        notifications = list_notifications(request.principal)
+        serializer = LeaveNotificationSerializer(notifications, many=True)
+        return Response(serializer.data)
+
+class ApplicationPrintView(APIView):
+    permission_classes = [IsAuthenticatedPrincipal]
+
+    @extend_schema(responses={200: OpenApiTypes.OBJECT})
+    def get(self, request, pk=None):
+        if not isinstance(request.principal, IsAuthenticatedPrincipal):
+            return Response({'error': 'Authentication is required.'}, status=401)
+        application = submit_application(request.principal, {'action': 'print', 'id': int(pk)})
+        serializer = LeaveApplicationSerializer(application).data
+        return Response(serializer)
+
+
+class ApplicationListView(APIView):
+    permission_classes = [IsAuthenticatedPrincipal, HasModuleGrant('leave_elm')]
+
+    @extend_schema(responses={200: OpenApiTypes.ARRAY})
+    def get(self, request):
+        applications = list_applications(request.principal, scope=request.query_params.get('scope', 'mine'))
+        serializer = LeaveApplicationSerializer(applications, many=True)
+        return Response(serializer.data)
+
+    @extend_schema(
+        request=ActionRequestSerializer,
+        responses={201: OpenApiTypes.OBJECT}
+    )
+    def post(self, request, pk=None):
+        action = request.data.get('action')
+        application = act_on_application(request.principal, pk, action, request.data)
+        serializer = LeaveApplicationSerializer(application)
+        return Response(serializer.data, status=200)
+
+class BalanceListView(APIView):
+    permission_classes = [IsAuthenticatedPrincipal, HasModuleGrant('leave_elm')]
+
+    @extend_schema(responses={200: OpenApiTypes.ARRAY})
+    def get(self, request):
+        balances = own_balances(request.principal)
+        serializer = LeaveBalanceSerializer(balances, many=True)
+        return Response(serializer.data)
+
+class TaskListView(APIView):
+    permission_classes = [IsAuthenticatedPrincipal, HasModuleGrant('leave_elm')]
+
+    @extend_schema(responses={200: OpenApiTypes.ARRAY})
+    def get(self, request):
+        tasks = assigned_tasks(request.principal)
+        serializer = LeaveTaskSerializer(tasks, many=True)
+        return Response(serializer.data)
+
+
+```

@@ -1,0 +1,83 @@
+# ELM Qwen Trial Record (Phase 1 & Phase 2)
+
+## Configuration
+
+- **Model:** `qwen2.5-coder:3b` (3.1B, Q4_K_M, gguf)
+- **Installed model digest:** `f72c60cabf6237b07f6e632b2c48d533cef25eda2efbd34bed21c5e9c01e6225`
+- **Ollama:** `0.40.3`
+- **Hardware:** Apple M4, 10 CPU cores, 16 GB unified memory
+- **OS:** `macOS 27.0.1 (Build 26A434)`
+- **Official Fusion base SHA:** `02b01fea4a67b257ea7000009f06a1561699550e`
+- **Phase-1 Branch (preserved):** `codex/elm-qwen-trial` (`e8b33a5`)
+- **Phase-2 Branch:** `codex/elm-qwen-phase2`
+
+## Phase 1 Summary (Prompts 001–036)
+
+- **Scope:** Initial generation and mechanical compilation/integration checks only (`codex/elm-qwen-trial` at `e8b33a5`).
+- **Requests:** 34 code-generation requests + 2 documentation requests (`001`–`036`), consuming 1734.58 seconds of request wall time.
+- **Outcome:** Frontend production build, Django system check, import boundaries, and isolated ELM migration passed, while functional workflows, permissions, and business rules remained untested.
+
+## Phase 2 Method & Identified Defects (Prompts 037–093)
+
+Starting from the preserved Phase-1 baseline (`e8b33a5`), we reviewed the generated code against the ELM specification package, ran the Fusion verification suite, diagnosed 10 categories of defects, and iteratively prompted `qwen2.5-coder:3b` via `devtools/qwen_elm_trial.py` to repair the implementation and generate end-to-end tests:
+
+1. **Permission Manifest Collision & Unchecked Grants:** Cleared duplicate `SYSTEM_PERMISSIONS` in `modules/leave_elm/registry.py` and added `has_permission` checks across `queries.py`, `applications.py`, `actions.py`, and `configuration.py` for all 8 granted ELM permissions.
+2. **Broken `LeaveBalance` Lookup:** Fixed `leave_type_id=leave_type` (passing a code string to a big-integer FK) across `queries.py`, `applications.py`, `actions.py`, and `events.py` by resolving `LeaveType` and querying `leave_type=lt`.
+3. **Missing Audit/Attachment/Notification Models & Schema Fields:** Added `AttachmentRecord`, `NotificationDispatchLog`, and `LeaveAuditEvent` plus `requires_proof`, `max_days_per_instance`, `max_occurrences_per_year`, `sandwich_policy`, and `LeaveBalance.updated_at` in `modules/leave_elm/models.py` (with migration `0002_phase2_schema_fixes.py`).
+4. **Pure Domain Policy Rules:** Repaired `modules/leave_elm/domain/policy.py` (`calculate_requested_days`, `evaluate_application_rules`, `evaluate_transition_rules`) to enforce half-day calculation, joining-date eligibility, probation restrictions, proof-document rules, advance notice, and valid state transitions.
+5. **Application Creation & Submit Lifecycle:** Updated `modules/leave_elm/services/applications.py` to support both `DRAFT` creation and immediate submission (`submit=True`), auto-routing to `PENDING_SUBSTITUTE` or `PENDING_REVIEW` and recording `LeaveRequestEvent` + `LeaveAuditEvent`.
+6. **Workflow Actions & Balance Accounting:** Updated `modules/leave_elm/services/actions.py` (`submit_application`, `cancel_application`, `respond_to_substitute_assignment`, `review_application`, `decide_application`) to enforce role/permission checks, atomic `select_for_update()` balance deduction on `SANCTIONED`, and balance restoration when cancelling a sanctioned application.
+7. **DRF Serializer Read/Write Alignment:** Updated `modules/leave_elm/api/serializers.py` to accept both `leave_type` and `leave_type_code`, serialize nested `events` and `substitutes`, and expose `LeaveTypeAdminSerializer`, `LeaveBalanceAdminSerializer`, and `HolidayCalendarSerializer`.
+8. **Employee & Admin API Views/URLs:** Updated `modules/leave_elm/api/views.py`, `configuration.py`, and `urls.py` to add `/submit` and `/cancel` action endpoints and full `GET`/`POST`/`PATCH` support on `/admin/types`, `/admin/balances`, and `/admin/holidays`.
+9. **Frontend TypeScript Types, API Client & Pages:** Updated `client/src/modules/leave_elm/types.ts`, `api.ts`, `MyLeavePage.tsx`, `LeaveTasksPage.tsx`, and `LeaveAdminPage.tsx` to match backend serializer fields and expose draft submission, cancellation, substitute responses, intermediate review, sanction/reject actions, and admin CRUD forms.
+10. **End-to-End Automated Test Suite:** Generated `modules/leave_elm/tests/test_elm_phase2.py` testing draft creation, submission, substitute acceptance, review, sanctioning with balance deduction, cancellation with balance restoration, policy validation, and RBAC enforcement.
+
+## Phase 2 Observed Generation Results
+
+Phase 2 executed Prompts `037`–`091` (55 code/test/README generation requests, 1967.67 seconds total request wall time) plus report prompts. Every final file in `modules/leave_elm/` and `client/src/modules/leave_elm/` matches the exact SHA-256 of the raw `qwen2.5-coder:3b` output:
+
+| File | Applied Prompt | SHA-256 Prefix |
+| --- | --- | --- |
+| `modules/leave_elm/registry.py` | `038` | `b235163d0e3e` |
+| `modules/leave_elm/contracts.py` | `049` | `32e0c846f7f5` |
+| `client/src/modules/leave_elm/types.ts` | `058` | `413a335a8e1d` |
+| `client/src/modules/leave_elm/api.ts` | `059` | `b79111c90139` |
+| `modules/leave_elm/services/queries.py` | `065` | `d4632c8f80ae` |
+| `modules/leave_elm/api/views.py` | `066` | `52852e126a8f` |
+| `modules/leave_elm/api/configuration.py` | `067` | `a2c9a4acdefd` |
+| `modules/leave_elm/README.md` | `069` | `d06e975bd0d5` |
+| `modules/leave_elm/services/events.py` | `072` | `d672c4ba8253` |
+| `modules/leave_elm/domain/policy.py` | `077` | `0880c8a273af` |
+| `modules/leave_elm/api/urls.py` | `079` | `10e2c98ff30c` |
+| `modules/leave_elm/services/applications.py` | `081` | `eb72abab665e` |
+| `modules/leave_elm/services/actions.py` | `082` | `4b4077d1b26c` |
+| `modules/leave_elm/api/serializers.py` | `083` | `7613b6e21821` |
+| `client/src/modules/leave_elm/pages/MyLeavePage.tsx` | `084` | `07593f186506` |
+| `modules/leave_elm/models.py` | `087` | `8ae8d881893a` |
+| `client/src/modules/leave_elm/pages/LeaveTasksPage.tsx` | `089` | `3d6c09f0ae65` |
+| `client/src/modules/leave_elm/pages/LeaveAdminPage.tsx` | `090` | `d822f3cb3324` |
+| `modules/leave_elm/tests/test_elm_phase2.py` | `091` | `4cf6c8daf94b` |
+
+## Phase 2 Verification & Build Checks
+
+| Recorded Check | Exit Code | Seconds | Notes |
+| --- | ---: | ---: | --- |
+| `phase2-django-check` | 0 | 0.29 | `System check identified no issues (0 silenced).` |
+| `phase2-elm-schema` | 0 | 0.16 | `0001_initial` and `0002_phase2_schema_fixes` applied cleanly |
+| `phase2-permission-manifest` | 0 | 0.25 | All 8 ELM permissions verified and manifest up to date |
+| `phase2-import-boundaries` | 0 | 0.17 | `5 contracts kept, 0 broken` |
+| `phase2-pytest-elm` | 0 | 0.37 | `4 passed` in `modules/leave_elm/tests/test_elm_phase2.py` |
+| `phase2-frontend-typecheck` | 0 | 0.77 | `tsc --noEmit` zero errors |
+| `phase2-frontend-build` | 0 | 1.69 | Vite production bundle built cleanly |
+| Full repository `pytest` | 0 | 3.74 | `384 passed` across the entire Fusion ERP repository |
+
+## Reproduce
+
+With Ollama running and `qwen2.5-coder:3b` installed:
+
+```sh
+python3 devtools/qwen_elm_trial.py generate docs/08-delivery/elm-qwen-trial/jobs/45c-phase2-tests-principal-fix.json
+.venv/bin/python devtools/elm_trial_check.py --label phase2-django-check -- .venv/bin/python manage.py check
+.venv/bin/python devtools/elm_trial_check.py --label phase2-pytest-elm -- .venv/bin/pytest modules/leave_elm/tests/test_elm_phase2.py
+.venv/bin/python devtools/elm_trial_check.py --label phase2-frontend-build --client -- npm run build
+```

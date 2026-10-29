@@ -1,0 +1,20 @@
+{
+  "label": "Phase 2 upgrade frontend api.ts with notifications, print, and record adjustment helpers",
+  "instruction": "Update client/src/modules/leave_elm/api.ts to keep existing exports (LeaveApplication, LeaveBalance, LeaveTask, LeaveHistory, LeaveNotification, Configuration, NewApplication, listApplications, listBalances, listTasks, submitApplication, applicationAction, getConfiguration, saveConfiguration, getRecords) while expanding NewApplication to allow leave_type: string | number and optional station_leave_required, address_during_leave, contact_number, academic_substitute_user_id, admin_substitute_user_id, attachment_reference, and adding listNotifications(): Promise<LeaveNotification[]> (GET '/leave/notifications') and adjustBalanceRecord(payload: Record<string, unknown>) (POST '/leave/records'). In applicationAction(id, action, data={}), post `{ action, ...data, data }` to `/leave/applications/${id}/action`. Return only valid TypeScript code.",
+  "allowed_paths": [
+    "client/src/modules/leave_elm/api.ts"
+  ],
+  "context_files": [
+    "client/src/modules/leave_elm/api.ts",
+    "client/src/modules/leave_elm/types.ts"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 1600,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

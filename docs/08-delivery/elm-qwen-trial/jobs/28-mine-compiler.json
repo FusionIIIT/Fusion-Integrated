@@ -1,0 +1,20 @@
+{
+  "label": "Compiler interface repair MyLeavePage",
+  "instruction": "Repair only the existing React/TypeScript/library interfaces; preserve JSX, options and HTTP behavior. Return complete raw source. Install react-hook-form is done. Correct react-query import to @tanstack/react-query, remove unused useQuery and Tooltip. Add api imports listApplications,submitApplication and type LeaveApplication,NewApplication. ListApplicationsResponse is LeaveApplication[]. SubmitApplicationRequest is Omit<NewApplication,\"leave_type\"> & {leave_type:string}, preserving existing string defaults and vacation/sick_leave choices. useForm returns object: const {handleSubmit,register,setValue}=useForm<SubmitApplicationRequest>({defaultValues:existing}). Replace Mantine Input with TextInput for label prop. In Select only, replace {...register(\"leave_type\")} with onChange={value => setValue(\"leave_type\",value ?? \"\")}, adapting Mantine select string callback. handleSubmit sends data via submitApplication(data as unknown as NewApplication), preserving current payload string value rather than introducing new values. Do not correct categories, cache behavior or backend logic. No features added.",
+  "allowed_paths": [
+    "client/src/modules/leave_elm/pages/MyLeavePage.tsx"
+  ],
+  "context_files": [
+    "client/src/modules/leave_elm/pages/MyLeavePage.tsx",
+    "client/src/modules/leave_elm/api.ts"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 2600,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

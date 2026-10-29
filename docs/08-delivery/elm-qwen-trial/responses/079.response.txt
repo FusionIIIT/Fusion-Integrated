@@ -1,0 +1,23 @@
+```python
+from django.urls import path
+from .configuration import ConfigurationView, RecordListView
+from .views import (
+    ApplicationActionView,
+    ApplicationListView,
+    ApplicationPrintView,
+    BalanceListView,
+    NotificationListView,
+    TaskListView,
+)
+
+urlpatterns = [
+    path('applications', ApplicationListView.as_view(), name='application-list'),
+    path('applications/<int:pk>/action', ApplicationActionView.as_view(), name='application-action'),
+    path('applications/<int:pk>/print', ApplicationPrintView.as_view(), name='application-print'),
+    path('balances', BalanceListView.as_view(), name='balance-list'),
+    path('tasks', TaskListView.as_view(), name='task-list'),
+    path('notifications', NotificationListView.as_view(), name='notification-list'),
+    path('configuration', ConfigurationView.as_view(), name='configuration-view'),
+    path('records', RecordListView.as_view(), name='record-list'),
+]
+```

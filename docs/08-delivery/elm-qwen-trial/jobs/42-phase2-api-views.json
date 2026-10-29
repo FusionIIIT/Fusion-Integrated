@@ -1,0 +1,22 @@
+{
+  "label": "Phase 2 upgrade api/views.py fixing authentication, POST /applications, and ApplicationActionView",
+  "instruction": "Replace modules/leave_elm/api/views.py to fix all broken views: (1) Replace `isinstance(request.principal, IsAuthenticatedPrincipal)` with `permission_classes = [IsAuthenticatedPrincipal, HasModuleGrant('leave_elm')]` on all APIViews! (2) Add `@extend_schema` from drf_spectacular.utils (and OpenApiTypes from drf_spectacular.types) on all view methods so `make schema-check` passes with 0 warnings. (3) In ApplicationListView: GET calls list_applications(request.principal, scope=request.query_params.get('scope', 'mine')) and returns LeaveApplicationSerializer(applications, many=True).data; POST calls submit_application(request.principal, request.data) and returns Response(LeaveApplicationSerializer(application).data, status=201). (4) In BalanceListView: GET calls own_balances(request.principal) and returns LeaveBalanceSerializer(balances, many=True).data. (5) In TaskListView: GET calls assigned_tasks(request.principal) and returns LeaveTaskSerializer(tasks, many=True).data. (6) In ApplicationActionView: POST extracts action = request.data.get('action') and calls act_on_application(request.principal, pk, action, request.data) (NOT submit_application!), returning Response(LeaveApplicationSerializer(application).data, status=200). (7) Add NotificationListView (GET /api/v1/leave/notifications) returning LeaveNotificationSerializer(list_notifications(request.principal), many=True).data and ApplicationPrintView (GET /api/v1/leave/applications/<int:pk>/print) returning a printable summary dict for an application owned by or reviewable by request.principal. Do NOT catch DomainError/PermissionDeniedError/BadRequestError/NotFoundError/ConflictError into a generic 500 — let Fusion's exception handler format them properly! Return only valid Python code.",
+  "allowed_paths": [
+    "modules/leave_elm/api/views.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/api/views.py",
+    "modules/leave_elm/api/serializers.py",
+    "modules/leave_elm/api/record_serializers.py",
+    "fusion_auth/permissions.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 2600,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

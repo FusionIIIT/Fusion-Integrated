@@ -1,0 +1,98 @@
+```
+from rest_framework import serializers
+from .models import LeaveApplication, LeaveBalance, LeaveTask, LeavePolicy, LeaveCalendar
+
+class LeaveTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeaveType
+        fields = ['name', 'description']
+
+class LeaveCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeaveCategory
+        fields = '__all__'
+
+class LeaveApplicationSerializer(serializers.ModelSerializer):
+    leave_type_name = serializers.CharField(source='leave_type.name', read_only=True)
+    leave_category_name = serializers.CharField(source='leave_type.leave_category.name', read_only=True)
+
+    class Meta:
+        model = LeaveApplication
+        fields = '__all__'
+        read_only_fields = [
+            'id',
+            'user_id',
+            'created_at',
+            'updated_at',
+            'approved_by_id',
+            'approved_at',
+            'cancelled_by_id',
+            'cancelled_at',
+            'extension_requested',
+            'extension_approved',
+            'extension_start_date',
+            'extension_end_date',
+            'extension_approved_by_id',
+            'extension_approved_at',
+            'reviewed_by_id',
+            'reviewed_at',
+            'balance_deducted',
+            'resumed_at',
+        ]
+
+class LeaveBalanceSerializer(serializers.ModelSerializer):
+    leave_category_name = serializers.CharField(source='leave_category.name', read_only=True)
+
+    class Meta:
+        model = LeaveBalance
+        fields = ['id', 'user_id', 'leave_category', 'leave_category_name', 'balance', 'created_at', 'updated_at']
+
+class LeaveTaskSerializer(serializers.ModelSerializer):
+    title = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+    application_status = serializers.CharField(source='leave_application.status', read_only=True)
+    applicant_user_id = serializers.IntegerField(source='leave_application.user_id', read_only=True)
+    leave_type_name = serializers.CharField(
+        source='leave_type.name' if hasattr(self, 'context') and self.context.get('request').method == 'GET' else '',
+        default='',
+        read_only=True,
+    )
+    start_date = serializers.DateField(source='leave_application.start_date', read_only=True)
+    end_date = serializers.DateField(source='leave_application.end_date', read_only=True)
+    purpose = serializers.CharField(source='leave_application.purpose', read_only=True)
+
+    def get_title(self, obj):
+        return f"Leave Task for {obj.leave_application.leave_type.name} from {obj.leave_application.start_date} to {obj.leave_application.end_date}"
+
+    def get_description(self, obj):
+        return obj.leave_application.purpose
+
+    class Meta:
+        model = LeaveTask
+        fields = [
+            'id',
+            'user_id',
+            'leave_application',
+            'task_type',
+            'role',
+            'status',
+            'reminder_threshold',
+            'escalation_threshold',
+            'reminded_at',
+            'escalated_at',
+            'title',
+            'description',
+            'application_status',
+            'applicant_user_id',
+            'start_date',
+            'end_date',
+            'purpose',
+            'created_at',
+            'updated_at',
+        ]
+
+class ActionRequestSerializer(serializers.Serializer):
+    action = serializers.CharField()
+    decision = serializers.CharField(required=False, allow_blank=True, default='')
+    remarks = serializers.CharField(required=False, allow_blank=True, default='')
+```

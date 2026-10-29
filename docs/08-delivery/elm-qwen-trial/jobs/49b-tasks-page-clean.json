@@ -1,0 +1,17 @@
+{
+  "label": "Phase 2 clean LeaveTasksPage.tsx with Mantine v7 and React Query v5",
+  "instruction": "Write client/src/modules/leave_elm/pages/LeaveTasksPage.tsx from scratch with these exact imports and Mantine v7 props (`gap=\"sm\"`, NEVER `spacing=\"sm\"`):\n1. Imports:\n`import { useState } from 'react';`\n`import { Alert, Badge, Button, Container, Group, LoadingOverlay, Paper, Stack, Text, TextInput, Title } from '@mantine/core';`\n`import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';`\n`import { PageHeader } from '../../../ui/components/PageHeader';`\n`import { applicationAction, listTasks, type LeaveTask } from '../api';`\n2. Inside `export const LeaveTasksPage = () => {`:\n- `const queryClient = useQueryClient();`\n- `const [remarks, setRemarks] = useState<string>('');`\n- `const { isLoading, isError, error, data: tasks = [] } = useQuery<LeaveTask[]>({ queryKey: ['tasks'], queryFn: listTasks });`\n- `const actMutation = useMutation({ mutationFn: (vars: { applicationId: number; action: string }) => applicationAction(vars.applicationId, vars.action, { decision: remarks, remarks }), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tasks'] }); } });`\n3. Render `<Container>` with `<LoadingOverlay visible={isLoading} />`, `<PageHeader title=\"Leave Tasks\" subtitle=\"Review and act on pending leave workflow tasks\" />`, `<TextInput label=\"Decision / Remarks\" value={remarks} onChange={(e) => setRemarks(e.currentTarget.value)} mb=\"md\" />`, and `<Stack gap=\"md\">` mapping over `tasks`:\nEach task renders `<Paper key={task.id} p=\"md\" withBorder>` with `<Title order={4}>{task.title ?? task.task_type}</Title>`, `<Badge>{task.status}</Badge>`, `<Text size=\"sm\" c=\"dimmed\">{task.description ?? task.purpose ?? ''}</Text>`, `<Text size=\"xs\">Application #{task.leave_application}</Text>`, and `<Group gap=\"sm\" mt=\"sm\">` with buttons calling `actMutation.mutate({ applicationId: task.leave_application, action: ... })` for `'substitute_accept'`, `'substitute_reject'`, `'recommend'`, `'return_clarification'`, `'approve'`, and `'reject'`.\nExport `export default LeaveTasksPage;`. Return only valid TypeScript JSX code.",
+  "allowed_paths": [
+    "client/src/modules/leave_elm/pages/LeaveTasksPage.tsx"
+  ],
+  "context_files": [],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 2000,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

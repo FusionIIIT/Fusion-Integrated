@@ -1,0 +1,21 @@
+--- a/modules/leave_elm/models.py
++++ b/modules/leave_elm/models.py
+@@ -25,15 +25,15 @@
+     end_date = models.DateField()
+     purpose = models.TextField()
+     status = models.CharField(max_length=50, default='Pending')
+-    approved_by = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
++    approved_by = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='approved_by_applications')
+     approved_at = models.DateTimeField(null=True, blank=True)
+-    cancelled_by = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
++    cancelled_by = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='cancelled_by_applications')
+     cancelled_at = models.DateTimeField(null=True, blank=True)
+     extension_requested = models.BooleanField(default=False)
+     extension_approved = models.BooleanField(default=False)
+     extension_start_date = models.DateField(null=True, blank=True)
+     extension_end_date = models.DateField(null=True, blank=True)
+-    extension_approved_by = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
++    extension_approved_by = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='extension_approved_by_applications')
+     extension_approved_at = models.DateTimeField(null=True, blank=True)
+ 
+     def save(self, *args, **kwargs):

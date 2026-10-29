@@ -1,0 +1,21 @@
+{
+  "label": "Initial typed frontend API client",
+  "instruction": "Generate a compact TypeScript api.ts file for the ELM React module (max110 lines). Import http from ../../../lib/http. Export interfaces LeaveApplication, LeaveBalance, LeaveTask, Configuration and NewApplication, plus async functions listApplications(), listBalances(), listTasks(), submitApplication(data: NewApplication), applicationAction(id:number, action:string, data:Record<string,unknown>), getConfiguration(), saveConfiguration(data:Configuration), getRecords(). Existing API routes use /leave/applications etc and return bare arrays. Match existing generated model fields; no new dependencies, no fetch or custom auth. NewApplication has leave_type:number,start_date:string,end_date:string,purpose:string. Keep response types explicit for TypeScript. Configuration shape policy and calendar can use Record<string,unknown> arrays as needed. Use supplied API shapes, do not fix backend logic.",
+  "allowed_paths": [
+    "client/src/modules/leave_elm/api.ts"
+  ],
+  "context_files": [
+    "modules/leave_elm/api/urls.py",
+    "modules/leave_elm/api/serializers.py",
+    "modules/leave_elm/api/configuration.py",
+    "client/src/lib/http.ts"
+  ],
+  "include_specs": false,
+  "num_predict": 2300,
+  "options": {
+    "temperature": 0.3,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

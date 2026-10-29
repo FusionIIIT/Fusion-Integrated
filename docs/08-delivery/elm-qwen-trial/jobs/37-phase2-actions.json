@@ -1,0 +1,20 @@
+{
+  "label": "Phase 2 upgrade services/actions.py fixing crashes, balance restore, and RBAC",
+  "instruction": "Replace modules/leave_elm/services/actions.py to fix all runtime crashes (undefined update_leave_balance, undefined User, non-existent actor.notify_leave_status, assigning Principal to approved_by) and implement complete workflow actions in act_on_application(actor, application_id, action, data=None). Specifically: (1) Fetch LeaveApplication by id=application_id with select_for_update() inside transaction.atomic(), raising NotFoundError if missing. (2) Helper _adjust_balance(user_id, leave_category, delta_days) updates LeaveBalance.balance safely (preventing negative balance on deduction). (3) Support actions: 'substitute_accept' / 'substitute_reject' (requires leave_elm.substitute.respond; updates LeaveSubstitution status; if all accepted, moves app to 'Pending' and creates 'Application Review' task; if rejected, moves app to 'Returned for Clarification'); 'recommend' / 'forward' (requires leave_elm.application.review and actor.user_id != leave_app.user_id; sets status='Awaiting Sanctioning Authority', reviewed_by_id=actor.user_id, reviewed_at=timezone.now(), creates 'Sanction Decision' task for role='authority'); 'return_clarification' (requires review or approve; sets status='Returned for Clarification'); 'approve' (requires leave_elm.application.approve and actor.user_id != leave_app.user_id; deducts working_days from LeaveBalance once when not balance_deducted, sets balance_deducted=True, status='Approved', approved_by_id=actor.user_id, approved_at=timezone.now()); 'reject' (requires review or approve and actor.user_id != leave_app.user_id; sets status='Rejected'); 'withdraw' (applicant only while Pending/Substitute Pending/Under Review/Returned for Clarification; sets status='Cancelled', cancelled_by_id=actor.user_id, cancelled_at=timezone.now()); 'cancel' (applicant or approve permission on Approved leave; restores working_days to LeaveBalance (+working_days, NOT negative!) when balance_deducted is True and sets balance_deducted=False, status='Cancelled', cancelled_by_id=actor.user_id); 'extend' (applicant on Approved leave; creates LeaveExtension and 'Extension Approval' task); 'resume' (applicant on Approved leave; creates LeaveResumption, sets resumed_at=timezone.now(), status='Completed'). (4) Record LeaveHistory and LeaveNotification on every action. Keep under 160 lines and return only valid Python code.",
+  "allowed_paths": [
+    "modules/leave_elm/services/actions.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/services/actions.py",
+    "modules/leave_elm/models.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 3200,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

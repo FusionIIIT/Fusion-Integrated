@@ -1,0 +1,118 @@
+```
+import { useEffect, useState } from 'react';
+import { Alert, Button, Container, Group, LoadingOverlay, Paper, Table, Textarea, Title } from '@mantine/core';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { errorMessage } from '../../../lib/http';
+import { PageHeader } from '../../../ui/components/PageHeader';
+import { getConfiguration, getRecords, saveConfiguration, type Configuration, type LeaveHistory, type LeaveNotification } from '../api';
+
+const LeaveAdminPage = () => {
+  const queryClient = useQueryClient();
+  const [policyJSON, setPolicyJSON] = useState<string>('');
+  const [calendarJSON, setCalendarJSON] = useState<string>('');
+
+  const { data } = useQuery({ queryKey: ['configuration'], queryFn: getConfiguration });
+
+  useEffect(() => {
+    if (data) {
+      setPolicyJSON(JSON.stringify(data.policy ?? {}, null, 2));
+      setCalendarJSON(JSON.stringify(data.calendar ?? {}, null, 2));
+    }
+  }, [data]);
+
+  const saveConfigurationMutation = useMutation({
+    mutationFn: (newData: Configuration) => saveConfiguration(newData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['configuration'] });
+      queryClient.invalidateQueries({ queryKey: ['records'] });
+    },
+  });
+
+  const history: LeaveHistory[] = data?.history ?? [];
+  const notifications: LeaveNotification[] = data?.notifications ?? [];
+
+  return (
+    <Container size="lg" mt="md">
+      <PageHeader title="Leave Admin" subtitle="Manage leave policies, holiday calendars, and audit records." />
+      
+      {/* Policy */}
+      <Paper p="md" withBorder>
+        <Textarea value={policyJSON} onChange={(e) => setPolicyJSON(e.currentTarget.value)} rows={8} />
+        <Group justify="flex-end" mt="sm">
+          <Button onClick={() => saveConfigurationMutation.mutate({ policy: JSON.parse(policyJSON), run_rollover: false } as unknown as Configuration)}>Save Policy</Button>
+        </Group>
+      </Paper>
+
+      {/* Calendar */}
+      <Paper p="md" mt="md" withBorder>
+        <Textarea value={calendarJSON} onChange={(e) => setCalendarJSON(e.currentTarget.value)} rows={8} />
+        <Group justify="flex-end" mt="sm">
+          <Button onClick={() => saveConfigurationMutation.mutate({ calendar: JSON.parse(calendarJSON), run_rollover: false } as unknown as Configuration)}>Save Calendar</Button>
+          <Button onClick={() => saveConfigurationMutation.mutate({ run_rollover: true } as unknown as Configuration)}>Run Year-End Rollover</Button>
+        </Group>
+      </Paper>
+
+      {/* History Table */}
+      {isLoadingRecords ? (
+        <LoadingOverlay visible={isLoadingRecords} />
+      ) : isErrorRecords ? (
+        <Alert color="red">{errorMessage(error)}</Alert>
+      ) : (
+        <Table striped highlightOnHover>
+          <thead>
+            <tr>
+              <th>Created At</th>
+              <th>Leave Application</th>
+              <th>Action</th>
+              <th>Status</th>
+              <th>Decision</th>
+            </tr>
+          </thead>
+          <tbody>
+            {history.map((record, index) => (
+              <tr key={index}>
+                <td>{record.created_at ?? '-'}</td>
+                <td>{record.leave_application ?? '-'}</td>
+                <td>{record.action ?? '-'}</td>
+                <td>{record.status}</td>
+                <td>{record.decision}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      )}
+
+      {/* Notifications Table */}
+      {isLoadingRecords ? (
+        <LoadingOverlay visible={isLoadingRecords} />
+      ) : isErrorRecords ? (
+        <Alert color="red">{errorMessage(error)}</Alert>
+      ) : (
+        <Table striped highlightOnHover>
+          <thead>
+            <tr>
+              <th>Created At</th>
+              <th>Leave Application</th>
+              <th>Message</th>
+              <th>Channel</th>
+            </tr>
+          </thead>
+          <tbody>
+            {notifications.map((notification, index) => (
+              <tr key={index}>
+                <td>{notification.created_at ?? '-'}</td>
+                <td>{notification.leave_application ?? '-'}</td>
+                <td>{notification.message}</td>
+                <td>{notification.channel ?? 'in_app'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      )}
+    </Container>
+  );
+};
+
+export default LeaveAdminPage;
+
+```

@@ -1,0 +1,17 @@
+{
+  "label": "Phase 2 clean api/serializers.py with absolute imports and LeaveCalendar imported",
+  "instruction": "Write modules/leave_elm/api/serializers.py from scratch with these exact imports and serializer classes:\n1. Imports:\n`from rest_framework import serializers`\n`from modules.leave_elm.models import LeaveApplication, LeaveBalance, LeaveCalendar, LeaveCategory, LeavePolicy, LeaveTask, LeaveType`\n2. `LeaveApplicationSerializer(serializers.ModelSerializer)` with `leave_type_name = serializers.CharField(source='leave_type.name', read_only=True)`, `leave_category_name = serializers.CharField(source='leave_type.leave_category.name', read_only=True)`, `model = LeaveApplication`, `fields = '__all__'`, `read_only_fields = ['id', 'user_id', 'created_at', 'updated_at', 'approved_by_id', 'approved_at', 'cancelled_by_id', 'cancelled_at', 'extension_requested', 'extension_approved', 'extension_start_date', 'extension_end_date', 'extension_approved_by_id', 'extension_approved_at', 'reviewed_by_id', 'reviewed_at', 'balance_deducted', 'resumed_at']`.\n3. `LeaveBalanceSerializer(serializers.ModelSerializer)` with `leave_category_name = serializers.CharField(source='leave_category.name', read_only=True)`, `model = LeaveBalance`, `fields = ['id', 'user_id', 'leave_category', 'leave_category_name', 'balance', 'created_at', 'updated_at']`.\n4. `LeaveTaskSerializer(serializers.ModelSerializer)` with `title = serializers.SerializerMethodField()`, `description = serializers.SerializerMethodField()`, `application_status = serializers.CharField(source='leave_application.status', read_only=True)`, `applicant_user_id = serializers.IntegerField(source='leave_application.user_id', read_only=True)`, `start_date = serializers.DateField(source='leave_application.start_date', read_only=True)`, `end_date = serializers.DateField(source='leave_application.end_date', read_only=True)`, `purpose = serializers.CharField(source='leave_application.purpose', read_only=True)`, `def get_title(self, obj) -> str: return f'{obj.task_type} (App #{obj.leave_application_id})'`, `def get_description(self, obj) -> str: return obj.leave_application.purpose`, `model = LeaveTask`, `fields = ['id', 'user_id', 'leave_application', 'task_type', 'role', 'status', 'reminder_threshold', 'escalation_threshold', 'reminded_at', 'escalated_at', 'title', 'description', 'application_status', 'applicant_user_id', 'start_date', 'end_date', 'purpose', 'created_at', 'updated_at']`.\n5. `LeavePolicySerializer(serializers.ModelSerializer)` with `model = LeavePolicy`, `fields = '__all__'`.\n6. `LeaveCalendarSerializer(serializers.ModelSerializer)` with `model = LeaveCalendar`, `fields = '__all__'`, `read_only_fields = ['id', 'user_id', 'created_at', 'updated_at']`.\n7. `ActionRequestSerializer(serializers.Serializer)` with `action = serializers.CharField()`, `decision = serializers.CharField(required=False, allow_blank=True, default='')`, `remarks = serializers.CharField(required=False, allow_blank=True, default='')`.\nReturn only valid Python code.",
+  "allowed_paths": [
+    "modules/leave_elm/api/serializers.py"
+  ],
+  "context_files": [],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 1800,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

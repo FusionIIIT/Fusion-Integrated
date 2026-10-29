@@ -1,0 +1,16 @@
+{
+  "model": "qwen2.5-coder:3b",
+  "system": "You are a local coding assistant. Follow CURRENT TASK after references. Return complete raw source for the one requested file. Do not claim tests or add provenance labels.",
+  "prompt": "REFERENCE MATERIAL ONLY\n\n\n### Repository file modules/leave_elm/domain/policy.py\n```\nLEAVE_CATEGORY_NAMES = ['CL', 'RH', 'SCL', 'EL', 'COL', 'VL']\n\nLEAVE_POLICY_DEFAULTS = {\n    'CL': 8,\n    'RH': 2,\n    'SCL': 15,\n    'EL': 30,\n    'COL': 20,\n    'VL': 60\n}\n\n```\n\n\nEND OF REFERENCES\n\nCURRENT TASK\n\nReplace modules/leave_elm/domain/policy.py with pure Python domain constants and helper functions for Employee Leave Management (ELM). Do not import Django or ORM models. Include: (1) LEAVE_CATEGORY_NAMES = ['CL', 'RH', 'SCL', 'EL', 'COL', 'VL'] and LEAVE_POLICY_DEFAULTS = {'CL': 8, 'RH': 2, 'SCL': 15, 'EL': 30, 'COL': 20, 'VL': 60}. (2) Application status constants: STATUS_DRAFT='Draft', STATUS_PENDING='Pending', STATUS_SUBSTITUTE_PENDING='Substitute Pending', STATUS_UNDER_REVIEW='Under Review', STATUS_AWAITING_AUTHORITY='Awaiting Sanctioning Authority', STATUS_CLARIFICATION='Returned for Clarification', STATUS_APPROVED='Approved', STATUS_REJECTED='Rejected', STATUS_CANCELLED='Cancelled', STATUS_COMPLETED='Completed', and ACTIVE_OVERLAP_STATUSES={'Pending', 'Substitute Pending', 'Under Review', 'Awaiting Sanctioning Authority', 'Returned for Clarification', 'Approved'}. (3) Helper normalize_category_code(raw_code: str) -> str that maps 'VACATION'/'VL'->'VL', 'SICK_LEAVE'/'SCL'->'SCL', and uppercases valid codes in LEAVE_CATEGORY_NAMES (raising ValueError for unknown codes). (4) Helper calculate_requested_days(category_code: str, start_date, end_date, holidays=(),restricted_holidays=(), prefix_suffix_days: int = 0) -> Decimal that raises ValueError if end_date < start_date, raising ValueError for RH if start_date != end_date or (restricted_holidays and start_date.isoformat() not in set(restricted_holidays)), counting working days (excluding weekends and holidays) for CL/SCL and calendar days plus prefix_suffix_days for EL/COL/VL. (5) Helper validate_policy_rules(category_code: str, requested_days: Decimal, available_balance: Decimal, *, has_medical_certificate: bool=False, is_faculty_vacation_eligible: bool=True, station_leave_required: bool=False, address_during_leave: str='', max_cl_spell: int=5) -> None that raises ValueError if requested_days <= 0, requested_days > available_balance, CL > max_cl_spell, VL when not is_faculty_vacation_eligible, EL >= 10 without has_medical_certificate when medical note is required, or station_leave_required without address_during_leave. Keep the file concise (under 110 lines) and return only valid Python source code.\n\nOutput file: modules/leave_elm/domain/policy.py\nReturn only complete raw source code, without JSON, explanation or Markdown fences.\n",
+  "stream": true,
+  "keep_alive": "15m",
+  "options": {
+    "temperature": 0.1,
+    "seed": 42,
+    "num_ctx": 8192,
+    "num_batch": 128,
+    "num_predict": 2500,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256
+  }
+}
