@@ -34,6 +34,186 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "elm": {
+      "grants": {
+        "elm_admin": [
+          "elm.admin.manage_calendar",
+          "elm.admin.record_offline",
+          "elm.leave.apply",
+          "elm.leave.approve",
+          "elm.leave.cancel",
+          "elm.leave.modify",
+          "elm.leave.report",
+          "elm.leave.respond_substitute",
+          "elm.leave.view_all",
+          "elm.leave.view_self"
+        ],
+        "employee": [
+          "elm.leave.apply",
+          "elm.leave.cancel",
+          "elm.leave.modify",
+          "elm.leave.respond_substitute",
+          "elm.leave.view_self"
+        ],
+        "establishment": [
+          "elm.leave.approve",
+          "elm.leave.view_all"
+        ],
+        "sanction_authority": [
+          "elm.leave.apply",
+          "elm.leave.approve",
+          "elm.leave.cancel",
+          "elm.leave.modify",
+          "elm.leave.report",
+          "elm.leave.respond_substitute",
+          "elm.leave.view_all",
+          "elm.leave.view_self"
+        ],
+        "unit_head": [
+          "elm.leave.apply",
+          "elm.leave.approve",
+          "elm.leave.cancel",
+          "elm.leave.modify",
+          "elm.leave.report",
+          "elm.leave.respond_substitute",
+          "elm.leave.view_all",
+          "elm.leave.view_self"
+        ]
+      },
+      "module_grants": [
+        "elm_admin",
+        "employee",
+        "establishment",
+        "sanction_authority",
+        "unit_head"
+      ],
+      "nav": {
+        "base_path": "/elm",
+        "icon": "FaCalendarAlt",
+        "items": [
+          {
+            "code": "elm.apply",
+            "icon": "FaFileSignature",
+            "label": "Apply for Leave",
+            "required_permission": "elm.leave.apply",
+            "sort_order": 10,
+            "to": "/elm/apply"
+          },
+          {
+            "code": "elm.my_leaves",
+            "icon": "FaCalendarAlt",
+            "label": "My Leaves",
+            "required_permission": "elm.leave.view_self",
+            "sort_order": 20,
+            "to": "/elm/my-leaves"
+          },
+          {
+            "code": "elm.my_balance",
+            "icon": "FaChartBar",
+            "label": "Leave Balance",
+            "required_permission": "elm.leave.view_self",
+            "sort_order": 30,
+            "to": "/elm/balance"
+          },
+          {
+            "code": "elm.substitute",
+            "icon": "FaUserCheck",
+            "label": "Substitute Requests",
+            "required_permission": "elm.leave.respond_substitute",
+            "sort_order": 40,
+            "to": "/elm/substitute"
+          },
+          {
+            "code": "elm.pending",
+            "icon": "FaClipboardCheck",
+            "label": "Pending Approvals",
+            "required_permission": "elm.leave.approve",
+            "sort_order": 50,
+            "to": "/elm/pending"
+          },
+          {
+            "code": "elm.all_leaves",
+            "icon": "FaUsers",
+            "label": "All Leaves",
+            "required_permission": "elm.leave.view_all",
+            "sort_order": 60,
+            "to": "/elm/all-leaves"
+          },
+          {
+            "code": "elm.calendar",
+            "icon": "FaCalendarAlt",
+            "label": "Holiday Calendar",
+            "required_permission": "elm.admin.manage_calendar",
+            "sort_order": 80,
+            "to": "/elm/calendar"
+          },
+          {
+            "code": "elm.offline",
+            "icon": "FaClipboardList",
+            "label": "Record Offline Leave",
+            "required_permission": "elm.admin.record_offline",
+            "sort_order": 90,
+            "to": "/elm/offline"
+          }
+        ],
+        "label": "Employee Leave Management",
+        "nav_section": "Leave Management",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "elm.leave.apply",
+          "label": "Submit a leave request"
+        },
+        {
+          "code": "elm.leave.view_self",
+          "label": "View own leave history and balance"
+        },
+        {
+          "code": "elm.leave.cancel",
+          "label": "Withdraw pending or cancel approved leave"
+        },
+        {
+          "code": "elm.leave.modify",
+          "label": "Request extension or submit resumption"
+        },
+        {
+          "code": "elm.leave.respond_substitute",
+          "label": "Accept or decline substitute nomination"
+        },
+        {
+          "code": "elm.leave.approve",
+          "label": "Approve, reject, or recommend a leave request"
+        },
+        {
+          "code": "elm.leave.view_all",
+          "label": "View all employees' leave data"
+        },
+        {
+          "code": "elm.leave.report",
+          "label": "Generate leave balance and year-end reports"
+        },
+        {
+          "code": "elm.admin.manage_calendar",
+          "label": "Publish and edit holiday/RH calendar"
+        },
+        {
+          "code": "elm.admin.record_offline",
+          "label": "Record offline-sanctioned leave"
+        },
+        {
+          "code": "elm.admin.year_end",
+          "label": "Run year-end balance processing"
+        }
+      ],
+      "scope_permissions": [
+        "elm.leave.view_all"
+      ],
+      "system_permissions": [
+        "elm.admin.year_end"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

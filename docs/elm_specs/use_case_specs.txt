@@ -1,0 +1,750 @@
+Employee Leave Management (ELM)
+Use Case Specifications — Final Synchronized v1.4
+Fusion ERP • Employee Leave Management • Synchronized baseline v1.4
+Use-case conventionELM uses one use-case formalism with two types: Actor-triggered and Event-triggered. For an event-triggered UC, Primary Actor is “N.A. — Event-triggered”; the initiating time/external event is stated in Trigger. ELM itself is not its own UC actor. Supporting Actors/Systems list only genuine external participants or recipients.
+1. Use Case Registry
+UC ID
+Use Case Name
+Primary Actor
+Status
+Primary CFRs
+UC Type
+EL-UC-001
+Apply for Leave
+Employee
+Active
+CFR-EL-002–003, CFR-EL-011, CFR-EL-015
+Actor-triggered
+EL-UC-002
+Respond to Substitute Request
+Substitute / Responsibility Holder
+Active
+CFR-EL-012, CFR-EL-030
+Actor-triggered
+EL-UC-003
+Review Leave-Related Request at Unit Head
+Unit Head
+Active
+CFR-EL-013–016, CFR-EL-019–020
+Actor-triggered
+EL-UC-004
+Verify and Route Higher-Sanction Request
+Deputy Registrar (Estt.) / Establishment Processing Role
+Active
+CFR-EL-014, CFR-EL-019–020
+Actor-triggered
+EL-UC-005
+Make Final Sanctioning Decision
+Sanctioning Authority (Deputy Registrar (Estt.), Dean, Registrar, Director, or other configured competent authority)
+Active
+CFR-EL-006, CFR-EL-014–016, CFR-EL-019–020
+Actor-triggered
+EL-UC-007
+Withdraw Pending Request
+Employee
+Active
+CFR-EL-017–018
+Actor-triggered
+EL-UC-008
+Request Cancellation of Approved Leave
+Employee
+Active
+CFR-EL-019
+Actor-triggered
+EL-UC-009
+Request Extension of Ongoing Leave
+Employee
+Active
+CFR-EL-020
+Actor-triggered
+EL-UC-010
+Submit Resumption of Duty
+Employee
+Active
+CFR-EL-021
+Actor-triggered
+EL-UC-011
+Review Resumption
+Applicable Sanctioning Authority
+Active
+CFR-EL-021
+Actor-triggered
+EL-UC-012
+View Leave Balances and History
+Employee
+Active
+CFR-EL-016, CFR-EL-022
+Actor-triggered
+EL-UC-013
+Obtain Printable/Exportable Leave Application
+Employee
+Active
+CFR-EL-023
+Actor-triggered
+EL-UC-014
+Maintain Policy and Hierarchy Configuration
+Authorized administrative role
+Active
+CFR-EL-024
+Actor-triggered
+EL-UC-015
+Maintain and Publish Holiday/RH Calendar
+Authorized administrative role
+Active
+CFR-EL-005, CFR-EL-025
+Actor-triggered
+EL-UC-016
+Record Already-Sanctioned Offline Leave
+Leave Administrator
+Active
+CFR-EL-027
+Actor-triggered
+EL-UC-017
+Maintain Authorized Leave Records
+Authorized administrative role
+Active
+CFR-EL-026
+Actor-triggered
+EL-UC-018
+Configure Workflow SLA Thresholds
+Authorized administrative role
+Active
+CFR-EL-029
+Actor-triggered
+EL-UC-019
+Nominate Replacement Substitute After Decline
+Employee
+Active
+CFR-EL-011–012, CFR-EL-018
+Actor-triggered
+EL-UC-020
+Execute Year-End Leave Processing
+N.A. — Event-triggered
+Active
+CFR-EL-004–009, CFR-EL-028
+Event-triggered
+EL-UC-021
+Process SLA Threshold Event
+N.A. — Event-triggered
+Active
+CFR-EL-031–032
+Event-triggered
+EL-UC-006
+Modify Pending Request
+Employee
+RETIRED
+Superseded by CFR-EL-017 / BR-EL-034
+Retired
+2. Use Case Specifications
+EL-UC-001 — Apply for Leave
+Primary Actor
+Employee
+Supporting Actors / Systems
+Academic Calendar service (for VL vacation-period data); Substitute interaction is handled by EL-UC-002 when required.
+Goal / Description
+Create and submit a valid new leave application and place it into the applicable processing path.
+Trigger
+Employee needs to request CL, RH, SCL, EL, COL, or VL.
+Preconditions
+• Employee is authenticated and authorized for own leave activity.• Current configured leave policy/hierarchy is available; effective published holiday/RH calendar is available; Academic Calendar vacation-period data is available where VL is requested.
+UC Type
+Actor-triggered
+Main Success Scenario
+M1. Employee starts a new leave application.
+M2. Employee selects the leave category and requested period and enters purpose/reason and other required information.
+M3. System captures Station Leave details in the same application when applicable.
+M4. System validates category eligibility, entitlement/balance, counting/calendar conditions, and impermissible overlap.
+M5. When responsibility coverage is required, Employee nominates one eligible substitute.
+M6. Employee submits the application.
+M7. If substitute consent is required, System places the request in Awaiting Substitute Response; otherwise it routes the request to Unit Head review. A Director-applicant follows the self-sanction path.
+Alternative / Exception Flows
+A1 Validation fails: identify the failed condition and do not allow progression.
+A2 Substitute nomination invalid: reject the nominee and allow another eligible nominee.
+A3 After a substitute decline, the Employee may invoke EL-UC-019 to nominate a replacement or EL-UC-007 to withdraw.
+Success Postcondition
+A valid submitted request exists in the correct next processing state.
+Failure / Minimal Guarantee
+No invalid request is allowed to progress; previously entered data may remain available as implementation permits.
+Related Business Rules
+BR-EL-001–015, BR-EL-020, BR-EL-030–031, BR-EL-036
+Related Functional Requirements
+CFR-EL-002–003, CFR-EL-011, CFR-EL-015
+Related Workflow(s)
+CW-EL-01
+EL-UC-002 — Respond to Substitute Request
+Primary Actor
+Substitute / Responsibility Holder
+Supporting Actors / Systems
+Employee
+Goal / Description
+Accept or decline a nominated responsibility assignment.
+Trigger
+A substitute responsibility request is assigned to the nominated employee.
+Preconditions
+• The nominee is an eligible substitute for the responsibility period.• The associated leave/extension request is awaiting substitute response.
+UC Type
+Actor-triggered
+Main Success Scenario
+M1. Substitute opens the assigned responsibility request.
+M2. System presents the applicant, responsibility period, and relevant request context.
+M3. Substitute selects Accept or Decline.
+M4. System records the response.
+M5. If Accept, the consent gate is released and the request proceeds to Unit Head review; if Decline, the request becomes Applicant Action Required.
+Alternative / Exception Flows
+A1 If the request is no longer pending, System prevents a stale response.
+Success Postcondition
+The substitute response is recorded and the request enters the outcome-appropriate state.
+Failure / Minimal Guarantee
+No routing occurs without a valid recorded response.
+Related Business Rules
+BR-EL-014–015, BR-EL-035–036
+Related Functional Requirements
+CFR-EL-012, CFR-EL-030
+Related Workflow(s)
+CW-EL-01; CW-EL-03
+EL-UC-003 — Review Leave-Related Request at Unit Head
+Primary Actor
+Unit Head
+Supporting Actors / Systems
+Employee; Establishment / final Sanctioning Authority as downstream roles
+Goal / Description
+Review a routed new-leave, cancellation, or extension request and record the decision/recommendation permitted by the applicable policy.
+Trigger
+A request enters the Unit Head work queue.
+Preconditions
+• The request has passed applicable submission/consent gates.• The Unit Head is the resolved Unit Head for the applicant.
+UC Type
+Actor-triggered
+Main Success Scenario
+M1. Unit Head opens the assigned request and reviews the request context and available supporting information.
+M2. For a new CL/RH request, Unit Head records final Approve or Reject.
+M3. For higher-sanction new leave, cancellation of higher-sanction leave, or EL/COL/VL extension, Unit Head records Recommended or Not Recommended.
+M4. System records the outcome.
+M5. A Unit-Head-final outcome completes the decision; a recommendation outcome continues through the configured higher-sanction path.
+Alternative / Exception Flows
+A1 Director-applicant cases do not use the normal Unit Head path.
+A2 Not Recommended for higher-sanction contexts is not a final rejection.
+Success Postcondition
+The Unit Head outcome is recorded and the request is either finally decided or advanced to the configured next stage.
+Failure / Minimal Guarantee
+No unauthorized or out-of-scope decision is recorded.
+Related Business Rules
+BR-EL-016–020, BR-EL-023, BR-EL-025, BR-EL-030, BR-EL-036
+Related Functional Requirements
+CFR-EL-013–016, CFR-EL-019–020
+Related Workflow(s)
+CW-EL-01; CW-EL-02; CW-EL-03
+EL-UC-004 — Verify and Route Higher-Sanction Request
+Primary Actor
+Deputy Registrar (Estt.) / Establishment Processing Role
+Supporting Actors / Systems
+Unit Head; final Sanctioning Authority
+Goal / Description
+Perform the configured Establishment-level verification/routing step and forward the request to the resolved competent authority.
+Trigger
+A higher-sanction request reaches an Establishment step that is configured for its path.
+Preconditions
+• An Establishment step is configured for this request context.• The required upstream review/consent outcome has been recorded.
+UC Type
+Actor-triggered
+Main Success Scenario
+M1. Establishment opens the routed work item.
+M2. System presents the request and resolved routing context.
+M3. Establishment performs the configured verification/routing checks.
+M4. System resolves/validates the next competent authority using current hierarchy configuration.
+M5. Establishment forwards the request to the resolved final Sanctioning Authority.
+Alternative / Exception Flows
+A1 If no Establishment step is configured, this use case is bypassed.
+A2 If routing context is inconsistent or incomplete, do not forward until the inconsistency is resolved through authorized configuration/record handling.
+Success Postcondition
+The request is assigned to the resolved final Sanctioning Authority.
+Failure / Minimal Guarantee
+The request is not forwarded to an unauthorized/unresolved authority.
+Related Business Rules
+BR-EL-018–019, BR-EL-023, BR-EL-025, BR-EL-030, BR-EL-036
+Related Functional Requirements
+CFR-EL-014, CFR-EL-019–020
+Related Workflow(s)
+CW-EL-01; CW-EL-02; CW-EL-03
+EL-UC-005 — Make Final Sanctioning Decision
+Primary Actor
+Sanctioning Authority (Deputy Registrar (Estt.), Dean, Registrar, Director, or other configured competent authority)
+Supporting Actors / Systems
+Employee; Unit Head; Establishment where configured
+Goal / Description
+Record the final approve/reject decision for a routed higher-sanction new-leave, cancellation, or extension request.
+Trigger
+A request is assigned to the resolved final Sanctioning Authority.
+Preconditions
+• The actor is the resolved competent final authority for the request.• Required upstream routing and consent gates have been completed.
+UC Type
+Actor-triggered
+Main Success Scenario
+M1. Authority opens the assigned request and reviews the request, recommendation, and available evidence.
+M2. Authority records Approve or Reject.
+M3. System records the final decision and notifies the employee.
+M4. For new-leave approval, System updates the leave record/account.
+M5. For cancellation approval, System marks the leave Cancelled and restores/adjusts deducted balance; cancellation rejection preserves the original approval.
+M6. For extension approval, System posts only the incremental additional period; extension rejection preserves the original approved leave.
+Alternative / Exception Flows
+A1 SCL purpose admissibility is decided by the applicable Sanctioning Authority; no separate encoded admissibility criterion is required.
+A2 Director-as-applicant uses the Director-specific self-sanction path.
+Success Postcondition
+A final decision and the context-appropriate completion effects are recorded.
+Failure / Minimal Guarantee
+No final decision is recorded by an unauthorized authority.
+Related Business Rules
+BR-EL-004, BR-EL-017–020, BR-EL-023–025, BR-EL-030, BR-EL-036
+Related Functional Requirements
+CFR-EL-006, CFR-EL-014–016, CFR-EL-019–020
+Related Workflow(s)
+CW-EL-01; CW-EL-02; CW-EL-03
+EL-UC-007 — Withdraw Pending Request
+Primary Actor
+Employee
+Supporting Actors / Systems
+Concerned processing/sanctioning roles
+Goal / Description
+Immediately terminate a pending request before final approval.
+Trigger
+Employee chooses to withdraw a request that is still pending before final approval.
+Preconditions
+• The request is pending and has not received final approval.
+UC Type
+Actor-triggered
+Main Success Scenario
+M1. Employee selects the pending request and confirms withdrawal.
+M2. System validates that final approval has not occurred.
+M3. System makes the withdrawal effective immediately.
+M4. System terminates all remaining approval processing, prevents later approve/reject actions, and notifies concerned roles.
+Alternative / Exception Flows
+A1 If final approval already exists, withdrawal is unavailable; approved-leave cancellation applies where its preconditions hold.
+Success Postcondition
+Request is Withdrawn and no remaining approval action can be taken.
+Failure / Minimal Guarantee
+No withdrawal is applied to an already finally approved request.
+Related Business Rules
+BR-EL-022, BR-EL-034, BR-EL-036
+Related Functional Requirements
+CFR-EL-017–018
+Related Workflow(s)
+CW-EL-01; CW-EL-03 (only when the extension request itself is pending and withdrawal is applicable)
+EL-UC-008 — Request Cancellation of Approved Leave
+Primary Actor
+Employee
+Supporting Actors / Systems
+Unit Head; Establishment where configured; final Sanctioning Authority
+Goal / Description
+Request pre-start cancellation of an approved leave without editing the approved leave in place.
+Trigger
+Employee needs to reverse an approved leave before its approved start date.
+Preconditions
+• Leave is finally Approved.• Approved start date has not yet occurred.
+UC Type
+Actor-triggered
+Main Success Scenario
+M1. Employee selects the approved leave and requests cancellation.
+M2. System validates that the leave has not started and that withdrawal is no longer the applicable mechanism.
+M3. System creates the cancellation request without editing the approved leave.
+M4. System routes the cancellation to the Unit Head and then through the same applicable hierarchy as the original leave.
+Alternative / Exception Flows
+A1 If leave has started, cancellation is unavailable; extension/resumption applies as relevant.
+A2 If cancellation is finally rejected, original approved leave remains unchanged.
+A3 If cancellation is approved and revised leave is still needed, Employee submits a fresh leave application.
+Success Postcondition
+A valid cancellation request enters the applicable decision path.
+Failure / Minimal Guarantee
+No pre-start cancellation request is created outside its eligibility boundary.
+Related Business Rules
+BR-EL-023–024, BR-EL-030, BR-EL-036
+Related Functional Requirements
+CFR-EL-019
+Related Workflow(s)
+CW-EL-02
+EL-UC-009 — Request Extension of Ongoing Leave
+Primary Actor
+Employee
+Supporting Actors / Systems
+Substitute; Unit Head; Establishment where configured; final Sanctioning Authority
+Goal / Description
+Request additional leave time while ongoing EL, COL, or VL is being availed.
+Trigger
+Employee on ongoing EL/COL/VL needs additional leave time.
+Preconditions
+• Original leave is ongoing and is EL, COL, or VL.
+UC Type
+Actor-triggered
+Main Success Scenario
+M1. Employee enters the requested additional period and required information.
+M2. System validates eligibility, balance, calendar/counting conditions and other applicable rules.
+M3. When responsibility coverage is required, Employee nominates an eligible substitute and obtains consent through EL-UC-002.
+M4. System creates the extension request and routes it to Unit Head review and the configured higher-sanction path.
+Alternative / Exception Flows
+A1 Validation failure prevents the extension request from progressing.
+A2 Substitute decline invokes replacement handling through EL-UC-019; no approval routing occurs before required acceptance.
+Success Postcondition
+A valid extension request enters the applicable higher-sanction path.
+Failure / Minimal Guarantee
+Original approved leave remains unaffected by an invalid/unsubmitted extension request.
+Related Business Rules
+BR-EL-001, BR-EL-005–015, BR-EL-017–019, BR-EL-025, BR-EL-030–031, BR-EL-036
+Related Functional Requirements
+CFR-EL-020
+Related Workflow(s)
+CW-EL-03
+EL-UC-010 — Submit Resumption of Duty
+Primary Actor
+Employee
+Supporting Actors / Systems
+Applicable Sanctioning Authority
+Goal / Description
+Submit actual return-to-duty information after EL, COL, or VL for review.
+Trigger
+Employee returns to duty after EL/COL/VL.
+Preconditions
+• An EL/COL/VL leave record exists for the employee.• Employee has returned and can state the actual resumption date.
+UC Type
+Actor-triggered
+Main Success Scenario
+M1. Employee opens the relevant leave record.
+M2. Employee enters actual resumption date and required resumption details.
+M3. System records the resumption submission and routes it to the applicable Sanctioning Authority for review.
+Alternative / Exception Flows
+A1 Resumption is outside this baseline for CL/RH/SCL as a formal reviewed process.
+Success Postcondition
+A resumption submission exists in Resumption Review Pending.
+Failure / Minimal Guarantee
+No review submission is created if required information is missing/invalid.
+Related Business Rules
+BR-EL-027, BR-EL-036
+Related Functional Requirements
+CFR-EL-021
+Related Workflow(s)
+CW-EL-04
+EL-UC-011 — Review Resumption
+Primary Actor
+Applicable Sanctioning Authority
+Supporting Actors / Systems
+Employee; leave/attendance records
+Goal / Description
+Review the submitted resumption and apply only the adjustments required by the actual return date.
+Trigger
+A resumption submission is assigned for review.
+Preconditions
+• A valid resumption submission exists for EL/COL/VL.• Actor is the applicable Sanctioning Authority.
+UC Type
+Actor-triggered
+Main Success Scenario
+M1. Authority reviews the submitted actual resumption date/details.
+M2. System compares actual resumption date with approved end date.
+M3. If dates match, Authority records review completion; no approved leave-period or balance adjustment is made.
+M4. If actual date is earlier or later, Authority confirms the review outcome and System records actual leave period, adjusts balance accordingly, and synchronizes relevant leave/attendance records.
+Alternative / Exception Flows
+A1 No generic 'close leave' state transition is asserted for normal resumption in this baseline.
+Success Postcondition
+Resumption review is recorded; early/late return produces the required data/balance synchronization.
+Failure / Minimal Guarantee
+No balance/period adjustment is applied before required review.
+Related Business Rules
+BR-EL-027–028, BR-EL-036
+Related Functional Requirements
+CFR-EL-021
+Related Workflow(s)
+CW-EL-04
+EL-UC-012 — View Leave Balances and History
+Primary Actor
+Employee
+Supporting Actors / Systems
+None
+Goal / Description
+Inspect own current leave balances and leave-account/request history, including request status and final decisions.
+Trigger
+Employee wants to inspect current balances or historical/request status information.
+Preconditions
+• Employee is authenticated and authorized to access own leave information.
+UC Type
+Actor-triggered
+Main Success Scenario
+M1. Employee opens leave balance/history inquiry.
+M2. System displays current leave balances.
+M3. System displays accessible leave-account/request history including current request status and recorded final decisions.
+Success Postcondition
+Requested balance/history information is displayed.
+Failure / Minimal Guarantee
+No other employee's protected leave information is exposed.
+Related Business Rules
+BR-EL-036
+Related Functional Requirements
+CFR-EL-016, CFR-EL-022
+Related Workflow(s)
+N/A
+EL-UC-013 — Obtain Printable/Exportable Leave Application
+Primary Actor
+Employee
+Supporting Actors / Systems
+None
+Goal / Description
+Obtain a printable or exportable representation of an accessible leave application.
+Trigger
+Employee needs a printable/exportable copy of an accessible leave application.
+Preconditions
+• Employee is authorized to access the application.
+UC Type
+Actor-triggered
+Main Success Scenario
+M1. Employee selects an accessible leave application.
+M2. Employee requests print/export representation.
+M3. System produces the representation for the selected application.
+Success Postcondition
+Printable/exportable representation is available.
+Failure / Minimal Guarantee
+No representation is produced for an application the employee is not authorized to access.
+Related Business Rules
+BR-EL-036
+Related Functional Requirements
+CFR-EL-023
+Related Workflow(s)
+N/A
+EL-UC-014 — Maintain Policy and Hierarchy Configuration
+Primary Actor
+Authorized administrative role
+Supporting Actors / Systems
+None
+Goal / Description
+Create/revise current ELM leave-policy parameters and maintain hierarchy configuration used for validation and routing.
+Trigger
+Authorized administrator needs to change current ELM policy or hierarchy configuration.
+Preconditions
+• Actor is authorized for the relevant configuration capability.
+UC Type
+Actor-triggered
+Main Success Scenario
+M1. Administrator opens the relevant configuration.
+M2. Administrator creates/revises policy parameters and/or hierarchy configuration.
+M3. System validates the configuration input and saves it as the current configured value.
+M4. Subsequent validation/routing uses the current configured values.
+Alternative / Exception Flows
+A1 This baseline has no policy draft/publish/effective-version lifecycle; do not create unpublished policy versions.
+Success Postcondition
+Current ELM policy/hierarchy configuration is updated.
+Failure / Minimal Guarantee
+Unauthorized or invalid configuration changes are not applied.
+Related Business Rules
+BR-EL-030, BR-EL-036
+Related Functional Requirements
+CFR-EL-024
+Related Workflow(s)
+N/A
+EL-UC-015 — Maintain and Publish Holiday/RH Calendar
+Primary Actor
+Authorized administrative role
+Supporting Actors / Systems
+None
+Goal / Description
+Create, revise, and publish the holiday/RH calendar used by date and RH validation.
+Trigger
+Authorized administrator needs to create or replace the ELM holiday/RH calendar.
+Preconditions
+• Actor is authorized to maintain the holiday/RH calendar.
+UC Type
+Actor-triggered
+Main Success Scenario
+M1. Administrator creates or revises the calendar.
+M2. System validates calendar data.
+M3. Administrator publishes the replacement calendar.
+M4. System makes the published calendar effective for subsequent date/RH validation.
+Alternative / Exception Flows
+A1 Until a replacement is published, the currently effective published calendar remains governing.
+Success Postcondition
+A valid published holiday/RH calendar is effective.
+Failure / Minimal Guarantee
+Unpublished/invalid replacement data does not displace the current effective published calendar.
+Related Business Rules
+BR-EL-003, BR-EL-031, BR-EL-036
+Related Functional Requirements
+CFR-EL-005, CFR-EL-025
+Related Workflow(s)
+N/A
+EL-UC-016 — Record Already-Sanctioned Offline Leave
+Primary Actor
+Leave Administrator
+Supporting Actors / Systems
+None
+Goal / Description
+Synchronize ELM with leave already sanctioned through an authorized offline/paper process when ELM could not originally be used.
+Trigger
+Authorized administrator needs to record already-sanctioned leave that was handled offline for an acceptable reason.
+Preconditions
+• Leave was already validly sanctioned through an authorized offline/paper process.• Actor is authorized to perform retrospective synchronization.
+UC Type
+Actor-triggered
+Main Success Scenario
+M1. Administrator identifies the employee and sanctioned leave.
+M2. Administrator enters the sanctioned leave details and sanction/reference evidence.
+M3. System validates the entry for record consistency.
+M4. System records the leave and updates relevant leave balance/history.
+M5. System does not create a second approval workflow.
+Alternative / Exception Flows
+A1 If sanction/reference evidence or record-consistency validation is insufficient, do not complete synchronization.
+Success Postcondition
+ELM records reflect the already-sanctioned leave without a new sanction decision.
+Failure / Minimal Guarantee
+No unsanctioned retrospective leave is turned into an approval through this capability.
+Related Business Rules
+BR-EL-029, BR-EL-036–037
+Related Functional Requirements
+CFR-EL-027
+Related Workflow(s)
+N/A
+EL-UC-017 — Maintain Authorized Leave Records
+Primary Actor
+Authorized administrative role
+Supporting Actors / Systems
+None
+Goal / Description
+Maintain or correct leave records within the actor's authorized record-maintenance scope without creating a sanctioning decision.
+Trigger
+Authorized administrator needs to perform permitted leave-record maintenance/correction.
+Preconditions
+• Actor has the relevant record-maintenance authorization.
+UC Type
+Actor-triggered
+Main Success Scenario
+M1. Administrator selects the relevant leave record.
+M2. Administrator performs an authorized maintenance/correction action.
+M3. System validates authorization and record consistency.
+M4. System saves the permitted record change and preserves audit/history as implemented.
+Alternative / Exception Flows
+A1 If the attempted change would constitute a new sanctioning decision, this maintenance use case must not be used.
+Success Postcondition
+Authorized record maintenance is applied without creating a new leave approval/rejection.
+Failure / Minimal Guarantee
+Unauthorized or sanction-equivalent changes are blocked.
+Related Business Rules
+BR-EL-036–037
+Related Functional Requirements
+CFR-EL-026
+Related Workflow(s)
+N/A
+EL-UC-018 — Configure Workflow SLA Thresholds
+Primary Actor
+Authorized administrative role
+Supporting Actors / Systems
+None
+Goal / Description
+Configure reminder and escalation thresholds for SLA-controlled actionable workflow tasks.
+Trigger
+Authorized administrator needs to establish or change SLA thresholds.
+Preconditions
+• Actor is authorized to configure SLA thresholds.
+UC Type
+Actor-triggered
+Main Success Scenario
+M1. Administrator opens SLA configuration.
+M2. Administrator specifies reminder and escalation thresholds for applicable actionable task classes.
+M3. System validates and saves the configuration.
+M4. Subsequent event-triggered SLA processing uses the configured thresholds.
+Success Postcondition
+Valid reminder/escalation thresholds are available to event-triggered SLA processing.
+Failure / Minimal Guarantee
+Invalid or unauthorized threshold changes are not applied.
+Related Business Rules
+BR-EL-038, BR-EL-036
+Related Functional Requirements
+CFR-EL-029
+Related Workflow(s)
+N/A
+EL-UC-019 — Nominate Replacement Substitute After Decline
+Primary Actor
+Employee
+Supporting Actors / Systems
+Substitute / Responsibility Holder
+Goal / Description
+Recover from a substitute decline by nominating one replacement eligible substitute.
+Trigger
+A nominated substitute declines and the request enters Applicant Action Required.
+Preconditions
+• The associated request remains pending.• Responsibility coverage is still required.
+UC Type
+Actor-triggered
+Main Success Scenario
+M1. Employee chooses to replace the declined substitute.
+M2. Employee nominates one replacement.
+M3. System validates replacement eligibility.
+M4. System assigns a fresh substitute request and places the leave/extension request in Awaiting Substitute Response.
+Alternative / Exception Flows
+A1 Employee may instead withdraw the pending request where withdrawal is applicable.
+Success Postcondition
+A fresh substitute response is awaited for an eligible replacement.
+Failure / Minimal Guarantee
+An ineligible replacement is not assigned.
+Related Business Rules
+BR-EL-014–015, BR-EL-022, BR-EL-036
+Related Functional Requirements
+CFR-EL-011–012, CFR-EL-018
+Related Workflow(s)
+CW-EL-01; CW-EL-03
+3. Retired Use Case
+Use Case
+EL-UC-006 — Modify Pending Request
+Disposition
+RETIRED
+Reason
+The adjudicated baseline prohibits in-place post-submission modification. Change before final approval is handled by immediate withdrawal followed, if needed, by a fresh application.
+Replacement semantics
+CFR-EL-017, CFR-EL-018; BR-EL-034, BR-EL-022; EL-UC-007 and EL-UC-001.
+4. Event-Triggered Use Cases
+EL-UC-020 — Execute Year-End Leave Processing
+UC Type
+Event-triggered
+Primary Actor
+N.A. — Event-triggered
+Supporting Actors / Systems
+None
+Goal / Description
+Apply the defined year-end leave-account outcomes and record the resulting processing evidence.
+Trigger
+Configured year-end boundary reached.
+Preconditions
+Current leave accounts and the applicable leave-category rules are available.
+Main Success Scenario
+1. System identifies leave accounts/categories requiring year-end processing.2. System lapses unused CL/RH/SCL, converts unused faculty VL to EL including fractional conversion and no VL carry-forward, and carries forward EL/COL according to policy.3. System records the resulting leave-account transactions.4. System reports processing exceptions.
+Alternative / Exception Flows
+If an account cannot be processed consistently, the system reports the exception rather than silently applying an uncertain result.
+Success Postcondition
+Year-end balances reflect the applicable category rules; transactions are recorded and exceptions are reported.
+Failure / Minimal Guarantee
+No unvalidated/ambiguous year-end adjustment is silently committed.
+Related Business Rules
+BR-EL-002–009
+Related Functional Requirements
+CFR-EL-004–009, CFR-EL-028
+Related Workflow(s)
+N/A — this event-triggered UC is an isolated year-end system operation, not by itself a connected multi-step business progression.
+EL-UC-021 — Process SLA Threshold Event
+UC Type
+Event-triggered
+Primary Actor
+N.A. — Event-triggered
+Supporting Actors / Systems
+Responsible user; configured higher/responsible authority as notification/escalation recipient where applicable
+Goal / Description
+Process a configured SLA reminder or escalation threshold for an actionable workflow task.
+Trigger
+Configured reminder or escalation threshold reached for an actionable workflow task.
+Preconditions
+The task is SLA-controlled and the applicable reminder/escalation thresholds are configured.
+Main Success Scenario
+1. System identifies the task and threshold event.2. System checks whether the task is still pending.3. At a reminder threshold, if still pending, System reminds the responsible user and logs the reminder.4. At an escalation threshold, if still pending, System performs the configured escalation action (notification and, where configured, routing/responsibility change) and logs the escalation.5. If the task is no longer pending, System issues no corresponding reminder/escalation.
+Alternative / Exception Flows
+Notification-only escalation does not create a workflow transition. Where configured escalation changes routing/responsibility, that automatic System transition is represented cross-cuttingly in the applicable workflow.
+Success Postcondition
+The pending-only reminder/escalation rule is applied and any issued action is logged.
+Failure / Minimal Guarantee
+A completed/non-pending task is not reminded or escalated by the threshold event.
+Related Business Rules
+BR-EL-032–033, BR-EL-038
+Related Functional Requirements
+CFR-EL-031–032
+Related Workflow(s)
+Conditional cross-cutting trace to CW-EL-01–04 only when configured escalation changes task routing/responsibility; otherwise N/A.

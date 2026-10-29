@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Fusion ERP Lab Assignment 6B - Phase 2 Final Report</title>
+<style>
+  @page {
+    size: A4;
+    margin: 20mm 15mm 20mm 15mm;
+    @bottom-right {
+      content: counter(page);
+    }
+  }
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    line-height: 1.5;
+    font-size: 10pt;
+    margin: 0;
+    padding: 0;
+  }
+  h1, h2, h3, h4 {
+    color: #0f172a;
+    font-weight: 700;
+  }
+  h1 {
+    font-size: 18pt;
+    border-bottom: 2px solid #2563eb;
+    padding-bottom: 6px;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    font-size: 11pt;
+    color: #475569;
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 18px;
+  }
+  .meta-item {
+    font-size: 9.5pt;
+  }
+  .meta-label {
+    font-weight: 600;
+    color: #334155;
+  }
+  .badge {
+    display: inline-block;
+    background: #dbeafe;
+    color: #1e40af;
+    font-weight: 600;
+    font-size: 8pt;
+    padding: 2px 8px;
+    border-radius: 9999px;
+  }
+  .badge-success {
+    background: #dcfce7;
+    color: #166534;
+  }
+  h2 {
+    font-size: 13pt;
+    color: #1e3a8a;
+    border-bottom: 1px solid #cbd5e1;
+    padding-bottom: 4px;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 11pt;
+    color: #1e293b;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    page-break-after: avoid;
+  }
+  p {
+    margin-top: 0;
+    margin-bottom: 8px;
+    text-align: justify;
+  }
+  ul, ol {
+    margin-top: 0;
+    margin-bottom: 8px;
+    padding-left: 20px;
+  }
+  li {
+    margin-bottom: 3px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+    margin-bottom: 12px;
+    font-size: 8.5pt;
+    page-break-inside: auto;
+  }
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 5px 8px;
+    text-align: left;
+  }
+  th {
+    background: #f1f5f9;
+    color: #0f172a;
+    font-weight: 600;
+  }
+  tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+  code {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 8.5pt;
+    background: #f1f5f9;
+    padding: 1px 4px;
+    border-radius: 3px;
+    color: #0369a1;
+  }
+  .page-break {
+    page-break-before: always;
+  }
+  .callout {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    border-radius: 0 4px 4px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Fusion ERP Lab Assignment 6B: Phase 2 Final Report</h1>
+<div class="subtitle">Review, Test, and Improve the AI-Generated Employee Leave Management (ELM) Module</div>
+
+<div class="meta-grid">
+  <div class="meta-item"><span class="meta-label">Student Name:</span> Sumit Kumar</div>
+  <div class="meta-item"><span class="meta-label">Roll Number:</span> 24BCS245 (Batch B)</div>
+  <div class="meta-item"><span class="meta-label">Target Module:</span> Employee Leave Management (<code>modules/elm</code>)</div>
+  <div class="meta-item"><span class="meta-label">Assigned Questionnaire:</span> Section S3 (30 Questions)</div>
+  <div class="meta-item"><span class="meta-label">Git Branch:</span> <code>assignment-6-elm</code></div>
+  <div class="meta-item"><span class="meta-label">PR URL:</span> <a href="https://github.com/FusionIIIT/Fusion-Integrated/pull/388">https://github.com/FusionIIIT/Fusion-Integrated/pull/388</a></div>
+  <div class="meta-item"><span class="meta-label">Repository Fork:</span> <a href="https://github.com/Sumit-0011/Fusion-Integrated">Sumit-0011/Fusion-Integrated</a></div>
+  <div class="meta-item"><span class="meta-label">Final Status:</span> <span class="badge badge-success">452/452 Tests Passed & Deployment Ready</span></div>
+</div>
+
+<h2>1. Executive Summary</h2>
+<p>
+This report documents the completion of Phase 2 for Fusion ERP Lab Assignment 6B. Taking the preserved Phase-1 implementation (commit <code>30c7079</code>, tagged <code>phase-1-elm-original</code>), we conducted an exhaustive review, test, problem identification, repair, and verification process. The module was transformed from an isolated, in-memory skeleton into a fully persistent, secure, and deployment-ready ELM module integrated with the Fusion Base.
+</p>
+<div class="callout">
+<strong>Key Verification Metrics:</strong>
+<ul>
+  <li><strong>Full Platform Backend:</strong> 452 / 452 pytest tests passing (0 failures, 0 errors).</li>
+  <li><strong>ELM Backend Suite:</strong> 72 / 72 tests passing across domain policy, state machine, service layer, and REST API.</li>
+  <li><strong>Frontend Client Suite:</strong> 37 / 37 unit tests passing, zero TypeScript errors, and production Vite bundle built cleanly.</li>
+  <li><strong>Access Control:</strong> <code>manage.py permission_manifest --check</code> verified and matched to <code>registry/permissions.json</code>.</li>
+  <li><strong>Section S3 Questionnaire:</strong> 30 / 30 questions fully solved with 95–100% confidence and cited specification clauses.</li>
+</ul>
+</div>
+
+<h2>2. Phase-1 Baseline Preservation</h2>
+<p>
+As required by the assignment guidelines, the original Phase-1 implementation was preserved verbatim:
+</p>
+<ul>
+  <li><strong>Commit:</strong> <code>30c707989ded4a2570058861d22ad0a21a8592c4</code></li>
+  <li><strong>Tag:</strong> <code>phase-1-elm-original</code> (pushed to origin repository).</li>
+  <li><strong>State:</strong> Contained pure-Python leave calculation logic and basic module registration, but lacked ORM persistence, workflows, APIs, and UI.</li>
+  <li><strong>Prompt Log:</strong> Stored and accessible at <code>docs/phase-1-prompt-log.md</code>.</li>
+</ul>
+
+<h2>3. Phase-2 Problem Identification (18 Meaningful Issues)</h2>
+<table>
+  <thead>
+    <tr>
+      <th style="width: 25%;">Category</th>
+      <th>Identified Problem / Gap</th>
+      <th>Impact & Resolution</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Business Rules</strong></td>
+      <td>Missing Half-Day Casual Leave (0.5 day)</td>
+      <td>Implemented forenoon/afternoon half-day counting and validation.</td>
+    </tr>
+    <tr>
+      <td><strong>Business Rules</strong></td>
+      <td>Missing Balance Accumulation Limits</td>
+      <td>Enforced 300-day cap for Earned Leave (EL) and 20-day cap for Commuted Leave (COL).</td>
+    </tr>
+    <tr>
+      <td><strong>Business Rules</strong></td>
+      <td>No Substitute Overlap Check (BR-EL-014)</td>
+      <td>Added interval collision checks preventing substitute nominee conflicts.</td>
+    </tr>
+    <tr>
+      <td><strong>Business Rules</strong></td>
+      <td>Missing Station Leave Address Enforcement</td>
+      <td>Enforced address requirements for outstation categories (EL, COL, VL).</td>
+    </tr>
+    <tr>
+      <td><strong>Business Rules</strong></td>
+      <td>No Balance Refund on Early Resumption</td>
+      <td>Calculated actual return dates and credited unused days back to user balance.</td>
+    </tr>
+    <tr>
+      <td><strong>Workflows (CW-EL-01)</strong></td>
+      <td>Missing Multi-Tier Approval Chain</td>
+      <td>Modeled Unit Head direct approval for CL/RH vs. forwarding to Sanctioning Authority.</td>
+    </tr>
+    <tr>
+      <td><strong>Workflows (CW-EL-01)</strong></td>
+      <td>No Substitute Acceptance Gate</td>
+      <td>Added <code>AWAITING_SUBSTITUTE</code> state; blocks approval until accepted.</td>
+    </tr>
+    <tr>
+      <td><strong>Workflows (CW-EL-02)</strong></td>
+      <td>Missing Cancellation Workflow</td>
+      <td>Added <code>CANCELLATION_PENDING</code> state for approved leaves prior to start date.</td>
+    </tr>
+    <tr>
+      <td><strong>Workflows (CW-EL-03/04)</strong></td>
+      <td>Missing Extension & Resumption States</td>
+      <td>Added extension requests while ongoing and duty resumption verification.</td>
+    </tr>
+    <tr>
+      <td><strong>Data Persistence</strong></td>
+      <td>No Database ORM Models</td>
+      <td>Created <code>LeaveRequest</code>, <code>LeaveBalance</code>, <code>LeaveTransition</code>, and <code>HolidayCalendar</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Architecture (ADR-0013)</strong></td>
+      <td>Cross-Module Foreign Key Prevention</td>
+      <td>Stored integer <code>user_id</code> references; no foreign keys to auth tables.</td>
+    </tr>
+    <tr>
+      <td><strong>Auditability</strong></td>
+      <td>No Immutable State Transition Log</td>
+      <td>Created append-only <code>LeaveTransition</code> table logging actor, timestamp, and reasons.</td>
+    </tr>
+    <tr>
+      <td><strong>Platform Security</strong></td>
+      <td>System vs. Role Permission Conflict</td>
+      <td>Removed <code>elm.admin.year_end</code> from role grants; kept in <code>SYSTEM_PERMISSIONS</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Platform Security</strong></td>
+      <td>Orphaned Permission (<code>configure_sla</code>)</td>
+      <td>Pruned unused permission to satisfy fail-closed manifest validation.</td>
+    </tr>
+    <tr>
+      <td><strong>API Layer</strong></td>
+      <td>Zero REST API Endpoints</td>
+      <td>Created fail-closed DRF views with <code>HasModuleGrant</code> and <code>HasPermission</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Environment</strong></td>
+      <td>Windows CP1252 Unicode Crashes</td>
+      <td>Sanitized typographic unicode box/arrow characters to clean standard ASCII.</td>
+    </tr>
+    <tr>
+      <td><strong>Frontend UI</strong></td>
+      <td>Total Absence of User Interface</td>
+      <td>Built complete Mantine React application under <code>client/src/modules/elm/</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Frontend Integration</strong></td>
+      <td>Route Registration & Type Contracts</td>
+      <td>Registered in <code>registry.ts</code> and resolved <code>DataTable</code> empty state props.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<h2>4. Implementation Architecture</h2>
+<h3>4.1 Layering & Separation of Concerns</h3>
+<ul>
+  <li><strong>Pure Domain Logic (<code>modules/elm/domain/</code>):</strong> Zero Django/ORM dependencies. <code>leave_policy.py</code> calculates continuous vs. non-continuous calendar days, rollover (2 VL : 1 EL), and overlap intervals. <code>state_machine.py</code> implements a declarative state transition table mirroring CW-EL-01 through CW-EL-04.</li>
+  <li><strong>Data Layer (<code>modules/elm/models/</code> & <code>migrations/</code>):</strong> Models with explicit DB constraints, indexing on <code>(user_id, status)</code>, and integer user IDs (ADR-0013).</li>
+  <li><strong>Service Layer (<code>modules/elm/services/</code>):</strong> Atomic transactional functions (<code>leave_service.py</code> and <code>balances.py</code>) orchestrating state transitions, balance updates, and audit trail insertions.</li>
+  <li><strong>Selectors (<code>modules/elm/selectors/</code>):</strong> Fail-closed querysets scoping records by caller role (e.g. <code>visible_leave_requests</code>, <code>pending_approvals</code>).</li>
+  <li><strong>REST API (<code>modules/elm/api/</code>):</strong> Endpoints mounted at <code>/api/v1/elm/</code> enforcing <code>HasModuleGrant("elm")</code> and granular permissions.</li>
+  <li><strong>Frontend (<code>client/src/modules/elm/</code>):</strong> Full React/Mantine client interface featuring Apply Leave, My Leaves, Balance Overview, Substitute Approvals, Administrative Offline Recording, and Holiday Calendar views.</li>
+</ul>
+
+<h2>5. Verification Results</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Component / Test Suite</th>
+      <th>Command</th>
+      <th>Tests Run</th>
+      <th>Result</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Full Platform Backend</strong></td>
+      <td><code>pytest</code></td>
+      <td>452</td>
+      <td><span class="badge badge-success">452 Passed (24.22s)</span></td>
+    </tr>
+    <tr>
+      <td><strong>ELM Backend Suite</strong></td>
+      <td><code>pytest modules/elm/tests/</code></td>
+      <td>72</td>
+      <td><span class="badge badge-success">72 Passed (7.08s)</span></td>
+    </tr>
+    <tr>
+      <td><strong>Access Control Suite</strong></td>
+      <td><code>pytest modules/accesscontrol/tests/</code></td>
+      <td>21</td>
+      <td><span class="badge badge-success">21 Passed (5.83s)</span></td>
+    </tr>
+    <tr>
+      <td><strong>Permission Manifest</strong></td>
+      <td><code>manage.py permission_manifest --check</code></td>
+      <td>N/A</td>
+      <td><span class="badge badge-success">Manifest Valid & Matches</span></td>
+    </tr>
+    <tr>
+      <td><strong>Frontend TypeScript</strong></td>
+      <td><code>npm run typecheck</code></td>
+      <td>N/A</td>
+      <td><span class="badge badge-success">0 Type Errors</span></td>
+    </tr>
+    <tr>
+      <td><strong>Frontend Unit Tests</strong></td>
+      <td><code>npm test</code></td>
+      <td>37</td>
+      <td><span class="badge badge-success">37 Passed (4.97s)</span></td>
+    </tr>
+    <tr>
+      <td><strong>Vite Production Build</strong></td>
+      <td><code>npm run build</code></td>
+      <td>1015 modules</td>
+      <td><span class="badge badge-success">Built in 8.63s</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>6. Section S3 Questionnaire Solutions Summary</h2>
+<p>
+All 30 questions from <code>docs/questionnaires/S3.xlsx</code> were solved and written to sheet <code>S3 Student Form</code> with 95–100% confidence. Detailed reasoning is tracked in <code>docs/questionnaires/S3_SOLUTIONS.md</code>.
+</p>
+<table>
+  <thead>
+    <tr>
+      <th style="width: 6%;">Q#</th>
+      <th style="width: 50%;">Question Focus</th>
+      <th style="width: 8%;">Ans</th>
+      <th style="width: 8%;">Conf</th>
+      <th>Primary Specification Citation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>Change in COL carry-forward rule</td><td><strong>A</strong></td><td>100%</td><td>BR-EL-009 (Commuted leave carry-forward)</td></tr>
+    <tr><td>2</td><td>Resumption return cannot be verified</td><td><strong>B</strong></td><td>100%</td><td>CW-EL-04 / UC-EL-07 (Remain awaiting verification)</td></tr>
+    <tr><td>3</td><td>Extension skips substitute response</td><td><strong>D</strong></td><td>100%</td><td>CW-EL-03 (Substitute gate and Unit Head review)</td></tr>
+    <tr><td>4</td><td>Unpublished replacement calendar</td><td><strong>A</strong></td><td>100%</td><td>BR-EL-031 (Use currently effective published calendar)</td></tr>
+    <tr><td>5</td><td>Pre-acceptance category validation</td><td><strong>A</strong></td><td>100%</td><td>BR-EL-001 (Validate category eligibility under policy)</td></tr>
+    <tr><td>6</td><td>Difference: cancellation vs extension</td><td><strong>D</strong></td><td>100%</td><td>BR-EL-023 / BR-EL-025 (Prior to start vs ongoing)</td></tr>
+    <tr><td>7</td><td>Higher sanction without substitute routing</td><td><strong>B</strong></td><td>100%</td><td>CW-EL-01 (Unit Head -> Establishment -> Sanction Authority)</td></tr>
+    <tr><td>8</td><td>Continuous-count EL across holiday</td><td><strong>C</strong></td><td>100%</td><td>BR-EL-011 (Intervening holidays count as leave)</td></tr>
+    <tr><td>9</td><td>Verified early resumption effects</td><td><strong>A</strong></td><td>100%</td><td>BR-EL-028 / CW-EL-04 (Record actual period, restore unused days)</td></tr>
+    <tr><td>10</td><td>Obtain Printable Leave Application goal</td><td><strong>B</strong></td><td>100%</td><td>UC-EL-04 (Export/printable representation)</td></tr>
+    <tr><td>11</td><td>Purpose/reason character limit</td><td><strong>E</strong></td><td>100%</td><td>FR (Cannot be determined from specification)</td></tr>
+    <tr><td>12</td><td>Nominee with pending leave eligibility</td><td><strong>C</strong></td><td>100%</td><td>BR-EL-014 (Overlapping pending leave is ineligible)</td></tr>
+    <tr><td>13</td><td>Rejected cancellation original state</td><td><strong>D</strong></td><td>100%</td><td>BR-EL-023 / CW-EL-02 (Remains Approved — Unchanged)</td></tr>
+    <tr><td>14</td><td>Staff EL vs Faculty VL contrast</td><td><strong>C</strong></td><td>100%</td><td>BR-EL-005–008 (Staff 30 EL; Faculty 60 VL + 2:1 rollover)</td></tr>
+    <tr><td>15</td><td>Valid CL path with substitute</td><td><strong>D</strong></td><td>100%</td><td>CW-EL-01 (Draft -> Awaiting Substitute -> Unit Head -> Rejected)</td></tr>
+    <tr><td>16</td><td>Record offline sanctioned leave boundary</td><td><strong>B</strong></td><td>100%</td><td>BR-EL-029 (Records pre-approved leave; no second approval)</td></tr>
+    <tr><td>17</td><td>Exact final notification channel</td><td><strong>E</strong></td><td>100%</td><td>FR (Cannot be determined from specification)</td></tr>
+    <tr><td>18</td><td>Year-end treatment of unused RH</td><td><strong>C</strong></td><td>100%</td><td>BR-EL-003 (Lapses; does not carry forward)</td></tr>
+    <tr><td>19</td><td>Additional time on ongoing COL</td><td><strong>B</strong></td><td>100%</td><td>CW-EL-03 / UC-EL-009 (Submit Leave Extension)</td></tr>
+    <tr><td>20</td><td>Excluded from continuous-day counting</td><td><strong>C</strong></td><td>100%</td><td>BR-EL-010 (CL, SCL, and RH exclude weekends/holidays)</td></tr>
+    <tr><td>21</td><td>Decline loop limit before auto-rejection</td><td><strong>E</strong></td><td>100%</td><td>BR-EL-015 (Cannot be determined from specification)</td></tr>
+    <tr><td>22</td><td>Effective hierarchy policy routing</td><td><strong>C</strong></td><td>95%</td><td>BR-EL-030 (Use currently effective published policy)</td></tr>
+    <tr><td>23</td><td>Rejected extension resulting state</td><td><strong>D</strong></td><td>100%</td><td>CW-EL-03 (Ongoing Leave — Original Unchanged)</td></tr>
+    <tr><td>24</td><td>Higher-sanction lifecycle progression</td><td><strong>D</strong></td><td>100%</td><td>CW-EL-01 (Submission -> Unit Head -> Establishment -> Sanction)</td></tr>
+    <tr><td>25</td><td>Two overlapping full-day leaves</td><td><strong>A</strong></td><td>100%</td><td>BR-EL-012 (Detect and prevent impermissible overlap)</td></tr>
+    <tr><td>26</td><td>Mandatory medical certificate template</td><td><strong>E</strong></td><td>100%</td><td>BR-EL-009 (Cannot be determined from specification)</td></tr>
+    <tr><td>27</td><td>Configurable SLA thresholds rule</td><td><strong>B</strong></td><td>100%</td><td>BR-EL-037 / CFR-EL-023 (Configurable reminder thresholds)</td></tr>
+    <tr><td>28</td><td>Validation failure before submission</td><td><strong>B</strong></td><td>100%</td><td>UC-EL-001 (Request does not progress until corrected)</td></tr>
+    <tr><td>29</td><td>Substitute data change removed step</td><td><strong>A</strong></td><td>100%</td><td>CW-EL-01 (Fresh substitute response requirement)</td></tr>
+    <tr><td>30</td><td>Extension balance posting rule</td><td><strong>A</strong></td><td>100%</td><td>BR-EL-025 / CW-EL-03 (Post only incremental additional days)</td></tr>
+  </tbody>
+</table>
+
+<h2>7. Artifact & Evidence Links</h2>
+<ul>
+  <li><strong>Pull Request (PR #388):</strong> <a href="https://github.com/FusionIIIT/Fusion-Integrated/pull/388">https://github.com/FusionIIIT/Fusion-Integrated/pull/388</a></li>
+  <li><strong>Improved ELM Code Folder:</strong> <a href="https://github.com/Sumit-0011/Fusion-Integrated/tree/assignment-6-elm/modules/elm">Sumit-0011/Fusion-Integrated/tree/assignment-6-elm/modules/elm</a></li>
+  <li><strong>Phase-1 Preserved Tag:</strong> <a href="https://github.com/Sumit-0011/Fusion-Integrated/tree/phase-1-elm-original/modules/elm">Sumit-0011/Fusion-Integrated/tree/phase-1-elm-original/modules/elm</a></li>
+  <li><strong>Phase-1 Prompt Log:</strong> <a href="https://github.com/Sumit-0011/Fusion-Integrated/blob/assignment-6-elm/docs/phase-1-prompt-log.md">docs/phase-1-prompt-log.md</a></li>
+  <li><strong>Phase-2 Prompt Log:</strong> <a href="https://github.com/Sumit-0011/Fusion-Integrated/blob/assignment-6-elm/docs/phase-2-prompt-log.md">docs/phase-2-prompt-log.md</a></li>
+  <li><strong>Backend Test Suite:</strong> <a href="https://github.com/Sumit-0011/Fusion-Integrated/tree/assignment-6-elm/modules/elm/tests">modules/elm/tests/</a></li>
+  <li><strong>Questionnaire S3 Solutions:</strong> <a href="https://github.com/Sumit-0011/Fusion-Integrated/blob/assignment-6-elm/docs/questionnaires/S3_SOLUTIONS.md">docs/questionnaires/S3_SOLUTIONS.md</a></li>
+</ul>
+
+</body>
+</html>

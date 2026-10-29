@@ -13,6 +13,22 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.leave.apply` | Submit a leave request | `elm_admin`, `employee`, `sanction_authority`, `unit_head` |
+| `elm.leave.view_self` | View own leave history and balance | `elm_admin`, `employee`, `sanction_authority`, `unit_head` |
+| `elm.leave.cancel` | Withdraw pending or cancel approved leave | `elm_admin`, `employee`, `sanction_authority`, `unit_head` |
+| `elm.leave.modify` | Request extension or submit resumption | `elm_admin`, `employee`, `sanction_authority`, `unit_head` |
+| `elm.leave.respond_substitute` | Accept or decline substitute nomination | `elm_admin`, `employee`, `sanction_authority`, `unit_head` |
+| `elm.leave.approve` | Approve, reject, or recommend a leave request | `elm_admin`, `establishment`, `sanction_authority`, `unit_head` |
+| `elm.leave.view_all` | View all employees' leave data | `elm_admin`, `establishment`, `sanction_authority`, `unit_head` |
+| `elm.leave.report` | Generate leave balance and year-end reports | `elm_admin`, `sanction_authority`, `unit_head` |
+| `elm.admin.manage_calendar` | Publish and edit holiday/RH calendar | `elm_admin` |
+| `elm.admin.record_offline` | Record offline-sanctioned leave | `elm_admin` |
+| `elm.admin.year_end` | Run year-end balance processing | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
