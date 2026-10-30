@@ -13,6 +13,15 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.leave.view` | See leave categories and own balances | `Dean`, `Deputy Registrar`, `Director`, `HOD`, `Registrar`, `faculty`, `staff` |
+| `elm.leave.view_self` | See own leave applications | `Dean`, `Deputy Registrar`, `Director`, `HOD`, `Registrar`, `faculty`, `staff` |
+| `elm.leave.create` | Apply for leave | `Dean`, `Deputy Registrar`, `Director`, `HOD`, `Registrar`, `faculty`, `staff` |
+| `elm.leave.approve` | Review, recommend or sanction leave requests | `Dean`, `Deputy Registrar`, `Director`, `HOD`, `Registrar` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

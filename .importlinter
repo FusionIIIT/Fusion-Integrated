@@ -15,7 +15,11 @@ source_modules =
     modules.placement
     modules.directory
     modules.accesscontrol
+    modules.elm
 forbidden_modules =
+    modules.elm.models
+    modules.elm.services
+    modules.elm.api
     modules.placement.models
     modules.placement.services
     modules.placement.selectors
@@ -66,3 +70,11 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+
+[importlinter:contract:elm-layers]
+name = Layering inside elm
+type = layers
+layers =
+    modules.elm.api
+    modules.elm.services
+    modules.elm.models

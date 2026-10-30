@@ -63,6 +63,201 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/elm/leave-applications/:
+    get:
+      operationId: v1_elm_leave_applications_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveApplicationList'
+          description: ''
+    post:
+      operationId: v1_elm_leave_applications_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveApplication'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveApplication'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveApplication'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/leave-applications/{id}/:
+    get:
+      operationId: v1_elm_leave_applications_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Leave Application.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/leave-balances/:
+    get:
+      operationId: v1_elm_leave_balances_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveBalanceList'
+          description: ''
+  /api/v1/elm/leave-balances/{id}/:
+    get:
+      operationId: v1_elm_leave_balances_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this leave balance.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveBalance'
+          description: ''
+  /api/v1/elm/leave-types/:
+    get:
+      operationId: v1_elm_leave_types_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveTypeList'
+          description: ''
+  /api/v1/elm/leave-types/{code}/:
+    get:
+      operationId: v1_elm_leave_types_retrieve
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        description: A unique value identifying this leave type.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveType'
+          description: ''
+  /api/v1/elm/record-decision/:
+    post:
+      operationId: v1_elm_record_decision_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordDecisionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RecordDecisionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RecordDecisionRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1763,6 +1958,20 @@ components:
       - semester
       - semester_type
       - user_id
+    ActionEnum:
+      enum:
+      - approve
+      - reject
+      - recommend
+      - not_recommend
+      - route
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
+        * `recommend` - recommend
+        * `not_recommend` - not_recommend
+        * `route` - route
     AddCandidates:
       type: object
       properties:
@@ -2637,6 +2846,141 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        leave_type:
+          type: string
+        leave_type_name:
+          type: string
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        purpose:
+          type: string
+        station_leave_details: {}
+        substitute_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/LeaveApplicationStatusEnum'
+          readOnly: true
+        decision_maker_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decision_date:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        unit_head_recommendation:
+          type: string
+          readOnly: true
+      required:
+      - created_at
+      - decision_date
+      - decision_maker_id
+      - end_date
+      - id
+      - leave_type
+      - leave_type_name
+      - purpose
+      - start_date
+      - status
+      - unit_head_recommendation
+      - updated_at
+      - user_id
+    LeaveApplicationStatusEnum:
+      enum:
+      - AWAITING_SUBSTITUTE_RESPONSE
+      - APPLICANT_ACTION_REQUIRED
+      - AWAITING_UNIT_HEAD_REVIEW
+      - AWAITING_ESTABLISHMENT_ROUTING
+      - AWAITING_FINAL_SANCTION
+      - AWAITING_DIRECTOR_SELF_SANCTION
+      - APPROVED
+      - REJECTED
+      - WITHDRAWN
+      type: string
+      description: |-
+        * `AWAITING_SUBSTITUTE_RESPONSE` - Awaiting Substitute Response
+        * `APPLICANT_ACTION_REQUIRED` - Applicant Action Required
+        * `AWAITING_UNIT_HEAD_REVIEW` - Awaiting Unit Head Review
+        * `AWAITING_ESTABLISHMENT_ROUTING` - Awaiting Establishment Routing
+        * `AWAITING_FINAL_SANCTION` - Awaiting Final Sanction
+        * `AWAITING_DIRECTOR_SELF_SANCTION` - Awaiting Director Self Sanction
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
+        * `WITHDRAWN` - Withdrawn
+    LeaveBalance:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        balance:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+        leave_type:
+          type: string
+      required:
+      - balance
+      - id
+      - leave_type
+      - user_id
+      - year
+    LeaveType:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 10
+        name:
+          type: string
+          maxLength: 50
+        annual_entitlement:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+        carry_forward:
+          type: boolean
+        continuous_counting:
+          type: boolean
+      required:
+      - annual_entitlement
+      - code
+      - name
     LiftSanction:
       type: object
       properties:
@@ -2981,6 +3325,63 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedLeaveApplicationList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveApplication'
+    PaginatedLeaveBalanceList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveBalance'
+    PaginatedLeaveTypeList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveType'
     PaginatedOfferList:
       type: object
       required:
@@ -3220,6 +3621,16 @@ components:
       - message
       - rule
       - sanction
+    RecordDecisionRequest:
+      type: object
+      properties:
+        application_id:
+          type: integer
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+      required:
+      - action
+      - application_id
     RecordIncident:
       type: object
       properties:
