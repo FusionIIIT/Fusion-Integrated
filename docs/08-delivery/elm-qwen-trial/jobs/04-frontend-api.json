@@ -1,0 +1,23 @@
+{
+  "label": "Frontend types, queries and route table",
+  "instruction": "Generate the frontend API types, React Query hooks and route table for the actual ELM backend supplied below. This is initial frontend implementation; do not review or repair business rules. Use the exact URL paths, input field names and output JSON shapes exposed by YOUR API code. Reuse Fusion http and errorMessage from client/src/lib/http, useAuth from client/src/auth/AuthProvider, installed @tanstack/react-query and @mantine/notifications. The existing http baseURL is /api/v1; all hooks must use paths under /leave and no trailing slash unless your server uses one. Define clear typed functions/hooks for the pages to call; avoid external packages or custom clients. A later request will create the page components against these hooks. routes.tsx must export const routes: RouteObject[] and contain index redirect plus three relative paths mine, queue, admin, lazy-loading MyLeavePage, LeaveTasksPage, LeaveAdminPage under ./pages. Use only installed React 18/react-router-dom 6/Mantine 7/React Query 5 interfaces. Keep this batch under about 230 lines and return exactly the required files. Do not create tests.",
+  "allowed_paths": [
+    "client/src/modules/leave_elm/api/types.ts",
+    "client/src/modules/leave_elm/api/hooks.ts",
+    "client/src/modules/leave_elm/routes.tsx"
+  ],
+  "include_specs": false,
+  "context_files": [
+    "docs/08-delivery/elm-qwen-trial/problem-statement-context.md",
+    "modules/leave_elm/api/urls.py",
+    "modules/leave_elm/api/views.py",
+    "modules/leave_elm/api/serializers.py",
+    "modules/leave_elm/registry.py",
+    "client/src/lib/http.ts",
+    "client/src/auth/types.ts",
+    "client/src/app/registry.ts",
+    "client/src/modules/placement/routes.tsx",
+    "client/package.json"
+  ],
+  "num_predict": 6000
+}
