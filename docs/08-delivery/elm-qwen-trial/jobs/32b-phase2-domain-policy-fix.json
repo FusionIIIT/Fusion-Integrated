@@ -1,0 +1,19 @@
+{
+  "label": "Phase 2 repair domain/policy.py Decimal import order and date ordinal bug",
+  "instruction": "Fix the bugs in modules/leave_elm/domain/policy.py: (1) Put `from datetime import date, timedelta` and `from decimal import Decimal` at the VERY TOP of the file (line 1-2) before any functions so `-> Decimal` does not raise NameError. (2) In normalize_category_code(raw_code: str) -> str: check `code = str(raw_code).strip().upper()`; if code in ('VACATION', 'VL'): return 'VL'; if code in ('SICK_LEAVE', 'SCL'): return 'SCL'; if code in LEAVE_CATEGORY_NAMES: return code; otherwise raise ValueError. (3) In calculate_requested_days(category_code: str, start_date: date, end_date: date, holidays=(), restricted_holidays=(), prefix_suffix_days: int = 0) -> Decimal: first normalize category_code = normalize_category_code(category_code). If end_date < start_date, raise ValueError('end_date cannot be earlier than start_date'). If category_code == 'RH': if start_date != end_date, raise ValueError('RH must be 1 day'); if restricted_holidays and start_date.isoformat() not in set(restricted_holidays), raise ValueError('Date is not in restricted_holidays'); return Decimal('1.00'). If category_code in ('CL', 'SCL'): iterate `cur = start_date` while `cur <= end_date` (`cur += timedelta(days=1)`) and count days where `cur.weekday() < 5 and cur.isoformat() not in set(holidays)`, returning `Decimal(str(count))`. Otherwise (for EL, COL, VL): return `Decimal(str((end_date - start_date).days + 1 + max(0, int(prefix_suffix_days))))`. (4) Keep validate_policy_rules intact. Return only valid Python code.",
+  "allowed_paths": [
+    "modules/leave_elm/domain/policy.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/domain/policy.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 2000,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

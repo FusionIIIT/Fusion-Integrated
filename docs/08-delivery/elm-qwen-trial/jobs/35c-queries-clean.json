@@ -1,0 +1,17 @@
+{
+  "label": "Phase 2 clean services/queries.py with correct Decimal import and OR permission check",
+  "instruction": "Write modules/leave_elm/services/queries.py from scratch with these exact imports and 4 functions:\n1. Imports:\n`from decimal import Decimal`\n`from django.db.models import Q`\n`from core.api.exceptions import PermissionDeniedError`\n`from modules.leave_elm.domain.policy import LEAVE_CATEGORY_NAMES, LEAVE_POLICY_DEFAULTS`\n`from modules.leave_elm.models import LeaveApplication, LeaveBalance, LeaveCategory, LeaveNotification, LeaveTask, LeaveType`\n2. `def list_applications(actor, scope='mine'):`\nSet `can_review_all = actor.has_permission('leave_elm.application.review') or actor.has_permission('leave_elm.application.approve') or actor.has_permission('leave_elm.record.manage')`.\nIf `not (actor.has_permission('leave_elm.application.view_self') or can_review_all)`: `raise PermissionDeniedError()`.\nSet `qs = LeaveApplication.objects.select_related('leave_type', 'leave_type__leave_category').order_by('-created_at', '-id')`.\nIf `scope == 'all' and can_review_all`: return `qs`.\nReturn `qs.filter(user_id=actor.user_id)`.\n3. `def own_balances(actor):`\nIf `not actor.has_permission('leave_elm.application.view_self')`: `raise PermissionDeniedError()`.\nFor `cat_name in LEAVE_CATEGORY_NAMES`:\n  `cat, _ = LeaveCategory.objects.get_or_create(name=cat_name, defaults={'description': cat_name})`\n  `LeaveType.objects.get_or_create(name=cat_name, defaults={'description': cat_name, 'leave_category': cat})`\n  `LeaveBalance.objects.get_or_create(user_id=actor.user_id, leave_category=cat, defaults={'balance': Decimal(str(LEAVE_POLICY_DEFAULTS[cat_name]))})`\nReturn `LeaveBalance.objects.select_related('leave_category').filter(user_id=actor.user_id).order_by('leave_category__name', 'id')`.\n4. `def assigned_tasks(actor):`\nIf `not (actor.has_permission('leave_elm.task.view') or actor.has_permission('leave_elm.substitute.respond') or actor.has_permission('leave_elm.application.review') or actor.has_permission('leave_elm.application.approve'))`: `raise PermissionDeniedError()`.\nSet `cond = Q(user_id=actor.user_id)`.\nIf `actor.has_permission('leave_elm.application.review')`: `cond = cond | Q(role='reviewer')`.\nIf `actor.has_permission('leave_elm.application.approve')`: `cond = cond | Q(role='authority')`.\nReturn `LeaveTask.objects.select_related('leave_application', 'leave_application__leave_type').filter(status='Pending').filter(cond).order_by('-created_at', '-id')`.\n5. `def list_notifications(actor):`\nIf `not actor.has_permission('leave_elm.application.view_self')`: `raise PermissionDeniedError()`.\nReturn `LeaveNotification.objects.select_related('leave_application').filter(user_id=actor.user_id).order_by('-created_at', '-id')`.\nReturn only valid Python code.",
+  "allowed_paths": [
+    "modules/leave_elm/services/queries.py"
+  ],
+  "context_files": [],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 1800,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

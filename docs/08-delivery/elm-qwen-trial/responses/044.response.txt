@@ -1,0 +1,257 @@
+```python
+from datetime import timedelta
+from django.utils import timezone
+from django.db import transaction
+from core.api.exceptions import DomainError, NotFoundError, PermissionDeniedError
+from modules.leave_elm.models import LeaveApplication, LeaveHistory, LeaveTask, LeaveSubstitution, LeaveExtension, LeaveResumption
+
+def act_on_application(actor, application_id, action, data=None):
+    try:
+        with transaction.atomic():
+            leave_app = LeaveApplication.objects.select_for_update().get(id=application_id)
+    except LeaveApplication.DoesNotExist:
+        raise NotFoundError(message='Leave Application not found')
+
+    if actor.kind != 'faculty' and actor.kind != 'staff':
+        raise PermissionDeniedError(message='Only faculty/staff can perform leave-related actions')
+
+    def _adjust_balance(user_id, leave_category, delta_days):
+        balance = LeaveBalance.objects.get_or_create(user_id=user_id, leave_category=leave_category)[0]
+        new_balance = max(balance.balance + delta_days, 0)
+        balance.balance = new_balance
+        balance.save()
+
+    def update_leave_balance(user_id, leave_category, days):
+        _adjust_balance(user_id, leave_category, -days)
+
+    if action == 'substitute_accept':
+        if leave_app.status not in ['Pending', 'Under Review']:
+            raise DomainError(message='Cannot accept a substitute for an application that is not pending or under review')
+        
+        substitution_user_id = data['substitute_user_id']
+        try:
+            substitute_user = User.objects.get(id=substitution_user_id)
+        except User.DoesNotExist:
+            raise NotFoundError(message='Substitute user not found')
+
+        leave_substitution = LeaveSubstitution.objects.create(
+            leave_application=leave_app,
+            substitute_user_id=substitution_user_id,
+            status='Accepted',
+            remarks=data.get('remarks', ''),
+        )
+
+        if all(sub.submission_status == 'Accepted' for sub in leave_app.leave_substitutions.all()):
+            leave_app.status = 'Pending'
+            leave_app.reviewed_by_id = actor.user_id
+            leave_app.reviewed_at = timezone.now()
+            leave_app.save()
+
+            # Create task for application review
+            LeaveTask.objects.create(
+                leave_application=leave_app,
+                task_type='Application Review',
+                reminder_threshold=60,
+                escalation_threshold=120,
+            )
+        else:
+            leave_app.status = 'Returned for Clarification'
+
+    elif action == 'substitute_reject':
+        if leave_app.status not in ['Pending', 'Under Review']:
+            raise DomainError(message='Cannot reject a substitute for an application that is not pending or under review')
+
+        substitution_user_id = data['substitute_user_id']
+
+        leave_substitution = LeaveSubstitution.objects.filter(leave_application=leave_app, substitute_user_id=substitution_user_id).first()
+        if leave_substitution:
+            leave_substitution.status = 'Rejected'
+            leave_substitution.remarks = data.get('remarks', '')
+            leave_substitution.responded_at = timezone.now()
+            leave_substitution.save()
+
+            if all(sub.submission_status != 'Accepted' for sub in leave_app.leave_substitutions.all()):
+                leave_app.status = 'Approved'
+                leave_app.approved_by_id = actor.user_id
+                leave_app.approved_at = timezone.now()
+                leave_app.balance_deducted = True
+
+                update_leave_balance(leave_app.user_id, leave_app.leave_category, -leave_app.working_days)
+
+                # Create history entry
+                LeaveHistory.objects.create(
+                    leave_application=leave_app,
+                    status='Approved',
+                    decision=data['decision'] or 'Approved by ' + str(actor.username),
+                )
+
+                # Update balance
+                update_leave_balance(leave_app.user_id, leave_app.leave_category, -leave_app.working_days)
+        else:
+            raise NotFoundError(message='Substitute user not found')
+
+    elif action == 'recommend':
+        if leave_app.status != ['Pending']:
+            raise DomainError(message='Cannot recommend an application that is not pending')
+        
+        leave_app.reviewed_by_id = actor.user_id
+        leave_app.reviewed_at = timezone.now()
+        leave_app.status = 'Awaiting Sanctioning Authority'
+
+        # Create history entry
+        LeaveHistory.objects.create(
+            leave_application=leave_app,
+            status='Recommended',
+            decision=data['decision'] or 'Recommended by ' + str(actor.username),
+        )
+
+        # Create task for sanction decision
+        LeaveTask.objects.create(
+            leave_application=leave_app,
+            task_type='Sanction Decision',
+            reminder_threshold=60,
+            escalation_threshold=120,
+            role='authority',
+        )
+
+    elif action == 'forward':
+        if leave_app.status != ['Pending', 'Under Review']:
+            raise DomainError(message='Cannot forward an application that is not pending or under review')
+        
+        leave_app.reviewed_by_id = actor.user_id
+        leave_app.reviewed_at = timezone.now()
+        leave_app.status = 'Awaiting Sanctioning Authority'
+
+        # Create history entry
+        LeaveHistory.objects.create(
+            leave_application=leave_app,
+            status='Forwarded',
+            decision=data['decision'] or 'Forwarded by ' + str(actor.username),
+        )
+
+        # Create task for sanction decision
+        LeaveTask.objects.create(
+            leave_application=leave_app,
+            task_type='Sanction Decision',
+            reminder_threshold=60,
+            escalation_threshold=120,
+            role='authority',
+        )
+
+    elif action == 'return_clarification':
+        if leave_app.status in ['Pending', 'Substitute Pending', 'Under Review', 'Returned for Clarification']:
+            leave_app.status = 'Returned for Clarification'
+        else:
+            raise DomainError(message='Only applications in Pending, Substitute Pending, Under Review, Returned for Clarification can be returned for clarification')
+
+    elif action == 'approve':
+        if leave_app.status not in ['Pending', 'Submitted']:
+            raise DomainError(message='Cannot approve an application that is not yet submitted')
+        
+        if leave_app.balance_deducted:
+            raise DomainError(message='Leave balance has already been deducted')
+
+        leave_app.approved_by_id = actor.user_id
+        leave_app.approved_at = timezone.now()
+        leave_app.status = 'Approved'
+
+        update_leave_balance(leave_app.user_id, leave_app.leave_category, -leave_app.working_days)
+
+        leave_app.balance_deducted = True
+
+        # Create history entry
+        LeaveHistory.objects.create(
+            leave_application=leave_app,
+            status='Approved',
+            decision=data['decision'] or 'Approved by ' + str(actor.username),
+        )
+
+        # Update balance
+        update_leave_balance(leave_app.user_id, leave_app.leave_category, -leave_app.working_days)
+    
+    elif action == 'reject':
+        if leave_app.status != ['Pending', 'Submitted']:
+            raise DomainError(message='Cannot reject an application that is not yet submitted')
+        
+        leave_app.status = 'Rejected'
+
+        # Create history entry
+        LeaveHistory.objects.create(
+            leave_application=leave_app,
+            status='Rejected',
+            decision=data['decision'] or 'Rejected by ' + str(actor.username),
+        )
+
+    elif action == 'withdraw':
+        if leave_app.status not in ['Pending', 'Substitute Pending', 'Under Review', 'Returned for Clarification']:
+            raise DomainError(message='Only pending applications can be withdrawn')
+
+        leave_app.status = 'Cancelled'
+        leave_app.cancelled_by_id = actor.user_id
+        leave_app.cancelled_at = timezone.now()
+
+        # Create history entry
+        LeaveHistory.objects.create(
+            leave_application=leave_app,
+            status='Cancelled',
+            decision=data['decision'] or 'Withdrawn by ' + str(actor.username),
+        )
+
+    elif action == 'cancel':
+        if leave_app.status not in ['Approved', 'Cancelled']:
+            raise DomainError(message='Only approved/cancelled applications can be cancelled')
+        
+        if leave_app.balance_deducted:
+            update_leave_balance(leave_app.user_id, leave_app.leave_category, leave_app.working_days)
+
+        leave_app.status = 'Cancelled'
+        leave_app.cancelled_by_id = actor.user_id
+
+        # Create history entry
+        LeaveHistory.objects.create(
+            leave_application=leave_app,
+            status='Cancelled',
+            decision=data['decision'] or 'Cancelled by ' + str(actor.username),
+        )
+
+    elif action == 'extend':
+        if leave_app.status != 'Approved' or leave_app.extension_requested:
+            raise DomainError(message='Cannot extend an application that is not yet approved or has already been extended')
+        
+        leave_app.extension_requested = True
+        leave_app.extension_start_date = data.get('extension_start_date', leave_app.end_date + timedelta(days=1))
+        leave_app.extension_end_date = data.get('extension_end_date', leave_app.end_date + timedelta(days=30))
+
+        leave_app.save()
+
+        # Create task for extension approval
+        LeaveTask.objects.create(
+            leave_application=leave_app,
+            task_type='Extension Approval',
+            reminder_threshold=60,
+            escalation_threshold=120,
+        )
+
+    elif action == 'resume':
+        if leave_app.status != 'Approved' or leave_app.resumption_start_date:
+            raise DomainError(message='Cannot resume an application that is not yet approved or has already been resumed')
+
+        leave_app.resumption_start_date = data['actual_resumption_date']
+
+        leave_app.save()
+
+        # Create task for resumption review
+        LeaveTask.objects.create(
+            leave_application=leave_app,
+            task_type='Resumption Review',
+            reminder_threshold=60,
+            escalation_threshold=120,
+        )
+
+    else:
+        raise ValueError(f"Unsupported action: {action}")
+
+    actor.notify_leave_status(leave_app.id, leave_app.status)
+
+    return leave_app
+```

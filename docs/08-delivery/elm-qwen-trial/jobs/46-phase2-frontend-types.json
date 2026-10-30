@@ -1,0 +1,19 @@
+{
+  "label": "Phase 2 upgrade frontend types.ts with complete ELM interfaces",
+  "instruction": "Update client/src/modules/leave_elm/types.ts to include complete fields for LeaveApplication, LeaveBalance, LeaveTask, LeaveHistory, and LeaveNotification. Specifically: (1) LeaveApplication: id, user_id, status, leave_type, leave_type_name?: string, leave_category_name?: string, start_date, end_date, working_days?: string, purpose, station_leave_required?: boolean, address_during_leave?: string, contact_number?: string, academic_substitute_user_id?: number | null, admin_substitute_user_id?: number | null, attachment_reference?: string, remarks?: string, created_at?: string. (2) LeaveBalance: id, user_id, leave_category, leave_category_name?: string, balance: string. (3) LeaveTask: id, user_id, leave_application, task_type, role?: string, status, title?: string, description?: string, application_status?: string, applicant_user_id?: number, start_date?: string, end_date?: string, purpose?: string. (4) LeaveHistory: id, user_id?: number, leave_application?: number, action?: string, status, decision, created_at?: string. (5) LeaveNotification: id, user_id?: number, leave_application?: number, message, is_read?: boolean, channel?: string, created_at?: string. Return only valid TypeScript code.",
+  "allowed_paths": [
+    "client/src/modules/leave_elm/types.ts"
+  ],
+  "context_files": [
+    "client/src/modules/leave_elm/types.ts"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 1200,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

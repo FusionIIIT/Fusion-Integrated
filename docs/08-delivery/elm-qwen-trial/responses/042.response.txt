@@ -1,0 +1,56 @@
+```
+from django.db.models import Q
+from core.api.exceptions import PermissionDeniedError
+from modules.leave_elm.models import LeaveApplication, LeaveBalance, LeaveTask, LeaveNotification
+
+def list_applications(actor, scope='mine'):
+    if not actor.has_permission('leave_elm.application.view_self') and \
+       not actor.has_permission('leave_elm.application.review/approve/record.manage'):
+        raise PermissionDeniedError()
+    
+    queryset = LeaveApplication.objects.select_related('leave_type', 'leave_type__leave_category')
+    if scope == 'all':
+        if not actor.has_permission('leave_elm.application.review/approve/record.manage'):
+            raise PermissionDeniedError()
+        queryset = LeaveApplication.objects.all().select_related('leave_type', 'leave_type__leave_category')
+    else:
+        queryset = queryset.filter(user_id=actor.user_id)
+    return queryset.order_by('-created_at', '-id')
+
+def own_balances(actor):
+    if not actor.has_permission('leave_elm.application.view_self'):  # Changed to view_self
+        raise PermissionDeniedError()
+    
+    leave_categories = LEAVE_CATEGORY_NAMES + ['RH']
+    for category in leave_categories:
+        try:
+            LeaveBalance.objects.get_or_create(
+                user_id=actor.user_id,
+                defaults={
+                    'category': category.upper(),
+                    'balance': LEAVE_POLICY_DEFAULTS[category]
+                }
+            )
+        except Exception as e:
+            print(f"Failed to create or update balance for {category}: {e}")
+    
+    return LeaveBalance.objects.select_related('leave_category').filter(user_id=actor.user_id).order_by('leave_category__name', 'id')
+
+def assigned_tasks(actor):
+    if not (actor.has_permission('leave_elm.task.view') or 
+           actor.has_permission('substitute.respond') or 
+           actor.has_permission('application.review') or 
+           actor.has_permission('application.approve')):
+        raise PermissionDeniedError()
+    
+    pending_statuses = {'Pending', 'Substitute Pending', 'Under Review', 'Awaiting Sanctioning Authority'}
+    query = Q(role='reviewer' and actor.has_permission('application.review')) | \
+             Q(role='authority' and actor.has_permission('application.approve'))
+    queryset = LeaveTask.objects.filter(leave_application__user_id=actor.user_id, status__in=pending_statuses)
+    if query.exists():
+        queryset |= LeaveTask.objects.filter(query)
+    return queryset.order_by('-created_at', '-id')
+
+def list_notifications(actor):
+    return LeaveNotification.objects.select_related('leave_application').filter(user_id=actor.user_id).order_by('-created_at', '-id')
+```

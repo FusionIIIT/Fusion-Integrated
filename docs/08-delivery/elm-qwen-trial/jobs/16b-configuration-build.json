@@ -1,0 +1,19 @@
+{
+  "label": "Repair configuration syntax and Fusion permission interfaces",
+  "instruction": "Mechanical build repair only to existing api/configuration.py. Its indentation before module-level save_configuration and record_view is invalid; HasModuleGrant and HasPermission are class factories for DRF permission_classes, not decorators. Adapt to supplied interfaces: remove invalid decorators, use permission_classes on the existing ConfigurationView/RecordListView with module leave_elm and the existing configuration.manage/record.manage names. Add missing existing Response, LeaveHistory and LeaveNotification imports. The referenced LeaveHistorySerializer and LeaveNotificationSerializer are absent: add those two simple ModelSerializer classes using fields=\"__all__\" in the same configuration.py file before the views. Preserve all existing queryset filters, function bodies, save arguments and response behavior; do not repair business or query logic. Return the entire configuration.py only, max100 lines.",
+  "allowed_paths": [
+    "modules/leave_elm/api/configuration.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/api/configuration.py",
+    "fusion_auth/permissions.py"
+  ],
+  "include_specs": false,
+  "num_predict": 2500,
+  "options": {
+    "temperature": 0.3,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

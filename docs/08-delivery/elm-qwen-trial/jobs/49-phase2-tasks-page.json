@@ -1,0 +1,21 @@
+{
+  "label": "Phase 2 fix LeaveTasksPage.tsx to pass task.leave_application ID and remarks",
+  "instruction": "Update client/src/modules/leave_elm/pages/LeaveTasksPage.tsx to fix the bug where task.id was sent instead of task.leave_application to `/leave/applications/${applicationId}/action`! Specifically: (1) Use useState for remarks/decision text and useQueryClient to invalidate ['tasks'] after any mutation succeeds. (2) Pass `task.leave_application` (NOT `task.id`!) as the application ID when calling `applicationAction(task.leave_application, action, { decision: remarks, remarks })`. (3) Support task actions: 'substitute_accept' (Accept Substitute), 'substitute_reject' (Decline Substitute), 'recommend' (Recommend / Forward), 'return_clarification' (Return for Clarification), 'approve' (Approve), and 'reject' (Reject). Display task.title, task.description, task.task_type, task.status, and application ID clearly inside Mantine Paper cards. Return only valid TypeScript JSX code.",
+  "allowed_paths": [
+    "client/src/modules/leave_elm/pages/LeaveTasksPage.tsx"
+  ],
+  "context_files": [
+    "client/src/modules/leave_elm/pages/LeaveTasksPage.tsx",
+    "client/src/modules/leave_elm/api.ts",
+    "client/src/modules/leave_elm/types.ts"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 2200,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

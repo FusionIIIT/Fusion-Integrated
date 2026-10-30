@@ -1,0 +1,20 @@
+{
+  "label": "Phase 2 fix queries.py permission checks and task queue scoping",
+  "instruction": "Update modules/leave_elm/services/queries.py to fix own_balances permission check and assigned_tasks filtering, and add list_notifications(actor). Specifically: (1) In list_applications(actor, scope='mine'): check actor.has_permission('leave_elm.application.view_self') or review/approve/record.manage; if scope == 'all' and actor has review/approve/record.manage, return all LeaveApplication.objects.select_related('leave_type', 'leave_type__leave_category').order_by('-created_at', '-id'), otherwise filter by user_id=actor.user_id. (2) In own_balances(actor): check actor.has_permission('leave_elm.application.view_self') (NOT configuration.manage!). Ensure default LeaveCategory, LeaveType, and LeaveBalance rows exist for actor.user_id for all LEAVE_CATEGORY_NAMES using LEAVE_POLICY_DEFAULTS from modules.leave_elm.domain.policy if missing, then return LeaveBalance.objects.select_related('leave_category').filter(user_id=actor.user_id).order_by('leave_category__name', 'id'). (3) In assigned_tasks(actor): check actor.has_permission('leave_elm.task.view') or substitute.respond or review or approve; return Pending LeaveTask rows where user_id=actor.user_id OR (role='reviewer' and actor has application.review) OR (role='authority' and actor has application.approve). (4) Add list_notifications(actor) returning LeaveNotification.objects.select_related('leave_application').filter(user_id=actor.user_id).order_by('-created_at', '-id'). Keep the file under 90 lines and return only valid Python source code.",
+  "allowed_paths": [
+    "modules/leave_elm/services/queries.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/services/queries.py",
+    "modules/leave_elm/domain/policy.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 2200,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

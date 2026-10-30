@@ -1,0 +1,19 @@
+{
+  "label": "Phase 2 upgrade domain/policy.py with BR1-BR5 pure domain policy helpers",
+  "instruction": "Replace modules/leave_elm/domain/policy.py with pure Python domain constants and helper functions for Employee Leave Management (ELM). Do not import Django or ORM models. Include: (1) LEAVE_CATEGORY_NAMES = ['CL', 'RH', 'SCL', 'EL', 'COL', 'VL'] and LEAVE_POLICY_DEFAULTS = {'CL': 8, 'RH': 2, 'SCL': 15, 'EL': 30, 'COL': 20, 'VL': 60}. (2) Application status constants: STATUS_DRAFT='Draft', STATUS_PENDING='Pending', STATUS_SUBSTITUTE_PENDING='Substitute Pending', STATUS_UNDER_REVIEW='Under Review', STATUS_AWAITING_AUTHORITY='Awaiting Sanctioning Authority', STATUS_CLARIFICATION='Returned for Clarification', STATUS_APPROVED='Approved', STATUS_REJECTED='Rejected', STATUS_CANCELLED='Cancelled', STATUS_COMPLETED='Completed', and ACTIVE_OVERLAP_STATUSES={'Pending', 'Substitute Pending', 'Under Review', 'Awaiting Sanctioning Authority', 'Returned for Clarification', 'Approved'}. (3) Helper normalize_category_code(raw_code: str) -> str that maps 'VACATION'/'VL'->'VL', 'SICK_LEAVE'/'SCL'->'SCL', and uppercases valid codes in LEAVE_CATEGORY_NAMES (raising ValueError for unknown codes). (4) Helper calculate_requested_days(category_code: str, start_date, end_date, holidays=(),restricted_holidays=(), prefix_suffix_days: int = 0) -> Decimal that raises ValueError if end_date < start_date, raising ValueError for RH if start_date != end_date or (restricted_holidays and start_date.isoformat() not in set(restricted_holidays)), counting working days (excluding weekends and holidays) for CL/SCL and calendar days plus prefix_suffix_days for EL/COL/VL. (5) Helper validate_policy_rules(category_code: str, requested_days: Decimal, available_balance: Decimal, *, has_medical_certificate: bool=False, is_faculty_vacation_eligible: bool=True, station_leave_required: bool=False, address_during_leave: str='', max_cl_spell: int=5) -> None that raises ValueError if requested_days <= 0, requested_days > available_balance, CL > max_cl_spell, VL when not is_faculty_vacation_eligible, EL >= 10 without has_medical_certificate when medical note is required, or station_leave_required without address_during_leave. Keep the file concise (under 110 lines) and return only valid Python source code.",
+  "allowed_paths": [
+    "modules/leave_elm/domain/policy.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/domain/policy.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 2500,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

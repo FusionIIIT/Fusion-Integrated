@@ -1,0 +1,94 @@
+```
+import { useEffect } from 'react';
+import { Group, Stack, Text, Title, Button, LoadingOverlay, Alert, Container, Paper } from '@mantine/core';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { http } from '../../../lib/http';
+
+export const LeaveTasksPage = () => {
+  const queryClient = useQueryClient();
+  const [remarks, setRemarks] = useState('');
+  const [decision, setDecision] = useState('');
+
+  const { mutate: approveTask } = useMutation({ mutationFn: (data: { id: number }) =>
+    http.post(`/leave/applications/${data.id}/action`, { action: 'approve', data })
+  });
+  const { mutate: rejectTask } = useMutation({ mutationFn: (data: { id: number }) =>
+    http.post(`/leave/applications/${data.id}/action`, { action: 'reject', data })
+  });
+  const { mutate: recommendTask } = useMutation({ mutationFn: (data: { id: number }) =>
+    http.post(`/leave/applications/${data.id}/action`, { action: 'recommend', data })
+  });
+  const { mutate: substituteAcceptTask } = useMutation({ mutationFn: (data: { applicationId: number }) =>
+    http.post(`/leave/applications/${data.applicationId}/action`, { action: 'substitute_accept', ...data })
+  });
+  const { mutate: substituteRejectTask } = useMutation({ mutationFn: (data: { applicationId: number }) =>
+    http.post(`/leave/applications/${data.applicationId}/action`, { action: 'substitute_reject', ...data })
+  });
+
+  const { isLoading, isError, error, data: tasks } = useQuery({
+    queryKey: ['tasks'],
+    queryFn: listTasks,
+  });
+
+  useEffect(() => {
+    if (isError && error instanceof Error) {
+      console.error('Error fetching leave tasks:', error.message);
+    }
+  }, [isError, error]);
+
+  return (
+    <Container>
+      <LoadingOverlay visible={isLoading} />
+      {isError && (
+        <Alert title="Error" color="red">
+          {error?.message}
+        </Alert>
+      )}
+      <PageHeader title="Leave Tasks" subtitle="Manage pending leave applications" />
+
+      <Stack gap="lg">
+        {!isLoading && !isError && tasks!.map((task) => (
+          <Paper key={task.id}>
+            <Title order={3}>{task.title}</Title>
+            <Text c="dimmed">{task.description}</Text>
+
+            <Group spacing="sm">
+              <Button onClick={() => approveTask({ id: task.leave_application })}>Approve</Button>
+              <Button onClick={() => rejectTask({ id: task.leave_application })}>Reject</Button>
+              <Button onClick={() => recommendTask({ id: task.leave_application })}>Recommend</Button>
+              <Button
+                onClick={() =>
+                  substituteAcceptTask({
+                    applicationId: task.leave_application,
+                    remarks,
+                    decision,
+                  })
+                }
+              >
+                Accept Substitute
+              </Button>
+              <Button
+                onClick={() =>
+                  substituteRejectTask({
+                    applicationId: task.leave_application,
+                    remarks,
+                    decision,
+                  })
+                }
+              >
+                Decline Substitute
+              </Button>
+            </Group>
+
+            <Text>Application ID: {task.leave_application}</Text>
+            <Text>Title: {task.task_type}</Text>
+            <Text>Status: {task.status}</Text>
+          </Paper>
+        ))}
+      </Stack>
+    </Container>
+  );
+};
+
+export default LeaveTasksPage;
+```

@@ -13,6 +13,19 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave_elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave_elm.application.view_self` | See own leave applications | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Employee`, `Establishment Reviewer`, `Head of Department`, `Registrar`, `Section Head`, `Unit Head`, `authority`, `faculty`, `reviewer`, `staff` |
+| `leave_elm.application.create` | Apply for leave | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Employee`, `Establishment Reviewer`, `Head of Department`, `Registrar`, `Section Head`, `Unit Head`, `authority`, `faculty`, `reviewer`, `staff` |
+| `leave_elm.application.review` | Review leave applications | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Establishment Reviewer`, `Head of Department`, `Registrar`, `Section Head`, `Unit Head`, `authority`, `reviewer` |
+| `leave_elm.application.approve` | Approve leave applications | `Dean`, `Director`, `Registrar`, `authority` |
+| `leave_elm.substitute.respond` | Respond to substitute requests | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Employee`, `Establishment Reviewer`, `Head of Department`, `Registrar`, `Section Head`, `Unit Head`, `authority`, `faculty`, `reviewer`, `staff` |
+| `leave_elm.task.view` | View leave tasks | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Employee`, `Establishment Reviewer`, `Head of Department`, `Registrar`, `Section Head`, `Unit Head`, `authority`, `faculty`, `reviewer`, `staff` |
+| `leave_elm.configuration.manage` | Manage leave configuration | `Leave Admin`, `Leave Administrator`, `admin` |
+| `leave_elm.record.manage` | Manage leave records | `Leave Admin`, `Leave Administrator`, `admin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

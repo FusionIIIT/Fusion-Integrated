@@ -1,0 +1,17 @@
+{
+  "label": "Phase 2 final api/urls.py without ApplicationDetailView or trailing slashes",
+  "instruction": "Write modules/leave_elm/api/urls.py with these exact lines:\n```python\nfrom django.urls import path\nfrom .configuration import ConfigurationView, RecordListView\nfrom .views import (\n    ApplicationActionView,\n    ApplicationListView,\n    ApplicationPrintView,\n    BalanceListView,\n    NotificationListView,\n    TaskListView,\n)\n\nurlpatterns = [\n    path('applications', ApplicationListView.as_view(), name='application-list'),\n    path('applications/<int:pk>/action', ApplicationActionView.as_view(), name='application-action'),\n    path('applications/<int:pk>/print', ApplicationPrintView.as_view(), name='application-print'),\n    path('balances', BalanceListView.as_view(), name='balance-list'),\n    path('tasks', TaskListView.as_view(), name='task-list'),\n    path('notifications', NotificationListView.as_view(), name='notification-list'),\n    path('configuration', ConfigurationView.as_view(), name='configuration-view'),\n    path('records', RecordListView.as_view(), name='record-list'),\n]\n```\nDo NOT add `ApplicationDetailView` and do NOT add trailing slashes. Return only valid Python code.",
+  "allowed_paths": [
+    "modules/leave_elm/api/urls.py"
+  ],
+  "context_files": [],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 600,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}
