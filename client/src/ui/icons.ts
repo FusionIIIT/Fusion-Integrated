@@ -7,7 +7,7 @@ import {
   FaCheckDouble, FaCircle, FaClipboardCheck, FaClipboardList, FaCog,
   FaExternalLinkAlt,
   FaFileSignature, FaGraduationCap, FaIdBadge, FaIdCard, FaLayerGroup,
-  FaSignOutAlt, FaThLarge, FaUserCheck, FaUserTie, FaUsers,
+  FaPlusCircle, FaSignOutAlt, FaTasks, FaThLarge, FaUserCheck, FaUserTie, FaUsers,
 } from "react-icons/fa";
 import type { IconType } from "react-icons";
 
@@ -16,7 +16,7 @@ export const ICONS = {
   FaCheckDouble, FaCircle, FaClipboardCheck, FaClipboardList, FaCog,
   FaExternalLinkAlt,
   FaFileSignature, FaGraduationCap, FaIdBadge, FaIdCard, FaLayerGroup,
-  FaSignOutAlt, FaThLarge, FaUserCheck, FaUserTie, FaUsers,
+  FaPlusCircle, FaSignOutAlt, FaTasks, FaThLarge, FaUserCheck, FaUserTie, FaUsers,
 } as const;
 
 export type IconKey = keyof typeof ICONS;

@@ -10,11 +10,15 @@ authorization fails closed rather than open.
 from rest_framework.permissions import BasePermission
 
 
+def _principal(request):
+    return getattr(request, "principal", None) or getattr(request, "user", None)
+
+
 class IsAuthenticatedPrincipal(BasePermission):
     message = "Authentication required."
 
     def has_permission(self, request, view):
-        return getattr(request, "principal", None) is not None
+        return _principal(request) is not None
 
 
 class _HasModuleGrant(BasePermission):
@@ -22,7 +26,7 @@ class _HasModuleGrant(BasePermission):
     message = "This module is not available to your role."
 
     def has_permission(self, request, view):
-        p = getattr(request, "principal", None)
+        p = _principal(request)
         return p is not None and p.has_module(self.module_code)
 
 
@@ -37,7 +41,7 @@ class _HasPermission(BasePermission):
     message = "You do not have permission to perform this action."
 
     def has_permission(self, request, view):
-        p = getattr(request, "principal", None)
+        p = _principal(request)
         if p is None:
             return False
         if self.require_all:

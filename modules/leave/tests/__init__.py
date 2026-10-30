@@ -1,0 +1,1 @@
+"""Leave module test suite."""

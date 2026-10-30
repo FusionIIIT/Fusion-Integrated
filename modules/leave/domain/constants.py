@@ -1,0 +1,57 @@
+"""Pure-python leave domain constants."""
+
+# Leave Categories (SRS-EL-002, BR-EL-001)
+LEAVE_CL = "CL"
+LEAVE_RH = "RH"
+LEAVE_SCL = "SCL"
+LEAVE_EL = "EL"
+LEAVE_COL = "COL"
+LEAVE_VL = "VL"
+ALL_LEAVE_CATEGORIES = (LEAVE_CL, LEAVE_RH, LEAVE_SCL, LEAVE_EL, LEAVE_COL, LEAVE_VL)
+
+# Half-day options (BR-EL-010)
+HALF_DAY_FULL = "full"
+HALF_DAY_FIRST = "first_half"
+HALF_DAY_SECOND = "second_half"
+
+# Leave Request Statuses (WF-EL-01 to WF-EL-05)
+STATUS_DRAFT = "draft"
+STATUS_AWAITING_SUBSTITUTE = "awaiting_substitute"
+STATUS_AWAITING_UNIT_HEAD = "awaiting_unit_head"
+STATUS_AWAITING_ESTABLISHMENT = "awaiting_establishment"
+STATUS_AWAITING_FINAL_SANCTION = "awaiting_final_sanction"
+STATUS_AWAITING_DIRECTOR_SELF_SANCTION = "awaiting_director_self_sanction"
+STATUS_APPROVED = "approved"
+STATUS_REJECTED = "rejected"
+STATUS_WITHDRAWN = "withdrawn"
+STATUS_CANCELLATION_PENDING = "cancellation_pending"
+STATUS_CANCELLED = "cancelled"
+STATUS_CLOSED = "closed"
+
+TERMINAL_STATUSES = {STATUS_REJECTED, STATUS_WITHDRAWN, STATUS_CANCELLED, STATUS_CLOSED}
+ACTIVE_STATUSES = {
+    STATUS_AWAITING_SUBSTITUTE,
+    STATUS_AWAITING_UNIT_HEAD,
+    STATUS_AWAITING_ESTABLISHMENT,
+    STATUS_AWAITING_FINAL_SANCTION,
+    STATUS_AWAITING_DIRECTOR_SELF_SANCTION,
+    STATUS_APPROVED,
+}
+
+# Substitute statuses (BR-EL-014, BR-EL-015)
+SUBSTITUTE_NOT_REQUIRED = "not_required"
+SUBSTITUTE_PENDING = "pending"
+SUBSTITUTE_ACCEPTED = "accepted"
+SUBSTITUTE_DECLINED = "declined"
+
+# Unit Head decisions (BR-EL-016, BR-EL-017)
+DECISION_APPROVE = "approved"
+DECISION_REJECT = "rejected"
+DECISION_RECOMMEND = "recommended"
+DECISION_NOT_RECOMMEND = "not_recommended"
+
+# Entitlements baseline
+DEFAULT_ENTITLEMENTS = {
+    "staff": {LEAVE_CL: 8.0, LEAVE_RH: 2.0, LEAVE_SCL: 15.0, LEAVE_EL: 30.0, LEAVE_COL: 20.0, LEAVE_VL: 0.0},
+    "faculty": {LEAVE_CL: 8.0, LEAVE_RH: 2.0, LEAVE_SCL: 15.0, LEAVE_EL: 0.0, LEAVE_COL: 20.0, LEAVE_VL: 60.0},
+}
