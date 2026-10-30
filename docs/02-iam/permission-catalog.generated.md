@@ -13,6 +13,23 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave_elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave_elm.application.view_self` | See one's own leave applications and balances | `Dean`, `Director`, `Employee`, `HOD`, `Leave Administrator`, `Leave Approver`, `Registrar`, `faculty`, `staff` |
+| `leave_elm.application.apply` | Submit a leave application | `Director`, `Employee`, `HOD`, `faculty`, `staff` |
+| `leave_elm.application.withdraw` | Withdraw a pending leave application | `Director`, `Employee`, `HOD`, `faculty`, `staff` |
+| `leave_elm.application.cancel` | Request cancellation of an approved leave | `Director`, `Employee`, `HOD`, `faculty`, `staff` |
+| `leave_elm.application.extend` | Request extension of an ongoing leave | `Director`, `Employee`, `HOD`, `faculty`, `staff` |
+| `leave_elm.application.resume` | Submit a return to duty resumption report | `Director`, `Employee`, `HOD`, `faculty`, `staff` |
+| `leave_elm.application.view` | View employee leave applications | `Dean`, `Director`, `HOD`, `Leave Administrator`, `Leave Approver`, `Registrar` |
+| `leave_elm.substitute.respond` | Accept or decline nominated substitute responsibilities | `Director`, `Employee`, `HOD`, `faculty`, `staff` |
+| `leave_elm.application.review` | Review and record Unit Head recommendation | `Dean`, `Director`, `HOD`, `Leave Administrator`, `Leave Approver`, `Registrar` |
+| `leave_elm.application.approve` | Approve or reject leave, cancellation, and extension | `Dean`, `Director`, `HOD`, `Leave Administrator`, `Leave Approver`, `Registrar` |
+| `leave_elm.admin.manage` | Manage ELM policy configuration, calendars, and offline records | `Leave Administrator` |
+| `leave_elm.report.view` | View employee leave summary reports | `Dean`, `Director`, `HOD`, `Leave Administrator`, `Leave Approver`, `Registrar` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
