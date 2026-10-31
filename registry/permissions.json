@@ -34,6 +34,238 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "modules.elm": {
+      "grants": {
+        "deputy_registrar": [
+          "modules.elm.application.view",
+          "modules.elm.balance.view",
+          "modules.elm.history.view",
+          "modules.elm.offline.record",
+          "modules.elm.policy.configure",
+          "modules.elm.records.maintain",
+          "modules.elm.resumption.review",
+          "modules.elm.workflow.review"
+        ],
+        "director": [
+          "modules.elm.application.view",
+          "modules.elm.balance.view",
+          "modules.elm.history.view",
+          "modules.elm.resumption.review",
+          "modules.elm.workflow.review"
+        ],
+        "faculty": [
+          "modules.elm.application.create",
+          "modules.elm.application.print",
+          "modules.elm.application.view",
+          "modules.elm.balance.view",
+          "modules.elm.history.view",
+          "modules.elm.leave.cancel_request",
+          "modules.elm.leave.extension_request",
+          "modules.elm.leave.withdraw",
+          "modules.elm.resumption.submit",
+          "modules.elm.substitute.replace"
+        ],
+        "leave_administrator": [
+          "modules.elm.calendar.manage",
+          "modules.elm.offline.record",
+          "modules.elm.policy.configure",
+          "modules.elm.records.maintain",
+          "modules.elm.sla.configure_thresholds",
+          "modules.elm.workflow.configure"
+        ],
+        "staff": [
+          "modules.elm.application.create",
+          "modules.elm.application.print",
+          "modules.elm.application.view",
+          "modules.elm.balance.view",
+          "modules.elm.history.view",
+          "modules.elm.leave.cancel_request",
+          "modules.elm.leave.extension_request",
+          "modules.elm.leave.withdraw",
+          "modules.elm.resumption.submit",
+          "modules.elm.substitute.replace"
+        ],
+        "unit_head": [
+          "modules.elm.application.view",
+          "modules.elm.balance.view",
+          "modules.elm.history.view",
+          "modules.elm.offline.record",
+          "modules.elm.policy.configure",
+          "modules.elm.records.maintain",
+          "modules.elm.resumption.review",
+          "modules.elm.workflow.review"
+        ]
+      },
+      "module_grants": [
+        "deputy_registrar",
+        "director",
+        "faculty",
+        "leave_administrator",
+        "staff",
+        "unit_head"
+      ],
+      "nav": {
+        "base_path": "/elm",
+        "icon": "Leaf",
+        "items": [
+          {
+            "code": "elm.apply",
+            "icon": "Leaf",
+            "label": "Apply for Leave",
+            "required_permission": "modules.elm.application.create",
+            "sort_order": 10,
+            "to": "/elm/apply"
+          },
+          {
+            "code": "elm.balances",
+            "icon": "Scale",
+            "label": "Leave Balances",
+            "required_permission": "modules.elm.balance.view",
+            "sort_order": 20,
+            "to": "/elm/balances"
+          },
+          {
+            "code": "elm.history",
+            "icon": "History",
+            "label": "Leave History",
+            "required_permission": "modules.elm.history.view",
+            "sort_order": 30,
+            "to": "/elm/history"
+          },
+          {
+            "code": "elm.print",
+            "icon": "Printer",
+            "label": "Print Application",
+            "required_permission": "modules.elm.application.print",
+            "sort_order": 40,
+            "to": "/elm/print"
+          },
+          {
+            "code": "elm.approvals",
+            "icon": "ClipboardCheck",
+            "label": "Leave Approvals",
+            "required_permission": "modules.elm.workflow.review",
+            "sort_order": 50,
+            "to": "/elm/approvals"
+          },
+          {
+            "code": "elm.routing",
+            "icon": "Settings",
+            "label": "Approval Routing",
+            "required_permission": "modules.elm.workflow.configure",
+            "sort_order": 60,
+            "to": "/elm/routing"
+          },
+          {
+            "code": "elm.sla",
+            "icon": "Clock",
+            "label": "SLA Thresholds",
+            "required_permission": "modules.elm.sla.configure_thresholds",
+            "sort_order": 90,
+            "to": "/elm/sla/thresholds"
+          },
+          {
+            "code": "elm.year_end",
+            "icon": "Calendar",
+            "label": "Year-End Processing",
+            "required_permission": "modules.elm.yearend.execute",
+            "sort_order": 100,
+            "to": "/elm/year-end"
+          }
+        ],
+        "label": "Employee Leave Management",
+        "nav_section": "Employee Leave Management",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "modules.elm.application.create",
+          "label": "Create a new leave application"
+        },
+        {
+          "code": "modules.elm.application.view",
+          "label": "View own leave applications"
+        },
+        {
+          "code": "modules.elm.balance.view",
+          "label": "View own leave balances"
+        },
+        {
+          "code": "modules.elm.history.view",
+          "label": "View own leave history"
+        },
+        {
+          "code": "modules.elm.leave.withdraw",
+          "label": "Withdraw a pending leave request"
+        },
+        {
+          "code": "modules.elm.leave.cancel_request",
+          "label": "Request cancellation of approved leave"
+        },
+        {
+          "code": "modules.elm.leave.extension_request",
+          "label": "Request extension of ongoing leave"
+        },
+        {
+          "code": "modules.elm.resumption.submit",
+          "label": "Submit resumption of duty"
+        },
+        {
+          "code": "modules.elm.resumption.review",
+          "label": "Review resumption of duty"
+        },
+        {
+          "code": "modules.elm.workflow.review",
+          "label": "Review leave approval workflow items"
+        },
+        {
+          "code": "modules.elm.workflow.configure",
+          "label": "Configure leave approval routing roles"
+        },
+        {
+          "code": "modules.elm.application.print",
+          "label": "Obtain printable/exportable leave application"
+        },
+        {
+          "code": "modules.elm.policy.configure",
+          "label": "Configure leave policy parameters"
+        },
+        {
+          "code": "modules.elm.calendar.manage",
+          "label": "Maintain and publish holiday/RH calendar"
+        },
+        {
+          "code": "modules.elm.offline.record",
+          "label": "Record already-sanctioned offline leave"
+        },
+        {
+          "code": "modules.elm.records.maintain",
+          "label": "Maintain authorized leave records"
+        },
+        {
+          "code": "modules.elm.sla.configure_thresholds",
+          "label": "Configure SLA reminder/escalation thresholds"
+        },
+        {
+          "code": "modules.elm.substitute.replace",
+          "label": "Nominate a replacement substitute after decline"
+        },
+        {
+          "code": "modules.elm.yearend.execute",
+          "label": "Execute year-end leave processing"
+        },
+        {
+          "code": "modules.elm.sla.process",
+          "label": "Process SLA threshold event"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "modules.elm.sla.process",
+        "modules.elm.yearend.execute"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

@@ -13,6 +13,31 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `modules.elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `modules.elm.application.create` | Create a new leave application | `faculty`, `staff` |
+| `modules.elm.application.view` | View own leave applications | `deputy_registrar`, `director`, `faculty`, `staff`, `unit_head` |
+| `modules.elm.balance.view` | View own leave balances | `deputy_registrar`, `director`, `faculty`, `staff`, `unit_head` |
+| `modules.elm.history.view` | View own leave history | `deputy_registrar`, `director`, `faculty`, `staff`, `unit_head` |
+| `modules.elm.leave.withdraw` | Withdraw a pending leave request | `faculty`, `staff` |
+| `modules.elm.leave.cancel_request` | Request cancellation of approved leave | `faculty`, `staff` |
+| `modules.elm.leave.extension_request` | Request extension of ongoing leave | `faculty`, `staff` |
+| `modules.elm.resumption.submit` | Submit resumption of duty | `faculty`, `staff` |
+| `modules.elm.resumption.review` | Review resumption of duty | `deputy_registrar`, `director`, `unit_head` |
+| `modules.elm.workflow.review` | Review leave approval workflow items | `deputy_registrar`, `director`, `unit_head` |
+| `modules.elm.workflow.configure` | Configure leave approval routing roles | `leave_administrator` |
+| `modules.elm.application.print` | Obtain printable/exportable leave application | `faculty`, `staff` |
+| `modules.elm.policy.configure` | Configure leave policy parameters | `deputy_registrar`, `leave_administrator`, `unit_head` |
+| `modules.elm.calendar.manage` | Maintain and publish holiday/RH calendar | `leave_administrator` |
+| `modules.elm.offline.record` | Record already-sanctioned offline leave | `deputy_registrar`, `leave_administrator`, `unit_head` |
+| `modules.elm.records.maintain` | Maintain authorized leave records | `deputy_registrar`, `leave_administrator`, `unit_head` |
+| `modules.elm.sla.configure_thresholds` | Configure SLA reminder/escalation thresholds | `leave_administrator` |
+| `modules.elm.substitute.replace` | Nominate a replacement substitute after decline | `faculty`, `staff` |
+| `modules.elm.yearend.execute` | Execute year-end leave processing | _service only_ |
+| `modules.elm.sla.process` | Process SLA threshold event | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
