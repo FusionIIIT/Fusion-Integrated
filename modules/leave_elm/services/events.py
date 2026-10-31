@@ -1,57 +1,57 @@
-from django.db import models
+from decimal import Decimal
 from django.utils import timezone
-from modules.leave_elm.domain.policy import LEAVE_CATEGORY_NAMES, LEAVE_POLICY_DEFAULTS
-from django.core.mail import send_mail
-from datetime import timedelta
-from modules.leave_elm.models import LeaveBalance, LeavePolicy, LeaveTask, LeaveNotification
+
+from modules.leave_elm.domain.policy import LEAVE_CATEGORY_NAMES
+from modules.leave_elm.models import LeaveBalance, LeaveCategory, LeaveNotification, LeavePolicy, LeaveTask
 
 
 def year_end_rollover():
-    # Logic to calculate new leave balance for each user based on policy defaults
-    current_year = timezone.now().year
-    policies = LeavePolicy.objects.all()
-    for policy in policies:
-        category_defaults = LEAVE_POLICY_DEFAULTS.get(policy.name)
-        if category_defaults is None:
-            continue
-        for leave_category in LEAVE_CATEGORY_NAMES:
-            balance = LeaveBalance.objects.filter(leave_category__name=leave_category).aggregate(total_balance=models.Sum('balance'))['total_balance'] or 0
-            new_balance = balance + (category_defaults - balance / 12) * 12
-            LeaveBalance.objects.update_or_create(
-                leave_category__name=leave_category,
-                defaults={'balance': new_balance}
-            )
-
-
-def process_task_sla():
-    # Logic to check and notify pending tasks that are approaching SLA thresholds
-    threshold_days = {
-        'Reminder': 60,
-        'Escalation': 120
+    policy = LeavePolicy.objects.first()
+    allocations = {
+        'CL': policy.cl_days if policy else 8,
+        'RH': policy.rh_days if policy else 2,
+        'SCL': policy.scl_days if policy else 15,
+        'EL': policy.el_days if policy else 30,
+        'COL': policy.col_days if policy else 20,
+        'VL': policy.vl_days if policy else 60
     }
-    now = timezone.now()
-    for task in LeaveTask.objects.filter(status='Pending'):
-        reminder_threshold = threshold_days.get(task.task_type, 30)
-        escalation_threshold = threshold_days.get(task.task_type, 90)
-        if now > task.reminder_threshold and not task.notification_sent:
-            send_mail(
-                subject=f'Leave Task Reminder: {task.leave_application.id} - {task.task_type}',
-                message=f"""Reminder: Your leave task is due on {task.reminder_threshold.strftime('%Y-%m-%d')}.
-Please update the status of your leave application.""",
-                from_email='noreply@yourdomain.com',
-                recipient_list=[task.leave_application.user.email],
-                fail_silently=False
+    user_ids = list(LeaveBalance.objects.values_list('user_id', flat=True).distinct())
+    for uid in user_ids:
+        for cat_name in LEAVE_CATEGORY_NAMES:
+            cat, _ = LeaveCategory.objects.get_or_create(name=cat_name, defaults={'description': cat_name})
+            bal, created = LeaveBalance.objects.get_or_create(user_id=uid, leave_category=cat, defaults={'balance': Decimal(str(allocations[cat_name]))})
+            if not created:
+                if cat_name == 'EL':
+                    bal.balance = min(Decimal('300.00'), bal.balance + Decimal(str(allocations['EL'])))
+                elif cat_name != 'COL':
+                    bal.balance = Decimal(str(allocations[cat_name]))
+                bal.save(update_fields=['balance', 'updated_at'])
+    return {'users_processed': len(user_ids), 'balances_updated': len(user_ids) * len(LEAVE_CATEGORY_NAMES)}
+
+def process_task_sla(now=None):
+    now = now or timezone.now()
+    reminded = 0
+    escalated = 0
+    for task in LeaveTask.objects.select_related('leave_application').filter(status='Pending'):
+        elapsed_minutes = (now - task.created_at).total_seconds() / 60.0
+        if elapsed_minutes >= float(task.escalation_threshold) and task.escalated_at is None:
+            task.escalated_at = now
+            task.save(update_fields=['escalated_at', 'updated_at'])
+            LeaveNotification.objects.create(
+                user_id=task.leave_application.user_id,
+                leave_application=task.leave_application,
+                message=f'SLA Escalation for task #{task.id}',
+                channel='in_app'
             )
-            task.notification_sent = True
-            task.save()
-        elif now > task.escalation_threshold and not task.escalated:
-            send_mail(
-                subject=f'Leave Task Escalation: {task.leave_application.id} - {task.task_type}',
-                message=f"""Escalation: Your leave task has exceeded its SLA of {task.escalation_threshold.days} days.
-Please escalate the issue to a higher authority.""",
-                from_email='noreply@yourdomain.com',
-                recipient_list=[task.leave_application.user.email],
-                fail_silently=False
+            escalated += 1
+        elif elapsed_minutes >= float(task.reminder_threshold) and task.reminded_at is None:
+            task.reminded_at = now
+            task.save(update_fields=['reminded_at', 'updated_at'])
+            LeaveNotification.objects.create(
+                user_id=task.leave_application.user_id,
+                leave_application=task.leave_application,
+                message=f'SLA Reminder for task #{task.id}',
+                channel='in_app'
             )
-            task.escalated = True
-            task.save()
+            reminded += 1
+    return {'reminded': reminded, 'escalated': escalated}

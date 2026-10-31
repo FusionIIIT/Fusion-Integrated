@@ -1,10 +1,92 @@
-LEAVE_CATEGORY_NAMES = ['CL', 'RH', 'SCL', 'EL', 'COL', 'VL']
+from datetime import date, timedelta
+from decimal import Decimal
 
-LEAVE_POLICY_DEFAULTS = {
-    'CL': 8,
-    'RH': 2,
-    'SCL': 15,
-    'EL': 30,
-    'COL': 20,
-    'VL': 60
+LEAVE_CATEGORY_NAMES = ['CL', 'RH', 'SCL', 'EL', 'COL', 'VL']
+LEAVE_POLICY_DEFAULTS = {'CL': 8, 'RH': 2, 'SCL': 15, 'EL': 30, 'COL': 20, 'VL': 60}
+
+STATUS_DRAFT = 'Draft'
+STATUS_PENDING = 'Pending'
+STATUS_SUBSTITUTE_PENDING = 'Substitute Pending'
+STATUS_UNDER_REVIEW = 'Under Review'
+STATUS_AWAITING_AUTHORITY = 'Awaiting Sanctioning Authority'
+STATUS_CLARIFICATION = 'Returned for Clarification'
+STATUS_APPROVED = 'Approved'
+STATUS_REJECTED = 'Rejected'
+STATUS_CANCELLED = 'Cancelled'
+STATUS_COMPLETED = 'Completed'
+
+ACTIVE_OVERLAP_STATUSES = {
+    'Pending',
+    'Substitute Pending',
+    'Under Review',
+    'Awaiting Sanctioning Authority',
+    'Returned for Clarification',
+    'Approved',
 }
+
+
+def normalize_category_code(raw_code: str) -> str:
+    code = str(raw_code).strip().upper()
+    if code in ('VACATION', 'VL'):
+        return 'VL'
+    if code in ('SICK_LEAVE', 'SCL'):
+        return 'SCL'
+    if code in LEAVE_CATEGORY_NAMES:
+        return code
+    raise ValueError(f'Unsupported leave category: {raw_code}')
+
+
+def calculate_requested_days(
+    category_code: str,
+    start_date: date,
+    end_date: date,
+    holidays=(),
+    restricted_holidays=(),
+    prefix_suffix_days: int = 0,
+) -> Decimal:
+    code = normalize_category_code(category_code)
+    if end_date < start_date:
+        raise ValueError('end_date cannot be earlier than start_date')
+    if code == 'RH':
+        if start_date != end_date:
+            raise ValueError('Restricted Holiday (RH) must be a single day')
+        if restricted_holidays and start_date.isoformat() not in set(restricted_holidays):
+            raise ValueError('Selected date is not in the restricted holiday calendar')
+        return Decimal('1.00')
+    if code in ('CL', 'SCL'):
+        holiday_set = set(holidays)
+        count = 0
+        cur = start_date
+        while cur <= end_date:
+            if cur.weekday() < 5 and cur.isoformat() not in holiday_set:
+                count += 1
+            cur += timedelta(days=1)
+        return Decimal(str(count))
+    total_days = (end_date - start_date).days + 1 + max(0, int(prefix_suffix_days))
+    return Decimal(str(total_days))
+
+
+def validate_policy_rules(
+    category_code: str,
+    requested_days: Decimal,
+    available_balance: Decimal,
+    *,
+    has_medical_certificate: bool = False,
+    is_faculty_vacation_eligible: bool = True,
+    station_leave_required: bool = False,
+    address_during_leave: str = '',
+    max_cl_spell: int = 5,
+) -> None:
+    code = normalize_category_code(category_code)
+    if requested_days <= 0:
+        raise ValueError('Requested days cannot be zero or negative')
+    if requested_days > available_balance:
+        raise ValueError('Requested days exceed available balance')
+    if code == 'CL' and requested_days > Decimal(str(max_cl_spell)):
+        raise ValueError('Maximum CL spell exceeded')
+    if code == 'VL' and not is_faculty_vacation_eligible:
+        raise ValueError('Faculty vacation eligibility required for VL')
+    if code == 'EL' and requested_days >= Decimal('10') and not has_medical_certificate:
+        raise ValueError('Medical certificate required for EL >= 10 days')
+    if station_leave_required and not str(address_during_leave).strip():
+        raise ValueError('Address during leave is required for station leave')

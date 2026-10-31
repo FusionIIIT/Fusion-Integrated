@@ -1,0 +1,21 @@
+{
+  "label": "Phase 2 fix LeaveAdminPage.tsx table column mismatches and add rollover trigger",
+  "instruction": "Update client/src/modules/leave_elm/pages/LeaveAdminPage.tsx to fix the mismatched History and Notifications table columns (`record.date`/`record.details` and `notification.title`/`notification.description` which were undefined!). Specifically: (1) In the History table, render `record.created_at ? new Date(record.created_at).toLocaleString() : '-'`, `record.leave_application`, `record.action || '-'`, `record.status`, and `record.decision`. (2) In the Notifications table, render `notification.created_at ? new Date(notification.created_at).toLocaleString() : '-'`, `notification.leave_application`, `notification.message`, and `notification.channel || 'in_app'`. (3) Keep the Policy and Calendar JSON editors with Save Policy and Save Calendar buttons, and add a 'Run Year-End Rollover' button that calls `saveConfigurationMutation.mutate({ run_rollover: true } as unknown as Configuration)`. Keep under 155 lines and return only valid TypeScript JSX code.",
+  "allowed_paths": [
+    "client/src/modules/leave_elm/pages/LeaveAdminPage.tsx"
+  ],
+  "context_files": [
+    "client/src/modules/leave_elm/pages/LeaveAdminPage.tsx",
+    "client/src/modules/leave_elm/api.ts",
+    "client/src/modules/leave_elm/types.ts"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 2600,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

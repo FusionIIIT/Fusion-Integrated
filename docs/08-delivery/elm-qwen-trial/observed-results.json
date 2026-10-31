@@ -687,5 +687,867 @@
       "wall_seconds": 3.56
     }
   ],
-  "validation_scope": "Build/integration only. No functional, BR, security, missing-requirement, maintainability or optimization review. User requested bugs be retained. No deliberate mistakes inserted. Full temporary SQLite migration fails existing Placement0009 missing document_profile_idx; isolated ELM migration passes. PostgreSQL unverified."
+  "validation_scope": "Build/integration only. No functional, BR, security, missing-requirement, maintainability or optimization review. User requested bugs be retained. No deliberate mistakes inserted. Full temporary SQLite migration fails existing Placement0009 missing document_profile_idx; isolated ELM migration passes. PostgreSQL unverified.",
+  "phase2": {
+    "branch": "codex/elm-qwen-phase2",
+    "phase1_baseline_commit": "e8b33a5",
+    "generation_requests": 55,
+    "generation_seconds": 1967.67,
+    "generation_unapplied_or_failed": 0,
+    "requests": [
+      {
+        "prompt": "037",
+        "label": "Phase 2 fix ROLE_GRANTS least-privilege in registry.py",
+        "wall_seconds": 26.98,
+        "input_tokens": 1006,
+        "output_tokens": 1027,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/registry.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/registry.py": "f82de5be6017338fc5e8eb435d0353843bdd2290558b2b6c4d4ca59cf1cea83f"
+        }
+      },
+      {
+        "prompt": "038",
+        "label": "Phase 2 fix SYSTEM_PERMISSIONS conflict in registry.py",
+        "wall_seconds": 29.79,
+        "input_tokens": 2720,
+        "output_tokens": 959,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/registry.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/registry.py": "b235163d0e3ebde7948c7ab1389c432542d1249c81056940fad69463460e44cb"
+        }
+      },
+      {
+        "prompt": "039",
+        "label": "Phase 2 upgrade domain/policy.py with BR1-BR5 pure domain policy helpers",
+        "wall_seconds": 19.66,
+        "input_tokens": 722,
+        "output_tokens": 782,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/domain/policy.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/domain/policy.py": "26c12d90dc6faf2410611cf1895ed0b0c33b7615401def3c884348a70d4d5305"
+        }
+      },
+      {
+        "prompt": "040",
+        "label": "Phase 2 upgrade models.py fixing self-FK bugs and adding ELM fields",
+        "wall_seconds": 41.84,
+        "input_tokens": 1948,
+        "output_tokens": 1514,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/models.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/models.py": "49da3e37c5c8d0f1d826a5c2a49c79eb72ecf24abbf3a0239817ee98adab1310"
+        }
+      },
+      {
+        "prompt": "041",
+        "label": "Phase 2 fix contracts.py FieldError on Count('days')",
+        "wall_seconds": 8.06,
+        "input_tokens": 1907,
+        "output_tokens": 153,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/contracts.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/contracts.py": "3d838fe4c13b717cafbaefa8846d12e62b029967b114594539a8f2f01e6f04f8"
+        }
+      },
+      {
+        "prompt": "042",
+        "label": "Phase 2 fix queries.py permission checks and task queue scoping",
+        "wall_seconds": 16.33,
+        "input_tokens": 1373,
+        "output_tokens": 539,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/services/queries.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/services/queries.py": "7ac6dba9f3ca9c7017876db50570fe7a3d0434491b6aaf1f59f2591b9ed55bf6"
+        }
+      },
+      {
+        "prompt": "043",
+        "label": "Phase 2 upgrade services/applications.py with BR1-BR8 validation and overlap detection",
+        "wall_seconds": 30.95,
+        "input_tokens": 3093,
+        "output_tokens": 946,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/services/applications.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/services/applications.py": "6d2431d88b04ee17a6e56e1bc402b3d26348c26d371c043b71abc7894ed2be2a"
+        }
+      },
+      {
+        "prompt": "044",
+        "label": "Phase 2 upgrade services/actions.py fixing crashes, balance restore, and RBAC",
+        "wall_seconds": 60.56,
+        "input_tokens": 3210,
+        "output_tokens": 2010,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/services/actions.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/services/actions.py": "439bf708d22f43eb160f2927b3a199af55e983a2d0daab9c903fafd3918541b2"
+        }
+      },
+      {
+        "prompt": "045",
+        "label": "Phase 2 fix services/events.py rollover and SLA datetime comparison bugs",
+        "wall_seconds": 25.09,
+        "input_tokens": 3288,
+        "output_tokens": 615,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/services/events.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/services/events.py": "7222c0090f38399c46be81a427b1190fa1b4befa8dbf28ca1f557d694980e737"
+        }
+      },
+      {
+        "prompt": "046",
+        "label": "Phase 2 upgrade api/serializers.py with category fields and ActionRequestSerializer",
+        "wall_seconds": 23.53,
+        "input_tokens": 2377,
+        "output_tokens": 671,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/api/serializers.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/api/serializers.py": "54bc29b184ecf6590ce58b8c69cff7e3649e5d3212bcdc1a8dc823b637e13192"
+        }
+      },
+      {
+        "prompt": "047",
+        "label": "Phase 2 repair domain/policy.py Decimal import order and date ordinal bug",
+        "wall_seconds": 25.97,
+        "input_tokens": 1263,
+        "output_tokens": 912,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/domain/policy.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/domain/policy.py": "220938d404cfc4357211aa7a09da348021371b56bf957492c9bc7bc77b0f0696"
+        }
+      },
+      {
+        "prompt": "048",
+        "label": "Phase 2 repair models.py missing LeaveCalendar, LeavePolicyParameter, and LeaveApplication timestamps",
+        "wall_seconds": 47.23,
+        "input_tokens": 1857,
+        "output_tokens": 1599,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/models.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/models.py": "945cd09faadb29768d1fc0d0d414f37b3fa67d29895187238a40774c0afa7870"
+        }
+      },
+      {
+        "prompt": "049",
+        "label": "Phase 2 repair contracts.py missing LeaveBalance import",
+        "wall_seconds": 4.77,
+        "input_tokens": 320,
+        "output_tokens": 148,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/contracts.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/contracts.py": "32e0c846f7f5bad6b3601ecbb5eb7fb5b4d7d013f0039073dcd81b64e1d93d45"
+        }
+      },
+      {
+        "prompt": "050",
+        "label": "Phase 2 repair queries.py permission strings, LeaveBalance seeding, and Q filter",
+        "wall_seconds": 29.78,
+        "input_tokens": 2865,
+        "output_tokens": 723,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/services/queries.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/services/queries.py": "f699daf5ef3ce174f2f8381b3e6581382f06e6bb5ef9fdc6c2fa775cd20c22cc"
+        }
+      },
+      {
+        "prompt": "051",
+        "label": "Phase 2 upgrade api/views.py fixing authentication, POST /applications, and ApplicationActionView",
+        "wall_seconds": 26.11,
+        "input_tokens": 2127,
+        "output_tokens": 616,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/api/views.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/api/views.py": "b17cc5a584dad3ebf4aa91ec4a90ca2488bf2c2854511d9bd860df362c955a89"
+        }
+      },
+      {
+        "prompt": "052",
+        "label": "Phase 2 fix api/configuration.py FieldErrors and add balance credit/debit admin action",
+        "wall_seconds": 31.77,
+        "input_tokens": 1806,
+        "output_tokens": 823,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/api/configuration.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/api/configuration.py": "0d3eaad2295f5f39c22e4628cec86e0a1e739ef25c021bf2e7507b08a0e738e9"
+        }
+      },
+      {
+        "prompt": "053",
+        "label": "Phase 2 update api/urls.py with notifications and print routes",
+        "wall_seconds": 6.82,
+        "input_tokens": 324,
+        "output_tokens": 186,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/api/urls.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/api/urls.py": "974730ec3ab9d4b3efe21259859a073dfe4612ef3f7ff4fd8094a1510fde3b80"
+        }
+      },
+      {
+        "prompt": "054",
+        "label": "Phase 2 repair services/applications.py missing imports, LeaveApplication.objects.create, and exception handling",
+        "wall_seconds": 44.73,
+        "input_tokens": 4430,
+        "output_tokens": 1233,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/services/applications.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/services/applications.py": "8dfda6075ee3ba132a8e0927268a0ece7ac7746c3ebcadcf0f5cc86742003f89"
+        }
+      },
+      {
+        "prompt": "055",
+        "label": "Phase 2 repair services/actions.py RBAC checks, string list comparisons, and balance updates",
+        "wall_seconds": 98.15,
+        "input_tokens": 5207,
+        "output_tokens": 2446,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/services/actions.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/services/actions.py": "79ec8a0d31be0482b35625d6a26bdf5b769e8f0af2e4f682a4fb211a7fe9ca00"
+        }
+      },
+      {
+        "prompt": "056",
+        "label": "Phase 2 repair services/events.py missing imports and remove broken send_mail calls",
+        "wall_seconds": 37.83,
+        "input_tokens": 3937,
+        "output_tokens": 659,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/services/events.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/services/events.py": "fa3b5efeb768869f14acd0f56246882b21de0e4262c4a70cfc4d4b9d1fa2fa7a"
+        }
+      },
+      {
+        "prompt": "057",
+        "label": "Phase 2 repair api/serializers.py model imports, LeaveTaskSerializer, and Policy/Calendar serializers",
+        "wall_seconds": 33.43,
+        "input_tokens": 2698,
+        "output_tokens": 716,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/api/serializers.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/api/serializers.py": "a8e982613c83d1be5fbf5cbc46dcf623110ff4791b239c316fb114250fd8c234"
+        }
+      },
+      {
+        "prompt": "058",
+        "label": "Phase 2 upgrade frontend types.ts with complete ELM interfaces",
+        "wall_seconds": 13.44,
+        "input_tokens": 541,
+        "output_tokens": 365,
+        "done_reason": "stop",
+        "files_applied": [
+          "client/src/modules/leave_elm/types.ts"
+        ],
+        "sha256": {
+          "client/src/modules/leave_elm/types.ts": "413a335a8e1d08fb4c86af74e7ed900ccde8f24b198de54223eb090d99ffffc9"
+        }
+      },
+      {
+        "prompt": "059",
+        "label": "Phase 2 upgrade frontend api.ts with notifications, print, and record adjustment helpers",
+        "wall_seconds": 19.8,
+        "input_tokens": 1030,
+        "output_tokens": 508,
+        "done_reason": "stop",
+        "files_applied": [
+          "client/src/modules/leave_elm/api.ts"
+        ],
+        "sha256": {
+          "client/src/modules/leave_elm/api.ts": "b79111c901391d84040cd5935e65b2f4adf707777d6b84fd4a8cc28c185793fb"
+        }
+      },
+      {
+        "prompt": "060",
+        "label": "Phase 2 upgrade MyLeavePage.tsx with CL/RH/SCL/EL/COL/VL options, balances, and lifecycle actions",
+        "wall_seconds": 50.43,
+        "input_tokens": 1814,
+        "output_tokens": 1333,
+        "done_reason": "stop",
+        "files_applied": [
+          "client/src/modules/leave_elm/pages/MyLeavePage.tsx"
+        ],
+        "sha256": {
+          "client/src/modules/leave_elm/pages/MyLeavePage.tsx": "554e42fa646696ebddd096d409bf5a9c8754b59e44393ba357f6ac5d3e636109"
+        }
+      },
+      {
+        "prompt": "061",
+        "label": "Phase 2 fix LeaveTasksPage.tsx to pass task.leave_application ID and remarks",
+        "wall_seconds": 31.43,
+        "input_tokens": 1774,
+        "output_tokens": 759,
+        "done_reason": "stop",
+        "files_applied": [
+          "client/src/modules/leave_elm/pages/LeaveTasksPage.tsx"
+        ],
+        "sha256": {
+          "client/src/modules/leave_elm/pages/LeaveTasksPage.tsx": "8b496bc85fc49a8554032bddc91ca9d24a8fbfa5e43e9ddd7f2fa84cbf085ae4"
+        }
+      },
+      {
+        "prompt": "062",
+        "label": "Phase 2 fix LeaveAdminPage.tsx table column mismatches and add rollover trigger",
+        "wall_seconds": 57.17,
+        "input_tokens": 2341,
+        "output_tokens": 1411,
+        "done_reason": "stop",
+        "files_applied": [
+          "client/src/modules/leave_elm/pages/LeaveAdminPage.tsx"
+        ],
+        "sha256": {
+          "client/src/modules/leave_elm/pages/LeaveAdminPage.tsx": "05d690523002783bd23649d88c15f2fbc9e94e232ccfa0f139651afe66e768e4"
+        }
+      },
+      {
+        "prompt": "063",
+        "label": "Phase 2 clean domain/policy.py without broken ordinal loop",
+        "wall_seconds": 23.88,
+        "input_tokens": 893,
+        "output_tokens": 783,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/domain/policy.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/domain/policy.py": "9c4d51b1aa4e0a6fae9ea25b0c7b0ac0f0aff0820b0e1a96390ed438de3c4f63"
+        }
+      },
+      {
+        "prompt": "064",
+        "label": "Phase 2 add missing approved_at, cancelled_at, extension_approved_by_id to models.py",
+        "wall_seconds": 52.15,
+        "input_tokens": 1867,
+        "output_tokens": 1599,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/models.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/models.py": "945cd09faadb29768d1fc0d0d414f37b3fa67d29895187238a40774c0afa7870"
+        }
+      },
+      {
+        "prompt": "065",
+        "label": "Phase 2 clean services/queries.py with correct Decimal import and OR permission check",
+        "wall_seconds": 20.93,
+        "input_tokens": 715,
+        "output_tokens": 597,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/services/queries.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/services/queries.py": "d4632c8f80ae6464e52fa38e0d73f30da19aa7a704e169387b1c7e29d010547d"
+        }
+      },
+      {
+        "prompt": "066",
+        "label": "Phase 2 clean api/views.py with ApplicationListView, ApplicationActionView, BalanceListView, TaskListView, NotificationListView, ApplicationPrintView",
+        "wall_seconds": 29.47,
+        "input_tokens": 979,
+        "output_tokens": 807,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/api/views.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/api/views.py": "52852e126a8f2c39502221058fa4b8ecf9fb0b600e25bb796e53efccd97de8ea"
+        }
+      },
+      {
+        "prompt": "067",
+        "label": "Phase 2 clean api/configuration.py with working ConfigurationView and RecordListView",
+        "wall_seconds": 36.51,
+        "input_tokens": 1187,
+        "output_tokens": 1012,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/api/configuration.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/api/configuration.py": "a2c9a4acdefdbbe0d23851b8a75ec766175d21663a5053ebe410840d48b7e4f2"
+        }
+      },
+      {
+        "prompt": "068",
+        "label": "Phase 2 fix api/urls.py imports from .views and .configuration",
+        "wall_seconds": 6.91,
+        "input_tokens": 204,
+        "output_tokens": 207,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/api/urls.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/api/urls.py": "f38e993a3849da94a6f5cd23130dad9388a46f15706bc25b251a9d3e034358d0"
+        }
+      },
+      {
+        "prompt": "069",
+        "label": "Phase 2 update modules/leave_elm/README.md with Phase 2 architecture and verification",
+        "wall_seconds": 48.21,
+        "input_tokens": 2205,
+        "output_tokens": 1263,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/README.md"
+        ],
+        "sha256": {
+          "modules/leave_elm/README.md": "d06e975bd0d566f9f4dbe55f798080f868d9bc09b2ceb5d7d2bf848dd0d952cb"
+        }
+      },
+      {
+        "prompt": "070",
+        "label": "Phase 2 clean services/applications.py with exact imports and validate_policy_rules args",
+        "wall_seconds": 40.57,
+        "input_tokens": 1420,
+        "output_tokens": 1246,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/services/applications.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/services/applications.py": "71f9b558f4677aa5028e3e315c09fbc363163d052c2163944c07c56ed13f55d4"
+        }
+      },
+      {
+        "prompt": "071",
+        "label": "Phase 2 clean services/actions.py without User.objects or actor.notify_leave_status",
+        "wall_seconds": 31.38,
+        "input_tokens": 2115,
+        "output_tokens": 797,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/services/actions.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/services/actions.py": "a0b9424ee2ef0ad5f510b025cf4dc67b5c623938ee3f538978e27c81c492445f"
+        }
+      },
+      {
+        "prompt": "072",
+        "label": "Phase 2 clean services/events.py with django.utils.timezone and LeaveNotification",
+        "wall_seconds": 21.32,
+        "input_tokens": 758,
+        "output_tokens": 620,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/services/events.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/services/events.py": "d672c4ba82530a070a28c58817e5c230518e1dd759ca03d87c5aa7cd8def9183"
+        }
+      },
+      {
+        "prompt": "073",
+        "label": "Phase 2 clean api/serializers.py with absolute imports and LeaveCalendar imported",
+        "wall_seconds": 18.94,
+        "input_tokens": 733,
+        "output_tokens": 533,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/api/serializers.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/api/serializers.py": "0f5aa6224ad20e7c9ba33335c05d2cd1ae2f216cc4393c207a0b225285852607"
+        }
+      },
+      {
+        "prompt": "074",
+        "label": "Phase 2 clean MyLeavePage.tsx with React Query v5 and Mantine v7",
+        "wall_seconds": 49.44,
+        "input_tokens": 1209,
+        "output_tokens": 1395,
+        "done_reason": "stop",
+        "files_applied": [
+          "client/src/modules/leave_elm/pages/MyLeavePage.tsx"
+        ],
+        "sha256": {
+          "client/src/modules/leave_elm/pages/MyLeavePage.tsx": "c79b728635c1bd027666e65e6b2cd52aa1bdebaf7745d7d3fd8c618a0a4418b7"
+        }
+      },
+      {
+        "prompt": "075",
+        "label": "Phase 2 clean LeaveTasksPage.tsx with Mantine v7 and React Query v5",
+        "wall_seconds": 22.79,
+        "input_tokens": 615,
+        "output_tokens": 645,
+        "done_reason": "stop",
+        "files_applied": [
+          "client/src/modules/leave_elm/pages/LeaveTasksPage.tsx"
+        ],
+        "sha256": {
+          "client/src/modules/leave_elm/pages/LeaveTasksPage.tsx": "329b045ea864dd038ef438ccf59176dc9dae72a432e366dc3d2bddbd33f0a65d"
+        }
+      },
+      {
+        "prompt": "076",
+        "label": "Phase 2 clean LeaveAdminPage.tsx rendering notification.message and record.leave_application",
+        "wall_seconds": 34.93,
+        "input_tokens": 739,
+        "output_tokens": 1021,
+        "done_reason": "stop",
+        "files_applied": [
+          "client/src/modules/leave_elm/pages/LeaveAdminPage.tsx"
+        ],
+        "sha256": {
+          "client/src/modules/leave_elm/pages/LeaveAdminPage.tsx": "eb3d2deecbe7d28f9f50535b5cc6d909deb7e6999aedb105c7f09abbc7584ac2"
+        }
+      },
+      {
+        "prompt": "077",
+        "label": "Phase 2 final domain/policy.py with calendar days branch for EL/COL/VL",
+        "wall_seconds": 27.03,
+        "input_tokens": 918,
+        "output_tokens": 812,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/domain/policy.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/domain/policy.py": "0880c8a273afb21e82c464faa7998bd032b34b852c72e472959407fdb820b494"
+        }
+      },
+      {
+        "prompt": "078",
+        "label": "Phase 2 final models.py with approved_at, cancelled_at, extension_approved_by_id",
+        "wall_seconds": 49.99,
+        "input_tokens": 1496,
+        "output_tokens": 1454,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/models.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/models.py": "aaf4c2b72df3c67724571ca31e9ad4f7115a4ad108891769ee830cb7d4953dd0"
+        }
+      },
+      {
+        "prompt": "079",
+        "label": "Phase 2 final api/urls.py without ApplicationDetailView or trailing slashes",
+        "wall_seconds": 6.87,
+        "input_tokens": 309,
+        "output_tokens": 189,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/api/urls.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/api/urls.py": "10e2c98ff30c744d6f2064611a60114574c88c8140604199b5e0974bf8ef3d67"
+        }
+      },
+      {
+        "prompt": "080",
+        "label": "Phase 2 generate pytest suite in modules/leave_elm/tests/test_elm_phase2.py",
+        "wall_seconds": 122.54,
+        "input_tokens": 6095,
+        "output_tokens": 2692,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/tests/test_elm_phase2.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/tests/test_elm_phase2.py": "b111dc84701cb1e64cd7e8f679bee20442a2ea58bc673a8673ac97a08bada77e"
+        }
+      },
+      {
+        "prompt": "081",
+        "label": "Phase 2 final services/applications.py wrapping calculate_requested_days and validate_policy_rules in try/except ValueError",
+        "wall_seconds": 45.04,
+        "input_tokens": 1579,
+        "output_tokens": 1283,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/services/applications.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/services/applications.py": "eb72abab665ea84ed6bdf236dab5370b6c8e5cdcdcd13783a2627a1f1f15f54e"
+        }
+      },
+      {
+        "prompt": "082",
+        "label": "Phase 2 final services/actions.py with complete if/elif branches",
+        "wall_seconds": 71.76,
+        "input_tokens": 2062,
+        "output_tokens": 1952,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/services/actions.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/services/actions.py": "4b4077d1b26cedb7dd5f16299b2e4fc40ebc8c61408753bf312a99cee3cbe6d3"
+        }
+      },
+      {
+        "prompt": "083",
+        "label": "Phase 2 final api/serializers.py with model imports and LeaveTaskSerializer fields",
+        "wall_seconds": 25.29,
+        "input_tokens": 763,
+        "output_tokens": 654,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/api/serializers.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/api/serializers.py": "7613b6e21821f8a5bfbb5318adf5407d23d7dcc2b02698f84b21e1dce5c867da"
+        }
+      },
+      {
+        "prompt": "084",
+        "label": "Phase 2 final MyLeavePage.tsx fixing Table.Thead and Mantine v7 gap props",
+        "wall_seconds": 56.96,
+        "input_tokens": 1748,
+        "output_tokens": 1456,
+        "done_reason": "stop",
+        "files_applied": [
+          "client/src/modules/leave_elm/pages/MyLeavePage.tsx"
+        ],
+        "sha256": {
+          "client/src/modules/leave_elm/pages/MyLeavePage.tsx": "07593f18650605f36fd02121777298727b59d761c51d293f2cfcef860a3b3082"
+        }
+      },
+      {
+        "prompt": "085",
+        "label": "Phase 2 final LeaveTasksPage.tsx fixing muteate typo and Container prop",
+        "wall_seconds": 24.38,
+        "input_tokens": 870,
+        "output_tokens": 635,
+        "done_reason": "stop",
+        "files_applied": [
+          "client/src/modules/leave_elm/pages/LeaveTasksPage.tsx"
+        ],
+        "sha256": {
+          "client/src/modules/leave_elm/pages/LeaveTasksPage.tsx": "21d9201d28d69aa64e29dfeca48bcf865b0fccebd08bd985fd7aee744164b3ad"
+        }
+      },
+      {
+        "prompt": "086",
+        "label": "Phase 2 final LeaveAdminPage.tsx fixing Mantine v7 Group justify and Alert color props",
+        "wall_seconds": 37.12,
+        "input_tokens": 1257,
+        "output_tokens": 980,
+        "done_reason": "stop",
+        "files_applied": [
+          "client/src/modules/leave_elm/pages/LeaveAdminPage.tsx"
+        ],
+        "sha256": {
+          "client/src/modules/leave_elm/pages/LeaveAdminPage.tsx": "ac9c81ceff66c208ed764983d123485417470fcb482a5c03857c3706ba5e4389"
+        }
+      },
+      {
+        "prompt": "087",
+        "label": "Phase 2 fix models.py to import TimeStampedModel and UserScopedModel from core.db.mixins",
+        "wall_seconds": 53.21,
+        "input_tokens": 1748,
+        "output_tokens": 1434,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/models.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/models.py": "8ae8d881893a74b85917993792ffe8776f56adfe17c35044007aaab8998d8228"
+        }
+      },
+      {
+        "prompt": "088",
+        "label": "Phase 2 final pytest suite in modules/leave_elm/tests/test_elm_phase2.py",
+        "wall_seconds": 61.46,
+        "input_tokens": 1772,
+        "output_tokens": 1659,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/tests/test_elm_phase2.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/tests/test_elm_phase2.py": "e2245d5cad7ad93ea5ef4fb6f81c5ebd8e6242642c9ec35b767545a16a16f0e9"
+        }
+      },
+      {
+        "prompt": "089",
+        "label": "Phase 2 final LeaveTasksPage.tsx with context_files=[] and actMutation.mutate",
+        "wall_seconds": 19.81,
+        "input_tokens": 755,
+        "output_tokens": 636,
+        "done_reason": "stop",
+        "files_applied": [
+          "client/src/modules/leave_elm/pages/LeaveTasksPage.tsx"
+        ],
+        "sha256": {
+          "client/src/modules/leave_elm/pages/LeaveTasksPage.tsx": "3d6c09f0ae65c749e86f57582aef7b8631201ef3ad4d34e35ba9acdd983b6f86"
+        }
+      },
+      {
+        "prompt": "090",
+        "label": "Phase 2 final LeaveAdminPage.tsx with context_files=[] and valid React Query v5 hooks",
+        "wall_seconds": 34.08,
+        "input_tokens": 1195,
+        "output_tokens": 1076,
+        "done_reason": "stop",
+        "files_applied": [
+          "client/src/modules/leave_elm/pages/LeaveAdminPage.tsx"
+        ],
+        "sha256": {
+          "client/src/modules/leave_elm/pages/LeaveAdminPage.tsx": "d822f3cb332462e8fdb2c65292b10bbd1a083115c3e590c317c3caa974a6c842"
+        }
+      },
+      {
+        "prompt": "091",
+        "label": "Phase 2 fix _make_principal in test_elm_phase2.py to match Principal dataclass fields",
+        "wall_seconds": 53.05,
+        "input_tokens": 2402,
+        "output_tokens": 1653,
+        "done_reason": "stop",
+        "files_applied": [
+          "modules/leave_elm/tests/test_elm_phase2.py"
+        ],
+        "sha256": {
+          "modules/leave_elm/tests/test_elm_phase2.py": "4cf6c8daf94b1f8366a5aecb54194c5b832643d9953965a9a31987f57c325bd1"
+        }
+      }
+    ],
+    "checks": [
+      {
+        "label": "final-harness-compilation",
+        "returncode": 0,
+        "command": [
+          ".venv/bin/python",
+          "-m",
+          "py_compile",
+          "devtools/qwen_elm_trial.py",
+          "devtools/elm_trial_check.py"
+        ],
+        "wall_seconds": 0.03
+      },
+      {
+        "label": "phase2-django-check",
+        "returncode": 0,
+        "command": [
+          ".venv/bin/python",
+          "manage.py",
+          "check"
+        ],
+        "wall_seconds": 0.34
+      },
+      {
+        "label": "phase2-elm-schema",
+        "returncode": 0,
+        "command": [
+          ".venv/bin/python",
+          "manage.py",
+          "migrate",
+          "--noinput"
+        ],
+        "wall_seconds": 0.35
+      },
+      {
+        "label": "phase2-permission-manifest",
+        "returncode": 0,
+        "command": [
+          ".venv/bin/python",
+          "manage.py",
+          "permission_manifest",
+          "--check"
+        ],
+        "wall_seconds": 0.31
+      },
+      {
+        "label": "phase2-import-boundaries",
+        "returncode": 0,
+        "command": [
+          ".venv/bin/lint-imports"
+        ],
+        "wall_seconds": 0.12
+      },
+      {
+        "label": "phase2-pytest-elm",
+        "returncode": 0,
+        "command": [
+          ".venv/bin/pytest",
+          "modules/leave_elm/tests/test_elm_phase2.py"
+        ],
+        "wall_seconds": 1.28
+      },
+      {
+        "label": "phase2-frontend-typecheck",
+        "returncode": 0,
+        "command": [
+          "npm",
+          "run",
+          "typecheck"
+        ],
+        "wall_seconds": 1.7
+      },
+      {
+        "label": "phase2-frontend-build",
+        "returncode": 0,
+        "command": [
+          "npm",
+          "run",
+          "build"
+        ],
+        "wall_seconds": 3.22
+      }
+    ]
+  }
 }

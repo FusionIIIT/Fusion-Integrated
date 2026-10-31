@@ -1,48 +1,76 @@
-
-from rest_framework.views import APIView
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
-from modules.leave_elm.services.queries import list_applications, own_balances, assigned_tasks
-from modules.leave_elm.services.applications import submit_application
+from rest_framework.views import APIView
+from core.api.exceptions import NotFoundError, PermissionDeniedError
+from fusion_auth.permissions import HasModuleGrant, IsAuthenticatedPrincipal
+from modules.leave_elm.api.record_serializers import LeaveNotificationSerializer
+from modules.leave_elm.api.serializers import ActionRequestSerializer, LeaveApplicationSerializer, LeaveBalanceSerializer, LeaveTaskSerializer
+from modules.leave_elm.models import LeaveApplication
 from modules.leave_elm.services.actions import act_on_application
-from .serializers import LeaveApplicationSerializer, LeaveBalanceSerializer, LeaveTaskSerializer
-from fusion_auth.permissions import IsAuthenticatedPrincipal, HasModuleGrant, HasPermission
-import datetime
+from modules.leave_elm.services.applications import submit_application
+from modules.leave_elm.services.queries import assigned_tasks, list_applications, list_notifications, own_balances
 
 class ApplicationListView(APIView):
+    permission_classes = [IsAuthenticatedPrincipal, HasModuleGrant('leave_elm')]
+    
+    @extend_schema(responses=LeaveApplicationSerializer(many=True))
     def get(self, request):
-        if not isinstance(request.principal, IsAuthenticatedPrincipal):
-            return Response({'error': 'Authentication is required.'}, status=401)
-        applications = list_applications(request.principal)
-        serializer = LeaveApplicationSerializer(applications, many=True)
-        return Response(serializer.data)
+        scope = request.query_params.get('scope', 'mine')
+        applications = list_applications(request.principal, scope=scope)
+        return Response(LeaveApplicationSerializer(applications, many=True).data)
+
+    @extend_schema(request=LeaveApplicationSerializer, responses={201: LeaveApplicationSerializer})
+    def post(self, request):
+        leave_application = submit_application(request.principal, request.data)
+        return Response(LeaveApplicationSerializer(leave_application).data, status=201)
 
 class BalanceListView(APIView):
+    permission_classes = [IsAuthenticatedPrincipal, HasModuleGrant('leave_elm')]
+    
+    @extend_schema(responses=LeaveBalanceSerializer(many=True))
     def get(self, request):
-        if not isinstance(request.principal, IsAuthenticatedPrincipal):
-            return Response({'error': 'Authentication is required.'}, status=401)
         balances = own_balances(request.principal)
-        serializer = LeaveBalanceSerializer(balances, many=True)
-        return Response(serializer.data)
+        return Response(LeaveBalanceSerializer(balances, many=True).data)
 
 class TaskListView(APIView):
+    permission_classes = [IsAuthenticatedPrincipal, HasModuleGrant('leave_elm')]
+    
+    @extend_schema(responses=LeaveTaskSerializer(many=True))
     def get(self, request):
-        if not isinstance(request.principal, IsAuthenticatedPrincipal):
-            return Response({'error': 'Authentication is required.'}, status=401)
         tasks = assigned_tasks(request.principal)
-        serializer = LeaveTaskSerializer(tasks, many=True)
-        return Response(serializer.data)
+        return Response(LeaveTaskSerializer(tasks, many=True).data)
+
+class NotificationListView(APIView):
+    permission_classes = [IsAuthenticatedPrincipal, HasModuleGrant('leave_elm')]
+    
+    @extend_schema(responses=LeaveNotificationSerializer(many=True))
+    def get(self, request):
+        notifications = list_notifications(request.principal)
+        return Response(LeaveNotificationSerializer(notifications, many=True).data)
 
 class ApplicationActionView(APIView):
-    permission_classes = [HasModuleGrant('leave_elm'), HasPermission('leave_elm.application.create')]
+    permission_classes = [IsAuthenticatedPrincipal, HasModuleGrant('leave_elm')]
+    
+    @extend_schema(request=ActionRequestSerializer, responses=LeaveApplicationSerializer)
+    def post(self, request, pk: int):
+        action = request.data.get('action')
+        leave_application = act_on_application(request.principal, int(pk), action, request.data)
+        return Response(LeaveApplicationSerializer(leave_application).data, status=200)
 
-    def post(self, request, pk=None):
-        if not isinstance(request.principal, IsAuthenticatedPrincipal):
-            return Response({'error': 'Authentication is required.'}, status=401)
-        data = request.data.copy()
-        application_id = int(pk)  # Assuming the URL parameter is a string representation of an integer
-        try:
-            leave_application = submit_application(request.principal, data)
-            serializer = LeaveApplicationSerializer(leave_application)
-            return Response(serializer.data, status=201)
-        except Exception as e:
-            return Response({'error': str(e)}, status=500)
+class ApplicationPrintView(APIView):
+    permission_classes = [IsAuthenticatedPrincipal, HasModuleGrant('leave_elm')]
+    
+    @extend_schema(responses=OpenApiTypes.OBJECT)
+    def get(self, request, pk: int):
+        app = LeaveApplication.objects.select_related('leave_type', 'leave_type__leave_category').filter(id=int(pk)).first()
+        if not app:
+            raise NotFoundError('Leave Application not found')
+        
+        if (app.user_id != request.principal.user_id and
+                not (request.principal.has_permission('leave_elm.application.review') or 
+                     request.principal.has_permission('leave_elm.application.approve') or 
+                     request.principal.has_permission('leave_elm.record.manage'))):
+            raise PermissionDeniedError()
+        
+        return Response({'application': LeaveApplicationSerializer(app).data, 'printable_title': f'IIITDMJ Leave Application #{app.id}'})

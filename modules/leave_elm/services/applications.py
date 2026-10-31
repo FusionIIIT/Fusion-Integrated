@@ -1,43 +1,151 @@
 
-
-from django.db import transaction
-from modules.leave_elm.models import LeaveApplication, LeaveHistory, LeaveTask
-from fusion_auth.principal import Principal
-from core.api.exceptions import BadRequestError, ConflictError, DomainError, NotFoundError, PermissionDeniedError
 import datetime
+from decimal import Decimal
+from django.db import transaction
+from core.api.exceptions import BadRequestError, ConflictError, DomainError, PermissionDeniedError
+from modules.leave_elm.domain.policy import ACTIVE_OVERLAP_STATUSES, LEAVE_POLICY_DEFAULTS, calculate_requested_days, normalize_category_code, validate_policy_rules
+from modules.leave_elm.models import LeaveApplication, LeaveBalance, LeaveCategory, LeaveHistory, LeaveNotification, LeaveSubstitution, LeaveTask, LeaveType
 
 @transaction.atomic
 def submit_application(actor, data):
     if not actor.has_permission('leave_elm.application.create'):
         raise PermissionDeniedError()
 
+    raw_lt = data.get('leave_type') if 'leave_type' in data else data.get('leave_type_id')
+    if raw_lt is None or raw_lt == '':
+        raise BadRequestError('leave_type is required')
+
+    if isinstance(raw_lt, LeaveType):
+        leave_type = raw_lt
+    elif isinstance(raw_lt, int) or str(raw_lt).isdigit():
+        leave_type = LeaveType.objects.select_related('leave_category').filter(id=int(raw_lt)).first()
+        if not leave_type:
+            raise BadRequestError('Invalid leave_type id')
+    else:
+        try:
+            code = normalize_category_code(str(raw_lt))
+        except ValueError as exc:
+            raise DomainError(str(exc)) from exc
+        cat, _ = LeaveCategory.objects.get_or_create(name=code, defaults={'description': code})
+        leave_type, _ = LeaveType.objects.get_or_create(name=code, defaults={'description': code, 'leave_category': cat})
+
+    raw_start = data.get('start_date')
+    raw_end = data.get('end_date')
+    if not raw_start or not raw_end:
+        raise BadRequestError('start_date and end_date are required')
+
+    start_date = raw_start if isinstance(raw_start, datetime.date) else datetime.date.fromisoformat(str(raw_start))
+    end_date = raw_end if isinstance(raw_end, datetime.date) else datetime.date.fromisoformat(str(raw_end))
+
+    purpose = str(data.get('purpose', '')).strip()
+    if not purpose:
+        raise BadRequestError('purpose is required')
+
+    cat_code = leave_type.leave_category.name
+    bal, _ = LeaveBalance.objects.get_or_create(user_id=actor.user_id, leave_category=leave_type.leave_category, defaults={'balance': Decimal(str(LEAVE_POLICY_DEFAULTS.get(cat_code, 8)))})
+
     try:
-        # Create a new leave application
-        leave_application = LeaveApplication(
+        requested_days = calculate_requested_days(
+            cat_code,
+            start_date,
+            end_date,
+            holidays=data.get('holidays', ()),
+            restricted_holidays=data.get('restricted_holidays', ()),
+            prefix_suffix_days=int(data.get('prefix_suffix_days', 0) or 0),
+        )
+        validate_policy_rules(
+            cat_code,
+            requested_days,
+            bal.balance,
+            has_medical_certificate=bool(data.get('has_medical_certificate') or data.get('attachment_reference')),
+            is_faculty_vacation_eligible=(actor.kind == 'faculty'),
+            station_leave_required=bool(data.get('station_leave_required', False)),
+            address_during_leave=str(data.get('address_during_leave', '')).strip(),
+        )
+    except ValueError as exc:
+        raise DomainError(str(exc)) from exc
+
+    if LeaveApplication.objects.filter(user_id=actor.user_id, status__in=ACTIVE_OVERLAP_STATUSES, start_date__lte=end_date, end_date__gte=start_date).exists():
+        raise ConflictError('Leave dates overlap with an existing active leave application.')
+
+    acad_sub = int(data['academic_substitute_user_id']) if data.get('academic_substitute_user_id') else None
+    admin_sub = int(data['admin_substitute_user_id']) if data.get('admin_substitute_user_id') else None
+
+    if (acad_sub and acad_sub == actor.user_id) or (admin_sub and admin_sub == actor.user_id):
+        raise DomainError('Applicant cannot be their own substitute.')
+
+    status_val = 'Substitute Pending' if (acad_sub or admin_sub) else 'Pending'
+
+    app = LeaveApplication.objects.create(
+        user_id=actor.user_id,
+        leave_type=leave_type,
+        start_date=start_date,
+        end_date=end_date,
+        working_days=requested_days,
+        purpose=purpose,
+        status=status_val,
+        station_leave_required=bool(data.get('station_leave_required', False)),
+        address_during_leave=str(data.get('address_during_leave', '')),
+        contact_number=str(data.get('contact_number', '')),
+        academic_substitute_user_id=acad_sub,
+        admin_substitute_user_id=admin_sub,
+        attachment_reference=str(data.get('attachment_reference', '')),
+        remarks=str(data.get('remarks', ''))
+    )
+
+    if acad_sub:
+        LeaveSubstitution.objects.create(
             user_id=actor.user_id,
-            leave_type=data['leave_type'],
-            start_date=data['start_date'],
-            end_date=data['end_date'],
-            purpose=data['purpose'],
+            leave_application=app,
+            substitute_user_id=acad_sub,
+            substitution_type='academic',
+            status='Pending'
         )
-        leave_application.save()
-
-        # Record history for submission
-        leave_history = LeaveHistory(
-            leave_application=leave_application,
-            status='Submitted',
-        )
-        leave_history.save()
-
-        # Record task for submission
-        leave_task = LeaveTask(
-            leave_application=leave_application,
-            task_type='Submission',
+        LeaveTask.objects.create(
+            user_id=acad_sub,
+            leave_application=app,
+            task_type='Substitute Consent',
             status='Pending',
+            role='substitute'
         )
-        leave_task.save()
 
-        return leave_application
+    if admin_sub:
+        LeaveSubstitution.objects.create(
+            user_id=actor.user_id,
+            leave_application=app,
+            substitute_user_id=admin_sub,
+            substitution_type='administrative',
+            status='Pending'
+        )
+        LeaveTask.objects.create(
+            user_id=admin_sub,
+            leave_application=app,
+            task_type='Substitute Consent',
+            status='Pending',
+            role='substitute'
+        )
 
-    except Exception as e:
-        raise DomainError(str(e))
+    if not acad_sub and not admin_sub:
+        LeaveTask.objects.create(
+            user_id=actor.user_id,
+            leave_application=app,
+            task_type='Application Review',
+            status='Pending',
+            role='reviewer'
+        )
+
+    LeaveHistory.objects.create(
+        user_id=actor.user_id,
+        leave_application=app,
+        action='submit',
+        status=app.status,
+        decision='Submitted'
+    )
+    LeaveNotification.objects.create(
+        user_id=actor.user_id,
+        leave_application=app,
+        message=f'Application #{app.id} submitted ({app.status}).',
+        channel='in_app'
+    )
+
+    return app

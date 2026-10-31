@@ -1,52 +1,71 @@
-
-from rest_framework import generics
-from modules.leave_elm.models import LeavePolicy, LeaveCalendar, LeaveType, LeaveHistory, LeaveNotification
-from modules.leave_elm.api.serializers import LeavePolicySerializer, LeaveCalendarSerializer
-from .record_serializers import LeaveHistorySerializer, LeaveNotificationSerializer
-from fusion_auth.permissions import HasModuleGrant, HasPermission
-import json
+from decimal import Decimal
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from core.api.exceptions import BadRequestError
+from fusion_auth.permissions import HasModuleGrant, HasPermission, IsAuthenticatedPrincipal
+from modules.leave_elm.api.record_serializers import LeaveHistorySerializer, LeaveNotificationSerializer
+from modules.leave_elm.api.serializers import LeaveApplicationSerializer, LeaveBalanceSerializer, LeaveCalendarSerializer, LeavePolicySerializer
+from modules.leave_elm.domain.policy import normalize_category_code
+from modules.leave_elm.models import LeaveApplication, LeaveBalance, LeaveCalendar, LeaveCategory, LeaveHistory, LeaveNotification, LeavePolicy
+from modules.leave_elm.services.events import year_end_rollover
 
-class ConfigurationView(generics.ListCreateAPIView):
-    permission_classes = [HasModuleGrant("leave_elm"), HasPermission("leave_elm.configuration.manage")]
-    queryset = LeavePolicy.objects.all()
-    serializer_class = LeavePolicySerializer
+class ConfigurationView(APIView):
+    permission_classes = [IsAuthenticatedPrincipal, HasModuleGrant('leave_elm'), HasPermission('leave_elm.configuration.manage')]
 
-    def get_queryset(self):
-        return self.queryset.filter(user=self.request.principal.user_id)
+    @extend_schema(responses=OpenApiTypes.OBJECT)
+    def get(self, request):
+        policy, _ = LeavePolicy.objects.get_or_create(name='Default', defaults={'description': 'Default ELM Policy'})
+        calendar, _ = LeaveCalendar.objects.get_or_create(name='Default', defaults={'user_id': request.principal.user_id, 'holidays': []})
+        return Response({'policy': LeavePolicySerializer(policy).data, 'calendar': LeaveCalendarSerializer(calendar).data, 'policies': LeavePolicySerializer(LeavePolicy.objects.all(), many=True).data, 'calendars': LeaveCalendarSerializer(LeaveCalendar.objects.all(), many=True).data})
 
-def save_configuration(request):
-    if request.method == 'POST':
-        data = json.loads(request.body.decode('utf-8'))
-        policy_serializer = LeavePolicySerializer(data=data['policy'])
-        calendar_serializer = LeaveCalendarSerializer(data=data['calendar'])
+    @extend_schema(request=OpenApiTypes.OBJECT, responses=OpenApiTypes.OBJECT)
+    def post(self, request):
+        data = request.data
+        policy, _ = LeavePolicy.objects.get_or_create(name='Default', defaults={'description': 'Default ELM Policy'})
+        calendar, _ = LeaveCalendar.objects.get_or_create(name='Default', defaults={'user_id': request.principal.user_id, 'holidays': []})
+        
+        if isinstance(data.get('policy'), dict):
+            for k in ('cl_days', 'rh_days', 'scl_days', 'el_days', 'col_days', 'vl_days', 'description'):
+                if k in data['policy']: setattr(policy, k, data['policy'][k])
+            policy.save()
+        
+        if isinstance(data.get('calendar'), dict):
+            if 'holidays' in data['calendar']: calendar.holidays = data['calendar']['holidays']; calendar.save()
 
-        if policy_serializer.is_valid() and calendar_serializer.is_valid():
-            policy_serializer.save(user=request.principal.user_id)
-            calendar_serializer.save(user=request.principal.user_id)
+        rollover_result = year_end_rollover() if data.get('run_rollover') else None
 
-            response_data = {
-                'policy': policy_serializer.data,
-                'calendar': calendar_serializer.data
-            }
+        return Response({'policy': LeavePolicySerializer(policy).data, 'calendar': LeaveCalendarSerializer(calendar).data, 'rollover': rollover_result}, status=200)
 
-            return Response(response_data, status=201)
-        else:
-            return Response(policy_serializer.errors or calendar_serializer.errors, status=400)
+class RecordListView(APIView):
+    permission_classes = [IsAuthenticatedPrincipal, HasModuleGrant('leave_elm'), HasPermission('leave_elm.record.manage')]
 
-class RecordListView(generics.ListAPIView):
-    permission_classes = [HasModuleGrant("leave_elm"), HasPermission("leave_elm.record.manage")]
-    queryset = LeaveHistory.objects.all()
-    serializer_class = LeaveHistorySerializer
+    @extend_schema(responses=OpenApiTypes.OBJECT)
+    def get(self, request):
+        return Response({
+            'applications': LeaveApplicationSerializer(LeaveApplication.objects.select_related('leave_type', 'leave_type__leave_category').order_by('-created_at')[:100], many=True).data,
+            'balances': LeaveBalanceSerializer(LeaveBalance.objects.select_related('leave_category').order_by('user_id', 'id')[:200], many=True).data,
+            'history': LeaveHistorySerializer(LeaveHistory.objects.order_by('-created_at')[:100], many=True).data,
+            'notifications': LeaveNotificationSerializer(LeaveNotification.objects.order_by('-created_at')[:100], many=True).data
+        })
 
-    def get_queryset(self):
-        return self.queryset.filter(leave_application__user=self.request.principal.user_id)
+    @extend_schema(request=OpenApiTypes.OBJECT, responses=OpenApiTypes.OBJECT)
+    def post(self, request):
+        user_id = request.data.get('user_id')
+        cat_raw = request.data.get('category_code') or request.data.get('leave_category')
 
-def record_view(request):
-    history_query = LeaveHistory.objects.filter(leave_application__user=request.principal.user_id)
-    notifications_query = LeaveNotification.objects.filter(leave_application__user=request.principal.user_id)
+        if not user_id or not cat_raw:
+            raise BadRequestError('user_id and category_code are required')
 
-    history_serializer = LeaveHistorySerializer(history_query, many=True)
-    notifications_serializer = LeaveNotificationSerializer(notifications_query, many=True)
+        code = normalize_category_code(str(cat_raw))
+        cat, _ = LeaveCategory.objects.get_or_create(name=code, defaults={'description': code})
+        bal, _ = LeaveBalance.objects.get_or_create(user_id=int(user_id), leave_category=cat, defaults={'balance': Decimal('0.00')})
 
-    return Response({'history': history_serializer.data, 'notifications': notifications_serializer.data})
+        if 'balance' in request.data and request.data.get('balance') is not None:
+            bal.balance = Decimal(str(request.data['balance']))
+        elif 'delta_days' in request.data and request.data.get('delta_days') is not None:
+            bal.balance = bal.balance + Decimal(str(request.data['delta_days']))
+
+        bal.save()
+        return Response(LeaveBalanceSerializer(bal).data, status=200)

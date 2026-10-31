@@ -1,0 +1,17 @@
+{
+  "label": "Generate Phase-2 local-model trial report in TRIAL_RECORD.md",
+  "instruction": "Write the updated docs/08-delivery/elm-qwen-trial/TRIAL_RECORD.md in Markdown covering both Phase 1 (codex/elm-qwen-trial at e8b33a5, Prompts 001-036) and the new Phase 2 section (codex/elm-qwen-phase2, Prompts 037-091). Include these exact sections:\n1. Configuration (model: qwen2.5-coder:3b, 3.1B, Q4_K_M, gguf; digest f72c60cabf6237b07f6e632b2c48d533cef25eda2efbd34bed21c5e9c01e6225; Ollama 0.40.3; Apple M4 10 cores 16 GB RAM; macOS 27.0.1; Fusion base SHA 02b01fea4a67b257ea7000009f06a1561699550e; Phase-1 branch codex/elm-qwen-trial at e8b33a5; Phase-2 branch codex/elm-qwen-phase2)\n2. Phase 1 Summary (Prompts 001-036, 34 code-generation requests, 1734.58s wall time, compilation/integration checks only)\n3. Phase 2 Method & Identified Defects (started from preserved Phase-1 commit e8b33a5; all application, test, and module README changes generated strictly by qwen2.5-coder:3b via devtools/qwen_elm_trial.py across Prompts 037-091; fixed 10 defects: SYSTEM_PERMISSIONS collision and unchecked permissions in registry.py/services, LeaveBalance leave_type_id lookup bug, missing AttachmentRecord/NotificationDispatchLog/LeaveAuditEvent models and 0002_phase2_schema_fixes migration, pure domain policy helpers with half-day/joining-date/probation/document/notice rules, submit/cancel/substitute/review/approve/reject workflows with balance deduction and restoration, DRF serializer read/write alignment, missing submit/cancel and admin CRUD endpoints, frontend TypeScript API/types/pages alignment, and end-to-end pytest suite)\n4. Phase 2 Observed Generation Results (55 requests across Prompts 037-091, 1967.67 seconds total wall time; list the final applied prompts for each of the 19 updated/created module files: 038 registry.py, 049 contracts.py, 058 types.ts, 059 api.ts, 065 queries.py, 066 views.py, 067 configuration.py, 069 README.md, 072 events.py, 077 policy.py, 079 urls.py, 081 applications.py, 082 actions.py, 083 serializers.py, 084 MyLeavePage.tsx, 087 models.py, 089 LeaveTasksPage.tsx, 090 LeaveAdminPage.tsx, 091 test_elm_phase2.py)\n5. Phase 2 Verification & Build Checks (table of recorded Phase-2 checks from checks.jsonl: phase2-django-check exit 0 in 0.29s, phase2-elm-schema exit 0 in 0.16s, phase2-permission-manifest exit 0 in 0.25s, phase2-import-boundaries exit 0 in 0.17s, phase2-pytest-elm exit 0 in 0.37s with 4 passed tests, phase2-frontend-typecheck exit 0 in 0.77s, phase2-frontend-build exit 0 in 1.69s, plus full repository pytest suite 384 passed)\n6. Reproduce (commands to run devtools/qwen_elm_trial.py and devtools/elm_trial_check.py).\nReturn only the complete Markdown content of TRIAL_RECORD.md.",
+  "allowed_paths": [
+    "docs/08-delivery/elm-qwen-trial/TRIAL_RECORD.md"
+  ],
+  "context_files": [],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 3600,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.1,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

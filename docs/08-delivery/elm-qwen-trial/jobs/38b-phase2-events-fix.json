@@ -1,0 +1,21 @@
+{
+  "label": "Phase 2 repair services/events.py missing imports and remove broken send_mail calls",
+  "instruction": "Fix modules/leave_elm/services/events.py: (1) Import `Decimal` from `decimal`, `timezone` from `django.utils`, `LEAVE_CATEGORY_NAMES, LEAVE_POLICY_DEFAULTS` from `modules.leave_elm.domain.policy`, and `LeaveBalance, LeaveCategory, LeaveNotification, LeavePolicy, LeaveTask` from `modules.leave_elm.models`. Do NOT use `send_mail` or `task.leave_application.user.email`! (2) In `year_end_rollover()`: get `policy = LeavePolicy.objects.first()` and build `allocations = {'CL': policy.cl_days if policy else 8, 'RH': policy.rh_days if policy else 2, 'SCL': policy.scl_days if policy else 15, 'EL': policy.el_days if policy else 30, 'COL': policy.col_days if policy else 20, 'VL': policy.vl_days if policy else 60}`. Find `user_ids = list(LeaveBalance.objects.values_list('user_id', flat=True).distinct())`. Loop `for uid in user_ids:` and `for cat_name in LEAVE_CATEGORY_NAMES:`: `cat, _ = LeaveCategory.objects.get_or_create(name=cat_name, defaults={'description': cat_name})`; `bal, created = LeaveBalance.objects.get_or_create(user_id=uid, leave_category=cat, defaults={'balance': Decimal(str(allocations[cat_name]))})`; if not created: if `cat_name == 'EL'`: `bal.balance = min(Decimal('300.00'), bal.balance + Decimal(str(allocations['EL'])))`; elif `cat_name != 'COL'`: `bal.balance = Decimal(str(allocations[cat_name]))`; `bal.save(update_fields=['balance', 'updated_at'])`. Return `{'users_processed': len(user_ids), 'balances_updated': len(user_ids) * len(LEAVE_CATEGORY_NAMES)}`. (3) In `process_task_sla(now=None)`: set `now = now or timezone.now()`, `reminded = 0`, `escalated = 0`. Loop `for task in LeaveTask.objects.select_related('leave_application').filter(status='Pending'):`: compute `elapsed_minutes = (now - task.created_at).total_seconds() / 60.0`. If `elapsed_minutes >= float(task.escalation_threshold) and task.escalated_at is None`: set `task.escalated_at = now`, `task.save(update_fields=['escalated_at', 'updated_at'])`, create `LeaveNotification.objects.create(user_id=task.leave_application.user_id, leave_application=task.leave_application, message=f'SLA Escalation for task #{task.id}', channel='in_app')`, `escalated += 1`. Else if `elapsed_minutes >= float(task.reminder_threshold) and task.reminded_at is None`: set `task.reminded_at = now`, `task.save(update_fields=['reminded_at', 'updated_at'])`, create `LeaveNotification.objects.create(user_id=task.leave_application.user_id, leave_application=task.leave_application, message=f'SLA Reminder for task #{task.id}', channel='in_app')`, `reminded += 1`. Return `{'reminded': reminded, 'escalated': escalated}`. Return only valid Python code.",
+  "allowed_paths": [
+    "modules/leave_elm/services/events.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/services/events.py",
+    "modules/leave_elm/models.py",
+    "modules/leave_elm/domain/policy.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 2000,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

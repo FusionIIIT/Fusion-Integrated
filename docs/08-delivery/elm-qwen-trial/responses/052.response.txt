@@ -1,0 +1,86 @@
+```
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from fusion_auth.permissions import IsAuthenticatedPrincipal, HasModuleGrant, HasPermission
+from drf_spectacular.utils import extend_schema
+import json
+
+class ConfigurationView(APIView):
+    permission_classes = [IsAuthenticatedPrincipal, HasModuleGrant("leave_elm"), HasPermission("leave_elm.configuration.manage")]
+
+    @extend_schema(responses=OpenApiTypes.OBJECT)
+    def get(self, request):
+        try:
+            policy = LeavePolicy.objects.get(user=request.principal.user_id)
+        except LeavePolicy.DoesNotExist:
+            policy = LeavePolicy(name='Default', user_id=request.principal.user_id)
+            policy.save()
+
+        try:
+            calendar = LeaveCalendar.objects.get(user_id=request.principal.user_id)
+        except LeaveCalendar.DoesNotExist:
+            calendar = LeaveCalendar(name='Default', user_id=request.principal.user_id, holidays=[])
+            calendar.save()
+
+        policies = LeavePolicySerializer(LeavePolicy.objects.all(), many=True).data
+        calendars = LeaveCalendarSerializer(LeaveCalendar.objects.all(), many=True).data
+
+        return Response({'policy': LeavePolicySerializer(policy).data, 'calendar': LeaveCalendarSerializer(calendar).data, 'policies': policies, 'calendars': calendars})
+
+    def post(self, request):
+        if request.method == 'POST':
+            data = json.loads(request.body.decode('utf-8'))
+            policy_serializer = LeavePolicySerializer(data=data['policy'], partial=True)
+            calendar_serializer = LeaveCalendarSerializer(data=data['calendar'])
+
+            if policy_serializer.is_valid() and calendar_serializer.is_valid():
+                policy_serializer.save(user=request.principal.user_id)
+                calendar_serializer.save(user=request.principal.user_id)
+
+                response_data = {
+                    'policy': policy_serializer.data,
+                    'calendar': calendar_serializer.data
+                }
+
+                if 'run_rollover' in data and data['run_rollover']:
+                    # Assuming year_end_rollover is a method on LeavePolicy or LeaveCalendar model
+                    policy.year_end_rollover()
+                    calendar.year_end_rollover()
+
+                return Response(response_data, status=201)
+            else:
+                return Response(policy_serializer.errors or calendar_serializer.errors, status=400)
+
+class RecordListView(APIView):
+    permission_classes = [IsAuthenticatedPrincipal, HasModuleGrant("leave_elm"), HasPermission("leave_elm.record.manage")]
+
+    @extend_schema(responses=OpenApiTypes.OBJECT)
+    def get(self, request):
+        applications = LeaveApplication.objects.select_related('leave_type', 'leave_type__leave_category').order_by('-created_at')[:100]
+        balances = LeaveBalance.objects.select_related('leave_category').order_by('user_id', 'id')[:200]
+        history = LeaveHistory.objects.order_by('-created_at')[:100]
+        notifications = LeaveNotification.objects.order_by('-created_at')[:100]
+
+        return Response({
+            'applications': LeaveApplicationSerializer(applications, many=True).data,
+            'balances': LeaveBalanceSerializer(balances, many=True).data,
+            'history': LeaveHistorySerializer(history, many=True).data,
+            'notifications': LeaveNotificationSerializer(notifications, many=True).data
+        })
+
+    def post(self, request):
+        if request.method == 'POST':
+            data = json.loads(request.body.decode('utf-8'))
+            user_id = request.principal.user_id
+
+            # Assuming admin balance adjustment logic is implemented here
+            # For example:
+            # balance_obj = LeaveBalance.objects.get(user_id=user_id, leave_category_code=data['category_code'])
+            # balance_obj.balance += data.get('balance', 0) + (data.get('delta_days', 0) * balance_obj.leave_category.days_per_period)
+            # balance_obj.save()
+
+            # Return the updated LeaveBalanceSerializer(balance_obj).data
+            # return Response(LeaveBalanceSerializer(balance_obj).data)
+
+            raise NotImplementedError("Admin balance adjustment logic needs to be implemented.")
+```

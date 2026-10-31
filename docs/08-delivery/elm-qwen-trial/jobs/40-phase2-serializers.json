@@ -1,0 +1,20 @@
+{
+  "label": "Phase 2 upgrade api/serializers.py with category fields and ActionRequestSerializer",
+  "instruction": "Update modules/leave_elm/api/serializers.py to include readable leave_type_name and leave_category_name fields and an ActionRequestSerializer. Specifically: (1) In LeaveApplicationSerializer(serializers.ModelSerializer): add leave_type_name = serializers.CharField(source='leave_type.name', read_only=True) and leave_category_name = serializers.CharField(source='leave_type.leave_category.name', read_only=True), set model = LeaveApplication, fields = '__all__', and read_only_fields = ['id', 'user_id', 'created_at', 'updated_at', 'approved_by_id', 'approved_at', 'cancelled_by_id', 'cancelled_at', 'extension_requested', 'extension_approved', 'extension_start_date', 'extension_end_date', 'extension_approved_by_id', 'extension_approved_at', 'reviewed_by_id', 'reviewed_at', 'balance_deducted', 'resumed_at']. (2) In LeaveBalanceSerializer(serializers.ModelSerializer): add leave_category_name = serializers.CharField(source='leave_category.name', read_only=True), model = LeaveBalance, fields = ['id', 'user_id', 'leave_category', 'leave_category_name', 'balance', 'created_at', 'updated_at']. (3) In LeaveTaskSerializer(serializers.ModelSerializer): add title = serializers.SerializerMethodField(), description = serializers.SerializerMethodField(), application_status = serializers.CharField(source='leave_application.status', read_only=True), applicant_user_id = serializers.IntegerField(source='leave_application.user_id', read_only=True), leave_type_name = serializers.CharField(source='leave_type.name', default='', read_only=True) or from leave_application.leave_type.name, start_date = serializers.DateField(source='leave_application.start_date', read_only=True), end_date = serializers.DateField(source='leave_application.end_date', read_only=True), purpose = serializers.CharField(source='leave_application.purpose', read_only=True), model = LeaveTask, fields = ['id', 'user_id', 'leave_application', 'task_type', 'role', 'status', 'reminder_threshold', 'escalation_threshold', 'reminded_at', 'escalated_at', 'title', 'description', 'application_status', 'applicant_user_id', 'start_date', 'end_date', 'purpose', 'created_at', 'updated_at']. (4) Keep LeavePolicySerializer and LeaveCalendarSerializer. (5) Add ActionRequestSerializer(serializers.Serializer) with action = serializers.CharField(), decision = serializers.CharField(required=False, allow_blank=True, default=''), remarks = serializers.CharField(required=False, allow_blank=True, default=''). Return only valid Python code.",
+  "allowed_paths": [
+    "modules/leave_elm/api/serializers.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/api/serializers.py",
+    "modules/leave_elm/models.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 2200,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

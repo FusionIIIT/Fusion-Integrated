@@ -1,0 +1,26 @@
+{
+  "label": "Phase 2 generate pytest suite in modules/leave_elm/tests/test_elm_phase2.py",
+  "instruction": "Create modules/leave_elm/tests/test_elm_phase2.py with pytest tests (using `@pytest.mark.django_db`) covering the ELM module: (1) Create a helper `_make_principal(user_id, *, kind='faculty', designations=None, permissions=None)` returning a `Principal` from `fusion_auth.principal` with `module_grants=frozenset({'leave_elm'})` and permissions derived from `ROLE_GRANTS` in `modules.leave_elm.registry`. (2) Test domain policy rules (`normalize_category_code`, `calculate_requested_days` for CL working days vs EL calendar days vs RH single-day validation, and `validate_policy_rules` for CL > 5 max spell, VL non-faculty restriction, EL >= 10 medical certificate requirement, and station leave address requirement). (3) Test `submit_application` and `own_balances` for a faculty principal, verifying default balances (CL=8, RH=2, SCL=15, EL=30, COL=20, VL=60) are seeded and overlapping active applications raise `ConflictError`. (4) Test substitute consent workflow (`substitute_accept` and `substitute_reject` by substitute principal, and `PermissionDeniedError` when an unauthorized user tries). (5) Test multi-stage review (`recommend`), approval (`approve` deducting `working_days` from `LeaveBalance`), self-approval prevention (`PermissionDeniedError`), and cancellation (`cancel` restoring `working_days` back to `LeaveBalance` instead of double-deducting). (6) Test `year_end_rollover()` and `process_task_sla()` in `modules.leave_elm.services.events` and `LeaveElmContracts` in `modules.leave_elm.contracts`. Return only valid Python code.",
+  "allowed_paths": [
+    "modules/leave_elm/tests/test_elm_phase2.py"
+  ],
+  "context_files": [
+    "fusion_auth/principal.py",
+    "modules/leave_elm/registry.py",
+    "modules/leave_elm/domain/policy.py",
+    "modules/leave_elm/services/queries.py",
+    "modules/leave_elm/services/applications.py",
+    "modules/leave_elm/services/actions.py",
+    "modules/leave_elm/services/events.py",
+    "modules/leave_elm/contracts.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 3200,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

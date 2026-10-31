@@ -1,0 +1,19 @@
+{
+  "label": "Phase 2 upgrade models.py fixing self-FK bugs and adding ELM fields",
+  "instruction": "Update modules/leave_elm/models.py to fix the broken self-ForeignKeys on LeaveApplication and add required ELM workflow fields while keeping all 12 model class names (LeaveCategory, LeaveType, LeaveApplication, LeaveBalance, LeavePolicy, LeaveHistory, LeaveNotification, LeaveTask, LeaveSubstitution, LeaveExtension, LeaveResumption, LeavePolicyParameter, LeaveCalendar). Specifically: (1) Import Decimal from decimal, models from django.db, timezone from django.utils, and TimeStampedModel, UserScopedModel from core.db.mixins. (2) Keep LeaveCategory(name, description) and LeaveType(name, description, leave_category). (3) In LeaveApplication(TimeStampedModel, UserScopedModel): keep leave_type, start_date, end_date, purpose, status (default='Pending'), and replace the broken ForeignKey('self') fields approved_by, cancelled_by, extension_approved_by with IntegerField(null=True, blank=True, db_index=True) named approved_by_id, cancelled_by_id, extension_approved_by_id plus @property aliases approved_by, cancelled_by, extension_approved_by returning those IDs! Also add working_days=models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('1.00')), station_leave_required=models.BooleanField(default=False), address_during_leave=models.TextField(blank=True, default=''), contact_number=models.CharField(max_length=32, blank=True, default=''), academic_substitute_user_id=models.IntegerField(null=True, blank=True, db_index=True), admin_substitute_user_id=models.IntegerField(null=True, blank=True, db_index=True), attachment_reference=models.CharField(max_length=255, blank=True, default=''), remarks=models.TextField(blank=True, default=''), reviewed_by_id=models.IntegerField(null=True, blank=True, db_index=True), reviewed_at=models.DateTimeField(null=True, blank=True), balance_deducted=models.BooleanField(default=False), resumed_at=models.DateTimeField(null=True, blank=True), fitness_certificate_Reference=models.CharField(max_length=255, blank=True, default=''). Keep approved_at, cancelled_at, extension_requested, extension_approved, extension_start_date, extension_end_date, extension_approved_at. (4) In LeaveHistory: add action=models.CharField(max_length=64, blank=True, default=''). (5) In LeaveNotification: add is_read=models.BooleanField(default=False) and channel=models.CharField(max_length=32, default='in_app'). (6) In LeaveTask: add role=models.CharField(max_length=64, blank=True, default='reviewer'), reminded_at=models.DateTimeField(null=True, blank=True), escalated_at=models.DateTimeField(null=True, blank=True). (7) In LeaveSubstitution: add substitution_type=models.CharField(max_length=32, default='academic'), status=models.CharField(max_length=32, default='Pending'), remarks=models.TextField(blank=True, default=''), responded_at=models.DateTimeField(null=True, blank=True). (8) In LeaveExtension: add reason=models.TextField(blank=True, default=''), status=models.CharField(max_length=32, default='Pending'). (9) In LeaveResumption: add remarks=models.TextField(blank=True, default=''), fitness_certificate_reference=models.CharField(max_length=255, blank=True, default=''), status=models.CharField(max_length=32, default='Submitted'). Return only valid Python code.",
+  "allowed_paths": [
+    "modules/leave_elm/models.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/models.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 3200,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

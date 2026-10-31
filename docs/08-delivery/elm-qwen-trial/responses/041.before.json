@@ -1,0 +1,3 @@
+{
+  "modules/leave_elm/contracts.py": "from collections.abc import Sequence\nfrom modules.leave_elm.models import LeaveApplication, LeaveBalance\nfrom django.db.models import QuerySet, Count\n\nclass LeaveElmContracts:\n    @staticmethod\n    def get_leave_balances(user_ids: Sequence[int]) -> QuerySet[LeaveBalance]:\n        return LeaveBalance.objects.filter(user_id__in=user_ids)\n\n    @staticmethod\n    def get_leave_application_summaries(user_ids: Sequence[int]) -> QuerySet[LeaveApplication]:\n        return LeaveApplication.objects.filter(user_id__in=user_ids).annotate(\n            total_days=Count('days')\n        )\n"
+}

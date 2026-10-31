@@ -20,22 +20,23 @@ PERMISSIONS = [
     ("leave_elm.record.manage", "Manage leave records"),
 ]
 
+SYSTEM_PERMISSIONS = []
+
 ROLE_GRANTS = {
-    "faculty": ["leave_elm.application.view_self", "leave_elm.application.create", "leave_elm.application.review", "leave_elm.application.approve"],
-    "staff": ["leave_elm.application.view_self", "leave_elm.application.create", "leave_elm.application.review", "leave_elm.application.approve"],
-    "Employee": ["leave_elm.application.view_self", "leave_elm.application.create", "leave_elm.application.review", "leave_elm.application.approve"],
-    "reviewer": ["leave_elm.application.review", "leave_elm.application.approve"],
-    "authority": ["leave_elm.application.review", "leave_elm.application.approve", "leave_elm.substitute.respond"],
+    "faculty": ["leave_elm.application.view_self", "leave_elm.application.create", "leave_elm.substitute.respond", "leave_elm.task.view"],
+    "staff": ["leave_elm.application.view_self", "leave_elm.application.create", "leave_elm.substitute.respond", "leave_elm.task.view"],
+    "Employee": ["leave_elm.application.view_self", "leave_elm.application.create", "leave_elm.substitute.respond", "leave_elm.task.view"],
+    "Unit Head": ["leave_elm.application.view_self", "leave_elm.application.create", "leave_elm.substitute.respond", "leave_elm.task.view", "leave_elm.application.review"],
+    "Head of Department": ["leave_elm.application.view_self", "leave_elm.application.create", "leave_elm.substitute.respond", "leave_elm.task.view", "leave_elm.application.review"],
+    "Section Head": ["leave_elm.application.view_self", "leave_elm.application.create", "leave_elm.substitute.respond", "leave_elm.task.view", "leave_elm.application.review"],
+    "Deputy Registrar (Estt.)": ["leave_elm.application.view_self", "leave_elm.application.create", "leave_elm.substitute.respond", "leave_elm.task.view", "leave_elm.application.review"],
+    "Establishment Reviewer": ["leave_elm.application.view_self", "leave_elm.application.create", "leave_elm.substitute.respond", "leave_elm.task.view", "leave_elm.application.review"],
+    "reviewer": ["leave_elm.application.view_self", "leave_elm.application.create", "leave_elm.substitute.respond", "leave_elm.task.view", "leave_elm.application.review"],
+    "Dean": ["leave_elm.application.view_self", "leave_elm.application.create", "leave_elm.substitute.respond", "leave_elm.task.view", "leave_elm.application.review", "leave_elm.application.approve"],
+    "Registrar": ["leave_elm.application.view_self", "leave_elm.application.create", "leave_elm.substitute.respond", "leave_elm.task.view", "leave_elm.application.review", "leave_elm.application.approve"],
+    "Director": ["leave_elm.application.view_self", "leave_elm.application.create", "leave_elm.substitute.respond", "leave_elm.task.view", "leave_elm.application.review", "leave_elm.application.approve"],
+    "authority": ["leave_elm.application.view_self", "leave_elm.application.create", "leave_elm.substitute.respond", "leave_elm.task.view", "leave_elm.application.review", "leave_elm.application.approve"],
+    "Leave Administrator": ["leave_elm.configuration.manage", "leave_elm.record.manage"],
+    "Leave Admin": ["leave_elm.configuration.manage", "leave_elm.record.manage"],
     "admin": ["leave_elm.configuration.manage", "leave_elm.record.manage"],
 }
-
-SYSTEM_PERMISSIONS = [
-    "leave_elm.application.approve",
-    "leave_elm.application.review",
-    "leave_elm.application.create",
-    "leave_elm.application.view_self",
-    "leave_elm.substitute.respond",
-    "leave_elm.task.view",
-    "leave_elm.configuration.manage",
-    "leave_elm.record.manage",
-]

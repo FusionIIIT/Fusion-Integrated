@@ -13,10 +13,17 @@ export interface Configuration {
 }
 
 export interface NewApplication {
-  leave_type: number;
+  leave_type: string | number;
   start_date: string;
   end_date: string;
   purpose: string;
+  station_leave_required?: boolean;
+  address_during_leave?: string;
+  contact_number?: string;
+  academic_substitute_user_id?: number | null;
+  admin_substitute_user_id?: number | null;
+  attachment_reference?: string;
+  remarks?: string;
 }
 
 export async function listApplications(): Promise<LeaveApplication[]> {
@@ -38,8 +45,8 @@ export async function submitApplication(data: NewApplication): Promise<void> {
   await http.post('/leave/applications', data);
 }
 
-export async function applicationAction(id: number, action: string, data: Record<string, unknown>): Promise<void> {
-  await http.post(`/leave/applications/${id}/action`, { action, data });
+export async function applicationAction(id: number, action: string, data: { [key: string]: any } = {}): Promise<void> {
+  await http.post(`/leave/applications/${id}/action`, { action, ...data });
 }
 
 export async function getConfiguration(): Promise<Configuration> {
@@ -54,4 +61,13 @@ export async function saveConfiguration(data: Configuration): Promise<void> {
 export async function getRecords(): Promise<{ history?: LeaveHistory[], notifications?: LeaveNotification[] }> {
   const response = await http.get('/leave/records');
   return response.data as { history?: LeaveHistory[], notifications?: LeaveNotification[] };
+}
+
+export async function listNotifications(): Promise<LeaveNotification[]> {
+  const response = await http.get('/leave/notifications');
+  return response.data as LeaveNotification[];
+}
+
+export async function adjustBalanceRecord(payload: Record<string, unknown>): Promise<void> {
+  await http.post('/leave/records', payload);
 }

@@ -1,0 +1,16 @@
+{
+  "model": "qwen2.5-coder:3b",
+  "system": "You are a local coding assistant. Follow CURRENT TASK after references. Return complete raw source for the one requested file. Do not claim tests or add provenance labels.",
+  "prompt": "REFERENCE MATERIAL ONLY\n\n\n### Repository file modules/leave_elm/contracts.py\n```\nfrom collections.abc import Sequence\nfrom modules.leave_elm.models import LeaveApplication, LeaveCategory, LeaveType\nfrom django.db.models import QuerySet, Count\n\nclass LeaveElmContracts:\n    @staticmethod\n    def get_leave_balances(user_ids: Sequence[int]) -> QuerySet[LeaveBalance]:\n        return LeaveBalance.objects.select_related('leave_category').filter(user_id__in=user_ids).order_by('user_id', 'id')\n\n    @staticmethod\n    def get_leave_application_summaries(user_ids: Sequence[int]) -> QuerySet[LeaveApplication]:\n        return LeaveApplication.objects.select_related('leave_type', 'leave_type__leave_category').filter(user_id__in=user_ids).order_by('-created_at', '-id')\n\n```\n\n\nEND OF REFERENCES\n\nCURRENT TASK\n\nFix modules/leave_elm/contracts.py: import `LeaveApplication, LeaveBalance` from `modules.leave_elm.models` (instead of `LeaveCategory, LeaveType`) and remove unused `Count` from `django.db.models`. Keep `get_leave_balances` and `get_leave_application_summaries` unchanged. Return only valid Python code.\n\nOutput file: modules/leave_elm/contracts.py\nReturn only complete raw source code, without JSON, explanation or Markdown fences.\n",
+  "stream": true,
+  "keep_alive": "15m",
+  "options": {
+    "temperature": 0.1,
+    "seed": 42,
+    "num_ctx": 8192,
+    "num_batch": 128,
+    "num_predict": 600,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256
+  }
+}

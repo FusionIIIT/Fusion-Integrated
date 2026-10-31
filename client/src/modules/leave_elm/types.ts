@@ -3,15 +3,27 @@ export interface LeaveApplication {
   user_id: number;
   status: string;
   leave_type: number;
+  leave_type_name?: string; // Optional field
+  leave_category_name?: string; // Optional field
   start_date: string;
   end_date: string;
+  working_days?: string; // Optional field
   purpose: string;
+  station_leave_required?: boolean;
+  address_during_leave?: string;
+  contact_number?: string;
+  academic_substitute_user_id?: number | null;
+  admin_substitute_user_id?: number | null;
+  attachment_reference?: string;
+  remarks?: string;
+  created_at?: string;
 }
 
 export interface LeaveBalance {
   id: number;
   user_id: number;
   leave_category: number;
+  leave_category_name?: string; // Optional field
   balance: string;
 }
 
@@ -20,18 +32,33 @@ export interface LeaveTask {
   user_id: number;
   leave_application: number;
   task_type: string;
+  role?: string; // Optional field
   status: string;
   title?: string; // Optional field
   description?: string; // Optional field
+  application_status?: string; // Optional field
+  applicant_user_id?: number;
+  start_date?: string;
+  end_date?: string;
+  purpose?: string;
 }
 
 export interface LeaveHistory {
   id: number;
+  user_id?: number;
+  leave_application?: number;
+  action?: string;
   status: string;
   decision: string;
+  created_at?: string;
 }
 
 export interface LeaveNotification {
   id: number;
+  user_id?: number;
+  leave_application?: number;
   message: string;
+  is_read?: boolean;
+  channel?: string;
+  created_at?: string;
 }

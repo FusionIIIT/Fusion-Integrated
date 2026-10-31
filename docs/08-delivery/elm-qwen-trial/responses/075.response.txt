@@ -1,0 +1,73 @@
+```typescript
+import { useState } from 'react';
+import { Alert, Badge, Button, Container, Group, LoadingOverlay, Paper, Stack, Text, TextInput, Title } from '@mantine/core';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { PageHeader } from '../../../ui/components/PageHeader';
+import { applicationAction, listTasks, type LeaveTask } from '../api';
+
+export const LeaveTasksPage = () => {
+  const queryClient = useQueryClient();
+  const [remarks, setRemarks] = useState<string>('');
+
+  const { isLoading, isError, error, data: tasks = [] } = useQuery<LeaveTask[]>({
+    queryKey: ['tasks'],
+    queryFn: listTasks,
+  });
+
+  const actMutation = useMutation({
+    mutationFn: (vars: { applicationId: number; action: string }) =>
+      applicationAction(vars.applicationId, vars.action, { decision: remarks, remarks }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    },
+  });
+
+  return (
+    <Container gap="sm">
+      <LoadingOverlay visible={isLoading} />
+      <PageHeader title="Leave Tasks" subtitle="Review and act on pending leave workflow tasks" />
+
+      <TextInput
+        label="Decision / Remarks"
+        value={remarks}
+        onChange={(e) => setRemarks(e.currentTarget.value)}
+        mb="md"
+      />
+
+      <Stack gap="md">
+        {tasks.map((task) => (
+          <Paper key={task.id} p="md" withBorder>
+            <Title order={4}>{task.title ?? task.task_type}</Title>
+            <Badge>{task.status}</Badge>
+            <Text size="sm" c="dimmed">{task.description ?? task.purpose ?? ''}</Text>
+            <Text size="xs">Application #{task.leave_application}</Text>
+
+            <Group gap="sm" mt="sm">
+              <Button onClick={() => actMutation.mutate({ applicationId: task.leave_application, action: 'substitute_accept' })}>
+                Accept Substitute
+              </Button>
+              <Button onClick={() => actMutation.muteate({ applicationId: task.leave_application, action: 'substitute_reject' })}>
+                Reject Substitute
+              </Button>
+              <Button onClick={() => actMutation.muteate({ applicationId: task.leave_application, action: 'recommend' })}>
+                Recommend
+              </Button>
+              <Button onClick={() => actMutation.muteate({ applicationId: task.leave_application, action: 'return_clarification' })}>
+                Return Clarification
+              </Button>
+              <Button onClick={() => actMutation.muteate({ applicationId: task.leave_application, action: 'approve' })}>
+                Approve
+              </Button>
+              <Button onClick={() => actMutation.muteate({ applicationId: task.leave_application, action: 'reject' })}>
+                Reject
+              </Button>
+            </Group>
+          </Paper>
+        ))}
+      </Stack>
+    </Container>
+  );
+};
+
+export default LeaveTasksPage;
+```

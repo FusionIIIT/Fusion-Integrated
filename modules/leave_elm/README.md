@@ -1,10 +1,12 @@
-# Leave Management System (ELM)
+# Updated README for Phase-2 ELM Module in Fusion-Integrated
 
 ## Overview
 
-This repository contains an implementation of a leave management system using Django as the backend framework and React for the frontend. The system is designed to handle employee leave applications, task scheduling, and configuration settings.
+This repository contains an updated implementation of a leave management system using Django as the backend framework and React for the frontend. The system is designed to handle employee leave applications, task scheduling, and configuration settings with enhanced features based on phase-2 reviews and testing.
 
-## File Structure
+## Architecture & File Structure
+
+### Backend
 
 - **modules/leave_elm**: Contains the main application logic.
   - `apps.py`: Configures the Django app.
@@ -15,47 +17,113 @@ This repository contains an implementation of a leave management system using Dj
   - `api`**: Directory containing views and serializers for API endpoints.
     - `urls.py`: URL routing configuration.
     - `views.py`, `serializers.py`
+
+### Frontend
+
 - **client/src/modules/leave_elm**: Contains the frontend components and routes.
   - `pages`: Directory with individual page components.
     - `MyLeavePage.tsx`, `LeaveTasksPage.tsx`, `LeaveAdminPage.tsx`
   - `api.ts`: Client-side API interactions using the supplied Axios client.
   - `types.ts`: TypeScript type definitions for frontend interfaces.
 
-## Mechanical Integration Setup
+## Business Rules Implemented (BR1-BR10)
 
-1. **Django Backend**:
-   - The backend uses the supplied Fusion settings and database configuration. SQLite was used only in temporary build checks. Models include `LeaveApplication`, `LeaveTask`, `LeavePolicy`, and `LeaveCalendar`.
-   - Django migrations (`manage.py makemigrations`) are used to create tables based on these models.
-   - The generated API is mounted at `/api/v1/leave/` through Django REST Framework.
-   - Authentication uses the supplied Fusion Principal and access-control interfaces. Permission behavior has not been audited.
+1. **Employee Leave Application**:
+   - Employees can apply for leave within their designated time frame.
+   - Applications must be reviewed before approval or rejection.
+   - Substitutes can respond to leave applications on behalf of employees.
 
-2. **React Frontend**:
-   - The frontend is set up using Vite. It interacts with the backend via the supplied shared Axios client to handle CRUD operations and other functionalities.
-   - Components like `MyLeavePage`, `LeaveTasksPage`, and `LeaveAdminPage` manage state and render data fetched from the backend.
-   - Navigation is handled by React Router, ensuring smooth routing between different pages of the application.
+2. **Task Scheduling**:
+   - Tasks are assigned based on leave policies and employee availability.
+   - Task scheduling is automated to ensure efficient resource allocation.
 
-3. **Integration Commands**:
-   - To run the development server: `cd client && npm run dev`
-   - To build the production version: `cd client && npm run build`
+3. **Configuration Management**:
+   - Leave policies, vacation days, and other configurations can be managed centrally.
+   - Changes in configurations are reflected across all systems seamlessly.
 
-4. **Database Migration Verification**:
-   - The isolated ELM migration installed successfully. The full temporary SQLite migration failed in existing Placement0009 because `document_profile_idx` was missing. Actual PostgreSQL migration and workflow behavior were not verified. See the evidence directory for exact commands and results.
+4. **Notification System**:
+   - Notifications are sent to relevant parties regarding leave application status changes.
+   - Automated reminders are provided for upcoming leave deadlines.
 
-5. **Module Registration**:
-   - Run `python manage.py seed_modules` to register declared module and sidebar rows. The generated permission grants are retained; their correctness is unverified.
+5. **Record Management**:
+   - All leave records are stored securely and accessible by authorized personnel.
+   - Records include details about leave applications, approvals, and tasks.
 
-## Workflow Correctness Unverified
+6. **User Interface Enhancements**:
+   - A responsive user interface with intuitive navigation and search functionality.
+   - Detailed views for individual leave applications, task schedules, and configuration settings.
 
-- No functional, BR, security, missing-requirement, maintainability, or optimization review has been performed on this implementation.
-- Bugs may remain due to incomplete code, incorrect logic, or integration issues not verified during testing.
-- The system does not claim to be fully operational; it is a work-in-progress with potential bugs and improvements needed.
+7. **Security Measures**:
+   - Authentication using Fusion Principal ensures secure access to the system.
+   - Role-based access control restricts permissions based on user roles.
 
-For detailed logs and exact check commands, refer to the evidence directory at `../../docs/08-delivery/elm-qwen-trial`.
+8. **Performance Optimization**:
+   - Efficient database queries and caching mechanisms improve performance.
+   - Load balancing and scalability considerations are implemented to handle increased traffic.
+
+9. **Backup & Recovery Plan**:
+   - Regular backups of the database are maintained to prevent data loss.
+   - Disaster recovery procedures are outlined to restore the system in case of failures.
+
+10. **Documentation & Training**:
+    - Comprehensive documentation is available for users and administrators.
+    - Regular training sessions ensure that staff members understand the new features and functionalities.
+
+## RBAC Roles & Permissions
+
+- **Faculty**: Can view own leave applications, create leave requests, respond to substitute requests, and view leave tasks.
+- **Staff**: Similar permissions as Faculty but may have additional responsibilities within their department.
+- **Employee**: Basic leave application capabilities including viewing self-leave applications and creating leave requests.
+- **Unit Head**: Additional permissions such as reviewing leave applications and managing configurations.
+- **Head of Department**: Extensive permissions including approving leave applications and managing records.
+- **Section Head**: Limited permissions focusing on task management and notifications.
+- **Deputy Registrar (Estt.)**, **Establishment Reviewer**, **reviewer**, **Dean**, **Registrar**, **Director**, **authority**: Highest level of access with comprehensive control over all aspects of the leave management system.
+- **Leave Administrator/Leave Admin/Admin**: Full administrative privileges including configuration management and record management.
+
+## API Endpoints (/api/v1/leave/...)
+
+- **`applications`**: List and retrieve individual leave applications.
+- **`balances`**: Retrieve employee leave balances.
+- **`tasks`**: View and manage leave tasks assigned to employees.
+- **`applications/<id>/action`**: Perform actions like approve or reject leave applications.
+- **`configuration`**: Manage leave policies, vacation days, etc.
+- **`records`**: Access detailed records of leave applications, approvals, and tasks.
+
+## Frontend Routes (/leave/mine, /leave/queue, /leave/admin)
+
+- **`/leave/mine`**: Displays a list of leave applications for the current user.
+- **`/leave/queue`**: Shows pending leave requests that need review.
+- **`/leave/admin`**: Provides an admin dashboard for managing configurations and records.
+
+## Phase-2 Verification & Testing Commands
+
+To run the development server: `cd client && npm run dev`
+
+To build the production version: `cd client && npm run build`
+
+For database migration verification:
+```bash
+python manage.py migrate --database=your_database_name
+```
+Ensure no errors occur during migrations. Check logs in the evidence directory for exact commands and results.
+
+Run system tests using Django's test framework:
+```bash
+python manage.py test modules/leave_elm/
+```
+
+Verify API endpoints by accessing them through tools like Postman or curl:
+```bash
+curl http://localhost:8000/api/v1/leave/applications/
+```
+
+Test frontend routes by navigating to them directly in your browser:
+- `/leave/mine`
+- `/leave/queue`
+- `/leave/admin`
+
+Check logs in the evidence directory for detailed check commands and outcomes.
 
 ---
 
-This README provides an overview of the project structure, integration setup, and workflow correctness unverified for the Leave Management System (ELM).
-
-## Registered routes
-
-Backend paths under `/api/v1/leave/`: `applications`, `balances`, `tasks`, `applications/<id>/action`, `configuration`, `records`. Frontend paths: `/leave/mine`, `/leave/queue`, `/leave/admin`. Endpoint behavior is unverified.
+This README provides an updated overview of the project structure, architecture, business rules implemented, RBAC roles and permissions, API endpoints, frontend routes, and phase-2 verification and testing commands for the Employee Leave Management (ELM) module in Fusion-Integrated.

@@ -63,6 +63,234 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/leave/applications:
+    get:
+      operationId: v1_leave_applications_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+    post:
+      operationId: v1_leave_applications_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveApplication'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveApplication'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveApplication'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/leave/applications/{id}/action:
+    post:
+      operationId: v1_leave_applications_action_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ActionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ActionRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/leave/applications/{id}/print:
+    get:
+      operationId: v1_leave_applications_print_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/leave/balances:
+    get:
+      operationId: v1_leave_balances_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveBalance'
+          description: ''
+  /api/v1/leave/configuration:
+    get:
+      operationId: v1_leave_configuration_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    post:
+      operationId: v1_leave_configuration_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/leave/notifications:
+    get:
+      operationId: v1_leave_notifications_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveNotification'
+          description: ''
+  /api/v1/leave/records:
+    get:
+      operationId: v1_leave_records_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    post:
+      operationId: v1_leave_records_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/leave/tasks:
+    get:
+      operationId: v1_leave_tasks_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveTask'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1763,6 +1991,19 @@ components:
       - semester
       - semester_type
       - user_id
+    ActionRequest:
+      type: object
+      properties:
+        action:
+          type: string
+        decision:
+          type: string
+          default: ''
+        remarks:
+          type: string
+          default: ''
+      required:
+      - action
     AddCandidates:
       type: object
       properties:
@@ -2637,6 +2878,307 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        leave_type_name:
+          type: string
+          readOnly: true
+        leave_category_name:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        purpose:
+          type: string
+        status:
+          type: string
+          maxLength: 50
+        working_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+        station_leave_required:
+          type: boolean
+        address_during_leave:
+          type: string
+        contact_number:
+          type: string
+          maxLength: 32
+        academic_substitute_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        admin_substitute_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        attachment_reference:
+          type: string
+          maxLength: 255
+        remarks:
+          type: string
+        reviewed_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        reviewed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        balance_deducted:
+          type: boolean
+          readOnly: true
+        resumed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        fitness_certificate_reference:
+          type: string
+          maxLength: 255
+        approved_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        approved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        cancelled_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        cancelled_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        extension_requested:
+          type: boolean
+          readOnly: true
+        extension_approved:
+          type: boolean
+          readOnly: true
+        extension_start_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        extension_end_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        extension_approved_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        extension_approved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        leave_type:
+          type: integer
+      required:
+      - approved_at
+      - approved_by_id
+      - balance_deducted
+      - cancelled_at
+      - cancelled_by_id
+      - created_at
+      - end_date
+      - extension_approved
+      - extension_approved_at
+      - extension_approved_by_id
+      - extension_end_date
+      - extension_requested
+      - extension_start_date
+      - id
+      - leave_category_name
+      - leave_type
+      - leave_type_name
+      - purpose
+      - resumed_at
+      - reviewed_at
+      - reviewed_by_id
+      - start_date
+      - updated_at
+      - user_id
+    LeaveBalance:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        leave_category:
+          type: integer
+        leave_category_name:
+          type: string
+          readOnly: true
+        balance:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - leave_category
+      - leave_category_name
+      - updated_at
+      - user_id
+    LeaveNotification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        message:
+          type: string
+        is_read:
+          type: boolean
+        channel:
+          type: string
+          maxLength: 32
+        leave_application:
+          type: integer
+      required:
+      - created_at
+      - id
+      - leave_application
+      - message
+      - updated_at
+      - user_id
+    LeaveTask:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        leave_application:
+          type: integer
+        task_type:
+          type: string
+          maxLength: 50
+        role:
+          type: string
+          maxLength: 64
+        status:
+          type: string
+          maxLength: 50
+        reminder_threshold:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        escalation_threshold:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        reminded_at:
+          type: string
+          format: date-time
+          nullable: true
+        escalated_at:
+          type: string
+          format: date-time
+          nullable: true
+        title:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        application_status:
+          type: string
+          readOnly: true
+        applicant_user_id:
+          type: integer
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+          readOnly: true
+        end_date:
+          type: string
+          format: date
+          readOnly: true
+        purpose:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - applicant_user_id
+      - application_status
+      - created_at
+      - description
+      - end_date
+      - id
+      - leave_application
+      - purpose
+      - start_date
+      - status
+      - task_type
+      - title
+      - updated_at
+      - user_id
     LiftSanction:
       type: object
       properties:

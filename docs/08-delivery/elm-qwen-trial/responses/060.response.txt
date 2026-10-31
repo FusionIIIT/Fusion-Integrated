@@ -1,0 +1,196 @@
+```typescript
+import { useEffect } from 'react';
+import { Button, Grid, Paper, Table, TextInput, Select, Textarea, Title } from '@mantine/core';
+import { useForm } from 'react-hook-form';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
+
+import { listApplications, submitApplication, applicationAction, type LeaveApplication, type NewApplication, type LeaveBalance } from '../api';
+type ListApplicationsResponse = LeaveApplication[];
+type SubmitApplicationRequest = Omit<NewApplication, 'leave_type'> & { leave_type: string };
+
+const MyLeavePage = () => {
+  const queryClient = useQueryClient();
+  const { handleSubmit, register, setValue, reset } = useForm<SubmitApplicationRequest>({
+    defaultValues: {
+      leave_type: '',
+      start_date: '',
+      end_date: '',
+      purpose: ''
+    }
+  });
+
+  // Fetch balances on component mount
+  useEffect(() => {
+    const fetchBalances = async () => {
+      try {
+        const balances = await listBalances();
+        console.log('Balances:', balances);
+      } catch (error) {
+        console.error('Error fetching balances:', error);
+      }
+    };
+
+    fetchBalances();
+  }, []);
+
+  // Mutation for submitting an application
+  const [submitApp] = useMutation(submitApplication);
+
+  // Mutation for handling application actions
+  const [handleAction] = useMutation(applicationAction, {
+    onSuccess() {
+      queryClient.invalidateQueries(['leave']);
+    }
+  });
+
+  return (
+    <Grid>
+      <Grid.Col span={12}>
+        <Title order={3}>Your Leave Applications</Title>
+        {/* Render application table */}
+        <Table striped highlightRows>
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Leave Type</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Purpose</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {queryClient.getQueryData<ListApplicationsResponse>(['applications'])?.map((app) => (
+              <tr key={app.id}>
+                <td>{app.status}</td>
+                <td>{app.leave_type_name ?? 'Unknown'}</td>
+                <td>{app.start_date}</td>
+                <td>{app.end_date}</td>
+                <td>{app.purpose}</td>
+                <td>
+                  <Button variant="outline" onClick={() => handleAction({ id: app.id, action: 'withdraw' })} disabled={app.status !== 'Pending' && app.status !== 'Substitute Pending'}>
+                    Withdraw
+                  </Button>
+                  <Button variant="outline" onClick={() => handleAction({ id: app.id, action: 'cancel' })} disabled={app.status !== 'Approved'} >
+                    Cancel
+                  </Button>
+                  <Button variant="outline" onClick={() => handleAction({ id: app.id, action: 'extend' })} disabled={app.status !== 'Approved'} >
+                    Extend
+                  </Button>
+                  <Button variant="outline" onClick={() => handleAction({ id: app.id, action: 'resume' })} disabled={app.status !== 'Approved'} >
+                    Resume
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+
+      </Grid.Col>
+
+      {/* Fetch and display balances */}
+      <Grid.Col span={6}>
+        <Title order={4}>Leave Balances</Title>
+        <Paper shadow="sm">
+          <Table striped highlightRows>
+            <thead>
+              <tr>
+                <th>Category Name</th>
+                <th>Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {queryClient.getQueryData<LeaveBalance[]>(['leave', 'balances'])?.map((balance) => (
+                <tr key={balance.id}>
+                  <td>{balance.leave_category_name ?? 'Unknown'}</td>
+                  <td>{balance.balance}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Paper>
+      </Grid.Col>
+
+      {/* New Application Form */}
+      <Grid.Col span={12}>
+        <Title order={3}>New Application Form</Title>
+        <form onSubmit={handleSubmit(async (data) => {
+          try {
+            await submitApp(data as unknown as NewApplication);
+            reset();
+            console.log('Application submitted successfully');
+          } catch (error) {
+            console.error('Error submitting application:', error);
+          }
+        })}>
+          <TextInput
+            label="Start Date"
+            type="date"
+            {...register('start_date')}
+          />
+
+          <TextInput
+            label="End Date"
+            type="date"
+            {...register('end_date')}
+          />
+
+          <Select
+            label="Leave Type"
+            placeholder="Choose a leave type"
+            data={[
+              { value: 'CL', label: 'Casual Leave' },
+              { value: 'RH', label: 'Restricted Holiday' },
+              { value: 'SCL', label: 'Special Casual Leave' },
+              { value: 'EL', label: 'Earned Leave' },
+              { value: 'COL', label: 'Commuted Leave' },
+              { value: 'VL', label: 'Vacation Leave' },
+            ]}
+            onChange={(value) => setValue("leave_type", value ?? "")}
+          />
+
+          <Textarea
+            label="Purpose"
+            {...register('purpose')}
+          />
+
+          {/* Optional fields */}
+          <div>
+            <label>Station Leave Required</label>
+            <input type="checkbox" {...register('station_leave_required')} />
+          </div>
+
+          <Textarea
+            label="Address During Leave"
+            {...register('address_during_leave')}
+          />
+
+          <TextInput
+            label="Contact Number"
+            {...register('contact_number')}
+          />
+
+          <TextInput
+            label="Academic Substitute User ID"
+            {...register('academic_substitute_user_id')}
+          />
+
+          <TextInput
+            label="Admin Substitute User ID"
+            {...register('admin_substitute_user_id')}
+          />
+
+          <TextInput
+            label="Medical/Supporting Attachment Reference"
+            {...register('attachment_reference')}
+          />
+
+          <Button type="submit">Submit Application</Button>
+        </form>
+      </Grid.Col>
+    </Grid>
+  );
+};
+
+export default MyLeavePage;
+```

@@ -1,0 +1,19 @@
+{
+  "label": "Phase 2 add missing approved_at, cancelled_at, extension_approved_by_id to models.py",
+  "instruction": "In modules/leave_elm/models.py, on `class LeaveApplication(TimeStampedModel, UserScopedModel):`, keep all existing fields and add the three missing fields right after `cancelled_by_id = models.IntegerField(null=True, blank=True, db_index=True)`:\n- `approved_at = models.DateTimeField(null=True, blank=True)`\n- `cancelled_at = models.DateTimeField(null=True, blank=True)`\n- `extension_approved_by_id = models.IntegerField(null=True, blank=True, db_index=True)`\nKeep all 13 model classes (`LeaveCategory`, `LeaveType`, `LeaveApplication`, `LeaveBalance`, `LeavePolicy`, `LeaveHistory`, `LeaveNotification`, `LeaveTask`, `LeaveSubstitution`, `LeaveExtension`, `LeaveResumption`, `LeavePolicyParameter`, `LeaveCalendar`) and all properties/methods intact. Return the complete valid Python file.",
+  "allowed_paths": [
+    "modules/leave_elm/models.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/models.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 3200,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

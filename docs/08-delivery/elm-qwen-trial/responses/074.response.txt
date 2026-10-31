@@ -1,0 +1,125 @@
+```typescript
+import { useState } from 'react';
+import {
+  Badge,
+  Button,
+  Checkbox,
+  Grid,
+  Group,
+  Paper,
+  Select,
+  Stack,
+  Table,
+  Text,
+  Textarea,
+  TextInput,
+  Title,
+} from '@mantine/core';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { applicationAction, listApplications, listBalances, submitApplication, type LeaveApplication, type LeaveBalance, type NewApplication } from '../api';
+
+export const MyLeavePage = () => {
+  const queryClient = useQueryClient();
+  const [leaveType, setLeaveType] = useState<string>('CL');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
+  const [purpose, setPurpose] = useState<string>('');
+  const [stationLeave, setStationLeave] = useState<boolean>(false);
+  const [addressDuringLeave, setAddressDuringLeave] = useState<string>('');
+  const [contactNumber, setContactNumber] = useState<string>('');
+  const [academicSubId, setAcademicSubId] = useState<string>('');
+  const [adminSubId, setAdminSubId] = useState<string>('');
+  const [attachmentRef, setAttachmentRef] = useState<string>('');
+  
+  const { data: balances = [] } = useQuery<LeaveBalance[]>({ queryKey: ['leave', 'balances'], queryFn: listBalances });
+  const { data: applications = [] } = useQuery<LeaveApplication[]>({ queryKey: ['leave', 'applications'], queryFn: listApplications });
+
+  const submitMutation = useMutation({ mutationFn: (payload: NewApplication) => submitApplication(payload), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['leave'] }); setPurpose(''); } });
+  const actionMutation = useMutation({ mutationFn: (vars: { id: number; action: string }) => applicationAction(vars.id, vars.action, {}), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['leave'] }); } });
+
+  return (
+    <Grid>
+      {/* Leave Balances */}
+      <Grid.Col span={12}>
+        <Paper p="md" withBorder>
+          <Table striped highlightOnHover>
+            <Thead>
+              <Tr>
+                <Th>Category</Th>
+                <Th>Balance</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {balances.map((b) => (
+                <Tr key={b.leave_category_id}>
+                  <Td>{b.leave_category_name ?? b.leave_category}</Td>
+                  <Td>{b.balance}</Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Paper>
+      </Grid.Col>
+
+      {/* New Application Form */}
+      <Grid.Col span={12}>
+        <Paper p="md" withBorder>
+          <Stack spacing="sm">
+            <Title order={3}>New Application</Title>
+            <Select label="Leave Type" data={['CL', 'RH', 'SCL', 'EL', 'COL', 'VL']} value={leaveType} onChange={(v) => setLeaveType(v ?? 'CL')} />
+            <TextInput label="Start Date" type="date" value={startDate} onChange={(e) => setStartDate(e.currentTarget.value)} />
+            <TextInput label="End Date" type="date" value={endDate} onChange={(e) => setEndDate(e.currentTarget.value)} />
+            <Textarea label="Purpose" value={purpose} onChange={(e) => setPurpose(e.currentTarget.value)} />
+            <Checkbox label="Station Leave Required" checked={stationLeave} onChange={(e) => setStationLeave(e.currentTarget.checked)} />
+            <TextInput label="Address During Leave" value={addressDuringLeave} onChange={(e) => setAddressDuringLeave(e.currentTarget.value)} />
+            <TextInput label="Contact Number" value={contactNumber} onChange={(e) => setContactNumber(e.currentTarget.value)} />
+            <TextInput label="Academic Substitute User ID" value={academicSubId} onChange={(e) => setAcademicSubId(e.currentTarget.value)} />
+            <TextInput label="Admin Substitute User ID" value={adminSubId} onChange={(e) => setAdminSubId(e.currentTarget.value)} />
+            <TextInput label="Attachment Reference" value={attachmentRef} onChange={(e) => setAttachmentRef(e.currentTarget.value)} />
+            <Button onClick={() => submitMutation.mutate({ leave_type: leaveType, start_date: startDate, end_date: endDate, purpose, station_leave_required: stationLeave, address_during_leave: addressDuringLeave, contact_number: contactNumber, academic_substitute_user_id: academicSubId ? Number(academicSubId) : null, admin_substitute_user_id: adminSubId ? Number(adminSubId) : null, attachment_reference: attachmentRef })}>Submit Application</Button>
+          </Stack>
+        </Paper>
+      </Grid.Col>
+
+      {/* Applications */}
+      <Grid.Col span={12}>
+        <Paper p="md" withBorder>
+          <Table striped highlightOnHover>
+            <Thead>
+              <Tr>
+                <Th>ID</Th>
+                <Th>Leave Type</Th>
+                <Th>Dates</Th>
+                <Th>Working Days</Th>
+                <Th>Status</Th>
+                <Th>Action</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {applications.map((app) => (
+                <Tr key={app.id}>
+                  <Td>{app.id}</Td>
+                  <Td>{app.leave_type_name ?? app.leave_type}</Td>
+                  <Td>{`${startDate} - ${endDate}`}</Td>
+                  <Td>{app.working_days ?? '-'}</Td>
+                  <Td><Badge>{app.status}</Badge></Td>
+                  <Td>
+                    <Group spacing="sm">
+                      <Button onClick={() => actionMutation.mutate({ id: app.id, action: 'withdraw' })}>Withdraw</Button>
+                      <Button onClick={() => actionMutation.mutate({ id: app.id, action: 'cancel' })}>Cancel</Button>
+                      <Button onClick={() => actionMutation.mutate({ id: app.id, action: 'extend' })}>Extend</Button>
+                      <Button onClick={() => actionMutation.mutate({ id: app.id, action: 'resume' })}>Resume</Button>
+                    </Group>
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Paper>
+      </Grid.Col>
+    </Grid>
+  );
+};
+
+export default MyLeavePage;
+```

@@ -1,0 +1,21 @@
+{
+  "label": "Phase 2 upgrade MyLeavePage.tsx with CL/RH/SCL/EL/COL/VL options, balances, and lifecycle actions",
+  "instruction": "Update client/src/modules/leave_elm/pages/MyLeavePage.tsx so that: (1) It uses useQuery from '@tanstack/react-query' to fetch ['leave', 'balances'] via listBalances and ['leave', 'applications'] via listApplications, plus useMutation for submitApplication and applicationAction, invalidating ['leave'] queries on success. (2) It displays the employee's leave balances in a Mantine Table or Paper card (showing leave_category_name and balance). (3) The New Application Form Select offers all 6 ELM leave categories: CL (Casual Leave), RH (Restricted Holiday), SCL (Special Casual Leave), EL (Earned Leave), COL (Commuted Leave), and VL (Vacation Leave), plus Start Date, End Date, Purpose, optional Station Leave Checkbox/Switch, Address During Leave, Contact Number, Academic Substitute User ID, Admin Substitute User ID, and Medical/Supporting Attachment Reference. (4) It renders the employee's leave applications in a Mantine Table (replacing the raw JSON Textarea!) with status badges and lifecycle action Buttons: Withdraw (when status is Pending or Substitute Pending), Cancel (when status is Approved), Extend (when status is Approved), and Resume (when status is Approved). Keep under 160 lines and ensure TypeScript compiles cleanly with Mantine v7 and @tanstack/react-query v5. Return only valid TypeScript JSX code.",
+  "allowed_paths": [
+    "client/src/modules/leave_elm/pages/MyLeavePage.tsx"
+  ],
+  "context_files": [
+    "client/src/modules/leave_elm/pages/MyLeavePage.tsx",
+    "client/src/modules/leave_elm/api.ts",
+    "client/src/modules/leave_elm/types.ts"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 3000,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}
