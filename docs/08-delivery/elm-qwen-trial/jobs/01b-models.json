@@ -1,0 +1,14 @@
+{
+  "label": "Retry foundation: compact models only",
+  "instruction": "The prior multi-file attempt exceeded the output limit while repeating model methods, and no files could be applied. Retry as a SMALL single-file initial implementation attempt. Generate only modules/leave_elm/models.py as Django data-model definitions. Maximum approximately 180 lines. Do not put business functions, save overrides, can_* methods, getters, placeholders, duplicate class definitions or validation methods in models.py. Use compact fields and choices, and plain integer IAM user IDs. The foundation should store employee leave requests and their workflow status, leave balances, configurable policy/hierarchy/calendar, substitution, cancellation/extension/resumption data, history, notifications and pending tasks/SLA. You may use JSONField for configuration details to keep the model representation compact. Include data only; later service files will implement operations against these actual fields. Do not create Django user/login models. This is initial generation of previously unapplied output, not a functional review. Return a complete valid JSON response and a complete models.py without code fences.",
+  "allowed_paths": [
+    "modules/leave_elm/models.py"
+  ],
+  "include_specs": false,
+  "context_files": [
+    "docs/08-delivery/elm-qwen-trial/specification-context-compact.md",
+    "core/db/mixins.py",
+    "fusion_auth/principal.py"
+  ],
+  "num_predict": 4096
+}

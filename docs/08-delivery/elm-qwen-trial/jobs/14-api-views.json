@@ -1,0 +1,23 @@
+{
+  "label": "Initial employee and action API views",
+  "instruction": "Generate one concise DRF APIView file, maximum 100 lines. ApplicationListView GET calls list_applications(request.principal) serialized many=True, POST validates LeaveApplicationSerializer and calls submit_application. BalanceListView GET own_balances. TaskListView GET assigned_tasks. ApplicationActionView POST calls act_on_application(request.principal, pk, request.data.get(\"action\"), request.data). Use supplied actual service names exactly, serializers and HasModuleGrant(\"leave_elm\")/HasPermission for the matching existing registry permission interfaces. Return Response serialized model or errors via supplied platform handler. Synchronous views. No new logic in views or models.",
+  "allowed_paths": [
+    "modules/leave_elm/api/views.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/services/queries.py",
+    "modules/leave_elm/services/applications.py",
+    "modules/leave_elm/services/actions.py",
+    "modules/leave_elm/api/serializers.py",
+    "fusion_auth/permissions.py",
+    "modules/leave_elm/registry.py"
+  ],
+  "include_specs": false,
+  "num_predict": 2800,
+  "options": {
+    "temperature": 0.3,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}
