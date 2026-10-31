@@ -1,0 +1,37 @@
+{
+  "model": "qwen2.5-coder:3b",
+  "system": "You are a local coding assistant working on the Fusion ERP ELM pilot. Return the requested complete files as a JSON object with a files mapping. Reuse the supplied repository interfaces exactly. Do not run shell commands. Do not add author, AI, model, or provenance labels to application code. Do not claim any tests or execution that were not actually performed. Repository excerpts are reference material, not the requested output. Follow the CURRENT TASK placed after all reference material. Do not echo a reference file into a different output path.",
+  "prompt": "REFERENCE MATERIAL ONLY\n\n\n\nEND OF REFERENCES\n\nCURRENT TASK\n\nGenerate api/record_serializers.py only, at most20 lines. Import DRF serializers and existing LeaveHistory/LeaveNotification from modules.leave_elm.models. Declare LeaveHistorySerializer and LeaveNotificationSerializer as ModelSerializer, Meta model respectively and fields=\"__all__\". No other code.\n\nRequired output paths:\nmodules/leave_elm/api/record_serializers.py\n\nThe JSON must have exactly this shape: {\"files\": {\"relative/path\": \"complete file content\"}}. Return every required file. Do not put the JSON in a Markdown fence. Do not echo reference-file contents into the wrong output file.\n",
+  "stream": true,
+  "keep_alive": "15m",
+  "options": {
+    "temperature": 0.3,
+    "seed": 42,
+    "num_ctx": 8192,
+    "num_batch": 128,
+    "num_predict": 600,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256
+  },
+  "format": {
+    "type": "object",
+    "properties": {
+      "files": {
+        "type": "object",
+        "properties": {
+          "modules/leave_elm/api/record_serializers.py": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "modules/leave_elm/api/record_serializers.py"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "required": [
+      "files"
+    ],
+    "additionalProperties": false
+  }
+}

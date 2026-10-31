@@ -1,0 +1,17 @@
+{
+  "label": "Phase 2 final LeaveTasksPage.tsx with context_files=[] and actMutation.mutate",
+  "instruction": "Write client/src/modules/leave_elm/pages/LeaveTasksPage.tsx with this exact TypeScript JSX code:\n```tsx\nimport { useState } from 'react';\nimport { Badge, Button, Container, Group, LoadingOverlay, Paper, Stack, Text, TextInput, Title } from '@mantine/core';\nimport { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';\nimport { PageHeader } from '../../../ui/components/PageHeader';\nimport { applicationAction, listTasks, type LeaveTask } from '../api';\n\nexport const LeaveTasksPage = () => {\n  const queryClient = useQueryClient();\n  const [remarks, setRemarks] = useState<string>('');\n\n  const { isLoading, data: tasks = [] } = useQuery<LeaveTask[]>({\n    queryKey: ['tasks'],\n    queryFn: listTasks,\n  });\n\n  const actMutation = useMutation({\n    mutationFn: (vars: { applicationId: number; action: string }) =>\n      applicationAction(vars.applicationId, vars.action, { decision: remarks, remarks }),\n    onSuccess: () => {\n      queryClient.invalidateQueries({ queryKey: ['tasks'] });\n    },\n  });\n\n  return (\n    <Container>\n      <LoadingOverlay visible={isLoading} />\n      <PageHeader title=\"Leave Tasks\" subtitle=\"Review and act on pending leave workflow tasks\" />\n\n      <TextInput\n        label=\"Decision / Remarks\"\n        value={remarks}\n        onChange={(e) => setRemarks(e.currentTarget.value)}\n        mb=\"md\"\n      />\n\n      <Stack gap=\"md\">\n        {tasks.map((task) => (\n          <Paper key={task.id} p=\"md\" withBorder>\n            <Title order={4}>{task.title ?? task.task_type}</Title>\n            <Badge>{task.status}</Badge>\n            <Text size=\"sm\" c=\"dimmed\">{task.description ?? task.purpose ?? ''}</Text>\n            <Text size=\"xs\">Application #{task.leave_application}</Text>\n\n            <Group gap=\"sm\" mt=\"sm\">\n              <Button onClick={() => actMutation.mutate({ applicationId: task.leave_application, action: 'substitute_accept' })}>\n                Accept Substitute\n              </Button>\n              <Button onClick={() => actMutation.mutate({ applicationId: task.leave_application, action: 'substitute_reject' })}>\n                Reject Substitute\n              </Button>\n              <Button onClick={() => actMutation.mutate({ applicationId: task.leave_application, action: 'recommend' })}>\n                Recommend\n              </Button>\n              <Button onClick={() => actMutation.mutate({ applicationId: task.leave_application, action: 'return_clarification' })}>\n                Return Clarification\n              </Button>\n              <Button onClick={() => actMutation.mutate({ applicationId: task.leave_application, action: 'approve' })}>\n                Approve\n              </Button>\n              <Button onClick={() => actMutation.mutate({ applicationId: task.leave_application, action: 'reject' })}>\n                Reject\n              </Button>\n            </Group>\n          </Paper>\n        ))}\n      </Stack>\n    </Container>\n  );\n};\n\nexport default LeaveTasksPage;\n```\nReturn only valid TypeScript JSX code.",
+  "allowed_paths": [
+    "client/src/modules/leave_elm/pages/LeaveTasksPage.tsx"
+  ],
+  "context_files": [],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 1600,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

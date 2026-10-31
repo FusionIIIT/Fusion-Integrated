@@ -1,0 +1,17 @@
+{
+  "label": "Phase 2 clean domain/policy.py without broken ordinal loop",
+  "instruction": "Write modules/leave_elm/domain/policy.py from scratch with NO Django imports. Include:\n1. `from datetime import date, timedelta` and `from decimal import Decimal` at the top.\n2. `LEAVE_CATEGORY_NAMES = ['CL', 'RH', 'SCL', 'EL', 'COL', 'VL']` and `LEAVE_POLICY_DEFAULTS = {'CL': 8, 'RH': 2, 'SCL': 15, 'EL': 30, 'COL': 20, 'VL': 60}`.\n3. Status constants: `STATUS_DRAFT = 'Draft'`, `STATUS_PENDING = 'Pending'`, `STATUS_SUBSTITUTE_PENDING = 'Substitute Pending'`, `STATUS_UNDER_REVIEW = 'Under Review'`, `STATUS_AWAITING_AUTHORITY = 'Awaiting Sanctioning Authority'`, `STATUS_CLARIFICATION = 'Returned for Clarification'`, `STATUS_APPROVED = 'Approved'`, `STATUS_REJECTED = 'Rejected'`, `STATUS_CANCELLED = 'Cancelled'`, `STATUS_COMPLETED = 'Completed'`, and `ACTIVE_OVERLAP_STATUSES = {'Pending', 'Substitute Pending', 'Under Review', 'Awaiting Sanctioning Authority', 'Returned for Clarification', 'Approved'}`.\n4. `def normalize_category_code(raw_code: str) -> str:` strips and uppercases `raw_code`; maps `'VACATION'` or `'VL'` to `'VL'`, `'SICK_LEAVE'` or `'SCL'` to `'SCL'`, returns `code` if in `LEAVE_CATEGORY_NAMES`, else raises `ValueError(f'Unsupported leave category: {raw_code}')`.\n5. `def calculate_requested_days(category_code: str, start_date: date, end_date: date, holidays=(), restricted_holidays=(), prefix_suffix_days: int = 0) -> Decimal:` calls `code = normalize_category_code(category_code)`. If `end_date < start_date`: raises `ValueError('end_date cannot be earlier than start_date')`. Do NOT use `.toordinal()`! If `code == 'RH'`: if `start_date != end_date`: raise `ValueError('Restricted Holiday (RH) must be a single day')`; if `restricted_holidays and start_date.isoformat() not in set(restricted_holidays)`: raise `ValueError('Selected date is not in the restricted holiday calendar')`; return `Decimal('1.00')`. If `code in ('CL', 'SCL')`: loop `cur = start_date` while `cur <= end_date` (`cur += timedelta(days=1)`) counting days where `cur.weekday() < 5 and cur.isoformat() not in set(holidays)`; return `Decimal(str(count))`. Otherwise (for EL, COL, VL): return `Decimal(str((end_date - start_date).days + 1 + max(0, int(prefix_suffix_days))))`.\n6. `def validate_policy_rules(category_code: str, requested_days: Decimal, available_balance: Decimal, *, has_medical_certificate: bool = False, is_faculty_vacation_eligible: bool = True, station_leave_required: bool = False, address_during_leave: str = '', max_cl_spell: int = 5) -> None:` normalizes `code = normalize_category_code(category_code)`. Raises `ValueError` if `requested_days <= 0`, if `requested_days > available_balance`, if `code == 'CL' and requested_days > Decimal(str(max_cl_spell))`, if `code == 'VL' and not is_faculty_vacation_eligible`, if `code == 'EL' and requested_days >= Decimal('10') and not has_medical_certificate`, or if `station_leave_required and not str(address_during_leave).strip()`.\nReturn only valid Python source code.",
+  "allowed_paths": [
+    "modules/leave_elm/domain/policy.py"
+  ],
+  "context_files": [],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 2000,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

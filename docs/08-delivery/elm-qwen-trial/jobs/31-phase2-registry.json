@@ -1,0 +1,19 @@
+{
+  "label": "Phase 2 fix ROLE_GRANTS least-privilege in registry.py",
+  "instruction": "Update modules/leave_elm/registry.py to enforce least-privilege RBAC in ROLE_GRANTS while keeping MODULE, NAV_ITEMS, PERMISSIONS, and SYSTEM_PERMISSIONS intact. Specifically: (1) Keep MODULE, NAV_ITEMS, PERMISSIONS, and SYSTEM_PERMISSIONS with the exact same permission codes. (2) In ROLE_GRANTS, map employee roles ('faculty', 'staff', 'Employee') ONLY to ['leave_elm.application.view_self', 'leave_elm.application.create', 'leave_elm.substitute.respond', 'leave_elm.task.view'] — do NOT grant application.review or application.approve to faculty, staff, or Employee. (3) Map reviewer roles ('Unit Head', 'Head of Department', 'Section Head', 'Deputy Registrar (Estt.)', 'Establishment Reviewer', 'reviewer') to ['leave_elm.application.view_self', 'leave_elm.application.create', 'leave_elm.substitute.respond', 'leave_elm.task.view', 'leave_elm.application.review']. (4) Map sanctioning authority roles ('Dean', 'Registrar', 'Director', 'authority') to ['leave_elm.application.view_self', 'leave_elm.application.create', 'leave_elm.substitute.respond', 'leave_elm.task.view', 'leave_elm.application.review', 'leave_elm.application.approve']. (5) Map admin roles ('Leave Administrator', 'Leave Admin', 'admin') to all 8 leave_elm permissions including 'leave_elm.configuration.manage' and 'leave_elm.record.manage'. Return only valid Python code for modules/leave_elm/registry.py.",
+  "allowed_paths": [
+    "modules/leave_elm/registry.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/registry.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 1500,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

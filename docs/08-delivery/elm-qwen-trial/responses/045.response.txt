@@ -1,0 +1,72 @@
+```
+from django.db import models
+from django.utils import timezone
+
+from core.db.mixins import TimeStampedModel, UserScopedModel
+
+
+def year_end_rollover():
+    # Logic to calculate new leave balance for each user based on policy defaults
+    current_year = timezone.now().year
+    policies = LeavePolicy.objects.all()
+    for policy in policies:
+        category_defaults = LEAVE_POLICY_DEFAULTS.get(policy.name)
+        if category_defaults is None:
+            continue
+        for leave_category in LEAVE_CATEGORY_NAMES:
+            balances = LeaveBalance.objects.filter(leave_category__name=leave_category).aggregate(total_balance=models.Sum('balance'))['total_balance'] or 0
+            new_balance = balances + (category_defaults - balances / 12) * 12
+            LeaveBalance.objects.update_or_create(
+                user_id=models.F('user_id'),
+                leave_category__name=leave_category,
+                defaults={'balance': new_balance}
+            )
+    
+    return {'users_processed': len(LeaveCategory.objects.distinct()), 'balances_updated': LeaveBalance.objects.count()}
+
+
+def process_task_sla(now=None):
+    now = now or timezone.now()
+    reminded_count = 0
+    escalated_count = 0
+    
+    threshold_days = {
+        'Reminder': 60,
+        'Escalation': 120
+    }
+    
+    tasks = LeaveTask.objects.filter(status='Pending')
+    
+    for task in tasks:
+        reminder_threshold = threshold_days.get(task.task_type, 30)
+        escalation_threshold = threshold_days.get(task.task_type, 90)
+        
+        elapsed_minutes = (now - task.created_at).seconds / 60.0
+        
+        if elapsed_minutes >= escalation_threshold and not task.escalated_at:
+            task.escalated_at = now
+            task.save()
+            send_mail(
+                subject=f'Leave Task Escalation: {task.leave_application.id} - {task.task_type}',
+                message=f"""Escalation: Your leave task has exceeded its SLA of {task.escalation_threshold.days} days.
+Please escalate the issue to a higher authority.""",
+                from_email='noreply@yourdomain.com',
+                recipient_list=[task.leave_application.user.email],
+                fail_silently=False
+            )
+            escalated_count += 1
+        elif elapsed_minutes >= reminder_threshold and not task.reminded_at:
+            task.reminded_at = now
+            task.save()
+            send_mail(
+                subject=f'Leave Task Reminder: {task.leave_application.id} - {task.task_type}',
+                message=f"""Reminder: Your leave task is due on {task.reminder_threshold.strftime('%Y-%m-%d')}.
+Please update the status of your leave application.""",
+                from_email='noreply@yourdomain.com',
+                recipient_list=[task.leave_application.user.email],
+                fail_silently=False
+            )
+            reminded_count += 1
+    
+    return {'reminded': reminded_count, 'escalated': escalated_count}
+```

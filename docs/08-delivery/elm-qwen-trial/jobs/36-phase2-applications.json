@@ -1,0 +1,21 @@
+{
+  "label": "Phase 2 upgrade services/applications.py with BR1-BR8 validation and overlap detection",
+  "instruction": "Update modules/leave_elm/services/applications.py to implement complete leave submission validation (BR1-BR8). Specifically: (1) Check actor.has_permission('leave_elm.application.create'), raising PermissionDeniedError if missing. (2) Resolve leave_type from data.get('leave_type') or data.get('leave_type_id') — accept a LeaveType instance, an int PK, or a category/type string (e.g. 'CL', 'RH', 'SCL', 'EL', 'COL', 'VL', 'vacation', 'sick_leave') by normalizing via normalize_category_code and looking up or creating the LeaveCategory and LeaveType. (3) Parse start_date and end_date (from date or ISO string) and validatepurpose is non-empty (raise BadRequestError if missing). (4) Calculate working_days via calculate_requested_days from modules.leave_elm.domain.policy and validate policy rules via validate_policy_rules against the user's LeaveBalance (creating default balance from LEAVE_POLICY_DEFAULTS if missing; raise DomainError on policy violation). (5) Check for overlapping active applications for actor.user_id in ACTIVE_OVERLAP_STATUSES where start_date <= end_date and end_date >= start_date, raising ConflictError('Leave dates overlap with an existing active leave application.') if found. (6) Validate substitutes (academic_substitute_user_id and admin_substitute_user_id cannot equal actor.user_id). If substitutes are provided and status is not Draft, set status='Substitute Pending', create LeaveSubstitution rows and LeaveTask(task_type='Substitute Consent', status='Pending', user_id=sub_id, role='substitute'); otherwise set status='Pending' and create LeaveTask(task_type='Application Review', status='Pending', user_id=actor.user_id, role='reviewer'). (7) Record LeaveHistory(user_id=actor.user_id, leave_application=app, action='submit', status=app.status, decision='Submitted') and LeaveNotification(user_id=actor.user_id, leave_application=app, message=...). Return the saved LeaveApplication. Keep under 140 lines and return only valid Python code.",
+  "allowed_paths": [
+    "modules/leave_elm/services/applications.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/services/applications.py",
+    "modules/leave_elm/domain/policy.py",
+    "modules/leave_elm/models.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 3000,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

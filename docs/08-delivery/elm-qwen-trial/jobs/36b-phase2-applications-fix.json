@@ -1,0 +1,21 @@
+{
+  "label": "Phase 2 repair services/applications.py missing imports, LeaveApplication.objects.create, and exception handling",
+  "instruction": "Fix the runtime bugs in modules/leave_elm/services/applications.py: (1) Import `datetime`, `Decimal` from `decimal`, `transaction` from `django.db`, `BadRequestError, ConflictError, DomainError, PermissionDeniedError` from `core.api.exceptions`, `ACTIVE_OVERLAP_STATUSES, LEAVE_POLICY_DEFAULTS, calculate_requested_days, normalize_category_code, validate_policy_rules` from `modules.leave_elm.domain.policy`, and `LeaveApplication, LeaveBalance, LeaveCategory, LeaveHistory, LeaveNotification, LeaveSubstitution, LeaveTask, LeaveType` from `modules.leave_elm.models`. (2) Do NOT wrap the whole function in `try ... except Exception as e: raise DomainError(str(e))` because that swallows BadRequestError and ConflictError! Only wrap `normalize_category_code`, `calculate_requested_days`, and `validate_policy_rules` in `try ... except ValueError as exc: raise DomainError(str(exc)) from exc`. (3) When resolving `leave_type`: if `isinstance(raw_lt, LeaveType)` use it; else if `str(raw_lt).isdigit()` look up `LeaveType.objects.select_related('leave_category').filter(id=int(raw_lt)).first()`; else normalize code via `normalize_category_code(str(raw_lt))`, get_or_create `cat, _ = LeaveCategory.objects.get_or_create(name=code, defaults={'description': code})`, and get_or_create `leave_type, _ = LeaveType.objects.get_or_create(name=code, defaults={'description': code, 'leave_category': cat})`. (4) Parse `start_date` and `end_date` if they are `str` via `datetime.date.fromisoformat(val)` (or keep if already `datetime.date`). (5) Get or create `balance_obj, _ = LeaveBalance.objects.get_or_create(user_id=actor.user_id, leave_category=leave_type.leave_category, defaults={'balance': Decimal(str(LEAVE_POLICY_DEFAULTS.get(leave_type.leave_category.name, 8)))})`. (6) Call `calculate_requested_days` and `validate_policy_rules` (passing `has_medical_certificate=bool(data.get('has_medical_certificate') or data.get('attachment_reference'))`, `is_faculty_vacation_eligible=(actor.kind == 'faculty')`, `station_leave_required=bool(data.get('station_leave_required', False))`, `address_during_leave=str(data.get('address_during_leave', '')).strip()`). (7) Check overlap with `LeaveApplication.objects.filter(user_id=actor.user_id, status__in=ACTIVE_OVERLAP_STATUSES, start_date__lte=end_date, end_date__gte=start_date)`; if `.exists()`, `raise ConflictError('Leave dates overlap with an existing active leave application.')`. (8) Create `leave_application = LeaveApplication.objects.create(user_id=actor.user_id, leave_type=leave_type, start_date=start_date, end_date=end_date, working_days=requested_days, purpose=purpose, status=status_val, station_leave_required=bool(data.get('station_leave_required', False)), address_during_leave=str(data.get('address_during_leave', '')), contact_number=str(data.get('contact_number', '')), academic_substitute_user_id=acad_sub_id, admin_substitute_user_id=admin_sub_id, attachment_reference=str(data.get('attachment_reference', '')))`. If `acad_sub_id` or `admin_sub_id` is set, also create `LeaveSubstitution` and `LeaveTask(user_id=sub_id, leave_application=leave_application, task_type='Substitute Consent', status='Pending', role='substitute')`; otherwise create `LeaveTask(user_id=actor.user_id, leave_application=leave_application, task_type='Application Review', status='Pending', role='reviewer')`. Create `LeaveHistory(user_id=actor.user_id, leave_application=leave_application, status=leave_application.status, decision='Submitted', action='submit')` and `LeaveNotification(user_id=actor.user_id, leave_application=leave_application, message=f'Application #{leave_application.id} submitted.')`. Return `leave_application`. Return only valid Python code.",
+  "allowed_paths": [
+    "modules/leave_elm/services/applications.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/services/applications.py",
+    "modules/leave_elm/domain/policy.py",
+    "modules/leave_elm/models.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 2800,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

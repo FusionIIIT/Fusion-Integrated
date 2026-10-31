@@ -1,0 +1,20 @@
+{
+  "label": "Phase 2 fix SYSTEM_PERMISSIONS conflict in registry.py",
+  "instruction": "Running `manage.py permission_manifest` produced: `CommandError: permission manifest is invalid: leave_elm: leave_elm.application.approve is both a system permission and granted to a designation. Pick one.` Update modules/leave_elm/registry.py so that SYSTEM_PERMISSIONS = [] (an empty list, since all 8 permissions are granted to designations in ROLE_GRANTS), and in ROLE_GRANTS ensure 'Leave Administrator', 'Leave Admin', and 'admin' include all 8 permissions: ['leave_elm.application.view_self', 'leave_elm.application.create', 'leave_elm.substitute.respond', 'leave_elm.task.view', 'leave_elm.application.review', 'leave_elm.application.approve', 'leave_elm.configuration.manage', 'leave_elm.record.manage']. Keep MODULE, NAV_ITEMS, PERMISSIONS, and the other ROLE_GRANTS entries unchanged. Return only valid Python code.",
+  "allowed_paths": [
+    "modules/leave_elm/registry.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/registry.py",
+    "modules/placement/registry.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 1500,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

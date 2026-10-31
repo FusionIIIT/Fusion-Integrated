@@ -1,0 +1,73 @@
+```
+from django.db.models import Decimal, Q
+from core.api.exceptions import PermissionDeniedError
+
+LEAVE_CATEGORY_NAMES = ['CL', 'RH']
+LEAVE_POLICY_DEFAULTS = {
+    'CL': 8,
+    'RH': 2,
+    'SCL': 15,
+    'EL': 30,
+    'COL': 20,
+    'VL': 60
+}
+
+from modules.leave_elm.domain.policy import LEAVE_CATEGORY_NAMES, LEAVE_POLICY_DEFAULTS
+from modules.leave_elm.models import LeaveApplication, LeaveBalance, LeaveCategory, LeaveNotification, LeaveTask, LeaveType
+
+
+def list_applications(actor, scope='mine'):
+    has_admin_or_review = actor.has_permission('leave_elm.application.review') or \
+                         actor.has_permission('leave_elm.application.approve')
+    
+    if not (actor.has_permission('leave_elm.application.view_self') and has_admin_or_review):
+        raise PermissionDeniedError()
+    
+    queryset = LeaveApplication.objects.select_related('leave_type', 'leave_type__leave_category')
+    if scope == 'all' and has_admin_or_review:
+        queryset = LeaveApplication.objects.all().select_related('leave_type', 'leave_type__leave_category')
+    else:
+        queryset = queryset.filter(user_id=actor.user_id)
+    return queryset.order_by('-created_at', '-id')
+
+def own_balances(actor):
+    if not actor.has_permission('leave_elm.application.view_self'):  # Changed to view_self
+        raise PermissionDeniedError()
+    
+    leave_categories = LEAVE_CATEGORY_NAMES + ['RH']
+    for cat_name in leave_categories:
+        try:
+            cat, _ = LeaveCategory.objects.get_or_create(name=cat_name, defaults={'description': cat_name})
+            LeaveType.objects.get_or_create(name=cat_name, defaults={'description': cat_name, 'leave_category': cat})
+            LeaveBalance.objects.get_or_create(
+                user_id=actor.user_id,
+                leave_category=cat,
+                defaults={
+                    'balance': Decimal(str(LEAVE_POLICY_DEFAULTS[cat_name]))
+                }
+            )
+        except Exception as e:
+            print(f"Failed to create or update balance for {cat_name}: {e}")
+    
+    return LeaveBalance.objects.select_related('leave_category').filter(user_id=actor.user_id).order_by('leave_category__name', 'id')
+
+def assigned_tasks(actor):
+    has_admin_or_review = actor.has_permission('leave_elm.application.review') or \
+                         actor.has_permission('leave_elm.application.approve')
+    
+    cond = Q(user_id=actor.user_id)
+    if has_admin_or_review and (actor.has_permission('leave_elm.application.review') or 
+                               actor.has_permission('leave_elm.application.approve')):
+        cond = cond | Q(role='reviewer' and actor.has_permission('application.review')) | \
+               Q(role='authority' and actor.has_permission('application.approve'))
+    elif has_admin_or_review:
+        cond = cond | Q(role='reviewer' and actor.has_permission('application.review'))
+    else:
+        cond = cond | Q(role='authority' and actor.has_permission('application.approve'))
+    
+    queryset = LeaveTask.objects.select_related('leave_application', 'leave_application__leave_type').filter(status='Pending').filter(cond).order_by('-created_at', '-id')
+    return queryset
+
+def list_notifications(actor):
+    return LeaveNotification.objects.select_related('leave_application').filter(user_id=actor.user_id).order_by('-created_at', '-id')
+```

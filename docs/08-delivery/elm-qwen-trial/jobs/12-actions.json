@@ -1,0 +1,21 @@
+{
+  "label": "Initial application actions service",
+  "instruction": "Generate initial ELM action service in services/actions.py, maximum 90 lines. Provide act_on_application(actor, application_id, action, data) supporting approve, reject, withdraw, cancel, extend, resume, substitute and recommend. Reuse the existing model fields and permission names, ORM lookups, history and followup models. No new schema or duplicate models. Followup actions are available as described in the original problem statement. Return one concise file. Do not add repeated branches for identical actions. This is initial model implementation; no correctness audit or business-rule repair is requested.",
+  "allowed_paths": [
+    "modules/leave_elm/services/actions.py"
+  ],
+  "context_files": [
+    "docs/08-delivery/elm-qwen-trial/problem-statement-context.md",
+    "modules/leave_elm/models.py",
+    "modules/leave_elm/registry.py",
+    "core/api/exceptions.py"
+  ],
+  "include_specs": false,
+  "num_predict": 3800,
+  "options": {
+    "temperature": 0.3,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

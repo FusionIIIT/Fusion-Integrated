@@ -1,0 +1,17 @@
+{
+  "label": "Phase 2 clean LeaveAdminPage.tsx rendering notification.message and record.leave_application",
+  "instruction": "Write client/src/modules/leave_elm/pages/LeaveAdminPage.tsx from scratch with these exact imports and structure:\n1. Imports:\n`import { useEffect, useState } from 'react';`\n`import { Alert, Button, Container, Group, LoadingOverlay, Paper, Table, Textarea, Title } from '@mantine/core';`\n`import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';`\n`import { errorMessage } from '../../../lib/http';`\n`import { PageHeader } from '../../../ui/components/PageHeader';`\n`import { getConfiguration, getRecords, saveConfiguration, type Configuration, type LeaveHistory, type LeaveNotification } from '../api';`\n2. Inside `const LeaveAdminPage = () => {`:\n- `const queryClient = useQueryClient();`\n- `const [policyJSON, setPolicyJSON] = useState<string>('');`\n- `const [calendarJSON, setCalendarJSON] = useState<string>('');`\n- `const { isLoading, isError, error, data } = useQuery({ queryKey: ['configuration'], queryFn: getConfiguration });`\n- `const { isLoading: isLoadingRecords, isError: isErrorRecords, data: dataRecords } = useQuery({ queryKey: ['records'], queryFn: getRecords });`\n- `useEffect(() => { if (data) { setPolicyJSON(JSON.stringify(data.policy ?? {}, null, 2)); setCalendarJSON(JSON.stringify(data.calendar ?? {}, null, 2)); } }, [data]);`\n- `const saveConfigurationMutation = useMutation({ mutationFn: (newData: Configuration) => saveConfiguration(newData), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['configuration'] }); queryClient.invalidateQueries({ queryKey: ['records'] }); } });`\n- `const history: LeaveHistory[] = dataRecords?.history ?? [];`\n- `const notifications: LeaveNotification[] = dataRecords?.notifications ?? [];`\n3. Render `<Container size=\"lg\" mt=\"md\">` with `<PageHeader title=\"Leave Admin\" subtitle=\"Manage leave policies, holiday calendars, and audit records.\" />`, Policy `<Paper p=\"md\" withBorder>` (`<Textarea value={policyJSON} onChange={(e) => setPolicyJSON(e.currentTarget.value)} rows={8} />` + Save Policy button), Calendar `<Paper p=\"md\" mt=\"md\" withBorder>` (`<Textarea value={calendarJSON} onChange={(e) => setCalendarJSON(e.currentTarget.value)} rows={8} />` + Save Calendar button + Run Year-End Rollover button calling `saveConfigurationMutation.mutate({ run_rollover: true } as unknown as Configuration)`), History `<Table striped highlightOnHover>` showing `record.created_at ?? '-'`, `record.leave_application ?? '-'`, `record.action ?? '-'`, `record.status`, `record.decision`, and Notifications `<Table striped highlightOnHover>` showing `notification.created_at ?? '-'`, `notification.leave_application ?? '-'`, `notification.message`, and `notification.channel ?? 'in_app'`.\nExport `export default LeaveAdminPage;`. Return only valid TypeScript JSX code.",
+  "allowed_paths": [
+    "client/src/modules/leave_elm/pages/LeaveAdminPage.tsx"
+  ],
+  "context_files": [],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 2200,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

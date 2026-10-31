@@ -1,0 +1,21 @@
+{
+  "label": "Phase 2 fix api/configuration.py FieldErrors and add balance credit/debit admin action",
+  "instruction": "Replace modules/leave_elm/api/configuration.py to fix the FieldError crashes (`filter(user=...)` on LeavePolicy and `filter(leave_application__user=...)` on LeaveHistory) and support both GET and POST on ConfigurationView and RecordListView. Specifically: (1) Use APIView from rest_framework.views, Response from rest_framework.response, IsAuthenticatedPrincipal, HasModuleGrant, HasPermission from fusion_auth.permissions, and @extend_schema(responses=OpenApiTypes.OBJECT) from drf_spectacular. (2) In ConfigurationView: permission_classes = [IsAuthenticatedPrincipal, HasModuleGrant('leave_elm'), HasPermission('leave_elm.configuration.manage')]. GET ensures a default LeavePolicy(name='Default') and LeaveCalendar(name='Default', user_id=request.principal.user_id, holidays=[]) exist and returns {'policy': LeavePolicySerializer(policy).data, 'calendar': LeaveCalendarSerializer(calendar).data, 'policies': LeavePolicySerializer(LeavePolicy.objects.all(), many=True).data, 'calendars': LeaveCalendarSerializer(LeaveCalendar.objects.all(), many=True).data}. POST updates or creates LeavePolicy and LeaveCalendar from request.data.get('policy') and request.data.get('calendar') (passing user_id=request.principal.user_id on LeaveCalendar), and if request.data.get('run_rollover') is True, runs year_end_rollover(). Return status=200. (3) In RecordListView: permission_classes = [IsAuthenticatedPrincipal, HasModuleGrant('leave_elm'), HasPermission('leave_elm.record.manage')]. GET returns {'applications': LeaveApplicationSerializer(LeaveApplication.objects.select_related('leave_type', 'leave_type__leave_category').order_by('-created_at')[:100], many=True).data, 'balances': LeaveBalanceSerializer(LeaveBalance.objects.select_related('leave_category').order_by('user_id', 'id')[:200], many=True).data, 'history': LeaveHistorySerializer(LeaveHistory.objects.order_by('-created_at')[:100], many=True).data, 'notifications': LeaveNotificationSerializer(LeaveNotification.objects.order_by('-created_at')[:100], many=True).data}. POST allows admin balance adjustment (user_id, category_code, balance or delta_days) and returns the updated LeaveBalanceSerializer(balance_obj).data. Return only valid Python code.",
+  "allowed_paths": [
+    "modules/leave_elm/api/configuration.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/api/configuration.py",
+    "modules/leave_elm/api/serializers.py",
+    "modules/leave_elm/api/record_serializers.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 2800,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

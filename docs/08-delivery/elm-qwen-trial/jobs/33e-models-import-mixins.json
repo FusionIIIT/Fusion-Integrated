@@ -1,0 +1,19 @@
+{
+  "label": "Phase 2 fix models.py to import TimeStampedModel and UserScopedModel from core.db.mixins",
+  "instruction": "In modules/leave_elm/models.py:\n1. Replace the local `class TimeStampedModel(models.Model):` and `class UserScopedModel(models.Model):` declarations on lines 5-10 with:\n`from core.db.mixins import TimeStampedModel, UserScopedModel`\n2. In `LeaveApplication.save(self, *args, **kwargs):`, replace lines 81-84 with:\n```python\n    def save(self, *args, **kwargs):\n        if self.status == 'Approved' and not self.approved_at:\n            self.approved_at = timezone.now()\n        if self.status == 'Cancelled' and not self.cancelled_at:\n            self.cancelled_at = timezone.now()\n        super().save(*args, **kwargs)\n```\nand in `@extension_approved_by.setter` check `if self.extension_approved:` instead of `self.extension_status`.\nKeep all 13 model classes and all fields intact. Return only valid Python code.",
+  "allowed_paths": [
+    "modules/leave_elm/models.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/models.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 3200,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

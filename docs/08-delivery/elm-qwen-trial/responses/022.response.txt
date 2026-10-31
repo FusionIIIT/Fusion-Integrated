@@ -1,0 +1,5 @@
+{
+  "files": {
+    "modules/leave_elm/schedule.py": "from celery.schedules import crontab\n\nBEAT_SCHEDULE = {\n    'elm-year-end-rollover': {\n        'task': 'modules.leave_elm.tasks.elm_year_end_rollover',\n        'schedule': crontab(month_of_year=1, day_of_month=1, hour=0, minute=0)\n    },\n    'elm-task-sla': {\n        'task': 'modules.leave_elm.tasks.elm_task_sla',\n        'schedule': crontab(minute='*/15')\n    }\n}\n\nTASK_ROUTES = {\n    'modules.leave_elm.tasks.*': {'queue': 'default'}\n}"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "model": "qwen2.5-coder:3b",
+  "system": "You are a local coding assistant. Follow CURRENT TASK after references. Return complete raw source for the one requested file. Do not claim tests or add provenance labels.",
+  "prompt": "REFERENCE MATERIAL ONLY\n\n\n\nEND OF REFERENCES\n\nCURRENT TASK\n\nOutput the exact Markdown below for docs/08-delivery/elm-qwen-trial/PR_DESCRIPTION.md:\n\n# Phase 2: Review, Test, and Improve the ELM Module (`qwen2.5-coder:3b`)\n\nImproves the preserved Phase-1 ELM implementation (`e8b33a5` on `codex/elm-qwen-trial`) into a tested, deployment-ready Fusion ERP module on `codex/elm-qwen-phase2` using only local Ollama `qwen2.5-coder:3b` generation via `devtools/qwen_elm_trial.py` (Prompts `037`\u2013`094`).\n\n## Key Improvements\n- **Permissions & Registry (`038`):** Resolved `SYSTEM_PERMISSIONS` vs `ROLE_GRANTS` collision and enforced all 8 ELM permission checks across services and views.\n- **Schema & Models (`087` + `0002_phase2_schema_fixes`):** Fixed `LeaveBalance` foreign-key queries and added `AttachmentRecord`, `NotificationDispatchLog`, `LeaveAuditEvent`, and policy configuration columns.\n- **Domain Policy & Services (`065`, `072`, `077`, `081`, `082`):** Implemented pure domain validation (half-day, joining date, probation, proof requirements, advance notice) and end-to-end draft, submit, cancel, substitute response, review, and sanction/reject workflows with atomic balance deduction and restoration.\n- **API & Frontend (`058`, `059`, `066`, `067`, `079`, `083`, `084`, `089`, `090`):** Aligned DRF serializers, added `/submit`, `/cancel`, and admin CRUD endpoints, and updated `MyLeavePage`, `LeaveTasksPage`, and `LeaveAdminPage`.\n- **Verification (`091`):** Passes `manage.py check`, `migrate`, `permission_manifest --check`, `lint-imports`, `schema-check`, `tsc --noEmit`, `npm run build`, and `pytest` (`4 passed` in `test_elm_phase2.py`, `384 passed` repository-wide).\n\nOutput file: docs/08-delivery/elm-qwen-trial/PR_DESCRIPTION.md\nReturn only complete raw source code, without JSON, explanation or Markdown fences.\n",
+  "stream": true,
+  "keep_alive": "15m",
+  "options": {
+    "temperature": 0.0,
+    "seed": 42,
+    "num_ctx": 8192,
+    "num_batch": 128,
+    "num_predict": 2000,
+    "repeat_penalty": 1.05,
+    "repeat_last_n": 256
+  }
+}

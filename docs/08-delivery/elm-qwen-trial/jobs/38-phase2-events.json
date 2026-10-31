@@ -1,0 +1,21 @@
+{
+  "label": "Phase 2 fix services/events.py rollover and SLA datetime comparison bugs",
+  "instruction": "Update modules/leave_elm/services/events.py to fix the broken year_end_rollover() and process_task_sla() functions. Specifically: (1) In year_end_rollover(): iterate over distinct user_ids in LeaveBalance (and ensure default LeaveCategory rows exist for LEAVE_CATEGORY_NAMES). For each user_id and category_name in LEAVE_CATEGORY_NAMES: carry forward EL (accumulated up to 300 max) and COL, and reset annual allocations for CL, RH, SCL, VL to LEAVE_POLICY_DEFAULTS[category_name]. Update or create the user's LeaveBalance row with user_id and leave_category (not leave_category__name!). Return a dict {'users_processed': count, 'balances_updated': updated}. (2) In process_task_sla(now=None): compare elapsed_minutes = (now - task.created_at).total_seconds() / 60.0 against integer task.reminder_threshold and task.escalation_threshold on Pending LeaveTask rows. If elapsed_minutes >= task.escalation_threshold and task.escalated_at is None, set task.escalated_at = now, save task, and create a LeaveNotification(user_id=task.leave_application.user_id, leave_application=task.leave_application, message=..., channel='in_app'). Else if elapsed_minutes >= task.reminder_threshold and task.reminded_at is None, set task.reminded_at = now, save task, and create a LeaveNotification. Return {'reminded': reminded_count, 'escalated': escalated_count}. Return only valid Python code.",
+  "allowed_paths": [
+    "modules/leave_elm/services/events.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/services/events.py",
+    "modules/leave_elm/models.py",
+    "modules/leave_elm/domain/policy.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 2000,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

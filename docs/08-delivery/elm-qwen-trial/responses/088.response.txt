@@ -1,0 +1,156 @@
+```python
+from datetime import date, timedelta
+from decimal import Decimal
+import pytest
+from django.utils import timezone
+from core.api.exceptions import BadRequestError, ConflictError, DomainError, PermissionDeniedError
+from fusion_auth.principal import Principal
+from modules.leave_elm.contracts import LeaveElmContracts
+from modules.leave_elm.domain.policy import (
+    LEAVE_POLICY_DEFAULTS,
+    calculate_requested_days,
+    normalize_category_code,
+    validate_policy_rules,
+)
+from modules.leave_elm.models import LeaveBalance, LeaveTask
+from modules.leave_elm.registry import ROLE_GRANTS
+from modules.leave_elm.services.actions import act_on_application
+from modules.leave_elm.services.applications import submit_application
+from modules.leave_elm.services.events import process_task_sla, year_end_rollover
+from modules.leave_elm.services.queries import assigned_tasks, list_applications, list_notifications, own_balances
+
+
+def _make_principal(user_id: int, *, kind: str = 'faculty', role_key: str = 'faculty') -> Principal:
+    perms = ROLE_GRANTS[role_key]
+    return Principal(
+        user_id=user_id,
+        username=f'user_{user_id}',
+        display_name=f'User {user_id}',
+        kind=kind,
+        designations=(role_key,),
+        department_id=1,
+        permissions=frozenset(perms),
+        module_grants=frozenset({'leave_elm'}),
+    )
+
+
+def test_domain_policy_calculations_and_rules():
+    assert normalize_category_code('vacation') == 'VL'
+    assert normalize_category_code('sick_leave') == 'SCL'
+    assert normalize_category_code('cl') == 'CL'
+    # Mon 2026-11-02 to Fri 2026-11-06 is 5 working days
+    assert calculate_requested_days('CL', date(2026, 11, 2), date(2026, 11, 6)) == Decimal('5')
+    # EL counts calendar days + prefix/suffix
+    assert calculate_requested_days('EL', date(2026, 11, 2), date(2026, 11, 8), prefix_suffix_days=2) == Decimal('9')
+    # RH must be single day in restricted_holidays
+    assert calculate_requested_days('RH', date(2026, 11, 4), date(2026, 11, 4), restricted_holidays=('2026-11-04',)) == Decimal('1.00')
+    with pytest.raises(ValueError):
+        calculate_requested_days('RH', date(2026, 11, 4), date(2026, 11, 5))
+    with pytest.raises(ValueError):
+        validate_policy_rules('CL', Decimal('6'), Decimal('8'), max_cl_spell=5)
+    with pytest.raises(ValueError):
+        validate_policy_rules('VL', Decimal('5'), Decimal('60'), is_faculty_vacation_eligible=False)
+    with pytest.raises(ValueError):
+        validate_policy_rules('EL', Decimal('10'), Decimal('30'), has_medical_certificate=False)
+    with pytest.raises(ValueError):
+        validate_policy_rules('CL', Decimal('2'), Decimal('8'), station_leave_required=True, address_during_leave='')
+
+
+@pytest.mark.django_db
+def test_submit_application_and_overlap_detection():
+    faculty = _make_principal(101, kind='faculty', role_key='faculty')
+    balances = list(own_balances(faculty))
+    assert len(balances) == 6
+    app = submit_application(
+        faculty,
+        {
+            'leave_type': 'CL',
+            'start_date': '2026-11-02',
+            'end_date': '2026-11-04',
+            'purpose': 'Family event',
+        },
+    )
+    assert app.status == 'Pending'
+    assert app.working_days == Decimal('3')
+    # Overlapping leave must raise ConflictError
+    with pytest.raises(ConflictError):
+        submit_application(
+            faculty,
+            {
+                'leave_type': 'CL',
+                'start_date': '2026-11-03',
+                'end_date': '2026-11-05',
+                'purpose': 'Overlap test',
+            },
+        )
+
+
+@pytest.mark.django_db
+def test_substitute_consent_and_multi_stage_approval_and_cancellation():
+    faculty = _make_principal(201, kind='faculty', role_key='faculty')
+    sub_user = _make_principal(202, kind='faculty', role_key='faculty')
+    reviewer = _make_principal(203, kind='faculty', role_key='Unit Head')
+    authority = _make_principal(204, kind='faculty', role_key='Dean')
+
+    app = submit_application(
+        faculty,
+        {
+            'leave_type': 'CL',
+            'start_date': '2026-11-09',
+            'end_date': '2026-11-11',
+            'purpose': 'Conference',
+            'academic_substitute_user_id': sub_user.user_id,
+        },
+    )
+    assert app.status == 'Substitute Pending'
+    assert assigned_tasks(sub_user).count() == 1
+
+    # Substitute accepts
+    app = act_on_application(sub_user, app.id, 'substitute_accept', {'remarks': 'Agreed'})
+    assert app.status == 'Pending'
+
+    # Self-approval by applicant must fail
+    with pytest.raises(PermissionDeniedError):
+        act_on_application(faculty, app.id, 'approve', {})
+
+    # Reviewer recommends
+    app = act_on_application(reviewer, app.id, 'recommend', {'decision': 'Recommended'})
+    assert app.status == 'Awaiting Sanctioning Authority'
+
+    # Authority approves -> deducts 3 days from CL balance (8 -> 5)
+    app = act_on_application(authority, app.id, 'approve', {'decision': 'Sanctioned'})
+    assert app.status == 'Approved'
+    assert app.balance_deducted is True
+    cl_bal = LeaveBalance.objects.get(user_id=faculty.user_id, leave_category__name='CL')
+    assert cl_bal.balance == Decimal('5.00')
+
+    # Cancel approved application -> restores 3 days to CL balance (5 -> 8)
+    app = act_on_application(faculty, app.id, 'cancel', {'decision': 'Trip cancelled'})
+    assert app.status == 'Cancelled'
+    cl_bal.refresh_from_db()
+    assert cl_bal.balance == Decimal('8.00')
+
+
+@pytest.mark.django_db
+def test_rollover_sla_and_contracts():
+    faculty = _make_principal(301, kind='faculty', role_key='faculty')
+    own_balances(faculty)
+    app = submit_application(
+        faculty,
+        {
+            'leave_type': 'EL',
+            'start_date': '2026-12-01',
+            'end_date': '2026-12-03',
+            'purpose': 'Personal work',
+        },
+    )
+    rollover_stats = year_end_rollover()
+    assert rollover_stats['users_processed'] >= 1
+    future_now = timezone.now() + timedelta(minutes=180)
+    sla_stats = process_task_sla(now=future_now)
+    assert sla_stats['escalated'] >= 1
+    assert LeaveElmContracts.get_leave_balances([faculty.user_id]).count() == 6
+    assert LeaveElmContracts.get_leave_application_summaries([faculty.user_id]).count() == 1
+    assert list_applications(faculty).count() == 1
+    assert list_notifications(faculty).count() >= 1
+```

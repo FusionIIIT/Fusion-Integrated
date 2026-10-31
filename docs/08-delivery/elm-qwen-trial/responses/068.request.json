@@ -1,0 +1,16 @@
+{
+  "model": "qwen2.5-coder:3b",
+  "system": "You are a local coding assistant. Follow CURRENT TASK after references. Return complete raw source for the one requested file. Do not claim tests or add provenance labels.",
+  "prompt": "REFERENCE MATERIAL ONLY\n\n\n\nEND OF REFERENCES\n\nCURRENT TASK\n\nWrite modules/leave_elm/api/urls.py from scratch importing `path` from `django.urls`, `ApplicationActionView, ApplicationListView, ApplicationPrintView, BalanceListView, NotificationListView, TaskListView` from `.views`, and `ConfigurationView, RecordListView` from `.configuration` (NOT from `.views`!). Define `urlpatterns` with `'applications'`, `'applications/<int:pk>/action'`, `'applications/<int:pk>/print'`, `'balances'`, `'tasks'`, `'notifications'`, `'configuration'`, and `'records'`. Return only valid Python code.\n\nOutput file: modules/leave_elm/api/urls.py\nReturn only complete raw source code, without JSON, explanation or Markdown fences.\n",
+  "stream": true,
+  "keep_alive": "15m",
+  "options": {
+    "temperature": 0.1,
+    "seed": 42,
+    "num_ctx": 8192,
+    "num_batch": 128,
+    "num_predict": 600,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256
+  }
+}

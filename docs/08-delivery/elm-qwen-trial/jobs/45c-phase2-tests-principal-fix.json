@@ -1,0 +1,20 @@
+{
+  "label": "Phase 2 fix _make_principal in test_elm_phase2.py to match Principal dataclass fields",
+  "instruction": "Running pytest on `modules/leave_elm/tests/test_elm_phase2.py` produced: `TypeError: Principal.__init__() got an unexpected keyword argument 'designations'`. In `modules/leave_elm/tests/test_elm_phase2.py`, update `_make_principal` on lines 22-33 to pass the exact `Principal` dataclass fields (`user_id`, `username`, `display_name`, `kind`, `active_role`, `roles`, `permissions`, `modules`):\n```python\ndef _make_principal(user_id: int, *, kind: str = 'faculty', role_key: str = 'faculty') -> Principal:\n    perms = ROLE_GRANTS[role_key]\n    return Principal(\n        user_id=user_id,\n        username=f'user_{user_id}',\n        display_name=f'User {user_id}',\n        kind=kind,\n        active_role=role_key,\n        roles=(role_key,),\n        permissions=frozenset(perms),\n        modules=('leave_elm',),\n    )\n```\nKeep all 4 test functions (`test_domain_policy_calculations_and_rules`, `test_submit_application_and_overlap_detection`, `test_substitute_consent_and_multi_stage_approval_and_cancellation`, `test_rollover_sla_and_contracts`) unchanged. Return the complete valid Python file.",
+  "allowed_paths": [
+    "modules/leave_elm/tests/test_elm_phase2.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/tests/test_elm_phase2.py",
+    "fusion_auth/principal.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 2600,
+  "options": {
+    "temperature": 0.1,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}
