@@ -6,7 +6,8 @@ NAV_ITEMS = [
  {"code":"elm.approvals","label":"Leave Approvals","icon":"ClipboardCheck","to":"/elm/approvals","required_permission":"elm.leave.review","sort_order":40},
  {"code":"elm.admin","label":"ELM Administration","icon":"Settings","to":"/elm/admin","required_permission":"elm.leave.configure","sort_order":50},
 ]
-PERMISSIONS = [("elm.leave.view_self","View own leave requests and balances"),("elm.leave.apply","Submit own leave requests"),("elm.substitute.respond","Respond to substitute requests"),("elm.leave.review","Review and sanction leave requests"),("elm.leave.configure","Configure ELM policies and calendars"),("elm.leave.view_all","View leave records for administration")]
+PERMISSIONS = [("elm.leave.view_self","View own leave requests and balances"),("elm.leave.apply","Submit own leave requests"),("elm.substitute.respond","Respond to substitute requests"),("elm.leave.review","Review and recommend leave requests"),
+("elm.leave.sanction","Make final sanction decisions on routed leave requests"),("elm.leave.configure","Configure ELM policies and calendars"),("elm.leave.view_all","View leave records for administration")]
 SYSTEM_PERMISSIONS = []
 ROLE_GRANTS = {
  "student": ["elm.leave.view_self","elm.leave.apply"],
@@ -14,4 +15,7 @@ ROLE_GRANTS = {
  "staff": ["elm.leave.view_self","elm.leave.apply","elm.substitute.respond"],
  "leave_administrator": ["elm.leave.view_self","elm.leave.view_all","elm.leave.configure"],
  "unit_head": ["elm.leave.view_self","elm.leave.apply","elm.substitute.respond","elm.leave.review"],
+ "dean": ["elm.leave.sanction"],
+ "registrar": ["elm.leave.sanction"],
+ "director": ["elm.leave.sanction"],
 }

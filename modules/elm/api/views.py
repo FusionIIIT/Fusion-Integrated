@@ -13,6 +13,7 @@ P_SELF = "elm.leave.view_self"
 P_APPLY = "elm.leave.apply"
 P_RESPOND = "elm.substitute.respond"
 P_REVIEW = "elm.leave.review"
+P_SANCTION = "elm.leave.sanction"
 P_CONFIG = "elm.leave.configure"
 
 def actor(request): return getattr(request, "principal", None)
@@ -40,8 +41,10 @@ class LeaveActionView(APIView):
             permission = HasPermission(P_SELF)
         elif action in ("accept_substitute","decline_substitute"):
             permission = HasPermission(P_RESPOND)
-        elif action in ("approve","not_recommended","final_approve","final_reject"):
+        elif action in ("approve","not_recommended"):
             permission = HasPermission(P_REVIEW)
+        elif action in ("final_approve","final_reject"):
+            permission = HasPermission(P_SANCTION)
         else:
             return Response({"detail":"Unsupported action."}, status=400)
         if not permission().has_permission(request, self): return Response({"detail":"Permission denied."},status=403)
