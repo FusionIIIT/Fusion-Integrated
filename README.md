@@ -19,7 +19,7 @@ This service holds **no user table**. Identity, RBAC and common directory data
                  ▼
         Fusion-Integrated                ← this repo
         owns fusion_integrated
-        backend  →  placement  (more modules later)
+        backend  →  placement, BADMS  (more modules later)
         client   →  the shell: one login, one sidebar
         holds only user_id references — no user table
 ```
@@ -189,6 +189,11 @@ its migrations, then replacing its `contracts.py` callers with HTTP.
 Working today: the module system, both authorization gates, the server-driven
 sidebar, the directory projection, the placement application state machine with
 an append-only audit trail, and the client shell with login.
+
+BADMS currently includes a first secure-archival slice: users submit requests
+with a validated Drive link and their department head can review requests from
+that department. Backup execution, quota checks, notifications, encryption,
+and subsequent SysAdmin classification remain out of scope for this MVP.
 
 **Blocking next step — the IAM side.** `Fusion_System_Administrator` currently
 authenticates operators only; its own router says so: *"this is what makes admin

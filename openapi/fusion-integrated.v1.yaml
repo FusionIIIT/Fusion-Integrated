@@ -46,6 +46,79 @@ paths:
               schema:
                 $ref: '#/components/schemas/Ok'
           description: ''
+  /api/v1/badms/archival-requests:
+    get:
+      operationId: v1_badms_archival_requests_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ArchivalRequest'
+          description: ''
+    post:
+      operationId: v1_badms_archival_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchivalRequestCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ArchivalRequestCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ArchivalRequestCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchivalRequest'
+          description: ''
+  /api/v1/badms/archival-requests/{id}/decision:
+    post:
+      operationId: v1_badms_archival_requests_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchivalDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ArchivalDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ArchivalDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchivalRequest'
+          description: ''
   /api/v1/directory/users:
     get:
       operationId: v1_directory_users_retrieve
@@ -2000,6 +2073,157 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    ArchivalDecision:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        note:
+          type: string
+          maxLength: 500
+      required:
+      - decision
+    ArchivalRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        requester_user_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        file_name:
+          type: string
+          readOnly: true
+        file_date:
+          type: string
+          format: date
+          readOnly: true
+        owners:
+          readOnly: true
+        file_type:
+          type: string
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        attachment_url:
+          type: string
+          format: uri
+          readOnly: true
+        initial_classification:
+          allOf:
+          - $ref: '#/components/schemas/ArchivalRequestInitialClassificationEnum'
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ArchivalRequestStatusEnum'
+          readOnly: true
+        decided_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decision_note:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - attachment_url
+      - created_at
+      - decided_at
+      - decided_by_user_id
+      - decision_note
+      - department
+      - file_date
+      - file_name
+      - file_type
+      - id
+      - initial_classification
+      - owners
+      - reason
+      - requester_user_id
+      - status
+    ArchivalRequestCreate:
+      type: object
+      properties:
+        file_name:
+          type: string
+          maxLength: 180
+        file_date:
+          type: string
+          format: date
+        owners:
+          type: array
+          items:
+            type: string
+            maxLength: 150
+          maxItems: 20
+        file_type:
+          type: string
+          maxLength: 80
+        reason:
+          type: string
+          maxLength: 2000
+        attachment_url:
+          type: string
+          format: uri
+          maxLength: 500
+        initial_classification:
+          allOf:
+          - $ref: '#/components/schemas/ArchivalRequestCreateInitialClassificationEnum'
+          default: routine
+      required:
+      - attachment_url
+      - file_date
+      - file_name
+      - file_type
+      - owners
+      - reason
+    ArchivalRequestCreateInitialClassificationEnum:
+      enum:
+      - critical
+      - sensitive
+      - routine
+      - archival
+      type: string
+      description: |-
+        * `critical` - critical
+        * `sensitive` - sensitive
+        * `routine` - routine
+        * `archival` - archival
+    ArchivalRequestInitialClassificationEnum:
+      enum:
+      - critical
+      - sensitive
+      - routine
+      - archival
+      type: string
+      description: |-
+        * `critical` - Critical
+        * `sensitive` - Sensitive
+        * `routine` - Routine
+        * `archival` - Archival
+    ArchivalRequestStatusEnum:
+      enum:
+      - submitted
+      - hod_approved
+      - rejected
+      type: string
+      description: |-
+        * `submitted` - Submitted
+        * `hod_approved` - HoD approved
+        * `rejected` - Rejected
     AudienceEnum:
       enum:
       - students
@@ -2297,6 +2521,14 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DecisionEnum:
+      enum:
+      - approve
+      - reject
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
     Detail:
       type: object
       properties:
