@@ -381,11 +381,13 @@ class CompanyApprovalView(_Scoped, APIView):
         note = payload.validated_data["note"]
         actor = _actor(request)
         if action == "approve":
-            company = company_service.approve(company_id=pk, actor=actor,
-                                              note=note)
+            raise ConflictError(
+                "Company approval is decided by the institute's external approval process.",
+                code="external_approval_required")
         elif action == "reject":
-            company = company_service.reject(company_id=pk, actor=actor,
-                                             note=note)
+            raise ConflictError(
+                "Company rejection is decided by the institute's external approval process.",
+                code="external_approval_required")
         elif action == "blacklist":
             company = company_service.blacklist(company_id=pk, actor=actor,
                                                 note=note)

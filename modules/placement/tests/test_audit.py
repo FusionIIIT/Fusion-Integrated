@@ -43,11 +43,9 @@ def _client(stub_iam, perms, uid=STUDENT, kind="student"):
 
 
 def _staff_actor(uid=9):
-    from fusion_auth.principal import Principal
-    return Principal.from_session(make_session(
-        user_id=uid, kind="staff", modules=("placement_cell",),
-        permissions=("placement_cell.application.view",
-                     "placement_cell.application.review")))
+    from modules.placement.authentication import RecruiterPrincipal
+    return RecruiterPrincipal(account_id=uid, company_id=1, email="recruiter@example.test",
+                              display_name="Recruiter")
 
 
 @pytest.fixture
@@ -85,7 +83,7 @@ class TestApplicationHistory:
         assert body["redacted"] is False
         entry = body["results"][-1]
         assert entry["reason"] == REASON
-        assert entry["actor_user_id"] == 9
+        assert entry["actor_recruiter_id"] == 9
 
     def test_a_student_sees_the_timeline_without_the_internal_note(
             self, stub_iam, rejected_application):
@@ -112,7 +110,7 @@ class TestApplicationHistory:
         ).json()["results"][-1]
 
         assert "actor_user_id" not in entry
-        assert entry["actor_label"] == "staff"
+        assert entry["actor_label"] == "recruiter"
 
     def test_the_timeline_is_ordered_oldest_first(self, stub_iam,
                                                   rejected_application):

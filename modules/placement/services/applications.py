@@ -188,9 +188,9 @@ def transition(*, application_id: int, to_status: str, actor,
 
 def _notify_transition(app: Application, to_status: str) -> None:
     topics = {
-        sm.SHORTLISTED: ("application.shortlisted", "You have been shortlisted"),
-        sm.REJECTED: ("application.rejected", "Update on your application"),
-        sm.SUBMITTED: ("application.submitted", "Application received"),
+        sm.SHORTLISTED: ("application.shortlisted", "Shortlisting update"),
+        sm.REJECTED: ("application.rejected", "Application decision update"),
+        sm.SUBMITTED: ("application.submitted", "Application submitted"),
     }
     entry = topics.get(to_status)
     if entry is None:
@@ -198,9 +198,8 @@ def _notify_transition(app: Application, to_status: str) -> None:
     topic, subject = entry
     notifications.enqueue(
         topic=topic, dedupe_key=f"{topic}:{app.pk}:{to_status}",
-        recipient_user_id=app.user_id,
         subject=f"{subject} — {app.posting.title}",
-        body=f"Your application for {app.posting.title} is now {to_status}.",
+        body=f"Application {app.pk} for {app.posting.title} changed to {to_status}.",
         payload={"application_id": app.pk, "status": to_status},
     )
 

@@ -89,10 +89,8 @@ def make_offer(name, ctc, *, marquee=False, sector="it", dream=False,
         ctc_lpa=D(str(ctc)), is_dream_slot=dream)
     app = Application.objects.create(posting=posting, user_id=STUDENT,
                                      status=status)
-    staff = make_principal(user_id=9, kind="staff",
-                           permissions=("placement_cell.offer.issue",
-                                        "placement_cell.application.review"))
-    return offer_service.issue(application_id=app.pk, actor=staff)
+    company_actor = make_principal(user_id=9, kind="recruiter")
+    return offer_service.issue(application_id=app.pk, actor=company_actor)
 
 
 def student_principal():

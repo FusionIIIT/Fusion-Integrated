@@ -57,7 +57,8 @@ class NotificationOutbox(TimeStampedModel):
     """
 
     STATUS = [("pending", "Pending"), ("sending", "Sending"), ("sent", "Sent"),
-              ("failed", "Failed"), ("suppressed", "Suppressed")]
+              ("failed", "Failed"), ("suppressed", "Suppressed"),
+              ("unresolved", "Recipient policy unresolved")]
 
     topic = models.CharField(max_length=60, db_index=True)
     dedupe_key = models.CharField(max_length=200, unique=True)

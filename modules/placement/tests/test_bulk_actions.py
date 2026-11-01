@@ -188,9 +188,7 @@ class TestLimits:
 # -- Authorisation ------------------------------------------------------------------
 class TestBulkGrantsNoShortcut:
 
-    def test_a_reason_is_still_required_for_rejection(self, stub_iam, world):
-        """The has_reason guard applies per item, so a bulk reject cannot skip
-        the reason a single reject demands."""
+    def test_staff_cannot_bulk_reject_on_a_companys_behalf(self, stub_iam, world):
         stub_iam()
         _, posting = world
         apps = submitted(posting, 2)
@@ -200,22 +198,21 @@ class TestBulkGrantsNoShortcut:
             reason="", actor=_actor(), scope=Application.objects.all())
 
         assert not any(o.moved for o in outcomes)
-        assert {o.code for o in outcomes} == {"reason_required"}
+        assert {o.code for o in outcomes} == {"actor_not_allowed"}
 
-    def test_with_a_reason_the_rejection_goes_through_and_is_stored(
+    def test_a_reason_does_not_give_staff_company_decision_authority(
             self, stub_iam, world):
         stub_iam()
         _, posting = world
         apps = submitted(posting, 2)
 
-        service.bulk_transition(
+        outcomes = service.bulk_transition(
             application_ids=[a.pk for a in apps], to_status="rejected",
             reason="Did not clear the written round", actor=_actor(),
             scope=Application.objects.all())
 
-        assert ApplicationTransition.objects.filter(
-            to_status="rejected",
-            reason="Did not clear the written round").count() == 2
+        assert not any(o.moved for o in outcomes)
+        assert not ApplicationTransition.objects.filter(to_status="rejected").exists()
 
     def test_a_student_cannot_bulk_move_their_own_applications(self, stub_iam,
                                                               world):

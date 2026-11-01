@@ -161,7 +161,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
         from modules.placement.domain import state_machine as sm
         from modules.placement.services.applications import actor_kind
         actor = self.context.get("actor")
-        return sm.allowed_targets(obj.status, actor_kind(actor) if actor else None)
+        return sm.allowed_targets(
+            obj.status, actor_kind(actor, obj) if actor else None)
 
     def get_candidate(self, obj) -> dict | None:
         """Populated only when the view batch-loaded the directory, i.e. when

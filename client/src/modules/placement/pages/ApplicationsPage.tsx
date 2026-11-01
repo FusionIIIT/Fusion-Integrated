@@ -133,7 +133,7 @@ export default function ApplicationsPage() {
     <Container size="xl">
       <PageHeader
         title="Applications"
-        subtitle="Review, shortlist and progress candidates"
+        subtitle="Review applications and coordinate placement activity"
         action={
           <Select
             placeholder="All statuses" clearable value={status}

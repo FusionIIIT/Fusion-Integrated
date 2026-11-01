@@ -88,8 +88,10 @@ def test_reject_without_a_reason_is_refused(stub_iam, posting):
                 permissions=("placement_cell.application.review",))
     r = c.post(f"/api/v1/placement/applications/{app.id}/transition",
                {"to_status": "rejected"}, format="json")
-    assert r.status_code == 409
-    assert r.json()["error"]["code"] == "reason_required"
+    # Institute staff can review/filter, but cannot make an external
+    # company's rejection decision (PC-UC-008 / PC-BR-030).
+    assert r.status_code == 403
+    assert r.json()["error"]["code"] == "actor_not_allowed"
 
 
 def test_someone_elses_application_is_404_not_403(stub_iam, posting):
