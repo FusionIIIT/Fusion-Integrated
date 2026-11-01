@@ -1,0 +1,501 @@
+
+# 2026-10-26 19:27:51.618133
++Y
+
+# 2026-10-26 19:28:03.263466
++N
+
+# 2026-10-26 19:28:25.281250
++We are implementing Employee Leave Management (ELM) inside this existing Fusion ERP repository for a course pilot. First inspect the repository, architecture, backend and frontend entry points, authentication and role checks, navigation, database/models/migrations, tests, and developer setup. Do not edit files yet.
++
++Report: (1) the application stack and how to run it; (2) relevant existing modules and conventions; (3) where ELM should integrate; (4) likely files that need changes; (5) risks and unknowns; (6) build/test commands. Do not invent paths or APIs; cite paths you actually inspected. Reuse Fusion's existing login, role management, UI, routing, and database. Do not create a separate standalone app. Wait for approval before modifying anything
+
+# 2026-10-26 20:02:16.792211
++Y
+
+# 2026-10-26 20:02:38.716555
++We are implementing Employee Leave Management (ELM) as a separate module inside the existing Fusion ERP repository.
++
++IMPORTANT SCOPE RESTRICTIONS:
++- Implement only the pure Python leave-policy domain module and its tests.
++- The only files you may create or modify are:
++  1. modules/elm/domain/leave_policy.py
++  2. modules/elm/tests/test_leave_policy.py
++- The Placement files provided as read-only references are examples of conventions only.
++- NEVER implement ELM inside Placement.
++- Do not change any configuration, routing, permissions, registry, database models, frontend files, dependencies, or existing files.
++- Do not import Django, Django REST Framework, Celery, or any project models into the domain module.
++- Use Python 3.12-compatible code and pytest tests.
++
++Implement the following requirements from the supplied ELM baseline:
++
++1. Supported leave categories are CL, RH, SCL, EL, COL, and VL.
++
++2. Annual entitlement:
++   - CL: 8 days per employee per year.
++   - RH: 2 days per employee per year.
++   - SCL: up to 15 days per employee per year, subject to the applicable Sanctioning Authority considering the purpose admissible.
++   - EL: 30 days per year for non-faculty employees.
++   - VL: 60 days for faculty, usable only during vacation periods supplied through the external institute Academic Calendar.
++   - COL: 20 days per year for each eligible employee.
++   Do not invent additional eligibility or admissibility policies. Where eligibility depends on external or configured information, represent that dependency explicitly rather than guessing.
++
++3. Half-day CL consumes exactly 0.5 day. Full-day CL consumes 1 day.
++
++4. EL, COL, and VL are counted continuously across an inclusive start/end date interval. Intervening weekends and closed holidays count. Do not apply this counting rule to CL, SCL, or RH. Do not invent a working-day-counting rule for those other categories.
++
++5. Year-end treatment:
++   - Unused CL, RH, and SCL lapse and do not carry forward.
++   - EL and COL carry forward according to policy.
++   - Unused VL converts to EL at the exact ratio 2 VL : 1 EL, including fractional amounts. VL itself never carries forward.
++   - Converted EL is credited to EL and may carry forward.
++   Use decimal arithmetic for fractional leave amounts. Reject invalid negative leave amounts.
++
++6. Use explicit, readable types and small pure functions. Prefer enum.StrEnum for category/type definitions and decimal.Decimal for balances. Validate invalid date intervals and invalid numeric inputs.
++
++7. Write meaningful pytest tests for every rule implemented, including boundary cases, invalid inputs, faculty/non-faculty applicability, and fractional VL-to-EL conversion.
++
++8. Do not implement API endpoints, database models, approval routing, notifications, or frontend code in this task.
++
++Before finishing, summarize the exact files changed, the rules implemented, and the tests added. Do not claim tests passed unless you actually ran them.
+
+# 2026-10-26 20:38:57.392291
++Y
+
+# 2026-10-26 20:45:52.158099
++done?
+
+# 2026-10-26 20:54:14.409133
++D
+
+# 2026-10-26 20:54:30.401107
++Fix the incomplete ELM leave-policy implementation and its tests. Do not change any files except:
++
++1. modules/elm/domain/leave_policy.py
++2. modules/elm/tests/test_leave_policy.py
++
++The current implementation is incomplete: calculate_days() always returns Decimal("0"), and year_end_treatment() simply returns the balance. The existing test incorrectly expects calculate_days() to raise NotImplementedError. Do not preserve that placeholder test, and do not make tests pass by weakening their assertions.
++
++Implement behavior according to the supplied ELM problem statement:
++
++LEAVE CATEGORIES AND ENTITLEMENTS
++- CL: 8 days annually.
++- RH: 2 days annually.
++- SCL: up to 15 days annually, subject to the applicable Sanctioning Authority considering the purpose admissible.
++- EL: 30 days annually for non-faculty employees.
++- VL: 60 days for faculty, usable only during vacation periods provided by the external Academic Calendar.
++- COL: 20 days annually for each eligible employee.
++Do not invent eligibility rules where the specification leaves eligibility to configured policy or external information.
++
++CALCULATIONS
++- Use Decimal for leave quantities and reject negative, non-finite, or invalid numeric inputs.
++- Use datetime.date inputs for date calculations. Reject invalid intervals where start_date is later than end_date.
++- EL, COL and VL use inclusive continuous calendar-day counting: the count is (end_date - start_date).days + 1. Weekends and closed holidays count.
++- CL full-day leave consumes Decimal("1"); an explicitly requested half-day CL on a single date consumes Decimal("0.5").
++- Do not apply the EL/COL/VL continuous-counting rule to CL, SCL or RH. The provided specification does not define a complete alternative multi-date counting algorithm for these categories. Represent this limitation explicitly using a clear domain exception instead of silently guessing or returning zero.
++- Do not allow half-day CL across a multi-date interval.
++
++YEAR-END TREATMENT
++- Unused CL, RH and SCL lapse: return Decimal("0").
++- Unused EL and COL carry forward: return the unchanged balance.
++- Unused VL converts to EL at the exact ratio 2 VL : 1 EL, including fractional values. Return the converted EL credit, calculated as balance / Decimal("2"). VL itself does not carry forward.
++- Reject invalid or negative balances.
++
++IMPLEMENTATION QUALITY
++- Keep the module pure Python; do not import Django, DRF, Celery or application models.
++- Preserve small, readable functions and useful type hints.
++- Validate constructor inputs, leave categories, numeric inputs and dates.
++- Avoid float arithmetic.
++- Import InvalidOperation from decimal in the appropriate place, and use Python's built-in ValueError without importing it from the domain module.
++- Provide clear docstrings, including the meaning of the year-end return value for VL.
++- Do not add database models, API routes, frontend files, permissions, dependencies or configuration.
++
++TESTS
++Replace the placeholder tests with meaningful pytest tests. Cover:
++- All six leave categories.
++- Correct annual entitlements where applicability is known.
++- Inclusive date counting for EL, COL and VL, including a range that crosses a weekend.
++- Full-day and half-day CL.
++- Explicitly unsupported counting behavior where the requirements do not define an algorithm.
++- Invalid date intervals and invalid numeric inputs.
++- Negative and non-finite balances.
++- Year-end lapse for CL/RH/SCL.
++- EL/COL carry-forward.
++- VL-to-EL conversion, including fractional conversion such as 1 VL becoming 0.5 EL.
++
++Do not claim success unless tests are run. After editing, summarize each behavior implemented and any ambiguity the specification still leaves unresolved.
+
+# 2026-10-26 21:13:49.804534
++D
+
+# 2026-10-26 21:14:07.625672
++Continue implementing the ELM leave-policy domain logic in the
++existing Fusion ERP repository.
++
++IMPORTANT:
++Only modify:
++1. modules/elm/domain/leave_policy.py
++2. modules/elm/tests/test_leave_policy.py
++
++Do not modify Placement or any configuration, routing, permissions,
++database models, frontend files, or dependencies.
++
++The current implementation is incomplete. calculate_days() returns
++Decimal("0") for every valid interval, and year_end_treatment()
++simply returns the existing balance. The test suite contains a
++placeholder test expecting NotImplementedError.
++
++Implement the actual behavior from the supplied ELM specification.
++
++LEAVE CATEGORIES:
++- CL: 8 days annually.
++- RH: 2 days annually.
++- SCL: up to 15 days annually.
++- EL: 30 days annually for non-faculty employees.
++- VL: 60 days for faculty, usable only during vacation periods
++  supplied by the external Academic Calendar.
++- COL: 20 days annually for eligible employees.
++
++CALCULATIONS:
++- Use decimal.Decimal for leave quantities.
++- Reject negative and non-finite numeric values.
++- Validate date inputs and reject start dates after end dates.
++- EL, COL and VL count inclusive calendar days, including weekends
++  and closed holidays.
++- Full-day CL consumes 1 day; half-day CL on one date consumes
++  0.5 day.
++- Do not invent a multi-date counting rule for CL, SCL or RH.
++  Raise an explicit domain exception when the requested calculation
++  is not defined by the supplied specification.
++- Reject half-day CL spanning multiple dates.
++
++YEAR-END:
++- CL, RH and SCL unused balances lapse to zero.
++- EL and COL unused balances carry forward unchanged.
++- VL converts to EL at exactly 2 VL : 1 EL, so 1 VL produces
++  0.5 EL, including fractional balances.
++- Reject invalid, negative or non-finite balances.
++
++QUALITY:
++- Keep domain logic pure Python.
++- Do not import Django, DRF, Celery or application models.
++- Use Python 3.12-compatible code and useful type hints.
++- Do not import the built-in ValueError from the domain module.
++- Replace the placeholder tests with meaningful tests.
++- Test all categories, supported entitlement values, inclusive
++  counting, weekends, half-day CL, unsupported counting cases,
++  invalid input, negative balances, lapse, carry-forward and
++  fractional VL conversion.
++
++Do not claim success without running the tests.
++After editing, summarize the exact files changed and the test results.
+
+# 2026-10-26 21:43:59.751457
++cd ~/Fusion-Integrated-A6-Qwen
++
++.venv/bin/python -m pytest -q modules/elm/tests/test_leave_policy.py
+
+# 2026-10-26 21:52:50.680267
++.venv/bin/ruff check \
++  modules/elm/domain/leave_policy.py \
++  modules/elm/tests/test_leave_policy.py
+
+# 2026-10-26 22:12:52.919774
++/exit
+
+# 2026-10-26 22:15:23.237787
++D
+
+# 2026-10-26 22:15:29.916117
++cd ~/Fusion-Integrated-A6-Qwen
++
++aider \
++  --model ollama_chat/qwen2.5-coder:7b \
++  --no-auto-commits \
++  modules/elm/domain/leave_policy.py \
++  modules/elm/tests/test_leave_policy.py
+
+# 2026-10-26 22:20:06.957129
++Repair the ELM leave-policy implementation. The previous implementation is incorrect, and the tests are also incorrect. Rewrite both files as necessary.
++
++ALLOWED FILES — do not edit anything else:
++- modules/elm/domain/leave_policy.py
++- modules/elm/tests/test_leave_policy.py
++
++Use Python 3.12, which this Fusion repository requires. Use `enum.StrEnum`, not `Enum`, so leave-category members compare correctly with their string values.
++
++IMPLEMENTATION REQUIREMENTS
++
++1. Define LeaveCategory with CL, RH, SCL, EL, COL and VL.
++
++2. Preserve the LeavePolicy(category, annual_entitlement) constructor, but validate its arguments. Store entitlements as finite, non-negative Decimal values. Reject invalid categories and invalid numeric inputs. Never import the built-in ValueError from the domain module.
++
++3. Provide an annual entitlement helper with these rules:
++   - CL: Decimal("8") for every employee.
++   - RH: Decimal("2") for every employee.
++   - SCL: Decimal("15") as the maximum annual allowance, without inventing a separate admissibility rule.
++   - EL: Decimal("30") for staff/non-faculty employees only.
++   - VL: Decimal("60") for faculty only, subject to the external Academic Calendar's vacation periods.
++   - COL: Decimal("20") only when the employee is identified as eligible.
++   Reject missing or contradictory employee-type/eligibility information where required. Do not invent extra policy.
++
++4. Use datetime.date for date calculations. Do not convert dates into Decimal. Reject non-date inputs and intervals where start_date is later than end_date. Reject datetime objects if the interface requires calendar dates only.
++
++5. Implement calculate_days(start_date, end_date, *, half_day=False):
++   - EL, COL and VL: inclusive calendar-day count = (end_date - start_date).days + 1.
++   - CL: one full day on a single date returns Decimal("1"); half_day=True on a single date returns Decimal("0.5").
++   - RH and SCL: a single-date request consumes Decimal("1").
++   - For multi-date CL, RH and SCL requests, raise a clearly named domain exception because the required counting algorithm is not defined in this specification. Do not silently invent a rule or return zero.
++   - Reject half-day requests spanning multiple dates and half_day=True for categories other than CL.
++   - Do not accept a category argument in calculate_days unless you deliberately implement and test a documented API that needs it. The policy object's category should control calculation.
++
++6. Implement year_end_treatment(balance):
++   - CL, RH, SCL -> Decimal("0").
++   - EL, COL -> unchanged balance.
++   - VL -> balance / Decimal("2"), returning the converted EL credit rather than a VL balance.
++   - Reject negative, invalid and non-finite balances.
++
++7. Keep the domain module pure Python. No Django, DRF, Celery, database models, network calls or filesystem access. Use clear type annotations, docstrings and readable functions.
++
++TEST REQUIREMENTS
++
++Replace the existing tests rather than preserving their false expectations. Test:
++- String comparisons for all six StrEnum categories.
++- Annual entitlement helpers, including faculty/staff restrictions and COL eligibility.
++- Constructor validation and decimal inputs.
++- Inclusive date counting for EL, COL and VL, including dates crossing a weekend.
++- Single-day full and half-day CL.
++- Single-day RH and SCL.
++- Explicit exceptions for unsupported multi-date CL, RH and SCL.
++- Invalid dates and reversed intervals.
++- Negative, malformed and non-finite numbers.
++- Year-end lapse for CL, RH and SCL.
++- EL/COL carry-forward.
++- VL conversion, including 1 VL -> 0.5 EL.
++- Rejection of unsupported method arguments rather than tests that assume nonexistent signatures.
++
++Do not weaken assertions just to make the tests pass. Do not add placeholder implementations. Once editing is complete, summarize the changes and the tests that still need to be run. Do not claim test success without actual test results.
+
+# 2026-10-26 23:07:29.799726
++Y
+
+# 2026-10-26 23:53:07.359984
++/exit
+
+# 2026-10-26 23:54:05.799583
++D
+
+# 2026-10-26 23:54:12.543281
++Fix the remaining ELM leave-policy test failures. Modify ONLY:
++- modules/elm/domain/leave_policy.py
++- modules/elm/tests/test_leave_policy.py
++
++Follow the supplied ELM specification exactly.
++
++1. EL, COL and VL use inclusive calendar-day counting. For date(2023, 1, 1) through date(2023, 1, 2), the result must be Decimal("2"), not Decimal("1"). Update the tests accordingly.
++
++2. CL, RH and SCL must not use that continuous-day counting algorithm. When start_date != end_date for these categories, raise a clear domain-specific exception because the specification does not define their multi-date counting algorithm. Update the tests to expect this exception.
++
++3. For a single date, full-day CL, RH and SCL consume Decimal("1"). Half-day CL consumes Decimal("0.5"). Half-day is supported only for CL.
++
++4. Remove the tests that call calculate_days(..., category="INVALID") or year_end_treatment(..., category="INVALID"). Those method signatures do not accept category. Replace these with a constructor-validation test that verifies an invalid category is rejected.
++
++5. Preserve year-end behavior: CL/RH/SCL lapse to Decimal("0"); EL/COL carry forward unchanged; VL returns its converted EL credit using balance / Decimal("2"). Reject negative and non-finite balances.
++
++Do not weaken assertions just to get a green result. Do not edit any other repository files. Keep Python 3.12 compatibility and use StrEnum. Run the focused pytest and Ruff commands if possible, and report honestly which checks were actually executed.
+
+# 2026-10-27 00:05:59.086970
++/exit
+
+# 2026-10-27 00:25:42.623911
++D
+
+# 2026-10-27 00:25:46.982329
++Implement Phase 1 of the independent Fusion ELM module. Modify ONLY `modules/elm/models.py` and create `modules/elm/tests/test_models.py`. Do not edit Placement, configuration, routes, `leave_policy.py`, or migrations.
++
++Create these Django models:
++
++1. `LeaveBalance`: employee `user_id` as a plain integer, leave year, category, annual entitlement, and a computed current balance based on signed account transactions. Enforce unique employee/year/category and nonnegative entitlement.
++2. `LeaveApplication`: applicant, category, date interval, requested days as Decimal, purpose, status, optional first-half/second-half CL, medical-evidence reference, responsibility-period fields, and Station Leave details within the same application. Add sensible database constraints and indexes.
++3. `LeaveApplicationTransition`: timestamped status-transition/audit history, actor ID, action, reason and metadata.
++4. `SubstituteConsent`: retain each nominee’s pending, accepted, declined or cancelled response as a separate record.
++5. `LeaveAccountTransaction`: ELM-owned balance relationship, signed Decimal delta, effective date, transaction type, actor ID, reference and note. Support leave debit/restoration, carry-forward in/out, lapse, VL conversion in/out, manual adjustment and offline-sanction recording. Reject zero-value transactions.
++
++Use `TimeStampedModel` and `UserScopedModel` from `core.db.mixins` where appropriate. Import the existing category enum from the ELM domain layer rather than defining conflicting category values. All references to institute employees must remain integer IDs; foreign keys are allowed only between ELM-owned models.
++
++For new leave applications, use the workflow v1.6 states: draft, awaiting substitute response, applicant action required, awaiting Unit Head review, awaiting Establishment routing, awaiting final sanction decision, awaiting Director self-sanction, approved, rejected and withdrawn.
++
++Enforce half-day constraints: half-day portions are first-half or second-half, CL only, one date, and exactly Decimal("0.50"). Other requests must have a positive requested-day amount. Do not invent a multi-date counting rule for CL, RH or SCL.
++
++Add focused metadata tests for category choices, plain-integer employee IDs, and ELM-only foreign keys. Do not add business logic or migrations in this phase. Keep the code Python 3.12 and Django 5.2 compatible. Run Ruff and the new tests if possible, and report the actual results.
+
+# 2026-10-27 00:46:31.069038
++/exit
+
+# 2026-10-27 00:48:03.374639
++D
+
+# 2026-10-27 00:48:10.144132
++Implement only the first two Django models in modules/elm/models.py:
++LeaveBalance and LeaveApplication.
++
++Requirements:
++- Use TimeStampedModel and UserScopedModel from core.db.mixins.
++- Employee IDs must be plain integers, never foreign keys.
++- LeaveBalance: employee ID, leave year, category, annual entitlement.
++  Enforce unique employee/year/category and nonnegative entitlement.
++- LeaveApplication: applicant ID, category, start/end dates, requested
++  days as Decimal, purpose, status, half-day CL portion, medical evidence
++  reference, responsibility period, and Station Leave details.
++- Use categories CL, RH, SCL, EL, COL and VL.
++- Use workflow v1.6 state names where applicable.
++- Add appropriate database constraints and indexes.
++- Foreign keys may reference ELM-owned models only.
++- Do not invent multi-date counting rules for CL, RH or SCL.
++- Modify no other files. Do not create migrations, tests, services,
++  APIs or frontend code yet.
++- Keep compatibility with Django 5.2 and Python 3.12.
+
+# 2026-10-27 10:39:47.472055
++D
+
+# 2026-10-27 10:39:56.225524
++Implement only the first two Django models in modules/elm/models.py:
++LeaveBalance and LeaveApplication.
++
++Requirements:
++- Use TimeStampedModel and UserScopedModel from core.db.mixins.
++- Employee IDs must be plain integers, never foreign keys.
++- LeaveBalance: employee ID, leave year, category, annual entitlement.
++  Enforce unique employee/year/category and nonnegative entitlement.
++- LeaveApplication: applicant ID, category, start/end dates, requested
++  days as Decimal, purpose, status, half-day CL portion, medical evidence
++  reference, responsibility period, and Station Leave details.
++- Use categories CL, RH, SCL, EL, COL and VL.
++- Use workflow v1.6 state names where applicable.
++- Add appropriate database constraints and indexes.
++- Foreign keys may reference ELM-owned models only.
++- Do not invent multi-date counting rules for CL, RH or SCL.
++- Modify no other files. Do not create migrations, tests, services,
++  APIs or frontend code yet.
++- Keep compatibility with Django 5.2 and Python 3.12.
+
+# 2026-10-27 10:54:07.623744
++/exit
+
+# 2026-10-27 11:00:57.580977
++D
+
+# 2026-10-27 11:01:01.362517
++Continue Phase 1 of the ELM database layer. Modify ONLY `modules/elm/models.py` and `modules/elm/tests/test_models.py`.
++
++The existing `LeaveBalance` and `LeaveApplication` models are already implemented. Preserve them except for necessary, justified integration changes.
++
++Add these three models:
++
++1. **LeaveApplicationTransition**
++   - Foreign key to LeaveApplication.
++   - From-state, to-state, action, optional actor user ID, reason, timestamp and JSON metadata.
++   - Keep the history of changes rather than overwriting previous transition records.
++
++2. **SubstituteConsent**
++   - Foreign key to LeaveApplication.
++   - Substitute employee ID as a plain integer, never a foreign key to another module.
++   - Response status: pending, accepted, declined or cancelled.
++   - Record response time and optional note.
++   - Allow a declined nomination and a replacement nomination to remain separately auditable.
++
++3. **LeaveAccountTransaction**
++   - Foreign key to LeaveBalance and an optional foreign key to LeaveApplication.
++   - Signed Decimal delta, transaction type, effective date, optional actor user ID, reference and note.
++   - Support annual grant, leave debit, restoration, carry-forward in/out, lapse, VL conversion in/out, manual adjustment and offline-sanction recording.
++   - Add a database constraint rejecting zero-value transactions.
++   - Add useful indexes for balance history and application history.
++   - Add a `current_balance` property to LeaveBalance that sums its account transaction deltas using Django aggregation. An account without transactions has a balance of Decimal("0.00"). Do not add annual entitlement a second time to this sum: entitlement grants will be recorded as transactions by the future service layer.
++
++Architecture:
++- Employee IDs remain plain integers.
++- Foreign keys may reference ELM-owned models only.
++- Use Django 5.2 / Python 3.12 conventions.
++- Preserve the ELM LeaveCategory import; never import anything from Placement.
++- Use stable, unique constraint and index names.
++- Do not implement services, APIs, migrations or frontend code yet.
++
++Add focused tests in `modules/elm/tests/test_models.py` for the six category choices, employee ID field types, ELM-only foreign keys, transaction nonzero constraint, and substitute response choices.
++
++Do not weaken tests to make them pass. Run Ruff, Django's system check, and the focused ELM tests if possible. Report exactly which commands were run and their results.
+
+# 2026-10-27 11:22:53.992109
++Y
+
+# 2026-10-27 11:30:15.005149
++/exit
+
+# 2026-10-27 11:31:18.799841
++D
+
+# 2026-10-27 11:31:25.021638
++Continue the ELM database implementation. Modify ONLY `modules/elm/models.py` and `modules/elm/tests/test_models.py`.
++
++The current LeaveBalance and LeaveApplication models already exist. Preserve them.
++
++Add these three models:
++
++1. LeaveAccountTransaction:
++   - FK to LeaveBalance and optional FK to LeaveApplication.
++   - Signed Decimal delta, transaction type, effective date, optional actor user ID, reference and note.
++   - Support grant, debit, restoration, carry-forward in/out, lapse, VL conversion in/out, manual adjustment and offline sanction.
++   - Add a database constraint rejecting zero deltas.
++   - Add a `current_balance` property on LeaveBalance that sums its transaction deltas; default to Decimal("0.00") when empty.
++
++2. LeaveApplicationTransition:
++   - FK to LeaveApplication.
++   - From state, to state, action, nullable actor user ID, reason, JSON metadata and timestamp.
++   - Retain transitions as separate audit records.
++
++3. SubstituteConsent:
++   - FK to LeaveApplication.
++   - Plain integer substitute employee ID.
++   - Response choices: pending, accepted, declined, cancelled.
++   - Response timestamp and optional note.
++   - Permit distinct nomination records for replacement nominees.
++
++Foreign keys must target ELM-owned models only. Employee references must remain integer IDs. Use Django 5.2-compatible code, stable database constraint/index names, and the existing ELM category definitions. Do not import from Placement. Do not create migrations, services, APIs or frontend code.
++
++Add focused tests in test_models.py for category choices, integer employee ID fields, ELM-only foreign keys, nonzero transaction constraint and substitute response choices. Do not weaken assertions. Run Ruff, Django checks and ELM tests if possible, reporting actual results.
+
+# 2026-10-27 12:16:53.940992
++/exit
+
+# 2026-10-27 12:36:09.436876
++D
+
+# 2026-10-27 12:36:12.791418
++Implement the first database-backed ELM workflow service. Modify only these four files:
++- modules/elm/registry.py
++- modules/elm/services/authz.py
++- modules/elm/services/workflow.py
++- modules/elm/tests/test_workflow_service.py
++
++Use the existing pure state machine in modules/elm/domain/workflow.py and the existing Django models. Follow modules/placement/services/authz.py as the authorization pattern, but do not import any Placement internals.
++
++1. Register permission codes for leave submission, withdrawal, substitute response, Unit Head review, Establishment routing, final sanction, and Director self-sanction. Add ROLE_GRANTS for faculty, staff, Unit Head, Establishment, Deputy Registrar (Estt.), Dean, Registrar, and Director using the role names in the requirements. Keep the module status planned and the navigation empty. Do not register unused permissions.
++
++2. Implement an atomic transition service that locks LeaveApplication with select_for_update(), validates the action through the existing pure state machine, updates status, and creates LeaveApplicationTransition in the same transaction.
++
++3. Enforce action-specific permissions. Only the applicant may submit, nominate a replacement, or withdraw their request. A substitute response must come from the currently nominated employee with a pending consent. Unit Head, Establishment, and final-sanction actions must verify the actor against a server-resolved responsible user ID; do not trust IDs supplied by the client.
++
++4. Before creating a substitute nomination, use only modules.directory.contracts to verify that the nominee is an active faculty/staff employee, reject the applicant as nominee, and reject overlap with the nominee's pending or approved leave during the responsibility period. Replacement nomination must preserve the original declined consent record.
++
++5. Submission must require an internal submission_validated=True signal from a future validation service; do not expose this as client input. If the application requires a substitute, submission must create a pending consent record. Withdrawal must cancel any pending substitute consent.
++
++6. Do not allow this generic transition service to move a request to Approved yet. Raise a clear ConflictError for approval actions until the approval service can atomically validate and debit the leave ledger. Rejection and nonterminal workflow transitions may proceed.
++
++7. Translate illegal transitions to ConflictError, return NotFoundError for missing applications, and enforce all changes and audit records atomically. Use trusted server-resolved routing context for Director self-sanction and Establishment routing.
++
++8. Add focused Django database tests covering permissions, applicant ownership, audit history, substitute response and replacement handling, nominee overlap rejection, required validation before submission, and the approval guard.
++
++Do not create migrations or modify any other files. Do not weaken tests. Run Ruff, Django system checks, ELM tests, and permission-manifest checks if possible. Report exactly which checks ran and their results.
+
+# 2026-10-27 19:02:54.231213
++/exit
