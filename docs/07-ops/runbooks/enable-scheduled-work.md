@@ -7,8 +7,11 @@ Until beat runs, three things simply do not happen:
 | `placement.deliver_notifications` | 60 s | Nothing is ever emailed. The outbox grows. |
 | `placement.expire_overdue_offers` | 5 min | **An unanswered offer never expires**, so the student stays blocked from the pool with no way out but a database edit. |
 | `placement.rebuild_active_stats` | 15 min | The statistics page serves stale snapshots. |
+| `employee_leave.process_sla` | 15 min | Pending ELM tasks do not receive role-scoped in-app reminders or configured escalation. |
 
 The second is the reason this is not optional.
+
+ELM assignment, SLA reminder, and escalation events are stored as role-scoped in-app notices. They do not use Placement's email outbox.
 
 ---
 
