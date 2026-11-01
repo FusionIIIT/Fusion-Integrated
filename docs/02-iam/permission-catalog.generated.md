@@ -13,6 +13,22 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `employee_leave`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `employee_leave.request.create` | Submit and view own leave requests | `employee` |
+| `employee_leave.request.respond_substitute` | Respond to an assigned substitute task | `employee`, `unit_head` |
+| `employee_leave.request.work_queue` | Open the role-scoped leave task queue | `employee`, `establishment`, `sanctioning_authority`, `unit_head` |
+| `employee_leave.request.view_all` | View all leave requests | `leave_administrator` |
+| `employee_leave.request.review_unit` | Review requests as Unit Head | `unit_head` |
+| `employee_leave.request.route` | Verify and route higher-sanction requests | `establishment` |
+| `employee_leave.request.sanction` | Make final leave decisions | `sanctioning_authority` |
+| `employee_leave.balance.view_self` | View own leave balances and history | `employee` |
+| `employee_leave.balance.manage` | Maintain employee leave balances | `leave_administrator` |
+| `employee_leave.record.offline` | Record an already-sanctioned offline leave | `leave_administrator` |
+| `employee_leave.configuration.manage` | Manage leave policy and calendars | `leave_administrator` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
