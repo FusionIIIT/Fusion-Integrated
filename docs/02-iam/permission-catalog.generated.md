@@ -38,3 +38,52 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `rspc`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `rspc.proposal.create` | Submit a research project proposal | `faculty`, `hod` |
+| `rspc.proposal.view_self` | View own proposals | `faculty`, `hod` |
+| `rspc.proposal.view` | View all proposals (within scope) | `Dean Academic`, `dean_rspc`, `director`, `hod`, `rspc_admin` |
+| `rspc.proposal.review_hod` | Review proposal as HoD | `hod` |
+| `rspc.proposal.verify_admin` | Verify and forward proposals as RSPC Admin | `rspc_admin` |
+| `rspc.proposal.decide_dean` | Approve/reject proposals as Dean-RSPC | `Dean Academic`, `dean_rspc` |
+| `rspc.proposal.decide_director` | Authorize proposals as Director | `director` |
+| `rspc.consultancy.create` | Register a consultancy project | `faculty`, `hod` |
+| `rspc.consultancy.view_self` | View own consultancy projects | `faculty`, `hod` |
+| `rspc.consultancy.view` | View all consultancy projects | `Dean Academic`, `dean_rspc`, `director`, `hod`, `rspc_admin` |
+| `rspc.consultancy.review_hod` | Review consultancy as HoD | `hod` |
+| `rspc.consultancy.verify_admin` | Verify consultancy as RSPC Admin | `rspc_admin` |
+| `rspc.consultancy.decide_dean` | Decide consultancy as Dean-RSPC | `Dean Academic`, `dean_rspc` |
+| `rspc.consultancy.decide_director` | Authorize consultancy as Director | `director` |
+| `rspc.appointment.create` | Request project-based staff appointment | `faculty`, `hod` |
+| `rspc.appointment.view_self` | View own appointment requests | `faculty`, `hod` |
+| `rspc.appointment.view` | View all appointment requests | `Dean Academic`, `dean_rspc`, `director`, `rspc_admin` |
+| `rspc.appointment.manage_admin` | Manage appointment records as RSPC Admin | `rspc_admin` |
+| `rspc.appointment.recommend` | Record selection recommendation as Faculty | `faculty`, `hod` |
+| `rspc.appointment.decide_dean` | Approve/forward appointment as Dean-RSPC | `Dean Academic`, `dean_rspc` |
+| `rspc.appointment.decide_director` | Authorize appointment as Director | `director` |
+| `rspc.finance.create` | Submit fund-utilization or expenditure request | `faculty`, `hod` |
+| `rspc.finance.view_self` | View own financial requests | `faculty`, `hod` |
+| `rspc.finance.view` | View all financial requests | `Dean Academic`, `dean_rspc`, `director`, `rspc_admin` |
+| `rspc.finance.verify_admin` | Verify financial requests as RSPC Admin | `rspc_admin` |
+| `rspc.finance.decide_dean` | Approve/forward financial requests as Dean-RSPC | `Dean Academic`, `dean_rspc` |
+| `rspc.finance.decide_director` | Authorize financial requests as Director | `director` |
+| `rspc.procurement.create` | Request equipment or consumable procurement | `faculty`, `hod` |
+| `rspc.procurement.view_self` | View own procurement requests | `faculty`, `hod` |
+| `rspc.procurement.view` | View all procurement requests | `Dean Academic`, `dean_rspc`, `director`, `rspc_admin` |
+| `rspc.procurement.verify_admin` | Verify procurement requests as RSPC Admin | `rspc_admin` |
+| `rspc.procurement.decide_dean` | Approve/forward procurement as Dean-RSPC | `Dean Academic`, `dean_rspc` |
+| `rspc.procurement.decide_director` | Authorize procurement as Director | `director` |
+| `rspc.progress_report.submit` | Submit periodic progress report | `faculty`, `hod` |
+| `rspc.progress_report.view_self` | View own progress reports | `faculty`, `hod` |
+| `rspc.progress_report.view` | View all progress reports | `Dean Academic`, `dean_rspc`, `director`, `hod`, `rspc_admin` |
+| `rspc.progress_report.manage` | Manage/review progress reports as Admin/Dean | `rspc_admin` |
+| `rspc.closure.submit` | Submit project closure report | `faculty`, `hod` |
+| `rspc.closure.view_self` | View own closure records | `faculty`, `hod` |
+| `rspc.closure.view` | View all closure records | `Dean Academic`, `dean_rspc`, `director`, `hod`, `rspc_admin` |
+| `rspc.closure.verify_admin` | Verify closure records as RSPC Admin | `rspc_admin` |
+| `rspc.closure.decide_dean` | Approve closure as Dean-RSPC | `Dean Academic`, `dean_rspc` |
+| `rspc.report.view` | View RSPC operational reports and statistics | `Dean Academic`, `dean_rspc`, `director`, `rspc_admin` |
+| `rspc.report.manage` | Manage all RSPC records (admin) | `rspc_admin` |

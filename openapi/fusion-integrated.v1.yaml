@@ -1674,6 +1674,745 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/rspc/appointments:
+    get:
+      operationId: v1_rspc_appointments_list
+      summary: List staff appointment requests
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - rspc
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStaffAppointmentList'
+          description: ''
+    post:
+      operationId: v1_rspc_appointments_create
+      summary: Submit staff appointment request
+      tags:
+      - rspc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WriteStaffAppointment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WriteStaffAppointment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WriteStaffAppointment'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WriteStaffAppointment'
+          description: ''
+  /api/v1/rspc/appointments/{id}/transition:
+    post:
+      operationId: v1_rspc_appointments_transition_create
+      summary: Transition a staff appointment request
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - rspc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffAppointment'
+          description: ''
+  /api/v1/rspc/closures:
+    get:
+      operationId: v1_rspc_closures_list
+      summary: List project closures
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - rspc
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProjectClosureList'
+          description: ''
+    post:
+      operationId: v1_rspc_closures_create
+      summary: Submit a project closure record
+      tags:
+      - rspc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WriteProjectClosure'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WriteProjectClosure'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WriteProjectClosure'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WriteProjectClosure'
+          description: ''
+  /api/v1/rspc/closures/{id}/transition:
+    post:
+      operationId: v1_rspc_closures_transition_create
+      summary: Transition a project closure record
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - rspc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectClosure'
+          description: ''
+  /api/v1/rspc/consultancy:
+    get:
+      operationId: v1_rspc_consultancy_list
+      summary: List consultancy projects
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - rspc
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedConsultancyProjectList'
+          description: ''
+    post:
+      operationId: v1_rspc_consultancy_create
+      summary: Register a new consultancy project
+      tags:
+      - rspc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WriteConsultancy'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WriteConsultancy'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WriteConsultancy'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WriteConsultancy'
+          description: ''
+  /api/v1/rspc/consultancy/{id}/transition:
+    post:
+      operationId: v1_rspc_consultancy_transition_create
+      summary: Transition a consultancy project
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - rspc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultancyProject'
+          description: ''
+  /api/v1/rspc/dashboard:
+    get:
+      operationId: v1_rspc_dashboard_retrieve
+      summary: RSPC module dashboard summary
+      tags:
+      - rspc
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/rspc/finance:
+    get:
+      operationId: v1_rspc_finance_list
+      summary: List financial / fund requests
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - rspc
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFinanceRequestList'
+          description: ''
+    post:
+      operationId: v1_rspc_finance_create
+      summary: Submit a financial request
+      tags:
+      - rspc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WriteFinanceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WriteFinanceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WriteFinanceRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WriteFinanceRequest'
+          description: ''
+  /api/v1/rspc/finance/{id}/transition:
+    post:
+      operationId: v1_rspc_finance_transition_create
+      summary: Transition a financial request
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - rspc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinanceRequest'
+          description: ''
+  /api/v1/rspc/procurement:
+    get:
+      operationId: v1_rspc_procurement_list
+      summary: List procurement requests
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - rspc
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProcurementRequestList'
+          description: ''
+    post:
+      operationId: v1_rspc_procurement_create
+      summary: Submit a procurement request
+      tags:
+      - rspc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WriteProcurement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WriteProcurement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WriteProcurement'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WriteProcurement'
+          description: ''
+  /api/v1/rspc/procurement/{id}/transition:
+    post:
+      operationId: v1_rspc_procurement_transition_create
+      summary: Transition a procurement request
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - rspc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcurementRequest'
+          description: ''
+  /api/v1/rspc/progress-reports:
+    get:
+      operationId: v1_rspc_progress_reports_list
+      summary: List progress reports
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - rspc
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProgressReportList'
+          description: ''
+    post:
+      operationId: v1_rspc_progress_reports_create
+      summary: Create a progress report draft
+      tags:
+      - rspc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WriteProgressReport'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WriteProgressReport'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WriteProgressReport'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WriteProgressReport'
+          description: ''
+  /api/v1/rspc/progress-reports/{id}/transition:
+    post:
+      operationId: v1_rspc_progress_reports_transition_create
+      summary: Transition a progress report
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - rspc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgressReport'
+          description: ''
+  /api/v1/rspc/proposals:
+    get:
+      operationId: v1_rspc_proposals_list
+      summary: List research project proposals
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - rspc
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResearchProjectList'
+          description: ''
+    post:
+      operationId: v1_rspc_proposals_create
+      summary: Create a research project proposal draft
+      tags:
+      - rspc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WriteResearchProject'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WriteResearchProject'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WriteResearchProject'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WriteResearchProject'
+          description: ''
+  /api/v1/rspc/proposals/{id}:
+    get:
+      operationId: v1_rspc_proposals_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchProject'
+          description: ''
+    put:
+      operationId: v1_rspc_proposals_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WriteResearchProject'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WriteResearchProject'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WriteResearchProject'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WriteResearchProject'
+          description: ''
+    patch:
+      operationId: v1_rspc_proposals_partial_update
+      summary: Update proposal draft
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - rspc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedWriteResearchProject'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedWriteResearchProject'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedWriteResearchProject'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WriteResearchProject'
+          description: ''
+  /api/v1/rspc/proposals/{id}/history:
+    get:
+      operationId: v1_rspc_proposals_history_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResearchProjectTransitionList'
+          description: ''
+  /api/v1/rspc/proposals/{id}/transition:
+    post:
+      operationId: v1_rspc_proposals_transition_create
+      summary: Transition a proposal to a new state
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - rspc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchProject'
+          description: ''
 components:
   schemas:
     AcademicDirectory:
@@ -2082,6 +2821,16 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CategoryEnum:
+      enum:
+      - fund_utilisation
+      - expenditure
+      - advance
+      type: string
+      description: |-
+        * `fund_utilisation` - Fund Utilisation
+        * `expenditure` - Expenditure
+        * `advance` - Advance
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2315,6 +3064,134 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    ConsultancyProject:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 300
+        client_name:
+          type: string
+          maxLength: 200
+        client_details:
+          type: string
+        scope:
+          type: string
+        deliverables:
+          type: string
+        financial_terms:
+          type: string
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          nullable: true
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          nullable: true
+        department:
+          type: string
+          maxLength: 100
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ConsultancyProjectStatusEnum'
+          readOnly: true
+        hod_remarks:
+          type: string
+          readOnly: true
+        admin_remarks:
+          type: string
+          readOnly: true
+        dean_remarks:
+          type: string
+          readOnly: true
+        director_remarks:
+          type: string
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        hod_decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        admin_verified_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        dean_decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        director_decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - admin_remarks
+      - admin_verified_at
+      - created_at
+      - dean_decided_at
+      - dean_remarks
+      - director_decided_at
+      - director_remarks
+      - hod_decided_at
+      - hod_remarks
+      - id
+      - status
+      - submitted_at
+      - title
+      - updated_at
+      - user_id
+    ConsultancyProjectStatusEnum:
+      enum:
+      - draft
+      - submitted
+      - hod_review
+      - hod_recommended
+      - admin_verified
+      - dean_approved
+      - dean_rejected
+      - forwarded_director
+      - director_approved
+      - director_rejected
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `submitted` - Submitted
+        * `hod_review` - HoD Review
+        * `hod_recommended` - HoD Recommended
+        * `admin_verified` - Admin Verified
+        * `dean_approved` - Dean Approved
+        * `dean_rejected` - Dean Rejected
+        * `forwarded_director` - Forwarded to Director
+        * `director_approved` - Director Approved
+        * `director_rejected` - Director Rejected
     Detail:
       type: object
       properties:
@@ -2422,6 +3299,85 @@ components:
       required:
       - fee_reference
       - season
+      - user_id
+    FinanceRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        project:
+          type: integer
+          nullable: true
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        description:
+          type: string
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        purpose:
+          type: string
+          maxLength: 500
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusB87Enum'
+          readOnly: true
+        admin_remarks:
+          type: string
+          readOnly: true
+        dean_remarks:
+          type: string
+          readOnly: true
+        director_remarks:
+          type: string
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        admin_verified_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        dean_decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        director_decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - admin_remarks
+      - admin_verified_at
+      - amount
+      - created_at
+      - dean_decided_at
+      - dean_remarks
+      - description
+      - director_decided_at
+      - director_remarks
+      - id
+      - status
+      - submitted_at
+      - updated_at
       - user_id
     IncidentRecorded:
       type: object
@@ -2943,6 +3899,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Company'
+    PaginatedConsultancyProjectList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsultancyProject'
+    PaginatedFinanceRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinanceRequest'
     PaginatedInterviewRoundList:
       type: object
       required:
@@ -3000,6 +3994,120 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PaginatedProcurementRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProcurementRequest'
+    PaginatedProgressReportList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProgressReport'
+    PaginatedProjectClosureList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectClosure'
+    PaginatedResearchProjectList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResearchProject'
+    PaginatedResearchProjectTransitionList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResearchProjectTransition'
+    PaginatedStaffAppointmentList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/StaffAppointment'
     PatchedJobPosting:
       type: object
       properties:
@@ -3085,6 +4193,36 @@ components:
       properties:
         active_role:
           type: string
+    PatchedWriteResearchProject:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 300
+        objectives:
+          type: string
+        funding_source:
+          type: string
+          maxLength: 200
+        budget_requested:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          nullable: true
+          description: Total budget requested in INR
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          nullable: true
+        resource_requirements:
+          type: string
+        department:
+          type: string
+          maxLength: 100
     PlacementRecordDetail:
       type: object
       description: A student's own record, with what rules 22 and 24 still want from
@@ -3145,6 +4283,87 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    ProcurementRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        project:
+          type: integer
+          nullable: true
+        item_description:
+          type: string
+        quantity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        estimated_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        justification:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusB87Enum'
+          readOnly: true
+        admin_remarks:
+          type: string
+          readOnly: true
+        dean_remarks:
+          type: string
+          readOnly: true
+        director_remarks:
+          type: string
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        admin_verified_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        dean_decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        director_decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - admin_remarks
+      - admin_verified_at
+      - created_at
+      - dean_decided_at
+      - dean_remarks
+      - director_decided_at
+      - director_remarks
+      - estimated_cost
+      - id
+      - item_description
+      - status
+      - submitted_at
+      - updated_at
+      - user_id
     ProfileDocument:
       type: object
       description: |-
@@ -3201,6 +4420,156 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    ProgressReport:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        project:
+          type: integer
+        reporting_period:
+          type: string
+          description: e.g. Q1 2026-27
+          maxLength: 100
+        summary:
+          type: string
+        milestones_achieved:
+          type: string
+        expenditure_so_far:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ProgressReportStatusEnum'
+          readOnly: true
+        reviewer_remarks:
+          type: string
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        reviewed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - project
+      - reporting_period
+      - reviewed_at
+      - reviewer_remarks
+      - status
+      - submitted_at
+      - summary
+      - updated_at
+      - user_id
+    ProgressReportStatusEnum:
+      enum:
+      - draft
+      - submitted
+      - accepted
+      - returned
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `submitted` - Submitted
+        * `accepted` - Accepted
+        * `returned` - Returned for Revision
+    ProjectClosure:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        project:
+          type: integer
+        completion_summary:
+          type: string
+        financial_settlement_details:
+          type: string
+        assets_declared:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ProjectClosureStatusEnum'
+          readOnly: true
+        admin_remarks:
+          type: string
+          readOnly: true
+        dean_remarks:
+          type: string
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        admin_verified_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        dean_decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - admin_remarks
+      - admin_verified_at
+      - completion_summary
+      - created_at
+      - dean_decided_at
+      - dean_remarks
+      - id
+      - project
+      - status
+      - submitted_at
+      - updated_at
+      - user_id
+    ProjectClosureStatusEnum:
+      enum:
+      - draft
+      - submitted
+      - admin_verified
+      - dean_approved
+      - dean_rejected
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `submitted` - Submitted
+        * `admin_verified` - Admin Verified
+        * `dean_approved` - Dean Approved
+        * `dean_rejected` - Dean Rejected
     Recommendation:
       type: object
       description: |-
@@ -3466,6 +4835,163 @@ components:
       - message
       - reason
       - route
+    ResearchProject:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 300
+        objectives:
+          type: string
+        funding_source:
+          type: string
+          maxLength: 200
+        budget_requested:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          nullable: true
+          description: Total budget requested in INR
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          nullable: true
+        resource_requirements:
+          type: string
+        department:
+          type: string
+          maxLength: 100
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ResearchProjectStatusEnum'
+          readOnly: true
+        hod_remarks:
+          type: string
+          readOnly: true
+        admin_remarks:
+          type: string
+          readOnly: true
+        dean_remarks:
+          type: string
+          readOnly: true
+        director_remarks:
+          type: string
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        hod_decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        admin_verified_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        dean_decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        director_decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - admin_remarks
+      - admin_verified_at
+      - created_at
+      - dean_decided_at
+      - dean_remarks
+      - director_decided_at
+      - director_remarks
+      - hod_decided_at
+      - hod_remarks
+      - id
+      - status
+      - submitted_at
+      - title
+      - updated_at
+      - user_id
+    ResearchProjectStatusEnum:
+      enum:
+      - draft
+      - submitted
+      - hod_review
+      - hod_recommended
+      - hod_not_recommended
+      - admin_verified
+      - dean_approved
+      - dean_rejected
+      - forwarded_director
+      - director_approved
+      - director_rejected
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `submitted` - Submitted
+        * `hod_review` - HoD Review
+        * `hod_recommended` - HoD Recommended
+        * `hod_not_recommended` - HoD Not Recommended
+        * `admin_verified` - Admin Verified
+        * `dean_approved` - Dean Approved
+        * `dean_rejected` - Dean Rejected
+        * `forwarded_director` - Forwarded to Director
+        * `director_approved` - Director Approved
+        * `director_rejected` - Director Rejected
+    ResearchProjectTransition:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        from_status:
+          type: string
+          maxLength: 30
+        to_status:
+          type: string
+          maxLength: 30
+        actor_user_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        remarks:
+          type: string
+          maxLength: 1000
+        at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - at
+      - from_status
+      - id
+      - to_status
     RoundOutcome:
       type: object
       properties:
@@ -3663,6 +5189,114 @@ components:
       description: |-
         * `campus` - Through the Placement Cell
         * `off_campus` - Off campus (rules 5 and 24)
+    StaffAppointment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        project:
+          type: integer
+          nullable: true
+        position_title:
+          type: string
+          maxLength: 200
+        stipend_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        duration_months:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        department:
+          type: string
+          maxLength: 100
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StaffAppointmentStatusEnum'
+          readOnly: true
+        admin_remarks:
+          type: string
+          readOnly: true
+        dean_remarks:
+          type: string
+          readOnly: true
+        director_remarks:
+          type: string
+          readOnly: true
+        selection_remarks:
+          type: string
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        admin_verified_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        dean_decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        director_decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - admin_remarks
+      - admin_verified_at
+      - created_at
+      - dean_decided_at
+      - dean_remarks
+      - director_decided_at
+      - director_remarks
+      - id
+      - position_title
+      - selection_remarks
+      - status
+      - submitted_at
+      - updated_at
+      - user_id
+    StaffAppointmentStatusEnum:
+      enum:
+      - draft
+      - requested
+      - admin_verified
+      - selection_recommendation_recorded
+      - approved
+      - forwarded_director
+      - director_approved
+      - rejected
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `requested` - Requested
+        * `admin_verified` - Admin Verified
+        * `selection_recommendation_recorded` - Selection Recommendation Recorded
+        * `approved` - Approved
+        * `forwarded_director` - Forwarded to Director
+        * `director_approved` - Director Approved
+        * `rejected` - Rejected
     StaffStats:
       type: object
       description: PC-UC-011/012. Operational figures, staff only.
@@ -3691,6 +5325,24 @@ components:
       required:
       - available
       - season
+    StatusB87Enum:
+      enum:
+      - draft
+      - submitted
+      - verified
+      - approved
+      - forwarded_director
+      - director_approved
+      - rejected
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `submitted` - Submitted
+        * `verified` - Verified
+        * `approved` - Approved
+        * `forwarded_director` - Forwarded to Director
+        * `director_approved` - Director Approved
+        * `rejected` - Rejected
     SubmitOfferLetter:
       type: object
       properties:
@@ -3769,6 +5421,16 @@ components:
       - application_id
       - redacted
       - results
+    TransitionRequest:
+      type: object
+      properties:
+        to_status:
+          type: string
+        remarks:
+          type: string
+          default: ''
+      required:
+      - to_status
     UserRef:
       type: object
       properties:
@@ -3830,6 +5492,176 @@ components:
           maxLength: 300
       required:
       - reason
+    WriteConsultancy:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 300
+        client_name:
+          type: string
+          maxLength: 200
+        client_details:
+          type: string
+        scope:
+          type: string
+        deliverables:
+          type: string
+        financial_terms:
+          type: string
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          nullable: true
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          nullable: true
+        department:
+          type: string
+          maxLength: 100
+      required:
+      - title
+    WriteFinanceRequest:
+      type: object
+      properties:
+        project_id:
+          type: integer
+          nullable: true
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        description:
+          type: string
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        purpose:
+          type: string
+          maxLength: 500
+      required:
+      - amount
+      - description
+    WriteProcurement:
+      type: object
+      properties:
+        project_id:
+          type: integer
+          nullable: true
+        item_description:
+          type: string
+        quantity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        estimated_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        justification:
+          type: string
+      required:
+      - estimated_cost
+      - item_description
+    WriteProgressReport:
+      type: object
+      properties:
+        project_id:
+          type: integer
+        reporting_period:
+          type: string
+          description: e.g. Q1 2026-27
+          maxLength: 100
+        summary:
+          type: string
+        milestones_achieved:
+          type: string
+        expenditure_so_far:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          nullable: true
+      required:
+      - project_id
+      - reporting_period
+      - summary
+    WriteProjectClosure:
+      type: object
+      properties:
+        project_id:
+          type: integer
+        completion_summary:
+          type: string
+        financial_settlement_details:
+          type: string
+        assets_declared:
+          type: string
+      required:
+      - completion_summary
+      - project_id
+    WriteResearchProject:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 300
+        objectives:
+          type: string
+        funding_source:
+          type: string
+          maxLength: 200
+        budget_requested:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          nullable: true
+          description: Total budget requested in INR
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          nullable: true
+        resource_requirements:
+          type: string
+        department:
+          type: string
+          maxLength: 100
+      required:
+      - title
+    WriteStaffAppointment:
+      type: object
+      properties:
+        project_id:
+          type: integer
+          nullable: true
+        position_title:
+          type: string
+          maxLength: 200
+        stipend_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        duration_months:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        department:
+          type: string
+          maxLength: 100
+      required:
+      - position_title
   securitySchemes:
     iamSession:
       type: apiKey
