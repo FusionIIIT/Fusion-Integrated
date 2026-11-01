@@ -1,0 +1,198 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+3 0 obj
+<< /Length 5388 >>
+stream
+BT /F2 20 Tf 0.08 0.22 0.36 rg 54 790.0 Td (Patent Management System Implementation Report) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 756.0 Td (Branch: 11-PMS) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 742.0 Td (Specification set: Assignment 7, PMS v1.2/v1.3) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 728.0 Td (Status: Backend lifecycle implementation present; final verification is blocked by the local) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 714.0 Td (  PostgreSQL service and Ruff issues. The client pages remain placeholders.) Tj ET
+BT /F2 13 Tf 0.08 0.22 0.36 rg 54 688.0 Td (Architecture and design) Tj ET
+0.72 0.8 0.87 RG 54 684.0 m 541 684.0 l S
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 660.0 Td (PMS is a Django domain module under modules.pms, registered in DOMAIN_MODULES and mounted at) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 646.0 Td (  /api/v1/pms/. It follows the module layering contracts for API, services, selectors, models,) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 632.0 Td (  and domain logic. Cross-module references use integer IAM user IDs; contracts.py exposes) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 618.0 Td (  plural-ID lookups to other modules. The domain state machine owns status transitions, services) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 604.0 Td (  enforce lifecycle rules and write audit/notification records, selectors scope application) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 590.0 Td (  reads, and DRF serializers/views form the API boundary.) Tj ET
+BT /F2 13 Tf 0.08 0.22 0.36 rg 54 564.0 Td (Features present in the code) Tj ET
+0.72 0.8 0.87 RG 54 560.0 m 541 560.0 l S
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 536.0 Td (- Application submission, unique application numbers, review assignment and decisions,) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 522.0 Td (  revision/resubmission, withdrawal, and appeals.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 508.0 Td (- Inventor ownership shares, consent/agreement records, and withdrawal consent.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 494.0 Td (- PDF size/malware validation metadata and document version tracking.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 480.0 Td (- Budget decisions and escalations, attorney panel/assignment/response, patentability) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 466.0 Td (  assessments, and legal advice.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 452.0 Td (- Prior-art search/attachment, external filing/grant tracking, office actions and responses, and) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 438.0 Td (  maintenance decisions/actions.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 424.0 Td (- Licensing requests, audit trail, report aggregates, notification outbox, and deadline) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 410.0 Td (  monitoring services.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 396.0 Td (- PMS-specific role/permission declarations and navigation manifest entries.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 375.0 Td (The integration currently records external filing and notification state in PMS; it does not) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 361.0 Td (  perform legal decisions, actual payments, or patent-office submission. Search is a) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 347.0 Td (  PMS-supported adapter/stub rather than a live patent database integration.) Tj ET
+BT /F2 13 Tf 0.08 0.22 0.36 rg 54 321.0 Td (Models and relationships) Tj ET
+0.72 0.8 0.87 RG 54 317.0 m 541 317.0 l S
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 293.0 Td (The migration creates PatentApplication and related records: CoInventor, ApplicationDocument,) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 279.0 Td (  DirectorReview, PatentBudget, AttorneyAssignment, AttorneyPanel, PatentabilityAssessment,) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 265.0 Td (  PriorArtReference, OfficeAction, PostGrantMaintenance, LicensingRequest, PatentAppeal,) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 251.0 Td (  PatentLegalAdvice, PmsAuditTrail, PmsNotificationOutbox, PmsConfiguration, and) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 237.0 Td (  PmsRoleAssignment. Applications own lifecycle records; budgets are one-to-one; actor) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 223.0 Td (  references are scalar IAM IDs. 0001_initial.py is the only PMS migration currently present.) Tj ET
+BT /F2 13 Tf 0.08 0.22 0.36 rg 54 197.0 Td (Workflows and business rules) Tj ET
+0.72 0.8 0.87 RG 54 193.0 m 541 193.0 l S
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 169.0 Td (Services and state transitions cover the documented submission/review/revision/appeal paths,) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 155.0 Td (  attorney assignment, budget decisions, filing, office-action response \(with and without) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 141.0 Td (  applicant review\), maintenance, and pre-filing withdrawal. Rule validation includes required) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 127.0 Td (  fields, document constraints, reviewer justification, deadlines, assignment conflicts,) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 113.0 Td (  ownership shares, and inventor consent. The test suite names and maps cases to CFR/BR/UC/BW) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 99.0 Td (  identifiers, though coverage is selective rather than exhaustive.) Tj ET
+BT /F2 13 Tf 0.08 0.22 0.36 rg 54 73.0 Td (Authorization and integrations) Tj ET
+0.72 0.8 0.87 RG 54 69.0 m 541 69.0 l S
+BT /F1 8 Tf 0.4 0.45 0.5 rg 500 27 Td (1 / 3) Tj ET
+endstream
+endobj
+4 0 obj
+<< /Type /Page /Parent 9 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 3 0 R >>
+endobj
+5 0 obj
+<< /Length 5690 >>
+stream
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 790.0 Td (The registry declares PMS roles and permissions for applicant, Director/Dean Research, PCC) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 776.0 Td (  admin, and attorney workflows. API endpoints use module grants and permission gates;) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 762.0 Td (  application list/detail reads use the visible_applications selector. During continuation,) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 748.0 Td (  revise_and_resubmit_application was corrected to check primary-applicant ownership at the) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 734.0 Td (  service boundary, and an authorization regression test was added \(CFR-PMS-008\). Missing) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 720.0 Td (  OpenAPI annotations were added for prior-art search, consent, reporting, renewal, and) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 706.0 Td (  office-action actions. Office-action extension input now uses a bounded serializer instead of) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 692.0 Td (  an unchecked integer conversion. The generated OpenAPI schema and permission manifest were) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 678.0 Td (  refreshed.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 657.0 Td (Known authorization limitation: several nested resource endpoints retrieve records by ID in) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 643.0 Td (  their services/views and do not consistently apply the application selector first. Director) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 629.0 Td (  selector scope is also broader than assigned-only because domain membership is not currently) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 615.0 Td (  modeled. These require security review before production use.) Tj ET
+BT /F2 13 Tf 0.08 0.22 0.36 rg 54 589.0 Td (Files created and modified) Tj ET
+0.72 0.8 0.87 RG 54 585.0 m 541 585.0 l S
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 561.0 Td (- Added modules/pms/ \(domain, models, migration, services, selectors, API, and tests\).) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 547.0 Td (- Added client/src/modules/pms/ routes and a placeholder page.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 533.0 Td (- Modified .importlinter, config/settings/base.py, and config/urls.py to register the module and) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 519.0 Td (  API.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 505.0 Td (- Modified registry/permissions.json and generated docs/02-iam/permission-catalog.generated.md) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 491.0 Td (  with PMS permissions/navigation.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 477.0 Td (- Added this report.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 463.0 Td (- Added one regression test in modules/pms/tests/test_authorization.py for cross-applicant) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 449.0 Td (  revision denial.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 428.0 Td (No unrelated module implementation files were changed. Ruff formatting and safe autofixes were) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 414.0 Td (  applied to the new PMS package after the project check reported lint issues.) Tj ET
+BT /F2 13 Tf 0.08 0.22 0.36 rg 54 388.0 Td (Requirement coverage) Tj ET
+0.72 0.8 0.87 RG 54 384.0 m 541 384.0 l S
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 360.0 Td (Implemented in backend code: core application lifecycle; document and inventor records; review,) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 346.0 Td (  budget, assignment, filing, office action, maintenance, licensing, appeal, prior-art, audit,) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 332.0 Td (  and notification flows. The existing tests reference all major workflow families \(UC-PMS-001) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 318.0 Td (  through UC-PMS-033\), a selected subset of the 30 CFRs and 84 BRs, and the 16 basis/5 composite) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 304.0 Td (  workflows.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 283.0 Td (Partially implemented:) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 262.0 Td (- Report UC-PMS-024/030/031/032: current API returns basic status/domain aggregates; full) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 248.0 Td (  dashboards, workload analytics, and workflow oversight are not present.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 234.0 Td (- UC-PMS-025: configuration and role-assignment models exist, but complete configuration/role) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 220.0 Td (  administration endpoints are absent.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 206.0 Td (- UC-PMS-026: attorney panel listing/creation exists; full edit/deactivation and expertise) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 192.0 Td (  lifecycle are incomplete.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 178.0 Td (- UC-PMS-016: deadline monitoring service exists but no scheduled-job registration/operation is) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 164.0 Td (  supplied in this module.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 150.0 Td (- UC-PMS-002: status/history is represented by application state and audit rows, but there is no) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 136.0 Td (  dedicated history endpoint.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 122.0 Td (- UI: all PMS routes currently render Placeholder; no applicant, reviewer, attorney, or admin) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 108.0 Td (  workflow screens are implemented.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 94.0 Td (- External prior-art search and notification delivery depend on integration/deployment adapters;) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 80.0 Td (  this repository does not provide a live external search connector.) Tj ET
+BT /F1 8 Tf 0.4 0.45 0.5 rg 500 27 Td (2 / 3) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 9 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 5082 >>
+stream
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 790.0 Td (Not implemented or not verified: complete requirement-by-requirement acceptance evidence; fully) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 776.0 Td (  functional PMS client pages; scheduled task wiring; production-grade malware scanning and) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 762.0 Td (  binary document storage; full configuration, exceptional-case, and analytics workflows.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 748.0 Td (  Because database-dependent tests could not initialize, these requirements are not considered) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 734.0 Td (  successfully tested.) Tj ET
+BT /F2 13 Tf 0.08 0.22 0.36 rg 54 708.0 Td (Tests and checks) Tj ET
+0.72 0.8 0.87 RG 54 704.0 m 541 704.0 l S
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 680.0 Td (Existing PMS tests were inspected before adding a single regression case. Test modules cover) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 666.0 Td (  domain transitions, business rules, models, workflows, authorization,) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 652.0 Td (  deadlines/notifications/audit, and API behavior.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 631.0 Td (Commands executed:) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 610.0 Td (- make check  failed at .venv/bin/ruff check .. Django manage.py check passed; makemigrations) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 596.0 Td (  --check --dry-run reported no changes \(with a warning that the PostgreSQL connection was) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 582.0 Td (  unavailable\). Ruff initially reported 227 PMS lint findings; after safe formatting/autofixes,) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 568.0 Td (  69 remained, primarily E501 long lines plus unused test variables and two regex warnings.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 554.0 Td (  Later checks in the Make target did not execute.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 540.0 Td (- ./.venv/bin/pytest -q modules/pms/tests  26 passed, 73 errors. Errors occurred while) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 526.0 Td (  creating/connecting to the test database because PostgreSQL at 127.0.0.1:5432 was unavailable.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 512.0 Td (  There were no assertion failures reported; database-backed tests, including the new regression) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 498.0 Td (  test, remain unverified.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 484.0 Td (- client checks were not run: client/node_modules is absent.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 470.0 Td (- lint-imports, no_cross_module_fk.py, contracts_are_plural.py, and nav_matches_routes.py) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 456.0 Td (  passed.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 442.0 Td (- manage.py permission_manifest --check  passed after restoring the PMS PERMISSIONS export) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 428.0 Td (  expected by the manifest generator.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 414.0 Td (- make schema / manage.py spectacular --fail-on-warn  passed after adding the missing PMS) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 400.0 Td (  endpoint schemas.) Tj ET
+BT /F2 13 Tf 0.08 0.22 0.36 rg 54 374.0 Td (Setup and rerun instructions) Tj ET
+0.72 0.8 0.87 RG 54 370.0 m 541 370.0 l S
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 346.0 Td (1. Start the project PostgreSQL service and configure DB_NAME, DB_USER, DB_PASSWORD, DB_HOST,) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 332.0 Td (  and DB_PORT for the local environment.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 318.0 Td (2. From Fusion-Integrated, run make migrate to apply migrations.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 304.0 Td (3. Run the backend checks with make check and the PMS tests with ./.venv/bin/pytest -q) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 290.0 Td (  modules/pms/tests.) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 276.0 Td (4. Install the client dependencies according to the repository lockfile, then run cd client &&) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 262.0 Td (  npm run typecheck && npm test && npm run build.) Tj ET
+BT /F2 13 Tf 0.08 0.22 0.36 rg 54 236.0 Td (Readiness) Tj ET
+0.72 0.8 0.87 RG 54 232.0 m 541 232.0 l S
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 208.0 Td (The module is not ready to push as a completed assignment: database-backed tests have not run) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 194.0 Td (  successfully, project lint still fails, and the client and several administration/reporting) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 180.0 Td (  requirements remain partial. The schema and permission checks were rerun after the first make) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 166.0 Td (  check; the full test suite was not rerun after the final schema/validation edits, so those) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 152.0 Td (  edits also remain unverified by execution. The report records observed code and execution) Tj ET
+BT /F1 10 Tf 0.12 0.18 0.25 rg 54 138.0 Td (  results rather than treating declared features as verified behavior.) Tj ET
+BT /F1 8 Tf 0.4 0.45 0.5 rg 500 27 Td (3 / 3) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 9 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R 8 0 R] /Count 3 >>
+endobj
+10 0 obj
+<< /Type /Catalog /Pages 9 0 R >>
+endobj
+xref
+0 11
+0000000000 65535 f 
+0000000015 00000 n 
+0000000085 00000 n 
+0000000160 00000 n 
+0000005600 00000 n 
+0000005736 00000 n 
+0000011478 00000 n 
+0000011614 00000 n 
+0000016748 00000 n 
+0000016884 00000 n 
+0000016953 00000 n 
+trailer
+<< /Size 11 /Root 10 0 R >>
+startxref
+17003
+%%EOF

@@ -278,6 +278,338 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "pms": {
+      "grants": {
+        "Dean Research": [
+          "pms.application.review",
+          "pms.application.review_appeal",
+          "pms.application.view",
+          "pms.audit.view",
+          "pms.budget.review",
+          "pms.document.manage",
+          "pms.licensing.review",
+          "pms.maintenance.decide",
+          "pms.report.view",
+          "pms.workflow.oversight"
+        ],
+        "attorney": [
+          "pms.advice.record",
+          "pms.application.view",
+          "pms.attorney.respond_assignment",
+          "pms.document.manage",
+          "pms.filing.record",
+          "pms.maintenance.manage",
+          "pms.office_action.record",
+          "pms.office_action.respond",
+          "pms.patentability.assess",
+          "pms.prior_art.search"
+        ],
+        "director": [
+          "pms.application.review",
+          "pms.application.review_appeal",
+          "pms.application.view",
+          "pms.audit.view",
+          "pms.budget.review",
+          "pms.document.manage",
+          "pms.licensing.review",
+          "pms.maintenance.decide",
+          "pms.report.view",
+          "pms.workflow.oversight"
+        ],
+        "faculty": [
+          "pms.application.appeal",
+          "pms.application.create",
+          "pms.application.revise",
+          "pms.application.view_self",
+          "pms.application.withdraw",
+          "pms.coinventor.manage",
+          "pms.document.manage",
+          "pms.licensing.submit",
+          "pms.office_action.review",
+          "pms.prior_art.search",
+          "pms.report.view_self"
+        ],
+        "pcc_admin": [
+          "pms.application.assign_director",
+          "pms.application.view",
+          "pms.attorney.assign",
+          "pms.audit.view",
+          "pms.config.manage",
+          "pms.document.manage",
+          "pms.panel.manage",
+          "pms.report.view",
+          "pms.workflow.monitor"
+        ],
+        "staff": [
+          "pms.application.appeal",
+          "pms.application.create",
+          "pms.application.revise",
+          "pms.application.view_self",
+          "pms.application.withdraw",
+          "pms.coinventor.manage",
+          "pms.document.manage",
+          "pms.licensing.submit",
+          "pms.office_action.review",
+          "pms.prior_art.search",
+          "pms.report.view_self"
+        ],
+        "student": [
+          "pms.application.appeal",
+          "pms.application.create",
+          "pms.application.revise",
+          "pms.application.view_self",
+          "pms.application.withdraw",
+          "pms.coinventor.manage",
+          "pms.document.manage",
+          "pms.licensing.submit",
+          "pms.office_action.review",
+          "pms.prior_art.search",
+          "pms.report.view_self"
+        ]
+      },
+      "module_grants": [
+        "Dean Research",
+        "attorney",
+        "director",
+        "faculty",
+        "pcc_admin",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/pms",
+        "icon": "FileText",
+        "items": [
+          {
+            "code": "pms.mine",
+            "icon": "FileText",
+            "label": "My Applications",
+            "required_permission": "pms.application.view_self",
+            "sort_order": 10,
+            "to": "/pms/mine"
+          },
+          {
+            "code": "pms.submit",
+            "icon": "PlusCircle",
+            "label": "New Application",
+            "required_permission": "pms.application.create",
+            "sort_order": 15,
+            "to": "/pms/submit"
+          },
+          {
+            "code": "pms.queue",
+            "icon": "Inbox",
+            "label": "Application Queue",
+            "required_permission": "pms.application.view",
+            "sort_order": 20,
+            "to": "/pms/queue"
+          },
+          {
+            "code": "pms.reviews",
+            "icon": "CheckSquare",
+            "label": "Director Reviews",
+            "required_permission": "pms.application.review",
+            "sort_order": 30,
+            "to": "/pms/reviews"
+          },
+          {
+            "code": "pms.filings",
+            "icon": "Send",
+            "label": "Patent Filings",
+            "required_permission": "pms.filing.record",
+            "sort_order": 40,
+            "to": "/pms/filings"
+          },
+          {
+            "code": "pms.maintenance",
+            "icon": "Clock",
+            "label": "Maintenance",
+            "required_permission": "pms.maintenance.manage",
+            "sort_order": 50,
+            "to": "/pms/maintenance"
+          },
+          {
+            "code": "pms.reports",
+            "icon": "ChartBar",
+            "label": "Reports",
+            "required_permission": "pms.report.view",
+            "sort_order": 60,
+            "to": "/pms/reports"
+          },
+          {
+            "code": "pms.my_reports",
+            "icon": "ChartPie",
+            "label": "My Reports",
+            "required_permission": "pms.report.view_self",
+            "sort_order": 65,
+            "to": "/pms/my-reports"
+          },
+          {
+            "code": "pms.admin",
+            "icon": "Gear",
+            "label": "Administration",
+            "required_permission": "pms.config.manage",
+            "sort_order": 70,
+            "to": "/pms/admin"
+          },
+          {
+            "code": "pms.audit",
+            "icon": "ShieldCheck",
+            "label": "Audit Trail",
+            "required_permission": "pms.audit.view",
+            "sort_order": 80,
+            "to": "/pms/audit"
+          }
+        ],
+        "label": "Patent Management",
+        "nav_section": "Research",
+        "sort_order": 25,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "pms.application.create",
+          "label": "Submit a new patent application"
+        },
+        {
+          "code": "pms.application.view_self",
+          "label": "View one's own patent applications"
+        },
+        {
+          "code": "pms.application.view",
+          "label": "View patent applications within scope"
+        },
+        {
+          "code": "pms.application.withdraw",
+          "label": "Withdraw patent application before filing"
+        },
+        {
+          "code": "pms.application.revise",
+          "label": "Revise and resubmit patent application"
+        },
+        {
+          "code": "pms.application.assign_director",
+          "label": "Assign patent application to Director"
+        },
+        {
+          "code": "pms.application.review",
+          "label": "Review patent application and record decision"
+        },
+        {
+          "code": "pms.application.appeal",
+          "label": "File appeal against application rejection"
+        },
+        {
+          "code": "pms.application.review_appeal",
+          "label": "Review appeal against rejection"
+        },
+        {
+          "code": "pms.budget.review",
+          "label": "Review and decide patent budget"
+        },
+        {
+          "code": "pms.attorney.assign",
+          "label": "Assign attorney to approved application"
+        },
+        {
+          "code": "pms.attorney.respond_assignment",
+          "label": "Accept or decline attorney assignment"
+        },
+        {
+          "code": "pms.patentability.assess",
+          "label": "Conduct patentability assessment"
+        },
+        {
+          "code": "pms.filing.record",
+          "label": "Prepare and record external patent filing"
+        },
+        {
+          "code": "pms.office_action.record",
+          "label": "Record patent office communication"
+        },
+        {
+          "code": "pms.office_action.respond",
+          "label": "Respond to office action"
+        },
+        {
+          "code": "pms.office_action.review",
+          "label": "Review and approve office action response"
+        },
+        {
+          "code": "pms.maintenance.manage",
+          "label": "Manage post-grant maintenance and fees"
+        },
+        {
+          "code": "pms.maintenance.decide",
+          "label": "Make maintenance renewal decision"
+        },
+        {
+          "code": "pms.prior_art.search",
+          "label": "Search and attach prior art references"
+        },
+        {
+          "code": "pms.document.manage",
+          "label": "Upload and manage document versions"
+        },
+        {
+          "code": "pms.licensing.submit",
+          "label": "Submit licensing or technology transfer request"
+        },
+        {
+          "code": "pms.licensing.review",
+          "label": "Review licensing or technology transfer request"
+        },
+        {
+          "code": "pms.coinventor.manage",
+          "label": "Manage co-inventors and agreements"
+        },
+        {
+          "code": "pms.workflow.monitor",
+          "label": "Monitor workflow and handle exceptional cases"
+        },
+        {
+          "code": "pms.workflow.oversight",
+          "label": "View application workflow oversight"
+        },
+        {
+          "code": "pms.report.view_self",
+          "label": "View own application reports"
+        },
+        {
+          "code": "pms.report.view",
+          "label": "View PMS reports and analytics"
+        },
+        {
+          "code": "pms.config.manage",
+          "label": "Manage PMS roles and configuration"
+        },
+        {
+          "code": "pms.panel.manage",
+          "label": "Maintain attorney panel and expertise mappings"
+        },
+        {
+          "code": "pms.audit.view",
+          "label": "View audit trail and compliance logs"
+        },
+        {
+          "code": "pms.advice.record",
+          "label": "Record patent legal advice"
+        },
+        {
+          "code": "pms.application.auto_expire",
+          "label": "System expiration of overdue revisions"
+        },
+        {
+          "code": "pms.deadline.escalate",
+          "label": "System deadline monitoring and escalation"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "pms.application.auto_expire",
+        "pms.deadline.escalate"
+      ]
     }
   },
   "publisher": "integrated",

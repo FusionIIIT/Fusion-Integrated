@@ -1674,6 +1674,1140 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/pms/appeals/{appeal_id}/review/:
+    post:
+      operationId: v1_pms_appeals_review_create
+      description: Review and decide an appeal (UC-PMS-023, CFR-PMS-020).
+      parameters:
+      - in: path
+        name: appeal_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewAppeal'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReviewAppeal'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReviewAppeal'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentAppeal'
+          description: ''
+  /api/v1/pms/applications/:
+    get:
+      operationId: v1_pms_applications_list
+      description: List applications visible to caller or submit a new application
+        (UC-PMS-001, CFR-PMS-001, CFR-PMS-005).
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PatentApplicationRead'
+          description: ''
+    post:
+      operationId: v1_pms_applications_create
+      description: List applications visible to caller or submit a new application
+        (UC-PMS-001, CFR-PMS-001, CFR-PMS-005).
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitApplicationWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubmitApplicationWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubmitApplicationWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationRead'
+          description: ''
+  /api/v1/pms/applications/{id}/:
+    get:
+      operationId: v1_pms_applications_retrieve
+      description: Retrieve full application details (UC-PMS-002, CFR-PMS-001).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationRead'
+          description: ''
+  /api/v1/pms/applications/{id}/appeal/:
+    post:
+      operationId: v1_pms_applications_appeal_create
+      description: File an appeal against application rejection (UC-PMS-022, CFR-PMS-020).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileAppeal'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FileAppeal'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileAppeal'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentAppeal'
+          description: ''
+  /api/v1/pms/applications/{id}/assign-attorney/:
+    post:
+      operationId: v1_pms_applications_assign_attorney_create
+      description: PCC_ADMIN assigns an Attorney to an approved application (UC-PMS-010,
+        CFR-PMS-009).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignAttorney'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AssignAttorney'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AssignAttorney'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttorneyAssignment'
+          description: ''
+  /api/v1/pms/applications/{id}/assign-director/:
+    post:
+      operationId: v1_pms_applications_assign_director_create
+      description: Assign an application to a Director for review (UC-PMS-007, CFR-PMS-006).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignDirector'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AssignDirector'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AssignDirector'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationRead'
+          description: ''
+  /api/v1/pms/applications/{id}/budget/:
+    post:
+      operationId: v1_pms_applications_budget_create
+      description: Submit budget line items or decide budget (UC-PMS-009, CFR-PMS-011).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecideBudget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DecideBudget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DecideBudget'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentBudget'
+          description: ''
+    put:
+      operationId: v1_pms_applications_budget_update
+      description: Submit budget line items or decide budget (UC-PMS-009, CFR-PMS-011).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetLineItems'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BudgetLineItems'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BudgetLineItems'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentBudget'
+          description: ''
+  /api/v1/pms/applications/{id}/documents/:
+    post:
+      operationId: v1_pms_applications_documents_create
+      description: Upload a new document version (UC-PMS-019, CFR-PMS-018).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadDocument'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UploadDocument'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadDocument'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationDocument'
+          description: ''
+  /api/v1/pms/applications/{id}/filing/:
+    post:
+      operationId: v1_pms_applications_filing_create
+      description: Prepare and record external patent filing (UC-PMS-013, CFR-PMS-012).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordFiling'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RecordFiling'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RecordFiling'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationRead'
+          description: ''
+  /api/v1/pms/applications/{id}/grant/:
+    post:
+      operationId: v1_pms_applications_grant_create
+      description: Record patent grant and initialize maintenance tracking (UC-PMS-014,
+        CFR-PMS-013).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordGrant'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RecordGrant'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RecordGrant'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationRead'
+          description: ''
+  /api/v1/pms/applications/{id}/legal-advice/:
+    get:
+      operationId: v1_pms_applications_legal_advice_list
+      description: Record or view patent legal advice (UC-PMS-033, CFR-PMS-004).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PatentLegalAdvice'
+          description: ''
+    post:
+      operationId: v1_pms_applications_legal_advice_create
+      description: Record or view patent legal advice (UC-PMS-033, CFR-PMS-004).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LegalAdviceCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LegalAdviceCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LegalAdviceCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentLegalAdvice'
+          description: ''
+  /api/v1/pms/applications/{id}/licensing/:
+    get:
+      operationId: v1_pms_applications_licensing_list
+      description: Submit or list licensing requests (UC-PMS-020, CFR-PMS-019).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LicensingRequest'
+          description: ''
+    post:
+      operationId: v1_pms_applications_licensing_create
+      description: Submit or list licensing requests (UC-PMS-020, CFR-PMS-019).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LicensingRequestCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LicensingRequestCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LicensingRequestCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LicensingRequest'
+          description: ''
+  /api/v1/pms/applications/{id}/office-actions/:
+    get:
+      operationId: v1_pms_applications_office_actions_list
+      description: List or record office actions (UC-PMS-014, CFR-PMS-014).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OfficeAction'
+          description: ''
+    post:
+      operationId: v1_pms_applications_office_actions_create
+      description: List or record office actions (UC-PMS-014, CFR-PMS-014).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordOfficeAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RecordOfficeAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RecordOfficeAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfficeAction'
+          description: ''
+  /api/v1/pms/applications/{id}/patentability/:
+    post:
+      operationId: v1_pms_applications_patentability_create
+      description: Conduct patentability assessment (UC-PMS-012, CFR-PMS-010).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatentabilityAssessmentCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatentabilityAssessmentCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatentabilityAssessmentCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentabilityAssessment'
+          description: ''
+  /api/v1/pms/applications/{id}/prior-art/:
+    post:
+      operationId: v1_pms_applications_prior_art_create
+      description: Attach prior-art reference to an application (UC-PMS-004, CFR-PMS-017).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttachPriorArt'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AttachPriorArt'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AttachPriorArt'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriorArtReference'
+          description: ''
+  /api/v1/pms/applications/{id}/review/:
+    post:
+      operationId: v1_pms_applications_review_create
+      description: Submit a Director technical review decision (UC-PMS-008, CFR-PMS-007).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubmitReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubmitReview'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectorReview'
+          description: ''
+  /api/v1/pms/applications/{id}/revise/:
+    post:
+      operationId: v1_pms_applications_revise_create
+      description: Revise and resubmit an application (UC-PMS-005, CFR-PMS-008).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviseApplication'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReviseApplication'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReviseApplication'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationRead'
+          description: ''
+  /api/v1/pms/applications/{id}/withdraw/:
+    post:
+      operationId: v1_pms_applications_withdraw_create
+      description: Withdraw an application before filing (UC-PMS-006, CFR-PMS-015).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithdrawApplication'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WithdrawApplication'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WithdrawApplication'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationRead'
+          description: ''
+  /api/v1/pms/attorney-assignments/{assignment_id}/respond/:
+    post:
+      operationId: v1_pms_attorney_assignments_respond_create
+      description: Attorney accepts or declines assignment (UC-PMS-011, CFR-PMS-009).
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RespondAttorneyAssignment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RespondAttorneyAssignment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RespondAttorneyAssignment'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttorneyAssignment'
+          description: ''
+  /api/v1/pms/attorney-panel/:
+    get:
+      operationId: v1_pms_attorney_panel_list
+      description: Attorney panel maintenance and expertise mappings (UC-PMS-026,
+        CFR-PMS-003).
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAttorneyPanelList'
+          description: ''
+    post:
+      operationId: v1_pms_attorney_panel_create
+      description: Attorney panel maintenance and expertise mappings (UC-PMS-026,
+        CFR-PMS-003).
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttorneyPanel'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AttorneyPanel'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AttorneyPanel'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttorneyPanel'
+          description: ''
+  /api/v1/pms/audit-trail/:
+    get:
+      operationId: v1_pms_audit_trail_list
+      description: View audit trail and compliance logs (UC-PMS-028, CFR-PMS-024).
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsAuditTrail'
+          description: ''
+  /api/v1/pms/coinventors/{coinventor_id}/consent/:
+    post:
+      operationId: v1_pms_coinventors_consent_create
+      description: Record inventor agreement and signature (UC-PMS-003, CFR-PMS-016).
+      parameters:
+      - in: path
+        name: coinventor_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoInventorConsentWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CoInventorConsentWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CoInventorConsentWrite'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoInventor'
+          description: ''
+  /api/v1/pms/coinventors/{coinventor_id}/withdrawal-consent/:
+    post:
+      operationId: v1_pms_coinventors_withdrawal_consent_create
+      description: Record co-inventor consent for withdrawal (UC-PMS-003, BR-PMS-070).
+      parameters:
+      - in: path
+        name: coinventor_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoInventorWithdrawalConsentWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CoInventorWithdrawalConsentWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CoInventorWithdrawalConsentWrite'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoInventor'
+          description: ''
+  /api/v1/pms/licensing/{request_id}/review/:
+    post:
+      operationId: v1_pms_licensing_review_create
+      description: Review licensing request (UC-PMS-021, CFR-PMS-019).
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LicensingReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LicensingReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LicensingReview'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LicensingRequest'
+          description: ''
+  /api/v1/pms/maintenance/{maintenance_id}/decide-renewal/:
+    post:
+      operationId: v1_pms_maintenance_decide_renewal_create
+      description: 'Director decides renewal: Renew or Do Not Renew (UC-PMS-018, BR-PMS-061).'
+      parameters:
+      - in: path
+        name: maintenance_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecideRenewal'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DecideRenewal'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DecideRenewal'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostGrantMaintenance'
+          description: ''
+  /api/v1/pms/maintenance/{maintenance_id}/record-action/:
+    post:
+      operationId: v1_pms_maintenance_record_action_create
+      description: Attorney records completed renewal action (UC-PMS-017, BW-PMS-14).
+      parameters:
+      - in: path
+        name: maintenance_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordMaintenanceAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RecordMaintenanceAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RecordMaintenanceAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostGrantMaintenance'
+          description: ''
+  /api/v1/pms/maintenance/{maintenance_id}/request-renewal/:
+    post:
+      operationId: v1_pms_maintenance_request_renewal_create
+      description: Attorney initiates renewal decision request (UC-PMS-017, BR-PMS-061).
+      parameters:
+      - in: path
+        name: maintenance_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostGrantMaintenance'
+          description: ''
+  /api/v1/pms/office-actions/{oa_id}/approve-response/:
+    post:
+      operationId: v1_pms_office_actions_approve_response_create
+      description: Applicant approves draft response (UC-PMS-029, BR-PMS-146).
+      parameters:
+      - in: path
+        name: oa_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfficeAction'
+          description: ''
+  /api/v1/pms/office-actions/{oa_id}/draft-response/:
+    post:
+      operationId: v1_pms_office_actions_draft_response_create
+      description: Attorney drafts response to office action (UC-PMS-015, CFR-PMS-014).
+      parameters:
+      - in: path
+        name: oa_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DraftOfficeActionResponse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DraftOfficeActionResponse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DraftOfficeActionResponse'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfficeAction'
+          description: ''
+  /api/v1/pms/office-actions/{oa_id}/extension/:
+    post:
+      operationId: v1_pms_office_actions_extension_create
+      description: Attorney files extension request (UC-PMS-015).
+      parameters:
+      - in: path
+        name: oa_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfficeActionExtension'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OfficeActionExtension'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OfficeActionExtension'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfficeAction'
+          description: ''
+  /api/v1/pms/office-actions/{oa_id}/submit-response/:
+    post:
+      operationId: v1_pms_office_actions_submit_response_create
+      description: Attorney submits finalized response (UC-PMS-015, BR-PMS-065).
+      parameters:
+      - in: path
+        name: oa_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitOfficeActionResponse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubmitOfficeActionResponse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubmitOfficeActionResponse'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfficeAction'
+          description: ''
+  /api/v1/pms/prior-art/search/:
+    get:
+      operationId: v1_pms_prior_art_search_retrieve
+      description: Search prior art across external databases (UC-PMS-004, CFR-PMS-017).
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriorArtSearchResponse'
+          description: ''
+  /api/v1/pms/reports/:
+    get:
+      operationId: v1_pms_reports_retrieve
+      description: Reports, dashboards, and workload analytics (UC-PMS-024, 030, 031,
+        032, CFR-PMS-022).
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsReportResponse'
+          description: ''
 components:
   schemas:
     AcademicDirectory:
@@ -1898,6 +3032,52 @@ components:
       - status
       - user_id
       - withdrawn_reason
+    ApplicationDocument:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        doc_type:
+          type: string
+          maxLength: 50
+        title:
+          type: string
+          maxLength: 200
+        file_format:
+          type: string
+          maxLength: 10
+        file_size_bytes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        sensitivity:
+          type: string
+          maxLength: 20
+        version:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        is_current:
+          type: boolean
+        uploaded_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        file_url:
+          type: string
+          maxLength: 500
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - doc_type
+      - id
+      - title
+      - uploaded_by_user_id
     ApplicationStatusEnum:
       enum:
       - draft
@@ -1981,6 +3161,125 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    AssignAttorney:
+      type: object
+      properties:
+        attorney_user_id:
+          type: integer
+        institutional_exception:
+          type: boolean
+          default: false
+      required:
+      - attorney_user_id
+    AssignDirector:
+      type: object
+      properties:
+        director_user_id:
+          type: integer
+      required:
+      - director_user_id
+    AttachPriorArt:
+      type: object
+      properties:
+        source:
+          type: string
+          maxLength: 100
+        reference_id:
+          type: string
+          maxLength: 100
+        title:
+          type: string
+          maxLength: 300
+        authors:
+          type: string
+        relevance:
+          type: string
+          default: high
+        notes:
+          type: string
+      required:
+      - reference_id
+      - source
+      - title
+    AttorneyAssignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        attorney_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        assigned_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          $ref: '#/components/schemas/AttorneyAssignmentStatusEnum'
+        decline_reason:
+          type: string
+        decided_at:
+          type: string
+          format: date-time
+          nullable: true
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - assigned_by_user_id
+      - attorney_user_id
+      - created_at
+      - id
+    AttorneyAssignmentStatusEnum:
+      enum:
+      - offered
+      - accepted
+      - declined
+      type: string
+      description: |-
+        * `offered` - Offered
+        * `accepted` - Accepted
+        * `declined` - Declined
+    AttorneyPanel:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        attorney_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        name:
+          type: string
+          maxLength: 150
+        firm_name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        is_approved:
+          type: boolean
+        expertise_domains: {}
+        current_workload:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        max_workload:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+      - attorney_user_id
+      - email
+      - id
+      - name
     AudienceEnum:
       enum:
       - students
@@ -1993,6 +3292,29 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BudgetLineItems:
+      type: object
+      properties:
+        filing_fees:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        attorney_fees:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        administrative_costs:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        threshold_limit:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+      required:
+      - administrative_costs
+      - attorney_fees
+      - filing_fees
     BulkOutcome:
       type: object
       properties:
@@ -2101,6 +3423,66 @@ components:
       - cleared
       - message
       - user_id
+    CoInventor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        department:
+          type: string
+          maxLength: 100
+        ownership_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+        consent_given:
+          type: boolean
+        agreement_signed:
+          type: boolean
+        electronic_signature:
+          type: string
+          maxLength: 255
+        signed_at:
+          type: string
+          format: date-time
+          nullable: true
+        withdrawal_consent_given:
+          type: boolean
+      required:
+      - email
+      - id
+      - name
+      - ownership_percentage
+    CoInventorConsentWrite:
+      type: object
+      properties:
+        consent_given:
+          type: boolean
+          default: true
+        agreement_signed:
+          type: boolean
+          default: true
+        electronic_signature:
+          type: string
+    CoInventorWithdrawalConsentWrite:
+      type: object
+      properties:
+        withdrawal_consent_given:
+          type: boolean
+          default: true
     Company:
       type: object
       properties:
@@ -2315,6 +3697,40 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DecideBudget:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecideBudgetDecisionEnum'
+        justification:
+          type: string
+      required:
+      - decision
+    DecideBudgetDecisionEnum:
+      enum:
+      - Approve
+      - Reject
+      - Escalate
+      type: string
+      description: |-
+        * `Approve` - Approve
+        * `Reject` - Reject
+        * `Escalate` - Escalate
+    DecideRenewal:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecideRenewalDecisionEnum'
+      required:
+      - decision
+    DecideRenewalDecisionEnum:
+      enum:
+      - Renew
+      - Do Not Renew
+      type: string
+      description: |-
+        * `Renew` - Renew
+        * `Do Not Renew` - Do Not Renew
     Detail:
       type: object
       properties:
@@ -2322,6 +3738,33 @@ components:
           type: string
       required:
       - detail
+    DirectorReview:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        director_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        decision:
+          type: string
+          maxLength: 20
+        justification:
+          type: string
+        feedback:
+          type: string
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - decided_at
+      - decision
+      - director_user_id
+      - id
+      - justification
     DocumentLink:
       type: object
       description: A Drive link. Validated in core.files.drive.
@@ -2350,6 +3793,13 @@ components:
         * `certificate` - certificate
         * `offer_letter` - offer_letter
         * `other` - other
+    DraftOfficeActionResponse:
+      type: object
+      properties:
+        draft_response:
+          type: string
+      required:
+      - draft_response
     EligibilityFailure:
       type: object
       properties:
@@ -2423,6 +3873,16 @@ components:
       - fee_reference
       - season
       - user_id
+    FileAppeal:
+      type: object
+      properties:
+        grounds:
+          type: string
+        justification:
+          type: string
+      required:
+      - grounds
+      - justification
     IncidentRecorded:
       type: object
       properties:
@@ -2637,6 +4097,94 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LegalAdviceCreate:
+      type: object
+      properties:
+        stage:
+          type: string
+          maxLength: 50
+        advice_text:
+          type: string
+      required:
+      - advice_text
+      - stage
+    LicensingRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        requested_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        licensee_name:
+          type: string
+          maxLength: 200
+        request_type:
+          type: string
+          maxLength: 50
+        commercial_terms:
+          type: string
+        status:
+          type: string
+          maxLength: 32
+        negotiation_notes:
+          type: string
+        agreement_reference:
+          type: string
+          maxLength: 100
+        is_confidential:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - commercial_terms
+      - created_at
+      - id
+      - licensee_name
+      - request_type
+      - requested_by_user_id
+    LicensingRequestCreate:
+      type: object
+      properties:
+        licensee_name:
+          type: string
+          maxLength: 200
+        request_type:
+          type: string
+          maxLength: 50
+        commercial_terms:
+          type: string
+      required:
+      - commercial_terms
+      - licensee_name
+      - request_type
+    LicensingReview:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/LicensingReviewStatusEnum'
+        negotiation_notes:
+          type: string
+        agreement_reference:
+          type: string
+      required:
+      - status
+    LicensingReviewStatusEnum:
+      enum:
+      - under_review
+      - negotiating
+      - agreement_recorded
+      - rejected
+      type: string
+      description: |-
+        * `under_review` - under_review
+        * `negotiating` - negotiating
+        * `agreement_recorded` - agreement_recorded
+        * `rejected` - rejected
     LiftSanction:
       type: object
       properties:
@@ -2864,6 +4412,61 @@ components:
         * `revoked` - Revoked
         * `superseded` - Superseded
         * `expired` - Expired
+    OfficeAction:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        action_type:
+          type: string
+          maxLength: 100
+        issue_date:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        details:
+          type: string
+        status:
+          type: string
+          maxLength: 32
+        requires_applicant_review:
+          type: boolean
+        draft_response:
+          type: string
+        applicant_approved:
+          type: boolean
+        extension_months:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        response_submitted_date:
+          type: string
+          format: date
+          nullable: true
+        submission_details:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action_type
+      - created_at
+      - details
+      - due_date
+      - id
+      - issue_date
+    OfficeActionExtension:
+      type: object
+      properties:
+        extension_months:
+          type: integer
+          maximum: 12
+          minimum: 1
+          default: 1
     Ok:
       type: object
       properties:
@@ -2924,6 +4527,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Application'
+    PaginatedAttorneyPanelList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttorneyPanel'
     PaginatedCompanyList:
       type: object
       required:
@@ -3085,6 +4707,393 @@ components:
       properties:
         active_role:
           type: string
+    PatentAppeal:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        applicant_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        grounds:
+          type: string
+        justification:
+          type: string
+        status:
+          type: string
+          maxLength: 32
+        outcome:
+          type: string
+          maxLength: 32
+        director_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        outcome_justification:
+          type: string
+        decided_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - applicant_user_id
+      - created_at
+      - grounds
+      - id
+      - justification
+    PatentApplicationRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        application_no:
+          type: string
+          maxLength: 64
+        title:
+          type: string
+          maxLength: 255
+        abstract:
+          type: string
+        detailed_description:
+          type: string
+        claims:
+          type: string
+        domain:
+          type: string
+          maxLength: 100
+        status:
+          $ref: '#/components/schemas/PatentApplicationReadStatusEnum'
+        applicant_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        assigned_director_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        assigned_attorney_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        director_assigned_at:
+          type: string
+          format: date-time
+          nullable: true
+        review_deadline:
+          type: string
+          format: date-time
+          nullable: true
+        revision_deadline:
+          type: string
+          format: date-time
+          nullable: true
+        jurisdiction:
+          type: string
+          maxLength: 50
+        is_international:
+          type: boolean
+        international_justification:
+          type: string
+        external_filing_id:
+          type: string
+          maxLength: 100
+        external_filing_date:
+          type: string
+          format: date
+          nullable: true
+        filing_confirmation:
+          type: string
+        format_validated:
+          type: boolean
+        grant_date:
+          type: string
+          format: date
+          nullable: true
+        patent_number:
+          type: string
+          maxLength: 100
+        is_withdrawn:
+          type: boolean
+        withdrawal_reason:
+          type: string
+        withdrawal_date:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        coinventors:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoInventor'
+          readOnly: true
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApplicationDocument'
+          readOnly: true
+        budget:
+          allOf:
+          - $ref: '#/components/schemas/PatentBudget'
+          readOnly: true
+        director_reviews:
+          type: array
+          items:
+            $ref: '#/components/schemas/DirectorReview'
+          readOnly: true
+        attorney_assignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttorneyAssignment'
+          readOnly: true
+        office_actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/OfficeAction'
+          readOnly: true
+        maintenance_records:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostGrantMaintenance'
+          readOnly: true
+      required:
+      - abstract
+      - applicant_user_id
+      - application_no
+      - attorney_assignments
+      - budget
+      - claims
+      - coinventors
+      - created_at
+      - detailed_description
+      - director_reviews
+      - documents
+      - domain
+      - id
+      - maintenance_records
+      - office_actions
+      - title
+      - updated_at
+    PatentApplicationReadStatusEnum:
+      enum:
+      - draft
+      - submitted
+      - under_review
+      - approved
+      - needs_revision
+      - resubmitted
+      - rejected
+      - expired
+      - appeal_submitted
+      - rejection_upheld
+      - remanded_for_amendment
+      - decision_modified
+      - assignment_offered
+      - attorney_assigned
+      - pending_review
+      - budget_approved
+      - budget_rejected
+      - escalated
+      - escalation_tracked
+      - pre_filing_satisfied
+      - filed
+      - office_action_recorded
+      - awaiting_applicant_approval
+      - applicant_approved
+      - response_ready
+      - response_submitted
+      - granted
+      - renewal_decision_requested
+      - renewal_approved
+      - do_not_renew
+      - renewed
+      - withdrawn
+      type: string
+      description: |-
+        * `draft` - DRAFT
+        * `submitted` - SUBMITTED
+        * `under_review` - UNDER_REVIEW
+        * `approved` - APPROVED
+        * `needs_revision` - NEEDS_REVISION
+        * `resubmitted` - RESUBMITTED
+        * `rejected` - REJECTED
+        * `expired` - EXPIRED
+        * `appeal_submitted` - APPEAL_SUBMITTED
+        * `rejection_upheld` - REJECTION_UPHELD
+        * `remanded_for_amendment` - REMANDED_FOR_AMENDMENT
+        * `decision_modified` - DECISION_MODIFIED
+        * `assignment_offered` - ASSIGNMENT_OFFERED
+        * `attorney_assigned` - ATTORNEY_ASSIGNED
+        * `pending_review` - PENDING_REVIEW
+        * `budget_approved` - BUDGET_APPROVED
+        * `budget_rejected` - BUDGET_REJECTED
+        * `escalated` - ESCALATED
+        * `escalation_tracked` - ESCALATION_TRACKED
+        * `pre_filing_satisfied` - PRE_FILING_SATISFIED
+        * `filed` - FILED
+        * `office_action_recorded` - OFFICE_ACTION_RECORDED
+        * `awaiting_applicant_approval` - AWAITING_APPLICANT_APPROVAL
+        * `applicant_approved` - APPLICANT_APPROVED
+        * `response_ready` - RESPONSE_READY
+        * `response_submitted` - RESPONSE_SUBMITTED
+        * `granted` - GRANTED
+        * `renewal_decision_requested` - RENEWAL_DECISION_REQUESTED
+        * `renewal_approved` - RENEWAL_APPROVED
+        * `do_not_renew` - DO_NOT_RENEW
+        * `renewed` - RENEWED
+        * `withdrawn` - WITHDRAWN
+    PatentBudget:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        filing_fees:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        attorney_fees:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        administrative_costs:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        total_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        status:
+          $ref: '#/components/schemas/PatentBudgetStatusEnum'
+        threshold_limit:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        decided_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          nullable: true
+        justification:
+          type: string
+      required:
+      - id
+    PatentBudgetStatusEnum:
+      enum:
+      - draft
+      - pending_approval
+      - approved
+      - rejected
+      - escalated
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `pending_approval` - Pending Approval
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `escalated` - Escalated
+    PatentLegalAdvice:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        attorney_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        stage:
+          type: string
+          maxLength: 50
+        advice_text:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - advice_text
+      - attorney_user_id
+      - created_at
+      - id
+      - stage
+    PatentabilityAssessment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        attorney_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        novelty_score:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        non_obviousness_score:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        utility_score:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        recommendation:
+          type: string
+          maxLength: 20
+        opinion_text:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - attorney_user_id
+      - created_at
+      - id
+      - opinion_text
+      - recommendation
+    PatentabilityAssessmentCreate:
+      type: object
+      properties:
+        recommendation:
+          $ref: '#/components/schemas/RecommendationEnum'
+        opinion_text:
+          type: string
+        novelty_score:
+          type: integer
+          default: 0
+        non_obviousness_score:
+          type: integer
+          default: 0
+        utility_score:
+          type: integer
+          default: 0
+      required:
+      - opinion_text
+      - recommendation
     PlacementRecordDetail:
       type: object
       description: A student's own record, with what rules 22 and 24 still want from
@@ -3145,6 +5154,142 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    PmsAuditTrail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        application_id:
+          type: integer
+          nullable: true
+          readOnly: true
+        actor_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        action_type:
+          type: string
+          maxLength: 100
+        from_state:
+          type: string
+          maxLength: 50
+        to_state:
+          type: string
+          maxLength: 50
+        details: {}
+        timestamp:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action_type
+      - application_id
+      - id
+      - timestamp
+    PmsReportResponse:
+      type: object
+      properties:
+        total_applications:
+          type: integer
+        status_distribution:
+          type: object
+          additionalProperties:
+            type: integer
+        domain_distribution:
+          type: object
+          additionalProperties:
+            type: integer
+      required:
+      - domain_distribution
+      - status_distribution
+      - total_applications
+    PostGrantMaintenance:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cycle_number:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        fee_due_date:
+          type: string
+          format: date
+        fee_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        decision_requested:
+          type: boolean
+        director_decision:
+          type: string
+          maxLength: 20
+        renewal_decided_at:
+          type: string
+          format: date-time
+          nullable: true
+        maintenance_status:
+          type: string
+          maxLength: 32
+        action_recorded_date:
+          type: string
+          format: date
+          nullable: true
+        transaction_reference:
+          type: string
+          maxLength: 100
+      required:
+      - fee_due_date
+      - id
+    PriorArtReference:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        source:
+          type: string
+          maxLength: 100
+        reference_id:
+          type: string
+          maxLength: 100
+        title:
+          type: string
+          maxLength: 300
+        authors:
+          type: string
+          maxLength: 300
+        relevance:
+          type: string
+          maxLength: 20
+        notes:
+          type: string
+        attached_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - attached_by_user_id
+      - created_at
+      - id
+      - reference_id
+      - source
+      - title
+    PriorArtSearchResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items: {}
+      required:
+      - results
     ProfileDocument:
       type: object
       description: |-
@@ -3220,6 +5365,48 @@ components:
       - message
       - rule
       - sanction
+    RecommendationEnum:
+      enum:
+      - File Patent
+      - Do Not File
+      - Needs Amendment
+      type: string
+      description: |-
+        * `File Patent` - File Patent
+        * `Do Not File` - Do Not File
+        * `Needs Amendment` - Needs Amendment
+    RecordFiling:
+      type: object
+      properties:
+        external_filing_id:
+          type: string
+          maxLength: 100
+        external_filing_date:
+          type: string
+          format: date
+        filing_confirmation:
+          type: string
+        is_international:
+          type: boolean
+          default: false
+        international_justification:
+          type: string
+      required:
+      - external_filing_date
+      - external_filing_id
+      - filing_confirmation
+    RecordGrant:
+      type: object
+      properties:
+        patent_number:
+          type: string
+          maxLength: 100
+        grant_date:
+          type: string
+          format: date
+      required:
+      - grant_date
+      - patent_number
     RecordIncident:
       type: object
       properties:
@@ -3251,6 +5438,36 @@ components:
         * `consent_failure` - consent_failure
         * `code_of_conduct` - code_of_conduct
         * `misrepresentation` - misrepresentation
+    RecordMaintenanceAction:
+      type: object
+      properties:
+        transaction_reference:
+          type: string
+          maxLength: 100
+      required:
+      - transaction_reference
+    RecordOfficeAction:
+      type: object
+      properties:
+        action_type:
+          type: string
+          maxLength: 100
+        issue_date:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        details:
+          type: string
+        requires_applicant_review:
+          type: boolean
+          default: true
+      required:
+      - action_type
+      - details
+      - due_date
+      - issue_date
     RecruiterAccept:
       type: object
       properties:
@@ -3466,6 +5683,55 @@ components:
       - message
       - reason
       - route
+    RespondAttorneyAssignment:
+      type: object
+      properties:
+        accept:
+          type: boolean
+        decline_reason:
+          type: string
+      required:
+      - accept
+    ReviewAppeal:
+      type: object
+      properties:
+        outcome:
+          $ref: '#/components/schemas/ReviewAppealOutcomeEnum'
+        outcome_justification:
+          type: string
+      required:
+      - outcome
+      - outcome_justification
+    ReviewAppealOutcomeEnum:
+      enum:
+      - Uphold Rejection
+      - Remand for Amendment
+      - Modify Decision
+      type: string
+      description: |-
+        * `Uphold Rejection` - Uphold Rejection
+        * `Remand for Amendment` - Remand for Amendment
+        * `Modify Decision` - Modify Decision
+    ReviseApplication:
+      type: object
+      properties:
+        feedback_response:
+          type: string
+        title:
+          type: string
+        abstract:
+          type: string
+        detailed_description:
+          type: string
+        claims:
+          type: string
+        documents:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - feedback_response
     RoundOutcome:
       type: object
       properties:
@@ -3691,6 +5957,49 @@ components:
       required:
       - available
       - season
+    SubmitApplicationWrite:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        abstract:
+          type: string
+        detailed_description:
+          type: string
+        claims:
+          type: string
+        domain:
+          type: string
+          maxLength: 100
+        jurisdiction:
+          type: string
+          default: IN
+          maxLength: 50
+        is_international:
+          type: boolean
+          default: false
+        international_justification:
+          type: string
+        preferred_attorney_id:
+          type: integer
+          nullable: true
+        coinventors:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        documents:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - abstract
+      - claims
+      - detailed_description
+      - domain
+      - title
     SubmitOfferLetter:
       type: object
       properties:
@@ -3698,6 +6007,36 @@ components:
           type: integer
       required:
       - document_id
+    SubmitOfficeActionResponse:
+      type: object
+      properties:
+        submission_details:
+          type: string
+      required:
+      - submission_details
+    SubmitReview:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/SubmitReviewDecisionEnum'
+        justification:
+          type: string
+          minLength: 50
+        feedback:
+          type: string
+      required:
+      - decision
+      - justification
+    SubmitReviewDecisionEnum:
+      enum:
+      - Approve
+      - Reject
+      - Needs Revision
+      type: string
+      description: |-
+        * `Approve` - Approve
+        * `Reject` - Reject
+        * `Needs Revision` - Needs Revision
     TopicEnum:
       enum:
       - drive
@@ -3769,6 +6108,30 @@ components:
       - application_id
       - redacted
       - results
+    UploadDocument:
+      type: object
+      properties:
+        doc_type:
+          type: string
+          maxLength: 50
+        title:
+          type: string
+          maxLength: 200
+        filename:
+          type: string
+          maxLength: 200
+        file_size_bytes:
+          type: integer
+        sensitivity:
+          type: string
+          default: confidential
+        file_url:
+          type: string
+      required:
+      - doc_type
+      - file_size_bytes
+      - filename
+      - title
     UserRef:
       type: object
       properties:
@@ -3828,6 +6191,13 @@ components:
         reason:
           type: string
           maxLength: 300
+      required:
+      - reason
+    WithdrawApplication:
+      type: object
+      properties:
+        reason:
+          type: string
       required:
       - reason
   securitySchemes:
