@@ -12,10 +12,16 @@ include_external_packages = True
 name = Modules may reach each other ONLY through contracts.py
 type = forbidden
 source_modules =
+    modules.courses
     modules.placement
     modules.directory
     modules.accesscontrol
 forbidden_modules =
+    modules.courses.models
+    modules.courses.services
+    modules.courses.selectors
+    modules.courses.api
+    modules.courses.domain
     modules.placement.models
     modules.placement.services
     modules.placement.selectors
@@ -38,6 +44,7 @@ type = forbidden
 source_modules =
 # Every module's domain, not just the first one written.
     modules.placement.domain
+    modules.courses.domain
 forbidden_modules =
     django
     rest_framework
@@ -66,3 +73,13 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+
+[importlinter:contract:courses-layers]
+name = Layering inside courses
+type = layers
+layers =
+    modules.courses.api
+    modules.courses.services
+    modules.courses.selectors
+    modules.courses.models
+    modules.courses.domain
