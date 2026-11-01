@@ -13,6 +13,28 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave.application.view_self` | See one's own leave requests | `Assistant Professor`, `Associate Professor`, `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Junior Assistant`, `Professor`, `Registrar`, `Senior Assistant`, `Upper Division Clerk`, `acadadmin` |
+| `leave.application.view` | See every leave request, within scope | `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `acadadmin` |
+| `leave.application.create` | Apply for leave | `Assistant Professor`, `Associate Professor`, `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Junior Assistant`, `Professor`, `Registrar`, `Senior Assistant`, `Upper Division Clerk`, `acadadmin` |
+| `leave.application.withdraw` | Withdraw a pending request | `Assistant Professor`, `Associate Professor`, `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Junior Assistant`, `Professor`, `Registrar`, `Senior Assistant`, `Upper Division Clerk`, `acadadmin` |
+| `leave.application.cancel` | Request cancellation of approved leave | `Assistant Professor`, `Associate Professor`, `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Junior Assistant`, `Professor`, `Registrar`, `Senior Assistant`, `Upper Division Clerk`, `acadadmin` |
+| `leave.application.extend` | Request an extension of ongoing leave | `Assistant Professor`, `Associate Professor`, `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Junior Assistant`, `Professor`, `Registrar`, `Senior Assistant`, `Upper Division Clerk`, `acadadmin` |
+| `leave.substitute.respond` | Accept or decline a nominated substitution | `Assistant Professor`, `Associate Professor`, `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Junior Assistant`, `Professor`, `Registrar`, `Senior Assistant`, `Upper Division Clerk`, `acadadmin` |
+| `leave.substitute.nominate` | Nominate a replacement substitute | `Assistant Professor`, `Associate Professor`, `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Junior Assistant`, `Professor`, `Registrar`, `Senior Assistant`, `Upper Division Clerk`, `acadadmin` |
+| `leave.request.review` | Review at Unit Head and record a recommendation | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)` |
+| `leave.request.route` | Verify and route a higher-sanction request | `Deputy Registrar` |
+| `leave.request.approve` | Take the final sanctioning decision | `Dean Academic`, `Director`, `Registrar` |
+| `leave.resumption.submit` | Submit a resumption of duty | `Assistant Professor`, `Associate Professor`, `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Junior Assistant`, `Professor`, `Registrar`, `Senior Assistant`, `Upper Division Clerk`, `acadadmin` |
+| `leave.resumption.review` | Review a submitted resumption | `Dean Academic`, `Director`, `Registrar` |
+| `leave.balance.view` | See one's own leave balances | `Assistant Professor`, `Associate Professor`, `Dean Academic`, `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Junior Assistant`, `Professor`, `Registrar`, `Senior Assistant`, `Upper Division Clerk`, `acadadmin` |
+| `leave.calendar.manage` | Maintain and publish the holiday/RH calendar | `acadadmin` |
+| `leave.policy.manage` | Maintain leave policy and hierarchy configuration | `acadadmin` |
+| `leave.record.manage` | Maintain leave records and enter offline leave | `acadadmin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
