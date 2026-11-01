@@ -1,0 +1,316 @@
+# Gymkhana Business Rule Specifications (v1.1 SYNCHRONIZED)
+
+## BR-GYM-001: Valid Student Leadership
+
+- **Rule Type**: Validation
+- **Rule Statement**: Club coordinator, co-coordinator, and replacement leaders must reference valid students.
+- **Applies To**: Club creation; leadership change
+- **Condition / Trigger**: Whenever a student leadership assignment is made
+- **Required Outcome / Constraint**: Reject/stop the operation if the selected leader is not a valid student.
+- **Exceptions / Exclusions**: None defined
+- **Source / Rationale**: Corrected PS + prior BR001 + accepted baseline
+- **Related UCs**: UC-GYM-001, UC-GYM-008
+- **Related WFs**: BW-GYM-03
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-002: Valid Club Faculty Councillor
+
+- **Rule Type**: Validation
+- **Rule Statement**: A Club Faculty Councillor used by the module must reference a valid faculty member.
+- **Applies To**: Club creation; event context
+- **Condition / Trigger**: Whenever a faculty councillor is assigned/used
+- **Required Outcome / Constraint**: Reject/stop the operation if the selected faculty member is invalid.
+- **Exceptions / Exclusions**: None defined
+- **Source / Rationale**: Corrected PS + prior BR002
+- **Related UCs**: UC-GYM-001, UC-GYM-003
+- **Related WFs**: BW-GYM-03
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-003: Allowed Club Categories
+
+- **Rule Type**: Constraint
+- **Rule Statement**: Club category is limited to Technical, Sports, or Cultural.
+- **Applies To**: Club creation
+- **Condition / Trigger**: On category selection
+- **Required Outcome / Constraint**: Accept only the allowed category values.
+- **Exceptions / Exclusions**: None defined
+- **Source / Rationale**: Corrected PS + prior BR020
+- **Related UCs**: UC-GYM-001
+- **Related WFs**: BW-GYM-03
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-004: Club Confirmation Lifecycle
+
+- **Rule Type**: Lifecycle
+- **Rule Statement**: A new club is open; Student Admin approval changes an open club to confirmed.
+- **Applies To**: Club lifecycle
+- **Condition / Trigger**: Club creation / approval
+- **Required Outcome / Constraint**: Creation results in open; successful approval results in confirmed.
+- **Exceptions / Exclusions**: No rejection transition is specified in the current baseline.
+- **Source / Rationale**: Accepted user clarification + corrected PS
+- **Related UCs**: UC-GYM-001, UC-GYM-011
+- **Related WFs**: BW-GYM-03
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-005: Valid Booking Time Range
+
+- **Rule Type**: Validation
+- **Rule Statement**: A session/event start time must be earlier than its end time.
+- **Applies To**: Session and event booking
+- **Condition / Trigger**: On booking submission
+- **Required Outcome / Constraint**: Reject the booking if start time is not before end time.
+- **Exceptions / Exclusions**: None defined
+- **Source / Rationale**: Corrected PS + prior BR004
+- **Related UCs**: UC-GYM-002, UC-GYM-003
+- **Related WFs**: N/A
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-006: Cross-Type Venue Exclusivity
+
+- **Rule Type**: Constraint
+- **Rule Statement**: No session or event may overlap any existing session or event in the same venue on the same date.
+- **Applies To**: Session and event booking
+- **Condition / Trigger**: On booking submission
+- **Required Outcome / Constraint**: Reject any session-session, event-event, or session-event overlap.
+- **Exceptions / Exclusions**: None defined
+- **Source / Rationale**: Accepted user clarification; corrected PS; prior BR003 strengthened
+- **Related UCs**: UC-GYM-002, UC-GYM-003
+- **Related WFs**: N/A
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-007: Membership Requires Confirmed Club
+
+- **Rule Type**: Eligibility
+- **Rule Statement**: A student may apply for membership only in a confirmed club.
+- **Applies To**: Membership application
+- **Condition / Trigger**: When an application is initiated
+- **Required Outcome / Constraint**: Permit application only when the selected club is confirmed.
+- **Exceptions / Exclusions**: None defined
+- **Source / Rationale**: Existing UC004 precondition + corrected PS
+- **Related UCs**: UC-GYM-004
+- **Related WFs**: BW-GYM-01
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-008: Multiple Different-Club Applications Allowed
+
+- **Rule Type**: Entitlement
+- **Rule Statement**: A student may apply to multiple different clubs.
+- **Applies To**: Membership application
+- **Condition / Trigger**: When the student applies to another club
+- **Required Outcome / Constraint**: Do not block an application solely because the student has an application/membership in a different club.
+- **Exceptions / Exclusions**: Duplicate same-club application is governed by BR-GYM-009.
+- **Source / Rationale**: Prior BR005 + corrected PS
+- **Related UCs**: UC-GYM-004
+- **Related WFs**: BW-GYM-01
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-009: No Duplicate Same-Club Application
+
+- **Rule Type**: Constraint
+- **Rule Statement**: A student may not submit a duplicate membership application to the same club.
+- **Applies To**: Membership application
+- **Condition / Trigger**: On membership submission
+- **Required Outcome / Constraint**: Reject the duplicate and leave membership state unchanged.
+- **Exceptions / Exclusions**: Applications to other clubs remain allowed.
+- **Source / Rationale**: Prior BR006 + corrected PS
+- **Related UCs**: UC-GYM-004
+- **Related WFs**: BW-GYM-01
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-010: Club Head Authorization
+
+- **Rule Type**: Authorization
+- **Rule Statement**: Only the applicable club coordinator or co-coordinator may perform Club Head operations for that club.
+- **Applies To**: Club Head operations
+- **Condition / Trigger**: Whenever a Club Head operation is invoked
+- **Required Outcome / Constraint**: Authorize only the applicable coordinator/co-coordinator.
+- **Exceptions / Exclusions**: None defined
+- **Source / Rationale**: Prior BR007 generalized to accepted Club Head actor
+- **Related UCs**: UC-GYM-002, UC-GYM-003, UC-GYM-005, UC-GYM-006, UC-GYM-008, UC-GYM-009, UC-GYM-010
+- **Related WFs**: BW-GYM-01, BW-GYM-02
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-011: Membership Approval Transition
+
+- **Rule Type**: Lifecycle
+- **Rule Statement**: Approving an open club-membership application changes its status to confirmed.
+- **Applies To**: Membership approval
+- **Condition / Trigger**: On successful approval
+- **Required Outcome / Constraint**: Set the selected application from open to confirmed and retain optional remarks.
+- **Exceptions / Exclusions**: No reject/cancel transition is included in the current baseline.
+- **Source / Rationale**: Accepted clarification + prior BR008
+- **Related UCs**: UC-GYM-005
+- **Related WFs**: BW-GYM-01
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-012: Minimum Poll Choices
+
+- **Rule Type**: Validation
+- **Rule Statement**: A voting poll must have at least two choices.
+- **Applies To**: Poll creation
+- **Condition / Trigger**: On poll submission
+- **Required Outcome / Constraint**: Do not create a poll with fewer than two choices.
+- **Exceptions / Exclusions**: None defined
+- **Source / Rationale**: Prior BR009
+- **Related UCs**: UC-GYM-006
+- **Related WFs**: BW-GYM-02
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-013: Poll Targeting
+
+- **Rule Type**: Routing
+- **Rule Statement**: A poll is addressed only to the student groups selected by batch and branch.
+- **Applies To**: Poll creation and access
+- **Condition / Trigger**: On poll creation/access
+- **Required Outcome / Constraint**: Determine the intended recipients from the selected batch/branch groups and use that audience for notification/access.
+- **Exceptions / Exclusions**: Branch selection may represent all branches where supported.
+- **Source / Rationale**: Prior BR010 normalized from JSON implementation detail
+- **Related UCs**: UC-GYM-006, UC-GYM-007
+- **Related WFs**: BW-GYM-02
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-014: Active Poll Eligibility
+
+- **Rule Type**: Eligibility
+- **Rule Statement**: A student may participate only in an active, unexpired poll for which the student belongs to the selected target audience.
+- **Applies To**: Poll access/voting
+- **Condition / Trigger**: When poll details or vote submission is requested
+- **Required Outcome / Constraint**: Allow participation only when the poll is active and the student is eligible.
+- **Exceptions / Exclusions**: None defined
+- **Source / Rationale**: Existing UC007 preconditions + corrected PS
+- **Related UCs**: UC-GYM-007
+- **Related WFs**: BW-GYM-02
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-015: One Vote per Student per Poll
+
+- **Rule Type**: Constraint
+- **Rule Statement**: A student may cast at most one vote in the same poll.
+- **Applies To**: Voting
+- **Condition / Trigger**: On vote submission
+- **Required Outcome / Constraint**: Reject a second vote by the same student in the same poll.
+- **Exceptions / Exclusions**: None defined
+- **Source / Rationale**: Prior BR011 + corrected PS
+- **Related UCs**: UC-GYM-007
+- **Related WFs**: BW-GYM-02
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-016: Leadership Succession
+
+- **Rule Type**: Lifecycle
+- **Rule Statement**: When club coordinator/co-coordinator assignments change, superseded active leadership assignments must no longer remain current.
+- **Applies To**: Leadership change
+- **Condition / Trigger**: On successful leadership change
+- **Required Outcome / Constraint**: Record the new current leaders and retire/remove the superseded current designations.
+- **Exceptions / Exclusions**: Historical retention, if any, is an implementation concern not specified here.
+- **Source / Rationale**: Prior BR013/BR014 normalized
+- **Related UCs**: UC-GYM-008
+- **Related WFs**: N/A
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-017: Non-Negative Club Budget
+
+- **Rule Type**: Validation
+- **Rule Statement**: A submitted club budget amount must be zero or greater.
+- **Applies To**: Club budget request
+- **Condition / Trigger**: On budget request submission
+- **Required Outcome / Constraint**: Reject a request with a negative amount.
+- **Exceptions / Exclusions**: None defined
+- **Source / Rationale**: Prior BR015 + corrected PS
+- **Related UCs**: UC-GYM-009
+- **Related WFs**: N/A
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-018: Budget Supporting File Required
+
+- **Rule Type**: Validation
+- **Rule Statement**: A club budget request must include its required supporting file.
+- **Applies To**: Club budget request
+- **Condition / Trigger**: On budget request submission
+- **Required Outcome / Constraint**: Reject a request with the required file missing.
+- **Exceptions / Exclusions**: None defined
+- **Source / Rationale**: Prior BR016 + corrected PS
+- **Related UCs**: UC-GYM-009
+- **Related WFs**: N/A
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-019: Event Report File Required
+
+- **Rule Type**: Validation
+- **Rule Statement**: A club event report must include its report/details file.
+- **Applies To**: Event report submission
+- **Condition / Trigger**: On report submission
+- **Required Outcome / Constraint**: Reject a report submission with the required report file missing.
+- **Exceptions / Exclusions**: None defined
+- **Source / Rationale**: Prior BR017 + corrected PS
+- **Related UCs**: UC-GYM-010
+- **Related WFs**: N/A
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-020: Configured Venue Required
+
+- **Rule Type**: Validation
+- **Rule Statement**: A session/event booking must use a venue configured for Gymkhana booking.
+- **Applies To**: Session and event booking
+- **Condition / Trigger**: On venue selection/submission
+- **Required Outcome / Constraint**: Accept only a configured venue value.
+- **Exceptions / Exclusions**: None defined
+- **Source / Rationale**: Corrected PS constraint from existing Constants.venue evidence
+- **Related UCs**: UC-GYM-002, UC-GYM-003
+- **Related WFs**: N/A
+- **Status / Notes**: Synchronized
+
+---
+
+## BR-GYM-021: Faculty Report Review Authorization
+
+- **Rule Type**: Authorization
+- **Rule Statement**: A Club Faculty Councillor may review/access submitted reports only for the club to which the councillor is assigned.
+- **Applies To**: Event report review
+- **Condition / Trigger**: When a report is opened for review
+- **Required Outcome / Constraint**: Allow access only when the authenticated faculty member is the assigned Club Faculty Councillor for that club.
+- **Exceptions / Exclusions**: No approval/rejection outcome is specified.
+- **Source / Rationale**: Accepted user clarification + corrected PS
+- **Related UCs**: UC-GYM-012
+- **Related WFs**: N/A
+- **Status / Notes**: Synchronized
+
+---
