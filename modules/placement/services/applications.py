@@ -13,7 +13,10 @@ from __future__ import annotations
 import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Dict, Optional
 
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
 
@@ -339,3 +342,54 @@ def bulk_transition(*, application_ids: Sequence[int], to_status: str, actor,
              to_status, moved, len(outcomes) - moved,
              getattr(actor, "user_id", None))
     return outcomes
+
+
+# -- Submit an application ---------------------------------------------------
+def submit_application(user_id: int, posting_id: int, facts: Dict[str, Any]) -> Application:
+    """Submit an application for a job posting.
+
+    Args:
+        user_id: The ID of the user applying.
+        posting_id: The ID of the job posting.
+        facts: The facts about the user.
+
+    Returns:
+        The created Application.
+
+    Raises:
+        ValidationError: If the application is ineligible or a duplicate.
+    """
+    posting = JobPosting.objects.filter(pk=posting_id).first()
+    if posting is None:
+        raise NotFoundError("No such posting.")
+    if posting.status != "published" or (posting.closes_at and timezone.now() > posting.closes_at):
+        raise ValidationError("The posting is not open for applications.")
+
+    policy = PlacementPolicy.objects.filter(season=posting.placement_year).first()
+    if policy is None:
+        raise ConflictError(
+            f"No placement policy is configured for {posting.placement_year}.",
+            code="policy_missing")
+
+    eligibility, error = evaluate_student_eligibility(facts, posting.criteria)
+    if not eligibility:
+        raise ValidationError(error)
+
+    if Application.objects.filter(posting=posting, user_id=user_id).exists():
+        raise ValidationError("You have already applied to this posting.")
+
+    application = Application.objects.create(
+        posting=posting, user_id=user_id, status=sm.DRAFT,
+        cpi_at_apply=facts.get("cpi"),
+        semester_at_apply=facts.get("semester"),
+        standing_declared_seq_at_apply=facts.get("declared_seq"),
+        eligibility_snapshot=facts,
+    )
+
+    transition(application_id=application.pk, to_status=sm.SUBMITTED, actor=None)
+
+    notifications.enqueue(
+        event='application_submitted', user_id=user_id, context={'posting': posting.title}
+    )
+
+    return application
