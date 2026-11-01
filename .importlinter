@@ -15,6 +15,7 @@ source_modules =
     modules.placement
     modules.directory
     modules.accesscontrol
+    modules.complaints
 forbidden_modules =
     modules.placement.models
     modules.placement.services
@@ -25,6 +26,9 @@ forbidden_modules =
     modules.directory.services
     modules.directory.api
     modules.accesscontrol.models
+    modules.complaints.models
+    modules.complaints.services
+    modules.complaints.api
 # DIRECT imports only. contracts.py legitimately imports its OWN module's
 # models and services, so following the chain transitively would make this
 # contract impossible to satisfy. What we forbid is a module reaching straight
@@ -66,3 +70,11 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+
+[importlinter:contract:complaints-layers]
+name = Layering inside complaints
+type = layers
+layers =
+    modules.complaints.api
+    modules.complaints.services
+    modules.complaints.models

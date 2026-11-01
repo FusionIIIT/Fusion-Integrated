@@ -7,6 +7,12 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `complaints`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `complaints.complaint.create` | Submit a complaint | `faculty`, `staff`, `student` |
+
 ## `directory`
 
 | Code | What it allows | Held by |

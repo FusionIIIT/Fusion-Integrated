@@ -91,6 +91,7 @@ PLATFORM_MODULES = [
 DOMAIN_MODULES = [
     "modules.placement",
     "modules.elm",
+    "modules.complaints",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -188,6 +189,16 @@ PLACEMENT_UPLOAD_ROOT = env(
     str(Path.home() / ".local" / "share" / "fusion-integrated" / "uploads"))
 #: When set, legacy reads go to nginx via X-Accel-Redirect. Must be `internal;`.
 PLACEMENT_UPLOAD_INTERNAL_PREFIX = env("PLACEMENT_UPLOAD_INTERNAL_PREFIX", "")
+
+COMPLAINT_ATTACHMENT_ROOT = env(
+    "COMPLAINT_ATTACHMENT_ROOT",
+    str(Path.home() / ".local" / "share" / "fusion-integrated" / "complaints"))
+COMPLAINT_ATTACHMENT_MAX_BYTES = env_int("COMPLAINT_ATTACHMENT_MAX_BYTES")
+COMPLAINT_ATTACHMENT_MAX_COUNT = env_int("COMPLAINT_ATTACHMENT_MAX_COUNT")
+COMPLAINT_ATTACHMENT_CONTENT_TYPES = tuple(env_list(
+    "COMPLAINT_ATTACHMENT_CONTENT_TYPES"))
+COMPLAINT_NOTIFICATION_MAX_ATTEMPTS = env_int(
+    "COMPLAINT_NOTIFICATION_MAX_ATTEMPTS", 5)
 
 # No multipart endpoints remain, so this only caps the JSON body.
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
