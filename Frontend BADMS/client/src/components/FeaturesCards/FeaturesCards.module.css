@@ -1,0 +1,53 @@
+.title {
+    font-size: 34px;
+    /* Replaced rem(34px) with a direct value */
+    font-weight: 900;
+
+    @media (max-width: 768px) {
+        /* Replaced $mantine-breakpoint-sm with 768px */
+        font-size: 24px;
+        /* Replaced rem(24px) with a direct value */
+    }
+}
+
+.description {
+    max-width: 600px;
+    /* Replaced rem(600px) with a direct value */
+    margin: auto;
+
+    /* Fixed the &::after by explicitly using the class */
+    position: relative;
+}
+
+.description::after {
+    content: '';
+    display: block;
+    background-color: var(--mantine-color-blue-filled);
+    width: 45px;
+    /* Replaced rem(45px) with a direct value */
+    height: 2px;
+    /* Replaced rem(2px) with a direct value */
+    margin-top: var(--mantine-spacing-sm);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.card {
+    border: 1px solid var(--mantine-color-gray-1);
+    /* If you want to support dark mode, handle it via separate media queries or classes */
+}
+
+.cardTitle {
+    position: relative;
+}
+
+.cardTitle::after {
+    content: '';
+    display: block;
+    background-color: var(--mantine-color-blue-filled);
+    width: 45px;
+    /* Replaced rem(45px) with a direct value */
+    height: 2px;
+    /* Replaced rem(2px) with a direct value */
+    margin-top: var(--mantine-spacing-sm);
+}
