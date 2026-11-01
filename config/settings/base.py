@@ -62,10 +62,13 @@ SECRET_KEY = env("DJANGO_SECRET_KEY", "django-insecure-dev-only-change-me")
 DEBUG = False
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", ["localhost", "127.0.0.1"])
 
-# django.contrib.auth is here because DRF needs it; fusion_auth authenticates.
+# FIX: Added django.contrib.admin, django.contrib.sessions, and django.contrib.messages
 DJANGO_APPS = [
-    "django.contrib.contenttypes",
+    "django.contrib.admin",
     "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
 
@@ -88,8 +91,10 @@ PLATFORM_MODULES = [
 ]
 
 # See docs/03-platform/module-authoring-guide.md to add one.
+# FIX: Added modules.hr_eis to DOMAIN_MODULES
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.hr_eis",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -100,11 +105,12 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "core.observability.middleware.RequestIDMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
     # X_FRAME_OPTIONS is inert without this; only this middleware emits it.
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
-# No CsrfViewMiddleware: core/api/csrf.py does it from the authentication classes.
 
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
@@ -114,11 +120,17 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [],
         "APP_DIRS": True,
-        "OPTIONS": {"context_processors": []},
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ]
+        },
     }
 ]
 
-# One database, owned by this service; person data comes from modules.directory.
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -127,16 +139,13 @@ DATABASES = {
         "PASSWORD": env("DB_PASSWORD", ""),
         "HOST": env("DB_HOST", "127.0.0.1"),
         "PORT": env("DB_PORT", "5432"),
-        # MUST stay 0 under PgBouncer transaction pooling, which leaks session state.
         "CONN_MAX_AGE": env_int("DB_CONN_MAX_AGE", 0),
     }
 }
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-#: How long a cached directory row may be trusted before it is refetched.
 DIRECTORY_MAX_AGE_SECONDS = env_int("DIRECTORY_MAX_AGE_SECONDS", 6 * 60 * 60)
 
-# The IAM. This service is a client of it and caches nothing it cannot rebuild.
 IAM_BASE_URL = env("IAM_BASE_URL", "http://127.0.0.1:8001")
 IAM_API_PREFIX = env("IAM_API_PREFIX", "/api")
 IAM_SERVICE_TOKEN = env("IAM_SERVICE_TOKEN", "")
@@ -163,7 +172,6 @@ CELERY_TASK_ALWAYS_EAGER = env_bool("CELERY_TASK_ALWAYS_EAGER", False)
 CELERY_TASK_ACKS_LATE = True
 CELERY_TASK_REJECT_ON_WORKER_LOST = True
 
-# Console by default, so a laptop never mails 3,000 students by accident.
 EMAIL_BACKEND = env("DJANGO_EMAIL_BACKEND",
                     "django.core.mail.backends.console.EmailBackend")
 EMAIL_HOST = env("EMAIL_HOST", "localhost")
@@ -174,21 +182,15 @@ EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", False)
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL",
                          "Placement Cell <placement@iiitdmj.ac.in>")
 
-#: Ceiling per worker pass, so a runaway loop cannot mail the institute.
 NOTIFY_MAX_PER_RUN = env_int("NOTIFY_MAX_PER_RUN", 500)
-#: Attempts before a notification is parked as failed for a human to look at.
 NOTIFY_MAX_ATTEMPTS = env_int("NOTIFY_MAX_ATTEMPTS", 5)
-#: A dozen events a day is legitimate during a drive; thirty is a bug.
 NOTIFY_DAILY_CAP_PER_RECIPIENT = env_int("NOTIFY_DAILY_CAP_PER_RECIPIENT", 20)
 
-#: Pre-Drive uploads, still served but never written; outside BASE_DIR or boot fails.
 PLACEMENT_UPLOAD_ROOT = env(
     "PLACEMENT_UPLOAD_ROOT",
     str(Path.home() / ".local" / "share" / "fusion-integrated" / "uploads"))
-#: When set, legacy reads go to nginx via X-Accel-Redirect. Must be `internal;`.
 PLACEMENT_UPLOAD_INTERNAL_PREFIX = env("PLACEMENT_UPLOAD_INTERNAL_PREFIX", "")
 
-# No multipart endpoints remain, so this only caps the JSON body.
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
 
 REST_FRAMEWORK = {
@@ -204,11 +206,8 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "core.api.exceptions.exception_handler",
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "UNAUTHENTICATED_USER": None,
-    # Unset, DRF throttles on the whole client-controlled X-Forwarded-For.
     "NUM_PROXIES": env_int("DJANGO_NUM_PROXIES", 1),
-    # Not DRF's ScopedRateThrottle: it keys on request.user.pk, absent here.
     "DEFAULT_THROTTLE_CLASSES": ["core.api.throttling.PrincipalScopedThrottle"],
-    # Only endpoints opting in via `throttle_scope` are limited.
     "DEFAULT_THROTTLE_RATES": {
         "recruiter_login": "5/min",
         "recruiter_invite_accept": "10/hour",
@@ -219,7 +218,6 @@ REST_FRAMEWORK = {
     },
 }
 
-# Recruiter passwords only; PBKDF2 verifies an older hash, then upgrades it.
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.Argon2PasswordHasher",
     "django.contrib.auth.hashers.PBKDF2PasswordHasher",
@@ -238,7 +236,6 @@ CORS_ALLOW_CREDENTIALS = True
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Asia/Kolkata"
-# After TIME_ZONE, which it reads, or a crontab entry fires at the wrong hour.
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_ENABLE_UTC = True
 USE_I18N = True
@@ -248,14 +245,10 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
-# SAMEORIGIN, not DENY: Fusion-client embeds these screens, same origin in prod.
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
-# W003: CSRF is enforced by core/api/csrf.py. See the note above MIDDLEWARE.
-# W019: the portal frames these screens deliberately, and only same origin.
 SILENCED_SYSTEM_CHECKS = ["security.W003", "security.W019"]
 
-# Without this, nothing is configured and every INFO audit line is discarded.
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -270,7 +263,6 @@ LOGGING = {
     },
     "root": {"handlers": ["console"], "level": "WARNING"},
     "loggers": {
-        # Raise the level to quiet a host down; do not remove the handler.
         "fusion": {"level": env("FUSION_LOG_LEVEL", "INFO"), "propagate": True},
     },
 }
