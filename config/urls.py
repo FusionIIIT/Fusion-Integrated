@@ -4,6 +4,7 @@ Every module mounts itself under /api/v1/<module>/. A module that is not in
 INSTALLED_APPS contributes no URLs at all — that is what "independent" means
 here: removing a module is deleting a directory and one settings line.
 """
+
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
@@ -11,6 +12,7 @@ import core.api.schema  # noqa: F401  registers the auth schemes by import
 from core.api.health import healthz, readyz
 
 urlpatterns = [
+    path("api/v1/hreis/", include("modules.hreis.api.urls")),
     path("healthz", healthz, name="healthz"),
     path("readyz", readyz, name="readyz"),
     path("api/v1/", include("fusion_auth.urls")),

@@ -13,6 +13,21 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `hreis`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `hreis.records.view` | View Employee Records | `Accountant`, `Director`, `Employee`, `HOD`, `HR Administrator`, `Registrar`, `faculty`, `staff` |
+| `hreis.records.manage` | Manage Employee Records | `HR Administrator` |
+| `hreis.config.manage` | Manage Configuration | `HR Administrator` |
+| `hreis.requests.submit` | Submit Request | `Accountant`, `Director`, `Employee`, `HOD`, `HR Administrator`, `Registrar`, `faculty`, `staff` |
+| `hreis.requests.view` | View Requests | `Accountant`, `Director`, `Employee`, `HOD`, `HR Administrator`, `Registrar`, `faculty`, `staff` |
+| `hreis.requests.decide` | Decide Request | `Director`, `HOD`, `Registrar` |
+| `hreis.claims.verify` | Verify Claims | `HR Administrator` |
+| `hreis.claims.settle` | Settle Claims | `Accountant` |
+| `hreis.audit.view` | View Audit Logs | `HR Administrator` |
+| `hreis.notifications.view` | View Notifications | `Accountant`, `Director`, `Employee`, `HOD`, `HR Administrator`, `Registrar`, `faculty`, `staff` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
