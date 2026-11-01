@@ -15,6 +15,9 @@ OFFER_EXTENDED = "offer_extended"
 OFFER_ACCEPTED = "offer_accepted"
 OFFER_DECLINED = "offer_declined"
 REJECTED = "rejected"
+WITHDRAWN = "withdrawn"
+DRAFT = "draft"
+AUTO_WITHDRAWN = "auto_withdrawn"
 
 TERMINAL = frozenset({REJECTED, OFFER_ACCEPTED, OFFER_DECLINED})
 IN_FLIGHT = frozenset({APPLIED, SHORTLISTED, INTERVIEW_SCHEDULED, OFFER_EXTENDED})
@@ -139,7 +142,7 @@ def allowed_targets(frm: str, actor_kind: str | None = None) -> list[str]:
 
 class ApplicationState:
     def __init__(self, state: str):
-        if state not in (APPLIED, SHORTLISTED, INTERVIEW_SCHEDULED, OFFER_EXTENDED, OFFER_ACCEPTED, OFFER_DECLINED, REJECTED):
+        if state not in (APPLIED, SHORTLISTED, INTERVIEW_SCHEDULED, OFFER_EXTENDED, OFFER_ACCEPTED, OFFER_DECLINED, REJECTED, WITHDRAWN, DRAFT, AUTO_WITHDRAWN):
             raise ValueError(f"Invalid application state: {state}")
         self.state = state
 
