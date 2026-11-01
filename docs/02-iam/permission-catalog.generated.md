@@ -13,6 +13,32 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `iwd`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `iwd.complaint.create` | Submit a maintenance complaint | `Dean`, `Department Head`, `Director`, `faculty`, `iwd_admin`, `iwd_engineer`, `staff` |
+| `iwd.complaint.view_self` | View own submitted maintenance complaints | `Dean`, `Department Head`, `Director`, `faculty`, `iwd_admin`, `iwd_engineer`, `staff` |
+| `iwd.complaint.view` | View maintenance complaints within authorized scope | `Dean`, `Department Head`, `Director`, `accounts_officer`, `auditor`, `iwd_admin`, `iwd_engineer` |
+| `iwd.feedback.create` | Submit feedback and rating for resolved maintenance work | `Dean`, `Department Head`, `Director`, `faculty`, `iwd_admin`, `iwd_engineer`, `staff` |
+| `iwd.feedback.view` | View recorded maintenance feedback and ratings | `Dean`, `Department Head`, `Director`, `iwd_admin` |
+| `iwd.complaint.assess` | Assess assigned complaint and prepare repair estimate | `iwd_engineer` |
+| `iwd.work.execute` | Record work execution progress and mark repair work complete | `iwd_engineer` |
+| `iwd.bill.create` | Submit final bill and supporting records after physical verification | `iwd_engineer` |
+| `iwd.urgent.flag` | Flag active repair work as urgent for fast-track attention | `iwd_engineer` |
+| `iwd.estimate.review_low` | Review, approve, or reject low-cost estimates (< Rs.25k) | `iwd_admin` |
+| `iwd.inventory.manage` | Manage inventory stock, issue materials, and coordinate shortage procurement | `iwd_admin` |
+| `iwd.bidding.manage` | Conduct external competitive bidding and vendor selection | `iwd_admin` |
+| `iwd.estimate.review_committee` | Record necessity and feasibility recommendation for mid-range estimates | `Department Head` |
+| `iwd.estimate.review_mid` | Review, approve, reject, or forward mid-range estimates (Rs.25k-2.5L) | `Department Head` |
+| `iwd.work.verify` | Conduct physical quality verification of completed work | `Department Head` |
+| `iwd.urgent.review` | Review urgent fast-track escalation | `Department Head`, `Director` |
+| `iwd.estimate.review_director` | Review and approve high-cost bidding (> Rs.2.5L) or forwarded estimates | `Director` |
+| `iwd.payment.approve` | Grant final approval for payment settlement after Auditor validation | `Director` |
+| `iwd.bill.audit` | Audit and validate final bill against approved estimate and work evidence | `auditor` |
+| `iwd.payment.settle` | Record and execute payment settlement | `accounts_officer` |
+| `iwd.complaint.auto_assign` | System automatic assignment of complaint | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
