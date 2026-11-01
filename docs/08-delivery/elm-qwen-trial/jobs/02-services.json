@@ -1,0 +1,21 @@
+{
+  "label": "Backend services and selectors",
+  "instruction": "Continue the same ELM implementation trial. Generate the service layer and selectors against YOUR supplied foundation files, without renaming or redefining their models/fields. Implement the ELM operations described in the supplied specification: applications, balance inquiries, substitutes and response/replacement, approval routing and decisions, withdrawal, cancellation, extensions, resumption, offline-sanctioned entry, record maintenance, notifications, configuration helpers, year-end and SLA processing. Reuse request.principal / actor.user_id and actor.has_permission(code); use the exact leave_elm permission codes in your registry. All user identities are from modules.directory.contracts; only contracts may be imported across module boundaries. Do not import DRF into services. Use core.api.exceptions domain errors, transaction.atomic for writes, and functions with clear parameters that a later API stage can call. Getters/selectors return QuerySets or simple serializable data. Do not create tests or run functional correctness checks. This is initial implementation generation, not a business-rule review or hardening pass. Return complete compact service code, no placeholders, and only the requested files. The services/__init__.py and selectors/__init__.py may be empty. Do not create login/authentication/database connection infrastructure. Do not invent observed results. Keep this initial output compact, with no repeated methods or placeholder functions. Limit the TOTAL batch to about 280 source lines and at most twelve public service functions; use compact action dispatch rather than generating repetitive per-field methods. Leave unrelated getters to contracts.py. Do not include placeholder pass methods. Keep it small enough to finish the output.",
+  "allowed_paths": [
+    "modules/leave_elm/services/__init__.py",
+    "modules/leave_elm/services/leave.py",
+    "modules/leave_elm/selectors/__init__.py",
+    "modules/leave_elm/selectors/leave.py"
+  ],
+  "context_files": [
+    "docs/08-delivery/elm-qwen-trial/specification-context-compact.md",
+    "modules/leave_elm/models.py",
+    "modules/leave_elm/domain/policy.py",
+    "modules/leave_elm/registry.py",
+    "fusion_auth/principal.py",
+    "modules/directory/contracts.py",
+    "core/api/exceptions.py"
+  ],
+  "num_predict": 6500,
+  "include_specs": false
+}

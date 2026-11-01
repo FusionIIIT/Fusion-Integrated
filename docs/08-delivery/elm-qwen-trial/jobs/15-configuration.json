@@ -1,0 +1,20 @@
+{
+  "label": "Initial configuration API views",
+  "instruction": "Generate a compact DRF API view file (max 75 lines) providing ConfigurationView GET current LeavePolicy, LeaveCalendar and LeaveType rows; PUT saves submitted policy and calendar configuration using existing serializers and models. Include RecordListView GET LeaveHistory and LeaveNotification rows for request.principal.user_id as JSON values. Use existing configuration.manage and record.manage permission interfaces, HasModuleGrant, no duplicate models. This is initial implementation for configuration and records, not a request to audit or repair workflow logic.",
+  "allowed_paths": [
+    "modules/leave_elm/api/configuration.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/models.py",
+    "modules/leave_elm/api/serializers.py",
+    "fusion_auth/permissions.py"
+  ],
+  "include_specs": false,
+  "num_predict": 2300,
+  "options": {
+    "temperature": 0.3,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

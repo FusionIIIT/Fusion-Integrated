@@ -1,0 +1,20 @@
+{
+  "label": "Generate genuine local-model trial record",
+  "instruction": "Write a concise factual TRIAL_RECORD.md in Markdown with sections Configuration, Method, Observed generation results, Build checks, Limits, Reproduce. Use supplied observed-results.json and mechanical-corrections.md exactly. This was one real local Ollama qwen2.5-coder:3b trial, not a simulation; user chose one candidate. Record model size/quant/version, hardware, official Fusion base SHA, API Python runner with streamed prompts and periodic output checks, token-limit/repetition failures and raw-source format switch. Parameters changed across attempts: do not present as controlled comparative benchmark or prove general efficiency. State original raw responses and payloads retained in responses/, exact prompts separately in prompts.md, host mechanical changes in mechanical-corrections.md; no deliberate bugs inserted, functional bugs left, no BR correctness/missing requirement/security/optimization tests. Include actual passing/failing checks, particularly pre-existing PlacementSQLite failure separate from isolated ELM migration. Do not invent functional success, tests, PRs, commits or PostgreSQL runs. Reproduce a request with python devtools/qwen_elm_trial.py generate docs/08-delivery/elm-qwen-trial/jobs/02h-queries-small.json (appends a new log and rewrites that generated file, not identical-run guarantee). Point exact per-call payloads/options/statistics/checks. No broad claims model inefficient. Max150 lines.",
+  "allowed_paths": [
+    "docs/08-delivery/elm-qwen-trial/TRIAL_RECORD.md"
+  ],
+  "context_files": [
+    "docs/08-delivery/elm-qwen-trial/observed-results.json",
+    "docs/08-delivery/elm-qwen-trial/mechanical-corrections.md"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 3600,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}
