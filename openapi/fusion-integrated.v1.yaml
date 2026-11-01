@@ -63,6 +63,174 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/gymkhana/clubs:
+    get:
+      operationId: v1_gymkhana_clubs_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedClubList'
+          description: ''
+    post:
+      operationId: v1_gymkhana_clubs_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Club'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Club'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Club'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Club'
+          description: ''
+  /api/v1/gymkhana/clubs/{id}/approve:
+    post:
+      operationId: v1_gymkhana_clubs_approve_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Club'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Club'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Club'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Club'
+          description: ''
+  /api/v1/gymkhana/memberships:
+    get:
+      operationId: v1_gymkhana_memberships_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMembershipList'
+          description: ''
+    post:
+      operationId: v1_gymkhana_memberships_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Membership'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Membership'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Membership'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Membership'
+          description: ''
+  /api/v1/gymkhana/memberships/{id}/approve:
+    post:
+      operationId: v1_gymkhana_memberships_approve_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Membership'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Membership'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Membership'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Membership'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -2082,6 +2250,16 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CategoryEnum:
+      enum:
+      - Technical
+      - Sports
+      - Cultural
+      type: string
+      description: |-
+        * `Technical` - Technical
+        * `Sports` - Sports
+        * `Cultural` - Cultural
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2101,6 +2279,42 @@ components:
       - cleared
       - message
       - user_id
+    Club:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 120
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        description:
+          type: string
+        status:
+          type: string
+          readOnly: true
+        coordinator_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        co_coordinator_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        faculty_councillor_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+      - category
+      - co_coordinator_user_id
+      - coordinator_user_id
+      - faculty_councillor_user_id
+      - id
+      - name
+      - status
     Company:
       type: object
       properties:
@@ -2663,6 +2877,31 @@ components:
       required:
       - password
       - username
+    Membership:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        club:
+          type: integer
+        user_id:
+          type: integer
+          readOnly: true
+        description:
+          type: string
+        status:
+          type: string
+          readOnly: true
+        remarks:
+          type: string
+          readOnly: true
+      required:
+      - club
+      - id
+      - remarks
+      - status
+      - user_id
     ModeEnum:
       enum:
       - online
@@ -2924,6 +3163,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Application'
+    PaginatedClubList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Club'
     PaginatedCompanyList:
       type: object
       required:
@@ -2981,6 +3239,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedMembershipList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Membership'
     PaginatedOfferList:
       type: object
       required:
