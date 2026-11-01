@@ -9,6 +9,7 @@ from django.db import models
 
 from core.db.mixins import TimeStampedModel, UserScopedModel
 
+
 # -- Student placement profile (PC-UC-001, PC-BR-001) --------------------------
 
 class ProfileDocument(TimeStampedModel, UserScopedModel):
@@ -121,3 +122,39 @@ class PlacementRegistration(TimeStampedModel, UserScopedModel):
 
     def __str__(self) -> str:
         return f"reg u{self.user_id} {self.policy_id} {self.status}"
+
+
+# -- New models for student clearance and debarment records --------------------
+
+class StudentClearance(TimeStampedModel, UserScopedModel):
+    """A record of a student's clearance status."""
+
+    academic_year = models.CharField(max_length=10)
+    is_cleared = models.BooleanField()
+    clearance_reason = models.TextField()
+    verified_by_user_id = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        db_table = "placement_student_clearance"
+        indexes = [models.Index(fields=["user_id", "academic_year"],
+                                name="clearance_user_year_idx")]
+
+    def __str__(self) -> str:
+        return f"clr u{self.user_id} {self.academic_year}"
+
+
+class DebarmentRecord(TimeStampedModel, UserScopedModel):
+    """A record of a student's debarment status."""
+
+    season = models.CharField(max_length=20)
+    is_debarred = models.BooleanField()
+    reason = models.TextField()
+    debarred_until = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "placement_debarment_record"
+        indexes = [models.Index(fields=["user_id", "season"],
+                                name="debarment_user_season_idx")]
+
+    def __str__(self) -> str:
+        return f"deb u{self.user_id} {self.season}"
