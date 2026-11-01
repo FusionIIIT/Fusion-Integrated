@@ -38,3 +38,11 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `superadmin`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `superadmin.user.manage` | Create, maintain, and archive user accounts | `Director`, `super_admin` |
+| `superadmin.role.manage` | Assign and revoke additional roles | `Director`, `super_admin` |
+| `superadmin.audit.view` | Inspect system-wide audit logs | `Director`, `super_admin` |
