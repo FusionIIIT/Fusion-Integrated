@@ -17,4 +17,9 @@ export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
     basePath: "/placement",
     load: () => import("../modules/placement/routes"),
   },
+  gymkhana: {
+    code: "gymkhana",
+    basePath: "/gymkhana",
+    load: () => import("../modules/gymkhana/routes"),
+  },
 };
