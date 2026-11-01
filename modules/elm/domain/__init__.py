@@ -1,0 +1,1 @@
+"""Pure ELM domain rules."""

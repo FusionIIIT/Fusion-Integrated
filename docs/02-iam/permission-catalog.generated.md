@@ -13,6 +13,16 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave_elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave_elm.application.apply` | Apply for and withdraw own leave | `faculty`, `staff` |
+| `leave_elm.application.view_self` | View own leave applications | `faculty`, `staff` |
+| `leave_elm.application.review` | Review assigned leave applications | `Dean Academic`, `HOD (CSE)`, `Registrar` |
+| `leave_elm.balance.view` | View own leave balances | `faculty`, `staff` |
+| `leave_elm.policy.manage` | Configure leave policy, balances, and approval routes | `Registrar`, `acadadmin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
@@ -24,12 +34,12 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.application.create` | Apply to a posting | `student` |
 | `placement_cell.application.review` | Shortlist and reject applications | `placement_coordinator`, `placement_officer` |
 | `placement_cell.application.delete` | Withdraw an application | `student` |
-| `placement_cell.application.auto_withdraw` | System auto-withdrawal | _service only_ |
+| `placement_cell.application.auto_withdraw` | System auto-withdrawal |  |
 | `placement_cell.interview.schedule` | Schedule interview rounds | `placement_officer` |
 | `placement_cell.offer.issue` | Extend an offer | `placement_officer` |
 | `placement_cell.offer.respond` | Accept or decline an offer | `student` |
 | `placement_cell.offer.revoke` | Revoke an issued offer | `placement_officer` |
-| `placement_cell.offer.expire` | System offer expiry | _service only_ |
+| `placement_cell.offer.expire` | System offer expiry |  |
 | `placement_cell.company.manage` | Register and approve companies | `placement_officer` |
 | `placement_cell.announcement.publish` | Publish announcements | `Dean Academic`, `placement_chairman`, `placement_officer` |
 | `placement_cell.report.view` | See operational reports | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
