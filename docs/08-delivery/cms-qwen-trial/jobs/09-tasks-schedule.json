@@ -1,0 +1,22 @@
+{
+  "label": "Celery tasks and beat schedule",
+  "instruction": "Generate modules/complaint_cms/tasks.py and modules/complaint_cms/schedule.py, max 50 lines total. tasks.py defines Celery @shared_task wrappers cms_process_sla and cms_auto_close_resolved calling process_complaint_sla and auto_close_resolved_complaints from modules.complaint_cms.services.events. schedule.py imports crontab from celery.schedules and exports BEAT_SCHEDULE (running cms_process_sla every 15 minutes and cms_auto_close_resolved daily at midnight) and TASK_ROUTES mapping \"modules.complaint_cms.tasks.*\" to {\"queue\": \"default\"}. Return valid JSON response.",
+  "allowed_paths": [
+    "modules/complaint_cms/tasks.py",
+    "modules/complaint_cms/schedule.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": false,
+  "context_files": [
+    "modules/complaint_cms/services/events.py",
+    "modules/placement/schedule.py",
+    "config/celery.py"
+  ],
+  "num_predict": 1400,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

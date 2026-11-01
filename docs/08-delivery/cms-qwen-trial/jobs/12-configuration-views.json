@@ -1,0 +1,21 @@
+{
+  "label": "Configuration and record API views",
+  "instruction": "Generate a compact DRF API view file at modules/complaint_cms/api/configuration.py (max 90 lines) providing ConfigurationView (GET returns categories and routing_rules using ComplaintCategorySerializer and RoutingRuleSerializer; POST creates or updates a ComplaintCategory or RoutingRule) and RecordListView (GET returns recent ComplaintUpdate and ComplaintNotification records serialized with ComplaintUpdateSerializer and ComplaintNotificationSerializer). Use IsAuthenticated, HasModuleGrant(\"complaint_cms\"), and HasPermission(\"complaint_cms.configuration.manage\") / HasPermission(\"complaint_cms.record.manage\") in permission_classes, and @extend_schema on view methods. Return raw Python source only without code fences.",
+  "allowed_paths": [
+    "modules/complaint_cms/api/configuration.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "context_files": [
+    "modules/complaint_cms/models.py",
+    "modules/complaint_cms/api/serializers.py",
+    "fusion_auth/permissions.py"
+  ],
+  "num_predict": 2400,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "label": "Frontend typed API client",
+  "instruction": "Generate a compact TypeScript client/src/modules/complaint_cms/api.ts file (max 75 lines). Import { http } from \"../../lib/http\" and re-export types from \"./types\". Export async functions listComplaints(), submitComplaint(payload: NewComplaint), listTasks(), listNotifications(), complaintAction(id: number, action: string, data?: Record<string, unknown>), getConfiguration(), saveConfiguration(payload: Record<string, unknown>), and getRecords() calling the /complaints/... endpoints exposed by modules/complaint_cms/api/urls.py. Return raw TypeScript source only without code fences.",
+  "allowed_paths": [
+    "client/src/modules/complaint_cms/api.ts"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "context_files": [
+    "client/src/modules/complaint_cms/types.ts",
+    "modules/complaint_cms/api/urls.py",
+    "client/src/lib/http.ts"
+  ],
+  "num_predict": 1800,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

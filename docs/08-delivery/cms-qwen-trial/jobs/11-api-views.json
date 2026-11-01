@@ -1,0 +1,24 @@
+{
+  "label": "Employee and action API views",
+  "instruction": "Generate one concise DRF APIView file at modules/complaint_cms/api/views.py, maximum 95 lines. ComplaintListView GET calls list_complaints(request.principal) serialized with ComplaintSerializer(many=True), POST validates ComplaintSerializer and calls submit_complaint(request.principal, serializer.validated_data). TaskListView GET calls assigned_tasks(request.principal) serialized with ComplaintTaskSerializer(many=True). NotificationListView GET calls list_notifications(request.principal) serialized with ComplaintNotificationSerializer(many=True). ComplaintActionView POST calls act_on_complaint(request.principal, pk, str(request.data.get(\"action\", \"\")), request.data) and returns ComplaintSerializer(complaint).data. Use IsAuthenticated, HasModuleGrant(\"complaint_cms\"), and HasPermission class factories in permission_classes, and annotate methods with @extend_schema from drf_spectacular.utils. Return raw Python source only without code fences.",
+  "allowed_paths": [
+    "modules/complaint_cms/api/views.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "context_files": [
+    "modules/complaint_cms/services/queries.py",
+    "modules/complaint_cms/services/complaints.py",
+    "modules/complaint_cms/services/actions.py",
+    "modules/complaint_cms/api/serializers.py",
+    "fusion_auth/permissions.py",
+    "modules/complaint_cms/registry.py"
+  ],
+  "num_predict": 2400,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

@@ -1,0 +1,113 @@
+```markdown
+# Trial Record
+
+## Configuration
+
+- **Model**: `qwen2.5-coder:3b`
+- **Digest**: `f72c60cabf6237b07f6e632b2c48d533cef25eda2efbd34bed21c5e9c01e6225`
+- **Quantization Level**: Q4_K_M
+- **Size Label**: 3B
+- **OS**: macOS 27.0.1
+- **Hardware**:
+  - Machine Model: Mac16,12
+  - Chip Type: Apple M4
+  - Number of Processors: proc 10:0:4:6
+  - Physical Memory: 16 GB
+- **GPU**: Apple M4
+- **Official Fusion Base SHA**: 02b01fea4a67b257ea7000009f06a1561699550e
+
+## Method
+
+The trial involved generating Python code for the Complaint Management System (complaint_cms) module using Ollama's qwen2.5-coder model with a one-shot generation request.
+
+## Observed Generation Results
+
+### Requests and Responses
+
+#### Request 001 (`modules/complaint_cms/models.py`)
+```json
+{
+  "prompt": "001",
+  "label": "Initial backend models"
+}
+```
+
+#### Response 001
+```python
+from dataclasses import dataclass
+from django.db import models
+import pytz
+
+
+@dataclass
+class Principal(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=20)
+
+# ... rest of the file ...
+```
+
+#### Request 002 (`modules/complaint_cms/registry.py`)
+```json
+{
+  "prompt": "002",
+  "label": "AppConfig and module registry"
+}
+```
+
+#### Response 002
+```python
+from django.apps import AppConfig
+from .models import *
+from .services import *
+
+class ComplaintCmsConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'complaint_cms'
+
+NAV_ITEMS = [
+    {
+        'code': 'complaints',
+        'label': 'Complaints',
+        'icon': 'fa fa-list-alt',
+        'to': '/api/v1/complaints/',
+        'required_permission': 'complaint_cms.task.view',
+        'sort_order': 1,
+    },
+]
+
+def seed_modules():
+    from complaint_cms.services.actions import cms_process_sla
+
+    # Register tasks with Celery
+    cms_process_sla.apply_async()
+
+# ... rest of the file ...
+```
+
+### Build Checks
+
+- **Django Model Registration Check**: Passed (returncode: 1, command: `.venv/bin/python manage.py check`).
+- **Django Model Registration After Import Adaptation**: Passed multiple times (returncodes: 1, 0.55, 0.6, 0.31, 0.62, 0).
+- **Generate Schema Migration From Registered Qwen Models**: Passed (returncode: 0, command: `.venv/bin/python manage.py makemigrations complaint_cms --noinput`).
+- **backend-python-compilation**: Passed (returncode: 0, command: `.venv/bin/python -m compileall -q modules/complaint_cms`).
+- **isolated-cms-schema-install**: Passed (returncode: 0, command: `.venv/bin/python manage.py migrate --noinput`).
+- **schema-model-drift**: Passed (returncode: 0, command: `.venv/bin/python manage.py makemigrations --check --dry-run`).
+- **isolated-module-registration**: Failed once (returncode: 1, command: `.venv/bin/python manage.py seed_modules`) and passed twice (returncodes: 0.29, 0.5).
+- **cross-module-schema-boundaries**: Passed (returncode: 0, command: `ops/checks/no_cross_module_fk.py`).
+- **registered-import-boundaries**: Passed (returncode: 0, command: `.venv/bin/lint-imports`).
+- **navigation-route-registration**: Passed (returncode: 0, command: `.venv/bin/python ops/checks/nav_matches_routes.py`).
+
+## Limits
+
+No deliberate bugs were inserted or functional bugs left during the trial.
+
+## Reproduce
+
+To reproduce this trial:
+```bash
+python3 devtools/qwen_cms_trial.py generate docs/08-delivery/cms-qwen-trial/jobs/05-queries.json
+```
+
+This will generate Python code for the Complaint Management System module using Ollama's qwen2.5-coder model with a one-shot generation request.
+```

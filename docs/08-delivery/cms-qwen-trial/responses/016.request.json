@@ -1,0 +1,16 @@
+{
+  "model": "qwen2.5-coder:3b",
+  "system": "You are a local coding assistant. Follow CURRENT TASK after references. Return complete raw source for the one requested file. Do not claim tests or add provenance labels.",
+  "prompt": "REFERENCE MATERIAL ONLY\n\n\n### Repository file client/src/modules/placement/routes.tsx\n```\nimport { lazy } from \"react\";\nimport { Navigate, type RouteObject } from \"react-router-dom\";\n\n/** One lazy chunk per page. Vite can only split these if the import() argument\n *  is a static literal \u2014 a computed path silently bundles everything. */\nconst PostingsPage = lazy(() => import(\"./pages/PostingsPage\"));\nconst MyApplicationsPage = lazy(() => import(\"./pages/MyApplicationsPage\"));\nconst ApplicationsPage = lazy(() => import(\"./pages/ApplicationsPage\"));\nconst OffersPage = lazy(() => import(\"./pages/OffersPage\"));\nconst CompaniesPage = lazy(() => import(\"./pages/CompaniesPage\"));\nconst InterviewsPage = lazy(() => import(\"./pages/InterviewsPage\"));\nconst AnnouncementsPage = lazy(() => import(\"./pages/AnnouncementsPage\"));\nconst ReportsPage = lazy(() => import(\"./pages/ReportsPage\"));\nconst StudentCpiPage = lazy(() => import(\"./pages/StudentCpiPage\"));\nconst RegistrationPage = lazy(() => import(\"./pages/RegistrationPage\"));\nconst RegistrationApprovalsPage = lazy(\n  () => import(\"./pages/RegistrationApprovalsPage\"));\n\n/** Paths are RELATIVE \u2014 the shell mounts them under the manifest's basePath.\n *\n *  Every entry here has a matching nav item in the server's registry.py, and\n *  that correspondence matters: the sidebar is built server-side, so a nav item\n *  without a route here renders a link that goes nowhere. */\nexport const routes: RouteObject[] = [\n  { index: true, element: <Navigate to=\"postings\" replace /> },\n  { path: \"registration\", element: <RegistrationPage /> },\n  { path: \"registration-approvals\", element: <RegistrationApprovalsPage /> },\n  { path: \"postings\", element: <PostingsPage /> },\n  { path: \"mine\", element: <MyApplicationsPage /> },\n  { path: \"offers\", element: <OffersPage /> },\n  { path: \"applications\", element: <ApplicationsPage /> },\n  { path: \"companies\", element: <CompaniesPage /> },\n  { path: \"interviews\", element: <InterviewsPage /> },\n  { path: \"announcements\", element: <AnnouncementsPage /> },\n  { path: \"students-cpi\", element: <StudentCpiPage /> },\n  { path: \"reports\", element: <ReportsPage /> },\n];\n\n```\n\n\nEND OF REFERENCES\n\nCURRENT TASK\n\nGenerate client/src/modules/complaint_cms/routes.tsx only, exporting const routes: RouteObject[] with index Navigate to \"mine\", path \"mine\" rendering MyComplaintsPage, path \"queue\" rendering ComplaintQueuePage, and path \"admin\" rendering ComplaintAdminPage using React.lazy imports from ./pages/*. Return raw TypeScript JSX source only without code fences.\n\nOutput file: client/src/modules/complaint_cms/routes.tsx\nReturn only complete raw source code, without JSON, explanation or Markdown fences.\n",
+  "stream": true,
+  "keep_alive": "15m",
+  "options": {
+    "temperature": 0.2,
+    "seed": 42,
+    "num_ctx": 8192,
+    "num_batch": 128,
+    "num_predict": 1000,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256
+  }
+}

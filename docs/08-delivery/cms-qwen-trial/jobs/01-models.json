@@ -1,0 +1,21 @@
+{
+  "label": "Initial backend models",
+  "instruction": "Generate only modules/complaint_cms/models.py as Django data-model definitions for the Complaint Management System (CMS) module inside the supplied Fusion ERP base. Maximum approximately 170 lines. Do not put business functions, save overrides, can_* methods, getters, placeholders, duplicate class definitions or validation methods in models.py. Use compact fields and choices, and plain integer IAM user IDs (do not create Django User foreign keys or login models). The foundation should store: ComplaintCategory (code, name, description, severity_default, sla_ack_hours, sla_resolution_hours, is_active), RoutingRule (category FK, location_type, target_section, primary_authority_role, escalation_authority_role, is_active), Complaint (tracking_code, user_id, is_anonymous, category FK, title, description, location_type, location_details, severity, status, assigned_to_id, assigned_role, escalation_level, sla_due_at, resolved_at, closed_at, resolution_summary, reopen_count, feedback_rating, feedback_comment), ComplaintAttachment (complaint FK, uploaded_by_id, file_name, file_url, stage), ComplaintUpdate (complaint FK, actor_id, update_type, visibility, comment, old_status, new_status), ComplaintTask (complaint FK, assigned_to_id, role_name, task_type, status, due_at, completed_at), and ComplaintNotification (complaint FK, recipient_id, title, message, is_read). Inherit TimestampedModel from core.db.mixins. Include data only; later service files will implement operations against these actual fields. Return complete raw Python source only without markdown code fences.",
+  "allowed_paths": [
+    "modules/complaint_cms/models.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "context_files": [
+    "docs/08-delivery/cms-qwen-trial/problem-statement-context.md",
+    "core/db/mixins.py",
+    "fusion_auth/principal.py"
+  ],
+  "num_predict": 3200,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

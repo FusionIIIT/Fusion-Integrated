@@ -1,0 +1,22 @@
+{
+  "label": "Complaint workflow actions service",
+  "instruction": "Generate initial CMS workflow action service in modules/complaint_cms/services/actions.py, maximum 110 lines. Provide act_on_complaint(actor, complaint_id, action, data) supporting actions acknowledge, start_progress, resolve, close, reopen, escalate, assign, and feedback. Reuse existing model fields from modules.complaint_cms.models, permission names from modules.complaint_cms.registry, and error classes from core.api.exceptions (PermissionDeniedError, DomainValidationError, ResourceNotFoundError). Update Complaint fields, record a ComplaintUpdate entry, update or create ComplaintTask as needed, and create a ComplaintNotification for the complainant inside transaction.atomic(). Return the updated Complaint. Return raw Python source only without code fences.",
+  "allowed_paths": [
+    "modules/complaint_cms/services/actions.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "context_files": [
+    "modules/complaint_cms/models.py",
+    "modules/complaint_cms/domain/policy.py",
+    "modules/complaint_cms/registry.py",
+    "core/api/exceptions.py"
+  ],
+  "num_predict": 2800,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

@@ -1,0 +1,20 @@
+from django.urls import path
+from .views import (
+    ComplaintListView,
+    TaskListView,
+    NotificationListView,
+    ComplaintActionView,
+)
+from .configuration import (
+    ConfigurationView,
+    RecordListView
+)
+
+urlpatterns = [
+    path('complaints', ComplaintListView.as_view(), name='complaint-list'),
+    path('tasks', TaskListView.as_view(), name='task-list'),
+    path('notifications', NotificationListView.as_view(), name='notification-list'),
+    path('complaints/<int:pk>/action', ComplaintActionView.as_view(), name='complaint-action'),
+    path('configuration', ConfigurationView.as_view(), name='configuration-view'),
+    path('records', RecordListView.as_view(), name='record-list')
+]

@@ -1,0 +1,51 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from fusion_auth.permissions import HasModuleGrant, HasPermission
+from ..services.queries import list_complaints, assigned_tasks, list_notifications
+from ..services.complaints import submit_complaint
+from ..services.actions import act_on_complaint
+from .serializers import (
+    ComplaintCategorySerializer,
+    RoutingRuleSerializer,
+    ComplaintSerializer,
+    ComplaintTaskSerializer,
+    ComplaintUpdateSerializer,
+    ComplaintNotificationSerializer
+)
+from drf_spectacular.utils import extend_schema
+
+class ComplaintListView(APIView):
+    permission_classes = [IsAuthenticated, HasModuleGrant("complaint_cms"), HasPermission('complaint_cms.complaint.view_self')]
+
+    def get(self, request):
+        complaints = list_complaints(request.principal)
+        serializer = ComplaintSerializer(complaints, many=True)
+        return Response(serializer.data)
+
+class TaskListView(APIView):
+    permission_classes = [IsAuthenticated, HasModuleGrant("complaint_cms"), HasPermission('complaint_cms.task.view')]
+
+    def get(self, request):
+        tasks = assigned_tasks(request.principal)
+        serializer = ComplaintTaskSerializer(tasks, many=True)
+        return Response(serializer.data)
+
+class NotificationListView(APIView):
+    permission_classes = [IsAuthenticated, HasModuleGrant("complaint_cms"), HasPermission('complaint_cms.configuration.manage')]
+
+    def get(self, request):
+        notifications = list_notifications(request.principal)
+        serializer = ComplaintNotificationSerializer(notifications, many=True)
+        return Response(serializer.data)
+
+@extend_schema(responses={201: ComplaintSerializer})
+class ComplaintActionView(APIView):
+    permission_classes = [IsAuthenticated, HasModuleGrant("complaint_cms")]
+
+    def post(self, request, pk=None):
+        action = request.data.get("action", "")
+        complaint_id = int(pk) if pk else None
+        complaint = act_on_complaint(request.principal, complaint_id, action, request.data)
+        serializer = ComplaintSerializer(complaint)
+        return Response(serializer.data)

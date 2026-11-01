@@ -1,0 +1,550 @@
+
+## Django model registration check
+2026-11-01T18:10:02.273657+00:00
+Command: .venv/bin/python manage.py check
+Traceback (most recent call last):
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/manage.py", line 9, in <module>
+    execute_from_command_line(sys.argv)
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 416, in execute
+    django.setup()
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/apps/registry.py", line 116, in populate
+    app_config.import_models()
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/apps/config.py", line 269, in import_models
+    self.models_module = import_module(models_module_name)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/modules/complaint_cms/models.py", line 19, in <module>
+    @dataclass(frozen=True)
+     ^^^^^^^^^
+NameError: name 'dataclass' is not defined
+
+Exit code: 1; 0.55 seconds
+
+## Django model registration after import adaptation
+2026-11-01T18:12:32.840931+00:00
+Command: .venv/bin/python manage.py check
+Traceback (most recent call last):
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/manage.py", line 9, in <module>
+    execute_from_command_line(sys.argv)
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 436, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 420, in run_from_argv
+    self.execute(*args, **cmd_options)
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 464, in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/commands/check.py", line 81, in handle
+    self.check(
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 496, in check
+    all_issues = checks.run_checks(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/checks/registry.py", line 89, in run_checks
+    new_errors = check(app_configs=app_configs, databases=databases)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/checks/urls.py", line 16, in check_url_config
+    return check_resolver(resolver)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/checks/urls.py", line 26, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 531, in check
+    for pattern in self.url_patterns:
+                   ^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 718, in url_patterns
+    patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+                       ^^^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 711, in urlconf_module
+    return import_module(self.urlconf_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/config/urls.py", line 18, in <module>
+    path("api/v1/complaints/", include("modules.complaint_cms.api.urls")),
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/conf.py", line 39, in include
+    urlconf_module = import_module(urlconf_module)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/modules/complaint_cms/api/urls.py", line 2, in <module>
+    from .views import (
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/modules/complaint_cms/api/views.py", line 6, in <module>
+    from ..services.complaints import submit_complaint
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/modules/complaint_cms/services/complaints.py", line 4, in <module>
+    from core.api.exceptions import DomainValidationError as BadRequestError, PermissionDeniedError, ResourceNotFoundError as NotFoundError
+ImportError: cannot import name 'DomainValidationError' from 'core.api.exceptions' (/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/core/api/exceptions.py)
+
+Exit code: 1; 0.6 seconds
+
+## Django model registration after import adaptation
+2026-11-01T18:13:01.673147+00:00
+Command: .venv/bin/python manage.py check
+Traceback (most recent call last):
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/manage.py", line 9, in <module>
+    execute_from_command_line(sys.argv)
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 436, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 420, in run_from_argv
+    self.execute(*args, **cmd_options)
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 464, in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/commands/check.py", line 81, in handle
+    self.check(
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 496, in check
+    all_issues = checks.run_checks(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/checks/registry.py", line 89, in run_checks
+    new_errors = check(app_configs=app_configs, databases=databases)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/checks/urls.py", line 16, in check_url_config
+    return check_resolver(resolver)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/checks/urls.py", line 26, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 531, in check
+    for pattern in self.url_patterns:
+                   ^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 718, in url_patterns
+    patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+                       ^^^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 711, in urlconf_module
+    return import_module(self.urlconf_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/config/urls.py", line 18, in <module>
+    path("api/v1/complaints/", include("modules.complaint_cms.api.urls")),
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/conf.py", line 39, in include
+    urlconf_module = import_module(urlconf_module)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/modules/complaint_cms/api/urls.py", line 2, in <module>
+    from .views import (
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/modules/complaint_cms/api/views.py", line 8, in <module>
+    from .serializers import (
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/modules/complaint_cms/api/serializers.py", line 25, in <module>
+    class ComplaintSerializer(serializers.ModelSerializer):
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/modules/complaint_cms/api/serializers.py", line 29, in ComplaintSerializer
+    status = serializers.CharField(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/rest_framework/fields.py", line 731, in __init__
+    super().__init__(**kwargs)
+TypeError: Field.__init__() got an unexpected keyword argument 'choices'
+
+Exit code: 1; 0.31 seconds
+
+## Django model registration after import adaptation
+2026-11-01T18:13:43.331944+00:00
+Command: .venv/bin/python manage.py check
+SystemCheckError: System check identified some issues:
+
+ERRORS:
+complaint_cms.Complaint.status: (fields.E009) 'max_length' is too small to fit the longest value in 'choices' (11 characters).
+complaint_cms.ComplaintUpdate.update_type: (fields.E009) 'max_length' is too small to fit the longest value in 'choices' (12 characters).
+
+System check identified 2 issues (0 silenced).
+
+Exit code: 1; 0.62 seconds
+
+## Django model registration after import adaptation
+2026-11-01T18:14:06.519256+00:00
+Command: .venv/bin/python manage.py check
+System check identified no issues (0 silenced).
+
+Exit code: 0; 0.32 seconds
+
+## Generate schema migration from registered Qwen models
+2026-11-01T18:14:06.919915+00:00
+Command: .venv/bin/python manage.py makemigrations complaint_cms --noinput
+Migrations for 'complaint_cms':
+  modules/complaint_cms/migrations/0001_initial.py
+    + Create model Complaint
+    + Create model ComplaintCategory
+    + Create model ComplaintAttachment
+    + Add field category to complaint
+    + Create model ComplaintNotification
+    + Create model ComplaintTask
+    + Create model ComplaintUpdate
+    + Create model RoutingRule
+
+Exit code: 0; 0.37 seconds
+
+## backend-python-compilation
+2026-11-01T18:14:06.990304+00:00
+Command: .venv/bin/python -m compileall -q modules/complaint_cms
+
+Exit code: 0; 0.03 seconds
+
+## isolated-cms-schema-install
+2026-11-01T18:14:07.381184+00:00
+Command: .venv/bin/python manage.py migrate --noinput
+Operations to perform:
+  Apply all migrations: accesscontrol, auth, complaint_cms, contenttypes, directory
+Running migrations:
+  Applying accesscontrol.0001_initial... OK
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying complaint_cms.0001_initial... OK
+  Applying directory.0001_initial... OK
+  Applying directory.0002_userref_profile_completed_userref_resume_link... OK
+
+Exit code: 0; 0.36 seconds
+
+## schema-model-drift
+2026-11-01T18:14:07.731045+00:00
+Command: .venv/bin/python manage.py makemigrations --check --dry-run
+No changes detected
+
+Exit code: 0; 0.32 seconds
+
+## isolated-module-registration
+2026-11-01T18:14:08.054627+00:00
+Command: .venv/bin/python manage.py seed_modules
+Traceback (most recent call last):
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/manage.py", line 9, in <module>
+    execute_from_command_line(sys.argv)
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 436, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 420, in run_from_argv
+    self.execute(*args, **cmd_options)
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 464, in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/modules/accesscontrol/management/commands/seed_modules.py", line 53, in handle
+    code=item["code"],
+         ~~~~^^^^^^^^
+KeyError: 'code'
+
+Exit code: 1; 0.29 seconds
+
+## isolated-module-registration
+2026-11-01T18:14:39.360953+00:00
+Command: .venv/bin/python manage.py seed_modules
+  registered complaint_cms (active)
+1 module(s) registered
+
+Exit code: 0; 0.5 seconds
+
+## cross-module-schema-boundaries
+2026-11-01T18:14:39.546454+00:00
+Command: .venv/bin/python ops/checks/no_cross_module_fk.py
+no cross-module foreign keys
+
+Exit code: 0; 0.15 seconds
+
+## registered-import-boundaries
+2026-11-01T18:14:39.726491+00:00
+Command: .venv/bin/lint-imports
+
+╔══╗─────────▶╔╗ ╔╗      ╔╗◀───┐
+╚╣╠╝◀─────┐  ╔╝╚╗║║────▶╔╝╚╗   │
+ ║║   ╔══╦══╦╩╗╔╝║║  ╔╦═╩╗╔╝╔═╦══╗
+ ║║╔══╣╔╗║╔╗║╔╣║ ║║ ╔╬╣╔╗║║ ║│║╔═╝
+╔╣╠╣║║║╚╝║╚╝║║║╚╗║╚═╝║║║║║╚╗║═╣║
+╚══╩╩╩╣╔═╩══╩╝╚═╝╚═══╩╩╝╚╩═╩╩═╩╝
+  └──▶║║                    ▲ 
+      ╚╝────────────────────┘
+
+
+---------
+Contracts
+---------
+
+Analyzed 222 files, 651 dependencies.
+-------------------------------------
+
+Modules may reach each other ONLY through contracts.py KEPT
+domain/ must not import Django, DRF or Celery KEPT
+core/ must not import any module KEPT
+Layering inside placement KEPT
+Layering inside CMS KEPT
+
+Contracts: 5 kept, 0 broken.
+
+Exit code: 0; 0.15 seconds
+
+## navigation-route-registration
+2026-11-01T18:14:39.910864+00:00
+Command: .venv/bin/python ops/checks/nav_matches_routes.py
+nav items and client routes agree
+
+Exit code: 0; 0.15 seconds
+
+## frontend-first-typecheck
+2026-11-01T18:14:49.057951+00:00
+Command: npx tsc --noEmit
+src/modules/complaint_cms/api.ts(4,16): error TS6133: 'listComplaints' is declared but its value is never read.
+src/modules/complaint_cms/api.ts(9,16): error TS6133: 'submitComplaint' is declared but its value is never read.
+src/modules/complaint_cms/api.ts(13,16): error TS6133: 'listTasks' is declared but its value is never read.
+src/modules/complaint_cms/api.ts(18,16): error TS6133: 'listNotifications' is declared but its value is never read.
+src/modules/complaint_cms/api.ts(23,16): error TS6133: 'complaintAction' is declared but its value is never read.
+src/modules/complaint_cms/api.ts(31,16): error TS6133: 'getConfiguration' is declared but its value is never read.
+src/modules/complaint_cms/api.ts(36,16): error TS6133: 'saveConfiguration' is declared but its value is never read.
+src/modules/complaint_cms/api.ts(40,16): error TS6133: 'getRecords' is declared but its value is never read.
+src/modules/complaint_cms/api.ts(40,40): error TS2694: Namespace '"/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/client/src/modules/complaint_cms/types"' has no exported member 'RecordListView'.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(2,25): error TS2307: Cannot find module '@mantine/form' or its corresponding type declarations.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(3,17): error TS6133: 'Stack' is declared but its value is never read.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(3,56): error TS6133: 'Select' is declared but its value is never read.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(5,10): error TS2459: Module '"../api"' declares 'getConfiguration' locally, but it is not exported.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(5,28): error TS2459: Module '"../api"' declares 'saveConfiguration' locally, but it is not exported.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(5,47): error TS2459: Module '"../api"' declares 'getRecords' locally, but it is not exported.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(5,47): error TS6133: 'getRecords' is declared but its value is never read.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(6,8): error TS2613: Module '"/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/client/src/ui/components/PageHeader"' has no default export. Did you mean to use 'import { PageHeader } from "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/client/src/ui/components/PageHeader"' instead?
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(7,8): error TS2613: Module '"/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/client/src/lib/http"' has no default export. Did you mean to use 'import { errorMessage } from "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/client/src/lib/http"' instead?
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(13,87): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(options: DefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>, queryClient?: QueryClient | undefined): DefinedUseQueryResult<unknown, Error>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'DefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>'.
+      Property 'queryKey' is missing in type 'string[]' but required in type 'Omit<UseQueryOptions<unknown, Error, unknown, readonly unknown[]>, "queryFn">'.
+  Overload 2 of 3, '(options: UndefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>, queryClient?: QueryClient | undefined): UseQueryResult<unknown, Error>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'UndefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>'.
+      Property 'queryKey' is missing in type 'string[]' but required in type 'UseQueryOptions<unknown, Error, unknown, readonly unknown[]>'.
+  Overload 3 of 3, '(options: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>, queryClient?: QueryClient | undefined): UseQueryResult<unknown, Error>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'UseQueryOptions<unknown, Error, unknown, readonly unknown[]>'.
+      Property 'queryKey' is missing in type 'string[]' but required in type 'UseQueryOptions<unknown, Error, unknown, readonly unknown[]>'.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(18,16): error TS7006: Parameter 'values' implicitly has an 'any' type.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(24,9): error TS2488: Type 'UseMutationResult<unknown, Error, void, unknown>' must have a '[Symbol.iterator]()' method that returns an iterator.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(25,5): error TS2353: Object literal may only specify known properties, and 'onSuccess' does not exist in type 'QueryClient'.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(26,37): error TS2559: Type 'string[]' has no properties in common with type 'InvalidateQueryFilters<readonly unknown[]>'.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(29,13): error TS7006: Parameter 'error' implicitly has an 'any' type.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(36,22): error TS18046: 'configData' is of type 'unknown'.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(41,9): error TS6133: 'handleSubmit' is declared but its value is never read.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(41,31): error TS7006: Parameter 'values' implicitly has an 'any' type.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(50,27): error TS2304: Cannot find name 'useState'.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(52,36): error TS2339: Property 'recordsCount' does not exist on type '{}'.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(60,14): error TS2322: Type '{ children: Element[]; position: string; mt: number; }' is not assignable to type 'IntrinsicAttributes & GroupProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+  Property 'position' does not exist on type 'IntrinsicAttributes & GroupProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(67,22): error TS2322: Type '{ children: Element[]; striped: true; highlightRows: true; }' is not assignable to type 'IntrinsicAttributes & TableProps & RefAttributes<HTMLTableElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+  Property 'highlightRows' does not exist on type 'IntrinsicAttributes & TableProps & RefAttributes<HTMLTableElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(74,24): error TS2339: Property 'categories' does not exist on type '{}'.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(74,40): error TS7006: Parameter 'category' implicitly has an 'any' type.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(84,9): error TS2322: Type '{ page: any; onChange: (newPage: number) => any; totalPages: number; totalItems: any; size: "lg"; align: string; mt: number; }' is not assignable to type 'IntrinsicAttributes & PaginationProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+  Property 'page' does not exist on type 'IntrinsicAttributes & PaginationProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(98,20): error TS2339: Property 'records' does not exist on type '{}'.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(99,24): error TS2322: Type '{ children: Element[]; striped: true; highlightRows: true; }' is not assignable to type 'IntrinsicAttributes & TableProps & RefAttributes<HTMLTableElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+  Property 'highlightRows' does not exist on type 'IntrinsicAttributes & TableProps & RefAttributes<HTMLTableElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(109,14): error TS18046: 'configData' is of type 'unknown'.
+src/modules/complaint_cms/pages/ComplaintAdminPage.tsx(109,81): error TS7006: Parameter 'record' implicitly has an 'any' type.
+src/modules/complaint_cms/pages/ComplaintQueuePage.tsx(2,60): error TS6133: 'ActionIcon' is declared but its value is never read.
+src/modules/complaint_cms/pages/ComplaintQueuePage.tsx(3,20): error TS6133: 'useMutation' is declared but its value is never read.
+src/modules/complaint_cms/pages/ComplaintQueuePage.tsx(4,10): error TS2724: '"../../../lib/http"' has no exported member named 'ErrorMessage'. Did you mean 'errorMessage'?
+src/modules/complaint_cms/pages/ComplaintQueuePage.tsx(5,8): error TS2613: Module '"/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/client/src/ui/components/PageHeader"' has no default export. Did you mean to use 'import { PageHeader } from "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/client/src/ui/components/PageHeader"' instead?
+src/modules/complaint_cms/pages/ComplaintQueuePage.tsx(25,26): error TS2304: Cannot find name 'listTasks'.
+src/modules/complaint_cms/pages/ComplaintQueuePage.tsx(29,17): error TS6133: 'complaintsData' is declared but its value is never read.
+src/modules/complaint_cms/pages/ComplaintQueuePage.tsx(29,67): error TS6133: 'isComplaintsLoading' is declared but its value is never read.
+src/modules/complaint_cms/pages/ComplaintQueuePage.tsx(31,26): error TS2304: Cannot find name 'listComplaints'.
+src/modules/complaint_cms/pages/ComplaintQueuePage.tsx(36,5): error TS2304: Cannot find name 'complaintAction'.
+src/modules/complaint_cms/pages/ComplaintQueuePage.tsx(37,37): error TS2559: Type 'string[]' has no properties in common with type 'InvalidateQueryFilters<readonly unknown[]>'.
+src/modules/complaint_cms/pages/ComplaintQueuePage.tsx(38,37): error TS2559: Type 'string[]' has no properties in common with type 'InvalidateQueryFilters<readonly unknown[]>'.
+src/modules/complaint_cms/pages/ComplaintQueuePage.tsx(55,34): error TS2339: Property 'title' does not exist on type 'Task'.
+src/modules/complaint_cms/pages/ComplaintQueuePage.tsx(59,79): error TS2554: Expected 2 arguments, but got 3.
+src/modules/complaint_cms/pages/ComplaintQueuePage.tsx(60,13): error TS2322: Type '{ label: string; value: string; onChange: (status: string | null) => void; options: { value: string; label: string; }[]; }' is not assignable to type 'IntrinsicAttributes & SelectProps & RefAttributes<HTMLInputElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+  Property 'options' does not exist on type 'IntrinsicAttributes & SelectProps & RefAttributes<HTMLInputElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+src/modules/complaint_cms/pages/ComplaintQueuePage.tsx(70,22): error TS2339: Property 'Textarea' does not exist on type '(<C = "input">(props: PolymorphicComponentProps<C, InputProps>) => ReactElement<any, string | JSXElementConstructor<any>>) & ... 4 more ... & { ...; }'.
+src/modules/complaint_cms/pages/ComplaintQueuePage.tsx(77,18): error TS2322: Type '{ children: Element[]; spacing: string; }' is not assignable to type 'IntrinsicAttributes & GroupProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+  Property 'spacing' does not exist on type 'IntrinsicAttributes & GroupProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(2,24): error TS6133: 'Text' is declared but its value is never read.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(2,83): error TS6133: 'Loader' is declared but its value is never read.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(2,119): error TS2724: '"@mantine/core"' has no exported member named 'InputGroup'. Did you mean 'InputProps'?
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(2,144): error TS6133: 'Checkbox' is declared but its value is never read.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(2,154): error TS6133: 'Flex' is declared but its value is never read.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(2,160): error TS6133: 'Center' is declared but its value is never read.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(3,10): error TS6133: 'IconTrash' is declared but its value is never read.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(3,21): error TS6133: 'IconCheckCircle' is declared but its value is never read.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(3,38): error TS6133: 'IconXCircle' is declared but its value is never read.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(3,51): error TS6133: 'IconEdit' is declared but its value is never read.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(3,61): error TS6133: 'IconPlus' is declared but its value is never read.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(3,120): error TS2307: Cannot find module '@tabler/icons-react' or its corresponding type declarations.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(5,10): error TS2459: Module '"../api"' declares 'listComplaints' locally, but it is not exported.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(5,10): error TS6133: 'listComplaints' is declared but its value is never read.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(5,26): error TS2459: Module '"../api"' declares 'submitComplaint' locally, but it is not exported.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(5,43): error TS2459: Module '"../api"' declares 'complaintAction' locally, but it is not exported.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(5,60): error TS2459: Module '"../api"' declares 'getConfiguration' locally, but it is not exported.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(5,78): error TS2305: Module '"../api"' has no exported member 'NewComplaint'.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(6,8): error TS2613: Module '"/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/client/src/ui/components/PageHeader"' has no default export. Did you mean to use 'import { PageHeader } from "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/client/src/ui/components/PageHeader"' instead?
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(7,1): error TS6133: 'errorMessage' is declared but its value is never read.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(7,8): error TS2613: Module '"/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/client/src/lib/http"' has no default export. Did you mean to use 'import { errorMessage } from "/Users/techsavvy185/Documents/Fusion/Fusion-Integrated/client/src/lib/http"' instead?
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(24,37): error TS2559: Type 'string[]' has no properties in common with type 'InvalidateQueryFilters<readonly unknown[]>'.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(45,16): error TS7031: Binding element 'row' implicitly has an 'any' type.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(46,16): error TS2322: Type '{ children: Element[]; spacing: string; }' is not assignable to type 'IntrinsicAttributes & GroupProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+  Property 'spacing' does not exist on type 'IntrinsicAttributes & GroupProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(86,12): error TS2304: Cannot find name 'Textarea'.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(89,24): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(124,14): error TS2322: Type '{ children: Element[]; sx: { minWidth: number; }; }' is not assignable to type 'IntrinsicAttributes & TableProps & RefAttributes<HTMLTableElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+  Property 'sx' does not exist on type 'IntrinsicAttributes & TableProps & RefAttributes<HTMLTableElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(133,37): error TS2503: Cannot find namespace 'T'.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(133,52): error TS2345: Argument of type 'string' is not assignable to parameter of type 'readonly unknown[]'.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(133,72): error TS2339: Property 'map' does not exist on type 'NonNullable<InferDataFromTag<TQueryFnData, TTaggedQueryKey>>'.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(133,77): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(147,9): error TS2322: Type '{ total: number; page: number; onChange: (page: number) => void; }' is not assignable to type 'IntrinsicAttributes & PaginationProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+  Property 'page' does not exist on type 'IntrinsicAttributes & PaginationProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+src/modules/complaint_cms/routes.tsx(9,28): error TS2552: Cannot find name 'Navigate'. Did you mean 'Navigator'?
+
+Exit code: 2; 2.06 seconds
+
+## frontend-final-typecheck
+2026-11-01T18:16:14.190602+00:00
+Command: npx tsc --noEmit
+src/modules/complaint_cms/pages/MyComplaintsPage.tsx(62,93): error TS2322: Type '{ title: string; subtitle: any; actions: Element; }' is not assignable to type 'IntrinsicAttributes & { title: string; subtitle?: string | undefined; action?: ReactNode; }'.
+  Property 'actions' does not exist on type 'IntrinsicAttributes & { title: string; subtitle?: string | undefined; action?: ReactNode; }'. Did you mean 'action'?
+
+Exit code: 2; 1.59 seconds
+
+## frontend-final-typecheck
+2026-11-01T18:16:24.288632+00:00
+Command: npx tsc --noEmit
+
+Exit code: 0; 1.49 seconds
+
+## frontend-production-build
+2026-11-01T18:16:27.651181+00:00
+Command: npm run build
+
+> build
+> tsc -b && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 1010 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                      0.53 kB │ gzip:   0.33 kB
+dist/assets/iiitdmj_logo-v9-ebxtE.png               30.89 kB
+dist/assets/IIITJ_logo-BnzEnV7U.webp                64.62 kB
+dist/assets/index-B68ekXUP.css                     210.03 kB │ gzip:  31.37 kB
+dist/assets/create-event-handler-C3eq9ghx.js         0.07 kB │ gzip:   0.08 kB │ map:     0.67 kB
+dist/assets/PageHeader-C2i-3BL2.js                   0.32 kB │ gzip:   0.24 kB │ map:     1.18 kB
+dist/assets/ErrorState-rlAIyxe7.js                   0.35 kB │ gzip:   0.26 kB │ map:     1.26 kB
+dist/assets/StatusBadge-D9XyP1vL.js                  0.42 kB │ gzip:   0.30 kB │ map:     1.18 kB
+dist/assets/api-ClxRCUEp.js                          0.47 kB │ gzip:   0.23 kB │ map:     2.13 kB
+dist/assets/Paper-BjXShSP6.js                        0.65 kB │ gzip:   0.41 kB │ map:     3.57 kB
+dist/assets/CheckIcon-DD5Qdz33.js                    0.70 kB │ gzip:   0.42 kB │ map:     2.78 kB
+dist/assets/CpiBadge-3023XC9v.js                     0.89 kB │ gzip:   0.52 kB │ map:     2.85 kB
+dist/assets/RecruiterLoginPage-Dz8pQTQy.js           0.98 kB │ gzip:   0.62 kB │ map:     3.54 kB
+dist/assets/FormModal-DS4ec7QL.js                    1.23 kB │ gzip:   0.68 kB │ map:     4.29 kB
+dist/assets/routes-CNgZNY_J.js                       1.23 kB │ gzip:   0.60 kB │ map:     1.20 kB
+dist/assets/Card-CLQVyhj7.js                         1.26 kB │ gzip:   0.67 kB │ map:     7.44 kB
+dist/assets/FormSection-CFn3iJx3.js                  1.29 kB │ gzip:   0.69 kB │ map:     6.13 kB
+dist/assets/List-BCADtKxE.js                         1.50 kB │ gzip:   0.73 kB │ map:     8.17 kB
+dist/assets/ComplaintQueuePage-C_T7Sts2.js           1.86 kB │ gzip:   0.88 kB │ map:     5.93 kB
+dist/assets/Progress-B38N1b11.js                     2.33 kB │ gzip:   0.99 kB │ map:    13.61 kB
+dist/assets/ComplaintAdminPage-BjsWejB_.js           2.57 kB │ gzip:   1.19 kB │ map:     8.01 kB
+dist/assets/MyApplicationsPage-BC5ooyXu.js           2.57 kB │ gzip:   1.28 kB │ map:     7.15 kB
+dist/assets/RegistrationApprovalsPage-BDFfikS-.js    2.71 kB │ gzip:   1.37 kB │ map:     7.68 kB
+dist/assets/Switch-DX5C5vMM.js                       2.75 kB │ gzip:   1.32 kB │ map:    12.59 kB
+dist/assets/AcceptInvitePage-8Vv7FVpa.js             3.01 kB │ gzip:   1.44 kB │ map:     9.43 kB
+dist/assets/MyComplaintsPage-Cd1hrw6O.js             3.22 kB │ gzip:   1.35 kB │ map:     8.94 kB
+dist/assets/routes-BelFsJcZ.js                       3.40 kB │ gzip:   1.20 kB │ map:     3.55 kB
+dist/assets/Grid-DeWQQkoR.js                         3.60 kB │ gzip:   1.44 kB │ map:    19.64 kB
+dist/assets/Textarea-DCzb-z9q.js                     3.63 kB │ gzip:   1.67 kB │ map:    17.08 kB
+dist/assets/HistoryDrawer-BobidINO.js                3.74 kB │ gzip:   1.69 kB │ map:    16.39 kB
+dist/assets/FocusTrap-xMG7CxyP.js                    3.84 kB │ gzip:   1.64 kB │ map:    17.67 kB
+dist/assets/Modal-E-RTHQdv.js                        3.95 kB │ gzip:   1.32 kB │ map:    24.47 kB
+dist/assets/Table-C4XztV8e.js                        4.02 kB │ gzip:   1.57 kB │ map:    18.14 kB
+dist/assets/InterviewsPage-Gg8YXST4.js               4.10 kB │ gzip:   1.87 kB │ map:    11.69 kB
+dist/assets/Drawer-BheNU8gs.js                       4.17 kB │ gzip:   1.42 kB │ map:    25.32 kB
+dist/assets/StudentCpiPage-gdSTMA6L.js               4.22 kB │ gzip:   1.88 kB │ map:    12.63 kB
+dist/assets/AnnouncementsPage-B9ADYnhA.js            4.24 kB │ gzip:   1.86 kB │ map:    12.08 kB
+dist/assets/RecruiterInterviewsPage-BY0Vnmg3.js      5.41 kB │ gzip:   2.32 kB │ map:    16.32 kB
+dist/assets/NativeScrollArea-CMuoUycK.js             5.47 kB │ gzip:   2.17 kB │ map:    28.01 kB
+dist/assets/RegistrationPage-D5vKQP7q.js             5.79 kB │ gzip:   2.35 kB │ map:    15.82 kB
+dist/assets/RecruiterApplicantsPage-B3Ztk3sd.js      5.81 kB │ gzip:   2.52 kB │ map:    16.69 kB
+dist/assets/RecruiterPostingsPage-Dw4vLL1j.js        5.88 kB │ gzip:   2.40 kB │ map:    17.44 kB
+dist/assets/CompaniesPage-Dl_aUqb4.js                6.56 kB │ gzip:   2.67 kB │ map:    20.69 kB
+dist/assets/hooks-BsXr2Q-l.js                        6.93 kB │ gzip:   1.77 kB │ map:    31.46 kB
+dist/assets/Pagination-CSJyWN0-.js                   7.17 kB │ gzip:   2.72 kB │ map:    30.93 kB
+dist/assets/ReportsPage-B3Z0GhyF.js                  7.82 kB │ gzip:   2.81 kB │ map:    27.60 kB
+dist/assets/Menu-5-u3aC7b.js                         7.85 kB │ gzip:   2.95 kB │ map:    36.52 kB
+dist/assets/ApplicationsPage-DhatMgaW.js             8.01 kB │ gzip:   3.35 kB │ map:    24.85 kB
+dist/assets/DataTable-DMBoX5RH.js                    8.51 kB │ gzip:   3.16 kB │ map:    42.32 kB
+dist/assets/OffersPage-uaYnoBaW.js                   8.75 kB │ gzip:   3.19 kB │ map:    25.35 kB
+dist/assets/TagsInput-BGKizXcv.js                    8.83 kB │ gzip:   3.35 kB │ map:    42.85 kB
+dist/assets/PostingsPage-Dph1e13u.js                12.05 kB │ gzip:   4.60 kB │ map:    36.26 kB
+dist/assets/NumberInput-CrgAkkXC.js                 21.17 kB │ gzip:   8.12 kB │ map:   118.41 kB
+dist/assets/Select-CTVJyjiA.js                      27.54 kB │ gzip:   8.92 kB │ map:   116.87 kB
+dist/assets/DateTimePicker-BOIfpQb-.js              52.38 kB │ gzip:  15.38 kB │ map:   188.95 kB
+dist/assets/index-CS4JcFX8.js                      502.65 kB │ gzip: 162.40 kB │ map: 3,674.48 kB
+✓ built in 1.64s
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+Exit code: 0; 3.33 seconds

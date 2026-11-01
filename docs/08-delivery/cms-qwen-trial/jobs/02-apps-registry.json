@@ -1,0 +1,21 @@
+{
+  "label": "AppConfig and module registry",
+  "instruction": "Generate modules/complaint_cms/apps.py and modules/complaint_cms/registry.py for the Complaint Management System module using the REQUIRED Fusion registry interface shown in modules/placement/registry.py. AppConfig class ComplaintCmsConfig has default_auto_field = \"django.db.models.BigAutoField\", name = \"modules.complaint_cms\", label = \"complaint_cms\", verbose_name = \"Complaint Management System\". registry.py must define MODULE plain dictionary (code \"complaint_cms\", label \"Complaint Management System\", base_path \"/complaints\", nav_section \"Services\", icon \"WarningCircle\", status \"active\", sort_order 40), NAV_ITEMS list of dictionaries for /complaints/mine (permission complaint_cms.complaint.view_self), /complaints/queue (permission complaint_cms.task.view), /complaints/admin (permission complaint_cms.configuration.manage), PERMISSIONS list of (code,label) tuples with codes complaint_cms.complaint.view_self, complaint_cms.complaint.create, complaint_cms.complaint.review, complaint_cms.complaint.resolve, complaint_cms.complaint.escalate, complaint_cms.task.view, complaint_cms.configuration.manage, complaint_cms.record.manage, ROLE_GRANTS dict mapping student/faculty/staff/Complainant, Caretaker/Warden/Unit Incharge/Section Head/Complaint Authority, and Dean/Registrar/Director/Complaint Administrator to permission lists so every declared permission has a holder, and SYSTEM_PERMISSIONS = []. Do not import views or django.urls in registry.py. Return valid JSON response.",
+  "allowed_paths": [
+    "modules/complaint_cms/apps.py",
+    "modules/complaint_cms/registry.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": false,
+  "context_files": [
+    "modules/placement/registry.py",
+    "docs/08-delivery/cms-qwen-trial/problem-statement-context.md"
+  ],
+  "num_predict": 2400,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

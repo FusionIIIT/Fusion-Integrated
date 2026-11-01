@@ -1,0 +1,45 @@
+```
+import { http } from '../../lib/http';
+import type * as T from './types';
+
+async function listComplaints(): Promise<T.Complaint[]> {
+  const res = await http.get('/complaints/');
+  return res.data;
+}
+
+async function submitComplaint(payload: T.NewComplaint): Promise<void> {
+  await http.post('/complaints/', payload);
+}
+
+async function listTasks(complaintId: number): Promise<T.ComplaintTask[]> {
+  const res = await http.get(`/complaints/${complaintId}/tasks`);
+  return res.data;
+}
+
+async function listNotifications(complaintId: number): Promise<T.ComplaintNotificationRecord[]> {
+  const res = await http.get(`/complaints/${complaintId}/notifications`);
+  return res.data;
+}
+
+async function complaintAction(
+  id: number,
+  action: string,
+  data?: Record<string, unknown>
+): Promise<void> {
+  await http.patch(`/complaints/${id}/action`, { action, ...data });
+}
+
+async function getConfiguration(): Promise<T.ConfigurationResponse> {
+  const res = await http.get('/configuration/');
+  return res.data;
+}
+
+async function saveConfiguration(payload: Record<string, unknown>): Promise<void> {
+  await http.put('/configuration/', payload);
+}
+
+async function getRecords(): Promise<T.RecordListView[]> {
+  const res = await http.get('/records/');
+  return res.data;
+}
+```

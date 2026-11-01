@@ -1,0 +1,23 @@
+{
+  "label": "Initial complaint submission service",
+  "instruction": "Generate the initial CMS submission service in modules/complaint_cms/services/complaints.py, maximum 75 lines. Define submit_complaint(actor, data) using existing models from modules.complaint_cms.models and domain helpers from modules.complaint_cms.domain.policy. Enforce complaint_cms.complaint.create permission via actor.has_permission (raising PermissionDeniedError from core.api.exceptions), validate required title and description (raising DomainValidationError), look up ComplaintCategory and optional RoutingRule, generate a unique tracking_code, compute sla_due_at using timezone.now() + timedelta(hours=...), and inside transaction.atomic() create the Complaint, initial ComplaintUpdate, initial ComplaintTask, and ComplaintNotification. Return the created Complaint instance. Return raw Python source only without code fences.",
+  "allowed_paths": [
+    "modules/complaint_cms/services/complaints.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "context_files": [
+    "modules/complaint_cms/models.py",
+    "modules/complaint_cms/domain/policy.py",
+    "modules/complaint_cms/registry.py",
+    "fusion_auth/principal.py",
+    "core/api/exceptions.py"
+  ],
+  "num_predict": 2200,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

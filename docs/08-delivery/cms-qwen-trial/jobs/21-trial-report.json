@@ -1,0 +1,20 @@
+{
+  "label": "Generate genuine local-model trial record",
+  "instruction": "Write a concise factual TRIAL_RECORD.md in Markdown with sections Configuration, Method, Observed generation results, Build checks, Limits, Reproduce. Use supplied observed-results.json and mechanical-corrections.md. This was one real local Ollama qwen2.5-coder:3b one-shot trial for the Complaint Management System (complaint_cms) module. Record model size/quant/version, hardware, official Fusion base SHA (02b01fea4a67b257ea7000009f06a1561699550e), API Python runner (devtools/qwen_cms_trial.py), raw responses and payloads retained in responses/, exact prompts in prompts.md, host mechanical changes in mechanical-corrections.md; no deliberate bugs inserted, functional bugs left, no BR correctness/missing requirement/security/optimization tests. Include passing checks (Django check, makemigrations, isolated migrate, seed_modules, no_cross_module_fk, lint-imports, nav_matches_routes, tsc --noEmit, npm run build). Reproduce a request with python3 devtools/qwen_cms_trial.py generate docs/08-delivery/cms-qwen-trial/jobs/05-queries.json. Max 140 lines.",
+  "allowed_paths": [
+    "docs/08-delivery/cms-qwen-trial/TRIAL_RECORD.md"
+  ],
+  "context_files": [
+    "docs/08-delivery/cms-qwen-trial/observed-results.json",
+    "docs/08-delivery/cms-qwen-trial/mechanical-corrections.md"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 3200,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

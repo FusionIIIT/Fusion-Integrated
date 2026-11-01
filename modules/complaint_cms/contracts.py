@@ -1,0 +1,34 @@
+from __future__ import annotations
+
+from collections.abc import Mapping
+from dataclasses import dataclass
+from typing import Sequence
+
+from .models import UserScopedModel as UserRef, ComplaintCategory, RoutingRule, Complaint
+
+
+@dataclass(frozen=True)
+class ComplaintSummary:
+    user_id: int
+    total_complaints: int
+    open_complaints: int
+    resolved_complaints: int
+
+
+def get_complaint_summaries_for_users(user_ids: Sequence[int]) -> Mapping[int, ComplaintSummary]:
+    summaries = {}
+    for r in UserRef.objects.filter(user_id__in=user_ids):
+        complaint_count = Complaint.objects.filter(user_id=r.user_id).count()
+        open_complaints = Complaint.objects.filter(
+            user_id=r.user_id, status="Submitted"
+        ).count()
+        resolved_complaints = Complaint.objects.filter(
+            user_id=r.user_id, status="Resolved"
+        ).count()
+        summaries[r.user_id] = ComplaintSummary(
+            user_id=r.user_id,
+            total_complaints=complaint_count,
+            open_complaints=open_complaints,
+            resolved_complaints=resolved_complaints,
+        )
+    return summaries

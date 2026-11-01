@@ -1,0 +1,20 @@
+{
+  "label": "Generate module documentation",
+  "instruction": "Write a concise README.md in Markdown for the generated Complaint Management System (complaint_cms) module, max 90 lines. Describe the actual file structure, existing route paths (/complaints/mine, /complaints/queue, /complaints/admin and /api/v1/complaints/...) and mechanical integration setup, not requirements compliance. Explain that it uses existing Fusion auth/config/DB and that python manage.py migrate, seed_modules and client npm run build are the integration commands. State that only build/structural checks are performed in this Phase 1 one-shot local LLM trial and workflow correctness is unverified. Link evidence directory ../../docs/08-delivery/cms-qwen-trial for logs and check outputs. Return Markdown only without code fences.",
+  "allowed_paths": [
+    "modules/complaint_cms/README.md"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "context_files": [
+    "modules/complaint_cms/registry.py",
+    "modules/complaint_cms/api/urls.py"
+  ],
+  "num_predict": 1800,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

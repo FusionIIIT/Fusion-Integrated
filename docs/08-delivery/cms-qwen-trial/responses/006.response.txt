@@ -1,0 +1,89 @@
+```
+from datetime import datetime, timedelta
+import uuid
+from django.db import transaction
+from .models import (
+    Complaint,
+    ComplaintCategory,
+    ComplaintRoutingRule,
+    ComplaintAttachment,
+    ComplaintUpdate,
+    ComplaintTask,
+    ComplaintNotification
+)
+from .domain.policy import can_transition, default_sla_hours
+from .exceptions import BadRequestError, NotFoundError
+
+def submit_complaint(actor, data):
+    if not actor.has_permission('complaint_cms.complaint.create'):
+        raise PermissionDeniedError()
+
+    try:
+        category = ComplaintCategory.objects.get(code=data['category'])
+    except ComplaintCategory.DoesNotExist:
+        raise NotFoundError("Complaint category not found")
+
+    routing_rule = None
+    if 'routing_rule' in data:
+        try:
+            routing_rule = ComplaintRoutingRule.objects.get(category_id=category.id)
+        except ComplaintRoutingRule.DoesNotExist:
+            pass
+
+    title = data.get('title', '')
+    description = data.get('description', '')
+
+    if not (title and description):
+        raise BadRequestError(message="Title and description are required")
+
+    tracking_code = str(uuid.uuid4()).replace('-', '').upper()[:10]
+    sla_due_at = datetime.now().astimezone() + timedelta(hours=default_sla_hours(category.severity_default))
+
+    with transaction.atomic():
+        complaint = Complaint(
+            tracking_code=tracking_code,
+            user_id=actor.user_id,
+            is_anonymous=False,
+            category=category,
+            title=title,
+            description=description,
+            location_type=data.get('location_type'),
+            location_details=data.get('location_details'),
+            severity=data.get('severity', 2),
+            status='Submitted',
+            escalation_level=1,
+            sla_due_at=sla_due_at
+        )
+        complaint.save()
+
+        update = ComplaintUpdate(
+            complaint=complaint,
+            actor_id=actor.user_id,
+            update_type='Comment',
+            comment=f"Complaint submitted by {actor.username}",
+            visibility=True
+        )
+        update.save()
+
+        task = ComplaintTask(
+            complaint=complaint,
+            assigned_to_id=None,
+            role_name='',
+            task_type='',
+            status='Pending',
+            due_at=datetime.now().astimezone()
+        )
+        task.save()
+
+        notification = ComplaintNotification(
+            complaint=complaint,
+            recipient_id=actor.user_id,
+            title="New Complaint Submitted",
+            message=f"A new complaint has been submitted: {title}",
+            is_read=False
+        )
+        notification.save()
+
+    return complaint
+
+```

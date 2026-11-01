@@ -1,0 +1,78 @@
+export interface ComplaintCategory {
+  id?: number;
+  code: string;
+  name: string;
+  description: string;
+  severity_default: number;
+  sla_ack_hours: number;
+  sla_resolution_hours: number;
+  is_active: boolean;
+}
+
+export interface RoutingRule {
+  id?: number;
+  category_id: number;
+  location_type: string;
+  target_section: string;
+  primary_authority_role: string;
+  escalation_authority_role: string;
+  is_active: boolean;
+}
+
+export interface Complaint {
+  id?: number;
+  tracking_code: string;
+  user_id: number;
+  status: string;
+  assigned_to_id?: number;
+  assigned_role: string;
+  escalation_level: number;
+  sla_due_at?: Date;
+  resolved_at?: Date;
+  closed_at?: Date;
+  reopen_count: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export type NewComplaint = Omit<Complaint, 'id'>;
+
+export interface ComplaintTask {
+  id?: number;
+  complaint_id: number;
+  assigned_to_id?: number;
+  role_name: string;
+  task_type: string;
+  status: string;
+  due_at?: Date;
+  completed_at?: Date;
+}
+
+export interface ComplaintUpdateRecord {
+  id?: number;
+  complaint_id: number;
+  actor_id: number;
+  update_type: string;
+  visibility: boolean;
+  comment: string;
+  old_status?: string;
+  new_status?: string;
+}
+
+export interface ComplaintNotificationRecord {
+  id?: number;
+  complaint_id: number;
+  recipient_id: number;
+  title: string;
+  message: string;
+  is_read: boolean;
+}
+
+export interface ConfigurationResponse {
+  categories: ComplaintCategory[];
+  routing_rules: RoutingRule[];
+  recordsCount?: number;
+  records?: Record<string, any>[];
+}
+
+export type RecordListView = Record<string, any>;

@@ -1,0 +1,106 @@
+```
+from rest_framework import serializers
+from .models import (
+    ComplaintCategory,
+    RoutingRule,
+    Complaint,
+    ComplaintAttachment,
+    ComplaintUpdate,
+    ComplaintTask,
+    ComplaintNotification
+)
+
+
+class ComplaintCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ComplaintCategory
+        fields = "__all__"
+
+
+class RoutingRuleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RoutingRule
+        fields = "__all__"
+
+
+class ComplaintSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    tracking_code = serializers.CharField(max_length=100, read_only=True)
+    user_id = serializers.IntegerField(read_only=True)
+    status = serializers.CharField(
+        max_length=10,
+        choices=[
+            ('Submitted', 'Submitted'),
+            ('In Progress', 'In Progress'),
+            ('Resolved', 'Resolved'),
+            ('Rejected', 'Rejected'),
+            ('Closed', 'Closed')
+        ],
+        default='Submitted'
+    )
+    assigned_to_id = serializers.IntegerField(null=True, db_index=True, read_only=True)
+    assigned_role = serializers.CharField(max_length=100, blank=True, read_only=True)
+    escalation_level = serializers.PositiveIntegerField(default=1, read_only=True)
+    sla_due_at = serializers.DateTimeField(null=True, read_only=True)
+    resolved_at = serializers.DateTimeField(null=True, read_only=True)
+    closed_at = serializers.DateTimeField(null=True, read_only=True)
+    reopen_count = serializers.PositiveIntegerField(default=0, read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
+    updated_at = serializers.DateTimeField(read_only=True)
+
+    class Meta:
+        model = Complaint
+        fields = "__all__"
+
+class ComplaintTaskSerializer(serializers.ModelSerializer):
+    complaint = serializers.PrimaryKeyRelatedField(queryset=Complaint.objects.all())
+    id = serializers.IntegerField(read_only=True)
+    assigned_to_id = serializers.IntegerField(null=True, db_index=True, read_only=True)
+    role_name = serializers.CharField(max_length=100, blank=True, read_only=True)
+    task_type = serializers.CharField(max_length=100, blank=True, read_only=True)
+    status = serializers.CharField(
+        max_length=10,
+        choices=[
+            ('Pending', 'Pending'),
+            ('Completed', 'Completed')
+        ],
+        default='Pending'
+    )
+    due_at = serializers.DateTimeField(null=True, read_only=True)
+    completed_at = serializers.DateTimeField(null=True, read_only=True)
+
+    class Meta:
+        model = ComplaintTask
+        fields = "__all__"
+
+
+class ComplaintUpdateSerializer(serializers.ModelSerializer):
+    complaint = serializers.PrimaryKeyRelatedField(queryset=Complaint.objects.all())
+    actor_id = serializers.IntegerField(db_index=True, read_only=True)
+    update_type = serializers.CharField(
+        max_length=10,
+        choices=[
+            ('Comment', 'Comment'),
+            ('StatusChange', 'Status Change')
+        ]
+    )
+    visibility = serializers.BooleanField(default=False, read_only=True)
+    comment = serializers.TextField()
+    old_status = serializers.CharField(max_length=10, null=True, read_only=True)
+    new_status = serializers.CharField(max_length=10, null=True, read_only=True)
+
+    class Meta:
+        model = ComplaintUpdate
+        fields = "__all__"
+
+class ComplaintNotificationSerializer(serializers.ModelSerializer):
+    complaint = serializers.PrimaryKeyRelatedField(queryset=Complaint.objects.all())
+    recipient_id = serializers.IntegerField(db_index=True, read_only=True)
+    title = serializers.CharField(max_length=255, read_only=True)
+    message = serializers.TextField(read_only=True)
+    is_read = serializers.BooleanField(default=False, read_only=True)
+
+    class Meta:
+        model = ComplaintNotification
+        fields = "__all__"
+```

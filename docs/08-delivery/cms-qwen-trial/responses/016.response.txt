@@ -1,0 +1,15 @@
+```
+import { lazy } from "react";
+import { type RouteObject } from "react-router-dom";
+
+const MyComplaintsPage = lazy(() => import("./pages/MyComplaintsPage"));
+const ComplaintQueuePage = lazy(() => import("./pages/ComplaintQueuePage"));
+const ComplaintAdminPage = lazy(() => import("./pages/ComplaintAdminPage"));
+
+export const routes: RouteObject[] = [
+  { index: true, element: <Navigate to="mine" replace /> },
+  { path: "mine", element: <MyComplaintsPage /> },
+  { path: "queue", element: <ComplaintQueuePage /> },
+  { path: "admin", element: <ComplaintAdminPage /> }
+];
+```

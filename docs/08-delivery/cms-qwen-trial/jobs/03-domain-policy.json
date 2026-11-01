@@ -1,0 +1,19 @@
+{
+  "label": "Pure Python domain policy and SLA constants",
+  "instruction": "Generate only modules/complaint_cms/domain/policy.py as a compact PURE-PYTHON module (max 45 lines). Domain modules must not import Django, DRF, ORM models or Celery. Export COMPLAINT_STATUSES tuple, SEVERITY_SLA_HOURS dict (Mapping low/medium/high/critical to default SLA hours), ALLOWED_TRANSITIONS dict mapping each complaint status to a set of allowed next statuses, can_transition(current_status, next_status) bool helper, and default_sla_hours(severity, fallback_hours=48) int helper. Return raw Python source only without code fences.",
+  "allowed_paths": [
+    "modules/complaint_cms/domain/policy.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "context_files": [
+    "modules/complaint_cms/models.py"
+  ],
+  "num_predict": 1200,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

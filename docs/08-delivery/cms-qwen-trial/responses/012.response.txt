@@ -1,0 +1,31 @@
+```
+from rest_framework import generics, permissions
+from .models import ComplaintCategory, RoutingRule, ComplaintUpdate, ComplaintNotification
+from .serializers import (
+    ComplaintCategorySerializer,
+    RoutingRuleSerializer,
+    ComplaintUpdateSerializer,
+    ComplaintNotificationSerializer
+)
+from drf_spectacular.utils import extend_schema
+from django.contrib.auth.decorators import login_required
+
+class ConfigurationView(generics.ListCreateAPIView):
+    queryset = ComplaintCategory.objects.all() | RoutingRule.objects.all()
+    serializer_class = ComplaintCategorySerializer if request.method == 'POST' else RoutingRuleSerializer
+    permission_classes = [permissions.IsAuthenticated, HasModuleGrant("complaint_cms"), HasPermission("complaint_cms.configuration.manage")]
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
+@extend_schema(responses={200: ComplaintUpdateSerializer(many=True)})
+@login_required
+def record_list_view(request):
+    updates = ComplaintUpdate.objects.order_by('-created_at')[:10]
+    notifications = ComplaintNotification.objects.order_by('-created_at')[:10]
+    data = list(updates) + list(notifications)
+    return Response(data)
+
+```

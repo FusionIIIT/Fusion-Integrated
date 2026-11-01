@@ -1,0 +1,126 @@
+```
+import { useEffect } from 'react';
+import { useForm } from '@mantine/form';
+import { Group, Stack, Text, Title, TextInput, Button, Select, Paper, Table, Pagination, Loader } from "@mantine/core";
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import { getConfiguration, saveConfiguration, getRecords } from '../api';
+import PageHeader from '../../../ui/components/PageHeader';
+import errorMessage from '../../../lib/http';
+
+const ComplaintAdminPage = () => {
+  const queryClient = useQueryClient();
+
+  // Fetch configuration data for complaint categories
+  const { isLoading: configLoading, error: configError, data: configData } = useQuery(['config'], getConfiguration);
+
+  // Form state management using Mantine's useForm hook
+  const form = useForm({
+    initialValues: {},
+    validate: (values) => ({
+      name: values.name ? null : "Category name is required",
+    }),
+  });
+
+  // Mutation to add/update a new category
+  const [addOrUpdateCategory] = useMutation(saveConfiguration, {
+    onSuccess() {
+      queryClient.invalidateQueries(['config']);
+      form.reset();
+    },
+    onError(error) {
+      console.error("Failed to update or create category:", error);
+    }
+  });
+
+  useEffect(() => {
+    if (!configLoading && !configError) {
+      form.setValues(configData.categories || []);
+    }
+  }, [configLoading, configError, configData]);
+
+  // Handle form submission
+  const handleSubmit = async (values) => {
+    try {
+      await addOrUpdateCategory(values);
+    } catch (error) {
+      console.error("Form submission failed", error);
+    }
+  };
+
+  // Pagination setup for records
+  const [page, setPage] = useState(1);
+  const perPage = 20;
+  const totalRecords = configData?.recordsCount ?? 0;
+
+  return (
+    <Paper shadow="sm" p="md">
+      <PageHeader title="Complaint Admin" subtitle="Manage complaint categories and notifications" />
+      
+      {/* Form to add/update complaint categories */}
+      {form.errors.name && <Text color="red">{form.errors.name}</Text>}
+      <Group position="center" mt={30}>
+        <TextInput {...form.getInputProps('name')} label="Category Name" required />
+        <Button type="submit" onClick={() => form.submit()}>Save Category</Button>
+      </Group>
+
+      {/* Display existing categories from configuration data */}
+      <Title order={4} mt={50}>Existing Categories</Title>
+      <Table striped highlightRows>
+        <thead>
+          <tr>
+            <th>Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          {configData?.categories.map((category) => (
+            <tr key={category.id}>
+              <td>{category.name}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+
+      {/* Pagination for records */}
+      <Pagination
+        page={page}
+        onChange={(newPage) => setPage(newPage)}
+        totalPages={Math.ceil(totalRecords / perPage)}
+        totalItems={totalRecords}
+        size="lg"
+        align="center"
+        mt={20}
+      />
+
+      {/* Fetch audit updates/notifications */}
+      <Title order={4} mt={50}>Audit Updates and Notifications</Title>
+      {configLoading && <Loader />}
+      {configError ? <Text color="red">{errorMessage(configError)}</Text> : null}
+
+      {configData?.records.length > 0 && (
+        <Table striped highlightRows>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Action</th>
+              <th>Description</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {configData.records.slice((page - 1) * perPage, page * perPage).map(record => (
+              <tr key={record.id}>
+                <td>{record.id}</td>
+                <td>{record.action}</td>
+                <td>{record.description}</td>
+                <td>{new Date(record.date).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      )}
+    </Paper>
+  );
+};
+
+export default ComplaintAdminPage;
+```

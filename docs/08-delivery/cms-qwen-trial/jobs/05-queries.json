@@ -1,0 +1,22 @@
+{
+  "label": "Complaint query service",
+  "instruction": "Create ONE short Python file, modules/complaint_cms/services/queries.py (maximum 45 lines). It must contain exactly three MODULE-LEVEL functions and no classes: list_complaints(actor), assigned_tasks(actor), and list_notifications(actor). Enforce actor.has_permission(\"complaint_cms.complaint.view_self\") or \"complaint_cms.task.view\" as appropriate and raise core.api.exceptions.PermissionDeniedError if access is not granted. Return Django QuerySets from Complaint, ComplaintTask and ComplaintNotification filtered by actor.user_id (or all complaints if actor has complaint_cms.complaint.review or complaint_cms.record.manage). Use only existing model classes and fields from modules.complaint_cms.models. Return raw Python source only without code fences.",
+  "allowed_paths": [
+    "modules/complaint_cms/services/queries.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "context_files": [
+    "modules/complaint_cms/models.py",
+    "modules/complaint_cms/registry.py",
+    "fusion_auth/principal.py",
+    "core/api/exceptions.py"
+  ],
+  "num_predict": 1500,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

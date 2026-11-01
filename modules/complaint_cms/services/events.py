@@ -1,0 +1,57 @@
+from datetime import datetime, timedelta
+from django.utils import timezone
+from ..models import Complaint, ComplaintTask, ComplaintUpdate, ComplaintNotification
+
+def process_complaint_sla():
+    now = timezone.now()
+    overdue_complaints = Complaint.objects.filter(
+        sla_due_at__lt=now,
+        is_active=True
+    )
+    
+    for complaint in overdue_complaints:
+        if complaint.sla_due_at + timedelta(hours=complaint.category.sla_ack_hours) > now:
+            complaint.status = 'Escalated'
+            complaint.save()
+            
+            # Create a new task for the next level of escalation
+            task = ComplaintTask(complaint=complaint)
+            task.role_name = complaint.category.escalation_authority_role
+            task.task_type = 'Escalation'
+            task.due_at = complaint.sla_due_at + timedelta(hours=complaint.category.sla_resolution_hours)
+            task.status = 'Pending'
+            task.save()
+            
+            # Record an update
+            update = ComplaintUpdate(complaint=complaint)
+            update.actor_id = 1  # Assuming admin user ID
+            update.update_type = 'StatusChange'
+            update.comment = f'Complaint {complaint.tracking_code} has been escalated.'
+            update.old_status = complaint.status
+            update.new_status = 'Escalated'
+            update.visibility = True
+            update.save()
+            
+            # Send notification
+            notification = ComplaintNotification(complaint=complaint)
+            notification.recipient_id = complaint.user_id
+            notification.title = 'Complaint Escalated'
+            notification.message = f'Your complaint {complaint.tracking_code} has been escalated to the next level.'
+            notification.is_read = False
+            notification.save()
+
+def auto_close_resolved_complaints():
+    now = timezone.now()
+    resolved_complaints = Complaint.objects.filter(
+        status='Resolved',
+        closed_at__isnull=True,
+        resolution_summary='',
+        feedback_rating=None,
+        feedback_comment=''
+    ).exclude(assigned_to_id=0)  # Exclude unassigned complaints
+    
+    for complaint in resolved_complaints:
+        if (now - complaint.resolved_at).days > 7:
+            complaint.closed_at = now
+            complaint.status = 'Closed'
+            complaint.save()

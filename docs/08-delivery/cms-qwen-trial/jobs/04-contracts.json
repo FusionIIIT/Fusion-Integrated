@@ -1,0 +1,20 @@
+{
+  "label": "Public cross-module contracts",
+  "instruction": "Generate only modules/complaint_cms/contracts.py, maximum 45 lines. Cross-module contract getters must accept a sequence of integer user_ids (Sequence[int]) and use actual models from modules.complaint_cms.models. Define frozen dataclass ComplaintSummary(user_id: int, total_complaints: int, open_complaints: int, resolved_complaints: int) and function get_complaint_summaries_for_users(user_ids: Sequence[int]) -> dict[int, ComplaintSummary]. Return raw Python source only without code fences.",
+  "allowed_paths": [
+    "modules/complaint_cms/contracts.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "context_files": [
+    "modules/directory/contracts.py",
+    "modules/complaint_cms/models.py"
+  ],
+  "num_predict": 1400,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

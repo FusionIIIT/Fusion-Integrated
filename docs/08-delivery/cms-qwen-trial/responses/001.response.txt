@@ -1,0 +1,125 @@
+```python
+from django.db import models
+
+
+class TimeStampedModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class UserScopedModel(models.Model):
+    user_id = models.IntegerField(db_index=True)
+
+    class Meta:
+        abstract = True
+
+
+@dataclass(frozen=True)
+class Principal:
+    pass  # Placeholder for the principal object as it's not defined in this context
+
+
+class ComplaintCategory(TimeStampedModel, UserScopedModel):
+    code = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    severity_default = models.PositiveIntegerField(choices=[(1, 'Low'), (2, 'Medium'), (3, 'High')])
+    sla_ack_hours = models.PositiveIntegerField(default=48)
+    sla_resolution_hours = models.PositiveIntegerField(default=72)
+    is_active = models.BooleanField(default=True)
+
+
+class RoutingRule(TimeStampedModel, UserScopedModel):
+    category = models.ForeignKey('ComplaintCategory', on_delete=models.CASCADE)
+    location_type = models.CharField(max_length=100)
+    target_section = models.CharField(max_length=255)
+    primary_authority_role = models.CharField(max_length=100)
+    escalation_authority_role = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+
+
+class Complaint(TimeStampedModel, UserScopedModel):
+    tracking_code = models.CharField(max_length=100, unique=True)
+    user_id = models.IntegerField(db_index=True)
+    is_anonymous = models.BooleanField(default=False)
+    category = models.ForeignKey('ComplaintCategory', on_delete=models.SET_NULL, null=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    location_type = models.CharField(max_length=100)
+    location_details = models.TextField(blank=True)
+    severity = models.PositiveIntegerField(choices=[(1, 'Low'), (2, 'Medium'), (3, 'High')])
+    status = models.CharField(
+        max_length=10,
+        choices=[
+            ('Submitted', 'Submitted'),
+            ('In Progress', 'In Progress'),
+            ('Resolved', 'Resolved'),
+            ('Rejected', 'Rejected'),
+            ('Closed', 'Closed')
+        ],
+        default='Submitted'
+    )
+    assigned_to_id = models.IntegerField(null=True, db_index=True)
+    assigned_role = models.CharField(max_length=100, blank=True)
+    escalation_level = models.PositiveIntegerField(default=1)
+    sla_due_at = models.DateTimeField(null=True)
+    resolved_at = models.DateTimeField(null=True)
+    closed_at = models.DateTimeField(null=True)
+    resolution_summary = models.TextField(blank=True)
+    reopen_count = models.PositiveIntegerField(default=0)
+    feedback_rating = models.PositiveIntegerField(null=True, blank=True)
+    feedback_comment = models.TextField(blank=True)
+
+
+class ComplaintAttachment(TimeStampedModel):
+    complaint = models.ForeignKey('Complaint', on_delete=models.CASCADE)
+    uploaded_by_id = models.IntegerField(db_index=True)
+    file_name = models.CharField(max_length=255)
+    file_url = models.URLField()
+    stage = models.CharField(max_length=100, default='Initial')
+
+
+class ComplaintUpdate(TimeStampedModel):
+    complaint = models.ForeignKey('Complaint', on_delete=models.CASCADE)
+    actor_id = models.IntegerField(db_index=True)
+    update_type = models.CharField(
+        max_length=10,
+        choices=[
+            ('Comment', 'Comment'),
+            ('StatusChange', 'Status Change')
+        ]
+    )
+    visibility = models.BooleanField(default=False)
+    comment = models.TextField()
+    old_status = models.CharField(max_length=10, null=True)
+    new_status = models.CharField(max_length=10, null=True)
+
+
+class ComplaintTask(TimeStampedModel):
+    complaint = models.ForeignKey('Complaint', on_delete=models.CASCADE)
+    assigned_to_id = models.IntegerField(null=True, db_index=True)
+    role_name = models.CharField(max_length=100, blank=True)
+    task_type = models.CharField(max_length=100, blank=True)
+    status = models.CharField(
+        max_length=10,
+        choices=[
+            ('Pending', 'Pending'),
+            ('Completed', 'Completed')
+        ],
+        default='Pending'
+    )
+    due_at = models.DateTimeField(null=True)
+    completed_at = models.DateTimeField(null=True)
+
+
+class ComplaintNotification(TimeStampedModel):
+    complaint = models.ForeignKey('Complaint', on_delete=models.CASCADE)
+    recipient_id = models.IntegerField(db_index=True)
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+
+```

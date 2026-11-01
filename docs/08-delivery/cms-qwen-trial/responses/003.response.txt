@@ -1,0 +1,31 @@
+```
+from dataclasses import dataclass
+
+COMPLAINT_STATUSES = (
+    'Submitted',
+    'In Progress',
+    'Resolved',
+    'Rejected',
+    'Closed'
+)
+
+SEVERITY_SLA_HOURS = {
+    'Low': 16,
+    'Medium': 32,
+    'High': 48,
+    'Critical': 72
+}
+
+ALLOWED_TRANSITIONS = {
+    'Submitted': {'In Progress'},
+    'In Progress': {'Resolved', 'Rejected', 'Closed'},
+    'Resolved': {'Closed'},
+    'Rejected': {'Closed'}
+}
+
+def can_transition(current_status, next_status):
+    return next_status in ALLOWED_TRANSITIONS.get(current_status, set())
+
+def default_sla_hours(severity, fallback_hours=48):
+    return SEVERITY_SLA_HOURS.get(severity, fallback_hours)
+```

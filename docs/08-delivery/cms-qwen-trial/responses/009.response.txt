@@ -1,0 +1,6 @@
+{
+    "files": {
+        "modules/complaint_cms/tasks.py": "from celery import shared_task\n\ndef cms_process_sla():\n    from .services.events import process_complaint_sla\n    process_complaint_sla()\n\n@shared_task\ndef cms_auto_close_resolved():\n    from .services.events import auto_close_resolved_complaints\n    auto_close_resolved_complaints()",
+        "modules/complaint_cms/schedule.py": "from datetime import timedelta\nimport pytz\nfrom celery.schedules import crontab\n\nBEAT_SCHEDULE = {\n    'cms_process_sla': {\n        'task': 'modules.complaint_cms.tasks.cms_process_sla',\n        'schedule': 900,  # 15 minutes\n        'options': {'expires': 8640},  # 24 hours\n    },\n    'cms_auto_close_resolved': {\n        'task': 'modules.complaint_cms.tasks.cms_auto_close_resolved',\n        'schedule': crontab(hour=0, minute=0),  # Midnight daily\n        'options': {'expires': 3600},  # 1 hour\n    }\n}\n\nTASK_ROUTES = {\n    'modules.complaint_cms.tasks.*': {'queue': 'default'}\n}"
+    }
+}

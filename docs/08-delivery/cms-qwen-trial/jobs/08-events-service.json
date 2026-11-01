@@ -1,0 +1,19 @@
+{
+  "label": "Scheduled SLA and auto-close events service",
+  "instruction": "Generate a concise modules/complaint_cms/services/events.py module (maximum 60 lines) with process_complaint_sla() and auto_close_resolved_complaints() functions using existing Complaint, ComplaintTask, ComplaintUpdate, and ComplaintNotification models. process_complaint_sla() finds overdue active complaints (sla_due_at < timezone.now()), increments escalation_level, sets status to escalated, and records an update/notification. auto_close_resolved_complaints() finds resolved complaints older than 7 days and closes them. No Celery decorators in services. Return raw Python source only without code fences.",
+  "allowed_paths": [
+    "modules/complaint_cms/services/events.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "context_files": [
+    "modules/complaint_cms/models.py"
+  ],
+  "num_predict": 1800,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

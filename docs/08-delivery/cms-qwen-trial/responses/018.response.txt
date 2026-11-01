@@ -1,0 +1,92 @@
+```
+import { useEffect } from 'react';
+import { Group, Stack, Text, Title, Button, Input, Select, ActionIcon, Tooltip } from '@mantine/core';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ErrorMessage } from '../../../lib/http';
+import PageHeader from '../../../ui/components/PageHeader';
+
+interface Task {
+  id: number;
+  status: string;
+}
+
+interface Complaint {
+  id: number;
+  title: string;
+  description: string;
+  status: string;
+}
+
+const ComplaintQueuePage = () => {
+  const queryClient = useQueryClient();
+
+  // Fetch assigned tasks for the current user
+  const { data: tasksData, error: taskError, isLoading: isTasksLoading } = useQuery<Task[]>({
+    queryKey: ['tasks'],
+    queryFn: async () => listTasks(0), // Assuming 0 represents the current user's ID
+  });
+
+  // Fetch complaints
+  const { data: complaintsData, error: complaintError, isLoading: isComplaintsLoading } = useQuery<Complaint[]>({
+    queryKey: ['complaints'],
+    queryFn: async () => listComplaints(),
+  });
+
+  // Handle action button clicks
+  const handleActionClick = (id: number, action: string) => {
+    complaintAction(id, action).then(() => {
+      queryClient.invalidateQueries(['tasks']);
+      queryClient.invalidateQueries(['complaints']);
+    });
+  };
+
+  useEffect(() => {
+    if (taskError || complaintError) {
+      console.error('Error fetching data:', ErrorMessage(taskError));
+    }
+  }, [taskError, complaintError]);
+
+  return (
+    <Stack>
+      <PageHeader title="Complaint Queue" />
+      {isTasksLoading && <Text>Loading tasks...</Text>}
+      {!isTasksLoading && tasksData?.length === 0 && <Text>No assigned tasks found.</Text>}
+      {tasksData?.map((task) => (
+        <Group key={task.id} mb="sm">
+          <Title order={3}>{task.title}</Title>
+          <Select
+            label="Status"
+            value={task.status}
+            onChange={(status) => handleActionClick(task.id, 'update_status', { status })}
+            options={[
+              { value: 'pending', label: 'Pending' },
+              { value: 'in_progress', label: 'In Progress' },
+              { value: 'resolved', label: 'Resolved' },
+              { value: 'escalated', label: 'Escalated' },
+              { value: 'closed', label: 'Closed' },
+            ]}
+          />
+          <Input.Wrapper required error={ErrorMessage(taskError)}>
+            <Tooltip label="Comment/Resolution">
+              <Input.Textarea
+                placeholder="Enter comment or resolution"
+                value=""
+                onChange={() => {}}
+              />
+            </Tooltip>
+          </Input.Wrapper>
+          <Group spacing="xs">
+            <Button onClick={() => handleActionClick(task.id, 'acknowledge')}>Acknowledge</Button>
+            <Button onClick={() => handleActionClick(task.id, 'start_progress')}>Start Progress</Button>
+            <Button onClick={() => handleActionClick(task.id, 'resolve')}>Resolve</Button>
+            <Button onClick={() => handleActionClick(task.id, ' escalate')}>Escalate</Button>
+            <Button onClick={() => handleActionClick(task.id, 'close')}>Close</Button>
+          </Group>
+        </Group>
+      ))}
+    </Stack>
+  );
+};
+
+export default ComplaintQueuePage;
+```
