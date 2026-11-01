@@ -1,5 +1,112 @@
 {
   "modules": {
+    "dept": {
+      "grants": {
+        "dept_admin": [
+          "dept.announcement.publish",
+          "dept.announcement.view",
+          "dept.feedback.access",
+          "dept.feedback.review",
+          "dept.inventory.manage",
+          "dept.inventory.view",
+          "dept.stock_log.view",
+          "dept.stock_request.issue",
+          "dept.stock_request.view_all"
+        ],
+        "faculty": [
+          "dept.announcement.publish",
+          "dept.announcement.view",
+          "dept.feedback.access",
+          "dept.feedback.create",
+          "dept.inventory.view",
+          "dept.stock_request.create"
+        ],
+        "hod": [
+          "dept.announcement.manage",
+          "dept.announcement.publish",
+          "dept.announcement.view",
+          "dept.feedback.access",
+          "dept.feedback.resolve",
+          "dept.inventory.view",
+          "dept.stock_log.view",
+          "dept.stock_request.decide",
+          "dept.stock_request.view_all"
+        ],
+        "student": [
+          "dept.announcement.view",
+          "dept.feedback.access",
+          "dept.feedback.create"
+        ]
+      },
+      "module_grants": [
+        "dept_admin",
+        "faculty",
+        "hod",
+        "student"
+      ],
+      "permissions": [
+        {
+          "code": "dept.announcement.view",
+          "label": "See announcements addressed to you"
+        },
+        {
+          "code": "dept.announcement.publish",
+          "label": "Create and publish announcements"
+        },
+        {
+          "code": "dept.announcement.manage",
+          "label": "Edit, hide or delete any announcement"
+        },
+        {
+          "code": "dept.inventory.view",
+          "label": "See inventory and stock requests"
+        },
+        {
+          "code": "dept.inventory.manage",
+          "label": "Insert inventory and log stock insertions"
+        },
+        {
+          "code": "dept.stock_request.create",
+          "label": "Request stock from the department"
+        },
+        {
+          "code": "dept.stock_request.view_all",
+          "label": "See every stock request"
+        },
+        {
+          "code": "dept.stock_request.decide",
+          "label": "Approve or reject a stock request"
+        },
+        {
+          "code": "dept.stock_request.issue",
+          "label": "Issue approved stock"
+        },
+        {
+          "code": "dept.stock_log.view",
+          "label": "Read the immutable stock movement log"
+        },
+        {
+          "code": "dept.feedback.access",
+          "label": "Reach the feedback screens"
+        },
+        {
+          "code": "dept.feedback.create",
+          "label": "Submit confidential feedback"
+        },
+        {
+          "code": "dept.feedback.review",
+          "label": "Initial review, categorise and close feedback"
+        },
+        {
+          "code": "dept.feedback.resolve",
+          "label": "Resolve or close reviewed feedback (HOD)"
+        }
+      ],
+      "scope_permissions": [
+        "dept.stock_request.view_all"
+      ],
+      "system_permissions": []
+    },
     "directory": {
       "grants": {
         "Dean Academic": [

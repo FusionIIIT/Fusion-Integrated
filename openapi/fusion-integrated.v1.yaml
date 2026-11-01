@@ -46,6 +46,364 @@ paths:
               schema:
                 $ref: '#/components/schemas/Ok'
           description: ''
+  /api/v1/dept/announcements:
+    get:
+      operationId: v1_dept_announcements_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeptAnnouncement'
+          description: ''
+    post:
+      operationId: v1_dept_announcements_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnnouncementWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AnnouncementWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AnnouncementWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptAnnouncement'
+          description: ''
+  /api/v1/dept/announcements/{id}:
+    patch:
+      operationId: v1_dept_announcements_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAnnouncementEdit'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAnnouncementEdit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAnnouncementEdit'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptAnnouncement'
+          description: ''
+    delete:
+      operationId: v1_dept_announcements_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/dept/announcements/{id}/status:
+    post:
+      operationId: v1_dept_announcements_status_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnnouncementStatus'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AnnouncementStatus'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AnnouncementStatus'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptAnnouncement'
+          description: ''
+  /api/v1/dept/feedback:
+    get:
+      operationId: v1_dept_feedback_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Feedback'
+          description: ''
+    post:
+      operationId: v1_dept_feedback_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FeedbackWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FeedbackWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+          description: ''
+  /api/v1/dept/feedback/{id}/transition:
+    post:
+      operationId: v1_dept_feedback_transition_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackMove'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FeedbackMove'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FeedbackMove'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+          description: ''
+  /api/v1/dept/inventory:
+    get:
+      operationId: v1_dept_inventory_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryItem'
+          description: ''
+    post:
+      operationId: v1_dept_inventory_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InventoryWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InventoryWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+          description: ''
+  /api/v1/dept/stock-log:
+    get:
+      operationId: v1_dept_stock_log_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StockMovement'
+          description: ''
+  /api/v1/dept/stock-requests:
+    get:
+      operationId: v1_dept_stock_requests_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StockRequest'
+          description: ''
+    post:
+      operationId: v1_dept_stock_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockRequestWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StockRequestWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StockRequestWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockRequest'
+          description: ''
+  /api/v1/dept/stock-requests/{id}/decision:
+    post:
+      operationId: v1_dept_stock_requests_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StockDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StockDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockRequest'
+          description: ''
+  /api/v1/dept/stock-requests/{id}/issue:
+    post:
+      operationId: v1_dept_stock_requests_issue_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockRequest'
+          description: ''
+  /api/v1/dept/stock-requests/issued:
+    get:
+      operationId: v1_dept_stock_requests_issued_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StockRequest'
+          description: ''
   /api/v1/directory/users:
     get:
       operationId: v1_directory_users_retrieve
@@ -1846,6 +2204,46 @@ components:
       - title
       - topic
       - withdrawn_reason
+    AnnouncementStatus:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/AnnouncementStatusStatusEnum'
+      required:
+      - status
+    AnnouncementStatusStatusEnum:
+      enum:
+      - active
+      - hidden
+      - deleted
+      type: string
+      description: |-
+        * `active` - active
+        * `hidden` - hidden
+        * `deleted` - deleted
+    AnnouncementWrite:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        body:
+          type: string
+        target_roles:
+          type: array
+          items:
+            type: string
+        target_programmes:
+          type: array
+          items:
+            type: string
+        target_years:
+          type: array
+          items:
+            type: integer
+      required:
+      - body
+      - title
     Application:
       type: object
       properties:
@@ -2297,6 +2695,64 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DeptAnnouncement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        body:
+          type: string
+          readOnly: true
+        target_roles:
+          readOnly: true
+        target_programmes:
+          readOnly: true
+        target_years:
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/DeptAnnouncementStatusEnum'
+          readOnly: true
+        published_by_user_id:
+          type: integer
+          readOnly: true
+        published_by_role:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - body
+      - created_at
+      - id
+      - published_by_role
+      - published_by_user_id
+      - status
+      - target_programmes
+      - target_roles
+      - target_years
+      - title
+      - updated_at
+    DeptAnnouncementStatusEnum:
+      enum:
+      - active
+      - hidden
+      - deleted
+      type: string
+      description: |-
+        * `active` - Active
+        * `hidden` - Hidden
+        * `deleted` - Deleted
     Detail:
       type: object
       properties:
@@ -2405,6 +2861,87 @@ components:
       - fee_reference
       - season
       - user_id
+    Feedback:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        subject:
+          type: string
+          readOnly: true
+        body:
+          type: string
+          readOnly: true
+        category:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/FeedbackStatusEnum'
+          readOnly: true
+        resolution_note:
+          type: string
+          readOnly: true
+        submitted_by_role:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - body
+      - category
+      - created_at
+      - id
+      - resolution_note
+      - status
+      - subject
+      - submitted_by_role
+      - updated_at
+    FeedbackMove:
+      type: object
+      properties:
+        to_status:
+          $ref: '#/components/schemas/ToStatusEnum'
+        category:
+          type: string
+          default: ''
+          maxLength: 60
+        note:
+          type: string
+          default: ''
+          maxLength: 500
+      required:
+      - to_status
+    FeedbackStatusEnum:
+      enum:
+      - new
+      - under_review
+      - resolved
+      - closed
+      type: string
+      description: |-
+        * `new` - New
+        * `under_review` - Under review
+        * `resolved` - Resolved
+        * `closed` - Closed
+    FeedbackWrite:
+      type: object
+      properties:
+        subject:
+          type: string
+          maxLength: 200
+        body:
+          type: string
+      required:
+      - body
+      - subject
     IncidentRecorded:
       type: object
       properties:
@@ -2490,6 +3027,50 @@ components:
         * `tech` - Technical interview
         * `hr` - HR interview
         * `other` - Other
+    InventoryItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        category:
+          type: string
+          readOnly: true
+        unit:
+          type: string
+          readOnly: true
+        quantity:
+          type: integer
+          readOnly: true
+      required:
+      - category
+      - id
+      - name
+      - quantity
+      - unit
+    InventoryWrite:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        quantity:
+          type: integer
+          minimum: 1
+        category:
+          type: string
+          default: ''
+          maxLength: 60
+        unit:
+          type: string
+          default: pcs
+          maxLength: 20
+      required:
+      - name
+      - quantity
     JobPosting:
       type: object
       properties:
@@ -2982,6 +3563,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PatchedAnnouncementEdit:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        body:
+          type: string
+        target_roles:
+          type: array
+          items:
+            type: string
+        target_programmes:
+          type: array
+          items:
+            type: string
+        target_years:
+          type: array
+          items:
+            type: integer
     PatchedJobPosting:
       type: object
       properties:
@@ -3700,6 +4301,164 @@ components:
       required:
       - available
       - season
+    StockDecision:
+      type: object
+      properties:
+        approve:
+          type: boolean
+        note:
+          type: string
+          default: ''
+          maxLength: 300
+      required:
+      - approve
+    StockMovement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        item:
+          type: integer
+          readOnly: true
+        item_name:
+          type: string
+          readOnly: true
+        kind:
+          allOf:
+          - $ref: '#/components/schemas/StockMovementKindEnum'
+          readOnly: true
+        quantity:
+          type: integer
+          readOnly: true
+        request:
+          type: integer
+          readOnly: true
+          nullable: true
+        recipient_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        actor_user_id:
+          type: integer
+          readOnly: true
+        at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actor_user_id
+      - at
+      - id
+      - item
+      - item_name
+      - kind
+      - quantity
+      - recipient_user_id
+      - request
+    StockMovementKindEnum:
+      enum:
+      - insert
+      - issue
+      type: string
+      description: |-
+        * `insert` - Insertion
+        * `issue` - Issue
+    StockRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        item:
+          type: integer
+          readOnly: true
+        item_name:
+          type: string
+          readOnly: true
+        unit:
+          type: string
+          readOnly: true
+        requested_by_user_id:
+          type: integer
+          readOnly: true
+        quantity:
+          type: integer
+          readOnly: true
+        purpose:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StockRequestStatusEnum'
+          readOnly: true
+        decided_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decision_note:
+          type: string
+          readOnly: true
+        issued_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        issued_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - decided_at
+      - decided_by_user_id
+      - decision_note
+      - id
+      - issued_at
+      - issued_by_user_id
+      - item
+      - item_name
+      - purpose
+      - quantity
+      - requested_by_user_id
+      - status
+      - unit
+    StockRequestStatusEnum:
+      enum:
+      - pending_hod
+      - approved
+      - rejected
+      - issued
+      type: string
+      description: |-
+        * `pending_hod` - Pending HOD approval
+        * `approved` - Approved for issuance
+        * `rejected` - Rejected
+        * `issued` - Issued
+    StockRequestWrite:
+      type: object
+      properties:
+        item:
+          type: integer
+        quantity:
+          type: integer
+          minimum: 1
+        purpose:
+          type: string
+          default: ''
+          maxLength: 300
+      required:
+      - item
+      - quantity
     StudentProfile:
       type: object
       properties:
@@ -3779,6 +4538,16 @@ components:
           type: integer
       required:
       - document_id
+    ToStatusEnum:
+      enum:
+      - under_review
+      - resolved
+      - closed
+      type: string
+      description: |-
+        * `under_review` - under_review
+        * `resolved` - resolved
+        * `closed` - closed
     TopicEnum:
       enum:
       - drive

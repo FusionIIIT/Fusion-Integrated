@@ -7,6 +7,25 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `dept`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `dept.announcement.view` | See announcements addressed to you | `dept_admin`, `faculty`, `hod`, `student` |
+| `dept.announcement.publish` | Create and publish announcements | `dept_admin`, `faculty`, `hod` |
+| `dept.announcement.manage` | Edit, hide or delete any announcement | `hod` |
+| `dept.inventory.view` | See inventory and stock requests | `dept_admin`, `faculty`, `hod` |
+| `dept.inventory.manage` | Insert inventory and log stock insertions | `dept_admin` |
+| `dept.stock_request.create` | Request stock from the department | `faculty` |
+| `dept.stock_request.view_all` | See every stock request | `dept_admin`, `hod` |
+| `dept.stock_request.decide` | Approve or reject a stock request | `hod` |
+| `dept.stock_request.issue` | Issue approved stock | `dept_admin` |
+| `dept.stock_log.view` | Read the immutable stock movement log | `dept_admin`, `hod` |
+| `dept.feedback.access` | Reach the feedback screens | `dept_admin`, `faculty`, `hod`, `student` |
+| `dept.feedback.create` | Submit confidential feedback | `faculty`, `student` |
+| `dept.feedback.review` | Initial review, categorise and close feedback | `dept_admin` |
+| `dept.feedback.resolve` | Resolve or close reviewed feedback (HOD) | `hod` |
+
 ## `directory`
 
 | Code | What it allows | Held by |
