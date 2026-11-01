@@ -1,6 +1,5 @@
 # PROMPT: ELM Phase 2 — Review, Test and Improve the Leave Module (Fusion-Integrated)
 
-Copy everything below this line into your local LLM (llama).
 
 ---
 
