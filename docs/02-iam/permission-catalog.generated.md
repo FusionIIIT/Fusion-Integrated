@@ -13,6 +13,19 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `lms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `lms.course.view` | View authorized course workspaces | `Course Faculty`, `Observer`, `Student`, `TA`, `Teaching Assistant`, `faculty`, `student` |
+| `lms.course.manage` | Maintain assigned course details | `Course Faculty`, `faculty` |
+| `lms.material.manage` | Maintain assigned course materials | `Course Faculty`, `faculty` |
+| `lms.announcement.create` | Post authorized course announcements | `Course Faculty`, `TA`, `Teaching Assistant`, `faculty` |
+| `lms.assignment.manage` | Create, edit and publish assigned course assignments | `Course Faculty`, `faculty` |
+| `lms.submission.create` | Submit own work for a registered course | `Student`, `student` |
+| `lms.submission.review` | Grade submissions for assigned courses | `Course Faculty`, `TA`, `Teaching Assistant`, `faculty` |
+| `lms.grade.publish` | Release grades for assigned courses | `Course Faculty`, `faculty` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

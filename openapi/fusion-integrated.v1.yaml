@@ -63,6 +63,299 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/lms/courses/:
+    get:
+      operationId: lms_courses_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/lms/courses/{id}/:
+    get:
+      operationId: lms_workspace_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/lms/courses/{id}/assignments/{item_id}/publish/:
+    post:
+      operationId: v1_lms_courses_assignments_publish_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: item_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/lms/courses/{id}/assignments/{item_id}/submit/:
+    post:
+      operationId: v1_lms_courses_assignments_submit_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: item_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission'
+          description: ''
+  /api/v1/lms/courses/{id}/download/{kind}/{item_id}/:
+    get:
+      operationId: v1_lms_courses_download_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: item_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: kind
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/v1/lms/courses/{id}/submissions/{item_id}/grade/:
+    post:
+      operationId: v1_lms_courses_submissions_grade_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: item_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission'
+          description: ''
+  /api/v1/lms/courses/{id}/submissions/{item_id}/release/:
+    post:
+      operationId: v1_lms_courses_submissions_release_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: item_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Revision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Revision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Revision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission'
+          description: ''
+  /api/v1/lms/courses/{id}/write/{kind}/:
+    post:
+      operationId: lms_content_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: kind
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/lms/courses/{id}/write/{kind}/{item_id}/:
+    post:
+      operationId: lms_content_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: item_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: kind
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -3466,6 +3759,14 @@ components:
       - message
       - reason
       - route
+    Revision:
+      type: object
+      properties:
+        revision:
+          type: integer
+          minimum: 1
+      required:
+      - revision
     RoundOutcome:
       type: object
       properties:
@@ -3691,6 +3992,57 @@ components:
       required:
       - available
       - season
+    Submission:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        assignment_id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        text:
+          type: string
+        link:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+        points:
+          type: string
+          nullable: true
+          readOnly: true
+        feedback:
+          type: string
+          readOnly: true
+        released:
+          type: boolean
+        revision:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        download_url:
+          type: string
+          nullable: true
+          readOnly: true
+      required:
+      - assignment_id
+      - download_url
+      - feedback
+      - id
+      - points
+      - student_id
+      - submitted_at
     SubmitOfferLetter:
       type: object
       properties:
