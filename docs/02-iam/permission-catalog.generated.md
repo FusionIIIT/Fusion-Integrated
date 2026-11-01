@@ -7,6 +7,27 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `complaints`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `complaints.complaint.view_self` | View own complaints | `Dean Academic`, `Director`, `Registrar`, `acadadmin`, `faculty`, `staff`, `student` |
+| `complaints.complaint.create` | Submit a complaint | `Dean Academic`, `Director`, `Registrar`, `acadadmin`, `faculty`, `staff`, `student` |
+| `complaints.complaint.view` | View complaints within scope | `Dean Academic`, `Director`, `Registrar`, `acadadmin` |
+| `complaints.complaint.assign` | Assign and categorize complaint | `Dean Academic`, `Director`, `Registrar`, `acadadmin` |
+| `complaints.complaint.update` | Update complaint progress | `Dean Academic`, `Director`, `Registrar`, `acadadmin` |
+| `complaints.complaint.resolve` | Resolve complaint | `Dean Academic`, `Director`, `Registrar`, `acadadmin` |
+| `complaints.complaint.reject` | Reject complaint | `Dean Academic`, `Director`, `Registrar`, `acadadmin` |
+| `complaints.complaint.verify` | Verify resolved complaint for closure | `Dean Academic`, `Director`, `Registrar`, `acadadmin`, `faculty`, `staff`, `student` |
+| `complaints.complaint.reopen` | Request or review complaint reopening | `Dean Academic`, `Director`, `Registrar`, `acadadmin`, `faculty`, `staff`, `student` |
+| `complaints.complaint.escalate` | Escalate unresolved complaint | `Dean Academic`, `Director`, `Registrar`, `acadadmin` |
+| `complaints.feedback.submit` | Submit feedback for complaint | `Dean Academic`, `Director`, `Registrar`, `acadadmin`, `faculty`, `staff`, `student` |
+| `complaints.feedback.view` | Review submitted feedback | `Dean Academic`, `Director`, `Registrar`, `acadadmin` |
+| `complaints.announcement.view` | View complaint announcements | `Dean Academic`, `Director`, `Registrar`, `acadadmin`, `faculty`, `staff`, `student` |
+| `complaints.announcement.publish` | Publish complaint announcement | `Dean Academic`, `Director`, `Registrar`, `acadadmin` |
+| `complaints.report.view` | View CMS reports and analytics | `Dean Academic`, `Director`, `Registrar`, `acadadmin` |
+| `complaints.role.manage` | Assign and manage CMS roles | `Director`, `acadadmin` |
+
 ## `directory`
 
 | Code | What it allows | Held by |

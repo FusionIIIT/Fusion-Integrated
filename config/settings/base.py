@@ -91,6 +91,7 @@ PLATFORM_MODULES = [
 DOMAIN_MODULES = [
     "modules.placement",
     "modules.leave",
+    "modules.complaints",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

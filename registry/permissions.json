@@ -1,5 +1,227 @@
 {
   "modules": {
+    "complaints": {
+      "grants": {
+        "Dean Academic": [
+          "complaints.announcement.publish",
+          "complaints.announcement.view",
+          "complaints.complaint.assign",
+          "complaints.complaint.create",
+          "complaints.complaint.escalate",
+          "complaints.complaint.reject",
+          "complaints.complaint.reopen",
+          "complaints.complaint.resolve",
+          "complaints.complaint.update",
+          "complaints.complaint.verify",
+          "complaints.complaint.view",
+          "complaints.complaint.view_self",
+          "complaints.feedback.submit",
+          "complaints.feedback.view",
+          "complaints.report.view"
+        ],
+        "Director": [
+          "complaints.announcement.publish",
+          "complaints.announcement.view",
+          "complaints.complaint.assign",
+          "complaints.complaint.create",
+          "complaints.complaint.escalate",
+          "complaints.complaint.reject",
+          "complaints.complaint.reopen",
+          "complaints.complaint.resolve",
+          "complaints.complaint.update",
+          "complaints.complaint.verify",
+          "complaints.complaint.view",
+          "complaints.complaint.view_self",
+          "complaints.feedback.submit",
+          "complaints.feedback.view",
+          "complaints.report.view",
+          "complaints.role.manage"
+        ],
+        "Registrar": [
+          "complaints.announcement.publish",
+          "complaints.announcement.view",
+          "complaints.complaint.assign",
+          "complaints.complaint.create",
+          "complaints.complaint.escalate",
+          "complaints.complaint.reject",
+          "complaints.complaint.reopen",
+          "complaints.complaint.resolve",
+          "complaints.complaint.update",
+          "complaints.complaint.verify",
+          "complaints.complaint.view",
+          "complaints.complaint.view_self",
+          "complaints.feedback.submit",
+          "complaints.feedback.view",
+          "complaints.report.view"
+        ],
+        "acadadmin": [
+          "complaints.announcement.publish",
+          "complaints.announcement.view",
+          "complaints.complaint.assign",
+          "complaints.complaint.create",
+          "complaints.complaint.escalate",
+          "complaints.complaint.reject",
+          "complaints.complaint.reopen",
+          "complaints.complaint.resolve",
+          "complaints.complaint.update",
+          "complaints.complaint.verify",
+          "complaints.complaint.view",
+          "complaints.complaint.view_self",
+          "complaints.feedback.submit",
+          "complaints.feedback.view",
+          "complaints.report.view",
+          "complaints.role.manage"
+        ],
+        "faculty": [
+          "complaints.announcement.view",
+          "complaints.complaint.create",
+          "complaints.complaint.reopen",
+          "complaints.complaint.verify",
+          "complaints.complaint.view_self",
+          "complaints.feedback.submit"
+        ],
+        "staff": [
+          "complaints.announcement.view",
+          "complaints.complaint.create",
+          "complaints.complaint.reopen",
+          "complaints.complaint.verify",
+          "complaints.complaint.view_self",
+          "complaints.feedback.submit"
+        ],
+        "student": [
+          "complaints.announcement.view",
+          "complaints.complaint.create",
+          "complaints.complaint.reopen",
+          "complaints.complaint.verify",
+          "complaints.complaint.view_self",
+          "complaints.feedback.submit"
+        ]
+      },
+      "module_grants": [
+        "Dean Academic",
+        "Director",
+        "Registrar",
+        "acadadmin",
+        "faculty",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/complaints",
+        "icon": "FaTools",
+        "items": [
+          {
+            "code": "complaints.mine",
+            "icon": "FaListUl",
+            "label": "My Complaints",
+            "required_permission": "complaints.complaint.view_self",
+            "sort_order": 10,
+            "to": "/complaints/mine"
+          },
+          {
+            "code": "complaints.queue",
+            "icon": "FaInbox",
+            "label": "Complaint Queue",
+            "required_permission": "complaints.complaint.view",
+            "sort_order": 20,
+            "to": "/complaints/queue"
+          },
+          {
+            "code": "complaints.announcements",
+            "icon": "FaBullhorn",
+            "label": "Announcements",
+            "required_permission": "complaints.announcement.view",
+            "sort_order": 30,
+            "to": "/complaints/announcements"
+          },
+          {
+            "code": "complaints.reports",
+            "icon": "FaChartBar",
+            "label": "Reports & Analytics",
+            "required_permission": "complaints.report.view",
+            "sort_order": 40,
+            "to": "/complaints/reports"
+          }
+        ],
+        "label": "Complaints",
+        "nav_section": "Campus",
+        "sort_order": 30,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "complaints.complaint.view_self",
+          "label": "View own complaints"
+        },
+        {
+          "code": "complaints.complaint.create",
+          "label": "Submit a complaint"
+        },
+        {
+          "code": "complaints.complaint.view",
+          "label": "View complaints within scope"
+        },
+        {
+          "code": "complaints.complaint.assign",
+          "label": "Assign and categorize complaint"
+        },
+        {
+          "code": "complaints.complaint.update",
+          "label": "Update complaint progress"
+        },
+        {
+          "code": "complaints.complaint.resolve",
+          "label": "Resolve complaint"
+        },
+        {
+          "code": "complaints.complaint.reject",
+          "label": "Reject complaint"
+        },
+        {
+          "code": "complaints.complaint.verify",
+          "label": "Verify resolved complaint for closure"
+        },
+        {
+          "code": "complaints.complaint.reopen",
+          "label": "Request or review complaint reopening"
+        },
+        {
+          "code": "complaints.complaint.escalate",
+          "label": "Escalate unresolved complaint"
+        },
+        {
+          "code": "complaints.feedback.submit",
+          "label": "Submit feedback for complaint"
+        },
+        {
+          "code": "complaints.feedback.view",
+          "label": "Review submitted feedback"
+        },
+        {
+          "code": "complaints.announcement.view",
+          "label": "View complaint announcements"
+        },
+        {
+          "code": "complaints.announcement.publish",
+          "label": "Publish complaint announcement"
+        },
+        {
+          "code": "complaints.report.view",
+          "label": "View CMS reports and analytics"
+        },
+        {
+          "code": "complaints.role.manage",
+          "label": "Assign and manage CMS roles"
+        }
+      ],
+      "scope_permissions": [
+        "complaints.complaint.view",
+        "complaints.report.view"
+      ],
+      "system_permissions": [
+        "complaints.complaint.sla_check"
+      ]
+    },
     "directory": {
       "grants": {
         "Dean Academic": [
