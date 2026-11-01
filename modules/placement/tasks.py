@@ -87,7 +87,7 @@ def expire_pending_offers() -> int:
         for offer in expired_offers:
             offer.status = 'expired'
             offer.save(update_fields=['status'])
-            notifications.enqueue_notification(event='offer_expired', user_id=offer.user_id)
+            notifications.enqueue(event='offer_expired', recipient_user_id=offer.user_id, payload={'offer_id': offer.id})
             count += 1
 
     log.info("placement.offers.expired count=%d", count)
