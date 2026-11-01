@@ -13,6 +13,15 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `gymkhana`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `gymkhana.club.view` | View active Gymkhana clubs | `student` |
+| `gymkhana.application.self` | View own club membership applications | `student` |
+| `gymkhana.application.create` | Apply for club membership | `student` |
+| `gymkhana.application.review` | Review club membership applications | `club_head`, `co_coordinator` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
