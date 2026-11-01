@@ -17,4 +17,9 @@ export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
     basePath: "/placement",
     load: () => import("../modules/placement/routes"),
   },
+  systemadmin: {
+    code: "systemadmin",
+    basePath: "/systemadmin",
+    load: () => import("../modules/systemadmin/routes"),
+  },
 };
