@@ -15,14 +15,14 @@ function HistoryList({ events }: HistoryListProps) {
       {events.map((event) => (
         <Paper key={event.id} p="md" shadow="sm">
           <Stack>
-            <Badge color={event.type === "created" ? "green" : "blue"}>{event.type}</Badge>
+            <Badge color={event.event === "created" ? "green" : "blue"}>{event.event}</Badge>
             <Text>{event.sender_name} to {event.receiver_name ?? "-"}</Text>
             <Text>{event.created_at.toLocaleString()}</Text>
             {event.comment && <Text>{event.comment}</Text>}
             {event.attachments && event.attachments.length > 0 && (
               <Stack>
                 {event.attachments.map((attachment) => (
-                  <Text key={attachment.name}>{attachment.name}</Text>
+                  <Text key={attachment}>{attachment}</Text>
                 ))}
               </Stack>
             )}

@@ -26,18 +26,20 @@ export function useRecipients() {
   return useQuery({ queryKey: ["fts", "recipients"], queryFn: async () => (await http.get<Recipient[]>("/fts/recipients/")).data });
 }
 
-export function useCreateFile(input: CreateFileInput) {
+export function useCreateFile() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async () => (await http.post<FileDetail>("/fts/files/", input)).data,
+    mutationFn: async (input: CreateFileInput) =>
+      (await http.post<FileDetail>("/fts/files/", input)).data,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["fts"] }),
   });
 }
 
-export function useUpdateFile(id: number, input: UpdateFileInput) {
+export function useUpdateFile(id: number) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async () => (await http.put<FileDetail>(`/fts/files/${id}/`, input)).data,
+    mutationFn: async (input: UpdateFileInput) =>
+      (await http.patch<FileDetail>(`/fts/files/${id}/`, input)).data,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["fts"] }),
   });
 }
@@ -45,15 +47,18 @@ export function useUpdateFile(id: number, input: UpdateFileInput) {
 export function useDiscardDraft(id: number) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async () => (await http.delete<FileDetail>(`/fts/files/${id}/discard/`)).data,
+    mutationFn: async () => {
+      await http.delete(`/fts/files/${id}/`);
+    },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["fts"] }),
   });
 }
 
-export function useForwardFile(id: number, input: ForwardInput) {
+export function useForwardFile(id: number) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async () => (await http.post<FileDetail>(`/fts/files/${id}/forward/`, input)).data,
+    mutationFn: async (input: ForwardInput) =>
+      (await http.post<FileDetail>(`/fts/files/${id}/forward/`, input)).data,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["fts"] }),
   });
 }
@@ -61,7 +66,8 @@ export function useForwardFile(id: number, input: ForwardInput) {
 export function useReturnFile(id: number) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async () => (await http.post<FileDetail>(`/fts/files/${id}/return/`)).data,
+    mutationFn: async (input: { comment: string }) =>
+      (await http.post<FileDetail>(`/fts/files/${id}/return/`, input)).data,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["fts"] }),
   });
 }
@@ -69,7 +75,8 @@ export function useReturnFile(id: number) {
 export function useArchiveFile(id: number) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async () => (await http.post<FileDetail>(`/fts/files/${id}/archive/`, {})).data,
+    mutationFn: async () =>
+      (await http.post<FileDetail>(`/fts/files/${id}/archive/`, {})).data,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["fts"] }),
   });
 }

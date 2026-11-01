@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
-import { Navigate, type RouteObject } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+import type { RouteObject } from "react-router-dom";
 
 const InboxPage = lazy(() => import("./pages/InboxPage"));
 const OutboxPage = lazy(() => import("./pages/OutboxPage"));

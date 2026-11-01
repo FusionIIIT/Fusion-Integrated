@@ -1,71 +1,69 @@
-import { Alert, Button, Group, Loader, Stack, TextInput, Textarea } from "@mantine/core";
+import { useState } from "react";
+import { Alert, Button, Group, Loader, Stack, Textarea, TextInput, Title } from "@mantine/core";
 import { useNavigate, useParams } from "react-router-dom";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { errorMessage, useCreateFile, useDiscardDraft, useFile, useUpdateFile } from "../api/hooks";
-import { FileSummary, FileDetail, CreateFileInput, UpdateFileInput } from "../api/types";
 
-function DraftFilePage() {
+const DraftFilePage = () => {
+  const params = useParams();
+  const id = params.id ? Number(params.id) : NaN;
+  const isEdit = Number.isFinite(id);
   const navigate = useNavigate();
-  const { id } = useParams();
-  const queryClient = useQueryClient();
-  const mode = id ? "edit" : "create";
 
-  const { data: file, isLoading, error } = useQuery({ queryKey: ["fts", "file", id], queryFn: () => useFile(Number(id)).data, enabled: !!id });
-  const createMutation = useCreateFile();
-  const updateMutation = useUpdateFile(Number(id));
-  const discardMutation = useDiscardDraft(Number(id));
+  const { data: file, isLoading } = useFile(id);
+  const create = useCreateFile();
+  const update = useUpdateFile(id);
+  const discard = useDiscardDraft(id);
 
-  const [subject, setSubject] = useState(file?.subject || "");
-  const [comment, setComment] = useState(file?.initial_comment || "");
+  const [subjectInput, setSubjectInput] = useState<string | null>(null);
+  const [commentInput, setCommentInput] = useState<string | null>(null);
+  const [problem, setProblem] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!comment.trim()) {
-      alert("A comment is required");
+  const handleSave = () => {
+    const subject = subjectInput ?? file?.subject ?? "";
+    const comment = commentInput ?? file?.comment ?? "";
+
+    if (comment.trim() === "") {
+      setProblem("A comment is required");
       return;
     }
 
-    if (mode === "create") {
-      const input: CreateFileInput = { subject, initial_comment: comment };
-      try {
-        const data = await createMutation.mutateAsync(input);
-        navigate(`/fts/files/${data.id}`);
-      } catch (e) {
-        alert(errorMessage(e));
-      }
-    } else if (mode === "edit" && file?.permissions.can_edit_draft) {
-      const input: UpdateFileInput = { subject, initial_comment: comment };
-      try {
-        await updateMutation.mutateAsync(input);
-        navigate("/fts/drafts");
-      } catch (e) {
-        alert(errorMessage(e));
-      }
+    setProblem(null);
+
+    if (isEdit && file?.permissions.can_edit_draft) {
+      update.mutate({ subject, comment }, { onSuccess: () => navigate(`/fts/files/${id}`) });
+    } else {
+      create.mutate({ subject, comment }, { onSuccess: (data) => navigate(`/fts/files/${data.id}`) });
     }
   };
 
   return (
-    <Stack gap="md">
-      <Title order={2}>{mode === "create" ? "Create Draft" : "Edit Draft"}</Title>
-      {isLoading && <Loader />}
-      {error && <Alert color="red">{errorMessage(error)}</Alert>}
-      {!isLoading && !error && (
-        <form onSubmit={handleSubmit}>
-          <TextInput label="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} />
-          <Textarea label="Initial comment" value={comment} onChange={(e) => setComment(e.target.value)} required />
-          <Group position="right">
-            <Button type="submit">Save</Button>
-            {mode === "edit" && file?.permissions.can_edit_draft && (
-              <Button color="red" onClick={() => discardMutation.mutate()}>
-                Discard draft
-              </Button>
-            )}
-          </Group>
-        </form>
+    <Stack>
+      {isEdit && isLoading && <Loader />}
+      {problem && <Alert color="red">{problem}</Alert>}
+      {(create.error ?? update.error ?? discard.error) && (
+        <Alert color="red">{errorMessage(create.error ?? update.error ?? discard.error)}</Alert>
       )}
+      <Title>{isEdit ? "Edit draft" : "Create file"}</Title>
+      <TextInput
+        label="Subject"
+        value={subjectInput ?? file?.subject ?? ""}
+        onChange={(e) => setSubjectInput(e.target.value)}
+      />
+      <Textarea
+        label="Comment"
+        value={commentInput ?? file?.comment ?? ""}
+        onChange={(e) => setCommentInput(e.target.value)}
+      />
+      <Group justify="flex-end">
+        {isEdit && file?.permissions.can_edit_draft && (
+          <Button color="red" onClick={() => discard.mutate(undefined, { onSuccess: () => navigate("/fts/drafts") })}>
+            Discard draft
+          </Button>
+        )}
+        <Button onClick={handleSave}>Save</Button>
+      </Group>
     </Stack>
   );
-}
+};
 
-export { DraftFilePage };
 export default DraftFilePage;

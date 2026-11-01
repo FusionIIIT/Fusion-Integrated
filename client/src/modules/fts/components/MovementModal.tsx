@@ -1,8 +1,6 @@
-import { Modal, Select, Textarea, Button, Group, Alert } from "@mantine/core";
-import { useMutation } from "@tanstack/react-query";
-import { useRecipients } from "../api/hooks";
-import { useForwardFile, useReturnFile } from "../api/hooks";
-import { errorMessage } from "../api/hooks";
+import { useState } from "react";
+import { Alert, Button, Group, Modal, Select, Stack, Textarea } from "@mantine/core";
+import { errorMessage, useForwardFile, useRecipients, useReturnFile } from "../api/hooks";
 
 interface MovementModalProps {
   opened: boolean;
@@ -11,73 +9,61 @@ interface MovementModalProps {
   mode: "forward" | "return";
 }
 
-function MovementModal({ opened, onClose, fileId, mode }: MovementModalProps) {
+export const MovementModal: React.FC<MovementModalProps> = ({ opened, onClose, fileId, mode }) => {
+  const forward = useForwardFile(fileId);
+  const ret = useReturnFile(fileId);
   const { data: recipients } = useRecipients();
-  const forwardMutation = useForwardFile();
-  const returnMutation = useReturnFile();
 
   const [recipient, setRecipient] = useState<string | null>(null);
   const [comment, setComment] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
+  const [problem, setProblem] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!comment.trim()) {
-      setError("A comment is required");
+  const handleSubmit = () => {
+    if (comment.trim() === "") {
+      setProblem("A comment is required");
       return;
     }
 
-    setError(null);
+    if (mode === "forward" && recipient === null) {
+      setProblem("Choose a recipient");
+      return;
+    }
 
     if (mode === "forward") {
-      if (!recipient) {
-        setError("A recipient is required");
-        return;
-      }
-
-      try {
-        await forwardMutation.mutateAsync({ recipient_id: Number(recipient), comment });
-        onClose();
-      } catch (e) {
-        setError(errorMessage(e));
-      }
-    } else if (mode === "return") {
-      try {
-        await returnMutation.mutateAsync({ comment });
-        onClose();
-      } catch (e) {
-        setError(errorMessage(e));
-      }
+      forward.mutate({ recipient_id: Number(recipient), comment }, { onSuccess: onClose });
+    } else {
+      ret.mutate({ comment }, { onSuccess: onClose });
     }
   };
 
   return (
-    <Modal opened={opened} onClose={onClose} title={mode === "forward" ? "Forward File" : "Return File"}>
-      {error && <Alert color="red">{error}</Alert>}
-      <form onSubmit={handleSubmit}>
+    <Modal opened={opened} onClose={onClose} title="Movement">
+      <Stack>
+        {problem && <Alert color="red">{problem}</Alert>}
+        {forward.isError || ret.isError && <Alert color="red">{errorMessage(forward.error ?? ret.error)}</Alert>}
         {mode === "forward" && (
           <Select
             label="Recipient"
+            placeholder="Select a recipient"
             value={recipient}
             onChange={(value) => setRecipient(value)}
-            data={recipients?.map((recipient) => ({ value: recipient.id.toString(), label: recipient.name })) || []}
-            required
+            data={(recipients ?? []).map(r => ({ value: String(r.id), label: `${r.name} (${r.designation})` }))}
           />
         )}
         <Textarea
-          label="Movement comment"
+          label="Comment"
+          placeholder="Enter a comment"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          required
-          error={error}
         />
-        <Group position="right">
-          <Button type="submit">Submit</Button>
+        <Group justify="flex-end">
+          <Button type="submit" onClick={handleSubmit} loading={forward.isPending || ret.isPending}>
+            Submit
+          </Button>
         </Group>
-      </form>
+      </Stack>
     </Modal>
   );
-}
+};
 
-export { MovementModal };
 export default MovementModal;

@@ -17,6 +17,9 @@ export type FilePermissions = {
 };
 
 export type FileDetail = {
+  status: FileStatus;
+  owner_name: string;
+  holder_name: string | null;
   id: number;
   subject: string;
   comment: string;
