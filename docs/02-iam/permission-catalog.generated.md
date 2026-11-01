@@ -38,3 +38,15 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `psm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `psm.indent.create` | Create and submit purchase indents | `Accounts Admin`, `Department Admin`, `Department Head`, `Director`, `Procurement Admin`, `Registrar`, `faculty`, `staff`, `student` |
+| `psm.indent.view` | View accessible indents and tracking | `Accounts Admin`, `Department Admin`, `Department Head`, `Director`, `Procurement Admin`, `Registrar`, `faculty`, `staff`, `student` |
+| `psm.indent.approve` | Review, recommend, or approve indents | `Accounts Admin`, `Department Admin`, `Department Head`, `Director`, `Procurement Admin`, `Registrar` |
+| `psm.stock.manage` | Check, reserve, issue, and transfer stock | `Accounts Admin`, `Department Admin`, `Department Head`, `Director`, `Procurement Admin`, `Registrar` |
+| `psm.po.manage` | Create, issue, and manage purchase orders and vendors | `Accounts Admin`, `Department Admin`, `Department Head`, `Director`, `Procurement Admin`, `Registrar` |
+| `psm.invoice.manage` | Verify invoices and perform 3-way matching | `Accounts Admin`, `Department Admin`, `Department Head`, `Director`, `Procurement Admin`, `Registrar` |
+| `psm.payment.manage` | Process and release vendor payments | `Accounts Admin`, `Department Admin`, `Department Head`, `Director`, `Procurement Admin`, `Registrar` |
