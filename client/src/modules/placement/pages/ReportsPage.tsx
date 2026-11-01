@@ -1,16 +1,20 @@
+import { useState } from "react";
 import {
-  Alert, Badge, Button, Card, Container, Grid, Group, Progress, SimpleGrid,
-  Stack, Table, Text,
+  Alert, Badge, Button, Card, Container, Grid, Group, Progress, Select,
+  SimpleGrid, Stack, Table, Text,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { FaChartBar, FaDownload, FaInfoCircle } from "react-icons/fa";
+import {
+  FaCalendarAlt, FaChartBar, FaChartLine, FaDownload, FaInfoCircle,
+  FaMoneyBillWave,
+} from "react-icons/fa";
 
 import { useAuth } from "../../../auth/AuthProvider";
 import { errorMessage } from "../../../lib/http";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import {
-  useCsvExport, useOutstandingLetters, useStats, type ExportKind,
+  useCsvExport, useOutstandingLetters, useSeasons, useStats, type ExportKind,
 } from "../api/hooks";
 
 /** Staff only, matching the server. Hiding it is UX; the endpoint enforces. */
@@ -125,9 +129,29 @@ function Metric({ label, value, hint }: {
 }
 
 export default function ReportsPage() {
-  const { data, isPending, error } = useStats();
+  const seasonsQuery = useSeasons();
+  const seasonOptions = (seasonsQuery.data ?? []).map((s) => ({
+    value: s.season,
+    label: s.season + (s.is_active ? " (Active)" : ""),
+  }));
+
+  const [selectedSeason, setSelectedSeason] = useState<string | null>(null);
+
+  const { data, isPending, error } = useStats(selectedSeason || undefined);
   const { can } = useAuth();
   const isStaff = can("placement_cell.report.view");
+
+  const seasonSelect = (
+    <Select
+      placeholder="Select Season"
+      size="xs"
+      data={seasonOptions}
+      value={selectedSeason || data?.season || null}
+      onChange={(val) => setSelectedSeason(val)}
+      leftSection={<FaCalendarAlt size={12} />}
+      style={{ width: 170 }}
+    />
+  );
 
   if (error) return <Container size="lg"><ErrorState error={error} /></Container>;
   if (isPending) return <Container size="lg"><Text c="dimmed">Loading…</Text></Container>;
@@ -136,7 +160,11 @@ export default function ReportsPage() {
   if (data && data.available === false) {
     return (
       <Container size="lg">
-        <PageHeader title="Placement Statistics" subtitle={data.season} />
+        <PageHeader
+          title="Placement Statistics"
+          subtitle={data.season}
+          action={<Group gap="xs">{seasonSelect}</Group>}
+        />
         <Alert variant="light" color="blue" icon={<FaInfoCircle />}
           title="Statistics are not published yet">
           <Text size="sm">
@@ -155,7 +183,12 @@ export default function ReportsPage() {
         subtitle={isStaff
           ? `Operational figures for ${data?.season}`
           : `Anonymised figures for ${data?.season}`}
-        action={isStaff ? <ExportActions /> : undefined}
+        action={
+          <Group gap="xs">
+            {seasonSelect}
+            {isStaff && <ExportActions />}
+          </Group>
+        }
       />
 
       <SimpleGrid cols={{ base: 2, sm: 4 }} mb="md">
@@ -181,7 +214,7 @@ export default function ReportsPage() {
         </Card>
       )}
 
-      <Grid>
+      <Grid mb="md">
         <Grid.Col span={{ base: 12, md: isStaff ? 7 : 12 }}>
           <Card padding="lg">
             <Group gap="xs" mb="sm">
@@ -244,7 +277,93 @@ export default function ReportsPage() {
         )}
       </Grid>
 
+      {/* PC-AFR-035: Salary Package Distribution */}
+      {isStaff && data?.salary_distribution && data.salary_distribution.length > 0 && (
+        <Card padding="lg" mb="md">
+          <Group gap="xs" mb="sm">
+            <FaMoneyBillWave size={13} />
+            <Text fw={600}>Salary Package Distribution (PC-AFR-035)</Text>
+          </Group>
+          <Table>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Salary Band</Table.Th>
+                <Table.Th ta="right">Offers / Students Placed</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {data.salary_distribution.map((d) => (
+                <Table.Tr key={d.band}>
+                  <Table.Td>{d.band}</Table.Td>
+                  <Table.Td ta="right">{d.count}</Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </Card>
+      )}
+
+      {/* PC-AFR-034 & PC-AFR-036: Multi-Season Trends */}
+      {isStaff && (
+        <Grid mb="md">
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Card padding="lg">
+              <Group gap="xs" mb="sm">
+                <FaChartLine size={13} />
+                <Text fw={600}>Company Participation Trend (PC-AFR-034)</Text>
+              </Group>
+              <Table>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>Season</Table.Th>
+                    <Table.Th ta="right">Companies Participated</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {(data?.company_participation_trend ?? []).map((t) => (
+                    <Table.Tr key={t.season}>
+                      <Table.Td>{t.season}</Table.Td>
+                      <Table.Td ta="right">{t.companies_count}</Table.Td>
+                    </Table.Tr>
+                  ))}
+                </Table.Tbody>
+              </Table>
+            </Card>
+          </Grid.Col>
+
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Card padding="lg">
+              <Group gap="xs" mb="sm">
+                <FaChartLine size={13} />
+                <Text fw={600}>Employment Trend (PC-AFR-036)</Text>
+              </Group>
+              <Table>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>Season</Table.Th>
+                    <Table.Th ta="right">Registered</Table.Th>
+                    <Table.Th ta="right">Placed</Table.Th>
+                    <Table.Th ta="right">Rate</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {(data?.employment_trend ?? []).map((t) => (
+                    <Table.Tr key={t.season}>
+                      <Table.Td>{t.season}</Table.Td>
+                      <Table.Td ta="right">{t.registered}</Table.Td>
+                      <Table.Td ta="right">{t.placed}</Table.Td>
+                      <Table.Td ta="right">{t.placement_rate}%</Table.Td>
+                    </Table.Tr>
+                  ))}
+                </Table.Tbody>
+              </Table>
+            </Card>
+          </Grid.Col>
+        </Grid>
+      )}
+
       {isStaff && <OutstandingLetters />}
     </Container>
   );
 }
+

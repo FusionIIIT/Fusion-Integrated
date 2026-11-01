@@ -128,23 +128,84 @@ def student_view(*, season: str) -> dict:
     }
 
 
+def _salary_distribution(records: list[PlacementRecord]) -> list[dict]:
+    """PC-AFR-035: Salary package distributions across standard CTC bands.
+
+    Bands: < 6 LPA, 6-10 LPA, 10-15 LPA, 15-25 LPA, 25+ LPA.
+    """
+    bands = [
+        {"band": "< 6 LPA", "min": Decimal("0.0"), "max": Decimal("6.0"), "count": 0},
+        {"band": "6-10 LPA", "min": Decimal("6.0"), "max": Decimal("10.0"), "count": 0},
+        {"band": "10-15 LPA", "min": Decimal("10.0"), "max": Decimal("15.0"), "count": 0},
+        {"band": "15-25 LPA", "min": Decimal("15.0"), "max": Decimal("25.0"), "count": 0},
+        {"band": "25+ LPA", "min": Decimal("25.0"), "max": Decimal("9999.0"), "count": 0},
+    ]
+    for r in records:
+        if r.ctc_lpa is None:
+            continue
+        ctc = r.ctc_lpa
+        for b in bands:
+            if b["min"] <= ctc < b["max"]:
+                b["count"] += 1
+                break
+    return [{"band": b["band"], "count": b["count"]} for b in bands]
+
+
+def _multi_season_trends() -> dict:
+    """PC-AFR-034 (company participation trend) and PC-AFR-036 (employment trend)."""
+    policies = list(PlacementPolicy.objects.all().order_by("season"))
+    company_trend = []
+    employment_trend = []
+
+    for pol in policies:
+        recs = PlacementRecord.objects.filter(policy=pol, is_active=True)
+        reg_count = PlacementRegistration.objects.filter(
+            policy=pol, status="registered").count()
+        placed_count = recs.count()
+        companies_count = len(set(recs.values_list("company_id", flat=True)))
+
+        rate = (round(placed_count * 100 / reg_count, 1) if reg_count else 0.0)
+
+        company_trend.append({
+            "season": pol.season,
+            "companies_count": companies_count,
+        })
+        employment_trend.append({
+            "season": pol.season,
+            "registered": reg_count,
+            "placed": placed_count,
+            "placement_rate": rate,
+        })
+
+    return {
+        "company_participation_trend": company_trend,
+        "employment_trend": employment_trend,
+    }
+
+
 def staff_view(*, season: str) -> dict:
-    """Operational figures for the TPO and chairman (PC-UC-011, PC-UC-012)."""
+    """Operational figures for the TPO and chairman (PC-UC-011, PC-UC-012,
+    PC-AFR-034, PC-AFR-035, PC-AFR-036)."""
     policy = PlacementPolicy.objects.filter(season=season).first()
     if policy is None:
         return {"season": season, "available": False}
 
-    records = PlacementRecord.objects.filter(policy=policy, is_active=True)
-    agg = records.aggregate(n=Count("id"), mean=Avg("ctc_lpa"), top=Max("ctc_lpa"))
-    ctcs = [r for r in records.values_list("ctc_lpa", flat=True) if r is not None]
+    records = list(PlacementRecord.objects.filter(policy=policy, is_active=True)
+                   .select_related("company"))
+    agg = PlacementRecord.objects.filter(policy=policy, is_active=True).aggregate(
+        n=Count("id"), mean=Avg("ctc_lpa"), top=Max("ctc_lpa"))
+    ctcs = [r.ctc_lpa for r in records if r.ctc_lpa is not None]
 
     by_company = list(
-        records.values("company__name")
+        PlacementRecord.objects.filter(policy=policy, is_active=True)
+        .values("company__name")
         .annotate(placed=Count("id"), top=Max("ctc_lpa"))
         .order_by("-placed"))
     by_status = dict(
         Application.objects.filter(posting__placement_year=season)
         .values_list("status").annotate(n=Count("id")))
+
+    trends = _multi_season_trends()
 
     return {
         "season": season,
@@ -157,6 +218,9 @@ def staff_view(*, season: str) -> dict:
         "median_ctc": str(_median(ctcs)) if ctcs else None,
         "mean_ctc": str(round(agg["mean"], 2)) if agg["mean"] else None,
         "max_ctc": str(agg["top"]) if agg["top"] else None,
+        "salary_distribution": _salary_distribution(records),
         "by_company": by_company,
         "applications_by_status": by_status,
+        "company_participation_trend": trends["company_participation_trend"],
+        "employment_trend": trends["employment_trend"],
     }

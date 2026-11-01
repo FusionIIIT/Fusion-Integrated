@@ -126,3 +126,30 @@ class OffCampusRecordView(APIView):
                                            **payload.validated_data)
         return Response(s.PlacementRecordDetailSerializer(record).data,
                         status=status.HTTP_201_CREATED)
+
+
+@extend_schema(request=s.UpdatePlacementRecordSerializer,
+               responses=s.PlacementRecordDetailSerializer)
+class PlacementRecordDetailView(APIView):
+    """PC-UC-010, PC-BR-029, PC-AFR-031, PC-AFR-032.
+
+    Allows the TPO to view and update student and alumni placement records.
+    """
+
+    permission_classes = [MODULE, HasPermission(P_MANAGE)]
+
+    def get(self, request, pk):
+        record = PlacementRecord.objects.filter(pk=pk).select_related(
+            "company", "policy").first()
+        if record is None:
+            return Response({"error": "No such placement record."},
+                            status=status.HTTP_404_NOT_FOUND)
+        return Response(s.PlacementRecordDetailSerializer(record).data)
+
+    def patch(self, request, pk):
+        payload = s.UpdatePlacementRecordSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        record = service.update_placement_record(
+            record_id=pk, actor=_actor(request), **payload.validated_data)
+        return Response(s.PlacementRecordDetailSerializer(record).data)
+

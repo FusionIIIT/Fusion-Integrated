@@ -368,6 +368,36 @@ class CompanyListView(_Scoped, generics.ListCreateAPIView):
                         status=status.HTTP_201_CREATED)
 
 
+@extend_schema(request=s.CompanyRegisterSerializer, responses={201: s.CompanySerializer})
+class CompanySelfRegisterView(APIView):
+    """PC-UC-014, PC-AFR-044, PC-AFR-045.
+
+    Company/Recruiter self-registration endpoint. Anyone may submit a registration
+    for institute consideration. The company is recorded in "pending" status and
+    granted zero access until an authorized authority approves it.
+    """
+
+    authentication_classes: list = []
+    permission_classes: list = []
+    throttle_scope = "recruiter_login"
+
+    def post(self, request):
+        payload = s.CompanyRegisterSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        d = payload.validated_data
+        company = company_service.register(
+            name=d["name"], sector=d.get("sector", ""),
+            website=d.get("website", ""), hq_city=d.get("hq_city", ""),
+            contact={"name": d.get("contact_name", ""),
+                     "email": d.get("contact_email", ""),
+                     "phone": d.get("contact_phone", "")}
+            if d.get("contact_email") else None,
+            actor=None, registered_by_user_id=None)
+        return Response(s.CompanySerializer(company).data,
+                        status=status.HTTP_201_CREATED)
+
+
+
 class CompanyApprovalView(_Scoped, APIView):
     permission_classes = [MODULE, HasPermission(P_MANAGE_COMPANIES)]
 

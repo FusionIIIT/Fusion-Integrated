@@ -52,7 +52,7 @@ def publish(*, actor, title: str, body: str, topic: str = "general",
 
 @transaction.atomic
 def withdraw(*, announcement_id: int, actor, reason: str) -> Announcement:
-    """PC-BR-018: history is maintained, so this flags rather than deletes."""
+    """PC-AFR-043: history is maintained, so this flags rather than deletes."""
     if not (reason or "").strip():
         raise ConflictError("A reason is required to withdraw an announcement.",
                             code="reason_required")
