@@ -63,6 +63,79 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/lms/courses:
+    get:
+      operationId: v1_lms_courses_list
+      description: List all course workspaces the caller is enrolled in, assigned
+        to, or linked to.
+      summary: List authorized course workspaces
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseSummary'
+          description: ''
+  /api/v1/lms/courses/{code}:
+    get:
+      operationId: v1_lms_courses_retrieve
+      description: View and manage course home workspace details.
+      summary: Retrieve course workspace details
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseWorkspaceDetail'
+          description: ''
+    patch:
+      operationId: v1_lms_courses_partial_update
+      description: View and manage course home workspace details.
+      summary: Configure course workspace details (Faculty only)
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseWorkspaceUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseWorkspaceUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseWorkspaceUpdate'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseWorkspaceDetail'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -2315,6 +2388,94 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    CourseStaff:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        display_name:
+          type: string
+        email:
+          oneOf:
+          - type: string
+            format: email
+          - type: string
+            maxLength: 0
+        department:
+          type: string
+      required:
+      - department
+      - display_name
+      - email
+      - user_id
+    CourseSummary:
+      type: object
+      properties:
+        code:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        schedule:
+          type: string
+        status:
+          type: string
+        role:
+          type: string
+      required:
+      - code
+      - description
+      - role
+      - schedule
+      - status
+      - title
+    CourseWorkspaceDetail:
+      type: object
+      properties:
+        code:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        syllabus:
+          type: string
+        schedule:
+          type: string
+        status:
+          type: string
+        role:
+          type: string
+        can_edit:
+          type: boolean
+        instructors:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseStaff'
+        teaching_assistants:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseStaff'
+      required:
+      - can_edit
+      - code
+      - description
+      - instructors
+      - role
+      - schedule
+      - status
+      - syllabus
+      - teaching_assistants
+      - title
+    CourseWorkspaceUpdateStatusEnum:
+      enum:
+      - draft
+      - published
+      type: string
+      description: |-
+        * `draft` - draft
+        * `published` - published
     Detail:
       type: object
       properties:
@@ -3000,6 +3161,21 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PatchedCourseWorkspaceUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        syllabus:
+          type: string
+        schedule:
+          type: string
+          maxLength: 200
+        status:
+          $ref: '#/components/schemas/CourseWorkspaceUpdateStatusEnum'
     PatchedJobPosting:
       type: object
       properties:

@@ -13,6 +13,13 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `lms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `lms.course.view` | View courses and course home workspaces | `faculty`, `staff`, `student` |
+| `lms.course.manage` | Configure and edit course workspace details | `faculty` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
