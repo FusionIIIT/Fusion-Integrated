@@ -278,6 +278,75 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "superadmin": {
+      "grants": {
+        "Super Admin": [
+          "superadmin.role.assign",
+          "superadmin.role.view",
+          "superadmin.user.bulk_create",
+          "superadmin.user.create",
+          "superadmin.user.update",
+          "superadmin.user.view"
+        ]
+      },
+      "module_grants": [
+        "Super Admin"
+      ],
+      "nav": {
+        "base_path": "/superadmin",
+        "icon": "FaLayerGroup",
+        "items": [
+          {
+            "code": "superadmin.users",
+            "icon": "FaUsers",
+            "label": "Users",
+            "required_permission": "superadmin.user.view",
+            "sort_order": 10,
+            "to": "/superadmin/users"
+          },
+          {
+            "code": "superadmin.roles",
+            "icon": "FaIdBadge",
+            "label": "Roles",
+            "required_permission": "superadmin.role.view",
+            "sort_order": 20,
+            "to": "/superadmin/roles"
+          }
+        ],
+        "label": "Super Admin",
+        "nav_section": "Super Admin",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "superadmin.user.view",
+          "label": "View the institute user directory"
+        },
+        {
+          "code": "superadmin.user.create",
+          "label": "Create supported faculty and staff users"
+        },
+        {
+          "code": "superadmin.user.update",
+          "label": "Request an IAM password reset"
+        },
+        {
+          "code": "superadmin.user.bulk_create",
+          "label": "Import users through the IAM service"
+        },
+        {
+          "code": "superadmin.role.view",
+          "label": "View IAM role metadata and user roles"
+        },
+        {
+          "code": "superadmin.role.assign",
+          "label": "Replace a user's role assignments through IAM"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
     }
   },
   "publisher": "integrated",

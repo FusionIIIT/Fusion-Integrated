@@ -38,3 +38,14 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `superadmin`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `superadmin.user.view` | View the institute user directory | `Super Admin` |
+| `superadmin.user.create` | Create supported faculty and staff users | `Super Admin` |
+| `superadmin.user.update` | Request an IAM password reset | `Super Admin` |
+| `superadmin.user.bulk_create` | Import users through the IAM service | `Super Admin` |
+| `superadmin.role.view` | View IAM role metadata and user roles | `Super Admin` |
+| `superadmin.role.assign` | Replace a user's role assignments through IAM | `Super Admin` |
