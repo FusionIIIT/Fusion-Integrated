@@ -34,6 +34,303 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "iaa": {
+      "grants": {
+        "Auditor": [
+          "iaa.anomaly.create",
+          "iaa.anomaly.update",
+          "iaa.anomaly.view",
+          "iaa.audit_observation.create",
+          "iaa.audit_observation.update",
+          "iaa.audit_observation.view",
+          "iaa.audit_record.view",
+          "iaa.notification.view",
+          "iaa.report.export",
+          "iaa.report.view",
+          "iaa.request.view",
+          "iaa.role.update",
+          "iaa.role.view",
+          "iaa.ta_claim.view"
+        ],
+        "Basic User": [
+          "iaa.audit_observation.update",
+          "iaa.audit_observation.view",
+          "iaa.notification.view",
+          "iaa.request.create",
+          "iaa.request.update",
+          "iaa.request.view_self",
+          "iaa.role.update",
+          "iaa.role.view",
+          "iaa.ta_claim.create",
+          "iaa.ta_claim.update",
+          "iaa.ta_claim.view_self"
+        ],
+        "Dean": [
+          "iaa.anomaly.update",
+          "iaa.anomaly.view",
+          "iaa.audit_record.view",
+          "iaa.notification.view",
+          "iaa.report.view",
+          "iaa.request.approve",
+          "iaa.request.view",
+          "iaa.role.update",
+          "iaa.role.view",
+          "iaa.ta_claim.approve",
+          "iaa.ta_claim.view"
+        ],
+        "Director": [
+          "iaa.anomaly.update",
+          "iaa.anomaly.view",
+          "iaa.audit_record.view",
+          "iaa.notification.view",
+          "iaa.report.view",
+          "iaa.request.approve",
+          "iaa.request.view",
+          "iaa.role.update",
+          "iaa.role.view",
+          "iaa.ta_claim.approve",
+          "iaa.ta_claim.view"
+        ],
+        "Finance Staff": [
+          "iaa.anomaly.create",
+          "iaa.anomaly.update",
+          "iaa.anomaly.view",
+          "iaa.audit_observation.view",
+          "iaa.audit_record.view",
+          "iaa.notification.view",
+          "iaa.report.export",
+          "iaa.report.view",
+          "iaa.request.approve",
+          "iaa.request.review",
+          "iaa.request.update",
+          "iaa.request.view",
+          "iaa.role.update",
+          "iaa.role.view",
+          "iaa.ta_claim.approve",
+          "iaa.ta_claim.review",
+          "iaa.ta_claim.update",
+          "iaa.ta_claim.view"
+        ],
+        "HoD": [
+          "iaa.anomaly.update",
+          "iaa.anomaly.view",
+          "iaa.audit_record.view",
+          "iaa.notification.view",
+          "iaa.report.view",
+          "iaa.request.approve",
+          "iaa.request.view",
+          "iaa.role.update",
+          "iaa.role.view",
+          "iaa.ta_claim.approve",
+          "iaa.ta_claim.view"
+        ],
+        "System Admin": [
+          "iaa.configuration.manage",
+          "iaa.role.assign",
+          "iaa.role.update",
+          "iaa.role.view"
+        ]
+      },
+      "module_grants": [
+        "Auditor",
+        "Basic User",
+        "Dean",
+        "Director",
+        "Finance Staff",
+        "HoD",
+        "System Admin"
+      ],
+      "nav": {
+        "base_path": "/iaa",
+        "icon": "FaFileInvoiceDollar",
+        "items": [
+          {
+            "code": "iaa.requests",
+            "icon": "FaReceipt",
+            "label": "Expense / Voucher Requests",
+            "required_permission": "iaa.request.view_self",
+            "sort_order": 10,
+            "to": "/iaa/requests"
+          },
+          {
+            "code": "iaa.finance",
+            "icon": "FaInbox",
+            "label": "Finance Queue",
+            "required_permission": "iaa.request.review",
+            "sort_order": 20,
+            "to": "/iaa/finance"
+          },
+          {
+            "code": "iaa.approvals",
+            "icon": "FaCheckCircle",
+            "label": "Approvals",
+            "required_permission": "iaa.request.approve",
+            "sort_order": 30,
+            "to": "/iaa/approvals"
+          },
+          {
+            "code": "iaa.ta",
+            "icon": "FaPlane",
+            "label": "Travel Allowance",
+            "required_permission": "iaa.ta_claim.view_self",
+            "sort_order": 40,
+            "to": "/iaa/ta"
+          },
+          {
+            "code": "iaa.anomalies",
+            "icon": "FaExclamationTriangle",
+            "label": "Anomalies",
+            "required_permission": "iaa.anomaly.view",
+            "sort_order": 50,
+            "to": "/iaa/anomalies"
+          },
+          {
+            "code": "iaa.audit",
+            "icon": "FaSearch",
+            "label": "Audit Observations",
+            "required_permission": "iaa.audit_observation.view",
+            "sort_order": 60,
+            "to": "/iaa/audit-observations"
+          },
+          {
+            "code": "iaa.reports",
+            "icon": "FaChartBar",
+            "label": "Reports",
+            "required_permission": "iaa.report.view",
+            "sort_order": 70,
+            "to": "/iaa/reports"
+          },
+          {
+            "code": "iaa.notifications",
+            "icon": "FaBell",
+            "label": "Notifications",
+            "required_permission": "iaa.notification.view",
+            "sort_order": 75,
+            "to": "/iaa/notifications"
+          },
+          {
+            "code": "iaa.admin",
+            "icon": "FaCog",
+            "label": "Configuration",
+            "required_permission": "iaa.configuration.manage",
+            "sort_order": 80,
+            "to": "/iaa/configuration"
+          }
+        ],
+        "label": "Institute Accounts and Audits",
+        "nav_section": "Administration",
+        "sort_order": 30,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "iaa.request.view",
+          "label": "View requests within authorized scope"
+        },
+        {
+          "code": "iaa.request.view_self",
+          "label": "View own requests and their history"
+        },
+        {
+          "code": "iaa.request.create",
+          "label": "Create and submit expense or voucher requests"
+        },
+        {
+          "code": "iaa.request.update",
+          "label": "Update drafts or respond to a finance query"
+        },
+        {
+          "code": "iaa.request.review",
+          "label": "Review requests for finance validation"
+        },
+        {
+          "code": "iaa.request.approve",
+          "label": "Approve or reject assigned requests"
+        },
+        {
+          "code": "iaa.ta_claim.view",
+          "label": "View TA claims within authorized scope"
+        },
+        {
+          "code": "iaa.ta_claim.view_self",
+          "label": "View own TA claims and their history"
+        },
+        {
+          "code": "iaa.ta_claim.create",
+          "label": "Submit a TA claim"
+        },
+        {
+          "code": "iaa.ta_claim.update",
+          "label": "Respond to a TA clarification query"
+        },
+        {
+          "code": "iaa.ta_claim.review",
+          "label": "Verify TA claims for policy and budget compliance"
+        },
+        {
+          "code": "iaa.ta_claim.approve",
+          "label": "Approve or reject assigned high-value TA claims"
+        },
+        {
+          "code": "iaa.anomaly.view",
+          "label": "View anomalies within authorized scope"
+        },
+        {
+          "code": "iaa.anomaly.create",
+          "label": "Flag a material anomaly"
+        },
+        {
+          "code": "iaa.anomaly.update",
+          "label": "Resolve or escalate an assigned anomaly"
+        },
+        {
+          "code": "iaa.audit_record.view",
+          "label": "Review financial records for audit"
+        },
+        {
+          "code": "iaa.audit_observation.view",
+          "label": "View observations within authorized scope"
+        },
+        {
+          "code": "iaa.audit_observation.create",
+          "label": "Raise an audit observation"
+        },
+        {
+          "code": "iaa.audit_observation.update",
+          "label": "Respond to or verify an audit observation"
+        },
+        {
+          "code": "iaa.report.view",
+          "label": "View role-scoped IAA reports"
+        },
+        {
+          "code": "iaa.report.export",
+          "label": "Export a read-only IAA report"
+        },
+        {
+          "code": "iaa.notification.view",
+          "label": "View assigned IAA notifications and pending actions"
+        },
+        {
+          "code": "iaa.role.view",
+          "label": "View IAA role assignments"
+        },
+        {
+          "code": "iaa.role.update",
+          "label": "Select the active IAA actor role"
+        },
+        {
+          "code": "iaa.role.assign",
+          "label": "Manage IAA role assignments"
+        },
+        {
+          "code": "iaa.configuration.manage",
+          "label": "Configure IAA approval, budget, year, and policy rules"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

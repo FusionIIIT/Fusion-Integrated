@@ -15,6 +15,7 @@ source_modules =
     modules.placement
     modules.directory
     modules.accesscontrol
+    modules.iaa
 forbidden_modules =
     modules.placement.models
     modules.placement.services
@@ -25,6 +26,11 @@ forbidden_modules =
     modules.directory.services
     modules.directory.api
     modules.accesscontrol.models
+    modules.iaa.models
+    modules.iaa.services
+    modules.iaa.selectors
+    modules.iaa.api
+    modules.iaa.domain
 # DIRECT imports only. contracts.py legitimately imports its OWN module's
 # models and services, so following the chain transitively would make this
 # contract impossible to satisfy. What we forbid is a module reaching straight
@@ -38,6 +44,7 @@ type = forbidden
 source_modules =
 # Every module's domain, not just the first one written.
     modules.placement.domain
+    modules.iaa.domain
 forbidden_modules =
     django
     rest_framework
@@ -66,3 +73,13 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+
+[importlinter:contract:iaa-layers]
+name = Layering inside IAA
+type = layers
+layers =
+    modules.iaa.api
+    modules.iaa.services
+    modules.iaa.selectors
+    modules.iaa.models
+    modules.iaa.domain
