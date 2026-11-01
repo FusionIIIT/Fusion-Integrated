@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.iaa",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -274,3 +275,4 @@ LOGGING = {
         "fusion": {"level": env("FUSION_LOG_LEVEL", "INFO"), "propagate": True},
     },
 }
+
