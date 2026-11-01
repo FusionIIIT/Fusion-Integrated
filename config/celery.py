@@ -8,6 +8,12 @@ from modules.placement.schedule import (
 from modules.placement.schedule import (
     TASK_ROUTES as PLACEMENT_ROUTES,
 )
+from modules.department.schedule import (
+    BEAT_SCHEDULE as DEPARTMENT_SCHEDULE,
+)
+from modules.department.schedule import (
+    TASK_ROUTES as DEPARTMENT_ROUTES,
+)
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.dev")
 app = Celery("fusion_integrated")
@@ -15,5 +21,5 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
 # Each module owns its timers; this only merges them, so modules stay removable.
-app.conf.beat_schedule = {**PLACEMENT_SCHEDULE}
-app.conf.task_routes = {**PLACEMENT_ROUTES}
+app.conf.beat_schedule = {**PLACEMENT_SCHEDULE, **DEPARTMENT_SCHEDULE}
+app.conf.task_routes = {**PLACEMENT_ROUTES, **DEPARTMENT_ROUTES}
