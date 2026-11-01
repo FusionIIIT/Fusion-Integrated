@@ -1,0 +1,1 @@
+"""BADMS module."""

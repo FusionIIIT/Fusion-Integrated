@@ -7,6 +7,33 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `badms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `badms.archive.view_self` | View own archive requests | `HOD`, `Super Admin`, `SysAdmin`, `admin`, `faculty`, `staff`, `student`, `sysadmin` |
+| `badms.archive.create` | Submit an archival request | `HOD`, `Super Admin`, `SysAdmin`, `admin`, `faculty`, `staff`, `student`, `sysadmin` |
+| `badms.archive.view` | View department or institute archive requests | `HOD`, `IT Security`, `Super Admin`, `SysAdmin`, `admin`, `it_security`, `sysadmin` |
+| `badms.archive.review` | Review department archive requests as HoD | `HOD` |
+| `badms.archive.classify` | Assign authoritative archive classification | `Super Admin`, `SysAdmin`, `admin`, `sysadmin` |
+| `badms.archive.encrypt` | Configure encryption for sensitive archives | `IT Security`, `it_security` |
+| `badms.archive.special` | Execute special offline archival | `Super Admin`, `admin` |
+| `badms.backup.view` | View backups, history, and schedules | `Director of IT`, `IT Security`, `Super Admin`, `SysAdmin`, `admin`, `it_security`, `sysadmin` |
+| `badms.backup.create` | Trigger a manual backup | `Super Admin`, `SysAdmin`, `admin`, `sysadmin` |
+| `badms.backup.manage` | Manage local backup schedules | `Super Admin`, `SysAdmin`, `admin`, `sysadmin` |
+| `badms.policy.manage` | Manage global backup schedules and policies | `Super Admin`, `admin` |
+| `badms.restoration.view_self` | View own restoration requests | `HOD`, `Super Admin`, `SysAdmin`, `admin`, `faculty`, `staff`, `student`, `sysadmin` |
+| `badms.restoration.create` | Submit a restoration request | `HOD`, `Super Admin`, `SysAdmin`, `admin`, `faculty`, `staff`, `student`, `sysadmin` |
+| `badms.restoration.view` | View all restoration requests | `IT Security`, `Super Admin`, `SysAdmin`, `admin`, `it_security`, `sysadmin` |
+| `badms.restoration.approve` | Approve sensitive restoration requests | `Super Admin`, `SysAdmin`, `admin`, `sysadmin` |
+| `badms.restoration.restore` | Execute a restoration request | `Super Admin`, `SysAdmin`, `admin`, `sysadmin` |
+| `badms.storage.view_self` | View own storage extension requests | `HOD`, `Super Admin`, `SysAdmin`, `admin`, `faculty`, `staff`, `student`, `sysadmin` |
+| `badms.storage.create` | Request a storage quota extension | `HOD`, `Super Admin`, `SysAdmin`, `admin`, `faculty`, `staff`, `student`, `sysadmin` |
+| `badms.storage.view` | View department storage extension requests | `HOD`, `Super Admin`, `SysAdmin`, `admin`, `sysadmin` |
+| `badms.storage.review` | Review storage extension requests as HoD | `HOD` |
+| `badms.audit.view` | View BADMS audit logs | `IT Security`, `Super Admin`, `SysAdmin`, `admin`, `it_security`, `sysadmin` |
+| `badms.report.view` | View BADMS operational and department reports | `Director of IT`, `HOD`, `IT Security`, `Super Admin`, `SysAdmin`, `admin`, `it_security`, `sysadmin` |
+
 ## `directory`
 
 | Code | What it allows | Held by |
