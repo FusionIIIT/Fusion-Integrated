@@ -13,6 +13,21 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave_management`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave_management.leave_request.create` | Apply, withdraw, cancel, extend and resume one's own leave | `faculty`, `staff` |
+| `leave_management.leave_request.view` | See leave requests within one's scope | `Leave Administrator`, `faculty`, `staff` |
+| `leave_management.leave_request.review` | Act on leave tasks assigned by the hierarchy | `faculty`, `staff` |
+| `leave_management.leave_request.export` | Print one's own leave application | `faculty`, `staff` |
+| `leave_management.policy.manage` | Maintain leave policy, hierarchy and SLA | `Leave Administrator` |
+| `leave_management.calendar.publish` | Create and publish the holiday/RH calendar | `Leave Administrator` |
+| `leave_management.leave_record.import` | Record offline-sanctioned leave | `Leave Administrator` |
+| `leave_management.leave_record.update` | Correct leave balances and see all records | `Leave Administrator` |
+| `leave_management.leave_account.update` | Year-end leave processing | _service only_ |
+| `leave_management.leave_request.assign` | SLA reminder and escalation | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
