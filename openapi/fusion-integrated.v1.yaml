@@ -105,6 +105,528 @@ paths:
               schema:
                 $ref: '#/components/schemas/Session'
           description: ''
+  /api/v1/mms/announcements/:
+    get:
+      operationId: v1_mms_announcements_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSAnnouncementSchema'
+          description: ''
+    post:
+      operationId: v1_mms_announcements_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MMSAnnouncementSchema'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MMSAnnouncementSchema'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MMSAnnouncementSchema'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSAnnouncementSchema'
+          description: ''
+  /api/v1/mms/feedback/:
+    get:
+      operationId: v1_mms_feedback_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSFeedbackSchema'
+          description: ''
+    post:
+      operationId: v1_mms_feedback_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MMSFeedbackSchema'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MMSFeedbackSchema'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MMSFeedbackSchema'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSFeedbackSchema'
+          description: ''
+  /api/v1/mms/menu/:
+    get:
+      operationId: v1_mms_menu_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSMenuItemSchema'
+          description: ''
+    post:
+      operationId: v1_mms_menu_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MMSMenuItemSchema'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MMSMenuItemSchema'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MMSMenuItemSchema'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSMenuItemSchema'
+          description: ''
+  /api/v1/mms/rebates/:
+    get:
+      operationId: v1_mms_rebates_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSRebateSchema'
+          description: ''
+    post:
+      operationId: v1_mms_rebates_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MMSRebateSchema'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MMSRebateSchema'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MMSRebateSchema'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSRebateSchema'
+          description: ''
+  /api/v1/mms/rebates/{request_id}/decision/:
+    post:
+      operationId: v1_mms_rebates_decision_create
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MMSRebateSchema'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MMSRebateSchema'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MMSRebateSchema'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSRebateSchema'
+          description: ''
+  /api/v1/mms/registration-windows/:
+    get:
+      operationId: v1_mms_registration_windows_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSWindowSchema'
+          description: ''
+    post:
+      operationId: v1_mms_registration_windows_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MMSWindowSchema'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MMSWindowSchema'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MMSWindowSchema'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSWindowSchema'
+          description: ''
+  /api/v1/mms/registrations/:
+    get:
+      operationId: v1_mms_registrations_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSRegistrationSchema'
+          description: ''
+    post:
+      operationId: v1_mms_registrations_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MMSRegistrationSchema'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MMSRegistrationSchema'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MMSRegistrationSchema'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSRegistrationSchema'
+          description: ''
+  /api/v1/mms/registrations/{request_id}/decision/:
+    post:
+      operationId: v1_mms_registrations_decision_create
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MMSRegistrationSchema'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MMSRegistrationSchema'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MMSRegistrationSchema'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSRegistrationSchema'
+          description: ''
+  /api/v1/mms/reports/:
+    get:
+      operationId: v1_mms_reports_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportSummary'
+          description: ''
+  /api/v1/mms/roles/:
+    get:
+      operationId: v1_mms_roles_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSRoleAssignmentSchema'
+          description: ''
+    post:
+      operationId: v1_mms_roles_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MMSRoleAssignmentSchema'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MMSRoleAssignmentSchema'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MMSRoleAssignmentSchema'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSRoleAssignmentSchema'
+          description: ''
+  /api/v1/mms/special-food/:
+    get:
+      operationId: v1_mms_special_food_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSSpecialFoodSchema'
+          description: ''
+    post:
+      operationId: v1_mms_special_food_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MMSSpecialFoodSchema'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MMSSpecialFoodSchema'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MMSSpecialFoodSchema'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSSpecialFoodSchema'
+          description: ''
+  /api/v1/mms/special-food/{request_id}/decision/:
+    post:
+      operationId: v1_mms_special_food_decision_create
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MMSSpecialFoodSchema'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MMSSpecialFoodSchema'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MMSSpecialFoodSchema'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSSpecialFoodSchema'
+          description: ''
+  /api/v1/mms/special-food/{request_id}/fulfillment/:
+    post:
+      operationId: v1_mms_special_food_fulfillment_create
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MMSSpecialFoodSchema'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MMSSpecialFoodSchema'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MMSSpecialFoodSchema'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSSpecialFoodSchema'
+          description: ''
+  /api/v1/mms/vacation-surveys/:
+    get:
+      operationId: v1_mms_vacation_surveys_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSVacationSurveySchema'
+          description: ''
+    post:
+      operationId: v1_mms_vacation_surveys_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MMSVacationSurveySchema'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MMSVacationSurveySchema'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MMSVacationSurveySchema'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSVacationSurveySchema'
+          description: ''
+  /api/v1/mms/vacation-surveys/{survey_id}/response/:
+    post:
+      operationId: v1_mms_vacation_surveys_response_create
+      parameters:
+      - in: path
+        name: survey_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MMSVacationResponseSchema'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MMSVacationResponseSchema'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MMSVacationResponseSchema'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MMSVacationResponseSchema'
+          description: ''
   /api/v1/placement/announcements:
     get:
       operationId: v1_placement_announcements_list
@@ -1993,6 +2515,9 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BlankEnum:
+      enum:
+      - ''
     BulkOutcome:
       type: object
       properties:
@@ -2315,6 +2840,24 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DayEnum:
+      enum:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      type: integer
+      description: |-
+        * `0` - Monday
+        * `1` - Tuesday
+        * `2` - Wednesday
+        * `3` - Thursday
+        * `4` - Friday
+        * `5` - Saturday
+        * `6` - Sunday
     Detail:
       type: object
       properties:
@@ -2663,6 +3206,340 @@ components:
       required:
       - password
       - username
+    MMSAnnouncementSchema:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        owner_role:
+          $ref: '#/components/schemas/MMSRoleEnum'
+        title:
+          type: string
+          maxLength: 160
+        body:
+          type: string
+          maxLength: 4000
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - body
+      - created_at
+      - id
+      - owner_role
+      - title
+    MMSFeedbackSchema:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        text:
+          type: string
+          maxLength: 4000
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - text
+    MMSMenuItemSchema:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        week_start:
+          type: string
+          format: date
+        day:
+          allOf:
+          - $ref: '#/components/schemas/DayEnum'
+          minimum: 0
+          maximum: 32767
+        meal:
+          $ref: '#/components/schemas/MealEnum'
+        item:
+          type: string
+          maxLength: 160
+      required:
+      - day
+      - id
+      - item
+      - meal
+      - week_start
+    MMSRebateSchema:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        reason:
+          $ref: '#/components/schemas/ReasonEnum'
+        explanation:
+          type: string
+          maxLength: 500
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        status:
+          allOf:
+          - $ref: '#/components/schemas/MMSRebateSchemaStatusEnum'
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - decided_at
+      - end_date
+      - id
+      - reason
+      - start_date
+      - status
+      - submitted_at
+      - user_id
+    MMSRebateSchemaStatusEnum:
+      enum:
+      - pending
+      - approved
+      - rejected
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `approved` - Approved
+        * `rejected` - Rejected
+    MMSRegistrationSchema:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        cycle:
+          type: string
+          readOnly: true
+        request_type:
+          allOf:
+          - $ref: '#/components/schemas/RequestTypeEnum'
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/MMSRegistrationSchemaStatusEnum'
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        effective_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+      required:
+      - cycle
+      - decided_at
+      - effective_date
+      - id
+      - request_type
+      - status
+      - submitted_at
+      - user_id
+    MMSRegistrationSchemaStatusEnum:
+      enum:
+      - pending
+      - registered
+      - deregistered
+      - rejected
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `registered` - Registered
+        * `deregistered` - Deregistered
+        * `rejected` - Rejected
+    MMSRoleAssignmentSchema:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        role:
+          $ref: '#/components/schemas/MMSRoleEnum'
+        user_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - id
+      - role
+      - starts_at
+      - user_id
+    MMSRoleEnum:
+      enum:
+      - caretaker
+      - warden
+      type: string
+      description: |-
+        * `caretaker` - Caretaker
+        * `warden` - Warden
+    MMSSpecialFoodSchema:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        requested_date:
+          type: string
+          format: date
+        description:
+          type: string
+          maxLength: 500
+        charge:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,7}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/MMSSpecialFoodSchemaStatusEnum'
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - charge
+      - description
+      - id
+      - requested_date
+      - status
+      - submitted_at
+      - user_id
+    MMSSpecialFoodSchemaStatusEnum:
+      enum:
+      - requested
+      - approved
+      - rejected
+      - served
+      - cancelled
+      type: string
+      description: |-
+        * `requested` - Requested
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `served` - Served
+        * `cancelled` - Cancelled
+    MMSVacationResponseSchema:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        survey:
+          type: integer
+          readOnly: true
+        response:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/ResponseEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+      required:
+      - id
+      - survey
+    MMSVacationSurveySchema:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 160
+        vacation_start:
+          type: string
+          format: date
+        vacation_end:
+          type: string
+          format: date
+        response_deadline:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - response_deadline
+      - title
+      - vacation_end
+      - vacation_start
+    MMSWindowSchema:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cycle:
+          type: string
+          maxLength: 80
+        opens_at:
+          type: string
+          format: date-time
+        closes_at:
+          type: string
+          format: date-time
+      required:
+      - closes_at
+      - cycle
+      - id
+      - opens_at
+    MealEnum:
+      enum:
+      - breakfast
+      - lunch
+      - dinner
+      type: string
+      description: |-
+        * `breakfast` - Breakfast
+        * `lunch` - Lunch
+        * `dinner` - Dinner
     ModeEnum:
       enum:
       - online
@@ -2732,6 +3609,9 @@ components:
       - is_late
       - message
       - record
+    NullEnum:
+      enum:
+      - null
     OffCampusRecord:
       type: object
       properties:
@@ -3201,6 +4081,18 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    ReasonEnum:
+      enum:
+      - medical
+      - institute_leave
+      - family_function
+      - other
+      type: string
+      description: |-
+        * `medical` - Medical
+        * `institute_leave` - Institute leave
+        * `family_function` - Family function
+        * `other` - Other
     Recommendation:
       type: object
       description: |-
@@ -3466,6 +4358,41 @@ components:
       - message
       - reason
       - route
+    ReportSummary:
+      type: object
+      properties:
+        registrations:
+          type: array
+          items:
+            $ref: '#/components/schemas/_CycleStatusCount'
+        rebates:
+          type: array
+          items:
+            $ref: '#/components/schemas/_StatusCount'
+        special_food:
+          type: array
+          items:
+            $ref: '#/components/schemas/_StatusCount'
+      required:
+      - rebates
+      - registrations
+      - special_food
+    RequestTypeEnum:
+      enum:
+      - register
+      - deregister
+      type: string
+      description: |-
+        * `register` - Register
+        * `deregister` - Deregister
+    ResponseEnum:
+      enum:
+      - 'yes'
+      - 'no'
+      type: string
+      description: |-
+        * `yes` - Yes
+        * `no` - No
     RoundOutcome:
       type: object
       properties:
@@ -3830,6 +4757,29 @@ components:
           maxLength: 300
       required:
       - reason
+    _CycleStatusCount:
+      type: object
+      properties:
+        status:
+          type: string
+        count:
+          type: integer
+        cycle:
+          type: string
+      required:
+      - count
+      - cycle
+      - status
+    _StatusCount:
+      type: object
+      properties:
+        status:
+          type: string
+        count:
+          type: integer
+      required:
+      - count
+      - status
   securitySchemes:
     iamSession:
       type: apiKey
