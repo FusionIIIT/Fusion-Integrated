@@ -76,6 +76,11 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
 ]
 
+INSTALLED_APPS = [
+    # Existing apps...
+    "modules.vms.apps.VmsConfig",
+]
+
 # No models. Installed so its AppConfig runs and registers the session checks.
 LOCAL_APPS = [
     "fusion_auth",
@@ -90,6 +95,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.elm",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
