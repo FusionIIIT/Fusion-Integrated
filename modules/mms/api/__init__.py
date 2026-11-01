@@ -1,1 +1,0 @@
-"""MMS API package."""
