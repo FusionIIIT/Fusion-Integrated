@@ -57,4 +57,50 @@ class Command(BaseCommand):
 
 
 
+        from modules.lms.models import Course as LmsCourse
+        from modules.lms.models import CourseMembership as LmsMembership
+
+        s_cs301 = (
+            "1. Relational Model & SQL\n2. Normalization\n"
+            "3. Storage & Indexing\n4. Query Optimization\n5. Transactions"
+        )
+        cs301, _ = LmsCourse.objects.update_or_create(
+            code="CS301",
+            defaults={
+                "title": "Database Systems",
+                "description": "Relational model, SQL, transactions, concurrency, and indexing.",
+                "syllabus": s_cs301,
+                "schedule": "Monday & Wednesday: 10:00 AM - 11:30 AM (L-201)",
+                "status": "published",
+            },
+        )
+
+        s_cs302 = (
+            "1. Intro to OS\n2. Process Management\n"
+            "3. CPU Scheduling\n4. Deadlocks\n5. Memory Virtualization"
+        )
+        cs302, _ = LmsCourse.objects.update_or_create(
+            code="CS302",
+            defaults={
+                "title": "Operating Systems",
+                "description": "Processes, threads, scheduling, synchronization, and memory.",
+                "syllabus": s_cs302,
+                "schedule": "Tuesday & Thursday: 02:00 PM - 03:30 PM (L-202)",
+                "status": "published",
+            },
+        )
+
+        for course, uid, role in [
+            (cs301, 9001, "faculty"),
+            (cs301, 1001, "student"),
+            (cs301, 1002, "ta"),
+            (cs301, 1003, "observer"),
+            (cs302, 9001, "faculty"),
+            (cs302, 1001, "student"),
+            (cs302, 1002, "student"),
+        ]:
+            LmsMembership.objects.update_or_create(
+                course=course, user_id=uid, defaults={"role": role}
+            )
+
         self.stdout.write(self.style.SUCCESS("demo data loaded"))

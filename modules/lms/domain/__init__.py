@@ -1,0 +1,1 @@
+"""LMS pure domain package."""
