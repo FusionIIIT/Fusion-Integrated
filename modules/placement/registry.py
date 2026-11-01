@@ -16,6 +16,10 @@ NAV_ITEMS = [
      "icon": "Checks", "to": "/placement/registration",
      "required_permission": "placement_cell.registration.self",
      "sort_order": 5},
+    {"code": "placement.profile", "label": "Placement Profile",
+     "icon": "IdentificationCard", "to": "/placement/profile",
+     "required_permission": "placement_cell.application.view_self",
+     "sort_order": 6},
     {"code": "placement.postings", "label": "Opportunities",
      "icon": "ClipboardText", "to": "/placement/postings",
      "required_permission": "placement_cell.job_posting.view", "sort_order": 10},
@@ -26,6 +30,12 @@ NAV_ITEMS = [
     {"code": "placement.offers", "label": "My Offers",
      "icon": "Signature", "to": "/placement/offers",
      "required_permission": "placement_cell.offer.respond", "sort_order": 30},
+    {"code": "placement.statistics", "label": "Placement Statistics",
+     "icon": "ChartBar", "to": "/placement/reports",
+     "required_permission": "placement_cell.statistics.student.view", "sort_order": 35},
+    {"code": "placement.announcements.read", "label": "Announcements",
+     "icon": "Megaphone", "to": "/placement/announcements",
+     "required_permission": "placement_cell.announcement.view", "sort_order": 40},
 
     # -- staff (TPO / chairman) -------------------------------------------
     {"code": "placement.registrations", "label": "Registrations",
@@ -58,6 +68,8 @@ NAV_ITEMS = [
 #: Every permission this module recognises; ROLE_GRANTS below says who holds each.
 PERMISSIONS = [
     ("placement_cell.job_posting.view", "See job postings"),
+    ("placement_cell.announcement.view", "See published placement announcements"),
+    ("placement_cell.statistics.student.view", "See anonymized placement statistics"),
     ("placement_cell.job_posting.manage", "Create and publish postings"),
     ("placement_cell.application.view", "See all applications"),
     ("placement_cell.application.view_self", "See one's own applications"),
@@ -92,12 +104,22 @@ SYSTEM_PERMISSIONS = [
 ]
 
 _STUDENT = [
+    "placement_cell.statistics.student.view",
+    "placement_cell.announcement.view",
     "placement_cell.registration.self",
     "placement_cell.job_posting.view",
     "placement_cell.application.view_self",
     "placement_cell.application.create",
     "placement_cell.application.delete",
     "placement_cell.offer.respond",
+]
+
+# Alumni can browse public opportunities, announcements and aggregate
+# statistics; selector scope keeps them out of active placement workflows.
+_ALUMNI = [
+    "placement_cell.job_posting.view",
+    "placement_cell.announcement.view",
+    "placement_cell.statistics.student.view",
 ]
 
 _COORDINATOR = [
@@ -133,6 +155,7 @@ _CHAIRMAN = [
 #: Keyed by the designation name as it exists in globals_designation.
 ROLE_GRANTS = {
     "student": _STUDENT,
+    "alumni": _ALUMNI,
     "placement_coordinator": _COORDINATOR,
     "placement_officer": _OFFICER,
     "placement_chairman": _CHAIRMAN,

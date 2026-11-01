@@ -12,6 +12,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 
 from core.api import csrf
 from core.api.exceptions import BadRequestError, ConflictError, NotFoundError
@@ -304,14 +305,50 @@ class ApplyView(_Scoped, APIView):
 # -- Profile -------------------------------------------------------------------
 @extend_schema(responses=s.CandidateSerializer)
 class MyResumeView(_Scoped, APIView):
-    """The student's own candidate record, including the resume they maintain
-    on the ERP portal."""
+    """Generate a structured resume from the saved placement profile."""
 
     permission_classes = [MODULE, HasPermission(P_VIEW_SELF)]
 
     def get(self, request):
         actor = _actor(request)
-        return Response(_candidate(actor.user_id))
+        from modules.placement.services import profiles
+        return Response(profiles.generate_resume(user_id=actor.user_id))
+
+
+class MyPlacementProfileView(_Scoped, APIView):
+    """Read and maintain the authenticated student's own placement profile."""
+
+    permission_classes = [MODULE, HasPermission(P_VIEW_SELF)]
+
+    def get(self, request):
+        from modules.placement.services import profiles
+        profile = profiles.get(user_id=_actor(request).user_id)
+        if profile is None:
+            return Response({"profile": {
+                "summary": "", "skills": [], "achievements": [],
+                "certifications": [], "projects": [], "links": [],
+                "updated_at": None,
+            }})
+        return Response({"profile": s.PlacementProfileSerializer(profile).data})
+
+    @extend_schema(request=s.PlacementProfileWriteSerializer,
+                   responses=s.PlacementProfileSerializer)
+    def put(self, request):
+        return self._save(request, partial=False)
+
+    @extend_schema(request=s.PlacementProfileWriteSerializer,
+                   responses=s.PlacementProfileSerializer)
+    def patch(self, request):
+        return self._save(request, partial=True)
+
+    def _save(self, request, *, partial: bool):
+        payload = s.PlacementProfileWriteSerializer(
+            data=request.data, partial=partial)
+        payload.is_valid(raise_exception=True)
+        from modules.placement.services import profiles
+        profile = profiles.save(user_id=_actor(request).user_id,
+                                values=payload.validated_data)
+        return Response({"profile": s.PlacementProfileSerializer(profile).data})
 
 
 @extend_schema(responses=s.CandidateSerializer)
@@ -364,6 +401,28 @@ class CompanyListView(_Scoped, generics.ListCreateAPIView):
             if d.get("contact_email") else None,
             actor=_actor(request),
             registered_by_user_id=getattr(_actor(request), "user_id", None))
+        return Response(s.CompanySerializer(company).data,
+                        status=status.HTTP_201_CREATED)
+
+
+class CompanyRegistrationRequestView(_Scoped, APIView):
+    """Submit a company registration request for external institute review."""
+
+    permission_classes = [AllowAny]
+
+    @extend_schema(request=s.CompanyRegisterSerializer, responses=s.CompanySerializer)
+    def post(self, request):
+        payload = s.CompanyRegisterSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        data = payload.validated_data
+        company = company_service.register(
+            name=data["name"], sector=data.get("sector", ""),
+            website=data.get("website", ""), hq_city=data.get("hq_city", ""),
+            contact={"name": data.get("contact_name", ""),
+                     "email": data.get("contact_email", ""),
+                     "phone": data.get("contact_phone", "")}
+            if data.get("contact_email") else None,
+            actor=None, registered_by_user_id=None)
         return Response(s.CompanySerializer(company).data,
                         status=status.HTTP_201_CREATED)
 

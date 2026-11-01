@@ -74,7 +74,7 @@ TRANSITIONS: tuple[Transition, ...] = (
     # -- the student's own moves ------------------------------------------
     Transition(DRAFT, SUBMITTED, "placement_cell.application.create",
                frozenset({STUDENT}),
-               ("window_open", "profile_complete", "is_eligible", "may_apply")),
+               ("window_open", "is_eligible", "may_apply")),
 
     # -- review and shortlisting (PC-WF-005) ------------------------------
     Transition(SUBMITTED, UNDER_REVIEW, "placement_cell.application.review",

@@ -23,6 +23,19 @@ def _client(stub_iam, **kw):
     return c
 
 
+def test_company_can_submit_registration_without_an_institute_decision():
+    response = APIClient().post("/api/v1/placement/companies/register", {
+        "name": "Example Recruiting Co",
+        "website": "https://example.test",
+        "contact_name": "Recruiter",
+        "contact_email": "recruiter@example.test",
+    }, format="json")
+
+    assert response.status_code == 201
+    assert response.json()["approval_status"] == "pending"
+    assert response.json()["can_operate"] is False
+
+
 def test_student_sees_only_their_own_applications(stub_iam, posting, user_ref):
     Application.objects.create(posting=posting, user_id=1001, status="submitted")
     Application.objects.create(posting=posting, user_id=2002, status="submitted")

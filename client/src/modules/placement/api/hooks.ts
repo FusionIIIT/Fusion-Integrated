@@ -25,6 +25,7 @@ export const keys = {
   applications: (f?: unknown) => [KEY, "applications", f] as const,
   offers: () => [KEY, "offers"] as const,
   resume: () => [KEY, "resume"] as const,
+  profile: () => [KEY, "profile"] as const,
   companies: () => [KEY, "companies"] as const,
   rounds: (postingId?: number) => [KEY, "rounds", postingId] as const,
   announcements: () => [KEY, "announcements"] as const,
@@ -166,7 +167,45 @@ export function useRespondToOffer() {
 }
 
 // -- Profile -------------------------------------------------------------------
+export interface PlacementProfile {
+  summary: string;
+  skills: string[];
+  achievements: { title: string; description?: string; date?: string }[];
+  certifications: { name: string; issuer?: string; issued_on?: string;
+    credential_url?: string }[];
+  projects: { title: string; description?: string; technologies?: string[];
+    url?: string }[];
+  links: { label: string; url: string }[];
+  updated_at: string | null;
+}
 
+export function useMyPlacementProfile() {
+  return useQuery({
+    queryKey: keys.profile(),
+    queryFn: async () =>
+      (await http.get<{ profile: PlacementProfile }>("/placement/profile")).data.profile,
+  });
+}
+
+export function useSavePlacementProfile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: Omit<PlacementProfile, "updated_at">) =>
+      (await http.put<{ profile: PlacementProfile }>("/placement/profile", body))
+        .data.profile,
+    onSuccess: (profile) => {
+      qc.setQueryData(keys.profile(), profile);
+      qc.invalidateQueries({ queryKey: keys.resume() });
+    },
+  });
+}
+
+export function useGenerateResume() {
+  return useMutation({
+    mutationFn: async () =>
+      (await http.get<Record<string, unknown>>("/placement/profile/resume")).data,
+  });
+}
 
 
 // -- Companies -----------------------------------------------------------------

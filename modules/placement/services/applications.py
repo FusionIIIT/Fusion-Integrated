@@ -18,7 +18,6 @@ from django.db import transaction
 from django.utils import timezone
 
 from core.api.exceptions import ConflictError, DomainError, NotFoundError, PermissionDeniedError
-from modules.directory import contracts as directory
 from modules.placement.domain import eligibility as elig
 from modules.placement.domain import state_machine as sm
 from modules.placement.models import (
@@ -109,14 +108,6 @@ def _guard(name: str, *, application, reason: str, actor) -> None:
         if posting.closes_at and now > posting.closes_at:
             raise ConflictError("Applications for this posting have closed.",
                                 code="window_closed")
-
-    if name == "profile_complete":
-        # PC-BR-001, answered by the ERP portal, which owns the one profile.
-        person = directory.get_users([application.user_id]).get(application.user_id)
-        if not getattr(person, "profile_completed", False):
-            raise ConflictError(
-                "Complete your profile on the Fusion portal before applying.",
-                code="profile_incomplete")
 
     if name == "is_eligible":
         snapshot = application.eligibility_snapshot or {}

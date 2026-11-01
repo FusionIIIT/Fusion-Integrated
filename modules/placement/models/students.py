@@ -11,6 +11,28 @@ from core.db.mixins import TimeStampedModel, UserScopedModel
 
 # -- Student placement profile (PC-UC-001, PC-BR-001) --------------------------
 
+class StudentPlacementProfile(TimeStampedModel, UserScopedModel):
+    """Student-owned competency data used by PCMS resume generation.
+
+    Academic master data stays with the institute's academic systems (PC-BR-025)
+    and is joined into the generated resume through the directory/IAM contracts.
+    """
+
+    summary = models.CharField(max_length=2000, blank=True)
+    skills = models.JSONField(default=list, blank=True)
+    achievements = models.JSONField(default=list, blank=True)
+    certifications = models.JSONField(default=list, blank=True)
+    projects = models.JSONField(default=list, blank=True)
+    links = models.JSONField(default=list, blank=True)
+
+    class Meta:
+        db_table = "placement_student_profile"
+        constraints = [models.UniqueConstraint(
+            fields=["user_id"], name="placement_profile_unique_user")]
+
+    def __str__(self) -> str:
+        return f"placement profile u{self.user_id}"
+
 class ProfileDocument(TimeStampedModel, UserScopedModel):
     """A document a student has submitted to the placement office.
 

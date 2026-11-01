@@ -34,6 +34,7 @@ from modules.placement.models.postings import (
 from modules.placement.models.students import (
     PlacementRegistration,
     ProfileDocument,
+    StudentPlacementProfile,
 )
 
 __all__ = [
@@ -53,6 +54,7 @@ __all__ = [
     "PlacementStatsSnapshot",
     "PolicyCategory",
     "ProfileDocument",
+    "StudentPlacementProfile",
     "RecruiterAccount",
     "RecruiterLoginAttempt",
     "RecruiterSession",

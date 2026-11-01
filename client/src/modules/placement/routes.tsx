@@ -15,6 +15,7 @@ const StudentCpiPage = lazy(() => import("./pages/StudentCpiPage"));
 const RegistrationPage = lazy(() => import("./pages/RegistrationPage"));
 const RegistrationApprovalsPage = lazy(
   () => import("./pages/RegistrationApprovalsPage"));
+const PlacementProfilePage = lazy(() => import("./pages/PlacementProfilePage"));
 
 /** Paths are RELATIVE — the shell mounts them under the manifest's basePath.
  *
@@ -25,6 +26,7 @@ export const routes: RouteObject[] = [
   { index: true, element: <Navigate to="postings" replace /> },
   { path: "registration", element: <RegistrationPage /> },
   { path: "registration-approvals", element: <RegistrationApprovalsPage /> },
+  { path: "profile", element: <PlacementProfilePage /> },
   { path: "postings", element: <PostingsPage /> },
   { path: "mine", element: <MyApplicationsPage /> },
   { path: "offers", element: <OffersPage /> },

@@ -26,10 +26,11 @@ def test_illegal_transition_raises():
         sm.resolve(sm.DRAFT, sm.OFFER_ACCEPTED)
 
 
-def test_submitting_requires_eligibility_and_an_open_window():
+def test_submission_applies_only_configured_profile_completeness_rules():
     t = sm.resolve(sm.DRAFT, sm.SUBMITTED)
     assert "is_eligible" in t.guards
     assert "window_open" in t.guards
+    assert "profile_complete" not in t.guards
 
 
 # ---- eligibility: the fail-closed table -------------------------------------
@@ -46,6 +47,13 @@ def test_simple_pass_and_fail():
     out = evaluate({"gte": ["cpi", 8.0]}, FACTS)
     assert out.is_eligible is False
     assert out.outcomes[0].reason == "cpi_out_of_range"
+
+
+def test_profile_completeness_is_enforced_only_when_a_posting_configures_it():
+    rule = {"eq": ["profile_complete", True]}
+    assert evaluate(rule, {"profile_complete": True}).is_eligible is True
+    assert evaluate(rule, {"profile_complete": False}).is_eligible is False
+    assert evaluate({}, {"profile_complete": False}).is_eligible is True
 
 
 def test_unknown_field_denies():
