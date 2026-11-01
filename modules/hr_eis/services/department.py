@@ -1,0 +1,1 @@
+from modules.hr_eis.models.employees import Department\n\ndef get_department_by_id(department_id):\n    return Department.objects.get(id=department_id)\n

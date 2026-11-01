@@ -1,0 +1,1 @@
+from modules.hr_eis.models import Leave, Employee\n\n\ndef create_leave(employee_id, start_date, end_date, reason):\n    employee = Employee.objects.get(id=employee_id)\n    leave = Leave.objects.create(employee=employee, start_date=start_date, end_date=end_date, reason=reason)\n    return leave\n

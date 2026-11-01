@@ -1,0 +1,1 @@
+from modules.hr_eis.models import LTC, Employee\n\n\ndef create_ltc(employee_id, amount, purpose):\n    employee = Employee.objects.get(id=employee_id)\n    ltc = LTC.objects.create(employee=employee, amount=amount, purpose=purpose)\n    return ltc\n

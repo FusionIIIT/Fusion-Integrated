@@ -1,0 +1,1 @@
+from modules.hr_eis.models import Approval, Employee\n\n\ndef create_approval(employee_id, amount, purpose):\n    employee = Employee.objects.get(id=employee_id)\n    approval = Approval.objects.create(employee=employee, amount=amount, purpose=purpose)\n    return approval\n

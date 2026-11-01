@@ -1,0 +1,1 @@
+import React from 'react';\nimport { Route, Switch } from 'react-router-dom';\nimport HrEisRoutes from './routes';\n\nconst HrEisModule = () => (\n    <Switch>\n        <Route path="/hr_eis" component={HrEisRoutes} />\n    </Switch>\n);\n\nexport default HrEisModule;\n

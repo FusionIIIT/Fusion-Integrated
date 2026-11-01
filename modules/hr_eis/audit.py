@@ -1,0 +1,1 @@
+from django.db.models.signals import post_save\nfrom django.dispatch import receiver\nfrom modules.hr_eis.models import Employee\n\n\n@receiver(post_save, sender=Employee)\ndef log_employee_creation(sender, instance, created, **kwargs):\n    if created:\n        print(f'Employee {instance.name} created.')\n

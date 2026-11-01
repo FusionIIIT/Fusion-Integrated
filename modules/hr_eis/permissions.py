@@ -1,0 +1,1 @@
+from rest_framework.permissions import BasePermission\n\n\nclass IsHRManager(BasePermission):\n    def has_permission(self, request, view):\n        return request.user.is_authenticated and request.user.groups.filter(name='HR Manager').exists()\n

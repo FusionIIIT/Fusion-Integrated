@@ -1,0 +1,1 @@
+from django.apps import AppConfig\n\n\nclass HrEisConfig(AppConfig):\n    default_auto_field = "django.db.models.BigAutoField"\n    name = "modules.hr_eis"\n    label = "hr_eis"\n

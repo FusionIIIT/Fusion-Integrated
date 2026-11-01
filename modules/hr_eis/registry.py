@@ -1,0 +1,1 @@
+MODULE = {\n    "code": "hr_eis",\n    "label": "HR & Employee Information",\n    "icon": "Users",\n    "base_path": "/hr-eis",\n    "nav_section": "Administration",\n    "sort_order": 20,\n    "status": "active",\n}\n\nNAV_ITEMS = []\nPERMISSIONS = []\nSYSTEM_PERMISSIONS = []\nROLE_GRANTS = {}\n
