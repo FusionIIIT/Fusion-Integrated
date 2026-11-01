@@ -1,9 +1,21 @@
 import pytest
 from rest_framework.test import APIClient
+
 from conftest import make_session
 from modules.rspc.models import ProposalDecision, ResearchProposal
 
 pytestmark = pytest.mark.django_db
+
+PROPOSAL = {
+    "title": "Sample Proposal",
+    "objectives": "To study...",
+    "start_date": "2027-01-01",
+    "end_date": "2027-12-31",
+    "budget": "1000.00",
+    "funding_agency": "Funding Agency",
+    "resource_requirements": "Resources needed...",
+    "department": "Department"
+}
 
 def _client(stub_iam, perms, uid):
     stub_iam(make_session(user_id=uid, kind="faculty", modules=("rspc",), permissions=perms))
@@ -11,23 +23,14 @@ def _client(stub_iam, perms, uid):
     c.credentials(HTTP_AUTHORIZATION="Token abc")
     return c
 
-def test_full_flow(stub_iam):
+def _submit(stub_iam):
     c = _client(stub_iam, ("rspc.proposal.submit",), 1)
-    
-    # Submit proposal
-    proposal_data = {
-        "title": "Sample Proposal",
-        "objectives": "To study...",
-        "start_date": "2027-01-01",
-        "end_date": "2027-12-31",
-        "budget": "1000.00",
-        "funding_agency": "Funding Agency",
-        "resource_requirements": "Resources needed...",
-        "department": "Department"
-    }
-    response = c.post("/api/v1/rspc/proposals/", proposal_data, format="json")
+    response = c.post("/api/v1/rspc/proposals/", PROPOSAL, format="json")
     assert response.status_code == 201
-    proposal_id = response.data['id']
+    return response.data['id']
+
+def test_full_flow(stub_iam):
+    proposal_id = _submit(stub_iam)
     
     # Recommend proposal
     c = _client(stub_iam, ("rspc.proposal.recommend",), 2)
@@ -55,22 +58,7 @@ def test_full_flow(stub_iam):
     assert proposal.pi_id == 1
 
 def test_decision_stored_with_remarks(stub_iam):
-    c = _client(stub_iam, ("rspc.proposal.submit",), 1)
-    
-    # Submit proposal
-    proposal_data = {
-        "title": "Sample Proposal",
-        "objectives": "To study...",
-        "start_date": "2027-01-01",
-        "end_date": "2027-12-31",
-        "budget": "1000.00",
-        "funding_agency": "Funding Agency",
-        "resource_requirements": "Resources needed...",
-        "department": "Department"
-    }
-    response = c.post("/api/v1/rspc/proposals/", proposal_data, format="json")
-    assert response.status_code == 201
-    proposal_id = response.data['id']
+    proposal_id = _submit(stub_iam)
     
     # Recommend proposal
     c = _client(stub_iam, ("rspc.proposal.recommend",), 2)
@@ -87,22 +75,7 @@ def test_decision_stored_with_remarks(stub_iam):
     assert decision.actor_id == 2
 
 def test_wrong_state_returns_400(stub_iam):
-    c = _client(stub_iam, ("rspc.proposal.submit", "rspc.proposal.decide"), 1)
-    
-    # Submit proposal
-    proposal_data = {
-        "title": "Sample Proposal",
-        "objectives": "To study...",
-        "start_date": "2027-01-01",
-        "end_date": "2027-12-31",
-        "budget": "1000.00",
-        "funding_agency": "Funding Agency",
-        "resource_requirements": "Resources needed...",
-        "department": "Department"
-    }
-    response = c.post("/api/v1/rspc/proposals/", proposal_data, format="json")
-    assert response.status_code == 201
-    proposal_id = response.data['id']
+    proposal_id = _submit(stub_iam)
     
     # Decide proposal immediately
     c = _client(stub_iam, ("rspc.proposal.decide",), 4)

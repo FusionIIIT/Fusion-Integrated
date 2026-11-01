@@ -29,7 +29,28 @@ ROLE_GRANTS = {
 }
 
 NAV_ITEMS = [
-    {"code": "rspc.submit", "label": "Submit Proposal", "icon": "PaperPlane", "to": "/rspc/submit", "required_permission": "rspc.proposal.submit", "sort_order": 5},
-    {"code": "rspc.mine", "label": "My Proposals", "icon": "UserCheck", "to": "/rspc/mine", "required_permission": "rspc.proposal.view_self", "sort_order": 10},
-    {"code": "rspc.queue", "label": "Review Queue", "icon": "CalendarBlank", "to": "/rspc/queue", "required_permission": "rspc.proposal.view_queue", "sort_order": 20},
+    {
+        "code": "rspc.submit",
+        "label": "Submit Proposal",
+        "icon": "PaperPlane",
+        "to": "/rspc/submit",
+        "required_permission": "rspc.proposal.submit",
+        "sort_order": 5,
+    },
+    {
+        "code": "rspc.mine",
+        "label": "My Proposals",
+        "icon": "UserCheck",
+        "to": "/rspc/mine",
+        "required_permission": "rspc.proposal.view_self",
+        "sort_order": 10,
+    },
+    {
+        "code": "rspc.queue",
+        "label": "Review Queue",
+        "icon": "CalendarBlank",
+        "to": "/rspc/queue",
+        "required_permission": "rspc.proposal.view_queue",
+        "sort_order": 20,
+    },
 ]

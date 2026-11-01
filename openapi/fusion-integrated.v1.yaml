@@ -1674,6 +1674,196 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/rspc/proposals/:
+    post:
+      operationId: v1_rspc_proposals_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResearchProposal'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResearchProposal'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResearchProposal'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchProposal'
+          description: ''
+  /api/v1/rspc/proposals/{proposal_id}/authorize/:
+    post:
+      operationId: v1_rspc_proposals_authorize_create
+      parameters:
+      - in: path
+        name: proposal_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProposalAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProposalAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProposalAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/rspc/proposals/{proposal_id}/decide/:
+    post:
+      operationId: v1_rspc_proposals_decide_create
+      parameters:
+      - in: path
+        name: proposal_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProposalAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProposalAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProposalAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/rspc/proposals/{proposal_id}/recommend/:
+    post:
+      operationId: v1_rspc_proposals_recommend_create
+      parameters:
+      - in: path
+        name: proposal_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProposalAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProposalAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProposalAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/rspc/proposals/{proposal_id}/verify/:
+    post:
+      operationId: v1_rspc_proposals_verify_create
+      parameters:
+      - in: path
+        name: proposal_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProposalAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProposalAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProposalAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/rspc/proposals/mine/:
+    get:
+      operationId: v1_rspc_proposals_mine_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResearchProposal'
+          description: ''
+  /api/v1/rspc/proposals/queue/:
+    get:
+      operationId: v1_rspc_proposals_queue_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResearchProposal'
+          description: ''
 components:
   schemas:
     AcademicDirectory:
@@ -3201,6 +3391,49 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    ProposalAction:
+      type: object
+      properties:
+        outcome:
+          type: string
+        remarks:
+          type: string
+      required:
+      - outcome
+    ProposalDecision:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        proposal:
+          type: integer
+          readOnly: true
+        stage:
+          type: string
+          readOnly: true
+        actor_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        outcome:
+          type: string
+          readOnly: true
+        remarks:
+          type: string
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actor_id
+      - decided_at
+      - id
+      - outcome
+      - proposal
+      - remarks
+      - stage
     Recommendation:
       type: object
       description: |-
@@ -3466,6 +3699,82 @@ components:
       - message
       - reason
       - route
+    ResearchProposal:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        objectives:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        budget:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        funding_agency:
+          type: string
+        resource_requirements:
+          type: string
+        department:
+          type: string
+          maxLength: 100
+        pi_id:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ResearchProposalStatusEnum'
+          readOnly: true
+        decisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProposalDecision'
+          readOnly: true
+      required:
+      - budget
+      - decisions
+      - end_date
+      - funding_agency
+      - id
+      - objectives
+      - pi_id
+      - resource_requirements
+      - start_date
+      - status
+      - title
+    ResearchProposalStatusEnum:
+      enum:
+      - draft
+      - submitted
+      - dept_recommended
+      - dept_not_recommended
+      - admin_verified
+      - not_eligible
+      - approved
+      - dean_not_approved
+      - director_not_approved
+      - forwarded_to_director
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `submitted` - Submitted
+        * `dept_recommended` - Dept. Recommended
+        * `dept_not_recommended` - Dept. Not Recommended
+        * `admin_verified` - Admin Verified
+        * `not_eligible` - Not Eligible
+        * `approved` - Approved
+        * `dean_not_approved` - Dean Not Approved
+        * `director_not_approved` - Director Not Approved
+        * `forwarded_to_director` - Forwarded to Director
     RoundOutcome:
       type: object
       properties:

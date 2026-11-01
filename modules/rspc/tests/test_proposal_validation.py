@@ -1,5 +1,6 @@
 import pytest
 from rest_framework.test import APIClient
+
 from conftest import make_session
 from modules.rspc.models import ResearchProposal
 

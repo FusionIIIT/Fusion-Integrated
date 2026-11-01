@@ -1,19 +1,53 @@
 from rest_framework import serializers
-from modules.rspc.models import ResearchProposal, ProposalDecision
+
+from modules.rspc.models import ProposalDecision, ResearchProposal
+
 
 class ProposalDecisionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProposalDecision
-        fields = ['id', 'proposal', 'stage', 'actor_id', 'outcome', 'remarks', 'decided_at']
-        read_only_fields = ['proposal', 'stage', 'actor_id', 'outcome', 'remarks', 'decided_at']
+        fields = [
+            'id',
+            'proposal',
+            'stage',
+            'actor_id',
+            'outcome',
+            'remarks',
+            'decided_at'
+        ]
+        read_only_fields = [
+            'proposal',
+            'stage',
+            'actor_id',
+            'outcome',
+            'remarks',
+            'decided_at'
+        ]
+
 
 class ResearchProposalSerializer(serializers.ModelSerializer):
     decisions = ProposalDecisionSerializer(many=True, read_only=True)
 
     class Meta:
         model = ResearchProposal
-        fields = ['id', 'title', 'objectives', 'start_date', 'end_date', 'budget', 'funding_agency', 'resource_requirements', 'department', 'pi_id', 'status', 'decisions']
-        read_only_fields = ['pi_id', 'status']
+        fields = [
+            'id',
+            'title',
+            'objectives',
+            'start_date',
+            'end_date',
+            'budget',
+            'funding_agency',
+            'resource_requirements',
+            'department',
+            'pi_id',
+            'status',
+            'decisions'
+        ]
+        read_only_fields = [
+            'pi_id',
+            'status'
+        ]
         extra_kwargs = {
             'start_date': {"required": True, "allow_null": False},
             'end_date': {"required": True, "allow_null": False},
@@ -34,3 +68,8 @@ class ResearchProposalSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Budget must be greater than zero.")
 
         return data
+
+
+class ProposalActionSerializer(serializers.Serializer):
+    outcome = serializers.CharField()
+    remarks = serializers.CharField(required=False, allow_blank=True)
