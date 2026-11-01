@@ -9,6 +9,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 import core.api.schema  # noqa: F401  registers the auth schemes by import
 from core.api.health import healthz, readyz
+from django.urls import include, path
 
 urlpatterns = [
     path("healthz", healthz, name="healthz"),
@@ -19,4 +20,8 @@ urlpatterns = [
     path("api/v1/elm/", include("modules.elm.api.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="docs"),
+    path(
+        "api/v1/vms/",
+        include("modules.vms.urls"),
+    ),
 ]
