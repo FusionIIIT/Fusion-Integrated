@@ -13,13 +13,18 @@ def _choices(values):
     return [(v, v.replace("_", " ").title()) for v in values]
 
 
+# Named so the OpenAPI schema can tell the two `status` enums apart.
+QUIZ_STATUS_CHOICES = _choices(sm.QUIZ_STATUSES)
+ATTEMPT_STATUS_CHOICES = _choices(sm.ATTEMPT_STATUSES)
+
+
 class Quiz(TimeStampedModel):
     owner_user_id = models.IntegerField(db_index=True)   # the professor (BR-QZ-002)
     course_code = models.CharField(max_length=32, db_index=True)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     instructions = models.TextField(blank=True)
-    status = models.CharField(max_length=16, choices=_choices(sm.QUIZ_STATUSES),
+    status = models.CharField(max_length=16, choices=QUIZ_STATUS_CHOICES,
                               default=sm.DRAFT, db_index=True)
 
     opens_at = models.DateTimeField()
@@ -97,12 +102,15 @@ class Option(models.Model):
     class Meta:
         ordering = ["position", "id"]
 
+    def __str__(self):
+        return self.text
+
 
 class Attempt(TimeStampedModel):
     quiz = models.ForeignKey(Quiz, related_name="attempts", on_delete=models.PROTECT)
     student_user_id = models.IntegerField(db_index=True)
     number = models.PositiveSmallIntegerField()
-    status = models.CharField(max_length=16, choices=_choices(sm.ATTEMPT_STATUSES),
+    status = models.CharField(max_length=16, choices=ATTEMPT_STATUS_CHOICES,
                               default=sm.IN_PROGRESS, db_index=True)
     started_at = models.DateTimeField()
     deadline = models.DateTimeField()

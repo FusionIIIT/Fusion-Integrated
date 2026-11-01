@@ -1,5 +1,5 @@
 """Domain rules, no database."""
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
@@ -7,7 +7,7 @@ import pytest
 from modules.quizzes.domain import scoring
 from modules.quizzes.domain import state_machine as sm
 
-NOW = datetime(2026, 11, 1, 10, 0, tzinfo=timezone.utc)
+NOW = datetime(2026, 11, 1, 10, 0, tzinfo=UTC)
 D = Decimal
 
 

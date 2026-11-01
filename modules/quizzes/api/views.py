@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 
 from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.quizzes.api import serializers as s
+from modules.quizzes.models import Attempt, Question, Quiz
 from modules.quizzes.selectors import quizzes as selectors
 from modules.quizzes.services import attempts as attempt_service
 from modules.quizzes.services import authoring
@@ -32,13 +33,25 @@ def _uid(request) -> int:
     return request.principal.user_id
 
 
+class _Scoped:
+    """Schema generation calls get_queryset with no principal on the request;
+    `model` says what to hand it instead."""
+    model = None
+
+    def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return self.model.objects.none()
+        return self.scoped_queryset()
+
+
 # -- Professor: quizzes and questions (CW-QZ-01) ------------------------------
 
-class QuizListView(generics.ListCreateAPIView):
+class QuizListView(_Scoped, generics.ListCreateAPIView):
+    model = Quiz
     serializer_class = s.QuizSerializer
     permission_classes = MANAGE
 
-    def get_queryset(self):
+    def scoped_queryset(self):
         return selectors.quizzes_owned_by(_uid(self.request))
 
     def perform_create(self, serializer):
@@ -46,11 +59,12 @@ class QuizListView(generics.ListCreateAPIView):
             owner_user_id=_uid(self.request), data=serializer.validated_data)
 
 
-class QuizDetailView(generics.RetrieveUpdateAPIView):
+class QuizDetailView(_Scoped, generics.RetrieveUpdateAPIView):
+    model = Quiz
     serializer_class = s.QuizDetailSerializer
     permission_classes = MANAGE
 
-    def get_queryset(self):
+    def scoped_queryset(self):
         return selectors.quizzes_owned_by(_uid(self.request))
 
     def perform_update(self, serializer):
@@ -116,11 +130,12 @@ class QuizCopyFromBankView(APIView):
                         status=status.HTTP_201_CREATED)
 
 
-class QuestionBankView(generics.ListCreateAPIView):
+class QuestionBankView(_Scoped, generics.ListCreateAPIView):
+    model = Question
     serializer_class = s.QuestionSerializer
     permission_classes = MANAGE
 
-    def get_queryset(self):
+    def scoped_queryset(self):
         filters = s.BankFilterSerializer(data=self.request.query_params)
         filters.is_valid(raise_exception=True)
         return selectors.bank_for(_uid(self.request), **filters.validated_data)
@@ -132,11 +147,12 @@ class QuestionBankView(generics.ListCreateAPIView):
 
 # -- Professor: evaluation and release (CW-QZ-03) -----------------------------
 
-class QuizAttemptsView(generics.ListAPIView):
+class QuizAttemptsView(_Scoped, generics.ListAPIView):
+    model = Attempt
     serializer_class = s.AttemptSerializer
     permission_classes = EVALUATE
 
-    def get_queryset(self):
+    def scoped_queryset(self):
         return selectors.attempts_on_quizzes_of(_uid(self.request)) \
             .filter(quiz_id=self.kwargs["pk"])
 
@@ -170,11 +186,12 @@ class ReleaseResultsView(APIView):
 
 # -- Student: attempts (CW-QZ-02) ---------------------------------------------
 
-class AvailableQuizzesView(generics.ListAPIView):
+class AvailableQuizzesView(_Scoped, generics.ListAPIView):
+    model = Quiz
     serializer_class = s.QuizSerializer
     permission_classes = [MODULE, HasPermission(P_VIEW)]
 
-    def get_queryset(self):
+    def scoped_queryset(self):
         return selectors.quizzes_for_student()
 
 
@@ -188,19 +205,21 @@ class StartAttemptView(APIView):
                         status=status.HTTP_201_CREATED)
 
 
-class MyAttemptsView(generics.ListAPIView):
+class MyAttemptsView(_Scoped, generics.ListAPIView):
+    model = Attempt
     serializer_class = s.AttemptSerializer
     permission_classes = [MODULE, HasPermission(P_VIEW)]
 
-    def get_queryset(self):
+    def scoped_queryset(self):
         return selectors.attempts_of(_uid(self.request))
 
 
-class MyAttemptDetailView(generics.RetrieveAPIView):
+class MyAttemptDetailView(_Scoped, generics.RetrieveAPIView):
+    model = Attempt
     serializer_class = s.AttemptPaperSerializer
     permission_classes = [MODULE, HasPermission(P_VIEW)]
 
-    def get_queryset(self):
+    def scoped_queryset(self):
         return selectors.attempts_of(_uid(self.request))
 
 
