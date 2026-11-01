@@ -1,18 +1,15 @@
 import { useState } from "react";
 import {
-  Badge, Button, Card, Code, Container, Group, Stack, Text, Textarea, TextInput,
+  Badge, Button, Card, Code, Container, Group, Stack, Text, TextInput,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { FaBuilding, FaPlus, FaUserPlus } from "react-icons/fa";
 
-import { errorMessage } from "../../../lib/http";
 import { DataTable } from "../../../ui/components/DataTable";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
-import {
-  useCompanies, useCompanyDecision, useInviteRecruiter, useRegisterCompany,
-} from "../api/hooks";
+import { useCompanies, useInviteRecruiter, useRegisterCompany } from "../api/hooks";
 import type { Company } from "../api/types";
 
 const APPROVAL_COLOR: Record<string, string> = {
@@ -21,31 +18,16 @@ const APPROVAL_COLOR: Record<string, string> = {
 
 export default function CompaniesPage() {
   const { data, isPending, error } = useCompanies();
-  const decide = useCompanyDecision();
   const [registering, setRegistering] = useState(false);
-  const [rejecting, setRejecting] = useState<Company | null>(null);
   const [inviting, setInviting] = useState<Company | null>(null);
-  const [note, setNote] = useState("");
 
   if (error) return <Container size="xl"><ErrorState error={error} /></Container>;
-
-  function approve(c: Company) {
-    decide.mutate({ id: c.id, action: "approve", note: "" }, {
-      onSuccess: () => notifications.show({
-        color: "green", title: "Approved",
-        message: `${c.name} can now be invited and post roles.`,
-      }),
-      onError: (e) => notifications.show({
-        color: "red", title: "Could not approve", message: errorMessage(e),
-      }),
-    });
-  }
 
   return (
     <Container size="xl">
       <PageHeader
         title="Companies"
-        subtitle="Registration, approval and recruiter access"
+        subtitle="Company records and recruiter access; institute approval is external"
         action={
           <Button leftSection={<FaPlus size={12} />}
             onClick={() => setRegistering(true)}>
@@ -110,16 +92,7 @@ export default function CompaniesPage() {
               render: (r) => (
                 <Group justify="flex-end" gap="xs" wrap="nowrap">
                   {r.approval_status === "pending" && (
-                    <>
-                      <Button size="xs" onClick={() => approve(r)}
-                        loading={decide.isPending}>
-                        Approve
-                      </Button>
-                      <Button size="xs" variant="subtle" color="red"
-                        onClick={() => { setRejecting(r); setNote(""); }}>
-                        Reject
-                      </Button>
-                    </>
+                    <Text size="xs" c="dimmed">Awaiting institute approval</Text>
                   )}
                   {r.can_operate && (
                     <Button
@@ -144,28 +117,6 @@ export default function CompaniesPage() {
 
       <RegisterModal opened={registering} onClose={() => setRegistering(false)} />
 
-      <FormModal
-        opened={rejecting != null} onClose={() => setRejecting(null)}
-        title={`Reject ${rejecting?.name ?? ""}`}
-        subtitle="The company cannot post roles or hold recruiter accounts"
-        onSubmit={() => rejecting && decide.mutate(
-          { id: rejecting.id, action: "reject", note },
-          {
-            onSuccess: () => { setRejecting(null); },
-            onError: (e) => notifications.show({
-              color: "red", title: "Could not reject", message: errorMessage(e),
-            }),
-          },
-        )}
-        submitLabel="Reject" danger submitting={decide.isPending}
-        disabled={!note.trim()}
-      >
-        <Textarea
-          label="Reason" required autosize minRows={3} value={note}
-          onChange={(e) => setNote(e.currentTarget.value)} maxLength={300}
-        />
-      </FormModal>
-
       <InviteModal company={inviting} onClose={() => setInviting(null)} />
     </Container>
   );
@@ -184,7 +135,7 @@ function RegisterModal({ opened, onClose }: {
     <FormModal
       opened={opened} onClose={onClose}
       title="Register a company"
-      subtitle="Recorded as pending — it grants nothing until approved"
+      subtitle="Company requests are held for the institute's external approval process"
       onSubmit={() => register.mutate(f, {
         onSuccess: () => {
           notifications.show({

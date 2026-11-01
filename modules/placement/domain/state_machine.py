@@ -65,20 +65,20 @@ class Transition:
 
 
 def _review(frm: str, to: str, *guards: str) -> Transition:
-    """A review decision by the TPO (PC-BR-010) or the owning company
-    (PC-BR-009). Which applications each can see is the selectors' business."""
+    """A company decision, scoped to its own applications (PC-UC-016)."""
     return Transition(frm, to, "placement_cell.application.review",
-                      frozenset({STAFF, RECRUITER}), guards)
+                      frozenset({RECRUITER}), guards)
 
 
 TRANSITIONS: tuple[Transition, ...] = (
     # -- the student's own moves ------------------------------------------
     Transition(DRAFT, SUBMITTED, "placement_cell.application.create",
                frozenset({STUDENT}),
-               ("window_open", "profile_complete", "is_eligible", "may_apply")),
+               ("window_open", "is_eligible", "may_apply")),
 
     # -- review and shortlisting (PC-WF-005) ------------------------------
-    _review(SUBMITTED, UNDER_REVIEW),
+    Transition(SUBMITTED, UNDER_REVIEW, "placement_cell.application.review",
+               frozenset({STAFF, RECRUITER})),
     _review(SUBMITTED, REJECTED, "has_reason"),
     _review(UNDER_REVIEW, SHORTLISTED),
     _review(UNDER_REVIEW, REJECTED, "has_reason"),
@@ -94,9 +94,9 @@ TRANSITIONS: tuple[Transition, ...] = (
 
     # -- offers (PC-WF-007) -----------------------------------------------
     Transition(SELECTED, OFFER_ISSUED, "placement_cell.offer.issue",
-               frozenset({STAFF, RECRUITER}), ("company_authorized",)),
+               frozenset({RECRUITER}), ("company_authorized",)),
     Transition(SHORTLISTED, OFFER_ISSUED, "placement_cell.offer.issue",
-               frozenset({STAFF, RECRUITER}), ("company_authorized",)),
+               frozenset({RECRUITER}), ("company_authorized",)),
 
     # The student answers. `offer_window_open` is PC-BR-013.
     Transition(OFFER_ISSUED, OFFER_ACCEPTED, "placement_cell.offer.respond",

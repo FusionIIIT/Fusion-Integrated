@@ -14,6 +14,8 @@ import { Dashboard, NotFound, Shell } from "./Shell";
 
 // A separate audience and credential, so none of it enters the institute bundle.
 const RecruiterLoginPage = lazy(() => import("../recruiter/RecruiterLoginPage"));
+const CompanyRegistrationPage = lazy(
+  () => import("../recruiter/CompanyRegistrationPage"));
 const AcceptInvitePage = lazy(() => import("../recruiter/AcceptInvitePage"));
 const RecruiterPostings = lazy(
   () => import("../recruiter/pages/RecruiterPostingsPage"));
@@ -36,6 +38,7 @@ const recruiterRoutes: RouteObject = {
   ),
   children: [
     { path: "login", element: <RecruiterLoginPage /> },
+    { path: "register-company", element: <CompanyRegistrationPage /> },
     { path: "accept", element: <AcceptInvitePage /> },
     {
       path: "",

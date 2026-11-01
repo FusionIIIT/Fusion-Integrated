@@ -54,6 +54,11 @@ export default function RecruiterLoginPage() {
             is no self-registration.
           </Text>
           <Text size="xs" c="dimmed">
+            Need to register your company?{" "}
+            <Text component="a" href="/recruiter/register-company" size="xs"
+              c={BRAND.primary}>Submit a company request</Text>.
+          </Text>
+          <Text size="xs" c="dimmed">
             Students and staff sign in at{" "}
             <Text component="a" href="/login" size="xs" c={BRAND.primary}>
               the main portal

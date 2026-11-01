@@ -23,6 +23,19 @@ def _client(stub_iam, **kw):
     return c
 
 
+def test_company_can_submit_registration_without_an_institute_decision():
+    response = APIClient().post("/api/v1/placement/companies/register", {
+        "name": "Example Recruiting Co",
+        "website": "https://example.test",
+        "contact_name": "Recruiter",
+        "contact_email": "recruiter@example.test",
+    }, format="json")
+
+    assert response.status_code == 201
+    assert response.json()["approval_status"] == "pending"
+    assert response.json()["can_operate"] is False
+
+
 def test_student_sees_only_their_own_applications(stub_iam, posting, user_ref):
     Application.objects.create(posting=posting, user_id=1001, status="submitted")
     Application.objects.create(posting=posting, user_id=2002, status="submitted")
@@ -88,8 +101,10 @@ def test_reject_without_a_reason_is_refused(stub_iam, posting):
                 permissions=("placement_cell.application.review",))
     r = c.post(f"/api/v1/placement/applications/{app.id}/transition",
                {"to_status": "rejected"}, format="json")
-    assert r.status_code == 409
-    assert r.json()["error"]["code"] == "reason_required"
+    # Institute staff can review/filter, but cannot make an external
+    # company's rejection decision (PC-UC-008 / PC-BR-030).
+    assert r.status_code == 403
+    assert r.json()["error"]["code"] == "actor_not_allowed"
 
 
 def test_someone_elses_application_is_404_not_403(stub_iam, posting):

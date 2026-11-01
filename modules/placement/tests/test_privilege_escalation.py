@@ -192,8 +192,7 @@ def test_read_only_reporting_staff_cannot_edit_postings(stub_iam, world):
     assert posting.seats == 2
 
 
-def test_tpo_can_still_do_all_of_it(stub_iam, world):
-    """The checks must not lock out the role they exist for."""
+def test_tpo_can_coordinate_but_cannot_extend_a_company_offer(stub_iam, world):
     _, posting = world
     app = Application.objects.create(posting=posting, user_id=1001,
                                      status="selected")
@@ -213,7 +212,7 @@ def test_tpo_can_still_do_all_of_it(stub_iam, world):
     }, format="json").status_code == 201
     assert client.post("/api/v1/placement/offers/issue",
                        {"application_id": app.pk, "ctc_lpa": "18.00"},
-                       format="json").status_code == 201
+                       format="json").status_code == 403
 
 
 def test_recruiter_can_still_run_their_own_process(world, recruiter_client):

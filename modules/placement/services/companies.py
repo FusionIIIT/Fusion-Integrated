@@ -26,8 +26,10 @@ def _unique_slug(name: str) -> str:
 def register(*, name: str, sector: str = "", website: str = "",
              hq_city: str = "", contact: dict | None = None,
              registered_by_user_id: int | None = None, actor=None) -> Company:
-    """Record a registration request. It grants nothing until approved, but
-    is still gated — otherwise any student can fill the table."""
+    """Record a registration request without granting recruitment access.
+
+    Institute authorization remains an external decision under PC-UC-014.
+    """
     if actor is not None:
         require(actor, P_MANAGE)
     name = (name or "").strip()

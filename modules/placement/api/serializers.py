@@ -18,6 +18,7 @@ from modules.placement.models import (
     PlacementRecord,
     PlacementRegistration,
     ProfileDocument,
+    StudentPlacementProfile,
     RoundParticipation,
 )
 
@@ -116,6 +117,58 @@ class JobPostingWriteSerializer(serializers.Serializer):
 
 
 # -- Profiles ------------------------------------------------------------------
+class ProfileEntrySerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=160)
+    description = serializers.CharField(max_length=2000, required=False,
+                                        allow_blank=True, default="")
+    date = serializers.CharField(max_length=40, required=False,
+                                 allow_blank=True, default="")
+
+
+class CertificationEntrySerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=160)
+    issuer = serializers.CharField(max_length=160, required=False,
+                                   allow_blank=True, default="")
+    issued_on = serializers.CharField(max_length=40, required=False,
+                                      allow_blank=True, default="")
+    credential_url = serializers.URLField(required=False, allow_blank=True,
+                                          default="")
+
+
+class ProjectEntrySerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=160)
+    description = serializers.CharField(max_length=2000, required=False,
+                                        allow_blank=True, default="")
+    technologies = serializers.ListField(
+        child=serializers.CharField(max_length=80), required=False, default=list)
+    url = serializers.URLField(required=False, allow_blank=True, default="")
+
+
+class ProfileLinkSerializer(serializers.Serializer):
+    label = serializers.CharField(max_length=80)
+    url = serializers.URLField()
+
+
+class PlacementProfileWriteSerializer(serializers.Serializer):
+    summary = serializers.CharField(max_length=2000, required=False,
+                                    allow_blank=True, default="")
+    skills = serializers.ListField(
+        child=serializers.CharField(max_length=80), required=False, default=list)
+    achievements = ProfileEntrySerializer(many=True, required=False, default=list)
+    certifications = CertificationEntrySerializer(many=True, required=False,
+                                                  default=list)
+    projects = ProjectEntrySerializer(many=True, required=False, default=list)
+    links = ProfileLinkSerializer(many=True, required=False, default=list)
+
+
+class PlacementProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentPlacementProfile
+        fields = ("summary", "skills", "achievements", "certifications",
+                  "projects", "links", "updated_at")
+        read_only_fields = fields
+
+
 class DocumentLinkSerializer(serializers.Serializer):
     """A Drive link. Validated in core.files.drive."""
 
@@ -161,7 +214,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
         from modules.placement.domain import state_machine as sm
         from modules.placement.services.applications import actor_kind
         actor = self.context.get("actor")
-        return sm.allowed_targets(obj.status, actor_kind(actor) if actor else None)
+        return sm.allowed_targets(
+            obj.status, actor_kind(actor, obj) if actor else None)
 
     def get_candidate(self, obj) -> dict | None:
         """Populated only when the view batch-loaded the directory, i.e. when

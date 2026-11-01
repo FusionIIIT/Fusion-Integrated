@@ -68,6 +68,15 @@ class TestDelivery:
             notifications.enqueue(topic="offer.issued", dedupe_key="x",
                                   subject="s", body="b")
 
+    def test_unspecified_application_audience_is_recorded_but_not_delivered(self):
+        row = notifications.enqueue(
+            topic="application.submitted", dedupe_key="application:1:submitted",
+            subject="Application submitted", body="Application event")
+
+        assert row.status == "unresolved"
+        assert notifications.deliver_pending().sent == 0
+        assert not mail.outbox
+
 
 class TestFailureHandling:
 

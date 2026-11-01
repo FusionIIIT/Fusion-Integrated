@@ -39,11 +39,15 @@ urlpatterns = [
          name="placement-document-download"),
 
     # profile
+    path("profile", v.MyPlacementProfileView.as_view(),
+         name="placement-my-profile"),
     path("profile/resume", v.MyResumeView.as_view(), name="placement-my-resume"),
     path("profiles/<int:user_id>", v.ProfileDetailView.as_view(),
          name="placement-profile"),
 
     # companies
+    path("companies/register", v.CompanyRegistrationRequestView.as_view(),
+         name="placement-company-registration-request"),
     path("companies", v.CompanyListView.as_view(), name="placement-companies"),
     path("companies/<int:pk>/<str:action>", v.CompanyApprovalView.as_view(),
          name="placement-company-approval"),

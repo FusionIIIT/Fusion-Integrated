@@ -31,6 +31,13 @@ TOPICS = {
     "record.not_joining",
 }
 
+# The finalized specification requires recording these events but does not
+# define who receives them. Keep them in the outbox for audit and avoid
+# inventing a recipient or retrying delivery to an arbitrary user.
+UNRESOLVED_RECIPIENT_TOPICS = {
+    "application.submitted", "application.shortlisted", "application.rejected",
+}
+
 
 def enqueue(*, topic: str, dedupe_key: str, subject: str, body: str,
             recipient_user_id: int | None = None, recipient_email: str = "",
@@ -39,7 +46,8 @@ def enqueue(*, topic: str, dedupe_key: str, subject: str, body: str,
     already queued."""
     if topic not in TOPICS:
         raise ValueError(f"Unknown notification topic {topic!r}.")
-    if recipient_user_id is None and not recipient_email:
+    unresolved = topic in UNRESOLVED_RECIPIENT_TOPICS
+    if recipient_user_id is None and not recipient_email and not unresolved:
         raise ValueError("A notification needs a recipient.")
 
     try:
@@ -49,6 +57,8 @@ def enqueue(*, topic: str, dedupe_key: str, subject: str, body: str,
                 topic=topic, dedupe_key=dedupe_key, subject=subject, body=body,
                 recipient_user_id=recipient_user_id,
                 recipient_email=recipient_email, payload=payload or {},
+                status="unresolved" if unresolved and not recipient_email
+                and recipient_user_id is None else "pending",
             )
     except IntegrityError:
         log.debug("placement.notify.duplicate key=%s", dedupe_key)
