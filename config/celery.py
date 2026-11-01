@@ -1,4 +1,5 @@
 import os
+from modules.psm.schedule import BEAT_SCHEDULE as PSM_SCHEDULE
 
 from celery import Celery
 
@@ -15,5 +16,5 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
 # Each module owns its timers; this only merges them, so modules stay removable.
-app.conf.beat_schedule = {**PLACEMENT_SCHEDULE}
+app.conf.beat_schedule = {**PLACEMENT_SCHEDULE, **PSM_SCHEDULE}
 app.conf.task_routes = {**PLACEMENT_ROUTES}
