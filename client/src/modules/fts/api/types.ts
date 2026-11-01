@@ -1,43 +1,47 @@
-export type FileStatus = 'active' | 'inactive' | 'deleted';
+export type FileStatus = 'draft' | 'circulated' | 'archived';
 
 export type FileSummary = {
   id: number;
   subject: string;
   status: FileStatus;
-  created_at: Date;
-  updated_at: Date;
+  owner_name: string;
+  holder_name: string | null;
+  updated_at: string;
 };
 
 export type FilePermissions = {
-  read: boolean;
-  write: boolean;
-  delete: boolean;
+  can_edit_draft: boolean;
+  can_forward: boolean;
+  can_return: boolean;
+  can_archive: boolean;
 };
 
 export type FileDetail = {
   id: number;
   subject: string;
-  content: string;
-  status: FileStatus;
+  comment: string;
+  attachments: string[];
   permissions: FilePermissions;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
 };
 
-export type HistoryEventType = 'created' | 'updated' | 'deleted' | 'moved';
+export type HistoryEventType = 'created' | 'edited' | 'forwarded' | 'returned' | 'archived';
 
 export type HistoryEvent = {
   id: number;
-  file_id: number;
-  event_type: HistoryEventType;
-  details: string;
-  created_at: Date;
+  event: HistoryEventType;
+  sender_name: string;
+  receiver_name: string | null;
+  comment: string;
+  attachments: string[];
+  created_at: string;
 };
 
 export type Recipient = {
   id: number;
   name: string;
-  email: string;
+  designation: string;
 };
 
 export type CreateFileInput = {
