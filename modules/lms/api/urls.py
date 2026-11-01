@@ -1,0 +1,37 @@
+from django.urls import path
+
+from modules.lms.api import views
+
+urlpatterns = [
+    path("courses", views.CourseListView.as_view(), name="lms-courses"),
+    path("courses/<str:course_id>", views.CourseDetailView.as_view(),
+         name="lms-course"),
+    path("courses/<str:course_id>/details", views.CourseDetailsView.as_view(),
+         name="lms-course-details"),
+    path("courses/<str:course_id>/sections", views.SectionListCreateView.as_view(),
+         name="lms-sections"),
+    path("courses/<str:course_id>/materials", views.MaterialListCreateView.as_view(),
+         name="lms-materials"),
+    path("courses/<str:course_id>/materials/<int:material_id>",
+         views.MaterialUpdateView.as_view(), name="lms-material"),
+    path("courses/<str:course_id>/materials/<int:material_id>/download",
+         views.MaterialDownloadView.as_view(), name="lms-material-download"),
+    path("courses/<str:course_id>/announcements",
+         views.AnnouncementListCreateView.as_view(), name="lms-announcements"),
+    path("courses/<str:course_id>/assignments",
+         views.AssignmentListCreateView.as_view(), name="lms-assignments"),
+    path("courses/<str:course_id>/assignments/<int:assignment_id>",
+         views.AssignmentUpdatePublishView.as_view(), name="lms-assignment"),
+    path("courses/<str:course_id>/assignments/<int:assignment_id>/publish",
+         views.AssignmentPublishView.as_view(), name="lms-assignment-publish"),
+    path("courses/<str:course_id>/assignments/<int:assignment_id>/submit",
+         views.AssignmentSubmitView.as_view(), name="lms-assignment-submit"),
+    path("courses/<str:course_id>/submissions", views.SubmissionListView.as_view(),
+         name="lms-submissions"),
+    path("courses/<str:course_id>/submissions/<int:submission_id>/grade",
+         views.GradeSubmissionView.as_view(), name="lms-grade-submission"),
+    path("courses/<str:course_id>/submissions/<int:submission_id>/download",
+         views.SubmissionDownloadView.as_view(), name="lms-submission-download"),
+    path("courses/<str:course_id>/grades", views.GradeListReleaseView.as_view(),
+         name="lms-grades"),
+]

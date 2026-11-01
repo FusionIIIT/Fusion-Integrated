@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.lms",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -188,6 +189,15 @@ PLACEMENT_UPLOAD_ROOT = env(
 #: When set, legacy reads go to nginx via X-Accel-Redirect. Must be `internal;`.
 PLACEMENT_UPLOAD_INTERNAL_PREFIX = env("PLACEMENT_UPLOAD_INTERNAL_PREFIX", "")
 
+# LMS stores user-authored course material and assignment submissions. Course
+# membership remains owned by the academic registration system and is supplied
+# by an adapter implementing modules.lms.integrations.registration.Provider.
+LMS_UPLOAD_ROOT = env(
+    "LMS_UPLOAD_ROOT",
+    str(Path.home() / ".local" / "share" / "fusion-integrated" / "lms"))
+MEDIA_ROOT = LMS_UPLOAD_ROOT
+LMS_COURSE_ACCESS_PROVIDER = env("LMS_COURSE_ACCESS_PROVIDER", "")
+
 # No multipart endpoints remain, so this only caps the JSON body.
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
 
@@ -230,6 +240,9 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "LMSSubmissionType": "modules.lms.models.Assignment.SUBMISSION_TYPES",
+    },
 }
 
 CORS_ALLOW_ALL_ORIGINS = False

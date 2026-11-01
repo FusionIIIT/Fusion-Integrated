@@ -63,10 +63,16 @@ def main() -> int:
             f"{name}: the sidebar links to {base}/{missing} but the client "
             f"has no route for it — the link would go nowhere"
             for missing in sorted(nav_paths - routes))
-        problems.extend(
-            f"{name}: the client has a route {base}/{orphan} with no nav "
-            f"item — the page is unreachable from the sidebar"
-            for orphan in sorted(routes - nav_paths - EXEMPT_ROUTES))
+        for orphan in sorted(routes - nav_paths - EXEMPT_ROUTES):
+            # A module's collection/detail pages are reachable by selecting a
+            # row in the collection, so only their collection route needs a
+            # sidebar entry. Literal nav equality still applies to that entry.
+            if any(orphan.startswith(nav.rstrip("/") + "/")
+                   for nav in nav_paths):
+                continue
+            problems.append(
+                f"{name}: the client has a route {base}/{orphan} with no nav "
+                f"item — the page is unreachable from the sidebar")
 
         # A nav item guarded by an unholdable permission is invisible forever.
         known = {code for code, _ in getattr(registry, "PERMISSIONS", [])}
