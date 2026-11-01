@@ -34,6 +34,203 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "hreis": {
+      "grants": {
+        "Accountant": [
+          "hreis.claim.process"
+        ],
+        "Director": [
+          "hreis.appraisal.review",
+          "hreis.claim.review",
+          "hreis.leave.review"
+        ],
+        "Employee": [
+          "hreis.appraisal.submit",
+          "hreis.claim.submit",
+          "hreis.leave.apply",
+          "hreis.notification.view",
+          "hreis.record.view_self"
+        ],
+        "HOD": [
+          "hreis.appraisal.review",
+          "hreis.claim.review",
+          "hreis.leave.review"
+        ],
+        "HR Administrator": [
+          "hreis.appraisal.assign",
+          "hreis.appraisal.submit",
+          "hreis.audit.view",
+          "hreis.claim.submit",
+          "hreis.claim.verify",
+          "hreis.leave.apply",
+          "hreis.leave.review",
+          "hreis.notification.manage",
+          "hreis.notification.view",
+          "hreis.record.manage",
+          "hreis.record.view_self",
+          "hreis.workflow.configure"
+        ],
+        "Registrar": [
+          "hreis.appraisal.review",
+          "hreis.claim.review",
+          "hreis.leave.review"
+        ]
+      },
+      "module_grants": [
+        "Accountant",
+        "Director",
+        "Employee",
+        "HOD",
+        "HR Administrator",
+        "Registrar"
+      ],
+      "nav": {
+        "base_path": "/hreis",
+        "icon": "FaUsers",
+        "items": [
+          {
+            "code": "hreis.records",
+            "icon": "FaIdCard",
+            "label": "Service Records",
+            "required_permission": "hreis.record.view_self",
+            "sort_order": 10,
+            "to": "/hreis/records"
+          },
+          {
+            "code": "hreis.leave",
+            "icon": "FaCalendarAlt",
+            "label": "Leave Requests",
+            "required_permission": "hreis.leave.apply",
+            "sort_order": 20,
+            "to": "/hreis/leave"
+          },
+          {
+            "code": "hreis.appraisals",
+            "icon": "FaFileAlt",
+            "label": "Appraisals",
+            "required_permission": "hreis.appraisal.submit",
+            "sort_order": 30,
+            "to": "/hreis/appraisals"
+          },
+          {
+            "code": "hreis.claims",
+            "icon": "FaMoneyBill",
+            "label": "LTC and CPDA",
+            "required_permission": "hreis.claim.submit",
+            "sort_order": 40,
+            "to": "/hreis/claims"
+          },
+          {
+            "code": "hreis.approvals",
+            "icon": "FaTasks",
+            "label": "Approvals",
+            "required_permission": "hreis.leave.review",
+            "sort_order": 50,
+            "to": "/hreis/approvals"
+          },
+          {
+            "code": "hreis.finance",
+            "icon": "FaMoneyBill",
+            "label": "Claim Settlements",
+            "required_permission": "hreis.claim.process",
+            "sort_order": 55,
+            "to": "/hreis/approvals"
+          },
+          {
+            "code": "hreis.admin",
+            "icon": "FaCog",
+            "label": "HR Administration",
+            "required_permission": "hreis.workflow.configure",
+            "sort_order": 60,
+            "to": "/hreis/admin"
+          },
+          {
+            "code": "hreis.notifications",
+            "icon": "FaBell",
+            "label": "Notifications",
+            "required_permission": "hreis.notification.view",
+            "sort_order": 65,
+            "to": "/hreis/notifications"
+          },
+          {
+            "code": "hreis.audit",
+            "icon": "FaHistory",
+            "label": "HR Audit",
+            "required_permission": "hreis.audit.view",
+            "sort_order": 70,
+            "to": "/hreis/audit"
+          }
+        ],
+        "label": "Human Resources",
+        "nav_section": "Administration",
+        "sort_order": 40,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "hreis.record.view_self",
+          "label": "View own service record"
+        },
+        {
+          "code": "hreis.record.manage",
+          "label": "Maintain service records"
+        },
+        {
+          "code": "hreis.leave.apply",
+          "label": "Apply for leave and track applications"
+        },
+        {
+          "code": "hreis.leave.review",
+          "label": "Decide routed leave requests"
+        },
+        {
+          "code": "hreis.appraisal.submit",
+          "label": "Submit annual appraisals"
+        },
+        {
+          "code": "hreis.appraisal.assign",
+          "label": "Assign appraisal reviewers"
+        },
+        {
+          "code": "hreis.appraisal.review",
+          "label": "Review and finalize assigned appraisals"
+        },
+        {
+          "code": "hreis.claim.submit",
+          "label": "Submit LTC and CPDA claims"
+        },
+        {
+          "code": "hreis.claim.verify",
+          "label": "Verify claims and eligibility"
+        },
+        {
+          "code": "hreis.claim.review",
+          "label": "Decide routed claims"
+        },
+        {
+          "code": "hreis.claim.process",
+          "label": "Record approved claim settlement status"
+        },
+        {
+          "code": "hreis.workflow.configure",
+          "label": "Configure HR workflows and appraisal windows"
+        },
+        {
+          "code": "hreis.audit.view",
+          "label": "Review immutable HR audit records"
+        },
+        {
+          "code": "hreis.notification.view",
+          "label": "View own HR notifications"
+        },
+        {
+          "code": "hreis.notification.manage",
+          "label": "Create policy and deadline notifications"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

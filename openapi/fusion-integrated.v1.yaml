@@ -63,6 +63,576 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/hreis/appraisals:
+    get:
+      operationId: v1_hreis_appraisals_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appraisal'
+          description: ''
+    post:
+      operationId: v1_hreis_appraisals_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Appraisal'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Appraisal'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Appraisal'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appraisal'
+          description: ''
+  /api/v1/hreis/appraisals/{id}/assign:
+    post:
+      operationId: v1_hreis_appraisals_assign_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Appraisal'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Appraisal'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Appraisal'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appraisal'
+          description: ''
+  /api/v1/hreis/appraisals/{id}/review:
+    post:
+      operationId: v1_hreis_appraisals_review_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Appraisal'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Appraisal'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Appraisal'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appraisal'
+          description: ''
+  /api/v1/hreis/approvals:
+    get:
+      operationId: v1_hreis_approvals_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalQueue'
+          description: ''
+  /api/v1/hreis/audit:
+    get:
+      operationId: v1_hreis_audit_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditEntry'
+          description: ''
+  /api/v1/hreis/claims:
+    get:
+      operationId: v1_hreis_claims_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+          description: ''
+    post:
+      operationId: v1_hreis_claims_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Claim'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Claim'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Claim'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+          description: ''
+  /api/v1/hreis/claims/{id}/decision:
+    post:
+      operationId: v1_hreis_claims_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Claim'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Claim'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Claim'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+          description: ''
+  /api/v1/hreis/claims/{id}/process:
+    post:
+      operationId: v1_hreis_claims_process_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Claim'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Claim'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Claim'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+          description: ''
+  /api/v1/hreis/claims/{id}/verify:
+    post:
+      operationId: v1_hreis_claims_verify_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Claim'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Claim'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Claim'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+          description: ''
+  /api/v1/hreis/leave:
+    get:
+      operationId: v1_hreis_leave_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+    post:
+      operationId: v1_hreis_leave_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/hreis/leave/{id}/decision:
+    post:
+      operationId: v1_hreis_leave_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/hreis/notifications:
+    get:
+      operationId: v1_hreis_notifications_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/v1/hreis/notifications/{id}/read:
+    post:
+      operationId: v1_hreis_notifications_read_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Notification'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Notification'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Notification'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/v1/hreis/notifications/policy:
+    post:
+      operationId: v1_hreis_notifications_policy_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Notification'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Notification'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Notification'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/v1/hreis/records:
+    get:
+      operationId: v1_hreis_records_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeRecord'
+          description: ''
+    post:
+      operationId: v1_hreis_records_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeRecord'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmployeeRecord'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmployeeRecord'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeRecord'
+          description: ''
+  /api/v1/hreis/records/{user_id}:
+    put:
+      operationId: v1_hreis_records_update
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeRecord'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmployeeRecord'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmployeeRecord'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeRecord'
+          description: ''
+  /api/v1/hreis/records/me:
+    get:
+      operationId: v1_hreis_records_me_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeRecord'
+          description: ''
+  /api/v1/hreis/routes:
+    get:
+      operationId: v1_hreis_routes_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowRoute'
+          description: ''
+    post:
+      operationId: v1_hreis_routes_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowRoute'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WorkflowRoute'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WorkflowRoute'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowRoute'
+          description: ''
+  /api/v1/hreis/windows:
+    get:
+      operationId: v1_hreis_windows_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppraisalWindow'
+          description: ''
+    post:
+      operationId: v1_hreis_windows_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppraisalWindow'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AppraisalWindow'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AppraisalWindow'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppraisalWindow'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1964,6 +2534,78 @@ components:
       - sanction
       - season
       - user_id
+    Appraisal:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        content: {}
+        reviewer_roles:
+          readOnly: true
+        current_step:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/AppraisalStatusEnum'
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+        closed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        record:
+          type: integer
+          readOnly: true
+      required:
+      - closed_at
+      - current_step
+      - id
+      - record
+      - reviewer_roles
+      - status
+      - submitted_at
+      - year
+    AppraisalStatusEnum:
+      enum:
+      - submitted
+      - review
+      - closed
+      type: string
+      description: |-
+        * `submitted` - Submitted
+        * `review` - Review
+        * `closed` - Closed
+    AppraisalWindow:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        opens_at:
+          type: string
+          format: date-time
+        closes_at:
+          type: string
+          format: date-time
+      required:
+      - closes_at
+      - id
+      - opens_at
+      - year
     Approval:
       type: object
       properties:
@@ -1971,6 +2613,25 @@ components:
           type: string
           default: ''
           maxLength: 300
+    ApprovalQueue:
+      type: object
+      properties:
+        leave:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveRequest'
+        claims:
+          type: array
+          items:
+            $ref: '#/components/schemas/Claim'
+        appraisals:
+          type: array
+          items:
+            $ref: '#/components/schemas/Appraisal'
+      required:
+      - appraisals
+      - claims
+      - leave
     ApprovalStatusEnum:
       enum:
       - pending
@@ -1993,6 +2654,38 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    AuditEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        entity_type:
+          type: string
+          readOnly: true
+        entity_id:
+          type: integer
+          readOnly: true
+        action:
+          type: string
+          readOnly: true
+        actor_id:
+          type: integer
+          readOnly: true
+        detail:
+          readOnly: true
+        occurred_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - actor_id
+      - detail
+      - entity_id
+      - entity_type
+      - id
+      - occurred_at
     BulkOutcome:
       type: object
       properties:
@@ -2082,6 +2775,101 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CategoryEnum:
+      enum:
+      - faculty
+      - staff
+      type: string
+      description: |-
+        * `faculty` - Faculty
+        * `staff` - Staff
+    Claim:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        kind:
+          $ref: '#/components/schemas/ClaimKindEnum'
+        claim_type:
+          $ref: '#/components/schemas/ClaimTypeEnum'
+        purpose:
+          type: string
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        documents: {}
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ClaimStatusEnum'
+          readOnly: true
+        current_step:
+          type: integer
+          readOnly: true
+        approval_roles:
+          readOnly: true
+        payment_status:
+          type: string
+          readOnly: true
+        payment_reference:
+          type: string
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        record:
+          type: integer
+          readOnly: true
+      required:
+      - amount
+      - approval_roles
+      - claim_type
+      - current_step
+      - id
+      - kind
+      - payment_reference
+      - payment_status
+      - purpose
+      - record
+      - status
+      - submitted_at
+      - updated_at
+    ClaimKindEnum:
+      enum:
+      - ltc
+      - cpda
+      type: string
+      description: |-
+        * `ltc` - LTC
+        * `cpda` - CPDA
+    ClaimStatusEnum:
+      enum:
+      - awaiting_hr
+      - pending
+      - approved
+      - rejected
+      - processed
+      type: string
+      description: |-
+        * `awaiting_hr` - Awaiting HR
+        * `pending` - Pending
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `processed` - Processed
+    ClaimTypeEnum:
+      enum:
+      - advance
+      - reimbursement
+      type: string
+      description: |-
+        * `advance` - Advance
+        * `reimbursement` - Reimbursement
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2407,6 +3195,52 @@ components:
       - season_decision
       - semester
       - standing
+    EmployeeRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        employee_name:
+          type: string
+          maxLength: 255
+        department:
+          type: string
+          maxLength: 255
+        designation:
+          type: string
+          maxLength: 255
+        appointment_date:
+          type: string
+          format: date
+          nullable: true
+        service_history: {}
+        leave_balances: {}
+        retirement_status:
+          type: string
+          maxLength: 80
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - category
+      - created_at
+      - department
+      - designation
+      - id
+      - updated_at
+      - user_id
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2637,6 +3471,77 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        leave_type:
+          $ref: '#/components/schemas/LeaveTypeEnum'
+        days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
+        justification:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/LeaveRequestStatusEnum'
+          readOnly: true
+        current_step:
+          type: integer
+          readOnly: true
+        approval_roles:
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        record:
+          type: integer
+          readOnly: true
+      required:
+      - approval_roles
+      - created_at
+      - current_step
+      - days
+      - id
+      - justification
+      - leave_type
+      - record
+      - status
+      - updated_at
+    LeaveRequestStatusEnum:
+      enum:
+      - pending
+      - approved
+      - rejected
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `approved` - Approved
+        * `rejected` - Rejected
+    LeaveTypeEnum:
+      enum:
+      - casual
+      - restricted
+      - medical
+      - earned
+      - vacation
+      - sabbatical
+      type: string
+      description: |-
+        * `casual` - Casual
+        * `restricted` - Restricted
+        * `medical` - Medical
+        * `earned` - Earned
+        * `vacation` - Vacation
+        * `sabbatical` - Sabbatical
     LiftSanction:
       type: object
       properties:
@@ -2732,6 +3637,37 @@ components:
       - is_late
       - message
       - record
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        read_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - id
+      - kind
+      - message
+      - read_at
+      - user_id
     OffCampusRecord:
       type: object
       properties:
@@ -3466,6 +4402,16 @@ components:
       - message
       - reason
       - route
+    RequestKindEnum:
+      enum:
+      - leave
+      - ltc
+      - cpda
+      type: string
+      description: |-
+        * `leave` - Leave
+        * `ltc` - LTC
+        * `cpda` - CPDA
     RoundOutcome:
       type: object
       properties:
@@ -3830,6 +4776,31 @@ components:
           maxLength: 300
       required:
       - reason
+    WorkflowRoute:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        request_kind:
+          $ref: '#/components/schemas/RequestKindEnum'
+        authorities: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - category
+      - created_at
+      - id
+      - request_kind
+      - updated_at
   securitySchemes:
     iamSession:
       type: apiKey
