@@ -63,6 +63,269 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/filetracking/admin/audit-logs/:
+    get:
+      operationId: v1_filetracking_admin_audit_logs_list
+      description: System Admin governance usage and audit logs (FTS-UC-009).
+      summary: View governance audit logs
+      tags:
+      - filetracking
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FileAuditLog'
+          description: ''
+  /api/v1/filetracking/files/:
+    get:
+      operationId: v1_filetracking_files_list
+      description: List files (inbox, outbox, drafts, archive) or create a new file
+        draft.
+      summary: List files visible to user
+      parameters:
+      - in: query
+        name: tab
+        schema:
+          type: string
+          enum:
+          - all
+          - archive
+          - drafts
+          - inbox
+          - outbox
+        description: Inbox, outbox, drafts, or archive tab
+      tags:
+      - filetracking
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrackedFileList'
+          description: ''
+    post:
+      operationId: v1_filetracking_files_create
+      description: List files (inbox, outbox, drafts, archive) or create a new file
+        draft.
+      summary: Create a new file draft
+      tags:
+      - filetracking
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDraft'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateDraft'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateDraft'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackedFileDetail'
+          description: ''
+  /api/v1/filetracking/files/{id}/:
+    get:
+      operationId: v1_filetracking_files_retrieve
+      description: Retrieve details of an associated file (comments, movements, attachments).
+      summary: Get file detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - filetracking
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackedFileDetail'
+          description: ''
+  /api/v1/filetracking/files/{id}/archive/:
+    post:
+      operationId: v1_filetracking_files_archive_create
+      description: Archive completed circulated file by owner (FTS-UC-007).
+      summary: Archive completed file
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - filetracking
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackedFileDetail'
+          description: ''
+  /api/v1/filetracking/files/{id}/draft/:
+    patch:
+      operationId: v1_filetracking_files_draft_partial_update
+      description: Edit or discard a pre-circulation draft (FTS-UC-002).
+      summary: Edit draft file
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - filetracking
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEditDraft'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEditDraft'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEditDraft'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackedFileDetail'
+          description: ''
+    delete:
+      operationId: v1_filetracking_files_draft_destroy
+      description: Edit or discard a pre-circulation draft (FTS-UC-002).
+      summary: Discard draft file
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - filetracking
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/filetracking/files/{id}/forward/:
+    post:
+      operationId: v1_filetracking_files_forward_create
+      description: Forward file to another institute employee (FTS-UC-003).
+      summary: Forward file to employee
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - filetracking
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForwardFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ForwardFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ForwardFile'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileMovement'
+          description: ''
+  /api/v1/filetracking/files/{id}/history/:
+    get:
+      operationId: v1_filetracking_files_history_list
+      description: Chronological file tracking movement history (FTS-UC-006).
+      summary: View file tracking history
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - filetracking
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FileMovement'
+          description: ''
+  /api/v1/filetracking/files/{id}/return/:
+    post:
+      operationId: v1_filetracking_files_return_create
+      description: Return received file to previous sender (FTS-UC-004).
+      summary: Return received file
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - filetracking
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReturnFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReturnFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReturnFile'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileMovement'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -2315,6 +2578,25 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    CreateDraft:
+      type: object
+      properties:
+        subject:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          default: ''
+        initial_comment:
+          type: string
+        attachments:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - initial_comment
+      - subject
     Detail:
       type: object
       properties:
@@ -2423,6 +2705,163 @@ components:
       - fee_reference
       - season
       - user_id
+    FileAttachment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uploaded_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        file_name:
+          type: string
+          maxLength: 255
+        file_path:
+          type: string
+          maxLength: 512
+        file_size:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        mime_type:
+          type: string
+          maxLength: 128
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - file_name
+      - file_path
+      - id
+      - uploaded_by_user_id
+    FileAuditLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        file_id:
+          type: integer
+          nullable: true
+          readOnly: true
+        action:
+          type: string
+          maxLength: 64
+        actor_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        actor_role:
+          type: string
+          maxLength: 64
+        details: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - actor_user_id
+      - created_at
+      - file_id
+      - id
+    FileComment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        author_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        author_role:
+          type: string
+          maxLength: 64
+        comment_text:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author_role
+      - author_user_id
+      - comment_text
+      - created_at
+      - id
+    FileMovement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        movement_type:
+          $ref: '#/components/schemas/MovementTypeEnum'
+        sender_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        sender_role:
+          type: string
+          maxLength: 64
+        receiver_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        receiver_role:
+          type: string
+          maxLength: 64
+        comment:
+          type: string
+          description: Mandatory movement comment (BR-FTS-006)
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - comment
+      - created_at
+      - id
+      - movement_type
+      - receiver_role
+      - receiver_user_id
+      - sender_role
+      - sender_user_id
+    ForwardFile:
+      type: object
+      properties:
+        receiver_user_id:
+          type: integer
+        receiver_role:
+          type: string
+          maxLength: 64
+        comment:
+          type: string
+        attachments:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - comment
+      - receiver_role
+      - receiver_user_id
+    FtsFileStatusEnum:
+      enum:
+      - draft
+      - circulated
+      - archived
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `circulated` - Circulated
+        * `archived` - Archived
     IncidentRecorded:
       type: object
       properties:
@@ -2671,6 +3110,18 @@ components:
       description: |-
         * `online` - Online
         * `offline` - Offline
+    MovementTypeEnum:
+      enum:
+      - creation
+      - forward
+      - return
+      - archival
+      type: string
+      description: |-
+        * `creation` - Creation
+        * `forward` - Forward
+        * `return` - Return
+        * `archival` - Archival
     NavGroup:
       type: object
       description: |-
@@ -3000,6 +3451,21 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PatchedEditDraft:
+      type: object
+      properties:
+        subject:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        comment:
+          type: string
+        attachments:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
     PatchedJobPosting:
       type: object
       properties:
@@ -3466,6 +3932,18 @@ components:
       - message
       - reason
       - route
+    ReturnFile:
+      type: object
+      properties:
+        comment:
+          type: string
+        attachments:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - comment
     RoundOutcome:
       type: object
       properties:
@@ -3714,6 +4192,148 @@ components:
         * `workshop` - Workshop
         * `internship` - Internship programme
         * `general` - General
+    TrackedFileDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        file_code:
+          type: string
+          description: Unique tracking code for the file
+          maxLength: 64
+        subject:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/FtsFileStatusEnum'
+        creator_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        creator_role:
+          type: string
+          maxLength: 64
+        owner_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        current_holder_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        current_holder_role:
+          type: string
+          maxLength: 64
+        source_module:
+          type: string
+          maxLength: 64
+        external_reference:
+          type: string
+          maxLength: 128
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        archived_at:
+          type: string
+          format: date-time
+          nullable: true
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileComment'
+          readOnly: true
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileAttachment'
+          readOnly: true
+        movements:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileMovement'
+          readOnly: true
+      required:
+      - attachments
+      - comments
+      - created_at
+      - creator_role
+      - creator_user_id
+      - current_holder_user_id
+      - id
+      - movements
+      - owner_user_id
+      - subject
+      - updated_at
+    TrackedFileList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        file_code:
+          type: string
+          description: Unique tracking code for the file
+          maxLength: 64
+        subject:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/FtsFileStatusEnum'
+        creator_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        creator_role:
+          type: string
+          maxLength: 64
+        owner_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        current_holder_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        current_holder_role:
+          type: string
+          maxLength: 64
+        source_module:
+          type: string
+          maxLength: 64
+        external_reference:
+          type: string
+          maxLength: 128
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        archived_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - created_at
+      - creator_role
+      - creator_user_id
+      - current_holder_user_id
+      - id
+      - owner_user_id
+      - subject
+      - updated_at
     Transition:
       type: object
       properties:
