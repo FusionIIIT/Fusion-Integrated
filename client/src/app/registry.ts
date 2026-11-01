@@ -22,4 +22,9 @@ export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
     basePath: "/elm",
     load: () => import("../modules/elm/routes"),
   },
+  spacs: {
+    code: "spacs",
+    basePath: "/spacs",
+    load: () => import("../modules/spacs/routes"),
+  },
 };
