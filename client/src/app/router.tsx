@@ -9,6 +9,7 @@ import {
 } from "../recruiter/RecruiterAuth";
 import { RecruiterNotFound, RecruiterShell } from "../recruiter/RecruiterShell";
 import LoginPage from "./LoginPage";
+const PreviewWorkspace = lazy(() => import("../modules/psm/PsmWorkspace").then(m => ({ default: m.PreviewWorkspace })));
 import { MODULE_REGISTRY } from "./registry";
 import { Dashboard, NotFound, Shell } from "./Shell";
 
@@ -115,6 +116,7 @@ export function AppRoutes() {
   ];
 
   return useRoutes([
+    ...(import.meta.env.VITE_PSM_PREVIEW === "true" ? [{ path: "/psm-preview", element: <Suspense fallback={loading}><PreviewWorkspace /></Suspense> }] : []),
     { path: "/login", element: <LoginPage /> },
     // Matched before "/" so the institute RequireAuth never sees a recruiter.
     recruiterRoutes,
