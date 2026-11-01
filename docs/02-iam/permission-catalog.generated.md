@@ -7,11 +7,55 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `complaints`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `complaints.complaint.view_self` | View own complaints | `Dean Academic`, `Director`, `Registrar`, `acadadmin`, `faculty`, `staff`, `student` |
+| `complaints.complaint.create` | Submit a complaint | `Dean Academic`, `Director`, `Registrar`, `acadadmin`, `faculty`, `staff`, `student` |
+| `complaints.complaint.view` | View complaints within scope | `Dean Academic`, `Director`, `Registrar`, `acadadmin` |
+| `complaints.complaint.assign` | Assign and categorize complaint | `Dean Academic`, `Director`, `Registrar`, `acadadmin` |
+| `complaints.complaint.update` | Update complaint progress | `Dean Academic`, `Director`, `Registrar`, `acadadmin` |
+| `complaints.complaint.resolve` | Resolve complaint | `Dean Academic`, `Director`, `Registrar`, `acadadmin` |
+| `complaints.complaint.reject` | Reject complaint | `Dean Academic`, `Director`, `Registrar`, `acadadmin` |
+| `complaints.complaint.verify` | Verify resolved complaint for closure | `Dean Academic`, `Director`, `Registrar`, `acadadmin`, `faculty`, `staff`, `student` |
+| `complaints.complaint.reopen` | Request or review complaint reopening | `Dean Academic`, `Director`, `Registrar`, `acadadmin`, `faculty`, `staff`, `student` |
+| `complaints.complaint.escalate` | Escalate unresolved complaint | `Dean Academic`, `Director`, `Registrar`, `acadadmin` |
+| `complaints.feedback.submit` | Submit feedback for complaint | `Dean Academic`, `Director`, `Registrar`, `acadadmin`, `faculty`, `staff`, `student` |
+| `complaints.feedback.view` | Review submitted feedback | `Dean Academic`, `Director`, `Registrar`, `acadadmin` |
+| `complaints.announcement.view` | View complaint announcements | `Dean Academic`, `Director`, `Registrar`, `acadadmin`, `faculty`, `staff`, `student` |
+| `complaints.announcement.publish` | Publish complaint announcement | `Dean Academic`, `Director`, `Registrar`, `acadadmin` |
+| `complaints.report.view` | View CMS reports and analytics | `Dean Academic`, `Director`, `Registrar`, `acadadmin` |
+| `complaints.role.manage` | Assign and manage CMS roles | `Director`, `acadadmin` |
+
 ## `directory`
 
 | Code | What it allows | Held by |
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `leave`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave.request.view` | See leave requests within your scope | `Dean Academic`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `acadadmin`, `faculty`, `staff` |
+| `leave.request.create` | Apply for leave, and nominate a substitute | `faculty`, `staff` |
+| `leave.request.delete` | Withdraw your own pending leave request | `faculty`, `staff` |
+| `leave.request.review` | Review a request and record the recommendation | `Dean Academic`, `Deputy Registrar (Estt.)`, `Director`, `Registrar` |
+| `leave.request.approve` | Record the final sanctioning decision | `Dean Academic`, `Deputy Registrar (Estt.)`, `Director`, `Registrar` |
+| `leave.cancellation.create` | Ask to cancel your own approved leave | `faculty`, `staff` |
+| `leave.extension.create` | Ask to extend your own ongoing leave | `faculty`, `staff` |
+| `leave.resumption.create` | Submit your own resumption of duty | `faculty`, `staff` |
+| `leave.resumption.review` | Review a submitted resumption of duty | `Dean Academic`, `Director`, `Registrar` |
+| `leave.substitute.review` | Accept or decline a responsibility request | `faculty`, `staff` |
+| `leave.record.view` | See leave records as an administrator | `Dean Academic`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `acadadmin` |
+| `leave.record.update` | Maintain records and log offline-sanctioned leave | `acadadmin` |
+| `leave.calendar.view` | See the effective holiday calendar | `acadadmin`, `faculty`, `staff` |
+| `leave.calendar.publish` | Create and publish the holiday/RH calendar | `acadadmin` |
+| `leave.policy.update` | Maintain the policy parameters and the hierarchy | `acadadmin` |
+| `leave.threshold.update` | Configure the workflow SLA thresholds | `acadadmin` |
+| `leave.balance.view` | See your own leave balances and history | `faculty`, `staff` |
+| `leave.application.export` | Obtain a printable copy of an application | `faculty`, `staff` |
 
 ## `placement_cell`
 
