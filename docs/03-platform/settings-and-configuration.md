@@ -1,9 +1,3 @@
----
-owner: platform-lead
-status: authoritative
-last-reviewed: 2026-08-01
----
-
 # Settings & Configuration
 
 Twelve-factor, `django-environ`, **no secret ever committed**. The reference for what this is fixing:

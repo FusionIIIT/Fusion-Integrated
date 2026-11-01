@@ -1,9 +1,3 @@
----
-owner: platform-lead
-status: authoritative
-last-reviewed: 2026-08-01
----
-
 # System Architecture
 
 ## Level 1 — context

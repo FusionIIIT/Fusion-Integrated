@@ -1,4 +1,7 @@
+from io import StringIO
+
 import pytest
+from django.core.management import call_command
 
 from modules.accesscontrol import contracts
 from modules.accesscontrol.models import Module, NavItem
@@ -67,3 +70,18 @@ def test_planned_module_is_never_shown_even_if_granted():
     _module(code="hostel", status="planned")
     assert contracts.build_navigation(granted_module_codes=["hostel"],
                                       permissions=[]) == []
+
+
+def test_seed_modules_retires_a_module_no_code_declares_any_more():
+    """Upsert-only seeding leaves a deleted module granted and reachable."""
+    _module(code="hr", status="active")
+    call_command("seed_modules", stdout=StringIO())
+    assert Module.objects.get(code="hr").status == "deprecated"
+
+
+def test_seed_modules_drops_a_nav_item_its_registry_no_longer_declares():
+    m = _module(code="leave")
+    NavItem.objects.create(module=m, code="leave.queue", label="Queue",
+                           to="/leave/queue")
+    call_command("seed_modules", stdout=StringIO())
+    assert not NavItem.objects.filter(code="leave.queue").exists()

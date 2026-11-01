@@ -1,9 +1,3 @@
----
-owner: placement-lead
-status: authoritative
-last-reviewed: 2026-08-01
----
-
 # Eligibility Rules Specification
 
 A posting's eligibility rule is a small JSON AST, evaluated by `core/rules/engine.py` against a fixed

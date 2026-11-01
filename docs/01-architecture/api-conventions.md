@@ -1,7 +1,4 @@
 ---
-owner: platform-lead
-status: authoritative
-last-reviewed: 2026-08-01
 enforced-by: >
   drf-spectacular schema generation + `git diff --exit-code openapi/` in CI, schemathesis
   fuzzing against the committed schema, and a shared DRF settings block in core/api/.

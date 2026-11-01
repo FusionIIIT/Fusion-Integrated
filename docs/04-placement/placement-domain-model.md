@@ -1,7 +1,4 @@
 ---
-owner: placement-lead
-status: authoritative
-last-reviewed: 2026-08-01
 note: >
   Designed from first principles. The deprecated applications/placement_cell app (25 models) is NOT
   the basis for this — see NG2 in vision-and-scope.md. Where a legacy idea is worth keeping it is

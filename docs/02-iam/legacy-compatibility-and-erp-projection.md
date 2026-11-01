@@ -1,7 +1,4 @@
 ---
-owner: iam-lead
-status: authoritative
-last-reviewed: 2026-08-01
 criticality: >
   This is the highest-risk edge in the system. It touches live production data for ~3,277 users
   through an untested legacy codebase. Read it fully before changing anything in the projector.

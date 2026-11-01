@@ -7,7 +7,6 @@ const PostingsPage = lazy(() => import("./pages/PostingsPage"));
 const MyApplicationsPage = lazy(() => import("./pages/MyApplicationsPage"));
 const ApplicationsPage = lazy(() => import("./pages/ApplicationsPage"));
 const OffersPage = lazy(() => import("./pages/OffersPage"));
-const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const CompaniesPage = lazy(() => import("./pages/CompaniesPage"));
 const InterviewsPage = lazy(() => import("./pages/InterviewsPage"));
 const AnnouncementsPage = lazy(() => import("./pages/AnnouncementsPage"));
@@ -29,7 +28,6 @@ export const routes: RouteObject[] = [
   { path: "postings", element: <PostingsPage /> },
   { path: "mine", element: <MyApplicationsPage /> },
   { path: "offers", element: <OffersPage /> },
-  { path: "profile", element: <ProfilePage /> },
   { path: "applications", element: <ApplicationsPage /> },
   { path: "companies", element: <CompaniesPage /> },
   { path: "interviews", element: <InterviewsPage /> },

@@ -1,9 +1,3 @@
----
-owner: frontend-lead
-status: authoritative
-last-reviewed: 2026-08-01
----
-
 # Module Authoring Guide — Frontend
 
 Adding a module to the shell. Worked example: `complaints`, matching the backend example in

@@ -10,6 +10,7 @@ interface AuthValue {
   /** `unavailable` is "we could not ask", which is not the same as signed out. */
   status: "loading" | "authenticated" | "anonymous" | "unavailable";
   can: (permission: string) => boolean;
+  switchRole: (role: string) => void;
   hasModule: (code: string) => boolean;
   logout: () => Promise<void>;
 }
@@ -48,6 +49,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   }, [navigate, qc]);
 
+  const switchRole = useCallback(async (role: string) => {
+    if (!role) return;
+    try {
+      const { data } = await http.patch<Session>("/me", { active_role: role });
+      qc.setQueryData(["session"], data);
+      // Screens are scoped by the role that drew them, so start again at the top.
+      navigate("/");
+    } catch {
+      /* the session query is unchanged, so the select snaps back */
+      qc.invalidateQueries({ queryKey: ["session"] });
+    }
+  }, [navigate, qc]);
+
   const logout = useCallback(async () => {
     try {
       await http.post("/auth/logout");
@@ -72,9 +86,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // UX only: every one of these has a server-side counterpart.
       can: (p) => perms.has(p),
       hasModule: (m) => mods.has(m),
+      switchRole,
       logout,
     };
-  }, [data, isPending, isError, logout]);
+  }, [data, isPending, isError, logout, switchRole]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

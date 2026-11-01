@@ -1,9 +1,3 @@
----
-owner: platform-lead
-status: authoritative
-last-reviewed: 2026-08-01
----
-
 # Vision & Scope
 
 ## The one-sentence version

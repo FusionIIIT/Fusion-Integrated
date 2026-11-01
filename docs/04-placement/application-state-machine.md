@@ -1,9 +1,3 @@
----
-owner: placement-lead
-status: authoritative
-last-reviewed: 2026-08-01
----
-
 # Application State Machine
 
 An application's status changes **only** through this table. `services/applications.transition()` is the

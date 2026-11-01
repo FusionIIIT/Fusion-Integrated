@@ -19,6 +19,15 @@ if (!window.matchMedia) {
   }) as MediaQueryList;
 }
 
+// jsdom has no ResizeObserver, which Mantine's ScrollArea needs on mount.
+if (!globalThis.ResizeObserver) {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver;
+}
+
 // jsdom implements neither, and the download path calls both.
 if (!URL.createObjectURL) {
   URL.createObjectURL = () => "blob:test";

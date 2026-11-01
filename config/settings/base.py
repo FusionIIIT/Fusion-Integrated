@@ -134,6 +134,9 @@ DATABASES = {
 }
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+#: How long a cached directory row may be trusted before it is refetched.
+DIRECTORY_MAX_AGE_SECONDS = env_int("DIRECTORY_MAX_AGE_SECONDS", 6 * 60 * 60)
+
 # The IAM. This service is a client of it and caches nothing it cannot rebuild.
 IAM_BASE_URL = env("IAM_BASE_URL", "http://127.0.0.1:8001")
 IAM_API_PREFIX = env("IAM_API_PREFIX", "/api")
@@ -250,10 +253,12 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
-X_FRAME_OPTIONS = "DENY"
+# SAMEORIGIN, not DENY: Fusion-client embeds these screens, same origin in prod.
+X_FRAME_OPTIONS = "SAMEORIGIN"
 
 # W003: CSRF is enforced by core/api/csrf.py. See the note above MIDDLEWARE.
-SILENCED_SYSTEM_CHECKS = ["security.W003"]
+# W019: the portal frames these screens deliberately, and only same origin.
+SILENCED_SYSTEM_CHECKS = ["security.W003", "security.W019"]
 
 # Without this, nothing is configured and every INFO audit line is discarded.
 LOGGING = {

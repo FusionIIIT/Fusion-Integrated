@@ -1,9 +1,3 @@
----
-owner: iam-lead
-status: authoritative
-last-reviewed: 2026-08-01
----
-
 # IAM Domain Model
 
 Every table in `fusion_system_db` schema `iam`, with its constraints, indexes and the reasoning behind

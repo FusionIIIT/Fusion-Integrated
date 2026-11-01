@@ -1,9 +1,3 @@
----
-owner: platform-lead
-status: authoritative
-last-reviewed: 2026-08-01
----
-
 # Context Map
 
 The bounded contexts and, for each pair that touches, the **relationship pattern**. The pattern is
