@@ -278,6 +278,186 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "visitor_hostel": {
+      "grants": {
+        "caretaker": [
+          "visitor_hostel.bill.manage",
+          "visitor_hostel.booking.record_offline",
+          "visitor_hostel.booking.review",
+          "visitor_hostel.booking.view",
+          "visitor_hostel.inventory.manage",
+          "visitor_hostel.meal.manage",
+          "visitor_hostel.notification.view_self",
+          "visitor_hostel.report.view_caretaker",
+          "visitor_hostel.role.view",
+          "visitor_hostel.room.manage",
+          "visitor_hostel.stay.manage"
+        ],
+        "indenter": [
+          "visitor_hostel.booking.cancel_self",
+          "visitor_hostel.booking.create",
+          "visitor_hostel.booking.modify_self",
+          "visitor_hostel.booking.view_self",
+          "visitor_hostel.notification.view_self"
+        ],
+        "vh_in_charge": [
+          "visitor_hostel.booking.decide",
+          "visitor_hostel.booking.view",
+          "visitor_hostel.inventory.approve",
+          "visitor_hostel.notification.view_self",
+          "visitor_hostel.report.view_in_charge",
+          "visitor_hostel.role.view",
+          "visitor_hostel.tariff.manage"
+        ]
+      },
+      "module_grants": [
+        "caretaker",
+        "indenter",
+        "vh_in_charge"
+      ],
+      "nav": {
+        "base_path": "/visitors-hostel",
+        "icon": "Bed",
+        "items": [
+          {
+            "code": "visitor_hostel.bookings",
+            "icon": "CalendarCheck",
+            "label": "Bookings",
+            "required_permission": "visitor_hostel.booking.view_self",
+            "sort_order": 10,
+            "to": "/visitors-hostel/bookings"
+          },
+          {
+            "code": "visitor_hostel.operations",
+            "icon": "Buildings",
+            "label": "VH Operations",
+            "required_permission": "visitor_hostel.booking.view",
+            "sort_order": 20,
+            "to": "/visitors-hostel/operations"
+          },
+          {
+            "code": "visitor_hostel.offline_booking",
+            "icon": "Phone",
+            "label": "Record offline booking",
+            "required_permission": "visitor_hostel.booking.record_offline",
+            "sort_order": 21,
+            "to": "/visitors-hostel/offline-booking"
+          },
+          {
+            "code": "visitor_hostel.inventory",
+            "icon": "Package",
+            "label": "Inventory",
+            "required_permission": "visitor_hostel.inventory.manage",
+            "sort_order": 30,
+            "to": "/visitors-hostel/inventory"
+          },
+          {
+            "code": "visitor_hostel.reports.caretaker",
+            "icon": "ChartBar",
+            "label": "Caretaker reports",
+            "required_permission": "visitor_hostel.report.view_caretaker",
+            "sort_order": 40,
+            "to": "/visitors-hostel/reports"
+          },
+          {
+            "code": "visitor_hostel.reports.in_charge",
+            "icon": "ChartBar",
+            "label": "VH In-Charge reports",
+            "required_permission": "visitor_hostel.report.view_in_charge",
+            "sort_order": 41,
+            "to": "/visitors-hostel/reports"
+          }
+        ],
+        "label": "Visitors Hostel",
+        "nav_section": "Campus",
+        "sort_order": 60,
+        "status": "planned"
+      },
+      "permissions": [
+        {
+          "code": "visitor_hostel.booking.view_self",
+          "label": "View own booking requests"
+        },
+        {
+          "code": "visitor_hostel.booking.create",
+          "label": "Submit an online booking request"
+        },
+        {
+          "code": "visitor_hostel.booking.modify_self",
+          "label": "Request a booking modification"
+        },
+        {
+          "code": "visitor_hostel.booking.cancel_self",
+          "label": "Request booking cancellation"
+        },
+        {
+          "code": "visitor_hostel.booking.view",
+          "label": "View operational booking requests"
+        },
+        {
+          "code": "visitor_hostel.booking.record_offline",
+          "label": "Record an offline booking"
+        },
+        {
+          "code": "visitor_hostel.booking.review",
+          "label": "Review and route booking requests"
+        },
+        {
+          "code": "visitor_hostel.booking.decide",
+          "label": "Approve or reject forwarded requests"
+        },
+        {
+          "code": "visitor_hostel.room.manage",
+          "label": "Manage rooms and room allotments"
+        },
+        {
+          "code": "visitor_hostel.stay.manage",
+          "label": "Record guest check-in and check-out"
+        },
+        {
+          "code": "visitor_hostel.tariff.manage",
+          "label": "Manage visitor categories and tariffs"
+        },
+        {
+          "code": "visitor_hostel.meal.manage",
+          "label": "Manage guest meal bookings"
+        },
+        {
+          "code": "visitor_hostel.bill.manage",
+          "label": "Generate bills and record offline settlement"
+        },
+        {
+          "code": "visitor_hostel.inventory.manage",
+          "label": "Maintain Visitors Hostel inventory"
+        },
+        {
+          "code": "visitor_hostel.inventory.approve",
+          "label": "Review replenishment requirements"
+        },
+        {
+          "code": "visitor_hostel.report.view_caretaker",
+          "label": "View Caretaker operational reports"
+        },
+        {
+          "code": "visitor_hostel.report.view_in_charge",
+          "label": "View VH In-Charge reports"
+        },
+        {
+          "code": "visitor_hostel.role.view",
+          "label": "View VH operational role assignments"
+        },
+        {
+          "code": "visitor_hostel.notification.view_self",
+          "label": "View own VHMS notifications"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "visitor_hostel.inventory.alert",
+        "visitor_hostel.notification.emit",
+        "visitor_hostel.stay.alert"
+      ]
     }
   },
   "publisher": "integrated",

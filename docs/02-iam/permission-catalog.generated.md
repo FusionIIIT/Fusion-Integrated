@@ -38,3 +38,27 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `visitor_hostel`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `visitor_hostel.booking.view_self` | View own booking requests | `indenter` |
+| `visitor_hostel.booking.create` | Submit an online booking request | `indenter` |
+| `visitor_hostel.booking.modify_self` | Request a booking modification | `indenter` |
+| `visitor_hostel.booking.cancel_self` | Request booking cancellation | `indenter` |
+| `visitor_hostel.booking.view` | View operational booking requests | `caretaker`, `vh_in_charge` |
+| `visitor_hostel.booking.record_offline` | Record an offline booking | `caretaker` |
+| `visitor_hostel.booking.review` | Review and route booking requests | `caretaker` |
+| `visitor_hostel.booking.decide` | Approve or reject forwarded requests | `vh_in_charge` |
+| `visitor_hostel.room.manage` | Manage rooms and room allotments | `caretaker` |
+| `visitor_hostel.stay.manage` | Record guest check-in and check-out | `caretaker` |
+| `visitor_hostel.tariff.manage` | Manage visitor categories and tariffs | `vh_in_charge` |
+| `visitor_hostel.meal.manage` | Manage guest meal bookings | `caretaker` |
+| `visitor_hostel.bill.manage` | Generate bills and record offline settlement | `caretaker` |
+| `visitor_hostel.inventory.manage` | Maintain Visitors Hostel inventory | `caretaker` |
+| `visitor_hostel.inventory.approve` | Review replenishment requirements | `vh_in_charge` |
+| `visitor_hostel.report.view_caretaker` | View Caretaker operational reports | `caretaker` |
+| `visitor_hostel.report.view_in_charge` | View VH In-Charge reports | `vh_in_charge` |
+| `visitor_hostel.role.view` | View VH operational role assignments | `caretaker`, `vh_in_charge` |
+| `visitor_hostel.notification.view_self` | View own VHMS notifications | `caretaker`, `indenter`, `vh_in_charge` |

@@ -1,0 +1,1 @@
+"""VHMS transactional write services."""

@@ -1,0 +1,1 @@
+"""Visitors Hostel HTTP API."""

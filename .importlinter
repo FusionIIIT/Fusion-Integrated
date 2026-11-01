@@ -13,6 +13,7 @@ name = Modules may reach each other ONLY through contracts.py
 type = forbidden
 source_modules =
     modules.placement
+    modules.visitors_hostel
     modules.directory
     modules.accesscontrol
 forbidden_modules =
@@ -21,6 +22,11 @@ forbidden_modules =
     modules.placement.selectors
     modules.placement.api
     modules.placement.domain
+    modules.visitors_hostel.models
+    modules.visitors_hostel.services
+    modules.visitors_hostel.selectors
+    modules.visitors_hostel.api
+    modules.visitors_hostel.domain
     modules.directory.models
     modules.directory.services
     modules.directory.api
@@ -38,6 +44,7 @@ type = forbidden
 source_modules =
 # Every module's domain, not just the first one written.
     modules.placement.domain
+    modules.visitors_hostel.domain
 forbidden_modules =
     django
     rest_framework
@@ -66,3 +73,13 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+
+[importlinter:contract:visitors-hostel-layers]
+name = Layering inside visitors_hostel
+type = layers
+layers =
+    modules.visitors_hostel.api
+    modules.visitors_hostel.services
+    modules.visitors_hostel.selectors
+    modules.visitors_hostel.models
+    modules.visitors_hostel.domain
