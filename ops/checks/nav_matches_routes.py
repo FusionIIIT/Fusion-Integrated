@@ -57,7 +57,8 @@ def main() -> int:
                 continue
             nav_paths.add(to[len(base):].lstrip("/"))
 
-        routes = client_routes(name) | EXEMPT_ROUTES
+        # Parameterised routes (`applications/:id`) are reached from a list, not the sidebar.
+        routes = {r for r in client_routes(name) if ":" not in r} | EXEMPT_ROUTES
 
         problems.extend(
             f"{name}: the sidebar links to {base}/{missing} but the client "

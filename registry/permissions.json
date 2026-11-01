@@ -34,6 +34,178 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "patent_management": {
+      "grants": {
+        "faculty": [
+          "patent_management.application.appeal",
+          "patent_management.application.revise",
+          "patent_management.application.submit",
+          "patent_management.application.view_own",
+          "patent_management.application.withdraw",
+          "patent_management.notification.view",
+          "patent_management.report.own"
+        ],
+        "patent_attorney": [
+          "patent_management.application.view_assigned",
+          "patent_management.attorney.respond",
+          "patent_management.notification.view",
+          "patent_management.report.own"
+        ],
+        "patent_director": [
+          "patent_management.appeal.decide",
+          "patent_management.application.view_assigned",
+          "patent_management.budget.decide",
+          "patent_management.notification.view",
+          "patent_management.report.own",
+          "patent_management.report.view",
+          "patent_management.review.decide"
+        ],
+        "pcc_admin": [
+          "patent_management.application.view_all",
+          "patent_management.notification.view",
+          "patent_management.report.view",
+          "patent_management.route.manage"
+        ],
+        "student": [
+          "patent_management.application.appeal",
+          "patent_management.application.revise",
+          "patent_management.application.submit",
+          "patent_management.application.view_own",
+          "patent_management.application.withdraw",
+          "patent_management.notification.view",
+          "patent_management.report.own"
+        ]
+      },
+      "module_grants": [
+        "faculty",
+        "patent_attorney",
+        "patent_director",
+        "pcc_admin",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/patents",
+        "icon": "FaFileSignature",
+        "items": [
+          {
+            "code": "patents.new",
+            "icon": "FaFileSignature",
+            "label": "New Application",
+            "required_permission": "patent_management.application.submit",
+            "sort_order": 10,
+            "to": "/patents/new"
+          },
+          {
+            "code": "patents.mine",
+            "icon": "FaClipboardList",
+            "label": "My Applications",
+            "required_permission": "patent_management.application.view_own",
+            "sort_order": 20,
+            "to": "/patents/mine"
+          },
+          {
+            "code": "patents.queue",
+            "icon": "FaUserCheck",
+            "label": "My Assignments",
+            "required_permission": "patent_management.application.view_assigned",
+            "sort_order": 30,
+            "to": "/patents/queue"
+          },
+          {
+            "code": "patents.all",
+            "icon": "FaLayerGroup",
+            "label": "All Applications",
+            "required_permission": "patent_management.application.view_all",
+            "sort_order": 40,
+            "to": "/patents/applications"
+          },
+          {
+            "code": "patents.reports",
+            "icon": "FaChartBar",
+            "label": "Reports",
+            "required_permission": "patent_management.report.own",
+            "sort_order": 50,
+            "to": "/patents/reports"
+          },
+          {
+            "code": "patents.notifications",
+            "icon": "FaBullhorn",
+            "label": "Notifications",
+            "required_permission": "patent_management.notification.view",
+            "sort_order": 60,
+            "to": "/patents/notifications"
+          }
+        ],
+        "label": "Patent Management",
+        "nav_section": "Patents",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "patent_management.application.submit",
+          "label": "Submit a patent application"
+        },
+        {
+          "code": "patent_management.application.view_own",
+          "label": "See one's own applications"
+        },
+        {
+          "code": "patent_management.application.view_assigned",
+          "label": "See applications assigned as Director or Attorney"
+        },
+        {
+          "code": "patent_management.application.view_all",
+          "label": "See every application (PCC_ADMIN)"
+        },
+        {
+          "code": "patent_management.application.revise",
+          "label": "Revise and resubmit"
+        },
+        {
+          "code": "patent_management.application.withdraw",
+          "label": "Withdraw before filing"
+        },
+        {
+          "code": "patent_management.application.appeal",
+          "label": "File an appeal against a rejection"
+        },
+        {
+          "code": "patent_management.route.manage",
+          "label": "Assign Directors and Attorneys"
+        },
+        {
+          "code": "patent_management.review.decide",
+          "label": "Decide Approve, Reject or Needs Revision"
+        },
+        {
+          "code": "patent_management.appeal.decide",
+          "label": "Decide an appeal"
+        },
+        {
+          "code": "patent_management.attorney.respond",
+          "label": "Accept assignment, record opinion, budget, filing"
+        },
+        {
+          "code": "patent_management.budget.decide",
+          "label": "Approve or reject a budget"
+        },
+        {
+          "code": "patent_management.report.own",
+          "label": "See one's own application report"
+        },
+        {
+          "code": "patent_management.report.view",
+          "label": "See system-wide PMS reports"
+        },
+        {
+          "code": "patent_management.notification.view",
+          "label": "See one's own notifications"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
