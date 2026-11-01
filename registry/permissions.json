@@ -278,6 +278,80 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "mms": {
+      "grants": {
+        "student": [
+          "mms.registration.view_self",
+          "mms.registration.create"
+        ],
+        "mess_caretaker": [
+          "mms.registration.view",
+          "mms.registration.review"
+        ],
+        "mess_warden": [
+          "mms.registration.view"
+        ]
+      },
+      "module_grants": [
+        "student",
+        "mess_caretaker",
+        "mess_warden"
+      ],
+      "nav": {
+        "base_path": "/mms",
+        "icon": "FaUtensils",
+        "items": [
+          {
+            "code": "mms.my-registration",
+            "icon": "FaClipboardList",
+            "label": "My Registration",
+            "required_permission": "mms.registration.view_self",
+            "sort_order": 10,
+            "to": "/mms/my-registration"
+          },
+          {
+            "code": "mms.registrations",
+            "icon": "FaInbox",
+            "label": "Registration Requests",
+            "required_permission": "mms.registration.review",
+            "sort_order": 20,
+            "to": "/mms/registrations"
+          },
+          {
+            "code": "mms.overview",
+            "icon": "FaChartBar",
+            "label": "Overview",
+            "required_permission": "mms.registration.view",
+            "sort_order": 30,
+            "to": "/mms/overview"
+          }
+        ],
+        "label": "Mess Management",
+        "nav_section": "Campus",
+        "sort_order": 200,
+        "status": "planned"
+      },
+      "permissions": [
+        {
+          "code": "mms.registration.view_self",
+          "label": "View own mess registration and history"
+        },
+        {
+          "code": "mms.registration.create",
+          "label": "Submit a mess registration request"
+        },
+        {
+          "code": "mms.registration.view",
+          "label": "View all registration requests (warden scope)"
+        },
+        {
+          "code": "mms.registration.review",
+          "label": "Approve or reject registration requests"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
     }
   },
   "publisher": "integrated",
