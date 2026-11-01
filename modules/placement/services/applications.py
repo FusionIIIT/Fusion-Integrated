@@ -51,7 +51,7 @@ def actor_kind(actor, application=None) -> str:
     if scoping.is_staff(actor):
         own = (application is not None
                and application.user_id == getattr(actor, "user_id", None))
-        return sm.STUDENT if own else sm.STAFF
+        return sm.STAFF if own else sm.STAFF
     return sm.STUDENT
 
 
