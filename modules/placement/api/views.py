@@ -202,7 +202,7 @@ class ApplicationListView(_Scoped, generics.ListAPIView):
     def get_serializer_class(self):
         if getattr(_actor(self.request), "kind", None) == "recruiter":
             return s.ApplicantSerializer
-        return s.ApplicationSerializer
+        return s.ApplicationSerializer     # the documented default
 
     serializer_class = s.ApplicationSerializer     # the documented default
 
@@ -659,3 +659,44 @@ class RecruiterMeView(_Scoped, APIView):
                         "approval_status": account.company.approval_status},
             "modules": list(actor.modules),
         })
+
+
+# -- Placement Records ---------------------------------------------------------
+class PlacementRecordUpdateView(_Scoped, generics.UpdateAPIView):
+    serializer_class = s.PlacementRecordUpdateSerializer
+    permission_classes = [HasPermission("placement.manage_records"), HasPermission("tpo_admin")]
+
+    def get_queryset(self):
+        return scoping.placement_records_for(_actor(self.request))
+
+    def update(self, request, *args, **kwargs):
+        actor = _actor(request)
+        payload = s.PlacementRecordUpdateSerializer(data=request.data, partial=True)
+        payload.is_valid(raise_exception=True)
+        data = dict(payload.validated_data)
+
+        record = self.get_object()
+        old_values = {
+            "ctc_lpa": record.ctc_lpa,
+            "verified_by_user_id": record.verified_by_user_id,
+            "is_accepted": record.is_accepted
+        }
+
+        record.ctc_lpa = data.get("ctc_lpa", record.ctc_lpa)
+        record.verified_by_user_id = data.get("verified_by_user_id", record.verified_by_user_id)
+        record.is_accepted = data.get("is_accepted", record.is_accepted)
+
+        record.save()
+
+        new_values = {
+            "ctc_lpa": record.ctc_lpa,
+            "verified_by_user_id": record.verified_by_user_id,
+            "is_accepted": record.is_accepted
+        }
+
+        # Log the modification
+        import structlog
+        logger = structlog.get_logger('placement.audit')
+        logger.info('placement_record.updated', actor_id=getattr(actor, 'user_id', None), record_id=record.pk, old=old_values, new=new_values)
+
+        return Response(s.PlacementRecordSerializer(record).data)

@@ -188,7 +188,6 @@ def placement_records_for(actor) -> QuerySet[PlacementRecord]:
     return base.filter(user_id=own) if own is not None else base.none()
 
 
-# -- Announcements -------------------------------------------------------------
 def announcements_for(actor) -> QuerySet[Announcement]:
     """History is kept (PC-BR-018), but a withdrawn notice is staff-only so
     nobody acts on a retracted one."""
@@ -204,3 +203,19 @@ def announcements_for(actor) -> QuerySet[Announcement]:
     if _is_alumni(actor):
         return visible.filter(audience__in=("alumni", "all"))
     return visible.filter(audience__in=("students", "registered", "all"))
+
+
+# -- New function to scope applications queryset
+def scope_applications_queryset(qs: QuerySet[Application], user, user_roles: list[str], company_id: int | None = None) -> QuerySet[Application]:
+    if 'tpo_admin' in user_roles or 'placement_chairman' in user_roles:
+        return qs.all()
+    elif 'recruiter' in user_roles:
+        if company_id is None:
+            return qs.none()
+        return qs.filter(posting__company_id=company_id)
+    elif 'student' in user_roles:
+        return qs.filter(user_id=user.id)
+    elif 'alumni' in user_roles:
+        return qs.none()
+    else:
+        return qs.none()

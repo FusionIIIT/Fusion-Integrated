@@ -713,3 +713,15 @@ class StudentConductIncidentSerializer(serializers.ModelSerializer):
         model = ConductIncident
         fields = ("id", "kind", "note", "waived", "waived_reason", "created_at")
         read_only_fields = fields
+
+
+# -- New Serializer --------------------------------------------------------------
+class PlacementRecordUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlacementRecord
+        fields = ('id', 'ctc_lpa', 'verified_by_user_id', 'is_accepted')
+        extra_kwargs = {
+            'ctc_lpa': {'required': False},
+            'verified_by_user_id': {'required': False},
+            'is_accepted': {'required': False},
+        }

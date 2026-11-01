@@ -200,3 +200,22 @@ def failure_reasons(outcome: Outcome) -> list[dict]:
          "actual": o.actual, "message": describe(o)}
         for o in outcome.outcomes if not o.passed
     ]
+
+
+def evaluate_student_eligibility(student_facts: dict, posting_criteria: dict) -> tuple[bool, list[str]]:
+    if student_facts.get("is_debarred"):
+        return False, ["Student is debarred"]
+    
+    min_cpi = posting_criteria.get("min_cpi", 0)
+    if student_facts.get("cpi") < min_cpi:
+        return False, ["CPI below cutoff"]
+    
+    eligible_branches = posting_criteria.get("eligible_branches", [])
+    if student_facts.get("discipline") not in eligible_branches:
+        return False, ["Branch not eligible"]
+    
+    max_backlogs = posting_criteria.get("max_backlogs", 0)
+    if student_facts.get("active_backlogs") > max_backlogs:
+        return False, ["Active backlogs present"]
+    
+    return True, []
