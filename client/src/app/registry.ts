@@ -12,6 +12,12 @@ export interface ModuleManifest {
 }
 
 export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
+  gymkhana: {
+    code: "gymkhana",
+    basePath: "/gymkhana",
+    load: () => import("../modules/gymkhana/routes"),
+  },
+
   placement_cell: {
     code: "placement_cell",
     basePath: "/placement",
