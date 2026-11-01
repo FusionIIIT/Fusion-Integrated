@@ -19,6 +19,10 @@ WITHDRAWN = "withdrawn"
 DRAFT = "draft"
 AUTO_WITHDRAWN = "auto_withdrawn"
 
+# Define missing constants
+UNDER_REVIEW = "under_review"
+SELECTED = "selected"
+
 TERMINAL = frozenset({REJECTED, OFFER_ACCEPTED, OFFER_DECLINED})
 IN_FLIGHT = frozenset({APPLIED, SHORTLISTED, INTERVIEW_SCHEDULED, OFFER_EXTENDED})
 
