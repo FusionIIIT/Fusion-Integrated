@@ -1,4 +1,4 @@
-"""Role scope, decided in one place (PC-UC-018).
+"""Role scope, decided in one place (PC-BR-022 / PC-AFR-061).
 
 Every list and detail view starts from a queryset built here. Ownership is
 enforced by narrowing the queryset, never by fetching a row and then checking
@@ -10,6 +10,7 @@ exists, which for placement data is itself a disclosure.
     PC-BR-016  students get anonymised aggregates, not raw records
     PC-BR-019  alumni get a narrow read-only slice
     PC-BR-020  alumni are excluded from active workflow objects
+    PC-BR-022  role-restricted placement actions and data access
     PC-BR-023  sensitive data is restricted to authorised readers
 """
 from __future__ import annotations
@@ -190,7 +191,7 @@ def placement_records_for(actor) -> QuerySet[PlacementRecord]:
 
 # -- Announcements -------------------------------------------------------------
 def announcements_for(actor) -> QuerySet[Announcement]:
-    """History is kept (PC-BR-018), but a withdrawn notice is staff-only so
+    """History is kept (PC-AFR-043), but a withdrawn notice is staff-only so
     nobody acts on a retracted one."""
     base = Announcement.objects.all()
 

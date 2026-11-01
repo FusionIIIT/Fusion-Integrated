@@ -6,6 +6,7 @@ nothing runs, and the only symptom is work quietly not happening.
 import pytest
 
 from config.celery import app
+import modules.placement.tasks  # noqa: F401 — registers shared tasks with celery
 from modules.placement.schedule import BEAT_SCHEDULE
 
 

@@ -45,6 +45,8 @@ urlpatterns = [
 
     # companies
     path("companies", v.CompanyListView.as_view(), name="placement-companies"),
+    path("companies/register", v.CompanySelfRegisterView.as_view(),
+         name="placement-company-self-register"),
     path("companies/<int:pk>/<str:action>", v.CompanyApprovalView.as_view(),
          name="placement-company-approval"),
 
@@ -98,6 +100,8 @@ urlpatterns = [
          name="placement-outstanding-letters"),
     path("records/off-campus", cl.OffCampusRecordView.as_view(),
          name="placement-off-campus-record"),
+    path("records/<int:pk>", cl.PlacementRecordDetailView.as_view(),
+         name="placement-record-detail"),
 
     # conduct and sanctions (rules 18, 19, 21)
     path("conduct/incidents", c.IncidentListView.as_view(),

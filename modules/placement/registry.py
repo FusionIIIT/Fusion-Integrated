@@ -53,6 +53,9 @@ NAV_ITEMS = [
     {"code": "placement.reports", "label": "Reports",
      "icon": "ChartBar", "to": "/placement/reports",
      "required_permission": "placement_cell.report.view", "sort_order": 90},
+    {"code": "placement.alumni", "label": "Mentorship & Networking",
+     "icon": "Megaphone", "to": "/placement/announcements",
+     "required_permission": "placement_cell.alumni.view", "sort_order": 95},
 ]
 
 #: Every permission this module recognises; ROLE_GRANTS below says who holds each.
@@ -83,6 +86,8 @@ PERMISSIONS = [
      "Record off-campus placements and chase offer letters"),
     ("placement_cell.academic_directory.view",
      "Browse every student's declared CPI"),
+    ("placement_cell.alumni.view",
+     "Restricted read-only access to announcements and networking companies"),
 ]
 
 #: Performed by a service or a scheduled task, so no designation holds them.
@@ -98,6 +103,10 @@ _STUDENT = [
     "placement_cell.application.create",
     "placement_cell.application.delete",
     "placement_cell.offer.respond",
+]
+
+_ALUMNI = [
+    "placement_cell.alumni.view",
 ]
 
 _COORDINATOR = [
@@ -133,8 +142,10 @@ _CHAIRMAN = [
 #: Keyed by the designation name as it exists in globals_designation.
 ROLE_GRANTS = {
     "student": _STUDENT,
+    "alumni": _ALUMNI,
     "placement_coordinator": _COORDINATOR,
     "placement_officer": _OFFICER,
     "placement_chairman": _CHAIRMAN,
     "Dean Academic": _CHAIRMAN,
 }
+

@@ -463,6 +463,9 @@ class StaffStatsSerializer(serializers.Serializer):
     max_ctc = serializers.CharField(required=False, allow_null=True)
     by_company = serializers.JSONField(required=False)
     applications_by_status = serializers.JSONField(required=False)
+    salary_distribution = serializers.JSONField(required=False)
+    company_participation_trend = serializers.JSONField(required=False)
+    employment_trend = serializers.JSONField(required=False)
 
 
 class RecruiterInviteResultSerializer(serializers.Serializer):
@@ -612,17 +615,28 @@ class PlacementRecordDetailSerializer(serializers.ModelSerializer):
 
     company = CompanyBriefSerializer(read_only=True)
     offer_letter_submitted = serializers.SerializerMethodField()
+    season = serializers.CharField(source="policy.season", read_only=True)
 
     class Meta:
         model = PlacementRecord
-        fields = ("id", "company", "source", "kind", "ctc_lpa",
-                  "offer_letter_submitted", "offer_letter_submitted_at",
+        fields = ("id", "user_id", "season", "company", "source", "kind", "ctc_lpa",
+                  "is_active", "offer_letter_submitted", "offer_letter_submitted_at",
                   "not_joining_declared_at", "not_joining_reason",
                   "not_joining_was_late", "created_at")
         read_only_fields = fields
 
     def get_offer_letter_submitted(self, obj) -> bool:
         return obj.offer_letter_id is not None
+
+
+class UpdatePlacementRecordSerializer(serializers.Serializer):
+    """PC-UC-010, PC-BR-029, PC-AFR-031, PC-AFR-032. TPO updates to a record."""
+
+    ctc_lpa = serializers.DecimalField(max_digits=8, decimal_places=2,
+                                       required=False, allow_null=True)
+    company_id = serializers.IntegerField(required=False)
+    kind = serializers.CharField(max_length=12, required=False)
+    is_active = serializers.BooleanField(required=False)
 
 
 class ClearanceSerializer(serializers.Serializer):
@@ -684,7 +698,7 @@ class BulkResultSerializer(serializers.Serializer):
     results = BulkOutcomeSerializer(many=True)
 
 
-# -- Audit trail (PC-BR-008) ---------------------------------------------------
+# -- Audit trail (PC-AFR-009) ---------------------------------------------------
 class TransitionEntrySerializer(serializers.Serializer):
     """`reason` and the actor ids are absent for a non-staff reader — see
     api/audit.py for why."""
