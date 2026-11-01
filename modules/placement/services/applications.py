@@ -363,7 +363,7 @@ def submit_application(user_id: int, posting_id: int, facts: Dict[str, Any]) -> 
     if posting is None:
         raise NotFoundError("No such posting.")
     if posting.status != "published" or (posting.closes_at and timezone.now() > posting.closes_at):
-        raise ValidationError("The posting is not open for applications.")
+        raise ValidationError('The application window has closed.')
 
     policy = PlacementPolicy.objects.filter(season=posting.placement_year).first()
     if policy is None:
@@ -371,7 +371,7 @@ def submit_application(user_id: int, posting_id: int, facts: Dict[str, Any]) -> 
             f"No placement policy is configured for {posting.placement_year}.",
             code="policy_missing")
 
-    eligibility, error = evaluate_student_eligibility(facts, posting.criteria)
+    eligibility, error = evaluate_student_eligibility(facts, posting.eligibility_rule)
     if not eligibility:
         raise ValidationError(error)
 
@@ -389,7 +389,7 @@ def submit_application(user_id: int, posting_id: int, facts: Dict[str, Any]) -> 
     transition(application_id=application.pk, to_status=sm.SUBMITTED, actor=None)
 
     notifications.enqueue(
-        event='application_submitted', user_id=user_id, context={'posting': posting.title}
+        event='application_submitted', recipient_user_id=user_id, payload={'posting_id': posting_id, 'title': posting.title}
     )
 
     return application
