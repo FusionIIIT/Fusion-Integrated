@@ -1,14 +1,5 @@
 # Ollama Prompt Pack — ELM Phase 2 (Fusion-Integrated)
 
-Sequential prompts P1→P6 for a local Ollama model. Run them **one per message, in order**.
-Between every prompt: run the Verification line yourself in the repo, then paste either
-`OK` or the full error output back to the model.
-
-**Setup**
-```bash
-cd /home/atharva/Documents/Fusion/Fusion-Integrated
-ollama run qwen2.5-coder:7b     # or whichever coding model you have
-```
 If a step fails twice, start a FRESH Ollama session with just that step's prompt
 (every prompt below is self-contained on purpose — small models lose context fast).
 
