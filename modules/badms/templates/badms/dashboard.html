@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fusion ERP — Backup & Database Archive Management System (BADMS)</title>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-hover: #1e40af;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --success: #15803d;
+      --success-bg: #dcfce7;
+      --warning: #b45309;
+      --warning-bg: #fef3c7;
+      --danger: #b91c1c;
+      --danger-bg: #fee2e2;
+      --info: #0369a1;
+      --info-bg: #e0f2fe;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 24px;
+    }
+    .header {
+      background: var(--card-bg);
+      padding: 20px 24px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 20px;
+      color: var(--primary);
+    }
+    .header .meta {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .card h2 {
+      font-size: 16px;
+      margin-top: 0;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      color: var(--primary);
+    }
+    .progress-bar-container {
+      background: #e2e8f0;
+      border-radius: 999px;
+      height: 12px;
+      width: 100%;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+    .progress-bar {
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.3s ease;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-success { background: var(--success-bg); color: var(--success); }
+    .badge-warning { background: var(--warning-bg); color: var(--warning); }
+    .badge-danger { background: var(--danger-bg); color: var(--danger); }
+    .badge-info { background: var(--info-bg); color: var(--info); }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      text-align: left;
+    }
+    th {
+      background: #f1f5f9;
+      font-weight: 600;
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text-muted);
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover {
+      background: var(--primary-hover);
+    }
+    .button-secondary {
+      background: #64748b;
+    }
+    .button-secondary:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <h1>Backup & Database Archive Management System (BADMS)</h1>
+      <div class="meta">Fusion ERP Integrated Module | Module ID: 24 | Standard Synchronized Baseline</div>
+    </div>
+    <div>
+      <span class="badge badge-info">AES-256 Enabled</span>
+      <span class="badge badge-success">SLA: 5m Alerting</span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- Card 1: Storage Quota -->
+    <div class="card">
+      <h2>My Storage Quota (BR-BA-016, BA-UC-022)</h2>
+      <div style="display: flex; justify-content: space-between; font-size: 13px;">
+        <span>Usage: <strong>{{ storage_quota.used_storage_mb|default:"120.0" }} MB</strong></span>
+        <span>Allocated: <strong>{{ storage_quota.allocated_storage_mb|default:"1024.0" }} MB</strong></span>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" style="width: 12%;"></div>
+      </div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+        Warning Threshold: 80% (Extension request permitted above threshold).
+      </div>
+      <div style="margin-top: 14px;">
+        <button type="button" class="button-secondary" onclick="document.getElementById('extModal').style.display='block'">
+          Request Quota Extension
+        </button>
+      </div>
+    </div>
+
+    <!-- Card 2: Backup Operations -->
+    <div class="card">
+      <h2>Database Backup Status (BR-BA-001, BR-BA-014)</h2>
+      <div style="font-size: 13px; line-height: 1.8;">
+        <div>Status: <span class="badge badge-success">ACTIVE / HEALTHY</span></div>
+        <div>Last Snapshot: <strong>{{ latest_backup.completed_at|default:"2026-11-01 22:00 UTC" }}</strong></div>
+        <div>Checksum (SHA-256): <code style="font-size: 10px;">{{ latest_backup.checksum_sha256|default:"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" }}</code></div>
+      </div>
+      <div style="margin-top: 14px;">
+        <button type="button" onclick="triggerManualBackup()">
+          Trigger Manual Snapshot
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Archival Request Submission -->
+  <div class="card" style="margin-bottom: 24px;">
+    <h2>Submit Secure Archival Request (BA-UC-002, CW-BA-01)</h2>
+    <form id="archivalForm" onsubmit="event.preventDefault(); submitArchival();">
+      <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 14px;">
+        <div class="form-group">
+          <label>File / Dataset Name</label>
+          <input type="text" id="fileName" placeholder="e.g. FY2025_Academic_Records.zip" required>
+        </div>
+        <div class="form-group">
+          <label>File Size (MB)</label>
+          <input type="number" id="fileSizeMb" value="15.5" step="0.1" required>
+        </div>
+        <div class="form-group">
+          <label>Initial Classification (Default: Routine)</label>
+          <select id="initialClassification">
+            <option value="ROUTINE" selected>Routine (Default)</option>
+            <option value="SENSITIVE">Sensitive (Requires AES-256)</option>
+            <option value="CRITICAL">Critical</option>
+            <option value="ARCHIVAL">Archival</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Archival Justification / Purpose</label>
+        <textarea id="reason" rows="2" placeholder="State reason for long-term retention..."></textarea>
+      </div>
+      <button type="submit">Submit for HoD Review</button>
+    </form>
+  </div>
+
+  <!-- Recent Archival Records -->
+  <div class="card">
+    <h2>Active Archival & Restoration Ledgers</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Request No</th>
+          <th>File Name</th>
+          <th>Size</th>
+          <th>Department</th>
+          <th>Initial Class</th>
+          <th>Authoritative Class</th>
+          <th>Status</th>
+          <th>Retention</th>
+        </tr>
+      </thead>
+      <tbody id="archivalTableBody">
+        <tr>
+          <td><strong>AR-20261101-9B3E12</strong></td>
+          <td>CSE_Curriculum_Evaluation_2026.pdf</td>
+          <td>18.4 MB</td>
+          <td>CSE</td>
+          <td>ROUTINE</td>
+          <td><span class="badge badge-warning">SENSITIVE</span></td>
+          <td><span class="badge badge-success">SENSITIVE_ARCHIVE_ENCRYPTED</span></td>
+          <td>10 Years (AES-256)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    async function triggerManualBackup() {
+      try {
+        const res = await fetch('/api/v1/badms/backups/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-User-Role': 'sysadmin' },
+          body: JSON.stringify({ dataset_name: 'primary_db' })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert('Manual backup successfully initiated! Checksum: ' + data.checksum_sha256);
+        } else {
+          alert('Error: ' + data.error);
+        }
+      } catch (err) {
+        alert('Network error triggering backup.');
+      }
+    }
+
+    async function submitArchival() {
+      const payload = {
+        file_name: document.getElementById('fileName').value,
+        file_size_mb: parseFloat(document.getElementById('fileSizeMb').value),
+        initial_classification: document.getElementById('initialClassification').value,
+        reason: document.getElementById('reason').value,
+      };
+      try {
+        const res = await fetch('/api/v1/badms/archival/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert('Secure archival request submitted: ' + data.request_number);
+          location.reload();
+        } else {
+          alert('Validation error: ' + data.error);
+        }
+      } catch (err) {
+        alert('Network error submitting request.');
+      }
+    }
+  </script>
+</body>
+</html>
