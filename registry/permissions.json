@@ -34,6 +34,316 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "hr_eis": {
+      "grants": {
+        "accountant": [
+          "hr_eis.cpda.settle",
+          "hr_eis.ltc.settle",
+          "hr_eis.notification.view_self",
+          "hr_eis.service_record.view_self"
+        ],
+        "director": [
+          "hr_eis.appraisal.finalize",
+          "hr_eis.appraisal.review",
+          "hr_eis.appraisal.submit",
+          "hr_eis.appraisal.view_self",
+          "hr_eis.cpda.apply",
+          "hr_eis.cpda.approve",
+          "hr_eis.cpda.view_self",
+          "hr_eis.leave.apply",
+          "hr_eis.leave.review",
+          "hr_eis.leave.view_self",
+          "hr_eis.ltc.apply",
+          "hr_eis.ltc.approve",
+          "hr_eis.ltc.view_self",
+          "hr_eis.notification.view_self",
+          "hr_eis.service_record.view_self"
+        ],
+        "faculty": [
+          "hr_eis.appraisal.submit",
+          "hr_eis.appraisal.view_self",
+          "hr_eis.cpda.apply",
+          "hr_eis.cpda.view_self",
+          "hr_eis.leave.apply",
+          "hr_eis.leave.view_self",
+          "hr_eis.ltc.apply",
+          "hr_eis.ltc.view_self",
+          "hr_eis.notification.view_self",
+          "hr_eis.service_record.view_self"
+        ],
+        "hod": [
+          "hr_eis.appraisal.review",
+          "hr_eis.appraisal.submit",
+          "hr_eis.appraisal.view_self",
+          "hr_eis.cpda.apply",
+          "hr_eis.cpda.approve",
+          "hr_eis.cpda.view_self",
+          "hr_eis.leave.apply",
+          "hr_eis.leave.review",
+          "hr_eis.leave.view_self",
+          "hr_eis.ltc.apply",
+          "hr_eis.ltc.approve",
+          "hr_eis.ltc.view_self",
+          "hr_eis.notification.view_self",
+          "hr_eis.service_record.view_self"
+        ],
+        "hr_admin": [
+          "hr_eis.appraisal.assign_reviewer",
+          "hr_eis.audit.view",
+          "hr_eis.cpda.verify",
+          "hr_eis.ltc.verify",
+          "hr_eis.notification.view_self",
+          "hr_eis.service_record.manage",
+          "hr_eis.service_record.view_all",
+          "hr_eis.service_record.view_self",
+          "hr_eis.workflow.configure"
+        ],
+        "registrar": [
+          "hr_eis.appraisal.finalize",
+          "hr_eis.appraisal.review",
+          "hr_eis.appraisal.submit",
+          "hr_eis.appraisal.view_self",
+          "hr_eis.cpda.apply",
+          "hr_eis.cpda.approve",
+          "hr_eis.cpda.view_self",
+          "hr_eis.leave.apply",
+          "hr_eis.leave.review",
+          "hr_eis.leave.view_self",
+          "hr_eis.ltc.apply",
+          "hr_eis.ltc.approve",
+          "hr_eis.ltc.view_self",
+          "hr_eis.notification.view_self",
+          "hr_eis.service_record.view_self"
+        ],
+        "staff": [
+          "hr_eis.appraisal.submit",
+          "hr_eis.appraisal.view_self",
+          "hr_eis.cpda.apply",
+          "hr_eis.cpda.view_self",
+          "hr_eis.leave.apply",
+          "hr_eis.leave.view_self",
+          "hr_eis.ltc.apply",
+          "hr_eis.ltc.view_self",
+          "hr_eis.notification.view_self",
+          "hr_eis.service_record.view_self"
+        ]
+      },
+      "module_grants": [
+        "accountant",
+        "director",
+        "faculty",
+        "hod",
+        "hr_admin",
+        "registrar",
+        "staff"
+      ],
+      "nav": {
+        "base_path": "/hr",
+        "icon": "Users",
+        "items": [
+          {
+            "code": "hreis.overview",
+            "icon": "Gauge",
+            "label": "HR Overview",
+            "required_permission": "hr_eis.service_record.view_self",
+            "sort_order": 5,
+            "to": "/hr/overview"
+          },
+          {
+            "code": "hreis.service_record",
+            "icon": "IdCard",
+            "label": "My Service Record",
+            "required_permission": "hr_eis.service_record.view_self",
+            "sort_order": 10,
+            "to": "/hr/service-record"
+          },
+          {
+            "code": "hreis.leaves",
+            "icon": "CalendarTime",
+            "label": "Leave Management",
+            "required_permission": "hr_eis.leave.apply",
+            "sort_order": 20,
+            "to": "/hr/leaves"
+          },
+          {
+            "code": "hreis.appraisals",
+            "icon": "FileCertificate",
+            "label": "Annual Appraisals",
+            "required_permission": "hr_eis.appraisal.submit",
+            "sort_order": 30,
+            "to": "/hr/appraisals"
+          },
+          {
+            "code": "hreis.ltc",
+            "icon": "PlaneDeparture",
+            "label": "LTC Claims",
+            "required_permission": "hr_eis.ltc.apply",
+            "sort_order": 40,
+            "to": "/hr/ltc"
+          },
+          {
+            "code": "hreis.cpda",
+            "icon": "Coins",
+            "label": "CPDA Allowance",
+            "required_permission": "hr_eis.cpda.apply",
+            "sort_order": 50,
+            "to": "/hr/cpda"
+          },
+          {
+            "code": "hreis.approvals",
+            "icon": "Checks",
+            "label": "Pending Approvals",
+            "required_permission": "hr_eis.leave.review",
+            "sort_order": 60,
+            "to": "/hr/approvals"
+          },
+          {
+            "code": "hreis.verification",
+            "icon": "FileCheck",
+            "label": "HR Verification",
+            "required_permission": "hr_eis.ltc.verify",
+            "sort_order": 70,
+            "to": "/hr/verification"
+          },
+          {
+            "code": "hreis.appraisal_admin",
+            "icon": "UserCheck",
+            "label": "Appraisal Reviewers",
+            "required_permission": "hr_eis.appraisal.assign_reviewer",
+            "sort_order": 75,
+            "to": "/hr/appraisal-admin"
+          },
+          {
+            "code": "hreis.admin_settings",
+            "icon": "Settings",
+            "label": "HR Administration",
+            "required_permission": "hr_eis.service_record.manage",
+            "sort_order": 80,
+            "to": "/hr/admin"
+          },
+          {
+            "code": "hreis.audit",
+            "icon": "ShieldCheck",
+            "label": "Audit & Compliance",
+            "required_permission": "hr_eis.audit.view",
+            "sort_order": 85,
+            "to": "/hr/audit"
+          },
+          {
+            "code": "hreis.settlement",
+            "icon": "Receipt",
+            "label": "Claim Settlements",
+            "required_permission": "hr_eis.ltc.settle",
+            "sort_order": 90,
+            "to": "/hr/settlement"
+          }
+        ],
+        "label": "Human Resources",
+        "nav_section": "Administration",
+        "sort_order": 15,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "hr_eis.service_record.view_self",
+          "label": "View own employee service record"
+        },
+        {
+          "code": "hr_eis.service_record.manage",
+          "label": "Create and update employee service records"
+        },
+        {
+          "code": "hr_eis.service_record.view_all",
+          "label": "View all employee service records"
+        },
+        {
+          "code": "hr_eis.leave.apply",
+          "label": "Submit leave requests"
+        },
+        {
+          "code": "hr_eis.leave.view_self",
+          "label": "View own leave requests"
+        },
+        {
+          "code": "hr_eis.leave.review",
+          "label": "Review, approve, reject, or forward leave requests"
+        },
+        {
+          "code": "hr_eis.appraisal.submit",
+          "label": "Submit annual appraisal form"
+        },
+        {
+          "code": "hr_eis.appraisal.view_self",
+          "label": "View own appraisal submissions"
+        },
+        {
+          "code": "hr_eis.appraisal.assign_reviewer",
+          "label": "Assign reviewers to annual appraisals"
+        },
+        {
+          "code": "hr_eis.appraisal.review",
+          "label": "Review and score assigned annual appraisals"
+        },
+        {
+          "code": "hr_eis.appraisal.finalize",
+          "label": "Finalize and close annual appraisals"
+        },
+        {
+          "code": "hr_eis.ltc.apply",
+          "label": "Submit LTC advance or reimbursement requests"
+        },
+        {
+          "code": "hr_eis.ltc.view_self",
+          "label": "View own LTC requests"
+        },
+        {
+          "code": "hr_eis.ltc.verify",
+          "label": "Verify LTC claim eligibility and documents"
+        },
+        {
+          "code": "hr_eis.ltc.approve",
+          "label": "Approve, reject, or forward LTC requests"
+        },
+        {
+          "code": "hr_eis.ltc.settle",
+          "label": "Record financial settlement for approved LTC claims"
+        },
+        {
+          "code": "hr_eis.cpda.apply",
+          "label": "Submit CPDA advance or reimbursement requests"
+        },
+        {
+          "code": "hr_eis.cpda.view_self",
+          "label": "View own CPDA requests"
+        },
+        {
+          "code": "hr_eis.cpda.verify",
+          "label": "Verify CPDA claim eligibility and documents"
+        },
+        {
+          "code": "hr_eis.cpda.approve",
+          "label": "Approve, reject, or forward CPDA requests"
+        },
+        {
+          "code": "hr_eis.cpda.settle",
+          "label": "Record financial disbursement for approved CPDA claims"
+        },
+        {
+          "code": "hr_eis.workflow.configure",
+          "label": "Configure HR-EIS workflow policies and submission windows"
+        },
+        {
+          "code": "hr_eis.audit.view",
+          "label": "View immutable audit logs and compliance records"
+        },
+        {
+          "code": "hr_eis.notification.view_self",
+          "label": "Receive and view HR-EIS notifications"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
