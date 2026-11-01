@@ -38,3 +38,15 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `rspc`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `rspc.proposal.submit` | Submit a research project proposal | `Faculty` |
+| `rspc.proposal.view_self` | View own proposals | `Faculty` |
+| `rspc.proposal.recommend` | Recommend a proposal from the department | `HoD` |
+| `rspc.proposal.verify` | Verify a department-recommended proposal | `RSPC Admin` |
+| `rspc.proposal.decide` | Decide an admin-verified proposal | `Dean-RSPC` |
+| `rspc.proposal.authorize` | Authorize a proposal forwarded to Director | `Director` |
+| `rspc.proposal.view_queue` | View the review queue | `Dean-RSPC`, `Director`, `HoD`, `RSPC Admin` |
