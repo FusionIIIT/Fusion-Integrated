@@ -1,5 +1,163 @@
 {
   "modules": {
+    "department": {
+      "grants": {
+        "Dean Academic": [
+          "department.allocation.view",
+          "department.announcement.view",
+          "department.seminar.view",
+          "department.seminar.view_all"
+        ],
+        "HOD": [
+          "department.allocation.manage",
+          "department.allocation.view",
+          "department.announcement.publish",
+          "department.announcement.view",
+          "department.seminar.request",
+          "department.seminar.schedule",
+          "department.seminar.view",
+          "department.seminar.view_all",
+          "department.seminar.view_self"
+        ],
+        "acadadmin": [
+          "department.allocation.view",
+          "department.announcement.view",
+          "department.seminar.view",
+          "department.seminar.view_all"
+        ],
+        "department_admin": [
+          "department.allocation.manage",
+          "department.allocation.view",
+          "department.announcement.publish",
+          "department.announcement.view",
+          "department.seminar.request",
+          "department.seminar.schedule",
+          "department.seminar.view",
+          "department.seminar.view_all",
+          "department.seminar.view_self"
+        ],
+        "faculty": [
+          "department.allocation.view",
+          "department.announcement.view",
+          "department.seminar.view"
+        ],
+        "student": [
+          "department.allocation.view",
+          "department.announcement.view",
+          "department.seminar.request",
+          "department.seminar.view",
+          "department.seminar.view_self"
+        ]
+      },
+      "module_grants": [
+        "Dean Academic",
+        "HOD",
+        "acadadmin",
+        "department_admin",
+        "faculty",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/department",
+        "icon": "Building",
+        "items": [
+          {
+            "code": "department.seminar_request",
+            "icon": "FaGraduationCap",
+            "label": "Request Seminar",
+            "required_permission": "department.seminar.request",
+            "sort_order": 10,
+            "to": "/department/seminar-request"
+          },
+          {
+            "code": "department.my_seminars",
+            "icon": "FaUserGraduate",
+            "label": "My Seminars",
+            "required_permission": "department.seminar.view_self",
+            "sort_order": 20,
+            "to": "/department/my-seminars"
+          },
+          {
+            "code": "department.pending_seminars",
+            "icon": "FaClipboardCheck",
+            "label": "Pending Seminars",
+            "required_permission": "department.seminar.schedule",
+            "sort_order": 30,
+            "to": "/department/pending-seminars"
+          },
+          {
+            "code": "department.calendar",
+            "icon": "FaCalendarAlt",
+            "label": "Seminar Schedule",
+            "required_permission": "department.seminar.view",
+            "sort_order": 40,
+            "to": "/department/calendar"
+          },
+          {
+            "code": "department.allocations",
+            "icon": "FaUsersCog",
+            "label": "Allocations",
+            "required_permission": "department.allocation.view",
+            "sort_order": 50,
+            "to": "/department/allocations"
+          },
+          {
+            "code": "department.announcements",
+            "icon": "FaBullhorn",
+            "label": "Announcements",
+            "required_permission": "department.announcement.view",
+            "sort_order": 60,
+            "to": "/department/announcements"
+          }
+        ],
+        "label": "Department",
+        "nav_section": "Academics",
+        "sort_order": 25,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "department.seminar.request",
+          "label": "Submit graduate seminar scheduling request"
+        },
+        {
+          "code": "department.seminar.view_self",
+          "label": "View one's own seminar requests"
+        },
+        {
+          "code": "department.seminar.view",
+          "label": "View scheduled graduate seminars"
+        },
+        {
+          "code": "department.seminar.schedule",
+          "label": "Schedule graduate seminars and record history"
+        },
+        {
+          "code": "department.seminar.view_all",
+          "label": "View all seminar requests and scheduling history"
+        },
+        {
+          "code": "department.allocation.view",
+          "label": "View TA and thesis supervisor allocations"
+        },
+        {
+          "code": "department.allocation.manage",
+          "label": "Manage TA and supervisor allocations"
+        },
+        {
+          "code": "department.announcement.view",
+          "label": "View department announcements"
+        },
+        {
+          "code": "department.announcement.publish",
+          "label": "Publish department announcements"
+        }
+      ],
+      "scope_permissions": [
+        "department.seminar.view_all"
+      ],
+      "system_permissions": []
+    },
     "directory": {
       "grants": {
         "Dean Academic": [
