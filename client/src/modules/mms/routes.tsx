@@ -17,3 +17,4 @@ export const routes: RouteObject[] = [
   { path: "caretaker", element: <CaretakerPage /> },
   { path: "admin", element: <AdminPage /> },
 ];
+
