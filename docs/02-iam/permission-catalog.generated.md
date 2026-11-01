@@ -38,3 +38,13 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `vms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `vms.request.create` | Raise a visit request | `Dean Academic`, `acadadmin`, `student` |
+| `vms.request.decide` | Approve or reject a visit request | `Dean Academic`, `acadadmin` |
+| `vms.gate.operate` | Check visitors in and out at the gate | `acadadmin` |
+| `vms.blacklist.manage` | Maintain the visitor blacklist | `acadadmin` |
+| `vms.policy.publish` | Publish an access policy version | `Dean Academic`, `acadadmin` |
