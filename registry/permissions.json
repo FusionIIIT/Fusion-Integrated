@@ -1,5 +1,49 @@
 {
   "modules": {
+    "complaints": {
+      "grants": {
+        "faculty": [
+          "complaints.complaint.create"
+        ],
+        "staff": [
+          "complaints.complaint.create"
+        ],
+        "student": [
+          "complaints.complaint.create"
+        ]
+      },
+      "module_grants": [
+        "faculty",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/complaints",
+        "icon": "FaLayerGroup",
+        "items": [
+          {
+            "code": "complaints.submit",
+            "icon": "FaClipboardList",
+            "label": "Submit a Complaint",
+            "required_permission": "complaints.complaint.create",
+            "sort_order": 5,
+            "to": "/complaints/submit"
+          }
+        ],
+        "label": "Complaints",
+        "nav_section": "Campus",
+        "sort_order": 70,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "complaints.complaint.create",
+          "label": "Submit a complaint"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "directory": {
       "grants": {
         "Dean Academic": [
