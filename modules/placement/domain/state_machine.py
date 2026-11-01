@@ -8,28 +8,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-DRAFT = "draft"
-SUBMITTED = "submitted"
-UNDER_REVIEW = "under_review"
+APPLIED = "applied"
 SHORTLISTED = "shortlisted"
 INTERVIEW_SCHEDULED = "interview_scheduled"
-SELECTED = "selected"
-REJECTED = "rejected"
-WITHDRAWN = "withdrawn"
-AUTO_WITHDRAWN = "auto_withdrawn"
-OFFER_ISSUED = "offer_issued"
+OFFER_EXTENDED = "offer_extended"
 OFFER_ACCEPTED = "offer_accepted"
 OFFER_DECLINED = "offer_declined"
-OFFER_EXPIRED = "offer_expired"
+REJECTED = "rejected"
 
-TERMINAL = frozenset({REJECTED, WITHDRAWN, AUTO_WITHDRAWN, OFFER_ACCEPTED,
-                      OFFER_DECLINED, OFFER_EXPIRED})
+TERMINAL = frozenset({REJECTED, OFFER_ACCEPTED, OFFER_DECLINED})
+IN_FLIGHT = frozenset({APPLIED, SHORTLISTED, INTERVIEW_SCHEDULED, OFFER_EXTENDED})
 
-#: Still in the running, so the auto-withdraw sweep knows what to close.
-IN_FLIGHT = frozenset({DRAFT, SUBMITTED, UNDER_REVIEW, SHORTLISTED,
-                       INTERVIEW_SCHEDULED, SELECTED, OFFER_ISSUED})
-
-# Explicit per transition rather than inferred, because a recruiter is an outsider.
 STUDENT = "student"
 STAFF = "staff"           # TPO / placement chairman, via IAM permissions
 RECRUITER = "recruiter"   # a company's own account, scoped to its postings
@@ -73,9 +62,8 @@ def _review(frm: str, to: str, *guards: str) -> Transition:
 
 TRANSITIONS: tuple[Transition, ...] = (
     # -- the student's own moves ------------------------------------------
-    Transition(DRAFT, SUBMITTED, "placement_cell.application.create",
-               frozenset({STUDENT}),
-               ("window_open", "profile_complete", "is_eligible", "may_apply")),
+    Transition(APPLIED, SHORTLISTED, "placement_cell.application.review",
+               frozenset({STAFF, RECRUITER}), ("window_open", "profile_complete", "is_eligible", "may_apply")),
 
     # -- review and shortlisting (PC-WF-005) ------------------------------
     _review(SUBMITTED, UNDER_REVIEW),
@@ -147,3 +135,50 @@ def allowed_targets(frm: str, actor_kind: str | None = None) -> list[str]:
     return sorted(t.to for t in TRANSITIONS
                   if t.frm == frm
                   and (actor_kind is None or actor_kind in t.actors))
+
+
+class ApplicationState:
+    def __init__(self, state: str):
+        if state not in (APPLIED, SHORTLISTED, INTERVIEW_SCHEDULED, OFFER_EXTENDED, OFFER_ACCEPTED, OFFER_DECLINED, REJECTED):
+            raise ValueError(f"Invalid application state: {state}")
+        self.state = state
+
+    def transition(self, action: str, actor_role: str) -> ApplicationState:
+        if action == "shortlist":
+            if self.state == APPLIED and actor_role in (STAFF, RECRUITER):
+                return ApplicationState(SHORTLISTED)
+            else:
+                raise ValueError(f"Invalid action {action} for state {self.state} by role {actor_role}")
+        elif action == "reject":
+            if self.state == APPLIED and actor_role in (STAFF, RECRUITER):
+                return ApplicationState(REJECTED)
+            else:
+                raise ValueError(f"Invalid action {action} for state {self.state} by role {actor_role}")
+        elif action == "schedule_interview":
+            if self.state == SHORTLISTED and actor_role in (STAFF, RECRUITER):
+                return ApplicationState(INTERVIEW_SCHEDULED)
+            else:
+                raise ValueError(f"Invalid action {action} for state {self.state} by role {actor_role}")
+        elif action == "extend_offer":
+            if self.state == INTERVIEW_SCHEDULED and actor_role in (STAFF, RECRUITER):
+                return ApplicationState(OFFER_EXTENDED)
+            else:
+                raise ValueError(f"Invalid action {action} for state {self.state} by role {actor_role}")
+        elif action == "accept_offer":
+            if self.state == OFFER_EXTENDED and actor_role == STUDENT:
+                return ApplicationState(OFFER_ACCEPTED)
+            else:
+                raise ValueError(f"Invalid action {action} for state {self.state} by role {actor_role}")
+        elif action == "decline_offer":
+            if self.state == OFFER_EXTENDED and actor_role == STUDENT:
+                return ApplicationState(OFFER_DECLINED)
+            else:
+                raise ValueError(f"Invalid action {action} for state {self.state} by role {actor_role}")
+        else:
+            raise ValueError(f"Invalid action: {action}")
+
+
+def transition_application_state(current_state: str, action: str, actor_role: str) -> str:
+    state = ApplicationState(current_state)
+    new_state = state.transition(action, actor_role)
+    return new_state.state
