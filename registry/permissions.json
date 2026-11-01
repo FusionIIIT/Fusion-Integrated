@@ -1,5 +1,63 @@
 {
   "modules": {
+    "courses": {
+      "grants": {
+        "Dean Academic": [
+          "courses.workspace.manage",
+          "courses.workspace.view"
+        ],
+        "faculty": [
+          "courses.workspace.manage",
+          "courses.workspace.view"
+        ],
+        "observer": [
+          "courses.workspace.view"
+        ],
+        "student": [
+          "courses.workspace.view"
+        ],
+        "ta": [
+          "courses.workspace.view"
+        ]
+      },
+      "module_grants": [
+        "Dean Academic",
+        "faculty",
+        "observer",
+        "student",
+        "ta"
+      ],
+      "nav": {
+        "base_path": "/courses",
+        "icon": "GraduationCap",
+        "items": [
+          {
+            "code": "courses.workspace",
+            "icon": "GraduationCap",
+            "label": "Course Workspace",
+            "required_permission": "courses.workspace.view",
+            "sort_order": 10,
+            "to": "/courses/workspace"
+          }
+        ],
+        "label": "Course Management",
+        "nav_section": "Academics",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "courses.workspace.view",
+          "label": "View enrolled or assigned course workspaces"
+        },
+        {
+          "code": "courses.workspace.manage",
+          "label": "Configure and update course workspace details"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "directory": {
       "grants": {
         "Dean Academic": [
