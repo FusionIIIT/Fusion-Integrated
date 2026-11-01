@@ -13,6 +13,21 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `mess_module`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `mess_module.role.manage` | Assign and reassign Mess Caretaker and Mess Warden roles | `Mess Admin`, `admin`, `dean_students` |
+| `mess_module.registration.submit` | Submit mess registration and deregistration requests | `student` |
+| `mess_module.registration.review` | Review student mess registrations & deregistrations | `Caretaker`, `Mess Caretaker`, `admin`, `mess_caretaker` |
+| `mess_module.menu.manage` | Publish and update daily/weekly mess menus | `Caretaker`, `Mess Caretaker`, `admin`, `mess_caretaker` |
+| `mess_module.menu.view` | View active mess menus and meal schedules | `Caretaker`, `Mess Admin`, `Mess Caretaker`, `Mess Warden`, `Warden`, `admin`, `dean_students`, `mess_caretaker`, `mess_warden`, `student` |
+| `mess_module.rebate.apply` | Submit mess rebate applications | `student` |
+| `mess_module.rebate.review` | Review and approve/reject mess rebate applications | `Caretaker`, `Mess Caretaker`, `admin`, `mess_caretaker` |
+| `mess_module.feedback.submit` | Submit feedback and suggestions regarding mess services | `student` |
+| `mess_module.feedback.view` | View student mess feedback and ratings | `Caretaker`, `Mess Caretaker`, `Mess Warden`, `Warden`, `admin`, `mess_caretaker`, `mess_warden` |
+| `mess_module.oversight.view` | Supervisory oversight of operational requests and reports | `Mess Admin`, `Mess Warden`, `Warden`, `admin`, `dean_students`, `mess_warden` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
