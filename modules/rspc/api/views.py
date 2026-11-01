@@ -6,6 +6,7 @@ from rest_framework.exceptions import ValidationError
 from modules.rspc.models import ResearchProposal, ProposalDecision
 from modules.rspc.api.serializers import ResearchProposalSerializer, ProposalDecisionSerializer
 from fusion_auth.permissions import HasModuleGrant, HasPermission
+from django.shortcuts import get_object_or_404
 
 MODULE = HasModuleGrant("rspc")
 
@@ -51,7 +52,7 @@ class ProposalDecisionView(APIView):
     permission_classes = [MODULE, HasPermission("rspc.proposal.recommend")]
 
     def post(self, request, proposal_id):
-        proposal = ResearchProposal.objects.get(pk=proposal_id)
+        proposal = get_object_or_404(ResearchProposal, pk=proposal_id)
         data = request.data
         outcome = data.get('outcome')
         remarks = data.get("remarks", "")
@@ -74,7 +75,7 @@ class ProposalVerifyView(APIView):
     permission_classes = [MODULE, HasPermission("rspc.proposal.verify")]
 
     def post(self, request, proposal_id):
-        proposal = ResearchProposal.objects.get(pk=proposal_id)
+        proposal = get_object_or_404(ResearchProposal, pk=proposal_id)
         data = request.data
         outcome = data.get('outcome')
         remarks = data.get("remarks", "")
@@ -97,7 +98,7 @@ class ProposalDecideView(APIView):
     permission_classes = [MODULE, HasPermission("rspc.proposal.decide")]
 
     def post(self, request, proposal_id):
-        proposal = ResearchProposal.objects.get(pk=proposal_id)
+        proposal = get_object_or_404(ResearchProposal, pk=proposal_id)
         data = request.data
         outcome = data.get('outcome')
         remarks = data.get("remarks", "")
@@ -132,7 +133,7 @@ class ProposalAuthorizeView(APIView):
     permission_classes = [MODULE, HasPermission("rspc.proposal.authorize")]
 
     def post(self, request, proposal_id):
-        proposal = ResearchProposal.objects.get(pk=proposal_id)
+        proposal = get_object_or_404(ResearchProposal, pk=proposal_id)
         data = request.data
         outcome = data.get('outcome')
         remarks = data.get("remarks", "")
