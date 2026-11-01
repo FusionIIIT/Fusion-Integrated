@@ -25,18 +25,29 @@ class JobPosting(TimeStampedModel):
 
     company = models.ForeignKey("Company", on_delete=models.PROTECT,
                                 related_name="postings")
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=160)
     kind = models.CharField(max_length=12, choices=KIND, default="fte")
-    season = models.CharField(max_length=32)
-    tier = models.CharField(max_length=10, choices=[("dream", "Dream"), ("core", "Core"), ("open", "Open")], default="open")
+    placement_year = models.CharField(max_length=12, db_index=True)   # "2026-27"
+
     description = models.TextField(blank=True)          # PC-BR-003 role description
     location = models.CharField(max_length=120, blank=True)
-    compensation_ctc = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    min_cpi = models.DecimalField(max_digits=4, decimal_places=2, default=0.0)
-    eligible_batches = models.JSONField(default=list)
-    eligible_branches = models.JSONField(default=list)
+    ctc_lpa = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    stipend_pm = models.DecimalField(max_digits=10, decimal_places=2,
+                                     null=True, blank=True)
+    bond_months = models.PositiveSmallIntegerField(null=True, blank=True)
+    seats = models.PositiveSmallIntegerField(null=True, blank=True)
+
+    eligibility_rule = models.JSONField(default=dict, blank=True)
+    eligibility_rule_locked_at = models.DateTimeField(null=True, blank=True)
+
+    # Rule 7: opens the process to placed students as well as unplaced.
+    is_dream_slot = models.BooleanField(default=False)
+    dream_slot_note = models.CharField(max_length=300, blank=True)
+
     status = models.CharField(max_length=20, choices=STATUS, default="draft")
-    deadline = models.DateTimeField(null=True, blank=True)   # PC-BR-003 deadline
+    opens_at = models.DateTimeField(null=True, blank=True)
+    closes_at = models.DateTimeField(null=True, blank=True)   # PC-BR-003 deadline
+    published_at = models.DateTimeField(null=True, blank=True)
 
     created_by_user_id = models.IntegerField(null=True, blank=True)
     created_by_recruiter = models.ForeignKey(
@@ -46,10 +57,10 @@ class JobPosting(TimeStampedModel):
     class Meta:
         db_table = "placement_job_posting"
         indexes = [
-            models.Index(fields=["status", "deadline"],
-                         name="posting_status_deadline_idx"),
-            models.Index(fields=["company", "season"],
-                         name="posting_company_season_idx"),
+            models.Index(fields=["placement_year", "status", "closes_at"],
+                         name="posting_year_status_idx"),
+            models.Index(fields=["company", "placement_year"],
+                         name="posting_company_year_idx"),
         ]
         constraints = [
             # PC-BR-002: publishing freezes the rule under applicants.
@@ -61,11 +72,12 @@ class JobPosting(TimeStampedModel):
             # PC-BR-003.
             models.CheckConstraint(
                 condition=~Q(status="published")
-                | (~Q(description="") & Q(deadline__isnull=False)),
+                | (~Q(description="") & Q(closes_at__isnull=False)),
                 name="posting_published_has_required_content",
             ),
             models.CheckConstraint(
-                condition=Q(deadline__isnull=True) | Q(deadline__gt=models.F("opens_at")),
+                condition=Q(closes_at__isnull=True) | Q(opens_at__isnull=True)
+                | Q(closes_at__gt=models.F("opens_at")),
                 name="posting_window_valid",
             ),
         ]
