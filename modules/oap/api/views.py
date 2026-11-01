@@ -3,6 +3,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+
 from modules.oap.models import (
     StudentLeave, BonafideRequest, NoDuesRequest, NoDuesAuthorityClearance,
     ThesisSupervisorAssignment, TAAssignment, AssistantshipClaim,
@@ -16,9 +17,35 @@ from modules.oap.api.serializers import (
 )
 from modules.oap.services import oap_service
 
+# OAP Permission Definitions
+P_PROCEDURE_VIEW = "oap.procedure.view"
+P_LEAVE_APPLY = "oap.leave.apply"
+P_LEAVE_REVIEW_HOD = "oap.leave.review_hod"
+P_BONAFIDE_REQUEST = "oap.bonafide.request"
+P_BONAFIDE_DECIDE = "oap.bonafide.decide"
+P_NODUES_INITIATE = "oap.nodues.initiate"
+P_NODUES_VERIFY_AUTHORITY = "oap.nodues.verify_authority"
+P_NODUES_FINALIZE = "oap.nodues.finalize"
+P_ASSISTANTSHIP_SUBMIT = "oap.assistantship.submit"
+P_ASSISTANTSHIP_VERIFY_SUPERVISOR = "oap.assistantship.verify_supervisor"
+P_ASSISTANTSHIP_REVIEW_DEPT = "oap.assistantship.review_dept"
+P_ASSISTANTSHIP_DECIDE_HOD = "oap.assistantship.decide_hod"
+P_ASSISTANTSHIP_DISBURSE_STIPEND = "oap.assistantship.disburse_stipend"
+P_ASSIGNMENT_MANAGE = "oap.assignment.manage"
+P_SEMINAR_REQUEST = "oap.seminar.request"
+P_SEMINAR_SCHEDULE = "oap.seminar.schedule"
+P_SEMINAR_VIEW = "oap.seminar.view"
+
+
 class StudentLeaveViewSet(viewsets.ModelViewSet):
     queryset = StudentLeave.objects.all()
     serializer_class = StudentLeaveSerializer
+    required_permissions = {
+        "list": "oap.procedure.view",
+        "retrieve": "oap.procedure.view",
+        "create": "oap.leave.apply",
+        "decide": "oap.leave.review_hod",
+    }
 
     @action(detail=True, methods=['post'])
     def decide(self, request, pk=None):
@@ -26,9 +53,17 @@ class StudentLeaveViewSet(viewsets.ModelViewSet):
         oap_service.decide_student_leave(instance)
         return Response({"status": "Decision made"}, status=status.HTTP_200_OK)
 
+
 class BonafideRequestViewSet(viewsets.ModelViewSet):
     queryset = BonafideRequest.objects.all()
     serializer_class = BonafideRequestSerializer
+    required_permissions = {
+        "list": "oap.procedure.view",
+        "retrieve": "oap.procedure.view",
+        "create": "oap.bonafide.request",
+        "decide": "oap.bonafide.decide",
+        "download_certificate": "oap.procedure.view",
+    }
 
     @action(detail=True, methods=['post'])
     def decide(self, request, pk=None):
@@ -44,9 +79,18 @@ class BonafideRequestViewSet(viewsets.ModelViewSet):
         else:
             return Response({"error": "Cannot download certificate"}, status=status.HTTP_403_FORBIDDEN)
 
+
 class NoDuesRequestViewSet(viewsets.ModelViewSet):
     queryset = NoDuesRequest.objects.all()
     serializer_class = NoDuesRequestSerializer
+    required_permissions = {
+        "list": "oap.procedure.view",
+        "retrieve": "oap.procedure.view",
+        "initiate": "oap.nodues.initiate",
+        "verify_domain": "oap.nodues.verify_authority",
+        "finalize": "oap.nodues.finalize",
+        "download_certificate": "oap.procedure.view",
+    }
 
     @action(detail=False, methods=['post'])
     def initiate(self, request):
@@ -73,17 +117,38 @@ class NoDuesRequestViewSet(viewsets.ModelViewSet):
         else:
             return Response({"error": "Cannot download certificate"}, status=status.HTTP_403_FORBIDDEN)
 
+
 class ThesisSupervisorAssignmentViewSet(viewsets.ModelViewSet):
     queryset = ThesisSupervisorAssignment.objects.all()
     serializer_class = ThesisSupervisorAssignmentSerializer
+    required_permissions = {
+        "list": "oap.procedure.view",
+        "create": "oap.assignment.manage",
+        "update": "oap.assignment.manage",
+    }
+
 
 class TAAssignmentViewSet(viewsets.ModelViewSet):
     queryset = TAAssignment.objects.all()
     serializer_class = TAAssignmentSerializer
+    required_permissions = {
+        "list": "oap.procedure.view",
+        "create": "oap.assignment.manage",
+        "update": "oap.assignment.manage",
+    }
+
 
 class AssistantshipClaimViewSet(viewsets.ModelViewSet):
     queryset = AssistantshipClaim.objects.all()
     serializer_class = AssistantshipClaimSerializer
+    required_permissions = {
+        "list": "oap.procedure.view",
+        "create": "oap.assistantship.submit",
+        "verify_supervisor": "oap.assistantship.verify_supervisor",
+        "review_forward": "oap.assistantship.review_dept",
+        "decide_hod": "oap.assistantship.decide_hod",
+        "process_stipend": "oap.assistantship.disburse_stipend",
+    }
 
     @action(detail=True, methods=['post'])
     def verify_supervisor(self, request, pk=None):
@@ -109,9 +174,16 @@ class AssistantshipClaimViewSet(viewsets.ModelViewSet):
         oap_service.process_stipend_disbursement(instance)
         return Response({"status": "Stipend Processed"}, status=status.HTTP_200_OK)
 
+
 class GraduateSeminarRequestViewSet(viewsets.ModelViewSet):
     queryset = GraduateSeminarRequest.objects.all()
     serializer_class = GraduateSeminarRequestSerializer
+    required_permissions = {
+        "list": "oap.seminar.view",
+        "retrieve": "oap.seminar.view",
+        "create": "oap.seminar.request",
+        "schedule": "oap.seminar.schedule",
+    }
 
     @action(detail=True, methods=['post'])
     def schedule(self, request, pk=None):
@@ -119,6 +191,11 @@ class GraduateSeminarRequestViewSet(viewsets.ModelViewSet):
         oap_service.schedule_graduate_seminar(instance)
         return Response({"status": "Seminar Scheduled"}, status=status.HTTP_200_OK)
 
+
 class OAPNotificationViewSet(viewsets.ModelViewSet):
     queryset = OAPNotification.objects.all()
     serializer_class = OAPNotificationSerializer
+    required_permissions = {
+        "list": "oap.procedure.view",
+        "retrieve": "oap.procedure.view",
+    }

@@ -14,7 +14,7 @@ NAV_ITEMS = [
         "label": "OAP Dashboard",
         "icon": "GraduationCap",
         "to": "/oap",
-        "required_permission": "oap.view",
+        "required_permission": "oap.procedure.view",
         "sort_order": 5
     },
     {
@@ -68,7 +68,7 @@ NAV_ITEMS = [
 ]
 
 PERMISSIONS = [
-    ("oap.view", "View OAP procedures"),
+    ("oap.procedure.view", "View OAP procedures"),
     ("oap.leave.apply", "Apply for student leave"),
     ("oap.leave.review_hod", "Review and approve/reject leave as HOD"),
     ("oap.bonafide.request", "Request bonafide certificate"),
@@ -88,14 +88,14 @@ PERMISSIONS = [
 ]
 
 ROLE_GRANTS = {
-    "student": ["oap.view", "oap.leave.apply", "oap.bonafide.request", "oap.nodues.initiate", "oap.assistantship.submit", "oap.seminar.request", "oap.seminar.view"],
-    "faculty": ["oap.view", "oap.seminar.view", "oap.assistantship.verify_supervisor"],
-    "HOD": ["oap.view", "oap.leave.review_hod", "oap.assistantship.decide_hod", "oap.seminar.view"],
-    "Academic Administrator": ["oap.view", "oap.bonafide.decide", "oap.nodues.finalize", "oap.assistantship.disburse_stipend", "oap.seminar.view"],
-    "Department Administrator": ["oap.view", "oap.assignment.manage", "oap.assistantship.review_dept", "oap.seminar.schedule", "oap.seminar.view"],
-    "Librarian": ["oap.view", "oap.nodues.verify_authority"],
-    "Hostel Warden": ["oap.view", "oap.nodues.verify_authority"],
-    "Mess In-charge": ["oap.view", "oap.nodues.verify_authority"],
-    "Lab Supervisor": ["oap.view", "oap.nodues.verify_authority"],
-    "admin": ["oap.view", "oap.leave.apply", "oap.leave.review_hod", "oap.bonafide.request", "oap.bonafide.decide", "oap.nodues.initiate", "oap.nodues.verify_authority", "oap.nodues.finalize", "oap.assistantship.submit", "oap.assistantship.verify_supervisor", "oap.assistantship.review_dept", "oap.assistantship.decide_hod", "oap.assistantship.disburse_stipend", "oap.assignment.manage", "oap.seminar.request", "oap.seminar.schedule", "oap.seminar.view"],
+    "student": ["oap.procedure.view", "oap.leave.apply", "oap.bonafide.request", "oap.nodues.initiate", "oap.assistantship.submit", "oap.seminar.request", "oap.seminar.view"],
+    "faculty": ["oap.procedure.view", "oap.seminar.view", "oap.assistantship.verify_supervisor"],
+    "HOD": ["oap.procedure.view", "oap.leave.review_hod", "oap.assistantship.decide_hod", "oap.seminar.view"],
+    "Academic Administrator": ["oap.procedure.view", "oap.bonafide.decide", "oap.nodues.finalize", "oap.assistantship.disburse_stipend", "oap.seminar.view"],
+    "Department Administrator": ["oap.procedure.view", "oap.assignment.manage", "oap.assistantship.review_dept", "oap.seminar.schedule", "oap.seminar.view"],
+    "Librarian": ["oap.procedure.view", "oap.nodues.verify_authority"],
+    "Hostel Warden": ["oap.procedure.view", "oap.nodues.verify_authority"],
+    "Mess In-charge": ["oap.procedure.view", "oap.nodues.verify_authority"],
+    "Lab Supervisor": ["oap.procedure.view", "oap.nodues.verify_authority"],
+    "admin": ["oap.procedure.view", "oap.leave.apply", "oap.leave.review_hod", "oap.bonafide.request", "oap.bonafide.decide", "oap.nodues.initiate", "oap.nodues.verify_authority", "oap.nodues.finalize", "oap.assistantship.submit", "oap.assistantship.verify_supervisor", "oap.assistantship.review_dept", "oap.assistantship.decide_hod", "oap.assistantship.disburse_stipend", "oap.assignment.manage", "oap.seminar.request", "oap.seminar.schedule", "oap.seminar.view"],
 }

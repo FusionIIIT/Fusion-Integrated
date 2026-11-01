@@ -13,6 +13,28 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `oap`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `oap.procedure.view` | View OAP procedures | `Academic Administrator`, `Department Administrator`, `HOD`, `Hostel Warden`, `Lab Supervisor`, `Librarian`, `Mess In-charge`, `admin`, `faculty`, `student` |
+| `oap.leave.apply` | Apply for student leave | `admin`, `student` |
+| `oap.leave.review_hod` | Review and approve/reject leave as HOD | `HOD`, `admin` |
+| `oap.bonafide.request` | Request bonafide certificate | `admin`, `student` |
+| `oap.bonafide.decide` | Approve or reject bonafide certificate | `Academic Administrator`, `admin` |
+| `oap.nodues.initiate` | Initiate no-dues clearance | `admin`, `student` |
+| `oap.nodues.verify_authority` | Verify clearance for authority domain | `Hostel Warden`, `Lab Supervisor`, `Librarian`, `Mess In-charge`, `admin` |
+| `oap.nodues.finalize` | Finalize no-dues clearance | `Academic Administrator`, `admin` |
+| `oap.assistantship.submit` | Submit PG assistantship claim | `admin`, `student` |
+| `oap.assistantship.verify_supervisor` | Verify assistantship as supervisor | `admin`, `faculty` |
+| `oap.assistantship.review_dept` | Review assistantship at department level | `Department Administrator`, `admin` |
+| `oap.assistantship.decide_hod` | HoD decision on assistantship claim | `HOD`, `admin` |
+| `oap.assistantship.disburse_stipend` | Disburse assistantship stipend | `Academic Administrator`, `admin` |
+| `oap.assignment.manage` | Assign thesis supervisors and TAs | `Department Administrator`, `admin` |
+| `oap.seminar.request` | Request graduate seminar | `admin`, `student` |
+| `oap.seminar.schedule` | Schedule graduate seminar | `Department Administrator`, `admin` |
+| `oap.seminar.view` | View graduate seminars | `Academic Administrator`, `Department Administrator`, `HOD`, `admin`, `faculty`, `student` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

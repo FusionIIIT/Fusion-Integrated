@@ -34,6 +34,229 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "oap": {
+      "grants": {
+        "Academic Administrator": [
+          "oap.assistantship.disburse_stipend",
+          "oap.bonafide.decide",
+          "oap.nodues.finalize",
+          "oap.procedure.view",
+          "oap.seminar.view"
+        ],
+        "Department Administrator": [
+          "oap.assignment.manage",
+          "oap.assistantship.review_dept",
+          "oap.procedure.view",
+          "oap.seminar.schedule",
+          "oap.seminar.view"
+        ],
+        "HOD": [
+          "oap.assistantship.decide_hod",
+          "oap.leave.review_hod",
+          "oap.procedure.view",
+          "oap.seminar.view"
+        ],
+        "Hostel Warden": [
+          "oap.nodues.verify_authority",
+          "oap.procedure.view"
+        ],
+        "Lab Supervisor": [
+          "oap.nodues.verify_authority",
+          "oap.procedure.view"
+        ],
+        "Librarian": [
+          "oap.nodues.verify_authority",
+          "oap.procedure.view"
+        ],
+        "Mess In-charge": [
+          "oap.nodues.verify_authority",
+          "oap.procedure.view"
+        ],
+        "admin": [
+          "oap.assignment.manage",
+          "oap.assistantship.decide_hod",
+          "oap.assistantship.disburse_stipend",
+          "oap.assistantship.review_dept",
+          "oap.assistantship.submit",
+          "oap.assistantship.verify_supervisor",
+          "oap.bonafide.decide",
+          "oap.bonafide.request",
+          "oap.leave.apply",
+          "oap.leave.review_hod",
+          "oap.nodues.finalize",
+          "oap.nodues.initiate",
+          "oap.nodues.verify_authority",
+          "oap.procedure.view",
+          "oap.seminar.request",
+          "oap.seminar.schedule",
+          "oap.seminar.view"
+        ],
+        "faculty": [
+          "oap.assistantship.verify_supervisor",
+          "oap.procedure.view",
+          "oap.seminar.view"
+        ],
+        "student": [
+          "oap.assistantship.submit",
+          "oap.bonafide.request",
+          "oap.leave.apply",
+          "oap.nodues.initiate",
+          "oap.procedure.view",
+          "oap.seminar.request",
+          "oap.seminar.view"
+        ]
+      },
+      "module_grants": [
+        "Academic Administrator",
+        "Department Administrator",
+        "HOD",
+        "Hostel Warden",
+        "Lab Supervisor",
+        "Librarian",
+        "Mess In-charge",
+        "admin",
+        "faculty",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/oap",
+        "icon": "GraduationCap",
+        "items": [
+          {
+            "code": "oap.dashboard",
+            "icon": "GraduationCap",
+            "label": "OAP Dashboard",
+            "required_permission": "oap.procedure.view",
+            "sort_order": 5,
+            "to": "/oap"
+          },
+          {
+            "code": "oap.leave",
+            "icon": "CalendarBlank",
+            "label": "Student Leave",
+            "required_permission": "oap.leave.apply",
+            "sort_order": 10,
+            "to": "/oap/leave"
+          },
+          {
+            "code": "oap.bonafide",
+            "icon": "Certificate",
+            "label": "Bonafide Certificate",
+            "required_permission": "oap.bonafide.request",
+            "sort_order": 20,
+            "to": "/oap/bonafide"
+          },
+          {
+            "code": "oap.nodues",
+            "icon": "Checks",
+            "label": "No-Dues Clearance",
+            "required_permission": "oap.nodues.initiate",
+            "sort_order": 30,
+            "to": "/oap/no-dues"
+          },
+          {
+            "code": "oap.assistantship",
+            "icon": "CurrencyDollar",
+            "label": "Assistantship Claims",
+            "required_permission": "oap.assistantship.submit",
+            "sort_order": 40,
+            "to": "/oap/assistantship"
+          },
+          {
+            "code": "oap.seminars",
+            "icon": "Presentation",
+            "label": "Graduate Seminars",
+            "required_permission": "oap.seminar.view",
+            "sort_order": 50,
+            "to": "/oap/seminars"
+          },
+          {
+            "code": "oap.assignments",
+            "icon": "Users",
+            "label": "Supervisor & TA Assignments",
+            "required_permission": "oap.assignment.manage",
+            "sort_order": 60,
+            "to": "/oap/assignments"
+          }
+        ],
+        "label": "Other Academic Procedures",
+        "nav_section": "Academics",
+        "sort_order": 25,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "oap.procedure.view",
+          "label": "View OAP procedures"
+        },
+        {
+          "code": "oap.leave.apply",
+          "label": "Apply for student leave"
+        },
+        {
+          "code": "oap.leave.review_hod",
+          "label": "Review and approve/reject leave as HOD"
+        },
+        {
+          "code": "oap.bonafide.request",
+          "label": "Request bonafide certificate"
+        },
+        {
+          "code": "oap.bonafide.decide",
+          "label": "Approve or reject bonafide certificate"
+        },
+        {
+          "code": "oap.nodues.initiate",
+          "label": "Initiate no-dues clearance"
+        },
+        {
+          "code": "oap.nodues.verify_authority",
+          "label": "Verify clearance for authority domain"
+        },
+        {
+          "code": "oap.nodues.finalize",
+          "label": "Finalize no-dues clearance"
+        },
+        {
+          "code": "oap.assistantship.submit",
+          "label": "Submit PG assistantship claim"
+        },
+        {
+          "code": "oap.assistantship.verify_supervisor",
+          "label": "Verify assistantship as supervisor"
+        },
+        {
+          "code": "oap.assistantship.review_dept",
+          "label": "Review assistantship at department level"
+        },
+        {
+          "code": "oap.assistantship.decide_hod",
+          "label": "HoD decision on assistantship claim"
+        },
+        {
+          "code": "oap.assistantship.disburse_stipend",
+          "label": "Disburse assistantship stipend"
+        },
+        {
+          "code": "oap.assignment.manage",
+          "label": "Assign thesis supervisors and TAs"
+        },
+        {
+          "code": "oap.seminar.request",
+          "label": "Request graduate seminar"
+        },
+        {
+          "code": "oap.seminar.schedule",
+          "label": "Schedule graduate seminar"
+        },
+        {
+          "code": "oap.seminar.view",
+          "label": "View graduate seminars"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
