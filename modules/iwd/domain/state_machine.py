@@ -274,8 +274,12 @@ def transition_inventory_and_procurement(
         if action == "stock_unavailable":
             if cost_band == CostBand.LOW:
                 return IWDState.PROCUREMENT_NEEDED_LOW
-            elif cost_band in (CostBand.MID, CostBand.HIGH):
+            elif cost_band == CostBand.MID:
                 return IWDState.PROCUREMENT_NEEDED_MID
+            elif cost_band == CostBand.HIGH:
+                raise DomainValidationError(
+                    "High-cost works (> ₹2.5L) use external bidding (BR-IWD-007) and cannot use inventory stock shortage procurement."
+                )
             else:
                 raise DomainValidationError("Cost band must be provided when stock is unavailable.")
 

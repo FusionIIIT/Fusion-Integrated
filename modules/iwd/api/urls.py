@@ -11,4 +11,6 @@ urlpatterns = [
     path("complaints/<int:pk>/assess/", views.ComplaintAssessView.as_view(), name="complaint-assess"),
     path("complaints/<int:pk>/estimates/", views.ComplaintEstimateView.as_view(), name="complaint-estimates"),
     path("complaints/<int:pk>/review-estimate/", views.ComplaintEstimateReviewView.as_view(), name="complaint-review-estimate"),
+    path("complaints/<int:pk>/resubmit-estimate/", views.ComplaintEstimateResubmitView.as_view(), name="complaint-resubmit-estimate"),
+    path("complaints/<int:pk>/inventory-action/", views.ComplaintInventoryActionView.as_view(), name="complaint-inventory-action"),
 ]

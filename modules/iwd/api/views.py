@@ -18,11 +18,13 @@ from modules.iwd.api.serializers import (
     ComplaintListSerializer,
     EstimateCreateSerializer,
     EstimateReviewActionSerializer,
+    MaterialIssueActionSerializer,
 )
 from modules.iwd.selectors.complaints import get_complaint_for_user, visible_complaints
 from modules.iwd.services.assessments import record_complaint_assessment
 from modules.iwd.services.complaints import submit_complaint
-from modules.iwd.services.estimates import submit_complaint_estimate
+from modules.iwd.services.estimates import resubmit_complaint_estimate, submit_complaint_estimate
+from modules.iwd.services.inventory import execute_inventory_action
 from modules.iwd.services.reviews import execute_estimate_review
 
 
@@ -216,4 +218,71 @@ class ComplaintEstimateReviewView(APIView):
         return Response(out_serializer.data, status=status.HTTP_200_OK)
 
 
+class ComplaintEstimateResubmitView(APIView):
+    """Modify and resubmit a rejected repair estimate (BW-IWD-12..14 / UC-IWD-151)."""
+
+    permission_classes = [
+        HasModuleGrant("iwd"),
+        HasPermission("iwd.complaint.assess"),
+    ]
+
+    @extend_schema(
+        summary="Resubmit rejected repair estimate",
+        description="Modifies and resubmits a rejected estimate, dynamically routing it to the appropriate cost-band review queue.",
+        request=EstimateCreateSerializer,
+        responses={201: ComplaintDetailSerializer},
+    )
+    def post(self, request, pk: int):
+        p = getattr(request, "principal", None)
+        if not p or getattr(p, "active_role", None) != "iwd_engineer" or not p.has_permission("iwd.complaint.assess"):
+            raise PermissionDenied("You must have active role 'iwd_engineer' and permission 'iwd.complaint.assess'.")
+
+        serializer = EstimateCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        complaint, estimate = resubmit_complaint_estimate(
+            complaint_id=pk,
+            principal=p,
+            estimated_cost=serializer.validated_data["estimated_cost"],
+            estimated_time=serializer.validated_data["estimated_time"],
+            materials_summary=serializer.validated_data["materials_summary"],
+            supporting_details=serializer.validated_data.get("supporting_details", ""),
+        )
+
+        out_serializer = ComplaintDetailSerializer(complaint)
+        return Response(out_serializer.data, status=status.HTTP_201_CREATED)
+
+
+class ComplaintInventoryActionView(APIView):
+    """Inventory verification, material issuance, or stock shortage procurement (BW-IWD-06..08, CW-IWD-02)."""
+
+    permission_classes = [
+        HasModuleGrant("iwd"),
+        HasPermission("iwd.inventory.manage"),
+    ]
+
+    @extend_schema(
+        summary="Execute inventory or procurement action",
+        description="IWD Admin checks stock, issues materials, or coordinates procurement for approved work (BW-IWD-06..08).",
+        request=MaterialIssueActionSerializer,
+        responses={200: ComplaintDetailSerializer},
+    )
+    def post(self, request, pk: int):
+        p = getattr(request, "principal", None)
+        if not p or getattr(p, "active_role", None) != "iwd_admin" or not p.has_permission("iwd.inventory.manage"):
+            raise PermissionDenied("You must have active role 'iwd_admin' and permission 'iwd.inventory.manage'.")
+
+        serializer = MaterialIssueActionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        complaint, _ = execute_inventory_action(
+            complaint_id=pk,
+            principal=p,
+            action=serializer.validated_data["action"],
+            materials_summary=serializer.validated_data.get("materials_summary", ""),
+            remarks=serializer.validated_data.get("remarks", ""),
+        )
+
+        out_serializer = ComplaintDetailSerializer(complaint)
+        return Response(out_serializer.data, status=status.HTTP_200_OK)
 

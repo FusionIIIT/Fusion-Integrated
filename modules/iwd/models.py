@@ -180,3 +180,39 @@ class Estimate(TimeStampedModel):
     def __str__(self) -> str:
         return f"Estimate #{self.pk} for Complaint #{self.complaint_id} [₹{self.estimated_cost}]"
 
+
+class MaterialIssue(TimeStampedModel):
+    """Auditable record of materials issued from stock or procurement for approved work (BR-IWD-011, AFR-IWD-029)."""
+
+    SOURCE_CHOICES = [
+        ("stock", "Warehouse Stock"),
+        ("procurement", "Stock Shortage Procurement"),
+    ]
+
+    complaint = models.ForeignKey(
+        Complaint,
+        on_delete=models.CASCADE,
+        related_name="material_issues",
+    )
+    admin_user_id = models.IntegerField(db_index=True)
+    source = models.CharField(max_length=20, choices=SOURCE_CHOICES)
+    materials_summary = models.TextField()
+    remarks = models.TextField(blank=True, default="")
+    issued_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "iwd_material_issue"
+        indexes = [
+            models.Index(fields=["complaint", "-created_at"], name="iwd_mat_issue_complaint_idx"),
+            models.Index(fields=["admin_user_id", "-created_at"], name="iwd_mat_issue_admin_idx"),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(source__in=["stock", "procurement"]),
+                name="iwd_material_issue_source_valid",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"MaterialIssue #{self.pk} for Complaint #{self.complaint_id} ({self.source})"
+

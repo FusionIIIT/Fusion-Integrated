@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from rest_framework import serializers
 
-from modules.iwd.models import Complaint, ComplaintTransition, Estimate
+from modules.iwd.models import Complaint, ComplaintTransition, Estimate, MaterialIssue
 
 
 class ComplaintCreateSerializer(serializers.Serializer):
@@ -106,6 +106,58 @@ class EstimateReviewActionSerializer(serializers.Serializer):
     )
 
 
+class MaterialIssueDetailSerializer(serializers.ModelSerializer):
+    """Output serializer for material issue records (BW-IWD-06, BW-IWD-07, BW-IWD-08)."""
+
+    class Meta:
+        model = MaterialIssue
+        fields = [
+            "id",
+            "complaint_id",
+            "admin_user_id",
+            "source",
+            "materials_summary",
+            "remarks",
+            "issued_at",
+            "created_at",
+        ]
+
+
+class MaterialIssueActionSerializer(serializers.Serializer):
+    """Input serializer for inventory verification, stock shortage, and material issuance."""
+
+    action = serializers.ChoiceField(
+        choices=[
+            ("issue_stock", "Issue Stock Materials"),
+            ("stock_unavailable", "Stock Unavailable"),
+            ("procurement_complete", "Procurement Complete"),
+            ("issue_material", "Issue Procured Materials"),
+        ],
+        required=True,
+    )
+    materials_summary = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        default="",
+        help_text="Required when issuing materials; itemized list of materials and quantities.",
+    )
+    remarks = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        default="",
+        help_text="Optional remarks, procurement coordination notes, or vendor details.",
+    )
+
+    def validate(self, attrs):
+        action = attrs.get("action")
+        materials_summary = attrs.get("materials_summary", "").strip()
+        if action in ("issue_stock", "issue_material") and not materials_summary:
+            raise serializers.ValidationError({
+                "materials_summary": "Materials summary with quantities is required when issuing materials (AFR-IWD-029, BR-IWD-011)."
+            })
+        return attrs
+
+
 class ComplaintTransitionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ComplaintTransition
@@ -123,6 +175,7 @@ class ComplaintTransitionSerializer(serializers.ModelSerializer):
 class ComplaintDetailSerializer(serializers.ModelSerializer):
     transitions = ComplaintTransitionSerializer(many=True, read_only=True)
     estimates = EstimateDetailSerializer(many=True, read_only=True)
+    material_issues = MaterialIssueDetailSerializer(many=True, read_only=True)
 
     class Meta:
         model = Complaint
@@ -142,6 +195,7 @@ class ComplaintDetailSerializer(serializers.ModelSerializer):
             "updated_at",
             "transitions",
             "estimates",
+            "material_issues",
         ]
 
 
