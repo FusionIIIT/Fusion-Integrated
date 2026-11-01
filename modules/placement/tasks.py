@@ -6,6 +6,8 @@ Ids only in arguments, never ORM objects. Everything is idempotent, because
 from __future__ import annotations
 
 import logging
+from django.db import transaction
+from django.utils import timezone
 
 from celery import shared_task
 
@@ -69,3 +71,24 @@ def rebuild_active_stats() -> int:
     rows = sum(rebuild_stats(season=s) for s in seasons)
     log.info("placement.stats.rebuilt seasons=%d rows=%d", len(seasons), rows)
     return rows
+
+
+@shared_task(name="placement.expire_pending_offers", acks_late=True)
+def expire_pending_offers() -> int:
+    """Expire offers that are past their deadline."""
+    from modules.placement.models import Offer
+    from modules.placement.services import notifications
+
+    now = timezone.now()
+    expired_offers = Offer.objects.filter(status='issued', respond_by__lt=now)
+
+    with transaction.atomic():
+        count = 0
+        for offer in expired_offers:
+            offer.status = 'expired'
+            offer.save(update_fields=['status'])
+            notifications.enqueue_notification(event='offer_expired', user_id=offer.user_id)
+            count += 1
+
+    log.info("placement.offers.expired count=%d", count)
+    return count
