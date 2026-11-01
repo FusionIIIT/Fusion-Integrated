@@ -60,7 +60,7 @@ class Company(TimeStampedModel):
         constraints = [
             # An approval records who made it even if the service layer is bypassed.
             models.CheckConstraint(
-                condition=~Q(approval_status="approved")
+                check=~Q(approval_status="approved")
                 | Q(approved_by_user_id__isnull=False),
                 name="company_approval_is_attributed",
             ),

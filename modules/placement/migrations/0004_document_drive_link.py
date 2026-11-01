@@ -47,6 +47,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='profiledocument',
-            constraint=models.CheckConstraint(condition=models.Q(models.Q(('drive_file_id', ''), ('storage_key__isnull', False)), models.Q(models.Q(('drive_file_id', ''), _negated=True), ('storage_key__isnull', True)), _connector='OR'), name='document_is_link_or_file_not_both'),
+            constraint=models.CheckConstraint(check=models.Q(models.Q(('drive_file_id', ''), ('storage_key__isnull', False)), models.Q(models.Q(('drive_file_id', ''), _negated=True), ('storage_key__isnull', True)), _connector='OR'), name='document_is_link_or_file_not_both'),
         ),
     ]

@@ -161,7 +161,7 @@ class ConductIncident(TimeStampedModel, UserScopedModel):
         constraints = [
             # A waiver is a decision; it must say who made it and why.
             models.CheckConstraint(
-                condition=Q(waived=False)
+                check=Q(waived=False)
                 | (Q(waived=True) & ~Q(waived_reason="")
                    & Q(waived_by_user_id__isnull=False)),
                 name="incident_waiver_is_attributed",

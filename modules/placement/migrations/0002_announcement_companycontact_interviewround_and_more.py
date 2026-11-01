@@ -449,7 +449,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='company',
-            constraint=models.CheckConstraint(condition=models.Q(models.Q(('approval_status', 'approved'), _negated=True), ('approved_by_user_id__isnull', False), _connector='OR'), name='company_approval_is_attributed'),
+            constraint=models.CheckConstraint(check=models.Q(models.Q(('approval_status', 'approved'), _negated=True), ('approved_by_user_id__isnull', False), _connector='OR'), name='company_approval_is_attributed'),
         ),
         migrations.AddIndex(
             model_name='announcement',
@@ -549,7 +549,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='jobposting',
-            constraint=models.CheckConstraint(condition=models.Q(models.Q(('status', 'published'), _negated=True), models.Q(models.Q(('description', ''), _negated=True), ('closes_at__isnull', False)), _connector='OR'), name='posting_published_has_required_content'),
+            constraint=models.CheckConstraint(check=models.Q(models.Q(('status', 'published'), _negated=True), models.Q(models.Q(('description', ''), _negated=True), ('closes_at__isnull', False)), _connector='OR'), name='posting_published_has_required_content'),
         ),
         migrations.AddIndex(
             model_name='recruiterloginattempt',
@@ -633,11 +633,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='interviewround',
-            constraint=models.CheckConstraint(condition=models.Q(('ends_at__isnull', True), ('ends_at__gt', models.F('starts_at')), _connector='OR'), name='round_time_valid'),
+            constraint=models.CheckConstraint(check=models.Q(('ends_at__isnull', True), ('ends_at__gt', models.F('starts_at')), _connector='OR'), name='round_time_valid'),
         ),
         migrations.AddConstraint(
             model_name='interviewround',
-            constraint=models.CheckConstraint(condition=models.Q(models.Q(('mode', 'online'), models.Q(('meeting_url', ''), _negated=True)), models.Q(('mode', 'offline'), models.Q(('venue', ''), _negated=True)), _connector='OR'), name='round_has_a_location'),
+            constraint=models.CheckConstraint(check=models.Q(models.Q(('mode', 'online'), models.Q(('meeting_url', ''), _negated=True)), models.Q(('mode', 'offline'), models.Q(('venue', ''), _negated=True)), _connector='OR'), name='round_has_a_location'),
         ),
         migrations.AddIndex(
             model_name='recruitersession',

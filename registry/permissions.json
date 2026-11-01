@@ -25,10 +25,177 @@
         "placement_coordinator",
         "placement_officer"
       ],
+      "nav": {
+        "base_path": "/directory",
+        "icon": "Users",
+        "items": [
+          {
+            "code": "directory.users",
+            "icon": "Users",
+            "label": "People Directory",
+            "required_permission": "directory.user.search",
+            "sort_order": 10,
+            "to": "/directory"
+          }
+        ],
+        "label": "Directory",
+        "nav_section": "Institute Services",
+        "sort_order": 15,
+        "status": "active"
+      },
       "permissions": [
         {
           "code": "directory.user.search",
           "label": "Search the institute directory"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
+    "leave_elm": {
+      "grants": {
+        "Dean": [
+          "leave_elm.application.view_self",
+          "leave_elm.workflow.review",
+          "leave_elm.workflow.sanction"
+        ],
+        "Deputy Registrar (Estt.)": [
+          "leave_elm.application.view_self",
+          "leave_elm.workflow.review"
+        ],
+        "Director": [
+          "leave_elm.application.apply",
+          "leave_elm.application.view_self",
+          "leave_elm.workflow.sanction"
+        ],
+        "Employee": [
+          "leave_elm.application.apply",
+          "leave_elm.application.cancel",
+          "leave_elm.application.extend",
+          "leave_elm.application.resume",
+          "leave_elm.application.view_self",
+          "leave_elm.application.withdraw"
+        ],
+        "Leave Administrator": [
+          "leave_elm.application.apply",
+          "leave_elm.application.cancel",
+          "leave_elm.application.extend",
+          "leave_elm.application.resume",
+          "leave_elm.application.view_self",
+          "leave_elm.application.withdraw",
+          "leave_elm.configuration.manage",
+          "leave_elm.records.manage",
+          "leave_elm.workflow.review",
+          "leave_elm.workflow.sanction",
+          "leave_elm.workflow.substitute",
+          "leave_elm.year_end.process"
+        ],
+        "Leave Approver": [
+          "leave_elm.application.view_self",
+          "leave_elm.workflow.review"
+        ],
+        "Registrar": [
+          "leave_elm.application.view_self",
+          "leave_elm.workflow.review",
+          "leave_elm.workflow.sanction"
+        ],
+        "Unit Head": [
+          "leave_elm.application.view_self",
+          "leave_elm.workflow.review"
+        ]
+      },
+      "module_grants": [
+        "Dean",
+        "Deputy Registrar (Estt.)",
+        "Director",
+        "Employee",
+        "Leave Administrator",
+        "Leave Approver",
+        "Registrar",
+        "Unit Head"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "Calendar",
+        "items": [
+          {
+            "code": "leave.balance",
+            "icon": "Calendar",
+            "label": "My Leave",
+            "required_permission": "leave_elm.application.view_self",
+            "sort_order": 10,
+            "to": "/leave"
+          },
+          {
+            "code": "leave.tasks",
+            "icon": "Checklist",
+            "label": "Leave Tasks",
+            "required_permission": "leave_elm.workflow.review",
+            "sort_order": 20,
+            "to": "/leave/tasks"
+          },
+          {
+            "code": "leave.admin",
+            "icon": "Settings",
+            "label": "Leave Administration",
+            "required_permission": "leave_elm.configuration.manage",
+            "sort_order": 30,
+            "to": "/leave/admin"
+          }
+        ],
+        "label": "Employee Leave",
+        "nav_section": "Employee Services",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "leave_elm.application.view_self",
+          "label": "View own leave balances and history"
+        },
+        {
+          "code": "leave_elm.application.apply",
+          "label": "Apply for leave"
+        },
+        {
+          "code": "leave_elm.application.withdraw",
+          "label": "Withdraw pending leave"
+        },
+        {
+          "code": "leave_elm.application.cancel",
+          "label": "Request cancellation of approved leave"
+        },
+        {
+          "code": "leave_elm.application.extend",
+          "label": "Request extension of ongoing leave"
+        },
+        {
+          "code": "leave_elm.application.resume",
+          "label": "Submit resumption of duty"
+        },
+        {
+          "code": "leave_elm.workflow.substitute",
+          "label": "Respond to substitute requests"
+        },
+        {
+          "code": "leave_elm.workflow.review",
+          "label": "Review assigned leave tasks"
+        },
+        {
+          "code": "leave_elm.workflow.sanction",
+          "label": "Make final sanctioning decisions"
+        },
+        {
+          "code": "leave_elm.configuration.manage",
+          "label": "Maintain leave configuration"
+        },
+        {
+          "code": "leave_elm.records.manage",
+          "label": "Maintain authorized leave records"
+        },
+        {
+          "code": "leave_elm.year_end.process",
+          "label": "Process leave year end"
         }
       ],
       "scope_permissions": [],

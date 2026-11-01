@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
             options={
                 'db_table': 'placement_conduct_incident',
                 'indexes': [models.Index(fields=['registration', 'kind', 'waived'], name='incident_ladder_idx')],
-                'constraints': [models.CheckConstraint(condition=models.Q(('waived', False), models.Q(('waived', True), models.Q(('waived_reason', ''), _negated=True), ('waived_by_user_id__isnull', False)), _connector='OR'), name='incident_waiver_is_attributed')],
+                'constraints': [models.CheckConstraint(check=models.Q(('waived', False), models.Q(('waived', True), models.Q(('waived_reason', ''), _negated=True), ('waived_by_user_id__isnull', False)), _connector='OR'), name='incident_waiver_is_attributed')],
             },
         ),
     ]

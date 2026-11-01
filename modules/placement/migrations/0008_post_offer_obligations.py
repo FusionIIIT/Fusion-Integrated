@@ -58,6 +58,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='placementrecord',
-            constraint=models.CheckConstraint(condition=models.Q(models.Q(('offer__isnull', False), ('posting__isnull', False), ('source', 'campus')), models.Q(('offer__isnull', True), ('posting__isnull', True), ('source', 'off_campus')), _connector='OR'), name='record_source_matches_its_origin'),
+            constraint=models.CheckConstraint(check=models.Q(models.Q(('offer__isnull', False), ('posting__isnull', False), ('source', 'campus')), models.Q(('offer__isnull', True), ('posting__isnull', True), ('source', 'off_campus')), _connector='OR'), name='record_source_matches_its_origin'),
         ),
     ]

@@ -48,7 +48,7 @@ class ProfileDocument(TimeStampedModel, UserScopedModel):
                                 name="document_user_idx")]
         constraints = [
             models.CheckConstraint(
-                condition=(
+                check=(
                     models.Q(drive_file_id="", storage_key__isnull=False)
                     | (~models.Q(drive_file_id="")
                        & models.Q(storage_key__isnull=True))
