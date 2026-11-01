@@ -34,6 +34,96 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "health_center": {
+      "grants": {
+        "faculty": [
+          "health_center.record.view_self",
+          "health_center.schedule.view"
+        ],
+        "phc_staff": [
+          "health_center.record.manage",
+          "health_center.record.view_self",
+          "health_center.schedule.manage",
+          "health_center.schedule.view"
+        ],
+        "staff": [
+          "health_center.record.view_self",
+          "health_center.schedule.view"
+        ],
+        "student": [
+          "health_center.record.view_self",
+          "health_center.schedule.view"
+        ]
+      },
+      "module_grants": [
+        "faculty",
+        "phc_staff",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/phc",
+        "icon": "FirstAidKit",
+        "items": [
+          {
+            "code": "health_center.schedule.view",
+            "icon": "CalendarBlank",
+            "label": "Doctor Schedule",
+            "required_permission": "health_center.schedule.view",
+            "sort_order": 10,
+            "to": "/phc"
+          },
+          {
+            "code": "health_center.records",
+            "icon": "UserCheck",
+            "label": "My Medical Records",
+            "required_permission": "health_center.record.view_self",
+            "sort_order": 20,
+            "to": "/phc/records"
+          },
+          {
+            "code": "health_center.manage-schedule",
+            "icon": "CalendarPlus",
+            "label": "Manage Schedules",
+            "required_permission": "health_center.schedule.manage",
+            "sort_order": 30,
+            "to": "/phc/manage-schedule"
+          },
+          {
+            "code": "health_center.visits",
+            "icon": "Stethoscope",
+            "label": "Record Visit",
+            "required_permission": "health_center.record.manage",
+            "sort_order": 40,
+            "to": "/phc/visits"
+          }
+        ],
+        "label": "Health Center",
+        "nav_section": "Health Center",
+        "sort_order": 40,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "health_center.schedule.view",
+          "label": "View doctor schedules"
+        },
+        {
+          "code": "health_center.schedule.manage",
+          "label": "Create and modify schedules"
+        },
+        {
+          "code": "health_center.record.view_self",
+          "label": "View own medical records"
+        },
+        {
+          "code": "health_center.record.manage",
+          "label": "Record new visits and update history"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

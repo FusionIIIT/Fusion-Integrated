@@ -105,6 +105,231 @@ paths:
               schema:
                 $ref: '#/components/schemas/Session'
           description: ''
+  /api/v1/phc/records/mine:
+    get:
+      operationId: v1_phc_records_mine_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVisitList'
+          description: ''
+  /api/v1/phc/schedules:
+    get:
+      operationId: v1_phc_schedules_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedScheduleList'
+          description: ''
+    post:
+      operationId: v1_phc_schedules_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Schedule'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Schedule'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Schedule'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+          description: ''
+  /api/v1/phc/schedules/{id}:
+    patch:
+      operationId: v1_phc_schedules_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSchedule'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSchedule'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSchedule'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+          description: ''
+  /api/v1/phc/schedules/{id}/presence:
+    post:
+      operationId: v1_phc_schedules_presence_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Presence'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Presence'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Presence'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Presence'
+          description: ''
+  /api/v1/phc/schedules/{id}/publish:
+    post:
+      operationId: v1_phc_schedules_publish_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Schedule'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Schedule'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Schedule'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+          description: ''
+  /api/v1/phc/visits:
+    get:
+      operationId: v1_phc_visits_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVisitList'
+          description: ''
+    post:
+      operationId: v1_phc_visits_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Visit'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Visit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Visit'
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visit'
+          description: ''
   /api/v1/placement/announcements:
     get:
       operationId: v1_placement_announcements_list
@@ -2315,6 +2540,24 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DayOfWeekEnum:
+      enum:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      type: integer
+      description: |-
+        * `0` - Monday
+        * `1` - Tuesday
+        * `2` - Wednesday
+        * `3` - Thursday
+        * `4` - Friday
+        * `5` - Saturday
+        * `6` - Sunday
     Detail:
       type: object
       properties:
@@ -3000,6 +3243,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PaginatedScheduleList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Schedule'
+    PaginatedVisitList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Visit'
     PatchedJobPosting:
       type: object
       properties:
@@ -3085,6 +3366,35 @@ components:
       properties:
         active_role:
           type: string
+    PatchedSchedule:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        doctor_name:
+          type: string
+          maxLength: 120
+        specialization:
+          type: string
+          maxLength: 80
+        day_of_week:
+          allOf:
+          - $ref: '#/components/schemas/DayOfWeekEnum'
+          minimum: 0
+          maximum: 32767
+        start_time:
+          type: string
+          format: time
+        end_time:
+          type: string
+          format: time
+        published:
+          type: boolean
+          readOnly: true
+        is_present:
+          type: boolean
+          readOnly: true
     PlacementRecordDetail:
       type: object
       description: A student's own record, with what rules 22 and 24 still want from
@@ -3145,6 +3455,36 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    Prescription:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        medicine:
+          type: string
+          maxLength: 120
+        dosage:
+          type: string
+          maxLength: 80
+        duration_days:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        notes:
+          type: string
+      required:
+      - dosage
+      - duration_days
+      - id
+      - medicine
+    Presence:
+      type: object
+      properties:
+        is_present:
+          type: boolean
+      required:
+      - is_present
     ProfileDocument:
       type: object
       description: |-
@@ -3551,6 +3891,43 @@ components:
         * `deregister` - deregister
         * `bar_season` - bar_season
         * `bar_permanent` - bar_permanent
+    Schedule:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        doctor_name:
+          type: string
+          maxLength: 120
+        specialization:
+          type: string
+          maxLength: 80
+        day_of_week:
+          allOf:
+          - $ref: '#/components/schemas/DayOfWeekEnum'
+          minimum: 0
+          maximum: 32767
+        start_time:
+          type: string
+          format: time
+        end_time:
+          type: string
+          format: time
+        published:
+          type: boolean
+          readOnly: true
+        is_present:
+          type: boolean
+          readOnly: true
+      required:
+      - day_of_week
+      - doctor_name
+      - end_time
+      - id
+      - is_present
+      - published
+      - start_time
     ScheduledCount:
       type: object
       properties:
@@ -3814,6 +4191,46 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    Visit:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient_id:
+          type: integer
+          readOnly: true
+        schedule:
+          type: integer
+          readOnly: true
+          nullable: true
+        visit_date:
+          type: string
+          format: date
+          readOnly: true
+        complaint:
+          type: string
+          readOnly: true
+        diagnosis:
+          type: string
+          readOnly: true
+        recorded_by:
+          type: integer
+          readOnly: true
+        prescriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Prescription'
+          readOnly: true
+      required:
+      - complaint
+      - diagnosis
+      - id
+      - patient_id
+      - prescriptions
+      - recorded_by
+      - schedule
+      - visit_date
     WaiveIncident:
       type: object
       properties:
