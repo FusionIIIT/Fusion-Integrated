@@ -5,6 +5,7 @@
 `request_id` is always present, so a user reads it off a toast and support
 greps one id across the logs.
 """
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import exception_handler as drf_handler
@@ -52,6 +53,12 @@ class ConflictError(DomainError):
     message = "The resource is not in a state that allows this."
 
 
+class ServiceUnavailableError(DomainError):
+    code = "service_unavailable"
+    status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    message = "A required service is temporarily unavailable."
+
+
 class AuthenticationFailedError(DomainError):
     """A credential was rejected: 401 "we do not know who you are", as opposed
     to PermissionDeniedError's 403 "we know, and no". Collapsing the two makes
@@ -88,7 +95,7 @@ def exception_handler(exc, context):
 
     response = drf_handler(exc, context)
     if response is None:
-        return None                      # let Django produce the 500
+        return None  # let Django produce the 500
 
     detail = response.data
     details = []
