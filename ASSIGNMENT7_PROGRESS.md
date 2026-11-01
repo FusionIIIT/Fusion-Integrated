@@ -59,7 +59,7 @@
 - Stage 4 (plan): documented above and implementation proceeded under the user's instruction.
 - Stage 5 (implementation): backend models/domain/services/selectors/API/tasks/tests and client routes/API/workspace are present. Generated IAM permission manifest/catalogue entries were added and checked for orphaned grants and unreferenced permissions; systematic notification coverage still needs a final requirements audit.
 - Stage 6 (verification): Python `compileall` passed. Django generated `modules/iaa/migrations/0001_initial.py`, and `makemigrations --check --dry-run` reported no changes using Django 5.2 with minimal IAA-only settings. IAA pytest suite passed 10 tests using an in-process `StrEnum` compatibility shim and SQLite because only Python 3.10 is available and PostgreSQL is not running; these are not full production-runtime checks. Client typecheck passed; Vitest passed 35 tests; Vite production build passed.
-- Stage 7 (final diff and PR): the reviewed 40-file IAA-only change set is committed locally; publication and PR creation are in progress for `Usha2007-feb/Fusion-Integrated:assignment7-iaa` targeting `FusionIIIT/Fusion-Integrated:main`.
+- Stage 7 (final diff and PR): the reviewed 40-file IAA-only change set is pushed to `Usha2007-feb/Fusion-Integrated:assignment7-iaa`; PR [#512](https://github.com/FusionIIIT/Fusion-Integrated/pull/512) is open against `FusionIIIT/Fusion-Integrated:main`.
 
 ## Files and verification log
 
