@@ -7,6 +7,20 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `department`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `department.seminar.request` | Submit graduate seminar scheduling request | `HOD`, `department_admin`, `student` |
+| `department.seminar.view_self` | View one's own seminar requests | `HOD`, `department_admin`, `student` |
+| `department.seminar.view` | View scheduled graduate seminars | `Dean Academic`, `HOD`, `acadadmin`, `department_admin`, `faculty`, `student` |
+| `department.seminar.schedule` | Schedule graduate seminars and record history | `HOD`, `department_admin` |
+| `department.seminar.view_all` | View all seminar requests and scheduling history | `Dean Academic`, `HOD`, `acadadmin`, `department_admin` |
+| `department.allocation.view` | View TA and thesis supervisor allocations | `Dean Academic`, `HOD`, `acadadmin`, `department_admin`, `faculty`, `student` |
+| `department.allocation.manage` | Manage TA and supervisor allocations | `HOD`, `department_admin` |
+| `department.announcement.view` | View department announcements | `Dean Academic`, `HOD`, `acadadmin`, `department_admin`, `faculty`, `student` |
+| `department.announcement.publish` | Publish department announcements | `HOD`, `department_admin` |
+
 ## `directory`
 
 | Code | What it allows | Held by |
