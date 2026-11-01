@@ -695,13 +695,8 @@ class PlacementRecordUpdateView(_Scoped, generics.UpdateAPIView):
         }
 
         # Log the modification
-        from modules.placement.services import audit
-        audit.log_modification(
-            actor=actor,
-            model_name="PlacementRecord",
-            record_id=record.pk,
-            old_values=old_values,
-            new_values=new_values
-        )
+        import structlog
+        logger = structlog.get_logger('placement.audit')
+        logger.info('placement_record.updated', actor_id=getattr(actor, 'user_id', None), record_id=record.pk, old=old_values, new=new_values)
 
         return Response(s.PlacementRecordSerializer(record).data)
