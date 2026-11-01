@@ -19,7 +19,7 @@ def _load_env_file(path):
     shell's exports.
     """
     try:
-        lines = path.read_text().splitlines()
+        lines = path.read_text(encoding="utf-8").splitlines()
     except OSError:
         return
     for line in lines:
