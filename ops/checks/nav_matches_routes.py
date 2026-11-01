@@ -26,7 +26,10 @@ def client_routes(module: str) -> set[str]:
     if not path.exists():
         return set()
     src = path.read_text()
-    return {m.group(1) for m in re.finditer(r'\{\s*path:\s*"([^"]+)"', src)}
+    # Parameterized detail pages are reached through their parent course/list
+    # page; they cannot be static sidebar destinations.
+    return {m.group(1) for m in re.finditer(r'\{\s*path:\s*"([^"]+)"', src)
+            if not any(part.startswith(':') or part == '*' for part in m.group(1).split('/'))}
 
 
 def main() -> int:

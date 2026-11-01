@@ -90,7 +90,12 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.lms",
 ]
+
+# A read-only academic registration adapter; no product mock enrolments.
+LMS_COURSE_PROVIDER = env("LMS_COURSE_PROVIDER", "")
+LMS_UPLOAD_ROOT = env("LMS_UPLOAD_ROOT", str(BASE_DIR / "var" / "lms-private"))
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
                   + PLATFORM_MODULES + DOMAIN_MODULES)
@@ -230,6 +235,10 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "LmsContentTypeEnum": "modules.lms.models.TYPES",
+        "LmsContentStateEnum": "modules.lms.models.STATES",
+    },
 }
 
 CORS_ALLOW_ALL_ORIGINS = False
