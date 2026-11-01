@@ -11,6 +11,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from modules.directory.models import UserRef
+from modules.leave.models import LeaveBalance, RestrictedHoliday
 from modules.placement.models import Application, Company, JobPosting
 
 
@@ -24,6 +25,7 @@ class Command(BaseCommand):
             (1002, "Bo Li", "student", "CSE"),
             (1003, "Chandra Rao", "student", "ECE"),
             (9001, "Dr. Meera Nair", "faculty", ""),
+            (9002, "Ravi Kulkarni", "staff", ""),
         ]:
             UserRef.objects.update_or_create(
                 user_id=uid,
@@ -56,5 +58,24 @@ class Command(BaseCommand):
                           "applied_at": timezone.now()})
 
 
+
+        # ELM: an opening balance per employee, and a published RH calendar.
+        for uid, kind in [(9001, "faculty"), (9002, "staff")]:
+            for leave_type, entitled in [("CL", 8), ("RH", 2), ("SCL", 15),
+                                         ("COL", 20),
+                                         ("VL" if kind == "faculty" else "EL",
+                                          60 if kind == "faculty" else 30)]:
+                LeaveBalance.objects.update_or_create(
+                    user_id=uid, year="2026-27", leave_type=leave_type,
+                    defaults={"entitled": entitled})
+
+        for on_date, name, closed in [("2026-04-14", "Ambedkar Jayanti", False),
+                                      ("2026-08-15", "Independence Day", True),
+                                      ("2026-10-02", "Gandhi Jayanti", True),
+                                      ("2026-11-08", "Guru Nanak Jayanti", False)]:
+            RestrictedHoliday.objects.update_or_create(
+                on_date=on_date, name=name,
+                defaults={"year": "2026-27", "is_closed_holiday": closed,
+                          "is_published": True})
 
         self.stdout.write(self.style.SUCCESS("demo data loaded"))

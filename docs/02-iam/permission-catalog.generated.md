@@ -13,6 +13,18 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave.application.create` | Apply for leave | `Dean Academic`, `Deputy Registrar`, `Director`, `HOD`, `Registrar`, `faculty`, `staff` |
+| `leave.application.view_self` | See one's own leave balances and history | `Dean Academic`, `Deputy Registrar`, `Director`, `HOD`, `Registrar`, `faculty`, `staff` |
+| `leave.application.withdraw` | Withdraw a pending request or ask to cancel an approved leave | `Dean Academic`, `Deputy Registrar`, `Director`, `HOD`, `Registrar`, `faculty`, `staff` |
+| `leave.substitute.respond` | Accept or decline a substitute nomination | `Dean Academic`, `Deputy Registrar`, `Director`, `HOD`, `Registrar`, `faculty`, `staff` |
+| `leave.request.review` | Review as Unit Head: decide CL/RH, recommend the rest | `Dean Academic`, `Deputy Registrar`, `HOD` |
+| `leave.request.sanction` | Take the final sanctioning decision | `Dean Academic`, `Deputy Registrar`, `Director`, `Registrar` |
+| `leave.policy.manage` | Maintain the holiday/RH calendar and leave records | `Deputy Registrar` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
