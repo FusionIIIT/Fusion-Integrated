@@ -54,3 +54,16 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `quiz`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `quiz.manage` | Create and manage quizzes | `professor` |
+| `quiz.question_bank.manage` | Manage the question bank | `professor` |
+| `quiz.evaluate` | Evaluate quiz submissions | `professor` |
+| `quiz.release` | Release quiz results | `professor` |
+| `quiz.report.view` | View quiz reports | `professor` |
+| `quiz.attempt` | Attempt eligible quizzes | `student` |
+| `quiz.result.view_own` | View own released results | `student` |
+| `quiz.history.view_own` | View own quiz history | `student` |

@@ -404,6 +404,88 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "quiz": {
+      "grants": {
+        "professor": [
+          "quiz.evaluate",
+          "quiz.manage",
+          "quiz.question_bank.manage",
+          "quiz.release",
+          "quiz.report.view"
+        ],
+        "student": [
+          "quiz.attempt",
+          "quiz.history.view_own",
+          "quiz.result.view_own"
+        ]
+      },
+      "module_grants": [
+        "professor",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/quiz",
+        "icon": "ClipboardCheck",
+        "items": [
+          {
+            "code": "quiz.manage",
+            "icon": "ClipboardCheck",
+            "label": "Quizzes",
+            "required_permission": "quiz.manage",
+            "sort_order": 10,
+            "to": "/quiz"
+          },
+          {
+            "code": "quiz.attempt",
+            "icon": "Pencil",
+            "label": "My Quizzes",
+            "required_permission": "quiz.attempt",
+            "sort_order": 20,
+            "to": "/quiz/my"
+          }
+        ],
+        "label": "Quiz Management",
+        "nav_section": "Academic",
+        "sort_order": 40,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "quiz.manage",
+          "label": "Create and manage quizzes"
+        },
+        {
+          "code": "quiz.question_bank.manage",
+          "label": "Manage the question bank"
+        },
+        {
+          "code": "quiz.evaluate",
+          "label": "Evaluate quiz submissions"
+        },
+        {
+          "code": "quiz.release",
+          "label": "Release quiz results"
+        },
+        {
+          "code": "quiz.report.view",
+          "label": "View quiz reports"
+        },
+        {
+          "code": "quiz.attempt",
+          "label": "Attempt eligible quizzes"
+        },
+        {
+          "code": "quiz.result.view_own",
+          "label": "View own released results"
+        },
+        {
+          "code": "quiz.history.view_own",
+          "label": "View own quiz history"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
     }
   },
   "publisher": "integrated",

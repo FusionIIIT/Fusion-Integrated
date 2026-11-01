@@ -153,6 +153,14 @@ def known_gaps(manifest: dict) -> list[str]:
 #: immediately instead of joining a pile nobody counts. Deleting a line
 #: here is the definition of done for that feature.
 KNOWN_UNENFORCED = frozenset({
+    "quiz.attempt",
+    "quiz.evaluate",
+    "quiz.history.view_own",
+    "quiz.manage",
+    "quiz.question_bank.manage",
+    "quiz.release",
+    "quiz.report.view",
+    "quiz.result.view_own",
 })
 
 
