@@ -215,3 +215,4 @@ class Migration(migrations.Migration):
             index=models.Index(fields=['is_escalated', '-created_at'], name='cmp_escalated_idx'),
         ),
     ]
+

@@ -56,3 +56,4 @@ def test_bw_cms_06_reopening_approved():
     """BW-CMS-06: Closed -> In Progress."""
     t = validate_transition(ComplaintStatus.CLOSED, ComplaintStatus.IN_PROGRESS, permissions={"*"})
     assert t.to == ComplaintStatus.IN_PROGRESS
+

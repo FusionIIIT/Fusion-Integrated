@@ -20,3 +20,4 @@ def test_get_user_complaint_counts_empty():
 def test_get_complaint_summaries_empty():
     res = get_complaint_summaries([])
     assert res == {}
+
