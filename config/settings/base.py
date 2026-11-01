@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.iaa",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -185,6 +186,11 @@ NOTIFY_DAILY_CAP_PER_RECIPIENT = env_int("NOTIFY_DAILY_CAP_PER_RECIPIENT", 20)
 PLACEMENT_UPLOAD_ROOT = env(
     "PLACEMENT_UPLOAD_ROOT",
     str(Path.home() / ".local" / "share" / "fusion-integrated" / "uploads"))
+# IAA evidence is written with private file/directory modes and never exposed
+# through a direct storage URL.
+IAA_UPLOAD_ROOT = env(
+    "IAA_UPLOAD_ROOT",
+    str(Path.home() / ".local" / "share" / "fusion-integrated" / "iaa-evidence"))
 #: When set, legacy reads go to nginx via X-Accel-Redirect. Must be `internal;`.
 PLACEMENT_UPLOAD_INTERNAL_PREFIX = env("PLACEMENT_UPLOAD_INTERNAL_PREFIX", "")
 
