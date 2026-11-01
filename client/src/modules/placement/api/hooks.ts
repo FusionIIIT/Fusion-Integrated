@@ -227,6 +227,15 @@ export function useRegisterCompany() {
   });
 }
 
+export function useRequestCompanyRegistration() {
+  return useMutation({
+    mutationFn: async (body: {
+      name: string; sector?: string; website?: string; hq_city?: string;
+      contact_name?: string; contact_email?: string; contact_phone?: string;
+    }) => (await http.post<Company>("/placement/companies/register", body)).data,
+  });
+}
+
 export function useCompanyDecision() {
   const qc = useQueryClient();
   return useMutation({
