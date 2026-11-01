@@ -1674,6 +1674,176 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/quizzes/available:
+    get:
+      operationId: v1_quizzes_available_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedQuizList'
+          description: ''
+  /api/v1/quizzes/available/{id}/start:
+    post:
+      operationId: v1_quizzes_available_start_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attempt'
+          description: ''
+  /api/v1/quizzes/my-attempts/{id}/responses:
+    put:
+      operationId: v1_quizzes_my_attempts_responses_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveResponse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SaveResponse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SaveResponse'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/quizzes/my-attempts/{id}/submit:
+    post:
+      operationId: v1_quizzes_my_attempts_submit_create
+      description: Marks immediately and returns the score.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attempt'
+          description: ''
+  /api/v1/quizzes/quizzes:
+    get:
+      operationId: v1_quizzes_quizzes_list
+      description: The professor's own quizzes; POST creates one with its questions.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedQuizList'
+          description: ''
+    post:
+      operationId: v1_quizzes_quizzes_create
+      description: The professor's own quizzes; POST creates one with its questions.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Quiz'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Quiz'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Quiz'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quiz'
+          description: ''
+  /api/v1/quizzes/quizzes/{id}/publish:
+    post:
+      operationId: v1_quizzes_quizzes_publish_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quiz'
+          description: ''
 components:
   schemas:
     AcademicDirectory:
@@ -1981,6 +2151,47 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    Attempt:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        quiz:
+          type: integer
+        status:
+          $ref: '#/components/schemas/AttemptStatusEnum'
+        deadline:
+          type: string
+          format: date-time
+        score:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
+          nullable: true
+        questions:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          description: The paper, in this attempt's fixed order, without the answer
+            key.
+          readOnly: true
+      required:
+      - deadline
+      - id
+      - questions
+      - quiz
+    AttemptStatusEnum:
+      enum:
+      - in_progress
+      - submitted
+      - auto_submitted
+      type: string
+      description: |-
+        * `in_progress` - In Progress
+        * `submitted` - Submitted
+        * `auto_submitted` - Auto Submitted
     AudienceEnum:
       enum:
       - students
@@ -2886,6 +3097,16 @@ components:
           maxLength: 300
       required:
       - season
+    Option:
+      type: object
+      properties:
+        text:
+          type: string
+          maxLength: 500
+        is_correct:
+          type: boolean
+      required:
+      - text
     PaginatedAnnouncementList:
       type: object
       required:
@@ -3000,6 +3221,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PaginatedQuizList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Quiz'
     PatchedJobPosting:
       type: object
       properties:
@@ -3201,6 +3441,103 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    Question:
+      type: object
+      properties:
+        question_type:
+          $ref: '#/components/schemas/QuestionTypeEnum'
+        text:
+          type: string
+        marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+        negative_marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+        accepted_answers: {}
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+      required:
+      - marks
+      - question_type
+      - text
+    QuestionTypeEnum:
+      enum:
+      - mcq
+      - multi_select
+      - true_false
+      - fill_blank
+      type: string
+      description: |-
+        * `mcq` - Mcq
+        * `multi_select` - Multi Select
+        * `true_false` - True False
+        * `fill_blank` - Fill Blank
+    Quiz:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        course_code:
+          type: string
+          maxLength: 32
+        title:
+          type: string
+          maxLength: 200
+        instructions:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/QuizStatusEnum'
+          readOnly: true
+        opens_at:
+          type: string
+          format: date-time
+        closes_at:
+          type: string
+          format: date-time
+        duration_minutes:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        max_attempts:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        shuffle_questions:
+          type: boolean
+        negative_marking:
+          type: boolean
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Question'
+          writeOnly: true
+      required:
+      - closes_at
+      - course_code
+      - duration_minutes
+      - id
+      - opens_at
+      - status
+      - title
+    QuizStatusEnum:
+      enum:
+      - draft
+      - scheduled
+      - available
+      - closed
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `scheduled` - Scheduled
+        * `available` - Available
+        * `closed` - Closed
     Recommendation:
       type: object
       description: |-
@@ -3551,6 +3888,20 @@ components:
         * `deregister` - deregister
         * `bar_season` - bar_season
         * `bar_permanent` - bar_permanent
+    SaveResponse:
+      type: object
+      properties:
+        question_id:
+          type: integer
+        selected_option_ids:
+          type: array
+          items:
+            type: integer
+        text:
+          type: string
+          default: ''
+      required:
+      - question_id
     ScheduledCount:
       type: object
       properties:
