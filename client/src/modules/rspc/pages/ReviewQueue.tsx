@@ -40,7 +40,7 @@ const ReviewQueue = () => {
     load();
   }, []);
 
-  const getActions = (status: string): { action: string; outcomes: string[] } => {
+  const getActions = (status: string): { action: string; outcomes: string[] } | undefined => {
     return ACTIONS[status];
   };
 
@@ -78,31 +78,36 @@ const ReviewQueue = () => {
             </tr>
           </thead>
           <tbody>
-            {proposals.map(p => (
-              <tr key={p.id}>
-                <td>{p.id}</td>
-                <td>{p.title}</td>
-                <td>{p.objectives}</td>
-                <td>{p.budget}</td>
-                <td>{p.department}</td>
-                <td>{p.status}</td>
-                <td>
-                  <Textarea
-                    value={remarks[p.id] || ""}
-                    onChange={e => handleRemarkChange(p.id, e.target.value)}
-                  />
-                </td>
-                <td>
-                  <Group>
-                    {getActions(p.status).outcomes.map(outcome => (
-                      <Button key={outcome} onClick={() => handleAction(p.id, getActions(p.status).action, outcome, remarks[p.id] || "")}>
-                        {outcome}
-                      </Button>
-                    ))}
-                  </Group>
-                </td>
-              </tr>
-            ))}
+            {proposals.map(p => {
+              const actions = getActions(p.status);
+              return (
+                <tr key={p.id}>
+                  <td>{p.id}</td>
+                  <td>{p.title}</td>
+                  <td>{p.objectives}</td>
+                  <td>{p.budget}</td>
+                  <td>{p.department}</td>
+                  <td>{p.status}</td>
+                  <td>
+                    <Textarea
+                      value={remarks[p.id] || ""}
+                      onChange={e => handleRemarkChange(p.id, e.target.value)}
+                    />
+                  </td>
+                  <td>
+                    {actions && (
+                      <Group>
+                        {actions.outcomes.map(outcome => (
+                          <Button key={outcome} onClick={() => handleAction(p.id, actions.action, outcome, remarks[p.id] || "")}>
+                            {outcome}
+                          </Button>
+                        ))}
+                      </Group>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </Table>
       )}

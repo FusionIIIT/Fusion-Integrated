@@ -23,7 +23,7 @@ const SubmitProposal = () => {
     setSuccess(false);
 
     try {
-      const response = await http.post("/rspc/proposals/", formData);
+      await http.post("/rspc/proposals/", formData);
       setFormData({
         title: "",
         objectives: "",
@@ -82,7 +82,7 @@ const SubmitProposal = () => {
               label="Budget"
               name="budget"
               value={formData.budget}
-              onChange={(value) => setFormData({ ...formData, budget: value })}
+              onChange={(value) => setFormData({ ...formData, budget: Number(value) })}
               required
             />
             <TextInput
