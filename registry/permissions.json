@@ -278,6 +278,198 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "systemadmin": {
+      "grants": {
+        "IT Head": [
+          "systemadmin.archive.view",
+          "systemadmin.audit.view",
+          "systemadmin.dashboard.view",
+          "systemadmin.purge.authorize"
+        ],
+        "Super Admin": [
+          "systemadmin.archive.execute",
+          "systemadmin.archive.restore",
+          "systemadmin.archive.view",
+          "systemadmin.audit.report",
+          "systemadmin.audit.view",
+          "systemadmin.config.manage",
+          "systemadmin.dashboard.view",
+          "systemadmin.purge.request",
+          "systemadmin.role.assign",
+          "systemadmin.role.extend",
+          "systemadmin.role.reassign",
+          "systemadmin.role.revoke",
+          "systemadmin.role.view",
+          "systemadmin.user.bulk",
+          "systemadmin.user.create",
+          "systemadmin.user.edit",
+          "systemadmin.user.status",
+          "systemadmin.user.view"
+        ]
+      },
+      "module_grants": [
+        "IT Head",
+        "Super Admin"
+      ],
+      "nav": {
+        "base_path": "/systemadmin",
+        "icon": "FaShieldAlt",
+        "items": [
+          {
+            "code": "systemadmin.dashboard",
+            "icon": "FaChartPie",
+            "label": "Dashboard",
+            "required_permission": "systemadmin.dashboard.view",
+            "sort_order": 10,
+            "to": "/systemadmin/dashboard"
+          },
+          {
+            "code": "systemadmin.users",
+            "icon": "FaUsers",
+            "label": "User Directory",
+            "required_permission": "systemadmin.user.view",
+            "sort_order": 20,
+            "to": "/systemadmin/users"
+          },
+          {
+            "code": "systemadmin.roles",
+            "icon": "FaIdBadge",
+            "label": "Role Directory",
+            "required_permission": "systemadmin.role.view",
+            "sort_order": 30,
+            "to": "/systemadmin/roles"
+          },
+          {
+            "code": "systemadmin.assignments",
+            "icon": "FaUserCheck",
+            "label": "Role Assignments",
+            "required_permission": "systemadmin.role.assign",
+            "sort_order": 40,
+            "to": "/systemadmin/assignments"
+          },
+          {
+            "code": "systemadmin.archival",
+            "icon": "FaArchive",
+            "label": "Data & User Archival",
+            "required_permission": "systemadmin.archive.view",
+            "sort_order": 50,
+            "to": "/systemadmin/archival"
+          },
+          {
+            "code": "systemadmin.audit",
+            "icon": "FaClipboardList",
+            "label": "Audit Logs",
+            "required_permission": "systemadmin.audit.view",
+            "sort_order": 60,
+            "to": "/systemadmin/audit"
+          },
+          {
+            "code": "systemadmin.reports",
+            "icon": "FaChartBar",
+            "label": "Audit Reports",
+            "required_permission": "systemadmin.audit.report",
+            "sort_order": 70,
+            "to": "/systemadmin/reports"
+          },
+          {
+            "code": "systemadmin.config",
+            "icon": "FaCog",
+            "label": "System Configuration",
+            "required_permission": "systemadmin.config.manage",
+            "sort_order": 80,
+            "to": "/systemadmin/configuration"
+          }
+        ],
+        "label": "System Administration",
+        "nav_section": "Administration",
+        "sort_order": 1,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "systemadmin.dashboard.view",
+          "label": "View the Super Admin monitoring dashboard and metrics"
+        },
+        {
+          "code": "systemadmin.user.view",
+          "label": "View basic user profiles and directory information"
+        },
+        {
+          "code": "systemadmin.user.create",
+          "label": "Create Student, Faculty, and Staff basic-user accounts"
+        },
+        {
+          "code": "systemadmin.user.edit",
+          "label": "Update editable basic-user profile information"
+        },
+        {
+          "code": "systemadmin.user.status",
+          "label": "Deactivate and reactivate basic-user accounts"
+        },
+        {
+          "code": "systemadmin.user.bulk",
+          "label": "Execute bulk CSV user creation and batch status operations"
+        },
+        {
+          "code": "systemadmin.role.view",
+          "label": "Inspect system-maintained role definitions and availability"
+        },
+        {
+          "code": "systemadmin.role.assign",
+          "label": "Assign additional roles to eligible basic users"
+        },
+        {
+          "code": "systemadmin.role.reassign",
+          "label": "Reassign active roles to new holders with work handover"
+        },
+        {
+          "code": "systemadmin.role.revoke",
+          "label": "Revoke active and scheduled role assignments early"
+        },
+        {
+          "code": "systemadmin.role.extend",
+          "label": "Extend validity of time-bound role assignments"
+        },
+        {
+          "code": "systemadmin.archive.view",
+          "label": "Search and view archived users and historical records"
+        },
+        {
+          "code": "systemadmin.archive.execute",
+          "label": "Archive eligible deactivated users and historical data"
+        },
+        {
+          "code": "systemadmin.archive.restore",
+          "label": "Restore eligible archived users and historical datasets"
+        },
+        {
+          "code": "systemadmin.purge.request",
+          "label": "Submit dual-authorization permanent data purge requests"
+        },
+        {
+          "code": "systemadmin.purge.authorize",
+          "label": "Authorize or reject permanent data purge requests as IT Head"
+        },
+        {
+          "code": "systemadmin.audit.view",
+          "label": "Inspect immutable Super Admin audit logs"
+        },
+        {
+          "code": "systemadmin.audit.report",
+          "label": "Generate and export tabular and graphical audit reports"
+        },
+        {
+          "code": "systemadmin.config.manage",
+          "label": "Configure permitted system-wide parameters"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "systemadmin.archive.finalize_non_restorable",
+        "systemadmin.role.activate_scheduled",
+        "systemadmin.role.auto_expire"
+      ]
     }
   },
   "publisher": "integrated",
