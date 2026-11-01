@@ -278,6 +278,103 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "rspc": {
+      "grants": {
+        "Dean-RSPC": [
+          "rspc.proposal.decide",
+          "rspc.proposal.view_queue"
+        ],
+        "Director": [
+          "rspc.proposal.authorize",
+          "rspc.proposal.view_queue"
+        ],
+        "Faculty": [
+          "rspc.proposal.submit",
+          "rspc.proposal.view_self"
+        ],
+        "HoD": [
+          "rspc.proposal.recommend",
+          "rspc.proposal.view_queue"
+        ],
+        "RSPC Admin": [
+          "rspc.proposal.verify",
+          "rspc.proposal.view_queue"
+        ]
+      },
+      "module_grants": [
+        "Dean-RSPC",
+        "Director",
+        "Faculty",
+        "HoD",
+        "RSPC Admin"
+      ],
+      "nav": {
+        "base_path": "/rspc",
+        "icon": "Flask",
+        "items": [
+          {
+            "code": "rspc.submit",
+            "icon": "PaperPlane",
+            "label": "Submit Proposal",
+            "required_permission": "rspc.proposal.submit",
+            "sort_order": 5,
+            "to": "/rspc/submit"
+          },
+          {
+            "code": "rspc.mine",
+            "icon": "UserCheck",
+            "label": "My Proposals",
+            "required_permission": "rspc.proposal.view_self",
+            "sort_order": 10,
+            "to": "/rspc/mine"
+          },
+          {
+            "code": "rspc.queue",
+            "icon": "CalendarBlank",
+            "label": "Review Queue",
+            "required_permission": "rspc.proposal.view_queue",
+            "sort_order": 20,
+            "to": "/rspc/queue"
+          }
+        ],
+        "label": "RSPC",
+        "nav_section": "Research",
+        "sort_order": 30,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "rspc.proposal.submit",
+          "label": "Submit a research project proposal"
+        },
+        {
+          "code": "rspc.proposal.view_self",
+          "label": "View own proposals"
+        },
+        {
+          "code": "rspc.proposal.recommend",
+          "label": "Recommend a proposal from the department"
+        },
+        {
+          "code": "rspc.proposal.verify",
+          "label": "Verify a department-recommended proposal"
+        },
+        {
+          "code": "rspc.proposal.decide",
+          "label": "Decide an admin-verified proposal"
+        },
+        {
+          "code": "rspc.proposal.authorize",
+          "label": "Authorize a proposal forwarded to Director"
+        },
+        {
+          "code": "rspc.proposal.view_queue",
+          "label": "View the review queue"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
     }
   },
   "publisher": "integrated",
