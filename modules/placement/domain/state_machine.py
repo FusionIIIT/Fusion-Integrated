@@ -69,8 +69,8 @@ TRANSITIONS: tuple[Transition, ...] = (
                frozenset({STAFF, RECRUITER}), ("window_open", "profile_complete", "is_eligible", "may_apply")),
 
     # -- review and shortlisting (PC-WF-005) ------------------------------
-    _review(SUBMITTED, UNDER_REVIEW),
-    _review(SUBMITTED, REJECTED, "has_reason"),
+    _review(APPLIED, UNDER_REVIEW),
+    _review(APPLIED, REJECTED, "has_reason"),
     _review(UNDER_REVIEW, SHORTLISTED),
     _review(UNDER_REVIEW, REJECTED, "has_reason"),
     _review(SHORTLISTED, REJECTED, "has_reason"),
