@@ -27,9 +27,9 @@
 
 ## Repository baseline
 
-- Repository: Fusion-Integrated; origin is `Usha2007-feb/Fusion-Integrated`, upstream is `Manivardhan-17507/Fusion-Integrated`.
-- PR base: fetched official `upstream/main` at `02b01fe` (the local `main`/`origin/main` were 36 commits behind).
-- Working branch: `codex/assignment7-iaa`, created from local `main`, then rebased onto official `upstream/main` before publication.
+- Source repository: `Usha2007-feb/Fusion-Integrated` (personal fork).
+- Target repository: `FusionIIIT/Fusion-Integrated`, base branch `main` at `02b01fea4a67b257ea7000009f06a1561699550e`.
+- Working branch: `assignment7-iaa`, based on target `main`; the local `main`/fork `origin/main` were 36 commits behind.
 - Starting worktree contained only the unrelated untracked `ELM_SPECIFICATIONS(2).code-workspace`; it is preserved.
 - No IAA module, route, registry entry, or IAA tests exist on the base branch.
 - Architecture uses independent Django modules, module-owned models/migrations, pure-Python domain rules, selectors for visibility, services for writes, IAM `Principal` permission checks, `modules/<name>/registry.py`, and lazy client module routes.
@@ -47,8 +47,8 @@
 
 ## Approval and change-management
 
-- User authorized creating `codex/assignment7-iaa` and continuing after the plan is documented.
-- The initial request prohibited commit/push until explicit authorization. The later user request explicitly authorized committing, pushing, and creating the PR; those actions are complete. The unrelated workspace file was kept out of the commit. The Assignment 7 Google Form was not submitted.
+- User authorized creating the `assignment7-iaa` feature branch and continuing after the plan is documented.
+- The initial request prohibited commit/push until explicit authorization. The later user request explicitly authorized committing, pushing, and creating the PR. The unrelated workspace file remains excluded. The Assignment 7 Google Form was not submitted.
 - The user authorized deriving and labeling candidate AFR-to-UC/BR/workflow links from detailed specification prose, and using the exact actor labels as IAA role keys.
 
 ## Implementation status
@@ -59,7 +59,7 @@
 - Stage 4 (plan): documented above and implementation proceeded under the user's instruction.
 - Stage 5 (implementation): backend models/domain/services/selectors/API/tasks/tests and client routes/API/workspace are present. Generated IAM permission manifest/catalogue entries were added and checked for orphaned grants and unreferenced permissions; systematic notification coverage still needs a final requirements audit.
 - Stage 6 (verification): Python `compileall` passed. Django generated `modules/iaa/migrations/0001_initial.py`, and `makemigrations --check --dry-run` reported no changes using Django 5.2 with minimal IAA-only settings. IAA pytest suite passed 10 tests using an in-process `StrEnum` compatibility shim and SQLite because only Python 3.10 is available and PostgreSQL is not running; these are not full production-runtime checks. Client typecheck passed; Vitest passed 35 tests; Vite production build passed.
-- Stage 7 (final diff and PR): complete; 40-file IAA-only diff reviewed, committed as `567752817df8ecf9e9d2e6b11898d0290eb043c9`, pushed to `Usha2007-feb/Fusion-Integrated:codex/assignment7-iaa`, and opened as https://github.com/Manivardhan-17507/Fusion-Integrated/pull/1 against official `main`.
+- Stage 7 (final diff and PR): the reviewed 40-file IAA-only change set is committed locally; publication and PR creation are in progress for `Usha2007-feb/Fusion-Integrated:assignment7-iaa` targeting `FusionIIIT/Fusion-Integrated:main`.
 
 ## Files and verification log
 
