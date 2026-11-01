@@ -66,12 +66,10 @@ _TRANSITIONS = {
     ("establishment_pending", "reject"): "rejected",
     ("final_pending", "approve"): "approved",
     ("final_pending", "reject"): "rejected",
-    ("cancellation_pending", "approve"): "cancelled",
-    ("cancellation_pending", "reject"): "approved",
     ("resumption_pending", "review"): "resumption_reviewed",
     ("substitute_declined", "nominate_substitute"): "substitute_pending",
     ("cancellation_unit_head_pending", "approve_cancellation"): "cancelled",
-    ("cancellation_unit_head_pending", "reject_cancellation"): "approved",
+    ("cancellation_unit_head_pending", "reject_cancellation"): "rejected",
     ("cancellation_unit_head_pending", "recommend_cancellation"): "cancellation_final_pending",
     (
         "cancellation_unit_head_pending",
@@ -85,9 +83,9 @@ _TRANSITIONS = {
         "cancellation_establishment_pending",
         "return_cancellation_to_unit_head",
     ): "cancellation_unit_head_pending",
-    ("cancellation_establishment_pending", "reject_cancellation"): "approved",
+    ("cancellation_establishment_pending", "reject_cancellation"): "rejected",
     ("cancellation_final_pending", "approve_cancellation"): "cancelled",
-    ("cancellation_final_pending", "reject_cancellation"): "approved",
+    ("cancellation_final_pending", "reject_cancellation"): "rejected",
 }
 
 

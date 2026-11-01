@@ -20,6 +20,7 @@ from modules.employee_leave.services import (
     P_FINAL,
     P_OFFLINE,
     P_UNIT_HEAD,
+    acknowledge_task_notice,
     act,
     assigned_tasks,
     employee_balances,
@@ -28,6 +29,7 @@ from modules.employee_leave.services import (
     record_offline,
     request_extension,
     submit,
+    task_notices_for,
     visible_requests,
 )
 
@@ -189,6 +191,33 @@ class LeaveTaskQueueView(APIView):
     def get(self, request):
         rows = assigned_tasks(_actor(request)).order_by("created_at")
         return Response(_serialize_requests(rows))
+
+
+class LeaveTaskNoticeListView(APIView):
+    permission_classes = [
+        MODULE,
+        HasPermission(
+            "employee_leave.request.work_queue",
+            "employee_leave.request.respond_substitute",
+            P_UNIT_HEAD,
+            P_ESTABLISHMENT,
+            P_FINAL,
+        ),
+    ]
+
+    @extend_schema(responses=s.LeaveTaskNoticeSerializer(many=True))
+    def get(self, request):
+        rows = task_notices_for(_actor(request))[:100]
+        return Response(s.LeaveTaskNoticeSerializer(rows, many=True).data)
+
+
+class LeaveTaskNoticeReadView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(request=None, responses=s.LeaveTaskNoticeSerializer)
+    def post(self, request, pk):
+        notice = acknowledge_task_notice(actor=_actor(request), notice_id=pk)
+        return Response(s.LeaveTaskNoticeSerializer(notice).data)
 
 
 class LeavePolicyView(generics.ListCreateAPIView):

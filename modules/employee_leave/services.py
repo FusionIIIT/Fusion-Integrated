@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from datetime import timedelta
 from decimal import Decimal
 
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models import Q, Sum
 from django.utils import timezone
 
@@ -16,6 +17,7 @@ from modules.employee_leave.models import (
     LeaveLedgerEntry,
     LeavePolicy,
     LeaveRequest,
+    LeaveTaskNotice,
     LeaveYearEndRun,
 )
 
@@ -44,11 +46,7 @@ def visible_requests(actor):
     if actor.has_any_permission(P_VIEW_ALL, P_UNIT_HEAD, P_ESTABLISHMENT, P_FINAL):
         if actor.has_permission(P_VIEW_ALL):
             return rows
-        return rows.filter(
-            Q(employee_id=actor.user_id)
-            | Q(assigned_user_id=actor.user_id)
-            | Q(assigned_role__in=_roles_for(actor))
-        )
+        return rows.filter(Q(employee_id=actor.user_id) | _assigned_scope(actor))
     return rows.filter(Q(employee_id=actor.user_id) | Q(assigned_user_id=actor.user_id))
 
 
@@ -68,13 +66,20 @@ def _roles_for(actor):
             )
             if role
         )
+        roles.extend(
+            role
+            for role in LeavePolicy.objects.exclude(escalation_role="").values_list(
+                "escalation_role", flat=True
+            )
+            if role
+        )
     return roles
 
 
 def assigned_tasks(actor):
     return (
         visible_requests(actor)
-        .filter(Q(assigned_user_id=actor.user_id) | Q(assigned_role__in=_roles_for(actor)))
+        .filter(_assigned_scope(actor))
         .exclude(
             status__in=(
                 "approved",
@@ -105,6 +110,20 @@ def _require_employee(user_id, *, label):
         raise ConflictError(
             f"{label} must be an active Fusion employee.", code="employee_not_eligible"
         )
+    return person
+
+
+def _assigned_scope(actor):
+    scope = Q(assigned_user_id=actor.user_id)
+    roles = _roles_for(actor)
+    if P_UNIT_HEAD in actor.permissions:
+        roles = [role for role in roles if role != "unit_head"]
+        department = directory.get_users([actor.user_id]).get(actor.user_id)
+        if department and department.department:
+            scope |= Q(assigned_role="unit_head", department=department.department)
+    if roles:
+        scope |= Q(assigned_role__in=roles)
+    return scope
 
 
 def _reserved_days(user_id, policy_id):
@@ -125,6 +144,19 @@ def _reserved_days(user_id, policy_id):
 
 def _assign(request, status, policy):
     request.status = status
+    pending = status in {
+        "substitute_pending",
+        "unit_head_pending",
+        "establishment_pending",
+        "final_pending",
+        "cancellation_unit_head_pending",
+        "cancellation_establishment_pending",
+        "cancellation_final_pending",
+        "resumption_pending",
+    }
+    request.assigned_at = timezone.now() if pending else None
+    request.sla_reminded_at = None
+    request.sla_escalated_at = None
     if status == "substitute_pending":
         request.assigned_user_id = request.substitute_id
         request.assigned_role = "substitute"
@@ -151,6 +183,139 @@ def _assign(request, status, policy):
         request.assigned_user_id = None
 
 
+def _queue_task_notice(request, event, message):
+    if not request.assigned_role and request.assigned_user_id is None:
+        return None
+    assigned_at = request.assigned_at.isoformat() if request.assigned_at else "unassigned"
+    return LeaveTaskNotice.objects.get_or_create(
+        dedupe_key=(
+            f"leave:{request.pk}:{event}:{request.status}:{request.assigned_role}:{assigned_at}"
+        ),
+        defaults={
+            "request": request,
+            "event": event,
+            "recipient_user_id": request.assigned_user_id,
+            "assigned_role": request.assigned_role,
+            "message": message[:300],
+        },
+    )[0]
+
+
+def _queue_employee_notice(request, decision_id):
+    return LeaveTaskNotice.objects.get_or_create(
+        dedupe_key=f"leave:{request.pk}:decision:{decision_id}",
+        defaults={
+            "request": request,
+            "event": "decision",
+            "recipient_user_id": request.employee_id,
+            "message": (
+                f"Your leave request #{request.pk} is now {request.status.replace('_', ' ')}."
+            ),
+        },
+    )[0]
+
+
+def task_notices_for(actor):
+    if actor is None:
+        return LeaveTaskNotice.objects.none()
+    if actor.has_permission(P_VIEW_ALL):
+        return LeaveTaskNotice.objects.all()
+    scope = Q(recipient_user_id=actor.user_id)
+    roles = _roles_for(actor)
+    if P_UNIT_HEAD in actor.permissions:
+        roles = [role for role in roles if role != "unit_head"]
+        department = directory.get_users([actor.user_id]).get(actor.user_id)
+        if department and department.department:
+            scope |= Q(assigned_role="unit_head", request__department=department.department)
+    if roles:
+        scope |= Q(assigned_role__in=roles)
+    return LeaveTaskNotice.objects.filter(scope)
+
+
+@transaction.atomic
+def acknowledge_task_notice(*, actor, notice_id):
+    notice = task_notices_for(actor).select_for_update().filter(pk=notice_id).first()
+    if notice is None:
+        raise NotFoundError("No such task notice.")
+    if notice.read_at is None:
+        notice.read_at = timezone.now()
+        notice.save(update_fields=("read_at", "updated_at"))
+    return notice
+
+
+@transaction.atomic
+def process_sla(*, now=None, limit=500):
+    """Record one role-visible reminder, then escalate overdue pending tasks once."""
+    now = now or timezone.now()
+    pending_statuses = (
+        "substitute_pending",
+        "unit_head_pending",
+        "establishment_pending",
+        "final_pending",
+        "cancellation_unit_head_pending",
+        "cancellation_establishment_pending",
+        "cancellation_final_pending",
+        "resumption_pending",
+    )
+    rows = list(
+        LeaveRequest.objects.select_for_update()
+        .select_related("policy")
+        .filter(status__in=pending_statuses, assigned_at__isnull=False)
+        .order_by("assigned_at")[:limit]
+    )
+    reminders = escalations = 0
+    for request in rows:
+        is_unit_stage = request.status in {
+            "unit_head_pending",
+            "cancellation_unit_head_pending",
+            "substitute_pending",
+        }
+        threshold_hours = (
+            request.policy.unit_head_sla_hours
+            if is_unit_stage
+            else request.policy.final_sanction_sla_hours
+        )
+        due_at = request.assigned_at + timedelta(hours=threshold_hours)
+        touched = []
+        if now >= due_at and request.sla_reminded_at is None:
+            _queue_task_notice(
+                request,
+                "reminder",
+                f"Leave request #{request.pk} is still pending at {request.assigned_role}.",
+            )
+            request.sla_reminded_at = now
+            touched.append("sla_reminded_at")
+            reminders += 1
+
+        escalation_role = request.policy.escalation_role.strip()
+        if (
+            escalation_role
+            and now >= due_at + timedelta(hours=threshold_hours)
+            and request.sla_escalated_at is None
+        ):
+            request.assigned_role = escalation_role
+            request.sla_escalated_at = now
+            touched.extend(("assigned_role", "sla_escalated_at"))
+            LeaveDecision.objects.create(
+                request=request,
+                actor_user_id=None,
+                actor_role="system",
+                action="sla_escalation",
+                from_status=request.status,
+                to_status=request.status,
+                comment=f"Escalated to {escalation_role} after {threshold_hours * 2} hours.",
+            )
+            _queue_task_notice(
+                request,
+                "escalated",
+                f"Leave request #{request.pk} was escalated to {escalation_role}.",
+            )
+            escalations += 1
+        if touched:
+            request.save(update_fields=(*touched, "updated_at"))
+    return {"examined": len(rows), "reminders": reminders, "escalations": escalations}
+
+
 @transaction.atomic
 def submit(
     *,
@@ -165,6 +330,7 @@ def submit(
     station_leave_details="",
 ):
     require(actor, P_APPLY)
+    employee = _require_employee(actor.user_id, label="The applicant")
     year = leave_year or start_date.year
     policy = _policy(leave_type, year)
     if policy.faculty_only and getattr(actor, "kind", "") not in ("faculty", "staff"):
@@ -181,6 +347,11 @@ def submit(
         is_director="director" in {r.lower() for r in actor.roles},
     )
     days = workflow.charged_days(start_date, end_date, half_day=half_day)
+    if leave_type == "RH" and start_date != end_date:
+        raise ConflictError(
+            "Restricted Holiday requests must be for one calendar day.",
+            code="restricted_holiday_single_day",
+        )
     if (
         leave_type == "RH"
         and not LeaveHoliday.objects.filter(
@@ -207,7 +378,12 @@ def submit(
             "You cannot nominate yourself as substitute.", code="invalid_substitute"
         )
     if substitute_id is not None:
-        _require_employee(substitute_id, label="The substitute")
+        substitute = _require_employee(substitute_id, label="The substitute")
+        if employee.department and substitute.department != employee.department:
+            raise ConflictError(
+                "The substitute must belong to the same department.",
+                code="substitute_department_mismatch",
+            )
     if LeaveRequest.objects.filter(
         employee_id=actor.user_id,
         request_kind__in=("new", "extension", "offline"),
@@ -242,6 +418,7 @@ def submit(
     status = workflow.initial_state(facts)
     request = LeaveRequest.objects.create(
         employee_id=actor.user_id,
+        department=employee.department,
         policy=policy,
         leave_type=leave_type,
         start_date=start_date,
@@ -254,7 +431,16 @@ def submit(
         status=status,
     )
     _assign(request, status, policy)
-    request.save(update_fields=("assigned_role", "assigned_user_id"))
+    request.save(
+        update_fields=(
+            "assigned_role",
+            "assigned_user_id",
+            "assigned_at",
+            "sla_reminded_at",
+            "sla_escalated_at",
+        )
+    )
+    _queue_task_notice(request, "assigned", f"Leave request #{request.pk} awaits your action.")
     LeaveDecision.objects.create(
         request=request,
         actor_user_id=actor.user_id,
@@ -312,6 +498,14 @@ def request_extension(*, actor, request_id, start_date, end_date, reason, substi
             "Another extension already covers this period.", code="extension_period_overlap"
         )
     days = workflow.charged_days(start_date, end_date)
+    if (
+        parent.policy.max_continuous_days
+        and parent.charged_days + days > parent.policy.max_continuous_days
+    ):
+        raise ConflictError(
+            "The extension exceeds the configured continuous-leave limit.",
+            code="continuous_limit_exceeded",
+        )
     balance = (
         LeaveBalance.objects.select_for_update()
         .filter(user_id=actor.user_id, policy=parent.policy)
@@ -338,10 +532,19 @@ def request_extension(*, actor, request_id, start_date, end_date, reason, substi
             raise ConflictError(
                 "You cannot nominate yourself as substitute.", code="invalid_substitute"
             )
-        _require_employee(substitute_id, label="The substitute")
+        substitute = _require_employee(substitute_id, label="The substitute")
+        employee = directory.get_users([actor.user_id]).get(actor.user_id)
+        if employee is None or (
+            employee.department and substitute.department != employee.department
+        ):
+            raise ConflictError(
+                "The substitute must belong to the same department.",
+                code="substitute_department_mismatch",
+            )
     status = "substitute_pending" if parent.policy.requires_substitute else "unit_head_pending"
     extension = LeaveRequest.objects.create(
         employee_id=actor.user_id,
+        department=parent.department,
         policy=parent.policy,
         parent=parent,
         request_kind="extension",
@@ -354,7 +557,16 @@ def request_extension(*, actor, request_id, start_date, end_date, reason, substi
         status=status,
     )
     _assign(extension, status, parent.policy)
-    extension.save(update_fields=("assigned_role", "assigned_user_id"))
+    extension.save(
+        update_fields=(
+            "assigned_role",
+            "assigned_user_id",
+            "assigned_at",
+            "sla_reminded_at",
+            "sla_escalated_at",
+        )
+    )
+    _queue_task_notice(extension, "assigned", f"Leave request #{extension.pk} awaits your action.")
     LeaveDecision.objects.create(
         request=extension,
         actor_user_id=actor.user_id,
@@ -397,7 +609,7 @@ def request_cancellation(*, actor, request_id):
         )
     cancellation = LeaveRequest.objects.create(
         employee_id=parent.employee_id,
-        policy=parent.policy,
+        department=parent.department,
         parent=parent,
         request_kind="cancellation",
         leave_type=parent.leave_type,
@@ -408,7 +620,18 @@ def request_cancellation(*, actor, request_id):
         status="cancellation_unit_head_pending",
     )
     _assign(cancellation, cancellation.status, parent.policy)
-    cancellation.save(update_fields=("assigned_role", "assigned_user_id"))
+    cancellation.save(
+        update_fields=(
+            "assigned_role",
+            "assigned_user_id",
+            "assigned_at",
+            "sla_reminded_at",
+            "sla_escalated_at",
+        )
+    )
+    _queue_task_notice(
+        cancellation, "assigned", f"Leave cancellation #{cancellation.pk} awaits your action."
+    )
     LeaveDecision.objects.create(
         request=cancellation,
         actor_user_id=actor.user_id,
@@ -437,6 +660,16 @@ def act(
     role = actor.active_role or "employee"
     own = request.employee_id == actor.user_id
     before = request.status
+    employee_actions = {
+        "withdraw",
+        "request_cancellation",
+        "request_resumption",
+        "nominate_substitute",
+    }
+    if own and action not in employee_actions:
+        raise PermissionDeniedError(
+            "You may not review your own leave request.", code="self_review_not_allowed"
+        )
 
     if action == "withdraw":
         if not own:
@@ -470,6 +703,16 @@ def act(
             raise ConflictError(
                 "Provide the actual date of resumption.", code="resumption_date_required"
             )
+        if request.leave_type not in {"EL", "COL", "VL"}:
+            raise ConflictError(
+                "Resumption review applies to EL, COL and VL.",
+                code="resumption_not_applicable",
+            )
+        if actual_resume_date < request.start_date:
+            raise ConflictError(
+                "Resumption cannot precede the approved leave start.",
+                code="invalid_resumption_date",
+            )
         if actual_resume_date > timezone.localdate():
             raise ConflictError(
                 "The actual return date cannot be in the future.",
@@ -494,8 +737,8 @@ def act(
         permissions = {
             "accept_substitute": ("substitute",),
             "decline_substitute": ("substitute",),
-            "recommend": (P_UNIT_HEAD,),
-            "route_establishment": (P_UNIT_HEAD,),
+            "recommend": (P_UNIT_HEAD, P_FINAL),
+            "route_establishment": (P_UNIT_HEAD, P_FINAL),
             "approve": (P_UNIT_HEAD, P_FINAL),
             "reject": (P_UNIT_HEAD, P_ESTABLISHMENT, P_FINAL),
             "route_final": (P_ESTABLISHMENT,),
@@ -503,8 +746,8 @@ def act(
             "review": (P_FINAL,),
             "approve_cancellation": (P_UNIT_HEAD, P_FINAL),
             "reject_cancellation": (P_UNIT_HEAD, P_ESTABLISHMENT, P_FINAL),
-            "recommend_cancellation": (P_UNIT_HEAD,),
-            "route_cancellation_establishment": (P_UNIT_HEAD,),
+            "recommend_cancellation": (P_UNIT_HEAD, P_FINAL),
+            "route_cancellation_establishment": (P_UNIT_HEAD, P_FINAL),
             "route_cancellation_final": (P_ESTABLISHMENT,),
             "return_cancellation_to_unit_head": (P_ESTABLISHMENT,),
         }
@@ -641,7 +884,9 @@ def act(
 
     _assign(request, after, request.policy)
     request.save()
-    LeaveDecision.objects.create(
+    if request.assigned_role or request.assigned_user_id is not None:
+        _queue_task_notice(request, "assigned", f"Leave request #{request.pk} awaits your action.")
+    decision = LeaveDecision.objects.create(
         request=request,
         actor_user_id=actor.user_id,
         actor_role=role,
@@ -650,6 +895,7 @@ def act(
         to_status=after,
         comment=(comment or "").strip()[:1000],
     )
+    _queue_employee_notice(request, decision.pk)
     return request
 
 
@@ -687,6 +933,11 @@ def maintain_balance(*, actor, user_id, policy_id, entry_type, days, description
     if entry_type == "credit":
         balance.credited += value
     elif entry_type == "opening":
+        if value < balance.used:
+            raise ConflictError(
+                "Opening balance cannot be lower than leave already used.",
+                code="opening_balance_below_used",
+            )
         balance.opening_balance = value
     else:
         raise ConflictError("Entry type must be credit or opening.", code="invalid_entry_type")
@@ -705,20 +956,51 @@ def record_offline(
     *, actor, user_id, leave_type, leave_year, start_date, end_date, reason, half_day=False
 ):
     require(actor, P_OFFLINE)
-    _require_employee(user_id, label="The leave record target")
+    employee = _require_employee(user_id, label="The leave record target")
     policy = _policy(leave_type, leave_year)
     days = workflow.charged_days(start_date, end_date, half_day=half_day)
+    if leave_type == "RH" and start_date != end_date:
+        raise ConflictError(
+            "Restricted Holiday records must be for one calendar day.",
+            code="restricted_holiday_single_day",
+        )
+    if half_day and leave_type != "CL":
+        raise ConflictError(
+            "Half-day leave is available for Casual Leave only.",
+            code="half_day_category_invalid",
+        )
     balance, _ = LeaveBalance.objects.select_for_update().get_or_create(
         user_id=user_id, policy=policy
     )
-    if balance.available < days:
+    available = balance.available - _reserved_days(user_id, policy.pk)
+    if available < days:
         raise ConflictError(
             "The available leave balance is insufficient.", code="insufficient_leave_balance"
+        )
+    if LeaveRequest.objects.filter(
+        employee_id=user_id,
+        request_kind__in=("new", "extension", "offline"),
+        status__in=(
+            "substitute_pending",
+            "substitute_declined",
+            "unit_head_pending",
+            "establishment_pending",
+            "final_pending",
+            "approved",
+            "resumption_pending",
+        ),
+        start_date__lte=end_date,
+        end_date__gte=start_date,
+    ).exists():
+        raise ConflictError(
+            "This offline leave period overlaps an active request.",
+            code="leave_period_overlap",
         )
     if not (reason or "").strip():
         raise ConflictError("An administrative reason is required.", code="reason_required")
     request = LeaveRequest.objects.create(
         employee_id=user_id,
+        department=employee.department,
         policy=policy,
         request_kind="offline",
         leave_type=leave_type,
@@ -775,9 +1057,35 @@ def process_year_end(*, actor, from_year):
             "Policies for both leave years must be configured first.", code="leave_policy_missing"
         )
 
-    run = LeaveYearEndRun.objects.create(
-        from_year=from_year, to_year=to_year, actor_user_id=actor.user_id
+    pending_states = (
+        "substitute_pending",
+        "substitute_declined",
+        "unit_head_pending",
+        "establishment_pending",
+        "final_pending",
+        "cancellation_unit_head_pending",
+        "cancellation_establishment_pending",
+        "cancellation_final_pending",
+        "resumption_pending",
     )
+    if LeaveRequest.objects.filter(
+        policy__leave_year=from_year, status__in=pending_states
+    ).exists():
+        raise ConflictError(
+            "Resolve all pending leave workflows before year-end processing.",
+            code="pending_leave_workflows",
+        )
+
+    try:
+        with transaction.atomic():
+            run = LeaveYearEndRun.objects.create(
+                from_year=from_year, to_year=to_year, actor_user_id=actor.user_id
+            )
+    except IntegrityError as exc:
+        raise ConflictError(
+            "Year-end processing has already run for this year.",
+            code="year_end_already_processed",
+        ) from exc
     totals = {
         "balances_processed": 0,
         "annual_credits": Decimal("0"),
@@ -852,13 +1160,12 @@ def process_year_end(*, actor, from_year):
                     entry_type="year_end_close",
                     days=remaining,
                     description=(
-                        f"Year-end close for {from_year}; "
-                        f"treatment={source.year_end_treatment}"
+                        f"Year-end close for {from_year}; treatment={source.year_end_treatment}"
                     ),
                     actor_user_id=actor.user_id,
                 )
             totals["balances_processed"] += 1
-            totals["lapsed"] += remaining - min(amount, remaining)
+            totals["lapsed"] += max(remaining - min(amount, remaining), Decimal("0"))
 
     for key, value in totals.items():
         setattr(run, key, value)

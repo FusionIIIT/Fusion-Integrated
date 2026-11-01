@@ -10,9 +10,10 @@ import { FaCalendarPlus, FaTimes } from "react-icons/fa";
 import { errorMessage } from "../../../lib/http";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
+import { formatLocalDate } from "../utils/dates";
 import {
-  useLeaveAction, useLeaveRequests, usePrintLeaveRequest, useSubmitExtension,
-  useSubmitLeave,
+  useAcknowledgeTaskNotice, useLeaveAction, useLeaveRequests,
+  usePrintLeaveRequest, useSubmitExtension, useSubmitLeave, useTaskNotices,
 } from "../api/hooks";
 
 const leaveTypes = ["CL", "RH", "SCL", "EL", "VL", "COL"];
@@ -20,6 +21,8 @@ const label = (status: string) => status.replaceAll("_", " ");
 
 export default function MyLeavePage() {
   const requests = useLeaveRequests();
+  const notices = useTaskNotices();
+  const acknowledge = useAcknowledgeTaskNotice();
   const submit = useSubmitLeave();
   const action = useLeaveAction();
   const printable = usePrintLeaveRequest();
@@ -42,8 +45,8 @@ export default function MyLeavePage() {
   function submitRequest() {
     if (!type || !start || !end) return;
     submit.mutate({
-      leave_type: type, start_date: start.toISOString().slice(0, 10),
-      end_date: end.toISOString().slice(0, 10), reason,
+      leave_type: type, start_date: formatLocalDate(start),
+      end_date: formatLocalDate(end), reason,
       leave_year: year || new Date().getFullYear(),
       ...(substitute ? { substitute_id: Number(substitute) } : {}),
     }, {
@@ -65,6 +68,22 @@ export default function MyLeavePage() {
     <Container size="xl">
       <PageHeader title="My Leave" subtitle="Requests, decisions and upcoming leave" />
       <Stack gap="lg">
+        {notices.data?.filter((notice) => !notice.read_at).map((notice) => (
+          <Alert key={notice.id} title={notice.event === "decision" ? "Leave request update" :
+            notice.event === "reminder" ? "Pending task reminder" :
+              notice.event === "escalated" ? "Task escalated" : "New task assigned"}
+            color={notice.event === "decision" ? "green" : "blue"}>
+            <Group justify="space-between" align="center">
+              <Text size="sm">{notice.message}</Text>
+              <Button size="xs" variant="subtle" loading={acknowledge.isPending}
+                onClick={() => acknowledge.mutate(notice.id, {
+                  onError: (error) => notifications.show({
+                    color: "red", message: errorMessage(error),
+                  }),
+                })}>Mark read</Button>
+            </Group>
+          </Alert>
+        ))}
         <section>
           <Title order={4} mb="sm">New request</Title>
           <Group align="end" grow wrap="wrap">
@@ -144,8 +163,8 @@ export default function MyLeavePage() {
               onChange={(event) => setExtensionReason(event.currentTarget.value)} />
             <Button loading={extension.isPending} disabled={!extensionStart || !extensionEnd || !extensionReason.trim()}
               onClick={() => extension.mutate({
-                id: extensionId, start_date: extensionStart?.toISOString().slice(0, 10),
-                end_date: extensionEnd?.toISOString().slice(0, 10), reason: extensionReason,
+                id: extensionId, start_date: extensionStart && formatLocalDate(extensionStart),
+                end_date: extensionEnd && formatLocalDate(extensionEnd), reason: extensionReason,
               }, { onSuccess: () => { setExtensionId(null); setExtensionStart(null); setExtensionEnd(null); setExtensionReason(""); },
                 onError: (error) => notifications.show({ color: "red", message: errorMessage(error) }) })}>
               Submit extension
@@ -159,7 +178,7 @@ export default function MyLeavePage() {
             <DateInput label="Actual return date" value={resumptionDate} onChange={setResumptionDate} />
             <Button disabled={!resumptionDate} loading={action.isPending}
               onClick={() => runAction(resumptionId, "request_resumption", {
-                actual_resume_date: resumptionDate?.toISOString().slice(0, 10),
+                actual_resume_date: resumptionDate && formatLocalDate(resumptionDate),
               })}>Submit return</Button>
             <Button variant="default" onClick={() => setResumptionId(null)}>Close</Button>
           </Group>

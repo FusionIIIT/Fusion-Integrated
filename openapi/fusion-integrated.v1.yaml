@@ -175,6 +175,42 @@ paths:
               schema:
                 $ref: '#/components/schemas/LeaveHoliday'
           description: ''
+  /api/v1/leave/notices:
+    get:
+      operationId: v1_leave_notices_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveTaskNotice'
+          description: ''
+  /api/v1/leave/notices/{id}/read:
+    post:
+      operationId: v1_leave_notices_read_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveTaskNotice'
+          description: ''
   /api/v1/leave/policies:
     get:
       operationId: v1_leave_policies_list
@@ -2919,6 +2955,18 @@ components:
       description: |-
         * `credit` - credit
         * `opening` - opening
+    EventEnum:
+      enum:
+      - assigned
+      - reminder
+      - escalated
+      - decision
+      type: string
+      description: |-
+        * `assigned` - Task assigned
+        * `reminder` - Task reminder
+        * `escalated` - Task escalated
+        * `decision` - Request status changed
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -3577,6 +3625,38 @@ components:
         * `cancelled` - Cancelled
         * `resumption_pending` - Resumption Pending
         * `resumption_reviewed` - Resumption Reviewed
+    LeaveTaskNotice:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        request_id:
+          type: integer
+          readOnly: true
+        event:
+          allOf:
+          - $ref: '#/components/schemas/EventEnum'
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        read_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - event
+      - id
+      - message
+      - read_at
+      - request_id
     LeaveTypeEnum:
       enum:
       - CL

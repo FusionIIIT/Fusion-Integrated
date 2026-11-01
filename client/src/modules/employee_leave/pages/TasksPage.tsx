@@ -1,15 +1,21 @@
 import { useState } from "react";
-import { Alert, Badge, Button, Container, Group, Table, Text, TextInput } from "@mantine/core";
+import {
+  Alert, Badge, Button, Container, Group, Stack, Table, Text, TextInput,
+} from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 
 import { errorMessage } from "../../../lib/http";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
-import { useLeaveAction, useLeaveTasks } from "../api/hooks";
+import {
+  useAcknowledgeTaskNotice, useLeaveAction, useLeaveTasks, useTaskNotices,
+} from "../api/hooks";
 import type { LeaveRequest } from "../api/types";
 
 export default function TasksPage() {
   const tasks = useLeaveTasks();
+  const notices = useTaskNotices();
+  const acknowledge = useAcknowledgeTaskNotice();
   const action = useLeaveAction();
   const [comments, setComments] = useState<Record<number, string>>({});
   if (tasks.error) return <Container size="xl"><ErrorState error={tasks.error} /></Container>;
@@ -65,7 +71,25 @@ export default function TasksPage() {
   return (
     <Container size="xl">
       <PageHeader title="Approval Queue" subtitle="Requests assigned to your role" />
-      {tasks.isPending ? <Text c="dimmed">Loading assigned tasks…</Text> : tasks.data?.length ?
+      <Stack gap="md">
+        {notices.data?.filter((notice) => !notice.read_at).map((notice) => (
+          <Alert key={notice.id} title={notice.event === "decision" ? "Leave request update" :
+            notice.event === "escalated" ? "Task escalated" :
+              notice.event === "reminder" ? "Pending task reminder" : "New task assigned"}
+            color={notice.event === "decision" ? "green" :
+              notice.event === "escalated" ? "orange" : "blue"}>
+            <Group justify="space-between" align="center">
+              <Text size="sm">{notice.message}</Text>
+              <Button size="xs" variant="subtle" loading={acknowledge.isPending}
+                onClick={() => acknowledge.mutate(notice.id, {
+                  onError: (error) => notifications.show({
+                    color: "red", message: errorMessage(error),
+                  }),
+                })}>Mark read</Button>
+            </Group>
+          </Alert>
+        ))}
+        {tasks.isPending ? <Text c="dimmed">Loading assigned tasks…</Text> : tasks.data?.length ?
         <Table.ScrollContainer minWidth={980}><Table striped highlightOnHover>
           <Table.Thead><Table.Tr><Table.Th>Employee</Table.Th><Table.Th>Request</Table.Th>
             <Table.Th>Period</Table.Th><Table.Th>Stage</Table.Th><Table.Th>Decision note</Table.Th>
@@ -81,6 +105,7 @@ export default function TasksPage() {
             <Table.Td>{controls(row)}</Table.Td>
           </Table.Tr>)}</Table.Tbody>
         </Table></Table.ScrollContainer> : <Alert color="gray">No tasks are assigned to your role.</Alert>}
+      </Stack>
     </Container>
   );
 }

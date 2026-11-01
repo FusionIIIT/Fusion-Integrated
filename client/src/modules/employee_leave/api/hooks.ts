@@ -1,8 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery, useMutation, useQuery, useQueryClient,
+} from "@tanstack/react-query";
 
 import { http } from "../../../lib/http";
 import type {
-  LeaveBalance, LeaveHoliday, LeaveLedgerEntry, LeavePolicy, LeaveRequest,
+  CursorPage, LeaveBalance, LeaveHoliday, LeaveLedgerEntry, LeavePolicy, LeaveRequest,
+  LeaveTaskNotice,
 } from "./types";
 
 const KEY = "employee-leave";
@@ -33,16 +36,22 @@ export function useLeaveBalances() {
 }
 
 export function useLeavePolicies() {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: [KEY, "policies"],
-    queryFn: async () => (await http.get<LeavePolicy[]>("/leave/policies")).data,
+    initialPageParam: "/leave/policies",
+    queryFn: async ({ pageParam }) =>
+      (await http.get<CursorPage<LeavePolicy>>(pageParam)).data,
+    getNextPageParam: (page) => page.next ?? undefined,
   });
 }
 
 export function useLeaveCalendar() {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: [KEY, "calendar"],
-    queryFn: async () => (await http.get<LeaveHoliday[]>("/leave/calendar")).data,
+    initialPageParam: "/leave/calendar",
+    queryFn: async ({ pageParam }) =>
+      (await http.get<CursorPage<LeaveHoliday>>(pageParam)).data,
+    getNextPageParam: (page) => page.next ?? undefined,
   });
 }
 
@@ -135,5 +144,22 @@ export function usePrintLeaveRequest() {
   return useMutation({
     mutationFn: async (id: number) =>
       (await http.get<string>(`/leave/requests/${id}/print`, { responseType: "text" })).data,
+  });
+}
+
+export function useTaskNotices() {
+  return useQuery({
+    queryKey: [KEY, "notices"],
+    queryFn: async () =>
+      (await http.get<LeaveTaskNotice[]>("/leave/notices")).data,
+  });
+}
+
+export function useAcknowledgeTaskNotice() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) =>
+      (await http.post<LeaveTaskNotice>(`/leave/notices/${id}/read`, {})).data,
+    onSuccess: () => refresh(client),
   });
 }

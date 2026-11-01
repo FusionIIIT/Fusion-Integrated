@@ -8,6 +8,7 @@ from modules.employee_leave.models import (
     LeaveLedgerEntry,
     LeavePolicy,
     LeaveRequest,
+    LeaveTaskNotice,
     LeaveYearEndRun,
 )
 
@@ -33,6 +34,41 @@ class LeavePolicySerializer(serializers.ModelSerializer):
             "final_sanction_sla_hours",
             "escalation_role",
         )
+
+    def validate(self, attrs):
+        current = self.instance
+
+        def value(name, default=None):
+            if name in attrs:
+                return attrs[name]
+            if current is not None:
+                return getattr(current, name)
+            field = LeavePolicy._meta.get_field(name)
+            return field.get_default() if field.has_default() else default
+
+        if value("annual_entitlement") < 0 or value("carry_forward_limit") < 0:
+            raise serializers.ValidationError(
+                "Annual entitlement and carry-forward limit cannot be negative."
+            )
+        ratio = value("conversion_ratio")
+        if ratio <= 0:
+            raise serializers.ValidationError("Conversion ratio must be greater than zero.")
+        if value("year_end_treatment") == "convert_to_el" and value("leave_type") != "VL":
+            raise serializers.ValidationError(
+                "Only Vacation Leave may be converted to Earned Leave."
+            )
+        hierarchy = value("hierarchy", {})
+        if not isinstance(hierarchy, dict):
+            raise serializers.ValidationError("Hierarchy configuration must be an object.")
+        final_role = hierarchy.get("final_role", "sanctioning_authority")
+        if not isinstance(final_role, str) or not final_role.strip() or len(final_role) > 64:
+            raise serializers.ValidationError("A valid final authority role is required.")
+        establishment_required = hierarchy.get("establishment_required", False)
+        if not isinstance(establishment_required, bool):
+            raise serializers.ValidationError("establishment_required must be a boolean value.")
+        if value("unit_head_sla_hours") <= 0 or value("final_sanction_sla_hours") <= 0:
+            raise serializers.ValidationError("SLA thresholds must be greater than zero.")
+        return attrs
 
 
 class LeaveDecisionSerializer(serializers.ModelSerializer):
@@ -228,4 +264,11 @@ class LeaveYearEndRunSerializer(serializers.ModelSerializer):
             "lapsed",
             "created_at",
         )
+        read_only_fields = fields
+
+
+class LeaveTaskNoticeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeaveTaskNotice
+        fields = ("id", "request_id", "event", "message", "created_at", "read_at")
         read_only_fields = fields

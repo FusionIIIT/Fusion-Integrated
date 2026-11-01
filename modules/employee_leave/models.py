@@ -87,6 +87,7 @@ class LeaveRequest(TimeStampedModel):
     ]
 
     employee_id = models.PositiveBigIntegerField(db_index=True)
+    department = models.CharField(max_length=80, blank=True, db_index=True)
     policy = models.ForeignKey(LeavePolicy, on_delete=models.PROTECT, related_name="requests")
     parent = models.ForeignKey(
         "self", null=True, blank=True, on_delete=models.PROTECT, related_name="related_requests"
@@ -103,6 +104,9 @@ class LeaveRequest(TimeStampedModel):
     status = models.CharField(max_length=40, choices=STATES, db_index=True)
     assigned_role = models.CharField(max_length=64, blank=True)
     assigned_user_id = models.PositiveBigIntegerField(null=True, blank=True)
+    assigned_at = models.DateTimeField(null=True, blank=True)
+    sla_reminded_at = models.DateTimeField(null=True, blank=True)
+    sla_escalated_at = models.DateTimeField(null=True, blank=True)
     actual_resume_date = models.DateField(null=True, blank=True)
     actual_resume_details = models.CharField(max_length=500, blank=True)
     final_decision = models.CharField(max_length=12, blank=True)
@@ -182,3 +186,23 @@ class LeaveYearEndRun(TimeStampedModel):
                 fields=("from_year", "to_year"), name="elm_year_end_run_years_uniq"
             )
         ]
+
+
+class LeaveTaskNotice(TimeStampedModel):
+    EVENTS = [
+        ("assigned", "Task assigned"),
+        ("reminder", "Task reminder"),
+        ("escalated", "Task escalated"),
+        ("decision", "Request status changed"),
+    ]
+    request = models.ForeignKey(LeaveRequest, on_delete=models.CASCADE, related_name="task_notices")
+    event = models.CharField(max_length=12, choices=EVENTS)
+    dedupe_key = models.CharField(max_length=220, unique=True)
+    recipient_user_id = models.PositiveBigIntegerField(null=True, blank=True, db_index=True)
+    assigned_role = models.CharField(max_length=64, blank=True, db_index=True)
+    message = models.CharField(max_length=300)
+    read_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "elm_leave_task_notice"
+        ordering = ("-created_at", "-id")

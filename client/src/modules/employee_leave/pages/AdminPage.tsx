@@ -9,6 +9,7 @@ import { notifications } from "@mantine/notifications";
 import { errorMessage } from "../../../lib/http";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
+import { formatLocalDate } from "../utils/dates";
 import {
   useAdjustBalance, useCreateHoliday, useCreatePolicy, useLeaveCalendar,
   useLeavePolicies, useProcessYearEnd, usePublishHoliday, useRecordOfflineLeave,
@@ -49,6 +50,8 @@ export default function AdminPage() {
   const [offlineStart, setOfflineStart] = useState<Date | null>(null);
   const [offlineEnd, setOfflineEnd] = useState<Date | null>(null);
   const [offlineReason, setOfflineReason] = useState("");
+  const policyRows = policies.data?.pages.flatMap((page) => page.results) ?? [];
+  const holidayRows = calendar.data?.pages.flatMap((page) => page.results) ?? [];
 
   if (policies.error || calendar.error) return <Container size="xl"><ErrorState error={policies.error ?? calendar.error} /></Container>;
   function notifyError(error: unknown) {
@@ -76,7 +79,12 @@ export default function AdminPage() {
         <section>
           <Title order={4} mb="sm">Leave policies</Title>
           <Group align="end" grow wrap="wrap">
-            <Select label="Category" data={types} value={type} onChange={setType} />
+            <Select label="Category" data={types} value={type} onChange={(value) => {
+              setType(value);
+              if (value !== "VL" && yearEndTreatment === "convert_to_el") {
+                setYearEndTreatment("lapse");
+              }
+            }} />
             <NumberInput label="Leave year" value={year} min={2000} max={2200}
               onChange={(value) => setYear(typeof value === "number" ? value : "")} />
             <NumberInput label="Annual entitlement" min={0} decimalScale={2} value={entitlement}
@@ -88,7 +96,7 @@ export default function AdminPage() {
             <Select label="Year-end treatment" data={[
               { value: "lapse", label: "Lapse" },
               { value: "carry_forward", label: "Carry forward" },
-              { value: "convert_to_el", label: "Convert to EL" },
+              ...(type === "VL" ? [{ value: "convert_to_el", label: "Convert to EL" }] : []),
             ]} value={yearEndTreatment} onChange={setYearEndTreatment} />
             {yearEndTreatment === "convert_to_el" && <NumberInput label="Conversion ratio" min={0}
               decimalScale={3} value={conversionRatio}
@@ -115,11 +123,15 @@ export default function AdminPage() {
           <Table.ScrollContainer minWidth={660}><Table striped><Table.Thead><Table.Tr>
             <Table.Th>Year</Table.Th><Table.Th>Type</Table.Th><Table.Th>Entitlement</Table.Th>
             <Table.Th>Carry limit</Table.Th><Table.Th>Workflow</Table.Th></Table.Tr></Table.Thead>
-            <Table.Tbody>{policies.data?.map((row) => <Table.Tr key={row.id}>
+            <Table.Tbody>{policyRows.map((row) => <Table.Tr key={row.id}>
               <Table.Td>{row.leave_year}</Table.Td><Table.Td>{row.leave_type}</Table.Td>
               <Table.Td>{row.annual_entitlement}</Table.Td><Table.Td>{row.carry_forward_limit}</Table.Td>
               <Table.Td>{row.requires_substitute ? "Substitute · " : ""}{row.requires_higher_sanction ? "Higher sanction" : "Unit Head"}</Table.Td>
             </Table.Tr>)}</Table.Tbody></Table></Table.ScrollContainer>
+          {policies.hasNextPage && <Button mt="xs" variant="default"
+            loading={policies.isFetchingNextPage} onClick={() => policies.fetchNextPage()}>
+            Load more policies
+          </Button>}
         </section>
 
         <section>
@@ -132,13 +144,13 @@ export default function AdminPage() {
             <Checkbox label="Restricted holiday" checked={restricted} onChange={(e) => setRestricted(e.currentTarget.checked)} />
             <Button loading={createHoliday.isPending} disabled={!holidayDate || !holidayName.trim()}
               onClick={() => createHoliday.mutate({
-                leave_year: year, day: holidayDate?.toISOString().slice(0, 10),
+                leave_year: year, day: holidayDate && formatLocalDate(holidayDate),
                 name: holidayName, restricted,
               }, { onError: notifyError })}>Add calendar entry</Button>
           </Group>
           <Table mt="sm"><Table.Thead><Table.Tr><Table.Th>Date</Table.Th><Table.Th>Name</Table.Th>
             <Table.Th>Kind</Table.Th><Table.Th>Status</Table.Th><Table.Th /></Table.Tr></Table.Thead>
-            <Table.Tbody>{calendar.data?.map((row) => <Table.Tr key={row.id}>
+            <Table.Tbody>{holidayRows.map((row) => <Table.Tr key={row.id}>
               <Table.Td>{row.day}</Table.Td><Table.Td>{row.name}</Table.Td>
               <Table.Td>{row.restricted ? "Restricted" : "Holiday"}</Table.Td>
               <Table.Td>{row.published ? "Published" : "Draft"}</Table.Td>
@@ -146,13 +158,17 @@ export default function AdminPage() {
                 loading={publishHoliday.isPending} onClick={() => publishHoliday.mutate(row.id,
                   { onError: notifyError })}>Publish</Button>}</Table.Td>
             </Table.Tr>)}</Table.Tbody></Table>
+          {calendar.hasNextPage && <Button mt="xs" variant="default"
+            loading={calendar.isFetchingNextPage} onClick={() => calendar.fetchNextPage()}>
+            Load more calendar entries
+          </Button>}
         </section>
 
         <section>
           <Title order={4} mb="sm">Balance maintenance</Title>
           <Group align="end" grow wrap="wrap">
             <TextInput label="Employee ID" value={userId} onChange={(e) => setUserId(e.currentTarget.value)} />
-            <Select label="Policy" data={(policies.data ?? []).map((row) => ({
+            <Select label="Policy" data={policyRows.map((row) => ({
               value: String(row.id), label: `${row.leave_year} · ${row.leave_type}`,
             }))} value={policyId || null} onChange={(value) => setPolicyId(value ?? "")} />
             <Select label="Entry" data={[{ value: "opening", label: "Set opening balance" },
@@ -190,8 +206,8 @@ export default function AdminPage() {
               disabled={!offlineUser || !offlineType || !offlineStart || !offlineEnd || !offlineReason.trim()}
               onClick={() => offline.mutate({
                 user_id: Number(offlineUser), leave_type: offlineType, leave_year: year,
-                start_date: offlineStart?.toISOString().slice(0, 10),
-                end_date: offlineEnd?.toISOString().slice(0, 10), reason: offlineReason,
+                start_date: offlineStart && formatLocalDate(offlineStart),
+                end_date: offlineEnd && formatLocalDate(offlineEnd), reason: offlineReason,
               }, { onSuccess: () => { setOfflineUser(""); setOfflineReason(""); },
                 onError: notifyError })}>Record leave</Button>
           </Group>

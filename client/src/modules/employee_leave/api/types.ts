@@ -83,3 +83,18 @@ export interface LeaveHoliday {
   restricted: boolean;
   published: boolean;
 }
+
+export interface CursorPage<T> {
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+
+export interface LeaveTaskNotice {
+  id: number;
+  request_id: number;
+  event: "assigned" | "reminder" | "escalated" | "decision";
+  message: string;
+  created_at: string;
+  read_at: string | null;
+}
