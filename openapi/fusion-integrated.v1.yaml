@@ -1674,6 +1674,1277 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/rspc/agency-trackings:
+    get:
+      operationId: v1_rspc_agency_trackings_list
+      summary: List external agency trackings
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExternalAgencyTracking'
+          description: ''
+    post:
+      operationId: v1_rspc_agency_trackings_create
+      summary: Record external funding agency update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalAgencyTracking'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExternalAgencyTracking'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExternalAgencyTracking'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalAgencyTracking'
+          description: ''
+  /api/v1/rspc/audit-trails:
+    get:
+      operationId: v1_rspc_audit_trails_list
+      summary: List RSPC audit trail records
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RSPCAuditTrail'
+          description: ''
+  /api/v1/rspc/closures:
+    get:
+      operationId: v1_rspc_closures_list
+      summary: List project closure records
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectClosureRecord'
+          description: ''
+    post:
+      operationId: v1_rspc_closures_create
+      summary: Submit project closure record
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectClosureCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProjectClosureCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProjectClosureCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectClosureRecord'
+          description: ''
+  /api/v1/rspc/closures/{id}/dean-decide:
+    post:
+      operationId: v1_rspc_closures_dean_decide_create
+      summary: Dean-RSPC decision on closure
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectClosureRecord'
+          description: ''
+  /api/v1/rspc/closures/{id}/director-authorize:
+    post:
+      operationId: v1_rspc_closures_director_authorize_create
+      summary: Director authorization on closure
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectClosureRecord'
+          description: ''
+  /api/v1/rspc/closures/{id}/verify:
+    post:
+      operationId: v1_rspc_closures_verify_create
+      summary: RSPC Admin verification of closure
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectClosureRecord'
+          description: ''
+  /api/v1/rspc/consultancies:
+    get:
+      operationId: v1_rspc_consultancies_list
+      summary: List registered consultancy projects
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConsultancyProject'
+          description: ''
+    post:
+      operationId: v1_rspc_consultancies_create
+      summary: Register a new consultancy project
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsultancyCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConsultancyCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConsultancyCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultancyProject'
+          description: ''
+  /api/v1/rspc/consultancies/{id}/dean-decide:
+    post:
+      operationId: v1_rspc_consultancies_dean_decide_create
+      summary: Dean-RSPC decision on consultancy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultancyProject'
+          description: ''
+  /api/v1/rspc/consultancies/{id}/director-authorize:
+    post:
+      operationId: v1_rspc_consultancies_director_authorize_create
+      summary: Director authorization for consultancy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultancyProject'
+          description: ''
+  /api/v1/rspc/consultancies/{id}/recommend-dept:
+    post:
+      operationId: v1_rspc_consultancies_recommend_dept_create
+      summary: HoD recommendation on consultancy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultancyProject'
+          description: ''
+  /api/v1/rspc/consultancies/{id}/settlements:
+    get:
+      operationId: v1_rspc_consultancies_settlements_list
+      summary: List consultancy settlements
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConsultancySettlement'
+          description: ''
+    post:
+      operationId: v1_rspc_consultancies_settlements_create
+      summary: Record consultancy milestone settlement
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsultancySettlement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConsultancySettlement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConsultancySettlement'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultancySettlement'
+          description: ''
+  /api/v1/rspc/consultancies/{id}/verify:
+    post:
+      operationId: v1_rspc_consultancies_verify_create
+      summary: RSPC Admin verification of consultancy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultancyProject'
+          description: ''
+  /api/v1/rspc/financial-requests:
+    get:
+      operationId: v1_rspc_financial_requests_list
+      summary: List financial requests
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FinancialRequest'
+          description: ''
+    post:
+      operationId: v1_rspc_financial_requests_create
+      summary: Submit fund utilization or expenditure request
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinancialRequestCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FinancialRequestCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FinancialRequestCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRequest'
+          description: ''
+  /api/v1/rspc/financial-requests/{id}/dean-decide:
+    post:
+      operationId: v1_rspc_financial_requests_dean_decide_create
+      summary: Dean-RSPC approval of financial request
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRequest'
+          description: ''
+  /api/v1/rspc/financial-requests/{id}/director-authorize:
+    post:
+      operationId: v1_rspc_financial_requests_director_authorize_create
+      summary: Director authorization of financial request
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRequest'
+          description: ''
+  /api/v1/rspc/financial-requests/{id}/verify:
+    post:
+      operationId: v1_rspc_financial_requests_verify_create
+      summary: RSPC Admin verification of financial request
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRequest'
+          description: ''
+  /api/v1/rspc/integrations/exchange:
+    post:
+      operationId: v1_rspc_integrations_exchange_create
+      summary: Exchange integration records with Fusion modules
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntegrationExchange'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IntegrationExchange'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IntegrationExchange'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/rspc/notifications:
+    get:
+      operationId: v1_rspc_notifications_list
+      summary: List in-app notifications
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RSPCNotification'
+          description: ''
+  /api/v1/rspc/procurement-requests:
+    get:
+      operationId: v1_rspc_procurement_requests_list
+      summary: List procurement requests
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProcurementRequest'
+          description: ''
+    post:
+      operationId: v1_rspc_procurement_requests_create
+      summary: Submit procurement request
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcurementRequestCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProcurementRequestCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProcurementRequestCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcurementRequest'
+          description: ''
+  /api/v1/rspc/procurement-requests/{id}/dean-decide:
+    post:
+      operationId: v1_rspc_procurement_requests_dean_decide_create
+      summary: Dean-RSPC approval of procurement
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcurementRequest'
+          description: ''
+  /api/v1/rspc/procurement-requests/{id}/director-authorize:
+    post:
+      operationId: v1_rspc_procurement_requests_director_authorize_create
+      summary: Director authorization of procurement
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcurementRequest'
+          description: ''
+  /api/v1/rspc/procurement-requests/{id}/verify:
+    post:
+      operationId: v1_rspc_procurement_requests_verify_create
+      summary: RSPC Admin verification of procurement
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcurementRequest'
+          description: ''
+  /api/v1/rspc/progress-reports:
+    get:
+      operationId: v1_rspc_progress_reports_list
+      summary: List progress reports
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProgressReport'
+          description: ''
+    post:
+      operationId: v1_rspc_progress_reports_create
+      summary: Submit progress/utilization report
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProgressReportCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProgressReportCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProgressReportCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgressReport'
+          description: ''
+  /api/v1/rspc/projects:
+    get:
+      operationId: v1_rspc_projects_list
+      summary: List RSPC project portfolio
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RSPCProject'
+          description: ''
+  /api/v1/rspc/projects/{id}:
+    get:
+      operationId: v1_rspc_projects_retrieve
+      summary: Retrieve project details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RSPCProject'
+          description: ''
+  /api/v1/rspc/projects/{id}/update-lifecycle:
+    patch:
+      operationId: v1_rspc_projects_update_lifecycle_partial_update
+      summary: Update project milestones and progress info
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectUpdate'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RSPCProject'
+          description: ''
+  /api/v1/rspc/proposals:
+    get:
+      operationId: v1_rspc_proposals_list
+      summary: List research proposals visible to caller
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResearchProposal'
+          description: ''
+    post:
+      operationId: v1_rspc_proposals_create
+      summary: Submit a new research proposal
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResearchProposalCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResearchProposalCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResearchProposalCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchProposal'
+          description: ''
+  /api/v1/rspc/proposals/{id}:
+    get:
+      operationId: v1_rspc_proposals_retrieve
+      summary: Retrieve proposal detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchProposal'
+          description: ''
+  /api/v1/rspc/proposals/{id}/dean-decide:
+    post:
+      operationId: v1_rspc_proposals_dean_decide_create
+      summary: Dean-RSPC decision on proposal
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchProposal'
+          description: ''
+  /api/v1/rspc/proposals/{id}/director-authorize:
+    post:
+      operationId: v1_rspc_proposals_director_authorize_create
+      summary: Director authorization for proposal
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchProposal'
+          description: ''
+  /api/v1/rspc/proposals/{id}/recommend-dept:
+    post:
+      operationId: v1_rspc_proposals_recommend_dept_create
+      summary: HoD recommendation on research proposal
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchProposal'
+          description: ''
+  /api/v1/rspc/proposals/{id}/verify:
+    post:
+      operationId: v1_rspc_proposals_verify_create
+      summary: RSPC Admin verification of proposal
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchProposal'
+          description: ''
+  /api/v1/rspc/roles/sync:
+    post:
+      operationId: v1_rspc_roles_sync_create
+      summary: Synchronize RSPC role assignment
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RSPCRoleSync'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RSPCRoleSync'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RSPCRoleSync'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RSPCRoleSync'
+          description: ''
+  /api/v1/rspc/staff-appointments:
+    get:
+      operationId: v1_rspc_staff_appointments_list
+      summary: List staff appointment requests
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StaffAppointmentRequest'
+          description: ''
+    post:
+      operationId: v1_rspc_staff_appointments_create
+      summary: Request project-based staff appointment
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StaffAppointmentCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StaffAppointmentCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StaffAppointmentCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffAppointmentRequest'
+          description: ''
+  /api/v1/rspc/staff-appointments/{id}/dean-decide:
+    post:
+      operationId: v1_rspc_staff_appointments_dean_decide_create
+      summary: Dean-RSPC decision on staff appointment
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffAppointmentRequest'
+          description: ''
+  /api/v1/rspc/staff-appointments/{id}/director-authorize:
+    post:
+      operationId: v1_rspc_staff_appointments_director_authorize_create
+      summary: Director authorization on staff appointment
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffAppointmentRequest'
+          description: ''
+  /api/v1/rspc/staff-appointments/{id}/recommend:
+    post:
+      operationId: v1_rspc_staff_appointments_recommend_create
+      summary: Record selection participation and recommendation
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffAppointmentRequest'
+          description: ''
+  /api/v1/rspc/staff-appointments/{id}/verify:
+    post:
+      operationId: v1_rspc_staff_appointments_verify_create
+      summary: RSPC Admin verification of staff appointment
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransitionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffAppointmentRequest'
+          description: ''
 components:
   schemas:
     AcademicDirectory:
@@ -2315,6 +3586,163 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    ConsultancyCreate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        department_id:
+          type: string
+          maxLength: 64
+        client_name:
+          type: string
+          maxLength: 255
+        client_details:
+          type: string
+        scope:
+          type: string
+        deliverables:
+          type: string
+        duration_months:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        budget_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        financial_terms:
+          type: string
+        requires_hod_review:
+          type: boolean
+        is_strategic:
+          type: boolean
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - client_name
+      - deliverables
+      - department_id
+      - scope
+      - title
+    ConsultancyProject:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        faculty_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        department_id:
+          type: string
+          maxLength: 64
+        title:
+          type: string
+          maxLength: 255
+        client_name:
+          type: string
+          maxLength: 255
+        client_details:
+          type: string
+        scope:
+          type: string
+        deliverables:
+          type: string
+        duration_months:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          nullable: true
+        financial_terms:
+          type: string
+        budget_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        requires_hod_review:
+          type: boolean
+        is_strategic:
+          type: boolean
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RspcProposalStatusEnum'
+          readOnly: true
+      required:
+      - client_name
+      - created_at
+      - deliverables
+      - department_id
+      - faculty_user_id
+      - id
+      - scope
+      - status
+      - title
+      - updated_at
+    ConsultancySettlement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        milestone_name:
+          type: string
+          maxLength: 160
+        deliverable_description:
+          type: string
+        amount_due:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        amount_received:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        settlement_status:
+          type: string
+          maxLength: 32
+        deliverable_status:
+          type: string
+          maxLength: 32
+        consultancy:
+          type: integer
+      required:
+      - consultancy
+      - created_at
+      - id
+      - milestone_name
+      - updated_at
     Detail:
       type: object
       properties:
@@ -2407,6 +3835,53 @@ components:
       - season_decision
       - semester
       - standing
+    ExternalAgencyTracking:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        proposal_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        agency_name:
+          type: string
+          maxLength: 255
+        external_reference_number:
+          type: string
+          maxLength: 128
+        submission_status:
+          type: string
+          maxLength: 64
+        disbursement_status:
+          type: string
+          maxLength: 64
+        disbursement_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        updated_by_actor:
+          type: string
+          maxLength: 64
+        project:
+          type: integer
+          nullable: true
+      required:
+      - agency_name
+      - created_at
+      - external_reference_number
+      - id
+      - updated_at
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2423,6 +3898,80 @@ components:
       - fee_reference
       - season
       - user_id
+    FinancialRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project_code:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        faculty_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        request_type:
+          type: string
+          maxLength: 32
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        budget_head:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RspcFinanceAndProcurementStatusEnum'
+          readOnly: true
+        project:
+          type: integer
+      required:
+      - amount
+      - budget_head
+      - created_at
+      - description
+      - faculty_user_id
+      - id
+      - project
+      - project_code
+      - request_type
+      - status
+      - updated_at
+    FinancialRequestCreate:
+      type: object
+      properties:
+        project:
+          type: integer
+        request_type:
+          type: string
+          maxLength: 32
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        budget_head:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+      required:
+      - amount
+      - budget_head
+      - description
+      - project
+      - request_type
     IncidentRecorded:
       type: object
       properties:
@@ -2433,6 +3982,16 @@ components:
       required:
       - incident
       - recommendation
+    IntegrationExchange:
+      type: object
+      properties:
+        source_module:
+          type: string
+          default: external
+          maxLength: 64
+        payload:
+          type: object
+          additionalProperties: {}
     InterviewRound:
       type: object
       properties:
@@ -3080,6 +4639,12 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PatchedProjectUpdate:
+      type: object
+      properties:
+        milestones: {}
+        progress_info:
+          type: string
     PatchedRole:
       type: object
       properties:
@@ -3145,6 +4710,90 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    ProcurementRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project_code:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        faculty_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        item_type:
+          type: string
+          maxLength: 32
+        item_name:
+          type: string
+          maxLength: 255
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        estimated_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        specifications:
+          type: string
+        budget_validation_passed:
+          type: boolean
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RspcFinanceAndProcurementStatusEnum'
+          readOnly: true
+        project:
+          type: integer
+      required:
+      - budget_validation_passed
+      - created_at
+      - estimated_cost
+      - faculty_user_id
+      - id
+      - item_name
+      - item_type
+      - project
+      - project_code
+      - status
+      - updated_at
+    ProcurementRequestCreate:
+      type: object
+      properties:
+        project:
+          type: integer
+        item_type:
+          type: string
+          maxLength: 32
+        item_name:
+          type: string
+          maxLength: 255
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        estimated_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        specifications:
+          type: string
+      required:
+      - estimated_cost
+      - item_name
+      - item_type
+      - project
     ProfileDocument:
       type: object
       description: |-
@@ -3201,6 +4850,348 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    ProgressReport:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project_code:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        faculty_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        report_type:
+          type: string
+          maxLength: 32
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        summary:
+          type: string
+        expenditure_reported:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        status:
+          type: string
+          readOnly: true
+        project:
+          type: integer
+      required:
+      - created_at
+      - faculty_user_id
+      - id
+      - period_end
+      - period_start
+      - project
+      - project_code
+      - report_type
+      - status
+      - summary
+      - updated_at
+    ProgressReportCreate:
+      type: object
+      properties:
+        project:
+          type: integer
+        report_type:
+          type: string
+          maxLength: 32
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        summary:
+          type: string
+        expenditure_reported:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+      required:
+      - period_end
+      - period_start
+      - project
+      - report_type
+      - summary
+    ProjectClosureCreate:
+      type: object
+      properties:
+        project:
+          type: integer
+        completion_report:
+          type: string
+        financial_settlement_record:
+          type: string
+        asset_declaration_record:
+          type: string
+      required:
+      - completion_report
+      - project
+    ProjectClosureRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project_code:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        faculty_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        completion_report:
+          type: string
+        financial_settlement_record:
+          type: string
+        asset_declaration_record:
+          type: string
+        settlement_verified:
+          type: boolean
+          readOnly: true
+        assets_verified:
+          type: boolean
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RspcClosureStatusEnum'
+          readOnly: true
+        project:
+          type: integer
+      required:
+      - assets_verified
+      - completion_report
+      - created_at
+      - faculty_user_id
+      - id
+      - project
+      - project_code
+      - settlement_verified
+      - status
+      - updated_at
+    RSPCAuditTrail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        record_type:
+          type: string
+          maxLength: 64
+        record_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        action:
+          type: string
+          maxLength: 64
+        from_status:
+          type: string
+          maxLength: 32
+        to_status:
+          type: string
+          maxLength: 32
+        actor_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        actor_role:
+          type: string
+          maxLength: 64
+        remarks:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - id
+      - record_id
+      - record_type
+      - timestamp
+    RSPCNotification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        recipient_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        category:
+          type: string
+          maxLength: 64
+        title:
+          type: string
+          maxLength: 255
+        message:
+          type: string
+        record_type:
+          type: string
+          maxLength: 64
+        record_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+        is_read:
+          type: boolean
+        email_dispatched:
+          type: boolean
+      required:
+      - category
+      - created_at
+      - id
+      - message
+      - recipient_user_id
+      - title
+      - updated_at
+    RSPCProject:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        available_budget:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        project_code:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        project_type:
+          type: string
+          maxLength: 32
+        pi_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        department_id:
+          type: string
+          maxLength: 64
+        funding_source:
+          type: string
+          maxLength: 255
+        sanctioned_budget:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        utilized_budget:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          nullable: true
+        status:
+          $ref: '#/components/schemas/RspcProjectLifecycleStatusEnum'
+        milestones: {}
+        progress_info:
+          type: string
+        archived_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        proposal:
+          type: integer
+          nullable: true
+        consultancy:
+          type: integer
+          nullable: true
+      required:
+      - archived_at
+      - available_budget
+      - created_at
+      - department_id
+      - funding_source
+      - id
+      - pi_user_id
+      - project_code
+      - project_type
+      - title
+      - updated_at
+    RSPCRoleSync:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        previous_role:
+          type: string
+          maxLength: 64
+        new_role:
+          type: string
+          maxLength: 64
+        source_mechanism:
+          type: string
+          maxLength: 128
+        synchronized_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - id
+      - new_role
+      - source_mechanism
+      - synchronized_at
+      - user_id
     Recommendation:
       type: object
       description: |-
@@ -3466,6 +5457,110 @@ components:
       - message
       - reason
       - route
+    ResearchProposal:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        faculty_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        department_id:
+          type: string
+          maxLength: 64
+        title:
+          type: string
+          maxLength: 255
+        objectives:
+          type: string
+        funding_agency:
+          type: string
+          maxLength: 255
+        duration_months:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          nullable: true
+        budget_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        resource_requirements:
+          type: string
+        policy_validation_passed:
+          type: boolean
+        is_strategic:
+          type: boolean
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RspcProposalStatusEnum'
+          readOnly: true
+      required:
+      - created_at
+      - department_id
+      - faculty_user_id
+      - funding_agency
+      - id
+      - objectives
+      - status
+      - title
+      - updated_at
+    ResearchProposalCreate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        department_id:
+          type: string
+          maxLength: 64
+        objectives:
+          type: string
+        funding_agency:
+          type: string
+          maxLength: 255
+        duration_months:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        budget_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        resource_requirements:
+          type: string
+        is_strategic:
+          type: boolean
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - department_id
+      - funding_agency
+      - objectives
+      - title
     RoundOutcome:
       type: object
       properties:
@@ -3539,6 +5634,102 @@ components:
         * `absent` - Absent
         * `passed` - Passed
         * `failed` - Failed
+    RspcClosureStatusEnum:
+      enum:
+      - draft
+      - submitted
+      - verified
+      - not_eligible
+      - forwarded_to_director
+      - archived
+      - dean_not_approved
+      - director_not_approved
+      type: string
+      description: |-
+        * `draft` - DRAFT
+        * `submitted` - SUBMITTED
+        * `verified` - VERIFIED
+        * `not_eligible` - NOT_ELIGIBLE
+        * `forwarded_to_director` - FORWARDED_TO_DIRECTOR
+        * `archived` - ARCHIVED
+        * `dean_not_approved` - DEAN_NOT_APPROVED
+        * `director_not_approved` - DIRECTOR_NOT_APPROVED
+    RspcFinanceAndProcurementStatusEnum:
+      enum:
+      - draft
+      - submitted
+      - verified
+      - not_eligible
+      - forwarded_to_director
+      - approved
+      - dean_not_approved
+      - director_not_approved
+      type: string
+      description: |-
+        * `draft` - DRAFT
+        * `submitted` - SUBMITTED
+        * `verified` - VERIFIED
+        * `not_eligible` - NOT_ELIGIBLE
+        * `forwarded_to_director` - FORWARDED_TO_DIRECTOR
+        * `approved` - APPROVED
+        * `dean_not_approved` - DEAN_NOT_APPROVED
+        * `director_not_approved` - DIRECTOR_NOT_APPROVED
+    RspcProjectLifecycleStatusEnum:
+      enum:
+      - active
+      - completed
+      - archived
+      type: string
+      description: |-
+        * `active` - ACTIVE
+        * `completed` - COMPLETED
+        * `archived` - ARCHIVED
+    RspcProposalStatusEnum:
+      enum:
+      - draft
+      - submitted
+      - dept_recommended
+      - dept_not_recommended
+      - admin_verified
+      - not_eligible
+      - forwarded_to_director
+      - approved
+      - dean_not_approved
+      - director_not_approved
+      type: string
+      description: |-
+        * `draft` - DRAFT
+        * `submitted` - SUBMITTED
+        * `dept_recommended` - DEPT_RECOMMENDED
+        * `dept_not_recommended` - DEPT_NOT_RECOMMENDED
+        * `admin_verified` - ADMIN_VERIFIED
+        * `not_eligible` - NOT_ELIGIBLE
+        * `forwarded_to_director` - FORWARDED_TO_DIRECTOR
+        * `approved` - APPROVED
+        * `dean_not_approved` - DEAN_NOT_APPROVED
+        * `director_not_approved` - DIRECTOR_NOT_APPROVED
+    RspcStaffAppointmentStatusEnum:
+      enum:
+      - draft
+      - requested
+      - admin_verified
+      - not_eligible
+      - selection_recommended
+      - forwarded_to_director
+      - approved
+      - dean_not_approved
+      - director_not_approved
+      type: string
+      description: |-
+        * `draft` - DRAFT
+        * `requested` - REQUESTED
+        * `admin_verified` - ADMIN_VERIFIED
+        * `not_eligible` - NOT_ELIGIBLE
+        * `selection_recommended` - SELECTION_RECOMMENDED
+        * `forwarded_to_director` - FORWARDED_TO_DIRECTOR
+        * `approved` - APPROVED
+        * `dean_not_approved` - DEAN_NOT_APPROVED
+        * `director_not_approved` - DIRECTOR_NOT_APPROVED
     SanctionEnum:
       enum:
       - bar_next_two
@@ -3663,6 +5854,83 @@ components:
       description: |-
         * `campus` - Through the Placement Cell
         * `off_campus` - Off campus (rules 5 and 24)
+    StaffAppointmentCreate:
+      type: object
+      properties:
+        project:
+          type: integer
+        position_title:
+          type: string
+          maxLength: 160
+        stipend_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        duration_months:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        advertisement_details:
+          type: string
+      required:
+      - position_title
+      - project
+    StaffAppointmentRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project_code:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        faculty_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        position_title:
+          type: string
+          maxLength: 160
+        stipend_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        duration_months:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        advertisement_details:
+          type: string
+        application_records: {}
+        selection_committee_records: {}
+        recommendation:
+          type: string
+        recommended_candidate_name:
+          type: string
+          maxLength: 255
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RspcStaffAppointmentStatusEnum'
+          readOnly: true
+        project:
+          type: integer
+      required:
+      - created_at
+      - faculty_user_id
+      - id
+      - position_title
+      - project
+      - project_code
+      - status
+      - updated_at
     StaffStats:
       type: object
       description: PC-UC-011/012. Operational figures, staff only.
@@ -3724,6 +5992,35 @@ components:
           type: string
           default: ''
           maxLength: 300
+      required:
+      - to_status
+    TransitionAction:
+      type: object
+      properties:
+        to_status:
+          type: string
+          maxLength: 64
+        remarks:
+          type: string
+          default: ''
+          maxLength: 1000
+        is_eligible:
+          type: boolean
+          default: true
+        recommendation:
+          type: string
+          default: ''
+          maxLength: 1000
+        recommended_candidate_name:
+          type: string
+          default: ''
+          maxLength: 255
+        settlement_verified:
+          type: boolean
+          default: true
+        assets_verified:
+          type: boolean
+          default: true
       required:
       - to_status
     TransitionEntry:

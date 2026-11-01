@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.rspc",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -230,6 +231,13 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "RspcProposalStatusEnum": "modules.rspc.domain.entities.ProposalStatus",
+        "RspcStaffAppointmentStatusEnum": "modules.rspc.domain.entities.StaffAppointmentStatus",
+        "RspcFinanceAndProcurementStatusEnum": "modules.rspc.domain.entities.FinancialRequestStatus",
+        "RspcClosureStatusEnum": "modules.rspc.domain.entities.ClosureStatus",
+        "RspcProjectLifecycleStatusEnum": "modules.rspc.domain.entities.ProjectLifecycleStatus",
+    },
 }
 
 CORS_ALLOW_ALL_ORIGINS = False

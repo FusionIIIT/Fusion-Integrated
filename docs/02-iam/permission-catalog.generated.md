@@ -38,3 +38,52 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `rspc`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `rspc.proposal.create` | Submit research project proposals | `Faculty`, `faculty` |
+| `rspc.proposal.view_self` | View own submitted research proposals | `Faculty`, `faculty` |
+| `rspc.proposal.view` | View all research project proposals within scope | `Dean RSPC`, `Dean-RSPC`, `Director`, `Head of Department`, `HoD`, `RSPC Admin`, `dean_rspc`, `director`, `hod`, `rspc_admin` |
+| `rspc.proposal.recommend_dept` | Record HoD departmental recommendation on proposals | `Head of Department`, `HoD`, `hod` |
+| `rspc.proposal.verify` | Perform RSPC Admin verification on proposals | `RSPC Admin`, `rspc_admin` |
+| `rspc.proposal.approve_dean` | Dean-RSPC review and approval of proposals | `Dean RSPC`, `Dean-RSPC`, `dean_rspc` |
+| `rspc.proposal.authorize_director` | Director authorization for high-value proposals | `Director`, `director` |
+| `rspc.consultancy.create` | Register consultancy projects | `Faculty`, `faculty` |
+| `rspc.consultancy.view_self` | View own registered consultancy projects | `Faculty`, `faculty` |
+| `rspc.consultancy.view` | View all consultancy projects | `Dean RSPC`, `Dean-RSPC`, `Director`, `Head of Department`, `HoD`, `RSPC Admin`, `dean_rspc`, `director`, `hod`, `rspc_admin` |
+| `rspc.consultancy.recommend_dept` | Record HoD recommendation on consultancy | `Head of Department`, `HoD`, `hod` |
+| `rspc.consultancy.verify` | Verify consultancy project records | `RSPC Admin`, `rspc_admin` |
+| `rspc.consultancy.approve_dean` | Dean-RSPC review and approval of consultancy | `Dean RSPC`, `Dean-RSPC`, `dean_rspc` |
+| `rspc.consultancy.authorize_director` | Director authorization for consultancy projects | `Director`, `director` |
+| `rspc.project.view_self` | View own active/completed RSPC projects portfolio | `Faculty`, `faculty` |
+| `rspc.project.view` | View institutional RSPC projects portfolio | `Dean RSPC`, `Dean-RSPC`, `Director`, `Head of Department`, `HoD`, `RSPC Admin`, `dean_rspc`, `director`, `hod`, `rspc_admin` |
+| `rspc.project.update` | Update project lifecycle details, milestones, and progress | `Faculty`, `faculty` |
+| `rspc.staff.request` | Submit project staff appointment request | `Faculty`, `faculty` |
+| `rspc.staff.view` | View project staff appointment requests | `Dean RSPC`, `Dean-RSPC`, `Director`, `RSPC Admin`, `dean_rspc`, `director`, `rspc_admin` |
+| `rspc.staff.verify` | Verify staff appointment requests and operational records | `RSPC Admin`, `rspc_admin` |
+| `rspc.staff.recommend` | Record staff selection committee participation & recommendation | `Faculty`, `faculty` |
+| `rspc.staff.approve_dean` | Dean-RSPC decision on staff appointment | `Dean RSPC`, `Dean-RSPC`, `dean_rspc` |
+| `rspc.staff.authorize_director` | Director decision on staff appointment | `Director`, `director` |
+| `rspc.finance.request` | Submit fund utilization or expenditure requests | `Faculty`, `faculty` |
+| `rspc.finance.view` | View project financial and fund requests | `Dean RSPC`, `Dean-RSPC`, `Director`, `RSPC Admin`, `dean_rspc`, `director`, `rspc_admin` |
+| `rspc.finance.verify` | Verify financial and fund requests | `RSPC Admin`, `rspc_admin` |
+| `rspc.finance.approve_dean` | Dean-RSPC approval of financial requests | `Dean RSPC`, `Dean-RSPC`, `dean_rspc` |
+| `rspc.finance.authorize_director` | Director authorization for high-value financial requests | `Director`, `director` |
+| `rspc.procurement.request` | Submit project equipment or consumable procurement requests | `Faculty`, `faculty` |
+| `rspc.procurement.view` | View procurement requests and track status | `Dean RSPC`, `Dean-RSPC`, `Director`, `RSPC Admin`, `dean_rspc`, `director`, `rspc_admin` |
+| `rspc.procurement.verify` | Verify procurement requests and validate project budget | `RSPC Admin`, `rspc_admin` |
+| `rspc.procurement.approve_dean` | Dean-RSPC approval of procurement requests | `Dean RSPC`, `Dean-RSPC`, `dean_rspc` |
+| `rspc.procurement.authorize_director` | Director authorization for high-value procurement | `Director`, `director` |
+| `rspc.report.submit` | Submit periodic progress and utilization reports | `Faculty`, `faculty` |
+| `rspc.report.view` | View historical progress and utilization reports | `Dean RSPC`, `Dean-RSPC`, `Director`, `RSPC Admin`, `dean_rspc`, `director`, `rspc_admin` |
+| `rspc.closure.submit` | Submit project closure and completion reports | `Faculty`, `faculty` |
+| `rspc.closure.verify` | Verify project closure, settlement, and asset declarations | `RSPC Admin`, `rspc_admin` |
+| `rspc.closure.approve_dean` | Dean-RSPC decision and archival of project closure | `Dean RSPC`, `Dean-RSPC`, `dean_rspc` |
+| `rspc.closure.authorize_director` | Director decision on project closure | `Director`, `director` |
+| `rspc.notification.view_self` | View received RSPC dashboard notifications | `Dean RSPC`, `Dean-RSPC`, `Director`, `Faculty`, `Head of Department`, `HoD`, `RSPC Admin`, `dean_rspc`, `director`, `faculty`, `hod`, `rspc_admin` |
+| `rspc.audit.view` | View RSPC audit trails, logs, and compliance records | `Dean RSPC`, `Dean-RSPC`, `Director`, `RSPC Admin`, `dean_rspc`, `director`, `rspc_admin` |
+| `rspc.integration.exchange` | Exchange RSPC integration records with Fusion modules | `RSPC Admin`, `rspc_admin` |
+| `rspc.agency.track` | Record and view external funding agency tracking updates | `RSPC Admin`, `rspc_admin` |
+| `rspc.role.sync` | Synchronize RSPC role assignments | `RSPC Admin`, `rspc_admin` |
