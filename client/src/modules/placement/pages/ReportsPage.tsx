@@ -4,13 +4,16 @@ import {
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { FaChartBar, FaDownload, FaInfoCircle } from "react-icons/fa";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 import { useAuth } from "../../../auth/AuthProvider";
 import { errorMessage } from "../../../lib/http";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
+import { SeasonSelector } from "../../../ui/components/SeasonSelector";
 import {
-  useCsvExport, useOutstandingLetters, useStats, type ExportKind,
+  useCsvExport, useOutstandingLetters, usePlacementStats, type ExportKind,
 } from "../api/hooks";
 
 /** Staff only, matching the server. Hiding it is UX; the endpoint enforces. */
@@ -125,9 +128,17 @@ function Metric({ label, value, hint }: {
 }
 
 export default function ReportsPage() {
-  const { data, isPending, error } = useStats();
+  const router = useRouter();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const season = searchParams.get("season") || "2023-24";
+  const { data, isPending, error } = usePlacementStats(season);
   const { can } = useAuth();
   const isStaff = can("placement_cell.report.view");
+
+  const handleSeasonChange = (newSeason: string) => {
+    setSearchParams({ season: newSeason });
+    router.replace(router.pathname, { query: searchParams });
+  };
 
   if (error) return <Container size="lg"><ErrorState error={error} /></Container>;
   if (isPending) return <Container size="lg"><Text c="dimmed">Loading…</Text></Container>;
@@ -158,16 +169,14 @@ export default function ReportsPage() {
         action={isStaff ? <ExportActions /> : undefined}
       />
 
+      <SeasonSelector season={season} onChange={handleSeasonChange} />
+
       <SimpleGrid cols={{ base: 2, sm: 4 }} mb="md">
-        <Metric label="Registered" value={data?.registered} />
-        <Metric label="Placed" value={data?.placed} />
+        <Metric label="Total Placed" value={data?.placed} />
+        <Metric label="Mean CTC" value={data?.mean_ctc ? `${data.mean_ctc} LPA` : null} />
         <Metric
           label="Median CTC"
           value={data?.median_ctc ? `${data.median_ctc} LPA` : null}
-        />
-        <Metric
-          label="Highest CTC"
-          value={data?.max_ctc ? `${data.max_ctc} LPA` : null}
         />
       </SimpleGrid>
 
