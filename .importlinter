@@ -15,12 +15,18 @@ source_modules =
     modules.placement
     modules.directory
     modules.accesscontrol
+    modules.rspc
 forbidden_modules =
     modules.placement.models
     modules.placement.services
     modules.placement.selectors
     modules.placement.api
     modules.placement.domain
+    modules.rspc.models
+    modules.rspc.services
+    modules.rspc.selectors
+    modules.rspc.api
+    modules.rspc.domain
     modules.directory.models
     modules.directory.services
     modules.directory.api
@@ -38,6 +44,7 @@ type = forbidden
 source_modules =
 # Every module's domain, not just the first one written.
     modules.placement.domain
+    modules.rspc.domain
 forbidden_modules =
     django
     rest_framework
@@ -66,3 +73,13 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+
+[importlinter:contract:rspc-layers]
+name = Layering inside rspc
+type = layers
+layers =
+    modules.rspc.api
+    modules.rspc.services
+    modules.rspc.selectors
+    modules.rspc.models
+    modules.rspc.domain

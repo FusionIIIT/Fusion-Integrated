@@ -278,6 +278,409 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "rspc": {
+      "grants": {
+        "Dean Academic": [
+          "rspc.appointment.decide_dean",
+          "rspc.appointment.view",
+          "rspc.closure.decide_dean",
+          "rspc.closure.view",
+          "rspc.consultancy.decide_dean",
+          "rspc.consultancy.view",
+          "rspc.finance.decide_dean",
+          "rspc.finance.view",
+          "rspc.procurement.decide_dean",
+          "rspc.procurement.view",
+          "rspc.progress_report.view",
+          "rspc.proposal.decide_dean",
+          "rspc.proposal.view",
+          "rspc.report.view"
+        ],
+        "dean_rspc": [
+          "rspc.appointment.decide_dean",
+          "rspc.appointment.view",
+          "rspc.closure.decide_dean",
+          "rspc.closure.view",
+          "rspc.consultancy.decide_dean",
+          "rspc.consultancy.view",
+          "rspc.finance.decide_dean",
+          "rspc.finance.view",
+          "rspc.procurement.decide_dean",
+          "rspc.procurement.view",
+          "rspc.progress_report.view",
+          "rspc.proposal.decide_dean",
+          "rspc.proposal.view",
+          "rspc.report.view"
+        ],
+        "director": [
+          "rspc.appointment.decide_director",
+          "rspc.appointment.view",
+          "rspc.closure.view",
+          "rspc.consultancy.decide_director",
+          "rspc.consultancy.view",
+          "rspc.finance.decide_director",
+          "rspc.finance.view",
+          "rspc.procurement.decide_director",
+          "rspc.procurement.view",
+          "rspc.progress_report.view",
+          "rspc.proposal.decide_director",
+          "rspc.proposal.view",
+          "rspc.report.view"
+        ],
+        "faculty": [
+          "rspc.appointment.create",
+          "rspc.appointment.recommend",
+          "rspc.appointment.view_self",
+          "rspc.closure.submit",
+          "rspc.closure.view_self",
+          "rspc.consultancy.create",
+          "rspc.consultancy.view_self",
+          "rspc.finance.create",
+          "rspc.finance.view_self",
+          "rspc.procurement.create",
+          "rspc.procurement.view_self",
+          "rspc.progress_report.submit",
+          "rspc.progress_report.view_self",
+          "rspc.proposal.create",
+          "rspc.proposal.view_self"
+        ],
+        "hod": [
+          "rspc.appointment.create",
+          "rspc.appointment.recommend",
+          "rspc.appointment.view_self",
+          "rspc.closure.submit",
+          "rspc.closure.view",
+          "rspc.closure.view_self",
+          "rspc.consultancy.create",
+          "rspc.consultancy.review_hod",
+          "rspc.consultancy.view",
+          "rspc.consultancy.view_self",
+          "rspc.finance.create",
+          "rspc.finance.view_self",
+          "rspc.procurement.create",
+          "rspc.procurement.view_self",
+          "rspc.progress_report.submit",
+          "rspc.progress_report.view",
+          "rspc.progress_report.view_self",
+          "rspc.proposal.create",
+          "rspc.proposal.review_hod",
+          "rspc.proposal.view",
+          "rspc.proposal.view_self"
+        ],
+        "rspc_admin": [
+          "rspc.appointment.manage_admin",
+          "rspc.appointment.view",
+          "rspc.closure.verify_admin",
+          "rspc.closure.view",
+          "rspc.consultancy.verify_admin",
+          "rspc.consultancy.view",
+          "rspc.finance.verify_admin",
+          "rspc.finance.view",
+          "rspc.procurement.verify_admin",
+          "rspc.procurement.view",
+          "rspc.progress_report.manage",
+          "rspc.progress_report.view",
+          "rspc.proposal.verify_admin",
+          "rspc.proposal.view",
+          "rspc.report.manage",
+          "rspc.report.view"
+        ]
+      },
+      "module_grants": [
+        "Dean Academic",
+        "dean_rspc",
+        "director",
+        "faculty",
+        "hod",
+        "rspc_admin"
+      ],
+      "nav": {
+        "base_path": "/rspc",
+        "icon": "FlaskConical",
+        "items": [
+          {
+            "code": "rspc.my_proposals",
+            "icon": "FileText",
+            "label": "My Proposals",
+            "required_permission": "rspc.proposal.view_self",
+            "sort_order": 10,
+            "to": "/rspc/my-proposals"
+          },
+          {
+            "code": "rspc.my_consultancy",
+            "icon": "Briefcase",
+            "label": "My Consultancy",
+            "required_permission": "rspc.consultancy.view_self",
+            "sort_order": 20,
+            "to": "/rspc/my-consultancy"
+          },
+          {
+            "code": "rspc.my_finance",
+            "icon": "CurrencyDollar",
+            "label": "My Requests",
+            "required_permission": "rspc.finance.view_self",
+            "sort_order": 30,
+            "to": "/rspc/my-finance"
+          },
+          {
+            "code": "rspc.my_progress_reports",
+            "icon": "ChartLine",
+            "label": "Progress Reports",
+            "required_permission": "rspc.progress_report.view_self",
+            "sort_order": 40,
+            "to": "/rspc/my-progress-reports"
+          },
+          {
+            "code": "rspc.proposals",
+            "icon": "Files",
+            "label": "Proposals",
+            "required_permission": "rspc.proposal.view",
+            "sort_order": 50,
+            "to": "/rspc/proposals"
+          },
+          {
+            "code": "rspc.consultancy",
+            "icon": "Buildings",
+            "label": "Consultancy",
+            "required_permission": "rspc.consultancy.view",
+            "sort_order": 60,
+            "to": "/rspc/consultancy"
+          },
+          {
+            "code": "rspc.appointments",
+            "icon": "UsersThree",
+            "label": "Appointments",
+            "required_permission": "rspc.appointment.view",
+            "sort_order": 70,
+            "to": "/rspc/appointments"
+          },
+          {
+            "code": "rspc.finance",
+            "icon": "Money",
+            "label": "Financial Requests",
+            "required_permission": "rspc.finance.view",
+            "sort_order": 80,
+            "to": "/rspc/finance"
+          },
+          {
+            "code": "rspc.procurement",
+            "icon": "Package",
+            "label": "Procurement",
+            "required_permission": "rspc.procurement.view",
+            "sort_order": 90,
+            "to": "/rspc/procurement"
+          },
+          {
+            "code": "rspc.progress_reports",
+            "icon": "ChartBar",
+            "label": "Progress Reports",
+            "required_permission": "rspc.progress_report.view",
+            "sort_order": 100,
+            "to": "/rspc/progress-reports"
+          },
+          {
+            "code": "rspc.closures",
+            "icon": "Archive",
+            "label": "Project Closures",
+            "required_permission": "rspc.closure.view",
+            "sort_order": 110,
+            "to": "/rspc/closures"
+          },
+          {
+            "code": "rspc.reports",
+            "icon": "PresentationChart",
+            "label": "Reports",
+            "required_permission": "rspc.report.view",
+            "sort_order": 120,
+            "to": "/rspc/reports"
+          }
+        ],
+        "label": "RSPC",
+        "nav_section": "Research",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "rspc.proposal.create",
+          "label": "Submit a research project proposal"
+        },
+        {
+          "code": "rspc.proposal.view_self",
+          "label": "View own proposals"
+        },
+        {
+          "code": "rspc.proposal.view",
+          "label": "View all proposals (within scope)"
+        },
+        {
+          "code": "rspc.proposal.review_hod",
+          "label": "Review proposal as HoD"
+        },
+        {
+          "code": "rspc.proposal.verify_admin",
+          "label": "Verify and forward proposals as RSPC Admin"
+        },
+        {
+          "code": "rspc.proposal.decide_dean",
+          "label": "Approve/reject proposals as Dean-RSPC"
+        },
+        {
+          "code": "rspc.proposal.decide_director",
+          "label": "Authorize proposals as Director"
+        },
+        {
+          "code": "rspc.consultancy.create",
+          "label": "Register a consultancy project"
+        },
+        {
+          "code": "rspc.consultancy.view_self",
+          "label": "View own consultancy projects"
+        },
+        {
+          "code": "rspc.consultancy.view",
+          "label": "View all consultancy projects"
+        },
+        {
+          "code": "rspc.consultancy.review_hod",
+          "label": "Review consultancy as HoD"
+        },
+        {
+          "code": "rspc.consultancy.verify_admin",
+          "label": "Verify consultancy as RSPC Admin"
+        },
+        {
+          "code": "rspc.consultancy.decide_dean",
+          "label": "Decide consultancy as Dean-RSPC"
+        },
+        {
+          "code": "rspc.consultancy.decide_director",
+          "label": "Authorize consultancy as Director"
+        },
+        {
+          "code": "rspc.appointment.create",
+          "label": "Request project-based staff appointment"
+        },
+        {
+          "code": "rspc.appointment.view_self",
+          "label": "View own appointment requests"
+        },
+        {
+          "code": "rspc.appointment.view",
+          "label": "View all appointment requests"
+        },
+        {
+          "code": "rspc.appointment.manage_admin",
+          "label": "Manage appointment records as RSPC Admin"
+        },
+        {
+          "code": "rspc.appointment.recommend",
+          "label": "Record selection recommendation as Faculty"
+        },
+        {
+          "code": "rspc.appointment.decide_dean",
+          "label": "Approve/forward appointment as Dean-RSPC"
+        },
+        {
+          "code": "rspc.appointment.decide_director",
+          "label": "Authorize appointment as Director"
+        },
+        {
+          "code": "rspc.finance.create",
+          "label": "Submit fund-utilization or expenditure request"
+        },
+        {
+          "code": "rspc.finance.view_self",
+          "label": "View own financial requests"
+        },
+        {
+          "code": "rspc.finance.view",
+          "label": "View all financial requests"
+        },
+        {
+          "code": "rspc.finance.verify_admin",
+          "label": "Verify financial requests as RSPC Admin"
+        },
+        {
+          "code": "rspc.finance.decide_dean",
+          "label": "Approve/forward financial requests as Dean-RSPC"
+        },
+        {
+          "code": "rspc.finance.decide_director",
+          "label": "Authorize financial requests as Director"
+        },
+        {
+          "code": "rspc.procurement.create",
+          "label": "Request equipment or consumable procurement"
+        },
+        {
+          "code": "rspc.procurement.view_self",
+          "label": "View own procurement requests"
+        },
+        {
+          "code": "rspc.procurement.view",
+          "label": "View all procurement requests"
+        },
+        {
+          "code": "rspc.procurement.verify_admin",
+          "label": "Verify procurement requests as RSPC Admin"
+        },
+        {
+          "code": "rspc.procurement.decide_dean",
+          "label": "Approve/forward procurement as Dean-RSPC"
+        },
+        {
+          "code": "rspc.procurement.decide_director",
+          "label": "Authorize procurement as Director"
+        },
+        {
+          "code": "rspc.progress_report.submit",
+          "label": "Submit periodic progress report"
+        },
+        {
+          "code": "rspc.progress_report.view_self",
+          "label": "View own progress reports"
+        },
+        {
+          "code": "rspc.progress_report.view",
+          "label": "View all progress reports"
+        },
+        {
+          "code": "rspc.progress_report.manage",
+          "label": "Manage/review progress reports as Admin/Dean"
+        },
+        {
+          "code": "rspc.closure.submit",
+          "label": "Submit project closure report"
+        },
+        {
+          "code": "rspc.closure.view_self",
+          "label": "View own closure records"
+        },
+        {
+          "code": "rspc.closure.view",
+          "label": "View all closure records"
+        },
+        {
+          "code": "rspc.closure.verify_admin",
+          "label": "Verify closure records as RSPC Admin"
+        },
+        {
+          "code": "rspc.closure.decide_dean",
+          "label": "Approve closure as Dean-RSPC"
+        },
+        {
+          "code": "rspc.report.view",
+          "label": "View RSPC operational reports and statistics"
+        },
+        {
+          "code": "rspc.report.manage",
+          "label": "Manage all RSPC records (admin)"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
     }
   },
   "publisher": "integrated",

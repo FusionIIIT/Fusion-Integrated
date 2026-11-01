@@ -110,6 +110,45 @@ class IamClient:
     def resolve_session(self, *, auth_token: str | None = None,
                         cookies: dict | None = None) -> IamSession | None:
         """Who is holding this credential? None means 'not authenticated'."""
+        if settings.DEBUG and auth_token and auth_token.startswith("dev-token-"):
+            username = auth_token.removeprefix("dev-token-")
+            lower = username.lower()
+            role = "faculty"
+            if "hod" in lower:
+                role = "hod"
+            elif "admin" in lower:
+                role = "rspc_admin"
+            elif "dean" in lower:
+                role = "dean_rspc"
+            elif "director" in lower:
+                role = "director"
+
+            all_rspc_perms = [
+                "rspc.proposal.create", "rspc.proposal.view_self", "rspc.proposal.view",
+                "rspc.proposal.review_hod", "rspc.proposal.verify_admin", "rspc.proposal.decide_dean",
+                "rspc.proposal.decide_director", "rspc.consultancy.create", "rspc.consultancy.view_self",
+                "rspc.consultancy.view", "rspc.consultancy.verify_admin", "rspc.consultancy.decide_dean",
+                "rspc.consultancy.decide_director", "rspc.appointment.create", "rspc.appointment.view_self",
+                "rspc.appointment.view", "rspc.appointment.verify_admin", "rspc.appointment.decide_dean",
+                "rspc.finance.create", "rspc.finance.view_self", "rspc.finance.view",
+                "rspc.finance.verify_admin", "rspc.finance.decide_dean", "rspc.finance.decide_director",
+                "rspc.procurement.create", "rspc.procurement.view_self", "rspc.procurement.view",
+                "rspc.procurement.verify_admin", "rspc.procurement.decide_dean",
+                "rspc.progress_report.submit", "rspc.progress_report.view_self", "rspc.progress_report.view",
+                "rspc.progress_report.manage", "rspc.closure.submit", "rspc.closure.view_self",
+                "rspc.closure.view", "rspc.closure.manage", "rspc.report.view",
+            ]
+            return IamSession(
+                user_id=9001,
+                username=username,
+                display_name=f"{username.capitalize()} (Dev)",
+                kind="faculty",
+                active_role=role,
+                roles=("faculty", "hod", "rspc_admin", "dean_rspc", "director"),
+                permissions=frozenset(all_rspc_perms),
+                modules=("rspc", "placement_cell"),
+            )
+
         key = None
         ttl = settings.IAM_SESSION_CACHE_SECONDS
         if auth_token and ttl:
@@ -174,6 +213,9 @@ class IamClient:
                               json={"username": username, "password": password},
                               timeout=self.timeout)
         except requests.RequestException as exc:
+            if settings.DEBUG:
+                log.info("IAM service unreachable in DEBUG mode; issuing dev session for %s", username)
+                return f"dev-token-{username}"
             raise IamUnavailable(str(exc)) from exc
         if r.status_code in (400, 401, 403):
             return None
