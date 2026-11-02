@@ -78,7 +78,7 @@ class CourseDetailsView(APIView):
 class SectionListCreateView(APIView):
     def get_permissions(self):
         code = p.P_COURSE if self.request.method == "GET" else p.P_COURSE_MANAGE
-        return p.allow(code)
+        return [permission() for permission in p.allow(code)]
 
     def get(self, request, course_id):
         _ref, course = _course(_actor(request), course_id)
@@ -98,7 +98,7 @@ class MaterialListCreateView(APIView):
 
     def get_permissions(self):
         code = p.P_MATERIAL if self.request.method == "GET" else p.P_MATERIAL_MANAGE
-        return p.allow(code)
+        return [permission() for permission in p.allow(code)]
 
     @extend_schema(responses=s.MaterialSerializer(many=True))
     def get(self, request, course_id):
@@ -155,7 +155,7 @@ class AnnouncementListCreateView(APIView):
     def get_permissions(self):
         code = (p.P_ANNOUNCEMENT if self.request.method == "GET"
                 else p.P_ANNOUNCEMENT_CREATE)
-        return p.allow(code)
+        return [permission() for permission in p.allow(code)]
 
     @extend_schema(responses=s.AnnouncementSerializer(many=True))
     def get(self, request, course_id):
@@ -177,7 +177,7 @@ class AnnouncementListCreateView(APIView):
 class AssignmentListCreateView(APIView):
     def get_permissions(self):
         code = p.P_ASSIGNMENT if self.request.method == "GET" else p.P_ASSIGNMENT_MANAGE
-        return p.allow(code)
+        return [permission() for permission in p.allow(code)]
 
     @extend_schema(responses=s.AssignmentSerializer(many=True))
     def get(self, request, course_id):
@@ -259,7 +259,7 @@ class AssignmentSubmitView(APIView):
 
 class SubmissionListView(APIView):
     def get_permissions(self):
-        return [p.MODULE]
+        return [p.MODULE()]
 
     @extend_schema(responses=s.SubmissionSerializer(many=True))
     def get(self, request, course_id):
@@ -324,8 +324,8 @@ class SubmissionDownloadView(APIView):
 class GradeListReleaseView(APIView):
     def get_permissions(self):
         if self.request.method == "POST":
-            return p.allow(p.P_GRADE_RELEASE)
-        return [p.MODULE]
+            return [permission() for permission in p.allow(p.P_GRADE_RELEASE)]
+        return [p.MODULE()]
 
     @extend_schema(responses=s.GradeSerializer(many=True))
     def get(self, request, course_id):
