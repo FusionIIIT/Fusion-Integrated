@@ -82,13 +82,15 @@ class AuditLog(models.Model):
     to_status=models.CharField(max_length=24,blank=True); details=models.JSONField(default=dict,blank=True)
     created_at=models.DateTimeField(auto_now_add=True,db_index=True); objects=AuditLogQuerySet.as_manager()
     class Meta: db_table="iaa_audit_log"; ordering=["created_at"]
+    def __str__(self):
+        return f"{self.action} on {self.resource_type} #{self.resource_id}"
+
     def save(self,*args,**kwargs):
         if not self._state.adding: raise ValueError("IAA audit logs are append-only.")
         return super().save(*args,**kwargs)
-    def delete(self,*args,**kwargs): raise ValueError("IAA audit logs are append-only.")
 
-    def __str__(self):
-        return f"{self.action} on {self.resource_type} #{self.resource_id}"
+    def delete(self,*args,**kwargs):
+        raise ValueError("IAA audit logs are append-only.")
 
 class SupportingDocument(TimeStampedModel):
     uploaded_by_id=models.IntegerField(db_index=True); name=models.CharField(max_length=255)
