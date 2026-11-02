@@ -4,6 +4,7 @@ Every value comes from the environment. This service holds NO user table:
 identity, RBAC and directory data all come from Fusion_System_Administrator
 over HTTP — see fusion_auth/.
 """
+
 import os
 from pathlib import Path
 
@@ -90,6 +91,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.purchase_stores",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
