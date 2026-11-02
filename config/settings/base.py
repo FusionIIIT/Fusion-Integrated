@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.visitor_hostel",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -121,7 +122,7 @@ TEMPLATES = [
 # One database, owned by this service; person data comes from modules.directory.
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": env("DB_ENGINE", "django.db.backends.postgresql"),
         "NAME": env("DB_NAME", "fusion_integrated"),
         "USER": env("DB_USER", "fusion_admin"),
         "PASSWORD": env("DB_PASSWORD", ""),
