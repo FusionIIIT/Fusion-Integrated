@@ -33,7 +33,7 @@ class IAAView(APIView):
 
 
 class FinancialRecordListCreateView(IAAView):
-    @extend_schema(responses=s.PageSerializer)
+    @extend_schema(operation_id="iaa_requests_list", responses=s.PageSerializer)
     def get(self, request):
         role = service.actor_role(actor(request))
         permission = "iaa.request.view_self" if role in service.BASIC_ROLES else "iaa.request.view"
@@ -56,7 +56,7 @@ class FinancialRecordListCreateView(IAAView):
 
 
 class FinancialRecordDetailView(IAAView):
-    @extend_schema(responses=s.FinancialRecordSerializer)
+    @extend_schema(operation_id="iaa_request_retrieve", responses=s.FinancialRecordSerializer)
     def get(self, request, pk):
         role = service.actor_role(actor(request))
         service.require(actor(request), "iaa.request.view_self" if role in service.BASIC_ROLES else "iaa.request.view")
