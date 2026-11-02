@@ -1,0 +1,812 @@
+Hostel Management (HM) — Use Case Specifications
+v1.4_FINAL_SYNCHRONIZED | Actor-triggered + Event-triggered | DIRECT_FINAL_v2
+Modeling note. The system under specification is not modeled as its own actor. Human-goal services are Actor-triggered. Automatic services with explicit event semantics use Primary Actor = “N.A. — Event-triggered”. Informational UCs remain outside workflows unless they create a meaningful persistent business-state transition.
+1. Use Case Register
+2. Historical UC ID Disposition
+3. Detailed Use Cases
+HM-UC-001 — Create Hostel Record
+HM-UC-002 — Activate or Deactivate Hostel Record
+HM-UC-003 — Manage Warden Role Binding
+HM-UC-004 — Manage Caretaker Role Binding
+HM-UC-005 — Submit Hostel Accommodation Request
+HM-UC-006 — Record Hostel and Room Allotment Decisions
+HM-UC-007 — Record Central Re-allotment or Formal Room-Vacation Update
+HM-UC-008 — View Room Allocation Information
+HM-UC-009 — Maintain Room Availability and Occupancy
+HM-UC-010 — Record Individual Room Exchange
+HM-UC-011 — Review Room Assignments and Occupancy
+HM-UC-012 — Record and Monitor Student Attendance
+HM-UC-013 — View Own Attendance Information
+HM-UC-014 — Submit Leave Request
+HM-UC-015 — Review and Record Leave Decision
+HM-UC-016 — View Own Leave Status and History
+HM-UC-017 — Submit Hostel-Related Complaint
+HM-UC-018 — Review, Update, and Escalate Complaint
+HM-UC-019 — Monitor Complaint Status and History
+HM-UC-020 — Submit Guest Room Booking Request
+HM-UC-021 — Review Guest Room Booking Request
+HM-UC-022 — View Own Guest-Room Booking Status
+HM-UC-023 — Submit Extended-Stay Request
+HM-UC-024 — Review and Record Extended-Stay Decision
+HM-UC-025 — Record Extended-Stay Charge or Compliance Information
+HM-UC-026 — Record Hostel Fine
+HM-UC-027 — View Own Fine Records and History
+HM-UC-028 — Maintain Hostel Inventory Records
+HM-UC-029 — Maintain or View Hostel-Operational Staff Coordination Information
+HM-UC-030 — Maintain Security Guard Shift Schedule
+HM-UC-031 — Publish Hostel Notice or Announcement
+HM-UC-032 — View Hostel Notices
+HM-UC-033 — Generate Reports and Operational Summaries
+HM-UC-034 — Issue HM Notifications or Status Updates
+HM-UC-036 — Review Attendance Summaries, Trends, and Exceptions
+HM-UC-037 — Review Leave Information and Summaries
+HM-UC-038 — Review Fine Summaries and Disciplinary Patterns
+HM-UC-039 — Review Hostel-Operational Staff Assignments or Shift Information
+
+[TABLE 1]
+UC ID | Name | UC Type | Primary Actor | Related CFRs / AFRs | Related BRs | Related WFs
+HM-UC-001 | Create Hostel Record | Actor-triggered | Super Admin |  | BR-HM-003, BR-HM-005 | N/A
+HM-UC-002 | Activate or Deactivate Hostel Record | Actor-triggered | Super Admin |  | BR-HM-003, BR-HM-005 | N/A
+HM-UC-003 | Manage Warden Role Binding | Actor-triggered | Super Admin |  | BR-HM-001, BR-HM-003, BR-HM-004, BR-HM-005, BR-HM-006, BR-HM-007 | N/A
+HM-UC-004 | Manage Caretaker Role Binding | Actor-triggered | Super Admin |  | BR-HM-001, BR-HM-003, BR-HM-004, BR-HM-005, BR-HM-006, BR-HM-007 | N/A
+HM-UC-005 | Submit Hostel Accommodation Request | Actor-triggered | Student |  | BR-HM-002, BR-HM-005 | BW-HM-01
+HM-UC-006 | Record Hostel and Room Allotment Decisions | Actor-triggered | Super Admin |  | BR-HM-003, BR-HM-005, BR-HM-008, BR-HM-009, BR-HM-010, BR-HM-034 | BW-HM-01
+HM-UC-007 | Record Central Re-allotment or Formal Room-Vacation Update | Actor-triggered | Super Admin |  | BR-HM-003, BR-HM-005, BR-HM-008, BR-HM-009, BR-HM-010, BR-HM-034 | N/A
+HM-UC-008 | View Room Allocation Information | Actor-triggered | Student |  | BR-HM-002, BR-HM-005 | N/A
+HM-UC-009 | Maintain Room Availability and Occupancy | Actor-triggered | Hostel Caretaker |  | BR-HM-005, BR-HM-010, BR-HM-035 | N/A
+HM-UC-010 | Record Individual Room Exchange | Actor-triggered | Hostel Caretaker |  | BR-HM-005, BR-HM-009, BR-HM-010, BR-HM-034, BR-HM-035 | N/A
+HM-UC-011 | Review Room Assignments and Occupancy | Actor-triggered | Hostel Warden |  | BR-HM-005 | N/A
+HM-UC-012 | Record and Monitor Student Attendance | Actor-triggered | Hostel Caretaker |  | BR-HM-005, BR-HM-011, BR-HM-012, BR-HM-035 | N/A
+HM-UC-013 | View Own Attendance Information | Actor-triggered | Student |  | BR-HM-002, BR-HM-005 | N/A
+HM-UC-014 | Submit Leave Request | Actor-triggered | Student |  | BR-HM-002, BR-HM-005, BR-HM-013, BR-HM-014, BR-HM-034 | BW-HM-02, BW-HM-03, CW-HM-01
+HM-UC-015 | Review and Record Leave Decision | Actor-triggered | Hostel Caretaker |  | BR-HM-005, BR-HM-013, BR-HM-014, BR-HM-034, BR-HM-035 | BW-HM-02, BW-HM-03, CW-HM-01
+HM-UC-016 | View Own Leave Status and History | Actor-triggered | Student |  | BR-HM-002, BR-HM-005, BR-HM-013 | N/A
+HM-UC-017 | Submit Hostel-Related Complaint | Actor-triggered | Student |  | BR-HM-002, BR-HM-005, BR-HM-015, BR-HM-016, BR-HM-034 | BW-HM-04, BW-HM-05, CW-HM-02
+HM-UC-018 | Review, Update, and Escalate Complaint | Actor-triggered | Hostel Caretaker |  | BR-HM-005, BR-HM-017, BR-HM-034, BR-HM-035 | BW-HM-04, BW-HM-05, CW-HM-02
+HM-UC-019 | Monitor Complaint Status and History | Actor-triggered | Hostel Warden |  | BR-HM-005, BR-HM-016 | N/A
+HM-UC-020 | Submit Guest Room Booking Request | Actor-triggered | Student |  | BR-HM-002, BR-HM-005, BR-HM-018, BR-HM-019, BR-HM-034 | BW-HM-06, BW-HM-07, CW-HM-03
+HM-UC-021 | Review Guest Room Booking Request | Actor-triggered | Hostel Caretaker |  | BR-HM-005, BR-HM-018, BR-HM-019, BR-HM-034, BR-HM-035 | BW-HM-06, BW-HM-07, CW-HM-03
+HM-UC-022 | View Own Guest-Room Booking Status | Actor-triggered | Student |  | BR-HM-002, BR-HM-005, BR-HM-034 | N/A
+HM-UC-023 | Submit Extended-Stay Request | Actor-triggered | Student |  | BR-HM-002, BR-HM-005, BR-HM-022, BR-HM-024, BR-HM-034 | BW-HM-08, BW-HM-09, CW-HM-04
+HM-UC-024 | Review and Record Extended-Stay Decision | Actor-triggered | Hostel Warden |  | BR-HM-005, BR-HM-021, BR-HM-034 | BW-HM-08, BW-HM-09, CW-HM-04
+HM-UC-025 | Record Extended-Stay Charge or Compliance Information | Event-triggered | N.A. — Event-triggered |  | BR-HM-020, BR-HM-021, BR-HM-023, BR-HM-034 | N/A
+HM-UC-026 | Record Hostel Fine | Actor-triggered | Hostel Caretaker |  | BR-HM-005, BR-HM-025, BR-HM-026, BR-HM-034, BR-HM-035 | N/A
+HM-UC-027 | View Own Fine Records and History | Actor-triggered | Student |  | BR-HM-002, BR-HM-005 | N/A
+HM-UC-028 | Maintain Hostel Inventory Records | Actor-triggered | Hostel Caretaker |  | BR-HM-005, BR-HM-027, BR-HM-035 | N/A
+HM-UC-029 | Maintain or View Hostel-Operational Staff Coordination Information | Actor-triggered | Authorized Hostel Role |  | BR-HM-005, BR-HM-027 | N/A
+HM-UC-030 | Maintain Security Guard Shift Schedule | Actor-triggered | Hostel Warden |  | BR-HM-005, BR-HM-028 | N/A
+HM-UC-031 | Publish Hostel Notice or Announcement | Actor-triggered | Hostel Caretaker or Hostel Warden |  | BR-HM-005, BR-HM-029, BR-HM-030, BR-HM-034 | N/A
+HM-UC-032 | View Hostel Notices | Actor-triggered | Authorized HM User (including Student where relevant) |  | BR-HM-005, BR-HM-031, BR-HM-034 | N/A
+HM-UC-033 | Generate Reports and Operational Summaries | Actor-triggered | Hostel Caretaker, Hostel Warden, or Super Admin |  | BR-HM-005, BR-HM-032, BR-HM-033 | N/A
+HM-UC-034 | Issue HM Notifications or Status Updates | Event-triggered | N.A. — Event-triggered |  | BR-HM-034 | N/A
+HM-UC-036 | Review Attendance Summaries, Trends, and Exceptions | Actor-triggered | Hostel Warden |  | BR-HM-005 | N/A
+HM-UC-037 | Review Leave Information and Summaries | Actor-triggered | Hostel Warden |  | BR-HM-005, BR-HM-013 | N/A
+HM-UC-038 | Review Fine Summaries and Disciplinary Patterns | Actor-triggered | Hostel Warden |  | BR-HM-005, BR-HM-026 | N/A
+HM-UC-039 | Review Hostel-Operational Staff Assignments or Shift Information | Actor-triggered | Hostel Warden or Super Admin |  | BR-HM-003, BR-HM-005, BR-HM-027 | N/A
+
+[TABLE 2]
+UC ID | Prior v1.3 Disposition | Final v1.4 Disposition | Reason / Continuity Note
+HM-UC-034 | Retired as passive “Receive HM Notifications or Status Updates” | Reinstated and reclassified as Event-triggered “Issue HM Notifications or Status Updates” | DIRECT_FINAL_v2 explicitly permits event-triggered system services. Stable ID is retained because the underlying notification/status-update service is the same requirement family; passive recipient behavior is no longer the UC focus.
+HM-UC-035 | Retired as standalone RBAC access UC | Remains retired | RBAC is a cross-cutting authorization constraint represented by BR-HM-002–007 and BR-HM-035, not a standalone domain service.
+
+[TABLE 3]
+UC ID | HM-UC-001
+UC Name | Create Hostel Record
+UC Type | Actor-triggered
+Primary Actor | Super Admin
+Supporting Actors / Systems | None
+Goal / Description | Enable Super Admin to create hostel records in HM.
+Trigger | Super Admin opens the hostel master administration function.
+Preconditions | • Super Admin is authenticated. / • HM access is permitted under institution-level access and RBAC constraints (BR-HM-003, BR-HM-005). / • The hostel master record to be created does not already exist as the same target record.
+Main Success Scenario | • 1. Super Admin opens the create-hostel function. / • 2. The system displays the hostel master data fields required for a hostel record. / • 3. Super Admin enters hostel identification and related master information. / • 4. Super Admin submits the hostel record. / • 5. The system creates and stores the hostel record.
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | A new hostel record exists in HM.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-003, BR-HM-005
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 4]
+UC ID | HM-UC-002
+UC Name | Activate or Deactivate Hostel Record
+UC Type | Actor-triggered
+Primary Actor | Super Admin
+Supporting Actors / Systems | None
+Goal / Description | Enable Super Admin to activate or deactivate hostel records.
+Trigger | Super Admin selects an existing hostel record for activation or deactivation.
+Preconditions | • Super Admin is authenticated. / • HM access is permitted under institution-level access and RBAC constraints (BR-HM-003, BR-HM-005). / • The target hostel record exists.
+Main Success Scenario | • 1. Super Admin opens the hostel record. / • 2. The system displays the current activation status. / • 3. Super Admin selects activate or deactivate. / • 4. The system records the changed activation status. / • 5. The system makes the updated hostel status available for HM functions that use hostel records.
+Alternative Flows | • A1. Super Admin selects Activate; the system records the hostel as active. / • A2. Super Admin selects Deactivate; the system records the hostel as inactive.
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | The selected hostel record has the updated active/inactive status.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-003, BR-HM-005
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 5]
+UC ID | HM-UC-003
+UC Name | Manage Warden Role Binding
+UC Type | Actor-triggered
+Primary Actor | Super Admin
+Supporting Actors / Systems | None
+Goal / Description | Enable Super Admin to assign, reassign, activate, or deactivate Warden role bindings for hostels.
+Trigger | Super Admin opens Warden role binding administration.
+Preconditions | • Super Admin is authenticated. / • HM access is permitted under institution-level access and RBAC constraints (BR-HM-003, BR-HM-005). / • The target hostel record exists.
+Main Success Scenario | • 1. Super Admin selects the hostel and Warden role-binding action. / • 2. The system displays existing Warden bindings and status for the selected hostel. / • 3. Super Admin enters or changes the Warden binding/status. / • 4. The system records the binding, reassignment, activation, or deactivation. / • 5. The system applies hostel-specific access visibility for the updated Warden role binding.
+Alternative Flows | • A1. Super Admin assigns or reassigns the Warden binding. / • A2. Super Admin activates or deactivates the Warden binding. / • A3. Where time-bound role validity is configured in HM, the binding may include the configured start/end validity data; no time-bound rule is inferred when it is not configured (BR-HM-004).
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | The Warden role binding/status is recorded for the selected hostel. On reassignment, the new role holder can view pending HM records for the assigned hostel subject to BR-HM-006.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-001, BR-HM-003, BR-HM-004, BR-HM-005, BR-HM-006, BR-HM-007
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting. Operational handover outside system-visible responsibility records remains out of scope (BR-HM-007).
+
+[TABLE 6]
+UC ID | HM-UC-004
+UC Name | Manage Caretaker Role Binding
+UC Type | Actor-triggered
+Primary Actor | Super Admin
+Supporting Actors / Systems | None
+Goal / Description | Enable Super Admin to assign, reassign, activate, or deactivate Caretaker role bindings for hostels.
+Trigger | Super Admin opens Caretaker role binding administration.
+Preconditions | • Super Admin is authenticated. / • HM access is permitted under institution-level access and RBAC constraints (BR-HM-003, BR-HM-005). / • The target hostel record exists.
+Main Success Scenario | • 1. Super Admin selects the hostel and Caretaker role-binding action. / • 2. The system displays existing Caretaker bindings, shift context, and status for the selected hostel where maintained. / • 3. Super Admin enters or changes the Caretaker binding/status. / • 4. The system records the binding, reassignment, activation, or deactivation. / • 5. The system applies hostel-specific access visibility for the updated Caretaker role binding.
+Alternative Flows | • A1. Super Admin assigns or reassigns the Caretaker binding. / • A2. Super Admin activates or deactivates the Caretaker binding. / • A3. Where time-bound role validity is configured in HM, the binding may include the configured start/end validity data; no time-bound rule is inferred when it is not configured (BR-HM-004).
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | The Caretaker role binding/status is recorded for the selected hostel. On reassignment, the new role holder can view pending HM records for the assigned hostel subject to BR-HM-006.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-001, BR-HM-003, BR-HM-004, BR-HM-005, BR-HM-006, BR-HM-007
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting. Operational handover outside system-visible responsibility records remains out of scope (BR-HM-007).
+
+[TABLE 7]
+UC ID | HM-UC-005
+UC Name | Submit Hostel Accommodation Request
+UC Type | Actor-triggered
+Primary Actor | Student
+Supporting Actors / Systems | None
+Goal / Description | Enable Student to submit a hostel accommodation request.
+Trigger | Student opens the hostel accommodation request function.
+Preconditions | • Student is authenticated. / • Where hostel-specific data is involved, access is limited to the student-hostel association permitted by BR-HM-002 and BR-HM-005.
+Main Success Scenario | • 1. Student opens the accommodation request form. / • 2. The system displays the request fields. / • 3. Student enters accommodation request details. / • 4. Student submits the request. / • 5. The system records the request details and initial status.
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | Accommodation request details and an initial request status are recorded for subsequent allotment processing.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-002, BR-HM-005
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-HM-01
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 8]
+UC ID | HM-UC-006
+UC Name | Record Hostel and Room Allotment Decisions
+UC Type | Actor-triggered
+Primary Actor | Super Admin
+Supporting Actors / Systems | Fusion notification infrastructure / configured notification mechanism
+Goal / Description | Enable Super Admin to record hostel and room allotment decisions.
+Trigger | Super Admin opens batch allotment or allotment decision recording function.
+Preconditions | • Super Admin is authenticated. / • HM access is permitted under institution-level access and RBAC constraints (BR-HM-003, BR-HM-005).
+Main Success Scenario | • Super Admin opens the batch allotment / allotment-decision recording function. / • The system displays accommodation records and room/allotment context maintained in HM for the allotment round. / • Super Admin records hostel and room allotment decisions. / • The system checks that the resulting occupancy does not exceed defined room capacity (BR-HM-010). / • The system records the allotment decision, updates room assignment and occupancy information, and retains the resulting room-assignment history (BR-HM-008, BR-HM-009). / • The system issues the supported room-allocation status update/notification to relevant users through the configured mechanism (BR-HM-034).
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message. / • If the recorded allotment would exceed defined room capacity, the system rejects that update and preserves the prior occupancy state (BR-HM-010).
+Success Postcondition | Allotment decisions and related room assignment information are recorded.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-003, BR-HM-005, BR-HM-008, BR-HM-009, BR-HM-010, BR-HM-034
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-HM-01
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 9]
+UC ID | HM-UC-007
+UC Name | Record Central Re-allotment or Formal Room-Vacation Update
+UC Type | Actor-triggered
+Primary Actor | Super Admin
+Supporting Actors / Systems | Fusion notification infrastructure / configured notification mechanism
+Goal / Description | Enable Super Admin to record central re-allotment or formal room-vacation updates.
+Trigger | Super Admin opens central re-allotment or formal room-vacation update function.
+Preconditions | • Super Admin is authenticated. / • HM access is permitted under institution-level access and RBAC constraints (BR-HM-003, BR-HM-005).
+Main Success Scenario | • Super Admin selects the student/room/hostel record requiring a central re-allotment or formal room-vacation update. / • The system displays the current room assignment, room status, capacity, and occupancy context maintained in HM. / • Super Admin records either the central re-allotment or the formal room-vacation update. / • For an assignment-producing update, the system prevents occupancy beyond defined room capacity (BR-HM-010). / • The system updates room assignment/occupancy information as applicable and retains room-assignment history (BR-HM-009). / • The system issues the supported room-allocation status update/notification to relevant users (BR-HM-034).
+Alternative Flows | • A1. Central re-allotment is recorded, producing a new room assignment. / • A2. Formal room-vacation is recorded, removing the current room assignment/occupancy as applicable.
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message. / • If a re-allotment would exceed defined room capacity, the system rejects that update and preserves the prior occupancy state (BR-HM-010).
+Success Postcondition | Central re-allotment or formal room-vacation update is recorded and room history is updated.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-003, BR-HM-005, BR-HM-008, BR-HM-009, BR-HM-010, BR-HM-034
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 10]
+UC ID | HM-UC-008
+UC Name | View Room Allocation Information
+UC Type | Actor-triggered
+Primary Actor | Student
+Supporting Actors / Systems | None
+Goal / Description | Enable Student to view current and historical room allocation information.
+Trigger | Student opens room allocation information.
+Preconditions | • Student is authenticated. / • Where hostel-specific data is involved, access is limited to the student-hostel association permitted by BR-HM-002 and BR-HM-005.
+Main Success Scenario | • 1. Student opens the room allocation view. / • 2. The system identifies the student-hostel association. / • 3. The system displays the student’s current room allocation information. / • 4. The system displays historical allocation information made available through HM.
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | Student has viewed available room allocation information.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-002, BR-HM-005
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 11]
+UC ID | HM-UC-009
+UC Name | Maintain Room Availability and Occupancy
+UC Type | Actor-triggered
+Primary Actor | Hostel Caretaker
+Supporting Actors / Systems | None
+Goal / Description | Enable Caretaker to maintain room availability and occupancy information.
+Trigger | Caretaker opens room availability/occupancy maintenance for the assigned hostel/shift context.
+Preconditions | • Hostel Caretaker is authenticated. / • The function is within the Caretaker’s assigned-hostel and applicable shift context (BR-HM-035) and is permitted by RBAC (BR-HM-005).
+Main Success Scenario | • 1. Caretaker opens the room availability and occupancy function. / • 2. The system displays room status, capacity, and occupancy information for the assigned hostel. / • 3. Caretaker records permitted availability or occupancy updates. / • 4. The system stores the updated room availability/occupancy information.
+Alternative Flows | • A1. Caretaker updates room availability/status information. / • A2. Caretaker records an operational occupancy update supported by HM, subject to the capacity constraint.
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message. / • If an occupancy update would exceed defined room capacity, the system rejects the update (BR-HM-010).
+Success Postcondition | Room availability and occupancy information is updated in HM.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-005, BR-HM-010, BR-HM-035
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 12]
+UC ID | HM-UC-010
+UC Name | Record Individual Room Exchange
+UC Type | Actor-triggered
+Primary Actor | Hostel Caretaker
+Supporting Actors / Systems | Fusion notification infrastructure / configured notification mechanism
+Goal / Description | Enable Caretaker to record an individual room exchange within assigned hostel scope.
+Trigger | Caretaker opens the individual room exchange function.
+Preconditions | • Hostel Caretaker is authenticated. / • The function is within the Caretaker’s assigned-hostel and applicable shift context (BR-HM-035) and is permitted by RBAC (BR-HM-005).
+Main Success Scenario | • Caretaker selects the student and room assignment involved in the individual exchange. / • The system displays current room assignment, occupancy, and capacity information. / • Caretaker records the exchange. / • The system verifies that defined room capacity is not exceeded (BR-HM-010). / • The system updates the affected room assignments, occupancy, room status, and room-assignment history (BR-HM-009). / • The system issues the supported room-allocation-change notification/status update to relevant users (BR-HM-034).
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message. / • If the exchange would exceed defined room capacity, the system does not record the exchange (BR-HM-010).
+Success Postcondition | Room exchange is recorded only if capacity constraints are preserved.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-005, BR-HM-009, BR-HM-010, BR-HM-034, BR-HM-035
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 13]
+UC ID | HM-UC-011
+UC Name | Review Room Assignments and Occupancy
+UC Type | Actor-triggered
+Primary Actor | Hostel Warden
+Supporting Actors / Systems | None
+Goal / Description | Enable Warden to review room assignments and occupancy patterns.
+Trigger | Warden opens room assignment or occupancy review function.
+Preconditions | • Hostel Warden is authenticated. / • The relevant hostel is within the Warden’s active role binding and access is permitted by RBAC (BR-HM-005).
+Main Success Scenario | • 1. Warden opens the room assignment/occupancy review view. / • 2. The system displays room assignment, utilization, occupancy, and room-change information for the relevant hostel scope. / • 3. Warden reviews patterns for planning, discipline, or compliance oversight.
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | Warden has access to room assignment and occupancy review information.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-005
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 14]
+UC ID | HM-UC-012
+UC Name | Record and Monitor Student Attendance
+UC Type | Actor-triggered
+Primary Actor | Hostel Caretaker
+Supporting Actors / Systems | None
+Goal / Description | Enable Caretaker to record and monitor student attendance.
+Trigger | Caretaker opens attendance recording or monitoring function.
+Preconditions | • Hostel Caretaker is authenticated. / • The function is within the Caretaker’s assigned-hostel and applicable shift context (BR-HM-035) and is permitted by RBAC (BR-HM-005).
+Main Success Scenario | • 1. Caretaker opens the attendance function for the assigned hostel/shift context. / • 2. The system displays the relevant student attendance list or record context. / • 3. Caretaker records attendance information. / • 4. The system stores attendance records. / • 5. The system makes attendance information available for review, reporting, and oversight where applicable.
+Alternative Flows | • A1. The Caretaker records attendance data using the configured HM attendance surface. The detailed attendance-taking procedure is not specified by the baseline (BR-HM-012).
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | Attendance records are stored and available for authorized review/reporting.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-005, BR-HM-011, BR-HM-012, BR-HM-035
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 15]
+UC ID | HM-UC-013
+UC Name | View Own Attendance Information
+UC Type | Actor-triggered
+Primary Actor | Student
+Supporting Actors / Systems | None
+Goal / Description | Enable a Student to view attendance status or attendance-related information made available to that student.
+Trigger | Student opens the attendance-status view.
+Preconditions | • Student is authenticated. / • Where hostel-specific data is involved, access is limited to the student-hostel association permitted by BR-HM-002 and BR-HM-005.
+Main Success Scenario | • Student opens the attendance-status view. / • The system identifies the student and permitted hostel/student context. / • The system displays attendance status or attendance-related information made available to the student.
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | The Student has viewed available attendance information; no business state is changed.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-002, BR-HM-005
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 16]
+UC ID | HM-UC-014
+UC Name | Submit Leave Request
+UC Type | Actor-triggered
+Primary Actor | Student
+Supporting Actors / Systems | Fusion notification infrastructure / configured notification mechanism
+Goal / Description | Enable Student to submit a leave request.
+Trigger | Student opens the leave request function.
+Preconditions | • Student is authenticated. / • Where hostel-specific data is involved, access is limited to the student-hostel association permitted by BR-HM-002 and BR-HM-005.
+Main Success Scenario | • Student opens the leave-request form. / • The system displays the leave-request fields and any supporting-information/document fields that are configured. / • Student enters the leave-request details and any configured supporting information/documents. / • Student submits the request. / • The system records the leave request, assigns its submission/status information, retains the request as part of leave history, and makes it available for Caretaker review. / • The system issues the supported leave-submission status update/notification (BR-HM-034).
+Alternative Flows | • A1. Supporting information/document fields are absent because they are not configured; the request can still use the configured form as provided.
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | Leave request is recorded with status information for review.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-002, BR-HM-005, BR-HM-013, BR-HM-014, BR-HM-034
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-HM-02, BW-HM-03, CW-HM-01
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 17]
+UC ID | HM-UC-015
+UC Name | Review and Record Leave Decision
+UC Type | Actor-triggered
+Primary Actor | Hostel Caretaker
+Supporting Actors / Systems | Fusion notification infrastructure / configured notification mechanism
+Goal / Description | Enable Caretaker to review leave requests and record approval or rejection decisions.
+Trigger | Caretaker opens pending leave requests.
+Preconditions | • Hostel Caretaker is authenticated. / • The function is within the Caretaker’s assigned-hostel and applicable shift context (BR-HM-035) and is permitted by RBAC (BR-HM-005).
+Main Success Scenario | • Caretaker opens a submitted leave request for review. / • The system displays the request and configured supporting information; attendance-related information may be made available where supported by HM. / • Caretaker reviews the request. / • Caretaker records either an approval or a rejection decision. / • The system records the resulting decision status and retains leave history. / • The system issues the supported leave-decision status update/notification (BR-HM-034).
+Alternative Flows | • A1. Approval is recorded; the request state becomes Approved. / • A2. Rejection is recorded; the request state becomes Rejected.
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | Leave decision status and history are recorded.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-005, BR-HM-013, BR-HM-014, BR-HM-034, BR-HM-035
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-HM-02, BW-HM-03, CW-HM-01
+Notes / TODO | No leave eligibility rule, document rule, or approval hierarchy is inferred; those remain outside HM scope unless explicitly configured (BR-HM-014).
+
+[TABLE 18]
+UC ID | HM-UC-016
+UC Name | View Own Leave Status and History
+UC Type | Actor-triggered
+Primary Actor | Student
+Supporting Actors / Systems | None
+Goal / Description | Enable a Student to view the Student’s own leave status and leave-history information made available through HM.
+Trigger | Student opens leave status/history.
+Preconditions | • Student is authenticated. / • Where hostel-specific data is involved, access is limited to the student-hostel association permitted by BR-HM-002 and BR-HM-005.
+Main Success Scenario | • Student opens the leave status/history view. / • The system identifies the student and permitted record scope. / • The system displays the student’s available leave status and leave-history information.
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | The Student has viewed available leave status/history; no business state is changed.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-002, BR-HM-005, BR-HM-013
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 19]
+UC ID | HM-UC-017
+UC Name | Submit Hostel-Related Complaint
+UC Type | Actor-triggered
+Primary Actor | Student
+Supporting Actors / Systems | Fusion notification infrastructure / configured notification mechanism
+Goal / Description | Enable Student to submit a hostel-related complaint.
+Trigger | Student opens hostel complaint submission function.
+Preconditions | • Student is authenticated. / • Where hostel-specific data is involved, access is limited to the student-hostel association permitted by BR-HM-002 and BR-HM-005.
+Main Success Scenario | • Student opens the hostel-related complaint form. / • The system displays complaint category and description fields and an optional attachment field where configured. / • Student enters a hostel-related complaint. / • Student submits the complaint. / • The system records the complaint and its initial status. / • The system issues the supported complaint-submission notification/status update (BR-HM-034).
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message. / • If the submitted matter is outside the hostel-related complaint scope, HM does not treat it as an HM hostel complaint; no central complaint routing is inferred unless explicitly integrated (BR-HM-016, BR-HM-017).
+Success Postcondition | Hostel-related complaint is recorded for Caretaker handling.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-002, BR-HM-005, BR-HM-015, BR-HM-016, BR-HM-034
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-HM-04, BW-HM-05, CW-HM-02
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 20]
+UC ID | HM-UC-018
+UC Name | Review, Update, and Escalate Complaint
+UC Type | Actor-triggered
+Primary Actor | Hostel Caretaker
+Supporting Actors / Systems | Fusion notification infrastructure / configured notification mechanism
+Goal / Description | Enable Caretaker to review, update, and escalate hostel complaints.
+Trigger | Caretaker opens submitted hostel complaints.
+Preconditions | • Hostel Caretaker is authenticated. / • The function is within the Caretaker’s assigned-hostel and applicable shift context (BR-HM-035) and is permitted by RBAC (BR-HM-005).
+Main Success Scenario | • Caretaker opens a hostel-related complaint in the assigned hostel scope. / • The system displays the complaint details and current recorded status/history. / • Caretaker reviews the complaint and records action taken. / • Caretaker records the resulting complaint status. / • The system stores the action/status update and issues the supported complaint update/resolution notification as applicable (BR-HM-034).
+Alternative Flows | • A1. Caretaker records the complaint as resolved; the system stores the resolution status. / • A2. Caretaker records an unresolved status/action update without escalation; the complaint remains unresolved. / • A3. For an unresolved or supervisory complaint, Caretaker records escalation to the Warden when HM/integration scope supports that escalation (BR-HM-017).
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | The Caretaker’s action and resulting complaint status (including escalation where selected and supported) are recorded.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-005, BR-HM-017, BR-HM-034, BR-HM-035
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-HM-04, BW-HM-05, CW-HM-02
+Notes / TODO | The baseline does not define system-enforced criteria for what constitutes a “supervisory” complaint or when escalation must occur; no such policy is invented.
+
+[TABLE 21]
+UC ID | HM-UC-019
+UC Name | Monitor Complaint Status and History
+UC Type | Actor-triggered
+Primary Actor | Hostel Warden
+Supporting Actors / Systems | None
+Goal / Description | Enable Warden or authorized roles to monitor complaint status and history.
+Trigger | Authorized actor opens complaint monitoring or history view.
+Preconditions | • Hostel Warden is authenticated. / • The relevant hostel is within the Warden’s active role binding and access is permitted by RBAC (BR-HM-005).
+Main Success Scenario | • 1. Actor opens complaint status/history view. / • 2. The system displays unresolved, delayed, escalated, or historical complaint information within permitted scope. / • 3. Actor reviews complaint status, history, and resolution information.
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | Complaint monitoring information is available for oversight/review.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-005, BR-HM-016
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 22]
+UC ID | HM-UC-020
+UC Name | Submit Guest Room Booking Request
+UC Type | Actor-triggered
+Primary Actor | Student
+Supporting Actors / Systems | Fusion notification infrastructure / configured notification mechanism
+Goal / Description | Enable Student to submit a guest-room booking request.
+Trigger | Student opens guest-room booking request function.
+Preconditions | • Student is authenticated. / • Where hostel-specific data is involved, access is limited to the student-hostel association permitted by BR-HM-002 and BR-HM-005.
+Main Success Scenario | • Student opens the guest-room booking-request form. / • The system displays the configured booking-request fields. / • Student enters the guest-room booking-request details. / • Student submits the request. / • The system records the request and its initial booking status and retains it as part of booking history. / • The system issues the supported guest-room booking status update/notification (BR-HM-034).
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | Guest-room booking request is recorded for Caretaker review.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-002, BR-HM-005, BR-HM-018, BR-HM-019, BR-HM-034
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-HM-06, BW-HM-07, CW-HM-03
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 23]
+UC ID | HM-UC-021
+UC Name | Review Guest Room Booking Request
+UC Type | Actor-triggered
+Primary Actor | Hostel Caretaker
+Supporting Actors / Systems | Fusion notification infrastructure / configured notification mechanism
+Goal / Description | Enable Caretaker to review guest-room booking requests and record decisions.
+Trigger | Caretaker opens guest-room booking requests.
+Preconditions | • Hostel Caretaker is authenticated. / • The function is within the Caretaker’s assigned-hostel and applicable shift context (BR-HM-035) and is permitted by RBAC (BR-HM-005).
+Main Success Scenario | • 1. Caretaker opens pending guest-room booking requests. / • 2. The system provides guest-room availability information needed for the decision. / • 3. Caretaker verifies availability information and reviews the request. / • 4. Caretaker records approval or rejection decision. / • 5. The system updates booking status and maintains booking history.
+Alternative Flows | • A1. Caretaker records approval after reviewing the available guest-room information. / • A2. Caretaker records rejection after reviewing the available guest-room information.
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | Guest-room booking decision/status/history are recorded.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-005, BR-HM-018, BR-HM-019, BR-HM-034, BR-HM-035
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-HM-06, BW-HM-07, CW-HM-03
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 24]
+UC ID | HM-UC-022
+UC Name | View Own Guest-Room Booking Status
+UC Type | Actor-triggered
+Primary Actor | Student
+Supporting Actors / Systems | None
+Goal / Description | Enable a Student to view the status of the Student’s guest-room booking request.
+Trigger | Student opens guest-room booking status.
+Preconditions | • Student is authenticated. / • Where hostel-specific data is involved, access is limited to the student-hostel association permitted by BR-HM-002 and BR-HM-005.
+Main Success Scenario | • Student opens guest-room booking status. / • The system identifies the Student’s booking requests. / • The system displays the available booking status information.
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | The Student has viewed booking status; no business state is changed.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-002, BR-HM-005, BR-HM-034
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | Booking-history retention remains a system/BR obligation (BR-HM-018); the PS does not assign a general booking-history review goal to a specific additional actor.
+
+[TABLE 25]
+UC ID | HM-UC-023
+UC Name | Submit Extended-Stay Request
+UC Type | Actor-triggered
+Primary Actor | Student
+Supporting Actors / Systems | Fusion notification infrastructure / configured notification mechanism
+Goal / Description | Enable Student to submit an extended-stay request.
+Trigger | Student opens extended-stay request function for vacation or semester break.
+Preconditions | • Student is authenticated. / • Where hostel-specific data is involved, access is limited to the student-hostel association permitted by BR-HM-002 and BR-HM-005.
+Main Success Scenario | • 1. Student opens the extended-stay request form. / • 2. The system displays fields for requested stay period and related request information. / • 3. Student enters extended-stay request details. / • 4. Student submits the request. / • 5. The system records requested period and decision status.
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | Extended-stay request details and status are recorded for Warden review.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-002, BR-HM-005, BR-HM-022, BR-HM-024, BR-HM-034
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-HM-08, BW-HM-09, CW-HM-04
+Notes / TODO | Application-window enforcement is not assumed unless explicitly configured (BR-HM-022). Appeals and expedited handling remain out of scope (BR-HM-024).
+
+[TABLE 26]
+UC ID | HM-UC-024
+UC Name | Review and Record Extended-Stay Decision
+UC Type | Actor-triggered
+Primary Actor | Hostel Warden
+Supporting Actors / Systems | Fusion notification infrastructure / configured notification mechanism
+Goal / Description | Enable Warden to review and record extended-stay approval or rejection.
+Trigger | Warden opens submitted extended-stay requests.
+Preconditions | • Hostel Warden is authenticated. / • The relevant hostel is within the Warden’s active role binding and access is permitted by RBAC (BR-HM-005).
+Main Success Scenario | • Warden opens a submitted extended-stay request. / • The system displays the request details, requested period, and any charge/deadline/compliance information maintained in HM. / • Warden reviews the information made available by HM. / • Warden records either approval or rejection. / • The system records the resulting extended-stay decision status. / • The system issues the supported extended-stay status update/notification (BR-HM-034).
+Alternative Flows | • A1. Warden records approval; the request state becomes Approved. / • A2. Warden records rejection; the request state becomes Rejected.
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | Extended-stay decision status, actor, and timestamp are recorded.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-005, BR-HM-021, BR-HM-034
+Related CFRs / AFRs | 
+Related Workflow(s) | BW-HM-08, BW-HM-09, CW-HM-04
+Notes / TODO | The baseline states that charge/deadline/compliance information may be relevant and visible; it does not define an approval/rejection formula or mandatory guard based on that information.
+
+[TABLE 27]
+UC ID | HM-UC-025
+UC Name | Record Extended-Stay Charge or Compliance Information
+UC Type | Event-triggered
+Primary Actor | N.A. — Event-triggered
+Supporting Actors / Systems | Unspecified configured source supplying applicable charge/deadline/compliance data; the PS does not identify the human role or external integration (ISS-HM-014).
+Goal / Description | Record applicable extended-stay charge/fee amount, payment deadline, and payment/deadline compliance information where such information is maintained in HM, without inventing the source that supplies it.
+Trigger | Applicable extended-stay charge/deadline/compliance information is presented to or becomes available to HM through an already configured maintenance/integration context; the PS does not identify that source.
+Preconditions | • An extended-stay request exists. / • The relevant charge/deadline/compliance information is applicable and represented in HM. / • A configured source/context can supply the information; the specific source remains unspecified by the PS.
+Main Success Scenario | • 1. Applicable charge, payment-deadline, or compliance information becomes available to HM from the configured source/context. / • 2. HM associates the supplied information with the relevant extended-stay request. / • 3. HM records the applicable information. / • 4. HM makes maintained payment/deadline compliance information available for Warden review through HM-UC-024 where relevant. / • 5. Where a configured payment/deadline alert is supported, HM issues the corresponding notification/status update through HM-UC-034 subject to BR-HM-034.
+Alternative Flows | • A1. No charge/deadline/compliance information is maintained in HM for the request; this UC is not applicable for that request.
+Exception Flows | • If the configured source/context does not supply usable information, HM does not create an unsupported value. / • Actual payment collection, receipt generation, settlement, and accounting reconciliation remain outside HM scope unless explicitly integrated (BR-HM-023).
+Success Postcondition | Applicable extended-stay charge/deadline/compliance information is recorded where maintained in HM.
+Failure / Minimal Guarantee | HM does not invent or infer charge/deadline/compliance values that were not supplied through a configured source/context.
+Related Business Rules | BR-HM-020, BR-HM-021, BR-HM-023, BR-HM-034
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | NEEDS CLARIFICATION (ISS-HM-014): the PS requires the information to be recorded but does not identify the human role or external integration that supplies it. DIRECT_FINAL_v2 permits this service to be modeled as event-triggered without inventing that source.
+
+[TABLE 28]
+UC ID | HM-UC-026
+UC Name | Record Hostel Fine
+UC Type | Actor-triggered
+Primary Actor | Hostel Caretaker
+Supporting Actors / Systems | Fusion notification infrastructure / configured notification mechanism
+Goal / Description | Enable Caretaker to record hostel fine information.
+Trigger | Caretaker opens fine recording function.
+Preconditions | • Hostel Caretaker is authenticated. / • The function is within the Caretaker’s assigned-hostel and applicable shift context (BR-HM-035) and is permitted by RBAC (BR-HM-005).
+Main Success Scenario | • 1. Caretaker opens the fine recording function. / • 2. The system displays fields for affected student, reason, amount, and date. / • 3. Caretaker records the fine information. / • 4. The system stores the fine record. / • 5. The system issues configured fine-imposition notification where applicable.
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | Fine record is stored and visible for permitted review.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-005, BR-HM-025, BR-HM-026, BR-HM-034, BR-HM-035
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 29]
+UC ID | HM-UC-027
+UC Name | View Own Fine Records and History
+UC Type | Actor-triggered
+Primary Actor | Student
+Supporting Actors / Systems | None
+Goal / Description | Enable a Student to view imposed fines and fine history relevant to that Student.
+Trigger | Student opens fine records/history.
+Preconditions | • Student is authenticated. / • Where hostel-specific data is involved, access is limited to the student-hostel association permitted by BR-HM-002 and BR-HM-005.
+Main Success Scenario | • Student opens the fine records/history view. / • The system identifies the Student’s permitted fine-record scope. / • The system displays imposed fines and fine history relevant to the Student.
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | The Student has viewed relevant fine records/history; no business state is changed.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-002, BR-HM-005
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 30]
+UC ID | HM-UC-028
+UC Name | Maintain Hostel Inventory Records
+UC Type | Actor-triggered
+Primary Actor | Hostel Caretaker
+Supporting Actors / Systems | None
+Goal / Description | Enable Caretaker to maintain hostel inventory records.
+Trigger | Caretaker opens hostel inventory maintenance function.
+Preconditions | • Hostel Caretaker is authenticated. / • The function is within the Caretaker’s assigned-hostel and applicable shift context (BR-HM-035) and is permitted by RBAC (BR-HM-005).
+Main Success Scenario | • 1. Caretaker opens hostel inventory records. / • 2. The system displays hostel-operational inventory information. / • 3. Caretaker records inventory updates or usage-relevant changes. / • 4. The system stores inventory records and accountability logs where maintained in HM.
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | Hostel-operational inventory records are updated.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-005, BR-HM-027, BR-HM-035
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 31]
+UC ID | HM-UC-029
+UC Name | Maintain or View Hostel-Operational Staff Coordination Information
+UC Type | Actor-triggered
+Primary Actor | Authorized Hostel Role
+Supporting Actors / Systems | None
+Goal / Description | Enable an authorized hostel role to view or maintain hostel-operational staff coordination information where such records are maintained in HM.
+Trigger | Authorized hostel role opens hostel-operational staff coordination information.
+Preconditions | • Actor is authenticated. / • Access to the function and data is permitted by applicable HM role-binding and RBAC rules (BR-HM-005).
+Main Success Scenario | • Actor opens hostel-operational staff coordination records. / • The system displays assigned staff, duty/shift, contact/reference, or other coordination information maintained in HM within the actor’s permitted scope. / • If the actor has maintenance permission, the actor records an authorized update; otherwise the actor reviews the information. / • The system stores any permitted update or leaves the record unchanged for a view-only action.
+Alternative Flows | • A1. View-only action: no business-state change occurs. / • A2. Authorized maintenance action: the permitted staff-coordination record is updated.
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | Hostel-operational staff coordination information is maintained or reviewed.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-005, BR-HM-027
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 32]
+UC ID | HM-UC-030
+UC Name | Maintain Security Guard Shift Schedule
+UC Type | Actor-triggered
+Primary Actor | Hostel Warden
+Supporting Actors / Systems | None
+Goal / Description | Enable Warden to maintain, update, or review hostel-level security guard shift schedules.
+Trigger | Warden opens security guard shift schedule function.
+Preconditions | • Hostel Warden is authenticated. / • The relevant hostel is within the Warden’s active role binding and access is permitted by RBAC (BR-HM-005).
+Main Success Scenario | • 1. Warden opens the guard shift schedule function. / • 2. The system displays hostel-level guard shift schedules maintained in HM. / • 3. Warden records, updates, or reviews shift schedule information. / • 4. The system stores the updated schedule and makes it available for monitoring/review.
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | Hostel-level guard shift schedule information is maintained or reviewed.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-005, BR-HM-028
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 33]
+UC ID | HM-UC-031
+UC Name | Publish Hostel Notice or Announcement
+UC Type | Actor-triggered
+Primary Actor | Hostel Caretaker or Hostel Warden
+Supporting Actors / Systems | Fusion notification infrastructure / configured notification mechanism
+Goal / Description | Enable Caretaker or Warden to publish notices and announcements for assigned hostels.
+Trigger | Caretaker or Warden opens notice publication function.
+Preconditions | • Actor is authenticated. / • Access to the function and data is permitted by applicable HM role-binding and RBAC rules (BR-HM-005). / • The target hostel is assigned to the publishing Caretaker or Warden (BR-HM-029).
+Main Success Scenario | • 1. Actor opens the notice publication function. / • 2. The system displays notice/announcement fields and assigned hostel scope. / • 3. Actor enters notice or announcement content. / • 4. Actor publishes the notice for the assigned hostel. / • 5. The system displays the notice on the hostel notice board and maintains notice history.
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | Notice/announcement is published and recorded for assigned hostel scope.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-005, BR-HM-029, BR-HM-030, BR-HM-034
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 34]
+UC ID | HM-UC-032
+UC Name | View Hostel Notices
+UC Type | Actor-triggered
+Primary Actor | Authorized HM User (including Student where relevant)
+Supporting Actors / Systems | None
+Goal / Description | Enable authorized users to view hostel notices.
+Trigger | Authorized user opens hostel notice board or notice view.
+Preconditions | • Actor is authenticated. / • Access to the function and data is permitted by applicable HM role-binding and RBAC rules (BR-HM-005).
+Main Success Scenario | • 1. User opens the hostel notice board or notice view. / • 2. The system identifies relevant hostel/access scope. / • 3. The system displays notices and announcements visible to the user. / • 4. The system provides notice history/reference information where maintained.
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | Relevant hostel notices are visible to the authorized user.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-005, BR-HM-031, BR-HM-034
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 35]
+UC ID | HM-UC-033
+UC Name | Generate Reports and Operational Summaries
+UC Type | Actor-triggered
+Primary Actor | Hostel Caretaker, Hostel Warden, or Super Admin
+Supporting Actors / Systems | None
+Goal / Description | Enable authorized users to generate predefined HM reports and operational summaries.
+Trigger | Authorized user opens report/summary function.
+Preconditions | • Actor is authenticated. / • Access to the function and data is permitted by applicable HM role-binding and RBAC rules (BR-HM-005).
+Main Success Scenario | • 1. Actor opens the reports and operational summaries function. / • 2. The system displays report/summary options permitted for the actor’s role and scope. / • 3. Actor selects the required report or summary. / • 4. The system generates the predefined report or operational summary from HM records. / • 5. Actor views or retrieves the generated report/summary.
+Alternative Flows | • A1. Caretaker receives hostel-level operational report options. / • A2. Warden receives supervisory report options. / • A3. Super Admin receives institution-level/cross-hostel report options.
+Exception Flows | • If authorization fails, the system denies or hides the function and makes no business-state change. / • If required data cannot be validated or recorded, the system does not commit the requested change and presents an appropriate message.
+Success Postcondition | Selected HM report or operational summary is generated and visible to authorized actor.
+Failure / Minimal Guarantee | Existing valid records remain unchanged; no partial intended business-state change is committed.
+Related Business Rules | BR-HM-005, BR-HM-032, BR-HM-033
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | External policy or process is not system-enforced unless the PS/FR baseline explicitly requires enforcement, routing, recording, notification, or reporting.
+
+[TABLE 36]
+UC ID | HM-UC-034
+UC Name | Issue HM Notifications or Status Updates
+UC Type | Event-triggered
+Primary Actor | N.A. — Event-triggered
+Supporting Actors / Systems | Fusion notification infrastructure or configured notification mechanism; relevant recipient users.
+Goal / Description | Issue configured HM notifications or status updates to relevant users when a supported HM event occurs.
+Trigger | A supported HM event occurs for which a notification/status update is required under BR-HM-034.
+Preconditions | • The originating HM event has occurred or its status has changed. / • A configured notification/status-update mechanism is available for the event context. / • Recipient scope is derived from the originating HM record and applicable access/context rules.
+Main Success Scenario | • 1. HM detects or receives the supported originating event. / • 2. HM identifies the applicable notification/status-update event type and relevant recipient scope under BR-HM-034. / • 3. HM issues the configured notification or status update through the Fusion notification infrastructure or configured mechanism. / • 4. The notification/status update is made available to the relevant recipient user(s) through the configured mechanism.
+Alternative Flows | • A1. Supported event types include room allotment/allocation change, leave submission/decision, complaint submission/update/resolution, guest-room booking status, extended-stay status, maintained payment/deadline alerts, fine imposition, and notices/announcements, as specified by BR-HM-034.
+Exception Flows | • If the configured notification mechanism cannot accept the notification/status update, the system does not represent the notification as successfully issued. / • Events outside the supported notification scope do not create an HM notification obligation.
+Success Postcondition | The applicable notification/status update has been issued through the configured mechanism.
+Failure / Minimal Guarantee | No unsupported notification is issued; the originating HM business record remains governed by its originating UC and rules.
+Related Business Rules | BR-HM-034
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | Reclassified in v1.4 under DIRECT_FINAL_v2. HM-UC-034 had been retired in v1.3 because passive receipt was not an actor goal; the new formalism explicitly permits event-triggered system services. Stable ID retained for semantic continuity.
+
+[TABLE 37]
+UC ID | HM-UC-036
+UC Name | Review Attendance Summaries, Trends, and Exceptions
+UC Type | Actor-triggered
+Primary Actor | Hostel Warden
+Supporting Actors / Systems | None
+Goal / Description | Enable a Warden to review attendance summaries, trends, and exceptions for oversight.
+Trigger | Warden opens attendance oversight information.
+Preconditions | • Hostel Warden is authenticated. / • The relevant hostel is within the Warden’s active role binding and access is permitted by RBAC (BR-HM-005).
+Main Success Scenario | • Warden opens the attendance oversight view. / • The system displays attendance summaries, trends, and exceptions for the permitted hostel scope. / • Warden reviews the information for oversight.
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the information.
+Success Postcondition | Warden has reviewed available attendance oversight information; no business state is changed.
+Failure / Minimal Guarantee | No attendance record is changed by this review use case.
+Related Business Rules | BR-HM-005
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | The detailed attendance-taking procedure remains outside HM scope unless explicitly configured (BR-HM-012).
+
+[TABLE 38]
+UC ID | HM-UC-037
+UC Name | Review Leave Information and Summaries
+UC Type | Actor-triggered
+Primary Actor | Hostel Warden
+Supporting Actors / Systems | None
+Goal / Description | Enable a Warden to review leave information and summaries for oversight, control, and supervisory planning.
+Trigger | Warden opens leave oversight information.
+Preconditions | • Hostel Warden is authenticated. / • The relevant hostel is within the Warden’s active role binding and access is permitted by RBAC (BR-HM-005).
+Main Success Scenario | • Warden opens the leave oversight view. / • The system displays leave information and summaries available for the permitted hostel scope. / • Warden reviews the information for oversight/control/planning.
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the information.
+Success Postcondition | Warden has reviewed available leave information; no business state is changed.
+Failure / Minimal Guarantee | No leave request or decision state is changed by this review use case.
+Related Business Rules | BR-HM-005, BR-HM-013
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | No external leave approval hierarchy or eligibility policy is inferred (BR-HM-014).
+
+[TABLE 39]
+UC ID | HM-UC-038
+UC Name | Review Fine Summaries and Disciplinary Patterns
+UC Type | Actor-triggered
+Primary Actor | Hostel Warden
+Supporting Actors / Systems | None
+Goal / Description | Enable a Warden to review fine summaries and disciplinary patterns for oversight.
+Trigger | Warden opens fine/disciplinary oversight information.
+Preconditions | • Hostel Warden is authenticated. / • The relevant hostel is within the Warden’s active role binding and access is permitted by RBAC (BR-HM-005).
+Main Success Scenario | • Warden opens the fine/disciplinary summary view. / • The system displays fine summaries and disciplinary patterns available for the permitted hostel scope. / • Warden reviews the information for oversight.
+Alternative Flows | None
+Exception Flows | • If authorization fails, the system denies or hides the information.
+Success Postcondition | Warden has reviewed available fine summaries; no business state is changed.
+Failure / Minimal Guarantee | No fine record is changed by this review use case.
+Related Business Rules | BR-HM-005, BR-HM-026
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | Fine payment, waiver, settlement, appeal handling, and policy validation remain outside HM scope as stated in BR-HM-026.
+
+[TABLE 40]
+UC ID | HM-UC-039
+UC Name | Review Hostel-Operational Staff Assignments or Shift Information
+UC Type | Actor-triggered
+Primary Actor | Hostel Warden or Super Admin
+Supporting Actors / Systems | None
+Goal / Description | Enable Warden or Super Admin to review relevant hostel-operational staff assignments or shift information made available through HM.
+Trigger | Warden or Super Admin opens staff-assignment/shift review information.
+Preconditions | • Actor is authenticated. / • Access to the function and data is permitted by applicable HM role-binding and RBAC rules (BR-HM-005).
+Main Success Scenario | • Actor opens the staff-assignment/shift review view. / • The system identifies the actor’s permitted hostel/institution scope. / • The system displays relevant hostel-operational staff assignment or shift information maintained in HM. / • Actor reviews the information.
+Alternative Flows | • A1. Warden review is limited to the Warden’s permitted hostel scope. / • A2. Super Admin review uses institution-level scope unless explicitly restricted by configuration (BR-HM-003).
+Exception Flows | • If authorization fails, the system denies or hides the information.
+Success Postcondition | Actor has reviewed the available staff-assignment/shift information; no business state is changed.
+Failure / Minimal Guarantee | No staff-coordination record is changed by this review use case.
+Related Business Rules | BR-HM-003, BR-HM-005, BR-HM-027
+Related CFRs / AFRs | 
+Related Workflow(s) | N/A
+Notes / TODO | Formal HR records, payroll, and employee service administration remain outside HM scope.

@@ -1,0 +1,533 @@
+Hostel Management (HM) — Business Rule Specifications
+v1.4_FINAL_SYNCHRONIZED | DIRECT_FINAL_v2
+Synchronization note. Rule statements and stable BR IDs are preserved. Changes in this version are limited to CFR/AFR traceability, the event-triggered UC treatment of HM-UC-025/HM-UC-034, and affected cross-references.
+1. Business Rule Register
+2. Detailed Business Rules
+BR-HM-001 — Hostel-Specific Role Binding and Change Recording
+BR-HM-002 — Student Hostel-Specific Access Basis
+BR-HM-003 — Super Admin Institution-Level Access Boundary
+BR-HM-004 — Time-Bound Role Validity Boundary
+BR-HM-005 — RBAC Data and Function Restriction
+BR-HM-006 — Role Reassignment Pending-Record Visibility
+BR-HM-007 — Operational Handover Boundary
+BR-HM-008 — Allotment Algorithm Boundary
+BR-HM-009 — Room Assignment History Retention
+BR-HM-010 — Room Capacity Limit Enforcement
+BR-HM-011 — Attendance Record Retention
+BR-HM-012 — Attendance Procedure Boundary
+BR-HM-013 — Leave History Retention
+BR-HM-014 — External Leave Policy Boundary
+BR-HM-015 — Complaint Core Data Capture
+BR-HM-016 — Hostel-Related Complaint Scope
+BR-HM-017 — Central Complaint Integration Boundary
+BR-HM-018 — Guest-Room Booking History Retention
+BR-HM-019 — Guest-Room Booking Scope Boundary
+BR-HM-020 — Extended-Stay Charge Recording Boundary
+BR-HM-021 — Extended-Stay Compliance Recording Boundary
+BR-HM-022 — Extended-Stay Application Window Boundary
+BR-HM-023 — Extended-Stay Payment Processing Boundary
+BR-HM-024 — Extended-Stay Appeal and Expedited Handling Boundary
+BR-HM-025 — Fine Mandatory Data Fields
+BR-HM-026 — Fine Lifecycle and Policy Boundary
+BR-HM-027 — Inventory and Staff Coordination Boundary and Logging
+BR-HM-028 — Security Scope Boundary
+BR-HM-029 — Assigned-Hostel Notice Publishing
+BR-HM-030 — Notice History Retention
+BR-HM-031 — Authorized Notice Board Visibility
+BR-HM-032 — Predefined HM Reports Boundary
+BR-HM-033 — Advanced Analytics Exclusion
+BR-HM-034 — Configured Notification Event Scope
+BR-HM-035 — Caretaker Assigned Hostel and Shift Context
+
+[TABLE 1]
+Rule ID | Rule Name | Type | Related CFRs / AFRs
+BR-HM-001 | Hostel-Specific Role Binding and Change Recording | Access Control / Record Control | 
+BR-HM-002 | Student Hostel-Specific Access Basis | Access Control | 
+BR-HM-003 | Super Admin Institution-Level Access Boundary | Access Control | 
+BR-HM-004 | Time-Bound Role Validity Boundary | Scope Boundary | 
+BR-HM-005 | RBAC Data and Function Restriction | Access Control | 
+BR-HM-006 | Role Reassignment Pending-Record Visibility | Access Control / Visibility | 
+BR-HM-007 | Operational Handover Boundary | Scope Boundary | 
+BR-HM-008 | Allotment Algorithm Boundary | Scope Boundary / Record Control | 
+BR-HM-009 | Room Assignment History Retention | Retention / Audit | 
+BR-HM-010 | Room Capacity Limit Enforcement | Constraint | 
+BR-HM-011 | Attendance Record Retention | Retention / Audit | 
+BR-HM-012 | Attendance Procedure Boundary | Scope Boundary | 
+BR-HM-013 | Leave History Retention | Retention / Audit | 
+BR-HM-014 | External Leave Policy Boundary | Scope Boundary | 
+BR-HM-015 | Complaint Core Data Capture | Validation / Data Capture | 
+BR-HM-016 | Hostel-Related Complaint Scope | Scope Boundary | 
+BR-HM-017 | Central Complaint Integration Boundary | Integration Boundary | 
+BR-HM-018 | Guest-Room Booking History Retention | Retention / Audit | 
+BR-HM-019 | Guest-Room Booking Scope Boundary | Scope Boundary | 
+BR-HM-020 | Extended-Stay Charge Recording Boundary | Conditional Record Control | 
+BR-HM-021 | Extended-Stay Compliance Recording Boundary | Conditional Record Control | 
+BR-HM-022 | Extended-Stay Application Window Boundary | Scope Boundary | 
+BR-HM-023 | Extended-Stay Payment Processing Boundary | Scope Boundary | 
+BR-HM-024 | Extended-Stay Appeal and Expedited Handling Boundary | Scope Boundary | 
+BR-HM-025 | Fine Mandatory Data Fields | Validation / Data Completeness | 
+BR-HM-026 | Fine Lifecycle and Policy Boundary | Scope Boundary | 
+BR-HM-027 | Inventory and Staff Coordination Boundary and Logging | Scope Boundary / Audit | 
+BR-HM-028 | Security Scope Boundary | Scope Boundary | 
+BR-HM-029 | Assigned-Hostel Notice Publishing | Access Control | 
+BR-HM-030 | Notice History Retention | Retention / Audit | 
+BR-HM-031 | Authorized Notice Board Visibility | Information Access | 
+BR-HM-032 | Predefined HM Reports Boundary | Report Scope | 
+BR-HM-033 | Advanced Analytics Exclusion | Scope Boundary | 
+BR-HM-034 | Configured Notification Event Scope | Notification / Event Scope | 
+BR-HM-035 | Caretaker Assigned Hostel and Shift Context | Access Context | 
+
+[TABLE 2]
+Rule ID | BR-HM-001
+Rule Name | Hostel-Specific Role Binding and Change Recording
+Rule Type | Access Control / Record Control
+Rule Statement | The system shall maintain hostel-specific Warden and Caretaker role bindings and record role changes made by the Super Admin.
+Applies To | Hostel Management module; HM-UC-003, HM-UC-004
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | The system shall maintain hostel-specific Warden and Caretaker role bindings and record role changes made by the Super Admin.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.0 Hostel Master and Role Assignment Administration; 3.14 Hostel-Specific RBAC Enforcement and Role Continuity
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 3]
+Rule ID | BR-HM-002
+Rule Name | Student Hostel-Specific Access Basis
+Rule Type | Access Control
+Rule Statement | Student access to hostel-specific data shall be based on the student hostel allocation or relevant student-hostel association maintained in HM.
+Applies To | Hostel Management module; HM-UC-005, HM-UC-008, HM-UC-013, HM-UC-014, HM-UC-016, HM-UC-017, HM-UC-020, HM-UC-022, HM-UC-023, HM-UC-027, HM-UC-032
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | Student access to hostel-specific data shall be based on the student hostel allocation or relevant student-hostel association maintained in HM.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.14 Hostel-Specific RBAC Enforcement and Role Continuity
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 4]
+Rule ID | BR-HM-003
+Rule Name | Super Admin Institution-Level Access Boundary
+Rule Type | Access Control
+Rule Statement | Super Admin access shall be institution-level unless explicitly restricted by HM configuration.
+Applies To | Hostel Management module; HM-UC-001, HM-UC-002, HM-UC-003, HM-UC-004, HM-UC-006, HM-UC-007, HM-UC-033, HM-UC-039
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | Super Admin access shall be institution-level unless explicitly restricted by HM configuration.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.14 Hostel-Specific RBAC Enforcement and Role Continuity
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 5]
+Rule ID | BR-HM-004
+Rule Name | Time-Bound Role Validity Boundary
+Rule Type | Scope Boundary
+Rule Statement | Time-bound role validity is in scope only if start and end dates are configured and enforced in HM.
+Applies To | Hostel Management module; HM-UC-003, HM-UC-004
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | Time-bound role validity is in scope only if start and end dates are configured and enforced in HM.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.14 Hostel-Specific RBAC Enforcement and Role Continuity
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 6]
+Rule ID | BR-HM-005
+Rule Name | RBAC Data and Function Restriction
+Rule Type | Access Control
+Rule Statement | RBAC shall ensure users access only the hostel data and functions permitted for their role and hostel assignment.
+Applies To | Hostel Management module; All active HM UCs, as applicable by role/data scope
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | RBAC shall ensure users access only the hostel data and functions permitted for their role and hostel assignment.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.14 Hostel-Specific RBAC Enforcement and Role Continuity
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 7]
+Rule ID | BR-HM-006
+Rule Name | Role Reassignment Pending-Record Visibility
+Rule Type | Access Control / Visibility
+Rule Statement | When a Warden or Caretaker role is reassigned, the newly assigned role holder shall be able to view pending HM records associated with the assigned hostel, subject to RBAC.
+Applies To | Hostel Management module; HM-UC-003, HM-UC-004, downstream pending-record views for newly assigned Warden/Caretaker
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | When a Warden or Caretaker role is reassigned, the newly assigned role holder shall be able to view pending HM records associated with the assigned hostel, subject to RBAC.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.14 Hostel-Specific RBAC Enforcement and Role Continuity
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 8]
+Rule ID | BR-HM-007
+Rule Name | Operational Handover Boundary
+Rule Type | Scope Boundary
+Rule Statement | Operational handover outside system-visible responsibility records shall remain outside HM scope.
+Applies To | Hostel Management module; HM-UC-003, HM-UC-004
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | Operational handover outside system-visible responsibility records shall remain outside HM scope.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.14 Hostel-Specific RBAC Enforcement and Role Continuity
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 9]
+Rule ID | BR-HM-008
+Rule Name | Allotment Algorithm Boundary
+Rule Type | Scope Boundary / Record Control
+Rule Statement | The system shall record allotment decisions and update room assignment information without prescribing an allotment algorithm unless explicitly specified.
+Applies To | Hostel Management module; HM-UC-006, HM-UC-007
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | The system shall record allotment decisions and update room assignment information without prescribing an allotment algorithm unless explicitly specified.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.1 Hostel Accommodation Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 10]
+Rule ID | BR-HM-009
+Rule Name | Room Assignment History Retention
+Rule Type | Retention / Audit
+Rule Statement | The system shall maintain room assignment history for audit, traceability, and review.
+Applies To | Hostel Management module; HM-UC-006, HM-UC-007, HM-UC-010
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | The system shall maintain room assignment history for audit, traceability, and review.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.1 Hostel Accommodation Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 11]
+Rule ID | BR-HM-010
+Rule Name | Room Capacity Limit Enforcement
+Rule Type | Constraint
+Rule Statement | The system shall prevent room occupancy from exceeding defined room capacity.
+Applies To | Hostel Management module; HM-UC-006, HM-UC-007, HM-UC-009, HM-UC-010
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | The system shall prevent room occupancy from exceeding defined room capacity.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.2 Room Allocation and Occupancy Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 12]
+Rule ID | BR-HM-011
+Rule Name | Attendance Record Retention
+Rule Type | Retention / Audit
+Rule Statement | The system shall retain attendance records for reporting, monitoring, and compliance-oriented review.
+Applies To | Hostel Management module; HM-UC-012
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | The system shall retain attendance records for reporting, monitoring, and compliance-oriented review.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.3 Attendance Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 13]
+Rule ID | BR-HM-012
+Rule Name | Attendance Procedure Boundary
+Rule Type | Scope Boundary
+Rule Statement | The detailed hostel attendance-taking procedure shall remain outside HM system scope unless explicitly specified as system-enforced rules or configured workflow.
+Applies To | Hostel Management module; HM-UC-012, HM-UC-036
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | The detailed hostel attendance-taking procedure shall remain outside HM system scope unless explicitly specified as system-enforced rules or configured workflow.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.3 Attendance Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 14]
+Rule ID | BR-HM-013
+Rule Name | Leave History Retention
+Rule Type | Retention / Audit
+Rule Statement | The system shall retain leave history for audit, review, and reporting.
+Applies To | Hostel Management module; HM-UC-014, HM-UC-015, HM-UC-016, HM-UC-037
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | The system shall retain leave history for audit, review, and reporting.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.4 Leave Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 15]
+Rule ID | BR-HM-014
+Rule Name | External Leave Policy Boundary
+Rule Type | Scope Boundary
+Rule Statement | External leave eligibility rules, approval hierarchies, document rules, and institutional leave policy shall remain outside HM system-scoring scope unless explicitly specified as system-enforced or system-routed behavior.
+Applies To | Hostel Management module; HM-UC-014, HM-UC-015, HM-UC-037
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | External leave eligibility rules, approval hierarchies, document rules, and institutional leave policy shall remain outside HM system-scoring scope unless explicitly specified as system-enforced or system-routed behavior.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.4 Leave Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 16]
+Rule ID | BR-HM-015
+Rule Name | Complaint Core Data Capture
+Rule Type | Validation / Data Capture
+Rule Statement | The system shall capture complaint category and description and shall support optional attachment capture where the complaint form provides such a field.
+Applies To | Hostel Management module; HM-UC-017
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | The system shall capture complaint category and description and shall support optional attachment capture where the complaint form provides such a field.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.5 Complaint Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 17]
+Rule ID | BR-HM-016
+Rule Name | Hostel-Related Complaint Scope
+Rule Type | Scope Boundary
+Rule Statement | HM shall cover hostel-related complaints only; non-hostel complaints shall remain outside HM scope.
+Applies To | Hostel Management module; HM-UC-017, HM-UC-018, HM-UC-019
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | HM shall cover hostel-related complaints only; non-hostel complaints shall remain outside HM scope.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.5 Complaint Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 18]
+Rule ID | BR-HM-017
+Rule Name | Central Complaint Integration Boundary
+Rule Type | Integration Boundary
+Rule Statement | If a central Complaint Management module exists, HM shall handle hostel-local complaints or record/escalate hostel complaints only according to explicitly defined integration scope.
+Applies To | Hostel Management module; HM-UC-017, HM-UC-018
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | If a central Complaint Management module exists, HM shall handle hostel-local complaints or record/escalate hostel complaints only according to explicitly defined integration scope.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.5 Complaint Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced. Escalation criteria beyond “unresolved or supervisory” are not defined by the baseline.
+
+[TABLE 19]
+Rule ID | BR-HM-018
+Rule Name | Guest-Room Booking History Retention
+Rule Type | Retention / Audit
+Rule Statement | The system shall maintain guest-room booking history for audit, planning, and security-oriented review.
+Applies To | Hostel Management module; HM-UC-020, HM-UC-021
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | The system shall maintain guest-room booking history for audit, planning, and security-oriented review.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.6 Guest Room Booking Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 20]
+Rule ID | BR-HM-019
+Rule Name | Guest-Room Booking Scope Boundary
+Rule Type | Scope Boundary
+Rule Statement | Guest-room management in HM shall be limited to booking-request handling and booking-status tracking; guest check-in, guest check-out, inspection, charge collection, and settlement are outside scope unless explicitly integrated.
+Applies To | Hostel Management module; HM-UC-020, HM-UC-021, HM-UC-022
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | Guest-room management in HM shall be limited to booking-request handling and booking-status tracking; guest check-in, guest check-out, inspection, charge collection, and settlement are outside scope unless explicitly integrated.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.6 Guest Room Booking Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 21]
+Rule ID | BR-HM-020
+Rule Name | Extended-Stay Charge Recording Boundary
+Rule Type | Conditional Record Control
+Rule Statement | The system shall record applicable extended-stay payment, charge, or fee amount where such charges are applicable and represented in HM.
+Applies To | Hostel Management module; HM-UC-025
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | The system shall record applicable extended-stay payment, charge, or fee amount where such charges are applicable and represented in HM.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.7 Extended-Stay Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized under DIRECT_FINAL_v2. HM-UC-025 is event-triggered; the PS still does not identify the human role or external integration supplying charge/deadline/compliance data (ISS-HM-014). No source actor/integration is invented.
+
+[TABLE 22]
+Rule ID | BR-HM-021
+Rule Name | Extended-Stay Compliance Recording Boundary
+Rule Type | Conditional Record Control
+Rule Statement | The system shall record payment deadline and payment/deadline compliance status relevant to extended-stay decisions where such information is maintained in HM.
+Applies To | Hostel Management module; HM-UC-024, HM-UC-025
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | The system shall record payment deadline and payment/deadline compliance status relevant to extended-stay decisions where such information is maintained in HM.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.7 Extended-Stay Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized under DIRECT_FINAL_v2. HM-UC-025 is event-triggered; the PS still does not identify the human role or external integration supplying charge/deadline/compliance data (ISS-HM-014). No source actor/integration is invented.
+
+[TABLE 23]
+Rule ID | BR-HM-022
+Rule Name | Extended-Stay Application Window Boundary
+Rule Type | Scope Boundary
+Rule Statement | Application-window enforcement for extended-stay requests shall remain outside HM scope unless a configured application window is explicitly provided and enforced by the system.
+Applies To | Hostel Management module; HM-UC-023
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | Application-window enforcement for extended-stay requests shall remain outside HM scope unless a configured application window is explicitly provided and enforced by the system.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.7 Extended-Stay Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 24]
+Rule ID | BR-HM-023
+Rule Name | Extended-Stay Payment Processing Boundary
+Rule Type | Scope Boundary
+Rule Statement | Actual payment collection, receipt generation, financial settlement, and accounting reconciliation for extended stay shall remain outside HM scope unless explicitly integrated.
+Applies To | Hostel Management module; HM-UC-025
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | Actual payment collection, receipt generation, financial settlement, and accounting reconciliation for extended stay shall remain outside HM scope unless explicitly integrated.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.7 Extended-Stay Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized under DIRECT_FINAL_v2. HM-UC-025 is event-triggered; the PS still does not identify the human role or external integration supplying charge/deadline/compliance data (ISS-HM-014). No source actor/integration is invented.
+
+[TABLE 25]
+Rule ID | BR-HM-024
+Rule Name | Extended-Stay Appeal and Expedited Handling Boundary
+Rule Type | Scope Boundary
+Rule Statement | Appeal handling and expedited handling for extended-stay requests shall remain outside HM scope.
+Applies To | Hostel Management module; HM-UC-023
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | Appeal handling and expedited handling for extended-stay requests shall remain outside HM scope.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.7 Extended-Stay Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 26]
+Rule ID | BR-HM-025
+Rule Name | Fine Mandatory Data Fields
+Rule Type | Validation / Data Completeness
+Rule Statement | Each fine record shall include at least the reason, amount, date, and affected student reference.
+Applies To | Hostel Management module; HM-UC-026
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | Each fine record shall include at least the reason, amount, date, and affected student reference.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.8 Fine Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 27]
+Rule ID | BR-HM-026
+Rule Name | Fine Lifecycle and Policy Boundary
+Rule Type | Scope Boundary
+Rule Statement | Fine payment, waiver, settlement, appeal handling, and fine-reason policy validation shall remain outside HM scope unless explicitly specified as system-enforced behavior.
+Applies To | Hostel Management module; HM-UC-026, HM-UC-027, HM-UC-038
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | Fine payment, waiver, settlement, appeal handling, and fine-reason policy validation shall remain outside HM scope unless explicitly specified as system-enforced behavior.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.8 Fine Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 28]
+Rule ID | BR-HM-027
+Rule Name | Inventory and Staff Coordination Boundary and Logging
+Rule Type | Scope Boundary / Audit
+Rule Statement | HM inventory and staff coordination shall be limited to hostel-operational records, visibility, accountability logs, and system-maintained updates; procurement, stock purchase, payroll, formal HR records, and employee service administration are out of scope unless explicitly integrated.
+Applies To | Hostel Management module; HM-UC-028, HM-UC-029, HM-UC-039
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | HM inventory and staff coordination shall be limited to hostel-operational records, visibility, accountability logs, and system-maintained updates; procurement, stock purchase, payroll, formal HR records, and employee service administration are out of scope unless explicitly integrated.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.9 Inventory and Staff Coordination
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 29]
+Rule ID | BR-HM-028
+Rule Name | Security Scope Boundary
+Rule Type | Scope Boundary
+Rule Statement | Detailed incident investigation workflows, security staff employment records, payroll, and non-hostel security administration shall remain outside HM scope unless explicitly specified.
+Applies To | Hostel Management module; HM-UC-030
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | Detailed incident investigation workflows, security staff employment records, payroll, and non-hostel security administration shall remain outside HM scope unless explicitly specified.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.10 Security and Guard Shift Management
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 30]
+Rule ID | BR-HM-029
+Rule Name | Assigned-Hostel Notice Publishing
+Rule Type | Access Control
+Rule Statement | Caretakers and Wardens may publish hostel notices and announcements only for hostels assigned to them in HM.
+Applies To | Hostel Management module; HM-UC-031
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | Caretakers and Wardens may publish hostel notices and announcements only for hostels assigned to them in HM.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.11 Announcements and Notices
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 31]
+Rule ID | BR-HM-030
+Rule Name | Notice History Retention
+Rule Type | Retention / Audit
+Rule Statement | The system shall maintain notice history for reference, transparency, and auditability.
+Applies To | Hostel Management module; HM-UC-031
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | The system shall maintain notice history for reference, transparency, and auditability.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.11 Announcements and Notices
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 32]
+Rule ID | BR-HM-031
+Rule Name | Authorized Notice Board Visibility
+Rule Type | Information Access
+Rule Statement | The system shall provide a hostel notice board for displaying relevant notices and announcements to authorized users.
+Applies To | Hostel Management module; HM-UC-032
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | The system shall provide a hostel notice board for displaying relevant notices and announcements to authorized users.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.11 Announcements and Notices
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 33]
+Rule ID | BR-HM-032
+Rule Name | Predefined HM Reports Boundary
+Rule Type | Report Scope
+Rule Statement | The system shall support predefined reports and operational summaries derived from HM records.
+Applies To | Hostel Management module; HM-UC-033
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | The system shall support predefined reports and operational summaries derived from HM records.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.12 Reports and Operational Summaries
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 34]
+Rule ID | BR-HM-033
+Rule Name | Advanced Analytics Exclusion
+Rule Type | Scope Boundary
+Rule Statement | Advanced analytics, predictive analysis, or external data analysis shall remain outside HM scope unless explicitly specified.
+Applies To | Hostel Management module; HM-UC-033
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | Advanced analytics, predictive analysis, or external data analysis shall remain outside HM scope unless explicitly specified.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.12 Reports and Operational Summaries
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
+
+[TABLE 35]
+Rule ID | BR-HM-034
+Rule Name | Configured Notification Event Scope
+Rule Type | Notification / Event Scope
+Rule Statement | The system shall issue notifications or status updates to relevant users for supported HM events through the Fusion notification infrastructure or a configured notification mechanism; supported events are room allocation changes, leave events, complaint events, guest-room booking status, extended-stay status, configured payment/deadline alerts, fine imposition, and notices.
+Applies To | Hostel Management module; HM-UC-034, HM-UC-006, HM-UC-007, HM-UC-010, HM-UC-014, HM-UC-015, HM-UC-017, HM-UC-018, HM-UC-020, HM-UC-021, HM-UC-023, HM-UC-024, HM-UC-025, HM-UC-026, HM-UC-031
+Condition / Trigger | A supported HM event occurs and a configured notification/status-update mechanism is applicable.
+Required Outcome / Constraint | The system shall issue notifications or status updates to relevant users for supported HM events through the Fusion notification infrastructure or a configured notification mechanism; supported events are room allocation changes, leave events, complaint events, guest-room booking status, extended-stay status, configured payment/deadline alerts, fine imposition, and notices.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 3.13 Notifications
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized under DIRECT_FINAL_v2. HM-UC-034 is the event-triggered notification service; originating UCs retain event/postcondition traceability. No workflow transition is added because notification issuance is not itself a business-progression state.
+
+[TABLE 36]
+Rule ID | BR-HM-035
+Rule Name | Caretaker Assigned Hostel and Shift Context
+Rule Type | Access Context
+Rule Statement | Caretaker operations are supported within the assigned hostel and shift context maintained in HM.
+Applies To | Hostel Management module; HM-UC-009, HM-UC-010, HM-UC-012, HM-UC-015, HM-UC-018, HM-UC-021, HM-UC-026, HM-UC-028, HM-UC-029, HM-UC-031, HM-UC-033
+Condition / Trigger | Whenever the linked HM function or data context is exercised and the rule is applicable.
+Required Outcome / Constraint | Caretaker operations are supported within the assigned hostel and shift context maintained in HM.
+Exceptions / Exclusions | No external policy/process is included unless explicitly specified as HM system behavior.
+Source / Rationale | HM Problem Statement v1.4 — 2.3 Hostel Caretaker; 3.14 Hostel-Specific RBAC Enforcement and Role Continuity
+Related CFRs / AFRs / UCs / WFs | 
+Status / Notes / TODO | Synchronized; no new policy introduced.
