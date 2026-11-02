@@ -7,6 +7,13 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `badms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `badms.archival.submit` | Submit and track secure archival requests | `HoD`, `faculty`, `staff`, `student` |
+| `badms.archival.review` | Review archival requests for own department | `HoD` |
+
 ## `directory`
 
 | Code | What it allows | Held by |
