@@ -619,7 +619,7 @@ def resolve_anomaly(actor, anomaly_id: int, *, action: str, resolution: str) -> 
 
 @transaction.atomic
 def raise_observation(actor, payload: dict) -> AuditObservation:
-    role = require(actor, "iaa.audit.observation.create", roles=AUDIT_ROLES)
+    role = require(actor, "iaa.observation.create", roles=AUDIT_ROLES)
     record_kind = str(payload.get("record_kind", ""))
     record_id = int(payload.get("record_id", 0))
     record = get_record(actor, record_id)
@@ -643,7 +643,7 @@ def raise_observation(actor, payload: dict) -> AuditObservation:
 @transaction.atomic
 def respond_observation(actor, observation_id: int, *, response_text: str,
                         evidence_references: list | None = None) -> ObservationResponse:
-    require(actor, "iaa.audit.observation.respond", roles=BASIC_ROLES)
+    require(actor, "iaa.observation.respond", roles=BASIC_ROLES)
     obs = AuditObservation.objects.select_for_update().filter(
         pk=observation_id, status=workflow.OBSERVATION_OPEN).first()
     if obs is None:
@@ -670,7 +670,7 @@ def respond_observation(actor, observation_id: int, *, response_text: str,
 @transaction.atomic
 def verify_observation(actor, observation_id: int, *, satisfactory: bool,
                        remarks: str) -> AuditObservation:
-    role = require(actor, "iaa.audit.observation.verify", roles=AUDIT_ROLES)
+    role = require(actor, "iaa.observation.verify", roles=AUDIT_ROLES)
     obs = AuditObservation.objects.select_for_update().filter(
         pk=observation_id, status=workflow.OBSERVATION_RESPONDED).first()
     if obs is None:

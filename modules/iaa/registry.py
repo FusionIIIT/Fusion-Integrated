@@ -18,16 +18,16 @@ PERMISSIONS=[
 ("iaa.ta.create","Create TA claims"),("iaa.ta.view_self","View own TA claims"),("iaa.ta.submit","Submit TA claims"),
 ("iaa.ta.verify","Verify TA claims"),("iaa.approval.view","View assigned approval decisions"),("iaa.approval.decide","Approve or reject routed requests"),
 ("iaa.anomaly.view","View anomalies in permitted scope"),("iaa.anomaly.flag","Flag material anomalies"),("iaa.anomaly.resolve","Resolve or escalate assigned anomalies"),
-("iaa.audit.review","Review financial records and audit observations"),("iaa.audit.observation.create","Raise audit observations"),
-("iaa.audit.observation.respond","Respond to audit observations"),("iaa.audit.observation.verify","Verify and close audit observations"),
+("iaa.audit.review","Review financial records and audit observations"),("iaa.observation.create","Raise audit observations"),
+("iaa.observation.respond","Respond to audit observations"),("iaa.observation.verify","Verify and close audit observations"),
 ("iaa.report.view","View role-scoped reports"),("iaa.report.export","Export role-scoped reports"),
 ("iaa.notification.view","View personal IAA notifications"),("iaa.configuration.manage","Manage IAA configuration"),
 ("iaa.approval.escalate","System escalation of overdue approvals"),("iaa.anomaly.auto_create","System creation of rule-triggered anomalies")]
 SYSTEM_PERMISSIONS=["iaa.approval.escalate","iaa.anomaly.auto_create"]
-BASIC=["iaa.request.create","iaa.request.view_self","iaa.request.submit","iaa.query.respond","iaa.ta.create","iaa.ta.view_self","iaa.ta.submit","iaa.audit.observation.respond","iaa.notification.view","iaa.anomaly.view"]
+BASIC=["iaa.request.create","iaa.request.view_self","iaa.request.submit","iaa.query.respond","iaa.ta.create","iaa.ta.view_self","iaa.ta.submit","iaa.observation.respond","iaa.notification.view","iaa.anomaly.view"]
 FINANCE=["iaa.request.view","iaa.finance.query","iaa.finance.validate","iaa.finance.record","iaa.ta.verify","iaa.anomaly.view","iaa.anomaly.flag","iaa.anomaly.resolve","iaa.report.view","iaa.report.export","iaa.notification.view"]
 AUTHORITY=["iaa.request.view","iaa.approval.view","iaa.approval.decide","iaa.anomaly.view","iaa.anomaly.resolve","iaa.report.view","iaa.report.export","iaa.notification.view"]
-AUDITOR=["iaa.request.view","iaa.anomaly.view","iaa.anomaly.flag","iaa.anomaly.resolve","iaa.audit.review","iaa.audit.observation.create","iaa.audit.observation.verify","iaa.report.view","iaa.report.export","iaa.notification.view"]
+AUDITOR=["iaa.request.view","iaa.anomaly.view","iaa.anomaly.flag","iaa.anomaly.resolve","iaa.audit.review","iaa.observation.create","iaa.observation.verify","iaa.report.view","iaa.report.export","iaa.notification.view"]
 ROLE_GRANTS={"Basic User":BASIC,"basic_user":BASIC,"employee":BASIC,"faculty":BASIC,"staff":BASIC,"department_representative":BASIC,
 "Finance Staff":FINANCE,"finance_staff":FINANCE,"HoD":AUTHORITY,"hod":AUTHORITY,"Head of Department":AUTHORITY,
 "Dean":AUTHORITY,"dean":AUTHORITY,"Director":AUTHORITY,"director":AUTHORITY,

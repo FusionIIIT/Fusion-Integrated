@@ -35,9 +35,9 @@ For the intended taxonomy of modules not yet built, see
 | `iaa.anomaly.flag` | Flag material anomalies | `Auditor`, `Finance Staff`, `auditor`, `finance_staff` |
 | `iaa.anomaly.resolve` | Resolve or escalate assigned anomalies | `Auditor`, `Dean`, `Director`, `Finance Staff`, `Head of Department`, `HoD`, `auditor`, `dean`, `director`, `finance_staff`, `hod` |
 | `iaa.audit.review` | Review financial records and audit observations | `Auditor`, `auditor` |
-| `iaa.audit.observation.create` | Raise audit observations | `Auditor`, `auditor` |
-| `iaa.audit.observation.respond` | Respond to audit observations | `Basic User`, `basic_user`, `department_representative`, `employee`, `faculty`, `staff` |
-| `iaa.audit.observation.verify` | Verify and close audit observations | `Auditor`, `auditor` |
+| `iaa.observation.create` | Raise audit observations | `Auditor`, `auditor` |
+| `iaa.observation.respond` | Respond to audit observations | `Basic User`, `basic_user`, `department_representative`, `employee`, `faculty`, `staff` |
+| `iaa.observation.verify` | Verify and close audit observations | `Auditor`, `auditor` |
 | `iaa.report.view` | View role-scoped reports | `Auditor`, `Dean`, `Director`, `Finance Staff`, `Head of Department`, `HoD`, `auditor`, `dean`, `director`, `finance_staff`, `hod` |
 | `iaa.report.export` | Export role-scoped reports | `Auditor`, `Dean`, `Director`, `Finance Staff`, `Head of Department`, `HoD`, `auditor`, `dean`, `director`, `finance_staff`, `hod` |
 | `iaa.notification.view` | View personal IAA notifications | `Auditor`, `Basic User`, `Dean`, `Director`, `Finance Staff`, `Head of Department`, `HoD`, `auditor`, `basic_user`, `dean`, `department_representative`, `director`, `employee`, `faculty`, `finance_staff`, `hod`, `staff` |
