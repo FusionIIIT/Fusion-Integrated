@@ -85,6 +85,7 @@ LOCAL_APPS = [
 PLATFORM_MODULES = [
     "modules.directory",         # who people are, projected from IAM
     "modules.accesscontrol",     # which modules a role may enter
+    "modules.system_admin",      # administrative control plane
 ]
 
 # See docs/03-platform/module-authoring-guide.md to add one.
@@ -274,3 +275,17 @@ LOGGING = {
         "fusion": {"level": env("FUSION_LOG_LEVEL", "INFO"), "propagate": True},
     },
 }
+
+# System Administrator Module Configuration Defaults
+SYSTEM_ADMIN_CONFIG = {
+    "MAX_BULK_SIZE": 1000,                                 # BR-SA-030
+    "FAILED_LOGIN_ALERT_THRESHOLD": 5,                     # BR-SA-024
+    "DEFAULT_SESSION_TIMEOUT_MINUTES": 15,                 # BR-SA-027
+    "DEFAULT_PASSWORD_ROTATION_DAYS": 90,                  # BR-SA-031
+    "DEFAULT_DEACTIVATION_TO_ARCHIVE_DAYS": 30,            # BR-SA-004
+    "DEFAULT_REVERSIBLE_WINDOW_DAYS": 30,                  # BR-SA-005, ISS-SA-004
+    "DEFAULT_ROLE_EXPIRY_REMINDER_DAYS": 7,                # BR-SA-016
+    "DEFAULT_PREVIOUS_HOLDER_AUDIT_DAYS": 90,              # BR-SA-013
+    "ARCHIVE_BACKUP_STORAGE_DIR": "/var/fusion/archive_backups",
+}
+
