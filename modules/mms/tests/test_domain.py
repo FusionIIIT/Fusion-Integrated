@@ -11,7 +11,7 @@ from modules.mms.domain.constants import MessRole, RebateStatus
 def test_rebate_request_validation_success():
     submission_date = datetime.date(2026, 11, 1)
     start_date = datetime.date(2026, 11, 3)
-    end_date = datetime.date(2026, 11, 6)
+    end_date = datetime.date(2026, 11, 7)
 
     duration = rules.validate_rebate_request(start_date, end_date, submission_date)
     assert duration == 4
@@ -68,6 +68,22 @@ def test_rebate_overlap_detection():
         rules.check_rebate_overlap(
             existing, datetime.date(2026, 11, 14), datetime.date(2026, 11, 18)
         )
+
+    # Edge-case: same-day boundary overlap (Nov 15)
+    with pytest.raises(ValueError, match="impermissibly overlaps"):
+        rules.check_rebate_overlap(
+            existing, datetime.date(2026, 11, 15), datetime.date(2026, 11, 18)
+        )
+
+
+def test_exact_three_day_minimum_boundary():
+    # Exactly 3 calendar days: Nov 3, Nov 4, Nov 5
+    submission_date = datetime.date(2026, 11, 1)
+    start_date = datetime.date(2026, 11, 3)
+    end_date = datetime.date(2026, 11, 5)
+
+    duration = rules.validate_rebate_request(start_date, end_date, submission_date)
+    assert duration == 3
 
 
 def test_registration_window_validation():

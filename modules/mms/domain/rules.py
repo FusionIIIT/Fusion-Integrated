@@ -18,7 +18,8 @@ def validate_rebate_request(start_date: date, end_date: date, submission_date: d
     if start_date > end_date:
         raise ValueError("Rebate start date cannot be after end date.")
 
-    duration = (end_date - start_date).days + 1
+    # Calculate duration
+    duration = (end_date - start_date).days
     if duration < 3:
         raise ValueError(
             "MMS rejects rebate requests with duration fewer than 3 days "
@@ -50,7 +51,7 @@ def check_rebate_overlap(
 
         ex_start = rebate["start_date"]
         ex_end = rebate["end_date"]
-        if (new_start <= ex_end) and (new_end >= ex_start):
+        if (new_start < ex_end) and (new_end > ex_start):
             raise ValueError(
                 f"Requested rebate ({new_start} to {new_end}) impermissibly overlaps with existing "
                 f"rebate #{rebate.get('id')} ({ex_start} to {ex_end}, status: {status})."
