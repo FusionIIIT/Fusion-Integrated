@@ -374,13 +374,15 @@ def test_blacklist_post_then_list(api_as):
     assert [x["id_doc_number"] for x in rows] == ["B1"]
 
 
-def test_blacklist_post_cannot_choose_a_version(api_as):
-    draft = f.make_blacklist_version()
+def test_blacklist_post_goes_to_the_open_draft_not_the_published_version(api_as):
+    # Lane C: BR-120, a new entry is not enforced until its version is published.
+    f.make_blacklist_version(version=1, status="published", published_at=timezone.now())
+    other = f.make_blacklist_version(version=2)
     client = api_as(permissions=["vms.blacklist.manage"])
     client.post(BASE + "blacklist", {"name": "Bad", "id_doc_number": "B2", "reason": "x",
-                                     "version": draft.pk}, format="json")
+                                     "version": 1}, format="json")
     from modules.vms.models import BlacklistEntry
-    assert BlacklistEntry.objects.get().version.status == "published"
+    assert BlacklistEntry.objects.get().version_id == other.pk
 
 
 def test_blacklist_post_validates(api_as):

@@ -1,10 +1,37 @@
 from django.urls import path
 
-from modules.vms.api.admin import views
+from modules.vms.api.admin import views as v
 
 urlpatterns = [
-    path("blacklist", views.BlacklistView.as_view(), name="vms-blacklist"),
-    path("policies", views.PolicyListView.as_view(), name="vms-policies"),
-    path("policies/<int:pk>/publish", views.PolicyPublishView.as_view(),
+    path("roles", v.RoleListView.as_view(), name="vms-roles"),
+    path("roles/me", v.MyRolesView.as_view(), name="vms-roles-me"),
+    path("roles/<int:pk>/reassign", v.RoleReassignView.as_view(), name="vms-role-reassign"),
+    path("roles/<int:pk>/revoke", v.RoleRevokeView.as_view(), name="vms-role-revoke"),
+    path("integrations", v.IntegrationListView.as_view(), name="vms-integrations"),
+    path("integrations/<str:key>", v.IntegrationView.as_view(), name="vms-integration"),
+    path("vip", v.VipListView.as_view(), name="vms-vip"),
+    path("vip/<int:pk>/revoke", v.VipRevokeView.as_view(), name="vms-vip-revoke"),
+    path("policies", v.PolicyListView.as_view(), name="vms-policies"),
+    path("policies/<int:pk>", v.PolicyDetailView.as_view(), name="vms-policy"),
+    path("policies/<int:pk>/publish", v.PolicyPublishView.as_view(),
          name="vms-policy-publish"),
+    path("policies/<int:a>/diff/<int:b>", v.PolicyDiffView.as_view(), name="vms-policy-diff"),
+    path("blacklist", v.BlacklistView.as_view(), name="vms-blacklist"),
+    path("blacklist/versions", v.BlacklistVersionListView.as_view(),
+         name="vms-blacklist-versions"),
+    path("blacklist/versions/<int:pk>/entries", v.BlacklistEntryListView.as_view(),
+         name="vms-blacklist-entries"),
+    path("blacklist/versions/<int:pk>/entries/<int:entry_id>",
+         v.BlacklistEntryDetailView.as_view(), name="vms-blacklist-entry"),
+    path("blacklist/versions/<int:pk>/publish", v.BlacklistPublishView.as_view(),
+         name="vms-blacklist-publish"),
+    path("safelist", v.SafeListView.as_view(), name="vms-safelist"),
+    path("safelist/<int:pk>/revoke", v.SafeListRevokeView.as_view(),
+         name="vms-safelist-revoke"),
+    path("zones", v.ZoneListView.as_view(), name="vms-zones"),
+    path("zones/<int:pk>", v.ZoneDetailView.as_view(), name="vms-zone"),
+    path("gates", v.GateListView.as_view(), name="vms-gates"),
+    path("gates/<int:pk>", v.GateDetailView.as_view(), name="vms-gate"),
+    path("audit", v.AuditListView.as_view(), name="vms-audit"),
+    path("audit/export.csv", v.AuditExportView.as_view(), name="vms-audit-export"),
 ]
