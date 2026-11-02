@@ -1,9 +1,3 @@
----
-owner: ops
-status: authoritative
-last-reviewed: 2026-08-01
----
-
 # Observability
 
 The design goal is narrow and practical: **a user reads an id off an error toast, and support finds the exact

@@ -1,9 +1,3 @@
----
-owner: iam-lead
-status: authoritative
-last-reviewed: 2026-08-01
----
-
 # RBAC Model
 
 How authorization is decided. Schema is in [iam-domain-model.md](iam-domain-model.md); this document is

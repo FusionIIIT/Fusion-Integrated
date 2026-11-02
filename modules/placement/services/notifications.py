@@ -257,15 +257,12 @@ def _audience_ids(audience: str, season: str) -> list[int]:
 
     There is deliberately no "email every student in the institute" path.
     """
-    from modules.placement.models import PlacementRegistration, StudentProfile
+    from modules.placement.models import PlacementRegistration
 
     if audience in ("registered", "students", "all"):
+        # Registering for the season is the opt-in; there is no weaker one now.
         qs = PlacementRegistration.objects.filter(status="registered")
         if season:
             qs = qs.filter(policy__season=season)
-        ids = set(qs.values_list("user_id", flat=True))
-        if audience in ("students", "all"):
-            # Starting a profile is opt-in enough to hear about a drive.
-            ids |= set(StudentProfile.objects.values_list("user_id", flat=True))
-        return sorted(ids)
+        return sorted(qs.values_list("user_id", flat=True))
     return []

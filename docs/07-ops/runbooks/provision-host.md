@@ -1,9 +1,3 @@
----
-owner: platform-lead
-status: current
-last-reviewed: 2026-08-03
----
-
 # Runbook — provisioning the host, once
 
 Everything [deploy.md](deploy.md) assumes exists. Run this once per host, in

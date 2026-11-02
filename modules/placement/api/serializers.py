@@ -19,7 +19,6 @@ from modules.placement.models import (
     PlacementRegistration,
     ProfileDocument,
     RoundParticipation,
-    StudentProfile,
 )
 
 
@@ -144,21 +143,6 @@ class ProfileDocumentSerializer(serializers.ModelSerializer):
         return f"/api/v1/placement/documents/{obj.pk}/download"
 
 
-class StudentProfileSerializer(serializers.ModelSerializer):
-    documents = ProfileDocumentSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = StudentProfile
-        fields = ("user_id", "headline", "about", "phone", "alternate_email",
-                  "skills", "achievements", "certifications", "experience",
-                  "projects", "education", "github_url", "linkedin_url",
-                  "portfolio_url", "completeness_percent", "is_complete",
-                  "missing_fields", "documents", "updated_at")
-        # Computed, never accepted: academic data is owned by the ERP.
-        read_only_fields = ("user_id", "completeness_percent", "is_complete",
-                            "missing_fields", "documents", "updated_at")
-
-
 # -- Applications --------------------------------------------------------------
 class ApplicationSerializer(serializers.ModelSerializer):
     posting = JobPostingSerializer(read_only=True)
@@ -190,7 +174,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
                 "roll_no": getattr(person, "username", "") or "",
                 "discipline": getattr(person, "discipline", "") or "",
                 "programme": getattr(person, "programme", "") or "",
-                "batch_year": getattr(person, "batch_year", None)}
+                "batch_year": getattr(person, "batch_year", None),
+                "resume_link": getattr(person, "resume_link", "") or ""}
 
 
 class ApplicantSerializer(serializers.ModelSerializer):
@@ -218,6 +203,8 @@ class ApplicantSerializer(serializers.ModelSerializer):
             "discipline": getattr(person, "discipline", "") or "",
             "programme": getattr(person, "programme", "") or "",
             "batch_year": getattr(person, "batch_year", None),
+            # The one the student maintains on the ERP portal, not a second copy.
+            "resume_link": getattr(person, "resume_link", "") or "",
         }
 
 
@@ -423,18 +410,19 @@ class EligibilityVerdictSerializer(serializers.Serializer):
     evaluated_at = serializers.DateTimeField()
 
 
-class ResumeSerializer(serializers.Serializer):
-    """PC-UC-002: the profile rendered as a structured resume."""
+class CandidateSerializer(serializers.Serializer):
+    """A person as the ERP portal and the IAM describe them. Read-only here."""
 
     user_id = serializers.IntegerField()
-    headline = serializers.CharField(allow_blank=True)
-    summary = serializers.CharField(allow_blank=True)
-    skills = serializers.ListField(child=serializers.CharField())
-    education = serializers.JSONField()
-    experience = serializers.JSONField()
-    projects = serializers.JSONField()
-    links = serializers.JSONField()
-    standing = serializers.JSONField(allow_null=True)
+    name = serializers.CharField(allow_blank=True)
+    roll_no = serializers.CharField(allow_blank=True)
+    email = serializers.CharField(allow_blank=True)
+    programme = serializers.CharField(allow_blank=True)
+    discipline = serializers.CharField(allow_blank=True)
+    batch_year = serializers.IntegerField(allow_null=True)
+    resume_link = serializers.CharField(allow_blank=True)
+    profile_completed = serializers.BooleanField()
+    academic = serializers.JSONField(allow_null=True)
 
 
 class ScheduledCountSerializer(serializers.Serializer):

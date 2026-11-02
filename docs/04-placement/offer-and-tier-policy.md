@@ -1,7 +1,4 @@
 ---
-owner: placement-lead
-status: authoritative
-last-reviewed: 2026-08-01
 note: >
   The policy knobs are institute policy, not engineering. They must be set by the placement office
   before a placement year opens. The engineering commitment is that whatever is set is applied

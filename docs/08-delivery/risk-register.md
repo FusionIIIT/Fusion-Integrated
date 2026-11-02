@@ -1,7 +1,4 @@
 ---
-owner: platform-lead
-status: authoritative
-last-reviewed: 2026-08-01
 review-cadence: monthly, and at every phase gate
 ---
 

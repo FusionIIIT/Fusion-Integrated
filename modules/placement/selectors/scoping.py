@@ -24,7 +24,6 @@ from modules.placement.models import (
     JobPosting,
     Offer,
     PlacementRecord,
-    StudentProfile,
 )
 
 # Permission codes. Held by TPO / placement chairman via the IAM.
@@ -145,25 +144,24 @@ def interview_rounds_for(actor) -> QuerySet[InterviewRound]:
     return base.filter(participants__application__user_id=own).distinct()
 
 
-# -- Profiles and documents ----------------------------------------------------
-def profiles_for(actor) -> QuerySet[StudentProfile]:
-    base = StudentProfile.objects.all()
+# -- Candidates ----------------------------------------------------------------
+def may_read_candidate(actor, user_id: int) -> bool:
+    """Whether this actor may open that person's candidate record.
 
+    A predicate rather than a queryset: the record is assembled from the
+    directory projection now, and placement holds no table to narrow.
+    """
+    if _is_alumni(actor):
+        return False
+    if _sees_everything(actor):
+        return True
     if _is_recruiter(actor):
         # Only someone who has applied to them, and only while live.
-        return base.filter(
-            user_id__in=Application.objects
-            .filter(posting__company_id=actor.company_id)
-            .exclude(status__in=("draft", "withdrawn", "auto_withdrawn"))
-            .values("user_id")
-        ).distinct()
-
-    if _is_alumni(actor):
-        return base.none()
-    if _sees_everything(actor):
-        return base
-    own = _own_id(actor)
-    return base.filter(user_id=own) if own is not None else base.none()
+        return (Application.objects
+                .filter(posting__company_id=actor.company_id, user_id=user_id)
+                .exclude(status__in=("draft", "withdrawn", "auto_withdrawn"))
+                .exists())
+    return _own_id(actor) == user_id
 
 
 # -- Companies -----------------------------------------------------------------

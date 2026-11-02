@@ -25,6 +25,9 @@ class UserRef(TimeStampedModel):
     discipline = models.CharField(max_length=40, blank=True, db_index=True)
     batch_year = models.PositiveSmallIntegerField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    #: The ERP portal owns these; a student keeps one resume, not one per module.
+    resume_link = models.CharField(max_length=500, blank=True)
+    profile_completed = models.BooleanField(default=False)
     synced_at = models.DateTimeField(auto_now=True)
 
     class Meta:

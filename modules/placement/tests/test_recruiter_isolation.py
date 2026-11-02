@@ -19,7 +19,6 @@ from modules.placement.models import (
     RecruiterAccount,
     RecruiterLoginAttempt,
     RecruiterSession,
-    StudentProfile,
 )
 from modules.placement.services import recruiters
 
@@ -122,18 +121,19 @@ class TestCrossCompanyIsolation:
         assert [r["id"] for r in rows] == [two_companies["a"].pk]
 
     def test_a_recruiter_cannot_read_a_non_applicants_profile(self, two_companies):
-        StudentProfile.objects.create(user_id=5555)
         c = recruiter_client(two_companies["ra"])
         assert c.get("/api/v1/placement/profiles/5555").status_code == 404
 
-    def test_a_recruiter_can_read_their_own_applicants_profile(self, two_companies):
-        StudentProfile.objects.create(user_id=1001)
+    def test_a_recruiter_can_read_their_own_applicants_profile(
+            self, two_companies, stub_iam, user_ref):
+        # The record comes from the directory now, so that is what must know them.
+        stub_iam(users={1001: user_ref(1001)})
         c = recruiter_client(two_companies["ra"])
         assert c.get("/api/v1/placement/profiles/1001").status_code == 200
 
     def test_a_recruiter_cannot_read_another_companys_applicants_profile(
-            self, two_companies):
-        StudentProfile.objects.create(user_id=1002)
+            self, two_companies, stub_iam, user_ref):
+        stub_iam(users={1002: user_ref(1002)})
         c = recruiter_client(two_companies["ra"])
         assert c.get("/api/v1/placement/profiles/1002").status_code == 404
 

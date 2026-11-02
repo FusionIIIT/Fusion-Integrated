@@ -17,11 +17,11 @@ FIELDS = {
     "cpi", "earned_credits", "active_backlogs", "semester",   # IAM projection
     "programme", "discipline", "batch_year",                  # IAM directory
     "is_placed", "is_registered", "offer_count",              # this module
-    "skills", "profile_complete",                             # own profile
+    "profile_complete",                                       # the ERP portal
 }
 
-# List-valued facts, comparable only with the set operators.
-LIST_FIELDS = {"skills"}
+# List-valued facts, comparable only with the set operators. None today.
+LIST_FIELDS: set[str] = set()
 LIST_OPS = {"has_all", "has_any", "has_none"}
 
 MAX_DEPTH = 5
@@ -159,7 +159,7 @@ LABELS = {
     "programme": "programme", "discipline": "discipline",
     "batch_year": "batch year", "is_placed": "placement status",
     "is_registered": "season registration", "offer_count": "offers held",
-    "skills": "skills", "profile_complete": "profile completeness",
+    "profile_complete": "profile completeness",
 }
 
 _OP_PHRASE = {
@@ -177,11 +177,6 @@ def describe(outcome: RuleOutcome) -> str:
             return ("No declared result yet, so your academic standing cannot be "
                     "checked. Eligibility opens once your result is declared.")
         return f"{label} is not recorded on your profile yet."
-    if outcome.reason.startswith("skills_missing:"):
-        missing = outcome.reason.split(":", 1)[1].replace(",", ", ")
-        return f"Missing required skills: {missing}."
-    if outcome.reason == "skills_none_of_required":
-        return f"None of the required skills are listed: {outcome.required}."
     if outcome.op in ("in", "not_in"):
         allowed = ", ".join(str(x) for x in (outcome.required or []))
         return f"{label} is {outcome.actual} — this posting is open to {allowed}."

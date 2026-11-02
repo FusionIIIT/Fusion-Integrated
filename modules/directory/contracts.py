@@ -8,6 +8,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from fusion_auth.client import IamUnavailable, get_client
 from modules.directory.models import UserRef
 from modules.directory.services.sync import ensure_users_cached
 
@@ -23,6 +24,9 @@ class UserDTO:
     programme: str = ""
     discipline: str = ""
     batch_year: int | None = None
+    #: Maintained on the ERP portal's profile page, read here.
+    resume_link: str = ""
+    profile_completed: bool = False
 
 
 def _to_dto(r: UserRef) -> UserDTO:
@@ -30,6 +34,7 @@ def _to_dto(r: UserRef) -> UserDTO:
         user_id=r.user_id, username=r.username, display_name=r.display_name,
         kind=r.kind, email=r.email, department=r.department,
         programme=r.programme, discipline=r.discipline, batch_year=r.batch_year,
+        resume_link=r.resume_link, profile_completed=r.profile_completed,
     )
 
 
@@ -48,6 +53,34 @@ def user_ids_in_discipline(discipline: str) -> list[int]:
         UserRef.objects.filter(discipline=discipline, kind="student", is_active=True)
         .values_list("user_id", flat=True)
     )
+
+
+def get_employees() -> list[UserDTO]:
+    """Everyone on the payroll: faculty and staff, not students."""
+    return [
+        _to_dto(r)
+        for r in UserRef.objects.filter(
+            kind__in=("faculty", "staff"), is_active=True
+        ).order_by("user_id")
+    ]
+
+
+def held_employee_ids() -> set[int]:
+    return set(
+        UserRef.objects.filter(
+            kind__in=("faculty", "staff"), is_active=True
+        ).values_list("user_id", flat=True)
+    )
+
+
+def employee_projection_disagreement() -> tuple[list[int], list[int]] | None:
+    """Where this service and the identity service disagree about the payroll."""
+    held = held_employee_ids()
+    try:
+        known = {r.user_id for r in get_client().iter_employees()}
+    except IamUnavailable:
+        return None
+    return sorted(known - held), sorted(held - known)
 
 
 def search(q: str = "", kind: str | None = None, limit: int = 25) -> list[UserDTO]:

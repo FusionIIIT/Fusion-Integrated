@@ -1,8 +1,18 @@
-/* Byte-for-byte the sysadmin client's AppLayout.module.css. This file IS the
-   visual contract — if it drifts, the two apps stop looking like one product. */
 .navbar {
   background: linear-gradient(180deg, #0c1526 0%, #080d18 100%);
   border-right: none;
+  transition: width 160ms ease;
+}
+
+.navbar[data-peek] {
+  width: var(--nav-expanded-width);
+  box-shadow: 8px 0 32px rgba(0, 0, 0, 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar {
+    transition: none;
+  }
 }
 
 .header {
@@ -15,12 +25,16 @@
 .brand {
   border-left: 3px solid #15abff;
   padding-left: 14px;
-  background: linear-gradient(90deg, rgba(21, 171, 255, 0.06) 0%, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(21, 171, 255, 0.06) 0%,
+    transparent 100%
+  );
 }
 
 .sectionLabel {
-  color: rgba(255, 255, 255, 0.34);
-  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -28,28 +42,92 @@
 }
 
 .navLink {
+  position: relative;
   color: rgba(255, 255, 255, 0.68);
   border-radius: 9px;
   font-size: 0.9rem;
 }
-.navLink:hover { background-color: rgba(255, 255, 255, 0.05); color: #fff; }
+.navLink:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
 .navLink[data-active] {
   background-color: rgba(21, 171, 255, 0.14);
   color: #fff;
   box-shadow: inset 2px 0 0 0 #15abff;
 }
-.navLink[data-active]:hover { background-color: rgba(21, 171, 255, 0.2); }
+.navLink[data-active]:hover {
+  background-color: rgba(21, 171, 255, 0.2);
+}
+.navLink[data-holds-active] {
+  color: #fff;
+  box-shadow: inset 2px 0 0 0 rgba(21, 171, 255, 0.55);
+}
 
-.scroll { flex: 1; padding: 0 10px; }
+.navTop {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 16px 4px;
+}
+.navTop .search {
+  flex: 1;
+  min-width: 0;
+}
+
+.railToggle {
+  color: rgba(255, 255, 255, 0.55);
+  flex: 0 0 auto;
+}
+.railToggle:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.railDivider {
+  height: 1px;
+  margin: 10px 8px 6px;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.navbar[data-rail] .navTop {
+  justify-content: center;
+  padding: 16px 0 4px;
+}
+.navbar[data-rail] .navLink {
+  justify-content: center;
+  padding-inline: 0;
+}
+.navbar[data-rail] .navLinkBody,
+.navbar[data-rail] .navLinkSection[data-position="right"] {
+  display: none;
+}
+.navbar[data-rail] .navLinkSection[data-position="left"] {
+  margin-inline-end: 0;
+}
+.navbar[data-rail] .footer {
+  justify-content: center;
+  padding: 8px;
+}
+.navbar[data-rail] .footerDetails,
+.navbar[data-rail] .footerLogout {
+  display: none;
+}
+
+.scroll {
+  flex: 1;
+  padding: 0 10px;
+}
 
 .search input {
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
-.search input::placeholder { color: rgba(255, 255, 255, 0.36); }
+.search input::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
 
-/* ---- Signed-in user footer (the only place identity is rendered) ---- */
 .footer {
   display: flex;
   align-items: center;
@@ -60,23 +138,149 @@
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.07);
 }
+.footerAvatar {
+  border-radius: 10px;
+  line-height: 0;
+}
+.footerAvatar:hover {
+  opacity: 0.85;
+}
+.footerNameButton {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+}
+.footerNameButton:hover .footerName {
+  text-decoration: underline;
+}
 .footerName {
   color: #fff;
   font-weight: 600;
   font-size: 0.82rem;
   line-height: 1.1;
 }
+.footerDetails {
+  flex: 1;
+  min-width: 0;
+}
 .footerRole {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.55);
   font-size: 0.66rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   font-weight: 600;
 }
+.footerRoleSelect {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  max-width: 100%;
+  padding: 1px 16px 1px 0;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  background-image: linear-gradient(
+      45deg,
+      transparent 50%,
+      rgba(255, 255, 255, 0.45) 50%
+    ),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.45) 50%, transparent 50%);
+  background-position:
+    right 5px center,
+    right 1px center;
+  background-size:
+    4px 4px,
+    4px 4px;
+  background-repeat: no-repeat;
+}
+
+.footerRoleSelect:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.footerRoleSelect option {
+  color: #0b1220;
+}
+
 .footerLogout {
   color: rgba(255, 255, 255, 0.55);
 }
 .footerLogout:hover {
   color: #ff8787;
   background: rgba(255, 135, 135, 0.1);
+}
+
+.headerInner {
+  padding-inline: 20px;
+  gap: 12px;
+}
+
+.headerLeft {
+  min-width: 0;
+  flex: 0 1 auto;
+  overflow: hidden;
+}
+
+.headerRight {
+  flex: 0 0 auto;
+}
+
+.bell {
+  cursor: pointer;
+  color: #0b1220;
+}
+.bell:hover {
+  color: #15abff;
+}
+
+@media (max-width: 767px) {
+  .headerInner {
+    padding-inline: 10px;
+    gap: 8px;
+  }
+
+  }
+
+.skipLink {
+  position: absolute;
+  top: 0;
+  left: -9999px;
+  z-index: 300;
+  padding: 10px 18px;
+  background: #15abff;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-radius: 0 0 8px 0;
+  text-decoration: none;
+}
+.skipLink:focus {
+  left: 0;
+}
+
+.main:focus,
+.main h1:focus {
+  outline: none;
+}
+
+.navLabelText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navbar[data-rail] .navLink[data-pending]::after {
+  content: "";
+  position: absolute;
+  top: 7px;
+  right: 13px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #15abff;
 }

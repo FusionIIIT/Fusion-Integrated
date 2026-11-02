@@ -1,7 +1,4 @@
 ---
-owner: ops
-status: authoritative
-last-reviewed: 2026-08-01
 extends: Fusion_System_Administrator/DEPLOYMENT.md
 ---
 

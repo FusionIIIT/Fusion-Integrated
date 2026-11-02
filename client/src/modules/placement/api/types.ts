@@ -195,6 +195,8 @@ export interface Announcement {
   created_at: string;
 }
 
+/** A document submitted to the placement office. Not a resume: that is
+ *  maintained once on the ERP portal. */
 export interface ProfileDocument {
   id: number;
   kind: "resume" | "certificate" | "offer_letter" | "other";
@@ -215,30 +217,6 @@ export interface MissingField {
   weight: number;
 }
 
-export interface StudentProfile {
-  user_id: number;
-  headline: string;
-  about: string;
-  phone: string;
-  alternate_email: string;
-  skills: string[];
-  achievements: string[];
-  certifications: string[];
-  experience: unknown[];
-  projects: unknown[];
-  education: unknown[];
-  github_url: string;
-  linkedin_url: string;
-  portfolio_url: string;
-  completeness_percent: number;
-  is_complete: boolean;
-  missing_fields: MissingField[];
-  documents: ProfileDocument[];
-  updated_at: string;
-  /** Present only on the placeholder the server returns before a profile
-   *  exists. */
-  exists?: boolean;
-}
 
 /** Anonymised figures a student may see. `available: false` when there are too
  *  few placements to publish without identifying people. */
