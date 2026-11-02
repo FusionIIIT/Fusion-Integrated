@@ -9,6 +9,7 @@ from .views import (
     AssistantshipClaimViewSet,
     GraduateSeminarRequestViewSet,
     OAPNotificationViewSet,
+    OAPAuditTrailViewSet,
 )
 
 router = DefaultRouter()
@@ -20,6 +21,7 @@ router.register(r'ta-assignments', TAAssignmentViewSet)
 router.register(r'assistantship-claims', AssistantshipClaimViewSet)
 router.register(r'seminars', GraduateSeminarRequestViewSet)
 router.register(r'notifications', OAPNotificationViewSet)
+router.register(r'audit-trails', OAPAuditTrailViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

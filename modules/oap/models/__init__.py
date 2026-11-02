@@ -1,4 +1,5 @@
 from .procedures import (
+    OAPAuditTrail,
     StudentLeave,
     BonafideRequest,
     NoDuesRequest,
@@ -11,6 +12,7 @@ from .procedures import (
 )
 
 __all__ = [
+    "OAPAuditTrail",
     "StudentLeave",
     "BonafideRequest",
     "NoDuesRequest",
