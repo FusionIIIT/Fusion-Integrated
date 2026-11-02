@@ -13,6 +13,19 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `mess_module`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `mess_module.menu.view` | See mess menu schedule | `caretaker`, `student`, `warden` |
+| `mess_module.menu.manage` | Update mess menu | `caretaker` |
+| `mess_module.registration.submit` | Submit mess registration | `student` |
+| `mess_module.registration.review` | Review student registrations | `caretaker` |
+| `mess_module.rebate.submit` | Submit meal rebate | `student` |
+| `mess_module.rebate.review` | Approve or reject rebates | `caretaker`, `warden` |
+| `mess_module.feedback.submit` | Submit mess feedback | `student` |
+| `mess_module.role.assign` | Assign caretaker or warden roles | `warden` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
