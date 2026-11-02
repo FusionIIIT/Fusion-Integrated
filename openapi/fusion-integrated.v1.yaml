@@ -63,6 +63,882 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/iaa/admin/approval-rules:
+    get:
+      operationId: v1_iaa_admin_approval_rules_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+          description: ''
+    post:
+      operationId: v1_iaa_admin_approval_rules_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalRuleInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ApprovalRuleInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ApprovalRuleInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRule'
+          description: ''
+  /api/v1/iaa/admin/budgets:
+    get:
+      operationId: v1_iaa_admin_budgets_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+          description: ''
+    post:
+      operationId: v1_iaa_admin_budgets_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentBudgetInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DepartmentBudgetInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DepartmentBudgetInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentBudget'
+          description: ''
+  /api/v1/iaa/admin/financial-years:
+    get:
+      operationId: v1_iaa_admin_financial_years_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+          description: ''
+    post:
+      operationId: v1_iaa_admin_financial_years_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinancialYearPolicyInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FinancialYearPolicyInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FinancialYearPolicyInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialYearPolicy'
+          description: ''
+  /api/v1/iaa/admin/roles:
+    get:
+      operationId: v1_iaa_admin_roles_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+          description: ''
+    post:
+      operationId: v1_iaa_admin_roles_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleAssignmentInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RoleAssignmentInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoleAssignmentInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleAssignment'
+          description: ''
+  /api/v1/iaa/anomalies:
+    get:
+      operationId: v1_iaa_anomalies_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+          description: ''
+    post:
+      operationId: v1_iaa_anomalies_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnomalyInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AnomalyInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AnomalyInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Anomaly'
+          description: ''
+  /api/v1/iaa/anomalies/{id}/resolve:
+    post:
+      operationId: v1_iaa_anomalies_resolve_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnomalyResolutionInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AnomalyResolutionInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AnomalyResolutionInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Anomaly'
+          description: ''
+  /api/v1/iaa/approvals:
+    get:
+      operationId: v1_iaa_approvals_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+          description: ''
+  /api/v1/iaa/approvals/{id}/decision:
+    post:
+      operationId: v1_iaa_approvals_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalDecisionInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ApprovalDecisionInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ApprovalDecisionInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalStep'
+          description: ''
+  /api/v1/iaa/audit/logs:
+    get:
+      operationId: v1_iaa_audit_logs_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+          description: ''
+  /api/v1/iaa/audit/records:
+    get:
+      operationId: v1_iaa_audit_records_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+          description: ''
+  /api/v1/iaa/finance/queue:
+    get:
+      operationId: v1_iaa_finance_queue_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+          description: ''
+  /api/v1/iaa/finance/requests/{id}/validate:
+    post:
+      operationId: v1_iaa_finance_requests_validate_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinanceValidationInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FinanceValidationInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FinanceValidationInput'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRecord'
+          description: ''
+  /api/v1/iaa/notifications:
+    get:
+      operationId: v1_iaa_notifications_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+          description: ''
+  /api/v1/iaa/notifications/{id}/read:
+    post:
+      operationId: v1_iaa_notifications_read_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/v1/iaa/observations:
+    get:
+      operationId: v1_iaa_observations_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+          description: ''
+    post:
+      operationId: v1_iaa_observations_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObservationInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ObservationInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ObservationInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditObservation'
+          description: ''
+  /api/v1/iaa/observations/{id}/respond:
+    post:
+      operationId: v1_iaa_observations_respond_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObservationResponseInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ObservationResponseInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ObservationResponseInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObservationResponse'
+          description: ''
+  /api/v1/iaa/observations/{id}/verify:
+    post:
+      operationId: v1_iaa_observations_verify_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObservationVerifyInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ObservationVerifyInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ObservationVerifyInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditObservation'
+          description: ''
+  /api/v1/iaa/queries/{id}/respond:
+    post:
+      operationId: v1_iaa_queries_respond_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryResponseInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/QueryResponseInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/QueryResponseInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinanceQuery'
+          description: ''
+  /api/v1/iaa/reports:
+    get:
+      operationId: v1_iaa_reports_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/iaa/reports/export.csv:
+    get:
+      operationId: v1_iaa_reports_export.csv_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            text/csv:
+              schema:
+                type: string
+          description: ''
+  /api/v1/iaa/requests:
+    get:
+      operationId: iaa_requests_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+          description: ''
+    post:
+      operationId: v1_iaa_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinancialRecordWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FinancialRecordWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FinancialRecordWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRecord'
+          description: ''
+  /api/v1/iaa/requests/{id}:
+    get:
+      operationId: iaa_request_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRecord'
+          description: ''
+    patch:
+      operationId: v1_iaa_requests_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFinancialRecordWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedFinancialRecordWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFinancialRecordWrite'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRecord'
+          description: ''
+  /api/v1/iaa/requests/{id}/attachments:
+    post:
+      operationId: v1_iaa_requests_attachments_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupportingDocumentInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SupportingDocumentInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SupportingDocumentInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportingDocument'
+          description: ''
+  /api/v1/iaa/requests/{id}/queries:
+    get:
+      operationId: v1_iaa_requests_queries_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+          description: ''
+    post:
+      operationId: v1_iaa_requests_queries_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/QueryInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/QueryInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinanceQuery'
+          description: ''
+  /api/v1/iaa/requests/{id}/record:
+    post:
+      operationId: v1_iaa_requests_record_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRecord'
+          description: ''
+  /api/v1/iaa/requests/{id}/submit:
+    post:
+      operationId: v1_iaa_requests_submit_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRecord'
+          description: ''
+  /api/v1/iaa/roles/active:
+    get:
+      operationId: v1_iaa_roles_active_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    post:
+      operationId: v1_iaa_roles_active_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleSwitch'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RoleSwitch'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoleSwitch'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/iaa/ta:
+    get:
+      operationId: v1_iaa_ta_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+          description: ''
+    post:
+      operationId: v1_iaa_ta_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinancialRecordWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FinancialRecordWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FinancialRecordWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRecord'
+          description: ''
+  /api/v1/iaa/ta/{id}/submit:
+    post:
+      operationId: v1_iaa_ta_submit_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRecord'
+          description: ''
+  /api/v1/iaa/ta/{id}/verify:
+    post:
+      operationId: v1_iaa_ta_verify_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRecord'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1763,6 +2639,14 @@ components:
       - semester
       - semester_type
       - user_id
+    ActionEnum:
+      enum:
+      - resolve
+      - escalate
+      type: string
+      description: |-
+        * `resolve` - resolve
+        * `escalate` - escalate
     AddCandidates:
       type: object
       properties:
@@ -1827,6 +2711,107 @@ components:
       - title
       - topic
       - withdrawn_reason
+    Anomaly:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        record_id:
+          type: integer
+          nullable: true
+          readOnly: true
+        category:
+          type: string
+          readOnly: true
+        severity:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        details:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/AnomalyStatusEnum'
+          readOnly: true
+        raised_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        resolver_role:
+          type: string
+          readOnly: true
+        resolver_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        resolution:
+          type: string
+          readOnly: true
+        resolved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - category
+      - created_at
+      - details
+      - id
+      - raised_by_id
+      - record_id
+      - resolution
+      - resolved_at
+      - resolver_role
+      - resolver_user_id
+      - severity
+      - status
+      - title
+    AnomalyInput:
+      type: object
+      properties:
+        record_id:
+          type: integer
+        category:
+          type: string
+          maxLength: 80
+        details:
+          type: string
+        severity:
+          allOf:
+          - $ref: '#/components/schemas/SeverityEnum'
+          default: medium
+      required:
+      - category
+      - details
+      - record_id
+    AnomalyResolutionInput:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+        resolution:
+          type: string
+      required:
+      - action
+      - resolution
+    AnomalyStatusEnum:
+      enum:
+      - open
+      - resolved
+      - escalated
+      type: string
+      description: |-
+        * `open` - Open
+        * `resolved` - Resolved
+        * `escalated` - Escalated
     Application:
       type: object
       properties:
@@ -1971,6 +2956,111 @@ components:
           type: string
           default: ''
           maxLength: 300
+    ApprovalDecisionInput:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        remarks:
+          type: string
+      required:
+      - decision
+      - remarks
+    ApprovalRule:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        record_kind:
+          type: string
+          readOnly: true
+        request_type:
+          type: string
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        min_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        max_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        levels:
+          readOnly: true
+        priority:
+          type: integer
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - department
+      - id
+      - is_active
+      - levels
+      - max_amount
+      - min_amount
+      - priority
+      - record_kind
+      - request_type
+    ApprovalRuleInput:
+      type: object
+      properties:
+        record_kind:
+          oneOf:
+          - $ref: '#/components/schemas/ApprovalRuleInputRecordKindEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        request_type:
+          type: string
+          default: ''
+          maxLength: 80
+        department:
+          type: string
+          default: ''
+          maxLength: 120
+        min_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          nullable: true
+        max_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          nullable: true
+        levels:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        priority:
+          type: integer
+          minimum: 0
+          default: 100
+        is_active:
+          type: boolean
+          default: true
+      required:
+      - levels
+    ApprovalRuleInputRecordKindEnum:
+      enum:
+      - expense_voucher
+      - ta
+      type: string
+      description: "* `` - \n* `expense_voucher` - expense_voucher\n* `ta` - ta"
     ApprovalStatusEnum:
       enum:
       - pending
@@ -1981,6 +3071,75 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    ApprovalStep:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        record_id:
+          type: integer
+          readOnly: true
+        step_number:
+          type: integer
+          readOnly: true
+        authority_role:
+          type: string
+          readOnly: true
+        assigned_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ApprovalStepStatusEnum'
+          readOnly: true
+        due_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decided_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decided_role:
+          type: string
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        remarks:
+          type: string
+          readOnly: true
+      required:
+      - assigned_user_id
+      - authority_role
+      - decided_at
+      - decided_by_id
+      - decided_role
+      - due_at
+      - id
+      - record_id
+      - remarks
+      - status
+      - step_number
+    ApprovalStepStatusEnum:
+      enum:
+      - queued
+      - pending
+      - approved
+      - rejected
+      - escalated
+      type: string
+      description: |-
+        * `queued` - Queued
+        * `pending` - Pending
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `escalated` - Escalated
     AudienceEnum:
       enum:
       - students
@@ -1993,6 +3152,93 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    AuditObservation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        record_kind:
+          type: string
+          readOnly: true
+        record_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        details:
+          type: string
+          readOnly: true
+        raised_by_id:
+          type: integer
+          readOnly: true
+        concerned_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/AuditObservationStatusEnum'
+          readOnly: true
+        verified_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        verified_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        verification_remarks:
+          type: string
+          readOnly: true
+        closed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        responses:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObservationResponse'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - closed_at
+      - concerned_user_id
+      - created_at
+      - department
+      - details
+      - id
+      - raised_by_id
+      - record_id
+      - record_kind
+      - responses
+      - status
+      - title
+      - verification_remarks
+      - verified_at
+      - verified_by_id
+    AuditObservationStatusEnum:
+      enum:
+      - open
+      - responded
+      - closed
+      type: string
+      description: |-
+        * `open` - Open
+        * `responded` - Responded
+        * `closed` - Closed
+    BlankEnum:
+      enum:
+      - ''
     BulkOutcome:
       type: object
       properties:
@@ -2315,6 +3561,87 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DecisionEnum:
+      enum:
+      - approve
+      - reject
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
+    DepartmentBudget:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        financial_year:
+          type: string
+          readOnly: true
+        allocated:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,14}(?:\.\d{0,2})?$
+          readOnly: true
+        spent:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,14}(?:\.\d{0,2})?$
+          readOnly: true
+        committed:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,14}(?:\.\d{0,2})?$
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - allocated
+      - committed
+      - created_at
+      - department
+      - financial_year
+      - id
+      - is_active
+      - spent
+    DepartmentBudgetInput:
+      type: object
+      properties:
+        department:
+          type: string
+          maxLength: 120
+        financial_year:
+          type: string
+          maxLength: 12
+        allocated:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,14}(?:\.\d{0,2})?$
+        spent:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,14}(?:\.\d{0,2})?$
+          default: '0.00'
+        committed:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,14}(?:\.\d{0,2})?$
+          default: '0.00'
+        is_active:
+          type: boolean
+          default: true
+      required:
+      - allocated
+      - department
+      - financial_year
     Detail:
       type: object
       properties:
@@ -2423,6 +3750,299 @@ components:
       - fee_reference
       - season
       - user_id
+    FinanceQuery:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        record_id:
+          type: integer
+          readOnly: true
+        asked_by_id:
+          type: integer
+          readOnly: true
+        question:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/FinanceQueryStatusEnum'
+          readOnly: true
+        response:
+          type: string
+          readOnly: true
+        responded_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        responded_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - asked_by_id
+      - created_at
+      - id
+      - question
+      - record_id
+      - responded_at
+      - responded_by_id
+      - response
+      - status
+    FinanceQueryStatusEnum:
+      enum:
+      - open
+      - responded
+      type: string
+      description: |-
+        * `open` - Open
+        * `responded` - Responded
+    FinanceValidationInput:
+      type: object
+      properties:
+        policy_passed:
+          type: boolean
+          default: true
+        remarks:
+          type: string
+          default: ''
+    FinancialRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        record_kind:
+          allOf:
+          - $ref: '#/components/schemas/IaaRecordKindEnum'
+          readOnly: true
+        request_type:
+          type: string
+          readOnly: true
+        created_by_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/FinancialRecordStatusEnum'
+          readOnly: true
+        financial_year:
+          type: string
+          readOnly: true
+        trip_start_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        trip_end_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        trip_purpose:
+          type: string
+          readOnly: true
+        trip_details:
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        validated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        recorded_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        current_approval_step:
+          type: integer
+          readOnly: true
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/SupportingDocument'
+          readOnly: true
+        approval_steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovalStep'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - approval_steps
+      - attachments
+      - created_at
+      - created_by_id
+      - current_approval_step
+      - department
+      - description
+      - financial_year
+      - id
+      - record_kind
+      - recorded_at
+      - request_type
+      - status
+      - submitted_at
+      - trip_details
+      - trip_end_date
+      - trip_purpose
+      - trip_start_date
+      - updated_at
+      - validated_at
+    FinancialRecordStatusEnum:
+      enum:
+      - draft
+      - submitted
+      - query_raised
+      - query_responded
+      - finance_validated
+      - verified
+      - approval_pending
+      - escalated
+      - anomaly_pending
+      - approved
+      - rejected
+      - recorded
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `submitted` - Submitted
+        * `query_raised` - Query Raised
+        * `query_responded` - Query Responded
+        * `finance_validated` - Finance Validated
+        * `verified` - Verified
+        * `approval_pending` - Approval Pending
+        * `escalated` - Escalated
+        * `anomaly_pending` - Anomaly Pending
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `recorded` - Recorded
+    FinancialRecordWrite:
+      type: object
+      properties:
+        request_type:
+          type: string
+          maxLength: 80
+        department:
+          type: string
+          maxLength: 120
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        description:
+          type: string
+          default: ''
+        financial_year:
+          type: string
+          maxLength: 12
+        trip_start_date:
+          type: string
+          format: date
+          nullable: true
+        trip_end_date:
+          type: string
+          format: date
+          nullable: true
+        trip_purpose:
+          type: string
+          maxLength: 240
+        trip_details:
+          type: object
+          additionalProperties: {}
+      required:
+      - amount
+      - department
+      - request_type
+    FinancialYearPolicy:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        financial_year:
+          type: string
+          readOnly: true
+        starts_on:
+          type: string
+          format: date
+          readOnly: true
+        ends_on:
+          type: string
+          format: date
+          readOnly: true
+        settings:
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+      required:
+      - ends_on
+      - financial_year
+      - id
+      - is_active
+      - settings
+      - starts_on
+    FinancialYearPolicyInput:
+      type: object
+      properties:
+        financial_year:
+          type: string
+          maxLength: 12
+        starts_on:
+          type: string
+          format: date
+        ends_on:
+          type: string
+          format: date
+        settings:
+          type: object
+          additionalProperties: {}
+        is_active:
+          type: boolean
+          default: true
+      required:
+      - ends_on
+      - financial_year
+      - starts_on
+    IaaRecordKindEnum:
+      enum:
+      - expense_voucher
+      - ta
+      type: string
+      description: |-
+        * `expense_voucher` - Expense / Voucher
+        * `ta` - Travel Allowance
     IncidentRecorded:
       type: object
       properties:
@@ -2732,6 +4352,110 @@ components:
       - is_late
       - message
       - record
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        event_type:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+        resource_type:
+          type: string
+          readOnly: true
+        resource_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        read_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - event_type
+      - id
+      - message
+      - read_at
+      - resource_id
+      - resource_type
+      - title
+    ObservationInput:
+      type: object
+      properties:
+        record_kind:
+          $ref: '#/components/schemas/IaaRecordKindEnum'
+        record_id:
+          type: integer
+        title:
+          type: string
+          maxLength: 200
+        details:
+          type: string
+      required:
+      - details
+      - record_id
+      - record_kind
+      - title
+    ObservationResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        submitted_by_id:
+          type: integer
+          readOnly: true
+        response_text:
+          type: string
+          readOnly: true
+        evidence_references:
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - evidence_references
+      - id
+      - response_text
+      - submitted_by_id
+    ObservationResponseInput:
+      type: object
+      properties:
+        response_text:
+          type: string
+        evidence_references:
+          type: array
+          items:
+            type: string
+            maxLength: 700
+      required:
+      - evidence_references
+      - response_text
+    ObservationVerifyInput:
+      type: object
+      properties:
+        satisfactory:
+          type: boolean
+        remarks:
+          type: string
+          default: ''
+      required:
+      - satisfactory
     OffCampusRecord:
       type: object
       properties:
@@ -2886,6 +4610,19 @@ components:
           maxLength: 300
       required:
       - season
+    Page:
+      type: object
+      properties:
+        count:
+          type: integer
+        results:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - count
+      - results
     PaginatedAnnouncementList:
       type: object
       required:
@@ -3000,6 +4737,39 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PatchedFinancialRecordWrite:
+      type: object
+      properties:
+        request_type:
+          type: string
+          maxLength: 80
+        department:
+          type: string
+          maxLength: 120
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        description:
+          type: string
+          default: ''
+        financial_year:
+          type: string
+          maxLength: 12
+        trip_start_date:
+          type: string
+          format: date
+          nullable: true
+        trip_end_date:
+          type: string
+          format: date
+          nullable: true
+        trip_purpose:
+          type: string
+          maxLength: 240
+        trip_details:
+          type: object
+          additionalProperties: {}
     PatchedJobPosting:
       type: object
       properties:
@@ -3201,6 +4971,20 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    QueryInput:
+      type: object
+      properties:
+        question:
+          type: string
+      required:
+      - question
+    QueryResponseInput:
+      type: object
+      properties:
+        response:
+          type: string
+      required:
+      - response
     Recommendation:
       type: object
       description: |-
@@ -3466,6 +5250,59 @@ components:
       - message
       - reason
       - route
+    RoleAssignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        role:
+          type: string
+          readOnly: true
+        assigned_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        is_active:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - assigned_by_id
+      - created_at
+      - id
+      - is_active
+      - role
+      - user_id
+    RoleAssignmentInput:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          minimum: 1
+        role:
+          type: string
+          maxLength: 80
+        is_active:
+          type: boolean
+          default: true
+      required:
+      - role
+      - user_id
+    RoleSwitch:
+      type: object
+      properties:
+        role:
+          type: string
+          maxLength: 80
+      required:
+      - role
     RoundOutcome:
       type: object
       properties:
@@ -3655,6 +5492,18 @@ components:
       - id
       - kind
       - username
+    SeverityEnum:
+      enum:
+      - low
+      - medium
+      - high
+      - critical
+      type: string
+      description: |-
+        * `low` - low
+        * `medium` - medium
+        * `high` - high
+        * `critical` - critical
     SourceEnum:
       enum:
       - campus
@@ -3698,6 +5547,59 @@ components:
           type: integer
       required:
       - document_id
+    SupportingDocument:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        storage_reference:
+          type: string
+          readOnly: true
+        content_type:
+          type: string
+          readOnly: true
+        size_bytes:
+          type: integer
+          readOnly: true
+          nullable: true
+        uploaded_by_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - content_type
+      - created_at
+      - id
+      - name
+      - size_bytes
+      - storage_reference
+      - uploaded_by_id
+    SupportingDocumentInput:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        storage_reference:
+          type: string
+          maxLength: 700
+        content_type:
+          type: string
+          maxLength: 120
+        size_bytes:
+          type: integer
+          minimum: 0
+          nullable: true
+      required:
+      - name
+      - storage_reference
     TopicEnum:
       enum:
       - drive

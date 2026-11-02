@@ -13,6 +13,38 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `iaa`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `iaa.request.create` | Create expense/voucher drafts | `Basic User`, `basic_user`, `department_representative`, `employee`, `faculty`, `staff` |
+| `iaa.request.view_self` | View own financial requests | `Basic User`, `basic_user`, `department_representative`, `employee`, `faculty`, `staff` |
+| `iaa.request.view` | View permitted operational financial requests | `Auditor`, `Dean`, `Director`, `Finance Staff`, `Head of Department`, `HoD`, `auditor`, `dean`, `director`, `finance_staff`, `hod` |
+| `iaa.request.submit` | Submit financial requests | `Basic User`, `basic_user`, `department_representative`, `employee`, `faculty`, `staff` |
+| `iaa.query.respond` | Respond to Finance clarification | `Basic User`, `basic_user`, `department_representative`, `employee`, `faculty`, `staff` |
+| `iaa.finance.query` | Raise Finance clarification | `Finance Staff`, `finance_staff` |
+| `iaa.finance.validate` | Review and validate expense/voucher requests | `Finance Staff`, `finance_staff` |
+| `iaa.finance.record` | Internally record completed requests | `Finance Staff`, `finance_staff` |
+| `iaa.ta.create` | Create TA claims | `Basic User`, `basic_user`, `department_representative`, `employee`, `faculty`, `staff` |
+| `iaa.ta.view_self` | View own TA claims | `Basic User`, `basic_user`, `department_representative`, `employee`, `faculty`, `staff` |
+| `iaa.ta.submit` | Submit TA claims | `Basic User`, `basic_user`, `department_representative`, `employee`, `faculty`, `staff` |
+| `iaa.ta.verify` | Verify TA claims | `Finance Staff`, `finance_staff` |
+| `iaa.approval.view` | View assigned approval decisions | `Dean`, `Director`, `Head of Department`, `HoD`, `dean`, `director`, `hod` |
+| `iaa.approval.decide` | Approve or reject routed requests | `Dean`, `Director`, `Head of Department`, `HoD`, `dean`, `director`, `hod` |
+| `iaa.anomaly.view` | View anomalies in permitted scope | `Auditor`, `Basic User`, `Dean`, `Director`, `Finance Staff`, `Head of Department`, `HoD`, `auditor`, `basic_user`, `dean`, `department_representative`, `director`, `employee`, `faculty`, `finance_staff`, `hod`, `staff` |
+| `iaa.anomaly.flag` | Flag material anomalies | `Auditor`, `Finance Staff`, `auditor`, `finance_staff` |
+| `iaa.anomaly.resolve` | Resolve or escalate assigned anomalies | `Auditor`, `Dean`, `Director`, `Finance Staff`, `Head of Department`, `HoD`, `auditor`, `dean`, `director`, `finance_staff`, `hod` |
+| `iaa.audit.review` | Review financial records and audit observations | `Auditor`, `auditor` |
+| `iaa.observation.create` | Raise audit observations | `Auditor`, `auditor` |
+| `iaa.observation.respond` | Respond to audit observations | `Basic User`, `basic_user`, `department_representative`, `employee`, `faculty`, `staff` |
+| `iaa.observation.verify` | Verify and close audit observations | `Auditor`, `auditor` |
+| `iaa.report.view` | View role-scoped reports | `Auditor`, `Dean`, `Director`, `Finance Staff`, `Head of Department`, `HoD`, `auditor`, `dean`, `director`, `finance_staff`, `hod` |
+| `iaa.report.export` | Export role-scoped reports | `Auditor`, `Dean`, `Director`, `Finance Staff`, `Head of Department`, `HoD`, `auditor`, `dean`, `director`, `finance_staff`, `hod` |
+| `iaa.notification.view` | View personal IAA notifications | `Auditor`, `Basic User`, `Dean`, `Director`, `Finance Staff`, `Head of Department`, `HoD`, `auditor`, `basic_user`, `dean`, `department_representative`, `director`, `employee`, `faculty`, `finance_staff`, `hod`, `staff` |
+| `iaa.configuration.manage` | Manage IAA configuration | `System Admin`, `system_admin` |
+| `iaa.approval.escalate` | System escalation of overdue approvals | _service only_ |
+| `iaa.anomaly.auto_create` | System creation of rule-triggered anomalies | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
