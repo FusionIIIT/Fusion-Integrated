@@ -26,8 +26,6 @@ def calculate_leave_days(
     - BR-EL-010: Half-day CL consumes exactly 0.5 days.
     - BR-EL-011: Continuous counting for EL, VL, COL includes intervening weekends & holidays.
     - BR-EL-011: CL, SCL, RH exclude weekends (Saturday, Sunday) and closed holidays.
-    """
-    """Calculate the net leave days consumed by an application.
 
     Parameters
     ----------
