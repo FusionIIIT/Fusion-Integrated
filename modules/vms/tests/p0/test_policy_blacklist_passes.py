@@ -280,7 +280,3 @@ def test_qr_tokens_are_unique(approved):
     b = passes.issue_pass(request=other, pass_type="PRE_REGISTERED", issued_by=1)
     assert a.qr_token != b.qr_token
 
-
-def test_terminate_pass_is_a_stub_for_lane_d():
-    with pytest.raises(NotImplementedError):
-        passes.terminate_pass()
