@@ -26,6 +26,9 @@ class UserRef(TimeStampedModel):
     batch_year = models.PositiveSmallIntegerField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     synced_at = models.DateTimeField(auto_now=True)
+    # Keep this projection aligned with the shared IAM directory schema.
+    resume_link = models.CharField(max_length=500, blank=True)
+    profile_completed = models.BooleanField(default=False)
 
     class Meta:
         db_table = "directory_user_ref"

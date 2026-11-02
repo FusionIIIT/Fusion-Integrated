@@ -34,6 +34,9 @@ def upsert(refs) -> int:
             user_id=r.user_id, username=r.username, display_name=r.display_name,
             kind=r.kind or "student", email=r.email, department=r.department,
             programme=r.programme, discipline=r.discipline, batch_year=r.batch_year,
+            is_active=getattr(r, "is_active", True),
+            resume_link=(r.extra.get("resume_link", "") or ""),
+            profile_completed=bool(r.extra.get("profile_completed", False)),
         )
         for r in refs
     ]
@@ -42,6 +45,7 @@ def upsert(refs) -> int:
     UserRef.objects.bulk_create(
         rows, update_conflicts=True, unique_fields=["user_id"],
         update_fields=["username", "display_name", "kind", "email", "department",
-                       "programme", "discipline", "batch_year", "updated_at"],
+                       "programme", "discipline", "batch_year", "is_active",
+                       "resume_link", "profile_completed", "updated_at"],
     )
     return len(rows)

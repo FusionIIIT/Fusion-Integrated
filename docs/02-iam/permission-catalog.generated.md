@@ -7,6 +7,29 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `department`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `department.announcement.view` | View relevant announcements | `dept_admin`, `faculty`, `hod`, `student` |
+| `department.announcement.create` | Create announcements | `dept_admin`, `faculty`, `hod` |
+| `department.announcement.manage` | Edit, hide, or delete announcements | `hod` |
+| `department.inventory.view` | View department inventory | `dept_admin`, `faculty`, `hod` |
+| `department.inventory.manage` | Manage department inventory | `dept_admin` |
+| `department.stock_request.create` | Request stock | `faculty` |
+| `department.stock_request.review` | Review and decide stock requests | `dept_admin`, `hod` |
+| `department.stock_request.issue` | Issue approved stock requests | `dept_admin` |
+| `department.feedback.create` | Submit department feedback | `faculty`, `student` |
+| `department.feedback.view` | View feedback within the assigned scope | `dept_admin`, `faculty`, `hod`, `student` |
+| `department.feedback.review` | Review and disposition feedback | `dept_admin`, `hod` |
+| `department.resource.view` | View department resources | `dept_admin`, `faculty` |
+| `department.resource.manage` | Manage department resources | `dept_admin` |
+| `department.timetable.view` | View applicable timetables | `dept_admin`, `student` |
+| `department.timetable.manage` | Manage department timetables | `dept_admin` |
+| `department.details.view` | View department details | `dept_admin`, `hod`, `student` |
+| `department.details.manage` | Manage department details | `dept_admin` |
+| `department.details.approve` | Approve official department changes | `hod` |
+
 ## `directory`
 
 | Code | What it allows | Held by |
