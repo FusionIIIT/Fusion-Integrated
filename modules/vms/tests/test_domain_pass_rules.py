@@ -32,7 +32,7 @@ def test_clean_pass_has_no_failures():
 
 def test_br_077_inactive_pass_denied():
     fs = pr.validate_at_gate(P(is_active=False), NOW, None)
-    assert codes(fs) == [pr.PASS_INACTIVE] and fs[0].rule == "VMS-BR-077"
+    assert codes(fs) == [pr.NOT_ACTIVE] and fs[0].rule == "VMS-BR-077"
 
 
 def test_br_190_outside_validity_both_edges():
@@ -76,7 +76,7 @@ def test_returns_all_failures_in_rule_order():
     p = P(is_active=False, allowed_zone_ids=(1,), valid_until=NOW - timedelta(minutes=1),
           slot_start=NOW + timedelta(hours=1), slot_end=NOW + timedelta(hours=2))
     fs = pr.validate_at_gate(p, NOW, 2, blacklisted=True, open_checkin=True)
-    assert codes(fs) == [pr.PASS_INACTIVE, pr.OUTSIDE_VALIDITY, pr.OUTSIDE_SLOT, pr.BLACKLISTED,
+    assert codes(fs) == [pr.NOT_ACTIVE, pr.OUTSIDE_VALIDITY, pr.OUTSIDE_SLOT, pr.BLACKLISTED,
                          pr.ZONE_NOT_PERMITTED, pr.ALREADY_INSIDE]
     assert codes(fs) == sorted(codes(fs), key=pr.FAILURE_ORDER.index)
     t = P(terminated=True, is_active=False)
@@ -85,7 +85,7 @@ def test_returns_all_failures_in_rule_order():
 
 
 def test_d14_override_eligible_constant():
-    assert {pr.PASS_INACTIVE, pr.OUTSIDE_VALIDITY,
+    assert {pr.NOT_ACTIVE, pr.OUTSIDE_VALIDITY,
                                     pr.ZONE_NOT_PERMITTED, pr.OUTSIDE_SLOT} == pr.OVERRIDE_ELIGIBLE
     assert pr.BLACKLISTED not in pr.OVERRIDE_ELIGIBLE and pr.TERMINATED not in pr.OVERRIDE_ELIGIBLE
 

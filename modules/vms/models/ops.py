@@ -45,6 +45,9 @@ class Alert(models.Model):
         choice_check("status", Status, "vms_alert_status_valid"),
     ]
 
+    def __str__(self) -> str:
+        return f"Alert {self.pk} ({self.kind}, {self.status})"
+
 
 class Notification(models.Model):
     """Queued message; lane E delivers it (VMS-CFR-028, 021)."""
@@ -86,6 +89,9 @@ class Notification(models.Model):
         choice_check("status", Status, "vms_notif_status_valid"),
     ]
 
+    def __str__(self) -> str:
+        return f"Notification {self.pk} ({self.topic}, {self.status})"
+
 
 class AuditLog(AppendOnlyModel):
     """Append-only record of every state change (VMS-CFR-005)."""
@@ -102,6 +108,9 @@ class AuditLog(AppendOnlyModel):
         indexes = [models.Index(fields=["entity_type", "entity_id"],
                                 name="vms_audit_entity_idx")]
 
+    def __str__(self) -> str:
+        return f"{self.action} {self.entity_type}:{self.entity_id}"
+
 
 class OfflineSyncRun(models.Model):
     """One batch of offline gate events uploaded (VMS-CFR-025)."""
@@ -112,3 +121,6 @@ class OfflineSyncRun(models.Model):
     events_applied = models.PositiveIntegerField(default=0)
     events_conflicted = models.PositiveIntegerField(default=0)
     detail = models.JSONField(default=dict, blank=True)
+
+    def __str__(self) -> str:
+        return f"OfflineSyncRun {self.pk} (gate {self.gate_id})"

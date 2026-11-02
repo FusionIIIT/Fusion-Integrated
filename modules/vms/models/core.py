@@ -13,6 +13,9 @@ class Zone(models.Model):
                                     related_name="children")
     is_active = models.BooleanField(default=True)
 
+    def __str__(self) -> str:
+        return f"{self.name}"
+
 
 class Gate(models.Model):
     """An entry point (VMS-CFR-013, CFR-026)."""
@@ -20,6 +23,9 @@ class Gate(models.Model):
     zone = models.ForeignKey(Zone, on_delete=models.PROTECT, related_name="gates")
     device_id = models.CharField(max_length=80, blank=True)
     is_active = models.BooleanField(default=True)
+
+    def __str__(self) -> str:
+        return f"{self.name}"
 
 
 class VisitRequest(models.Model):
@@ -90,3 +96,6 @@ class VisitRequest(models.Model):
         choice_check("urgent_decision", UrgentDecision,
                      "vms_req_urgent_decision_valid"),
     ]
+
+    def __str__(self) -> str:
+        return f"VisitRequest #{self.pk} ({self.status})"

@@ -46,6 +46,9 @@ class VisitPass(models.Model):
         choice_check("pass_type", PassType, "vms_pass_type_valid"),
     ]
 
+    def __str__(self) -> str:
+        return f"Pass {self.pk} ({self.pass_type}, request {self.visit_request_id})"
+
 
 class VisitLog(AppendOnlyModel):
     """Append-only gate event trail (never updated or deleted)."""
@@ -85,6 +88,9 @@ class VisitLog(AppendOnlyModel):
 
     Meta.constraints = [choice_check("event", Event, "vms_log_event_valid")]
 
+    def __str__(self) -> str:
+        return f"VisitLog {self.pk} ({self.event}, pass {self.visit_pass_id})"
+
 
 class ZoneElevation(models.Model):
     """Time-boxed extra zone access for one pass (VMS-CFR-026, D-15)."""
@@ -105,6 +111,9 @@ class ZoneElevation(models.Model):
         condition=models.Q(ends_at__gt=models.F("starts_at")),
         name="vms_elevation_window_valid")]
 
+    def __str__(self) -> str:
+        return f"ZoneElevation {self.pk} (pass {self.visit_pass_id}, zone {self.zone_id})"
+
 
 class GateOverride(models.Model):
     """Admin override of a gate denial (VMS-CFR-014)."""
@@ -113,6 +122,9 @@ class GateOverride(models.Model):
     admin_user_id = models.IntegerField()
     justification = models.CharField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"GateOverride {self.pk} (log {self.visit_log_id})"
 
 
 class Escalation(models.Model):
@@ -136,3 +148,6 @@ class Escalation(models.Model):
         pass
 
     Meta.constraints = [choice_check("status", Status, "vms_escalation_status_valid")]
+
+    def __str__(self) -> str:
+        return f"Escalation {self.pk} ({self.status})"

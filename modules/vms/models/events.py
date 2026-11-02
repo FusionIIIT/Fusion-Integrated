@@ -27,6 +27,9 @@ class ExtensionRequest(models.Model):
 
     Meta.constraints = [choice_check("status", Status, "vms_ext_status_valid")]
 
+    def __str__(self) -> str:
+        return f"ExtensionRequest {self.pk} ({self.status})"
+
 
 class EmergencyMuster(models.Model):
     """An emergency roll call (VMS-CFR-018)."""
@@ -47,6 +50,9 @@ class EmergencyMuster(models.Model):
         pass
 
     Meta.constraints = [choice_check("status", Status, "vms_muster_status_valid")]
+
+    def __str__(self) -> str:
+        return f"Muster {self.pk} ({self.status})"
 
 
 class MusterEntry(models.Model):
@@ -78,6 +84,9 @@ class MusterEntry(models.Model):
                                 name="vms_musterentry_unique_pass"),
     ]
 
+    def __str__(self) -> str:
+        return f"MusterEntry {self.pk} ({self.status})"
+
 
 class EventBatch(models.Model):
     """A bulk event registration (VMS-CFR-009)."""
@@ -106,6 +115,9 @@ class EventBatch(models.Model):
         pass
 
     Meta.constraints = [choice_check("status", Status, "vms_event_status_valid")]
+
+    def __str__(self) -> str:
+        return f"{self.name}"
 
 
 class EventAttendee(models.Model):
@@ -136,3 +148,6 @@ class EventAttendee(models.Model):
         pass
 
     Meta.constraints = [choice_check("status", Status, "vms_attendee_status_valid")]
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.status})"

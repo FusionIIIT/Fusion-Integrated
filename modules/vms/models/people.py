@@ -13,6 +13,9 @@ class Visitor(models.Model):
     id_doc_number = models.CharField(max_length=60, blank=True, db_index=True)
     is_anonymized = models.BooleanField(default=False)   # VMS-CFR-029/032
 
+    def __str__(self) -> str:
+        return f"{self.full_name}"
+
 
 class VisitorSession(models.Model):
     """Email-OTP visitor login (decision D-1). Only hashes are stored."""
@@ -24,6 +27,9 @@ class VisitorSession(models.Model):
     verified_at = models.DateTimeField(null=True, blank=True)
     attempts = models.PositiveSmallIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"VisitorSession {self.pk} (visitor {self.visitor_id})"
 
 
 class RoleAssignment(models.Model):
@@ -64,6 +70,9 @@ class RoleAssignment(models.Model):
             name="vms_roleassign_window_valid"),
     ]
 
+    def __str__(self) -> str:
+        return f"user {self.user_id} as {self.role}"
+
 
 class VipPermission(models.Model):
     """Super-Admin granted VIP override scope (VMS-CFR-004, D-6, D-16)."""
@@ -75,6 +84,9 @@ class VipPermission(models.Model):
     valid_until = models.DateTimeField()
     granted_by_user_id = models.IntegerField()
     revoked_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self) -> str:
+        return f"VipPermission {self.pk} (visitor {self.visitor_id})"
 
 
 class PreAuthorization(models.Model):
@@ -96,3 +108,6 @@ class PreAuthorization(models.Model):
     Meta.constraints = [models.CheckConstraint(
         condition=models.Q(used_visits__lte=models.F("max_visits")),
         name="vms_preauth_used_le_max")]
+
+    def __str__(self) -> str:
+        return f"PreAuthorization {self.pk} (visitor {self.visitor_id})"
