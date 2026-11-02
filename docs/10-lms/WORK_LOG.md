@@ -109,3 +109,52 @@
   - Verified test suite: 18 passed in 3.02s running against PostgreSQL 16.15.
   - Verified migration consistency: `manage.py check` (0 issues), `makemigrations --check --dry-run` (No changes detected), `showmigrations lms` (linear history: 0001_initial, 0002_alter_gradeauditlog_grade).
   - Import-linter verified: 4 kept, 0 broken.
+
+## Phase 4: Backend Services, Selectors, REST APIs and Permissions (2026-11-02)
+- **Milestone:** Implementation of comprehensive LMS business logic, query selectors, role-based REST API, immutable audit logs, scheduled release runner, and automated test suite.
+- **Orchestrator:** Antigravity (Gemini Pro)
+- **Sole AI Coder:** `qwen2.5:7b` (Format: GGUF, Quantization: Q4_K_M, Full Digest: `845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e`)
+- **Key Implementations:**
+  - **Audit Immutability Hardening (BR-LMS-017, AFR-LMS-034):**
+    - Created `GradeAuditLogQuerySet(models.QuerySet)` overriding `.update()` and `.delete()` to raise `PermissionDenied`.
+    - Wired `objects = GradeAuditLogQuerySet.as_manager()` on `GradeAuditLog`.
+    - Overrode `GradeAuditLog.save()` (preventing updates if `pk is not None`) and `GradeAuditLog.delete()` (preventing instance deletions).
+    - Verified via `modules/lms/tests/test_audit_immutability.py` (5 tests passing).
+  - **Query Selectors Layer (`modules/lms/selectors/`):**
+    - `courses.py`: `get_user_courses`, `get_course_by_id`, `get_course_memberships`, `get_user_membership`.
+    - `content.py`: `get_sections_for_course`, `get_materials_for_section` (embargo and draft filtering for students), `get_announcements_for_course`.
+    - `assignments.py`: `get_assignments_for_course` (embargo and draft filtering for students), `get_assignment_by_id`.
+    - `submissions.py`: `get_student_submissions`, `get_latest_student_submission`, `get_grading_queue`.
+    - `grades.py`: `get_grade_for_submission` (draft hidden from students), `get_grade_audit_logs`.
+    - Verified via `modules/lms/tests/test_selectors.py` (3 tests passing).
+  - **Business Services Layer (`modules/lms/services/`):**
+    - `courses.py`: `create_course`, `add_course_membership`, `remove_course_membership`.
+    - `content.py`: `create_section`, `update_section`, `create_material`, `create_announcement`.
+    - `assignments.py`: `create_assignment`, `publish_assignment`.
+    - `storage.py`: `generate_storage_key` using SHA-256 sharding (`ab/cd/<hash>_<filename>`).
+    - `submissions.py`: `submit_assignment` supporting auto-incremented versioning, due-date late tagging, and preserving open policy ISS-LMS-005.
+    - `grading.py`: `save_draft_grade`, `release_grade` (faculty authority enforced, audit trail created), `modify_released_grade` (audit log appended).
+    - `release.py`: Deterministic scheduled release engine using `transaction.atomic()` and `select_for_update(skip_locked=True)` processing due materials and assignments.
+    - `management/commands/lms_process_scheduled_releases.py`: Local CLI management runner command.
+    - Verified via `modules/lms/tests/test_services.py` (5 tests passing).
+  - **Role-Based Permissions (`modules/lms/api/permissions.py`):**
+    - `IsCourseMember`, `IsCourseStaff`, `IsInstructor`, `IsTeachingAssistant`, `IsEnrolledStudent`.
+    - `IsObserverReadOnly` guaranteeing safe-method access to course content and strict denial to student submissions and grades.
+    - Robust IAM `Principal.user_id` / `request.user.id` handling.
+    - Deterministic multi-role evaluation (user holding both TA and Student roles receives both sets of permissions without guessing role priority).
+    - Verified via `modules/lms/tests/test_permissions.py` (3 tests passing).
+  - **REST API Endpoints & Serializers (`modules/lms/api/`):**
+    - Serializers: `CourseSerializer`, `CourseMembershipSerializer`, `ModuleSectionSerializer`, `CourseMaterialSerializer`, `AnnouncementSerializer`, `AssignmentSerializer`, `SubmissionSerializer`, `GradeSerializer`, `GradeAuditLogSerializer`, `ScheduledReleaseSerializer`.
+    - ViewSets: `CourseViewSet`, `CourseMembershipViewSet`, `ModuleSectionViewSet`, `CourseMaterialViewSet`, `AnnouncementViewSet`, `AssignmentViewSet` (with nested `/submit/` and `/submissions/` actions), `SubmissionViewSet` (with nested `/grade/` action), `GradeViewSet` (with nested `/audit_logs/` action), `ScheduledReleaseViewSet`.
+    - Mounted URL router under `/api/v1/lms/` in `config/urls.py`.
+    - Verified via `modules/lms/tests/test_api.py` (4 tests passing).
+- **Test Suite Results:**
+  - 38 total tests passing in 3.74s across 7 test files on PostgreSQL 16.15.
+- **System Verification:**
+  - `python manage.py check`: 0 issues.
+  - `python manage.py makemigrations --check --dry-run`: No changes detected.
+  - `lint-imports`: 4 kept, 0 broken.
+  - `git diff --check`: Clean, 0 whitespace warnings.
+- **Protection Compliance:**
+  - Zero modifications to ELM (`modules/elm/`, `docs/09-elm/`, `assignment6b/elm-review`, PR #269, stashes).
+  - All 6 policy issues (`ISS-LMS-001` to `ISS-LMS-006`) maintained as `NEEDS CLARIFICATION`.

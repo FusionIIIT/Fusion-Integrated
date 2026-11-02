@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.utils import timezone
 from core.db.mixins import TimeStampedModel
@@ -96,10 +97,20 @@ class Grade(TimeStampedModel):
         return f"Grade for Submission {self.submission_id}: {self.points_awarded} ({self.status})"
 
 
+class GradeAuditLogQuerySet(models.QuerySet):
+    def update(self, **kwargs):
+        raise PermissionDenied("GradeAuditLog records are immutable and cannot be updated.")
+
+    def delete(self):
+        raise PermissionDenied("GradeAuditLog records cannot be deleted.")
+
+
 class GradeAuditLog(models.Model):
     class Meta:
         db_table = "lms_grade_audit_log"
         ordering = ["-changed_at"]
+
+    objects = GradeAuditLogQuerySet.as_manager()
 
     grade = models.ForeignKey(
         "lms.Grade",
@@ -114,6 +125,14 @@ class GradeAuditLog(models.Model):
     new_feedback = models.TextField(blank=True, default="")
     reason = models.TextField(blank=True, default="")
     changed_at = models.DateTimeField(default=timezone.now)
+
+    def save(self, *args, **kwargs):
+        if self.pk is not None:
+            raise PermissionDenied("GradeAuditLog records cannot be modified once written.")
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise PermissionDenied("GradeAuditLog records cannot be deleted.")
 
     def __str__(self) -> str:
         return f"AuditLog on Grade {self.grade_id} by User {self.assessor_user_id}: {self.action} at {self.changed_at}"

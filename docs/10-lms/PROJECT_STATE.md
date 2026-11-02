@@ -28,7 +28,7 @@
 - **UI Base Path:** /courses
 
 ## 5. Operational Metrics & Phase Status:
-- **Current Phase:** Phase 3.1 Final Database Integrity Check & Audit Hardening (COMPLETED)
+- **Current Phase:** Phase 4 Backend Services, Selectors, REST APIs and Permissions (COMPLETED)
 - **PR Status:** Official PR #437 Open on FusionIIIT/Fusion-Integrated:main
 - **Architecture Documents:** DOMAIN_MODEL.md, WORKFLOW_DESIGN.md, INTEGRATION_DESIGN.md, ARCHITECTURE_PLAN.md
 - **CFR Count:** 15 Core Functional Requirements
@@ -40,5 +40,9 @@
 - **Implemented Backend Models:** 10 domain models in `modules/lms/models/` (`Course`, `CourseMembership`, `ModuleSection`, `CourseMaterial`, `Announcement`, `Assignment`, `Submission`, `Grade`, `GradeAuditLog`, `ScheduledRelease`)
 - **Database Migrations:** `modules/lms/migrations/0001_initial.py`, `modules/lms/migrations/0002_alter_gradeauditlog_grade.py`
 - **Module Contracts:** `modules/lms/contracts.py` (DTOs and batched queries, satisfying `.importlinter`)
-- **Automated Test Suite:** 18 tests passing (11 model, audit & contract tests in `test_models.py`, 7 database constraint tests in `test_constraints.py`)
+- **Implemented Query Selectors:** `modules/lms/selectors/` (`courses.py`, `content.py`, `assignments.py`, `submissions.py`, `grades.py`)
+- **Implemented Business Services:** `modules/lms/services/` (`courses.py`, `content.py`, `assignments.py`, `storage.py`, `submissions.py`, `grading.py`, `release.py`, `management/commands/lms_process_scheduled_releases.py`)
+- **Implemented Role-Based Permissions:** `modules/lms/api/permissions.py` (Instructor, TA, Student, Observer isolation, multi-role cardinality)
+- **Mounted REST API:** `/api/v1/lms/` in `config/urls.py` via `modules/lms/api/` (`serializers.py`, `views.py`, `urls.py`)
+- **Automated Test Suite:** 38 tests passing in 3.74s across 7 test files (`test_models.py`, `test_constraints.py`, `test_audit_immutability.py`, `test_selectors.py`, `test_services.py`, `test_permissions.py`, `test_api.py`)
 - **Repository Verification:** `manage.py check` (0 issues), `lint-imports` (4 kept, 0 broken), `git diff --check` (clean)
