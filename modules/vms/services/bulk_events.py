@@ -131,8 +131,9 @@ def _validate_window(start, end) -> None:
 
 def event_snapshot(ev: EventBatch) -> dict:
     return {"id": ev.pk, "name": ev.name, "organizer": ev.organizer,
-            "valid_from": ev.valid_from, "valid_until": ev.valid_until, "status": ev.status,
-            "fast_lane": ev.fast_lane, "walkin_rate_limit": ev.walkin_rate_limit,
+            "valid_from": ev.valid_from.isoformat(), "valid_until": ev.valid_until.isoformat(),
+            "status": ev.status, "fast_lane": ev.fast_lane,
+            "walkin_rate_limit": ev.walkin_rate_limit,
             "slots": ev.slots, "zone_ids": sorted(ev.zones.values_list("pk", flat=True))}
 
 
