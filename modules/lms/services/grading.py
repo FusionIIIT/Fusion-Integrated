@@ -12,13 +12,17 @@ def save_draft_grade(
     points_awarded: int | None = None,
     feedback_text: str = "",
 ) -> Grade:
-    grade, _ = Grade.objects.get_or_create(
+    grade, created = Grade.objects.get_or_create(
         submission_id=submission_id,
         defaults={
             "assessor_user_id": assessor_user_id,
             "assessor_role": assessor_role,
         },
     )
+    if not created and grade.status == GradeStatus.RELEASED:
+        raise PermissionDenied(
+            "Grade has already been released and cannot be modified pending policy clarification (ISS-LMS-006)."
+        )
     grade.assessor_user_id = assessor_user_id
     grade.assessor_role = assessor_role
     grade.points_awarded = points_awarded
@@ -40,13 +44,18 @@ def release_grade(
         raise PermissionDenied("Only instructors can release grades.")
 
     with transaction.atomic():
-        grade, _ = Grade.objects.get_or_create(
+        grade, created = Grade.objects.get_or_create(
             submission_id=submission_id,
             defaults={
                 "assessor_user_id": assessor_user_id,
                 "assessor_role": assessor_role,
             },
         )
+        if not created and grade.status == GradeStatus.RELEASED:
+            raise PermissionDenied(
+                "Grade has already been released and cannot be re-released pending policy clarification (ISS-LMS-006)."
+            )
+
         prev_points = grade.points_awarded
         prev_feedback = grade.feedback_text
         grade.points_awarded = points_awarded
@@ -77,23 +86,6 @@ def modify_released_grade(
     new_feedback: str = "",
     reason: str = "",
 ) -> Grade:
-    with transaction.atomic():
-        grade = Grade.objects.get(id=grade_id)
-        prev_points = grade.points_awarded
-        prev_feedback = grade.feedback_text
-        if new_points is not None:
-            grade.points_awarded = new_points
-        if new_feedback:
-            grade.feedback_text = new_feedback
-        grade.save()
-        GradeAuditLog.objects.create(
-            grade=grade,
-            assessor_user_id=modifier_user_id,
-            action=GradeAction.UPDATED,
-            previous_points=prev_points,
-            new_points=grade.points_awarded,
-            previous_feedback=prev_feedback,
-            new_feedback=grade.feedback_text,
-            reason=reason,
-        )
-    return grade
+    raise PermissionDenied(
+        "Post-release grade modification is pending policy clarification (ISS-LMS-006)."
+    )

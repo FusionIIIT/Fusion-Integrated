@@ -1,3 +1,5 @@
+from django.core.exceptions import PermissionDenied
+from modules.lms.domain.constants import Role
 from modules.lms.models import Course, CourseMembership
 
 
@@ -22,7 +24,11 @@ def create_course(
     )
 
 
-def add_course_membership(course_id: int, user_id: int, role: str) -> CourseMembership:
+def add_course_membership(course_id: int, user_id: int, role: str, is_projection: bool = False) -> CourseMembership:
+    if role == Role.STUDENT and not is_projection:
+        raise PermissionDenied(
+            "Direct student registration in LMS is prohibited. Student enrollment must originate from the institutional AcademicAdapter projection."
+        )
     membership, created = CourseMembership.objects.get_or_create(
         course_id=course_id,
         user_id=user_id,

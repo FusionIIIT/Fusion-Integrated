@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from modules.lms.domain.constants import ContentStatus, MaterialKind, Role
 from modules.lms.models import Announcement, CourseMaterial, ModuleSection
 
@@ -48,6 +49,10 @@ def create_announcement(
     content: str,
     author_role: str = Role.INSTRUCTOR,
 ) -> Announcement:
+    if author_role != Role.INSTRUCTOR:
+        raise PermissionDenied(
+            "TA announcement creation is pending policy clarification (ISS-LMS-002). Only instructors can publish announcements."
+        )
     return Announcement.objects.create(
         course_id=course_id,
         author_user_id=author_user_id,

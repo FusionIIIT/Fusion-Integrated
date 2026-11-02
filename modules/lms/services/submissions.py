@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from modules.lms.domain.constants import SubmissionStatus, SubmissionType
 from modules.lms.models import Assignment, Submission
@@ -12,29 +13,31 @@ def submit_assignment(
     link_url: str = "",
 ) -> Submission:
     assignment = Assignment.objects.get(id=assignment_id)
-    latest = (
-        Submission.objects.filter(
-            assignment_id=assignment_id,
-            student_user_id=student_user_id,
+
+    # Gating for ISS-LMS-005 (Resubmission policy)
+    if Submission.objects.filter(
+        assignment_id=assignment_id,
+        student_user_id=student_user_id,
+    ).exists():
+        raise ValidationError(
+            "Resubmission is currently gated pending policy clarification (ISS-LMS-005)."
         )
-        .order_by("-version")
-        .first()
-    )
-    next_version = (latest.version + 1) if latest else 1
+
+    # Gating for ISS-LMS-001 (Late-submission policy)
     now = timezone.now()
-    status = (
-        SubmissionStatus.LATE
-        if (assignment.due_date and now > assignment.due_date)
-        else SubmissionStatus.SUBMITTED
-    )
+    if assignment.due_date and now > assignment.due_date:
+        raise ValidationError(
+            "Late submissions are currently gated pending policy clarification (ISS-LMS-001)."
+        )
+
     return Submission.objects.create(
         assignment=assignment,
         student_user_id=student_user_id,
-        version=next_version,
+        version=1,
         submission_type=submission_type,
         content_text=content_text,
         file_storage_key=file_storage_key,
         link_url=link_url,
         submitted_at=now,
-        status=status,
+        status=SubmissionStatus.SUBMITTED,
     )

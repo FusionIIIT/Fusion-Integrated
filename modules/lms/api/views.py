@@ -1,8 +1,16 @@
+import os
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.http import FileResponse
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from modules.lms.api.permissions import (
+    get_course_id_from_request_or_view,
+    get_request_user_id,
+    get_resolved_role,
+)
 from modules.lms.api.serializers import (
     AnnouncementSerializer,
     AssignmentSerializer,
@@ -37,24 +45,12 @@ from modules.lms.selectors import (
     get_user_courses,
 )
 from modules.lms.services import (
+    get_file_path,
     release_grade,
     save_draft_grade,
+    save_uploaded_file,
     submit_assignment,
 )
-
-
-def get_request_user_id(request) -> int | None:
-    if not (request.user and request.user.is_authenticated):
-        return None
-    uid = getattr(request.user, "user_id", None)
-    if isinstance(uid, int):
-        return uid
-    uid = getattr(request.user, "id", None)
-    if isinstance(uid, int):
-        return uid
-    if uid is not None and str(uid).isdigit():
-        return int(uid)
-    return None
 
 
 def is_request_staff(request) -> bool:
@@ -99,6 +95,14 @@ class CourseMembershipViewSet(viewsets.ModelViewSet):
     serializer_class = CourseMembershipSerializer
     permission_classes = [IsAuthenticated]
 
+    def perform_create(self, serializer):
+        role = serializer.validated_data.get("role")
+        if role == Role.STUDENT:
+            raise PermissionDenied(
+                "Direct student registration in LMS is prohibited. Student enrollment must originate from the institutional AcademicAdapter projection."
+            )
+        serializer.save()
+
 
 class ModuleSectionViewSet(viewsets.ModelViewSet):
     queryset = ModuleSection.objects.all()
@@ -117,6 +121,18 @@ class AnnouncementViewSet(viewsets.ModelViewSet):
     serializer_class = AnnouncementSerializer
     permission_classes = [IsAuthenticated]
 
+    def perform_create(self, serializer):
+        course = serializer.validated_data.get("course")
+        role = get_resolved_role(self.request, course.id if course else None)
+        if role != Role.INSTRUCTOR and not is_request_staff(self.request):
+            raise PermissionDenied(
+                "TA announcement creation is pending policy clarification (ISS-LMS-002). Only instructors can publish announcements."
+            )
+        serializer.save(
+            author_user_id=get_request_user_id(self.request) or 1,
+            author_role=Role.INSTRUCTOR,
+        )
+
 
 class AssignmentViewSet(viewsets.ModelViewSet):
     queryset = Assignment.objects.all()
@@ -127,14 +143,18 @@ class AssignmentViewSet(viewsets.ModelViewSet):
     def submit(self, request, pk=None):
         assignment = self.get_object()
         user_id = get_request_user_id(request)
-        submission = submit_assignment(
-            assignment_id=assignment.id,
-            student_user_id=user_id,
-            submission_type=request.data.get("submission_type", "file"),
-            content_text=request.data.get("content_text", ""),
-            file_storage_key=request.data.get("file_storage_key", ""),
-            link_url=request.data.get("link_url", ""),
-        )
+        try:
+            submission = submit_assignment(
+                assignment_id=assignment.id,
+                student_user_id=user_id,
+                submission_type=request.data.get("submission_type", "file"),
+                content_text=request.data.get("content_text", ""),
+                file_storage_key=request.data.get("file_storage_key", ""),
+                link_url=request.data.get("link_url", ""),
+            )
+        except ValidationError as e:
+            msg = e.message if hasattr(e, "message") else str(e)
+            return Response({"detail": msg}, status=status.HTTP_400_BAD_REQUEST)
         return Response(SubmissionSerializer(submission).data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=["get"])
@@ -161,25 +181,29 @@ class SubmissionViewSet(viewsets.ReadOnlyModelViewSet):
         points = request.data.get("points")
         feedback = request.data.get("feedback", "")
         reason = request.data.get("reason", "")
-        assessor_role = request.data.get("role", Role.TA)
+        course_id = submission.assignment.course_id
+        resolved_role = get_resolved_role(request, course_id) or request.data.get("role", Role.TA)
 
-        if grade_action == "release":
-            grade = release_grade(
-                submission_id=submission.id,
-                assessor_user_id=user_id,
-                assessor_role=assessor_role,
-                points_awarded=points,
-                feedback_text=feedback,
-                reason=reason or "initial grade release",
-            )
-        else:
-            grade = save_draft_grade(
-                submission_id=submission.id,
-                assessor_user_id=user_id,
-                assessor_role=assessor_role,
-                points_awarded=points,
-                feedback_text=feedback,
-            )
+        try:
+            if grade_action == "release":
+                grade = release_grade(
+                    submission_id=submission.id,
+                    assessor_user_id=user_id,
+                    assessor_role=resolved_role,
+                    points_awarded=points,
+                    feedback_text=feedback,
+                    reason=reason or "initial grade release",
+                )
+            else:
+                grade = save_draft_grade(
+                    submission_id=submission.id,
+                    assessor_user_id=user_id,
+                    assessor_role=resolved_role,
+                    points_awarded=points,
+                    feedback_text=feedback,
+                )
+        except PermissionDenied as e:
+            return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
         return Response(GradeSerializer(grade).data)
 
 
@@ -199,3 +223,34 @@ class ScheduledReleaseViewSet(viewsets.ModelViewSet):
     queryset = ScheduledRelease.objects.all()
     serializer_class = ScheduledReleaseSerializer
     permission_classes = [IsAuthenticated]
+
+
+class FileViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=False, methods=["post"], url_path="upload")
+    def upload(self, request):
+        file_obj = request.FILES.get("file")
+        if not file_obj:
+            return Response({"detail": "No file uploaded."}, status=status.HTTP_400_BAD_REQUEST)
+        content_bytes = file_obj.read()
+        storage_key = save_uploaded_file(file_obj.name, content_bytes)
+        return Response(
+            {
+                "storage_key": storage_key,
+                "filename": file_obj.name,
+                "size": len(content_bytes),
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+    @action(detail=False, methods=["get"], url_path="download")
+    def download(self, request):
+        key = request.query_params.get("key")
+        if not key:
+            return Response({"detail": "Missing key parameter."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            path = get_file_path(key)
+        except ValidationError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_404_NOT_FOUND)
+        return FileResponse(open(path, "rb"), as_attachment=True, filename=os.path.basename(path))

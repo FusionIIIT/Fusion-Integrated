@@ -22,7 +22,11 @@ from modules.lms.services.release import (
     create_scheduled_release,
     process_due_scheduled_releases,
 )
-from modules.lms.services.storage import generate_storage_key
+from modules.lms.services.storage import (
+    generate_storage_key,
+    get_file_path,
+    save_uploaded_file,
+)
 from modules.lms.services.submissions import submit_assignment
 
 __all__ = [
@@ -40,6 +44,8 @@ __all__ = [
     "release_grade",
     "modify_released_grade",
     "generate_storage_key",
+    "save_uploaded_file",
+    "get_file_path",
     "create_scheduled_release",
     "process_due_scheduled_releases",
 ]

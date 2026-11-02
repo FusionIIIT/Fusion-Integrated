@@ -6,6 +6,7 @@ from modules.lms.api.views import (
     CourseMaterialViewSet,
     CourseMembershipViewSet,
     CourseViewSet,
+    FileViewSet,
     GradeViewSet,
     ModuleSectionViewSet,
     ScheduledReleaseViewSet,
@@ -24,5 +25,6 @@ router.register(r"assignments", AssignmentViewSet, basename="assignment")
 router.register(r"submissions", SubmissionViewSet, basename="submission")
 router.register(r"grades", GradeViewSet, basename="grade")
 router.register(r"scheduled-releases", ScheduledReleaseViewSet, basename="scheduled-release")
+router.register(r"files", FileViewSet, basename="file")
 
 urlpatterns = router.urls

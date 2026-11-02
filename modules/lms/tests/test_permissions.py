@@ -9,7 +9,7 @@ from modules.lms.api.permissions import (
     IsObserverReadOnly,
     IsTeachingAssistant,
     get_course_id_from_request_or_view,
-    get_user_roles,
+    get_resolved_role,
 )
 from modules.lms.domain.constants import Role
 from modules.lms.models import Course, CourseMembership, Grade, Submission
@@ -35,12 +35,13 @@ def make_user(user_id: int):
     user.user_id = user_id
     user.id = user_id
     user.is_authenticated = True
+    user.active_role = None
     return user
 
 
 @pytest.mark.django_db
 def test_course_membership_and_role_permissions(course, factory):
-    # Setup users
+    # Setup users with single clear authorized roles
     CourseMembership.objects.create(course=course, user_id=1, role=Role.INSTRUCTOR, is_active=True)
     CourseMembership.objects.create(course=course, user_id=2, role=Role.TA, is_active=True)
     CourseMembership.objects.create(course=course, user_id=3, role=Role.STUDENT, is_active=True)
@@ -115,19 +116,40 @@ def test_observer_read_only_and_data_isolation(course, factory):
 
 
 @pytest.mark.django_db
-def test_multi_role_cardinality(course, factory):
-    # User 99 has BOTH TA and Student active memberships
+def test_multi_role_disambiguation_guardrails(course, factory):
+    # User 99 has BOTH TA and Student active memberships in the same course
     CourseMembership.objects.create(course=course, user_id=99, role=Role.TA, is_active=True)
     CourseMembership.objects.create(course=course, user_id=99, role=Role.STUDENT, is_active=True)
 
     view = MagicMock()
     view.kwargs = {"course_id": course.id}
-    req = factory.get("/")
-    req.user = make_user(99)
 
-    # Should satisfy IsCourseStaff, IsTeachingAssistant, AND IsEnrolledStudent
-    assert IsCourseStaff().has_permission(req, view) is True
-    assert IsTeachingAssistant().has_permission(req, view) is True
-    assert IsEnrolledStudent().has_permission(req, view) is True
-    # But not Instructor
-    assert IsInstructor().has_permission(req, view) is False
+    # 1. Without explicit context, ambiguous multi-role access is DENIED (no unapproved union)
+    req_ambiguous = factory.get("/")
+    req_ambiguous.user = make_user(99)
+    assert get_resolved_role(req_ambiguous, course.id) is None
+    assert IsCourseStaff().has_permission(req_ambiguous, view) is False
+    assert IsTeachingAssistant().has_permission(req_ambiguous, view) is False
+    assert IsEnrolledStudent().has_permission(req_ambiguous, view) is False
+
+    # 2. When explicit TA role is requested, TA permissions evaluate and student is denied
+    req_ta = factory.get("/", HTTP_X_LMS_ROLE=Role.TA)
+    req_ta.user = make_user(99)
+    assert get_resolved_role(req_ta, course.id) == Role.TA
+    assert IsCourseStaff().has_permission(req_ta, view) is True
+    assert IsTeachingAssistant().has_permission(req_ta, view) is True
+    assert IsEnrolledStudent().has_permission(req_ta, view) is False
+
+    # 3. When explicit Student role is requested, Student permissions evaluate and TA is denied
+    req_stu = factory.get("/", HTTP_X_LMS_ROLE=Role.STUDENT)
+    req_stu.user = make_user(99)
+    assert get_resolved_role(req_stu, course.id) == Role.STUDENT
+    assert IsCourseStaff().has_permission(req_stu, view) is False
+    assert IsTeachingAssistant().has_permission(req_stu, view) is False
+    assert IsEnrolledStudent().has_permission(req_stu, view) is True
+
+    # 4. Requesting an unheld role (e.g., instructor) fails closed
+    req_invalid = factory.get("/", HTTP_X_LMS_ROLE=Role.INSTRUCTOR)
+    req_invalid.user = make_user(99)
+    assert get_resolved_role(req_invalid, course.id) is None
+    assert IsInstructor().has_permission(req_invalid, view) is False

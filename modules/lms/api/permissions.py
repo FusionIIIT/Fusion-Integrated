@@ -20,7 +20,6 @@ def get_request_user_id(request) -> int | None:
 def get_course_id_from_request_or_view(request, view, obj=None) -> int | None:
     course_id = view.kwargs.get("course_id") or view.kwargs.get("course_pk")
     if not course_id and hasattr(view, "kwargs") and "pk" in view.kwargs:
-        # Check if view is for Course itself
         if getattr(view, "basename", "") == "course":
             course_id = view.kwargs["pk"]
 
@@ -41,108 +40,115 @@ def get_course_id_from_request_or_view(request, view, obj=None) -> int | None:
     return int(course_id) if (course_id is not None and str(course_id).isdigit()) else None
 
 
-def get_user_roles(user_id: int | None, course_id: int | None) -> set[str]:
-    if not user_id or not course_id:
-        return set()
-    return set(
+def get_resolved_role(request, course_id: int | None) -> str | None:
+    """
+    Resolves the safe, explicit authorization role for a user in a course.
+    - If user has 0 active memberships: returns None.
+    - If user has exactly 1 active membership: returns that role unambiguously.
+    - If user has multiple active memberships:
+        Requires explicit role context (header X-LMS-Role, query ?as_role=, or IAM active_role).
+        If explicit role is one of user's active roles in that course, returns it.
+        Otherwise returns None (denies ambiguous multi-role context pending disambiguation).
+    """
+    user_id = get_request_user_id(request)
+    if user_id is None or course_id is None:
+        return None
+
+    active_roles = set(
         CourseMembership.objects.filter(
             course_id=course_id,
             user_id=user_id,
             is_active=True,
         ).values_list("role", flat=True)
     )
+    if not active_roles:
+        return None
+
+    if len(active_roles) == 1:
+        return next(iter(active_roles))
+
+    explicit_role = (
+        request.headers.get("X-LMS-Role")
+        or getattr(request, "query_params", {}).get("as_role")
+        or getattr(request.user, "active_role", None)
+    )
+
+    if explicit_role and explicit_role in active_roles:
+        return explicit_role
+
+    return None
 
 
 class IsCourseMember(BasePermission):
-    """Allows access to users who have an active membership in the course."""
+    """Allows access to users who have an active, resolved role in the course."""
 
     def has_permission(self, request, view):
-        user_id = get_request_user_id(request)
-        if not user_id:
-            return False
         course_id = get_course_id_from_request_or_view(request, view)
         if not course_id:
             return True
-        return bool(get_user_roles(user_id, course_id))
+        return get_resolved_role(request, course_id) is not None
 
     def has_object_permission(self, request, view, obj):
-        user_id = get_request_user_id(request)
         course_id = get_course_id_from_request_or_view(request, view, obj)
-        return bool(get_user_roles(user_id, course_id))
+        return get_resolved_role(request, course_id) is not None
 
 
 class IsCourseStaff(BasePermission):
-    """Allows access to instructors and teaching assistants."""
+    """Allows access to users acting as instructors or teaching assistants."""
 
     def has_permission(self, request, view):
-        user_id = get_request_user_id(request)
-        if not user_id:
-            return False
         course_id = get_course_id_from_request_or_view(request, view)
         if not course_id:
             return True
-        roles = get_user_roles(user_id, course_id)
-        return bool(roles & {Role.INSTRUCTOR, Role.TA})
+        role = get_resolved_role(request, course_id)
+        return role in (Role.INSTRUCTOR, Role.TA)
 
     def has_object_permission(self, request, view, obj):
-        user_id = get_request_user_id(request)
         course_id = get_course_id_from_request_or_view(request, view, obj)
-        roles = get_user_roles(user_id, course_id)
-        return bool(roles & {Role.INSTRUCTOR, Role.TA})
+        role = get_resolved_role(request, course_id)
+        return role in (Role.INSTRUCTOR, Role.TA)
 
 
 class IsInstructor(BasePermission):
-    """Allows access only to instructors."""
+    """Allows access only to users acting as instructors."""
 
     def has_permission(self, request, view):
-        user_id = get_request_user_id(request)
-        if not user_id:
-            return False
         course_id = get_course_id_from_request_or_view(request, view)
         if not course_id:
             return True
-        return Role.INSTRUCTOR in get_user_roles(user_id, course_id)
+        return get_resolved_role(request, course_id) == Role.INSTRUCTOR
 
     def has_object_permission(self, request, view, obj):
-        user_id = get_request_user_id(request)
         course_id = get_course_id_from_request_or_view(request, view, obj)
-        return Role.INSTRUCTOR in get_user_roles(user_id, course_id)
+        return get_resolved_role(request, course_id) == Role.INSTRUCTOR
 
 
 class IsTeachingAssistant(BasePermission):
-    """Allows access only to teaching assistants."""
+    """Allows access only to users acting as teaching assistants."""
 
     def has_permission(self, request, view):
-        user_id = get_request_user_id(request)
-        if not user_id:
-            return False
         course_id = get_course_id_from_request_or_view(request, view)
         if not course_id:
             return True
-        return Role.TA in get_user_roles(user_id, course_id)
+        return get_resolved_role(request, course_id) == Role.TA
 
     def has_object_permission(self, request, view, obj):
-        user_id = get_request_user_id(request)
         course_id = get_course_id_from_request_or_view(request, view, obj)
-        return Role.TA in get_user_roles(user_id, course_id)
+        return get_resolved_role(request, course_id) == Role.TA
 
 
 class IsEnrolledStudent(BasePermission):
-    """Allows access to enrolled students."""
+    """Allows access only to users acting as enrolled students."""
 
     def has_permission(self, request, view):
-        user_id = get_request_user_id(request)
-        if not user_id:
-            return False
         course_id = get_course_id_from_request_or_view(request, view)
         if not course_id:
             return True
-        return Role.STUDENT in get_user_roles(user_id, course_id)
+        return get_resolved_role(request, course_id) == Role.STUDENT
 
     def has_object_permission(self, request, view, obj):
-        user_id = get_request_user_id(request)
         course_id = get_course_id_from_request_or_view(request, view, obj)
-        return Role.STUDENT in get_user_roles(user_id, course_id)
+        return get_resolved_role(request, course_id) == Role.STUDENT
 
 
 class IsObserverReadOnly(BasePermission):

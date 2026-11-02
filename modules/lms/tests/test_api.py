@@ -1,4 +1,5 @@
 from datetime import timedelta
+import io
 import pytest
 from django.utils import timezone
 from rest_framework.test import APIClient
@@ -18,9 +19,9 @@ from modules.lms.models import (
 
 @pytest.fixture
 def auth_client(stub_iam):
-    def _client(user_id: int, is_staff: bool = False):
+    def _client(user_id: int, is_staff: bool = False, active_role: str = None):
         kind = "staff" if is_staff else "student"
-        stub_iam(make_session(user_id=user_id, kind=kind))
+        stub_iam(make_session(user_id=user_id, kind=kind, active_role=active_role or ("instructor" if is_staff else "student")))
         c = APIClient()
         c.credentials(HTTP_AUTHORIZATION="Token mock-test-token")
         return c
@@ -46,6 +47,12 @@ def lms_course(db):
         course=course,
         user_id=2001,
         role=Role.INSTRUCTOR,
+        is_active=True,
+    )
+    CourseMembership.objects.create(
+        course=course,
+        user_id=3001,
+        role=Role.TA,
         is_active=True,
     )
     return course
@@ -107,7 +114,7 @@ def test_course_nested_actions(auth_client, lms_course):
 
 
 @pytest.mark.django_db
-def test_assignment_submit_and_submissions(auth_client, lms_course):
+def test_assignment_submit_and_resubmission_guardrail(auth_client, lms_course):
     asg = Assignment.objects.create(
         course=lms_course,
         author_user_id=2001,
@@ -117,7 +124,7 @@ def test_assignment_submit_and_submissions(auth_client, lms_course):
 
     student_client = auth_client(user_id=1001)
 
-    # Submit assignment
+    # Initial submission succeeds
     submit_payload = {
         "submission_type": SubmissionType.TEXT,
         "content_text": "GitHub repo link and summary notes.",
@@ -136,9 +143,18 @@ def test_assignment_submit_and_submissions(auth_client, lms_course):
     assert subs_resp.status_code == 200
     assert len(subs_resp.json()) == 1
 
+    # Resubmission attempt is gated pending policy clarification (ISS-LMS-005)
+    resp2 = student_client.post(
+        f"/api/v1/lms/assignments/{asg.id}/submit/",
+        data=submit_payload,
+        format="json",
+    )
+    assert resp2.status_code == 400
+    assert "ISS-LMS-005" in resp2.json()["detail"]
+
 
 @pytest.mark.django_db
-def test_submission_grading_and_audit_logs(auth_client, lms_course):
+def test_submission_grading_and_post_release_guardrail(auth_client, lms_course):
     asg = Assignment.objects.create(
         course=lms_course,
         author_user_id=2001,
@@ -152,7 +168,7 @@ def test_submission_grading_and_audit_logs(auth_client, lms_course):
         submission_type=SubmissionType.FILE,
     )
 
-    instructor_client = auth_client(user_id=2001, is_staff=True)
+    instructor_client = auth_client(user_id=2001, is_staff=True, active_role=Role.INSTRUCTOR)
 
     # Draft grade
     draft_payload = {
@@ -192,3 +208,65 @@ def test_submission_grading_and_audit_logs(auth_client, lms_course):
     assert logs_resp.status_code == 200
     assert len(logs_resp.json()) == 1
     assert logs_resp.json()[0]["new_points"] == 92
+
+    # Post-release modification attempt is gated pending policy clarification (ISS-LMS-006)
+    post_release_resp = instructor_client.post(
+        f"/api/v1/lms/submissions/{sub.id}/grade/",
+        data={"action": "draft", "points": 95},
+        format="json",
+    )
+    assert post_release_resp.status_code == 403
+    assert "ISS-LMS-006" in post_release_resp.json()["detail"]
+
+
+@pytest.mark.django_db
+def test_membership_and_announcement_policy_guardrails(auth_client, lms_course):
+    staff_client = auth_client(user_id=2001, is_staff=True)
+
+    # Direct student registration in LMS is prohibited
+    mem_resp = staff_client.post(
+        "/api/v1/lms/memberships/",
+        data={"course": lms_course.id, "user_id": 999, "role": Role.STUDENT},
+        format="json",
+    )
+    assert mem_resp.status_code == 403
+    data = mem_resp.json()
+    err_msg = data.get("error", {}).get("message", data.get("detail", ""))
+    assert "Direct student registration in LMS is prohibited" in err_msg
+
+    # TA announcement creation is gated (ISS-LMS-002)
+    ta_client = auth_client(user_id=3001, is_staff=False, active_role=Role.TA)
+    ann_resp = ta_client.post(
+        "/api/v1/lms/announcements/",
+        data={"course": lms_course.id, "title": "TA Announcement", "content": "Notice"},
+        format="json",
+        HTTP_X_LMS_ROLE=Role.TA,
+    )
+    assert ann_resp.status_code == 403
+    ann_data = ann_resp.json()
+    ann_err = ann_data.get("error", {}).get("message", ann_data.get("detail", ""))
+    assert "ISS-LMS-002" in ann_err
+
+
+@pytest.mark.django_db
+def test_file_upload_and_download(auth_client):
+    client = auth_client(user_id=1001)
+
+    file_content = b"PDF binary test stream for LMS"
+    upload_file = io.BytesIO(file_content)
+    upload_file.name = "syllabus.pdf"
+
+    # Upload file
+    upload_resp = client.post(
+        "/api/v1/lms/files/upload/",
+        data={"file": upload_file},
+        format="multipart",
+    )
+    assert upload_resp.status_code == 201
+    storage_key = upload_resp.json()["storage_key"]
+    assert storage_key.endswith("_syllabus.pdf")
+
+    # Download file
+    download_resp = client.get(f"/api/v1/lms/files/download/?key={storage_key}")
+    assert download_resp.status_code == 200
+    assert download_resp.getvalue() == file_content
