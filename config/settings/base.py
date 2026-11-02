@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.leave_elm",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -230,6 +231,12 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "LeaveCategoryEnum": "modules.leave_elm.models.LeavePolicy.CATEGORIES",
+        "LeaveCategoryCodeEnum": [
+            "CL", "RH", "SCL", "EL", "COL", "VL",
+        ],
+    },
 }
 
 CORS_ALLOW_ALL_ORIGINS = False

@@ -13,6 +13,28 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave_elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave_elm.apply.self` | Submit own leave applications | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Faculty`, `Leave Administrator`, `Registrar`, `Staff`, `Unit Head` |
+| `leave_elm.view.self` | View own leave balances and history | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Faculty`, `Leave Administrator`, `Registrar`, `Staff`, `Unit Head` |
+| `leave_elm.cancel.self` | Request cancellation of own approved leave | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Faculty`, `Leave Administrator`, `Registrar`, `Staff`, `Unit Head` |
+| `leave_elm.extend.self` | Request extension of own ongoing leave | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Faculty`, `Leave Administrator`, `Registrar`, `Staff`, `Unit Head` |
+| `leave_elm.resume.self` | Submit own leave resumption | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Faculty`, `Leave Administrator`, `Registrar`, `Staff`, `Unit Head` |
+| `leave_elm.substitute.respond` | Respond to a substitute assignment | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Faculty`, `Leave Administrator`, `Registrar`, `Staff`, `Unit Head` |
+| `leave_elm.review.queue` | View leave tasks assigned to the current user | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Leave Administrator`, `Registrar`, `Unit Head` |
+| `leave_elm.review.unit` | Review leave requests as Unit Head | `Unit Head` |
+| `leave_elm.review.establishment` | Process routed leave requests | `Deputy Registrar (Estt.)` |
+| `leave_elm.review.final` | Make configured final sanction decisions | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar` |
+| `leave_elm.manage.policy` | Maintain leave policy and hierarchy | `Leave Administrator` |
+| `leave_elm.manage.calendar` | Maintain holiday and RH calendars | `Leave Administrator` |
+| `leave_elm.manage.records` | Maintain leave records and offline sanctions | `Leave Administrator` |
+| `leave_elm.manage.sla` | Configure leave workflow SLA thresholds | `Leave Administrator` |
+| `leave_elm.view.all` | View all employee leave records | `Leave Administrator` |
+| `leave_elm.process.year_end` | Run annual leave-account processing | _service only_ |
+| `leave_elm.process.sla` | Process pending leave SLA thresholds | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

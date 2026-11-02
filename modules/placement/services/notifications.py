@@ -28,7 +28,8 @@ TOPICS = {
     "offer.issued", "offer.expiring", "offer.expired",
     "announcement.published", "recruiter.invited", "company.approved",
     "company.rejected", "conduct.sanctioned", "registration.confirmed",
-    "record.not_joining",
+    "record.not_joining", "leave.task.assigned", "leave.status.changed",
+    "leave.sla.reminder", "leave.sla.escalated",
 }
 
 

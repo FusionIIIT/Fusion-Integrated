@@ -1,87 +1,84 @@
-"""What the server tells the shell about this module (ADR-0010).
+"""Fusion module, navigation, and IAM permission contract for ELM."""
 
-Nav items carry `required_permission` and the server filters before sending —
-the client does zero filtering, so a link a role cannot use never reaches the
-browser at all.
-"""
 MODULE = {
-    "code": "leave_elm", "label": "Leave Management", "icon": "Calendar",
-    "base_path": "/leave", "nav_section": "Leave", "sort_order": 20,
+    "code": "leave_elm",
+    "label": "Leave Management",
+    "icon": "Calendar",
+    "base_path": "/leave",
+    "nav_section": "Leave",
+    "sort_order": 20,
     "status": "active",
 }
 
 NAV_ITEMS = [
-    {"code": "leave.apply", "label": "Apply for Leave",
-     "icon": "CheckSquare", "to": "/leave/apply",
-     "required_permission": "leave_elm.apply.self",
+    {"code": "leave.mine", "label": "My Leave", "icon": "Calendar",
+     "to": "/leave/mine", "required_permission": "leave_elm.view.self",
      "sort_order": 5},
-    {"code": "leave.approve", "label": "Approve Leave",
-     "icon": "CheckCircle", "to": "/leave/approve",
-     "required_permission": "leave_elm.approve.all",
+    {"code": "leave.apply", "label": "Apply for Leave", "icon": "CheckSquare",
+     "to": "/leave/apply", "required_permission": "leave_elm.apply.self",
      "sort_order": 10},
-    {"code": "leave.reject", "label": "Reject Leave",
-     "icon": "XCircle", "to": "/leave/reject",
-     "required_permission": "leave_elm.reject.all",
-     "sort_order": 15},
-    {"code": "leave.cancel", "label": "Cancel Leave",
-     "icon": "XSquare", "to": "/leave/cancel",
-     "required_permission": "leave_elm.cancel.all",
+    {"code": "leave.approvals", "label": "Approval Queue", "icon": "CheckCircle",
+     "to": "/leave/approvals", "required_permission": "leave_elm.review.queue",
      "sort_order": 20},
-    {"code": "leave.extend", "label": "Extend Leave",
-     "icon": "PlusSquare", "to": "/leave/extend",
-     "required_permission": "leave_elm.extend.all",
-     "sort_order": 25},
-    {"code": "leave.view", "label": "View Leave",
-     "icon": "Eye", "to": "/leave/view",
-     "required_permission": "leave_elm.view.all",
+    {"code": "leave.admin", "label": "Leave Administration", "icon": "Settings",
+     "to": "/leave/admin", "required_permission": "leave_elm.manage.policy",
      "sort_order": 30},
 ]
 
-#: Every permission this module recognises; ROLE_GRANTS below says who holds each.
 PERMISSIONS = [
-    ("leave_elm.apply.self", "Apply for leave"),
-    ("leave_elm.approve.all", "Approve all leave requests"),
-    ("leave_elm.reject.all", "Reject all leave requests"),
-    ("leave_elm.cancel.all", "Cancel all leave requests"),
-    ("leave_elm.extend.all", "Extend all leave requests"),
-    ("leave_elm.view.all", "View all leave requests"),
+    ("leave_elm.apply.self", "Submit own leave applications"),
+    ("leave_elm.view.self", "View own leave balances and history"),
+    ("leave_elm.cancel.self", "Request cancellation of own approved leave"),
+    ("leave_elm.extend.self", "Request extension of own ongoing leave"),
+    ("leave_elm.resume.self", "Submit own leave resumption"),
+    ("leave_elm.substitute.respond", "Respond to a substitute assignment"),
+    ("leave_elm.review.queue", "View leave tasks assigned to the current user"),
+    ("leave_elm.review.unit", "Review leave requests as Unit Head"),
+    ("leave_elm.review.establishment", "Process routed leave requests"),
+    ("leave_elm.review.final", "Make configured final sanction decisions"),
+    ("leave_elm.manage.policy", "Maintain leave policy and hierarchy"),
+    ("leave_elm.manage.calendar", "Maintain holiday and RH calendars"),
+    ("leave_elm.manage.records", "Maintain leave records and offline sanctions"),
+    ("leave_elm.manage.sla", "Configure leave workflow SLA thresholds"),
+    ("leave_elm.view.all", "View all employee leave records"),
+    ("leave_elm.process.year_end", "Run annual leave-account processing"),
+    ("leave_elm.process.sla", "Process pending leave SLA thresholds"),
 ]
 
-#: Performed by a service or a scheduled task, so no designation holds them.
 SYSTEM_PERMISSIONS = [
-    "leave_elm.cancel.all",
+    "leave_elm.process.year_end",
+    "leave_elm.process.sla",
 ]
 
-_STUDENT = [
+_EMPLOYEE = [
     "leave_elm.apply.self",
-    "leave_elm.view.all",
+    "leave_elm.view.self",
+    "leave_elm.cancel.self",
+    "leave_elm.extend.self",
+    "leave_elm.resume.self",
+    "leave_elm.substitute.respond",
 ]
 
-_COORDINATOR = [
-    "leave_elm.apply.self",
-    "leave_elm.approve.all",
-    "leave_elm.reject.all",
-    "leave_elm.view.all",
-]
-
-_OFFICER = [
-    *_COORDINATOR,
-    "leave_elm.cancel.all",
-    "leave_elm.extend.all",
-]
-
-#: Oversees rather than operates: no shortlisting and no offers.
-_CHAIRMAN = [
-    "leave_elm.approve.all",
-    "leave_elm.reject.all",
-    "leave_elm.view.all",
-]
-
-#: Keyed by the designation name as it exists in globals_designation.
 ROLE_GRANTS = {
-    "student": _STUDENT,
-    "leave_coordinator": _COORDINATOR,
-    "leave_officer": _OFFICER,
-    "leave_chairman": _CHAIRMAN,
-    "Dean Academic": _CHAIRMAN,
+    "Faculty": _EMPLOYEE,
+    "Staff": _EMPLOYEE,
+    "Unit Head": ["leave_elm.review.queue", "leave_elm.review.unit", *_EMPLOYEE],
+    "Deputy Registrar (Estt.)": [
+        "leave_elm.review.queue",
+        "leave_elm.review.establishment",
+        "leave_elm.review.final",
+        *_EMPLOYEE,
+    ],
+    "Dean": ["leave_elm.review.queue", "leave_elm.review.final", *_EMPLOYEE],
+    "Registrar": ["leave_elm.review.queue", "leave_elm.review.final", *_EMPLOYEE],
+    "Director": ["leave_elm.review.queue", "leave_elm.review.final", *_EMPLOYEE],
+    "Leave Administrator": [
+        "leave_elm.review.queue",
+        *_EMPLOYEE,
+        "leave_elm.manage.policy",
+        "leave_elm.manage.calendar",
+        "leave_elm.manage.records",
+        "leave_elm.manage.sla",
+        "leave_elm.view.all",
+    ],
 }
