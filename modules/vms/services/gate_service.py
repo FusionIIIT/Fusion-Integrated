@@ -1,12 +1,13 @@
 """Gate entry validation and check-in/out service (BR-002, BR-023, BR-028, BR-029, BR-030, BR-040)."""
 from django.utils import timezone
-from modules.vms.models.visits import VisitPass, VisitRequest, VisitLog
+
 from modules.vms.models.access import GateAlert
-from modules.vms.services.pass_service import validate_pass_validity
+from modules.vms.models.visits import VisitLog, VisitPass
 from modules.vms.services.exceptions import (
-    GateValidationException,
     CheckoutBlockedException,
+    GateValidationException,
 )
+from modules.vms.services.pass_service import validate_pass_validity
 
 
 def validate_and_check_in_visitor(
@@ -16,7 +17,7 @@ def validate_and_check_in_visitor(
     gate_name: str = "Main Gate",
 ) -> VisitPass:
     """Validates visitor pass QR and processes gate check-in.
-    
+
     Enforces BR-028: Auto-closes pending non-critical gate alerts on successful entry.
     Enforces BR-029: Captures nominal machine ID of the scanning device.
     Enforces BR-040: On validation failure, raises GateValidationException without creating duplicate alerts.
@@ -71,7 +72,7 @@ def check_out_visitor(
     gate_name: str = "Main Gate",
 ) -> VisitPass:
     """Processes check-out and campus exit for a visitor.
-    
+
     Enforces BR-023: Checkout not logged when already completed.
     Enforces BR-030: Pass and visit closed on checkout.
     """

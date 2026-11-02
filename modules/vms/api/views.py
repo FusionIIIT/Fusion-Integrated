@@ -1,83 +1,79 @@
 """DRF API ViewSets and operational endpoints for VMS."""
+from django.utils import timezone
+from drf_spectacular.utils import extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.utils import timezone
 
-from modules.vms.models.visitors import (
-    Visitor,
-    BlacklistRecord,
-    SafeListRecord,
-)
-from modules.vms.models.visits import (
-    VisitRequest,
-    VisitPass,
-    VisitLog,
+from modules.vms.api.serializers import (
+    BlacklistRecordSerializer,
+    BulkEventUploadSerializer,
+    CampusZoneSerializer,
+    EmergencyMusterSerializer,
+    GateAlertSerializer,
+    GateCheckInSerializer,
+    GateCheckOutSerializer,
+    MusterRollCallSerializer,
+    SafeListRecordSerializer,
+    VisitorRegistrationSerializer,
+    VisitorSerializer,
+    VisitPassSerializer,
+    VisitRequestDecisionSerializer,
+    VisitRequestSerializer,
+    ZoneAccessCheckSerializer,
+    ZoneElevationSerializer,
 )
 from modules.vms.models.access import (
     CampusZone,
-    AccessPolicy,
     GateAlert,
 )
 from modules.vms.models.muster import (
     EmergencyMuster,
-    MusterRollCall,
 )
-from modules.vms.api.serializers import (
-    VisitorSerializer,
-    VisitorRegistrationSerializer,
-    VisitRequestSerializer,
-    VisitRequestDecisionSerializer,
-    VisitPassSerializer,
-    GateCheckInSerializer,
-    GateCheckOutSerializer,
-    ZoneAccessCheckSerializer,
-    ZoneElevationSerializer,
-    BlacklistRecordSerializer,
-    SafeListRecordSerializer,
-    CampusZoneSerializer,
-    GateAlertSerializer,
-    EmergencyMusterSerializer,
-    MusterRollCallSerializer,
-    BulkEventUploadSerializer,
+from modules.vms.models.visitors import (
+    BlacklistRecord,
+    SafeListRecord,
+    Visitor,
 )
-from modules.vms.services.visitor_service import (
-    register_visitor,
-    get_anonymized_visitor_record,
+from modules.vms.models.visits import (
+    VisitPass,
+    VisitRequest,
+)
+from modules.vms.services.access_service import (
+    grant_temporary_zone_elevation,
+    validate_zone_access,
+)
+from modules.vms.services.event_service import (
+    process_bulk_event_attendees,
+)
+from modules.vms.services.exceptions import VMSDomainException
+from modules.vms.services.gate_service import (
+    check_out_visitor,
+    validate_and_check_in_visitor,
+)
+from modules.vms.services.muster_service import (
+    audit_muster_overstay_evictions,
+    complete_emergency_muster,
+    start_emergency_muster,
+    update_muster_roll_call,
 )
 from modules.vms.services.pass_service import (
     issue_visit_pass,
-    extend_pass_duration,
 )
 from modules.vms.services.visit_service import (
     create_visit_request,
     decide_visit_request,
     terminate_visit_early,
 )
-from modules.vms.services.gate_service import (
-    validate_and_check_in_visitor,
-    check_out_visitor,
+from modules.vms.services.visitor_service import (
+    get_anonymized_visitor_record,
+    register_visitor,
 )
-from modules.vms.services.access_service import (
-    validate_zone_access,
-    grant_temporary_zone_elevation,
-)
-from modules.vms.services.muster_service import (
-    start_emergency_muster,
-    update_muster_roll_call,
-    audit_muster_overstay_evictions,
-    complete_emergency_muster,
-)
-from modules.vms.services.event_service import (
-    process_bulk_event_attendees,
-    process_event_checkout,
-)
-from modules.vms.services.exceptions import VMSDomainException
 
 
 class VisitorViewSet(viewsets.ModelViewSet):
     """Visitor profile management and privacy-preserving queries."""
-    queryset = Visitor.objects.filter(is_active=True).order_by("-created_at")
+    queryset = Visitor.objects.filter(is_disabled=False).order_by("-created_at")
     serializer_class = VisitorSerializer
 
     def create(self, request, *args, **kwargs):
@@ -89,6 +85,7 @@ class VisitorViewSet(viewsets.ModelViewSet):
         except VMSDomainException as exc:
             return Response({"error": exc.message, "rule_id": exc.rule_id}, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(responses={200: VisitorSerializer})
     @action(detail=True, methods=["get"], url_path="anonymized")
     def anonymized(self, request, pk=None):
         visitor = self.get_object()
@@ -124,6 +121,7 @@ class VisitRequestViewSet(viewsets.ModelViewSet):
         except VMSDomainException as exc:
             return Response({"error": exc.message, "rule_id": exc.rule_id}, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(responses={200: VisitRequestSerializer(many=True)})
     @action(detail=False, methods=["get"], url_path="pending-approvals")
     def pending_approvals(self, request):
         host_user_id = request.query_params.get("host_user_id") or getattr(request.user, "user_id", None)
@@ -132,6 +130,7 @@ class VisitRequestViewSet(viewsets.ModelViewSet):
             qs = qs.filter(host_user_id=int(host_user_id))
         return Response(VisitRequestSerializer(qs, many=True).data)
 
+    @extend_schema(request=VisitRequestDecisionSerializer, responses={200: VisitRequestSerializer})
     @action(detail=True, methods=["post"], url_path="decide")
     def decide(self, request, pk=None):
         visit = self.get_object()
@@ -151,6 +150,7 @@ class VisitRequestViewSet(viewsets.ModelViewSet):
         except VMSDomainException as exc:
             return Response({"error": exc.message, "rule_id": exc.rule_id}, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(responses={200: VisitRequestSerializer})
     @action(detail=True, methods=["post"], url_path="terminate")
     def terminate(self, request, pk=None):
         visit = self.get_object()
@@ -168,6 +168,7 @@ class VisitPassViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = VisitPass.objects.all().order_by("-created_at")
     serializer_class = VisitPassSerializer
 
+    @extend_schema(responses={200: VisitPassSerializer})
     @action(detail=False, methods=["get"], url_path="by-qr")
     def by_qr(self, request):
         token = request.query_params.get("qr_code_hash")
@@ -180,6 +181,7 @@ class VisitPassViewSet(viewsets.ReadOnlyModelViewSet):
 class GateTerminalViewSet(viewsets.ViewSet):
     """Gate terminal operations: scanning, check-in, check-out, and walk-in passes."""
 
+    @extend_schema(request=GateCheckInSerializer, responses={200: VisitPassSerializer})
     @action(detail=False, methods=["post"], url_path="check-in")
     def check_in(self, request):
         serializer = GateCheckInSerializer(data=request.data)
@@ -197,6 +199,7 @@ class GateTerminalViewSet(viewsets.ViewSet):
         except VMSDomainException as exc:
             return Response({"error": exc.message, "rule_id": exc.rule_id}, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(request=GateCheckOutSerializer, responses={200: VisitPassSerializer})
     @action(detail=False, methods=["post"], url_path="check-out")
     def check_out(self, request):
         serializer = GateCheckOutSerializer(data=request.data)
@@ -214,6 +217,7 @@ class GateTerminalViewSet(viewsets.ViewSet):
         except VMSDomainException as exc:
             return Response({"error": exc.message, "rule_id": exc.rule_id}, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(request=VisitorRegistrationSerializer, responses={201: VisitPassSerializer})
     @action(detail=False, methods=["post"], url_path="walk-in")
     def walk_in(self, request):
         """Walk-in on-the-spot registration and immediate pass issuance (BR-032)."""
@@ -243,6 +247,7 @@ class GateTerminalViewSet(viewsets.ViewSet):
 class ZoneAccessViewSet(viewsets.ViewSet):
     """Zone access scanning and elevation controls."""
 
+    @extend_schema(request=ZoneAccessCheckSerializer, responses={200: dict})
     @action(detail=False, methods=["post"], url_path="validate")
     def validate_zone(self, request):
         serializer = ZoneAccessCheckSerializer(data=request.data)
@@ -262,6 +267,7 @@ class ZoneAccessViewSet(viewsets.ViewSet):
         except VMSDomainException as exc:
             return Response({"status": "denied", "error": exc.message, "rule_id": exc.rule_id}, status=status.HTTP_403_FORBIDDEN)
 
+    @extend_schema(request=ZoneElevationSerializer, responses={200: VisitPassSerializer})
     @action(detail=False, methods=["post"], url_path="elevate")
     def elevate_zone(self, request):
         serializer = ZoneElevationSerializer(data=request.data)
@@ -293,12 +299,14 @@ class EmergencyMusterViewSet(viewsets.ModelViewSet):
         muster = start_emergency_muster(initiated_by_user_id=user_id, reason=reason)
         return Response(EmergencyMusterSerializer(muster).data, status=status.HTTP_201_CREATED)
 
+    @extend_schema(responses={200: MusterRollCallSerializer(many=True)})
     @action(detail=True, methods=["get"], url_path="roster")
     def roster(self, request, pk=None):
         muster = self.get_object()
         entries = muster.roll_calls.all()
         return Response(MusterRollCallSerializer(entries, many=True).data)
 
+    @extend_schema(request=dict, responses={200: MusterRollCallSerializer})
     @action(detail=True, methods=["post"], url_path="mark-roll-call")
     def mark_roll_call(self, request, pk=None):
         muster = self.get_object()
@@ -319,6 +327,7 @@ class EmergencyMusterViewSet(viewsets.ModelViewSet):
         except VMSDomainException as exc:
             return Response({"error": exc.message}, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(responses={200: dict})
     @action(detail=True, methods=["post"], url_path="audit-evictions")
     def audit_evictions(self, request, pk=None):
         """Enforces BR-045: >15 minute muster alerts."""
@@ -326,6 +335,7 @@ class EmergencyMusterViewSet(viewsets.ModelViewSet):
         alerts_count = audit_muster_overstay_evictions(muster)
         return Response({"eviction_alerts_created": alerts_count})
 
+    @extend_schema(responses={200: EmergencyMusterSerializer})
     @action(detail=True, methods=["post"], url_path="finalize")
     def finalize(self, request, pk=None):
         muster = self.get_object()
@@ -356,6 +366,7 @@ class GateAlertViewSet(viewsets.ReadOnlyModelViewSet):
 class BulkEventViewSet(viewsets.ViewSet):
     """Bulk event upload and mass pass provisioning (BR-021)."""
 
+    @extend_schema(request=BulkEventUploadSerializer, responses={201: VisitPassSerializer(many=True)})
     @action(detail=False, methods=["post"], url_path="upload")
     def upload(self, request):
         serializer = BulkEventUploadSerializer(data=request.data)

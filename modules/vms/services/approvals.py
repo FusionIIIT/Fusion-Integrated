@@ -13,7 +13,7 @@ from __future__ import annotations
 from django.utils import timezone
 
 from core.api.exceptions import ConflictError, PermissionDeniedError
-from modules.vms.models import Pass, Visit, VisitRequest, Visitor, VmsNotification
+from modules.vms.models import Pass, Visit, Visitor, VisitRequest, VmsNotification
 from modules.vms.services import notifications, policies
 from modules.vms.services.errors import VmsError
 from modules.vms.services.passes import deactivate_pass, issue_pass

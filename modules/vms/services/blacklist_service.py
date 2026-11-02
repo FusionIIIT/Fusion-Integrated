@@ -1,13 +1,14 @@
 """Blacklist matching and verification service (BR-001, BR-004, BR-011, BR-024)."""
 from django.utils import timezone
-from modules.vms.models.visitors import BlacklistRecord, Visitor
+
 from modules.vms.models.access import GateAlert
+from modules.vms.models.visitors import BlacklistRecord, Visitor
 from modules.vms.services.exceptions import BlacklistMatchException
 
 
 def check_blacklist(phone: str, id_number: str = "", visitor: Visitor | None = None) -> bool:
     """Checks whether the applicant matches any active blacklist record.
-    
+
     Enforces BR-001: Exact match on phone or ID number only; no partial matches.
     Enforces BR-004 & BR-024: If hit, raises BlacklistMatchException and logs critical alert.
     """
@@ -15,7 +16,7 @@ def check_blacklist(phone: str, id_number: str = "", visitor: Visitor | None = N
     clean_id = id_number.strip() if id_number else ""
 
     qs = BlacklistRecord.objects.filter(is_active=True)
-    
+
     matched_record = None
     if clean_phone and qs.filter(phone=clean_phone).exists():
         matched_record = qs.filter(phone=clean_phone).first()

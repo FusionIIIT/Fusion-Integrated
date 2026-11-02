@@ -17,7 +17,7 @@ from __future__ import annotations
 
 from django.utils import timezone
 
-from modules.vms.models import SafeListRecord, VmsNotification, Visitor
+from modules.vms.models import Visitor, VmsNotification
 from modules.vms.services.blacklist import find_safe_list
 
 HOST_CHANNELS = ("PUSH", "EMAIL", "CALL")      # VMS-BR-014
@@ -61,15 +61,22 @@ def notify_host(visit_request, *, kind: str, subject: str = "",
     disabled contacts suppress everything. VMS-BR-046: no valid contact
     data means no delivery.
     """
-    base = dict(kind=kind, visit_request=visit_request,
-                payload={"shared_badge": visit_request.is_shared_badge,
-                         **(payload or {})})
+    base = {"kind": kind, "visit_request": visit_request,
+                "payload": {"shared_badge": visit_request.is_shared_badge,
+                         **(payload or {})}}
     out = []
     if visit_request.host_contacts_disabled:                # VMS-BR-022
-        for channel in HOST_CHANNELS:
-            out.append(send(channel=channel, recipient_type="HOST",
-                            recipient_contact="", subject=subject,
-                            suppressed_reason="contact_disabled", **base))
+        out.extend(
+            send(
+                channel=channel,
+                recipient_type="HOST",
+                recipient_contact="",
+                subject=subject,
+                suppressed_reason="contact_disabled",
+                **base,
+            )
+            for channel in HOST_CHANNELS
+        )
         return out
     contacts = {
         "PUSH": f"user:{visit_request.host_user_id}",       # always reachable

@@ -1,12 +1,12 @@
 """Bulk event visitor management service (BR-021, BR-039, BR-043, BR-044)."""
 from django.utils import timezone
-from modules.vms.models.visitors import Visitor
-from modules.vms.models.visits import VisitRequest, VisitPass
+
 from modules.vms.models.muster import EmergencyMuster
-from modules.vms.services.visitor_service import register_visitor
-from modules.vms.services.pass_service import issue_visit_pass
+from modules.vms.models.visits import VisitPass, VisitRequest
+from modules.vms.services.exceptions import CheckoutBlockedException, VMSDomainException
 from modules.vms.services.gate_service import check_out_visitor
-from modules.vms.services.exceptions import VMSDomainException, CheckoutBlockedException
+from modules.vms.services.pass_service import issue_visit_pass
+from modules.vms.services.visitor_service import register_visitor
 
 
 def process_bulk_event_attendees(
@@ -17,7 +17,7 @@ def process_bulk_event_attendees(
     allowed_zones: list[str] | None = None,
 ) -> list[VisitPass]:
     """Bulk-registers attendees for a seminar/drive and generates event passes.
-    
+
     Enforces BR-021: Bulk event batch generates passes for all supplied records.
     """
     if not attendees:
@@ -61,7 +61,7 @@ def process_event_checkout(
     security_user_id: int | None = None,
 ) -> VisitPass:
     """Processes checkout for event attendee.
-    
+
     Enforces BR-043: If an emergency muster is currently in progress, standard checkout is
     blocked until evacuation protocol is respected.
     Enforces BR-044: Direct exit permitted without requiring transfer back to host.

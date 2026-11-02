@@ -1,6 +1,7 @@
 """Visitor registration and identity service (BR-009, BR-015, BR-017, BR-020, BR-035)."""
 from django.utils import timezone
-from modules.vms.models.visitors import Visitor, SafeListRecord
+
+from modules.vms.models.visitors import SafeListRecord, Visitor
 from modules.vms.models.visits import VisitPass
 from modules.vms.services.blacklist_service import check_blacklist
 from modules.vms.services.exceptions import DuplicatePassException
@@ -15,7 +16,7 @@ def register_visitor(
     organization: str = "",
 ) -> Visitor:
     """Registers or updates a visitor profile.
-    
+
     Enforces BR-011 & BR-024: Immediate blacklist verification.
     """
     clean_phone = phone.strip()
@@ -40,7 +41,7 @@ def register_visitor(
 
 def check_same_day_duplicate_pass(visitor: Visitor, target_date: timezone.datetime | None = None) -> None:
     """Validates that visitor does not already hold an active pass for the same calendar date.
-    
+
     Enforces BR-017 & BR-020: No duplicate pass for same visitor on same day.
     """
     check_date = target_date or timezone.now()
@@ -63,7 +64,7 @@ def check_same_day_duplicate_pass(visitor: Visitor, target_date: timezone.dateti
 
 def check_safelist_status(phone: str, id_number: str = "") -> SafeListRecord | None:
     """Checks if a visitor is on the pre-approved safe-list.
-    
+
     Enforces BR-009 & BR-015: Safe-listed visitor has NO implicit zone access;
     must be issued an explicit pass.
     """

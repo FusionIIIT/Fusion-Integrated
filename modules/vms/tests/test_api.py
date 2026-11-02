@@ -1,14 +1,12 @@
 """Integration tests for VMS DRF API endpoints."""
 from django.test import TestCase
-from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient
-from django.utils import timezone
 
-from modules.vms.models.visitors import Visitor
-from modules.vms.models.visits import VisitRequest, VisitPass
-from modules.vms.services.visitor_service import register_visitor
+from modules.vms.models.visits import VisitRequest
 from modules.vms.services.pass_service import issue_visit_pass
+from modules.vms.services.visitor_service import register_visitor
 
 
 class VMSAPITests(TestCase):
@@ -61,7 +59,7 @@ class VMSAPITests(TestCase):
             status="pending",
         )
         decide_url = f"/api/v1/vms/requests/{visit.id}/decide/"
-        
+
         # 2. Approve request
         payload = {
             "decision": "approved",

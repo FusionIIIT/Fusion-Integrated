@@ -1,25 +1,22 @@
 """DRF Serializers for VMS REST API."""
 from rest_framework import serializers
-from modules.vms.models.visitors import (
-    Visitor,
-    BlacklistRecord,
-    SafeListRecord,
-    VisitorIDDocument,
-)
-from modules.vms.models.visits import (
-    VisitRequest,
-    VisitPass,
-    VisitLog,
-)
+
 from modules.vms.models.access import (
-    CampusZone,
-    AccessPolicy,
-    ZoneAccessLog,
-    GateAlert,
+    Zone,
 )
 from modules.vms.models.muster import (
-    EmergencyMuster,
-    MusterRollCall,
+    Muster,
+    MusterEntry,
+)
+from modules.vms.models.visitors import (
+    Alert,
+    BlacklistRecord,
+    SafeListRecord,
+    Visitor,
+)
+from modules.vms.models.visits import (
+    Pass,
+    VisitRequest,
 )
 
 
@@ -31,10 +28,12 @@ class VisitorSerializer(serializers.ModelSerializer):
             "full_name",
             "phone",
             "email",
-            "identity_type",
-            "id_number",
-            "organization",
-            "is_active",
+            "id_doc_type",
+            "id_doc_number",
+            "photo_url",
+            "is_anonymous",
+            "is_disabled",
+            "disabled_reason",
             "created_at",
         ]
         read_only_fields = ["id", "created_at"]
@@ -50,30 +49,25 @@ class VisitorRegistrationSerializer(serializers.Serializer):
 
 
 class VisitRequestSerializer(serializers.ModelSerializer):
-    visitor = VisitorSerializer(read_only=True)
-    visitor_id = serializers.IntegerField(write_only=True, required=False)
-
     class Meta:
         model = VisitRequest
         fields = [
             "id",
-            "visitor",
             "visitor_id",
             "host_user_id",
             "purpose",
-            "intended_start",
-            "intended_end",
-            "actual_arrival",
-            "actual_departure",
-            "current_zone",
+            "requested_start",
+            "requested_end",
+            "requested_zones",
             "status",
             "instructions",
+            "decision_notes",
             "rejection_reason",
-            "decided_at",
+            "decision_at",
             "decided_by_user_id",
             "created_at",
         ]
-        read_only_fields = ["id", "status", "decided_at", "decided_by_user_id", "created_at"]
+        read_only_fields = ["id", "status", "decision_at", "decided_by_user_id", "created_at"]
 
 
 class VisitRequestDecisionSerializer(serializers.Serializer):
@@ -83,28 +77,22 @@ class VisitRequestDecisionSerializer(serializers.Serializer):
 
 
 class VisitPassSerializer(serializers.ModelSerializer):
-    visitor_name = serializers.CharField(source="visitor.full_name", read_only=True)
-    visitor_phone = serializers.CharField(source="visitor.phone", read_only=True)
-
     class Meta:
-        model = VisitPass
+        model = Pass
         fields = [
             "id",
-            "pass_number",
-            "visitor",
-            "visitor_name",
-            "visitor_phone",
-            "visit",
+            "visit_id",
+            "visitor_id",
             "pass_type",
-            "valid_from",
-            "valid_to",
+            "pass_code",
             "status",
-            "allowed_zones",
-            "qr_code_hash",
-            "parent_pass",
+            "valid_from",
+            "valid_until",
+            "permitted_zones",
+            "parent_pass_id",
             "created_at",
         ]
-        read_only_fields = ["id", "pass_number", "qr_code_hash", "created_at"]
+        read_only_fields = ["id", "pass_code", "created_at"]
 
 
 class GateCheckInSerializer(serializers.Serializer):
@@ -138,7 +126,9 @@ class BlacklistRecordSerializer(serializers.ModelSerializer):
             "id",
             "full_name",
             "phone",
-            "id_number",
+            "email",
+            "id_doc_type",
+            "id_doc_number",
             "reason",
             "added_by_user_id",
             "is_active",
@@ -154,10 +144,11 @@ class SafeListRecordSerializer(serializers.ModelSerializer):
             "id",
             "full_name",
             "phone",
-            "id_number",
-            "category",
-            "valid_until",
-            "added_by_user_id",
+            "email",
+            "id_doc_type",
+            "id_doc_number",
+            "expiry_date",
+            "notes",
             "is_active",
             "created_at",
         ]
@@ -166,74 +157,63 @@ class SafeListRecordSerializer(serializers.ModelSerializer):
 
 class CampusZoneSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CampusZone
+        model = Zone
         fields = [
             "id",
             "code",
             "name",
+            "is_restricted",
+            "is_vip_designated",
             "description",
-            "requires_special_elevation",
-            "max_occupancy",
-            "is_active",
         ]
 
 
 class GateAlertSerializer(serializers.ModelSerializer):
-    visitor_name = serializers.CharField(source="visitor.full_name", read_only=True)
-
     class Meta:
-        model = GateAlert
+        model = Alert
         fields = [
             "id",
             "alert_type",
             "severity",
+            "message",
+            "visitor_id",
+            "visit_id",
+            "pass_id",
+            "zone_code",
             "status",
-            "visitor",
-            "visitor_name",
-            "pass_record",
-            "gate_machine_id",
-            "details",
             "created_at",
-            "closed_at",
-            "closed_by_user_id",
         ]
 
 
 class EmergencyMusterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EmergencyMuster
+        model = Muster
         fields = [
             "id",
-            "muster_code",
-            "initiated_by_user_id",
-            "reason",
             "status",
+            "muster_type",
+            "reason",
+            "triggered_by_user_id",
             "started_at",
             "completed_at",
-            "total_on_site_at_start",
-            "total_accounted",
-            "total_unaccounted",
-            "summary_report",
+            "summary",
         ]
-        read_only_fields = ["id", "muster_code", "started_at"]
+        read_only_fields = ["id", "started_at"]
 
 
 class MusterRollCallSerializer(serializers.ModelSerializer):
-    visitor_name = serializers.CharField(source="visitor.full_name", read_only=True)
-    visitor_phone = serializers.CharField(source="visitor.phone", read_only=True)
-
     class Meta:
-        model = MusterRollCall
+        model = MusterEntry
         fields = [
             "id",
             "muster",
-            "visitor",
-            "visitor_name",
-            "visitor_phone",
+            "visit_id",
+            "visitor_id",
+            "host_user_id",
+            "last_seen_zone",
             "status",
-            "last_known_zone",
-            "checked_by_user_id",
-            "checked_at",
+            "marked_present",
+            "marked_at",
             "notes",
         ]
 

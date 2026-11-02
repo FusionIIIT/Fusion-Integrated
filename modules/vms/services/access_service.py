@@ -1,9 +1,8 @@
 """Zone access control and elevation service (BR-005, BR-031, BR-041, BR-042)."""
-from django.utils import timezone
+from modules.vms.models.access import CampusZone, GateAlert, ZoneAccessLog
 from modules.vms.models.visits import VisitPass
-from modules.vms.models.access import CampusZone, ZoneAccessLog, GateAlert
-from modules.vms.services.pass_service import validate_pass_validity
 from modules.vms.services.exceptions import UnauthorizedZoneException
+from modules.vms.services.pass_service import validate_pass_validity
 
 
 def validate_zone_access(
@@ -13,7 +12,7 @@ def validate_zone_access(
     verifier_user_id: int | None = None,
 ) -> bool:
     """Evaluates whether visitor's pass permits entry to a designated zone checkpoint.
-    
+
     Enforces BR-005: No violation if zone is within approved allowed_zones.
     Enforces BR-031: VIP passes restricted strictly to designated zones.
     Enforces BR-041 & BR-042: Non-designated zones trigger immediate access denial & alert.
@@ -48,29 +47,28 @@ def validate_zone_access(
         visit.current_zone = zone.name
         visit.save(update_fields=["current_zone", "updated_at"])
         return True
-    else:
-        # BR-041 & BR-042: Log denial and create security alert
-        ZoneAccessLog.objects.create(
-            pass_record=pass_record,
-            zone=zone,
-            action="denied",
-            verified_by_user_id=verifier_user_id,
-            gate_machine_id=gate_machine_id,
-            notes=f"Unauthorized entry attempt to restricted zone {zone.name} (BR-041).",
-        )
-        GateAlert.objects.create(
-            alert_type="unauthorized_zone",
-            severity="medium",
-            status="open",
-            visitor=pass_record.visitor,
-            pass_record=pass_record,
-            gate_machine_id=gate_machine_id,
-            details=f"Pass #{pass_record.pass_number} denied entry to zone '{zone.name}' [{zone_code}].",
-        )
-        raise UnauthorizedZoneException(
-            f"Access denied: Zone '{zone.name}' is outside visitor's designated pass permissions (BR-041).",
-            rule_id="BR-041",
-        )
+    # BR-041 & BR-042: Log denial and create security alert
+    ZoneAccessLog.objects.create(
+        pass_record=pass_record,
+        zone=zone,
+        action="denied",
+        verified_by_user_id=verifier_user_id,
+        gate_machine_id=gate_machine_id,
+        notes=f"Unauthorized entry attempt to restricted zone {zone.name} (BR-041).",
+    )
+    GateAlert.objects.create(
+        alert_type="unauthorized_zone",
+        severity="medium",
+        status="open",
+        visitor=pass_record.visitor,
+        pass_record=pass_record,
+        gate_machine_id=gate_machine_id,
+        details=f"Pass #{pass_record.pass_number} denied entry to zone '{zone.name}' [{zone_code}].",
+    )
+    raise UnauthorizedZoneException(
+        f"Access denied: Zone '{zone.name}' is outside visitor's designated pass permissions (BR-041).",
+        rule_id="BR-041",
+    )
 
 
 def grant_temporary_zone_elevation(

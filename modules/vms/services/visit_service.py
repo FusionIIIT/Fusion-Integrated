@@ -1,10 +1,10 @@
 """Visit request workflow and host approval service (BR-006, BR-007, BR-008, BR-047)."""
 from django.utils import timezone
+
 from modules.vms.models.visitors import Visitor
-from modules.vms.models.visits import VisitRequest, VisitLog
-from modules.vms.services.visitor_service import register_visitor
-from modules.vms.services.pass_service import issue_visit_pass
+from modules.vms.models.visits import VisitLog, VisitRequest
 from modules.vms.services.exceptions import VMSDomainException
+from modules.vms.services.pass_service import issue_visit_pass
 
 
 def create_visit_request(
@@ -27,7 +27,7 @@ def create_visit_request(
         intended_end=intended_end,
         status="pending",
     )
-    
+
     # Audit log entry
     VisitLog.objects.create(
         visit=visit,
@@ -45,7 +45,7 @@ def decide_visit_request(
     rejection_reason: str = "",
 ) -> VisitRequest:
     """Processes host approval or rejection.
-    
+
     Enforces BR-007: Approval preserves original request ID in workflow & logs.
     Enforces BR-047: If rejected, no pass generated and no host-approval notification dispatched.
     """

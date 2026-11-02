@@ -163,3 +163,25 @@ class VmsRoleAssignment(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.role}:{self.user_id}"
+
+
+CampusZone = Zone
+ZoneAccessLog = Violation
+
+
+
+def _get_alert():
+    from modules.vms.models.visitors import Alert
+    return Alert
+
+
+class _GateAlertProxy:
+    def __getattr__(self, name):
+        return getattr(_get_alert(), name)
+
+    def __call__(self, *args, **kwargs):
+        return _get_alert()(*args, **kwargs)
+
+
+GateAlert = _GateAlertProxy()
+

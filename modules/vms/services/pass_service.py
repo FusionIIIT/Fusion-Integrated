@@ -1,11 +1,12 @@
 """Pass lifecycle and issuance service (BR-003, BR-032, BR-033, BR-034, BR-039)."""
 from datetime import timedelta
+
 from django.utils import timezone
-from modules.vms.models.visitors import Visitor
-from modules.vms.models.visits import VisitRequest, VisitPass
+
 from modules.vms.models.access import AccessPolicy
-from modules.vms.services.visitor_service import check_same_day_duplicate_pass
+from modules.vms.models.visits import VisitPass, VisitRequest
 from modules.vms.services.exceptions import PassExpiredException, VMSDomainException
+from modules.vms.services.visitor_service import check_same_day_duplicate_pass
 
 
 def issue_visit_pass(
@@ -16,7 +17,7 @@ def issue_visit_pass(
     parent_pass: VisitPass | None = None,
 ) -> VisitPass:
     """Issues an active visit pass with QR token and time-bounded validity.
-    
+
     Enforces BR-032: Walk-in pass duration = 4 hours by default.
     Enforces BR-033: Registered guest pass default = 4 hours.
     Enforces BR-034: Generic pass duration from AccessPolicy if unprovided.
@@ -28,9 +29,10 @@ def issue_visit_pass(
     check_same_day_duplicate_pass(visitor=visitor)
 
     # Enforce BR-039: If parent pass specified, verify it is currently active
-    if parent_pass is not None:
-        if parent_pass.status != "active" or parent_pass.valid_to < timezone.now():
-            raise VMSDomainException(
+    if parent_pass is not None and (
+        parent_pass.status != "active" or parent_pass.valid_to < timezone.now()
+    ):
+        raise VMSDomainException(
                 "Cannot issue event/overflow pass: Parent pass is not active or has expired.",
                 rule_id="BR-039",
             )
@@ -54,7 +56,7 @@ def issue_visit_pass(
 
     default_zones = allowed_zones if allowed_zones is not None else ["Main Gate", "Administrative Block"]
 
-    pass_record = VisitPass.objects.create(
+    return VisitPass.objects.create(
         visitor=visitor,
         visit=visit,
         pass_type=pass_type,
@@ -64,12 +66,11 @@ def issue_visit_pass(
         allowed_zones=default_zones,
         parent_pass=parent_pass,
     )
-    return pass_record
 
 
 def validate_pass_validity(pass_record: VisitPass) -> bool:
     """Checks if a pass is within its valid operational time window.
-    
+
     Enforces BR-003: Pass is only valid during approved unexpired window.
     """
     now = timezone.now()

@@ -66,3 +66,8 @@ class MusterEntry(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"entry:{self.visit_id}:{self.status}"
+
+
+EmergencyMuster = Muster
+MusterRollCall = MusterEntry
+

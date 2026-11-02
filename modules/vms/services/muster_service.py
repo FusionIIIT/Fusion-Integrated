@@ -1,9 +1,11 @@
 """Emergency muster and evacuation accountability service (BR-045, VMS-UC-026)."""
 from datetime import timedelta
+
 from django.utils import timezone
-from modules.vms.models.visits import VisitPass
-from modules.vms.models.muster import EmergencyMuster, MusterRollCall
+
 from modules.vms.models.access import GateAlert
+from modules.vms.models.muster import EmergencyMuster, MusterRollCall
+from modules.vms.models.visits import VisitPass
 from modules.vms.services.exceptions import VMSDomainException
 
 
@@ -69,7 +71,7 @@ def audit_muster_overstay_evictions(muster: EmergencyMuster) -> int:
     """Enforces BR-045: Muster roster extra time > 15 minutes triggers eviction alert."""
     now = timezone.now()
     cutoff_time = muster.started_at + timedelta(minutes=15)
-    
+
     eviction_alerts_created = 0
     if now > cutoff_time:
         unaccounted_entries = muster.roll_calls.filter(status="unaccounted")
@@ -101,7 +103,7 @@ def complete_emergency_muster(muster: EmergencyMuster) -> EmergencyMuster:
     now = timezone.now()
     muster.status = "completed"
     muster.completed_at = now
-    
+
     total = muster.total_on_site_at_start
     accounted = muster.roll_calls.exclude(status="unaccounted").count()
     unaccounted = muster.roll_calls.filter(status="unaccounted").count()

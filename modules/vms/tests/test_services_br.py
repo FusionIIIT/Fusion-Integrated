@@ -1,56 +1,36 @@
 """Unit & integration tests verifying VMS Business Rules (BR-001 to BR-047)."""
 from datetime import timedelta
+
 from django.test import TestCase
 from django.utils import timezone
 
-from modules.vms.models.visitors import Visitor, BlacklistRecord, SafeListRecord
-from modules.vms.models.visits import VisitRequest, VisitPass
-from modules.vms.models.access import CampusZone, AccessPolicy, GateAlert
-from modules.vms.models.muster import EmergencyMuster
-from modules.vms.services.blacklist_service import (
-    check_blacklist,
-    add_to_blacklist,
-)
-from modules.vms.services.visitor_service import (
-    register_visitor,
-    check_same_day_duplicate_pass,
-    check_safelist_status,
-)
-from modules.vms.services.pass_service import (
-    issue_visit_pass,
-    validate_pass_validity,
-    extend_pass_duration,
-)
-from modules.vms.services.visit_service import (
-    create_visit_request,
-    decide_visit_request,
-    terminate_visit_early,
-)
-from modules.vms.services.gate_service import (
-    validate_and_check_in_visitor,
-    check_out_visitor,
-)
+from modules.vms.models.access import AccessPolicy, CampusZone, GateAlert
+from modules.vms.models.visits import VisitRequest
 from modules.vms.services.access_service import (
     validate_zone_access,
-    grant_temporary_zone_elevation,
 )
-from modules.vms.services.muster_service import (
-    start_emergency_muster,
-    update_muster_roll_call,
-    audit_muster_overstay_evictions,
-    complete_emergency_muster,
-)
-from modules.vms.services.event_service import (
-    process_bulk_event_attendees,
-    process_event_checkout,
+from modules.vms.services.blacklist_service import (
+    add_to_blacklist,
 )
 from modules.vms.services.exceptions import (
     BlacklistMatchException,
+    CheckoutBlockedException,
     DuplicatePassException,
     UnauthorizedZoneException,
-    PassExpiredException,
-    GateValidationException,
-    CheckoutBlockedException,
+)
+from modules.vms.services.gate_service import (
+    check_out_visitor,
+    validate_and_check_in_visitor,
+)
+from modules.vms.services.muster_service import (
+    audit_muster_overstay_evictions,
+    start_emergency_muster,
+)
+from modules.vms.services.pass_service import (
+    issue_visit_pass,
+)
+from modules.vms.services.visitor_service import (
+    register_visitor,
 )
 
 
@@ -247,7 +227,7 @@ class VMSBusinessRulesTests(TestCase):
             actual_arrival=now,
             status="on_site",
         )
-        pass_record = issue_visit_pass(visit=visit, pass_type="registered_guest")
+        issue_visit_pass(visit=visit, pass_type="registered_guest")
 
         muster = start_emergency_muster(initiated_by_user_id=9999, reason="Test Fire Evacuation")
         self.assertEqual(muster.total_on_site_at_start, 1)

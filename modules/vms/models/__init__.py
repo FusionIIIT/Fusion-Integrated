@@ -8,13 +8,6 @@ from modules.vms.models.access import (
     ZoneElevation,
 )
 from modules.vms.models.muster import Muster, MusterEntry
-from modules.vms.models.visits import (
-    Pass,
-    Visit,
-    VisitLog,
-    VisitRequest,
-    VmsNotification,
-)
 from modules.vms.models.visitors import (
     Alert,
     BlacklistRecord,
@@ -22,24 +15,43 @@ from modules.vms.models.visitors import (
     Visitor,
     normalize_id,
 )
+from modules.vms.models.visits import (
+    Pass,
+    Visit,
+    VisitLog,
+    VisitRequest,
+    VmsNotification,
+)
 
 __all__ = [
     "AccessPolicy",
     "Alert",
     "BlacklistRecord",
+    "CampusZone",
+    "EmergencyMuster",
     "Gate",
+    "GateAlert",
     "Muster",
     "MusterEntry",
+    "MusterRollCall",
     "Pass",
     "SafeListRecord",
-    "Visitor",
+    "Violation",
     "Visit",
     "VisitLog",
+    "VisitPass",
     "VisitRequest",
-    "Violation",
+    "Visitor",
     "VmsNotification",
     "VmsRoleAssignment",
     "Zone",
     "ZoneElevation",
     "normalize_id",
 ]
+
+VisitPass = Pass
+CampusZone = Zone
+GateAlert = Alert
+EmergencyMuster = Muster
+MusterRollCall = MusterEntry
+

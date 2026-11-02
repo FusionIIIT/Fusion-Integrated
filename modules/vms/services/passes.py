@@ -99,9 +99,7 @@ def pass_is_live(pass_obj: Pass, at=None) -> bool:
     at = at or timezone.now()
     if at < pass_obj.valid_from:
         return False
-    if pass_obj.valid_until and at > pass_obj.valid_until:
-        return False
-    return True
+    return not (pass_obj.valid_until and at > pass_obj.valid_until)
 
 
 def expire_if_due(pass_obj: Pass, at=None) -> Pass:

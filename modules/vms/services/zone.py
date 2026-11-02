@@ -16,7 +16,7 @@ from datetime import timedelta
 
 from django.utils import timezone
 
-from modules.vms.models import Pass, Visit, VisitLog, Visitor, Zone, ZoneElevation
+from modules.vms.models import Visit, VisitLog, Visitor, Zone, ZoneElevation
 from modules.vms.services import blacklist as blacklist_service
 from modules.vms.services import policies, roles
 from modules.vms.services.alerts import close_alerts_on_entry, open_alert

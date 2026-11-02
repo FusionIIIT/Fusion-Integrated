@@ -56,6 +56,23 @@ class Visitor(TimeStampedModel):
     def __str__(self) -> str:
         return f"{self.full_name} <{self.id or '?'}>"
 
+    @property
+    def is_active(self) -> bool:
+        return not self.is_disabled
+
+    @property
+    def identity_type(self) -> str:
+        return self.id_doc_type
+
+    @property
+    def id_number(self) -> str:
+        return self.id_doc_number
+
+    @property
+    def organization(self) -> str:
+        return ""
+
+
 
 class BlacklistRecord(TimeStampedModel):
     """A prohibited (or watched) person. Only PUBLISHED/active rows are

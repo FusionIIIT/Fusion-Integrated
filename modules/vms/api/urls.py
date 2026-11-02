@@ -1,19 +1,19 @@
 """URL routing for VMS REST API endpoints."""
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from django.urls import path, include
 
 from modules.vms.api.views import (
-    VisitorViewSet,
-    VisitRequestViewSet,
-    VisitPassViewSet,
-    GateTerminalViewSet,
-    ZoneAccessViewSet,
-    EmergencyMusterViewSet,
     BlacklistViewSet,
-    SafeListViewSet,
-    CampusZoneViewSet,
-    GateAlertViewSet,
     BulkEventViewSet,
+    CampusZoneViewSet,
+    EmergencyMusterViewSet,
+    GateAlertViewSet,
+    GateTerminalViewSet,
+    SafeListViewSet,
+    VisitorViewSet,
+    VisitPassViewSet,
+    VisitRequestViewSet,
+    ZoneAccessViewSet,
 )
 
 router = DefaultRouter()

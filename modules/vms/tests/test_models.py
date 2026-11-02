@@ -1,25 +1,19 @@
 """Unit tests for VMS database models and schema constraints."""
 from django.test import TestCase
 from django.utils import timezone
-from modules.vms.models.visitors import (
-    Visitor,
-    BlacklistRecord,
-    SafeListRecord,
-    VisitorIDDocument,
-)
-from modules.vms.models.visits import (
-    VisitRequest,
-    VisitPass,
-    VisitLog,
-)
-from modules.vms.models.access import (
-    CampusZone,
-    AccessPolicy,
-    GateAlert,
-)
+
 from modules.vms.models.muster import (
     EmergencyMuster,
     MusterRollCall,
+)
+from modules.vms.models.visitors import (
+    BlacklistRecord,
+    SafeListRecord,
+    Visitor,
+)
+from modules.vms.models.visits import (
+    VisitPass,
+    VisitRequest,
 )
 
 

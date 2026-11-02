@@ -20,9 +20,7 @@ def _in_window(row: VmsRoleAssignment, at=None) -> bool:
     at = at or timezone.now()
     if row.valid_from and at < row.valid_from:
         return False
-    if row.valid_to and at > row.valid_to:
-        return False
-    return True
+    return not (row.valid_to and at > row.valid_to)
 
 
 def active_assignment(user_id: int, role: str) -> VmsRoleAssignment | None:
@@ -74,10 +72,7 @@ def is_host_enabled(user_id: int) -> bool:
     """VMS-BR-026: an explicitly disabled (or expired) host is not valid
     for check-in. No row at all means an ordinary, enabled faculty host."""
     rows = VmsRoleAssignment.objects.filter(user_id=user_id, role="HOST")
-    for row in rows:
-        if not row.is_active or not _in_window(row):
-            return False
-    return True
+    return all(not (not row.is_active or not _in_window(row)) for row in rows)
 
 
 def require_host_enabled(user_id: int) -> None:

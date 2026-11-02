@@ -228,3 +228,7 @@ class VmsNotification(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.kind}/{self.channel}:{self.status}"
+
+
+VisitPass = Pass
+

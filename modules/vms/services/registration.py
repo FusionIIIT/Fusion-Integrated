@@ -15,10 +15,9 @@ import uuid
 from django.utils import timezone
 
 from core.api.exceptions import ConflictError
-from modules.vms.models import Pass, Visit, VisitRequest, Visitor, normalize_id
+from modules.vms.models import Pass, Visit, Visitor, VisitRequest, normalize_id
 from modules.vms.services import blacklist as blacklist_service
-from modules.vms.services import notifications
-from modules.vms.services import policies, roles
+from modules.vms.services import notifications, policies, roles
 from modules.vms.services.errors import DuplicatePassError, VmsError
 from modules.vms.services.passes import has_pass_today, issue_pass
 
