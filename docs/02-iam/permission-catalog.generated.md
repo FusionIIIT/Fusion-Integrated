@@ -13,6 +13,28 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `lms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `lms.course.view` | View an authorized course workspace | `faculty`, `observer`, `student`, `teaching_assistant` |
+| `lms.course.manage` | Manage assigned course details and structure | `faculty` |
+| `lms.material.view` | View authorized course materials | `faculty`, `observer`, `student`, `teaching_assistant` |
+| `lms.material.manage` | Manage course materials | `faculty` |
+| `lms.announcement.view` | View course announcements | `faculty`, `observer`, `student`, `teaching_assistant` |
+| `lms.announcement.create` | Post course announcements where permitted | `faculty`, `teaching_assistant` |
+| `lms.assignment.view` | View released assignments | `faculty`, `student` |
+| `lms.assignment.manage` | Create and edit course assignments | `faculty` |
+| `lms.assignment.publish` | Publish course assignments | `faculty` |
+| `lms.submission.create` | Submit assignment work | `student` |
+| `lms.submission.view_self` | View one's own submission history | `student` |
+| `lms.submission.view` | View course submissions for grading | `faculty`, `teaching_assistant` |
+| `lms.grade.view_self` | View one's own released grades | `student` |
+| `lms.grade.manage` | Grade course submissions where permitted | `faculty`, `teaching_assistant` |
+| `lms.grade.release` | Release grades and feedback to students | `faculty` |
+| `lms.material.release` | System release of scheduled course materials | _service only_ |
+| `lms.assignment.release` | System release of scheduled assignments | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
