@@ -34,6 +34,415 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "hostel": {
+      "grants": {
+        "admin": [
+          "hostel.accommodation.allot",
+          "hostel.accommodation.request",
+          "hostel.accommodation.view_self",
+          "hostel.attendance.record",
+          "hostel.attendance.view",
+          "hostel.attendance.view_self",
+          "hostel.complaint.escalate",
+          "hostel.complaint.manage",
+          "hostel.complaint.submit",
+          "hostel.complaint.view_self",
+          "hostel.extended_stay.request",
+          "hostel.extended_stay.review",
+          "hostel.extended_stay.view_self",
+          "hostel.fine.manage",
+          "hostel.fine.record",
+          "hostel.fine.view_self",
+          "hostel.guest_room.manage",
+          "hostel.guest_room.request",
+          "hostel.guest_room.view_self",
+          "hostel.hostel.manage",
+          "hostel.hostel.view",
+          "hostel.inventory.manage",
+          "hostel.leave.request",
+          "hostel.leave.review",
+          "hostel.leave.view_self",
+          "hostel.notice.publish",
+          "hostel.notice.view",
+          "hostel.report.view",
+          "hostel.report.view_institution",
+          "hostel.role_binding.manage",
+          "hostel.role_binding.view",
+          "hostel.room.manage",
+          "hostel.room.view",
+          "hostel.security.schedule",
+          "hostel.staff.manage"
+        ],
+        "hostel_caretaker": [
+          "hostel.accommodation.allot",
+          "hostel.accommodation.request",
+          "hostel.attendance.record",
+          "hostel.attendance.view",
+          "hostel.complaint.escalate",
+          "hostel.complaint.manage",
+          "hostel.fine.manage",
+          "hostel.fine.record",
+          "hostel.guest_room.manage",
+          "hostel.hostel.view",
+          "hostel.inventory.manage",
+          "hostel.leave.review",
+          "hostel.notice.publish",
+          "hostel.notice.view",
+          "hostel.report.view",
+          "hostel.role_binding.view",
+          "hostel.room.manage",
+          "hostel.room.view",
+          "hostel.staff.manage"
+        ],
+        "hostel_warden": [
+          "hostel.attendance.view",
+          "hostel.complaint.escalate",
+          "hostel.extended_stay.review",
+          "hostel.fine.manage",
+          "hostel.hostel.view",
+          "hostel.leave.review",
+          "hostel.notice.publish",
+          "hostel.notice.view",
+          "hostel.report.view",
+          "hostel.role_binding.view",
+          "hostel.room.view",
+          "hostel.security.schedule",
+          "hostel.staff.manage"
+        ],
+        "student": [
+          "hostel.accommodation.request",
+          "hostel.accommodation.view_self",
+          "hostel.attendance.view_self",
+          "hostel.complaint.submit",
+          "hostel.complaint.view_self",
+          "hostel.extended_stay.request",
+          "hostel.extended_stay.view_self",
+          "hostel.fine.view_self",
+          "hostel.guest_room.request",
+          "hostel.guest_room.view_self",
+          "hostel.leave.request",
+          "hostel.leave.view_self",
+          "hostel.notice.view",
+          "hostel.room.view"
+        ],
+        "super_admin": [
+          "hostel.accommodation.allot",
+          "hostel.accommodation.request",
+          "hostel.accommodation.view_self",
+          "hostel.attendance.record",
+          "hostel.attendance.view",
+          "hostel.attendance.view_self",
+          "hostel.complaint.escalate",
+          "hostel.complaint.manage",
+          "hostel.complaint.submit",
+          "hostel.complaint.view_self",
+          "hostel.extended_stay.request",
+          "hostel.extended_stay.review",
+          "hostel.extended_stay.view_self",
+          "hostel.fine.manage",
+          "hostel.fine.record",
+          "hostel.fine.view_self",
+          "hostel.guest_room.manage",
+          "hostel.guest_room.request",
+          "hostel.guest_room.view_self",
+          "hostel.hostel.manage",
+          "hostel.hostel.view",
+          "hostel.inventory.manage",
+          "hostel.leave.request",
+          "hostel.leave.review",
+          "hostel.leave.view_self",
+          "hostel.notice.publish",
+          "hostel.notice.view",
+          "hostel.report.view",
+          "hostel.report.view_institution",
+          "hostel.role_binding.manage",
+          "hostel.role_binding.view",
+          "hostel.room.manage",
+          "hostel.room.view",
+          "hostel.security.schedule",
+          "hostel.staff.manage"
+        ]
+      },
+      "module_grants": [
+        "admin",
+        "hostel_caretaker",
+        "hostel_warden",
+        "student",
+        "super_admin"
+      ],
+      "nav": {
+        "base_path": "/hostel",
+        "icon": "Buildings",
+        "items": [
+          {
+            "code": "hostel.dashboard",
+            "icon": "Buildings",
+            "label": "Hostel Overview",
+            "required_permission": "hostel.notice.view",
+            "sort_order": 10,
+            "to": "/hostel/dashboard"
+          },
+          {
+            "code": "hostel.master",
+            "icon": "GearSix",
+            "label": "Hostels & Administration",
+            "required_permission": "hostel.hostel.manage",
+            "sort_order": 20,
+            "to": "/hostel/master"
+          },
+          {
+            "code": "hostel.allotments",
+            "icon": "UsersThree",
+            "label": "Allotments & Requests",
+            "required_permission": "hostel.accommodation.allot",
+            "sort_order": 30,
+            "to": "/hostel/allotments"
+          },
+          {
+            "code": "hostel.occupancy",
+            "icon": "Door",
+            "label": "Rooms & Occupancy",
+            "required_permission": "hostel.room.view",
+            "sort_order": 40,
+            "to": "/hostel/occupancy"
+          },
+          {
+            "code": "hostel.attendance",
+            "icon": "CheckSquare",
+            "label": "Student Attendance",
+            "required_permission": "hostel.attendance.record",
+            "sort_order": 50,
+            "to": "/hostel/attendance"
+          },
+          {
+            "code": "hostel.leaves",
+            "icon": "CalendarDots",
+            "label": "Leave Requests",
+            "required_permission": "hostel.leave.review",
+            "sort_order": 60,
+            "to": "/hostel/leaves"
+          },
+          {
+            "code": "hostel.complaints",
+            "icon": "Wrench",
+            "label": "Hostel Complaints",
+            "required_permission": "hostel.complaint.manage",
+            "sort_order": 70,
+            "to": "/hostel/complaints"
+          },
+          {
+            "code": "hostel.guest_rooms",
+            "icon": "Bed",
+            "label": "Guest Rooms",
+            "required_permission": "hostel.guest_room.manage",
+            "sort_order": 80,
+            "to": "/hostel/guest-rooms"
+          },
+          {
+            "code": "hostel.extended_stays",
+            "icon": "ClockAfternoon",
+            "label": "Extended Stays",
+            "required_permission": "hostel.extended_stay.review",
+            "sort_order": 90,
+            "to": "/hostel/extended-stays"
+          },
+          {
+            "code": "hostel.fines",
+            "icon": "Receipt",
+            "label": "Fines & Disciplinary",
+            "required_permission": "hostel.fine.record",
+            "sort_order": 100,
+            "to": "/hostel/fines"
+          },
+          {
+            "code": "hostel.inventory",
+            "icon": "Package",
+            "label": "Inventory & Staff",
+            "required_permission": "hostel.inventory.manage",
+            "sort_order": 110,
+            "to": "/hostel/inventory"
+          },
+          {
+            "code": "hostel.security",
+            "icon": "ShieldCheck",
+            "label": "Security Roster",
+            "required_permission": "hostel.security.schedule",
+            "sort_order": 120,
+            "to": "/hostel/security"
+          },
+          {
+            "code": "hostel.notices",
+            "icon": "Megaphone",
+            "label": "Notice Board",
+            "required_permission": "hostel.notice.view",
+            "sort_order": 130,
+            "to": "/hostel/notices"
+          },
+          {
+            "code": "hostel.reports",
+            "icon": "ChartBar",
+            "label": "Operational Reports",
+            "required_permission": "hostel.report.view",
+            "sort_order": 140,
+            "to": "/hostel/reports"
+          }
+        ],
+        "label": "Hostel Management",
+        "nav_section": "Campus",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "hostel.hostel.view",
+          "label": "View hostel master records"
+        },
+        {
+          "code": "hostel.hostel.manage",
+          "label": "Create, activate, or deactivate hostels"
+        },
+        {
+          "code": "hostel.role_binding.view",
+          "label": "View hostel role assignments"
+        },
+        {
+          "code": "hostel.role_binding.manage",
+          "label": "Assign, reassign, or revoke hostel warden/caretaker bindings"
+        },
+        {
+          "code": "hostel.accommodation.request",
+          "label": "Submit hostel accommodation request"
+        },
+        {
+          "code": "hostel.accommodation.allot",
+          "label": "Record hostel and room allotment decisions"
+        },
+        {
+          "code": "hostel.accommodation.view_self",
+          "label": "View own room allotment and occupancy details"
+        },
+        {
+          "code": "hostel.room.view",
+          "label": "View room availability and occupancy"
+        },
+        {
+          "code": "hostel.room.manage",
+          "label": "Maintain rooms, record exchanges and formal vacations"
+        },
+        {
+          "code": "hostel.attendance.record",
+          "label": "Record student daily attendance"
+        },
+        {
+          "code": "hostel.attendance.view",
+          "label": "Review attendance summaries, trends, and exceptions"
+        },
+        {
+          "code": "hostel.attendance.view_self",
+          "label": "View own attendance records and percentages"
+        },
+        {
+          "code": "hostel.leave.request",
+          "label": "Submit hostel leave request"
+        },
+        {
+          "code": "hostel.leave.review",
+          "label": "Review and record leave decisions"
+        },
+        {
+          "code": "hostel.leave.view_self",
+          "label": "View own leave status and history"
+        },
+        {
+          "code": "hostel.complaint.submit",
+          "label": "Submit hostel complaint"
+        },
+        {
+          "code": "hostel.complaint.manage",
+          "label": "Review, assign, and resolve complaints"
+        },
+        {
+          "code": "hostel.complaint.escalate",
+          "label": "Escalate complaints to Warden or review escalated complaints"
+        },
+        {
+          "code": "hostel.complaint.view_self",
+          "label": "View own submitted complaints and resolution updates"
+        },
+        {
+          "code": "hostel.guest_room.request",
+          "label": "Submit guest room booking request"
+        },
+        {
+          "code": "hostel.guest_room.manage",
+          "label": "Review guest room booking and assign room"
+        },
+        {
+          "code": "hostel.guest_room.view_self",
+          "label": "View own guest room booking status"
+        },
+        {
+          "code": "hostel.extended_stay.request",
+          "label": "Submit vacation / break extended stay request"
+        },
+        {
+          "code": "hostel.extended_stay.review",
+          "label": "Review extended stay requests, set charges and compliance"
+        },
+        {
+          "code": "hostel.extended_stay.view_self",
+          "label": "View own extended stay status and compliance deadlines"
+        },
+        {
+          "code": "hostel.fine.record",
+          "label": "Record and impose hostel disciplinary fines"
+        },
+        {
+          "code": "hostel.fine.manage",
+          "label": "Review and resolve or waive disciplinary fines"
+        },
+        {
+          "code": "hostel.fine.view_self",
+          "label": "View own fine records and payment details"
+        },
+        {
+          "code": "hostel.inventory.manage",
+          "label": "Maintain hostel inventory records"
+        },
+        {
+          "code": "hostel.staff.manage",
+          "label": "Maintain hostel operational staff coordination and shifts"
+        },
+        {
+          "code": "hostel.security.schedule",
+          "label": "Maintain security guard shift schedules"
+        },
+        {
+          "code": "hostel.notice.publish",
+          "label": "Publish hostel notices and announcements"
+        },
+        {
+          "code": "hostel.notice.view",
+          "label": "View active hostel notice board"
+        },
+        {
+          "code": "hostel.report.view",
+          "label": "Generate hostel reports and operational summaries"
+        },
+        {
+          "code": "hostel.report.view_institution",
+          "label": "View institution-level cross-hostel summaries"
+        },
+        {
+          "code": "hostel.notification.auto_emit",
+          "label": "System automated event notifications"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "hostel.notification.auto_emit"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

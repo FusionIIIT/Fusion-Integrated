@@ -13,6 +13,47 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `hostel`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `hostel.hostel.view` | View hostel master records | `admin`, `hostel_caretaker`, `hostel_warden`, `super_admin` |
+| `hostel.hostel.manage` | Create, activate, or deactivate hostels | `admin`, `super_admin` |
+| `hostel.role_binding.view` | View hostel role assignments | `admin`, `hostel_caretaker`, `hostel_warden`, `super_admin` |
+| `hostel.role_binding.manage` | Assign, reassign, or revoke hostel warden/caretaker bindings | `admin`, `super_admin` |
+| `hostel.accommodation.request` | Submit hostel accommodation request | `admin`, `hostel_caretaker`, `student`, `super_admin` |
+| `hostel.accommodation.allot` | Record hostel and room allotment decisions | `admin`, `hostel_caretaker`, `super_admin` |
+| `hostel.accommodation.view_self` | View own room allotment and occupancy details | `admin`, `student`, `super_admin` |
+| `hostel.room.view` | View room availability and occupancy | `admin`, `hostel_caretaker`, `hostel_warden`, `student`, `super_admin` |
+| `hostel.room.manage` | Maintain rooms, record exchanges and formal vacations | `admin`, `hostel_caretaker`, `super_admin` |
+| `hostel.attendance.record` | Record student daily attendance | `admin`, `hostel_caretaker`, `super_admin` |
+| `hostel.attendance.view` | Review attendance summaries, trends, and exceptions | `admin`, `hostel_caretaker`, `hostel_warden`, `super_admin` |
+| `hostel.attendance.view_self` | View own attendance records and percentages | `admin`, `student`, `super_admin` |
+| `hostel.leave.request` | Submit hostel leave request | `admin`, `student`, `super_admin` |
+| `hostel.leave.review` | Review and record leave decisions | `admin`, `hostel_caretaker`, `hostel_warden`, `super_admin` |
+| `hostel.leave.view_self` | View own leave status and history | `admin`, `student`, `super_admin` |
+| `hostel.complaint.submit` | Submit hostel complaint | `admin`, `student`, `super_admin` |
+| `hostel.complaint.manage` | Review, assign, and resolve complaints | `admin`, `hostel_caretaker`, `super_admin` |
+| `hostel.complaint.escalate` | Escalate complaints to Warden or review escalated complaints | `admin`, `hostel_caretaker`, `hostel_warden`, `super_admin` |
+| `hostel.complaint.view_self` | View own submitted complaints and resolution updates | `admin`, `student`, `super_admin` |
+| `hostel.guest_room.request` | Submit guest room booking request | `admin`, `student`, `super_admin` |
+| `hostel.guest_room.manage` | Review guest room booking and assign room | `admin`, `hostel_caretaker`, `super_admin` |
+| `hostel.guest_room.view_self` | View own guest room booking status | `admin`, `student`, `super_admin` |
+| `hostel.extended_stay.request` | Submit vacation / break extended stay request | `admin`, `student`, `super_admin` |
+| `hostel.extended_stay.review` | Review extended stay requests, set charges and compliance | `admin`, `hostel_warden`, `super_admin` |
+| `hostel.extended_stay.view_self` | View own extended stay status and compliance deadlines | `admin`, `student`, `super_admin` |
+| `hostel.fine.record` | Record and impose hostel disciplinary fines | `admin`, `hostel_caretaker`, `super_admin` |
+| `hostel.fine.manage` | Review and resolve or waive disciplinary fines | `admin`, `hostel_caretaker`, `hostel_warden`, `super_admin` |
+| `hostel.fine.view_self` | View own fine records and payment details | `admin`, `student`, `super_admin` |
+| `hostel.inventory.manage` | Maintain hostel inventory records | `admin`, `hostel_caretaker`, `super_admin` |
+| `hostel.staff.manage` | Maintain hostel operational staff coordination and shifts | `admin`, `hostel_caretaker`, `hostel_warden`, `super_admin` |
+| `hostel.security.schedule` | Maintain security guard shift schedules | `admin`, `hostel_warden`, `super_admin` |
+| `hostel.notice.publish` | Publish hostel notices and announcements | `admin`, `hostel_caretaker`, `hostel_warden`, `super_admin` |
+| `hostel.notice.view` | View active hostel notice board | `admin`, `hostel_caretaker`, `hostel_warden`, `student`, `super_admin` |
+| `hostel.report.view` | Generate hostel reports and operational summaries | `admin`, `hostel_caretaker`, `hostel_warden`, `super_admin` |
+| `hostel.report.view_institution` | View institution-level cross-hostel summaries | `admin`, `super_admin` |
+| `hostel.notification.auto_emit` | System automated event notifications | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
