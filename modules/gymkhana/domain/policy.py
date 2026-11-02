@@ -1,7 +1,6 @@
 """
-Gymkhana Domain Policy and Business Rules.
-Adheres strictly to ADR-0001 (Pure Python domain layer - zero imports of Django, DRF, or Celery).
-Implements all 21 Business Rules: BR-GYM-001 through BR-GYM-021.
+Gymkhana domain policy and validation rules.
+Pure Python validators without Django/DRF dependencies.
 """
 
 from datetime import datetime, time
