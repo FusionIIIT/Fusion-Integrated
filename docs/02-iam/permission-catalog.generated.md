@@ -38,3 +38,29 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `vms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `vms.visitor.view` | See visitor records | `host`, `super_admin`, `vms_admin`, `vms_security` |
+| `vms.visitor.register` | Register visitors at the gate | `super_admin`, `vms_security` |
+| `vms.visit_request.create` | Submit a visit request | `host`, `super_admin` |
+| `vms.visit_request.approve` | Approve or reject visit requests | `host`, `super_admin`, `vms_admin` |
+| `vms.visit.view` | See visits and the on-site roster | `host`, `super_admin`, `vms_admin`, `vms_security` |
+| `vms.visit.terminate` | Terminate a visit early | `host`, `super_admin`, `vms_admin` |
+| `vms.pass.view` | See visitor passes | `host`, `super_admin`, `vms_admin`, `vms_security` |
+| `vms.pass.checkin` | Check a visitor in at the gate | `super_admin`, `vms_security` |
+| `vms.pass.checkout` | Check a visitor out | `super_admin`, `vms_security` |
+| `vms.pass.manage` | Issue and deactivate passes | `super_admin`, `vms_admin`, `vms_security` |
+| `vms.gate.manage` | Close a gate for the day | `super_admin`, `vms_security` |
+| `vms.zone.validate` | Validate zone access | `super_admin`, `vms_admin`, `vms_security` |
+| `vms.zone.elevate` | Grant temporary zone elevation | `super_admin`, `vms_admin` |
+| `vms.blacklist.manage` | Maintain the blacklist and safe-list | `super_admin`, `vms_admin` |
+| `vms.policy.manage` | Configure access policies | `super_admin`, `vms_admin` |
+| `vms.muster.trigger` | Trigger and run an emergency muster | `host`, `super_admin`, `vms_admin`, `vms_security` |
+| `vms.muster.view` | See muster rosters | `host`, `super_admin`, `vms_admin`, `vms_security` |
+| `vms.alert.view` | See security alerts | `host`, `super_admin`, `vms_admin`, `vms_security` |
+| `vms.alert.manage` | Close security alerts | `super_admin`, `vms_admin`, `vms_security` |
+| `vms.report.view` | See VMS reports | `super_admin`, `vms_admin` |
+| `vms.role.manage` | Assign VMS operational roles | `super_admin` |
