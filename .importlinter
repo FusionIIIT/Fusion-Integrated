@@ -14,6 +14,7 @@ type = forbidden
 source_modules =
     modules.placement
     modules.elm
+    modules.gymkhana
     modules.directory
     modules.accesscontrol
 forbidden_modules =
@@ -28,6 +29,9 @@ forbidden_modules =
     modules.accesscontrol.models
     modules.elm.models
     modules.elm.api
+    modules.gymkhana.models
+    modules.gymkhana.services
+    modules.gymkhana.api
 # DIRECT imports only. contracts.py legitimately imports its OWN module's
 # models and services, so following the chain transitively would make this
 # contract impossible to satisfy. What we forbid is a module reaching straight
@@ -69,3 +73,11 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+
+[importlinter:contract:gymkhana-layers]
+name = Layering inside gymkhana
+type = layers
+layers =
+    modules.gymkhana.api
+    modules.gymkhana.services
+    modules.gymkhana.models

@@ -20,6 +20,25 @@ For the intended taxonomy of modules not yet built, see
 | `elm.leave_request.view` | See leave requests | `staff` |
 | `elm.leave_request.manage` | Create, update and delete leave requests | `staff` |
 
+## `gymkhana`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `gymkhana.module.view` | Access the Gymkhana module | `Student Admin`, `faculty`, `student` |
+| `gymkhana.people.search` | Find student and faculty records for Gymkhana | `Student Admin`, `faculty`, `student` |
+| `gymkhana.club.manage` | Create and confirm clubs | `Student Admin` |
+| `gymkhana.club.leadership` | Change club leadership | `student` |
+| `gymkhana.activity.manage` | Book club sessions and events | `student` |
+| `gymkhana.membership.apply` | Apply for club membership | `student` |
+| `gymkhana.membership.review` | Review club membership applications | `student` |
+| `gymkhana.poll.view` | View eligible voting polls | `student` |
+| `gymkhana.poll.manage` | Create club polls | `student` |
+| `gymkhana.poll.vote` | Vote in eligible polls | `student` |
+| `gymkhana.budget.manage` | Submit and view club budget requests | `student` |
+| `gymkhana.report.submit` | Submit club event reports | `student` |
+| `gymkhana.report.view` | Review assigned club event reports | `faculty` |
+| `gymkhana.file.view` | Download Gymkhana attachments | `faculty`, `student` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

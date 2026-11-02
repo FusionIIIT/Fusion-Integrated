@@ -9,6 +9,14 @@ DATABASES["default"]["PASSWORD"] = DB_PASSWORD
 IAM_SERVICE_TOKEN = os.environ["IAM_SERVICE_TOKEN"]
 # Required, no fallback: a home-directory default is wrong on a server.
 PLACEMENT_UPLOAD_ROOT = os.environ["PLACEMENT_UPLOAD_ROOT"]
+GYMKHANA_UPLOAD_ROOT = os.environ["GYMKHANA_UPLOAD_ROOT"]
+GYMKHANA_VENUES = tuple(
+    venue.strip()
+    for venue in os.environ["GYMKHANA_VENUES"].split(",")
+    if venue.strip()
+)
+if not GYMKHANA_VENUES:
+    raise ValueError("GYMKHANA_VENUES must contain at least one configured venue.")
 
 # Required because their absence is silent and severe: LocMem makes every
 # throttle per-worker, and memory:// means no task ever runs — so no

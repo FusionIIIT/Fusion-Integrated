@@ -130,6 +130,7 @@ fusion_auth/     the IAM client, Principal, authentication, the two permission g
 modules/
   directory/     local projection of IAM's user data (a cache with a table)
   accesscontrol/ module registry + the server-driven sidebar
+  gymkhana/      student clubs, activities, membership, polling, and reporting
   placement/     companies, postings, applications, eligibility, state machine
 ops/checks/      the boundary enforcement scripts
 client/          the shell — Vite + React 18 + TS + Mantine 7.13
