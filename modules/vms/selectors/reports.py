@@ -39,6 +39,7 @@ from django.db.models.functions import (
     TruncMonth,
     TruncWeek,
 )
+from django.utils import timezone
 
 from modules.vms.models import (
     AccessPolicy,
@@ -216,6 +217,8 @@ def _deadline_expr():
                 .values_list("published_at", "approval_timeout_hours"))
     if not pols:
         return F("created_at") + timedelta(hours=DEFAULT_SLA_HOURS), []
+    if len(pols) == 1:
+        return F("created_at") + timedelta(hours=pols[0][1]), pols
     whens = []
     for i, (pub, hours) in enumerate(pols):
         cond = Q()
@@ -316,7 +319,7 @@ def audit_trail(start, end, filters) -> dict:
     events.sort(key=lambda e: (e["at"], _ORDER[e["type"]], e["request_id"] or 0))
     truncated = t1 or t2 or t3 or len(events) > ROW_CAP
     for e in events:
-        e["at"] = e["at"].isoformat()
+        e["at"] = timezone.localtime(e["at"]).isoformat()
         e.setdefault("justification", "")
     return _result(AUDIT_COLUMNS, events[:ROW_CAP], {"events": len(events)}, truncated)
 
