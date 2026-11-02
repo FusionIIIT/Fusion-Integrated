@@ -1,75 +1,61 @@
 # BADMS frontend API contract
 
-The React frontend in `client/src/pages/BADMS/BADMSPages.jsx` adds the user-facing BADMS request and review workflows. The uploaded repository already provides backup, schedule, and basic archive endpoints. It does **not** currently expose the approval, storage-extension, or security-audit endpoints below, so the frontend screens that use them require matching backend implementation before end-to-end testing.
+The frontend is integrated into the existing Fusion System Administrator React/Vite client and uses the existing `axiosInstance` (same-origin `/api`, cookie authentication). It does not implement authentication, role grants, encryption, approval authority, or data archival in the browser.
 
-All paths are relative to the existing Axios base URL (`/api`). The backend must apply authentication, role-based authorization, department scoping, validation, and audit logging. Hiding a navigation link is not a security boundary.
+The following endpoints are required from the backend. They are **not present in the supplied backend snapshot** and must be implemented by the backend owner before end-to-end workflow testing.
 
-## Endpoints expected by the frontend
-
-| Method | Path | Purpose |
+| Method | Endpoint | Purpose |
 |---|---|---|
-| GET, POST | `/badms/archive-requests/` | List the current user's requests; submit an archive request |
-| GET, POST | `/badms/restore-requests/` | List restoration requests; submit a restoration request |
-| GET | `/badms/approvals/?status=pending` | List approvals assigned to the current user |
-| PATCH | `/badms/approvals/{id}/decision/` | Approve/reject a request with comments |
-| GET, POST | `/badms/storage-requests/` | List and submit storage-extension requests |
-| GET | `/badms/security/status/` | Return encryption/security posture summary |
-| GET | `/badms/security/audit-logs/` | Return authorized audit events |
+| GET, POST | `/api/badms/archive-requests/` | List the current user's requests; create a request with multipart attachment |
+| GET, POST | `/api/badms/restore-requests/` | List and create restoration requests |
+| GET | `/api/badms/approval-queue/` | Return requests actionable by the authenticated user |
+| POST | `/api/badms/approval-queue/{id}/decision/` | Record `decision` (`approve` or `reject`) and `comments` |
+| GET, POST | `/api/badms/storage-requests/` | List and submit storage extension requests |
+| GET | `/api/badms/security/status/` | Return encryption status, algorithm, protected record count and last verification |
+| GET | `/api/badms/security/audit-logs/` | Return security audit events |
+| GET | `/api/badms/failure-alerts/` | Return backup failures, consecutive failure count, escalation target and alert status |
 
-## Request payloads
+## Expected request fields
 
-### Archive request
+### Archive request (multipart/form-data)
 
-```json
-{
-  "database_name": "student_records",
-  "archive_type": "full",
-  "data_classification": "internal",
-  "reason": "Archive records according to the retention policy.",
-  "retention_period_days": 365
-}
-```
+- `file_name`
+- `archive_date`
+- `owners`
+- `file_type`
+- `reason`
+- `initial_classification` (`Routine` by default, or `Sensitive`)
+- `attachment` (optional file)
 
-### Restore request
+If the classification is missing, the backend must default it to `Routine`. The backend must validate the archival quota and required fields and reject invalid submissions; the UI displays the API validation response.
 
-```json
-{
-  "backup_id": "<backup UUID>",
-  "target_database": "student_records_restore",
-  "reason": "Recover records after an approved incident."
-}
-```
+### Restoration request (JSON)
 
-### Approval decision
+- `backup_id`
+- `target_database`
+- `classification` (`Routine` or `Sensitive`)
+- `reason`
 
-```json
-{
-  "decision": "approved",
-  "comments": "Reviewed and approved."
-}
-```
+Non-Sensitive restoration follows the standard approval path. Sensitive restoration requires SysAdmin approval before execution.
 
-`decision` is `approved` or `rejected`.
+### Storage extension request (JSON)
 
-### Storage-extension request
+- `current_storage_gb`
+- `requested_storage_gb`
+- `reason`
 
-```json
-{
-  "current_storage_gb": 100,
-  "requested_storage_gb": 150,
-  "reason": "Storage usage is approaching the allocated limit."
-}
-```
+The backend must enforce eligibility (quota full) and route the request to the HoD for a decision.
 
-## Suggested response fields
+## Workflow and authorization responsibilities
 
-List endpoints may return an array or a paginated object with `results`. Request records should include `id`, `status`, `created_at` (or `submitted_at`), and the relevant submitted fields. Approval records should additionally include `request_type`, `requested_by_name`, `department`, and a short `description`/`reason`. Security status should include `encryption_enabled`, `algorithm`, `protected_database_count`, and `last_checked_at`. Audit rows should include `id`, `created_at`/`timestamp`, `actor_name`, `action`, `resource`, and `result`.
+- HoD: approve/reject archival requests originating from the same department; decide storage-extension requests.
+- SysAdmin: determine the authoritative archival classification and approve Sensitive restoration requests.
+- IT Security: review Sensitive archival requests and verify the AES-256 security path.
+- Backend: enforce all role, department, quota, workflow-stage, file-validation, and security checks. Hiding a button or selecting a role in React is not authorization.
+- Frontend: show the request's `status` and `current_stage` returned by the server; it must not advance workflow stages locally.
 
-## Workflow/security requirements for backend integration
+Suggested list response shape: an array or `{ "results": [...] }`. Each request should include `id`, `status`, `current_stage`, `created_at` and the fields relevant to its type. Approval-queue items should additionally include `request_type`, `department`, `classification`, `file_name` (when applicable), and `reason`.
 
-- Archive requests must be reviewed through the BADMS approval chain before archival execution.
-- Restore requests must not directly invoke the existing `/backups/{id}/restore/` endpoint. Approval must be completed before restore execution.
-- Approval lists and decisions must be scoped to the logged-in user's role and department by the backend.
-- IT Security-only security information and audit records must be authorized server-side.
-- Encryption status must reflect actual backend encryption configuration and verification; the UI must not claim AES-256 unless the backend confirms the exact implemented algorithm.
-- Every request, decision, backup/restore execution, and security-sensitive action should create an audit event.
+## Backup and schedule screens
+
+The existing Fusion client already provides manual backup, scheduled backup, schedule preview, pause/resume, backup history and restore APIs under `/backups/`, `/schedules/` and `/restores/`. The BADMS UI reuses these existing pages and API functions rather than duplicating them. The failure-alert view is an additional read-only BADMS view and requires the endpoint listed above.

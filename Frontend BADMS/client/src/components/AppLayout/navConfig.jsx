@@ -17,6 +17,7 @@ import {
   FaClipboardCheck,
   FaShieldAlt,
   FaRedo,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 
 export const NAV_GROUPS = [
@@ -72,7 +73,8 @@ export const NAV_GROUPS = [
         links: [
           { label: "Backups", icon: FaHdd, to: "/backups" },
           { label: "Schedules", icon: FaClock, to: "/backups/schedules" },
-          { label: "Restore Requests", icon: FaRedo, to: "/badms/restore-requests" },
+          { label: "Restoration Requests", icon: FaRedo, to: "/badms/restore-requests" },
+          { label: "Failure Alerts", icon: FaExclamationTriangle, to: "/badms/failure-alerts" },
         ],
       },
       {
