@@ -22,6 +22,8 @@ urlpatterns = [
          views.AssignmentListCreateView.as_view(), name="lms-assignments"),
     path("courses/<str:course_id>/assignments/<int:assignment_id>",
          views.AssignmentUpdatePublishView.as_view(), name="lms-assignment"),
+    path("courses/<str:course_id>/assignments/<int:assignment_id>/download",
+         views.AssignmentDownloadView.as_view(), name="lms-assignment-download"),
     path("courses/<str:course_id>/assignments/<int:assignment_id>/publish",
          views.AssignmentPublishView.as_view(), name="lms-assignment-publish"),
     path("courses/<str:course_id>/assignments/<int:assignment_id>/submit",

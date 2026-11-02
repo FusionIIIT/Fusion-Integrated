@@ -197,6 +197,7 @@ class AssignmentListCreateView(APIView):
 
 
 class AssignmentUpdatePublishView(APIView):
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
     permission_classes = p.allow(p.P_ASSIGNMENT_MANAGE)
 
     @extend_schema(request=s.AssignmentWriteSerializer, responses=s.AssignmentSerializer)
@@ -208,6 +209,21 @@ class AssignmentUpdatePublishView(APIView):
                                       data=payload.validated_data,
                                       assignment_id=assignment_id)
         return Response(s.AssignmentSerializer(row).data)
+
+
+class AssignmentDownloadView(APIView):
+    permission_classes = p.allow(p.P_ASSIGNMENT)
+
+    @extend_schema(responses=OpenApiTypes.BINARY)
+    def get(self, request, course_id, assignment_id):
+        ref, course = _course(_actor(request), course_id)
+        assignment = selectors.assignments(
+            course.pk, can_manage=ref.role == "faculty").filter(
+                pk=assignment_id).first()
+        if not assignment or not assignment.file:
+            raise NotFoundError("No downloadable course assignment was found.")
+        return FileResponse(assignment.file.open("rb"), as_attachment=True,
+                            filename=assignment.file.name.rsplit("/", 1)[-1])
 
 
 

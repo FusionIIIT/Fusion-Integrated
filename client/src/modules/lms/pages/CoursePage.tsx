@@ -9,6 +9,7 @@ import { useParams } from "react-router-dom";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { http, errorMessage } from "../../../lib/http";
+import { submissionStatus } from "../submissionStatus";
 
 type Row = Record<string, any>;
 interface Course extends Row {
@@ -199,15 +200,19 @@ export default function CoursePage() {
 
         <Tabs.Panel value="assignments" pt="md">
           <Stack>
-            {faculty && <Card withBorder padding="lg"><form onSubmit={submit((form) =>
-              http.post(`${base}/assignments`, {
-                title: form.get("title"), due_at: new Date(String(form.get("due_at"))).toISOString(),
-                instructions: form.get("instructions"),
-                submission_type: form.get("submission_type"),
-                points_possible: form.get("points_possible"),
-                release_at: form.get("release_at")
-                  ? new Date(String(form.get("release_at"))).toISOString() : null,
-              }))}><Stack>
+            {faculty && <Card withBorder padding="lg"><form onSubmit={submit((form) => {
+              const body = new FormData();
+              body.set("title", String(form.get("title")));
+              body.set("due_at", new Date(String(form.get("due_at"))).toISOString());
+              body.set("instructions", String(form.get("instructions")));
+              body.set("submission_type", String(form.get("submission_type")));
+              body.set("points_possible", String(form.get("points_possible")));
+              const releaseAt = form.get("release_at");
+              if (releaseAt) body.set("release_at", new Date(String(releaseAt)).toISOString());
+              const file = form.get("file");
+              if (file instanceof File && file.size) body.set("file", file);
+              return http.post(`${base}/assignments`, body);
+            })}><Stack>
               <TextInput label="Title" name="title" required />
               <Textarea label="Instructions" name="instructions" required />
               <Select label="Submission type" name="submission_type"
@@ -216,15 +221,27 @@ export default function CoursePage() {
               <TextInput label="Due date/time" name="due_at" type="datetime-local" required />
               <TextInput label="Release date/time (leave blank for immediate)"
                 name="release_at" type="datetime-local" />
+              <Text size="sm">Optional assignment file</Text><input type="file" name="file" />
               <Button type="submit">Save draft assignment</Button>
             </Stack></form></Card>}
             {assignments.map((item) => <Card key={item.id} withBorder padding="md">
               <Stack>
                 <Text fw={600}>{item.title}</Text><Text>{item.instructions}</Text>
                 <Text size="sm">Due {new Date(item.due_at).toLocaleString()} · {item.status}</Text>
+                {item.download_url && <Button component="a"
+                  href={item.download_url}>
+                  Download assignment file
+                </Button>}
+                {student && <Text size="sm" role="status">
+                  Submission status: {submissionStatus(
+                    item.due_at,
+                    submissions.find((row) => row.assignment === item.id),
+                  ) ?? "not submitted"}
+                </Text>}
                 {faculty && item.status === "draft" && <Button onClick={() => void mutate(() =>
                   http.post(`${base}/assignments/${item.id}/publish`))}>Publish</Button>}
-                {student && <form onSubmit={submit((form) => {
+                {student && !submissions.some((row) => row.assignment === item.id) &&
+                  Date.now() < new Date(item.due_at).getTime() && <form onSubmit={submit((form) => {
                   const body = new FormData();
                   for (const [key, value] of form.entries()) body.append(key, value);
                   body.set("content_type", item.submission_type);

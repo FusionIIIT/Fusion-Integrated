@@ -105,6 +105,8 @@ class Assignment(TimeStampedModel):
     instructions = models.TextField()
     submission_type = models.CharField(max_length=8, choices=SUBMISSION_TYPES)
     points_possible = models.DecimalField(max_digits=8, decimal_places=2)
+    file = models.FileField(storage=_lms_storage, upload_to=_upload_key,
+                            blank=True, max_length=255)
     release_at = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=12, choices=STATUS, default="draft")
     created_by_user_id = models.IntegerField()

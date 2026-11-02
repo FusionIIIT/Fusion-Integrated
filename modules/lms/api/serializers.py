@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 from rest_framework import serializers
 
 from modules.lms.models import (
@@ -93,11 +95,25 @@ class AnnouncementWriteSerializer(serializers.Serializer):
 
 
 class AssignmentSerializer(serializers.ModelSerializer):
+    file_name = serializers.SerializerMethodField()
+    download_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Assignment
         fields = ("id", "title", "due_at", "instructions", "submission_type",
-                  "points_possible", "release_at", "status", "published_at")
+                  "points_possible", "file_name", "download_url", "release_at",
+                  "status", "published_at")
         read_only_fields = fields
+
+    def get_file_name(self, obj) -> str:
+        return obj.file.name.rsplit("/", 1)[-1] if obj.file else ""
+
+    def get_download_url(self, obj) -> str:
+        if not obj.file:
+            return ""
+        course_id = quote(obj.course.source_course_id, safe="")
+        return (f"/api/v1/lms/courses/{course_id}"
+                f"/assignments/{obj.pk}/download")
 
 
 class AssignmentWriteSerializer(serializers.Serializer):
@@ -107,6 +123,7 @@ class AssignmentWriteSerializer(serializers.Serializer):
     submission_type = serializers.ChoiceField(choices=Assignment.SUBMISSION_TYPES)
     points_possible = serializers.DecimalField(max_digits=8, decimal_places=2,
                                                min_value=0)
+    file = serializers.FileField(required=False)
     release_at = serializers.DateTimeField(required=False, allow_null=True)
 
 
@@ -115,12 +132,13 @@ class SubmissionSerializer(serializers.ModelSerializer):
     has_grade = serializers.SerializerMethodField()
     file_name = serializers.SerializerMethodField()
     download_url = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
 
     class Meta:
         model = AssignmentSubmission
         fields = ("id", "assignment", "assignment_title", "user_id", "content_type",
                   "text", "link", "file_name", "download_url", "submitted_at",
-                  "has_grade")
+                  "has_grade", "status")
         read_only_fields = fields
 
     def get_has_grade(self, obj) -> bool:
@@ -132,8 +150,12 @@ class SubmissionSerializer(serializers.ModelSerializer):
     def get_download_url(self, obj) -> str:
         if not obj.file:
             return ""
-        return (f"/api/v1/lms/courses/{obj.assignment.course.source_course_id}"
+        course_id = quote(obj.assignment.course.source_course_id, safe="")
+        return (f"/api/v1/lms/courses/{course_id}"
                 f"/submissions/{obj.pk}/download")
+
+    def get_status(self, obj) -> str:
+        return "late" if obj.submitted_at >= obj.assignment.due_at else "submitted"
 
 
 class SubmissionWriteSerializer(serializers.Serializer):
