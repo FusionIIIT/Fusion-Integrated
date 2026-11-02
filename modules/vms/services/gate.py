@@ -326,8 +326,7 @@ def _manual_check_out(*, actor, gate, vp, inside, reason) -> GateResult:
     if not inside:
         raise ConflictError("No open check-in for this pass.", code="no_open_check_in")
     vr = VisitRequest.objects.select_for_update().get(pk=vp.visit_request_id)
-    kind = (request_state.WALK_IN if vr.source == VisitRequest.Source.WALK_IN
-            else request_state.PRE_REGISTERED)
+    kind = request_state.kind_for_source(vr.source)
     try:
         vr.status = request_state.next_state(
             kind, vr.status, request_state.COMPLETE, request_state.SECURITY)

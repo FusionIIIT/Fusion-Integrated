@@ -11,6 +11,7 @@ class WalkinRegisterSerializer(serializers.Serializer):
     host_user_id = serializers.IntegerField(min_value=1)
     host_available = serializers.BooleanField(required=False, default=True)
     gate_id = serializers.IntegerField(required=False, allow_null=True, default=None)
+    event_id = serializers.IntegerField(required=False, allow_null=True, default=None)
     zone_ids = serializers.ListField(child=serializers.IntegerField(), required=False,
                                      default=list)
 

@@ -26,8 +26,7 @@ APPROVE, REJECT = "approve", "reject"
 
 
 def _kind(vr: VisitRequest) -> str:
-    return (request_state.WALK_IN if vr.source == VisitRequest.Source.WALK_IN
-            else request_state.PRE_REGISTERED)
+    return request_state.kind_for_source(vr.source)
 
 
 def _narrow(vr, zones, window):

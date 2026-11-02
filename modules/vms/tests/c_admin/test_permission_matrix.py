@@ -2,6 +2,8 @@
 the gate (and an unknown id is a 404, never a 403, so ids are not enumerable)."""
 import pytest
 
+from modules.vms import registry
+
 BASE = "/api/v1/vms/"
 
 # (method, path, permission that opens it)
@@ -91,3 +93,11 @@ def test_policy_publish_permission_alone_can_read_policies(api_as):
 def test_roles_me_needs_only_a_signed_in_user(api_as):
     assert api_as(anonymous=True).get(BASE + "roles/me").status_code == 401
     assert api_as().get(BASE + "roles/me").status_code == 200
+
+
+def test_admin_designations_hold_pass_terminate():          # service request g-3
+    for designation in ("Registrar", "acadadmin", "Director"):
+        assert "vms.pass.terminate" in registry.ROLE_GRANTS[designation]
+        assert "vms.event.manage" in registry.ROLE_GRANTS[designation]
+    codes = [code for code, _ in registry.PERMISSIONS]
+    assert codes.count("vms.pass.terminate") == 1

@@ -77,14 +77,27 @@ def test_explicit_expires_at_wins():
     assert req.status == "expired"
 
 
-def test_only_pending_expires():
+def test_only_waiting_requests_expire():
     with freeze_time(T0):
         a = _setup(status="approved")
-        b = f.make_visit_request(status="awaiting_admin")
+        b = f.make_visit_request(status="awaiting_admin", source="walk_in")
     with freeze_time("2026-06-09 09:00:00+00:00"):
         assert scheduler_work.expire_pending() == 0
     a.refresh_from_db(), b.refresh_from_db()
     assert (a.status, b.status) == ("approved", "awaiting_admin")
+
+
+def test_urgent_request_awaiting_admin_expires():     # service request e-1
+    with freeze_time(T0):
+        req = _setup(status="awaiting_admin", is_urgent=True)
+    with freeze_time("2026-06-01 20:00:00+00:00"):
+        assert scheduler_work.expire_pending() == 0     # inside the 24 h window
+    with freeze_time("2026-06-02 09:00:00+00:00"):
+        assert scheduler_work.expire_pending() == 1
+        assert scheduler_work.expire_pending() == 0     # idempotent
+    req.refresh_from_db()
+    assert req.status == "expired" and req.decided_at is not None
+    assert Notification.objects.filter(topic="request.expired").count() == 4
 
 
 def test_reminder_sent_once():

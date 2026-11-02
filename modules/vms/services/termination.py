@@ -17,6 +17,7 @@ from core.api.exceptions import (
     NotFoundError,
     PermissionDeniedError,
 )
+from modules.vms.domain import request_state
 from modules.vms.models import Alert, VisitLog, VisitPass, VisitRequest
 from modules.vms.selectors import roster
 from modules.vms.services.common import audit, authz, notify
@@ -73,8 +74,9 @@ def terminate(*, actor, pass_id: int, reason: str) -> VisitPass:
                 detail={"action": "escort_out", "reason": reason,
                         "visitor": vr.visitor.full_name, "request_id": vr.pk})
         elif vr.status == VisitRequest.Status.APPROVED:       # BW-15/17: visit ends now
-            # SERVICE-REQUEST d-2: request_state has no terminate event.
-            vr.status = VisitRequest.Status.COMPLETED
+            vr.status = request_state.next_state(
+                request_state.kind_for_source(vr.source), vr.status, request_state.TERMINATE,
+                request_state.ADMIN if is_admin else request_state.HOST)
             vr.save(update_fields=["status"])
         audit.record(actor=actor, action="vms.pass.terminated", entity=vp, detail={
             "reason": reason, "request_id": vr.pk, "on_site": on_site,

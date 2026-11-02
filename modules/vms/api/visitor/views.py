@@ -25,11 +25,8 @@ from modules.vms.services import registration, visitor_session
 
 
 class VisitorLoginThrottle(AnonRateThrottle):
-    """Per-IP limit on OTP traffic (scope `vms_visitor_login`). The rate is
-    pinned here because config/settings is not a lane file; see
-    service_requests/a-1.md."""
+    """Per-IP limit on OTP traffic; the rate is DEFAULT_THROTTLE_RATES["vms_visitor_login"]."""
     scope = "vms_visitor_login"
-    rate = "10/min"
 
 
 class _VisitorView(APIView):

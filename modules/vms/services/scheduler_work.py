@@ -5,8 +5,9 @@ Timing comes from the policy that applied when the request was made
 Decision D-5: one reminder at `reminder_after_hours` (50 % of the timeout by
 default), expiry at `approval_timeout_hours`.
 
-Only `pending` requests are touched: the state table has no `auto_expire`
-move for `awaiting_admin` (a contingency waits for an Admin, BR-050).
+`pending` requests expire, and so do pre-registered (urgent) requests still
+`awaiting_admin`. A walk-in contingency stays `awaiting_admin` until an Admin
+decides it (BR-050): the state table has no expiry move for it.
 """
 from __future__ import annotations
 
@@ -14,6 +15,7 @@ import logging
 from datetime import datetime, timedelta
 
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 
 from modules.vms.domain import request_state as rs
@@ -25,7 +27,7 @@ log = logging.getLogger("fusion.vms.scheduler")
 
 
 def _kind(req: VisitRequest) -> str:
-    return rs.WALK_IN if req.source == VisitRequest.Source.WALK_IN else rs.PRE_REGISTERED
+    return rs.kind_for_source(req.source)
 
 
 def _expiry_at(req: VisitRequest, snap) -> datetime:
@@ -72,15 +74,18 @@ def send_reminders(now: datetime | None = None) -> int:
 def expire_pending(now: datetime | None = None) -> int:
     """Expire pending requests past their deadline (BR-062, BW-VMS-03). Idempotent."""
     now = now or timezone.now()
-    ids = list(VisitRequest.objects.filter(status=VisitRequest.Status.PENDING)
-               .values_list("pk", flat=True))
+    waiting = (Q(status=VisitRequest.Status.PENDING)
+               | (Q(status=VisitRequest.Status.AWAITING_ADMIN)
+                  & ~Q(source=VisitRequest.Source.WALK_IN)))
+    ids = list(VisitRequest.objects.filter(waiting).values_list("pk", flat=True))
     expired = 0
     for pk in ids:
         try:
             with transaction.atomic():
                 req = (VisitRequest.objects.select_for_update().select_related("visitor")
                        .get(pk=pk))
-                if req.status != VisitRequest.Status.PENDING:
+                if req.status not in (VisitRequest.Status.PENDING,
+                                      VisitRequest.Status.AWAITING_ADMIN):
                     continue
                 snap = policy.snapshot_for(req)
                 if now < _expiry_at(req, snap):
