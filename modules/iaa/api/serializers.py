@@ -51,7 +51,7 @@ class AnomalySerializer(serializers.ModelSerializer):
 class AnomalyResolutionInputSerializer(serializers.Serializer):
     action=serializers.ChoiceField(choices=("resolve","escalate")); resolution=serializers.CharField()
 class ObservationInputSerializer(serializers.Serializer):
-    record_kind=serializers.ChoiceField(choices=("expense_voucher","ta")); record_id=serializers.IntegerField()
+    record_kind=serializers.ChoiceField(choices=FinancialRecord.RECORD_KINDS); record_id=serializers.IntegerField()
     title=serializers.CharField(max_length=200); details=serializers.CharField()
 class ObservationResponseInputSerializer(serializers.Serializer):
     response_text=serializers.CharField()
