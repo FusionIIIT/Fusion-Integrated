@@ -1,0 +1,34 @@
+"""URL routing for VMS REST API endpoints."""
+from rest_framework.routers import DefaultRouter
+from django.urls import path, include
+
+from modules.vms.api.views import (
+    VisitorViewSet,
+    VisitRequestViewSet,
+    VisitPassViewSet,
+    GateTerminalViewSet,
+    ZoneAccessViewSet,
+    EmergencyMusterViewSet,
+    BlacklistViewSet,
+    SafeListViewSet,
+    CampusZoneViewSet,
+    GateAlertViewSet,
+    BulkEventViewSet,
+)
+
+router = DefaultRouter()
+router.register(r"visitors", VisitorViewSet, basename="visitor")
+router.register(r"requests", VisitRequestViewSet, basename="visit-request")
+router.register(r"passes", VisitPassViewSet, basename="visit-pass")
+router.register(r"gate", GateTerminalViewSet, basename="gate-terminal")
+router.register(r"zones", ZoneAccessViewSet, basename="zone-access")
+router.register(r"muster", EmergencyMusterViewSet, basename="emergency-muster")
+router.register(r"blacklist", BlacklistViewSet, basename="blacklist")
+router.register(r"safelist", SafeListViewSet, basename="safelist")
+router.register(r"campus-zones", CampusZoneViewSet, basename="campus-zones")
+router.register(r"alerts", GateAlertViewSet, basename="gate-alerts")
+router.register(r"events", BulkEventViewSet, basename="bulk-events")
+
+urlpatterns = [
+    path("", include(router.urls)),
+]
