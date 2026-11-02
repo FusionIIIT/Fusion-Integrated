@@ -61,7 +61,8 @@ def put_on_site(zone=None, host=HOST, **pass_kw):
 
 
 def zone_event(vp, zone, event="zone_allowed", reason=""):
-    return f.make_visit_log(visit_pass=vp, event=event, zone=zone, reason=reason)
+    return f.make_visit_log(visit_pass=vp, event=event, zone=zone, reason=reason,
+                            detail={"vip_override": True} if reason == "vip_override" else {})
 
 
 def check_out(vp):

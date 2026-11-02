@@ -59,6 +59,7 @@ def _apply_one(*, actor, gate, event: dict, now) -> dict:
         visit_pass=vp, event=kind, zone_id=zone_id or gate.zone_id, gate=gate,
         device_id=event.get("device_id", gate.device_id)[:80], entry_point=gate.name,
         reason=",".join(failures_codes)[:255], logged_by_user_id=actor.user_id,
+        detail={"failures": failures_codes} if failures_codes else {},
         offline=True, client_event_id=cid, occurred_at=occurred, synced_at=now,
         conflict=conflict)
     result.update(status=CONFLICT if conflict else APPLIED, visit_log_id=log.pk,

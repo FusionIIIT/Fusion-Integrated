@@ -80,6 +80,9 @@ class VisitRequest(models.Model):
     contingency_approved_by_user_id = models.IntegerField(null=True, blank=True)
     event = models.ForeignKey("vms.EventBatch", null=True, blank=True,
                               on_delete=models.PROTECT, related_name="requests")
+    # Gate a walk-in was registered at (per-gate rate limit, roster).
+    gate = models.ForeignKey("vms.Gate", null=True, blank=True,
+                             on_delete=models.PROTECT, related_name="requests")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

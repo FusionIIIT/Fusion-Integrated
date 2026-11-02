@@ -106,3 +106,11 @@ def test_policy_defaults():
     p = f.make_access_policy()
     assert (p.advance_registration_hours, p.contingency_sla_minutes) == (2, 15)
     assert p.visiting_hours_start < p.visiting_hours_end
+
+
+def test_only_one_open_muster_in_the_database():
+    f.make_emergency_muster(status="open")
+    with pytest.raises(IntegrityError), transaction.atomic():
+        f.make_emergency_muster(status="open")
+    f.make_emergency_muster(status="closed")
+    f.make_emergency_muster(status="closed")

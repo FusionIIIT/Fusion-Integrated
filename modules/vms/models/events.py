@@ -43,13 +43,19 @@ class EmergencyMuster(models.Model):
     triggered_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=10, choices=Status.choices,
                               default=Status.OPEN)
+    reason = models.TextField(blank=True)
     closed_at = models.DateTimeField(null=True, blank=True)
     summary = models.JSONField(default=dict, blank=True)
 
     class Meta:
         pass
 
-    Meta.constraints = [choice_check("status", Status, "vms_muster_status_valid")]
+    Meta.constraints = [
+        choice_check("status", Status, "vms_muster_status_valid"),
+        # One open muster at a time (CFR-018), enforced by the database.
+        models.UniqueConstraint(fields=["status"], condition=models.Q(status="open"),
+                                name="vms_muster_single_open"),
+    ]
 
     def __str__(self) -> str:
         return f"Muster {self.pk} ({self.status})"

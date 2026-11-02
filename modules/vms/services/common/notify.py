@@ -7,7 +7,7 @@ CHANNELS = {c.value for c in Notification.Channel}
 
 
 def enqueue(*, topic, dedupe_key, subject, body, user_id=None, visitor=None,
-            channels=("inapp", "email")) -> list[Notification]:
+            channels=("inapp", "email"), detail=None) -> list[Notification]:
     """One row per channel, idempotent: a repeated call returns the existing rows.
 
     The stored dedupe key is ``<dedupe_key>:<channel>`` because the column is
@@ -24,6 +24,7 @@ def enqueue(*, topic, dedupe_key, subject, body, user_id=None, visitor=None,
             dedupe_key=f"{dedupe_key}:{channel}"[:200],
             defaults={"topic": topic, "recipient_user_id": user_id,
                       "recipient_visitor": visitor, "channel": channel,
-                      "subject": subject[:200], "body": body})
+                      "subject": subject[:200], "body": body,
+                      "detail": detail or {}})
         rows.append(row)
     return rows

@@ -76,6 +76,10 @@ class Notification(models.Model):
                               default=Status.PENDING)
     attempts = models.PositiveSmallIntegerField(default=0)
     last_error = models.CharField(max_length=500, blank=True)
+    # Earliest time the next delivery attempt may run (retry backoff).
+    next_attempt_at = models.DateTimeField(null=True, blank=True)
+    # Scope (zone_id / gate_id / roles) for recipients resolved at delivery time.
+    detail = models.JSONField(default=dict, blank=True)
     sent_at = models.DateTimeField(null=True, blank=True)
     read_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -87,7 +87,8 @@ class DenialSerializer(serializers.ModelSerializer):
                   "failures", "overridden", "escalated", "created_at"]
 
     def get_failures(self, obj):
-        return [c for c in obj.reason.split(",") if c]
+        detail = obj.detail or {}
+        return detail.get("failures") or [c for c in obj.reason.split(",") if c]
 
 
 class AlertSerializer(serializers.ModelSerializer):

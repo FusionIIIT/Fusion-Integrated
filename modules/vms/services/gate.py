@@ -110,9 +110,9 @@ def _unknown_credential(*, actor, gate, credential, device_id) -> GateResult:
 
 def _deny(*, actor, gate, vp, ev, zone_id, device_id, manual=False) -> GateResult:
     """Log the denial, raise the alert and tell staff (BR-082, 116, 117)."""
-    # SCHEMA-REQUEST b-1: failure codes live in VisitLog.reason until it has a detail field.
     log = VisitLog.objects.create(
         visit_pass=vp, event=E.DENIED, reason=",".join(ev.codes)[:255], zone_id=zone_id,
+        detail={"failures": list(ev.codes), "manual": manual},
         gate=gate, device_id=device_id[:80], entry_point="manual" if manual else gate.name,
         logged_by_user_id=actor.user_id)
     visitor = vp.visit_request.visitor
@@ -137,13 +137,14 @@ def _deny(*, actor, gate, vp, ev, zone_id, device_id, manual=False) -> GateResul
 
 
 def _admit(*, actor, gate, vp, zone_id, device_id, vip_waived, reason="", entry_point="",
-           action="vms.gate.checked_in", extra=None) -> GateResult:
+           action="vms.gate.checked_in", extra=None, log_detail=None) -> GateResult:
     vr = vp.visit_request
-    # SCHEMA-REQUEST b-1: vip_override / manual / override flags ride in `reason`.
+    # `reason` keeps the legacy codes (reports parse them); `detail` is the structured record.
     log = VisitLog.objects.create(
         visit_pass=vp, event=E.CHECK_IN, zone_id=zone_id or gate.zone_id, gate=gate,
         device_id=device_id[:80], entry_point=entry_point or gate.name,
         reason=reason or ("vip_override" if vip_waived else ""),
+        detail={"vip_override": bool(vip_waived), **(log_detail or {})},
         logged_by_user_id=actor.user_id)
     audit.record(actor=actor, action=action, entity=vp, detail={
         "visit_log_id": log.pk, "gate_id": gate.pk, "vip_override": vip_waived, **(extra or {})})
@@ -201,7 +202,7 @@ def override(*, admin_actor, denial_log_id: int, justification: str) -> GateResu
     if denial is None:
         raise NotFoundError("Denial not found.")
     authz.require_role(admin_actor, "admin", gate_id=denial.gate_id)
-    codes = [c for c in denial.reason.split(",") if c]
+    codes = (denial.detail or {}).get("failures") or [c for c in denial.reason.split(",") if c]
     if not codes or not all(c in pass_rules.OVERRIDE_ELIGIBLE for c in codes):
         raise ConflictError("This denial cannot be overridden.", code="not_overridable",
                             details=[{"failures": codes}])
@@ -224,6 +225,7 @@ def override(*, admin_actor, denial_log_id: int, justification: str) -> GateResu
             actor=admin_actor, gate=denial.gate, vp=vp, zone_id=denial.zone_id,
             device_id=denial.device_id, vip_waived=False, reason="override_check_in",
             entry_point=denial.entry_point, action="vms.gate.override_check_in",
+            log_detail={"override": True, "denial_log_id": denial.pk},
             extra={"denial_log_id": denial.pk, "overridden": codes,
                    "justification": justification})
 
@@ -314,6 +316,8 @@ def record_manual_entry(*, security_actor, pass_id: int, event: str, reason: str
             actor=security_actor, gate=gate, vp=vp, zone_id=zone_id, device_id=gate.device_id,
             vip_waived=ev.vip_waived, reason=f"manual: {reason}"[:255], entry_point="manual",
             action="vms.gate.manual_entry",
+            log_detail={"manual": True, "manual_reason": reason,
+                        "waived": list(ev.codes) if waivable else []},
             extra={"manual": True, "event": "check_in", "reason": reason,
                    "waived": ev.codes if waivable else []})
 
@@ -332,7 +336,8 @@ def _manual_check_out(*, actor, gate, vp, inside, reason) -> GateResult:
     log = VisitLog.objects.create(
         visit_pass=vp, event=E.CHECK_OUT, gate=gate, zone_id=gate.zone_id,
         entry_point="manual", device_id=gate.device_id[:80],
-        reason=f"manual: {reason}"[:255], logged_by_user_id=actor.user_id)
+        reason=f"manual: {reason}"[:255], logged_by_user_id=actor.user_id,
+        detail={"manual": True, "manual_reason": reason})
     vr.save(update_fields=["status"])
     audit.record(actor=actor, action="vms.gate.manual_entry", entity=vp, detail={
         "manual": True, "event": "check_out", "reason": reason, "visit_log_id": log.pk})

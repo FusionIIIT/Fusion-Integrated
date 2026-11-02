@@ -188,3 +188,9 @@ def test_list_registrations_filters_status(security):
     _register(security, host_available=False, id_doc_number="Z9")
     assert walkin.list_registrations(actor=security).count() == 2
     assert walkin.list_registrations(actor=security, status="awaiting_admin").count() == 1
+
+
+def test_walkin_records_its_gate(security):
+    gate = f.make_gate()
+    vr = _register(security, gate_id=gate.pk, id_doc_number="G1")
+    assert vr.gate_id == gate.pk

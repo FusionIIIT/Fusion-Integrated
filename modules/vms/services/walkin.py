@@ -20,7 +20,6 @@ from core.api.exceptions import (
 from modules.vms.domain import request_state as rs
 from modules.vms.models import (
     Alert,
-    AuditLog,
     Gate,
     Visitor,
     VisitPass,
@@ -53,9 +52,8 @@ def _walkin_count_last_hour(now, gate_id):
     if gate_id is None:
         return VisitRequest.objects.filter(source=VisitRequest.Source.WALK_IN,
                                            created_at__gte=since).count()
-    # SCHEMA-REQUEST d-1: VisitRequest has no gate column; per-gate counts use the audit trail.
-    return AuditLog.objects.filter(action="vms.walkin.registered", created_at__gte=since,
-                                   detail__gate_id=gate_id).count()
+    return VisitRequest.objects.filter(source=VisitRequest.Source.WALK_IN, gate_id=gate_id,
+                                       created_at__gte=since).count()
 
 
 def register(*, security_actor, data: dict, host_user_id: int) -> VisitRequest:
@@ -118,7 +116,7 @@ def register(*, security_actor, data: dict, host_user_id: int) -> VisitRequest:
         vr = VisitRequest.objects.create(
             visitor=visitor, host_user_id=host_user_id, purpose=data["purpose"].strip(),
             scheduled_start=start, scheduled_end=end, status=to,
-            source=VisitRequest.Source.WALK_IN,
+            source=VisitRequest.Source.WALK_IN, gate_id=gate_id,
             contingency_requested_at=None if host_available else now)
         if zone_ids:
             vr.requested_zones.set(zone_ids)
