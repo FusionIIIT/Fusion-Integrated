@@ -7,7 +7,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 
-PASS_INACTIVE = "pass_inactive"
+NOT_ACTIVE = "pass_inactive"
 OUTSIDE_VALIDITY = "outside_validity"
 OUTSIDE_SLOT = "outside_slot"
 BLACKLISTED = "blacklisted"
@@ -16,13 +16,13 @@ ALREADY_INSIDE = "already_inside"
 TERMINATED = "terminated"
 
 #: Evaluation order (BR-077, 190, 112, 191, then state conflicts).
-FAILURE_ORDER = (PASS_INACTIVE, OUTSIDE_VALIDITY, OUTSIDE_SLOT, BLACKLISTED,
+FAILURE_ORDER = (NOT_ACTIVE, OUTSIDE_VALIDITY, OUTSIDE_SLOT, BLACKLISTED,
                  ZONE_NOT_PERMITTED, ALREADY_INSIDE, TERMINATED)
 
 #: Failures an Admin may override (BR-085, decision D-14). One-line edit to change the answer.
-OVERRIDE_ELIGIBLE = frozenset({PASS_INACTIVE, OUTSIDE_VALIDITY, ZONE_NOT_PERMITTED, OUTSIDE_SLOT})
+OVERRIDE_ELIGIBLE = frozenset({NOT_ACTIVE, OUTSIDE_VALIDITY, ZONE_NOT_PERMITTED, OUTSIDE_SLOT})
 
-_RULE = {PASS_INACTIVE: "VMS-BR-077", OUTSIDE_VALIDITY: "VMS-BR-190", OUTSIDE_SLOT: "VMS-BR-190",
+_RULE = {NOT_ACTIVE: "VMS-BR-077", OUTSIDE_VALIDITY: "VMS-BR-190", OUTSIDE_SLOT: "VMS-BR-190",
          BLACKLISTED: "VMS-BR-112", ZONE_NOT_PERMITTED: "VMS-BR-191",
          ALREADY_INSIDE: "VMS-BR-082", TERMINATED: "VMS-BR-077"}
 
@@ -53,7 +53,7 @@ def validate_at_gate(pass_, now: datetime, zone_id, policy=None, blacklisted: bo
     out: list[Failure] = []
     terminated = bool(getattr(pass_, "terminated", False))
     if not pass_.is_active and not terminated:
-        out.append(_fail(PASS_INACTIVE, "Pass is not active."))
+        out.append(_fail(NOT_ACTIVE, "Pass is not active."))
     if now < pass_.valid_from or now > pass_.valid_until:
         out.append(_fail(OUTSIDE_VALIDITY, "Outside the pass validity window."))
     slot_start = getattr(pass_, "slot_start", None)

@@ -1,10 +1,11 @@
+import contextlib
 import itertools
 
 import pytest
 
 from modules.vms.domain import request_state as rs
 
-ALL_FLAG_COMBOS = [dict(zip(rs.FLAGS, v)) for v in itertools.product([False, True], repeat=3)]
+ALL_FLAG_COMBOS = [dict(zip(rs.FLAGS, v, strict=True)) for v in itertools.product([False, True], repeat=3)]
 
 
 @pytest.mark.parametrize("t", rs.TABLE, ids=lambda t: f"{t.kind}:{t.frm}:{t.event}:{t.actor}:{t.to}")
@@ -18,10 +19,8 @@ def test_no_flag_combination_is_ambiguous():
     keys = {(t.kind, t.frm, t.event, t.actor) for t in rs.TABLE}
     for key in keys:
         for flags in ALL_FLAG_COMBOS:
-            try:
+            with contextlib.suppress(rs.InvalidTransition):  # a guard excluded it; fine
                 rs.resolve(*key, flags)
-            except rs.InvalidTransition:
-                pass  # a guard excluded it; fine
 
 
 def test_every_state_and_event_is_used():

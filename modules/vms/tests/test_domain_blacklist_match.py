@@ -1,4 +1,4 @@
-from types import SimpleNamespace as NS
+from types import SimpleNamespace
 
 import pytest
 
@@ -6,8 +6,8 @@ from modules.vms.domain import blacklist_match as bm
 
 
 def probe(**kw):
-    base = dict(name="", id_doc_number="", phone="", email="")
-    return NS(**{**base, **kw})
+    base = {"name": "", "id_doc_number": "", "phone": "", "email": ""}
+    return SimpleNamespace(**{**base, **kw})
 
 
 def test_id_doc_normalised():

@@ -22,7 +22,7 @@ E = VisitLog.Event
 
 #: Messages the old gate endpoint returned, keyed by the domain failure code.
 GATE_MESSAGES = {
-    pass_rules.PASS_INACTIVE: "Pass is not active.",
+    pass_rules.NOT_ACTIVE: "Pass is not active.",
     pass_rules.OUTSIDE_VALIDITY: "Pass is outside its validity window.",
     pass_rules.OUTSIDE_SLOT: "Outside the event slot.",
     pass_rules.BLACKLISTED: "Visitor is blacklisted.",
