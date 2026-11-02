@@ -1,49 +1,51 @@
 # 10-lms/OPEN_ISSUES.md — LMS Course Management Open Issues Register
 
-Overview:
-Explicitly document the 6 unresolved policy questions identified in Problem Statement v1.0 §5 and synchronized specification documents. Per mandatory instructions, NO policy is invented. All 6 remain in status 'NEEDS CLARIFICATION'.
+## Overview
+Explicitly document the six unresolved policy questions identified in the Problem Statement (v1.0 §5) and synchronized specification documents. **No policy is invented**; all six remain in status **NEEDS CLARIFICATION**.
 
-For each issue, detail:
-- Issue ID
-- Specification Source
-- Unresolved Question
-- Status (NEEDS CLARIFICATION)
-- Safe Baseline Implementation Constraint
+### Issue format
+- **Issue ID**
+- **Specification Source**
+- **Unresolved Question** (what is unknown)
+- **Known Specification** (what the spec confirms)
+- **Status** – always `NEEDS CLARIFICATION`
 
-List of issues:
+## Open Issues
 
-1. **ISS-LMS-001: Late-Submission Policy**
-   - **Source:** Problem Statement §5, BR-LMS-013, UC-LMS-010.
-   - **Question:** Is late submission hard-blocked, flagged as late, or overridable by faculty/admin?
-   - **Status:** NEEDS CLARIFICATION
-   - **Baseline Constraint:** Strict deadline enforcement (t <= t_due). After due date, submission is rejected with an informative error until policy is clarified.
+1. **ISS‑LMS‑001: Late‑Submission Policy**
+   - **Source:** Problem Statement §5, BR‑LMS‑013, UC‑LMS‑010.
+   - **Unresolved Question:** Whether a late submission is hard‑blocked, merely flagged as late, or overridable by faculty/administrators.
+   - **Known Specification:** Submissions have a `status` field that can represent `late`.
+   - **Status:** `NEEDS CLARIFICATION`
 
-2. **ISS-LMS-002: TA Permissions (Announcements & Grading)**
-   - **Source:** Problem Statement §5, BR-LMS-007, BR-LMS-015, AFR-LMS-014.2, AFR-LMS-014.4.
-   - **Question:** Are TA permissions to post announcements and grade submissions configurable per course or globally fixed?
-   - **Status:** NEEDS CLARIFICATION
-   - **Baseline Constraint:** Course-level configuration flags (allow_ta_announcements default False, allow_ta_grading default True) with TA attribution always recorded.
+2. **ISS‑LMS‑002: TA Permissions (Announcements & Grading)**
+   - **Source:** Problem Statement §5, BR‑LMS‑007, BR‑LMS‑015, AFR‑LMS‑014.2, AFR‑LMS‑014.4.
+   - **Unresolved Question:** Whether TA permissions to post announcements and grade submissions are configurable per‑course or globally fixed.
+   - **Known Specification:** Roles (`ta`) exist and can perform actions, but configurability is not defined.
+   - **Status:** `NEEDS CLARIFICATION`
 
-3. **ISS-LMS-003: Notification Delivery Channels**
-   - **Source:** Problem Statement §5, CFR-LMS-006, UC-LMS-005, UC-LMS-013.
-   - **Question:** Are notifications delivered via in-app alerts, email, or both?
-   - **Status:** NEEDS CLARIFICATION
-   - **Baseline Constraint:** Internal notification event logging and transactional outbox records. No hardcoded external SMTP dependency.
+3. **ISS‑LMS‑003: Notification Delivery Channels**
+   - **Source:** Problem Statement §5, CFR‑LMS‑006, UC‑LMS‑005, UC‑LMS‑013.
+   - **Unresolved Question:** Which channels (in‑app alerts, email, both) are used for notifications.
+   - **Known Specification:** A notification event log exists; external delivery mechanisms are unspecified.
+   - **Status:** `NEEDS CLARIFICATION`
 
-4. **ISS-LMS-004: Observer Linkage Granularity**
-   - **Source:** Problem Statement §5, BR-LMS-003, AFR-LMS-015.1.
-   - **Question:** Is an Observer linked to one specific student or to an entire course section?
-   - **Status:** NEEDS CLARIFICATION
-   - **Baseline Constraint:** Linkage is at the course/section level with strict prohibition of student-specific data access (grades, submissions).
+4. **ISS‑LMS‑004: Observer Linkage Granularity**
+   - **Source:** Problem Statement §5, BR‑LMS‑003, AFR‑LMS‑015.1.
+   - **Unresolved Question:** Whether an Observer links to a single student or to an entire course/section.
+   - **Known Specification:** Observers are defined, but linkage scope is not detailed.
+   - **Status:** `NEEDS CLARIFICATION`
 
-5. **ISS-LMS-005: Resubmission Policy**
-   - **Source:** Problem Statement §5, UC-LMS-010, AFR-LMS-011.1.
-   - **Question:** How many submission attempts are permitted? How are late resubmissions handled?
-   - **Status:** NEEDS CLARIFICATION
-   - **Baseline Constraint:** Versioned submission history with single active submission attempt before due date until multi-attempt policy is authorized.
+5. **ISS‑LMS‑005: Resubmission Policy**
+   - **Source:** Problem Statement §5, UC‑LMS‑010, AFR‑LMS‑011.1.
+   - **Unresolved Question:** Number of allowed submission attempts and handling of late resubmissions.
+   - **Known Specification:** `Submission.version` exists; semantics are not specified.
+   - **Status:** `NEEDS CLARIFICATION`
 
-6. **ISS-LMS-006: Post-Release Grade Change Authority & Effects**
-   - **Source:** Problem Statement §5, BR-LMS-019, UC-LMS-012, AFR-LMS-013.6.
-   - **Question:** Who is authorized to alter grades after release, and what downstream recalculation effects are permitted?
-   - **Status:** NEEDS CLARIFICATION
-   - **Baseline Constraint:** Faculty-only edits with mandatory immutable GradeAuditLog recording assessor, timestamp, previous score, new score, and reason.
+6. **ISS‑LMS‑006: Post‑Release Grade Change Authority & Effects**
+   - **Source:** Problem Statement §5, BR‑LMS‑019, UC‑LMS‑012, AFR‑LMS‑013.6.
+   - **Unresolved Question:** Who may alter grades after release and what downstream recalculations are permitted.
+   - **Known Specification:** `GradeAuditLog` is required; authority is not defined.
+   - **Status:** `NEEDS CLARIFICATION`
+
+*ISS‑LMS‑006 is a derived clarification rather than a direct Problem‑Statement question; it is kept here for traceability.*

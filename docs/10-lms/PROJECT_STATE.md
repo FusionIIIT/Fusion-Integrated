@@ -11,7 +11,7 @@
 - **Submission Target:** PR to FusionIIIT/Fusion-Integrated:main
 
 ## 2. AI Governance & Model Coordinates:
-- **Sole AI Coding Agent:** qwen2.5:7b (Q4_K_M, Digest prefix: 845dbda0ea48, Windows Ollama)
+- **Sole AI Coding Agent:** qwen2.5:7b (Q4_K_M, Full Digest: `845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e`, Windows Ollama)
 - **Project Orchestrator:** Antigravity (Gemini Pro) — orchestration, test coordination, no product code generation.
 - **Logging Directory:** local_agent/logs/ (verbatim prompts, responses, timestamps, model digests)
 
@@ -28,10 +28,12 @@
 - **UI Base Path:** /courses
 
 ## 5. Operational Metrics & Phase Status:
-- **Current Phase:** Phase 0 / Phase 1 Initialization (Git Branching & Project Memory Scaffolding)
+- **Current Phase:** Phase 2.1 Architecture Review, Policy Corrections & ER Model Alignment (Completed, Pending Review)
+- **PR Status:** Official PR #437 Open on FusionIIIT/Fusion-Integrated:main
+- **Architecture Documents:** DOMAIN_MODEL.md, WORKFLOW_DESIGN.md, INTEGRATION_DESIGN.md, ARCHITECTURE_PLAN.md
 - **CFR Count:** 15 Core Functional Requirements
 - **AFR Count:** 47 Atomic Functional Requirements
 - **BR Count:** 19 Business Rules
 - **UC Count:** 15 Use Cases
 - **BW/CW Count:** 5 Basis Workflows, 2 Composite Workflows
-- **Open Issues:** 6 unresolved policy issues (ISS-LMS-001 to ISS-LMS-006)
+- **Open Issues:** 6 unresolved policy issues (ISS-LMS-001 to ISS-LMS-006, strictly NEEDS CLARIFICATION)

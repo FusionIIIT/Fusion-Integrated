@@ -25,4 +25,42 @@
   - OPEN_ISSUES.md
   - REQUIREMENT_INVENTORY.md
   - ARCHITECTURE_PLAN.md
-- **Next Planned Step:** Architecture and Domain Modeling phase approval.
+- **Status:** Initial documentation committed (`60f87c4`), pushed to `origin`, and PR #437 created on `FusionIIIT/Fusion-Integrated:main`.
+
+## Phase 2: Architecture Design and Domain Modeling Milestone (2026-11-01)
+- **Milestone:** Full architecture, domain modeling, and integration design.
+- **Coding Agent:** qwen2.5:7b (Windows Ollama, digest prefix 845dbda0ea48)
+- **Generated Architecture Documents:**
+  - `DOMAIN_MODEL.md`: Pure Python domain boundaries, 10 core entities (Course, CourseMembership, ModuleSection, CourseMaterial, Announcement, Assignment, Submission, Grade, GradeAuditLog, ScheduledRelease), Mermaid ER diagram, and CFR/AFR/BR traceability.
+  - `WORKFLOW_DESIGN.md`: State machine lifecycles, step-by-step mapping of Basis Workflows (BW-LMS-01..05) and Composite Workflows (CW-LMS-01..02), actor permissions, and safe baseline constraints for open issues.
+  - `INTEGRATION_DESIGN.md`: Subsystem designs for Academic adapter (addressing missing modules/academics), IAM/directory lookups (UserScopedModel, batched get_users), file storage sharding/streaming, Celery Beat and deterministic CLI command (lms_process_scheduled_releases), and client routing (/courses).
+- **Next Planned Step:** Human review of Phase 2 architecture design before proceeding to Phase 3 (backend domain and model implementation).
+
+## Phase 2.1: Model Governance & Artifact Validation Milestone (2026-11-02)
+- **Milestone:** Architecture documentation review, policy corrections, ER model alignment, and governance audit.
+- **Orchestrator:** Antigravity
+- **Authorized AI Coder:** `qwen2.5:7b` (Format: GGUF, Quantization: Q4_K_M)
+- **Verified Full Model Digest:** `845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e`
+- **Runner Log Source:** `C:/Users/aabhi/OneDrive/Desktop/Software Engineering/ELM_Assignment/local_agent/logs/elm_agent_20261101.jsonl`
+- **Qwen Task Execution Inventory (Phase 2 & 2.1 Records):**
+  - **Record 22 (2026-11-01T16:08:24Z):** Generated `docs/10-lms/AGENTS.md`.
+  - **Record 23 (2026-11-01T16:11:55Z):** Generated `docs/10-lms/PROJECT_STATE.md`.
+  - **Record 24 (2026-11-01T16:14:54Z):** Generated initial `docs/10-lms/WORK_LOG.md`.
+  - **Record 25 (2026-11-01T16:20:18Z):** Generated `docs/10-lms/OPEN_ISSUES.md`.
+  - **Record 26 (2026-11-01T16:35:20Z):** Generated `docs/10-lms/REQUIREMENT_INVENTORY.md`.
+  - **Record 27 (2026-11-01T16:39:58Z):** Generated `docs/10-lms/ARCHITECTURE_PLAN.md`.
+  - **Record 28 (2026-11-01T17:12:07Z):** Generated Section 7 Open Issues Table for LMS.
+  - **Record 29 (2026-11-01T17:51:31Z):** Generated `docs/10-lms/DOMAIN_MODEL.md`.
+  - **Record 30 (2026-11-01T18:06:49Z):** Generated `docs/10-lms/WORKFLOW_DESIGN.md`.
+  - **Record 31 (2026-11-01T18:16:36Z):** Generated `docs/10-lms/INTEGRATION_DESIGN.md`.
+- **Domain Model & ER Diagram Corrections:**
+  - `CourseMembership.user_id`: Corrected from DB foreign key badge to external IAM identity integer reference (`models.IntegerField(db_index=True)` matching `UserScopedModel`, `IamSession`, and `modules.directory.contracts`).
+  - `CourseMembership.course_id`: Retained as actual database foreign key to `Course`.
+  - `CourseMaterial`: Verified parent relation exclusively to `ModuleSection.id` (no redundant `course_id`).
+  - `ScheduledRelease`: Replaced polymorphic `entity_id`/`entity_type` with nullable `material_id` and `assignment_id` foreign keys governed by a DB CHECK constraint (`CHECK ((material_id IS NOT NULL AND assignment_id IS NULL) OR (material_id IS NULL AND assignment_id IS NOT NULL))`).
+  - `Course.code`: Preserved uniqueness scope as unresolved (whether globally unique or scoped to `academic_year` and `semester`).
+  - Canonical diagram source maintained at [lms-domain-model.mmd](file:///home/abhi/Documents/Fusion/Fusion-Integrated/docs/10-lms/diagrams/lms-domain-model.mmd).
+  - Portable configuration created at [mermaid-config.json](file:///home/abhi/Documents/Fusion/Fusion-Integrated/docs/10-lms/diagrams/mermaid-config.json) specifying theme base, Arial system font, explicit hex colors, and zero remote font dependencies.
+  - Portable vector diagram generated at [lms-domain-model.svg](file:///home/abhi/Documents/Fusion/Fusion-Integrated/docs/10-lms/diagrams/lms-domain-model.svg) (47,592 bytes) via Python standard library XML construction without external tools, fully self-contained with explicit hex colors, system fonts, zero CSS variables, and verified valid XML.
+- **Strict Policy Preservation:** All six policy issues (ISS-LMS-001 through ISS-LMS-006) remain strictly in status `[NEEDS CLARIFICATION]` with zero invented defaults across all documentation.
+- **Git & Workspace Integrity:** Zero application code, zero migrations, zero dependencies added. Repository root temporary files removed; changes strictly confined to `docs/10-lms/`. ELM branches, PR #269, and stashes remain untouched.

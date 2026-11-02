@@ -38,6 +38,9 @@
 - **GradeAuditLog**
   - Fields: `grade`, `assessor_user_id`, `previous_points`, `new_points`, `reason`, `changed_at`
 
+- **ScheduledRelease**
+  - Fields: `material_id` (nullable FK to CourseMaterial), `assignment_id` (nullable FK to Assignment), `scheduled_date`, `processed_at`, `status`, `error_message` (CHECK constraint: exactly one non-null target)
+
 ## 3. Role-Based Access Control & Permission Architecture
 
 ### Actors
@@ -84,3 +87,9 @@
 - **Materials Organizer**
 - **Assignment View/Submit**
 - **Grading Console**
+
+## 7. Detailed Architecture Specifications
+- **Domain Modeling & Schema**: See [DOMAIN_MODEL.md](file:///home/abhi/Documents/Fusion/Fusion-Integrated/docs/10-lms/DOMAIN_MODEL.md) for entity schemas, Mermaid ER diagram, indexes, constraints, and CFR/AFR traceability.
+- **Workflow & Lifecycle Design**: See [WORKFLOW_DESIGN.md](file:///home/abhi/Documents/Fusion/Fusion-Integrated/docs/10-lms/WORKFLOW_DESIGN.md) for state-transition tables, Basis Workflows (BW-LMS-01..05), Composite Workflows (CW-LMS-01..02), and policy handling.
+- **Subsystem & Integration Design**: See [INTEGRATION_DESIGN.md](file:///home/abhi/Documents/Fusion/Fusion-Integrated/docs/10-lms/INTEGRATION_DESIGN.md) for Academic adapter, IAM lookups, file storage hashing, Celery Beat scheduling, and client routing.
+- **Unresolved Policy Issues**: See [OPEN_ISSUES.md](file:///home/abhi/Documents/Fusion/Fusion-Integrated/docs/10-lms/OPEN_ISSUES.md) where all six policy issues (ISS-LMS-001 through ISS-LMS-006) remain strictly in status `[NEEDS CLARIFICATION]` with zero invented defaults.
