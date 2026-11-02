@@ -34,6 +34,218 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "leave_elm": {
+      "grants": {
+        "Dean": [
+          "leave_elm.apply.self",
+          "leave_elm.cancel.self",
+          "leave_elm.extend.self",
+          "leave_elm.resume.self",
+          "leave_elm.review.final",
+          "leave_elm.review.queue",
+          "leave_elm.substitute.respond",
+          "leave_elm.view.self"
+        ],
+        "Deputy Registrar (Estt.)": [
+          "leave_elm.apply.self",
+          "leave_elm.cancel.self",
+          "leave_elm.extend.self",
+          "leave_elm.resume.self",
+          "leave_elm.review.establishment",
+          "leave_elm.review.final",
+          "leave_elm.review.queue",
+          "leave_elm.substitute.respond",
+          "leave_elm.view.self"
+        ],
+        "Director": [
+          "leave_elm.apply.self",
+          "leave_elm.cancel.self",
+          "leave_elm.extend.self",
+          "leave_elm.resume.self",
+          "leave_elm.review.final",
+          "leave_elm.review.queue",
+          "leave_elm.substitute.respond",
+          "leave_elm.view.self"
+        ],
+        "Faculty": [
+          "leave_elm.apply.self",
+          "leave_elm.cancel.self",
+          "leave_elm.extend.self",
+          "leave_elm.resume.self",
+          "leave_elm.substitute.respond",
+          "leave_elm.view.self"
+        ],
+        "Leave Administrator": [
+          "leave_elm.apply.self",
+          "leave_elm.cancel.self",
+          "leave_elm.extend.self",
+          "leave_elm.manage.calendar",
+          "leave_elm.manage.policy",
+          "leave_elm.manage.records",
+          "leave_elm.manage.sla",
+          "leave_elm.resume.self",
+          "leave_elm.review.queue",
+          "leave_elm.substitute.respond",
+          "leave_elm.view.all",
+          "leave_elm.view.self"
+        ],
+        "Registrar": [
+          "leave_elm.apply.self",
+          "leave_elm.cancel.self",
+          "leave_elm.extend.self",
+          "leave_elm.resume.self",
+          "leave_elm.review.final",
+          "leave_elm.review.queue",
+          "leave_elm.substitute.respond",
+          "leave_elm.view.self"
+        ],
+        "Staff": [
+          "leave_elm.apply.self",
+          "leave_elm.cancel.self",
+          "leave_elm.extend.self",
+          "leave_elm.resume.self",
+          "leave_elm.substitute.respond",
+          "leave_elm.view.self"
+        ],
+        "Unit Head": [
+          "leave_elm.apply.self",
+          "leave_elm.cancel.self",
+          "leave_elm.extend.self",
+          "leave_elm.resume.self",
+          "leave_elm.review.queue",
+          "leave_elm.review.unit",
+          "leave_elm.substitute.respond",
+          "leave_elm.view.self"
+        ]
+      },
+      "module_grants": [
+        "Dean",
+        "Deputy Registrar (Estt.)",
+        "Director",
+        "Faculty",
+        "Leave Administrator",
+        "Registrar",
+        "Staff",
+        "Unit Head"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "Calendar",
+        "items": [
+          {
+            "code": "leave.mine",
+            "icon": "Calendar",
+            "label": "My Leave",
+            "required_permission": "leave_elm.view.self",
+            "sort_order": 5,
+            "to": "/leave/mine"
+          },
+          {
+            "code": "leave.apply",
+            "icon": "CheckSquare",
+            "label": "Apply for Leave",
+            "required_permission": "leave_elm.apply.self",
+            "sort_order": 10,
+            "to": "/leave/apply"
+          },
+          {
+            "code": "leave.approvals",
+            "icon": "CheckCircle",
+            "label": "Approval Queue",
+            "required_permission": "leave_elm.review.queue",
+            "sort_order": 20,
+            "to": "/leave/approvals"
+          },
+          {
+            "code": "leave.admin",
+            "icon": "Settings",
+            "label": "Leave Administration",
+            "required_permission": "leave_elm.manage.policy",
+            "sort_order": 30,
+            "to": "/leave/admin"
+          }
+        ],
+        "label": "Leave Management",
+        "nav_section": "Leave",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "leave_elm.apply.self",
+          "label": "Submit own leave applications"
+        },
+        {
+          "code": "leave_elm.view.self",
+          "label": "View own leave balances and history"
+        },
+        {
+          "code": "leave_elm.cancel.self",
+          "label": "Request cancellation of own approved leave"
+        },
+        {
+          "code": "leave_elm.extend.self",
+          "label": "Request extension of own ongoing leave"
+        },
+        {
+          "code": "leave_elm.resume.self",
+          "label": "Submit own leave resumption"
+        },
+        {
+          "code": "leave_elm.substitute.respond",
+          "label": "Respond to a substitute assignment"
+        },
+        {
+          "code": "leave_elm.review.queue",
+          "label": "View leave tasks assigned to the current user"
+        },
+        {
+          "code": "leave_elm.review.unit",
+          "label": "Review leave requests as Unit Head"
+        },
+        {
+          "code": "leave_elm.review.establishment",
+          "label": "Process routed leave requests"
+        },
+        {
+          "code": "leave_elm.review.final",
+          "label": "Make configured final sanction decisions"
+        },
+        {
+          "code": "leave_elm.manage.policy",
+          "label": "Maintain leave policy and hierarchy"
+        },
+        {
+          "code": "leave_elm.manage.calendar",
+          "label": "Maintain holiday and RH calendars"
+        },
+        {
+          "code": "leave_elm.manage.records",
+          "label": "Maintain leave records and offline sanctions"
+        },
+        {
+          "code": "leave_elm.manage.sla",
+          "label": "Configure leave workflow SLA thresholds"
+        },
+        {
+          "code": "leave_elm.view.all",
+          "label": "View all employee leave records"
+        },
+        {
+          "code": "leave_elm.process.year_end",
+          "label": "Run annual leave-account processing"
+        },
+        {
+          "code": "leave_elm.process.sla",
+          "label": "Process pending leave SLA thresholds"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "leave_elm.process.sla",
+        "leave_elm.process.year_end"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
