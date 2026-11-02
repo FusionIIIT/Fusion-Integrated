@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { initializeDatabase } = require('./db');
 const elmLeaveRoutes = require('./modules/elm/api/routes/elm_leave_routes');
+const pmsPatentRoutes = require('./modules/pms/api/routes/pms_patent_routes');
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api', elmLeaveRoutes);
+app.use('/api', pmsPatentRoutes);
 
 async function startServer() {
   await initializeDatabase();
