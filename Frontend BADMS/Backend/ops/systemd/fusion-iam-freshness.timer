@@ -1,0 +1,10 @@
+[Unit]
+Description=Check the IAM projection's freshness every 15 minutes
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=15min
+Unit=fusion-iam-freshness.service
+
+[Install]
+WantedBy=timers.target

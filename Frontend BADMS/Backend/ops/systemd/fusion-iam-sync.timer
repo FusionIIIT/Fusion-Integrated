@@ -1,0 +1,12 @@
+[Unit]
+Description=Run the IAM identity sync every 10 minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=10min
+# Catch up after downtime: a projection an hour stale is the thing to avoid.
+Persistent=true
+Unit=fusion-iam-sync.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=Fail when the IAM projection has gone stale
+
+[Service]
+Type=oneshot
+User=fusion
+Group=fusion
+WorkingDirectory=/home/fusion/Fusion_System_Administrator/Backend/backend
+# Exits 1 past the limit, so a dead sync timer becomes a failed unit instead of
+# silence. Point the monitor at `systemctl is-failed fusion-iam-freshness`.
+ExecStart=/home/fusion/Fusion_System_Administrator/venv/bin/python manage.py sync_identity --status --max-age 1800
