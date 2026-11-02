@@ -5,7 +5,10 @@ from django.db import transaction
 from django.utils import timezone
 
 from modules.vms.models import (
-    AccessPolicy, BlacklistVersion, Gate, Zone,
+    AccessPolicy,
+    BlacklistVersion,
+    Gate,
+    Zone,
 )
 
 

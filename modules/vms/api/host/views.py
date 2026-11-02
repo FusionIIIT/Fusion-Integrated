@@ -5,7 +5,9 @@ from rest_framework.views import APIView
 
 from fusion_auth.permissions import HasPermission
 from modules.vms.api.host.serializers import (
-    DecisionSerializer, HostRequestSerializer, VisitPassSerializer,
+    DecisionSerializer,
+    HostRequestSerializer,
+    VisitPassSerializer,
 )
 from modules.vms.models import VisitRequest
 from modules.vms.services import legacy_flow

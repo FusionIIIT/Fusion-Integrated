@@ -4,7 +4,8 @@ from rest_framework.views import APIView
 
 from fusion_auth.permissions import HasPermission
 from modules.vms.api.gate.serializers import (
-    GateCheckoutSerializer, GateValidateSerializer,
+    GateCheckoutSerializer,
+    GateValidateSerializer,
 )
 from modules.vms.services import legacy_flow
 

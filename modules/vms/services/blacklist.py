@@ -11,7 +11,9 @@ from django.utils import timezone
 
 from modules.vms.domain import blacklist_match
 from modules.vms.models import (
-    BlacklistEntry, BlacklistVersion, SafeListEntry,
+    BlacklistEntry,
+    BlacklistVersion,
+    SafeListEntry,
 )
 from modules.vms.services.common import audit
 

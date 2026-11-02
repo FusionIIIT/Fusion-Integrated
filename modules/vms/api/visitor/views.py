@@ -7,7 +7,8 @@ from rest_framework.views import APIView
 
 from fusion_auth.permissions import IsAuthenticatedPrincipal
 from modules.vms.api.visitor.serializers import (
-    PreRegistrationSerializer, VisitRequestSerializer,
+    PreRegistrationSerializer,
+    VisitRequestSerializer,
 )
 from modules.vms.services import legacy_flow
 from modules.vms.services.common import scope

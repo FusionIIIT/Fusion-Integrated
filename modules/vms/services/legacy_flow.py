@@ -14,7 +14,7 @@ from django.utils import timezone
 
 from core.api.exceptions import BadRequestError, ConflictError, NotFoundError
 from modules.vms.domain import pass_rules, request_state
-from modules.vms.models import VisitLog, VisitPass, VisitRequest, Visitor
+from modules.vms.models import VisitLog, Visitor, VisitPass, VisitRequest
 from modules.vms.services import blacklist, passes, policy
 from modules.vms.services.common import audit, notify
 
