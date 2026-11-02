@@ -206,9 +206,15 @@ def it_security_configure_encryption(*, actor, request_id: int, algorithm: str =
 
 @transaction.atomic
 def submit_storage_extension(*, actor, department: str, requested_additional_mb: int, reason: str) -> StorageExtensionRequest:
-    """User requests additional storage when quota is full (BR-BA-016)."""
+    """User requests additional storage when quota is full (BR-BA-016, BR-BA-009)."""
     quota, _ = StorageQuota.objects.get_or_create(user_id=actor.user_id)
     sm.validate_storage_quota_threshold(quota.used_mb, quota.allocated_mb)
+
+    # BR-BA-009: block if a pending request already exists
+    pending_count = StorageExtensionRequest.objects.filter(
+        user_id=actor.user_id, status=sm.STORAGE_SUBMITTED
+    ).count()
+    sm.validate_no_pending_extension(pending_count)
 
     req = StorageExtensionRequest.objects.create(
         user_id=actor.user_id,
@@ -226,6 +232,7 @@ def submit_storage_extension(*, actor, department: str, requested_additional_mb:
         details={"requested_mb": requested_additional_mb},
     )
     return req
+
 
 
 @transaction.atomic
@@ -321,3 +328,41 @@ def sysadmin_review_restoration(*, actor, restoration_id: int, action: str, rema
         details={"remarks": remarks},
     )
     return req
+
+
+# --- Special Archival (BR-BA-018, CFR-BA-010) ---
+
+@transaction.atomic
+def super_admin_special_archival(
+    *, actor, department: str, file_name: str, file_type: str, file_size_bytes: int, reason: str
+) -> SecureArchivalRequest:
+    """Super Admin performs a special archival request received offline (BR-BA-018)."""
+    if not actor.has_permission("badms.archival.special"):
+        raise PermissionDeniedError("Only Super Admin can perform special archival operations.")
+
+    req = SecureArchivalRequest.objects.create(
+        user_id=actor.user_id,
+        department=department,
+        file_name=file_name,
+        file_type=file_type,
+        file_size_bytes=file_size_bytes,
+        reason=reason,
+        initial_classification="archival",
+        authoritative_classification="archival",
+        status=sm.ARCHIVAL_SPECIAL_EXECUTED,
+        is_special=True,
+        classified_by_user_id=actor.user_id,
+        classified_at=timezone.now(),
+        retention_until=timezone.now() + timedelta(days=365 * sm.RETENTION_YEARS[sm.TIER_ARCHIVAL]),
+        archive_location=f"/archives/special/{department}/{file_name}",
+    )
+    BadmsAuditLog.objects.create(
+        actor_user_id=actor.user_id,
+        actor_role=actor.active_role or "",
+        action="special_archival_executed",
+        entity_type="archival_request",
+        entity_id=req.pk,
+        details={"department": department, "file_name": file_name},
+    )
+    return req
+

@@ -4,6 +4,7 @@ from modules.badms.domain import state_machine as sm
 
 
 class BadmsDomainTestCase(unittest.TestCase):
+
     def test_hod_approval_and_rejection(self):
         self.assertEqual(sm.validate_hod_decision("approve"), sm.ARCHIVAL_HOD_APPROVED)
         self.assertEqual(sm.validate_hod_decision("reject"), sm.ARCHIVAL_HOD_REJECTED)
@@ -44,6 +45,29 @@ class BadmsDomainTestCase(unittest.TestCase):
         self.assertEqual(sm.RETENTION_YEARS[sm.TIER_SENSITIVE], 7)
         self.assertEqual(sm.RETENTION_YEARS[sm.TIER_CRITICAL], 10)
 
+    def test_no_duplicate_pending_extension(self):
+        # BR-BA-009: cannot submit a new request when one is already pending
+        with self.assertRaises(sm.RuleViolation) as ctx:
+            sm.validate_no_pending_extension(pending_count=1)
+        self.assertEqual(ctx.exception.rule_id, "BR-BA-009")
+
+        # zero pending — should pass
+        sm.validate_no_pending_extension(pending_count=0)
+
+    def test_invalid_hod_action_raises(self):
+        # Any action other than 'approve'/'reject' should raise InvalidTransition
+        with self.assertRaises(sm.InvalidTransition):
+            sm.validate_hod_decision("pending")
+        with self.assertRaises(sm.InvalidTransition):
+            sm.validate_hod_decision("")
+
+    def test_all_tiers_have_retention(self):
+        # Every tier in ALL_TIERS must have a defined retention year
+        for tier in sm.ALL_TIERS:
+            self.assertIn(tier, sm.RETENTION_YEARS)
+            self.assertGreater(sm.RETENTION_YEARS[tier], 0)
+
 
 if __name__ == "__main__":
     unittest.main()
+

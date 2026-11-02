@@ -71,6 +71,15 @@ NAV_ITEMS = [
         "required_permission": "badms.security.manage",
         "sort_order": 70,
     },
+    # -- Super Admin Nav Items ---
+    {
+        "code": "badms.special_archival",
+        "label": "Special Archival",
+        "icon": "LockKey",
+        "to": "/badms/archivals/special",
+        "required_permission": "badms.archival.special",
+        "sort_order": 75,
+    },
     # -- Audit Nav Items ---
     {
         "code": "badms.audit_logs",
@@ -81,6 +90,7 @@ NAV_ITEMS = [
         "sort_order": 80,
     },
 ]
+
 
 PERMISSIONS = [
     # Backup & Schedules

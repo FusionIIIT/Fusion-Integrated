@@ -9,6 +9,7 @@ from modules.badms.models import (
     BackupSchedule,
     BadmsAuditLog,
     StorageQuota,
+    SecureArchivalRequest,
 )
 from modules.badms.selectors import scoping
 from modules.badms.services import operations
@@ -175,3 +176,25 @@ class AuditLogListView(APIView):
     def get(self, request):
         logs = BadmsAuditLog.objects.all()[:100]
         return Response(BadmsAuditLogSerializer(logs, many=True).data)
+
+
+class SpecialArchivalView(APIView):
+    """Super Admin executes a special archival request (BR-BA-018, CFR-BA-010)."""
+    permission_classes = [MODULE_GUARD, HasPermission("badms.archival.special")]
+
+    def get(self, request):
+        reqs = SecureArchivalRequest.objects.filter(is_special=True)
+        return Response(SecureArchivalRequestSerializer(reqs, many=True).data)
+
+    def post(self, request):
+        req = operations.super_admin_special_archival(
+            actor=request.user,
+            department=request.data.get("department", "CSE"),
+            file_name=request.data.get("file_name", "special.tar.gz"),
+            file_type=request.data.get("file_type", "application/gzip"),
+            file_size_bytes=int(request.data.get("file_size_bytes", 0)),
+            reason=request.data.get("reason", "Special archival"),
+        )
+        return Response(SecureArchivalRequestSerializer(req).data, status=status.HTTP_201_CREATED)
+
+

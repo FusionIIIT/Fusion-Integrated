@@ -50,7 +50,7 @@ class RuleViolation(Exception):
 
 
 def validate_hod_decision(action: str) -> str:
-    """Validates HoD approval or rejection (BR-BA-002, BR-BA-009)."""
+    """Validates HoD approval or rejection (BR-BA-002)."""
     if action == "approve":
         return ARCHIVAL_HOD_APPROVED
     elif action == "reject":
@@ -74,3 +74,13 @@ def calculate_effective_schedule(dataset_code: str, local_schedules: dict, globa
 def check_repeated_failure_escalation(consecutive_failures: int) -> bool:
     """Escalates to Director of IT when 3 consecutive backup failures occur (BR-BA-015)."""
     return consecutive_failures >= 3
+
+
+def validate_no_pending_extension(pending_count: int) -> None:
+    """Only one pending storage-extension request is allowed per user at a time (BR-BA-009)."""
+    if pending_count > 0:
+        raise RuleViolation(
+            "BR-BA-009",
+            "You already have a pending storage extension request. "
+            "Wait for HoD to decide before submitting a new one.",
+        )

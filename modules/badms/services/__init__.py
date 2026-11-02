@@ -9,6 +9,7 @@ from modules.badms.services.operations import (
     hod_review_storage_extension,
     submit_restoration_request,
     sysadmin_review_restoration,
+    super_admin_special_archival,
 )
 
 __all__ = [
@@ -22,4 +23,6 @@ __all__ = [
     "hod_review_storage_extension",
     "submit_restoration_request",
     "sysadmin_review_restoration",
+    "super_admin_special_archival",
 ]
+

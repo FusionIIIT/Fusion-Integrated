@@ -8,6 +8,7 @@ urlpatterns = [
 
     # Secure archival
     path("archivals", v.SecureArchivalListView.as_view(), name="badms-archivals"),
+    path("archivals/special", v.SpecialArchivalView.as_view(), name="badms-archival-special"),
     path("archivals/<int:pk>/hod-review", v.ArchivalHodReviewView.as_view(), name="badms-archival-hod-review"),
     path("archivals/<int:pk>/classify", v.ArchivalClassifyView.as_view(), name="badms-archival-classify"),
     path("archivals/<int:pk>/configure-encryption", v.ArchivalEncryptionView.as_view(), name="badms-archival-encrypt"),
