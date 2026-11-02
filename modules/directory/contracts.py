@@ -8,6 +8,8 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from django.db.models import Q
+
 from fusion_auth.client import IamUnavailable, get_client
 from modules.directory.models import UserRef
 from modules.directory.services.sync import ensure_users_cached
@@ -24,6 +26,7 @@ class UserDTO:
     programme: str = ""
     discipline: str = ""
     batch_year: int | None = None
+    is_active: bool = True
     #: Maintained on the ERP portal's profile page, read here.
     resume_link: str = ""
     profile_completed: bool = False
@@ -34,6 +37,7 @@ def _to_dto(r: UserRef) -> UserDTO:
         user_id=r.user_id, username=r.username, display_name=r.display_name,
         kind=r.kind, email=r.email, department=r.department,
         programme=r.programme, discipline=r.discipline, batch_year=r.batch_year,
+        is_active=r.is_active,
         resume_link=r.resume_link, profile_completed=r.profile_completed,
     )
 
@@ -51,6 +55,30 @@ def get_users(user_ids: Sequence[int]) -> dict[int, UserDTO]:
 def user_ids_in_discipline(discipline: str) -> list[int]:
     return list(
         UserRef.objects.filter(discipline=discipline, kind="student", is_active=True)
+        .values_list("user_id", flat=True)
+    )
+
+
+def student_ids_in_groups(groups: Sequence[dict]) -> list[int]:
+    """Student ids matching selected batch/discipline poll groups.
+
+    `*` is the documented all-branches option; branch maps to IAM discipline.
+    """
+    selected = {
+        (int(group["batch_year"]), str(group["discipline"]))
+        for group in groups
+    }
+    if not selected:
+        return []
+    audience = Q(pk__in=[])
+    for batch_year, discipline in selected:
+        group = Q(batch_year=batch_year)
+        if discipline != "*":
+            group &= Q(discipline=discipline)
+        audience |= group
+    return list(
+        UserRef.objects.filter(kind="student", is_active=True)
+        .filter(audience)
         .values_list("user_id", flat=True)
     )
 

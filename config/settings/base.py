@@ -90,6 +90,8 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.elm",
+    "modules.gymkhana",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -187,6 +189,13 @@ PLACEMENT_UPLOAD_ROOT = env(
     str(Path.home() / ".local" / "share" / "fusion-integrated" / "uploads"))
 #: When set, legacy reads go to nginx via X-Accel-Redirect. Must be `internal;`.
 PLACEMENT_UPLOAD_INTERNAL_PREFIX = env("PLACEMENT_UPLOAD_INTERNAL_PREFIX", "")
+GYMKHANA_UPLOAD_ROOT = env(
+    "GYMKHANA_UPLOAD_ROOT",
+    str(Path.home() / ".local" / "share" / "fusion-integrated" / "gymkhana-uploads"),
+)
+GYMKHANA_VENUES = tuple(env_list("GYMKHANA_VENUES"))
+GYMKHANA_MAX_UPLOAD_BYTES = env_int("GYMKHANA_MAX_UPLOAD_BYTES", 10 * 1024 * 1024)
+DATA_UPLOAD_MAX_MEMORY_SIZE = GYMKHANA_MAX_UPLOAD_BYTES + 1024 * 1024
 
 # No multipart endpoints remain, so this only caps the JSON body.
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
