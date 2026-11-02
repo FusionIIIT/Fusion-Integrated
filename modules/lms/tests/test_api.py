@@ -1,17 +1,27 @@
 """API tests for LMS Course Workspace endpoints."""
+from datetime import UTC, datetime, timedelta
+
 import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.test import APIClient
 
 from conftest import make_session
 from fusion_auth.client import UserRef
-from modules.lms.domain.entities import CourseRole, CourseStatus
-from modules.lms.models import Course, CourseMembership
+from modules.lms.domain.entities import (
+    CourseRole,
+    CourseStatus,
+    MaterialStatus,
+    MaterialType,
+)
+from modules.lms.models import Course, CourseMaterial, CourseMembership
 
 pytestmark = pytest.mark.django_db
 
 MODULE = "lms"
 VIEW = "lms.course.view"
 MANAGE = "lms.course.manage"
+MAT_VIEW = "lms.material.view"
+MAT_MANAGE = "lms.material.manage"
 URL_COURSES = "/api/v1/lms/courses"
 
 
@@ -174,3 +184,163 @@ def test_ta_and_observer_cannot_modify_course_details(stub_iam):
     obs_client = api_client(stub_iam, user_id=3001, role="staff", permissions=(VIEW, MANAGE))
     resp_obs = obs_client.patch(f"{URL_COURSES}/CS301", data={"syllabus": "Observer Hack"}, format="json")
     assert resp_obs.status_code == 403
+
+
+def test_materials_list_visibility_and_restrictions(stub_iam):
+    c = Course.objects.create(code="CS301", title="Database Systems")
+    CourseMembership.objects.create(course=c, user_id=9001, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=c, user_id=1001, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=c, user_id=2001, role=CourseRole.TA)
+
+    future_release = datetime.now(UTC) + timedelta(days=5)
+
+    # 1. Published note
+    CourseMaterial.objects.create(
+        course=c,
+        title="Published Note",
+        section_title="Module 1",
+        material_type=MaterialType.NOTE,
+        status=MaterialStatus.PUBLISHED,
+        content="Published content",
+        created_by_user_id=9001,
+    )
+    # 2. Draft note
+    CourseMaterial.objects.create(
+        course=c,
+        title="Draft Note",
+        section_title="Module 1",
+        material_type=MaterialType.NOTE,
+        status=MaterialStatus.DRAFT,
+        content="Draft content",
+        created_by_user_id=9001,
+    )
+    # 3. Scheduled note
+    CourseMaterial.objects.create(
+        course=c,
+        title="Future Note",
+        section_title="Module 2",
+        material_type=MaterialType.NOTE,
+        status=MaterialStatus.SCHEDULED,
+        release_at=future_release,
+        content="Future content",
+        created_by_user_id=9001,
+    )
+
+    # Faculty sees all 3 materials
+    faculty_client = api_client(
+        stub_iam, user_id=9001, role="faculty", permissions=(VIEW, MAT_VIEW, MAT_MANAGE)
+    )
+    resp_fac = faculty_client.get(f"{URL_COURSES}/CS301/materials")
+    assert resp_fac.status_code == 200
+    fac_data = resp_fac.json()
+    assert fac_data["can_manage"] is True
+    assert fac_data["total_count"] == 3
+
+    # Student sees ONLY the 1 published material (BR-LMS-005, BR-LMS-006)
+    student_client = api_client(
+        stub_iam, user_id=1001, role="student", permissions=(VIEW, MAT_VIEW)
+    )
+    resp_stu = student_client.get(f"{URL_COURSES}/CS301/materials")
+    assert resp_stu.status_code == 200
+    stu_data = resp_stu.json()
+    assert stu_data["can_manage"] is False
+    assert stu_data["total_count"] == 1
+    assert stu_data["sections"][0]["materials"][0]["title"] == "Published Note"
+
+    # TA also sees ONLY published materials in read-only form (AFR-LMS-014.1, BR-LMS-005)
+    ta_client = api_client(
+        stub_iam, user_id=2001, role="staff", permissions=(VIEW, MAT_VIEW)
+    )
+    resp_ta = ta_client.get(f"{URL_COURSES}/CS301/materials")
+    assert resp_ta.status_code == 200
+    ta_data = resp_ta.json()
+    assert ta_data["can_manage"] is False
+    assert ta_data["total_count"] == 1
+
+
+def test_faculty_create_and_delete_material_endpoint(stub_iam):
+    c = Course.objects.create(code="CS301", title="Database Systems")
+    CourseMembership.objects.create(course=c, user_id=9001, role=CourseRole.FACULTY)
+
+    client = api_client(
+        stub_iam, user_id=9001, role="faculty", permissions=(VIEW, MAT_VIEW, MAT_MANAGE)
+    )
+
+    # Create link material
+    payload = {
+        "title": "SQL Tutorial",
+        "section_title": "Module 1: Foundations",
+        "material_type": "link",
+        "link_url": "https://sqlzoo.net",
+        "status": "published",
+    }
+    resp = client.post(f"{URL_COURSES}/CS301/materials", data=payload, format="json")
+    assert resp.status_code == 201
+    created_id = resp.json()["id"]
+
+    # Delete material
+    resp_del = client.delete(f"{URL_COURSES}/CS301/materials/{created_id}")
+    assert resp_del.status_code == 204
+    assert not CourseMaterial.objects.filter(id=created_id).exists()
+
+
+def test_ta_and_observer_cannot_create_materials_via_api(stub_iam):
+    c = Course.objects.create(code="CS301", title="Database Systems")
+    CourseMembership.objects.create(course=c, user_id=2001, role=CourseRole.TA)
+
+    ta_client = api_client(
+        stub_iam, user_id=2001, role="staff", permissions=(VIEW, MAT_VIEW, MAT_MANAGE)
+    )
+    payload = {
+        "title": "TA Illegal Note",
+        "section_title": "Module 1",
+        "material_type": "note",
+        "content": "Not allowed",
+    }
+    resp = ta_client.post(f"{URL_COURSES}/CS301/materials", data=payload, format="json")
+    assert resp.status_code == 403
+
+
+def test_material_file_download_endpoint(stub_iam):
+    c = Course.objects.create(code="CS301", title="Database Systems")
+    CourseMembership.objects.create(course=c, user_id=9001, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=c, user_id=1001, role=CourseRole.STUDENT)
+
+    # Upload published file material
+    uploaded_file = SimpleUploadedFile("slides.pdf", b"%PDF-1.4 sample content", content_type="application/pdf")
+    mat_pub = CourseMaterial.objects.create(
+        course=c,
+        title="Lecture Slides",
+        section_title="Module 1",
+        material_type=MaterialType.FILE,
+        file=uploaded_file,
+        file_name="slides.pdf",
+        status=MaterialStatus.PUBLISHED,
+        created_by_user_id=9001,
+    )
+
+    # Student downloads published file
+    student_client = api_client(
+        stub_iam, user_id=1001, role="student", permissions=(VIEW, MAT_VIEW)
+    )
+    resp = student_client.get(f"{URL_COURSES}/CS301/materials/{mat_pub.id}/download")
+    assert resp.status_code == 200
+    assert resp.getvalue() == b"%PDF-1.4 sample content"
+
+    # Create draft file material
+    draft_file = SimpleUploadedFile("exam.pdf", b"%PDF-1.4 confidential exam", content_type="application/pdf")
+    mat_draft = CourseMaterial.objects.create(
+        course=c,
+        title="Confidential Exam",
+        section_title="Exams",
+        material_type=MaterialType.FILE,
+        file=draft_file,
+        file_name="exam.pdf",
+        status=MaterialStatus.DRAFT,
+        created_by_user_id=9001,
+    )
+
+    # Student cannot download draft material (404 Not Found)
+    resp_draft = student_client.get(f"{URL_COURSES}/CS301/materials/{mat_draft.id}/download")
+    assert resp_draft.status_code == 404
+

@@ -41,6 +41,69 @@ export interface UpdateCourseWorkspacePayload {
   status?: "draft" | "published";
 }
 
+export interface CourseMaterialItem {
+  id: number;
+  title: string;
+  description: string;
+  material_type: "file" | "link" | "note";
+  section_type: "module" | "week";
+  section_title: string;
+  file_name: string;
+  file_size: number | null;
+  has_file: boolean;
+  link_url: string;
+  content: string;
+  status: "draft" | "published" | "scheduled";
+  release_at: string | null;
+  order: number;
+  created_by_user_id: number;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface CourseMaterialSection {
+  section_title: string;
+  section_type: "module" | "week";
+  materials: CourseMaterialItem[];
+}
+
+export interface CourseMaterialsResponse {
+  course_code: string;
+  course_title: string;
+  role: "faculty" | "student" | "ta" | "observer";
+  can_manage: boolean;
+  sections: CourseMaterialSection[];
+  total_count: number;
+}
+
+export interface CreateMaterialPayload {
+  title: string;
+  section_title: string;
+  material_type: "file" | "link" | "note";
+  section_type: "module" | "week";
+  status: "draft" | "published" | "scheduled";
+  description?: string;
+  link_url?: string;
+  content?: string;
+  file?: File | null;
+  release_at?: string | null;
+  order?: number;
+}
+
+export interface UpdateMaterialPayload {
+  title?: string;
+  section_title?: string;
+  material_type?: "file" | "link" | "note";
+  section_type?: "module" | "week";
+  status?: "draft" | "published" | "scheduled";
+  description?: string;
+  link_url?: string;
+  content?: string;
+  file?: File | null;
+  release_at?: string | null;
+  order?: number;
+}
+
 export function useCourses() {
   return useQuery({
     queryKey: [KEY, "courses"],
@@ -70,3 +133,84 @@ export function useUpdateCourseWorkspace() {
     },
   });
 }
+
+function toPayloadData(body: Record<string, unknown>): FormData | Record<string, unknown> {
+  if (body.file instanceof File) {
+    const fd = new FormData();
+    for (const [k, v] of Object.entries(body)) {
+      if (v !== undefined && v !== null) {
+        if (v instanceof File) {
+          fd.append(k, v);
+        } else {
+          fd.append(k, String(v));
+        }
+      }
+    }
+    return fd;
+  }
+  return body;
+}
+
+export function useCourseMaterials(code: string | null) {
+  return useQuery({
+    queryKey: [KEY, "materials", code],
+    queryFn: async () => {
+      if (!code) return null;
+      return (await http.get<CourseMaterialsResponse>(`/lms/courses/${code}/materials`)).data;
+    },
+    enabled: Boolean(code),
+  });
+}
+
+export function useCreateMaterial() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ code, body }: { code: string; body: CreateMaterialPayload }) => {
+      const payload = toPayloadData(body as unknown as Record<string, unknown>);
+      return (await http.post<CourseMaterialItem>(`/lms/courses/${code}/materials`, payload)).data;
+    },
+    onSuccess: (_, { code }) => {
+      qc.invalidateQueries({ queryKey: [KEY, "materials", code] });
+    },
+  });
+}
+
+export function useUpdateMaterial() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      code,
+      materialId,
+      body,
+    }: {
+      code: string;
+      materialId: number;
+      body: UpdateMaterialPayload;
+    }) => {
+      const payload = toPayloadData(body as unknown as Record<string, unknown>);
+      return (
+        await http.patch<CourseMaterialItem>(
+          `/lms/courses/${code}/materials/${materialId}`,
+          payload,
+        )
+      ).data;
+    },
+    onSuccess: (_, { code }) => {
+      qc.invalidateQueries({ queryKey: [KEY, "materials", code] });
+    },
+  });
+}
+
+export function useDeleteMaterial() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ code, materialId }: { code: string; materialId: number }) => {
+      await http.delete(`/lms/courses/${code}/materials/${materialId}`);
+      return { code, materialId };
+    },
+    onSuccess: (_, { code }) => {
+      qc.invalidateQueries({ queryKey: [KEY, "materials", code] });
+    },
+  });
+}
+

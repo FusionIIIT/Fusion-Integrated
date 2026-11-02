@@ -12,3 +12,12 @@ class CourseAccessDeniedError(LMSRuleError):
 
 class CourseEditingDeniedError(LMSRuleError):
     """Raised when a non-faculty or unassigned user attempts course workspace edits."""
+
+
+class MaterialAccessDeniedError(LMSRuleError):
+    """Raised when an unauthorized user attempts to view or download a material."""
+
+
+class MaterialAuthoringDeniedError(LMSRuleError):
+    """Raised when a non-faculty user (TA, Student, Observer) attempts to author material."""
+

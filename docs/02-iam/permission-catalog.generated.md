@@ -19,6 +19,8 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `lms.course.view` | View courses and course home workspaces | `faculty`, `staff`, `student` |
 | `lms.course.manage` | Configure and edit course workspace details | `faculty` |
+| `lms.material.view` | View published course materials | `faculty`, `staff`, `student` |
+| `lms.material.manage` | Create, edit, organize, and schedule course materials | `faculty` |
 
 ## `placement_cell`
 

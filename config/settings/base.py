@@ -189,6 +189,10 @@ PLACEMENT_UPLOAD_INTERNAL_PREFIX = env("PLACEMENT_UPLOAD_INTERNAL_PREFIX", "")
 # No multipart endpoints remain, so this only caps the JSON body.
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
 
+# Media files (uploads)
+MEDIA_ROOT = env("MEDIA_ROOT", str(BASE_DIR / "media"))
+MEDIA_URL = env("MEDIA_URL", "/media/")
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "fusion_auth.authentication.IamSessionAuthentication",

@@ -7,7 +7,13 @@ facts, so course memberships must not introduce cross-module foreign keys
 from django.db import models
 
 from core.db.mixins import TimeStampedModel
-from modules.lms.domain.entities import CourseRole, CourseStatus
+from modules.lms.domain.entities import (
+    CourseRole,
+    CourseStatus,
+    MaterialStatus,
+    MaterialType,
+    SectionType,
+)
 
 
 class Course(TimeStampedModel):
@@ -64,3 +70,62 @@ class CourseMembership(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"User({self.user_id}) in {self.course.code} as {self.role}"
+
+
+class CourseMaterial(TimeStampedModel):
+    """A course material item: file, link, or note.
+
+    Organized into modules or weekly sections, with support for draft,
+    immediate publication, and scheduled future release (CFR-LMS-003,
+    BR-LMS-005, BR-LMS-006).
+    """
+
+    TYPE_CHOICES = [
+        (MaterialType.FILE, "File"),
+        (MaterialType.LINK, "Link"),
+        (MaterialType.NOTE, "Note"),
+    ]
+
+    SECTION_CHOICES = [
+        (SectionType.MODULE, "Module"),
+        (SectionType.WEEK, "Weekly Section"),
+    ]
+
+    STATUS_CHOICES = [
+        (MaterialStatus.DRAFT, "Draft"),
+        (MaterialStatus.PUBLISHED, "Published"),
+        (MaterialStatus.SCHEDULED, "Scheduled"),
+    ]
+
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="materials")
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    material_type = models.CharField(max_length=16, choices=TYPE_CHOICES, default=MaterialType.FILE)
+    section_type = models.CharField(
+        max_length=16, choices=SECTION_CHOICES, default=SectionType.MODULE
+    )
+    section_title = models.CharField(max_length=100, db_index=True)
+    file = models.FileField(upload_to="lms/materials/%Y/%m/", null=True, blank=True)
+    file_name = models.CharField(max_length=255, blank=True)
+    file_size = models.BigIntegerField(null=True, blank=True)
+    link_url = models.CharField(max_length=500, blank=True)
+    content = models.TextField(blank=True)
+    status = models.CharField(
+        max_length=16, choices=STATUS_CHOICES, default=MaterialStatus.PUBLISHED
+    )
+    release_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    order = models.IntegerField(default=0)
+    created_by_user_id = models.IntegerField(db_index=True)
+
+    class Meta:
+        db_table = "lms_course_material"
+        ordering = ["section_title", "order", "-created_at"]
+        indexes = [
+            models.Index(fields=["course", "status"], name="lms_mat_course_status_idx"),
+            models.Index(fields=["course", "section_title"], name="lms_mat_course_sec_idx"),
+            models.Index(fields=["status", "release_at"], name="lms_mat_status_rel_idx"),
+        ]
+
+    def __str__(self) -> str:
+        return f"Material({self.title}) in {self.course.code} [{self.material_type}]"
+

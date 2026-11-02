@@ -136,6 +136,170 @@ paths:
               schema:
                 $ref: '#/components/schemas/CourseWorkspaceDetail'
           description: ''
+  /api/v1/lms/courses/{code}/materials:
+    get:
+      operationId: v1_lms_course_materials_list
+      description: List and create course materials (CFR-LMS-003, CFR-LMS-004).
+      summary: List published/accessible course materials
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseMaterialsResponse'
+          description: ''
+    post:
+      operationId: v1_lms_course_materials_create
+      description: List and create course materials (CFR-LMS-003, CFR-LMS-004).
+      summary: Add course material as file, link, or note (Faculty only)
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CourseMaterialCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CourseMaterialCreate'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseMaterialCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseMaterialItem'
+          description: ''
+  /api/v1/lms/courses/{code}/materials/{material_id}:
+    get:
+      operationId: v1_lms_course_materials_retrieve
+      description: Retrieve, update, or delete a specific course material item.
+      summary: Retrieve course material details
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: material_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseMaterialItem'
+          description: ''
+    patch:
+      operationId: v1_lms_course_materials_partial_update
+      description: Retrieve, update, or delete a specific course material item.
+      summary: Update course material details or schedule (Faculty only)
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: material_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - lms
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseMaterialUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseMaterialUpdate'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseMaterialUpdate'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseMaterialItem'
+          description: ''
+    delete:
+      operationId: v1_lms_course_materials_destroy
+      description: Retrieve, update, or delete a specific course material item.
+      summary: Delete a course material item (Faculty only)
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: material_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/lms/courses/{code}/materials/{material_id}/download:
+    get:
+      operationId: v1_lms_course_materials_download
+      description: Download attached course material file with membership verification.
+      summary: Download published course material file
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: material_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -2370,6 +2534,148 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    CourseMaterialCreate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        section_title:
+          type: string
+          maxLength: 100
+        material_type:
+          allOf:
+          - $ref: '#/components/schemas/MaterialTypeEnum'
+          default: file
+        section_type:
+          allOf:
+          - $ref: '#/components/schemas/SectionTypeEnum'
+          default: module
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status243Enum'
+          default: published
+        description:
+          type: string
+          default: ''
+        link_url:
+          type: string
+          default: ''
+        content:
+          type: string
+          default: ''
+        file:
+          type: string
+          format: uri
+          nullable: true
+        release_at:
+          type: string
+          format: date-time
+          nullable: true
+        order:
+          type: integer
+          default: 0
+      required:
+      - section_title
+      - title
+    CourseMaterialItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        material_type:
+          type: string
+        section_type:
+          type: string
+        section_title:
+          type: string
+        file_name:
+          type: string
+        file_size:
+          type: integer
+          nullable: true
+        has_file:
+          type: boolean
+        link_url:
+          type: string
+        content:
+          type: string
+        status:
+          type: string
+        release_at:
+          type: string
+          nullable: true
+        order:
+          type: integer
+        created_by_user_id:
+          type: integer
+        created_at:
+          type: string
+          nullable: true
+        updated_at:
+          type: string
+          nullable: true
+      required:
+      - content
+      - created_at
+      - created_by_user_id
+      - description
+      - file_name
+      - file_size
+      - has_file
+      - id
+      - link_url
+      - material_type
+      - order
+      - release_at
+      - section_title
+      - section_type
+      - status
+      - title
+      - updated_at
+    CourseMaterialSection:
+      type: object
+      properties:
+        section_title:
+          type: string
+        section_type:
+          type: string
+        materials:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseMaterialItem'
+      required:
+      - materials
+      - section_title
+      - section_type
+    CourseMaterialsResponse:
+      type: object
+      properties:
+        course_code:
+          type: string
+        course_title:
+          type: string
+        role:
+          type: string
+        can_manage:
+          type: boolean
+        sections:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseMaterialSection'
+        total_count:
+          type: integer
+      required:
+      - can_manage
+      - course_code
+      - course_title
+      - role
+      - sections
+      - total_count
     CourseStaff:
       type: object
       properties:
@@ -2806,6 +3112,16 @@ components:
       required:
       - password
       - username
+    MaterialTypeEnum:
+      enum:
+      - file
+      - link
+      - note
+      type: string
+      description: |-
+        * `file` - file
+        * `link` - link
+        * `note` - note
     ModeEnum:
       enum:
       - online
@@ -3143,6 +3459,37 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PatchedCourseMaterialUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        section_title:
+          type: string
+          maxLength: 100
+        material_type:
+          $ref: '#/components/schemas/MaterialTypeEnum'
+        section_type:
+          $ref: '#/components/schemas/SectionTypeEnum'
+        status:
+          $ref: '#/components/schemas/Status243Enum'
+        description:
+          type: string
+        link_url:
+          type: string
+        content:
+          type: string
+        file:
+          type: string
+          format: uri
+          nullable: true
+        release_at:
+          type: string
+          format: date-time
+          nullable: true
+        order:
+          type: integer
     PatchedCourseWorkspaceUpdate:
       type: object
       properties:
@@ -3773,6 +4120,14 @@ components:
       - allowed
       - message
       - rule
+    SectionTypeEnum:
+      enum:
+      - module
+      - week
+      type: string
+      description: |-
+        * `module` - module
+        * `week` - week
     SectorKindEnum:
       enum:
       - it
@@ -3876,6 +4231,16 @@ components:
       required:
       - available
       - season
+    Status243Enum:
+      enum:
+      - draft
+      - published
+      - scheduled
+      type: string
+      description: |-
+        * `draft` - draft
+        * `published` - published
+        * `scheduled` - scheduled
     StudentProfile:
       type: object
       properties:
