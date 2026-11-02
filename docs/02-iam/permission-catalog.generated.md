@@ -7,6 +7,25 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `complaints`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `complaints.complaint.view_self` | View own complaints | `admin`, `complaint_handler`, `complaint_supervisor`, `faculty`, `staff`, `student` |
+| `complaints.complaint.create` | Submit a complaint | `admin`, `complaint_handler`, `complaint_supervisor`, `faculty`, `staff`, `student` |
+| `complaints.complaint.view` | View complaints within scope | `admin`, `complaint_handler`, `complaint_supervisor` |
+| `complaints.complaint.assign` | Assign complaint category, priority, and worker | `admin`, `complaint_handler` |
+| `complaints.complaint.update` | Update complaint progress and resolution | `admin`, `complaint_handler` |
+| `complaints.complaint.resolve` | Resolve or reject complaint | `admin`, `complaint_handler` |
+| `complaints.complaint.close` | Verify resolution and close complaint | `admin`, `complaint_handler`, `complaint_supervisor`, `faculty`, `staff`, `student` |
+| `complaints.complaint.reopen` | Request or review complaint reopening | `admin`, `complaint_handler`, `complaint_supervisor`, `faculty`, `staff`, `student` |
+| `complaints.complaint.feedback` | Submit or review feedback | `admin`, `complaint_handler`, `complaint_supervisor`, `faculty`, `staff`, `student` |
+| `complaints.complaint.escalate` | Manually escalate complaint | `admin`, `complaint_handler` |
+| `complaints.complaint.supervise` | Supervise escalated complaints and reopenings | `admin`, `complaint_supervisor` |
+| `complaints.announcement.publish` | Publish complaint-related announcements | `admin`, `complaint_handler`, `complaint_supervisor` |
+| `complaints.complaint.report` | Generate operational or summary reports | `admin`, `complaint_handler`, `complaint_supervisor` |
+| `complaints.role.manage` | Assign and reassign CMS Handler and Supervisor roles | `admin` |
+
 ## `directory`
 
 | Code | What it allows | Held by |
