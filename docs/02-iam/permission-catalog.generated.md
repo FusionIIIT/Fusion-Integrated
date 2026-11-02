@@ -43,8 +43,36 @@ For the intended taxonomy of modules not yet built, see
 
 | Code | What it allows | Held by |
 |---|---|---|
-| `vms.request.create` | Raise a visit request | `Dean Academic`, `acadadmin`, `student` |
-| `vms.request.decide` | Approve or reject a visit request | `Dean Academic`, `acadadmin` |
-| `vms.gate.operate` | Check visitors in and out at the gate | `acadadmin` |
-| `vms.blacklist.manage` | Maintain the visitor blacklist | `acadadmin` |
-| `vms.policy.publish` | Publish an access policy version | `Dean Academic`, `acadadmin` |
+| `vms.request.decide` | Approve or reject a visit request for oneself | `faculty`, `staff` |
+| `vms.request.view_assigned` | See visit requests assigned to oneself | `faculty`, `staff` |
+| `vms.preauth.manage` | Pre-authorise recurring visitors | `faculty`, `staff` |
+| `vms.pass.terminate` | Terminate a visitor's pass early | `faculty`, `staff` |
+| `vms.notification.view_self` | See one's own VMS notifications | `Director`, `Registrar`, `acadadmin`, `faculty`, `staff`, `vms_security` |
+| `vms.walkin.register` | Register a walk-in visitor at the gate | `vms_security` |
+| `vms.gate.operate` | Check visitors in and out at the gate | `vms_security` |
+| `vms.gate.escalate` | Escalate a gate denial to an Admin | `vms_security` |
+| `vms.gate.sync` | Upload offline gate events | `vms_security` |
+| `vms.muster.trigger` | Trigger an emergency muster | `vms_security` |
+| `vms.muster.rollcall` | Mark visitors accounted for during a muster | `vms_security` |
+| `vms.monitor.view` | See live occupancy, roster and alerts | `vms_security` |
+| `vms.walkin.contingency_decide` | Decide a walk-in when the host is unavailable | `Director`, `Registrar`, `acadadmin` |
+| `vms.urgent.decide` | Decide a same-day urgent request | `Director`, `Registrar`, `acadadmin` |
+| `vms.extension.decide` | Approve or reject a visit extension | `Director`, `Registrar`, `acadadmin` |
+| `vms.gate.override` | Override an eligible gate denial | `Director`, `Registrar`, `acadadmin` |
+| `vms.zone.elevate` | Grant a time-boxed zone elevation | `Director`, `Registrar`, `acadadmin` |
+| `vms.zone.manage` | Maintain zones and gates | `Director`, `Registrar`, `acadadmin` |
+| `vms.blacklist.manage` | Maintain the visitor blacklist | `Director`, `Registrar`, `acadadmin` |
+| `vms.blacklist.publish` | Publish a blacklist version | `Director`, `Registrar`, `acadadmin` |
+| `vms.safelist.manage` | Maintain the visitor safe-list | `Director`, `Registrar`, `acadadmin` |
+| `vms.policy.manage` | Edit a draft access policy | `Director`, `Registrar`, `acadadmin` |
+| `vms.policy.publish` | Publish an access policy version | `Director`, `Registrar`, `acadadmin` |
+| `vms.event.manage` | Create and manage event batches | `Director`, `Registrar`, `acadadmin` |
+| `vms.report.view` | See anonymised visitor reports | `Director`, `Registrar`, `acadadmin` |
+| `vms.report.export` | Export visitor reports | `Director`, `Registrar`, `acadadmin` |
+| `vms.report.view_pii` | DANGEROUS: see un-masked visitor identity in reports | `Director` |
+| `vms.role.assign` | Assign Admin and Security roles and scopes | `Director` |
+| `vms.integration.manage` | Maintain integration settings | `Director` |
+| `vms.vip.manage` | Grant and revoke VIP permissions | `Director` |
+| `vms.audit.view` | Read the VMS audit log | `Director` |
+| `vms.visit.auto_checkout` | System auto-checkout at pass expiry | _service only_ |
+| `vms.request.auto_expire` | System expiry of unanswered requests | _service only_ |
