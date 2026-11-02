@@ -1,6 +1,6 @@
 """
-Gymkhana Database Models.
-Adheres strictly to ADR-0013 (zero cross-module foreign keys, integer user references).
+Gymkhana database models.
+Uses integer user references for cross-module decoupling (ADR-0013).
 """
 
 from django.db import models

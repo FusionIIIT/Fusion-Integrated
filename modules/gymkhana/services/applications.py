@@ -1,6 +1,5 @@
 """
-Service functions for Gymkhana module.
-Adheres strictly to transactional integrity and ADR-0013.
+Workflow and application service functions for gymkhana.
 """
 
 from datetime import date, datetime, time
