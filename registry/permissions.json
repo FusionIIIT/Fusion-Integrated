@@ -278,6 +278,204 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "purchase_stores": {
+      "grants": {
+        "accounts_admin": [
+          "purchase_stores.audit.view",
+          "purchase_stores.indent.view",
+          "purchase_stores.invoice.manage",
+          "purchase_stores.po.view",
+          "purchase_stores.report.view"
+        ],
+        "auditor": [
+          "purchase_stores.audit.view",
+          "purchase_stores.indent.view",
+          "purchase_stores.po.view",
+          "purchase_stores.report.view"
+        ],
+        "department_admin": [
+          "purchase_stores.discrepancy.manage",
+          "purchase_stores.indent.create",
+          "purchase_stores.indent.review",
+          "purchase_stores.indent.view",
+          "purchase_stores.indent.view_self",
+          "purchase_stores.indent.withdraw",
+          "purchase_stores.receipt.manage",
+          "purchase_stores.report.view",
+          "purchase_stores.stock.manage",
+          "purchase_stores.stock.view"
+        ],
+        "department_head": [
+          "purchase_stores.discrepancy.manage",
+          "purchase_stores.indent.review",
+          "purchase_stores.indent.view",
+          "purchase_stores.receipt.manage",
+          "purchase_stores.report.view",
+          "purchase_stores.stock.view"
+        ],
+        "director": [
+          "purchase_stores.indent.review",
+          "purchase_stores.indent.view"
+        ],
+        "faculty": [
+          "purchase_stores.indent.create",
+          "purchase_stores.indent.view_self",
+          "purchase_stores.indent.withdraw"
+        ],
+        "procurement_admin": [
+          "purchase_stores.discrepancy.manage",
+          "purchase_stores.indent.review",
+          "purchase_stores.indent.view",
+          "purchase_stores.po.manage",
+          "purchase_stores.po.view",
+          "purchase_stores.policy.manage",
+          "purchase_stores.receipt.manage",
+          "purchase_stores.report.view",
+          "purchase_stores.stock.manage",
+          "purchase_stores.stock.view",
+          "purchase_stores.tender.manage",
+          "purchase_stores.vendor.manage"
+        ],
+        "procurement_committee": [
+          "purchase_stores.indent.view",
+          "purchase_stores.tender.manage"
+        ],
+        "registrar": [
+          "purchase_stores.indent.review",
+          "purchase_stores.indent.view",
+          "purchase_stores.policy.manage"
+        ],
+        "staff": [
+          "purchase_stores.indent.create",
+          "purchase_stores.indent.view_self",
+          "purchase_stores.indent.withdraw"
+        ],
+        "student": [
+          "purchase_stores.indent.create",
+          "purchase_stores.indent.view_self",
+          "purchase_stores.indent.withdraw"
+        ]
+      },
+      "module_grants": [
+        "accounts_admin",
+        "auditor",
+        "department_admin",
+        "department_head",
+        "director",
+        "faculty",
+        "procurement_admin",
+        "procurement_committee",
+        "registrar",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/purchase-stores",
+        "icon": "FaBoxesStacked",
+        "items": [
+          {
+            "code": "purchase_stores.indents",
+            "icon": "FaFileInvoice",
+            "label": "Purchase Indents",
+            "required_permission": "purchase_stores.indent.view_self",
+            "sort_order": 10,
+            "to": "/purchase-stores/indents"
+          },
+          {
+            "code": "purchase_stores.stock",
+            "icon": "FaBoxesStacked",
+            "label": "Stock and Transfers",
+            "required_permission": "purchase_stores.stock.view",
+            "sort_order": 20,
+            "to": "/purchase-stores/stock"
+          },
+          {
+            "code": "purchase_stores.procurement",
+            "icon": "FaCartShopping",
+            "label": "Procurement",
+            "required_permission": "purchase_stores.po.view",
+            "sort_order": 30,
+            "to": "/purchase-stores/procurement"
+          }
+        ],
+        "label": "Purchase and Stores",
+        "nav_section": "Administration",
+        "sort_order": 40,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "purchase_stores.indent.create",
+          "label": "Create and submit purchase indents"
+        },
+        {
+          "code": "purchase_stores.indent.view_self",
+          "label": "View own purchase indents"
+        },
+        {
+          "code": "purchase_stores.indent.view",
+          "label": "View department and institutional indents"
+        },
+        {
+          "code": "purchase_stores.indent.review",
+          "label": "Review, recommend, and decide indents"
+        },
+        {
+          "code": "purchase_stores.indent.withdraw",
+          "label": "Withdraw or cancel a permitted indent"
+        },
+        {
+          "code": "purchase_stores.stock.view",
+          "label": "View stock availability and reservations"
+        },
+        {
+          "code": "purchase_stores.stock.manage",
+          "label": "Manage stock, issues, and transfers"
+        },
+        {
+          "code": "purchase_stores.vendor.manage",
+          "label": "Onboard and maintain vendors"
+        },
+        {
+          "code": "purchase_stores.tender.manage",
+          "label": "Publish tenders and evaluate bids"
+        },
+        {
+          "code": "purchase_stores.po.view",
+          "label": "View purchase orders and delivery schedules"
+        },
+        {
+          "code": "purchase_stores.po.manage",
+          "label": "Create and issue purchase orders"
+        },
+        {
+          "code": "purchase_stores.receipt.manage",
+          "label": "Inspect deliveries and record GRNs"
+        },
+        {
+          "code": "purchase_stores.discrepancy.manage",
+          "label": "Manage discrepancy, return, and warranty cases"
+        },
+        {
+          "code": "purchase_stores.invoice.manage",
+          "label": "Verify invoices and process vendor payments"
+        },
+        {
+          "code": "purchase_stores.report.view",
+          "label": "View and generate purchase and stores reports"
+        },
+        {
+          "code": "purchase_stores.audit.view",
+          "label": "Review purchase and financial audit records"
+        },
+        {
+          "code": "purchase_stores.policy.manage",
+          "label": "Configure approval thresholds and SLA policy"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
     }
   },
   "publisher": "integrated",

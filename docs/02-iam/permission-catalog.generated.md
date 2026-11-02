@@ -38,3 +38,25 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `purchase_stores`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `purchase_stores.indent.create` | Create and submit purchase indents | `department_admin`, `faculty`, `staff`, `student` |
+| `purchase_stores.indent.view_self` | View own purchase indents | `department_admin`, `faculty`, `staff`, `student` |
+| `purchase_stores.indent.view` | View department and institutional indents | `accounts_admin`, `auditor`, `department_admin`, `department_head`, `director`, `procurement_admin`, `procurement_committee`, `registrar` |
+| `purchase_stores.indent.review` | Review, recommend, and decide indents | `department_admin`, `department_head`, `director`, `procurement_admin`, `registrar` |
+| `purchase_stores.indent.withdraw` | Withdraw or cancel a permitted indent | `department_admin`, `faculty`, `staff`, `student` |
+| `purchase_stores.stock.view` | View stock availability and reservations | `department_admin`, `department_head`, `procurement_admin` |
+| `purchase_stores.stock.manage` | Manage stock, issues, and transfers | `department_admin`, `procurement_admin` |
+| `purchase_stores.vendor.manage` | Onboard and maintain vendors | `procurement_admin` |
+| `purchase_stores.tender.manage` | Publish tenders and evaluate bids | `procurement_admin`, `procurement_committee` |
+| `purchase_stores.po.view` | View purchase orders and delivery schedules | `accounts_admin`, `auditor`, `procurement_admin` |
+| `purchase_stores.po.manage` | Create and issue purchase orders | `procurement_admin` |
+| `purchase_stores.receipt.manage` | Inspect deliveries and record GRNs | `department_admin`, `department_head`, `procurement_admin` |
+| `purchase_stores.discrepancy.manage` | Manage discrepancy, return, and warranty cases | `department_admin`, `department_head`, `procurement_admin` |
+| `purchase_stores.invoice.manage` | Verify invoices and process vendor payments | `accounts_admin` |
+| `purchase_stores.report.view` | View and generate purchase and stores reports | `accounts_admin`, `auditor`, `department_admin`, `department_head`, `procurement_admin` |
+| `purchase_stores.audit.view` | Review purchase and financial audit records | `accounts_admin`, `auditor` |
+| `purchase_stores.policy.manage` | Configure approval thresholds and SLA policy | `procurement_admin`, `registrar` |
