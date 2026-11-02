@@ -13,6 +13,21 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `iwd`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `iwd.work_request.view` | View work requests | `iwd_director`, `iwd_engineer`, `iwd_requester`, `iwd_supervisor` |
+| `iwd.work_request.create` | Submit a new work request | `iwd_director`, `iwd_engineer`, `iwd_requester`, `iwd_supervisor` |
+| `iwd.work_request.approve` | Approve or reject work requests | `iwd_director`, `iwd_supervisor` |
+| `iwd.work_request.assign` | Assign work requests to engineers | `iwd_director`, `iwd_supervisor` |
+| `iwd.work_request.close` | Close and complete work requests | `iwd_director` |
+| `iwd.contractor.manage` | Manage contractor records | `iwd_director`, `iwd_supervisor` |
+| `iwd.inventory.manage` | Manage materials and inventory | `iwd_director`, `iwd_engineer`, `iwd_supervisor` |
+| `iwd.budget.view` | View budget allocations | `iwd_director`, `iwd_supervisor` |
+| `iwd.budget.manage` | Manage and update budgets | `iwd_director` |
+| `iwd.report.view` | View IWD operational reports | `iwd_director`, `iwd_supervisor` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
