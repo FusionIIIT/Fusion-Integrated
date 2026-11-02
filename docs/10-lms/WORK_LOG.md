@@ -96,3 +96,16 @@
 - **Branch & Protection Integrity:**
   - Branch strictly `lms-course-management`.
   - Zero modifications to `modules/elm/`, `docs/09-elm/`, ELM branch `assignment6b/elm-review`, or PR #269. Stashes preserved.
+
+## Phase 3.1: Final Database Integrity Check & Audit Hardening (2026-11-02)
+- **Milestone:** Final verification of database constraints, grade audit log protection, and submission-grade relationship integrity.
+- **Orchestrator:** Antigravity
+- **Authorized AI Coder:** `qwen2.5:7b` (Format: GGUF, Quantization: Q4_K_M, Digest: `845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e`)
+- **Audit Findings & Hardening:**
+  - `GradeAuditLog.grade`: Strengthened from `on_delete=models.CASCADE` to `on_delete=models.PROTECT`. Deleting a Grade that has associated audit records is strictly prevented at the ORM/database level (`ProtectedError`), guaranteeing tamper-evident audit log retention (BR-LMS-017).
+  - Generated migration `modules/lms/migrations/0002_alter_gradeauditlog_grade.py`.
+  - Audited Submission-Grade relationship: Confirmed single authoritative foreign key column `submission_id` in `lms_grade` with `UNIQUE` constraint, and reverse accessor `submission.grade` provided via `related_name="grade"`. No redundant columns or duplicate fields exist.
+  - Added test `test_grade_deletion_protected_when_audit_logs_exist` in `modules/lms/tests/test_models.py`.
+  - Verified test suite: 18 passed in 3.02s running against PostgreSQL 16.15.
+  - Verified migration consistency: `manage.py check` (0 issues), `makemigrations --check --dry-run` (No changes detected), `showmigrations lms` (linear history: 0001_initial, 0002_alter_gradeauditlog_grade).
+  - Import-linter verified: 4 kept, 0 broken.

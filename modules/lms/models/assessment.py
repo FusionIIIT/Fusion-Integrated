@@ -103,7 +103,7 @@ class GradeAuditLog(models.Model):
 
     grade = models.ForeignKey(
         "lms.Grade",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="audit_logs",
     )
     assessor_user_id = models.IntegerField(db_index=True)

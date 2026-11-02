@@ -1,5 +1,6 @@
 import pytest
 from django.db import IntegrityError
+from django.db.models import ProtectedError
 from django.utils import timezone
 from modules.lms.domain.constants import (
     Role,
@@ -148,3 +149,27 @@ def test_contracts_batched_queries():
     assignments = get_assignments([assignment.id])
     assert assignment.id in assignments
     assert assignments[assignment.id].title == 'Assignment 1'
+
+
+def test_grade_deletion_protected_when_audit_logs_exist():
+    course = Course.objects.create(code='CS101', title='Intro to CS', academic_year=2026, semester=1)
+    assignment = Assignment.objects.create(course=course, author_user_id=101, title='Assignment 1', points_possible=100)
+    submission = Submission.objects.create(assignment=assignment, student_user_id=301, submission_type=SubmissionType.FILE)
+    grade = Grade.objects.create(
+        submission=submission,
+        assessor_user_id=401,
+        assessor_role='instructor',
+        points_awarded=95,
+        status=GradeStatus.DRAFT,
+    )
+    GradeAuditLog.objects.create(
+        grade=grade,
+        assessor_user_id=401,
+        action=GradeAction.CREATED,
+        new_points=95,
+    )
+    with pytest.raises(ProtectedError):
+        grade.delete()
+
+    assert Grade.objects.filter(id=grade.id).exists() is True
+    assert GradeAuditLog.objects.filter(grade=grade).exists() is True
