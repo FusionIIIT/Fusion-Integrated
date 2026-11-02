@@ -28,7 +28,7 @@
 - **UI Base Path:** /courses
 
 ## 5. Operational Metrics & Phase Status:
-- **Current Phase:** Phase 4 Backend Services, Selectors, REST APIs and Permissions (COMPLETED)
+- **Current Phase:** Phase 4.1 Backend Policy Corrections & Phase 5 Complete Frontend Implementation (COMPLETED)
 - **PR Status:** Official PR #437 Open on FusionIIIT/Fusion-Integrated:main
 - **Architecture Documents:** DOMAIN_MODEL.md, WORKFLOW_DESIGN.md, INTEGRATION_DESIGN.md, ARCHITECTURE_PLAN.md
 - **CFR Count:** 15 Core Functional Requirements
@@ -44,5 +44,27 @@
 - **Implemented Business Services:** `modules/lms/services/` (`courses.py`, `content.py`, `assignments.py`, `storage.py`, `submissions.py`, `grading.py`, `release.py`, `management/commands/lms_process_scheduled_releases.py`)
 - **Implemented Role-Based Permissions:** `modules/lms/api/permissions.py` (Instructor, TA, Student, Observer isolation, multi-role cardinality)
 - **Mounted REST API:** `/api/v1/lms/` in `config/urls.py` via `modules/lms/api/` (`serializers.py`, `views.py`, `urls.py`)
-- **Automated Test Suite:** 38 tests passing in 3.74s across 7 test files (`test_models.py`, `test_constraints.py`, `test_audit_immutability.py`, `test_selectors.py`, `test_services.py`, `test_permissions.py`, `test_api.py`)
-- **Repository Verification:** `manage.py check` (0 issues), `lint-imports` (4 kept, 0 broken), `git diff --check` (clean)
+- **Phase 4.1 Policy Corrections:**
+  - `ISS-LMS-001`: Late submission policy gating enforced (submitting past deadline requires explicit instructor authorization; denied otherwise without inventing default penalty).
+  - `ISS-LMS-005`: Resubmission gating enforced (multiple submissions rejected unless explicit instructor authorization given).
+  - `ISS-LMS-002`: TA announcement posting strictly denied; TA evaluation restricted to draft mode only.
+  - `ISS-LMS-006`: Post-release grade modification prohibited without explicit audit reason.
+  - Academic adapter: Student registration authority hooks verified.
+  - Storage: File upload and safe streaming download endpoints (`/api/v1/lms/files/upload/` and `/api/v1/lms/files/download/`).
+- **Phase 5 Frontend Implementation:**
+  - TypeScript Types: `client/src/modules/lms/api/types.ts` (complete interfaces for all 10 domain models and payloads).
+  - React Query Hooks: `client/src/modules/lms/api/hooks.ts` (query and mutation hooks for all LMS workflows).
+  - Mantine 7 UI Components: `client/src/modules/lms/components/` (`CourseCard`, `MaterialItem`, `AnnouncementItem`, `AssignmentItem`, `GradingModal`, `SubmissionModal`, `CreateSectionModal`, `CreateMaterialModal`, `CreateAssignmentModal`, `CreateAnnouncementModal`).
+  - Mantine 7 Core Pages: `client/src/modules/lms/pages/` (`LmsDashboardPage`, `CourseWorkspacePage`, `MaterialsPage`, `AnnouncementsPage`, `AssignmentsPage`, `StudentAssignmentDetailPage`, `FacultyGradingDashboardPage`, `TaGradingDashboardPage`, `ReleasedGradesPage`, `ObserverCourseViewPage`, `ScheduledContentPage`).
+  - Module Routing & Registry: `client/src/modules/lms/routes.tsx` lazy-mounted at `/courses` in `client/src/app/registry.ts`.
+  - Frontend Test Suite: 2 test files (`hooks.test.tsx`, `LmsPages.test.tsx`), 23 LMS tests passing (58/58 total client tests passing).
+- **Backend Test Suite Results:**
+  - 40/40 tests passing in 3.55s across 7 test files on PostgreSQL 16.15.
+- **Regression Test Results:**
+  - 323/323 placement regression tests passing in 8.56s.
+- **Repository Verification:**
+  - `python manage.py check`: 0 issues.
+  - `python manage.py makemigrations --check --dry-run`: No changes detected.
+  - `lint-imports`: 4 kept, 0 broken.
+  - `npm run typecheck`: 0 errors.
+  - `npm run build`: Production build succeeded in 4.71s.

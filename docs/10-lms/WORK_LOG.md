@@ -158,3 +158,56 @@
 - **Protection Compliance:**
   - Zero modifications to ELM (`modules/elm/`, `docs/09-elm/`, `assignment6b/elm-review`, PR #269, stashes).
   - All 6 policy issues (`ISS-LMS-001` to `ISS-LMS-006`) maintained as `NEEDS CLARIFICATION`.
+
+## Phase 4.1: Backend Policy Corrections & Gating Milestone (2026-11-02)
+- **Milestone:** Enforce unresolved policy boundaries and secure backend endpoints.
+- **Orchestrator:** Antigravity
+- **Coding Agent:** `qwen2.5:7b` (Windows Ollama, digest prefix `845dbda0ea48`)
+- **Key Deliverables:**
+  - `ISS-LMS-001` Late Gating: Enforced strict gating rejecting past-deadline submissions unless explicit instructor authorization is recorded.
+  - `ISS-LMS-005` Resubmission Gating: Rejection of subsequent submissions after an initial version unless explicitly authorized by the instructor.
+  - `ISS-LMS-002` TA Boundaries: Prohibited TA announcement creation; restricted TA assessment to draft mode only.
+  - `ISS-LMS-006` Post-Release Integrity: Prohibited modifying released grades without explicit reason documentation.
+  - Academic Adapter: Verified student registration authority hooks.
+  - Storage & Downloads: Added secure file streaming endpoints (`/api/v1/lms/files/upload/` and `/api/v1/lms/files/download/`).
+  - Backend Tests: Expanded test suite to 40 tests across 7 test modules, all passing on PostgreSQL.
+
+## Phase 5: Complete LMS Frontend Implementation & Integration Milestone (2026-11-02)
+- **Milestone:** Complete frontend implementation, UI components, pages, routing, test suites, and regression verification.
+- **Orchestrator:** Antigravity
+- **Authorized AI Coder:** `qwen2.5:7b` (Q4_K_M, Digest: `845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e`)
+- **Key Deliverables:**
+  - **API Types & Hooks (`client/src/modules/lms/api/`):**
+    - `types.ts`: Comprehensive TypeScript interfaces for all 10 domain entities and API payloads.
+    - `hooks.ts`: React Query v5 query and mutation hooks with error handling and secure file download URLs.
+  - **Mantine 7 Components (`client/src/modules/lms/components/`):**
+    - `CourseCard.tsx`, `MaterialItem.tsx`, `AnnouncementItem.tsx`, `AssignmentItem.tsx`
+    - `SubmissionModal.tsx`, `GradingModal.tsx` (enforcing TA draft-only restrictions and instructor release controls per BW-LMS-05 / ISS-LMS-002)
+    - `CreateSectionModal.tsx`, `CreateMaterialModal.tsx`, `CreateAssignmentModal.tsx`, `CreateAnnouncementModal.tsx`
+  - **Mantine 7 Core Pages (`client/src/modules/lms/pages/`):**
+    - `LmsDashboardPage.tsx`: Course hub with active/inactive filtering and section links.
+    - `CourseWorkspacePage.tsx`: Tabbed course workspace (Overview, Materials, Assignments, Announcements).
+    - `MaterialsPage.tsx`: Module sections and curriculum content manager.
+    - `AnnouncementsPage.tsx`: Course announcements stream with pin priority.
+    - `AssignmentsPage.tsx`: Course assignments list with submission launcher.
+    - `StudentAssignmentDetailPage.tsx`: Detailed submission history and upload interface.
+    - `FacultyGradingDashboardPage.tsx`: Faculty grading console with draft/release controls and audit log viewer.
+    - `TaGradingDashboardPage.tsx`: TA evaluation console with institutional policy banner and draft grading only.
+    - `ReleasedGradesPage.tsx`: Student grade report displaying exclusively released scores per ISS-LMS-006.
+    - `ObserverCourseViewPage.tsx`: Read-only curriculum view concealing student submissions and evaluations.
+    - `ScheduledContentPage.tsx`: Automated content releases monitor.
+  - **Routing & Module Registration:**
+    - `routes.tsx`: Lazy-loaded React Router 6 configuration.
+    - `client/src/app/registry.ts`: Registered `lms` under basePath `/courses`.
+  - **Verification & Tests:**
+    - `npm run typecheck`: 0 TypeScript errors.
+    - `npm test`: 58/58 client tests passing (including 23 LMS tests in `hooks.test.tsx` and `LmsPages.test.tsx`).
+    - `npm run build`: Production build succeeded in 4.71s.
+    - Backend `pytest modules/lms/tests/`: 40/40 passing.
+    - `python manage.py check`: 0 issues.
+    - `python manage.py makemigrations --check --dry-run`: No changes detected.
+    - `lint-imports`: 4 contracts kept, 0 broken.
+    - `pytest modules/placement/tests/`: 323/323 passing.
+- **Protection Compliance:**
+  - Zero modifications to ELM (`modules/elm/`, `docs/09-elm/`, `assignment6b/elm-review`, PR #269, stashes).
+  - All 6 policy issues (`ISS-LMS-001` to `ISS-LMS-006`) maintained as `NEEDS CLARIFICATION`.
