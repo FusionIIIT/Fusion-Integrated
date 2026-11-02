@@ -1,0 +1,1 @@
+"""Hostel Management domain layer."""
