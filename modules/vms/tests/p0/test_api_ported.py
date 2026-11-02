@@ -7,7 +7,6 @@ from django.utils import timezone
 from modules.vms.models import (
     AuditLog,
     Notification,
-    VisitLog,
     Visitor,
     VisitPass,
     VisitRequest,
@@ -219,122 +218,12 @@ def _events(vp):
     return list(vp.logs.order_by("id").values_list("event", "reason"))
 
 
-def test_gate_valid_pass_checks_in(api_as, gate_pass):
-    r = _gate(api_as).post(BASE + "gate/validate", {"qr_token": gate_pass.qr_token}, format="json")
-    assert r.status_code == 200
-    assert r.json() == {"detail": "Checked in.", "visit_request_id": gate_pass.visit_request_id}
-    log = gate_pass.logs.get()
-    assert log.event == "check_in" and log.logged_by_user_id == 3001
-
-
-def test_gate_accepts_otp_for_active_pass(api_as, gate_pass):
-    r = _gate(api_as).post(BASE + "gate/validate", {"otp": gate_pass.otp}, format="json")
-    assert r.status_code == 200
-
-
-def test_gate_otp_ignores_inactive_pass(api_as, gate_pass):
-    gate_pass.is_active = False
-    gate_pass.save()
-    r = _gate(api_as).post(BASE + "gate/validate", {"otp": gate_pass.otp}, format="json")
-    assert r.status_code == 403 and r.json() == {"detail": "Pass not found."}
-
-
-def test_gate_unknown_pass_is_403_and_not_logged(api_as):
-    r = _gate(api_as).post(BASE + "gate/validate", {"qr_token": "nope"}, format="json")
-    assert r.status_code == 403 and r.json() == {"detail": "Pass not found."}
-    assert not VisitLog.objects.exists()
-
-
-def test_gate_needs_a_credential(api_as):
-    r = _gate(api_as).post(BASE + "gate/validate", {}, format="json")
-    assert r.status_code == 400
-
-
-def test_br_077_inactive_pass_is_denied_and_logged(api_as, gate_pass):
-    gate_pass.is_active = False
-    gate_pass.save()
-    r = _gate(api_as).post(BASE + "gate/validate", {"qr_token": gate_pass.qr_token}, format="json")
-    assert r.status_code == 403 and r.json() == {"detail": "Pass is not active."}
-    assert _events(gate_pass) == [("denied", "Pass is not active.")]
-
-
-def test_br_190_outside_validity_is_denied_and_logged(api_as, gate_pass):
-    gate_pass.valid_until = timezone.now() - timedelta(minutes=1)
-    gate_pass.save()
-    r = _gate(api_as).post(BASE + "gate/validate", {"qr_token": gate_pass.qr_token}, format="json")
-    assert r.json() == {"detail": "Pass is outside its validity window."}
-    assert _events(gate_pass) == [("denied", "Pass is outside its validity window.")]
-
-
-def test_br_112_blacklisted_visitor_is_denied_at_the_gate(api_as, gate_pass):
-    from modules.vms.services import blacklist
-    visitor = gate_pass.visit_request.visitor
-    blacklist.add_entry(actor=None, name=visitor.full_name,
-                        id_doc_number=visitor.id_doc_number, reason="x")
-    r = _gate(api_as).post(BASE + "gate/validate", {"qr_token": gate_pass.qr_token}, format="json")
-    assert r.status_code == 403 and r.json() == {"detail": "Visitor is blacklisted."}
-    assert _events(gate_pass) == [("denied", "Visitor is blacklisted.")]
-
-
-def test_br_191_zone_not_on_the_pass_is_denied(api_as, gate_pass):
-    allowed, other = f.make_zone(), f.make_zone()
-    gate_pass.allowed_zones.add(allowed)
-    r = _gate(api_as).post(BASE + "gate/validate",
-                           {"qr_token": gate_pass.qr_token, "zone_id": other.pk}, format="json")
-    assert r.json() == {"detail": "Zone not permitted for this pass."}
-    log = gate_pass.logs.get()
-    assert log.event == "denied" and log.zone is None
-
-
-def test_permitted_zone_is_recorded_on_check_in(api_as, gate_pass):
-    z = f.make_zone()
-    gate_pass.allowed_zones.add(z)
-    r = _gate(api_as).post(BASE + "gate/validate",
-                           {"qr_token": gate_pass.qr_token, "zone_id": z.pk}, format="json")
-    assert r.status_code == 200 and gate_pass.logs.get().zone_id == z.pk
-
-
-def test_br_082_second_check_in_is_denied(api_as, gate_pass):
-    client = _gate(api_as)
-    body = {"qr_token": gate_pass.qr_token}
-    assert client.post(BASE + "gate/validate", body, format="json").status_code == 200
-    r = client.post(BASE + "gate/validate", body, format="json")
-    assert r.status_code == 403 and r.json() == {"detail": "Already checked in."}
-    assert _events(gate_pass) == [("check_in", ""), ("denied", "Already checked in.")]
-
-
-def test_gate_validation_order_inactive_before_window_before_blacklist(api_as, gate_pass):
-    """Failures are reported in the order of the old endpoint."""
-    from modules.vms.services import blacklist
-    v = gate_pass.visit_request.visitor
-    blacklist.add_entry(actor=None, name="n", id_doc_number=v.id_doc_number, reason="x")
-    gate_pass.valid_until = timezone.now() - timedelta(minutes=1)
-    gate_pass.save()
-    body = {"qr_token": gate_pass.qr_token}
-    assert _gate(api_as).post(BASE + "gate/validate", body, format="json").json() == {
-        "detail": "Pass is outside its validity window."}
-    gate_pass.is_active = False
-    gate_pass.save()
-    assert _gate(api_as).post(BASE + "gate/validate", body, format="json").json() == {
-        "detail": "Pass is not active."}
-    gate_pass.is_active = True
-    gate_pass.valid_until = timezone.now() + timedelta(hours=1)
-    gate_pass.save()
-    assert _gate(api_as).post(BASE + "gate/validate", body, format="json").json() == {
-        "detail": "Visitor is blacklisted."}
-
-
-def test_terminated_pass_is_denied(api_as, gate_pass):
-    gate_pass.is_active = False
-    gate_pass.terminated_at = timezone.now()
-    gate_pass.save()
-    r = _gate(api_as).post(BASE + "gate/validate", {"qr_token": gate_pass.qr_token}, format="json")
-    assert r.status_code == 403 and r.json() == {"detail": "Pass was terminated."}
+# gate/validate behaviour moved to modules/vms/tests/b_gate (lane B).
 
 
 def test_checkout_completes_the_visit(api_as, gate_pass):
     client = _gate(api_as)
-    client.post(BASE + "gate/validate", {"qr_token": gate_pass.qr_token}, format="json")
+    f.make_visit_log(visit_pass=gate_pass, event="check_in")
     r = client.post(BASE + "gate/checkout", {"qr_token": gate_pass.qr_token}, format="json")
     assert r.status_code == 200 and r.json() == {"detail": "Checked out."}
     gate_pass.visit_request.refresh_from_db()
@@ -357,7 +246,7 @@ def test_checkout_unknown_pass_is_404(api_as):
 
 def test_checkout_twice_is_400(api_as, gate_pass):
     client = _gate(api_as)
-    client.post(BASE + "gate/validate", {"qr_token": gate_pass.qr_token}, format="json")
+    f.make_visit_log(visit_pass=gate_pass, event="check_in")
     client.post(BASE + "gate/checkout", {"qr_token": gate_pass.qr_token}, format="json")
     assert client.post(BASE + "gate/checkout", {"qr_token": gate_pass.qr_token},
                        format="json").status_code == 400
