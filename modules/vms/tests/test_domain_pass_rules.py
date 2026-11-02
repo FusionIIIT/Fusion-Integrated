@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from modules.vms.domain import pass_rules as pr
 
-NOW = datetime(2026, 1, 5, 10, 0, tzinfo=timezone.utc)
+NOW = datetime(2026, 1, 5, 10, 0, tzinfo=UTC)
 
 
 @dataclass
@@ -85,8 +85,8 @@ def test_returns_all_failures_in_rule_order():
 
 
 def test_d14_override_eligible_constant():
-    assert pr.OVERRIDE_ELIGIBLE == {pr.PASS_INACTIVE, pr.OUTSIDE_VALIDITY,
-                                    pr.ZONE_NOT_PERMITTED, pr.OUTSIDE_SLOT}
+    assert {pr.PASS_INACTIVE, pr.OUTSIDE_VALIDITY,
+                                    pr.ZONE_NOT_PERMITTED, pr.OUTSIDE_SLOT} == pr.OVERRIDE_ELIGIBLE
     assert pr.BLACKLISTED not in pr.OVERRIDE_ELIGIBLE and pr.TERMINATED not in pr.OVERRIDE_ELIGIBLE
 
 
