@@ -113,7 +113,7 @@ class EventAttendee(models.Model):
 
     class Status(models.TextChoices):
         INVITED = "invited"
-        PASS_ISSUED = "pass_issued"
+        PASS_ISSUED = "pass_issued"  # noqa: S105
         CHECKED_IN = "checked_in"
         CANCELLED = "cancelled"
 
