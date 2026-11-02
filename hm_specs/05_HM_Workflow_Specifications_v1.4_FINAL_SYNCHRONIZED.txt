@@ -1,0 +1,300 @@
+Hostel Management (HM) — Workflow Specifications
+v1.4_FINAL_SYNCHRONIZED | Basis → Composite | DIRECT_FINAL_v2
+Behavioral preservation. The v1.3 state-transition behavior remains valid and is preserved. This version adds the required CFR/AFR, UC, and BR traceability fields. HM-UC-025 and HM-UC-034 are event-triggered services but are intentionally not added as workflow transitions because they are isolated record/notification services rather than connected business-progression states. The STT remains authoritative.
+1. Workflow Register
+2. Superseded Old Workflow IDs
+3. Detailed Workflow Specifications
+BW-HM-01 — Accommodation Request to Initial Allotment
+Authoritative State-Transition Table
+BW-HM-02 — Leave Approval Path
+Authoritative State-Transition Table
+BW-HM-03 — Leave Rejection Path
+Authoritative State-Transition Table
+CW-HM-01 — Leave Request Decision
+Authoritative State-Transition Table
+BW-HM-04 — Complaint Resolution Path
+Authoritative State-Transition Table
+BW-HM-05 — Complaint Escalation Path
+Authoritative State-Transition Table
+CW-HM-02 — Complaint Handling and Escalation
+Authoritative State-Transition Table
+BW-HM-06 — Guest-Room Booking Approval Path
+Authoritative State-Transition Table
+BW-HM-07 — Guest-Room Booking Rejection Path
+Authoritative State-Transition Table
+CW-HM-03 — Guest-Room Booking Decision
+Authoritative State-Transition Table
+BW-HM-08 — Extended-Stay Approval Path
+Authoritative State-Transition Table
+BW-HM-09 — Extended-Stay Rejection Path
+Authoritative State-Transition Table
+CW-HM-04 — Extended-Stay Request Decision
+Authoritative State-Transition Table
+
+[TABLE 1]
+WF ID | Name | Type | Participants | Constituent WFs
+BW-HM-01 | Accommodation Request to Initial Allotment | Basis | Student, Super Admin | N/A
+BW-HM-02 | Leave Approval Path | Basis | Student, Hostel Caretaker | N/A
+BW-HM-03 | Leave Rejection Path | Basis | Student, Hostel Caretaker | N/A
+CW-HM-01 | Leave Request Decision | Composite | Student, Hostel Caretaker | BW-HM-02, BW-HM-03
+BW-HM-04 | Complaint Resolution Path | Basis | Student, Hostel Caretaker | N/A
+BW-HM-05 | Complaint Escalation Path | Basis | Student, Hostel Caretaker | N/A
+CW-HM-02 | Complaint Handling and Escalation | Composite | Student, Hostel Caretaker | BW-HM-04, BW-HM-05
+BW-HM-06 | Guest-Room Booking Approval Path | Basis | Student, Hostel Caretaker | N/A
+BW-HM-07 | Guest-Room Booking Rejection Path | Basis | Student, Hostel Caretaker | N/A
+CW-HM-03 | Guest-Room Booking Decision | Composite | Student, Hostel Caretaker | BW-HM-06, BW-HM-07
+BW-HM-08 | Extended-Stay Approval Path | Basis | Student, Hostel Warden | N/A
+BW-HM-09 | Extended-Stay Rejection Path | Basis | Student, Hostel Warden | N/A
+CW-HM-04 | Extended-Stay Request Decision | Composite | Student, Hostel Warden | BW-HM-08, BW-HM-09
+
+[TABLE 2]
+Old WF ID | Disposition | Replacement / Rationale
+HM-WF-001 | Retired / superseded by new methodology | BW-HM-01 (only the true request→allotment coordinated path); re-allotment/vacation/view behavior stays in UCs.
+HM-WF-002 | Retired / superseded by new methodology | No WF: room maintenance/exchange is a Caretaker state change; Warden review is informational.
+HM-WF-003 | Retired / superseded by new methodology | BW-HM-02, BW-HM-03, CW-HM-01.
+HM-WF-004 | Retired / superseded by new methodology | BW-HM-04, BW-HM-05, CW-HM-02.
+HM-WF-005 | Retired / superseded by new methodology | BW-HM-06, BW-HM-07, CW-HM-03.
+HM-WF-006 | Retired / superseded by new methodology | BW-HM-08, BW-HM-09, CW-HM-04; charge/compliance recording is not forced into the workflow.
+HM-WF-007 | Retired / superseded by new methodology | No WF: fine recording is a single-actor state change; Student/Warden viewing is informational.
+HM-WF-008 | Retired / superseded by new methodology | No WF: notice publication is a single-actor goal; notice viewing is informational.
+HM-WF-009 | Retired / superseded by new methodology | No WF: role binding is a Super Admin state change; access/RBAC is a cross-cutting rule, not a progression step.
+
+[TABLE 3]
+Workflow ID | BW-HM-01
+Workflow Name | Accommodation Request to Initial Allotment
+Type | Basis
+Purpose / Scope | A submitted accommodation request progresses to a recorded initial hostel/room allotment.
+Trigger | Student submits an accommodation request.
+Participants | Student, Super Admin
+Constituent Workflows | N/A
+Related Workflows | N/A
+Related CFRs / Key AFRs | 
+Related UCs | HM-UC-005, HM-UC-006
+Related BRs | BR-HM-008, BR-HM-009, BR-HM-010, BR-HM-034
+
+[TABLE 4]
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No active accommodation request | Student | HM-UC-005 — Submit Hostel Accommodation Request | Submission succeeds; request details/status are recorded. | Accommodation Request Submitted | N/A
+2 | Accommodation Request Submitted | Super Admin | HM-UC-006 — Record Hostel and Room Allotment Decisions | Super Admin records an allotment decision for the request/student in the allotment round; resulting occupancy must not exceed defined capacity. | Room Allotted | BR-HM-008, BR-HM-009, BR-HM-010, BR-HM-034
+
+[TABLE 5]
+Workflow ID | BW-HM-02
+Workflow Name | Leave Approval Path
+Type | Basis
+Purpose / Scope | A submitted leave request reaches the leave approved outcome.
+Trigger | Student submits a leave request.
+Participants | Student, Hostel Caretaker
+Constituent Workflows | N/A
+Related Workflows | CW-HM-01
+Related CFRs / Key AFRs | 
+Related UCs | HM-UC-014, HM-UC-015
+Related BRs | BR-HM-013, BR-HM-014, BR-HM-034
+
+[TABLE 6]
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No active leave request | Student | HM-UC-014 — Submit Leave Request | Submission succeeds; request is recorded and made available for review. | Leave Request Submitted | BR-HM-013, BR-HM-014, BR-HM-034
+2 | Leave Request Submitted | Hostel Caretaker | HM-UC-015 — Review and Record Leave Decision | Caretaker records approval. | Leave Approved | BR-HM-013, BR-HM-014, BR-HM-034
+
+[TABLE 7]
+Workflow ID | BW-HM-03
+Workflow Name | Leave Rejection Path
+Type | Basis
+Purpose / Scope | A submitted leave request reaches the leave rejected outcome.
+Trigger | Student submits a leave request.
+Participants | Student, Hostel Caretaker
+Constituent Workflows | N/A
+Related Workflows | CW-HM-01
+Related CFRs / Key AFRs | 
+Related UCs | HM-UC-014, HM-UC-015
+Related BRs | BR-HM-013, BR-HM-014, BR-HM-034
+
+[TABLE 8]
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No active leave request | Student | HM-UC-014 — Submit Leave Request | Submission succeeds; request is recorded and made available for review. | Leave Request Submitted | BR-HM-013, BR-HM-014, BR-HM-034
+2 | Leave Request Submitted | Hostel Caretaker | HM-UC-015 — Review and Record Leave Decision | Caretaker records rejection. | Leave Rejected | BR-HM-013, BR-HM-014, BR-HM-034
+
+[TABLE 9]
+Workflow ID | CW-HM-01
+Workflow Name | Leave Request Decision
+Type | Composite
+Purpose / Scope | Combines the supported approval and rejection outcomes for leave requests without inventing eligibility or hierarchy rules.
+Trigger | Student submits a leave request.
+Participants | Student, Hostel Caretaker
+Constituent Workflows | BW-HM-02, BW-HM-03
+Related Workflows | N/A
+Related CFRs / Key AFRs | 
+Related UCs | HM-UC-014, HM-UC-015
+Related BRs | BR-HM-013, BR-HM-014, BR-HM-034
+
+[TABLE 10]
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No active leave request | Student | HM-UC-014 — Submit Leave Request | Submission succeeds. | Leave Request Submitted | BR-HM-013, BR-HM-014, BR-HM-034
+2 | Leave Request Submitted | Hostel Caretaker | HM-UC-015 — Review and Record Leave Decision | Outcome: approval recorded. | Leave Approved | BR-HM-013, BR-HM-014, BR-HM-034
+3 | Leave Request Submitted | Hostel Caretaker | HM-UC-015 — Review and Record Leave Decision | Outcome: rejection recorded. | Leave Rejected | BR-HM-013, BR-HM-014, BR-HM-034
+
+[TABLE 11]
+Workflow ID | BW-HM-04
+Workflow Name | Complaint Resolution Path
+Type | Basis
+Purpose / Scope | A submitted hostel complaint reaches the complaint resolved outcome.
+Trigger | Student submits a hostel-related complaint.
+Participants | Student, Hostel Caretaker
+Constituent Workflows | N/A
+Related Workflows | CW-HM-02
+Related CFRs / Key AFRs | 
+Related UCs | HM-UC-017, HM-UC-018
+Related BRs | BR-HM-015, BR-HM-016, BR-HM-034, BR-HM-017
+
+[TABLE 12]
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No recorded hostel complaint | Student | HM-UC-017 — Submit Hostel-Related Complaint | Complaint is within HM hostel-related scope and submission succeeds. | Complaint Submitted | BR-HM-015, BR-HM-016, BR-HM-034
+2 | Complaint Submitted | Hostel Caretaker | HM-UC-018 — Review, Update, and Escalate Complaint | Caretaker records action/status with outcome Resolved. | Complaint Resolved | BR-HM-016, BR-HM-017, BR-HM-034
+
+[TABLE 13]
+Workflow ID | BW-HM-05
+Workflow Name | Complaint Escalation Path
+Type | Basis
+Purpose / Scope | A submitted hostel complaint reaches the complaint escalated to warden outcome.
+Trigger | Student submits a hostel-related complaint.
+Participants | Student, Hostel Caretaker
+Constituent Workflows | N/A
+Related Workflows | CW-HM-02
+Related CFRs / Key AFRs | 
+Related UCs | HM-UC-017, HM-UC-018
+Related BRs | BR-HM-015, BR-HM-016, BR-HM-034, BR-HM-017
+
+[TABLE 14]
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No recorded hostel complaint | Student | HM-UC-017 — Submit Hostel-Related Complaint | Complaint is within HM hostel-related scope and submission succeeds. | Complaint Submitted | BR-HM-015, BR-HM-016, BR-HM-034
+2 | Complaint Submitted | Hostel Caretaker | HM-UC-018 — Review, Update, and Escalate Complaint | For an unresolved or supervisory complaint, Caretaker records escalation when supported by HM/integration scope. | Complaint Escalated to Warden | BR-HM-016, BR-HM-017, BR-HM-034
+
+[TABLE 15]
+Workflow ID | CW-HM-02
+Workflow Name | Complaint Handling and Escalation
+Type | Composite
+Purpose / Scope | Combines complaint submission with supported Caretaker resolution, unresolved update, and escalation outcomes; informational Warden monitoring is not modeled as a state-changing transition.
+Trigger | Student submits a hostel-related complaint.
+Participants | Student, Hostel Caretaker
+Constituent Workflows | BW-HM-04, BW-HM-05
+Related Workflows | N/A
+Related CFRs / Key AFRs | 
+Related UCs | HM-UC-017, HM-UC-018
+Related BRs | BR-HM-015, BR-HM-016, BR-HM-034, BR-HM-017
+
+[TABLE 16]
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No recorded hostel complaint | Student | HM-UC-017 — Submit Hostel-Related Complaint | Hostel-related complaint submission succeeds. | Complaint Submitted | BR-HM-015, BR-HM-016, BR-HM-034
+2 | Complaint Submitted | Hostel Caretaker | HM-UC-018 — Review, Update, and Escalate Complaint | Outcome: resolved. | Complaint Resolved | BR-HM-016, BR-HM-017, BR-HM-034
+3 | Complaint Submitted | Hostel Caretaker | HM-UC-018 — Review, Update, and Escalate Complaint | One non-final update is recorded without resolution or escalation. | Complaint Updated — Unresolved | BR-HM-016, BR-HM-017, BR-HM-034
+4 | Complaint Submitted or Complaint Updated — Unresolved | Hostel Caretaker | HM-UC-018 — Review, Update, and Escalate Complaint | Outcome: escalation recorded for unresolved/supervisory complaint when supported by HM/integration scope. | Complaint Escalated to Warden | BR-HM-016, BR-HM-017, BR-HM-034
+5 | Complaint Updated — Unresolved | Hostel Caretaker | HM-UC-018 — Review, Update, and Escalate Complaint | Outcome after the one represented update traversal: resolved. | Complaint Resolved | BR-HM-016, BR-HM-017, BR-HM-034
+
+[TABLE 17]
+Workflow ID | BW-HM-06
+Workflow Name | Guest-Room Booking Approval Path
+Type | Basis
+Purpose / Scope | A guest-room booking request reaches the guest-room booking approved outcome.
+Trigger | Student submits a guest-room booking request.
+Participants | Student, Hostel Caretaker
+Constituent Workflows | N/A
+Related Workflows | CW-HM-03
+Related CFRs / Key AFRs | 
+Related UCs | HM-UC-020, HM-UC-021
+Related BRs | BR-HM-018, BR-HM-019, BR-HM-034
+
+[TABLE 18]
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No active guest-room booking request | Student | HM-UC-020 — Submit Guest Room Booking Request | Submission succeeds; request/status are recorded. | Guest-Room Booking Request Submitted | BR-HM-018, BR-HM-019, BR-HM-034
+2 | Guest-Room Booking Request Submitted | Hostel Caretaker | HM-UC-021 — Review Guest Room Booking Request | Caretaker records approval after reviewing availability information. | Guest-Room Booking Approved | BR-HM-018, BR-HM-019, BR-HM-034
+
+[TABLE 19]
+Workflow ID | BW-HM-07
+Workflow Name | Guest-Room Booking Rejection Path
+Type | Basis
+Purpose / Scope | A guest-room booking request reaches the guest-room booking rejected outcome.
+Trigger | Student submits a guest-room booking request.
+Participants | Student, Hostel Caretaker
+Constituent Workflows | N/A
+Related Workflows | CW-HM-03
+Related CFRs / Key AFRs | 
+Related UCs | HM-UC-020, HM-UC-021
+Related BRs | BR-HM-018, BR-HM-019, BR-HM-034
+
+[TABLE 20]
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No active guest-room booking request | Student | HM-UC-020 — Submit Guest Room Booking Request | Submission succeeds; request/status are recorded. | Guest-Room Booking Request Submitted | BR-HM-018, BR-HM-019, BR-HM-034
+2 | Guest-Room Booking Request Submitted | Hostel Caretaker | HM-UC-021 — Review Guest Room Booking Request | Caretaker records rejection after reviewing availability information. | Guest-Room Booking Rejected | BR-HM-018, BR-HM-019, BR-HM-034
+
+[TABLE 21]
+Workflow ID | CW-HM-03
+Workflow Name | Guest-Room Booking Decision
+Type | Composite
+Purpose / Scope | Combines supported approval and rejection outcomes for guest-room booking requests.
+Trigger | Student submits a guest-room booking request.
+Participants | Student, Hostel Caretaker
+Constituent Workflows | BW-HM-06, BW-HM-07
+Related Workflows | N/A
+Related CFRs / Key AFRs | 
+Related UCs | HM-UC-020, HM-UC-021
+Related BRs | BR-HM-018, BR-HM-019, BR-HM-034
+
+[TABLE 22]
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No active guest-room booking request | Student | HM-UC-020 — Submit Guest Room Booking Request | Submission succeeds. | Guest-Room Booking Request Submitted | BR-HM-018, BR-HM-019, BR-HM-034
+2 | Guest-Room Booking Request Submitted | Hostel Caretaker | HM-UC-021 — Review Guest Room Booking Request | Outcome: approval recorded after availability review. | Guest-Room Booking Approved | BR-HM-018, BR-HM-019, BR-HM-034
+3 | Guest-Room Booking Request Submitted | Hostel Caretaker | HM-UC-021 — Review Guest Room Booking Request | Outcome: rejection recorded after availability review. | Guest-Room Booking Rejected | BR-HM-018, BR-HM-019, BR-HM-034
+
+[TABLE 23]
+Workflow ID | BW-HM-08
+Workflow Name | Extended-Stay Approval Path
+Type | Basis
+Purpose / Scope | An extended-stay request reaches the extended-stay approved outcome.
+Trigger | Student submits an extended-stay request for vacation/semester break.
+Participants | Student, Hostel Warden
+Constituent Workflows | N/A
+Related Workflows | CW-HM-04
+Related CFRs / Key AFRs | 
+Related UCs | HM-UC-023, HM-UC-024
+Related BRs | BR-HM-022, BR-HM-024, BR-HM-034, BR-HM-021
+
+[TABLE 24]
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No active extended-stay request | Student | HM-UC-023 — Submit Extended-Stay Request | Submission succeeds; requested period/status are recorded. | Extended-Stay Request Submitted | BR-HM-022, BR-HM-024, BR-HM-034
+2 | Extended-Stay Request Submitted | Hostel Warden | HM-UC-024 — Review and Record Extended-Stay Decision | Warden records approval. | Extended-Stay Approved | BR-HM-021, BR-HM-034
+
+[TABLE 25]
+Workflow ID | BW-HM-09
+Workflow Name | Extended-Stay Rejection Path
+Type | Basis
+Purpose / Scope | An extended-stay request reaches the extended-stay rejected outcome.
+Trigger | Student submits an extended-stay request for vacation/semester break.
+Participants | Student, Hostel Warden
+Constituent Workflows | N/A
+Related Workflows | CW-HM-04
+Related CFRs / Key AFRs | 
+Related UCs | HM-UC-023, HM-UC-024
+Related BRs | BR-HM-022, BR-HM-024, BR-HM-034, BR-HM-021
+
+[TABLE 26]
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No active extended-stay request | Student | HM-UC-023 — Submit Extended-Stay Request | Submission succeeds; requested period/status are recorded. | Extended-Stay Request Submitted | BR-HM-022, BR-HM-024, BR-HM-034
+2 | Extended-Stay Request Submitted | Hostel Warden | HM-UC-024 — Review and Record Extended-Stay Decision | Warden records rejection. | Extended-Stay Rejected | BR-HM-021, BR-HM-034
+
+[TABLE 27]
+Workflow ID | CW-HM-04
+Workflow Name | Extended-Stay Request Decision
+Type | Composite
+Purpose / Scope | Combines supported approval and rejection outcomes. Charge/deadline/compliance information may be reviewed where maintained, but the baseline supplies no decision formula based on it.
+Trigger | Student submits an extended-stay request.
+Participants | Student, Hostel Warden
+Constituent Workflows | BW-HM-08, BW-HM-09
+Related Workflows | N/A
+Related CFRs / Key AFRs | 
+Related UCs | HM-UC-023, HM-UC-024
+Related BRs | BR-HM-022, BR-HM-024, BR-HM-034, BR-HM-021
+
+[TABLE 28]
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No active extended-stay request | Student | HM-UC-023 — Submit Extended-Stay Request | Submission succeeds. | Extended-Stay Request Submitted | BR-HM-022, BR-HM-024, BR-HM-034
+2 | Extended-Stay Request Submitted | Hostel Warden | HM-UC-024 — Review and Record Extended-Stay Decision | Outcome: approval recorded. | Extended-Stay Approved | BR-HM-021, BR-HM-034
+3 | Extended-Stay Request Submitted | Hostel Warden | HM-UC-024 — Review and Record Extended-Stay Decision | Outcome: rejection recorded. | Extended-Stay Rejected | BR-HM-021, BR-HM-034

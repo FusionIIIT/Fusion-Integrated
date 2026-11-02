@@ -1,0 +1,157 @@
+HOSTEL MANAGEMENT SYSTEM (HM)
+Problem Requirement Statement
+1. Overview
+The Hostel Management System (HM) digitizes and streamlines system-supported operational and administrative activities related to student hostel services within the Fusion ERP ecosystem. The module supports hostel master administration, hostel-specific role assignment, accommodation administration, room occupancy management, attendance recording, leave request handling, hostel-related complaint handling, guest-room booking requests, extended-stay request handling during vacations or semester breaks, fine recording, hostel-operational inventory and staff coordination, hostel-level security guard shift scheduling, notices, notifications, and hostel-related reports and operational summaries.
+The module operates under role-based access control (RBAC) and supports coordination among students and authorized institute personnel in the roles of Super Admin, Hostel Warden, and Hostel Caretaker. The system is intended to improve transparency, operational efficiency, accountability, timely issue recording and follow-up, and safety-related coordination within hostel premises.
+Study-scope boundary rule. References to hostel policy, approved process, institutional guideline, rule book, manual, authorized scope, or administrative practice are treated as external governance context unless this problem statement explicitly requires the HM system to enforce, validate, restrict, route, record compliance, notify, or report based on them. If the system merely provides a function to a role holder, the relevant human actor is expected to follow applicable institutional practice outside the system-scoring scope.
+Separation-of-concern rule. The HM module is responsible only for the functions explicitly described in this document. Activities belonging to payment/accounting, HR/payroll, procurement/stock purchase, central complaint administration, non-hostel security administration, or other Fusion modules are outside HM scope unless an explicit HM integration point is stated.
+2. Actors
+2.1 Super Admin
+Creates, activates, and deactivates hostel records in the system.
+Assigns, reassigns, activates, and deactivates Warden and Caretaker role bindings for hostels.
+Performs hostel and room allotments in batches, including institutional allotment rounds and centrally controlled room re-allotments where such decisions are recorded in HM.
+Performs formal room-vacation updates that change institutional hostel occupancy records.
+Views institution-level hostel operational summaries and cross-hostel reports made available through the system.
+2.2 Student
+Views hostel room allocation and occupancy-related information made available to the student.
+Submits hostel accommodation requests/forms through the system.
+Submits leave requests with supporting information or documents where the configured leave-request form provides such fields.
+Requests guest-room bookings through the system.
+Submits complaints related to hostel facilities, services, discipline, infrastructure, or other hostel-operational issues.
+Views notices, announcements, attendance status, leave status, fine records, room-allocation information, guest-room booking status, complaint status, and extended-stay status relevant to the student.
+Submits extended-stay requests for vacations or semester breaks through the system.
+2.3 Hostel Caretaker
+Uses system-supported functions for day-to-day hostel operations within the assigned hostel and shift context.
+Reviews leave requests and records approval or rejection decisions through the system.
+Reviews hostel-related complaints, records action taken, updates complaint status, and escalates unresolved or supervisory complaints to the Warden when such escalation is supported by the HM workflow.
+Maintains room availability and occupancy records and records operational room updates supported by HM.
+Handles individual room exchanges for students within the assigned hostel, with the system updating occupancy records and enforcing explicitly defined room-capacity limits.
+Monitors room availability, occupancy, and hostel-level operational status through system records and summaries.
+Maintains hostel-operational inventory records and staff coordination information needed for hostel functioning, excluding HR service records, payroll, procurement, and formal employee administration.
+Verifies guest-room availability and records approval or rejection decisions for guest-room booking requests.
+Records and monitors student attendance through the system.
+Records fines imposed for hostel-related damages, rule violations, or disciplinary reasons.
+Publishes hostel notices and announcements for the assigned hostel.
+Generates hostel-level operational reports made available to the Caretaker role.
+2.4 Hostel Warden
+Oversees hostel functioning through system-visible summaries, reports, escalated complaints, attendance information, leave information, fine information, room-utilization information, and notice-management functions.
+Maintains or reviews hostel-level security guard shift schedules through the HM system.
+Reviews attendance, leave, fine, and complaint information for control and oversight.
+Reviews room allocation patterns, room utilization, and room-change information for planning, discipline, and compliance-oriented oversight.
+Reviews escalated complaints and unresolved operational issues recorded in the system.
+Publishes and manages hostel notices and announcements for hostels assigned to the Warden in the HM system.
+Reviews extended-stay request information, payment/deadline compliance information where configured, and records approval or rejection decisions through the HM system.
+Generates supervisory, operational, and compliance-oriented reports made available to the Warden role.
+3. Functional Scope
+3.0 Hostel Master and Role Assignment Administration
+Super Admin creates hostel records in the system.
+Super Admin activates and deactivates hostel records in the system.
+Super Admin assigns, reassigns, activates, and deactivates Warden role bindings for hostels.
+Super Admin assigns, reassigns, activates, and deactivates Caretaker role bindings for hostels.
+The system maintains hostel-specific role bindings and records role changes made by the Super Admin.
+3.1 Hostel Accommodation Management
+Students submit hostel accommodation requests through the system.
+The system records and manages accommodation application details and status.
+Super Admin records hostel and room allotment decisions in batch-oriented institutional processes.
+Super Admin manages centrally controlled room re-allotments and formal room-vacation updates through the system.
+The problem statement does not prescribe an allotment algorithm unless it is explicitly specified; the system records allotment decisions and updates room assignment information.
+The system maintains room assignment history for audit, traceability, and review.
+Students can view their own current and historical room allocation information made available through the system.
+3.2 Room Allocation and Occupancy Management
+Caretakers maintain hostel-level room availability and occupancy information.
+Room occupancy is updated based on approved allotments, re-allotments, formal room-vacation updates, and recorded individual exchanges.
+Caretakers may record individual room exchange operations within their assigned hostel.
+The system updates occupancy records after allotments, re-allotments, formal room-vacation updates, and recorded room exchanges, and prevents room occupancy from exceeding defined room capacity.
+Wardens may review room assignments and occupancy patterns for planning, discipline, and compliance-oriented oversight.
+The system maintains up-to-date room status information needed for hostel operations.
+3.3 Attendance Management
+Caretakers record and monitor student attendance through the system.
+The system makes attendance information available for leave review, disciplinary review, reporting, and supervisory oversight.
+Wardens can view attendance summaries, trends, and exceptions for oversight.
+Attendance records are retained for reporting, monitoring, and compliance-oriented review.
+Students can view attendance status or attendance-related information made available to them through the system.
+The detailed hostel attendance-taking procedure is outside HM system scope unless explicitly specified as system-enforced rules or configured workflow.
+3.4 Leave Management
+Students submit leave requests through the system.
+The system provides fields for supporting leave information or documents where such fields are configured in the leave-request form.
+Caretakers review leave requests and record approval or rejection decisions through the system.
+Students receive status updates for submitted leave requests.
+The system makes leave records available for attendance-related review, security coordination, and supervisory planning where such visibility is supported.
+Leave history is retained for audit, review, and reporting.
+Students can view leave status and leave-history information made available to them through the system.
+Wardens can review leave information and leave summaries for oversight, control, and supervisory planning.
+External leave eligibility rules, approval hierarchies, document rules, and institutional leave policy are outside HM system-scoring scope unless explicitly specified as system-enforced or system-routed behavior.
+3.5 Complaint Management
+Students submit hostel-related complaints through the system.
+Complaints include core descriptive information such as category and description, and optional attachment support where the complaint form provides such a field.
+Caretakers review hostel-related complaints, record action taken, update complaint status, and escalate unresolved or supervisory complaints to the Warden when escalation is supported by the HM workflow.
+Wardens can monitor unresolved, delayed, or escalated hostel-related complaints.
+Complaint history and resolution status are tracked for review and reporting.
+HM covers hostel-related complaints only. If a central Complaint Management module exists, HM either handles hostel-local complaints or records/escalates hostel complaints according to explicitly defined integration scope. Non-hostel complaints are outside HM scope.
+3.6 Guest Room Booking Management
+Students may submit guest-room booking requests through the system.
+The system records guest-room booking requests and provides guest-room availability information needed for approval or rejection decisions.
+Caretakers verify guest-room availability and record approval or rejection decisions for guest-room booking requests.
+Guest-room booking history is maintained for audit, planning, and security-oriented review.
+Guest-room management in this module is limited to booking-request handling and booking-status tracking only.
+Operational lifecycle activities such as guest check-in, guest check-out, room inspection, guest-room charge collection, and settlement are out of scope for this module statement unless explicitly integrated.
+3.7 Extended-Stay Management for Vacations / Semester Breaks
+Students submit extended-stay requests during vacations or semester breaks through the HM system.
+The system records the extended-stay request, requested period, and decision status.
+The system records applicable payment, charge, or fee amount for extended stay where such charges are applicable and represented in the HM system.
+The system records payment deadline and payment/deadline compliance status relevant to the extended-stay decision and continuation of stay where such information is maintained in HM.
+The Warden records approval or rejection of extended-stay requests through the HM system.
+The system makes extended-stay request details, payment/deadline compliance information where configured, and decision status visible to the Warden.
+HM supports extended-stay request submission. Application-window enforcement is outside HM scope unless a configured application window is explicitly provided and enforced by the system.
+Actual payment collection, receipt generation, financial settlement, and accounting reconciliation are outside HM scope unless explicitly integrated with the institute payment/accounting module.
+Appeal handling and expedited handling are out of scope for this module statement.
+3.8 Fine Management
+Caretakers may record fines imposed for hostel-related rule violations, damages, or disciplinary reasons.
+Each fine record includes at least the reason, amount, date, and affected student reference.
+Students can view imposed fines and fine history relevant to them.
+Wardens can review fine summaries and disciplinary patterns for oversight.
+Fine payment, waiver, settlement, and appeal handling are out of scope for this module statement.
+Fine-reason policy validation is outside HM system-scoring scope unless explicitly specified as system-enforced behavior.
+3.9 Inventory and Staff Coordination
+Caretakers maintain hostel-operational inventory records relevant to hostel functioning.
+The system allows authorized hostel roles to view or maintain hostel-operational staff coordination information such as assigned staff, duty/shift information, or contact/reference information where such records are maintained in HM.
+Wardens and Super Admin can review relevant hostel-operational staff assignments or shift information made available through the system.
+Inventory updates and usage-relevant changes maintained in HM are logged for accountability.
+HM inventory and staff coordination are limited to hostel-operational records, visibility, and accountability logs.
+Procurement, stock purchase, payroll, formal HR records, and employee service administration are outside HM scope unless explicitly integrated.
+3.10 Security and Guard Shift Management
+Wardens maintain, update, and review hostel-level security guard shift schedules through the HM system.
+Security-related schedules and records maintained in HM may be used for monitoring and review.
+Detailed incident investigation workflows, security staff employment records, payroll, and non-hostel security administration are outside HM scope unless explicitly specified.
+3.11 Announcements and Notices
+Caretakers and Wardens may publish hostel notices and announcements for hostels assigned to them in the HM system.
+Students receive visibility or notification for relevant notices and announcements.
+Notice history is maintained for reference, transparency, and auditability.
+The system provides a hostel notice board for displaying relevant notices and announcements to authorized users.
+3.12 Reports and Operational Summaries
+The system supports predefined reports and operational summaries derived from HM records.
+Examples include occupancy and room-utilization reports, attendance and leave summaries, fine and disciplinary summaries, complaint and resolution statistics, extended-stay summaries, hostel-level operational reports for Caretakers, supervisory reports for Wardens, and institution-level or cross-hostel monitoring reports for Super Admin.
+Advanced analytics, predictive analysis, or external data analysis is outside HM scope unless explicitly specified.
+3.13 Notifications
+The system issues notifications or status updates to relevant users for supported HM events through the Fusion notification infrastructure or a configured notification mechanism.
+Supported notification/status-update events include room allotment and room allocation changes, leave request submission and leave decisions, complaint submission/update/resolution, guest-room booking status, extended-stay request status, payment/deadline alerts where such information is maintained in HM, fine imposition, and notices and announcements.
+3.14 Hostel-Specific RBAC Enforcement and Role Continuity
+The system maintains hostel-specific Warden and Caretaker role assignments and applies hostel-specific access control for students based on their hostel allocation or relevant student-hostel association. Super Admin access is institution-level unless explicitly restricted by HM configuration.
+The system records role activation/deactivation status for hostel-specific Warden and Caretaker bindings.
+Time-bound role validity is in scope only if start and end dates are configured and enforced in the HM system.
+Role changes take effect when recorded by the Super Admin in the system.
+When a Warden or Caretaker role is reassigned, the newly assigned role holder can view pending HM records associated with the assigned hostel, subject to RBAC.
+Operational handover outside system-visible responsibility records is outside HM scope.
+RBAC ensures users access only the hostel data and functions permitted for their role and hostel assignment.
+4. Frozen Scope Clarifications and Exclusions
+External policies, approved processes, guidelines, manuals, rule books, or institutional practices are outside HM system scope unless the HM system is explicitly required to enforce, validate, restrict, route, record compliance, notify, or report based on them.
+HM supports attendance recording, monitoring, visibility, and reporting. The detailed attendance-taking procedure is outside HM scope unless explicitly configured as system-enforced behavior.
+HM supports leave request submission, decision recording, status visibility, history, and reporting. External leave eligibility rules, document rules, and approval hierarchy rules are outside HM scope unless explicitly specified as system-enforced or system-routed behavior.
+Extended stay during vacations or semester breaks is in scope as request recording, Warden decision recording, status visibility, and applicable charge/deadline/compliance recording where maintained in HM.
+Within extended-stay management, actual payment collection, receipt generation, settlement, financial reconciliation, appeal handling, and expedited handling are out of scope unless explicitly integrated.
+Guest-room management is limited to booking-request handling and booking-status tracking. Guest check-in, check-out, inspection, charge collection, and settlement are out of scope unless explicitly integrated.
+Fine management is limited to fine recording, review, visibility, and history. Fine payment, waiver, settlement, appeal handling, and fine-policy validation are out of scope unless explicitly specified.
+Hostel-related complaints are in scope. Non-hostel complaints and central complaint administration are outside HM scope unless explicitly integrated.
+HM inventory, staff coordination, and guard-shift functions are limited to hostel-operational records and visibility. Procurement, stock purchase, payroll, employee service records, and non-hostel security administration are outside HM scope unless explicitly integrated.
+Hostel and room allotments in batches are handled by Super Admin through recorded allotment decisions. Individual room exchanges are recorded by Caretakers within the assigned hostel, with explicit room-capacity enforcement.
+Administrative role-change rules, responsibility handover processes, and policy-based role constraints are outside HM scope unless explicitly supported by system-visible records or configured enforcement in HM.

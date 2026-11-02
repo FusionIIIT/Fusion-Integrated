@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hostel Management Dashboard</title>
+</head>
+<body>
+    <h1>Hostel Management Dashboard</h1>
+    <h2>Active Allocations</h2>
+    <ul>
+        {% for allocation in student_allocations %}
+            <li>{{ allocation }}</li>
+        {% empty %}
+            <li>No active allocations.</li>
+        {% endfor %}
+    </ul>
+    <h2>Leave Requests</h2>
+    <ul>
+        {% for request in leave_requests %}
+            <li>{{ request }}</li>
+        {% empty %}
+            <li>No leave requests.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'allocate_room' %}">Allocate Room</a>
+    <a href="{% url 'leave_request' %}">Leave Request</a>
+</body>
+</html>
