@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 import pytest
 
 from modules.lms.domain.entities import (
+    AnnouncementDetails,
     CourseDetails,
     CourseRole,
     CourseStatus,
@@ -11,6 +12,7 @@ from modules.lms.domain.entities import (
     MaterialStatus,
     MaterialType,
     SectionType,
+    validate_announcement_details,
     validate_course_details,
     validate_material_details,
 )
@@ -179,4 +181,39 @@ def test_validate_material_details_invalid():
             status=MaterialStatus.PUBLISHED,
             content="",
         )
+
+
+def test_validate_announcement_details_valid():
+    validate_announcement_details(
+        title="Midterm Exam Schedule",
+        content="Exam will be held on Friday at 10:00 in Room 101.",
+    )
+    details = AnnouncementDetails(
+        title="Quiz 2",
+        content="Topics: Chapters 3-4.",
+    )
+    assert details.title == "Quiz 2"
+
+
+def test_validate_announcement_details_invalid():
+    # Empty title
+    with pytest.raises(LMSRuleError, match="Announcement title cannot be empty"):
+        validate_announcement_details(title="", content="Valid content")
+
+    # Whitespace title
+    with pytest.raises(LMSRuleError, match="Announcement title cannot be empty"):
+        validate_announcement_details(title="   ", content="Valid content")
+
+    # Title exceeds 200 characters
+    with pytest.raises(LMSRuleError, match="Announcement title cannot exceed 200 characters"):
+        validate_announcement_details(title="X" * 201, content="Valid content")
+
+    # Empty content
+    with pytest.raises(LMSRuleError, match="Announcement content cannot be empty"):
+        validate_announcement_details(title="Valid title", content="")
+
+    # Whitespace content
+    with pytest.raises(LMSRuleError, match="Announcement content cannot be empty"):
+        validate_announcement_details(title="Valid title", content="   ")
+
 

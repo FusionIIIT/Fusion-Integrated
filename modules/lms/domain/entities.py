@@ -73,6 +73,13 @@ class MaterialDetails:
     order: int = 0
 
 
+@dataclass(frozen=True)
+class AnnouncementDetails:
+    title: str
+    content: str
+
+
+
 def validate_course_details(*, title: str, status: str) -> None:
     """Validate course workspace configuration parameters."""
     if not title or not title.strip():
@@ -136,4 +143,15 @@ def validate_material_details(
 
     if material_type == MaterialType.NOTE and (not content or not content.strip()):
         raise LMSRuleError("Note materials require content text.")
+
+
+def validate_announcement_details(*, title: str, content: str) -> None:
+    """Validate course announcement parameters according to CFR-LMS-005."""
+    if not title or not title.strip():
+        raise LMSRuleError("Announcement title cannot be empty.")
+    if len(title.strip()) > 200:
+        raise LMSRuleError("Announcement title cannot exceed 200 characters.")
+    if not content or not content.strip():
+        raise LMSRuleError("Announcement content cannot be empty.")
+
 

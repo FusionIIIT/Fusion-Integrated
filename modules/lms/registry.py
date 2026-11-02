@@ -26,18 +26,31 @@ PERMISSIONS = [
     ("lms.course.manage", "Configure and edit course workspace details"),
     ("lms.material.view", "View published course materials"),
     ("lms.material.manage", "Create, edit, organize, and schedule course materials"),
+    ("lms.announcement.view", "View course announcements"),
+    ("lms.announcement.manage", "Post and manage course announcements"),
 ]
 
 SYSTEM_PERMISSIONS = []
 
-_STUDENT = ["lms.course.view", "lms.material.view"]
+_STUDENT = [
+    "lms.course.view",
+    "lms.material.view",
+    "lms.announcement.view",
+]
 _FACULTY = [
     "lms.course.view",
     "lms.course.manage",
     "lms.material.view",
     "lms.material.manage",
+    "lms.announcement.view",
+    "lms.announcement.manage",
 ]
-_STAFF = ["lms.course.view", "lms.material.view"]
+_STAFF = [
+    "lms.course.view",
+    "lms.material.view",
+    "lms.announcement.view",
+]
+
 
 ROLE_GRANTS = {
     "student": _STUDENT,

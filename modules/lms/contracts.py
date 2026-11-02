@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from modules.lms.domain.entities import MaterialStatus
-from modules.lms.models import Course, CourseMaterial, CourseMembership
+from modules.lms.models import Course, CourseAnnouncement, CourseMaterial, CourseMembership
 
 
 @dataclass(frozen=True)
@@ -76,4 +76,30 @@ def get_course_materials(
             "link_url": m.link_url,
         })
     return result
+
+
+def get_course_announcements(
+    course_codes: Sequence[str],
+) -> dict[str, list[dict[str, Any]]]:
+    """Retrieve course announcements, batched by course codes (contracts_are_plural)."""
+    codes = {str(c).strip() for c in course_codes if c}
+    if not codes:
+        return {}
+    announcements = (
+        CourseAnnouncement.objects.filter(course__code__in=codes)
+        .select_related("course")
+        .order_by("course__code", "-created_at")
+    )
+    result: dict[str, list[dict[str, Any]]] = {code: [] for code in codes}
+    for a in announcements:
+        result.setdefault(a.course.code, []).append({
+            "id": a.id,
+            "title": a.title,
+            "content": a.content,
+            "created_by_user_id": a.created_by_user_id,
+            "author_role": a.author_role,
+            "created_at": a.created_at.isoformat() if a.created_at else None,
+        })
+    return result
+
 

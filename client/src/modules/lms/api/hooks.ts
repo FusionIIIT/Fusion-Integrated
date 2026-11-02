@@ -214,3 +214,57 @@ export function useDeleteMaterial() {
   });
 }
 
+export interface CourseAnnouncementItem {
+  id: number;
+  course_code: string;
+  title: string;
+  content: string;
+  created_by_user_id: number;
+  author_name: string;
+  author_role: "faculty" | "student" | "ta" | "observer";
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface CourseAnnouncementsResponse {
+  course_code: string;
+  course_title: string;
+  role: "faculty" | "student" | "ta" | "observer";
+  can_post: boolean;
+  announcements: CourseAnnouncementItem[];
+  total_count: number;
+}
+
+export interface PostAnnouncementPayload {
+  title: string;
+  content: string;
+}
+
+export function useCourseAnnouncements(code: string | null) {
+  return useQuery({
+    queryKey: [KEY, "announcements", code],
+    queryFn: async () => {
+      if (!code) return null;
+      return (
+        await http.get<CourseAnnouncementsResponse>(`/lms/courses/${code}/announcements`)
+      ).data;
+    },
+    enabled: Boolean(code),
+  });
+}
+
+export function usePostCourseAnnouncement() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ code, body }: { code: string; body: PostAnnouncementPayload }) => {
+      return (
+        await http.post<CourseAnnouncementItem>(`/lms/courses/${code}/announcements`, body)
+      ).data;
+    },
+    onSuccess: (_, { code }) => {
+      qc.invalidateQueries({ queryKey: [KEY, "announcements", code] });
+    },
+  });
+}
+
+

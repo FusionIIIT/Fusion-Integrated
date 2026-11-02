@@ -5,6 +5,7 @@ import pytest
 
 from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from fusion_auth.principal import Principal
+from modules.lms.contracts import get_course_announcements
 from modules.lms.domain.entities import (
     CourseRole,
     CourseStatus,
@@ -12,7 +13,12 @@ from modules.lms.domain.entities import (
     MaterialType,
     SectionType,
 )
-from modules.lms.models import Course, CourseMaterial, CourseMembership
+from modules.lms.models import Course, CourseAnnouncement, CourseMaterial, CourseMembership
+from modules.lms.selectors.announcements import (
+    get_course_announcement_detail,
+    list_course_announcements,
+)
+from modules.lms.services import announcements as announcement_service
 from modules.lms.services import courses as course_service
 from modules.lms.services import materials as material_service
 
@@ -310,4 +316,173 @@ def test_release_scheduled_materials_transition():
     m2.refresh_from_db()
     assert m1.status == MaterialStatus.PUBLISHED
     assert m2.status == MaterialStatus.SCHEDULED
+
+
+@pytest.mark.django_db
+def test_faculty_can_post_announcement_timestamped():
+    course = Course.objects.create(
+        code="CS501",
+        title="Advanced Algorithms",
+        status=CourseStatus.PUBLISHED,
+    )
+    CourseMembership.objects.create(course=course, user_id=101, role=CourseRole.FACULTY)
+
+    faculty = make_principal(101, "faculty", ("lms.announcement.manage", "lms.announcement.view"))
+    announcement = announcement_service.post_course_announcement(
+        actor=faculty,
+        course_code="CS501",
+        title="Midterm Exam Schedule",
+        content="Exam will be held next Monday at 10 AM in Hall A.",
+    )
+
+    assert announcement.id is not None
+    assert announcement.title == "Midterm Exam Schedule"
+    assert announcement.content == "Exam will be held next Monday at 10 AM in Hall A."
+    assert announcement.created_by_user_id == 101
+    assert announcement.author_role == CourseRole.FACULTY
+    assert announcement.created_at is not None  # Timestamped (AFR-LMS-005.3, BR-LMS-008)
+
+
+@pytest.mark.django_db
+def test_unauthorized_roles_cannot_post_announcement():
+    course = Course.objects.create(
+        code="CS502",
+        title="Operating Systems",
+        status=CourseStatus.PUBLISHED,
+    )
+    CourseMembership.objects.create(course=course, user_id=201, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=course, user_id=202, role=CourseRole.TA)
+    CourseMembership.objects.create(course=course, user_id=203, role=CourseRole.OBSERVER)
+
+    student = make_principal(201, "student", ("lms.announcement.manage", "lms.announcement.view"))
+    ta = make_principal(202, "ta", ("lms.announcement.manage", "lms.announcement.view"))
+    observer = make_principal(203, "observer", ("lms.announcement.manage", "lms.announcement.view"))
+
+    # Student cannot post (BR-LMS-007)
+    with pytest.raises(PermissionDeniedError, match="Students cannot post course announcements"):
+        announcement_service.post_course_announcement(
+            actor=student,
+            course_code="CS502",
+            title="Student Announcement",
+            content="Testing unauthorized post",
+        )
+
+    # TA cannot post without permitted mechanism (AFR-LMS-005.2, AFR-LMS-014.2, BR-LMS-007)
+    with pytest.raises(
+        PermissionDeniedError, match="Teaching Assistants are not permitted to post announcements"
+    ):
+        announcement_service.post_course_announcement(
+            actor=ta,
+            course_code="CS502",
+            title="TA Announcement",
+            content="Testing TA post",
+        )
+
+    # Observer has read-only access (AFR-LMS-015.4)
+    with pytest.raises(
+        PermissionDeniedError, match="Observers have read-only access and cannot post announcements"
+    ):
+        announcement_service.post_course_announcement(
+            actor=observer,
+            course_code="CS502",
+            title="Observer Announcement",
+            content="Testing observer post",
+        )
+
+
+@pytest.mark.django_db
+def test_non_member_cannot_post_or_view_announcements():
+    course = Course.objects.create(
+        code="CS503",
+        title="Computer Networks",
+        status=CourseStatus.PUBLISHED,
+    )
+    CourseMembership.objects.create(course=course, user_id=301, role=CourseRole.FACULTY)
+
+    non_member = make_principal(999, "faculty", ("lms.announcement.manage", "lms.announcement.view"))
+
+    with pytest.raises(NotFoundError, match="Course not found or you are not linked to it"):
+        announcement_service.post_course_announcement(
+            actor=non_member,
+            course_code="CS503",
+            title="Intruder Announcement",
+            content="Should fail",
+        )
+
+    # Selectors return None for non-members (BR-LMS-001)
+    assert list_course_announcements(principal=non_member, course_code="CS503") is None
+    assert (
+        get_course_announcement_detail(principal=non_member, course_code="CS503", announcement_id=1)
+        is None
+    )
+
+
+@pytest.mark.django_db
+def test_all_enrolled_and_linked_users_can_view_course_announcements():
+    course = Course.objects.create(
+        code="CS504",
+        title="Software Engineering",
+        status=CourseStatus.PUBLISHED,
+    )
+    CourseMembership.objects.create(course=course, user_id=401, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=402, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=course, user_id=403, role=CourseRole.TA)
+    CourseMembership.objects.create(course=course, user_id=404, role=CourseRole.OBSERVER)
+
+    ann = CourseAnnouncement.objects.create(
+        course=course,
+        title="Project Milestone 1 Due",
+        content="Submit your milestone reports before Sunday midnight.",
+        created_by_user_id=401,
+        author_role=CourseRole.FACULTY,
+    )
+
+    faculty = make_principal(401, "faculty", ("lms.announcement.view", "lms.announcement.manage"))
+    student = make_principal(402, "student", ("lms.announcement.view",))
+    ta = make_principal(403, "ta", ("lms.announcement.view",))
+    observer = make_principal(404, "observer", ("lms.announcement.view",))
+
+    for actor, expected_can_post in [
+        (faculty, True),
+        (student, False),
+        (ta, False),
+        (observer, False),
+    ]:
+        data = list_course_announcements(principal=actor, course_code="CS504")
+        assert data is not None
+        assert data["course_code"] == "CS504"
+        assert data["can_post"] is expected_can_post
+        assert len(data["announcements"]) == 1
+        assert data["announcements"][0]["title"] == "Project Milestone 1 Due"
+        assert data["announcements"][0]["created_at"] is not None
+
+        detail = get_course_announcement_detail(
+            principal=actor, course_code="CS504", announcement_id=ann.id
+        )
+        assert detail is not None
+        assert detail["title"] == "Project Milestone 1 Due"
+
+
+@pytest.mark.django_db
+def test_contract_get_course_announcements():
+    c1 = Course.objects.create(code="CS505A", title="Course A", status=CourseStatus.PUBLISHED)
+    c2 = Course.objects.create(code="CS505B", title="Course B", status=CourseStatus.PUBLISHED)
+
+    CourseAnnouncement.objects.create(
+        course=c1, title="A1", content="Content A1", created_by_user_id=1, author_role="faculty"
+    )
+    CourseAnnouncement.objects.create(
+        course=c2, title="B1", content="Content B1", created_by_user_id=1, author_role="faculty"
+    )
+
+    res = get_course_announcements(["CS505A", "CS505B", "NONEXISTENT"])
+    assert "CS505A" in res
+    assert "CS505B" in res
+    assert "NONEXISTENT" in res
+    assert len(res["CS505A"]) == 1
+    assert res["CS505A"][0]["title"] == "A1"
+    assert len(res["CS505B"]) == 1
+    assert res["CS505B"][0]["title"] == "B1"
+    assert len(res["NONEXISTENT"]) == 0
+
 

@@ -116,3 +116,30 @@ class CourseMaterialUpdateSerializer(serializers.Serializer):
     release_at = serializers.DateTimeField(required=False, allow_null=True)
     order = serializers.IntegerField(required=False)
 
+
+class CourseAnnouncementItemSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    course_code = serializers.CharField()
+    title = serializers.CharField()
+    content = serializers.CharField()
+    created_by_user_id = serializers.IntegerField()
+    author_name = serializers.CharField()
+    author_role = serializers.CharField()
+    created_at = serializers.CharField(allow_null=True)
+    updated_at = serializers.CharField(allow_null=True)
+
+
+class CourseAnnouncementsResponseSerializer(serializers.Serializer):
+    course_code = serializers.CharField()
+    course_title = serializers.CharField()
+    role = serializers.CharField()
+    can_post = serializers.BooleanField()
+    announcements = CourseAnnouncementItemSerializer(many=True)
+    total_count = serializers.IntegerField()
+
+
+class CourseAnnouncementCreateSerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=200)
+    content = serializers.CharField()
+
+

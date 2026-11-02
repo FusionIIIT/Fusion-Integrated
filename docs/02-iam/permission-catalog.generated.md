@@ -21,6 +21,8 @@ For the intended taxonomy of modules not yet built, see
 | `lms.course.manage` | Configure and edit course workspace details | `faculty` |
 | `lms.material.view` | View published course materials | `faculty`, `staff`, `student` |
 | `lms.material.manage` | Create, edit, organize, and schedule course materials | `faculty` |
+| `lms.announcement.view` | View course announcements | `faculty`, `staff`, `student` |
+| `lms.announcement.manage` | Post and manage course announcements | `faculty` |
 
 ## `placement_cell`
 

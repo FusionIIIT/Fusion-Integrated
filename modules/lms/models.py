@@ -129,3 +129,28 @@ class CourseMaterial(TimeStampedModel):
     def __str__(self) -> str:
         return f"Material({self.title}) in {self.course.code} [{self.material_type}]"
 
+
+class CourseAnnouncement(TimeStampedModel):
+    """Course-wide announcement posted by authorized faculty/staff.
+
+    Timestamped and visible to all users enrolled in or linked to the course
+    (CFR-LMS-005, AFR-LMS-005.1, AFR-LMS-005.3, AFR-LMS-005.4, BR-LMS-008).
+    """
+
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="announcements")
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    created_by_user_id = models.IntegerField(db_index=True)
+    author_role = models.CharField(max_length=16, default=CourseRole.FACULTY)
+
+    class Meta:
+        db_table = "lms_course_announcement"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["course", "-created_at"], name="lms_ann_course_created_idx"),
+        ]
+
+    def __str__(self) -> str:
+        return f"Announcement({self.title}) in {self.course.code}"
+
+

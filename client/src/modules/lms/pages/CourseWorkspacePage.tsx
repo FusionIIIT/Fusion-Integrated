@@ -28,6 +28,7 @@ import { useSearchParams } from "react-router-dom";
 import {
   FaArrowLeft,
   FaBook,
+  FaBullhorn,
   FaCalendarAlt,
   FaChalkboardTeacher,
   FaDownload,
@@ -44,6 +45,7 @@ import {
   FaUserGraduate,
 } from "react-icons/fa";
 
+
 import { errorMessage } from "../../../lib/http";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
@@ -54,14 +56,17 @@ import {
   type CreateMaterialPayload,
   type UpdateCourseWorkspacePayload,
   type UpdateMaterialPayload,
-  useCourses,
+  useCourseAnnouncements,
   useCourseMaterials,
+  useCourses,
   useCourseWorkspace,
   useCreateMaterial,
   useDeleteMaterial,
+  usePostCourseAnnouncement,
   useUpdateCourseWorkspace,
   useUpdateMaterial,
 } from "../api/hooks";
+
 
 function roleBadgeColor(role: string): string {
   switch (role) {
@@ -116,15 +121,28 @@ export default function CourseWorkspacePage() {
     error: materialsError,
   } = useCourseMaterials(selectedCode);
 
+  const {
+    data: announcementsData,
+    isPending: announcementsLoading,
+    error: announcementsError,
+  } = useCourseAnnouncements(selectedCode);
+
   const updateMutation = useUpdateCourseWorkspace();
   const createMaterialMutation = useCreateMaterial();
   const updateMaterialMutation = useUpdateMaterial();
   const deleteMaterialMutation = useDeleteMaterial();
+  const postAnnouncementMutation = usePostCourseAnnouncement();
 
   const [editOpened, setEditOpened] = useState(false);
   const [editForm, setEditForm] = useState<UpdateCourseWorkspacePayload>({});
 
+  // Announcements state
+  const [postAnnouncementOpened, setPostAnnouncementOpened] = useState(false);
+  const [announcementTitle, setAnnouncementTitle] = useState("");
+  const [announcementContent, setAnnouncementContent] = useState("");
+
   // Materials modal states
+
   const [addMaterialOpened, setAddMaterialOpened] = useState(false);
   const [addMaterialForm, setAddMaterialForm] = useState<CreateMaterialPayload>({
     title: "",
@@ -299,7 +317,65 @@ export default function CourseWorkspacePage() {
     );
   }
 
+  function handlePostAnnouncement() {
+    if (!selectedCode) return;
+    if (!announcementTitle.trim()) {
+      notifications.show({
+        title: "Validation error",
+        message: "Announcement title cannot be empty.",
+        color: "red",
+      });
+      return;
+    }
+    if (announcementTitle.trim().length > 200) {
+      notifications.show({
+        title: "Validation error",
+        message: "Announcement title cannot exceed 200 characters.",
+        color: "red",
+      });
+      return;
+    }
+    if (!announcementContent.trim()) {
+      notifications.show({
+        title: "Validation error",
+        message: "Announcement content cannot be empty.",
+        color: "red",
+      });
+      return;
+    }
+
+    postAnnouncementMutation.mutate(
+      {
+        code: selectedCode,
+        body: {
+          title: announcementTitle.trim(),
+          content: announcementContent.trim(),
+        },
+      },
+      {
+        onSuccess: () => {
+          notifications.show({
+            title: "Announcement Posted",
+            message: "Course announcement posted successfully.",
+            color: "teal",
+          });
+          setAnnouncementTitle("");
+          setAnnouncementContent("");
+          setPostAnnouncementOpened(false);
+        },
+        onError: (err) => {
+          notifications.show({
+            title: "Could not post announcement",
+            message: errorMessage(err),
+            color: "red",
+          });
+        },
+      },
+    );
+  }
+
   // 1. Course Listing View (when no course code is selected)
+
   if (!selectedCode) {
     const courses = coursesData?.results ?? [];
 
@@ -529,7 +605,21 @@ export default function CourseWorkspacePage() {
           >
             Course Materials
           </Tabs.Tab>
+          <Tabs.Tab
+            value="announcements"
+            leftSection={<FaBullhorn size={14} />}
+            rightSection={
+              announcementsData?.total_count !== undefined ? (
+                <Badge size="xs" variant="light" circle>
+                  {announcementsData.total_count}
+                </Badge>
+              ) : null
+            }
+          >
+            Announcements
+          </Tabs.Tab>
         </Tabs.List>
+
 
         {/* TAB 1: COURSE OVERVIEW (Syllabus, Schedule, Instructors & TAs) */}
         <Tabs.Panel value="overview">
@@ -917,7 +1007,93 @@ export default function CourseWorkspacePage() {
             )}
           </Stack>
         </Tabs.Panel>
+
+        {/* TAB 3: ANNOUNCEMENTS (CFR-LMS-005, UC-LMS-005, UC-LMS-006, BR-LMS-008) */}
+        <Tabs.Panel value="announcements">
+          <Stack gap="lg">
+            <Group justify="space-between" align="center">
+              <div>
+                <Title order={3}>Course Announcements</Title>
+                <Text size="sm" c="dimmed">
+                  Official notices and updates for {workspace.code} - {workspace.title}
+                </Text>
+              </div>
+
+              {announcementsData?.can_post ? (
+                <Button
+                  leftSection={<FaPlus size={14} />}
+                  onClick={() => setPostAnnouncementOpened(true)}
+                  color="indigo"
+                >
+                  Post Announcement
+                </Button>
+              ) : (
+                <Badge variant="outline" color={roleBadgeColor(workspace.role)}>
+                  {roleLabel(workspace.role)} (Read-only)
+                </Badge>
+              )}
+            </Group>
+
+            {announcementsLoading ? (
+              <Group justify="center" p="xl">
+                <Loader size="md" />
+              </Group>
+            ) : announcementsError ? (
+              <Alert icon={<FaInfoCircle size={16} />} title="Error loading announcements" color="red">
+                {errorMessage(announcementsError)}
+              </Alert>
+            ) : !announcementsData?.announcements || announcementsData.announcements.length === 0 ? (
+              <Paper p="xl" withBorder radius="md" style={{ textAlign: "center" }}>
+                <ThemeIcon size={48} radius="xl" color="gray" variant="light" mb="sm">
+                  <FaBullhorn size={24} />
+                </ThemeIcon>
+                <Title order={4} mb="xs">
+                  No Announcements Yet
+                </Title>
+                <Text size="sm" c="dimmed" maw={420} mx="auto">
+                  There are currently no announcements posted for this course.
+                  {announcementsData?.can_post
+                    ? " Click 'Post Announcement' above to publish the first notice."
+                    : " Check back later for updates from your course instructors."}
+                </Text>
+              </Paper>
+            ) : (
+              <Stack gap="md">
+                {announcementsData.announcements.map((ann) => (
+                  <Card key={ann.id} padding="lg" radius="md" withBorder shadow="xs">
+                    <Group justify="space-between" align="flex-start" mb="xs">
+                      <div>
+                        <Title order={4}>{ann.title}</Title>
+                        <Group gap="xs" mt={4}>
+                          <Badge size="xs" variant="light" color={roleBadgeColor(ann.author_role)}>
+                            {ann.author_name} ({roleLabel(ann.author_role)})
+                          </Badge>
+                          {ann.created_at && (
+                            <Group gap={4}>
+                              <FaCalendarAlt size={12} color="gray" />
+                              <Text size="xs" c="dimmed">
+                                {new Date(ann.created_at).toLocaleString(undefined, {
+                                  dateStyle: "medium",
+                                  timeStyle: "short",
+                                })}
+                              </Text>
+                            </Group>
+                          )}
+                        </Group>
+                      </div>
+                    </Group>
+                    <Divider my="sm" />
+                    <Text size="sm" style={{ whiteSpace: "pre-line", lineHeight: 1.6 }}>
+                      {ann.content}
+                    </Text>
+                  </Card>
+                ))}
+              </Stack>
+            )}
+          </Stack>
+        </Tabs.Panel>
       </Tabs>
+
 
       {/* Faculty Course Configuration Modal (AFR-LMS-002.1, AFR-LMS-002.2) */}
       <Modal
@@ -1280,6 +1456,51 @@ export default function CourseWorkspacePage() {
           </Stack>
         )}
       </Modal>
+      {/* Post Announcement Modal (Faculty only, UC-LMS-005) */}
+      <Modal
+        opened={postAnnouncementOpened}
+        onClose={() => setPostAnnouncementOpened(false)}
+        title={`Post Course Announcement (${workspace?.code})`}
+        size="lg"
+        centered
+      >
+        <Stack gap="md">
+          <TextInput
+            label="Announcement Title"
+            placeholder="e.g. Midterm Exam Schedule and Room Assignments"
+            value={announcementTitle}
+            onChange={(e) => setAnnouncementTitle(e.currentTarget.value)}
+            required
+            maxLength={200}
+            description="Clear and concise summary of the announcement (up to 200 characters)."
+          />
+
+          <Textarea
+            label="Announcement Content"
+            placeholder="Enter the full announcement details, instructions, or updates..."
+            value={announcementContent}
+            onChange={(e) => setAnnouncementContent(e.currentTarget.value)}
+            minRows={6}
+            required
+            description="Plain text or markdown content visible course-wide to enrolled students, TAs, and observers."
+          />
+
+          <Group justify="flex-end" mt="md">
+            <Button variant="default" onClick={() => setPostAnnouncementOpened(false)}>
+              Cancel
+            </Button>
+            <Button
+              color="indigo"
+              onClick={handlePostAnnouncement}
+              loading={postAnnouncementMutation.isPending}
+              leftSection={<FaBullhorn size={14} />}
+            >
+              Post Announcement
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Container>
   );
 }
+

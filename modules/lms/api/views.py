@@ -11,6 +11,9 @@ from rest_framework.views import APIView
 from core.api.exceptions import NotFoundError
 from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.lms.api.serializers import (
+    CourseAnnouncementCreateSerializer,
+    CourseAnnouncementItemSerializer,
+    CourseAnnouncementsResponseSerializer,
     CourseMaterialCreateSerializer,
     CourseMaterialItemSerializer,
     CourseMaterialsResponseSerializer,
@@ -19,12 +22,17 @@ from modules.lms.api.serializers import (
     CourseWorkspaceDetailSerializer,
     CourseWorkspaceUpdateSerializer,
 )
+from modules.lms.selectors.announcements import (
+    get_course_announcement_detail,
+    list_course_announcements,
+)
 from modules.lms.selectors.courses import course_workspace_details, visible_courses
 from modules.lms.selectors.materials import (
     get_course_material_detail,
     get_material_for_download,
     list_course_materials,
 )
+from modules.lms.services import announcements as announcement_service
 from modules.lms.services import courses as course_service
 from modules.lms.services import materials as material_service
 
@@ -33,6 +41,9 @@ P_VIEW = "lms.course.view"
 P_MANAGE = "lms.course.manage"
 P_MAT_VIEW = "lms.material.view"
 P_MAT_MANAGE = "lms.material.manage"
+P_ANN_VIEW = "lms.announcement.view"
+P_ANN_MANAGE = "lms.announcement.manage"
+
 
 
 class CourseListView(APIView):
@@ -225,3 +236,74 @@ class CourseMaterialDownloadView(APIView):
 
         filename = material.file_name or os.path.basename(material.file.name)
         return FileResponse(material.file.open("rb"), as_attachment=True, filename=filename)
+
+
+class CourseAnnouncementListView(APIView):
+    """List and post course announcements (CFR-LMS-005, UC-LMS-005, UC-LMS-006)."""
+
+    def get_permissions(self):
+        perm = P_ANN_VIEW if self.request.method == "GET" else P_ANN_MANAGE
+        return [MODULE(), HasPermission(perm)()]
+
+    @extend_schema(
+        operation_id="v1_lms_course_announcements_list",
+        summary="List course announcements",
+        tags=["lms"],
+        responses={200: CourseAnnouncementsResponseSerializer},
+    )
+    def get(self, request, code: str):
+        data = list_course_announcements(principal=request.principal, course_code=code)
+        if data is None:
+            raise NotFoundError("Course not found or you are not authorized to access it.")
+        return Response(CourseAnnouncementsResponseSerializer(data).data)
+
+    @extend_schema(
+        operation_id="v1_lms_course_announcements_create",
+        summary="Post a course-wide announcement (Faculty only)",
+        tags=["lms"],
+        request=CourseAnnouncementCreateSerializer,
+        responses={201: CourseAnnouncementItemSerializer},
+    )
+    def post(self, request, code: str):
+        payload = CourseAnnouncementCreateSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+
+        announcement = announcement_service.post_course_announcement(
+            actor=request.principal,
+            course_code=code,
+            **payload.validated_data,
+        )
+
+        detail = get_course_announcement_detail(
+            principal=request.principal,
+            course_code=code,
+            announcement_id=announcement.id,
+        )
+        return Response(
+            CourseAnnouncementItemSerializer(detail).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+
+class CourseAnnouncementDetailView(APIView):
+    """Retrieve details for a specific course announcement."""
+
+    permission_classes = [MODULE, HasPermission(P_ANN_VIEW)]
+
+    @extend_schema(
+        operation_id="v1_lms_course_announcements_retrieve",
+        summary="Retrieve course announcement details",
+        tags=["lms"],
+        responses={200: CourseAnnouncementItemSerializer},
+    )
+    def get(self, request, code: str, announcement_id: int):
+        detail = get_course_announcement_detail(
+            principal=request.principal,
+            course_code=code,
+            announcement_id=announcement_id,
+        )
+        if detail is None:
+            raise NotFoundError("Course announcement not found.")
+        return Response(CourseAnnouncementItemSerializer(detail).data)
+

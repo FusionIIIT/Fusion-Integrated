@@ -136,6 +136,88 @@ paths:
               schema:
                 $ref: '#/components/schemas/CourseWorkspaceDetail'
           description: ''
+  /api/v1/lms/courses/{code}/announcements:
+    get:
+      operationId: v1_lms_course_announcements_list
+      description: List and post course announcements (CFR-LMS-005, UC-LMS-005, UC-LMS-006).
+      summary: List course announcements
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseAnnouncementsResponse'
+          description: ''
+    post:
+      operationId: v1_lms_course_announcements_create
+      description: List and post course announcements (CFR-LMS-005, UC-LMS-005, UC-LMS-006).
+      summary: Post a course-wide announcement (Faculty only)
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseAnnouncementCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CourseAnnouncementCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CourseAnnouncementCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseAnnouncementItem'
+          description: ''
+  /api/v1/lms/courses/{code}/announcements/{announcement_id}:
+    get:
+      operationId: v1_lms_course_announcements_retrieve
+      description: Retrieve details for a specific course announcement.
+      summary: Retrieve course announcement details
+      parameters:
+      - in: path
+        name: announcement_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseAnnouncementItem'
+          description: ''
   /api/v1/lms/courses/{code}/materials:
     get:
       operationId: v1_lms_course_materials_list
@@ -2534,6 +2616,74 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    CourseAnnouncementCreate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        content:
+          type: string
+      required:
+      - content
+      - title
+    CourseAnnouncementItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        course_code:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        created_by_user_id:
+          type: integer
+        author_name:
+          type: string
+        author_role:
+          type: string
+        created_at:
+          type: string
+          nullable: true
+        updated_at:
+          type: string
+          nullable: true
+      required:
+      - author_name
+      - author_role
+      - content
+      - course_code
+      - created_at
+      - created_by_user_id
+      - id
+      - title
+      - updated_at
+    CourseAnnouncementsResponse:
+      type: object
+      properties:
+        course_code:
+          type: string
+        course_title:
+          type: string
+        role:
+          type: string
+        can_post:
+          type: boolean
+        announcements:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseAnnouncementItem'
+        total_count:
+          type: integer
+      required:
+      - announcements
+      - can_post
+      - course_code
+      - course_title
+      - role
+      - total_count
     CourseMaterialCreate:
       type: object
       properties:

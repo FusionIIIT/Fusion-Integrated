@@ -22,7 +22,10 @@ VIEW = "lms.course.view"
 MANAGE = "lms.course.manage"
 MAT_VIEW = "lms.material.view"
 MAT_MANAGE = "lms.material.manage"
+ANN_VIEW = "lms.announcement.view"
+ANN_MANAGE = "lms.announcement.manage"
 URL_COURSES = "/api/v1/lms/courses"
+
 
 
 def api_client(stub_iam, *, user_id=1001, role="student", permissions=(VIEW,), modules=(MODULE,)):
@@ -343,4 +346,108 @@ def test_material_file_download_endpoint(stub_iam):
     # Student cannot download draft material (404 Not Found)
     resp_draft = student_client.get(f"{URL_COURSES}/CS301/materials/{mat_draft.id}/download")
     assert resp_draft.status_code == 404
+
+
+def test_course_announcements_list_and_post_by_faculty(stub_iam):
+    c = Course.objects.create(code="CS601", title="Compiler Design")
+    CourseMembership.objects.create(course=c, user_id=9001, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=c, user_id=1001, role=CourseRole.STUDENT)
+
+    faculty_client = api_client(
+        stub_iam, user_id=9001, role="faculty", permissions=(VIEW, ANN_VIEW, ANN_MANAGE)
+    )
+
+    # Post an announcement
+    payload = {
+        "title": "Welcome to CS601",
+        "content": "First lecture begins tomorrow at 9:00 AM.",
+    }
+    resp_post = faculty_client.post(f"{URL_COURSES}/CS601/announcements", payload, format="json")
+    assert resp_post.status_code == 201
+    assert resp_post.data["title"] == "Welcome to CS601"
+    assert resp_post.data["created_by_user_id"] == 9001
+    assert resp_post.data["author_role"] == CourseRole.FACULTY
+    assert resp_post.data["created_at"] is not None
+
+    ann_id = resp_post.data["id"]
+
+    # Student lists announcements
+    student_client = api_client(
+        stub_iam, user_id=1001, role="student", permissions=(VIEW, ANN_VIEW)
+    )
+    resp_list = student_client.get(f"{URL_COURSES}/CS601/announcements")
+    assert resp_list.status_code == 200
+    assert resp_list.data["course_code"] == "CS601"
+    assert resp_list.data["can_post"] is False
+    assert len(resp_list.data["announcements"]) == 1
+    assert resp_list.data["announcements"][0]["title"] == "Welcome to CS601"
+
+    # Student retrieves announcement detail
+    resp_detail = student_client.get(f"{URL_COURSES}/CS601/announcements/{ann_id}")
+    assert resp_detail.status_code == 200
+    assert resp_detail.data["title"] == "Welcome to CS601"
+
+
+def test_unauthorized_roles_cannot_post_announcements_api(stub_iam):
+    c = Course.objects.create(code="CS602", title="Distributed Systems")
+    CourseMembership.objects.create(course=c, user_id=1001, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=c, user_id=2001, role=CourseRole.TA)
+    CourseMembership.objects.create(course=c, user_id=3001, role=CourseRole.OBSERVER)
+
+    student_client = api_client(
+        stub_iam, user_id=1001, role="student", permissions=(VIEW, ANN_VIEW, ANN_MANAGE)
+    )
+    ta_client = api_client(
+        stub_iam, user_id=2001, role="ta", permissions=(VIEW, ANN_VIEW, ANN_MANAGE)
+    )
+    observer_client = api_client(
+        stub_iam, user_id=3001, role="observer", permissions=(VIEW, ANN_VIEW, ANN_MANAGE)
+    )
+
+    payload = {"title": "Test Title", "content": "Test Content"}
+
+    # Student posting is forbidden (403)
+    resp_student = student_client.post(f"{URL_COURSES}/CS602/announcements", payload, format="json")
+    assert resp_student.status_code == 403
+
+    # TA posting is forbidden (403)
+    resp_ta = ta_client.post(f"{URL_COURSES}/CS602/announcements", payload, format="json")
+    assert resp_ta.status_code == 403
+
+    # Observer posting is forbidden (403)
+    resp_obs = observer_client.post(f"{URL_COURSES}/CS602/announcements", payload, format="json")
+    assert resp_obs.status_code == 403
+
+
+def test_announcements_course_isolation_and_validation(stub_iam):
+    c1 = Course.objects.create(code="CS603", title="Course Alpha")
+    CourseMembership.objects.create(course=c1, user_id=9001, role=CourseRole.FACULTY)
+
+    non_member_client = api_client(
+        stub_iam, user_id=5555, role="faculty", permissions=(VIEW, ANN_VIEW, ANN_MANAGE)
+    )
+
+    # Non-member cannot list announcements (404 Not Found, BR-LMS-001)
+    resp_list = non_member_client.get(f"{URL_COURSES}/CS603/announcements")
+    assert resp_list.status_code == 404
+
+    # Non-member cannot post announcements (404 Not Found)
+    resp_post = non_member_client.post(
+        f"{URL_COURSES}/CS603/announcements",
+        {"title": "Intrusion", "content": "Hello"},
+        format="json",
+    )
+    assert resp_post.status_code == 404
+
+    # Faculty member receives 400 on empty/missing fields
+    faculty_client = api_client(
+        stub_iam, user_id=9001, role="faculty", permissions=(VIEW, ANN_VIEW, ANN_MANAGE)
+    )
+    resp_bad = faculty_client.post(
+        f"{URL_COURSES}/CS603/announcements",
+        {"title": "", "content": ""},
+        format="json",
+    )
+    assert resp_bad.status_code == 400
+
 
