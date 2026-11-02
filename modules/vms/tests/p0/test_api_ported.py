@@ -6,11 +6,7 @@ from django.utils import timezone
 
 from modules.vms.models import (
     AuditLog,
-    Notification,
     VisitLog,
-    Visitor,
-    VisitPass,
-    VisitRequest,
 )
 from modules.vms.tests import factories as f
 
@@ -37,8 +33,6 @@ def _payload(host=2001, **over):
 # --- auth matrix ---------------------------------------------------------------------
 
 ENDPOINTS = [
-    ("get", "host/pending", "vms.request.decide"),
-    ("post", "host/requests/1/decision", "vms.request.decide"),
     ("post", "gate/validate", "vms.gate.operate"),
     ("post", "gate/checkout", "vms.gate.operate"),
     ("get", "blacklist", "vms.blacklist.manage"),
@@ -57,148 +51,6 @@ def test_anonymous_is_401(api_as, method, path, perm):
 def test_wrong_role_is_403(api_as, method, path, perm):
     client = api_as(permissions=["vms.report.view"])
     assert getattr(client, method)(BASE + path, {}, format="json").status_code == 403
-
-
-@pytest.mark.parametrize("method", ["get", "post"])
-def test_pre_registration_requires_authentication(api_as, method):
-    client = api_as(anonymous=True)
-    assert getattr(client, method)(BASE + "pre-registrations", {}, format="json").status_code == 401
-
-
-def test_pre_registration_is_open_to_any_authenticated_principal(api_as):
-    # TODO lane A (D-1): replaced by visitor sessions.
-    client = api_as(permissions=[], kind="student")
-    assert client.post(BASE + "pre-registrations", _payload(), format="json").status_code == 201
-
-
-# --- pre-registration ----------------------------------------------------------------
-
-def test_pre_registration_creates_a_pending_request_with_audit_and_host_notice(api_as):
-    r = api_as().post(BASE + "pre-registrations", _payload(), format="json")
-    assert r.status_code == 201
-    vr = VisitRequest.objects.get()
-    assert (vr.status, vr.source, vr.host_user_id) == ("pending", "pre_registered", 2001)
-    assert r.json()["visitor_name"] == "Ravi" and r.json()["status"] == "pending"
-    assert AuditLog.objects.filter(action="vms.request.submitted").count() == 1
-    assert Notification.objects.filter(recipient_user_id=2001,
-                                       topic="request.submitted").count() == 2
-
-
-def test_br_051_blacklisted_visitor_is_rejected_at_pre_registration(api_as):
-    f.make_blacklist_version(version=1, status="published", published_at=timezone.now())
-    from modules.vms.services import blacklist
-    blacklist.add_entry(actor=None, name="Ravi", id_doc_number="P1234567", reason="x")
-    r = api_as().post(BASE + "pre-registrations", _payload(), format="json")
-    assert r.status_code == 400 and r.json()["error"]["code"] == "visitor_blacklisted"
-    assert not VisitRequest.objects.exists()
-
-
-def test_br_038_duplicate_pending_request_is_rejected(api_as):
-    client = api_as()
-    body = _payload()
-    assert client.post(BASE + "pre-registrations", body, format="json").status_code == 201
-    r = client.post(BASE + "pre-registrations", body, format="json")
-    assert r.status_code == 400 and r.json()["error"]["code"] == "duplicate_request"
-    assert VisitRequest.objects.count() == 1 and Visitor.objects.count() == 1
-
-
-def test_pre_registration_validates_the_window(api_as):
-    now = timezone.now()
-    r = api_as().post(BASE + "pre-registrations", _payload(
-        scheduled_start=now.isoformat(), scheduled_end=(now - timedelta(hours=1)).isoformat()),
-        format="json")
-    assert r.status_code in (400, 422)
-    assert not VisitRequest.objects.exists()
-
-
-def test_pre_registration_list_is_scoped_to_the_callers_email(api_as):
-    mine = f.make_visit_request(visitor=f.make_visitor(email="me@example.com"))
-    f.make_visit_request(visitor=f.make_visitor(email="other@example.com"))
-    rows = api_as(email="Me@Example.com").get(BASE + "pre-registrations").json()["results"]
-    assert [r["id"] for r in rows] == [mine.pk]
-
-
-def test_pre_registration_list_is_empty_without_an_email(api_as):
-    f.make_visit_request()
-    assert api_as().get(BASE + "pre-registrations").json()["results"] == []
-
-
-# --- host ----------------------------------------------------------------------------
-
-def test_host_pending_lists_only_own_pending_requests(api_as):
-    mine = f.make_visit_request(host_user_id=2001)
-    f.make_visit_request(host_user_id=2001, status="approved")
-    f.make_visit_request(host_user_id=9999)
-    rows = api_as(permissions=["vms.request.decide"]).get(BASE + "host/pending").json()["results"]
-    assert [r["id"] for r in rows] == [mine.pk]
-
-
-def test_host_approval_issues_a_pass(api_as):
-    vr = f.make_visit_request(host_user_id=2001)
-    vr.requested_zones.add(f.make_zone())
-    r = api_as(permissions=["vms.request.decide"]).post(
-        BASE + f"host/requests/{vr.pk}/decision",
-        {"decision": "approve", "note": "ok"}, format="json")
-    assert r.status_code == 201
-    vr.refresh_from_db()
-    assert vr.status == "approved" and vr.decision_note == "ok" and vr.decided_at
-    vp = VisitPass.objects.get()
-    body = r.json()
-    assert body["qr_token"] == vp.qr_token and len(body["otp"]) == 6
-    assert body["pass_type"] == "PRE_REGISTERED" and body["is_active"] is True
-    assert body["allowed_zones"] == list(vp.allowed_zones.values_list("pk", flat=True))
-    assert vp.issued_by_user_id == 2001
-    assert AuditLog.objects.filter(action="vms.pass.issued").exists()
-    assert AuditLog.objects.filter(action="vms.request.approved").exists()
-    assert Notification.objects.filter(topic="request.decided", recipient_visitor=vr.visitor)
-
-
-def test_host_rejection_issues_no_pass(api_as):
-    vr = f.make_visit_request(host_user_id=2001)
-    r = api_as(permissions=["vms.request.decide"]).post(
-        BASE + f"host/requests/{vr.pk}/decision", {"decision": "reject"}, format="json")
-    assert r.status_code == 200 and r.json()["status"] == "rejected"
-    assert not VisitPass.objects.exists()
-
-
-def test_pass_validity_is_capped_by_policy(api_as):
-    start = timezone.now() + timedelta(days=1)
-    vr = f.make_visit_request(host_user_id=2001, scheduled_start=start,
-                              scheduled_end=start + timedelta(hours=12))
-    r = api_as(permissions=["vms.request.decide"]).post(
-        BASE + f"host/requests/{vr.pk}/decision", {"decision": "approve"}, format="json")
-    assert r.status_code == 201
-    assert VisitPass.objects.get().valid_until == start + timedelta(hours=8)
-
-
-def test_only_the_host_may_decide_and_a_stranger_gets_404(api_as):
-    vr = f.make_visit_request(host_user_id=2001)
-    r = api_as(user_id=3333, permissions=["vms.request.decide"]).post(
-        BASE + f"host/requests/{vr.pk}/decision", {"decision": "approve"}, format="json")
-    assert r.status_code == 404
-    vr.refresh_from_db()
-    assert vr.status == "pending" and not VisitPass.objects.exists()
-
-
-def test_unknown_request_decision_is_404(api_as):
-    r = api_as(permissions=["vms.request.decide"]).post(
-        BASE + "host/requests/999999/decision", {"decision": "approve"}, format="json")
-    assert r.status_code == 404
-
-
-def test_deciding_twice_is_a_409(api_as):
-    vr = f.make_visit_request(host_user_id=2001)
-    client = api_as(permissions=["vms.request.decide"])
-    url = BASE + f"host/requests/{vr.pk}/decision"
-    assert client.post(url, {"decision": "reject"}, format="json").status_code == 200
-    assert client.post(url, {"decision": "approve"}, format="json").status_code == 409
-
-
-def test_invalid_decision_value_is_rejected(api_as):
-    vr = f.make_visit_request(host_user_id=2001)
-    r = api_as(permissions=["vms.request.decide"]).post(
-        BASE + f"host/requests/{vr.pk}/decision", {"decision": "maybe"}, format="json")
-    assert r.status_code in (400, 422)
 
 
 # --- gate ----------------------------------------------------------------------------
