@@ -13,6 +13,23 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `lms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `lms.course.view` | View course home, syllabus, schedule, and details | `admin`, `faculty`, `observer`, `student`, `ta` |
+| `lms.course.manage` | Configure syllabus, schedule, and course settings | `admin`, `faculty` |
+| `lms.material.view` | View and download published course materials | `admin`, `faculty`, `observer`, `student`, `ta` |
+| `lms.material.upload` | Upload, schedule, and edit course study materials | `admin`, `faculty` |
+| `lms.announcement.post` | Post course-wide announcements | `admin`, `faculty`, `ta` |
+| `lms.assignment.view` | View published assignments | `admin`, `faculty`, `student`, `ta` |
+| `lms.assignment.create` | Create, edit, and publish course assignments | `admin`, `faculty` |
+| `lms.assignment.submit` | Submit assignment deliverables | `student` |
+| `lms.grade.view` | View released grades and feedback | `admin`, `faculty`, `student`, `ta` |
+| `lms.grade.evaluate` | Grade student submissions and enter points/feedback | `admin`, `faculty`, `ta` |
+| `lms.grade.release` | Release draft grades to students | `admin`, `faculty` |
+| `lms.grade.audit` | View post-release grade modification logs | `admin`, `faculty` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
