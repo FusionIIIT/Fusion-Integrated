@@ -36,12 +36,18 @@ class AccessPolicy(models.Model):
 
     Meta.constraints = [choice_check("status", Status, "vms_policy_status_valid")]
 
+    def __str__(self) -> str:
+        return f"AccessPolicy v{self.version} ({self.status})"
+
 
 class IntegrationSetting(models.Model):
     """Key/value integration config (VMS-CFR-003), e.g. sms_gateway."""
     key = models.CharField(max_length=80, unique=True)
     value = models.JSONField(default=dict, blank=True)
     updated_by_user_id = models.IntegerField(null=True, blank=True)
+
+    def __str__(self) -> str:
+        return f"{self.key}"
 
 
 class BlacklistVersion(models.Model):
@@ -61,6 +67,9 @@ class BlacklistVersion(models.Model):
         pass
 
     Meta.constraints = [choice_check("status", Status, "vms_blver_status_valid")]
+
+    def __str__(self) -> str:
+        return f"BlacklistVersion v{self.version} ({self.status})"
 
 
 class BlacklistEntry(models.Model):
@@ -89,6 +98,9 @@ class BlacklistEntry(models.Model):
 
     Meta.constraints = [choice_check("severity", Severity, "vms_bl_severity_valid")]
 
+    def __str__(self) -> str:
+        return f"{self.name} ({self.severity})"
+
 
 class SafeListEntry(models.Model):
     """Explicit exemption from the blacklist; mandatory expiry (BR-118/119, D-7)."""
@@ -97,3 +109,6 @@ class SafeListEntry(models.Model):
     expires_at = models.DateTimeField()
     created_by_user_id = models.IntegerField()
     revoked_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self) -> str:
+        return f"SafeList {self.visitor_id_doc_number}"
