@@ -87,6 +87,9 @@ class AuditLog(models.Model):
         return super().save(*args,**kwargs)
     def delete(self,*args,**kwargs): raise ValueError("IAA audit logs are append-only.")
 
+    def __str__(self):
+        return f"{self.action} on {self.resource_type} #{self.resource_id}"
+
 class SupportingDocument(TimeStampedModel):
     uploaded_by_id=models.IntegerField(db_index=True); name=models.CharField(max_length=255)
     storage_reference=models.CharField(max_length=700); content_type=models.CharField(max_length=120,blank=True)
@@ -135,3 +138,6 @@ class DashboardNotification(models.Model):
     resource_id=models.IntegerField(null=True,blank=True); read_at=models.DateTimeField(null=True,blank=True)
     created_at=models.DateTimeField(auto_now_add=True,db_index=True)
     class Meta: db_table="iaa_dashboard_notification"; ordering=["-created_at"]
+
+    def __str__(self):
+        return f"{self.title} for user {self.recipient_user_id}"
