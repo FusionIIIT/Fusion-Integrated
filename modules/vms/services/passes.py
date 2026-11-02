@@ -1,4 +1,4 @@
-"""Pass issuance (VMS-BR-190, BR-193). Termination arrives with lane D."""
+"""Pass issuance (VMS-BR-190, BR-193). Termination is lane D's (services/termination.py)."""
 from __future__ import annotations
 
 import secrets
@@ -67,6 +67,7 @@ def issue_pass(*, request, pass_type, issued_by, valid_from=None, valid_until=No
     return vp
 
 
-def terminate_pass(*args, **kwargs):
-    """Implemented by lane D (VMS-CFR-020)."""
-    raise NotImplementedError("terminate_pass is built by lane D")
+def terminate_pass(*, actor, pass_id, reason):
+    """Early termination (VMS-CFR-024, BR-073); delegates to lane D's service."""
+    from modules.vms.services import termination
+    return termination.terminate(actor=actor, pass_id=pass_id, reason=reason)
