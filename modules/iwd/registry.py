@@ -1,46 +1,113 @@
+# modules/iwd/registry.py
+"""
+Fusion-Integrated module registry for the IWD V2 system.
+
+This file follows the same structure as the placement module registry
+(`modules/placement/registry.py`).  It defines the module metadata, navigation
+items, permissions, and role grants for the IWD V2 role concepts.
+"""
+
+# --------------------------------------------------------------------------- #
+# MODULE
+# --------------------------------------------------------------------------- #
 MODULE = {
     "code": "iwd",
-    "label": "Institute Works Department",
-    "icon": "briefcase",
+    "label": "Integrated Work Delivery",
+    "icon": "iwd",
     "base_path": "/iwd",
-    "nav_section": "Facilities",
-    "sort_order": 40,
-    "status": "active"
+    "nav_section": "iwd",
+    "sort_order": 30,
+    "status": "active",
 }
 
+# --------------------------------------------------------------------------- #
+# NAVIGATION ITEMS
+# --------------------------------------------------------------------------- #
 NAV_ITEMS = [
-    {"code": "requests", "label": "Requests", "icon": None, "to": "/iwd/requests", "required_permission": "iwd.request.view_self", "sort_order": 1},
-    {"code": "proposals", "label": "Proposals", "icon": None, "to": "/iwd/proposals", "required_permission": "iwd.proposal.manage", "sort_order": 2},
-    {"code": "work_orders", "label": "Work Orders", "icon": None, "to": "/iwd/work-orders", "required_permission": "iwd.work_order.issue", "sort_order": 3},
-    {"code": "bills", "label": "Bills", "icon": None, "to": "/iwd/bills", "required_permission": "iwd.bill.view", "sort_order": 4},
-    {"code": "inventory", "label": "Inventory", "icon": None, "to": "/iwd/inventory", "required_permission": "iwd.inventory.manage", "sort_order": 5}
+    {
+        "code": "iwd.requests",
+        "label": "Requests",
+        "icon": "iwd",
+        "to": "/iwd/requests",
+        "required_permission": "iwd.request.view_self",
+        "sort_order": 10,
+    },
+    # Additional navigation items can be added here when routes are implemented.
 ]
 
+# --------------------------------------------------------------------------- #
+# PERMISSIONS
+# --------------------------------------------------------------------------- #
 PERMISSIONS = [
-    ("iwd.request.create", "Create a departmental request"),
-    ("iwd.request.view_self", "View own requests only"),
-    ("iwd.request.view_all", "View all requests in IWD"),
-    ("iwd.request.admin_approve", "Approve requests as admin"),
-    ("iwd.request.hod_approve", "Approve requests as HOD"),
-    ("iwd.request.director_approve", "Approve requests as Director"),
-    ("iwd.proposal.manage", "Create, edit, and manage proposals"),
-    ("iwd.work_order.issue", "Issue new work orders"),
-    ("iwd.work.update", "Update existing works/tasks"),
+    ("iwd.request.create", "Create a new IWD request"),
+    ("iwd.request.view_self", "View own IWD requests"),
+    ("iwd.request.view_all", "View all IWD requests"),
+    ("iwd.request.admin_approve", "Admin IWD first approval of requests"),
+    ("iwd.request.hod_approve", "HOD/Dean second approval of requests"),
+    ("iwd.request.director_approve", "Director final approval of requests"),
+    ("iwd.proposal.manage", "Create and manage proposals"),
+    ("iwd.work_order.issue", "Issue work orders"),
+    ("iwd.work.update", "Update and complete work orders"),
     ("iwd.bill.view", "View bills"),
-    ("iwd.bill.manage", "Edit and manage bill details (excluding settlement status)"),
-    ("iwd.bill.audit", "Perform audit on bills"),
-    ("iwd.bill.settle", "Settle/close bills after approval"),
-    ("iwd.inventory.manage", "Manage inventory records (add, update, remove items)"),
-    ("iwd.feedback.submit", "Submit feedback forms"),
-    ("iwd.sla.view", "View service level agreement details")
+    ("iwd.bill.manage", "Manage bills"),
+    ("iwd.bill.audit", "Audit bills"),
+    ("iwd.bill.settle", "Settle bills"),
+    ("iwd.inventory.manage", "Manage inventory and operations"),
+    ("iwd.feedback.submit", "Submit feedback"),
+    ("iwd.sla.view", "View SLA metrics"),
 ]
 
+# --------------------------------------------------------------------------- #
+# ROLE GRANTS
+# --------------------------------------------------------------------------- #
 ROLE_GRANTS = {
-    "Admin IWD": ["iwd.request.create", "iwd.request.view_self", "iwd.proposal.manage", "iwd.work_order.issue", "iwd.work.update", "iwd.inventory.manage", "iwd.feedback.submit", "iwd.sla.view", "iwd.request.admin_approve"],
-    "Director": ["iwd.request.view_all", "iwd.request.director_approve", "iwd.proposal.manage", "iwd.work_order.issue", "iwd.bill.view", "iwd.inventory.manage", "iwd.sla.view"],
-    "HOD (CSE)": ["iwd.request.view_all", "iwd.request.hod_approve", "iwd.proposal.manage", "iwd.work_order.issue", "iwd.work.update", "iwd.inventory.manage"],
-    "HOD (Design)": ["iwd.request.view_all", "iwd.request.hod_approve", "iwd.proposal.manage", "iwd.work_order.issue", "iwd.work.update", "iwd.inventory.manage"],
-    "Auditor": ["iwd.bill.view", "iwd.bill.audit"],
-    "Accounts Admin": ["iwd.bill.view", "iwd.bill.manage", "iwd.bill.settle"],
-    "Electrical_AE": ["iwd.request.create", "iwd.request.view_self", "iwd.proposal.manage", "iwd.work_order.issue", "iwd.work.update", "iwd.inventory.manage", "iwd.feedback.submit"]
+    # Request Initiator (Engineer/HOD/Dean)
+    "Request Initiator": [
+        "iwd.request.create",
+        "iwd.request.view_self",
+    ],
+
+    # Admin IWD
+    "Admin IWD": [
+        "iwd.request.admin_approve",
+        "iwd.proposal.manage",
+        "iwd.work_order.issue",
+        "iwd.inventory.manage",
+        "iwd.request.view_all",
+    ],
+
+    # HOD/Dean
+    "HOD/Dean": [
+        "iwd.request.hod_approve",
+    ],
+
+    # Director
+    "Director": [
+        "iwd.request.director_approve",
+    ],
+
+    # Engineer
+    "Engineer": [
+        "iwd.proposal.manage",
+        "iwd.work.update",
+    ],
+
+    # Auditor
+    "Auditor": [
+        "iwd.bill.audit",
+    ],
+
+    # Accounts Admin
+    "Accounts Admin": [
+        "iwd.bill.manage",
+        "iwd.bill.settle",
+    ],
+
+    # Authenticated users (any logged‑in user)
+    "Authenticated": [
+        "iwd.feedback.submit",
+        "iwd.sla.view",
+        "iwd.bill.view",
+    ],
 }
+
