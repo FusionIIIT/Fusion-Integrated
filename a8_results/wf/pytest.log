@@ -1,0 +1,132 @@
+....F....F......F......F..................F.....                         [100%]
+=================================== FAILURES ===================================
+________________________________ test_tc_wf_005 ________________________________
+
+    @pytest.mark.django_db
+    def test_tc_wf_005():
+        """TC_WF_005 - BW-FTS-01 — Row 1 guard: 'valid Institute Employee recipient': Verify the transition is blocked when the recipient is not a valid Institute Employee.
+    
+        Action/Input: Sender attempts Send/Forward to the invalid recipient with a mandatory comment.
+        Expected Result: The guard fails and the file is not moved to the recipient. The file remains held by the Sender, with no movement recorded and no notification triggered.
+        Test Type: negative
+        """
+        draft = create_file_draft("sender_1", "Officer", "Workflow File 5", "Initial note")
+        fid = draft["file_id"]
+>       with pytest.raises((ValueError, PermissionError)):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE any of (ValueError, PermissionError)
+
+tests/a8/wf/test_wf_spec.py:98: Failed
+________________________________ test_tc_wf_010 ________________________________
+
+    @pytest.mark.django_db
+    def test_tc_wf_010():
+        """TC_WF_010 - BW-FTS-02 — Row 1 guard: 'valid next recipient': Verify onward forwarding is blocked when the next recipient is not valid.
+    
+        Action/Input: Current holder attempts to forward onward to the invalid recipient with a mandatory comment.
+        Expected Result: The guard fails and the file is not moved. It remains held by the Current Holder, with no movement recorded.
+        Test Type: negative
+        """
+        draft = create_file_draft("sender_1", "Officer", "Workflow File 10", "Initial note")
+        fid = draft["file_id"]
+        forward_file(fid, "sender_1", "Officer", "rec_1", "Staff", "Init fwd")
+>       with pytest.raises((ValueError, PermissionError)):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE any of (ValueError, PermissionError)
+
+tests/a8/wf/test_wf_spec.py:171: Failed
+________________________________ test_tc_wf_017 ________________________________
+
+    @pytest.mark.django_db
+    def test_tc_wf_017():
+        """TC_WF_017 - BW-FTS-04 — Row 1 guard: 'Requester is file owner': Verify archival is blocked when the requester is not the file owner.
+    
+        Action/Input: The non-owner selects Archive.
+        Expected Result: The guard fails and no transition occurs. The file remains Active/Circulated, with no archive/audit record and no archive notification.
+        Test Type: negative
+        """
+        draft = create_file_draft("owner_user", "Officer", "Workflow File 17", "Initial note")
+        fid = draft["file_id"]
+        forward_file(fid, "owner_user", "Officer", "custodian_user", "Staff", "Custody fwd")
+>       with pytest.raises(PermissionError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PermissionError
+
+tests/a8/wf/test_wf_spec.py:275: Failed
+________________________________ test_tc_wf_024 ________________________________
+
+    @pytest.mark.django_db
+    def test_tc_wf_024():
+        """TC_WF_024 - BW-FTS-05 — Row 2 guard: 'valid Institute Employee recipient': Verify initial circulation of a Draft is blocked with an invalid recipient.
+    
+        Action/Input: Sender attempts Send to the invalid recipient with a mandatory movement comment.
+        Expected Result: The guard fails and the file remains Draft/Pre-circulation, with no movement recorded.
+        Test Type: negative
+        """
+        draft = create_file_draft("owner_user", "Officer", "Workflow File 24", "Initial note")
+        fid = draft["file_id"]
+>       with pytest.raises((ValueError, PermissionError)):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE any of (ValueError, PermissionError)
+
+tests/a8/wf/test_wf_spec.py:366: Failed
+________________________________ test_tc_wf_043 ________________________________
+
+    @pytest.mark.django_db
+    def test_tc_wf_043():
+        """TC_WF_043 - CW-FTS-01 — Row 5 guard (owner archives; objective complete); BW-FTS-04 Row 1: Verify the cross-cutting archival transition is blocked for a non-owner during an active composite circulation.
+    
+        Action/Input: The non-owner selects Archive.
+        Expected Result: The transition to Archived/Read-only/Permanently retained does not occur and the file remains Active/Circulated.
+        Test Type: negative
+        """
+        draft = create_file_draft("owner_user", "Officer", "Composite 43", "Initial note")
+        fid = draft["file_id"]
+        forward_file(fid, "owner_user", "Officer", "custodian_user", "Staff", "Custody active")
+>       with pytest.raises(PermissionError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PermissionError
+
+tests/a8/wf/test_wf_spec.py:641: Failed
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.15-final-0 _______________
+
+Name                                           Stmts   Miss Branch BrPart  Cover   Missing
+------------------------------------------------------------------------------------------
+modules/fts/__init__.py                            0      0      0      0   100%
+modules/fts/api/__init__.py                        0      0      0      0   100%
+modules/fts/api/serializers.py                    26     26      0      0     0%   3-75
+modules/fts/api/urls.py                            5      5      0      0     0%   3-10
+modules/fts/api/views.py                          82     82      2      0     0%   3-146
+modules/fts/apps.py                                4      0      0      0   100%
+modules/fts/contracts.py                          25      9      4      0    55%   35-39, 62-78
+modules/fts/domain/__init__.py                     0      0      0      0   100%
+modules/fts/domain/workflow.py                    70      7     36      7    87%   58, 66, 84, 112, 137, 146, 175
+modules/fts/migrations/0001_initial.py             6      0      0      0   100%
+modules/fts/migrations/__init__.py                 0      0      0      0   100%
+modules/fts/models.py                             62      4      0      0    94%   63, 93, 118, 143
+modules/fts/registry.py                           10     10      0      0     0%   3-32
+modules/fts/selectors/__init__.py                  0      0      0      0   100%
+modules/fts/selectors/drafts.py                   11      7      0      0    36%   16-22, 45-64
+modules/fts/selectors/inbox_outbox.py              9      5      0      0    44%   18-27, 49-65
+modules/fts/selectors/movements.py                15      0      6      0   100%
+modules/fts/services/__init__.py                   0      0      0      0   100%
+modules/fts/services/archival.py                  20      3      4      1    83%   33-34, 38
+modules/fts/services/drafts.py                    48      8     14      5    79%   110-111, 122->128, 125, 129, 132, 135, 152-153
+modules/fts/services/movements.py                 47      9     10      2    77%   42-43, 112-113, 131, 137-140
+modules/fts/tests/__init__.py                      0      0      0      0   100%
+modules/fts/tests/test_archival_and_inbox.py      40     40      0      0     0%   6-122
+modules/fts/tests/test_contracts_and_api.py       50     50      0      0     0%   3-134
+modules/fts/tests/test_domain_workflow.py         96     96      0      0     0%   6-248
+modules/fts/tests/test_draft_services.py          65     65      0      0     0%   6-174
+modules/fts/tests/test_movement_services.py       56     56      0      0     0%   6-175
+------------------------------------------------------------------------------------------
+TOTAL                                            747    482     76     15    39%
+Coverage XML written to file a8_results/wf/coverage.xml
+=========================== short test summary info ============================
+FAILED tests/a8/wf/test_wf_spec.py::test_tc_wf_005 - Failed: DID NOT RAISE an...
+FAILED tests/a8/wf/test_wf_spec.py::test_tc_wf_010 - Failed: DID NOT RAISE an...
+FAILED tests/a8/wf/test_wf_spec.py::test_tc_wf_017 - Failed: DID NOT RAISE Pe...
+FAILED tests/a8/wf/test_wf_spec.py::test_tc_wf_024 - Failed: DID NOT RAISE an...
+FAILED tests/a8/wf/test_wf_spec.py::test_tc_wf_043 - Failed: DID NOT RAISE Pe...
+5 failed, 43 passed in 5.07s
