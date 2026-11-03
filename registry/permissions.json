@@ -278,6 +278,322 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "pms": {
+      "grants": {
+        "Applicant": [
+          "pms.appeal.file",
+          "pms.application.create",
+          "pms.application.resubmit",
+          "pms.application.submit",
+          "pms.application.view_self",
+          "pms.application.withdraw",
+          "pms.deadline.view",
+          "pms.document.upload",
+          "pms.inventor.consent",
+          "pms.inventor.manage",
+          "pms.licensing.submit",
+          "pms.office_action_response.review",
+          "pms.prior_art.search",
+          "pms.report.view_self"
+        ],
+        "Attorney": [
+          "pms.application.view_all",
+          "pms.attorney_assignment.respond",
+          "pms.budget.propose",
+          "pms.deadline.view",
+          "pms.document.upload",
+          "pms.document.view_confidential",
+          "pms.filing.record",
+          "pms.legal_opinion.create",
+          "pms.maintenance.manage",
+          "pms.office_action.record",
+          "pms.office_action.respond",
+          "pms.prior_art.search",
+          "pms.report.view_self"
+        ],
+        "Director": [
+          "pms.appeal.review",
+          "pms.application.review",
+          "pms.application.view_all",
+          "pms.budget.decide",
+          "pms.deadline.view",
+          "pms.document.view_confidential",
+          "pms.maintenance.decide",
+          "pms.report.view"
+        ],
+        "PCC_ADMIN": [
+          "pms.application.view_all",
+          "pms.audit.view",
+          "pms.configuration.manage",
+          "pms.document.view_confidential",
+          "pms.inventor.manage",
+          "pms.licensing.review",
+          "pms.panel.manage",
+          "pms.report.view",
+          "pms.workflow.assign_attorney",
+          "pms.workflow.assign_director",
+          "pms.workflow.manage"
+        ],
+        "applicant": [
+          "pms.appeal.file",
+          "pms.application.create",
+          "pms.application.resubmit",
+          "pms.application.submit",
+          "pms.application.view_self",
+          "pms.application.withdraw",
+          "pms.deadline.view",
+          "pms.document.upload",
+          "pms.inventor.consent",
+          "pms.inventor.manage",
+          "pms.licensing.submit",
+          "pms.office_action_response.review",
+          "pms.prior_art.search",
+          "pms.report.view_self"
+        ],
+        "attorney": [
+          "pms.application.view_all",
+          "pms.attorney_assignment.respond",
+          "pms.budget.propose",
+          "pms.deadline.view",
+          "pms.document.upload",
+          "pms.document.view_confidential",
+          "pms.filing.record",
+          "pms.legal_opinion.create",
+          "pms.maintenance.manage",
+          "pms.office_action.record",
+          "pms.office_action.respond",
+          "pms.prior_art.search",
+          "pms.report.view_self"
+        ],
+        "director": [
+          "pms.appeal.review",
+          "pms.application.review",
+          "pms.application.view_all",
+          "pms.budget.decide",
+          "pms.deadline.view",
+          "pms.document.view_confidential",
+          "pms.maintenance.decide",
+          "pms.report.view"
+        ],
+        "pcc_admin": [
+          "pms.application.view_all",
+          "pms.audit.view",
+          "pms.configuration.manage",
+          "pms.document.view_confidential",
+          "pms.inventor.manage",
+          "pms.licensing.review",
+          "pms.panel.manage",
+          "pms.report.view",
+          "pms.workflow.assign_attorney",
+          "pms.workflow.assign_director",
+          "pms.workflow.manage"
+        ]
+      },
+      "module_grants": [
+        "Applicant",
+        "Attorney",
+        "Director",
+        "PCC_ADMIN",
+        "applicant",
+        "attorney",
+        "director",
+        "pcc_admin"
+      ],
+      "nav": {
+        "base_path": "/pms",
+        "icon": "FileText",
+        "items": [
+          {
+            "code": "pms.my_applications",
+            "icon": "FileText",
+            "label": "My Patent Applications",
+            "required_permission": "pms.application.view_self",
+            "sort_order": 10,
+            "to": "/pms/applications"
+          },
+          {
+            "code": "pms.submit_application",
+            "icon": "Plus",
+            "label": "Submit Application",
+            "required_permission": "pms.application.create",
+            "sort_order": 20,
+            "to": "/pms/applications/new"
+          },
+          {
+            "code": "pms.review_queue",
+            "icon": "ClipboardText",
+            "label": "Review Queue",
+            "required_permission": "pms.application.review",
+            "sort_order": 30,
+            "to": "/pms/applications"
+          },
+          {
+            "code": "pms.operations",
+            "icon": "Briefcase",
+            "label": "PMS Operations",
+            "required_permission": "pms.workflow.manage",
+            "sort_order": 40,
+            "to": "/pms/applications"
+          },
+          {
+            "code": "pms.reports",
+            "icon": "ChartBar",
+            "label": "PMS Reports",
+            "required_permission": "pms.report.view",
+            "sort_order": 50,
+            "to": "/pms/reports"
+          }
+        ],
+        "label": "Patent Management System",
+        "nav_section": "Patent Management",
+        "sort_order": 80,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "pms.application.create",
+          "label": "Create a PMS application draft"
+        },
+        {
+          "code": "pms.application.view_self",
+          "label": "View own patent applications"
+        },
+        {
+          "code": "pms.application.view_all",
+          "label": "View PMS applications in assigned oversight scope"
+        },
+        {
+          "code": "pms.application.submit",
+          "label": "Submit a patent application"
+        },
+        {
+          "code": "pms.application.review",
+          "label": "Review an assigned patent application"
+        },
+        {
+          "code": "pms.application.resubmit",
+          "label": "Revise and resubmit an application"
+        },
+        {
+          "code": "pms.application.withdraw",
+          "label": "Withdraw an eligible pre-filing application"
+        },
+        {
+          "code": "pms.inventor.manage",
+          "label": "Manage inventors and agreement records"
+        },
+        {
+          "code": "pms.inventor.consent",
+          "label": "Record an inventor agreement consent"
+        },
+        {
+          "code": "pms.document.upload",
+          "label": "Upload a PMS document version"
+        },
+        {
+          "code": "pms.document.view_confidential",
+          "label": "View confidential/restricted PMS documents"
+        },
+        {
+          "code": "pms.workflow.assign_director",
+          "label": "Assign an application to a Director"
+        },
+        {
+          "code": "pms.workflow.assign_attorney",
+          "label": "Assign an approved application to an Attorney"
+        },
+        {
+          "code": "pms.workflow.manage",
+          "label": "Monitor workflow and handle exceptions"
+        },
+        {
+          "code": "pms.attorney_assignment.respond",
+          "label": "Accept or decline an Attorney assignment"
+        },
+        {
+          "code": "pms.legal_opinion.create",
+          "label": "Record a patentability opinion"
+        },
+        {
+          "code": "pms.budget.propose",
+          "label": "Create a patent budget proposal"
+        },
+        {
+          "code": "pms.budget.decide",
+          "label": "Approve, reject, or escalate a patent budget"
+        },
+        {
+          "code": "pms.filing.record",
+          "label": "Record external patent-office filing details"
+        },
+        {
+          "code": "pms.office_action.record",
+          "label": "Record patent-office communications"
+        },
+        {
+          "code": "pms.office_action.respond",
+          "label": "Prepare and submit an office-action response"
+        },
+        {
+          "code": "pms.office_action_response.review",
+          "label": "Approve an office-action response when required"
+        },
+        {
+          "code": "pms.appeal.file",
+          "label": "File an appeal against a rejected application"
+        },
+        {
+          "code": "pms.appeal.review",
+          "label": "Review an assigned appeal"
+        },
+        {
+          "code": "pms.configuration.manage",
+          "label": "Manage PMS-specific configuration"
+        },
+        {
+          "code": "pms.panel.manage",
+          "label": "Maintain the approved Attorney panel and expertise"
+        },
+        {
+          "code": "pms.audit.view",
+          "label": "View PMS audit/compliance history"
+        },
+        {
+          "code": "pms.report.view",
+          "label": "View system-wide PMS reports and analytics"
+        },
+        {
+          "code": "pms.report.view_self",
+          "label": "View reports for own applications"
+        },
+        {
+          "code": "pms.prior_art.search",
+          "label": "Search and attach supported prior art"
+        },
+        {
+          "code": "pms.licensing.submit",
+          "label": "Submit a licensing/technology-transfer request"
+        },
+        {
+          "code": "pms.licensing.review",
+          "label": "Review licensing/technology-transfer requests"
+        },
+        {
+          "code": "pms.maintenance.manage",
+          "label": "Manage post-grant maintenance tracking"
+        },
+        {
+          "code": "pms.maintenance.decide",
+          "label": "Decide whether to renew a patent"
+        },
+        {
+          "code": "pms.deadline.view",
+          "label": "View PMS deadlines in authorized scope"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
     }
   },
   "publisher": "integrated",

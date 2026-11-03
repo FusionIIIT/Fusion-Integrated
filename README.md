@@ -1,6 +1,6 @@
 # Fusion-Integrated
 
-The non-academic platform. **Placement Cell** first; more modules later.
+The non-academic platform includes **Placement Cell** and the **Patent Management System (PMS)**.
 **Independent modules, one login.**
 
 This service holds **no user table**. Identity, RBAC and common directory data
@@ -34,6 +34,21 @@ This service holds **no user table**. Identity, RBAC and common directory data
 Users get **one** login for every module they are granted. Operators keep a
 separate door to the admin console — different audience, different account set.
 Both are backed by the same identity service; they are not the same login page.
+
+## Patent Management System
+
+PMS tracks patent applications through applicant submission, Director review, Attorney
+assignment, legal opinions, budget decisions, filing records, office actions, appeals,
+licensing requests, and post-grant maintenance. The system records interactions with
+external patent-office systems; it does not file or pay fees on an applicant?s behalf.
+
+IAM must grant the `pms` module and the appropriate PMS permissions to each role. The
+role names declared by PMS are `Applicant`, `Director`, `Attorney`, and `PCC_ADMIN`.
+The application list and draft form start at `/pms/applications`.
+
+Patent documents use a private upload directory outside the repository. Configure
+`PMS_MALWARE_SCAN_COMMAND` to an installed antivirus scanner; uploaded files remain
+unavailable for submission until a scan marks them clean.
 
 ---
 
@@ -131,6 +146,7 @@ modules/
   directory/     local projection of IAM's user data (a cache with a table)
   accesscontrol/ module registry + the server-driven sidebar
   placement/     companies, postings, applications, eligibility, state machine
+  pms/           patent applications, review, filing, office actions, and maintenance
 ops/checks/      the boundary enforcement scripts
 client/          the shell — Vite + React 18 + TS + Mantine 7.13
 ```
