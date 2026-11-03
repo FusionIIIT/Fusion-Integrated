@@ -1,0 +1,92 @@
+"""OAP Domain Constants.
+
+Pure Python module defining states, domain types, and clearance authority domains.
+Follows OAP Problem Statement v1.4, Use Case Specifications v1.4, and Workflow Specifications v1.4.
+"""
+
+# Student Programmes
+PROGRAMME_UG = "ug"
+PROGRAMME_PG = "pg"
+PROGRAMMES = (PROGRAMME_UG, PROGRAMME_PG)
+
+# Leave Management Statuses (BW-OAP-01, BW-OAP-02, CW-OAP-01)
+LEAVE_SUBMITTED = "submitted_awaiting_hod"
+LEAVE_APPROVED = "approved"
+LEAVE_REJECTED = "rejected"
+LEAVE_STATES = (LEAVE_SUBMITTED, LEAVE_APPROVED, LEAVE_REJECTED)
+
+# Bonafide Certificate Statuses (BW-OAP-03, BW-OAP-04, CW-OAP-02)
+BONAFIDE_SUBMITTED = "submitted_awaiting_academic_administrator"
+BONAFIDE_APPROVED = "approved_certificate_available"
+BONAFIDE_REJECTED = "rejected"
+BONAFIDE_STATES = (BONAFIDE_SUBMITTED, BONAFIDE_APPROVED, BONAFIDE_REJECTED)
+
+# No-Dues Seven Mandatory Authority Domains (OA-BR-31, CFR-OAP-009, CFR-OAP-010)
+DOMAIN_LIBRARY = "library"
+DOMAIN_HOSTEL = "hostel"
+DOMAIN_MESS = "mess"
+DOMAIN_DEPARTMENT = "department"
+DOMAIN_LAB = "lab"
+DOMAIN_ACADEMIC_SECTION = "academic_section"
+DOMAIN_STUDENT_SECTION = "student_section"
+
+MANDATORY_NO_DUES_DOMAINS = (
+    DOMAIN_LIBRARY,
+    DOMAIN_HOSTEL,
+    DOMAIN_MESS,
+    DOMAIN_DEPARTMENT,
+    DOMAIN_LAB,
+    DOMAIN_ACADEMIC_SECTION,
+    DOMAIN_STUDENT_SECTION,
+)
+
+# No-Dues Authority Clearance Statuses (OA-BR-32)
+CLEARANCE_PENDING = "pending"
+CLEARANCE_CLEAR = "clear"
+CLEARANCE_DUES_OUTSTANDING = "dues_outstanding"
+CLEARANCE_STATUSES = (CLEARANCE_PENDING, CLEARANCE_CLEAR, CLEARANCE_DUES_OUTSTANDING)
+
+# No-Dues Overall Request Statuses (BW-OAP-05, BW-OAP-06, CW-OAP-03)
+NODUES_VERIFICATION_IN_PROGRESS = "verification_in_progress"
+NODUES_COMPLETE_ALL_CLEAR = "verification_complete_all_clear"
+NODUES_COMPLETE_DUES_OUTSTANDING = "verification_complete_dues_outstanding"
+NODUES_FINALIZED = "finalized_certificate_available"
+NODUES_STATES = (
+    NODUES_VERIFICATION_IN_PROGRESS,
+    NODUES_COMPLETE_ALL_CLEAR,
+    NODUES_COMPLETE_DUES_OUTSTANDING,
+    NODUES_FINALIZED,
+)
+
+# Assistantship Claim Statuses (BW-OAP-07, BW-OAP-08, CW-OAP-04)
+ASSISTANTSHIP_AWAITING_DUAL_SUPERVISOR = "awaiting_dual_supervisor_verification"
+ASSISTANTSHIP_AWAITING_OTHER_SUPERVISOR = "awaiting_other_supervisor_verification"
+ASSISTANTSHIP_AWAITING_DEPT_REVIEW = "awaiting_department_review"
+ASSISTANTSHIP_AWAITING_HOD_DECISION = "awaiting_hod_decision"
+ASSISTANTSHIP_APPROVED_AWAITING_STIPEND = "approved_awaiting_stipend_processing"
+ASSISTANTSHIP_REJECTED = "rejected"
+ASSISTANTSHIP_STIPEND_PROCESSED = "stipend_processed"
+ASSISTANTSHIP_STATES = (
+    ASSISTANTSHIP_AWAITING_DUAL_SUPERVISOR,
+    ASSISTANTSHIP_AWAITING_OTHER_SUPERVISOR,
+    ASSISTANTSHIP_AWAITING_DEPT_REVIEW,
+    ASSISTANTSHIP_AWAITING_HOD_DECISION,
+    ASSISTANTSHIP_APPROVED_AWAITING_STIPEND,
+    ASSISTANTSHIP_REJECTED,
+    ASSISTANTSHIP_STIPEND_PROCESSED,
+)
+
+# Supervisor Roles (OA-BR-52)
+SUPERVISOR_ROLE_THESIS = "thesis_supervisor"
+SUPERVISOR_ROLE_TA = "ta_supervisor"
+SUPERVISOR_ROLES = (SUPERVISOR_ROLE_THESIS, SUPERVISOR_ROLE_TA)
+
+# Graduate Seminar Statuses (BW-OAP-09)
+SEMINAR_AWAITING_SCHEDULING = "awaiting_scheduling"
+SEMINAR_SCHEDULED = "scheduled"
+SEMINAR_STATES = (SEMINAR_AWAITING_SCHEDULING, SEMINAR_SCHEDULED)
+
+# Notification Channels (OA-BR-03)
+CHANNEL_SYSTEM_ALERT = "system_alert"
+CHANNEL_EMAIL = "email"
+NOTIFICATION_CHANNELS = (CHANNEL_SYSTEM_ALERT, CHANNEL_EMAIL)
