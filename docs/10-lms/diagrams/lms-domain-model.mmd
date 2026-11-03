@@ -1,0 +1,115 @@
+erDiagram
+    Course {
+        id Integer PK
+        code String
+        title String
+        description String
+        syllabus Text
+        schedule String
+        academic_year Integer
+        semester Integer
+        is_active Boolean
+    }
+    CourseMembership {
+        id Integer PK
+        course_id Integer FK
+        user_id Integer "IAM identity"
+        role String
+        is_active Boolean
+        "UniqueConstraint (course_id, user_id, role)"
+    }
+    ModuleSection {
+        id Integer PK
+        course_id Integer FK
+        title String
+        order Integer
+        is_published Boolean
+    }
+    CourseMaterial {
+        id Integer PK
+        section_id Integer FK
+        title String
+        kind String
+        content_text Text
+        file_storage_key String
+        link_url String
+        release_date Date
+        status String
+    }
+    Announcement {
+        id Integer PK
+        course_id Integer FK
+        author_user_id Integer "IAM identity"
+        author_role String
+        title String
+        content Text
+        created_at Timestamp
+        updated_at Timestamp
+    }
+    Assignment {
+        id Integer PK
+        course_id Integer FK
+        author_user_id Integer "IAM identity"
+        title String
+        instructions Text
+        submission_type String
+        points_possible Integer
+        due_date Date
+        release_date Date
+        status String
+    }
+    Submission {
+        id Integer PK
+        assignment_id Integer FK
+        student_user_id Integer "IAM identity"
+        version Integer
+        submission_type String
+        content_text Text
+        file_storage_key String
+        link_url String
+        submitted_at Timestamp
+        status String
+    }
+    Grade {
+        id Integer PK
+        submission_id Integer FK
+        assessor_user_id Integer "IAM identity"
+        assessor_role String
+        points_awarded Integer
+        feedback_text Text
+        status String
+        released_at Timestamp
+        released_by_user_id Integer "IAM identity"
+    }
+    GradeAuditLog {
+        id Integer PK
+        grade_id Integer FK
+        assessor_user_id Integer "IAM identity"
+        action String
+        previous_points Integer
+        new_points Integer
+        previous_feedback Text
+        new_feedback Text
+        reason Text
+        changed_at Timestamp
+    }
+    ScheduledRelease {
+        id Integer PK
+        material_id Integer FK "nullable"
+        assignment_id Integer FK "nullable"
+        scheduled_date Date
+        processed_at Timestamp
+        status String
+        error_message Text
+        "Check: exactly one of material_id, assignment_id is non‑null"
+    }
+    Course ||--o{ CourseMembership : has
+    Course ||--o{ ModuleSection : contains
+    ModuleSection ||--o{ CourseMaterial : holds
+    Course ||--o{ Announcement : posts
+    Course ||--o{ Assignment : gives
+    Assignment ||--o{ Submission : receives
+    Submission ||--o{ Grade : evaluated_by
+    Grade ||--o{ GradeAuditLog : logs
+    CourseMaterial ||--o{ ScheduledRelease : releases
+    Assignment ||--o{ ScheduledRelease : releases
