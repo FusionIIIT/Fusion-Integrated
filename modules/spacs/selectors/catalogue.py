@@ -20,12 +20,31 @@ def get_published_catalogue() -> QuerySet[CatalogueEntry]:
     )
 
 
+def get_all_catalogue_entries() -> QuerySet[CatalogueEntry]:
+    """Convener view: all entries regardless of status (UC-SPACS-010, UC-SPACS-014)."""
+    return CatalogueEntry.objects.all().prefetch_related("versions")
+
+
 def get_catalogue_entry_by_code(code: str) -> CatalogueEntry | None:
     return (
         CatalogueEntry.objects.filter(code=code)
         .prefetch_related("versions")
         .first()
     )
+
+
+def get_catalogue_entry_by_pk(pk: int) -> CatalogueEntry | None:
+    """Look up a catalogue entry by primary key (used by detail/version/retire views)."""
+    return (
+        CatalogueEntry.objects.filter(pk=pk)
+        .prefetch_related("versions")
+        .first()
+    )
+
+
+def get_policy_version_by_pk(version_pk: int) -> CataloguePolicyVersion | None:
+    """Look up a policy version by primary key."""
+    return CataloguePolicyVersion.objects.filter(pk=version_pk).first()
 
 
 def get_effective_policy_version(

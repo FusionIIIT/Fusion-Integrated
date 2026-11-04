@@ -15,8 +15,9 @@ from typing import Any
 from django.db import transaction
 from django.utils import timezone as dj_timezone
 
-from core.api.exceptions import ValidationError, NotFoundError, PermissionDenied
+from core.api.exceptions import ConflictError, NotFoundError
 from modules.spacs.domain.state_machines import (
+    AWARD_STATUS_OPEN,
     AWARD_STATUS_POOL_PREPARED,
     AWARD_STATUS_UNDER_EVALUATION,
     AWARD_STATUS_RESULT_RECORDED,
@@ -28,10 +29,42 @@ from modules.spacs.models import (
     AwardCycle,
     AwardCandidate,
     AwardCycleTransition,
+    CataloguePolicyVersion,
     SpacsTask,
 )
 from modules.spacs.services.audit import record_audit_event
 from modules.spacs.services.notifications import enqueue as enqueue_notification
+
+
+def open_award_cycle(
+    policy_version: CataloguePolicyVersion,
+    convocation_year: int,
+    actor_user_id: int,
+) -> AwardCycle:
+    """Opens a new convocation award cycle (UC-SPACS-017, CW-SPACS-03).
+
+    The cycle is created in the initial AWARD_STATUS_OPEN state; subsequent
+    transitions (pool preparation, evaluation, approval, publication) are
+    handled by their respective services.
+    """
+    with transaction.atomic():
+        cycle = AwardCycle.objects.create(
+            policy_version=policy_version,
+            convocation_year=convocation_year,
+            status=AWARD_STATUS_OPEN,
+        )
+        record_audit_event(
+            action="award_cycle.opened",
+            entity_type="AwardCycle",
+            entity_id=cycle.id,
+            actor_user_id=actor_user_id,
+            actor_role="spacs_convener",
+            details={
+                "convocation_year": convocation_year,
+                "policy_version_id": policy_version.pk,
+            },
+        )
+        return cycle
 
 
 def prepare_candidate_pool(
@@ -57,7 +90,7 @@ def prepare_candidate_pool(
             actor_role="spacs_convener",
         )
         if not transition.allowed:
-            raise ValidationError(transition.reason)
+            raise ConflictError(transition.reason)
 
         policy = cycle.policy_version
         source_method = policy.candidate_source_method
@@ -184,7 +217,7 @@ def record_institutional_approval(
 ) -> AwardCycle:
     """Records final institutional approval outcome and winners (UC-SPACS-019, BW-SPACS-09, BW-SPACS-11)."""
     if not approval_reference.strip() or not approval_authority.strip():
-        raise ValidationError("Recording final approval requires both approving authority and formal reference.")
+        raise ConflictError("Recording final approval requires both approving authority and formal reference.")
 
     with transaction.atomic():
         cycle = (
@@ -251,7 +284,7 @@ def publish_award_results(
             raise NotFoundError("Award cycle not found.")
 
         if not cycle.approval_reference_recorded:
-            raise ValidationError("Award results cannot be published without recorded institutional approval.")
+            raise ConflictError("Award results cannot be published without recorded institutional approval.")
 
         transition = can_transition_award_cycle(
             from_status=cycle.status,
@@ -260,7 +293,7 @@ def publish_award_results(
             approval_evidence_available=True,
         )
         if not transition.allowed:
-            raise ValidationError(transition.reason)
+            raise ConflictError(transition.reason)
 
         prev_status = cycle.status
         now = dj_timezone.now()

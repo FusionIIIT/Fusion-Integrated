@@ -1,4 +1,9 @@
-/** Wire types for the SPACS API. */
+
+/** Wire types for the SPACS API.
+ *
+ * These interfaces follow the backend DRF serializers in:
+ * modules/spacs/api/serializers.py
+ */
 
 export interface Page<T> {
   results: T[];
@@ -6,152 +11,225 @@ export interface Page<T> {
   previous: string | null;
 }
 
-export type SchemeType = "scholarship" | "award";
-export type TargetProgram = "all" | "ug" | "pg" | "phd";
-export type EntryStatus = "draft" | "published" | "retired";
-export type ApplicationStatus =
-  | "draft"
-  | "submitted"
-  | "under_verification"
-  | "flagged"
-  | "correction_requested"
-  | "verified"
-  | "awarded"
-  | "rejected"
-  | "withdrawn";
+// -----------------------------------------------------------------------------
+// Common types
+// -----------------------------------------------------------------------------
 
-export type AwardCycleStatus =
-  | "pool_prepared"
-  | "under_evaluation"
-  | "evaluated"
-  | "approved"
-  | "published";
+export type SchemeType = "scholarship" | "award";
+
+export type EntryStatus = "draft" | "published" | "retired";
+
+/**
+ * Application lifecycle values are controlled by the backend state machine.
+ * Keep this open to accommodate configured workflow states.
+ */
+export type ApplicationStatus = string;
+
+export type AwardCycleStatus = string;
+
+// -----------------------------------------------------------------------------
+// Catalogue and policy
+// -----------------------------------------------------------------------------
 
 export interface CataloguePolicyVersion {
   id: number;
-  entry: number;
-  version_number: number;
-  academic_year: string;
-  financial_year: string;
-  scheme_category: string;
-  sponsor_agency: string;
-  funding_source: string;
-  is_renewable: boolean;
-  max_renewal_terms: number;
-  disbursement_frequency: string;
-  sanctioned_seats: number | null;
-  award_amount: string | null;
-  frequency_amount: string | null;
-  eligibility_schema: Record<string, unknown>;
-  required_documents: Array<{ code: string; label: string; mandatory?: boolean }>;
+  version_label: string;
+
+  effective_from: string;
+  effective_to: string | null;
+
+  policy_approval_ref: string;
+  policy_approval_date: string | null;
+
   application_window_start: string | null;
   application_window_end: string | null;
-  sla_verification_hours: number | null;
-  sla_decision_hours: number | null;
-  created_at: string;
+
+  is_renewable: boolean;
+  renewal_window_start: string | null;
+  renewal_window_end: string | null;
+  max_renewal_cycles: number;
+
+  candidate_source_method: string;
+  eval_committee_role: string;
+  approving_authority_title: string;
+
+  eligibility_schema: Record<string, unknown>;
+  required_evidence_schema: unknown[];
+  sla_config: Record<string, unknown>;
+
+  is_published: boolean;
 }
 
 export interface CatalogueEntry {
   id: number;
   code: string;
-  name: string;
-  type: SchemeType;
+  title: string;
+  kind: SchemeType;
+  description: string;
   status: EntryStatus;
-  target_program: TargetProgram;
-  award_committee: string;
-  approving_authority: string;
-  current_policy_version: CataloguePolicyVersion | null;
+
+  active_version: CataloguePolicyVersion | null;
   versions?: CataloguePolicyVersion[];
-  created_at: string;
-  updated_at: string;
 }
+
+// -----------------------------------------------------------------------------
+// Scholarship application documents
+// -----------------------------------------------------------------------------
 
 export interface ApplicationDocument {
   id: number;
-  document_type: string;
-  file_name: string;
-  file_url: string;
-  file_hash: string;
+
+  doc_type: string;
+  title: string;
+
+  drive_url: string;
+  drive_file_id: string;
+
+  declared_validity_date: string | null;
+
   is_reused: boolean;
-  reused_from_application_id: number | null;
-  verification_status: "pending" | "verified" | "flagged" | "rejected";
-  verification_finding: string;
-  verified_by: number | null;
-  verified_at: string | null;
+  reused_from_doc_id: number | null;
+
+  verification_status: string;
+  verification_comment: string;
 }
 
+// -----------------------------------------------------------------------------
+// Application timeline
+// -----------------------------------------------------------------------------
+
 export interface ApplicationTransition {
-  id: number;
-  from_status: ApplicationStatus;
-  to_status: ApplicationStatus;
+  from_status: string;
+  to_status: string;
+
+  actor_user_id: string | null;
+  actor_role_label: string;
+
   reason: string;
-  created_by: number | null;
-  created_at: string;
+  at: string;
 }
+
+export interface ApplicationTimeline {
+  application_id: number;
+  timeline: ApplicationTransition[];
+}
+
+// -----------------------------------------------------------------------------
+// Scholarship applications
+// -----------------------------------------------------------------------------
 
 export interface ScholarshipApplication {
   id: number;
   application_number: string;
-  student_id: number;
-  catalogue_version: CataloguePolicyVersion;
+
+  user_id: string;
+
+  scheme_code: string;
+  scheme_title: string;
+  academic_cycle: string;
+
   status: ApplicationStatus;
-  academic_year: string;
+
   is_renewal: boolean;
-  parent_application: number | null;
-  renewal_count: number;
+  renewal_cycle_number: number;
+
   submitted_at: string | null;
-  verified_at: string | null;
-  decided_at: string | null;
-  decision_reason: string;
-  correction_comments: string;
-  concern_notes: string;
-  form_data: Record<string, unknown>;
-  documents: ApplicationDocument[];
-  transitions?: ApplicationTransition[];
   created_at: string;
-  updated_at: string;
+
+  // Additional fields available in the detail serializer.
+  prior_award_id?: string | null;
+
+  applicant_snapshot?: Record<string, unknown>;
+  submission_data?: Record<string, unknown>;
+
+  documents?: ApplicationDocument[];
+
+  verified_at?: string | null;
+  verification_findings?: Record<string, unknown>;
+  verification_concern_note?: string;
+
+  decision_outcome?: string;
+  decision_reason?: string;
+  decision_at?: string | null;
+
+  withdrawn_at?: string | null;
+  withdrawn_reason?: string;
+
+  policy_version_detail?: CataloguePolicyVersion;
 }
+
+// -----------------------------------------------------------------------------
+// Convocation award candidates
+// -----------------------------------------------------------------------------
 
 export interface AwardCandidate {
   id: number;
-  award_cycle: number;
-  student_id: number;
-  cpi: string | null;
-  program: string;
-  discipline: string;
-  batch: string;
+
+  award_cycle_id: number;
+  user_id: string;
+
+  source_method: string;
+
+  academic_snapshot: Record<string, unknown>;
+  nomination_data: Record<string, unknown>;
+
+  is_eligible: boolean;
+  ineligibility_notes: string;
+
   evaluation_score: string | null;
-  evaluation_notes: string;
-  citation: string;
-  merit_rank: number | null;
-  is_selected: boolean;
-  created_at: string;
+
+  committee_recommendation: string;
+  committee_remarks: string;
+
+  is_final_winner: boolean;
 }
+
+// -----------------------------------------------------------------------------
+// Award cycles
+// -----------------------------------------------------------------------------
 
 export interface AwardCycle {
   id: number;
-  catalogue_version: CataloguePolicyVersion;
-  academic_year: string;
-  convocation_year: string;
+
+  policy_version_id: number;
+
+  award_title: string;
+  convocation_year: number;
+
   status: AwardCycleStatus;
-  approval_body: string;
-  approved_by: number | null;
-  approved_at: string | null;
+
+  pool_finalized_at: string | null;
+  eval_completed_at: string | null;
+
+  approval_authority_recorded: string;
+  approval_reference_recorded: string;
+  approval_recorded_at: string | null;
+
   published_at: string | null;
+
   candidates?: AwardCandidate[];
+
   created_at: string;
-  updated_at: string;
 }
+
+// -----------------------------------------------------------------------------
+// Audit trail
+// -----------------------------------------------------------------------------
 
 export interface SpacsAuditLog {
   id: number;
-  event_type: string;
-  actor_id: number | null;
+
+  action: string;
+
+  entity_type: string;
+  entity_id: string;
+
+  actor_user_id: string | null;
   actor_role: string;
-  target_model: string;
-  target_id: string;
-  reason: string;
+
+  details: Record<string, unknown>;
+
   ip_address: string;
-  timestamp: string;
-  after_state?: Record<string, unknown>;
+
+  created_at: string;
 }

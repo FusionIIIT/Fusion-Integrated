@@ -24,12 +24,12 @@ urlpatterns = [
 
     # Verification
     path("verification/queue", v.VerificationQueueView.as_view(), name="spacs-verification-queue"),
-    path("verification/<int:application_id>/action", v.VerificationActionView.as_view(), name="spacs-verification-action"),
-    path("verification/documents/<int:doc_id>", v.DocumentVerifyView.as_view(), name="spacs-document-verify"),
+    path("verification/<int:pk>/action", v.VerificationActionView.as_view(), name="spacs-verification-action"),
+    path("verification/documents/<int:pk>", v.DocumentVerifyView.as_view(), name="spacs-document-verify"),
 
     # Decisions
     path("decisions/queue", v.DecisionQueueView.as_view(), name="spacs-decision-queue"),
-    path("decisions/<int:application_id>/action", v.DecisionActionView.as_view(), name="spacs-decision-action"),
+    path("decisions/<int:pk>/action", v.DecisionActionView.as_view(), name="spacs-decision-action"),
 
     # Awards
     path("awards/cycles", v.AwardCycleListView.as_view(), name="spacs-award-cycles"),

@@ -19,7 +19,7 @@ from typing import Any
 from django.db import transaction
 from django.utils import timezone as dj_timezone
 
-from core.api.exceptions import ValidationError, NotFoundError, PermissionDenied
+from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from core.files.drive import parse as parse_drive_url, InvalidDriveLink
 from modules.spacs.domain.eligibility import evaluate_machine_eligibility
 from modules.spacs.domain.state_machines import (
@@ -62,9 +62,9 @@ def save_draft(
             if not application:
                 raise NotFoundError("Application draft not found.")
             if application.user_id != user_id:
-                raise PermissionDenied("You do not own this application.")
+                raise PermissionDeniedError("You do not own this application.")
             if application.status != APP_STATUS_DRAFT:
-                raise ValidationError(f"Cannot edit draft in status '{application.status}'.")
+                raise ConflictError(f"Cannot edit draft in status '{application.status}'.")
 
             application.submission_data = submission_data
             if applicant_snapshot:
@@ -107,7 +107,7 @@ def submit_application(
         if not application:
             raise NotFoundError("Application not found.")
         if application.user_id != user_id:
-            raise PermissionDenied("You can only submit your own application.")
+            raise PermissionDeniedError("You can only submit your own application.")
 
         transition = can_transition_application(
             from_status=application.status,
@@ -116,9 +116,24 @@ def submit_application(
             is_owner=True,
         )
         if not transition.allowed:
-            raise ValidationError(transition.reason)
+            raise ConflictError(transition.reason)
 
         policy = application.policy_version
+
+        # CFR-SPACS-003 / AFR-SPACS-008: Application window must be open.
+        # The window bounds are configurable per policy version; absent bounds
+        # mean the window is unrestricted in that direction.
+        now = dj_timezone.now()
+        window_start = policy.application_window_start
+        window_end = policy.application_window_end
+        if window_start and now < window_start:
+            raise ConflictError(
+                "The application window for this scheme has not yet opened."
+            )
+        if window_end and now > window_end:
+            raise ConflictError(
+                "The application window for this scheme has closed."
+            )
 
         # 1. BR-SPACS-002: Check duplicate active application
         duplicates = ScholarshipApplication.objects.filter(
@@ -128,7 +143,7 @@ def submit_application(
             status__in=ACTIVE_APPLICATION_STATUSES,
         ).exclude(pk=application.pk)
         if duplicates.exists():
-            raise ValidationError("You already have an active application for this scholarship and cycle.")
+            raise ConflictError("You already have an active application for this scholarship and cycle.")
 
         # 2. BR-SPACS-001: Machine-checkable eligibility evaluation
         combined_snapshot = {**application.applicant_snapshot, **student_snapshot}
@@ -136,7 +151,7 @@ def submit_application(
             policy.eligibility_schema, combined_snapshot
         )
         if not is_eligible:
-            raise ValidationError(
+            raise ConflictError(
                 f"Eligibility criteria not satisfied: {'; '.join(deficiencies)}"
             )
 
@@ -151,7 +166,7 @@ def submit_application(
             if req.get("mandatory", True) and req["doc_type"] not in attached_doc_types
         ]
         if missing_docs:
-            raise ValidationError(f"Missing mandatory supporting evidence: {', '.join(missing_docs)}")
+            raise ConflictError(f"Missing mandatory supporting evidence: {', '.join(missing_docs)}")
 
         # Transition application to Submitted
         prev_status = application.status
@@ -231,7 +246,7 @@ def withdraw_application(
         if not application:
             raise NotFoundError("Application not found.")
         if application.user_id != user_id:
-            raise PermissionDenied("Only the owning student may withdraw an application.")
+            raise PermissionDeniedError("Only the owning student may withdraw an application.")
 
         transition = can_transition_application(
             from_status=application.status,
@@ -240,7 +255,7 @@ def withdraw_application(
             is_owner=True,
         )
         if not transition.allowed:
-            raise ValidationError(transition.reason)
+            raise ConflictError(transition.reason)
 
         prev_status = application.status
         now = dj_timezone.now()
@@ -304,7 +319,7 @@ def _sync_application_documents(
         try:
             drive_ref = parse_drive_url(raw_url)
         except InvalidDriveLink as exc:
-            raise ValidationError(f"Invalid Google Drive link for {doc_type}: {exc.message}")
+            raise ConflictError(f"Invalid Google Drive link for {doc_type}: {exc.message}")
 
         ApplicationDocument.objects.update_or_create(
             application=application,

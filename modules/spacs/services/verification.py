@@ -16,7 +16,7 @@ from typing import Any
 from django.db import transaction
 from django.utils import timezone as dj_timezone
 
-from core.api.exceptions import ValidationError, NotFoundError, PermissionDenied
+from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from modules.spacs.domain.state_machines import (
     APP_STATUS_VERIFIED_ROUTED,
     APP_STATUS_VERIFICATION_CONCERN,
@@ -94,7 +94,7 @@ def mark_verified_and_route(
             actor_role="spacs_assistant",
         )
         if not transition.allowed:
-            raise ValidationError(transition.reason)
+            raise ConflictError(transition.reason)
 
         prev_status = app.status
         now = dj_timezone.now()
@@ -172,7 +172,7 @@ def flag_verification_concern(
     - Creates a decision task for the SPACS Convener.
     """
     if not concern_note.strip():
-        raise ValidationError("A verification concern requires an explanatory note.")
+        raise ConflictError("A verification concern requires an explanatory note.")
 
     with transaction.atomic():
         app = (
@@ -190,7 +190,7 @@ def flag_verification_concern(
             actor_role="spacs_assistant",
         )
         if not transition.allowed:
-            raise ValidationError(transition.reason)
+            raise ConflictError(transition.reason)
 
         prev_status = app.status
         now = dj_timezone.now()
@@ -259,7 +259,7 @@ def request_correction(
     - No active task remains pending while student edits.
     """
     if not correction_reason.strip():
-        raise ValidationError("Returning for correction requires an explanatory reason for the student.")
+        raise ConflictError("Returning for correction requires an explanatory reason for the student.")
 
     with transaction.atomic():
         app = (
@@ -277,7 +277,7 @@ def request_correction(
             actor_role=actor_role,
         )
         if not transition.allowed:
-            raise ValidationError(transition.reason)
+            raise ConflictError(transition.reason)
 
         prev_status = app.status
         now = dj_timezone.now()
@@ -344,7 +344,7 @@ def resubmit_corrected_application(
         if not app:
             raise NotFoundError("Application not found.")
         if app.user_id != user_id:
-            raise PermissionDenied("Only the owning student may resubmit this application.")
+            raise PermissionDeniedError("Only the owning student may resubmit this application.")
 
         transition = can_transition_application(
             from_status=app.status,
@@ -353,7 +353,7 @@ def resubmit_corrected_application(
             is_owner=True,
         )
         if not transition.allowed:
-            raise ValidationError(transition.reason)
+            raise ConflictError(transition.reason)
 
         if updated_submission_data:
             app.submission_data = updated_submission_data

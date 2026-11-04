@@ -12,7 +12,7 @@ from typing import Any
 from django.db import transaction
 from django.utils import timezone as dj_timezone
 
-from core.api.exceptions import ValidationError, NotFoundError, PermissionDenied
+from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from modules.spacs.domain.renewal import check_renewal_eligibility, is_document_reusable
 from modules.spacs.models import (
     ScholarshipApplication,
@@ -40,7 +40,7 @@ def initiate_renewal(
         if not prior_app:
             raise NotFoundError("Prior scholarship application record not found.")
         if prior_app.user_id != user_id:
-            raise PermissionDenied("You can only renew your own scholarship award.")
+            raise PermissionDeniedError("You can only renew your own scholarship award.")
 
         next_cycle_number = prior_app.renewal_cycle_number + 1
         policy_dict = {
@@ -53,7 +53,7 @@ def initiate_renewal(
             policy_dict, prior_dict, next_cycle_number
         )
         if not is_eligible:
-            raise ValidationError(f"Renewal not permissible: {'; '.join(deficiencies)}")
+            raise ConflictError(f"Renewal not permissible: {'; '.join(deficiencies)}")
 
         # Create new renewal application draft
         renewal_app = save_draft(

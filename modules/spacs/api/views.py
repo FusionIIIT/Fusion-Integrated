@@ -12,16 +12,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.api.exceptions import NotFoundError, ValidationError, PermissionDenied
-from core.api.csv import csv_response
+from core.api.exceptions import BadRequestError, ConflictError, NotFoundError
 from modules.spacs.api.permissions import require_spacs_permission, MODULE_GRANT
 from modules.spacs.api import serializers as s
-from modules.spacs.models import (
-    CatalogueEntry,
-    CataloguePolicyVersion,
-    ScholarshipApplication,
-    AwardCycle,
-)
 from modules.spacs.selectors import (
     scoping,
     catalogue as catalogue_selectors,
@@ -44,25 +37,35 @@ def _principal(request):
 
 
 # --- Catalogue Endpoints ---
-
 class CatalogueListView(APIView):
-    """GET /api/v1/spacs/catalogue/ - Browse active catalogue (UC-SPACS-014)
-       POST /api/v1/spacs/catalogue/ - Create draft entry (UC-SPACS-010)
+    """GET: Browse active catalogue.
+       POST: Create draft catalogue entry.
     """
-    permission_classes = [MODULE_GRANT]
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            classes = require_spacs_permission("spacs.catalogue.view")
+        elif self.request.method == "POST":
+            classes = require_spacs_permission("spacs.catalogue.manage")
+        else:
+            classes = []
+
+        return [permission() for permission in classes]
 
     def get(self, request):
         p = _principal(request)
+
         if scoping.is_convener(p):
-            entries = CatalogueEntry.objects.all().prefetch_related("versions")
+            entries = catalogue_selectors.get_all_catalogue_entries()
         else:
             entries = catalogue_selectors.get_published_catalogue()
-        return Response(s.CatalogueEntrySerializer(entries, many=True).data)
+
+        return Response(
+            s.CatalogueEntrySerializer(entries, many=True).data
+        )
 
     def post(self, request):
         p = _principal(request)
-        if not scoping.is_convener(p):
-            raise PermissionDenied("Only the SPACS Convener may create catalogue entries.")
 
         code = request.data.get("code")
         title = request.data.get("title")
@@ -70,33 +73,47 @@ class CatalogueListView(APIView):
         desc = request.data.get("description", "")
 
         if not code or not title or not kind:
-            raise ValidationError("code, title, and kind are required.")
+            raise BadRequestError("code, title, and kind are required.")
 
         entry = catalogue_services.create_catalogue_entry(
-            code=code, title=title, kind=kind, description=desc,
+            code=code,
+            title=title,
+            kind=kind,
+            description=desc,
             actor_user_id=p.user_id,
         )
-        return Response(s.CatalogueEntrySerializer(entry).data, status=status.HTTP_201_CREATED)
+
+        return Response(
+            s.CatalogueEntrySerializer(entry).data,
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class CatalogueDetailView(APIView):
-    """GET /api/v1/spacs/catalogue/<slug>/ - Detail of an entry (UC-SPACS-014)"""
-    permission_classes = [MODULE_GRANT]
+    """GET: Detail of a catalogue entry."""
 
-    def get(self, request, slug):
-        entry = catalogue_selectors.get_catalogue_entry_by_code(slug)
+    permission_classes = require_spacs_permission(
+        "spacs.catalogue.view"
+    )
+
+    def get(self, request, pk):
+        entry = catalogue_selectors.get_catalogue_entry_by_pk(pk)
+
         if not entry:
             raise NotFoundError("Catalogue entry not found.")
-        return Response(s.CatalogueEntrySerializer(entry).data)
+
+        return Response(
+            s.CatalogueEntrySerializer(entry).data
+        )
 
 
 class CatalogueVersionCreateView(APIView):
-    """POST /api/v1/spacs/catalogue/<slug>/versions/ - Create draft version (UC-SPACS-011)"""
+    """POST /api/v1/spacs/catalogue/<int:pk>/versions/ - Create draft version (UC-SPACS-011)"""
     permission_classes = require_spacs_permission("spacs.catalogue.manage")
 
-    def post(self, request, slug):
+    def post(self, request, pk):
         p = _principal(request)
-        entry = catalogue_selectors.get_catalogue_entry_by_code(slug)
+        entry = catalogue_selectors.get_catalogue_entry_by_pk(pk)
         if not entry:
             raise NotFoundError("Catalogue entry not found.")
 
@@ -122,19 +139,19 @@ class CatalogueVersionCreateView(APIView):
 
 
 class CataloguePublishView(APIView):
-    """POST /api/v1/spacs/catalogue/<slug>/versions/<int:vid>/publish/ - Publish version (UC-SPACS-023)"""
+    """POST /api/v1/spacs/catalogue/versions/<int:version_id>/publish/ - Publish version (UC-SPACS-023)"""
     permission_classes = require_spacs_permission("spacs.catalogue.manage")
 
-    def post(self, request, slug, vid):
+    def post(self, request, version_id):
         p = _principal(request)
-        version = CataloguePolicyVersion.objects.filter(pk=vid, catalogue_entry__code=slug).first()
+        version = catalogue_selectors.get_policy_version_by_pk(version_id)
         if not version:
             raise NotFoundError("Policy version not found.")
 
         ref = request.data.get("policy_approval_ref")
         approval_date = request.data.get("policy_approval_date")
         if not ref or not approval_date:
-            raise ValidationError("policy_approval_ref and policy_approval_date are required to publish.")
+            raise BadRequestError("policy_approval_ref and policy_approval_date are required to publish.")
 
         pub_version = catalogue_services.publish_policy_version(
             version=version,
@@ -146,12 +163,12 @@ class CataloguePublishView(APIView):
 
 
 class CatalogueRetireView(APIView):
-    """POST /api/v1/spacs/catalogue/<slug>/retire/ - Retire entry prospectively (UC-SPACS-012)"""
+    """POST /api/v1/spacs/catalogue/<int:pk>/retire/ - Retire entry prospectively (UC-SPACS-012)"""
     permission_classes = require_spacs_permission("spacs.catalogue.manage")
 
-    def post(self, request, slug):
+    def post(self, request, pk):
         p = _principal(request)
-        entry = catalogue_selectors.get_catalogue_entry_by_code(slug)
+        entry = catalogue_selectors.get_catalogue_entry_by_pk(pk)
         if not entry:
             raise NotFoundError("Catalogue entry not found.")
 
@@ -181,7 +198,7 @@ class ApplicationDraftSaveView(APIView):
         ser.is_valid(raise_exception=True)
         data = ser.validated_data
 
-        policy = CataloguePolicyVersion.objects.filter(pk=data["policy_version_id"]).first()
+        policy = catalogue_selectors.get_policy_version_by_pk(data["policy_version_id"])
         if not policy:
             raise NotFoundError("Policy version not found.")
 
@@ -198,25 +215,53 @@ class ApplicationDraftSaveView(APIView):
 
 
 class ApplicationDetailView(APIView):
-    """GET /api/v1/spacs/applications/<int:pk>/ - Detail view scoped to owner/staff
-       PUT /api/v1/spacs/applications/<int:pk>/ - Modify editable application (UC-SPACS-003)
+    """GET: View application details.
+       PUT: Modify an editable or returned application.
     """
-    permission_classes = [MODULE_GRANT]
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            classes = require_spacs_permission(
+                "spacs.application.view_self",
+                "spacs.application.view_all",
+                "spacs.application.verify",
+            )
+        elif self.request.method == "PUT":
+            classes = require_spacs_permission(
+                "spacs.application.modify_self"
+            )
+        else:
+            classes = []
+
+        return [permission() for permission in classes]
 
     def get(self, request, pk):
         p = _principal(request)
+
         app = scoping.applications_for(p).filter(pk=pk).first()
+
         if not app:
             raise NotFoundError("Application not found.")
-        return Response(s.ScholarshipApplicationDetailSerializer(app).data)
+
+        return Response(
+            s.ScholarshipApplicationDetailSerializer(app).data
+        )
 
     def put(self, request, pk):
         p = _principal(request)
-        app = scoping.applications_for(p).filter(pk=pk, user_id=p.user_id).first()
+
+        app = scoping.applications_for(p).filter(
+            pk=pk,
+            user_id=p.user_id,
+        ).first()
+
         if not app:
             raise NotFoundError("Application not found.")
 
-        submission_data = request.data.get("submission_data", app.submission_data)
+        submission_data = request.data.get(
+            "submission_data",
+            app.submission_data,
+        )
         documents = request.data.get("documents")
 
         if app.status == "draft":
@@ -228,16 +273,22 @@ class ApplicationDetailView(APIView):
                 documents=documents,
                 application_id=app.id,
             )
+
         elif app.status == "correction_required":
             updated = verif_services.resubmit_corrected_application(
                 application_id=app.id,
                 user_id=p.user_id,
                 updated_submission_data=submission_data,
             )
-        else:
-            raise ValidationError(f"Cannot edit application in status '{app.status}'.")
 
-        return Response(s.ScholarshipApplicationDetailSerializer(updated).data)
+        else:
+            raise ConflictError(
+                f"Cannot edit application in status '{app.status}'."
+            )
+
+        return Response(
+            s.ScholarshipApplicationDetailSerializer(updated).data
+        )
 
 
 class ApplicationSubmitView(APIView):
@@ -278,20 +329,39 @@ class ApplicationWithdrawView(APIView):
         return Response(s.ScholarshipApplicationDetailSerializer(withdrawn).data)
 
 
+
 class ApplicationTimelineView(APIView):
-    """GET /api/v1/spacs/applications/<int:pk>/timeline/ - Status history with redaction"""
-    permission_classes = [MODULE_GRANT]
+    """GET: Application status history with appropriate redaction."""
+
+    permission_classes = require_spacs_permission(
+        "spacs.application.view_self",
+        "spacs.application.view_all",
+        "spacs.application.verify",
+    )
 
     def get(self, request, pk):
         p = _principal(request)
+
         app = scoping.applications_for(p).filter(pk=pk).first()
+
         if not app:
             raise NotFoundError("Application not found.")
 
-        is_staff = scoping.is_assistant(p) or scoping.is_convener(p) or scoping.is_auditor(p)
-        timeline = audit_selectors.get_application_timeline(app, is_staff=is_staff)
-        return Response({"application_id": app.pk, "timeline": timeline})
+        is_staff = (
+            scoping.is_assistant(p)
+            or scoping.is_convener(p)
+            or scoping.is_auditor(p)
+        )
 
+        timeline = audit_selectors.get_application_timeline(
+            app,
+            is_staff=is_staff,
+        )
+
+        return Response({
+            "application_id": app.pk,
+            "timeline": timeline,
+        })
 
 class ApplicationExportView(APIView):
     """GET /api/v1/spacs/applications/<int:pk>/export/ - Export application summary (UC-SPACS-007)"""
@@ -311,25 +381,30 @@ class ApplicationExportView(APIView):
             ["Submitted At", str(app.submitted_at or "N/A")],
             ["Applicant User ID", str(app.user_id)],
         ]
-        return csv_response(f"spacs-app-{app.application_number}.csv", ["Field", "Value"], rows)
+        return safe_csv.stream(
+            filename=f"spacs-app-{app.application_number}.csv",
+            header=["Field", "Value"],
+            rows=rows,
+        )
 
 
 # --- Scholarship Renewal Endpoints ---
 
 class RenewalInitiateView(APIView):
-    """POST /api/v1/spacs/renewals/ - Initiate renewal draft (UC-SPACS-015)"""
+    """POST /api/v1/spacs/applications/<int:pk>/renew/ - Initiate renewal draft (UC-SPACS-015)"""
     permission_classes = require_spacs_permission("spacs.application.create")
 
-    def post(self, request):
+    def post(self, request, pk):
         p = _principal(request)
-        prior_app_id = request.data.get("prior_application_id")
+        # pk from URL path is the prior application being renewed.
+        prior_app_id = pk
         cycle = request.data.get("academic_cycle")
         policy_id = request.data.get("policy_version_id")
 
-        if not prior_app_id or not cycle or not policy_id:
-            raise ValidationError("prior_application_id, academic_cycle, and policy_version_id are required.")
+        if not cycle or not policy_id:
+            raise BadRequestError("academic_cycle and policy_version_id are required.")
 
-        policy = CataloguePolicyVersion.objects.filter(pk=policy_id).first()
+        policy = catalogue_selectors.get_policy_version_by_pk(policy_id)
         if not policy:
             raise NotFoundError("Policy version not found.")
 
@@ -387,7 +462,7 @@ class VerificationActionView(APIView):
                 correction_reason=comment,
             )
         else:
-            raise ValidationError(f"Unknown verification action '{action}'.")
+            raise BadRequestError(f"Unknown verification action '{action}'.")
 
         return Response(s.ScholarshipApplicationDetailSerializer(app).data)
 
@@ -401,7 +476,7 @@ class DocumentVerifyView(APIView):
         status_val = request.data.get("status")
         comment = request.data.get("comment", "")
         if not status_val:
-            raise ValidationError("Verification status is required.")
+            raise BadRequestError("Verification status is required.")
 
         doc = verif_services.record_document_verification_finding(
             document_id=pk,
@@ -446,36 +521,59 @@ class DecisionActionView(APIView):
 # --- Convocation Awards Endpoints ---
 
 class AwardCycleListView(APIView):
-    """GET /api/v1/spacs/awards/cycles/ - List cycles
-       POST /api/v1/spacs/awards/cycles/ - Create cycle
+    """GET: List award cycles.
+       POST: Create a new award cycle.
     """
-    permission_classes = [MODULE_GRANT]
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            classes = require_spacs_permission(
+                "spacs.award.view"
+            )
+        elif self.request.method == "POST":
+            classes = require_spacs_permission(
+                "spacs.award.manage"
+            )
+        else:
+            classes = []
+
+        return [permission() for permission in classes]
 
     def get(self, request):
         p = _principal(request)
+
         cycles = scoping.award_cycles_for(p)
-        return Response(s.AwardCycleSerializer(cycles, many=True).data)
+
+        return Response(
+            s.AwardCycleSerializer(cycles, many=True).data
+        )
 
     def post(self, request):
         p = _principal(request)
-        if not scoping.is_convener(p):
-            raise PermissionDenied("Only the SPACS Convener may open an award cycle.")
 
         policy_id = request.data.get("policy_version_id")
         year = request.data.get("convocation_year")
-        if not policy_id or not year:
-            raise ValidationError("policy_version_id and convocation_year are required.")
 
-        policy = CataloguePolicyVersion.objects.filter(pk=policy_id).first()
+        if not policy_id or not year:
+            raise BadRequestError(
+                "policy_version_id and convocation_year are required."
+            )
+
+        policy = catalogue_selectors.get_policy_version_by_pk(policy_id)
+
         if not policy:
             raise NotFoundError("Policy version not found.")
 
-        cycle = AwardCycle.objects.create(
+        cycle = award_services.open_award_cycle(
             policy_version=policy,
             convocation_year=int(year),
-            status="open",
+            actor_user_id=p.user_id,
         )
-        return Response(s.AwardCycleSerializer(cycle).data, status=status.HTTP_201_CREATED)
+
+        return Response(
+            s.AwardCycleSerializer(cycle).data,
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class AwardCyclePoolView(APIView):

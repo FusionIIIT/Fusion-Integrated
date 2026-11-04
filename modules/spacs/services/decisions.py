@@ -11,11 +11,14 @@ from __future__ import annotations
 from django.db import transaction
 from django.utils import timezone as dj_timezone
 
-from core.api.exceptions import ValidationError, NotFoundError, PermissionDenied
+from core.api.exceptions import ConflictError, NotFoundError
 from modules.spacs.domain.state_machines import (
     APP_STATUS_APPROVED,
     APP_STATUS_REJECTED,
     APP_STATUS_CORRECTION_REQUIRED,
+    APP_STATUS_VERIFIED_ROUTED,
+    APP_STATUS_VERIFICATION_CONCERN,
+    APP_STATUS_UNDER_CONVENER_REVIEW,
     can_transition_application,
 )
 from modules.spacs.models import (
@@ -49,7 +52,7 @@ def record_scholarship_decision(
 
     target_status = APP_STATUS_APPROVED if outcome == "approved" else APP_STATUS_REJECTED
     if outcome == "rejected" and not reason.strip():
-        raise ValidationError("A rejection decision requires a recorded rationale (AFR-SPACS-029).")
+        raise ConflictError("A rejection decision requires a recorded rationale (AFR-SPACS-029).")
 
     with transaction.atomic():
         app = (
@@ -61,13 +64,28 @@ def record_scholarship_decision(
         if not app:
             raise NotFoundError("Application not found.")
 
+        # BW-SPACS-03: If the application is in verified/concern state, the
+        # Convener must first open it for review before applying a final decision.
+        # We handle both steps atomically here so a single API call covers the
+        # full "open review → decide" flow without requiring a separate round-trip.
+        if app.status in (APP_STATUS_VERIFIED_ROUTED, APP_STATUS_VERIFICATION_CONCERN):
+            open_review = can_transition_application(
+                from_status=app.status,
+                to_status=APP_STATUS_UNDER_CONVENER_REVIEW,
+                actor_role="spacs_convener",
+            )
+            if not open_review.allowed:
+                raise ConflictError(open_review.reason)
+            # Advance in-memory; the final save below persists both transitions.
+            app.status = APP_STATUS_UNDER_CONVENER_REVIEW
+
         transition = can_transition_application(
             from_status=app.status,
             to_status=target_status,
             actor_role="spacs_convener",
         )
         if not transition.allowed:
-            raise ValidationError(transition.reason)
+            raise ConflictError(transition.reason)
 
         prev_status = app.status
         now = dj_timezone.now()

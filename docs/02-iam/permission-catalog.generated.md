@@ -38,3 +38,23 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `spacs`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `spacs.catalogue.view` | Browse published scholarship/award catalogue | `Dean Academic`, `award_eval_committee`, `spacs_assistant`, `spacs_auditor`, `spacs_convener`, `student` |
+| `spacs.catalogue.manage` | Create, version, and retire catalogue entries | `spacs_convener` |
+| `spacs.application.view_self` | View own scholarship applications and status history | `student` |
+| `spacs.application.create` | Create drafts and submit scholarship/renewal applications | `student` |
+| `spacs.application.modify_self` | Modify editable/returned scholarship applications | `student` |
+| `spacs.application.withdraw_self` | Withdraw own pending applications before final decision | `student` |
+| `spacs.application.export` | Export/print own submitted scholarship applications | `spacs_assistant`, `spacs_convener`, `student` |
+| `spacs.application.verify` | Review applications, record findings, request corrections, flag concerns | `spacs_assistant`, `spacs_convener` |
+| `spacs.application.decide` | Approve, reject, or return verified applications | `spacs_convener` |
+| `spacs.application.view_all` | View all submitted applications across the institute | `spacs_convener` |
+| `spacs.award.view` | View award catalogue entries and published award results | `Dean Academic`, `award_eval_committee`, `spacs_assistant`, `spacs_convener`, `student` |
+| `spacs.award.manage` | Prepare candidate pools and record institutional approvals | `spacs_convener` |
+| `spacs.award.evaluate` | Evaluate and shortlist assigned award candidates | `award_eval_committee` |
+| `spacs.award.publish` | Publish officially approved convocation award results | `spacs_convener` |
+| `spacs.audit.view` | Inspect SPACS audit history and decision provenance | `Dean Academic`, `spacs_auditor`, `spacs_convener` |

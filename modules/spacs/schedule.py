@@ -13,10 +13,10 @@ TASK_ROUTES = {
     "spacs.process_renewal_reminders": {"queue": "default"},
 }
 
-_NOTIFY_INTERVAL = float(getattr(settings, "SPACS_NOTIFICATION_DRAIN_SECONDS", 60))
+_NOTIFY_INTERVAL = float(getattr(settings, "SPACS_NOTIFY_DRAIN_INTERVAL_SECONDS", 60))
 _SLA_INTERVAL = float(getattr(settings, "SPACS_SLA_CHECK_INTERVAL_SECONDS", 3600))
-_RENEWAL_HOUR = int(getattr(settings, "SPACS_RENEWAL_CHECK_CRON_HOUR", 8))
-_RENEWAL_MINUTE = int(getattr(settings, "SPACS_RENEWAL_CHECK_CRON_MINUTE", 0))
+_RENEWAL_HOUR = int(getattr(settings, "SPACS_RENEWAL_CHECK_HOUR", 8))
+_RENEWAL_MINUTE = int(getattr(settings, "SPACS_RENEWAL_CHECK_MINUTE", 0))
 
 BEAT_SCHEDULE = {
     # Drains outbox regularly

@@ -11,7 +11,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Any
 from django.db import transaction
-from core.api.exceptions import ValidationError
+from core.api.exceptions import ConflictError
 from modules.spacs.models import CatalogueEntry, CataloguePolicyVersion
 from modules.spacs.services.audit import record_audit_event
 
@@ -104,10 +104,10 @@ def publish_policy_version(
     Guarded by BR-SPACS-015: requires formal approval reference and date.
     """
     if not policy_approval_ref or not policy_approval_ref.strip():
-        raise ValidationError("Publication requires a formal policy approval reference (resolution or circular no).")
+        raise ConflictError("Publication requires a formal policy approval reference (resolution or circular no).")
 
     if not policy_approval_date:
-        raise ValidationError("Publication requires a recorded policy approval date.")
+        raise ConflictError("Publication requires a recorded policy approval date.")
 
     with transaction.atomic():
         version.policy_approval_ref = policy_approval_ref.strip()
