@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.spacs",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -187,6 +188,12 @@ PLACEMENT_UPLOAD_ROOT = env(
     str(Path.home() / ".local" / "share" / "fusion-integrated" / "uploads"))
 #: When set, legacy reads go to nginx via X-Accel-Redirect. Must be `internal;`.
 PLACEMENT_UPLOAD_INTERNAL_PREFIX = env("PLACEMENT_UPLOAD_INTERNAL_PREFIX", "")
+
+# SPACS Operational settings
+SPACS_SLA_CHECK_INTERVAL_SECONDS = env_int("SPACS_SLA_CHECK_INTERVAL_SECONDS", 3600)
+SPACS_RENEWAL_CHECK_HOUR = env_int("SPACS_RENEWAL_CHECK_HOUR", 8)
+SPACS_NOTIFY_DRAIN_INTERVAL_SECONDS = env_int("SPACS_NOTIFY_DRAIN_INTERVAL_SECONDS", 60)
+SPACS_DEFAULT_FROM_EMAIL = env("SPACS_DEFAULT_FROM_EMAIL", "SPACS Office <spacs@iiitdmj.ac.in>")
 
 # No multipart endpoints remain, so this only caps the JSON body.
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024

@@ -278,6 +278,200 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "spacs": {
+      "grants": {
+        "Dean Academic": [
+          "spacs.audit.view",
+          "spacs.award.view",
+          "spacs.catalogue.view"
+        ],
+        "award_eval_committee": [
+          "spacs.award.evaluate",
+          "spacs.award.view",
+          "spacs.catalogue.view"
+        ],
+        "spacs_assistant": [
+          "spacs.application.export",
+          "spacs.application.verify",
+          "spacs.award.view",
+          "spacs.catalogue.view"
+        ],
+        "spacs_auditor": [
+          "spacs.audit.view",
+          "spacs.catalogue.view"
+        ],
+        "spacs_convener": [
+          "spacs.application.decide",
+          "spacs.application.export",
+          "spacs.application.verify",
+          "spacs.application.view_all",
+          "spacs.audit.view",
+          "spacs.award.manage",
+          "spacs.award.publish",
+          "spacs.award.view",
+          "spacs.catalogue.manage",
+          "spacs.catalogue.view"
+        ],
+        "student": [
+          "spacs.application.create",
+          "spacs.application.export",
+          "spacs.application.modify_self",
+          "spacs.application.view_self",
+          "spacs.application.withdraw_self",
+          "spacs.award.view",
+          "spacs.catalogue.view"
+        ]
+      },
+      "module_grants": [
+        "Dean Academic",
+        "award_eval_committee",
+        "spacs_assistant",
+        "spacs_auditor",
+        "spacs_convener",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/spacs",
+        "icon": "Award",
+        "items": [
+          {
+            "code": "spacs.catalogue",
+            "icon": "BookOpen",
+            "label": "Scholarship Catalogue",
+            "required_permission": "spacs.catalogue.view",
+            "sort_order": 10,
+            "to": "/spacs/catalogue"
+          },
+          {
+            "code": "spacs.mine",
+            "icon": "UserCheck",
+            "label": "My Applications",
+            "required_permission": "spacs.application.view_self",
+            "sort_order": 20,
+            "to": "/spacs/mine"
+          },
+          {
+            "code": "spacs.awards_public",
+            "icon": "Trophy",
+            "label": "Convocation Awards",
+            "required_permission": "spacs.award.view",
+            "sort_order": 30,
+            "to": "/spacs/awards"
+          },
+          {
+            "code": "spacs.verification",
+            "icon": "Checks",
+            "label": "Application Verification",
+            "required_permission": "spacs.application.verify",
+            "sort_order": 40,
+            "to": "/spacs/verification"
+          },
+          {
+            "code": "spacs.decisions",
+            "icon": "Gavel",
+            "label": "Scholarship Decisions",
+            "required_permission": "spacs.application.decide",
+            "sort_order": 50,
+            "to": "/spacs/decisions"
+          },
+          {
+            "code": "spacs.committee_eval",
+            "icon": "Users",
+            "label": "Award Evaluation",
+            "required_permission": "spacs.award.evaluate",
+            "sort_order": 60,
+            "to": "/spacs/evaluation"
+          },
+          {
+            "code": "spacs.admin_manage",
+            "icon": "Sliders",
+            "label": "Catalogue Admin",
+            "required_permission": "spacs.catalogue.manage",
+            "sort_order": 70,
+            "to": "/spacs/admin"
+          },
+          {
+            "code": "spacs.audit_trail",
+            "icon": "ShieldCheck",
+            "label": "SPACS Audit Trail",
+            "required_permission": "spacs.audit.view",
+            "sort_order": 80,
+            "to": "/spacs/audit"
+          }
+        ],
+        "label": "Awards & Scholarships",
+        "nav_section": "Academics",
+        "sort_order": 25,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "spacs.catalogue.view",
+          "label": "Browse published scholarship/award catalogue"
+        },
+        {
+          "code": "spacs.catalogue.manage",
+          "label": "Create, version, and retire catalogue entries"
+        },
+        {
+          "code": "spacs.application.view_self",
+          "label": "View own scholarship applications and status history"
+        },
+        {
+          "code": "spacs.application.create",
+          "label": "Create drafts and submit scholarship/renewal applications"
+        },
+        {
+          "code": "spacs.application.modify_self",
+          "label": "Modify editable/returned scholarship applications"
+        },
+        {
+          "code": "spacs.application.withdraw_self",
+          "label": "Withdraw own pending applications before final decision"
+        },
+        {
+          "code": "spacs.application.export",
+          "label": "Export/print own submitted scholarship applications"
+        },
+        {
+          "code": "spacs.application.verify",
+          "label": "Review applications, record findings, request corrections, flag concerns"
+        },
+        {
+          "code": "spacs.application.decide",
+          "label": "Approve, reject, or return verified applications"
+        },
+        {
+          "code": "spacs.application.view_all",
+          "label": "View all submitted applications across the institute"
+        },
+        {
+          "code": "spacs.award.view",
+          "label": "View award catalogue entries and published award results"
+        },
+        {
+          "code": "spacs.award.manage",
+          "label": "Prepare candidate pools and record institutional approvals"
+        },
+        {
+          "code": "spacs.award.evaluate",
+          "label": "Evaluate and shortlist assigned award candidates"
+        },
+        {
+          "code": "spacs.award.publish",
+          "label": "Publish officially approved convocation award results"
+        },
+        {
+          "code": "spacs.audit.view",
+          "label": "Inspect SPACS audit history and decision provenance"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "spacs.renewal.remind",
+        "spacs.sla.escalate"
+      ]
     }
   },
   "publisher": "integrated",
