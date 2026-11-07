@@ -10061,3 +10061,840 @@ ASSISTANT     path("api/v1/patent/", include("modules.patent.api.urls")),
 ASSISTANT     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
 ASSISTANT >>>>>>> REPLACE
 ASSISTANT ```
+TO LLM 2026-11-07T14:52:44
+-------
+SYSTEM Act as an expert software developer.
+SYSTEM Take requests for changes to the supplied code.
+SYSTEM If the request is ambiguous, ask questions.
+SYSTEM Reply in English.
+SYSTEM 
+SYSTEM Once you understand the request you MUST:
+SYSTEM 1. Determine if any code changes are needed.
+SYSTEM 2. Explain any needed changes.
+SYSTEM 3. If changes are needed, output a copy of each file that needs changes.
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return the entire content of the updated file.
+SYSTEM You MUST use this *file listing* format:
+SYSTEM 
+SYSTEM path/to/filename.js
+SYSTEM ```
+SYSTEM // entire file content ...
+SYSTEM // ... goes in between
+SYSTEM ```
+SYSTEM 
+SYSTEM Every *file listing* MUST use this format:
+SYSTEM - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+SYSTEM - Second line: opening ```
+SYSTEM - ... entire content of the file ...
+SYSTEM - Final line: closing ```
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+SYSTEM *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+SYSTEM Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+SYSTEM 
+SYSTEM Reply in English.
+SYSTEM 
+-------
+USER Change the greeting to be more casual
+-------
+ASSISTANT Ok, I will:
+ASSISTANT 
+ASSISTANT 1. Switch the greeting text from "Hello" to "Hey".
+ASSISTANT 
+ASSISTANT show_greeting.py
+ASSISTANT ```
+ASSISTANT import sys
+ASSISTANT 
+ASSISTANT def greeting(name):
+ASSISTANT     print(f"Hey {name}")
+ASSISTANT 
+ASSISTANT if __name__ == '__main__':
+ASSISTANT     greeting(sys.argv[1])
+ASSISTANT ```
+-------
+USER I switched to a new code base. Please don't consider the above files or try to edit them any longer.
+-------
+ASSISTANT Ok.
+-------
+USER Here are some READ ONLY files, provided for your reference.
+USER Do not edit these files!
+USER 
+USER client/src/modules/placement/routes.tsx
+USER ```
+USER import { lazy } from "react";
+USER import { Navigate, type RouteObject } from "react-router-dom";
+USER 
+USER /** One lazy chunk per page. Vite can only split these if the import() argument
+USER  *  is a static literal — a computed path silently bundles everything. */
+USER const PostingsPage = lazy(() => import("./pages/PostingsPage"));
+USER const MyApplicationsPage = lazy(() => import("./pages/MyApplicationsPage"));
+USER const ApplicationsPage = lazy(() => import("./pages/ApplicationsPage"));
+USER const OffersPage = lazy(() => import("./pages/OffersPage"));
+USER const CompaniesPage = lazy(() => import("./pages/CompaniesPage"));
+USER const InterviewsPage = lazy(() => import("./pages/InterviewsPage"));
+USER const AnnouncementsPage = lazy(() => import("./pages/AnnouncementsPage"));
+USER const ReportsPage = lazy(() => import("./pages/ReportsPage"));
+USER const StudentCpiPage = lazy(() => import("./pages/StudentCpiPage"));
+USER const RegistrationPage = lazy(() => import("./pages/RegistrationPage"));
+USER const RegistrationApprovalsPage = lazy(
+USER   () => import("./pages/RegistrationApprovalsPage"));
+USER 
+USER /** Paths are RELATIVE — the shell mounts them under the manifest's basePath.
+USER  *
+USER  *  Every entry here has a matching nav item in the server's registry.py, and
+USER  *  that correspondence matters: the sidebar is built server-side, so a nav item
+USER  *  without a route here renders a link that goes nowhere. */
+USER export const routes: RouteObject[] = [
+USER   { index: true, element: <Navigate to="postings" replace /> },
+USER   { path: "registration", element: <RegistrationPage /> },
+USER   { path: "registration-approvals", element: <RegistrationApprovalsPage /> },
+USER   { path: "postings", element: <PostingsPage /> },
+USER   { path: "mine", element: <MyApplicationsPage /> },
+USER   { path: "offers", element: <OffersPage /> },
+USER   { path: "applications", element: <ApplicationsPage /> },
+USER   { path: "companies", element: <CompaniesPage /> },
+USER   { path: "interviews", element: <InterviewsPage /> },
+USER   { path: "announcements", element: <AnnouncementsPage /> },
+USER   { path: "students-cpi", element: <StudentCpiPage /> },
+USER   { path: "reports", element: <ReportsPage /> },
+USER ];
+USER ```
+USER 
+USER client/src/lib/http.ts
+USER ```
+USER /** One axios instance for the whole app, with the interceptors the legacy
+USER  *  academic SPA never had. */
+USER import axios from "axios";
+USER 
+USER export const http = axios.create({
+USER   baseURL: "/api/v1",
+USER   withCredentials: true,          // the session cookie, never a JS-readable token
+USER   timeout: 15000,
+USER });
+USER 
+USER /** Paired with the session cookie. Held in memory rather than a readable
+USER  *  cookie, which the SPA could not read cross-origin in development. */
+USER let csrfToken = "";
+USER export function setCsrfToken(value: string) {
+USER   csrfToken = value ?? "";
+USER }
+USER 
+USER const UNSAFE = new Set(["post", "put", "patch", "delete"]);
+USER 
+USER http.interceptors.request.use((config) => {
+USER   if (csrfToken && UNSAFE.has((config.method ?? "get").toLowerCase())) {
+USER     config.headers.set("X-CSRF-Token", csrfToken);
+USER   }
+USER   return config;
+USER });
+USER 
+USER let onUnauthorized: (() => void) | null = null;
+USER export function setUnauthorizedHandler(fn: () => void) {
+USER   onUnauthorized = fn;
+USER }
+USER 
+USER http.interceptors.response.use(
+USER   (r) => r,
+USER   (error) => {
+USER     if (error.response?.status === 401) onUnauthorized?.();
+USER     return Promise.reject(error);
+USER   },
+USER );
+USER 
+USER /** Pull a usable message out of the platform's error envelope. */
+USER export function errorMessage(e: unknown): string {
+USER   const env = (e as { response?: { data?: { error?: {
+USER     message?: string; details?: { message?: string }[] } } } })
+USER     ?.response?.data?.error;
+USER   if (!env) return "Something went wrong. Please try again.";
+USER   if (env.details?.length) {
+USER     return env.details.map((d) => d.message).filter(Boolean).join(" ") ||
+USER       env.message || "Request failed.";
+USER   }
+USER   return env.message ?? "Request failed.";
+USER }
+USER 
+USER /** A `responseType: "blob"` request delivers the *error* body as a Blob too,
+USER  *  which hides the envelope from errorMessage. Read it back before rethrowing. */
+USER export async function readBlobError(e: unknown): Promise<unknown> {
+USER   const res = (e as { response?: { data?: unknown } })?.response;
+USER   if (res?.data instanceof Blob) {
+USER     try {
+USER       res.data = JSON.parse(await res.data.text());
+USER     } catch {
+USER       res.data = undefined;             // an HTML page, not our envelope
+USER     }
+USER   }
+USER   return e;
+USER }
+USER 
+USER export function errorStatus(e: unknown): number | undefined {
+USER   return (e as { response?: { status?: number } })?.response?.status;
+USER }
+USER 
+USER export function requestId(e: unknown): string | undefined {
+USER   return (e as { response?: { data?: { error?: { request_id?: string } } } })
+USER     ?.response?.data?.error?.request_id;
+USER }
+USER ```
+USER 
+USER modules/patent/api/urls.py
+USER ```
+USER from django.urls import path, include
+USER from rest_framework.routers import DefaultRouter
+USER 
+USER from .views import (
+USER     ApplicationListView, ApplicationDetailView, ApplicationHistoryView,
+USER     SubmitApplicationView, AssignDirectorView, ReviewApplicationView,
+USER     ResubmitApplicationView, WithdrawApplicationView, FileAppealView,
+USER     DecideAppealView, ExpireOverdueResubmissionsView, AdminApplicationListView
+USER )
+USER from .views_legal import (
+USER     AssignAttorneyView, RespondToAssignmentView, MyAttorneyAssignmentsView,
+USER     RecordOpinionView, ProposeBudgetView, DecideBudgetView, RecordFilingView,
+USER     RecordOfficeActionView, PrepareResponseView, ApproveResponseView, SubmitResponseView,
+USER     RecordGrantView, ScheduleMaintenanceView, DecideRenewalView
+USER )
+USER 
+USER router = DefaultRouter()
+USER 
+USER # --- Application Routes ---
+USER router.register(r'applications', ApplicationListView, basename='application-list')
+USER router.register(r'applications/(?P<pk>[0-9]+)/', ApplicationDetailView, basename='application-detail')
+USER router.register(r'history/', ApplicationHistoryView, basename='application-history')
+USER 
+USER # --- Action Routes ---
+USER router.register(r'submit/', SubmitApplicationView, basename='submit-application')
+USER router.register(r'assign-director/', AssignDirectorView, basename='assign-director')
+USER router.register(r'review/', ReviewApplicationView, basename='review-application')
+USER router.register(r'resubmit/', ResubmitApplicationView, basename='resubmit-application')
+USER router.register(r'withdraw/', WithdrawApplicationView, basename='withdraw-application')
+USER router.register(r'appeal/', FileAppealView, basename='file-appeal')
+USER router.register(r'appeals/(?P<pk>[0-9]+)/', DecideAppealView, basename='decide-appeal')
+USER 
+USER # --- Admin Routes ---
+USER router.register(r'', ExpireOverdueResubmissionsView, basename='admin-expire-resubmissions')
+USER router.register(r'applications/', AdminApplicationListView, basename='admin-application-list')
+USER 
+USER # --- Legal Service Routes ---
+USER router.register(r'assign-attorney/', AssignAttorneyView, basename='assign-attorney')
+USER router.register(r'assignments/(?P<pk>[0-9]+)/', RespondToAssignmentView, basename='respond-to-assignment')
+USER router.register(r'my-assignments/', MyAttorneyAssignmentsView, basename='my-attorney-assignments')
+USER router.register(r'opinions/(?P<pk>[0-9]+)/', RecordOpinionView, basename='record-opinion')
+USER router.register(r'budgets/(?P<pk>[0-9]+)/', ProposeBudgetView, basename='propose-budget')
+USER router.register(r'budgets/(?P<pk>[0-9]+)/decide/', DecideBudgetView, basename='decide-budget')
+USER router.register(r'filings/(?P<pk>[0-9]+)/', RecordFilingView, basename='record-filing')
+USER router.register(r'office-actions/(?P<pk>[0-9]+)/', RecordOfficeActionView, basename='record-office-action')
+USER router.register(r'office-actions/(?P<pk>[0-9]+)/response/', PrepareResponseView, basename='prepare-response')
+USER router.register(r'office-actions/(?P<pk>[0-9]+)/response/approve/', ApproveResponseView, basename='approve-response')
+USER router.register(r'office-actions/(?P<pk>[0-9]+)/response/submit/', SubmitResponseView, basename='submit-response')
+USER router.register(r'applications/(?P<pk>[0-9]+)/grant/', RecordGrantView, basename='record-grant')
+USER router.register(r'maintenance/(?P<pk>[0-9]+)/', ScheduleMaintenanceView, basename='schedule-maintenance')
+USER router.register(r'maintenance/(?P<pk>[0-9]+)/decide/', DecideRenewalView, basename='decide-renewal')
+USER 
+USER urlpatterns = [
+USER     path('', include(router.urls)),
+USER ]
+USER ```
+USER 
+USER modules/patent/registry.py
+USER ```
+USER """What the server tells the shell about this module (ADR-0010).
+USER 
+USER PMS nav items carry `required_permission` and the server filters before sending —
+USER the client does zero filtering, so a link a role cannot use never reaches the
+USER browser at all.
+USER """
+USER MODULE = {
+USER     "code": "patent", "label": "Patent Management", "icon": "FileText",
+USER     "base_path": "/patent", "nav_section": "Patent", "sort_order": 20,
+USER     "status": "active",
+USER }
+USER 
+USER NAV_ITEMS = [
+USER     # -- Applicant: personal view and submission ----------------------------
+USER     {"code": "patent.mine", "label": "My Applications",
+USER      "icon": "UserCheck", "to": "/patent/mine",
+USER      "required_permission": "patent.application.view_self",
+USER      "sort_order": 5},
+USER     {"code": "patent.submit", "label": "Submit Application",
+USER      "icon": "Plus", "to": "/patent/submit",
+USER      "required_permission": "patent.application.create",
+USER      "sort_order": 10},
+USER 
+USER     # -- Director: review and decision -------------------------------------
+USER     {"code": "patent.review", "label": "Review Applications",
+USER      "icon": "ClipboardCheck", "to": "/patent/review",
+USER      "required_permission": "patent.application.review",
+USER      "sort_order": 15},
+USER 
+USER     # -- PCC_ADMIN: administration and coordination ------------------------
+USER     {"code": "patent.admin", "label": "Administration",
+USER      "icon": "Cog", "to": "/patent/admin",
+USER      "required_permission": "patent.admin.manage",
+USER      "sort_order": 25},
+USER 
+USER     # -- Attorney: legal and filing support --------------------------------
+USER     {"code": "patent.attorney", "label": "Legal & Filing",
+USER      "icon": "Gavel", "to": "/patent/attorney",
+USER      "required_permission": "patent.legal.review",
+USER      "sort_order": 30},
+USER ]
+USER 
+USER #: Every permission this module recognises; ROLE_GRANTS below says who holds each.
+USER PERMISSIONS = [
+USER     ("patent.application.view_self", "See one's own applications"),
+USER     ("patent.application.create", "Submit a new patent application"),
+USER     ("patent.application.review", "Review and decide on applications"),
+USER     ("patent.application.manage", "Manage application lifecycle (assign, withdraw, etc.)"),
+USER     ("patent.admin.manage", "Manage PMS configuration, roles, and global settings"),
+USER     ("patent.legal.review", "Conduct legal review, prior art search, and file patents"),
+USER     ("patent.budget.approve", "Approve or reject patent application budgets"),
+USER     ("patent.filing.record", "Record external patent office filings"),
+USER     ("patent.maintenance.manage", "Manage maintenance fee renewals"),
+USER     ("patent.appeal.review", "Review and decide on appeals"),
+USER ]
+USER 
+USER #: Performed by a service or a scheduled task, so no designation holds them.
+USER SYSTEM_PERMISSIONS = [
+USER     "patent.application.auto_withdraw",  # System auto-withdrawal if deadline missed
+USER     "patent.filing.expire",              # System filing expiry tracking
+USER ]
+USER 
+USER _STUDENT = [
+USER     "patent.application.view_self",
+USER     "patent.application.create",
+USER     "patent.application.delete",
+USER     "patent.application.withdraw",
+USER ]
+USER 
+USER _DIRECTOR = [
+USER     "patent.application.review",
+USER     "patent.budget.approve",
+USER     "patent.maintenance.manage",
+USER     "patent.appeal.review",
+USER ]
+USER 
+USER _PCC_ADMIN = [
+USER     "patent.admin.manage",
+USER     "patent.application.manage",
+USER     "patent.legal.review",  # PCC_ADMIN can oversee attorney work
+USER     "patent.budget.approve",
+USER     "patent.filing.record",
+USER ]
+USER 
+USER _ATTORNEY = [
+USER     "patent.legal.review",
+USER     "patent.filing.record",
+USER     "patent.maintenance.manage",
+USER ]
+USER 
+USER #: Keyed by the designation name as it exists in globals_designation.
+USER ROLE_GRANTS = {
+USER     "Applicant": _STUDENT,
+USER     "Director": _DIRECTOR,
+USER     "PCC_ADMIN": _PCC_ADMIN,
+USER     "Attorney": _ATTORNEY,
+USER }
+USER ```
+-------
+ASSISTANT Ok, I will use these files as references.
+-------
+USER Here are summaries of some files present in my git repository.
+USER Do not propose changes to these files, treat them as *read-only*.
+USER If you need to edit any of these files, ask me to *add them to the chat* first.
+USER 
+USER client/src/auth/RequireAuth.tsx:
+USER ⋮
+USER │export function RequireAuth({ children }: { children: React.ReactNode }) {
+USER │  const { status } = useAuth();
+USER │  const location = useLocation();
+USER │
+USER │  if (status === "loading") {
+USER │    return <Center h="100vh"><Loader /></Center>;
+USER │  }
+USER │  // Not a logout: signing in again cannot work while the IAM is unreachable.
+USER │  if (status === "unavailable") {
+USER │    return (
+USER ⋮
+USER 
+USER client/src/modules/placement/api/hooks.ts:
+USER ⋮
+USER │export type ExportKind = "applications" | "placements";
+USER │
+USER ⋮
+USER 
+USER client/src/modules/placement/api/types.ts:
+USER ⋮
+USER │export type ApplicationStatus =
+USER │  | "draft" | "submitted" | "under_review" | "shortlisted"
+USER │  | "interview_scheduled" | "selected" | "rejected" | "withdrawn"
+USER │  | "auto_withdrawn" | "offer_issued" | "offer_accepted" | "offer_declined"
+USER ⋮
+USER │export interface AcademicStanding {
+USER │  semester: number | null;
+USER │  semester_type: string | null;
+USER │  declared_seq: number | null;
+USER │  synced_at: string | null;
+USER │  computed_by: string | null;
+USER ⋮
+USER 
+USER client/src/modules/placement/components/NewPostingModal.tsx:
+USER ⋮
+USER │                hideControls placeholder="Unlimited"
+USER │              />
+USER │            </Field>
+USER │            <Field span={12}>
+USER │              <DateTimePicker
+USER │                label="Applications close" value={closesAt}
+USER │                onChange={setClosesAt} clearable minDate={new Date()}
+USER │                placeholder="Select a date and time"
+USER ⋮
+USER 
+USER client/src/ui/components/PageHeader.tsx:
+USER ⋮
+USER │export function PageHeader({ title, subtitle, action }: {
+USER │  title: string;
+USER │  subtitle?: string;
+USER │  action?: React.ReactNode;
+USER ⋮
+USER 
+USER client/src/ui/layout/AppShellLayout.tsx:
+USER ⋮
+USER │export interface NavGroupItem {
+USER │  code: string;
+USER │  label: string;
+USER │  icon?: string;
+USER │  to?: string;
+USER │  app?: string;
+USER │  links?: NavLinkItem[];
+USER ⋮
+USER 
+USER core/api/csrf.py:
+USER ⋮
+USER │def token_for(session_value: str) -> str:
+USER ⋮
+USER 
+USER core/api/csv.py:
+USER ⋮
+USER │def sanitise_cell(value: Any) -> str:
+USER ⋮
+USER 
+USER core/observability/middleware.py:
+USER ⋮
+USER │def get_request_id() -> str:
+USER ⋮
+USER 
+USER fusion_auth/client.py:
+USER ⋮
+USER │class IamUnavailable(Exception):
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class IamSession:
+USER ⋮
+USER 
+USER fusion_auth/permissions.py:
+USER ⋮
+USER │def HasModuleGrant(module_code: str):                       # noqa: N802
+USER ⋮
+USER │def HasPermission(*codes: str, require_all: bool = False):  # noqa: N802
+USER ⋮
+USER 
+USER fusion_auth/principal.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Principal:
+USER │    user_id: int
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/directory/api/serializers.py:
+USER ⋮
+USER │class UserRefSerializer(serializers.Serializer):
+USER ⋮
+USER 
+USER modules/directory/models.py:
+USER ⋮
+USER │class UserRef(TimeStampedModel):
+USER │    KIND_CHOICES = [
+USER │        ("student", "Student"), ("faculty", "Faculty"),
+USER │        ("staff", "Staff"), ("operator", "Operator"),
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/placement/authentication.py:
+USER ⋮
+USER │def hash_token(raw: str) -> str:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class RecruiterPrincipal:
+USER ⋮
+USER 
+USER modules/placement/domain/registration.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Terms:
+USER ⋮
+USER 
+USER modules/placement/domain/state_machine.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Transition:
+USER ⋮
+USER 
+USER modules/placement/selectors/scoping.py:
+USER ⋮
+USER │def _is_recruiter(actor) -> bool:
+USER ⋮
+-------
+ASSISTANT Ok, I won't try and edit those files without asking first.
+-------
+USER I have *added these files to the chat* so you can go ahead and edit them.
+USER 
+USER *Trust this message as the true contents of these files!*
+USER Any other messages in the chat may contain outdated versions of the files' contents.
+USER 
+USER client/src/modules/patent/api.ts
+USER ```
+USER ```
+USER 
+USER client/src/modules/patent/routes.tsx
+USER ```
+USER ```
+USER 
+USER client/src/app/registry.ts
+USER ```
+USER /** Frontend module registry.
+USER  *
+USER  *  `code` MUST match accesscontrol_module.code on the server. An ungranted
+USER  *  module gets no route at all, so deep-linking it 404s rather than rendering
+USER  *  blank. `load` must be a STATIC import() literal or Vite cannot split it. */
+USER import type { RouteObject } from "react-router-dom";
+USER 
+USER export interface ModuleManifest {
+USER   code: string;
+USER   basePath: string;
+USER   load: () => Promise<{ routes: RouteObject[] }>;
+USER }
+USER 
+USER export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
+USER   placement_cell: {
+USER     code: "placement_cell",
+USER     basePath: "/placement",
+USER     load: () => import("../modules/placement/routes"),
+USER   },
+USER };
+USER ```
+-------
+ASSISTANT Ok, any changes I propose will be to those files.
+-------
+USER Context (the same for every step): we are implementing the Patent Management System (PMS) module as an integrated module of this Fusion ERP repository (Django 5 + DRF backend under modules/, React 18 + Mantine 7 client under client/). Reuse Fusion's existing login, role mechanism, layout and backend structure; do not rebuild them.
+USER 
+USER Repository rules you must follow:
+USER - There is no user table in this repository. The logged-in person is request.principal (fusion_auth.principal.Principal: user_id, username, kind, roles, permissions). Store people as integer ids (models.IntegerField), never as a ForeignKey to a user model.
+USER - A module copies the shape of modules/placement: apps.py, registry.py, models.py, domain/ (pure Python, no Django imports), services/ (all writes), api/ (serializers, views, urls).
+USER - The module code is "patent", and every permission code starts with "patent.".
+USER - Every API view sets permission_classes = [HasModuleGrant("patent"), HasPermission("patent.<action>")], imported from fusion_auth.permissions.
+USER - The four PMS actors are Applicant, Director, PCC_ADMIN and Attorney.
+USER 
+USER Files marked read-only are context only. Write every file you create or change in full. Do not ask for more files; work with what is shown.
+USER 
+USER Step 9 of 11 — client module wiring. Read-only: client/src/modules/placement/routes.tsx, client/src/lib/http.ts, modules/patent/registry.py, modules/patent/api/urls.py.
+USER 
+USER Create or change these files:
+USER 1. client/src/modules/patent/api.ts — TypeScript types and @tanstack/react-query hooks that call the patent endpoints through the shared `http` axios instance exported by client/src/lib/http.ts (its base URL is already /api/v1, so paths start with /patent/).
+USER 2. client/src/modules/patent/routes.tsx — lazy-loaded pages for the paths "mine", "submit", "review", "admin" and "attorney" (these must match the NAV_ITEMS "to" paths in registry.py), plus an index redirect to "mine", following placement/routes.tsx. The page files will be pages/MyApplicationsPage.tsx, pages/SubmitApplicationPage.tsx, pages/ReviewPage.tsx, pages/AdminPage.tsx and pages/AttorneyPage.tsx.
+USER 3. client/src/app/registry.ts — add a "patent" entry (code "patent", basePath "/patent", load: () => import("../modules/patent/routes")) next to placement_cell. Keep everything else unchanged.
+USER 
+USER 
+USER To suggest changes to a file you MUST return the entire content of the updated file.
+USER You MUST use this *file listing* format:
+USER 
+USER path/to/filename.js
+USER ```
+USER // entire file content ...
+USER // ... goes in between
+USER ```
+USER 
+USER Every *file listing* MUST use this format:
+USER - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+USER - Second line: opening ```
+USER - ... entire content of the file ...
+USER - Final line: closing ```
+USER 
+USER To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+USER *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+USER Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+USER 
+USER Reply in English.
+USER 
+LLM RESPONSE 2026-11-07T15:01:12
+ASSISTANT client/src/modules/patent/api.ts
+ASSISTANT ```typescript
+ASSISTANT import { http } from "../../lib/http";
+ASSISTANT import type { ApplicationStatus } from "./types";
+ASSISTANT 
+ASSISTANT /**
+ASSISTANT  * Patent API types and hooks.
+ASSISTANT  *
+ASSISTANT  * Endpoints are under /patent/ in the backend, so axios calls use paths like "/patent/mine".
+ASSISTANT  */
+ASSISTANT 
+ASSISTANT // --- Types ---
+ASSISTANT 
+ASSISTANT export interface PatentApplication {
+ASSISTANT   id: number;
+ASSISTANT   title: string;
+ASSISTANT   abstract: string;
+ASSISTANT   inventor_names: string[];
+ASSISTANT   filing_date: string; // ISO date string
+ASSISTANT   status: ApplicationStatus;
+ASSISTANT   assigned_director_id: number | null;
+ASSISTANT   attorney_assigned: boolean;
+ASSISTANT   budget_total: number | null;
+ASSISTANT   created_at: string;
+ASSISTANT   updated_at: string;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT export interface PatentApplicationCreateData {
+ASSISTANT   title: string;
+ASSISTANT   abstract: string;
+ASSISTANT   inventor_names: string[];
+ASSISTANT   filing_date: string; // ISO date string
+ASSISTANT }
+ASSISTANT 
+ASSISTANT // --- Hooks ---
+ASSISTANT 
+ASSISTANT /** Fetches the current user's patent applications. */
+ASSISTANT export function useMyApplications() {
+ASSISTANT   return http.get<PatentApplication[]>("/patent/mine");
+ASSISTANT }
+ASSISTANT 
+ASSISTANT /** Creates a new patent application. */
+ASSISTANT export async function createPatentApplication(
+ASSISTANT   data: PatentApplicationCreateData,
+ASSISTANT ): Promise<PatentApplication> {
+ASSISTANT   const res = await http.post<PatentApplication>(
+ASSISTANT     "/patent/submit",
+ASSISTANT     data,
+ASSISTANT   );
+ASSISTANT   return res.data;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT /** Fetches a single patent application by ID. */
+ASSISTANT export function usePatentApplication(id: number) {
+ASSISTANT   return http.get<PatentApplication>(`/patent/applications/${id}/`);
+ASSISTANT }
+ASSISTANT 
+ASSISTANT /** Updates the status or metadata of a patent application (e.g., assign director, withdraw). */
+ASSISTANT export async function updatePatentApplication(
+ASSISTANT   id: number,
+ASSISTANT   data: Partial<PatentApplication>,
+ASSISTANT ): Promise<PatentApplication> {
+ASSISTANT   const res = await http.patch<PatentApplication>(
+ASSISTANT     `/patent/applications/${id}/`,
+ASSISTANT     data,
+ASSISTANT   );
+ASSISTANT   return res.data;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT /** Fetches pending applications for review (Director role). */
+ASSISTANT export function usePendingApplications() {
+ASSISTANT   // Assuming a dedicated endpoint or filtering on the list. 
+ASSISTANT   // For now, we'll assume a specific endpoint exists: /patent/review/pending
+ASSISTANT   // If not, this would need to be adjusted based on actual backend implementation.
+ASSISTANT   return http.get<PatentApplication[]>("/patent/review/pending");
+ASSISTANT }
+ASSISTANT 
+ASSISTANT /** Fetches admin applications (PCC_ADMIN role). */
+ASSISTANT export function useAdminApplications() {
+ASSISTANT   return http.get<PatentApplication[]>("/patent/admin/applications");
+ASSISTANT }
+ASSISTANT 
+ASSISTANT // --- Legal & Filing Hooks (Attorney) ---
+ASSISTANT 
+ASSISTANT /** Records an external patent office filing. */
+ASSISTANT export async function recordFiling(filingData: any) {
+ASSISTANT   const res = await http.post(
+ASSISTANT     "/patent/filings/",
+ASSISTANT     filingData,
+ASSISTANT   );
+ASSISTANT   return res.data;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT /** Records an office action received from the patent office. */
+ASSISTANT export async function recordOfficeAction(actionData: any) {
+ASSISTANT   const res = await http.post(
+ASSISTANT     "/patent/office-actions/",
+ASSISTANT     actionData,
+ASSISTANT   );
+ASSISTANT   return res.data;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT /** Prepares a response to an office action. */
+ASSISTANT export async function prepareResponse(responseData: any) {
+ASSISTANT   const res = await http.post(
+ASSISTANT     "/patent/office-actions/prepare/",
+ASSISTANT     responseData,
+ASSISTANT   );
+ASSISTANT   return res.data;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT /** Approves a prepared response. */
+ASSISTANT export async function approveResponse(id: number) {
+ASSISTANT   const res = await http.post(`/patent/office-actions/${id}/approve/`);
+ASSISTANT   return res.data;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT /** Submits the final response to the patent office. */
+ASSISTANT export async function submitResponse(id: number, responseData: any) {
+ASSISTANT   const res = await http.post(
+ASSISTANT     `/patent/office-actions/${id}/response/submit/`,
+ASSISTANT     responseData,
+ASSISTANT   );
+ASSISTANT   return res.data;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT /** Records a grant decision for an application. */
+ASSISTANT export async function recordGrant(applicationId: number, grantData: any) {
+ASSISTANT   const res = await http.post(
+ASSISTANT     `/patent/applications/${applicationId}/grant/`,
+ASSISTANT     grantData,
+ASSISTANT   );
+ASSISTANT   return res.data;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT /** Schedules a maintenance fee payment. */
+ASSISTANT export async function scheduleMaintenance(applicationId: number, data: any) {
+ASSISTANT   const res = await http.post(
+ASSISTANT     `/patent/maintenance/${applicationId}/`,
+ASSISTANT     data,
+ASSISTANT   );
+ASSISTANT   return res.data;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT /** Decides on a renewal request. */
+ASSISTANT export async function decideRenewal(applicationId: number, decisionData: any) {
+ASSISTANT   const res = await http.post(
+ASSISTANT     `/patent/maintenance/${applicationId}/decide/`,
+ASSISTANT     decisionData,
+ASSISTANT   );
+ASSISTANT   return res.data;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT /** Proposes a budget for an application. */
+ASSISTANT export async function proposeBudget(applicationId: number, budgetData: any) {
+ASSISTANT   const res = await http.post(
+ASSISTANT     `/patent/budgets/${applicationId}/`,
+ASSISTANT     budgetData,
+ASSISTANT   );
+ASSISTANT   return res.data;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT /** Decides on a proposed budget. */
+ASSISTANT export async function decideBudget(applicationId: number, decisionData: any) {
+ASSISTANT   const res = await http.post(
+ASSISTANT     `/patent/budgets/${applicationId}/decide/`,
+ASSISTANT     decisionData,
+ASSISTANT   );
+ASSISTANT   return res.data;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT /** Records an opinion from the attorney. */
+ASSISTANT export async function recordOpinion(opinionData: any) {
+ASSISTANT   const res = await http.post(
+ASSISTANT     "/patent/opinions/",
+ASSISTANT     opinionData,
+ASSISTANT   );
+ASSISTANT   return res.data;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT // --- Appeals Hooks ---
+ASSISTANT 
+ASSISTANT /** Files an appeal for an application. */
+ASSISTANT export async function fileAppeal(applicationId: number, appealData: any) {
+ASSISTANT   const res = await http.post(
+ASSISTANT     `/patent/applications/${applicationId}/appeal/`,
+ASSISTANT     appealData,
+ASSISTANT   );
+ASSISTANT   return res.data;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT /** Reviews and decides on an appeal. */
+ASSISTANT export async function decideAppeal(appealId: number, decisionData: any) {
+ASSISTANT   const res = await http.post(
+ASSISTANT     `/patent/appeals/${appealId}/`,
+ASSISTANT     decisionData,
+ASSISTANT   );
+ASSISTANT   return res.data;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT // --- Admin Hooks ---
+ASSISTANT 
+ASSISTANT /** Expire overdue resubmissions (system trigger). */
+ASSISTANT export async function expireOverdueResubmissions() {
+ASSISTANT   const res = await http.post("/patent/admin/expire-resubmissions/");
+ASSISTANT   return res.data;
+ASSISTANT }
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT client/src/modules/patent/routes.tsx
+ASSISTANT ```typescript
+ASSISTANT import { lazy } from "react";
+ASSISTANT import { Navigate, type RouteObject } from "react-router-dom";
+ASSISTANT 
+ASSISTANT /** One lazy chunk per page. Vite can only split these if the import() argument
+ASSISTANT  *  is a static literal — a computed path silently bundles everything. */
+ASSISTANT const MyApplicationsPage = lazy(() => import("./pages/MyApplicationsPage"));
+ASSISTANT const SubmitApplicationPage = lazy(() => import("./pages/SubmitApplicationPage"));
+ASSISTANT const ReviewPage = lazy(() => import("./pages/ReviewPage"));
+ASSISTANT const AdminPage = lazy(() => import("./pages/AdminPage"));
+ASSISTANT const AttorneyPage = lazy(() => import("./pages/AttorneyPage"));
+ASSISTANT 
+ASSISTANT /** Paths are RELATIVE — the shell mounts them under the manifest's basePath.
+ASSISTANT  *
+ASSISTANT  *  Every entry here has a matching nav item in the server's registry.py, and
+ASSISTANT  *  that correspondence matters: the sidebar is built server-side, so a nav item
+ASSISTANT  *  without a route here renders a link that goes nowhere. */
+ASSISTANT export const routes: RouteObject[] = [
+ASSISTANT   { index: true, element: <Navigate to="mine" replace /> },
+ASSISTANT   { path: "mine", element: <MyApplicationsPage /> },
+ASSISTANT   { path: "submit", element: <SubmitApplicationPage /> },
+ASSISTANT   { path: "review", element: <ReviewPage /> },
+ASSISTANT   { path: "admin", element: <AdminPage /> },
+ASSISTANT   { path: "attorney", element: <AttorneyPage /> },
+ASSISTANT ];
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT client/src/app/registry.ts
+ASSISTANT ```typescript
+ASSISTANT /** Frontend module registry.
+ASSISTANT  *
+ASSISTANT  *  `code` MUST match accesscontrol_module.code on the server. An ungranted
+ASSISTANT  *  module gets no route at all, so deep-linking it 404s rather than rendering
+ASSISTANT  *  blank. `load` must be a STATIC import() literal or Vite cannot split it. */
+ASSISTANT import type { RouteObject } from "react-router-dom";
+ASSISTANT 
+ASSISTANT export interface ModuleManifest {
+ASSISTANT   code: string;
+ASSISTANT   basePath: string;
+ASSISTANT   load: () => Promise<{ routes: RouteObject[] }>;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
+ASSISTANT   placement_cell: {
+ASSISTANT     code: "placement_cell",
+ASSISTANT     basePath: "/placement",
+ASSISTANT     load: () => import("../modules/placement/routes"),
+ASSISTANT   },
+ASSISTANT   patent: {
+ASSISTANT     code: "patent",
+ASSISTANT     basePath: "/patent",
+ASSISTANT     load: () => import("../modules/patent/routes"),
+ASSISTANT   },
+ASSISTANT };
+ASSISTANT ```

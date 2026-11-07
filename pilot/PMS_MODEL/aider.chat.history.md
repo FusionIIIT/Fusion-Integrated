@@ -3047,3 +3047,309 @@ config/urls.py
 > Tokens: 6.1k sent, 291 received.  
 > Applied edit to config/urls.py  
 > Applied edit to config/settings/base.py  
+
+# aider chat started at 2026-11-07 14:52:41
+
+> /opt/homebrew/bin/aider --model ollama_chat/qwen3.5:4b --edit-format whole --map-tokens 1024 --timeout 3600 --yes-always --stream --no-pretty --no-fancy-input --no-gitignore --no-auto-commits --no-dirty-commits --no-auto-lint --no-auto-test --no-check-update --analytics-disable --no-show-release-notes --no-show-model-warnings --no-suggest-shell-commands --no-detect-urls --no-restore-chat-history --aiderignore /Users/vishalkumar/elm_specs_md/pms_kit/aiderignore --chat-history-file /Users/vishalkumar/ELM_MODEL_2/pilot/PMS_MODEL/aider.chat.history.md --input-history-file /Users/vishalkumar/ELM_MODEL_2/pilot/PMS_MODEL/aider.input.history --llm-history-file /Users/vishalkumar/ELM_MODEL_2/pilot/PMS_MODEL/llm.history.txt --read client/src/modules/placement/routes.tsx --read client/src/lib/http.ts --read modules/patent/registry.py --read modules/patent/api/urls.py --file client/src/modules/patent/api.ts --file client/src/modules/patent/routes.tsx --file client/src/app/registry.ts --message-file /Users/vishalkumar/ELM_MODEL_2/pilot/PMS_MODEL/prompts/step9.md  
+> Creating empty file /Users/vishalkumar/ELM_MODEL_2/client/src/modules/patent/api.ts  
+> Creating empty file /Users/vishalkumar/ELM_MODEL_2/client/src/modules/patent/routes.tsx  
+> Aider v0.86.2  
+> Model: ollama_chat/qwen3.5:4b with whole edit format  
+> Git repo: .git with 250 files  
+> Repo-map: using 1024 tokens, auto refresh  
+> Added client/src/app/registry.ts to the chat.  
+> Added client/src/modules/patent/api.ts to the chat.  
+> Added client/src/modules/patent/routes.tsx to the chat.  
+> Added client/src/modules/placement/routes.tsx to the chat (read-only).  
+> Added client/src/lib/http.ts to the chat (read-only).  
+> Added modules/patent/api/urls.py to the chat (read-only).  
+> Added modules/patent/registry.py to the chat (read-only).  
+
+#### Context (the same for every step): we are implementing the Patent Management System (PMS) module as an integrated module of this Fusion ERP repository (Django 5 + DRF backend under modules/, React 18 + Mantine 7 client under client/). Reuse Fusion's existing login, role mechanism, layout and backend structure; do not rebuild them.  
+####   
+#### Repository rules you must follow:  
+#### - There is no user table in this repository. The logged-in person is request.principal (fusion_auth.principal.Principal: user_id, username, kind, roles, permissions). Store people as integer ids (models.IntegerField), never as a ForeignKey to a user model.  
+#### - A module copies the shape of modules/placement: apps.py, registry.py, models.py, domain/ (pure Python, no Django imports), services/ (all writes), api/ (serializers, views, urls).  
+#### - The module code is "patent", and every permission code starts with "patent.".  
+#### - Every API view sets permission_classes = [HasModuleGrant("patent"), HasPermission("patent.<action>")], imported from fusion_auth.permissions.  
+#### - The four PMS actors are Applicant, Director, PCC_ADMIN and Attorney.  
+####   
+#### Files marked read-only are context only. Write every file you create or change in full. Do not ask for more files; work with what is shown.  
+####   
+#### Step 9 of 11 — client module wiring. Read-only: client/src/modules/placement/routes.tsx, client/src/lib/http.ts, modules/patent/registry.py, modules/patent/api/urls.py.  
+####   
+#### Create or change these files:  
+#### 1. client/src/modules/patent/api.ts — TypeScript types and @tanstack/react-query hooks that call the patent endpoints through the shared `http` axios instance exported by client/src/lib/http.ts (its base URL is already /api/v1, so paths start with /patent/).  
+#### 2. client/src/modules/patent/routes.tsx — lazy-loaded pages for the paths "mine", "submit", "review", "admin" and "attorney" (these must match the NAV_ITEMS "to" paths in registry.py), plus an index redirect to "mine", following placement/routes.tsx. The page files will be pages/MyApplicationsPage.tsx, pages/SubmitApplicationPage.tsx, pages/ReviewPage.tsx, pages/AdminPage.tsx and pages/AttorneyPage.tsx.  
+#### 3. client/src/app/registry.ts — add a "patent" entry (code "patent", basePath "/patent", load: () => import("../modules/patent/routes")) next to placement_cell. Keep everything else unchanged.  
+
+client/src/modules/patent/api.ts
+```typescript
+import { http } from "../../lib/http";
+import type { ApplicationStatus } from "./types";
+
+/**
+ * Patent API types and hooks.
+ *
+ * Endpoints are under /patent/ in the backend, so axios calls use paths like "/patent/mine".
+ */
+
+// --- Types ---
+
+export interface PatentApplication {
+  id: number;
+  title: string;
+  abstract: string;
+  inventor_names: string[];
+  filing_date: string; // ISO date string
+  status: ApplicationStatus;
+  assigned_director_id: number | null;
+  attorney_assigned: boolean;
+  budget_total: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PatentApplicationCreateData {
+  title: string;
+  abstract: string;
+  inventor_names: string[];
+  filing_date: string; // ISO date string
+}
+
+// --- Hooks ---
+
+/** Fetches the current user's patent applications. */
+export function useMyApplications() {
+  return http.get<PatentApplication[]>("/patent/mine");
+}
+
+/** Creates a new patent application. */
+export async function createPatentApplication(
+  data: PatentApplicationCreateData,
+): Promise<PatentApplication> {
+  const res = await http.post<PatentApplication>(
+    "/patent/submit",
+    data,
+  );
+  return res.data;
+}
+
+/** Fetches a single patent application by ID. */
+export function usePatentApplication(id: number) {
+  return http.get<PatentApplication>(`/patent/applications/${id}/`);
+}
+
+/** Updates the status or metadata of a patent application (e.g., assign director, withdraw). */
+export async function updatePatentApplication(
+  id: number,
+  data: Partial<PatentApplication>,
+): Promise<PatentApplication> {
+  const res = await http.patch<PatentApplication>(
+    `/patent/applications/${id}/`,
+    data,
+  );
+  return res.data;
+}
+
+/** Fetches pending applications for review (Director role). */
+export function usePendingApplications() {
+  // Assuming a dedicated endpoint or filtering on the list. 
+  // For now, we'll assume a specific endpoint exists: /patent/review/pending
+  // If not, this would need to be adjusted based on actual backend implementation.
+  return http.get<PatentApplication[]>("/patent/review/pending");
+}
+
+/** Fetches admin applications (PCC_ADMIN role). */
+export function useAdminApplications() {
+  return http.get<PatentApplication[]>("/patent/admin/applications");
+}
+
+// --- Legal & Filing Hooks (Attorney) ---
+
+/** Records an external patent office filing. */
+export async function recordFiling(filingData: any) {
+  const res = await http.post(
+    "/patent/filings/",
+    filingData,
+  );
+  return res.data;
+}
+
+/** Records an office action received from the patent office. */
+export async function recordOfficeAction(actionData: any) {
+  const res = await http.post(
+    "/patent/office-actions/",
+    actionData,
+  );
+  return res.data;
+}
+
+/** Prepares a response to an office action. */
+export async function prepareResponse(responseData: any) {
+  const res = await http.post(
+    "/patent/office-actions/prepare/",
+    responseData,
+  );
+  return res.data;
+}
+
+/** Approves a prepared response. */
+export async function approveResponse(id: number) {
+  const res = await http.post(`/patent/office-actions/${id}/approve/`);
+  return res.data;
+}
+
+/** Submits the final response to the patent office. */
+export async function submitResponse(id: number, responseData: any) {
+  const res = await http.post(
+    `/patent/office-actions/${id}/response/submit/`,
+    responseData,
+  );
+  return res.data;
+}
+
+/** Records a grant decision for an application. */
+export async function recordGrant(applicationId: number, grantData: any) {
+  const res = await http.post(
+    `/patent/applications/${applicationId}/grant/`,
+    grantData,
+  );
+  return res.data;
+}
+
+/** Schedules a maintenance fee payment. */
+export async function scheduleMaintenance(applicationId: number, data: any) {
+  const res = await http.post(
+    `/patent/maintenance/${applicationId}/`,
+    data,
+  );
+  return res.data;
+}
+
+/** Decides on a renewal request. */
+export async function decideRenewal(applicationId: number, decisionData: any) {
+  const res = await http.post(
+    `/patent/maintenance/${applicationId}/decide/`,
+    decisionData,
+  );
+  return res.data;
+}
+
+/** Proposes a budget for an application. */
+export async function proposeBudget(applicationId: number, budgetData: any) {
+  const res = await http.post(
+    `/patent/budgets/${applicationId}/`,
+    budgetData,
+  );
+  return res.data;
+}
+
+/** Decides on a proposed budget. */
+export async function decideBudget(applicationId: number, decisionData: any) {
+  const res = await http.post(
+    `/patent/budgets/${applicationId}/decide/`,
+    decisionData,
+  );
+  return res.data;
+}
+
+/** Records an opinion from the attorney. */
+export async function recordOpinion(opinionData: any) {
+  const res = await http.post(
+    "/patent/opinions/",
+    opinionData,
+  );
+  return res.data;
+}
+
+// --- Appeals Hooks ---
+
+/** Files an appeal for an application. */
+export async function fileAppeal(applicationId: number, appealData: any) {
+  const res = await http.post(
+    `/patent/applications/${applicationId}/appeal/`,
+    appealData,
+  );
+  return res.data;
+}
+
+/** Reviews and decides on an appeal. */
+export async function decideAppeal(appealId: number, decisionData: any) {
+  const res = await http.post(
+    `/patent/appeals/${appealId}/`,
+    decisionData,
+  );
+  return res.data;
+}
+
+// --- Admin Hooks ---
+
+/** Expire overdue resubmissions (system trigger). */
+export async function expireOverdueResubmissions() {
+  const res = await http.post("/patent/admin/expire-resubmissions/");
+  return res.data;
+}
+```
+
+client/src/modules/patent/routes.tsx
+```typescript
+import { lazy } from "react";
+import { Navigate, type RouteObject } from "react-router-dom";
+
+/** One lazy chunk per page. Vite can only split these if the import() argument
+ *  is a static literal — a computed path silently bundles everything. */
+const MyApplicationsPage = lazy(() => import("./pages/MyApplicationsPage"));
+const SubmitApplicationPage = lazy(() => import("./pages/SubmitApplicationPage"));
+const ReviewPage = lazy(() => import("./pages/ReviewPage"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
+const AttorneyPage = lazy(() => import("./pages/AttorneyPage"));
+
+/** Paths are RELATIVE — the shell mounts them under the manifest's basePath.
+ *
+ *  Every entry here has a matching nav item in the server's registry.py, and
+ *  that correspondence matters: the sidebar is built server-side, so a nav item
+ *  without a route here renders a link that goes nowhere. */
+export const routes: RouteObject[] = [
+  { index: true, element: <Navigate to="mine" replace /> },
+  { path: "mine", element: <MyApplicationsPage /> },
+  { path: "submit", element: <SubmitApplicationPage /> },
+  { path: "review", element: <ReviewPage /> },
+  { path: "admin", element: <AdminPage /> },
+  { path: "attorney", element: <AttorneyPage /> },
+];
+```
+
+client/src/app/registry.ts
+```typescript
+/** Frontend module registry.
+ *
+ *  `code` MUST match accesscontrol_module.code on the server. An ungranted
+ *  module gets no route at all, so deep-linking it 404s rather than rendering
+ *  blank. `load` must be a STATIC import() literal or Vite cannot split it. */
+import type { RouteObject } from "react-router-dom";
+
+export interface ModuleManifest {
+  code: string;
+  basePath: string;
+  load: () => Promise<{ routes: RouteObject[] }>;
+}
+
+export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
+  placement_cell: {
+    code: "placement_cell",
+    basePath: "/placement",
+    load: () => import("../modules/placement/routes"),
+  },
+  patent: {
+    code: "patent",
+    basePath: "/patent",
+    load: () => import("../modules/patent/routes"),
+  },
+};
+```
+
+> Tokens: 5.3k sent, 1.8k received.  
+> Applied edit to client/src/modules/patent/api.ts  
+> Applied edit to client/src/app/registry.ts  
+> Applied edit to client/src/modules/patent/routes.tsx  
