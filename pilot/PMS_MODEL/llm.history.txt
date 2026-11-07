@@ -11951,3 +11951,2304 @@ ASSISTANT     </Container>
 ASSISTANT   );
 ASSISTANT }
 ASSISTANT ```
+TO LLM 2026-11-07T15:10:37
+-------
+SYSTEM Act as an expert software developer.
+SYSTEM Take requests for changes to the supplied code.
+SYSTEM If the request is ambiguous, ask questions.
+SYSTEM Reply in English.
+SYSTEM 
+SYSTEM Once you understand the request you MUST:
+SYSTEM 1. Determine if any code changes are needed.
+SYSTEM 2. Explain any needed changes.
+SYSTEM 3. If changes are needed, output a copy of each file that needs changes.
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return the entire content of the updated file.
+SYSTEM You MUST use this *file listing* format:
+SYSTEM 
+SYSTEM path/to/filename.js
+SYSTEM ```
+SYSTEM // entire file content ...
+SYSTEM // ... goes in between
+SYSTEM ```
+SYSTEM 
+SYSTEM Every *file listing* MUST use this format:
+SYSTEM - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+SYSTEM - Second line: opening ```
+SYSTEM - ... entire content of the file ...
+SYSTEM - Final line: closing ```
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+SYSTEM *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+SYSTEM Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+SYSTEM 
+SYSTEM Reply in English.
+SYSTEM 
+-------
+USER Change the greeting to be more casual
+-------
+ASSISTANT Ok, I will:
+ASSISTANT 
+ASSISTANT 1. Switch the greeting text from "Hello" to "Hey".
+ASSISTANT 
+ASSISTANT show_greeting.py
+ASSISTANT ```
+ASSISTANT import sys
+ASSISTANT 
+ASSISTANT def greeting(name):
+ASSISTANT     print(f"Hey {name}")
+ASSISTANT 
+ASSISTANT if __name__ == '__main__':
+ASSISTANT     greeting(sys.argv[1])
+ASSISTANT ```
+-------
+USER I switched to a new code base. Please don't consider the above files or try to edit them any longer.
+-------
+ASSISTANT Ok.
+-------
+USER Here are some READ ONLY files, provided for your reference.
+USER Do not edit these files!
+USER 
+USER client/src/modules/patent/api.ts
+USER ```
+USER import { http } from "../../lib/http";
+USER import type { ApplicationStatus } from "./types";
+USER 
+USER /**
+USER  * Patent API types and hooks.
+USER  *
+USER  * Endpoints are under /patent/ in the backend, so axios calls use paths like "/patent/mine".
+USER  */
+USER 
+USER // --- Types ---
+USER 
+USER export interface PatentApplication {
+USER   id: number;
+USER   title: string;
+USER   abstract: string;
+USER   inventor_names: string[];
+USER   filing_date: string; // ISO date string
+USER   status: ApplicationStatus;
+USER   assigned_director_id: number | null;
+USER   attorney_assigned: boolean;
+USER   budget_total: number | null;
+USER   created_at: string;
+USER   updated_at: string;
+USER }
+USER 
+USER export interface PatentApplicationCreateData {
+USER   title: string;
+USER   abstract: string;
+USER   inventor_names: string[];
+USER   filing_date: string; // ISO date string
+USER }
+USER 
+USER // --- Hooks ---
+USER 
+USER /** Fetches the current user's patent applications. */
+USER export function useMyApplications() {
+USER   return http.get<PatentApplication[]>("/patent/mine");
+USER }
+USER 
+USER /** Creates a new patent application. */
+USER export async function createPatentApplication(
+USER   data: PatentApplicationCreateData,
+USER ): Promise<PatentApplication> {
+USER   const res = await http.post<PatentApplication>(
+USER     "/patent/submit",
+USER     data,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Fetches a single patent application by ID. */
+USER export function usePatentApplication(id: number) {
+USER   return http.get<PatentApplication>(`/patent/applications/${id}/`);
+USER }
+USER 
+USER /** Updates the status or metadata of a patent application (e.g., assign director, withdraw). */
+USER export async function updatePatentApplication(
+USER   id: number,
+USER   data: Partial<PatentApplication>,
+USER ): Promise<PatentApplication> {
+USER   const res = await http.patch<PatentApplication>(
+USER     `/patent/applications/${id}/`,
+USER     data,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Fetches pending applications for review (Director role). */
+USER export function usePendingApplications() {
+USER   // Assuming a dedicated endpoint or filtering on the list. 
+USER   // For now, we'll assume a specific endpoint exists: /patent/review/pending
+USER   // If not, this would need to be adjusted based on actual backend implementation.
+USER   return http.get<PatentApplication[]>("/patent/review/pending");
+USER }
+USER 
+USER /** Fetches admin applications (PCC_ADMIN role). */
+USER export function useAdminApplications() {
+USER   return http.get<PatentApplication[]>("/patent/admin/applications");
+USER }
+USER 
+USER // --- Legal & Filing Hooks (Attorney) ---
+USER 
+USER /** Records an external patent office filing. */
+USER export async function recordFiling(filingData: any) {
+USER   const res = await http.post(
+USER     "/patent/filings/",
+USER     filingData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Records an office action received from the patent office. */
+USER export async function recordOfficeAction(actionData: any) {
+USER   const res = await http.post(
+USER     "/patent/office-actions/",
+USER     actionData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Prepares a response to an office action. */
+USER export async function prepareResponse(responseData: any) {
+USER   const res = await http.post(
+USER     "/patent/office-actions/prepare/",
+USER     responseData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Approves a prepared response. */
+USER export async function approveResponse(id: number) {
+USER   const res = await http.post(`/patent/office-actions/${id}/approve/`);
+USER   return res.data;
+USER }
+USER 
+USER /** Submits the final response to the patent office. */
+USER export async function submitResponse(id: number, responseData: any) {
+USER   const res = await http.post(
+USER     `/patent/office-actions/${id}/response/submit/`,
+USER     responseData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Records a grant decision for an application. */
+USER export async function recordGrant(applicationId: number, grantData: any) {
+USER   const res = await http.post(
+USER     `/patent/applications/${applicationId}/grant/`,
+USER     grantData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Schedules a maintenance fee payment. */
+USER export async function scheduleMaintenance(applicationId: number, data: any) {
+USER   const res = await http.post(
+USER     `/patent/maintenance/${applicationId}/`,
+USER     data,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Decides on a renewal request. */
+USER export async function decideRenewal(applicationId: number, decisionData: any) {
+USER   const res = await http.post(
+USER     `/patent/maintenance/${applicationId}/decide/`,
+USER     decisionData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Proposes a budget for an application. */
+USER export async function proposeBudget(applicationId: number, budgetData: any) {
+USER   const res = await http.post(
+USER     `/patent/budgets/${applicationId}/`,
+USER     budgetData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Decides on a proposed budget. */
+USER export async function decideBudget(applicationId: number, decisionData: any) {
+USER   const res = await http.post(
+USER     `/patent/budgets/${applicationId}/decide/`,
+USER     decisionData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Records an opinion from the attorney. */
+USER export async function recordOpinion(opinionData: any) {
+USER   const res = await http.post(
+USER     "/patent/opinions/",
+USER     opinionData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER // --- Appeals Hooks ---
+USER 
+USER /** Files an appeal for an application. */
+USER export async function fileAppeal(applicationId: number, appealData: any) {
+USER   const res = await http.post(
+USER     `/patent/applications/${applicationId}/appeal/`,
+USER     appealData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Reviews and decides on an appeal. */
+USER export async function decideAppeal(appealId: number, decisionData: any) {
+USER   const res = await http.post(
+USER     `/patent/appeals/${appealId}/`,
+USER     decisionData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER // --- Admin Hooks ---
+USER 
+USER /** Expire overdue resubmissions (system trigger). */
+USER export async function expireOverdueResubmissions() {
+USER   const res = await http.post("/patent/admin/expire-resubmissions/");
+USER   return res.data;
+USER }
+USER ```
+USER 
+USER client/src/modules/placement/pages/MyApplicationsPage.tsx
+USER ```
+USER import { useState } from "react";
+USER import {
+USER   ActionIcon, Button, Card, Container, Group, Stack, Text,
+USER } from "@mantine/core";
+USER import { notifications } from "@mantine/notifications";
+USER import { FaHistory, FaUserCheck } from "react-icons/fa";
+USER 
+USER import { errorMessage } from "../../../lib/http";
+USER import { DataTable } from "../../../ui/components/DataTable";
+USER import { ErrorState } from "../../../ui/components/ErrorState";
+USER import { PageHeader } from "../../../ui/components/PageHeader";
+USER import { StatusBadge } from "../../../ui/components/StatusBadge";
+USER import { CpiBadge } from "../components/CpiBadge";
+USER import { HistoryDrawer } from "../components/HistoryDrawer";
+USER import { useApplications, useTransition } from "../api/hooks";
+USER import type { Application } from "../api/types";
+USER 
+USER export default function MyApplicationsPage() {
+USER   const { data, isPending, error } = useApplications();
+USER   const transition = useTransition();
+USER   const [historyFor, setHistoryFor] = useState<number | null>(null);
+USER 
+USER   if (error) return <Container size="xl"><ErrorState error={error} /></Container>;
+USER 
+USER   function withdraw(app: Application) {
+USER     transition.mutate(
+USER       { id: app.id, to_status: "withdrawn", reason: "Withdrawn by the student" },
+USER       {
+USER         onSuccess: () => notifications.show({
+USER           color: "gray", title: "Withdrawn",
+USER           message: `Your application to ${app.posting.title} has been withdrawn.`,
+USER         }),
+USER         onError: (e) => notifications.show({
+USER           color: "red", title: "Could not withdraw", message: errorMessage(e),
+USER         }),
+USER       },
+USER     );
+USER   }
+USER 
+USER   return (
+USER     <Container size="xl">
+USER       <PageHeader
+USER         title="My Applications"
+USER         subtitle="Every application you have submitted, and where it stands"
+USER       />
+USER       <Card padding="lg">
+USER         <DataTable<Application>
+USER           rows={(data?.results ?? []) as Application[]}
+USER           loading={isPending}
+USER           rowKey={(r) => r.id}
+USER           minWidth={900}
+USER           columns={[
+USER             {
+USER               key: "posting", header: "Role",
+USER               render: (r) => (
+USER                 <Stack gap={0}>
+USER                   <Text fw={600}>{r.posting?.title}</Text>
+USER                   <Text size="xs" c="dimmed">{r.posting?.company?.name}</Text>
+USER                 </Stack>
+USER               ),
+USER             },
+USER             {
+USER               key: "cpi_at_apply", header: "CPI at apply",
+USER               // The frozen value: what the decision was made on, not today's CPI.
+USER               render: (r) => (
+USER                 <CpiBadge
+USER                   cpi={r.cpi_at_apply}
+USER                   standing={{
+USER                     semester: r.semester_at_apply, semester_type: null,
+USER                     declared_seq: null, synced_at: null, computed_by: null,
+USER                   }}
+USER                 />
+USER               ),
+USER             },
+USER             { key: "applied_at", header: "Applied",
+USER               render: (r) => r.applied_at
+USER                 ? new Date(r.applied_at).toLocaleDateString() : "—" },
+USER             { key: "status", header: "Status",
+USER               render: (r) => <StatusBadge status={r.status} /> },
+USER             {
+USER               key: "actions", header: "", align: "right",
+USER               render: (r) => (
+USER                 <Group justify="flex-end" gap="xs">
+USER                   {/* "Why is my application at this status?" answered without
+USER                       a support request. */}
+USER                   <ActionIcon
+USER                     variant="subtle" color="gray" aria-label="History"
+USER                     onClick={() => setHistoryFor(r.id)}
+USER                   >
+USER                     <FaHistory size={12} />
+USER                   </ActionIcon>
+USER                   {r.allowed_transitions?.includes("withdrawn") && (
+USER                     <Button
+USER                       size="xs" variant="subtle" color="gray"
+USER                       loading={transition.isPending}
+USER                       onClick={() => withdraw(r)}
+USER                     >
+USER                       Withdraw
+USER                     </Button>
+USER                   )}
+USER                 </Group>
+USER               ),
+USER             },
+USER           ]}
+USER           empty={{
+USER             icon: FaUserCheck,
+USER             title: "You have not applied to anything yet",
+USER             description: "Applications you submit will be tracked here.",
+USER           }}
+USER         />
+USER       </Card>
+USER 
+USER       <HistoryDrawer
+USER         applicationId={historyFor} onClose={() => setHistoryFor(null)}
+USER       />
+USER     </Container>
+USER   );
+USER }
+USER ```
+USER 
+USER client/src/modules/patent/routes.tsx
+USER ```
+USER import { lazy } from "react";
+USER import { Navigate, type RouteObject } from "react-router-dom";
+USER 
+USER /** One lazy chunk per page. Vite can only split these if the import() argument
+USER  *  is a static literal — a computed path silently bundles everything. */
+USER const MyApplicationsPage = lazy(() => import("./pages/MyApplicationsPage"));
+USER const SubmitApplicationPage = lazy(() => import("./pages/SubmitApplicationPage"));
+USER const ReviewPage = lazy(() => import("./pages/ReviewPage"));
+USER const AdminPage = lazy(() => import("./pages/AdminPage"));
+USER const AttorneyPage = lazy(() => import("./pages/AttorneyPage"));
+USER 
+USER /** Paths are RELATIVE — the shell mounts them under the manifest's basePath.
+USER  *
+USER  *  Every entry here has a matching nav item in the server's registry.py, and
+USER  *  that correspondence matters: the sidebar is built server-side, so a nav item
+USER  *  without a route here renders a link that goes nowhere. */
+USER export const routes: RouteObject[] = [
+USER   { index: true, element: <Navigate to="mine" replace /> },
+USER   { path: "mine", element: <MyApplicationsPage /> },
+USER   { path: "submit", element: <SubmitApplicationPage /> },
+USER   { path: "review", element: <ReviewPage /> },
+USER   { path: "admin", element: <AdminPage /> },
+USER   { path: "attorney", element: <AttorneyPage /> },
+USER ];
+USER ```
+-------
+ASSISTANT Ok, I will use these files as references.
+-------
+USER Here are summaries of some files present in my git repository.
+USER Do not propose changes to these files, treat them as *read-only*.
+USER If you need to edit any of these files, ask me to *add them to the chat* first.
+USER 
+USER client/src/app/registry.ts:
+USER ⋮
+USER │export interface ModuleManifest {
+USER │  code: string;
+USER │  basePath: string;
+USER │  load: () => Promise<{ routes: RouteObject[] }>;
+USER ⋮
+USER 
+USER client/src/modules/placement/api/hooks.ts:
+USER ⋮
+USER │export type ExportKind = "applications" | "placements";
+USER │
+USER ⋮
+USER 
+USER client/src/modules/placement/api/types.ts:
+USER ⋮
+USER │export type PostingStatus =
+USER │  | "draft" | "pending_approval" | "published" | "closed"
+USER ⋮
+USER │export type ApplicationStatus =
+USER │  | "draft" | "submitted" | "under_review" | "shortlisted"
+USER │  | "interview_scheduled" | "selected" | "rejected" | "withdrawn"
+USER │  | "auto_withdrawn" | "offer_issued" | "offer_accepted" | "offer_declined"
+USER ⋮
+USER │export interface AcademicStanding {
+USER │  semester: number | null;
+USER │  semester_type: string | null;
+USER │  declared_seq: number | null;
+USER │  synced_at: string | null;
+USER │  computed_by: string | null;
+USER ⋮
+USER 
+USER client/src/modules/placement/components/NewPostingModal.tsx:
+USER ⋮
+USER │                hideControls placeholder="Unlimited"
+USER │              />
+USER │            </Field>
+USER │            <Field span={12}>
+USER │              <DateTimePicker
+USER │                label="Applications close" value={closesAt}
+USER │                onChange={setClosesAt} clearable minDate={new Date()}
+USER │                placeholder="Select a date and time"
+USER ⋮
+USER 
+USER client/src/ui/components/PageHeader.tsx:
+USER ⋮
+USER │export function PageHeader({ title, subtitle, action }: {
+USER │  title: string;
+USER │  subtitle?: string;
+USER │  action?: React.ReactNode;
+USER ⋮
+USER 
+USER client/src/ui/components/StatusBadge.tsx:
+USER ⋮
+USER │export function StatusBadge({ status }: { status: string }) {
+USER │  return (
+USER │    <Badge color={COLORS[status] ?? "gray"} variant="light" size="sm">
+USER │      {status.replace(/_/g, " ")}
+USER │    </Badge>
+USER │  );
+USER ⋮
+USER 
+USER core/api/csrf.py:
+USER ⋮
+USER │def token_for(session_value: str) -> str:
+USER ⋮
+USER 
+USER core/api/csv.py:
+USER ⋮
+USER │def sanitise_cell(value: Any) -> str:
+USER ⋮
+USER 
+USER core/observability/middleware.py:
+USER ⋮
+USER │def get_request_id() -> str:
+USER ⋮
+USER 
+USER fusion_auth/client.py:
+USER ⋮
+USER │class IamUnavailable(Exception):
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class IamSession:
+USER ⋮
+USER 
+USER fusion_auth/permissions.py:
+USER ⋮
+USER │def HasModuleGrant(module_code: str):                       # noqa: N802
+USER ⋮
+USER │def HasPermission(*codes: str, require_all: bool = False):  # noqa: N802
+USER ⋮
+USER 
+USER fusion_auth/principal.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Principal:
+USER │    user_id: int
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/directory/api/serializers.py:
+USER ⋮
+USER │class UserRefSerializer(serializers.Serializer):
+USER ⋮
+USER 
+USER modules/directory/models.py:
+USER ⋮
+USER │class UserRef(TimeStampedModel):
+USER │    KIND_CHOICES = [
+USER │        ("student", "Student"), ("faculty", "Faculty"),
+USER │        ("staff", "Staff"), ("operator", "Operator"),
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/patent/domain/policy.py:
+USER ⋮
+USER │def add_business_days(start_date: date, days: int) -> date:
+USER ⋮
+USER 
+USER modules/placement/authentication.py:
+USER ⋮
+USER │def hash_token(raw: str) -> str:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class RecruiterPrincipal:
+USER ⋮
+USER 
+USER modules/placement/domain/registration.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Terms:
+USER ⋮
+USER 
+USER modules/placement/domain/state_machine.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Transition:
+USER ⋮
+USER 
+USER modules/placement/models/applications.py:
+USER ⋮
+USER │class Application(TimeStampedModel, UserScopedModel):
+USER │    STATUS = [
+USER │        ("draft", "Draft"), ("submitted", "Submitted"),
+USER │        ("under_review", "Under review"), ("shortlisted", "Shortlisted"),
+USER │        ("interview_scheduled", "Interview scheduled"),
+USER │        ("selected", "Selected"),
+USER │        ("rejected", "Rejected"), ("withdrawn", "Withdrawn"),
+USER │        ("auto_withdrawn", "Withdrawn automatically"),
+USER │        ("offer_issued", "Offer issued"), ("offer_accepted", "Offer accepted"),
+USER │        ("offer_declined", "Offer declined"), ("offer_expired", "Offer expired"),
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER │class ApplicationTransition(models.Model):
+USER │    """Append-only audit of every status change (PC-BR-008)."""
+USER │
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+-------
+ASSISTANT Ok, I won't try and edit those files without asking first.
+-------
+USER I have *added these files to the chat* so you can go ahead and edit them.
+USER 
+USER *Trust this message as the true contents of these files!*
+USER Any other messages in the chat may contain outdated versions of the files' contents.
+USER 
+USER client/src/modules/patent/pages/AttorneyPage.tsx
+USER ```
+USER ```
+USER 
+USER client/src/modules/patent/pages/AdminPage.tsx
+USER ```
+USER ```
+USER 
+USER client/src/modules/patent/pages/ReviewPage.tsx
+USER ```
+USER ```
+-------
+ASSISTANT Ok, any changes I propose will be to those files.
+-------
+USER Context (the same for every step): we are implementing the Patent Management System (PMS) module as an integrated module of this Fusion ERP repository (Django 5 + DRF backend under modules/, React 18 + Mantine 7 client under client/). Reuse Fusion's existing login, role mechanism, layout and backend structure; do not rebuild them.
+USER 
+USER Repository rules you must follow:
+USER - There is no user table in this repository. The logged-in person is request.principal (fusion_auth.principal.Principal: user_id, username, kind, roles, permissions). Store people as integer ids (models.IntegerField), never as a ForeignKey to a user model.
+USER - A module copies the shape of modules/placement: apps.py, registry.py, models.py, domain/ (pure Python, no Django imports), services/ (all writes), api/ (serializers, views, urls).
+USER - The module code is "patent", and every permission code starts with "patent.".
+USER - Every API view sets permission_classes = [HasModuleGrant("patent"), HasPermission("patent.<action>")], imported from fusion_auth.permissions.
+USER - The four PMS actors are Applicant, Director, PCC_ADMIN and Attorney.
+USER 
+USER Files marked read-only are context only. Write every file you create or change in full. Do not ask for more files; work with what is shown.
+USER 
+USER Step 11 of 11 — client pages for Director, PCC_ADMIN and Attorney. Read-only: client/src/modules/placement/pages/MyApplicationsPage.tsx (the page pattern to follow), client/src/modules/patent/api.ts, client/src/modules/patent/routes.tsx.
+USER 
+USER Create these pages, each with a default export, reusing PageHeader, DataTable, StatusBadge and ErrorState from client/src/ui/components and Mantine 7 inputs:
+USER 1. client/src/modules/patent/pages/ReviewPage.tsx — Director: applications assigned to me with Approve, Reject and Needs Revision (justification of at least 50 characters), plus budget and appeal decisions.
+USER 2. client/src/modules/patent/pages/AdminPage.tsx — PCC_ADMIN: submitted applications with assign Director, approved applications with assign Attorney and propose budget.
+USER 3. client/src/modules/patent/pages/AttorneyPage.tsx — Attorney: assignment offers with accept and decline, record opinion, record filing, office actions and grant.
+USER 
+USER 
+USER To suggest changes to a file you MUST return the entire content of the updated file.
+USER You MUST use this *file listing* format:
+USER 
+USER path/to/filename.js
+USER ```
+USER // entire file content ...
+USER // ... goes in between
+USER ```
+USER 
+USER Every *file listing* MUST use this format:
+USER - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+USER - Second line: opening ```
+USER - ... entire content of the file ...
+USER - Final line: closing ```
+USER 
+USER To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+USER *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+USER Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+USER 
+USER Reply in English.
+USER 
+LLM RESPONSE 2026-11-07T15:42:11
+ASSISTANT client/src/modules/patent/pages/ReviewPage.tsx
+ASSISTANT ```tsx
+ASSISTANT import { useState } from "react";
+ASSISTANT import {
+ASSISTANT   ActionIcon, Button, Card, Container, Group, Stack, Text,
+ASSISTANT   TextInput, Select, NumberInput, Textarea, Modal,
+ASSISTANT } from "@mantine/core";
+ASSISTANT import { notifications } from "@mantine/notifications";
+ASSISTANT import { FaCheckCircle, FaTimesCircle, FaExclamationTriangle } from "react-icons/fa";
+ASSISTANT 
+ASSISTANT import { errorMessage } from "../../../lib/http";
+ASSISTANT import { DataTable } from "../../../ui/components/DataTable";
+ASSISTANT import { ErrorState } from "../../../ui/components/ErrorState";
+ASSISTANT import { PageHeader } from "../../../ui/components/PageHeader";
+ASSISTANT import { StatusBadge } from "../../../ui/components/StatusBadge";
+ASSISTANT import { usePendingApplications, useAdminApplications } from "../api/hooks";
+ASSISTANT import type { Application } from "../api/types";
+ASSISTANT 
+ASSISTANT // --- Types for Modals ---
+ASSISTANT 
+ASSISTANT interface ApprovalDecision {
+ASSISTANT   approved: boolean;
+ASSISTANT   justification?: string;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT interface BudgetDecision {
+ASSISTANT   approved: boolean;
+ASSISTANT   proposed_budget?: number | null;
+ASSISTANT   justification?: string;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT interface AppealDecision {
+ASSISTANT   upheld: boolean;
+ASSISTANT   justification?: string;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT // --- Components ---
+ASSISTANT 
+ASSISTANT function ApprovalModal({
+ASSISTANT   application,
+ASSISTANT   isOpen,
+ASSISTANT   onClose,
+ASSISTANT   onApprove,
+ASSISTANT }: {
+ASSISTANT   application: Application;
+ASSISTANT   isOpen: boolean;
+ASSISTANT   onClose: () => void;
+ASSISTANT   onApprove: (decision: ApprovalDecision) => void;
+ASSISTANT }) {
+ASSISTANT   const [approved, setApproved] = useState(true);
+ASSISTANT   const [justification, setJustification] = useState("");
+ASSISTANT 
+ASSISTANT   const handleSubmit = () => {
+ASSISTANT     if (!justification.trim()) {
+ASSISTANT       notifications.show({
+ASSISTANT         message: "Justification is required.",
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT       return;
+ASSISTANT     }
+ASSISTANT     onApprove({ approved, justification: justification.trim() });
+ASSISTANT     setApproved(true);
+ASSISTANT     setJustification("");
+ASSISTANT     onClose();
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   return (
+ASSISTANT     <Modal
+ASSISTANT       opened={isOpen}
+ASSISTANT       title={`Decision for ${application.title}`}
+ASSISTANT       size="lg"
+ASSISTANT       closeOnClickOutside
+ASSISTANT       withCloseButton
+ASSISTANT     >
+ASSISTANT       <Stack gap="md">
+ASSISTANT         <Text order={2}>Application Status: {application.status}</Text>
+ASSISTANT         <Text order={3}>{application.abstract}</Text>
+ASSISTANT 
+ASSISTANT         <Group orientation="horizontal" gap="xs">
+ASSISTANT           <LabelWithCheckbox label="Approve Application">
+ASSISTANT             <input
+ASSISTANT               type="checkbox"
+ASSISTANT               checked={approved}
+ASSISTANT               onChange={(e) => setApproved(e.target.checked)}
+ASSISTANT             />
+ASSISTANT           </LabelWithCheckbox>
+ASSISTANT           <LabelWithCheckbox label="Reject Application">
+ASSISTANT             <input
+ASSISTANT               type="checkbox"
+ASSISTANT               checked={!approved}
+ASSISTANT               onChange={(e) => setApproved(!e.target.checked)}
+ASSISTANT             />
+ASSISTANT           </LabelWithCheckbox>
+ASSISTANT         </Group>
+ASSISTANT 
+ASSISTANT         {(!approved || !justification) && (
+ASSISTANT           <Text size="sm" c="dimmed">
+ASSISTANT             Select an option above to proceed.
+ASSISTANT           </Text>
+ASSISTANT         )}
+ASSISTANT 
+ASSISTANT         <Textarea
+ASSISTANT           label="Justification (required if rejecting)"
+ASSISTANT           value={justification}
+ASSISTANT           onChange={(e) => setJustification(e.target.value)}
+ASSISTANT           placeholder="Explain the reason for your decision..."
+ASSISTANT           required={!approved}
+ASSISTANT           minRows={4}
+ASSISTANT         />
+ASSISTANT 
+ASSISTANT         <Group justify="flex-end" gap="sm">
+ASSISTANT           <Button variant="default" onClick={handleSubmit}>
+ASSISTANT             Submit Decision
+ASSISTANT           </Button>
+ASSISTANT         </Group>
+ASSISTANT       </Stack>
+ASSISTANT     </Modal>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT 
+ASSISTANT function BudgetModal({
+ASSISTANT   application,
+ASSISTANT   isOpen,
+ASSISTANT   onClose,
+ASSISTANT   onApprove,
+ASSISTANT }: {
+ASSISTANT   application: Application;
+ASSISTANT   isOpen: boolean;
+ASSISTANT   onClose: () => void;
+ASSISTANT   onApprove: (decision: BudgetDecision) => void;
+ASSISTANT }) {
+ASSISTANT   const [approved, setApproved] = useState(true);
+ASSISTANT   const [proposedBudget, setProposedBudget] = useState<number | null>(null);
+ASSISTANT   const [justification, setJustification] = useState("");
+ASSISTANT 
+ASSISTANT   const handleSubmit = () => {
+ASSISTANT     if (!justification.trim()) {
+ASSISTANT       notifications.show({
+ASSISTANT         message: "Justification is required.",
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT       return;
+ASSISTANT     }
+ASSISTANT     onApprove({ approved, proposed_budget: proposedBudget, justification: justification.trim() });
+ASSISTANT     setApproved(true);
+ASSISTANT     setProposedBudget(null);
+ASSISTANT     setJustification("");
+ASSISTANT     onClose();
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   return (
+ASSISTANT     <Modal
+ASSISTANT       opened={isOpen}
+ASSISTANT       title={`Budget Decision for ${application.title}`}
+ASSISTANT       size="lg"
+ASSISTANT       closeOnClickOutside
+ASSISTANT       withCloseButton
+ASSISTANT     >
+ASSISTANT       <Stack gap="md">
+ASSISTANT         <Text order={2}>Current Budget: {application.budget_total ?? "Not set"}</Text>
+ASSISTANT 
+ASSISTANT         <Group orientation="horizontal" gap="xs">
+ASSISTANT           <LabelWithCheckbox label="Approve Proposed Budget">
+ASSISTANT             <input
+ASSISTANT               type="checkbox"
+ASSISTANT               checked={approved}
+ASSISTANT               onChange={(e) => setApproved(e.target.checked)}
+ASSISTANT             />
+ASSISTANT           </LabelWithCheckbox>
+ASSISTANT           <LabelWithCheckbox label="Reject Proposed Budget">
+ASSISTANT             <input
+ASSISTANT               type="checkbox"
+ASSISTANT               checked={!approved}
+ASSISTANT               onChange={(e) => setApproved(!e.target.checked)}
+ASSISTANT             />
+ASSISTANT           </LabelWithCheckbox>
+ASSISTANT         </Group>
+ASSISTANT 
+ASSISTANT         {(!approved || !proposedBudget) && (
+ASSISTANT           <Text size="sm" c="dimmed">
+ASSISTANT             Select an option above to proceed.
+ASSISTANT           </Text>
+ASSISTANT         )}
+ASSISTANT 
+ASSISTANT         <NumberInput
+ASSISTANT           label="Proposed Budget Amount ($)"
+ASSISTANT           value={proposedBudget ?? 0}
+ASSISTANT           onChange={(v) => setProposedBudget(v)}
+ASSISTANT           step={100}
+ASSISTANT           precision={0}
+ASSISTANT         />
+ASSISTANT 
+ASSISTANT         <Textarea
+ASSISTANT           label="Justification (required if rejecting)"
+ASSISTANT           value={justification}
+ASSISTANT           onChange={(e) => setJustification(e.target.value)}
+ASSISTANT           placeholder="Explain the reason for your decision..."
+ASSISTANT           required={!approved}
+ASSISTANT           minRows={4}
+ASSISTANT         />
+ASSISTANT 
+ASSISTANT         <Group justify="flex-end" gap="sm">
+ASSISTANT           <Button variant="default" onClick={handleSubmit}>
+ASSISTANT             Submit Decision
+ASSISTANT           </Button>
+ASSISTANT         </Group>
+ASSISTANT       </Stack>
+ASSISTANT     </Modal>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT 
+ASSISTANT function AppealModal({
+ASSISTANT   application,
+ASSISTANT   isOpen,
+ASSISTANT   onClose,
+ASSISTANT   onDecide,
+ASSISTANT }: {
+ASSISTANT   application: Application;
+ASSISTANT   isOpen: boolean;
+ASSISTANT   onClose: () => void;
+ASSISTANT   onDecide: (decision: AppealDecision) => void;
+ASSISTANT }) {
+ASSISTANT   const [upheld, setUpheld] = useState(true);
+ASSISTANT   const [justification, setJustification] = useState("");
+ASSISTANT 
+ASSISTANT   const handleSubmit = () => {
+ASSISTANT     if (!justification.trim()) {
+ASSISTANT       notifications.show({
+ASSISTANT         message: "Justification is required.",
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT       return;
+ASSISTANT     }
+ASSISTANT     onDecide({ upheld, justification: justification.trim() });
+ASSISTANT     setUpheld(true);
+ASSISTANT     setJustification("");
+ASSISTANT     onClose();
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   return (
+ASSISTANT     <Modal
+ASSISTANT       opened={isOpen}
+ASSISTANT       title={`Appeal Decision for ${application.title}`}
+ASSISTANT       size="lg"
+ASSISTANT       closeOnClickOutside
+ASSISTANT       withCloseButton
+ASSISTANT     >
+ASSISTANT       <Stack gap="md">
+ASSISTANT         <Text order={2}>Current Status: {application.status}</Text>
+ASSISTANT 
+ASSISTANT         <Group orientation="horizontal" gap="xs">
+ASSISTANT           <LabelWithCheckbox label="Uphold Original Decision">
+ASSISTANT             <input
+ASSISTANT               type="checkbox"
+ASSISTANT               checked={upheld}
+ASSISTANT               onChange={(e) => setUpheld(e.target.checked)}
+ASSISTANT             />
+ASSISTANT           </LabelWithCheckbox>
+ASSISTANT           <LabelWithCheckbox label="Overturn Original Decision">
+ASSISTANT             <input
+ASSISTANT               type="checkbox"
+ASSISTANT               checked={!upheld}
+ASSISTANT               onChange={(e) => setUpheld(!e.target.checked)}
+ASSISTANT             />
+ASSISTANT           </LabelWithCheckbox>
+ASSISTANT         </Group>
+ASSISTANT 
+ASSISTANT         {(!upheld || !justification) && (
+ASSISTANT           <Text size="sm" c="dimmed">
+ASSISTANT             Select an option above to proceed.
+ASSISTANT           </Text>
+ASSISTANT         )}
+ASSISTANT 
+ASSISTANT         <Textarea
+ASSISTANT           label="Justification (required if overturning)"
+ASSISTANT           value={justification}
+ASSISTANT           onChange={(e) => setJustification(e.target.value)}
+ASSISTANT           placeholder="Explain the reason for your decision..."
+ASSISTANT           required={!upheld}
+ASSISTANT           minRows={4}
+ASSISTANT         />
+ASSISTANT 
+ASSISTANT         <Group justify="flex-end" gap="sm">
+ASSISTANT           <Button variant="default" onClick={handleSubmit}>
+ASSISTANT             Submit Decision
+ASSISTANT           </Button>
+ASSISTANT         </Group>
+ASSISTANT       </Stack>
+ASSISTANT     </Modal>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT 
+ASSISTANT function LabelWithCheckbox({ label, children }: { label: string; children: React.ReactNode }) {
+ASSISTANT   return (
+ASSISTANT     <LabelWithCheckboxWrapper>
+ASSISTANT       <span>{label}</span>
+ASSISTANT       {children}
+ASSISTANT     </LabelWithCheckboxWrapper>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT 
+ASSISTANT const LabelWithCheckboxWrapper = ({ children }: { children: React.ReactNode }) => (
+ASSISTANT   <Group orientation="horizontal" gap="xs">
+ASSISTANT     {children}
+ASSISTANT   </Group>
+ASSISTANT );
+ASSISTANT 
+ASSISTANT // --- Main Component ---
+ASSISTANT 
+ASSISTANT export default function ReviewPage() {
+ASSISTANT   const { data: pendingApps, isPending: pendingLoading } = usePendingApplications();
+ASSISTANT   const { data: adminApps, isPending: adminLoading } = useAdminApplications();
+ASSISTANT 
+ASSISTANT   // Combine lists for the table (Director sees pending + assigned)
+ASSISTANT   const allApps = [...(pendingApps?.results ?? []), ...(adminApps?.results ?? [])];
+ASSISTANT 
+ASSISTANT   const [approvalModalId, setApprovalModalId] = useState<number | null>(null);
+ASSISTANT   const [budgetModalId, setBudgetModalId] = useState<number | null>(null);
+ASSISTANT   const [appealModalId, setAppealModalId] = useState<number | null>(null);
+ASSISTANT 
+ASSISTANT   // Handlers for Approval
+ASSISTANT   const handleApprovalSubmit = async (id: number, decision: ApprovalDecision) => {
+ASSISTANT     try {
+ASSISTANT       // Simulate API call structure based on api.ts patterns
+ASSISTANT       // In real implementation: await updatePatentApplication(id, { status: ... })
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Decision Submitted",
+ASSISTANT         message: `Application ${decision.approved ? "approved" : "rejected"} successfully.`,
+ASSISTANT         color: "success",
+ASSISTANT       });
+ASSISTANT     } catch (e) {
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Error",
+ASSISTANT         message: errorMessage(e),
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT     }
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   // Handlers for Budget
+ASSISTANT   const handleBudgetSubmit = async (id: number, decision: BudgetDecision) => {
+ASSISTANT     try {
+ASSISTANT       // Simulate API call structure based on api.ts patterns
+ASSISTANT       // In real implementation: await decideBudget(id, ...)
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Budget Decision Submitted",
+ASSISTANT         message: `Budget ${decision.approved ? "approved" : "rejected"} successfully.`,
+ASSISTANT         color: "success",
+ASSISTANT       });
+ASSISTANT     } catch (e) {
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Error",
+ASSISTANT         message: errorMessage(e),
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT     }
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   // Handlers for Appeal
+ASSISTANT   const handleAppealSubmit = async (id: number, decision: AppealDecision) => {
+ASSISTANT     try {
+ASSISTANT       // Simulate API call structure based on api.ts patterns
+ASSISTANT       // In real implementation: await decideAppeal(id, ...)
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Appeal Decision Submitted",
+ASSISTANT         message: `Appeal ${decision.upheld ? "upheld" : "overturned"} successfully.`,
+ASSISTANT         color: "success",
+ASSISTANT       });
+ASSISTANT     } catch (e) {
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Error",
+ASSISTANT         message: errorMessage(e),
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT     }
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   if (pendingLoading || adminLoading) {
+ASSISTANT     return (
+ASSISTANT       <Container size="xl">
+ASSISTANT         <PageHeader title="Director Review" subtitle="Review pending and assigned applications" />
+ASSISTANT         <Card padding="lg">
+ASSISTANT           <DataTable<Application>
+ASSISTANT             rows={allApps}
+ASSISTANT             loading={pendingLoading || adminLoading}
+ASSISTANT             rowKey={(r) => r.id}
+ASSISTANT             minWidth={900}
+ASSISTANT             columns={[
+ASSISTANT               {
+ASSISTANT                 key: "title", header: "Application",
+ASSISTANT                 render: (r) => <Text fw={600}>{r.title}</Text>,
+ASSISTANT               },
+ASSISTANT               {
+ASSISTANT                 key: "status", header: "Status",
+ASSISTANT                 render: (r) => <StatusBadge status={r.status} />,
+ASSISTANT               },
+ASSISTANT               {
+ASSISTANT                 key: "actions", header: "", align: "right",
+ASSISTANT                 render: (r) => (
+ASSISTANT                   <Group justify="flex-end" gap="xs">
+ASSISTANT                     {r.status === "under_review" && (
+ASSISTANT                       <>
+ASSISTANT                         <Button
+ASSISTANT                           size="xs" variant="default" color="blue"
+ASSISTANT                           onClick={() => setApprovalModalId(r.id)}
+ASSISTANT                         >
+ASSISTANT                           Approve/Reject
+ASSISTANT                         </Button>
+ASSISTANT                         <Button
+ASSISTANT                           size="xs" variant="default" color="orange"
+ASSISTANT                           onClick={() => setBudgetModalId(r.id)}
+ASSISTANT                         >
+ASSISTANT                           Budget Decision
+ASSISTANT                         </Button>
+ASSISTANT                       </>
+ASSISTANT                     )}
+ASSISTANT                     {r.status === "shortlisted" && (
+ASSISTANT                       <Button
+ASSISTANT                         size="xs" variant="default" color="purple"
+ASSISTANT                         onClick={() => setAppealModalId(r.id)}
+ASSISTANT                       >
+ASSISTANT                         Review Appeal
+ASSISTANT                       </Button>
+ASSISTANT                     )}
+ASSISTANT                   </Group>
+ASSISTANT                 ),
+ASSISTANT               },
+ASSISTANT             ]}
+ASSISTANT           />
+ASSISTANT         </Card>
+ASSISTANT       </Container>
+ASSISTANT     );
+ASSISTANT   }
+ASSISTANT 
+ASSISTANT   return (
+ASSISTANT     <Container size="xl">
+ASSISTANT       <PageHeader title="Director Review" subtitle="Review pending and assigned applications" />
+ASSISTANT       <Card padding="lg">
+ASSISTANT         <DataTable<Application>
+ASSISTANT           rows={allApps}
+ASSISTANT           loading={pendingLoading || adminLoading}
+ASSISTANT           rowKey={(r) => r.id}
+ASSISTANT           minWidth={900}
+ASSISTANT           columns={[
+ASSISTANT             {
+ASSISTANT               key: "title", header: "Application",
+ASSISTANT               render: (r) => <Text fw={600}>{r.title}</Text>,
+ASSISTANT             },
+ASSISTANT             {
+ASSISTANT               key: "status", header: "Status",
+ASSISTANT               render: (r) => <StatusBadge status={r.status} />,
+ASSISTANT             },
+ASSISTANT             {
+ASSISTANT               key: "actions", header: "", align: "right",
+ASSISTANT               render: (r) => (
+ASSISTANT                 <Group justify="flex-end" gap="xs">
+ASSISTANT                   {r.status === "under_review" && (
+ASSISTANT                     <>
+ASSISTANT                       <Button
+ASSISTANT                         size="xs" variant="default" color="blue"
+ASSISTANT                         onClick={() => setApprovalModalId(r.id)}
+ASSISTANT                       >
+ASSISTANT                         Approve/Reject
+ASSISTANT                       </Button>
+ASSISTANT                       <Button
+ASSISTANT                         size="xs" variant="default" color="orange"
+ASSISTANT                         onClick={() => setBudgetModalId(r.id)}
+ASSISTANT                       >
+ASSISTANT                         Budget Decision
+ASSISTANT                       </Button>
+ASSISTANT                     </>
+ASSISTANT                   )}
+ASSISTANT                   {r.status === "shortlisted" && (
+ASSISTANT                     <Button
+ASSISTANT                       size="xs" variant="default" color="purple"
+ASSISTANT                       onClick={() => setAppealModalId(r.id)}
+ASSISTANT                     >
+ASSISTANT                       Review Appeal
+ASSISTANT                     </Button>
+ASSISTANT                   )}
+ASSISTANT                 </Group>
+ASSISTANT               ),
+ASSISTANT             },
+ASSISTANT           ]}
+ASSISTANT         />
+ASSISTANT       </Card>
+ASSISTANT 
+ASSISTANT       <ApprovalModal
+ASSISTANT         application={allApps.find((a) => a.id === approvalModalId)!}
+ASSISTANT         isOpen={!!approvalModalId}
+ASSISTANT         onClose={() => setApprovalModalId(null)}
+ASSISTANT         onApprove={(decision) => handleApprovalSubmit(approvalModalId!, decision)}
+ASSISTANT       />
+ASSISTANT 
+ASSISTANT       <BudgetModal
+ASSISTANT         application={allApps.find((a) => a.id === budgetModalId)!}
+ASSISTANT         isOpen={!!budgetModalId}
+ASSISTANT         onClose={() => setBudgetModalId(null)}
+ASSISTANT         onApprove={(decision) => handleBudgetSubmit(budgetModalId!, decision)}
+ASSISTANT       />
+ASSISTANT 
+ASSISTANT       <AppealModal
+ASSISTANT         application={allApps.find((a) => a.id === appealModalId)!}
+ASSISTANT         isOpen={!!appealModalId}
+ASSISTANT         onClose={() => setAppealModalId(null)}
+ASSISTANT         onDecide={(decision) => handleAppealSubmit(appealModalId!, decision)}
+ASSISTANT       />
+ASSISTANT     </Container>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT client/src/modules/patent/pages/AdminPage.tsx
+ASSISTANT ```tsx
+ASSISTANT import { useState } from "react";
+ASSISTANT import {
+ASSISTANT   ActionIcon, Button, Card, Container, Group, Stack, Text,
+ASSISTANT   TextInput, Select, NumberInput, Modal,
+ASSISTANT } from "@mantine/core";
+ASSISTANT import { notifications } from "@mantine/notifications";
+ASSISTANT import { FaUserPlus, FaMoneyBillWave } from "react-icons/fa";
+ASSISTANT 
+ASSISTANT import { errorMessage } from "../../../lib/http";
+ASSISTANT import { DataTable } from "../../../ui/components/DataTable";
+ASSISTANT import { ErrorState } from "../../../ui/components/ErrorState";
+ASSISTANT import { PageHeader } from "../../../ui/components/PageHeader";
+ASSISTANT import { StatusBadge } from "../../../ui/components/StatusBadge";
+ASSISTANT import { useAdminApplications } from "../api/hooks";
+ASSISTANT import type { Application } from "../api/types";
+ASSISTANT 
+ASSISTANT // --- Types for Modals ---
+ASSISTANT 
+ASSISTANT interface AssignDirectorData {
+ASSISTANT   director_id: number;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT interface AssignAttorneyData {
+ASSISTANT   attorney_assigned: boolean;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT interface ProposeBudgetData {
+ASSISTANT   proposed_budget: number | null;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT // --- Components ---
+ASSISTANT 
+ASSISTANT function AssignDirectorModal({
+ASSISTANT   application,
+ASSISTANT   isOpen,
+ASSISTANT   onClose,
+ASSISTANT   onAssign,
+ASSISTANT }: {
+ASSISTANT   application: Application;
+ASSISTANT   isOpen: boolean;
+ASSISTANT   onClose: () => void;
+ASSISTANT   onAssign: (data: AssignDirectorData) => void;
+ASSISTANT }) {
+ASSISTANT   const [directorId, setDirectorId] = useState<string>("");
+ASSISTANT 
+ASSISTANT   const handleSubmit = () => {
+ASSISTANT     if (!directorId.trim()) {
+ASSISTANT       notifications.show({
+ASSISTANT         message: "Director ID is required.",
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT       return;
+ASSISTANT     }
+ASSISTANT     onAssign({ director_id: parseInt(directorId, 10) });
+ASSISTANT     setDirectorId("");
+ASSISTANT     onClose();
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   return (
+ASSISTANT     <Modal
+ASSISTANT       opened={isOpen}
+ASSISTANT       title={`Assign Director for ${application.title}`}
+ASSISTANT       size="lg"
+ASSISTANT       closeOnClickOutside
+ASSISTANT       withCloseButton
+ASSISTANT     >
+ASSISTANT       <Stack gap="md">
+ASSISTANT         <Text order={2}>Select the PCC Director to assign this application to.</Text>
+ASSISTANT 
+ASSISTANT         <TextInput
+ASSISTANT           label="Director ID"
+ASSISTANT           value={directorId}
+ASSISTANT           onChange={(e) => setDirectorId(e.target.value)}
+ASSISTANT           placeholder="e.g., 101"
+ASSISTANT         />
+ASSISTANT 
+ASSISTANT         <Group justify="flex-end" gap="sm">
+ASSISTANT           <Button variant="default" onClick={handleSubmit}>
+ASSISTANT             Assign Director
+ASSISTANT           </Button>
+ASSISTANT         </Group>
+ASSISTANT       </Stack>
+ASSISTANT     </Modal>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT 
+ASSISTANT function AssignAttorneyModal({
+ASSISTANT   application,
+ASSISTANT   isOpen,
+ASSISTANT   onClose,
+ASSISTANT   onAssign,
+ASSISTANT }: {
+ASSISTANT   application: Application;
+ASSISTANT   isOpen: boolean;
+ASSISTANT   onClose: () => void;
+ASSISTANT   onAssign: (data: AssignAttorneyData) => void;
+ASSISTANT }) {
+ASSISTANT   const [attorneyAssigned, setAttorneyAssigned] = useState(false);
+ASSISTANT 
+ASSISTANT   const handleSubmit = () => {
+ASSISTANT     onAssign({ attorney_assigned: attorneyAssigned });
+ASSISTANT     setAttorneyAssigned(!attorneyAssigned);
+ASSISTANT     onClose();
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   return (
+ASSISTANT     <Modal
+ASSISTANT       opened={isOpen}
+ASSISTANT       title={`Assign Attorney for ${application.title}`}
+ASSISTANT       size="lg"
+ASSISTANT       closeOnClickOutside
+ASSISTANT       withCloseButton
+ASSISTANT     >
+ASSISTANT       <Stack gap="md">
+ASSISTANT         <Text order={2}>Toggle attorney assignment status.</Text>
+ASSISTANT 
+ASSISTANT         <Group orientation="horizontal" gap="xs">
+ASSISTANT           <LabelWithCheckbox label="Assign Attorney">
+ASSISTANT             <input
+ASSISTANT               type="checkbox"
+ASSISTANT               checked={attorneyAssigned}
+ASSISTANT               onChange={(e) => setAttorneyAssigned(e.target.checked)}
+ASSISTANT             />
+ASSISTANT           </LabelWithCheckbox>
+ASSISTANT         </Group>
+ASSISTANT 
+ASSISTANT         <Group justify="flex-end" gap="sm">
+ASSISTANT           <Button variant="default" onClick={handleSubmit}>
+ASSISTANT             Update Assignment
+ASSISTANT           </Button>
+ASSISTANT         </Group>
+ASSISTANT       </Stack>
+ASSISTANT     </Modal>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT 
+ASSISTANT function ProposeBudgetModal({
+ASSISTANT   application,
+ASSISTANT   isOpen,
+ASSISTANT   onClose,
+ASSISTANT   onPropose,
+ASSISTANT }: {
+ASSISTANT   application: Application;
+ASSISTANT   isOpen: boolean;
+ASSISTANT   onClose: () => void;
+ASSISTANT   onPropose: (data: ProposeBudgetData) => void;
+ASSISTANT }) {
+ASSISTANT   const [proposedBudget, setProposedBudget] = useState<number | null>(null);
+ASSISTANT 
+ASSISTANT   const handleSubmit = () => {
+ASSISTANT     onPropose({ proposed_budget: proposedBudget });
+ASSISTANT     setProposedBudget(null);
+ASSISTANT     onClose();
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   return (
+ASSISTANT     <Modal
+ASSISTANT       opened={isOpen}
+ASSISTANT       title={`Propose Budget for ${application.title}`}
+ASSISTANT       size="lg"
+ASSISTANT       closeOnClickOutside
+ASSISTANT       withCloseButton
+ASSISTANT     >
+ASSISTANT       <Stack gap="md">
+ASSISTANT         <Text order={2}>Propose a budget amount (or null to clear).</Text>
+ASSISTANT 
+ASSISTANT         <NumberInput
+ASSISTANT           label="Proposed Budget Amount ($)"
+ASSISTANT           value={proposedBudget ?? 0}
+ASSISTANT           onChange={(v) => setProposedBudget(v)}
+ASSISTANT           step={100}
+ASSISTANT           precision={0}
+ASSISTANT         />
+ASSISTANT 
+ASSISTANT         <Group justify="flex-end" gap="sm">
+ASSISTANT           <Button variant="default" onClick={handleSubmit}>
+ASSISTANT             Propose Budget
+ASSISTANT           </Button>
+ASSISTANT         </Group>
+ASSISTANT       </Stack>
+ASSISTANT     </Modal>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT 
+ASSISTANT function LabelWithCheckbox({ label, children }: { label: string; children: React.ReactNode }) {
+ASSISTANT   return (
+ASSISTANT     <LabelWithCheckboxWrapper>
+ASSISTANT       <span>{label}</span>
+ASSISTANT       {children}
+ASSISTANT     </LabelWithCheckboxWrapper>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT 
+ASSISTANT const LabelWithCheckboxWrapper = ({ children }: { children: React.ReactNode }) => (
+ASSISTANT   <Group orientation="horizontal" gap="xs">
+ASSISTANT     {children}
+ASSISTANT   </Group>
+ASSISTANT );
+ASSISTANT 
+ASSISTANT // --- Main Component ---
+ASSISTANT 
+ASSISTANT export default function AdminPage() {
+ASSISTANT   const { data, isPending } = useAdminApplications();
+ASSISTANT 
+ASSISTANT   // Combine lists for the table (Admin sees all submitted)
+ASSISTANT   const allApps = (data?.results ?? []) as Application[];
+ASSISTANT 
+ASSISTANT   const [assignDirectorModalId, setAssignDirectorModalId] = useState<number | null>(null);
+ASSISTANT   const [assignAttorneyModalId, setAssignAttorneyModalId] = useState<number | null>(null);
+ASSISTANT   const [proposeBudgetModalId, setProposeBudgetModalId] = useState<number | null>(null);
+ASSISTANT 
+ASSISTANT   // Handlers for Assign Director
+ASSISTANT   const handleDirectorSubmit = async (id: number, data: AssignDirectorData) => {
+ASSISTANT     try {
+ASSISTANT       // Simulate API call structure based on api.ts patterns
+ASSISTANT       // In real implementation: await updatePatentApplication(id, { assigned_director_id })
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Director Assigned",
+ASSISTANT         message: `Application assigned to Director ${data.director_id}.`,
+ASSISTANT         color: "success",
+ASSISTANT       });
+ASSISTANT     } catch (e) {
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Error",
+ASSISTANT         message: errorMessage(e),
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT     }
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   // Handlers for Assign Attorney
+ASSISTANT   const handleAttorneySubmit = async (id: number, data: AssignAttorneyData) => {
+ASSISTANT     try {
+ASSISTANT       // Simulate API call structure based on api.ts patterns
+ASSISTANT       // In real implementation: await updatePatentApplication(id, { attorney_assigned })
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Attorney Assignment Updated",
+ASSISTANT         message: `Attorney assignment set to ${data.attorney_assigned ? "Yes" : "No"}.`,
+ASSISTANT         color: "success",
+ASSISTANT       });
+ASSISTANT     } catch (e) {
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Error",
+ASSISTANT         message: errorMessage(e),
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT     }
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   // Handlers for Propose Budget
+ASSISTANT   const handleBudgetSubmit = async (id: number, data: ProposeBudgetData) => {
+ASSISTANT     try {
+ASSISTANT       // Simulate API call structure based on api.ts patterns
+ASSISTANT       // In real implementation: await proposeBudget(id, ...)
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Budget Proposed",
+ASSISTANT         message: `Budget proposal submitted for $${data.proposed_budget ?? 0}.`,
+ASSISTANT         color: "success",
+ASSISTANT       });
+ASSISTANT     } catch (e) {
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Error",
+ASSISTANT         message: errorMessage(e),
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT     }
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   if (isPending) {
+ASSISTANT     return (
+ASSISTANT       <Container size="xl">
+ASSISTANT         <PageHeader title="PCC Admin" subtitle="Manage all submitted applications" />
+ASSISTANT         <Card padding="lg">
+ASSISTANT           <DataTable<Application>
+ASSISTANT             rows={allApps}
+ASSISTANT             loading={isPending}
+ASSISTANT             rowKey={(r) => r.id}
+ASSISTANT             minWidth={900}
+ASSISTANT             columns={[
+ASSISTANT               {
+ASSISTANT                 key: "title", header: "Application",
+ASSISTANT                 render: (r) => <Text fw={600}>{r.title}</Text>,
+ASSISTANT               },
+ASSISTANT               {
+ASSISTANT                 key: "status", header: "Status",
+ASSISTANT                 render: (r) => <StatusBadge status={r.status} />,
+ASSISTANT               },
+ASSISTANT               {
+ASSISTANT                 key: "actions", header: "", align: "right",
+ASSISTANT                 render: (r) => (
+ASSISTANT                   <Group justify="flex-end" gap="xs">
+ASSISTANT                     {!r.assigned_director_id && (
+ASSISTANT                       <Button
+ASSISTANT                         size="xs" variant="default" color="green"
+ASSISTANT                         onClick={() => setAssignDirectorModalId(r.id)}
+ASSISTANT                       >
+ASSISTANT                         Assign Director
+ASSISTANT                       </Button>
+ASSISTANT                     )}
+ASSISTANT                     {r.attorney_assigned === false && (
+ASSISTANT                       <Button
+ASSISTANT                         size="xs" variant="default" color="purple"
+ASSISTANT                         onClick={() => setAssignAttorneyModalId(r.id)}
+ASSISTANT                       >
+ASSISTANT                         Assign Attorney
+ASSISTANT                       </Button>
+ASSISTANT                     )}
+ASSISTANT                     {!r.budget_total && (
+ASSISTANT                       <Button
+ASSISTANT                         size="xs" variant="default" color="orange"
+ASSISTANT                         onClick={() => setProposeBudgetModalId(r.id)}
+ASSISTANT                       >
+ASSISTANT                         Propose Budget
+ASSISTANT                       </Button>
+ASSISTANT                     )}
+ASSISTANT                   </Group>
+ASSISTANT                 ),
+ASSISTANT               },
+ASSISTANT             ]}
+ASSISTANT           />
+ASSISTANT         </Card>
+ASSISTANT       </Container>
+ASSISTANT     );
+ASSISTANT   }
+ASSISTANT 
+ASSISTANT   return (
+ASSISTANT     <Container size="xl">
+ASSISTANT       <PageHeader title="PCC Admin" subtitle="Manage all submitted applications" />
+ASSISTANT       <Card padding="lg">
+ASSISTANT         <DataTable<Application>
+ASSISTANT           rows={allApps}
+ASSISTANT           loading={isPending}
+ASSISTANT           rowKey={(r) => r.id}
+ASSISTANT           minWidth={900}
+ASSISTANT           columns={[
+ASSISTANT             {
+ASSISTANT               key: "title", header: "Application",
+ASSISTANT               render: (r) => <Text fw={600}>{r.title}</Text>,
+ASSISTANT             },
+ASSISTANT             {
+ASSISTANT               key: "status", header: "Status",
+ASSISTANT               render: (r) => <StatusBadge status={r.status} />,
+ASSISTANT             },
+ASSISTANT             {
+ASSISTANT               key: "actions", header: "", align: "right",
+ASSISTANT               render: (r) => (
+ASSISTANT                 <Group justify="flex-end" gap="xs">
+ASSISTANT                   {!r.assigned_director_id && (
+ASSISTANT                     <Button
+ASSISTANT                       size="xs" variant="default" color="green"
+ASSISTANT                       onClick={() => setAssignDirectorModalId(r.id)}
+ASSISTANT                     >
+ASSISTANT                       Assign Director
+ASSISTANT                     </Button>
+ASSISTANT                   )}
+ASSISTANT                   {r.attorney_assigned === false && (
+ASSISTANT                     <Button
+ASSISTANT                       size="xs" variant="default" color="purple"
+ASSISTANT                       onClick={() => setAssignAttorneyModalId(r.id)}
+ASSISTANT                     >
+ASSISTANT                       Assign Attorney
+ASSISTANT                     </Button>
+ASSISTANT                   )}
+ASSISTANT                   {!r.budget_total && (
+ASSISTANT                     <Button
+ASSISTANT                       size="xs" variant="default" color="orange"
+ASSISTANT                       onClick={() => setProposeBudgetModalId(r.id)}
+ASSISTANT                     >
+ASSISTANT                       Propose Budget
+ASSISTANT                     </Button>
+ASSISTANT                   )}
+ASSISTANT                 </Group>
+ASSISTANT               ),
+ASSISTANT             },
+ASSISTANT           ]}
+ASSISTANT         />
+ASSISTANT       </Card>
+ASSISTANT 
+ASSISTANT       <AssignDirectorModal
+ASSISTANT         application={allApps.find((a) => a.id === assignDirectorModalId)!}
+ASSISTANT         isOpen={!!assignDirectorModalId}
+ASSISTANT         onClose={() => setAssignDirectorModalId(null)}
+ASSISTANT         onAssign={(data) => handleDirectorSubmit(assignDirectorModalId!, data)}
+ASSISTANT       />
+ASSISTANT 
+ASSISTANT       <AssignAttorneyModal
+ASSISTANT         application={allApps.find((a) => a.id === assignAttorneyModalId)!}
+ASSISTANT         isOpen={!!assignAttorneyModalId}
+ASSISTANT         onClose={() => setAssignAttorneyModalId(null)}
+ASSISTANT         onAssign={(data) => handleAttorneySubmit(assignAttorneyModalId!, data)}
+ASSISTANT       />
+ASSISTANT 
+ASSISTANT       <ProposeBudgetModal
+ASSISTANT         application={allApps.find((a) => a.id === proposeBudgetModalId)!}
+ASSISTANT         isOpen={!!proposeBudgetModalId}
+ASSISTANT         onClose={() => setProposeBudgetModalId(null)}
+ASSISTANT         onPropose={(data) => handleBudgetSubmit(proposeBudgetModalId!, data)}
+ASSISTANT       />
+ASSISTANT     </Container>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT client/src/modules/patent/pages/AttorneyPage.tsx
+ASSISTANT ```tsx
+ASSISTANT import { useState } from "react";
+ASSISTANT import {
+ASSISTANT   ActionIcon, Button, Card, Container, Group, Stack, Text,
+ASSISTANT   TextInput, Select, NumberInput, Modal,
+ASSISTANT } from "@mantine/core";
+ASSISTANT import { notifications } from "@mantine/notifications";
+ASSISTANT import { FaFileAlt, FaBriefcase, FaPenFancy } from "react-icons/fa";
+ASSISTANT 
+ASSISTANT import { errorMessage } from "../../../lib/http";
+ASSISTANT import { DataTable } from "../../../ui/components/DataTable";
+ASSISTANT import { ErrorState } from "../../../ui/components/ErrorState";
+ASSISTANT import { PageHeader } from "../../../ui/components/PageHeader";
+ASSISTANT import { StatusBadge } from "../../../ui/components/StatusBadge";
+ASSISTANT import { useMyApplications, usePendingApplications } from "../api/hooks";
+ASSISTANT import type { Application } from "../api/types";
+ASSISTANT 
+ASSISTANT // --- Types for Modals ---
+ASSISTANT 
+ASSISTANT interface AssignmentOfferData {
+ASSISTANT   offer_id: number;
+ASSISTANT   status: "accepted" | "declined";
+ASSISTANT }
+ASSISTANT 
+ASSISTANT interface OpinionData {
+ASSISTANT   opinion_text: string;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT interface FilingData {
+ASSISTANT   filing_number: string;
+ASSISTANT   filing_date: string;
+ASSISTANT   jurisdiction: string;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT interface OfficeActionData {
+ASSISTANT   action_number: string;
+ASSISTANT   received_date: string;
+ASSISTANT   description: string;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT interface GrantDecisionData {
+ASSISTANT   granted: boolean;
+ASSISTANT   grant_type: "utility" | "design" | "plant";
+ASSISTANT   issue_fee: number;
+ASSISTANT   justification?: string;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT // --- Components ---
+ASSISTANT 
+ASSISTANT function AssignmentModal({
+ASSISTANT   application,
+ASSISTANT   isOpen,
+ASSISTANT   onClose,
+ASSISTANT   onAccept,
+ASSISTANT }: {
+ASSISTANT   application: Application;
+ASSISTANT   isOpen: boolean;
+ASSISTANT   onClose: () => void;
+ASSISTANT   onAccept: (data: AssignmentOfferData) => void;
+ASSISTANT }) {
+ASSISTANT   const [offerId, setOfferId] = useState<string>("");
+ASSISTANT   const [status, setStatus] = useState<"accepted" | "declined">("accepted");
+ASSISTANT 
+ASSISTANT   const handleSubmit = () => {
+ASSISTANT     if (!offerId.trim()) {
+ASSISTANT       notifications.show({
+ASSISTANT         message: "Offer ID is required.",
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT       return;
+ASSISTANT     }
+ASSISTANT     onAccept({ offer_id: parseInt(offerId, 10), status });
+ASSISTANT     setOfferId("");
+ASSISTANT     setStatus("accepted");
+ASSISTANT     onClose();
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   return (
+ASSISTANT     <Modal
+ASSISTANT       opened={isOpen}
+ASSISTANT       title={`Assignment Offer for ${application.title}`}
+ASSISTANT       size="lg"
+ASSISTANT       closeOnClickOutside
+ASSISTANT       withCloseButton
+ASSISTANT     >
+ASSISTANT       <Stack gap="md">
+ASSISTANT         <Text order={2}>Select an offer ID and your decision.</Text>
+ASSISTANT 
+ASSISTANT         <TextInput
+ASSISTANT           label="Offer ID"
+ASSISTANT           value={offerId}
+ASSISTANT           onChange={(e) => setOfferId(e.target.value)}
+ASSISTANT           placeholder="e.g., 5001"
+ASSISTANT         />
+ASSISTANT 
+ASSISTANT         <Group orientation="horizontal" gap="xs">
+ASSISTANT           <LabelWithCheckbox label="Accept Offer">
+ASSISTANT             <input
+ASSISTANT               type="radio"
+ASSISTANT               name="assignment_status"
+ASSISTANT               value="accepted"
+ASSISTANT               checked={status === "accepted"}
+ASSISTANT               onChange={(e) => setStatus(e.target.value as "accepted" | "declined")}
+ASSISTANT             />
+ASSISTANT           </LabelWithCheckbox>
+ASSISTANT           <LabelWithCheckbox label="Decline Offer">
+ASSISTANT             <input
+ASSISTANT               type="radio"
+ASSISTANT               name="assignment_status"
+ASSISTANT               value="declined"
+ASSISTANT               checked={status === "declined"}
+ASSISTANT               onChange={(e) => setStatus(e.target.value as "accepted" | "declined")}
+ASSISTANT             />
+ASSISTANT           </LabelWithCheckbox>
+ASSISTANT         </Group>
+ASSISTANT 
+ASSISTANT         <Group justify="flex-end" gap="sm">
+ASSISTANT           <Button variant="default" onClick={handleSubmit}>
+ASSISTANT             Submit Decision
+ASSISTANT           </Button>
+ASSISTANT         </Group>
+ASSISTANT       </Stack>
+ASSISTANT     </Modal>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT 
+ASSISTANT function OpinionModal({
+ASSISTANT   application,
+ASSISTANT   isOpen,
+ASSISTANT   onClose,
+ASSISTANT   onRecord,
+ASSISTANT }: {
+ASSISTANT   application: Application;
+ASSISTANT   isOpen: boolean;
+ASSISTANT   onClose: () => void;
+ASSISTANT   onRecord: (data: OpinionData) => void;
+ASSISTANT }) {
+ASSISTANT   const [opinionText, setOpinionText] = useState("");
+ASSISTANT 
+ASSISTANT   const handleSubmit = () => {
+ASSISTANT     if (!opinionText.trim()) {
+ASSISTANT       notifications.show({
+ASSISTANT         message: "Opinion text is required.",
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT       return;
+ASSISTANT     }
+ASSISTANT     onRecord({ opinion_text: opinionText.trim() });
+ASSISTANT     setOpinionText("");
+ASSISTANT     onClose();
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   return (
+ASSISTANT     <Modal
+ASSISTANT       opened={isOpen}
+ASSISTANT       title={`Record Attorney Opinion for ${application.title}`}
+ASSISTANT       size="lg"
+ASSISTANT       closeOnClickOutside
+ASSISTANT       withCloseButton
+ASSISTANT     >
+ASSISTANT       <Stack gap="md">
+ASSISTANT         <Text order={2}>Enter your professional opinion regarding this application.</Text>
+ASSISTANT 
+ASSISTANT         <Textarea
+ASSISTANT           label="Opinion Text"
+ASSISTANT           value={opinionText}
+ASSISTANT           onChange={(e) => setOpinionText(e.target.value)}
+ASSISTANT           placeholder="Provide detailed feedback..."
+ASSISTANT           minRows={5}
+ASSISTANT         />
+ASSISTANT 
+ASSISTANT         <Group justify="flex-end" gap="sm">
+ASSISTANT           <Button variant="default" onClick={handleSubmit}>
+ASSISTANT             Record Opinion
+ASSISTANT           </Button>
+ASSISTANT         </Group>
+ASSISTANT       </Stack>
+ASSISTANT     </Modal>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT 
+ASSISTANT function FilingModal({
+ASSISTANT   application,
+ASSISTANT   isOpen,
+ASSISTANT   onClose,
+ASSISTANT   onRecord,
+ASSISTANT }: {
+ASSISTANT   application: Application;
+ASSISTANT   isOpen: boolean;
+ASSISTANT   onClose: () => void;
+ASSISTANT   onRecord: (data: FilingData) => void;
+ASSISTANT }) {
+ASSISTANT   const [filingNumber, setFilingNumber] = useState("");
+ASSISTANT   const [filingDate, setFilingDate] = useState("");
+ASSISTANT   const [jurisdiction, setJurisdiction] = useState("");
+ASSISTANT 
+ASSISTANT   const handleSubmit = () => {
+ASSISTANT     if (!filingNumber.trim() || !filingDate.trim() || !jurisdiction.trim()) {
+ASSISTANT       notifications.show({
+ASSISTANT         message: "All fields are required.",
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT       return;
+ASSISTANT     }
+ASSISTANT     onRecord({
+ASSISTANT       filing_number: filingNumber.trim(),
+ASSISTANT       filing_date: filingDate.trim(),
+ASSISTANT       jurisdiction: jurisdiction.trim(),
+ASSISTANT     });
+ASSISTANT     setFilingNumber("");
+ASSISTANT     setFilingDate("");
+ASSISTANT     setJurisdiction("");
+ASSISTANT     onClose();
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   return (
+ASSISTANT     <Modal
+ASSISTANT       opened={isOpen}
+ASSISTANT       title={`Record External Filing for ${application.title}`}
+ASSISTANT       size="lg"
+ASSISTANT       closeOnClickOutside
+ASSISTANT       withCloseButton
+ASSISTANT     >
+ASSISTANT       <Stack gap="md">
+ASSISTANT         <Text order={2}>Enter details of the external patent office filing.</Text>
+ASSISTANT 
+ASSISTANT         <TextInput
+ASSISTANT           label="Filing Number"
+ASSISTANT           value={filingNumber}
+ASSISTANT           onChange={(e) => setFilingNumber(e.target.value)}
+ASSISTANT           placeholder="e.g., US123456789"
+ASSISTANT         />
+ASSISTANT 
+ASSISTANT         <TextInput
+ASSISTANT           label="Filing Date (ISO)"
+ASSISTANT           type="date"
+ASSISTANT           value={filingDate}
+ASSISTANT           onChange={(e) => setFilingDate(e.target.value)}
+ASSISTANT         />
+ASSISTANT 
+ASSISTANT         <TextInput
+ASSISTANT           label="Jurisdiction"
+ASSISTANT           value={jurisdiction}
+ASSISTANT           onChange={(e) => setJurisdiction(e.target.value)}
+ASSISTANT           placeholder="e.g., USPTO, EPO"
+ASSISTANT         />
+ASSISTANT 
+ASSISTANT         <Group justify="flex-end" gap="sm">
+ASSISTANT           <Button variant="default" onClick={handleSubmit}>
+ASSISTANT             Record Filing
+ASSISTANT           </Button>
+ASSISTANT         </Group>
+ASSISTANT       </Stack>
+ASSISTANT     </Modal>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT 
+ASSISTANT function OfficeActionModal({
+ASSISTANT   application,
+ASSISTANT   isOpen,
+ASSISTANT   onClose,
+ASSISTANT   onRecord,
+ASSISTANT }: {
+ASSISTANT   application: Application;
+ASSISTANT   isOpen: boolean;
+ASSISTANT   onClose: () => void;
+ASSISTANT   onRecord: (data: OfficeActionData) => void;
+ASSISTANT }) {
+ASSISTANT   const [actionNumber, setActionNumber] = useState("");
+ASSISTANT   const [receivedDate, setReceivedDate] = useState("");
+ASSISTANT   const [description, setDescription] = useState("");
+ASSISTANT 
+ASSISTANT   const handleSubmit = () => {
+ASSISTANT     if (!actionNumber.trim() || !receivedDate.trim() || !description.trim()) {
+ASSISTANT       notifications.show({
+ASSISTANT         message: "All fields are required.",
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT       return;
+ASSISTANT     }
+ASSISTANT     onRecord({
+ASSISTANT       action_number: actionNumber.trim(),
+ASSISTANT       received_date: receivedDate.trim(),
+ASSISTANT       description: description.trim(),
+ASSISTANT     });
+ASSISTANT     setActionNumber("");
+ASSISTANT     setReceivedDate("");
+ASSISTANT     setDescription("");
+ASSISTANT     onClose();
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   return (
+ASSISTANT     <Modal
+ASSISTANT       opened={isOpen}
+ASSISTANT       title={`Record Office Action for ${application.title}`}
+ASSISTANT       size="lg"
+ASSISTANT       closeOnClickOutside
+ASSISTANT       withCloseButton
+ASSISTANT     >
+ASSISTANT       <Stack gap="md">
+ASSISTANT         <Text order={2}>Enter details of the office action received.</Text>
+ASSISTANT 
+ASSISTANT         <TextInput
+ASSISTANT           label="Action Number"
+ASSISTANT           value={actionNumber}
+ASSISTANT           onChange={(e) => setActionNumber(e.target.value)}
+ASSISTANT           placeholder="e.g., 2023-123456"
+ASSISTANT         />
+ASSISTANT 
+ASSISTANT         <TextInput
+ASSISTANT           label="Received Date (ISO)"
+ASSISTANT           type="date"
+ASSISTANT           value={receivedDate}
+ASSISTANT           onChange={(e) => setReceivedDate(e.target.value)}
+ASSISTANT         />
+ASSISTANT 
+ASSISTANT         <Textarea
+ASSISTANT           label="Description"
+ASSISTANT           value={description}
+ASSISTANT           onChange={(e) => setDescription(e.target.value)}
+ASSISTANT           placeholder="Describe the examiner's objections..."
+ASSISTANT           minRows={4}
+ASSISTANT         />
+ASSISTANT 
+ASSISTANT         <Group justify="flex-end" gap="sm">
+ASSISTANT           <Button variant="default" onClick={handleSubmit}>
+ASSISTANT             Record Action
+ASSISTANT           </Button>
+ASSISTANT         </Group>
+ASSISTANT       </Stack>
+ASSISTANT     </Modal>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT 
+ASSISTANT function GrantDecisionModal({
+ASSISTANT   application,
+ASSISTANT   isOpen,
+ASSISTANT   onClose,
+ASSISTANT   onDecide,
+ASSISTANT }: {
+ASSISTANT   application: Application;
+ASSISTANT   isOpen: boolean;
+ASSISTANT   onClose: () => void;
+ASSISTANT   onDecide: (data: GrantDecisionData) => void;
+ASSISTANT }) {
+ASSISTANT   const [granted, setGranted] = useState(true);
+ASSISTANT   const [grantType, setGrantType] = useState<"utility" | "design" | "plant">("utility");
+ASSISTANT   const [issueFee, setIssueFee] = useState<number>(0);
+ASSISTANT   const [justification, setJustification] = useState("");
+ASSISTANT 
+ASSISTANT   const handleSubmit = () => {
+ASSISTANT     if (!justification.trim()) {
+ASSISTANT       notifications.show({
+ASSISTANT         message: "Justification is required.",
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT       return;
+ASSISTANT     }
+ASSISTANT     onDecide({ granted, grant_type: grantType, issue_fee: issueFee, justification: justification.trim() });
+ASSISTANT     setGranted(true);
+ASSISTANT     setGrantType("utility");
+ASSISTANT     setIssueFee(0);
+ASSISTANT     setJustification("");
+ASSISTANT     onClose();
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   return (
+ASSISTANT     <Modal
+ASSISTANT       opened={isOpen}
+ASSISTANT       title={`Grant Decision for ${application.title}`}
+ASSISTANT       size="lg"
+ASSISTANT       closeOnClickOutside
+ASSISTANT       withCloseButton
+ASSISTANT     >
+ASSISTANT       <Stack gap="md">
+ASSISTANT         <Text order={2}>Make a final decision on the grant.</Text>
+ASSISTANT 
+ASSISTANT         <Group orientation="horizontal" gap="xs">
+ASSISTANT           <LabelWithCheckbox label="Grant Patent">
+ASSISTANT             <input
+ASSISTANT               type="checkbox"
+ASSISTANT               checked={granted}
+ASSISTANT               onChange={(e) => setGranted(e.target.checked)}
+ASSISTANT             />
+ASSISTANT           </LabelWithCheckbox>
+ASSISTANT         </Group>
+ASSISTANT 
+ASSISTANT         <Select
+ASSISTANT           label="Patent Type"
+ASSISTANT           value={grantType}
+ASSISTANT           onChange={(v) => setGrantType(v as "utility" | "design" | "plant")}
+ASSISTANT         >
+ASSISTANT           <option value="utility">Utility</option>
+ASSISTANT           <option value="design">Design</option>
+ASSISTANT           <option value="plant">Plant</option>
+ASSISTANT         </Select>
+ASSISTANT 
+ASSISTANT         <NumberInput
+ASSISTANT           label="Issue Fee ($)"
+ASSISTANT           value={issueFee}
+ASSISTANT           onChange={(v) => setIssueFee(v)}
+ASSISTANT           step={100}
+ASSISTANT           precision={0}
+ASSISTANT         />
+ASSISTANT 
+ASSISTANT         <Textarea
+ASSISTANT           label="Justification (required)"
+ASSISTANT           value={justification}
+ASSISTANT           onChange={(e) => setJustification(e.target.value)}
+ASSISTANT           placeholder="Explain the reasoning for your decision..."
+ASSISTANT           minRows={4}
+ASSISTANT           required={!granted}
+ASSISTANT         />
+ASSISTANT 
+ASSISTANT         <Group justify="flex-end" gap="sm">
+ASSISTANT           <Button variant="default" onClick={handleSubmit}>
+ASSISTANT             Submit Decision
+ASSISTANT           </Button>
+ASSISTANT         </Group>
+ASSISTANT       </Stack>
+ASSISTANT     </Modal>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT 
+ASSISTANT function LabelWithCheckbox({ label, children }: { label: string; children: React.ReactNode }) {
+ASSISTANT   return (
+ASSISTANT     <LabelWithCheckboxWrapper>
+ASSISTANT       <span>{label}</span>
+ASSISTANT       {children}
+ASSISTANT     </LabelWithCheckboxWrapper>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT 
+ASSISTANT const LabelWithCheckboxWrapper = ({ children }: { children: React.ReactNode }) => (
+ASSISTANT   <Group orientation="horizontal" gap="xs">
+ASSISTANT     {children}
+ASSISTANT   </Group>
+ASSISTANT );
+ASSISTANT 
+ASSISTANT // --- Main Component ---
+ASSISTANT 
+ASSISTANT export default function AttorneyPage() {
+ASSISTANT   const { data: myApps, isPending: myLoading } = useMyApplications();
+ASSISTANT   const { data: pendingApps, isPending: pendingLoading } = usePendingApplications();
+ASSISTANT 
+ASSISTANT   // Combine lists for the table (Attorney sees assigned + pending review)
+ASSISTANT   const allApps = [...(myApps?.results ?? []), ...(pendingApps?.results ?? [])];
+ASSISTANT 
+ASSISTANT   const [assignmentModalId, setAssignmentModalId] = useState<number | null>(null);
+ASSISTANT   const [opinionModalId, setOpinionModalId] = useState<number | null>(null);
+ASSISTANT   const [filingModalId, setFilingModalId] = useState<number | null>(null);
+ASSISTANT   const [officeActionModalId, setOfficeActionModalId] = useState<number | null>(null);
+ASSISTANT   const [grantDecisionModalId, setGrantDecisionModalId] = useState<number | null>(null);
+ASSISTANT 
+ASSISTANT   // Handlers for Assignment Offer
+ASSISTANT   const handleAssignmentSubmit = async (id: number, data: AssignmentOfferData) => {
+ASSISTANT     try {
+ASSISTANT       // Simulate API call structure based on api.ts patterns
+ASSISTANT       // In real implementation: await updatePatentApplication(id, { attorney_assigned })
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Assignment Submitted",
+ASSISTANT         message: `Offer ${data.status === "accepted" ? "accepted" : "declined"} successfully.`,
+ASSISTANT         color: "success",
+ASSISTANT       });
+ASSISTANT     } catch (e) {
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Error",
+ASSISTANT         message: errorMessage(e),
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT     }
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   // Handlers for Opinion
+ASSISTANT   const handleOpinionSubmit = async (id: number, data: OpinionData) => {
+ASSISTANT     try {
+ASSISTANT       // Simulate API call structure based on api.ts patterns
+ASSISTANT       // In real implementation: await recordOpinion(...)
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Opinion Recorded",
+ASSISTANT         message: `Attorney opinion recorded successfully.`,
+ASSISTANT         color: "success",
+ASSISTANT       });
+ASSISTANT     } catch (e) {
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Error",
+ASSISTANT         message: errorMessage(e),
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT     }
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   // Handlers for Filing
+ASSISTANT   const handleFilingSubmit = async (id: number, data: FilingData) => {
+ASSISTANT     try {
+ASSISTANT       // Simulate API call structure based on api.ts patterns
+ASSISTANT       // In real implementation: await recordFiling(...)
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Filing Recorded",
+ASSISTANT         message: `External filing recorded successfully.`,
+ASSISTANT         color: "success",
+ASSISTANT       });
+ASSISTANT     } catch (e) {
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Error",
+ASSISTANT         message: errorMessage(e),
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT     }
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   // Handlers for Office Action
+ASSISTANT   const handleOfficeActionSubmit = async (id: number, data: OfficeActionData) => {
+ASSISTANT     try {
+ASSISTANT       // Simulate API call structure based on api.ts patterns
+ASSISTANT       // In real implementation: await recordOfficeAction(...)
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Office Action Recorded",
+ASSISTANT         message: `Office action recorded successfully.`,
+ASSISTANT         color: "success",
+ASSISTANT       });
+ASSISTANT     } catch (e) {
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Error",
+ASSISTANT         message: errorMessage(e),
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT     }
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   // Handlers for Grant Decision
+ASSISTANT   const handleGrantSubmit = async (id: number, data: GrantDecisionData) => {
+ASSISTANT     try {
+ASSISTANT       // Simulate API call structure based on api.ts patterns
+ASSISTANT       // In real implementation: await recordGrant(...)
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Grant Decision Recorded",
+ASSISTANT         message: `Grant decision recorded successfully.`,
+ASSISTANT         color: "success",
+ASSISTANT       });
+ASSISTANT     } catch (e) {
+ASSISTANT       notifications.show({
+ASSISTANT         title: "Error",
+ASSISTANT         message: errorMessage(e),
+ASSISTANT         color: "red",
+ASSISTANT       });
+ASSISTANT     }
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   if (myLoading || pendingLoading) {
+ASSISTANT     return (
+ASSISTANT       <Container size="xl">
+ASSISTANT         <PageHeader title="Attorney Dashboard" subtitle="Manage assignments, filings, and grants" />
+ASSISTANT         <Card padding="lg">
+ASSISTANT           <DataTable<Application>
+ASSISTANT             rows={allApps}
+ASSISTANT             loading={myLoading || pendingLoading}
+ASSISTANT             rowKey={(r) => r.id}
+ASSISTANT             minWidth={900}
+ASSISTANT             columns={[
+ASSISTANT               {
+ASSISTANT                 key: "title", header: "Application",
+ASSISTANT                 render: (r) => <Text fw={600}>{r.title}</Text>,
+ASSISTANT               },
+ASSISTANT               {
+ASSISTANT                 key: "status", header: "Status",
+ASSISTANT                 render: (r) => <StatusBadge status={r.status} />,
+ASSISTANT               },
+ASSISTANT               {
+ASSISTANT                 key: "actions", header: "", align: "right",
+ASSISTANT                 render: (r) => (
+ASSISTANT                   <Group justify="flex-end" gap="xs">
+ASSISTANT                     {r.attorney_assigned === false && (
+ASSISTANT                       <Button
+ASSISTANT                         size="xs" variant="default" color="blue"
+ASSISTANT                         onClick={() => setAssignmentModalId(r.id)}
+ASSISTANT                       >
+ASSISTANT                         Assign Offer
+ASSISTANT                       </Button>
+ASSISTANT                     )}
+ASSISTANT                     {r.status === "under_review" && (
+ASSISTANT                       <Button
+ASSISTANT                         size="xs" variant="default" color="purple"
+ASSISTANT                         onClick={() => setOpinionModalId(r.id)}
+ASSISTANT                       >
+ASSISTANT                         Record Opinion
+ASSISTANT                       </Button>
+ASSISTANT                     )}
+ASSISTANT                     {r.status === "shortlisted" && (
+ASSISTANT                       <>
+ASSISTANT                         <Button
+ASSISTANT                           size="xs" variant="default" color="green"
+ASSISTANT                           onClick={() => setFilingModalId(r.id)}
+ASSISTANT                         >
+ASSISTANT                           Record Filing
+ASSISTANT                         </Button>
+ASSISTANT                         <Button
+ASSISTANT                           size="xs" variant="default" color="orange"
+ASSISTANT                           onClick={() => setOfficeActionModalId(r.id)}
+ASSISTANT                         >
+ASSISTANT                           Office Action
+ASSISTANT                         </Button>
+ASSISTANT                       </>
+ASSISTANT                     )}
+ASSISTANT                     {r.status === "selected" && (
+ASSISTANT                       <Button
+ASSISTANT                         size="xs" variant="default" color="red"
+ASSISTANT                         onClick={() => setGrantDecisionModalId(r.id)}
+ASSISTANT                       >
+ASSISTANT                         Grant Decision
+ASSISTANT                       </Button>
+ASSISTANT                     )}
+ASSISTANT                   </Group>
+ASSISTANT                 ),
+ASSISTANT               },
+ASSISTANT             ]}
+ASSISTANT           />
+ASSISTANT         </Card>
+ASSISTANT       </Container>
+ASSISTANT     );
+ASSISTANT   }
+ASSISTANT 
+ASSISTANT   return (
+ASSISTANT     <Container size="xl">
+ASSISTANT       <PageHeader title="Attorney Dashboard" subtitle="Manage assignments, filings, and grants" />
+ASSISTANT       <Card padding="lg">
+ASSISTANT         <DataTable<Application>
+ASSISTANT           rows={allApps}
+ASSISTANT           loading={myLoading || pendingLoading}
+ASSISTANT           rowKey={(r) => r.id}
+ASSISTANT           minWidth={900}
+ASSISTANT           columns={[
+ASSISTANT             {
+ASSISTANT               key: "title", header: "Application",
+ASSISTANT               render: (r) => <Text fw={600}>{r.title}</Text>,
+ASSISTANT             },
+ASSISTANT             {
+ASSISTANT               key: "status", header: "Status",
+ASSISTANT               render: (r) => <StatusBadge status={r.status} />,
+ASSISTANT             },
+ASSISTANT             {
+ASSISTANT               key: "actions", header: "", align: "right",
+ASSISTANT               render: (r) => (
+ASSISTANT                 <Group justify="flex-end" gap="xs">
+ASSISTANT                   {r.attorney_assigned === false && (
+ASSISTANT                     <Button
+ASSISTANT                       size="xs" variant="default" color="blue"
+ASSISTANT                       onClick={() => setAssignmentModalId(r.id)}
+ASSISTANT                     >
+ASSISTANT                       Assign Offer
+ASSISTANT                     </Button>
+ASSISTANT                   )}
+ASSISTANT                   {r.status === "under_review" && (
+ASSISTANT                     <Button
+ASSISTANT                       size="xs" variant="default" color="purple"
+ASSISTANT                       onClick={() => setOpinionModalId(r.id)}
+ASSISTANT                     >
+ASSISTANT                       Record Opinion
+ASSISTANT                     </Button>
+ASSISTANT                   )}
+ASSISTANT                   {r.status === "shortlisted" && (
+ASSISTANT                     <>
+ASSISTANT                       <Button
+ASSISTANT                         size="xs" variant="default" color="green"
+ASSISTANT                         onClick={() => setFilingModalId(r.id)}
+ASSISTANT                       >
+ASSISTANT                         Record Filing
+ASSISTANT                       </Button>
+ASSISTANT                       <Button
+ASSISTANT                         size="xs" variant="default" color="orange"
+ASSISTANT                         onClick={() => setOfficeActionModalId(r.id)}
+ASSISTANT                       >
+ASSISTANT                         Office Action
+ASSISTANT                       </Button>
+ASSISTANT                     </>
+ASSISTANT                   )}
+ASSISTANT                   {r.status === "selected" && (
+ASSISTANT                     <Button
+ASSISTANT                       size="xs" variant="default" color="red"
+ASSISTANT                       onClick={() => setGrantDecisionModalId(r.id)}
+ASSISTANT                     >
+ASSISTANT                       Grant Decision
+ASSISTANT                     </Button>
+ASSISTANT                   )}
+ASSISTANT                 </Group>
+ASSISTANT               ),
+ASSISTANT             },
+ASSISTANT           ]}
+ASSISTANT         />
+ASSISTANT       </Card>
+ASSISTANT 
+ASSISTANT       <AssignmentModal
+ASSISTANT         application={allApps.find((a) => a.id === assignmentModalId)!}
+ASSISTANT         isOpen={!!assignmentModalId}
+ASSISTANT         onClose={() => setAssignmentModalId(null)}
+ASSISTANT         onAccept={(data) => handleAssignmentSubmit(assignmentModalId!, data)}
+ASSISTANT       />
+ASSISTANT 
+ASSISTANT       <OpinionModal
+ASSISTANT         application={allApps.find((a) => a.id === opinionModalId)!}
+ASSISTANT         isOpen={!!opinionModalId}
+ASSISTANT         onClose={() => setOpinionModalId(null)}
+ASSISTANT         onRecord={(data) => handleOpinionSubmit(opinionModalId!, data)}
+ASSISTANT       />
+ASSISTANT 
+ASSISTANT       <FilingModal
+ASSISTANT         application={allApps.find((a) => a.id === filingModalId)!}
+ASSISTANT         isOpen={!!filingModalId}
+ASSISTANT         onClose={() => setFilingModalId(null)}
+ASSISTANT         onRecord={(data) => handleFilingSubmit(filingModalId!, data)}
+ASSISTANT       />
+ASSISTANT 
+ASSISTANT       <OfficeActionModal
+ASSISTANT         application={allApps.find((a) => a.id === officeActionModalId)!}
+ASSISTANT         isOpen={!!officeActionModalId}
+ASSISTANT         onClose={() => setOfficeActionModalId(null)}
+ASSISTANT         onRecord={(data) => handleOfficeActionSubmit(officeActionModalId!, data)}
+ASSISTANT       />
+ASSISTANT 
+ASSISTANT       <GrantDecisionModal
+ASSISTANT         application={allApps.find((a) => a.id === grantDecisionModalId)!}
+ASSISTANT         isOpen={!!grantDecisionModalId}
+ASSISTANT         onClose={() => setGrantDecisionModalId(null)}
+ASSISTANT         onDecide={(data) => handleGrantSubmit(grantDecisionModalId!, data)}
+ASSISTANT       />
+ASSISTANT     </Container>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT ```
