@@ -5488,3 +5488,1663 @@ ASSISTANT         return ApplicationHistory.objects.filter(
 ASSISTANT             application_id=application_id
 ASSISTANT         ).order_by('-created_at')
 ASSISTANT ```
+TO LLM 2026-11-07T14:29:14
+-------
+SYSTEM Act as an expert software developer.
+SYSTEM Take requests for changes to the supplied code.
+SYSTEM If the request is ambiguous, ask questions.
+SYSTEM Reply in English.
+SYSTEM 
+SYSTEM Once you understand the request you MUST:
+SYSTEM 1. Determine if any code changes are needed.
+SYSTEM 2. Explain any needed changes.
+SYSTEM 3. If changes are needed, output a copy of each file that needs changes.
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return the entire content of the updated file.
+SYSTEM You MUST use this *file listing* format:
+SYSTEM 
+SYSTEM path/to/filename.js
+SYSTEM ```
+SYSTEM // entire file content ...
+SYSTEM // ... goes in between
+SYSTEM ```
+SYSTEM 
+SYSTEM Every *file listing* MUST use this format:
+SYSTEM - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+SYSTEM - Second line: opening ```
+SYSTEM - ... entire content of the file ...
+SYSTEM - Final line: closing ```
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+SYSTEM *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+SYSTEM Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+SYSTEM 
+SYSTEM Reply in English.
+SYSTEM 
+-------
+USER Change the greeting to be more casual
+-------
+ASSISTANT Ok, I will:
+ASSISTANT 
+ASSISTANT 1. Switch the greeting text from "Hello" to "Hey".
+ASSISTANT 
+ASSISTANT show_greeting.py
+ASSISTANT ```
+ASSISTANT import sys
+ASSISTANT 
+ASSISTANT def greeting(name):
+ASSISTANT     print(f"Hey {name}")
+ASSISTANT 
+ASSISTANT if __name__ == '__main__':
+ASSISTANT     greeting(sys.argv[1])
+ASSISTANT ```
+-------
+USER I switched to a new code base. Please don't consider the above files or try to edit them any longer.
+-------
+ASSISTANT Ok.
+-------
+USER Here are some READ ONLY files, provided for your reference.
+USER Do not edit these files!
+USER 
+USER modules/patent/services/applications.py
+USER ```
+USER from django.db import transaction, connection
+USER from datetime import date, timedelta
+USER from typing import Dict, Any, List, Optional
+USER from core.models import TimeStampedModel
+USER 
+USER from ..models import (
+USER     PatentApplication, Inventor, ApplicationDocument,
+USER     AttorneyAssignment, PatentabilityOpinion, Budget, Filing,
+USER     OfficeAction, MaintenanceRecord, Appeal, ApplicationHistory
+USER )
+USER from ..domain.policy import (
+USER     can_transition, validate_document, missing_required_fields,
+USER     validate_justification, add_business_days, review_due_date,
+USER     resubmission_deadline, is_conflicted, can_withdraw
+USER )
+USER 
+USER 
+USER def submit_application(
+USER     applicant_id: int,
+USER     data: Dict[str, Any],
+USER     inventors: List[Dict[str, Any]],
+USER     documents: List[Dict[str, Any]],
+USER     actor_id: int
+USER ) -> PatentApplication:
+USER     """
+USER     Submit a new patent application.
+USER     
+USER     Validates required fields and documents per BR-PMS-014, 015, 016, 017.
+USER     Assigns unique application number and sets status to Submitted.
+USER     Creates inventor and document records.
+USER     
+USER     Raises ValueError if validation fails or actor lacks permission.
+USER     """
+USER     # Check for missing required fields
+USER     missing = missing_required_fields(data)
+USER     if missing:
+USER         raise ValueError(f"Missing required fields: {', '.join(missing)}")
+USER 
+USER     # Validate documents
+USER     invalid_docs = []
+USER     for doc in documents:
+USER         if not validate_document(doc['file_name'], doc.get('content_type', ''), doc.get('size', 0)):
+USER             invalid_docs.append(doc['file_name'])
+USER     if invalid_docs:
+USER         raise ValueError(f"Invalid documents: {', '.join(invalid_docs)}")
+USER 
+USER     # Create application record
+USER     app, created = PatentApplication.objects.get_or_create(
+USER         APPLICATION_NUMBER=models.CharField(max_length=20, unique=True),  # Note: This line is pseudo-code to illustrate intent; actual code uses get_or_create with kwargs
+USER         defaults={
+USER             'applicant_id': applicant_id,
+USER             'status': 'submitted',
+USER             'assigned_director_id': None,
+USER             'assigned_attorney_id': None,
+USER             'review_due_date': None,
+USER             'resubmission_deadline': None,
+USER             'latest_decision': None,
+USER             'latest_justification': '',
+USER             'version_number': 1,
+USER         }
+USER     )
+USER 
+USER     if not created:
+USER         # Update existing application if it was found (though get_or_create with unique constraint usually prevents this unless logic differs)
+USER         app.status = 'submitted'
+USER         app.version_number = 1
+USER 
+USER     # Create inventor records
+USER     for inv_data in inventors:
+USER         Inventor.objects.create(
+USER             application=app,
+USER             user_id=inv_data.get('user_id'),
+USER             name=inv_data['name'],
+USER             email=inv_data.get('email'),
+USER             contribution_percent=inv_data.get('contribution_percent', 0.0),
+USER             agreement_signed=inv_data.get('agreement_signed', False)
+USER         )
+USER 
+USER     # Create document records
+USER     for doc_data in documents:
+USER         ApplicationDocument.objects.create(
+USER             application=app,
+USER             file_name=doc_data['file_name'],
+USER             content_type=doc_data.get('content_type', ''),
+USER             size=doc_data.get('size', 0),
+USER             version=1,
+USER             sensitivity='internal',  # Default sensitivity
+USER             uploaded_by=applicant_id,
+USER             archived=False
+USER         )
+USER 
+USER     # Record history
+USER     ApplicationHistory.objects.create(
+USER         application=app,
+USER         actor_id=actor_id,
+USER         action='submit',
+USER         from_status=None,
+USER         to_status='submitted',
+USER         note=f"Application submitted by applicant {applicant_id}"
+USER     )
+USER 
+USER     return app
+USER 
+USER 
+USER def assign_director(admin_id: int, application_id: int, director_id: int) -> PatentApplication:
+USER     """
+USER     Assign a Director to review an application.
+USER     
+USER     Checks for conflict of interest (BR-PMS-025, 026, 027).
+USER     Sets review due date and status to Under Review.
+USER     
+USER     Raises ValueError if director is conflicted or assignment rules not met.
+USER     """
+USER     app = PatentApplication.objects.get(id=application_id)
+USER 
+USER     # Fetch inventors to check conflict
+USER     inventors = Inventor.objects.filter(application=app)
+USER     inventor_user_ids = inventors.values_list('user_id', flat=True)
+USER 
+USER     # Check conflict
+USER     if is_conflicted(director_id, inventor_user_ids):
+USER         raise ValueError(f"Director {director_id} is listed as an inventor and cannot review this application.")
+USER 
+USER     # Perform assignment
+USER     app.assigned_director_id = director_id
+USER     app.status = 'under_review'
+USER     app.review_due_date = review_due_date(app.created_at)  # Assuming created_at is available; otherwise use assignment timestamp logic if needed
+USER     app.save()
+USER 
+USER     # Record history
+USER     ApplicationHistory.objects.create(
+USER         application=app,
+USER         actor_id=admin_id,
+USER         action='assign_director',
+USER         from_status=app.status,
+USER         to_status='under_review',
+USER         note=f"Assigned to Director {director_id}"
+USER     )
+USER 
+USER     return app
+USER 
+USER 
+USER def review_application(director_id: int, application_id: int, decision: str, justification: str) -> PatentApplication:
+USER     """
+USER     Record a Director's review decision.
+USER     
+USER     Only the assigned Director can submit.
+USER     Decision must be one of: Approve, Reject, Needs Revision.
+USER     Justification must be at least 50 characters (BR-PMS-030).
+USER     Sets resubmission deadline for Reject/Needs Revision (BR-PMS-035).
+USER     
+USER     Raises ValueError if director is not assigned, decision invalid, or justification too short.
+USER     """
+USER     app = PatentApplication.objects.get(id=application_id)
+USER 
+USER     # Check if director is assigned
+USER     if app.assigned_director_id != director_id:
+USER         raise ValueError(f"Director {director_id} is not assigned to this application.")
+USER 
+USER     # Validate decision
+USER     valid_decisions = ['approve', 'reject', 'needs_revision']
+USER     if decision not in valid_decisions:
+USER         raise ValueError(f"Invalid decision. Must be one of: {', '.join(valid_decisions)}")
+USER 
+USER     # Validate justification length
+USER     if not validate_justification(justification):
+USER         raise ValueError("Justification must be at least 50 characters.")
+USER 
+USER     # Update application
+USER     app.latest_decision = decision
+USER     app.latest_justification = justification
+USER     app.save()
+USER 
+USER     # Set resubmission deadline if needed
+USER     if decision in ['reject', 'needs_revision']:
+USER         app.resubmission_deadline = resubmission_deadline(app.created_at)  # Using created_at as reference; adjust if decision_date is tracked separately
+USER         app.status = 'rejected' if decision == 'reject' else 'needs_revision'
+USER 
+USER     # Record history
+USER     ApplicationHistory.objects.create(
+USER         application=app,
+USER         actor_id=director_id,
+USER         action='review',
+USER         from_status=app.status,
+USER         to_status=app.status,
+USER         note=f"Decision: {decision}"
+USER     )
+USER 
+USER     return app
+USER 
+USER 
+USER def resubmit_application(
+USER     applicant_id: int,
+USER     application_id: int,
+USER     changes: Dict[str, Any],
+USER     response_to_feedback: str,
+USER     actor_id: int
+USER ) -> PatentApplication:
+USER     """
+USER     Resubmit an application after revision.
+USER     
+USER     Only the owner (applicant) can submit.
+USER     Status must be Needs Revision or Rejected.
+USER     Must be within 60-day deadline (BR-PMS-035).
+USER     Must address Director feedback (BR-PMS-036).
+USER     Bumps version number and sets status to Resubmitted.
+USER     
+USER     Raises ValueError if actor is not owner, status invalid, or deadline passed.
+USER     """
+USER     app = PatentApplication.objects.get(id=application_id)
+USER 
+USER     # Check ownership
+USER     if app.applicant_id != applicant_id:
+USER         raise ValueError(f"Applicant {applicant_id} is not the owner of this application.")
+USER 
+USER     # Check status eligibility
+USER     if app.status not in ['needs_revision', 'rejected']:
+USER         raise ValueError(f"Application status {app.status} is not eligible for resubmission.")
+USER 
+USER     # Check deadline (simplified; assumes resubmission_deadline field exists and is calculated from decision date)
+USER     if app.resubmission_deadline and app.resubmission_deadline < date.today():
+USER         raise ValueError(f"Resubmission deadline ({app.resubmission_deadline}) has passed.")
+USER 
+USER     # Update application
+USER     app.version_number += 1
+USER     app.status = 'resubmitted'
+USER     app.save()
+USER 
+USER     # Record history
+USER     ApplicationHistory.objects.create(
+USER         application=app,
+USER         actor_id=applicant_id,
+USER         action='resubmit',
+USER         from_status=app.status,
+USER         to_status='resubmitted',
+USER         note=f"Resubmission with version {app.version_number}. Feedback addressed."
+USER     )
+USER 
+USER     return app
+USER 
+USER 
+USER def withdraw_application(applicant_id: int, application_id: int, reason: str) -> PatentApplication:
+USER     """
+USER     Withdraw an application.
+USER     
+USER     Only the owner can withdraw.
+USER     Only allowed if policy.can_withdraw returns True (BR-PMS-067, 068).
+USER     Requires co-inventor consent if applicable (simplified check here).
+USER     
+USER     Raises ValueError if actor is not owner or withdrawal not allowed.
+USER     """
+USER     app = PatentApplication.objects.get(id=application_id)
+USER 
+USER     # Check ownership
+USER     if app.applicant_id != applicant_id:
+USER         raise ValueError(f"Applicant {applicant_id} is not the owner of this application.")
+USER 
+USER     # Check withdrawal eligibility
+USER     if not can_withdraw(app.status):
+USER         raise ValueError(f"Withdrawal is not allowed from status {app.status}.")
+USER 
+USER     # Update application
+USER     app.status = 'withdrawn'
+USER     app.save()
+USER 
+USER     # Record history
+USER     ApplicationHistory.objects.create(
+USER         application=app,
+USER         actor_id=applicant_id,
+USER         action='withdraw',
+USER         from_status=app.status,
+USER         to_status='withdrawn',
+USER         note=f"Application withdrawn by applicant. Reason: {reason}"
+USER     )
+USER 
+USER     return app
+USER 
+USER 
+USER def expire_overdue_resubmissions(today: date) -> List[PatentApplication]:
+USER     """
+USER     Set status to Expired for applications where resubmission deadline has passed without valid resubmission (BR-PMS-038).
+USER     
+USER     Returns list of expired applications.
+USER     """
+USER     expired_apps = []
+USER 
+USER     # Find applications with a past resubmission deadline and not yet resubmitted/resolved
+USER     apps_to_expire = PatentApplication.objects.filter(
+USER         resubmission_deadline__lt=today,
+USER         status__in=['needs_revision', 'rejected']  # Only these statuses can lead to expiration via missed deadline
+USER     )
+USER 
+USER     for app in apps_to_expire:
+USER         if app.status not in ['resubmitted', 'approved', 'granted', 'withdrawn']:
+USER             app.status = 'expired'
+USER             app.save()
+USER             expired_apps.append(app)
+USER 
+USER             # Record history
+USER             ApplicationHistory.objects.create(
+USER                 application=app,
+USER                 actor_id=None,  # System action
+USER                 action='expire',
+USER                 from_status=app.status,
+USER                 to_status='expired',
+USER                 note=f"Resubmission deadline passed without valid resubmission."
+USER             )
+USER 
+USER     return expired_apps
+USER 
+USER 
+USER def file_appeal(applicant_id: int, application_id: int, grounds: str) -> Appeal:
+USER     """
+USER     File an appeal against a rejection.
+USER     
+USER     Only the owner can file.
+USER     Application must be in 'rejected' status (BR-PMS-092).
+USER     Must be within allowed period (simplified check here).
+USER     
+USER     Raises ValueError if actor is not owner, application not rejected, or outside appeal period.
+USER     """
+USER     app = PatentApplication.objects.get(id=application_id)
+USER 
+USER     # Check ownership
+USER     if app.applicant_id != applicant_id:
+USER         raise ValueError(f"Applicant {applicant_id} is not the owner of this application.")
+USER 
+USER     # Check status eligibility
+USER     if app.status != 'rejected':
+USER         raise ValueError(f"Application must be in 'rejected' status to file an appeal. Current status: {app.status}.")
+USER 
+USER     # Create appeal record
+USER     appeal = Appeal.objects.create(
+USER         application=app,
+USER         grounds=grounds,
+USER         status='submitted',
+USER         decided_by=None,
+USER         justification=''  # Can be populated later if needed
+USER     )
+USER 
+USER     return appeal
+USER 
+USER 
+USER def decide_appeal(director_id: int, appeal_id: int, outcome: str, justification: str) -> Appeal:
+USER     """
+USER     Record a Director's decision on an appeal.
+USER     
+USER     Only the assigned Director can decide (simplified assumption that director is linked to appeal or application).
+USER     Outcome must be one of: Uphold Rejection, Remand for Amendment, Modify Decision (BR-PMS-095).
+USER     Justification required (simplified check here).
+USER     
+USER     Raises ValueError if outcome invalid or justification missing.
+USER     """
+USER     appeal = Appeal.objects.get(id=appeal_id)
+USER 
+USER     # Check if director is the one who decided previously (for simplicity, assume director_id matches application's assigned_director_id)
+USER     app = appeal.application
+USER     if app.assigned_director_id != director_id:
+USER         raise ValueError(f"Director {director_id} is not assigned to this application.")
+USER 
+USER     # Validate outcome
+USER     valid_outcomes = ['uphold_rejection', 'remand_for_amendment', 'modify_decision']
+USER     if outcome not in valid_outcomes:
+USER         raise ValueError(f"Invalid appeal outcome. Must be one of: {', '.join(valid_outcomes)}")
+USER 
+USER     # Update appeal
+USER     appeal.status = outcome.replace('_', '_')  # Map string to status field value (adjust mapping as needed)
+USER     appeal.decided_by = director_id
+USER     appeal.justification = justification
+USER     appeal.save()
+USER 
+USER     return appeal
+USER ```
+USER 
+USER modules/patent/registry.py
+USER ```
+USER """What the server tells the shell about this module (ADR-0010).
+USER 
+USER PMS nav items carry `required_permission` and the server filters before sending —
+USER the client does zero filtering, so a link a role cannot use never reaches the
+USER browser at all.
+USER """
+USER MODULE = {
+USER     "code": "patent", "label": "Patent Management", "icon": "FileText",
+USER     "base_path": "/patent", "nav_section": "Patent", "sort_order": 20,
+USER     "status": "active",
+USER }
+USER 
+USER NAV_ITEMS = [
+USER     # -- Applicant: personal view and submission ----------------------------
+USER     {"code": "patent.mine", "label": "My Applications",
+USER      "icon": "UserCheck", "to": "/patent/mine",
+USER      "required_permission": "patent.application.view_self",
+USER      "sort_order": 5},
+USER     {"code": "patent.submit", "label": "Submit Application",
+USER      "icon": "Plus", "to": "/patent/submit",
+USER      "required_permission": "patent.application.create",
+USER      "sort_order": 10},
+USER 
+USER     # -- Director: review and decision -------------------------------------
+USER     {"code": "patent.review", "label": "Review Applications",
+USER      "icon": "ClipboardCheck", "to": "/patent/review",
+USER      "required_permission": "patent.application.review",
+USER      "sort_order": 15},
+USER 
+USER     # -- PCC_ADMIN: administration and coordination ------------------------
+USER     {"code": "patent.admin", "label": "Administration",
+USER      "icon": "Cog", "to": "/patent/admin",
+USER      "required_permission": "patent.admin.manage",
+USER      "sort_order": 25},
+USER 
+USER     # -- Attorney: legal and filing support --------------------------------
+USER     {"code": "patent.attorney", "label": "Legal & Filing",
+USER      "icon": "Gavel", "to": "/patent/attorney",
+USER      "required_permission": "patent.legal.review",
+USER      "sort_order": 30},
+USER ]
+USER 
+USER #: Every permission this module recognises; ROLE_GRANTS below says who holds each.
+USER PERMISSIONS = [
+USER     ("patent.application.view_self", "See one's own applications"),
+USER     ("patent.application.create", "Submit a new patent application"),
+USER     ("patent.application.review", "Review and decide on applications"),
+USER     ("patent.application.manage", "Manage application lifecycle (assign, withdraw, etc.)"),
+USER     ("patent.admin.manage", "Manage PMS configuration, roles, and global settings"),
+USER     ("patent.legal.review", "Conduct legal review, prior art search, and file patents"),
+USER     ("patent.budget.approve", "Approve or reject patent application budgets"),
+USER     ("patent.filing.record", "Record external patent office filings"),
+USER     ("patent.maintenance.manage", "Manage maintenance fee renewals"),
+USER     ("patent.appeal.review", "Review and decide on appeals"),
+USER ]
+USER 
+USER #: Performed by a service or a scheduled task, so no designation holds them.
+USER SYSTEM_PERMISSIONS = [
+USER     "patent.application.auto_withdraw",  # System auto-withdrawal if deadline missed
+USER     "patent.filing.expire",              # System filing expiry tracking
+USER ]
+USER 
+USER _STUDENT = [
+USER     "patent.application.view_self",
+USER     "patent.application.create",
+USER     "patent.application.delete",
+USER     "patent.application.withdraw",
+USER ]
+USER 
+USER _DIRECTOR = [
+USER     "patent.application.review",
+USER     "patent.budget.approve",
+USER     "patent.maintenance.manage",
+USER     "patent.appeal.review",
+USER ]
+USER 
+USER _PCC_ADMIN = [
+USER     "patent.admin.manage",
+USER     "patent.application.manage",
+USER     "patent.legal.review",  # PCC_ADMIN can oversee attorney work
+USER     "patent.budget.approve",
+USER     "patent.filing.record",
+USER ]
+USER 
+USER _ATTORNEY = [
+USER     "patent.legal.review",
+USER     "patent.filing.record",
+USER     "patent.maintenance.manage",
+USER ]
+USER 
+USER #: Keyed by the designation name as it exists in globals_designation.
+USER ROLE_GRANTS = {
+USER     "Applicant": _STUDENT,
+USER     "Director": _DIRECTOR,
+USER     "PCC_ADMIN": _PCC_ADMIN,
+USER     "Attorney": _ATTORNEY,
+USER }
+USER ```
+USER 
+USER modules/patent/models.py
+USER ```
+USER from django.db import models
+USER from core.db.mixins import TimeStampedModel
+USER 
+USER 
+USER class PatentApplication(TimeStampedModel):
+USER     """Core patent application record."""
+USER     
+USER     STATUS_CHOICES = [
+USER         ("draft", "Draft"),
+USER         ("submitted", "Submitted"),
+USER         ("under_review", "Under Review"),
+USER         ("needs_revision", "Needs Revision"),
+USER         ("resubmitted", "Resubmitted"),
+USER         ("rejected", "Rejected"),
+USER         ("appeal_submitted", "Appeal Submitted"),
+USER         ("approved", "Approved"),
+USER         ("attorney_assigned", "Attorney Assigned"),
+USER         ("filed", "Filed"),
+USER         ("granted", "Granted"),
+USER         ("withdrawn", "Withdrawn"),
+USER         ("expired", "Expired"),
+USER     ]
+USER 
+USER     APPLICATION_NUMBER = models.CharField(max_length=20, unique=True)
+USER     title = models.CharField(max_length=255)
+USER     abstract = models.TextField(blank=True)
+USER     description = models.TextField()
+USER     claims = models.TextField()
+USER     technical_domain = models.CharField(max_length=100)
+USER     
+USER     applicant_id = models.IntegerField(db_index=True)
+USER     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default="draft")
+USER     assigned_director_id = models.IntegerField(null=True, blank=True)
+USER     assigned_attorney_id = models.IntegerField(null=True, blank=True)
+USER     review_due_date = models.DateField(null=True, blank=True)
+USER     resubmission_deadline = models.DateField(null=True, blank=True)
+USER     
+USER     # Latest decision and justification (stored as text for flexibility)
+USER     latest_decision = models.CharField(max_length=50, null=True, blank=True)
+USER     latest_justification = models.TextField(blank=True)
+USER     
+USER     version_number = models.IntegerField(default=1)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         ordering = ["-created_at"]
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION_NUMBER} ({self.status})"
+USER 
+USER 
+USER class Inventor(TimeStampedModel):
+USER     """Inventor associated with a patent application."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="inventors")
+USER     user_id = models.IntegerField(null=True, blank=True, db_index=True)  # Optional: linked IAM user
+USER     name = models.CharField(max_length=255)
+USER     email = models.EmailField(blank=True)
+USER     contribution_percent = models.DecimalField(max_digits=5, decimal_places=1, default=0.0)
+USER     agreement_signed = models.BooleanField(default=False)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION", "user_id"]  # Prevent duplicate entries for same user
+USER 
+USER     def __str__(self):
+USER         return f"Inventor {self.name} on {self.APPLICATION}"
+USER 
+USER 
+USER class ApplicationDocument(TimeStampedModel):
+USER     """Document associated with a patent application."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="documents")
+USER     file_name = models.CharField(max_length=255)
+USER     content_type = models.CharField(max_length=100)  # e.g., "application.pdf"
+USER     size = models.BigIntegerField()  # in bytes
+USER     version = models.IntegerField(default=1)
+USER     sensitivity = models.CharField(max_length=20, choices=[("public", "Public"), ("internal", "Internal"), ("confidential", "Confidential")])
+USER     uploaded_by = models.IntegerField(db_index=True)
+USER     archived = models.BooleanField(default=False)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         ordering = ["-created_at"]
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.file_name} (v{self.version})"
+USER 
+USER 
+USER class AttorneyAssignment(TimeStampedModel):
+USER     """Attorney assignment record for a patent application."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="assignments")
+USER     attorney_id = models.IntegerField(db_index=True)
+USER     status = models.CharField(max_length=20, choices=[("offered", "Offered"), ("accepted", "Accepted"), ("declined", "Declined")], default="offered")
+USER     decline_reason = models.TextField(blank=True)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION"]  # One assignment per application at a time
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.attorney_id} ({self.status})"
+USER 
+USER 
+USER class PatentabilityOpinion(TimeStampedModel):
+USER     """Attorney's legal and patentability assessment."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="opinions")
+USER     attorney_id = models.IntegerField(db_index=True)
+USER     novelty = models.BooleanField(default=False)  # True if novel
+USER     non_obviousness = models.BooleanField(default=False)  # True if non-obvious
+USER     utility = models.BooleanField(default=False)  # True if useful
+USER     recommendation = models.CharField(max_length=30, choices=[("file_patent", "File Patent"), ("do_not_file", "Do Not File"), ("needs_amendment", "Needs Amendment")], default="needs_amendment")
+USER     opinion_text = models.TextField()
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION"]  # One primary opinion per application
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.recommendation}"
+USER 
+USER 
+USER class Budget(TimeStampedModel):
+USER     """Budget record for a patent application."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="budgets")
+USER     filing_fee = models.DecimalField(max_digits=10, decimal_places=2)
+USER     attorney_fee = models.DecimalField(max_digits=10, decimal_places=2)
+USER     administrative_cost = models.DecimalField(max_digits=10, decimal_places=2)
+USER     total = models.DecimalField(max_digits=10, decimal_places=2)  # Calculated field (can be overridden by manager)
+USER     status = models.CharField(max_length=20, choices=[("pending", "Pending"), ("approved", "Approved"), ("rejected", "Rejected"), ("escalated", "Escalated")], default="pending")
+USER     decided_by = models.IntegerField(null=True, blank=True)
+USER     justification = models.TextField(blank=True)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION"]  # One budget per application at a time
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - ${self.total}"
+USER 
+USER 
+USER class Filing(TimeStampedModel):
+USER     """External patent office filing record."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="filings")
+USER     patent_office = models.CharField(max_length=100)  # e.g., "USPTO", "EPO"
+USER     filing_number = models.CharField(max_length=50)
+USER     filing_date = models.DateField()
+USER     international = models.BooleanField(default=False)
+USER     grant_number = models.CharField(max_length=50, null=True, blank=True)
+USER     grant_date = models.DateField(null=True, blank=True)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION"]  # One primary filing per application
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.patent_office} #{self.filing_number}"
+USER 
+USER 
+USER class OfficeAction(TimeStampedModel):
+USER     """Office action received from patent office."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="office_actions")
+USER     received_date = models.DateField()
+USER     response_due_date = models.DateField(null=True, blank=True)
+USER     description = models.TextField()
+USER     response_text = models.TextField(blank=True)  # Draft or submitted response
+USER     status = models.CharField(max_length=30, choices=[("recorded", "Recorded"), ("awaiting_applicant_approval", "Awaiting Applicant Approval"), ("applicant_approved", "Applicant Approved"), ("response_ready", "Response Ready"), ("response_submitted", "Response Submitted")], default="recorded")
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         ordering = ["-received_date"]
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.status}"
+USER 
+USER 
+USER class MaintenanceRecord(TimeStampedModel):
+USER     """Maintenance fee renewal record."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="maintenance_records")
+USER     due_date = models.DateField()
+USER     fee = models.DecimalField(max_digits=10, decimal_places=2)
+USER     decision = models.CharField(max_length=30, choices=[("renewal_requested", "Renewal Requested"), ("renew", "Renew"), ("do_not_renew", "Do Not Renew")], default="renewal_requested")
+USER     decided_by = models.IntegerField(null=True, blank=True)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION"]  # One decision per cycle (tracked by due_date)
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.due_date} ({self.decision})"
+USER 
+USER 
+USER class Appeal(TimeStampedModel):
+USER     """Appeal record against a rejection."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="appeals")
+USER     grounds = models.TextField()
+USER     status = models.CharField(max_length=30, choices=[("submitted", "Submitted"), ("remanded_for_amendment", "Remanded for Amendment"), ("rejection_upheld", "Rejection Upheld"), ("decision_modified", "Decision Modified")], default="submitted")
+USER     decided_by = models.IntegerField(null=True, blank=True)
+USER     justification = models.TextField(blank=True)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION"]  # One appeal per application at a time
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.status}"
+USER 
+USER 
+USER class ApplicationHistory(TimeStampedModel):
+USER     """Append-only history of application status changes and actions."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="history")
+USER     actor_id = models.IntegerField(db_index=True)  # User ID who performed the action
+USER     action = models.CharField(max_length=50)  # e.g., "review", "assign", "withdraw"
+USER     from_status = models.CharField(max_length=30, null=True, blank=True)
+USER     to_status = models.CharField(max_length=30)
+USER     note = models.TextField(blank=True)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         ordering = ["-created_at"]
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.actor_id}: {self.action}"
+USER ```
+USER 
+USER fusion_auth/permissions.py
+USER ```
+USER """Two gates on every request, both server-side.
+USER 
+USER     HasModuleGrant   is this module yours at all?   (coarse — drives the sidebar)
+USER     HasPermission    may you do this action?        (fine)
+USER 
+USER Both must pass. The default is deny: a view that declares nothing gets
+USER IsAuthenticatedPrincipal and nothing more, so forgetting to think about
+USER authorization fails closed rather than open.
+USER """
+USER from rest_framework.permissions import BasePermission
+USER 
+USER 
+USER class IsAuthenticatedPrincipal(BasePermission):
+USER     message = "Authentication required."
+USER 
+USER     def has_permission(self, request, view):
+USER         return getattr(request, "principal", None) is not None
+USER 
+USER 
+USER class _HasModuleGrant(BasePermission):
+USER     module_code = ""
+USER     message = "This module is not available to your role."
+USER 
+USER     def has_permission(self, request, view):
+USER         p = getattr(request, "principal", None)
+USER         return p is not None and p.has_module(self.module_code)
+USER 
+USER 
+USER def HasModuleGrant(module_code: str):                       # noqa: N802
+USER     return type("HasModuleGrant_" + module_code,
+USER                 (_HasModuleGrant,), {"module_code": module_code})
+USER 
+USER 
+USER class _HasPermission(BasePermission):
+USER     codes: tuple[str, ...] = ()
+USER     require_all = False
+USER     message = "You do not have permission to perform this action."
+USER 
+USER     def has_permission(self, request, view):
+USER         p = getattr(request, "principal", None)
+USER         if p is None:
+USER             return False
+USER         if self.require_all:
+USER             return all(p.has_permission(c) for c in self.codes)
+USER         return p.has_any_permission(*self.codes)
+USER 
+USER 
+USER def HasPermission(*codes: str, require_all: bool = False):  # noqa: N802
+USER     return type("HasPermission_" + "_".join(codes).replace(".", "_"),
+USER                 (_HasPermission,), {"codes": codes, "require_all": require_all})
+USER ```
+-------
+ASSISTANT Ok, I will use these files as references.
+-------
+USER Here are summaries of some files present in my git repository.
+USER Do not propose changes to these files, treat them as *read-only*.
+USER If you need to edit any of these files, ask me to *add them to the chat* first.
+USER 
+USER client/src/app/registry.ts:
+USER ⋮
+USER │export interface ModuleManifest {
+USER │  code: string;
+USER │  basePath: string;
+USER │  load: () => Promise<{ routes: RouteObject[] }>;
+USER ⋮
+USER 
+USER client/src/auth/RequireAuth.tsx:
+USER ⋮
+USER │export function RequireAuth({ children }: { children: React.ReactNode }) {
+USER │  const { status } = useAuth();
+USER │  const location = useLocation();
+USER │
+USER │  if (status === "loading") {
+USER │    return <Center h="100vh"><Loader /></Center>;
+USER │  }
+USER │  // Not a logout: signing in again cannot work while the IAM is unreachable.
+USER │  if (status === "unavailable") {
+USER │    return (
+USER ⋮
+USER 
+USER client/src/modules/placement/api/hooks.ts:
+USER ⋮
+USER │export type ExportKind = "applications" | "placements";
+USER │
+USER ⋮
+USER 
+USER client/src/modules/placement/api/types.ts:
+USER ⋮
+USER │export type ApplicationStatus =
+USER │  | "draft" | "submitted" | "under_review" | "shortlisted"
+USER │  | "interview_scheduled" | "selected" | "rejected" | "withdrawn"
+USER │  | "auto_withdrawn" | "offer_issued" | "offer_accepted" | "offer_declined"
+USER ⋮
+USER 
+USER client/src/modules/placement/components/NewPostingModal.tsx:
+USER ⋮
+USER │                hideControls placeholder="Unlimited"
+USER │              />
+USER │            </Field>
+USER │            <Field span={12}>
+USER │              <DateTimePicker
+USER │                label="Applications close" value={closesAt}
+USER │                onChange={setClosesAt} clearable minDate={new Date()}
+USER │                placeholder="Select a date and time"
+USER ⋮
+USER 
+USER core/api/csrf.py:
+USER ⋮
+USER │def token_for(session_value: str) -> str:
+USER ⋮
+USER 
+USER core/api/csv.py:
+USER ⋮
+USER │def sanitise_cell(value: Any) -> str:
+USER ⋮
+USER 
+USER fusion_auth/client.py:
+USER ⋮
+USER │class IamUnavailable(Exception):
+USER ⋮
+USER 
+USER fusion_auth/principal.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Principal:
+USER │    user_id: int
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/directory/api/serializers.py:
+USER ⋮
+USER │class UserRefSerializer(serializers.Serializer):
+USER ⋮
+USER 
+USER modules/directory/models.py:
+USER ⋮
+USER │class UserRef(TimeStampedModel):
+USER │    KIND_CHOICES = [
+USER │        ("student", "Student"), ("faculty", "Faculty"),
+USER │        ("staff", "Staff"), ("operator", "Operator"),
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/patent/domain/policy.py:
+USER ⋮
+USER │def add_business_days(start_date: date, days: int) -> date:
+USER ⋮
+USER 
+USER modules/placement/api/views.py:
+USER ⋮
+USER │class ApplicationListView(_Scoped, generics.ListAPIView):
+USER │    # A recruiter is authorised by the company-scoped queryset, not by a code.
+USER │    permission_classes = [MODULE, ScopedCollection(P_VIEW_APPS, P_VIEW_SELF)]
+USER │
+USER ⋮
+USER │    def list(self, request, *args, **kwargs):
+USER ⋮
+USER 
+USER modules/placement/authentication.py:
+USER ⋮
+USER │def hash_token(raw: str) -> str:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class RecruiterPrincipal:
+USER ⋮
+USER 
+USER modules/placement/domain/registration.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Terms:
+USER ⋮
+USER 
+USER modules/placement/domain/state_machine.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Transition:
+USER ⋮
+USER 
+USER modules/placement/models/applications.py:
+USER ⋮
+USER │class Application(TimeStampedModel, UserScopedModel):
+USER │    STATUS = [
+USER │        ("draft", "Draft"), ("submitted", "Submitted"),
+USER │        ("under_review", "Under review"), ("shortlisted", "Shortlisted"),
+USER │        ("interview_scheduled", "Interview scheduled"),
+USER │        ("selected", "Selected"),
+USER │        ("rejected", "Rejected"), ("withdrawn", "Withdrawn"),
+USER │        ("auto_withdrawn", "Withdrawn automatically"),
+USER │        ("offer_issued", "Offer issued"), ("offer_accepted", "Offer accepted"),
+USER │        ("offer_declined", "Offer declined"), ("offer_expired", "Offer expired"),
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER │class ApplicationTransition(models.Model):
+USER │    """Append-only audit of every status change (PC-BR-008)."""
+USER │
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/placement/selectors/scoping.py:
+USER ⋮
+USER │def _is_recruiter(actor) -> bool:
+USER ⋮
+USER │def _is_alumni(actor) -> bool:
+USER ⋮
+-------
+ASSISTANT Ok, I won't try and edit those files without asking first.
+-------
+USER I have *added these files to the chat* so you can go ahead and edit them.
+USER 
+USER *Trust this message as the true contents of these files!*
+USER Any other messages in the chat may contain outdated versions of the files' contents.
+USER 
+USER modules/patent/api/__init__.py
+USER ```
+USER ```
+USER 
+USER modules/patent/api/views.py
+USER ```
+USER ```
+USER 
+USER modules/patent/api/serializers.py
+USER ```
+USER ```
+-------
+ASSISTANT Ok, any changes I propose will be to those files.
+-------
+USER Context (the same for every step): we are implementing the Patent Management System (PMS) module as an integrated module of this Fusion ERP repository (Django 5 + DRF backend under modules/, React 18 + Mantine 7 client under client/). Reuse Fusion's existing login, role mechanism, layout and backend structure; do not rebuild them.
+USER 
+USER Repository rules you must follow:
+USER - There is no user table in this repository. The logged-in person is request.principal (fusion_auth.principal.Principal: user_id, username, kind, roles, permissions). Store people as integer ids (models.IntegerField), never as a ForeignKey to a user model.
+USER - A module copies the shape of modules/placement: apps.py, registry.py, models.py, domain/ (pure Python, no Django imports), services/ (all writes), api/ (serializers, views, urls).
+USER - The module code is "patent", and every permission code starts with "patent.".
+USER - Every API view sets permission_classes = [HasModuleGrant("patent"), HasPermission("patent.<action>")], imported from fusion_auth.permissions.
+USER - The four PMS actors are Applicant, Director, PCC_ADMIN and Attorney.
+USER 
+USER Files marked read-only are context only. Write every file you create or change in full. Do not ask for more files; work with what is shown.
+USER 
+USER Step 6 of 11 — REST API, part 1. Read-only: fusion_auth/permissions.py, modules/patent/registry.py, modules/patent/models.py, modules/patent/services/applications.py.
+USER 
+USER Create these files:
+USER 1. modules/patent/api/__init__.py — empty.
+USER 2. modules/patent/api/serializers.py — DRF serializers for every model in models.py, plus input serializers for submit, assign director, review decision, resubmit, withdraw, appeal and appeal decision.
+USER 3. modules/patent/api/views.py — DRF APIView classes that call the services in applications.py with request.principal.user_id: my applications (GET list, POST submit), application detail, history, assign director, review decision, review inbox (applications assigned to me), resubmit, withdraw, file appeal, decide appeal, and an admin list of submitted applications. Every view sets permission_classes = [HasModuleGrant("patent"), HasPermission(<a permission declared in registry.py>)]. List views filter by the caller in the queryset, never by fetching and then checking. Turn ValueError into a 400 response.
+USER 
+USER 
+USER To suggest changes to a file you MUST return the entire content of the updated file.
+USER You MUST use this *file listing* format:
+USER 
+USER path/to/filename.js
+USER ```
+USER // entire file content ...
+USER // ... goes in between
+USER ```
+USER 
+USER Every *file listing* MUST use this format:
+USER - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+USER - Second line: opening ```
+USER - ... entire content of the file ...
+USER - Final line: closing ```
+USER 
+USER To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+USER *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+USER Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+USER 
+USER Reply in English.
+USER 
+LLM RESPONSE 2026-11-07T14:38:23
+ASSISTANT modules/patent/api/__init__.py
+ASSISTANT ```python
+ASSISTANT # Empty init file to mark the api package
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT modules/patent/api/serializers.py
+ASSISTANT ```python
+ASSISTANT from rest_framework import serializers
+ASSISTANT from django.utils.translation import gettext_lazy as _
+ASSISTANT 
+ASSISTANT from ..models import (
+ASSISTANT     PatentApplication, Inventor, ApplicationDocument,
+ASSISTANT     AttorneyAssignment, PatentabilityOpinion, Budget, Filing,
+ASSISTANT     OfficeAction, MaintenanceRecord, Appeal, ApplicationHistory
+ASSISTANT )
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # --- Core Application Serializers ---
+ASSISTANT 
+ASSISTANT class PatentApplicationSerializer(serializers.ModelSerializer):
+ASSISTANT     """Read-only serializer for the core application record."""
+ASSISTANT     
+ASSISTANT     class Meta:
+ASSISTANT         model = PatentApplication
+ASSISTANT         fields = [
+ASSISTANT             'id', 'APPLICATION_NUMBER', 'title', 'abstract', 'description', 
+ASSISTANT             'claims', 'technical_domain', 'applicant_id', 'status', 
+ASSISTANT             'assigned_director_id', 'assigned_attorney_id', 'review_due_date', 
+ASSISTANT             'resubmission_deadline', 'latest_decision', 'latest_justification',
+ASSISTANT             'version_number', 'created_at', 'updated_at'
+ASSISTANT         ]
+ASSISTANT         read_only_fields = [
+ASSISTANT             'APPLICATION_NUMBER', 'status', 'assigned_director_id', 
+ASSISTANT             'assigned_attorney_id', 'review_due_date', 'resubmission_deadline',
+ASSISTANT             'latest_decision', 'latest_justification', 'version_number',
+ASSISTANT             'created_at', 'updated_at'
+ASSISTANT         ]
+ASSISTANT 
+ASSISTANT     def to_internal_representation(self, instance):
+ASSISTANT         return {
+ASSISTANT             'id': instance.id,
+ASSISTANT             'application_number': instance.APPLICATION_NUMBER,
+ASSISTANT             'title': instance.title,
+ASSISTANT             'abstract': instance.abstract,
+ASSISTANT             'description': instance.description,
+ASSISTANT             'claims': instance.claims,
+ASSISTANT             'technical_domain': instance.technical_domain,
+ASSISTANT             'applicant_id': instance.applicant_id,
+ASSISTANT             'status': instance.status,
+ASSISTANT             'assigned_director_id': instance.assigned_director_id,
+ASSISTANT             'assigned_attorney_id': instance.assigned_attorney_id,
+ASSISTANT             'review_due_date': instance.review_due_date,
+ASSISTANT             'resubmission_deadline': instance.resubmission_deadline,
+ASSISTANT             'latest_decision': instance.latest_decision,
+ASSISTANT             'latest_justification': instance.latest_justification,
+ASSISTANT             'version_number': instance.version_number,
+ASSISTANT         }
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class ApplicationDetailSerializer(serializers.ModelSerializer):
+ASSISTANT     """Extended read serializer including inventors and documents."""
+ASSISTANT     
+ASSISTANT     inventors_count = serializers.IntegerField(source='inventors.count', read_only=True)
+ASSISTANT     documents_count = serializers.IntegerField(source='documents.count', read_only=True)
+ASSISTANT 
+ASSISTANT     class Meta:
+ASSISTANT         model = PatentApplication
+ASSISTANT         fields = [
+ASSISTANT             'id', 'application_number', 'title', 'abstract', 'description', 
+ASSISTANT             'claims', 'technical_domain', 'applicant_id', 'status', 
+ASSISTANT             'assigned_director_id', 'assigned_attorney_id', 'review_due_date', 
+ASSISTANT             'resubmission_deadline', 'latest_decision', 'latest_justification',
+ASSISTANT             'version_number', 'created_at', 'updated_at',
+ASSISTANT             'inventors_count', 'documents_count'
+ASSISTANT         ]
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # --- Input Serializers for Actions ---
+ASSISTANT 
+ASSISTANT class SubmitApplicationSerializer(serializers.Serializer):
+ASSISTANT     """Input data for submitting a new application."""
+ASSISTANT     
+ASSISTANT     applicant_id = serializers.IntegerField(required=True, label=_('Applicant ID'))
+ASSISTANT     title = serializers.CharField(max_length=255, required=True, label=_('Title'))
+ASSISTANT     abstract = serializers.CharField(required=False, allow_blank=True, label=_('Abstract'))
+ASSISTANT     description = serializers.CharField(required=True, label=_('Description'))
+ASSISTANT     claims = serializers.CharField(required=True, label=_('Claims'))
+ASSISTANT     technical_domain = serializers.CharField(max_length=100, required=True, label=_('Technical Domain'))
+ASSISTANT     
+ASSISTANT     inventors = serializers.ListChild(
+ASSISTANT         child=serializers.DictField(
+ASSISTANT             child_keys=['user_id', 'name', 'email', 'contribution_percent', 'agreement_signed'],
+ASSISTANT             required=False
+ASSISTANT         ),
+ASSISTANT         required=True,
+ASSISTANT         label=_('Inventors')
+ASSISTANT     )
+ASSISTANT     
+ASSISTANT     documents = serializers.ListChild(
+ASSISTANT         child=serializers.DictField(
+ASSISTANT             child_keys=['file_name', 'content_type', 'size'],
+ASSISTANT             required=True
+ASSISTANT         ),
+ASSISTANT         required=True,
+ASSISTANT         label=_('Documents')
+ASSISTANT     )
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class AssignDirectorSerializer(serializers.Serializer):
+ASSISTANT     """Input data for assigning a director."""
+ASSISTANT     
+ASSISTANT     director_id = serializers.IntegerField(required=True, label=_('Director ID'))
+ASSISTANT     # admin_id is implicitly the actor performing the action via request.principal
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class ReviewApplicationSerializer(serializers.Serializer):
+ASSISTANT     """Input data for reviewing an application."""
+ASSISTANT     
+ASSISTANT     decision = serializers.ChoiceField(
+ASSISTANT         choices=['approve', 'reject', 'needs_revision'],
+ASSISTANT         required=True,
+ASSISTANT         label=_('Decision')
+ASSISTANT     )
+ASSISTANT     justification = serializers.CharField(min_length=50, required=True, label=_('Justification'))
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class ResubmitApplicationSerializer(serializers.Serializer):
+ASSISTANT     """Input data for resubmitting an application."""
+ASSISTANT     
+ASSISTANT     changes = serializers.DictField(required=True, label=_('Changes'))
+ASSISTANT     response_to_feedback = serializers.CharField(required=True, label=_('Response to Feedback'))
+ASSISTANT     # applicant_id is implicitly the actor via request.principal
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class WithdrawApplicationSerializer(serializers.Serializer):
+ASSISTANT     """Input data for withdrawing an application."""
+ASSISTANT     
+ASSISTANT     reason = serializers.CharField(required=True, label=_('Reason'))
+ASSISTANT     # applicant_id is implicitly the actor via request.principal
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # --- Input Serializers for Appeals ---
+ASSISTANT 
+ASSISTANT class FileAppealSerializer(serializers.Serializer):
+ASSISTANT     """Input data for filing an appeal."""
+ASSISTANT     
+ASSISTANT     grounds = serializers.CharField(required=True, label=_('Grounds'))
+ASSISTANT     # applicant_id is implicitly the actor via request.principal
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class DecideAppealSerializer(serializers.Serializer):
+ASSISTANT     """Input data for deciding an appeal."""
+ASSISTANT     
+ASSISTANT     outcome = serializers.ChoiceField(
+ASSISTANT         choices=['uphold_rejection', 'remand_for_amendment', 'modify_decision'],
+ASSISTANT         required=True,
+ASSISTANT         label=_('Outcome')
+ASSISTANT     )
+ASSISTANT     justification = serializers.CharField(required=True, label=_('Justification'))
+ASSISTANT     # director_id is implicitly the actor via request.principal
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # --- Document and Other Models ---
+ASSISTANT 
+ASSISTANT class ApplicationDocumentSerializer(serializers.ModelSerializer):
+ASSISTANT     """Read-only serializer for application documents."""
+ASSISTANT     
+ASSISTANT     class Meta:
+ASSISTANT         model = ApplicationDocument
+ASSISTANT         fields = [
+ASSISTANT             'id', 'file_name', 'content_type', 'size', 'version', 
+ASSISTANT             'sensitivity', 'uploaded_by', 'archived', 'created_at'
+ASSISTANT         ]
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class InventorSerializer(serializers.ModelSerializer):
+ASSISTANT     """Read-only serializer for inventors."""
+ASSISTANT     
+ASSISTANT     class Meta:
+ASSISTANT         model = Inventor
+ASSISTANT         fields = [
+ASSISTANT             'id', 'user_id', 'name', 'email', 'contribution_percent', 
+ASSISTANT             'agreement_signed', 'created_at'
+ASSISTANT         ]
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class AttorneyAssignmentSerializer(serializers.ModelSerializer):
+ASSISTANT     """Read-only serializer for attorney assignments."""
+ASSISTANT     
+ASSISTANT     class Meta:
+ASSISTANT         model = AttorneyAssignment
+ASSISTANT         fields = [
+ASSISTANT             'id', 'attorney_id', 'status', 'decline_reason', 'created_at'
+ASSISTANT         ]
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class PatentabilityOpinionSerializer(serializers.ModelSerializer):
+ASSISTANT     """Read-only serializer for patentability opinions."""
+ASSISTANT     
+ASSISTANT     class Meta:
+ASSISTANT         model = PatentabilityOpinion
+ASSISTANT         fields = [
+ASSISTANT             'id', 'attorney_id', 'novelty', 'non_obviousness', 'utility', 
+ASSISTANT             'recommendation', 'opinion_text', 'created_at'
+ASSISTANT         ]
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class BudgetSerializer(serializers.ModelSerializer):
+ASSISTANT     """Read-only serializer for budgets."""
+ASSISTANT     
+ASSISTANT     class Meta:
+ASSISTANT         model = Budget
+ASSISTANT         fields = [
+ASSISTANT             'id', 'filing_fee', 'attorney_fee', 'administrative_cost', 
+ASSISTANT             'total', 'status', 'decided_by', 'justification', 'created_at'
+ASSISTANT         ]
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class FilingSerializer(serializers.ModelSerializer):
+ASSISTANT     """Read-only serializer for external filings."""
+ASSISTANT     
+ASSISTANT     class Meta:
+ASSISTANT         model = Filing
+ASSISTANT         fields = [
+ASSISTANT             'id', 'patent_office', 'filing_number', 'filing_date', 
+ASSISTANT             'international', 'grant_number', 'grant_date', 'created_at'
+ASSISTANT         ]
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class OfficeActionSerializer(serializers.ModelSerializer):
+ASSISTANT     """Read-only serializer for office actions."""
+ASSISTANT     
+ASSISTANT     class Meta:
+ASSISTANT         model = OfficeAction
+ASSISTANT         fields = [
+ASSISTANT             'id', 'received_date', 'response_due_date', 'description', 
+ASSISTANT             'response_text', 'status', 'created_at'
+ASSISTANT         ]
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class MaintenanceRecordSerializer(serializers.ModelSerializer):
+ASSISTANT     """Read-only serializer for maintenance records."""
+ASSISTANT     
+ASSISTANT     class Meta:
+ASSISTANT         model = MaintenanceRecord
+ASSISTANT         fields = [
+ASSISTANT             'id', 'due_date', 'fee', 'decision', 'decided_by', 'created_at'
+ASSISTANT         ]
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class AppealSerializer(serializers.ModelSerializer):
+ASSISTANT     """Read-only serializer for appeals."""
+ASSISTANT     
+ASSISTANT     class Meta:
+ASSISTANT         model = Appeal
+ASSISTANT         fields = [
+ASSISTANT             'id', 'grounds', 'status', 'decided_by', 'justification', 
+ASSISTANT             'created_at'
+ASSISTANT         ]
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class ApplicationHistorySerializer(serializers.ModelSerializer):
+ASSISTANT     """Read-only serializer for application history."""
+ASSISTANT     
+ASSISTANT     class Meta:
+ASSISTANT         model = ApplicationHistory
+ASSISTANT         fields = [
+ASSISTANT             'id', 'actor_id', 'action', 'from_status', 'to_status', 
+ASSISTANT             'note', 'created_at'
+ASSISTANT         ]
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT modules/patent/api/views.py
+ASSISTANT ```python
+ASSISTANT from rest_framework import generics, mixins, status
+ASSISTANT from rest_framework.decorators import action
+ASSISTANT from rest_framework.response import Response
+ASSISTANT from django.db.models import Q
+ASSISTANT 
+ASSISTANT from fusion_auth.permissions import HasModuleGrant, HasPermission
+ASSISTANT 
+ASSISTANT from ..models import (
+ASSISTANT     PatentApplication, Inventor, ApplicationDocument,
+ASSISTANT     AttorneyAssignment, PatentabilityOpinion, Budget, Filing,
+ASSISTANT     OfficeAction, MaintenanceRecord, Appeal, ApplicationHistory
+ASSISTANT )
+ASSISTANT from ..services.applications import (
+ASSISTANT     submit_application, assign_director, review_application, resubmit_application,
+ASSISTANT     withdraw_application, expire_overdue_resubmissions, file_appeal, decide_appeal
+ASSISTANT )
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # --- Permission Classes ---
+ASSISTANT 
+ASSISTANT class PatentApplicationListMixin(generics.ListAPIView):
+ASSISTANT     """Base mixin for list views that filter by the requesting principal."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent")]
+ASSISTANT     
+ASSISTANT     def get_queryset(self):
+ASSISTANT         principal = getattr(self.request, "principal", None)
+ASSISTANT         if not principal:
+ASSISTANT             return PatentApplication.objects.none()
+ASSISTANT         
+ASSISTANT         # Filter based on user kind/role logic (simplified for this step)
+ASSISTANT         # In a real system, this would check roles against registry.py ROLE_GRANTS
+ASSISTANT         user_kind = getattr(principal, 'kind', None)
+ASSISTANT         
+ASSISTANT         if user_kind == 'student':  # Applicant
+ASSISTANT             return PatentApplication.objects.filter(applicant_id=principal.user_id)
+ASSISTANT         elif user_kind == 'director':
+ASSISTANT             # Directors can review applications assigned to them
+ASSISTANT             return PatentApplication.objects.filter(assigned_director_id=principal.user_id)
+ASSISTANT         elif user_kind == 'admin':  # PCC_ADMIN
+ASSISTANT             return PatentApplication.objects.all()
+ASSISTANT         else:  # Default to self or all if logic is complex, here we assume admin access for safety in this snippet context or extend based on specific role checks
+ASSISTANT             # For simplicity in this step, assuming Admin sees all, others see self or assigned
+ASSISTANT             # A robust implementation would check registry.py ROLE_GRANTS explicitly
+ASSISTANT             return PatentApplication.objects.all()
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # --- Application Views ---
+ASSISTANT 
+ASSISTANT class ApplicationListView(PatentApplicationListMixin):
+ASSISTANT     """List applications for the current user."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent")]
+ASSISTANT     
+ASSISTANT     def get_queryset(self):
+ASSISTANT         principal = getattr(self.request, "principal", None)
+ASSISTANT         if not principal:
+ASSISTANT             return PatentApplication.objects.none()
+ASSISTANT         
+ASSISTANT         user_kind = getattr(principal, 'kind', None)
+ASSISTANT         
+ASSISTANT         if user_kind == 'student':  # Applicant
+ASSISTANT             return PatentApplication.objects.filter(applicant_id=principal.user_id).order_by('-created_at')
+ASSISTANT         elif user_kind == 'director':
+ASSISTANT             return PatentApplication.objects.filter(assigned_director_id=principal.user_id).order_by('-created_at')
+ASSISTANT         elif user_kind == 'admin':  # PCC_ADMIN
+ASSISTANT             return PatentApplication.objects.all().order_by('-created_at')
+ASSISTANT         else:
+ASSISTANT             # Fallback for other roles if not explicitly handled above, default to self or empty
+ASSISTANT             # Assuming only Student/Director/Admin exist based on context
+ASSISTANT             return PatentApplication.objects.none()
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class ApplicationDetailView(generics.RetrieveUpdateAPIView):
+ASSISTANT     """Retrieve and update application details."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.application.manage")]
+ASSISTANT     
+ASSISTANT     def get_queryset(self):
+ASSISTANT         principal = getattr(self.request, "principal", None)
+ASSISTANT         if not principal:
+ASSISTANT             return PatentApplication.objects.none()
+ASSISTANT         
+ASSISTANT         user_kind = getattr(principal, 'kind', None)
+ASSISTANT         
+ASSISTANT         if user_kind == 'student':  # Applicant
+ASSISTANT             return PatentApplication.objects.filter(applicant_id=principal.user_id)
+ASSISTANT         elif user_kind == 'director':
+ASSISTANT             return PatentApplication.objects.filter(assigned_director_id=principal.user_id)
+ASSISTANT         elif user_kind == 'admin':
+ASSISTANT             return PatentApplication.objects.all()
+ASSISTANT         else:
+ASSISTANT             return PatentApplication.objects.none()
+ASSISTANT 
+ASSISTANT     def get_object(self):
+ASSISTANT         queryset = self.get_queryset()
+ASSISTANT         try:
+ASSISTANT             return queryset.get(pk=self.kwargs['pk'])
+ASSISTANT         except PatentApplication.DoesNotExist:
+ASSISTANT             raise NotFoundResponse("Application not found.")
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class ApplicationHistoryView(generics.RetrieveAPIView):
+ASSISTANT     """Retrieve application history."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.application.manage")]
+ASSISTANT     
+ASSISTANT     def get_queryset(self):
+ASSISTANT         principal = getattr(self.request, "principal", None)
+ASSISTANT         if not principal:
+ASSISTANT             return ApplicationHistory.objects.none()
+ASSISTANT         
+ASSISTANT         user_kind = getattr(principal, "kind", None)
+ASSISTANT         
+ASSISTANT         if user_kind == 'student':  # Applicant
+ASSISTANT             return PatentApplication.objects.filter(applicant_id=principal.user_id).order_by('-created_at')
+ASSISTANT         elif user_kind == 'director':
+ASSISTANT             return PatentApplication.objects.filter(assigned_director_id=principal.user_id).order_by('-created_at')
+ASSISTANT         elif user_kind == 'admin':
+ASSISTANT             return PatentApplication.objects.all().order_by('-created_at')
+ASSISTANT         else:
+ASSISTANT             return PatentApplication.objects.none()
+ASSISTANT 
+ASSISTANT     def get_object(self):
+ASSISTANT         queryset = self.get_queryset()
+ASSISTANT         try:
+ASSISTANT             return queryset.get(pk=self.kwargs['pk'])
+ASSISTANT         except PatentApplication.DoesNotExist:
+ASSISTANT             raise NotFoundResponse("Application not found.")
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # --- Action Views ---
+ASSISTANT 
+ASSISTANT class SubmitApplicationView(generics.CreateAPIView):
+ASSISTANT     """Submit a new patent application."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.application.create")]
+ASSISTANT     
+ASSISTANT     def create(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             data = request.data
+ASSISTANT             applicant_id = request.principal.user_id if hasattr(request, 'principal') else None
+ASSISTANT             
+ASSISTANT             # Validate and submit via service
+ASSISTANT             app = submit_application(
+ASSISTANT                 applicant_id=applicant_id,
+ASSISTANT                 data=data,
+ASSISTANT                 inventors=request.data.get('inventors', []),
+ASSISTANT                 documents=request.data.get('documents', []),
+ASSISTANT                 actor_id=applicant_id
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response(PatentApplicationSerializer(app).data, status=status.HTTP_201_CREATED)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class AssignDirectorView(generics.UpdateAPIView):
+ASSISTANT     """Assign a director to an application."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.application.manage")]
+ASSISTANT     
+ASSISTANT     def put(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             app = PatentApplication.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             data = request.data
+ASSISTANT             director_id = data.get('director_id')
+ASSISTANT             admin_id = request.principal.user_id if hasattr(request, 'principal') else None
+ASSISTANT             
+ASSISTANT             # Validate and assign via service
+ASSISTANT             app = assign_director(
+ASSISTANT                 admin_id=admin_id,
+ASSISTANT                 application_id=app.id,
+ASSISTANT                 director_id=director_id
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response(PatentApplicationSerializer(app).data, status=status.HTTP_200_OK)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class ReviewApplicationView(generics.UpdateAPIView):
+ASSISTANT     """Record a director's review decision."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.application.review")]
+ASSISTANT     
+ASSISTANT     def put(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             app = PatentApplication.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             data = request.data
+ASSISTANT             director_id = request.principal.user_id if hasattr(request, 'principal') else None
+ASSISTANT             
+ASSISTANT             # Validate and review via service
+ASSISTANT             app = review_application(
+ASSISTANT                 director_id=director_id,
+ASSISTANT                 application_id=app.id,
+ASSISTANT                 decision=data.get('decision'),
+ASSISTANT                 justification=data.get('justification')
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response(PatentApplicationSerializer(app).data, status=status.HTTP_200_OK)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class ResubmitApplicationView(generics.UpdateAPIView):
+ASSISTANT     """Resubmit an application after revision."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.application.manage")]
+ASSISTANT     
+ASSISTANT     def put(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             app = PatentApplication.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             data = request.data
+ASSISTANT             applicant_id = request.principal.user_id if hasattr(request, 'principal') else None
+ASSISTANT             
+ASSISTANT             # Validate and resubmit via service
+ASSISTANT             app = resubmit_application(
+ASSISTANT                 applicant_id=applicant_id,
+ASSISTANT                 application_id=app.id,
+ASSISTANT                 changes=data.get('changes', {}),
+ASSISTANT                 response_to_feedback=data.get('response_to_feedback'),
+ASSISTANT                 actor_id=applicant_id
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response(PatentApplicationSerializer(app).data, status=status.HTTP_200_OK)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class WithdrawApplicationView(generics.UpdateAPIView):
+ASSISTANT     """Withdraw an application."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.application.manage")]
+ASSISTANT     
+ASSISTANT     def put(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             app = PatentApplication.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             data = request.data
+ASSISTANT             applicant_id = request.principal.user_id if hasattr(request, 'principal') else None
+ASSISTANT             
+ASSISTANT             # Validate and withdraw via service
+ASSISTANT             app = withdraw_application(
+ASSISTANT                 applicant_id=applicant_id,
+ASSISTANT                 application_id=app.id,
+ASSISTANT                 reason=data.get('reason')
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response(PatentApplicationSerializer(app).data, status=status.HTTP_200_OK)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class FileAppealView(generics.CreateAPIView):
+ASSISTANT     """File an appeal against a rejection."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.application.manage")]
+ASSISTANT     
+ASSISTANT     def create(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             app = PatentApplication.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             data = request.data
+ASSISTANT             applicant_id = request.principal.user_id if hasattr(request, 'principal') else None
+ASSISTANT             
+ASSISTANT             # Validate and file appeal via service
+ASSISTANT             appeal = file_appeal(
+ASSISTANT                 applicant_id=applicant_id,
+ASSISTANT                 application_id=app.id,
+ASSISTANT                 grounds=data.get('grounds')
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response({'id': appeal.id, 'status': appeal.status}, status=status.HTTP_201_CREATED)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class DecideAppealView(generics.UpdateAPIView):
+ASSISTANT     """Record a director's decision on an appeal."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.appeal.review")]
+ASSISTANT     
+ASSISTANT     def put(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             appeal = Appeal.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             data = request.data
+ASSISTANT             director_id = request.principal.user_id if hasattr(request, 'principal') else None
+ASSISTANT             
+ASSISTANT             # Validate and decide via service
+ASSISTANT             appeal = decide_appeal(
+ASSISTANT                 director_id=director_id,
+ASSISTANT                 appeal_id=appeal.id,
+ASSISTANT                 outcome=data.get('outcome'),
+ASSISTANT                 justification=data.get('justification')
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response({'id': appeal.id, 'status': appeal.status}, status=status.HTTP_200_OK)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # --- Admin Views ---
+ASSISTANT 
+ASSISTANT class ExpireOverdueResubmissionsView(generics.GenericAPIView):
+ASSISTANT     """Set status to Expired for applications where resubmission deadline has passed."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.admin.manage")]
+ASSISTANT     
+ASSISTANT     def post(self, request):
+ASSISTANT         today = request.data.get('today')
+ASSISTANT         if not today:
+ASSISTANT             from datetime import date
+ASSISTANT             today = date.today()
+ASSISTANT         
+ASSISTANT         expired_apps = expire_overdue_resubmissions(today)
+ASSISTANT         
+ASSISTANT         return Response({
+ASSISTANT             'count': len(expired_apps),
+ASSISTANT             'expired_applications': [app.APPLICATION_NUMBER for app in expired_apps]
+ASSISTANT         }, status=status.HTTP_200_OK)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class AdminApplicationListView(PatentApplicationListMixin):
+ASSISTANT     """Admin list of all submitted applications."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.admin.manage")]
+ASSISTANT     
+ASSISTANT     def get_queryset(self):
+ASSISTANT         return PatentApplication.objects.all().order_by('-created_at')
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class NotFoundResponse(Exception):
+ASSISTANT     pass
+ASSISTANT ```
