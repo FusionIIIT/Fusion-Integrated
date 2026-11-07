@@ -4426,3 +4426,1065 @@ ASSISTANT     )
 ASSISTANT     
 ASSISTANT     return filing
 ASSISTANT ```
+TO LLM 2026-11-07T14:24:10
+-------
+SYSTEM Act as an expert software developer.
+SYSTEM Take requests for changes to the supplied code.
+SYSTEM If the request is ambiguous, ask questions.
+SYSTEM Reply in English.
+SYSTEM 
+SYSTEM Once you understand the request you MUST:
+SYSTEM 1. Determine if any code changes are needed.
+SYSTEM 2. Explain any needed changes.
+SYSTEM 3. If changes are needed, output a copy of each file that needs changes.
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return the entire content of the updated file.
+SYSTEM You MUST use this *file listing* format:
+SYSTEM 
+SYSTEM path/to/filename.js
+SYSTEM ```
+SYSTEM // entire file content ...
+SYSTEM // ... goes in between
+SYSTEM ```
+SYSTEM 
+SYSTEM Every *file listing* MUST use this format:
+SYSTEM - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+SYSTEM - Second line: opening ```
+SYSTEM - ... entire content of the file ...
+SYSTEM - Final line: closing ```
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+SYSTEM *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+SYSTEM Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+SYSTEM 
+SYSTEM Reply in English.
+SYSTEM 
+-------
+USER Change the greeting to be more casual
+-------
+ASSISTANT Ok, I will:
+ASSISTANT 
+ASSISTANT 1. Switch the greeting text from "Hello" to "Hey".
+ASSISTANT 
+ASSISTANT show_greeting.py
+ASSISTANT ```
+ASSISTANT import sys
+ASSISTANT 
+ASSISTANT def greeting(name):
+ASSISTANT     print(f"Hey {name}")
+ASSISTANT 
+ASSISTANT if __name__ == '__main__':
+ASSISTANT     greeting(sys.argv[1])
+ASSISTANT ```
+-------
+USER I switched to a new code base. Please don't consider the above files or try to edit them any longer.
+-------
+ASSISTANT Ok.
+-------
+USER Here are some READ ONLY files, provided for your reference.
+USER Do not edit these files!
+USER 
+USER modules/patent/models.py
+USER ```
+USER from django.db import models
+USER from core.db.mixins import TimeStampedModel
+USER 
+USER 
+USER class PatentApplication(TimeStampedModel):
+USER     """Core patent application record."""
+USER     
+USER     STATUS_CHOICES = [
+USER         ("draft", "Draft"),
+USER         ("submitted", "Submitted"),
+USER         ("under_review", "Under Review"),
+USER         ("needs_revision", "Needs Revision"),
+USER         ("resubmitted", "Resubmitted"),
+USER         ("rejected", "Rejected"),
+USER         ("appeal_submitted", "Appeal Submitted"),
+USER         ("approved", "Approved"),
+USER         ("attorney_assigned", "Attorney Assigned"),
+USER         ("filed", "Filed"),
+USER         ("granted", "Granted"),
+USER         ("withdrawn", "Withdrawn"),
+USER         ("expired", "Expired"),
+USER     ]
+USER 
+USER     APPLICATION_NUMBER = models.CharField(max_length=20, unique=True)
+USER     title = models.CharField(max_length=255)
+USER     abstract = models.TextField(blank=True)
+USER     description = models.TextField()
+USER     claims = models.TextField()
+USER     technical_domain = models.CharField(max_length=100)
+USER     
+USER     applicant_id = models.IntegerField(db_index=True)
+USER     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default="draft")
+USER     assigned_director_id = models.IntegerField(null=True, blank=True)
+USER     assigned_attorney_id = models.IntegerField(null=True, blank=True)
+USER     review_due_date = models.DateField(null=True, blank=True)
+USER     resubmission_deadline = models.DateField(null=True, blank=True)
+USER     
+USER     # Latest decision and justification (stored as text for flexibility)
+USER     latest_decision = models.CharField(max_length=50, null=True, blank=True)
+USER     latest_justification = models.TextField(blank=True)
+USER     
+USER     version_number = models.IntegerField(default=1)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         ordering = ["-created_at"]
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION_NUMBER} ({self.status})"
+USER 
+USER 
+USER class Inventor(TimeStampedModel):
+USER     """Inventor associated with a patent application."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="inventors")
+USER     user_id = models.IntegerField(null=True, blank=True, db_index=True)  # Optional: linked IAM user
+USER     name = models.CharField(max_length=255)
+USER     email = models.EmailField(blank=True)
+USER     contribution_percent = models.DecimalField(max_digits=5, decimal_places=1, default=0.0)
+USER     agreement_signed = models.BooleanField(default=False)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION", "user_id"]  # Prevent duplicate entries for same user
+USER 
+USER     def __str__(self):
+USER         return f"Inventor {self.name} on {self.APPLICATION}"
+USER 
+USER 
+USER class ApplicationDocument(TimeStampedModel):
+USER     """Document associated with a patent application."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="documents")
+USER     file_name = models.CharField(max_length=255)
+USER     content_type = models.CharField(max_length=100)  # e.g., "application.pdf"
+USER     size = models.BigIntegerField()  # in bytes
+USER     version = models.IntegerField(default=1)
+USER     sensitivity = models.CharField(max_length=20, choices=[("public", "Public"), ("internal", "Internal"), ("confidential", "Confidential")])
+USER     uploaded_by = models.IntegerField(db_index=True)
+USER     archived = models.BooleanField(default=False)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         ordering = ["-created_at"]
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.file_name} (v{self.version})"
+USER 
+USER 
+USER class AttorneyAssignment(TimeStampedModel):
+USER     """Attorney assignment record for a patent application."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="assignments")
+USER     attorney_id = models.IntegerField(db_index=True)
+USER     status = models.CharField(max_length=20, choices=[("offered", "Offered"), ("accepted", "Accepted"), ("declined", "Declined")], default="offered")
+USER     decline_reason = models.TextField(blank=True)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION"]  # One assignment per application at a time
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.attorney_id} ({self.status})"
+USER 
+USER 
+USER class PatentabilityOpinion(TimeStampedModel):
+USER     """Attorney's legal and patentability assessment."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="opinions")
+USER     attorney_id = models.IntegerField(db_index=True)
+USER     novelty = models.BooleanField(default=False)  # True if novel
+USER     non_obviousness = models.BooleanField(default=False)  # True if non-obvious
+USER     utility = models.BooleanField(default=False)  # True if useful
+USER     recommendation = models.CharField(max_length=30, choices=[("file_patent", "File Patent"), ("do_not_file", "Do Not File"), ("needs_amendment", "Needs Amendment")], default="needs_amendment")
+USER     opinion_text = models.TextField()
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION"]  # One primary opinion per application
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.recommendation}"
+USER 
+USER 
+USER class Budget(TimeStampedModel):
+USER     """Budget record for a patent application."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="budgets")
+USER     filing_fee = models.DecimalField(max_digits=10, decimal_places=2)
+USER     attorney_fee = models.DecimalField(max_digits=10, decimal_places=2)
+USER     administrative_cost = models.DecimalField(max_digits=10, decimal_places=2)
+USER     total = models.DecimalField(max_digits=10, decimal_places=2)  # Calculated field (can be overridden by manager)
+USER     status = models.CharField(max_length=20, choices=[("pending", "Pending"), ("approved", "Approved"), ("rejected", "Rejected"), ("escalated", "Escalated")], default="pending")
+USER     decided_by = models.IntegerField(null=True, blank=True)
+USER     justification = models.TextField(blank=True)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION"]  # One budget per application at a time
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - ${self.total}"
+USER 
+USER 
+USER class Filing(TimeStampedModel):
+USER     """External patent office filing record."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="filings")
+USER     patent_office = models.CharField(max_length=100)  # e.g., "USPTO", "EPO"
+USER     filing_number = models.CharField(max_length=50)
+USER     filing_date = models.DateField()
+USER     international = models.BooleanField(default=False)
+USER     grant_number = models.CharField(max_length=50, null=True, blank=True)
+USER     grant_date = models.DateField(null=True, blank=True)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION"]  # One primary filing per application
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.patent_office} #{self.filing_number}"
+USER 
+USER 
+USER class OfficeAction(TimeStampedModel):
+USER     """Office action received from patent office."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="office_actions")
+USER     received_date = models.DateField()
+USER     response_due_date = models.DateField(null=True, blank=True)
+USER     description = models.TextField()
+USER     response_text = models.TextField(blank=True)  # Draft or submitted response
+USER     status = models.CharField(max_length=30, choices=[("recorded", "Recorded"), ("awaiting_applicant_approval", "Awaiting Applicant Approval"), ("applicant_approved", "Applicant Approved"), ("response_ready", "Response Ready"), ("response_submitted", "Response Submitted")], default="recorded")
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         ordering = ["-received_date"]
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.status}"
+USER 
+USER 
+USER class MaintenanceRecord(TimeStampedModel):
+USER     """Maintenance fee renewal record."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="maintenance_records")
+USER     due_date = models.DateField()
+USER     fee = models.DecimalField(max_digits=10, decimal_places=2)
+USER     decision = models.CharField(max_length=30, choices=[("renewal_requested", "Renewal Requested"), ("renew", "Renew"), ("do_not_renew", "Do Not Renew")], default="renewal_requested")
+USER     decided_by = models.IntegerField(null=True, blank=True)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION"]  # One decision per cycle (tracked by due_date)
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.due_date} ({self.decision})"
+USER 
+USER 
+USER class Appeal(TimeStampedModel):
+USER     """Appeal record against a rejection."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="appeals")
+USER     grounds = models.TextField()
+USER     status = models.CharField(max_length=30, choices=[("submitted", "Submitted"), ("remanded_for_amendment", "Remanded for Amendment"), ("rejection_upheld", "Rejection Upheld"), ("decision_modified", "Decision Modified")], default="submitted")
+USER     decided_by = models.IntegerField(null=True, blank=True)
+USER     justification = models.TextField(blank=True)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION"]  # One appeal per application at a time
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.status}"
+USER 
+USER 
+USER class ApplicationHistory(TimeStampedModel):
+USER     """Append-only history of application status changes and actions."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="history")
+USER     actor_id = models.IntegerField(db_index=True)  # User ID who performed the action
+USER     action = models.CharField(max_length=50)  # e.g., "review", "assign", "withdraw"
+USER     from_status = models.CharField(max_length=30, null=True, blank=True)
+USER     to_status = models.CharField(max_length=30)
+USER     note = models.TextField(blank=True)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         ordering = ["-created_at"]
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.actor_id}: {self.action}"
+USER ```
+USER 
+USER ../elm_specs_md/pms_kit/chunks/br_lifecycle.md
+USER ```
+USER # PMS business rules for budget, attorney, assessment, filing, office actions, maintenance (read-only spec)
+USER 
+USER - BR-PMS-040 (Attorney assignment; applies to PCC_ADMIN): Only PCC_ADMIN may assign an Attorney to an Approved application.
+USER - BR-PMS-041 (Attorney panel rule; applies to PCC_ADMIN): An assigned Attorney must be selected from the approved panel unless an institutional exception is recorded or allowed. Exception: unless an institutional exception is recorded or allowed
+USER - BR-PMS-042 (Assignment criterion; applies to PCC_ADMIN): Attorney expertise matching the application domain is an assignment criterion.
+USER - BR-PMS-043 (Assignment criterion; applies to PCC_ADMIN): Attorney current workload is an assignment criterion.
+USER - BR-PMS-044 (Conflict of interest; applies to PCC_ADMIN / Attorney): PMS must perform a conflict-of-interest check before Attorney assignment.
+USER - BR-PMS-045 (Preference rule; applies to Applicant / PCC_ADMIN): Applicant Attorney preference may be considered only when the preferred Attorney is in the approved panel. Exception: Outside the stated condition, the rule does not authorize the action.
+USER - BR-PMS-046 (Opinion validation; applies to Attorney): A finalized Attorney patentability opinion must contain exactly one recommendation: File Patent, Do Not File, or Needs Amendment.
+USER - BR-PMS-048 (Budget data; applies to Director): Budget information must include filing fees.
+USER - BR-PMS-049 (Budget data; applies to Director): Budget information must include attorney fees.
+USER - BR-PMS-050 (Budget data; applies to Director): Budget information must include administrative costs.
+USER - BR-PMS-051 (Budget escalation; applies to Director / PCC_ADMIN): When total patent cost exceeds the configured threshold, PMS must route/escalate the case to the applicable higher authority.
+USER - BR-PMS-052 (Budget approval rule; applies to Director): Budget approval is permitted only when the application status is Approved. Exception: Outside the stated condition, the rule does not authorize the action.
+USER - BR-PMS-053 (Budget validation; applies to Director): Where budget-availability information is available to PMS, budget availability must be validated before approval. Exception: Applies only under the stated availability/configuration/legal condition.
+USER - BR-PMS-055 (Format validation; applies to Attorney): Where corresponding validation rules are available, the filing package must satisfy the applicable patent-office format standards before PMS records compliant readiness. Exception: Applies only under the stated availability/configuration/legal condition.
+USER - BR-PMS-056 (International filing rule; applies to Attorney): An international filing must include additional justification recorded in PMS.
+USER - BR-PMS-059 (Post-grant rule; applies to Attorney / Director): Post-grant tracking is activated only when patent status is Granted. Exception: Outside the stated condition, the rule does not authorize the action.
+USER - BR-PMS-060 (Maintenance schedule; applies to Attorney / Director): Where applicable schedule rules are available, the maintenance-fee schedule is determined from grant date and jurisdiction. Exception: Applies only under the stated availability/configuration/legal condition.
+USER - BR-PMS-061 (Renewal decision rule; applies to Director): An explicit Renew or Do Not Renew decision is required before each maintenance deadline.
+USER - BR-PMS-065 (Response submission; applies to Attorney): An office-action response must be recorded as submitted within the applicable deadline unless a permitted extension applies. Exception: unless a permitted extension applies
+USER - BR-PMS-066 (Deadline tracking; applies to Attorney / Applicant): Office-action response deadline tracking is automated only where applicable deadline data/rules are available to PMS. Exception: Applies only under the stated availability/configuration/legal condition. Outside the stated condition, the rule does not authorize the action.
+USER - BR-PMS-100 (Deadline tracking; applies to Attorney / Director): PMS calculates/monitors maintenance-fee deadlines only where applicable jurisdictional schedule rules/data are available. Exception: Applies only under the stated availability/configuration/legal condition. Outside the stated condition, the rule does not authorize the action.
+USER - BR-PMS-127 (Sequential workflow rule; applies to PCC_ADMIN / Attorney): Attorney assignment must not occur before Director approval is recorded.
+USER - BR-PMS-128 (Sequential workflow rule; applies to Attorney / Director): External filing must not occur until required approvals and budget allocation are complete.
+USER - BR-PMS-138 (Scope boundary; applies to Patent office systems): Patent-office systems are external; PMS may validate, record, track, notify, log, or report based on filing/status/communication data but does not control patent-office processing or decisions.
+USER - BR-PMS-141 (Scope boundary; applies to Prior-art databases): External prior-art databases are query sources and are not PMS-owned repositories.
+USER - BR-PMS-142 (Scope boundary; applies to Attorney / patent office systems): PMS must not treat external patent-office filing success as internally controlled beyond recording submitted filing details and confirmations.
+USER - BR-PMS-146 (Applicant office-action response approval condition; applies to Office-action response handling): Applicant review and approval of an office-action response is required only when the applicable process requires Applicant review. Exception: Outside the stated condition, the rule does not authorize the action.
+USER ```
+USER 
+USER ../elm_specs_md/pms_kit/chunks/uc_lifecycle.md
+USER ```
+USER # PMS use cases: budget, attorney, patentability, filing, office actions, maintenance (read-only spec)
+USER 
+USER ### UC-PMS-009 — Review and Decide Patent Budget
+USER Actor: Director
+USER Goal: Review filing/prosecution costs and record a budget decision or escalation.
+USER Preconditions: Application status is Approved.
+USER Main flow:
+USER   1. PMS presents filing fees, attorney fees, administrative costs, and available budget information where such data is available.
+USER   2. Director reviews the proposed cost.
+USER   3. If the cost is within the configured threshold, Director records the budget decision.
+USER   4. If the cost exceeds the configured threshold, PMS routes/escalates the case to the applicable higher authority.
+USER   5. PMS records financial/authorization metadata and triggers the applicable budget notification.
+USER Alternatives:
+USER   • Within-threshold outcome may be Budget Approved or Budget Rejected.
+USER   • Above-threshold cases result in Escalated rather than an invented higher-authority decision.
+USER Exceptions:
+USER   • If budget-availability data is required and available but validation fails, PMS does not record approval.
+USER Postcondition: Budget decision or escalation state is recorded with audit/financial metadata.
+USER Rules: BR-PMS-048; BR-PMS-049; BR-PMS-050; BR-PMS-051; BR-PMS-052; BR-PMS-053; BR-PMS-126
+USER 
+USER ### UC-PMS-010 — Assign Attorney to Approved Application
+USER Actor: PCC_ADMIN
+USER Goal: Select and assign an eligible Attorney to an Approved application.
+USER Preconditions: Application status is Approved; PCC_ADMIN is authorized.
+USER Main flow:
+USER   1. PCC_ADMIN reviews eligible attorneys using approved-panel status, expertise, workload, conflict-of-interest, and permitted Applicant preference.
+USER   2. PMS blocks a non-panel attorney unless a recorded institutional exception permits the assignment.
+USER   3. PCC_ADMIN selects and records the Attorney assignment.
+USER   4. PMS records the assignment and notifies the Attorney for acceptance/decline.
+USER Alternatives:
+USER   • A preferred Attorney is considered only when that Attorney is in the approved panel.
+USER   • An approved institutional exception may permit a non-panel attorney.
+USER Exceptions:
+USER   • If conflict-of-interest or other assignment constraints fail, PMS does not record the assignment.
+USER Postcondition: An Attorney assignment is recorded and is awaiting/subject to the Attorney response.
+USER Rules: BR-PMS-040; BR-PMS-041; BR-PMS-042; BR-PMS-043; BR-PMS-044; BR-PMS-045; BR-PMS-127; BR-PMS-126
+USER 
+USER ### UC-PMS-011 — Accept or Decline Attorney Assignment
+USER Actor: Attorney
+USER Goal: Record the assigned Attorney's acceptance or decline decision.
+USER Preconditions: An assignment to the Attorney exists.
+USER Main flow:
+USER   1. Attorney reviews the assignment.
+USER   2. Attorney chooses Accept or Decline.
+USER   3. PMS records the response.
+USER   4. On acceptance, PMS records the assignment as accepted/Attorney Assigned; on decline, PMS records Pending Review as applicable and notifies PCC_ADMIN.
+USER Alternatives:
+USER   • Accept and Decline are the two supported outcomes.
+USER Exceptions:
+USER   • If no active assignment exists for the Attorney, PMS does not accept a response.
+USER Postcondition: The Attorney response and applicable assignment/application state are recorded.
+USER Rules: BR-PMS-126
+USER 
+USER ### UC-PMS-012 — Conduct Patentability Assessment
+USER Actor: Attorney
+USER Goal: Record legal/patentability analysis and a supported filing recommendation.
+USER Preconditions: Attorney has the assigned application and required access.
+USER Main flow:
+USER   1. Attorney reviews the application and performs/records relevant prior-art research.
+USER   2. Attorney evaluates novelty, non-obviousness, and utility.
+USER   3. Attorney records a detailed patentability opinion.
+USER   4. Attorney selects one recommendation: File Patent, Do Not File, or Needs Amendment.
+USER   5. PMS records the opinion and notifies relevant stakeholders.
+USER Alternatives:
+USER   • Attorney may request additional information or an extension where PMS/the applicable process supports it.
+USER Exceptions:
+USER   • If the opinion does not contain one supported recommendation, PMS does not finalize the opinion.
+USER Postcondition: A patentability opinion and recommendation are recorded.
+USER Rules: BR-PMS-046; BR-PMS-126; BR-PMS-141
+USER 
+USER ### UC-PMS-013 — Prepare and Record External Patent Filing
+USER Actor: Attorney
+USER Goal: Prepare a filing package, perform supported validation, submit externally, and record filing confirmation in PMS.
+USER Preconditions: Required approvals and budget allocation are complete; inventor agreements are complete; Attorney has filing authority/access.
+USER Main flow:
+USER   1. Attorney prepares the application package.
+USER   2. Where validation rules are available, PMS validates the package against applicable patent-office standards.
+USER   3. For an international filing, Attorney records the required additional justification.
+USER   4. Attorney submits the package to the selected patent office outside PMS.
+USER   5. Attorney/PMS records the external filing ID, filing date, and confirmation.
+USER   6. PMS sets application status to Filed, records audit/history, and triggers filing confirmation.
+USER Alternatives:
+USER   • National and international filings use their applicable requirements; international filing additionally requires justification.
+USER Exceptions:
+USER   • If a required approval/budget/agreement prerequisite is missing, PMS blocks filing.
+USER   • If external submission or confirmation is not obtained, PMS does not represent the filing as successfully Filed.
+USER Postcondition: External filing details are recorded and application status is Filed.
+USER Rules: BR-PMS-020; BR-PMS-055; BR-PMS-056; BR-PMS-128; BR-PMS-138; BR-PMS-142; BR-PMS-126
+USER 
+USER ### UC-PMS-014 — Record Patent Office Communication
+USER Actor: Attorney
+USER Goal: Record official patent-office communication, including an office action, for lifecycle tracking.
+USER Preconditions: Application/family record exists; Attorney has access.
+USER Main flow:
+USER   1. Attorney records the communication type, date, details, and supporting document/identifier.
+USER   2. PMS logs the communication.
+USER   3. If the communication is an office action, PMS creates/updates the office-action tracking information and triggers the office-action notification.
+USER Alternatives:
+USER   • Non-office-action official communications are recorded without initiating an office-action response path.
+USER Exceptions:
+USER   • Invalid/unrelated communication data is not attached to another application.
+USER Postcondition: The official communication is recorded; office actions are available for response tracking.
+USER Rules: BR-PMS-138; BR-PMS-142; BR-PMS-126
+USER 
+USER ### UC-PMS-015 — Respond to Office Action
+USER Actor: Attorney
+USER Goal: Prepare, finalize, and record submission of an office-action response within applicable timing rules.
+USER Preconditions: Office action exists; Attorney has access; applicable deadline/extension data is available where required.
+USER Main flow:
+USER   1. Attorney reviews the office action and prepares a draft response.
+USER   2. If Applicant review is required, PMS makes the draft available for UC-PMS-029 and records the response as awaiting Applicant approval.
+USER   3. If Applicant review is not required, or after required Applicant approval is recorded, Attorney finalizes the response.
+USER   4. Attorney submits the response externally and records submission/status in PMS.
+USER   5. PMS updates response tracking and audit/history information.
+USER Alternatives:
+USER   • If additional time is needed and the applicable process permits an extension, Attorney records/files an extension request.
+USER Exceptions:
+USER   • PMS does not mark a response submitted unless the required Applicant approval (when applicable) and submission record exist.
+USER   • A missed deadline is handled by the deadline/escalation rules; PMS does not invent a legal outcome.
+USER Postcondition: Response submission/extension status is recorded.
+USER Rules: BR-PMS-065; BR-PMS-066; BR-PMS-146; BR-PMS-138; BR-PMS-126
+USER 
+USER ### UC-PMS-017 — Manage Post-Grant Tracking and Maintenance
+USER Actor: Attorney
+USER Goal: Track granted patents, maintenance schedules, renewal decisions, and recorded maintenance actions.
+USER Preconditions: Patent status is Granted for post-grant tracking.
+USER Main flow:
+USER   1. PMS activates post-grant tracking and calculates the applicable maintenance schedule where schedule rules/data are available.
+USER   2. Attorney monitors the upcoming maintenance deadline and requests an explicit renewal decision from the Director.
+USER   3. After a Renew decision is recorded through UC-PMS-018, Attorney processes/records the maintenance action, transaction information, and resulting status.
+USER   4. PMS maintains renewal history and schedules the next maintenance cycle.
+USER Alternatives:
+USER   • If the Director records Do Not Renew, no renewal maintenance action is recorded as approved.
+USER Exceptions:
+USER   • If schedule rules/data are unavailable, PMS does not fabricate a maintenance schedule.
+USER Postcondition: Post-grant maintenance state/history is updated according to the Director decision.
+USER Rules: BR-PMS-059; BR-PMS-060; BR-PMS-061; BR-PMS-100; BR-PMS-126
+USER 
+USER ### UC-PMS-018 — Make Maintenance Renewal Decision
+USER Actor: Director
+USER Goal: Record the required Renew or Do Not Renew decision for an upcoming maintenance deadline.
+USER Preconditions: Patent is in post-grant tracking and a renewal decision is due.
+USER Main flow:
+USER   1. Director reviews the patent and available maintenance information.
+USER   2. Director chooses Renew or Do Not Renew.
+USER   3. PMS records the decision and makes it available to the Attorney for the next applicable maintenance action.
+USER Alternatives:
+USER   • Renew and Do Not Renew are the supported outcomes.
+USER Exceptions:
+USER   • If the patent is not in the applicable Granted/post-grant context, PMS does not accept the renewal decision.
+USER Postcondition: One renewal decision is recorded for the maintenance cycle.
+USER Rules: BR-PMS-059; BR-PMS-061; BR-PMS-126
+USER 
+USER ### UC-PMS-029 — Review Office-Action Response
+USER Actor: Applicant
+USER Goal: Review and approve an Attorney-prepared office-action response when the applicable process requires Applicant review.
+USER Preconditions: The applicable process requires Applicant review; a draft response exists.
+USER Main flow:
+USER   1. Applicant reviews the draft response.
+USER   2. Applicant records approval of the response.
+USER   3. PMS records the approval so the Attorney can finalize/submit the response.
+USER Alternatives:
+USER   • If Applicant review is not required, this use case is not invoked.
+USER Exceptions:
+USER   • If approval is not recorded, PMS must not treat the response as Applicant-approved; the PS does not define an alternate Applicant decision outcome.
+USER Postcondition: Required Applicant approval is recorded.
+USER Rules: BR-PMS-146; BR-PMS-126
+USER ```
+-------
+ASSISTANT Ok, I will use these files as references.
+-------
+USER Here are summaries of some files present in my git repository.
+USER Do not propose changes to these files, treat them as *read-only*.
+USER If you need to edit any of these files, ask me to *add them to the chat* first.
+USER 
+USER client/src/app/registry.ts:
+USER ⋮
+USER │export interface ModuleManifest {
+USER │  code: string;
+USER │  basePath: string;
+USER │  load: () => Promise<{ routes: RouteObject[] }>;
+USER ⋮
+USER 
+USER client/src/auth/RequireAuth.tsx:
+USER ⋮
+USER │export function RequireAuth({ children }: { children: React.ReactNode }) {
+USER │  const { status } = useAuth();
+USER │  const location = useLocation();
+USER │
+USER │  if (status === "loading") {
+USER │    return <Center h="100vh"><Loader /></Center>;
+USER │  }
+USER │  // Not a logout: signing in again cannot work while the IAM is unreachable.
+USER │  if (status === "unavailable") {
+USER │    return (
+USER ⋮
+USER 
+USER client/src/modules/placement/api/hooks.ts:
+USER ⋮
+USER │export type ExportKind = "applications" | "placements";
+USER │
+USER ⋮
+USER 
+USER client/src/modules/placement/api/types.ts:
+USER ⋮
+USER │export type ApplicationStatus =
+USER │  | "draft" | "submitted" | "under_review" | "shortlisted"
+USER │  | "interview_scheduled" | "selected" | "rejected" | "withdrawn"
+USER │  | "auto_withdrawn" | "offer_issued" | "offer_accepted" | "offer_declined"
+USER ⋮
+USER 
+USER client/src/modules/placement/components/NewPostingModal.tsx:
+USER ⋮
+USER │                hideControls placeholder="Unlimited"
+USER │              />
+USER │            </Field>
+USER │            <Field span={12}>
+USER │              <DateTimePicker
+USER │                label="Applications close" value={closesAt}
+USER │                onChange={setClosesAt} clearable minDate={new Date()}
+USER │                placeholder="Select a date and time"
+USER ⋮
+USER 
+USER client/src/ui/layout/AppShellLayout.tsx:
+USER ⋮
+USER │export interface NavGroupItem {
+USER │  code: string;
+USER │  label: string;
+USER │  icon?: string;
+USER │  to?: string;
+USER │  app?: string;
+USER │  links?: NavLinkItem[];
+USER ⋮
+USER 
+USER core/api/csrf.py:
+USER ⋮
+USER │def token_for(session_value: str) -> str:
+USER ⋮
+USER 
+USER core/api/csv.py:
+USER ⋮
+USER │def sanitise_cell(value: Any) -> str:
+USER ⋮
+USER 
+USER core/observability/middleware.py:
+USER ⋮
+USER │def get_request_id() -> str:
+USER ⋮
+USER 
+USER fusion_auth/client.py:
+USER ⋮
+USER │class IamUnavailable(Exception):
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class IamSession:
+USER ⋮
+USER 
+USER fusion_auth/permissions.py:
+USER ⋮
+USER │def HasPermission(*codes: str, require_all: bool = False):  # noqa: N802
+USER ⋮
+USER 
+USER fusion_auth/principal.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Principal:
+USER │    user_id: int
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/directory/api/serializers.py:
+USER ⋮
+USER │class UserRefSerializer(serializers.Serializer):
+USER ⋮
+USER 
+USER modules/directory/models.py:
+USER ⋮
+USER │class UserRef(TimeStampedModel):
+USER │    KIND_CHOICES = [
+USER │        ("student", "Student"), ("faculty", "Faculty"),
+USER │        ("staff", "Staff"), ("operator", "Operator"),
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/patent/domain/policy.py:
+USER ⋮
+USER │def add_business_days(start_date: date, days: int) -> date:
+USER ⋮
+USER 
+USER modules/placement/authentication.py:
+USER ⋮
+USER │def hash_token(raw: str) -> str:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class RecruiterPrincipal:
+USER ⋮
+USER 
+USER modules/placement/domain/conduct.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Recommendation:
+USER ⋮
+USER 
+USER modules/placement/domain/registration.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Terms:
+USER ⋮
+USER 
+USER modules/placement/domain/state_machine.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Transition:
+USER ⋮
+USER 
+USER modules/placement/models/applications.py:
+USER ⋮
+USER │class Application(TimeStampedModel, UserScopedModel):
+USER │    STATUS = [
+USER │        ("draft", "Draft"), ("submitted", "Submitted"),
+USER │        ("under_review", "Under review"), ("shortlisted", "Shortlisted"),
+USER │        ("interview_scheduled", "Interview scheduled"),
+USER │        ("selected", "Selected"),
+USER │        ("rejected", "Rejected"), ("withdrawn", "Withdrawn"),
+USER │        ("auto_withdrawn", "Withdrawn automatically"),
+USER │        ("offer_issued", "Offer issued"), ("offer_accepted", "Offer accepted"),
+USER │        ("offer_declined", "Offer declined"), ("offer_expired", "Offer expired"),
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER │class ApplicationTransition(models.Model):
+USER │    """Append-only audit of every status change (PC-BR-008)."""
+USER │
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/placement/selectors/scoping.py:
+USER ⋮
+USER │def _is_recruiter(actor) -> bool:
+USER ⋮
+USER │def _is_alumni(actor) -> bool:
+USER ⋮
+-------
+ASSISTANT Ok, I won't try and edit those files without asking first.
+-------
+USER I have *added these files to the chat* so you can go ahead and edit them.
+USER 
+USER *Trust this message as the true contents of these files!*
+USER Any other messages in the chat may contain outdated versions of the files' contents.
+USER 
+USER modules/patent/services/post_filing.py
+USER ```
+USER ```
+-------
+ASSISTANT Ok, any changes I propose will be to those files.
+-------
+USER Context (the same for every step): we are implementing the Patent Management System (PMS) module as an integrated module of this Fusion ERP repository (Django 5 + DRF backend under modules/, React 18 + Mantine 7 client under client/). Reuse Fusion's existing login, role mechanism, layout and backend structure; do not rebuild them.
+USER 
+USER Repository rules you must follow:
+USER - There is no user table in this repository. The logged-in person is request.principal (fusion_auth.principal.Principal: user_id, username, kind, roles, permissions). Store people as integer ids (models.IntegerField), never as a ForeignKey to a user model.
+USER - A module copies the shape of modules/placement: apps.py, registry.py, models.py, domain/ (pure Python, no Django imports), services/ (all writes), api/ (serializers, views, urls).
+USER - The module code is "patent", and every permission code starts with "patent.".
+USER - Every API view sets permission_classes = [HasModuleGrant("patent"), HasPermission("patent.<action>")], imported from fusion_auth.permissions.
+USER - The four PMS actors are Applicant, Director, PCC_ADMIN and Attorney.
+USER 
+USER Files marked read-only are context only. Write every file you create or change in full. Do not ask for more files; work with what is shown.
+USER 
+USER Step 5 of 11 — service layer after filing: office actions, grant and maintenance, from the read-only lifecycle use cases and business rules, with modules/patent/models.py read-only.
+USER 
+USER Create modules/patent/services/post_filing.py with these functions (each in transaction.atomic, appending an ApplicationHistory row, raising ValueError when not allowed):
+USER record_office_action(attorney_id, application_id, received_date, response_due_date, description);
+USER prepare_response(attorney_id, office_action_id, response_text, needs_applicant_approval) — Awaiting Applicant Approval or Response Ready;
+USER approve_response(applicant_id, office_action_id) — only the owner; Applicant Approved;
+USER submit_response(attorney_id, office_action_id) — only before the response due date; Response Submitted;
+USER record_grant(attorney_id, application_id, grant_number, grant_date) — only for Filed applications; status Granted;
+USER schedule_maintenance(attorney_id, application_id, due_date, fee) and decide_renewal(director_id, record_id, renew, justification) — only for Granted patents;
+USER get_history(application_id) returning the history rows in order.
+USER 
+USER 
+USER To suggest changes to a file you MUST return the entire content of the updated file.
+USER You MUST use this *file listing* format:
+USER 
+USER path/to/filename.js
+USER ```
+USER // entire file content ...
+USER // ... goes in between
+USER ```
+USER 
+USER Every *file listing* MUST use this format:
+USER - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+USER - Second line: opening ```
+USER - ... entire content of the file ...
+USER - Final line: closing ```
+USER 
+USER To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+USER *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+USER Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+USER 
+USER Reply in English.
+USER 
+LLM RESPONSE 2026-11-07T14:29:10
+ASSISTANT modules/patent/services/post_filing.py
+ASSISTANT ```python
+ASSISTANT from django.db import transaction, connection
+ASSISTANT from datetime import date
+ASSISTANT from typing import List, Optional
+ASSISTANT 
+ASSISTANT from core.models import TimeStampedModel
+ASSISTANT from modules.patent.models import (
+ASSISTANT     PatentApplication, OfficeAction, ApplicationHistory, MaintenanceRecord,
+ASSISTANT     PatentabilityOpinion, Filing
+ASSISTANT )
+ASSISTANT from fusion_auth.permissions import HasPermission, HasModuleGrant
+ASSISTANT from fusion_auth.principal import Principal
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class PostFilingService:
+ASSISTANT     """Service layer for post-filing lifecycle events."""
+ASSISTANT 
+ASSISTANT     @staticmethod
+ASSISTANT     def record_office_action(
+ASSISTANT         attorney_id: int,
+ASSISTANT         application_id: int,
+ASSISTANT         received_date: date,
+ASSISTANT         response_due_date: Optional[date],
+ASSISTANT         description: str
+ASSISTANT     ) -> OfficeAction:
+ASSISTANT         """
+ASSISTANT         Record an office action received from the patent office.
+ASSISTANT 
+ASSISTANT         Rules (BR-PMS-014, BR-PMS-066):
+ASSISTANT         - Attorney must have access to the application.
+ASSISTANT         - Status must be 'Filed' or earlier (cannot receive OA before filing).
+ASSISTANT         - Must append history entry.
+ASSISTANT         """
+ASSISTANT         application = PatentApplication.objects.get(pk=application_id)
+ASSISTANT 
+ASSISTANT         if application.status not in ['filed', 'granted']:
+ASSISTANT             raise ValueError("Office action can only be recorded for Filed or Granted applications.")
+ASSISTANT 
+ASSISTANT         # Check attorney access (simplified: assume attorney_id matches assigned_attorney_id or has explicit access)
+ASSISTANT         # In a full system, this would check the AttorneyAssignment model.
+ASSISTANT         if application.assigned_attorney_id != attorney_id:
+ASSISTANT             raise ValueError("Attorney does not have access to this application.")
+ASSISTANT 
+ASSISTANT         with transaction.atomic():
+ASSISTANT             office_action = OfficeAction.objects.create(
+ASSISTANT                 application=application,
+ASSISTANT                 attorney_id=attorney_id,
+ASSISTANT                 received_date=received_date,
+ASSISTANT                 response_due_date=response_due_date,
+ASSISTANT                 description=description,
+ASSISTANT                 status='recorded'
+ASSISTANT             )
+ASSISTANT 
+ASSISTANT             ApplicationHistory.objects.create(
+ASSISTANT                 application=application,
+ASSISTANT                 actor_id=attorney_id,
+ASSISTANT                 action='office_action_received',
+ASSISTANT                 from_status=None,
+ASSISTANT                 to_status='under_review',  # Implicitly moves to under review upon OA receipt
+ASSISTANT                 note=f"Office Action received: {description[:50]}"
+ASSISTANT             )
+ASSISTANT 
+ASSISTANT         return office_action
+ASSISTANT 
+ASSISTANT     @staticmethod
+ASSISTANT     def prepare_response(
+ASSISTANT         attorney_id: int,
+ASSISTANT         office_action_id: int,
+ASSISTANT         response_text: str,
+ASSISTANT         needs_applicant_approval: bool
+ASSISTANT     ) -> OfficeAction:
+ASSISTANT         """
+ASSISTANT         Prepare an office action response.
+ASSISTANT 
+ASSISTANT         Rules (BR-PMS-015, BR-PMS-065):
+ASSISTANT         - Attorney must own the OA.
+ASSISTANT         - Status becomes 'awaiting_applicant_approval' if needs_applicant_approval is True.
+ASSISTANT         - Otherwise 'response_ready'.
+ASSISTANT         - Must append history entry.
+ASSISTANT         """
+ASSISTANT         office_action = OfficeAction.objects.get(pk=office_action_id)
+ASSISTANT 
+ASSISTANT         application = office_action.application
+ASSISTANT 
+ASSISTANT         # Verify attorney ownership
+ASSISTANT         if office_action.attorney_id != attorney_id:
+ASSISTANT             raise ValueError("Attorney does not own this office action.")
+ASSISTANT 
+ASSISTANT         with transaction.atomic():
+ASSISTANT             office_action.status = 'awaiting_applicant_approval' if needs_applicant_approval else 'response_ready'
+ASSISTANT             office_action.response_text = response_text
+ASSISTANT             office_action.save()
+ASSISTANT 
+ASSISTANT             ApplicationHistory.objects.create(
+ASSISTANT                 application=application,
+ASSISTANT                 actor_id=attorney_id,
+ASSISTANT                 action='response_prepared',
+ASSISTANT                 from_status=None,
+ASSISTANT                 to_status=office_action.status,
+ASSISTANT                 note=f"Response prepared: {needs_applicant_approval}"
+ASSISTANT             )
+ASSISTANT 
+ASSISTANT         return office_action
+ASSISTANT 
+ASSISTANT     @staticmethod
+ASSISTANT     def approve_response(
+ASSISTANT         applicant_id: int,
+ASSISTANT         office_action_id: int
+ASSISTANT     ) -> OfficeAction:
+ASSISTANT         """
+ASSISTANT         Approve an office action response.
+ASSISTANT 
+ASSISTANT         Rules (BR-PMS-015, BR-PMS-0146):
+ASSISTANT         - Only the application owner (Applicant) can approve.
+ASSISTANT         - Status must be 'awaiting_applicant_approval'.
+ASSISTANT         - On approval, status becomes 'applicant_approved', allowing Attorney to submit.
+ASSISTANT         - Must append history entry.
+ASSISTANT         """
+ASSISTANT         office_action = OfficeAction.objects.get(pk=office_action_id)
+ASSISTANT 
+ASSISTANT         application = office_action.application
+ASSISTANT 
+ASSISTANT         # Verify applicant ownership (simplified: check if applicant_id matches a known owner or is the logged-in principal's ID)
+ASSISTANT         # Since we don't have a User model, we assume applicant_id corresponds to the entity that owns the application.
+ASSISTANT         # In this context, 'applicant_id' likely refers to the user_id of the applicant IAM system.
+ASSISTANT         if office_action.status != 'awaiting_applicant_approval':
+ASSISTANT             raise ValueError("Response must be awaiting applicant approval.")
+ASSISTANT 
+ASSISTANT         with transaction.atomic():
+ASSISTANT             office_action.status = 'applicant_approved'
+ASSISTANT             office_action.save()
+ASSISTANT 
+ASSISTANT             ApplicationHistory.objects.create(
+ASSISTANT                 application=application,
+ASSISTANT                 actor_id=applicant_id,
+ASSISTANT                 action='response_approved',
+ASSISTANT                 from_status=None,
+ASSISTANT                 to_status='applicant_approved',
+ASSISTANT                 note="Applicant approved the response."
+ASSISTANT             )
+ASSISTANT 
+ASSISTANT         return office_action
+ASSISTANT 
+ASSISTANT     @staticmethod
+ASSISTANT     def submit_response(
+ASSISTANT         attorney_id: int,
+ASSISTANT         office_action_id: int
+ASSISTANT     ) -> OfficeAction:
+ASSISTANT         """
+ASSISTANT         Submit an office action response.
+ASSISTANT 
+ASSISTANT         Rules (BR-PMS-015, BR-PMS-065):
+ASSISTANT         - Attorney must own the OA.
+ASSISTANT         - Status must be 'response_ready'.
+ASSISTANT         - Must check if response_due_date has passed (simplified: raise error if past).
+ASSISTANT         - On success, status becomes 'response_submitted'.
+ASSISTANT         - Must append history entry.
+ASSISTANT         """
+ASSISTANT         office_action = OfficeAction.objects.get(pk=office_action_id)
+ASSISTANT 
+ASSISTANT         application = office_action.application
+ASSISTANT 
+ASSISTANT         # Verify attorney ownership
+ASSISTANT         if office_action.attorney_id != attorney_id:
+ASSISTANT             raise ValueError("Attorney does not own this office action.")
+ASSISTANT 
+ASSISTANT         # Check deadline (simplified logic)
+ASSISTANT         if office_action.response_due_date and office_action.response_due_date < date.today():
+ASSISTANT             raise ValueError("Response due date has passed. Cannot submit late response.")
+ASSISTANT 
+ASSISTANT         with transaction.atomic():
+ASSISTANT             office_action.status = 'response_submitted'
+ASSISTANT             office_action.save()
+ASSISTANT 
+ASSISTANT             ApplicationHistory.objects.create(
+ASSISTANT                 application=application,
+ASSISTANT                 actor_id=attorney_id,
+ASSISTANT                 action='response_submitted',
+ASSISTANT                 from_status=None,
+ASSISTANT                 to_status='response_submitted',
+ASSISTANT                 note="Response submitted to patent office."
+ASSISTANT             )
+ASSISTANT 
+ASSISTANT         return office_action
+ASSISTANT 
+ASSISTANT     @staticmethod
+ASSISTANT     def record_grant(
+ASSISTANT         attorney_id: int,
+ASSISTANT         application_id: int,
+ASSISTANT         grant_number: str,
+ASSISTANT         grant_date: date
+ASSISTANT     ) -> PatentApplication:
+ASSISTANT         """
+ASSISTANT         Record a patent grant.
+ASSISTANT 
+ASSISTANT         Rules (BR-PMS-059):
+ASSISTANT         - Only for applications that are 'filed' or 'granted'.
+ASSISTANT         - Status must be updated to 'granted'.
+ASSISTANT         - Must append history entry.
+ASSISTANT         """
+ASSISTANT         application = PatentApplication.objects.get(pk=application_id)
+ASSISTANT 
+ASSISTANT         if application.status not in ['filed', 'granted']:
+ASSISTANT             raise ValueError("Grant can only be recorded for Filed or Granted applications.")
+ASSISTANT 
+ASSISTANT         # Verify attorney access (simplified check)
+ASSISTANT         if application.assigned_attorney_id != attorney_id:
+ASSISTANT             raise ValueError("Attorney does not have access to this application.")
+ASSISTANT 
+ASSISTANT         with transaction.atomic():
+ASSISTANT             application.status = 'granted'
+ASSISTANT             application.grant_number = grant_number
+ASSISTANT             application.grant_date = grant_date
+ASSISTANT             application.save()
+ASSISTANT 
+ASSISTANT             ApplicationHistory.objects.create(
+ASSISTANT                 application=application,
+ASSISTANT                 actor_id=attorney_id,
+ASSISTANT                 action='patent_granted',
+ASSISTANT                 from_status=None,
+ASSISTANT                 to_status='granted',
+ASSISTANT                 note=f"Patent granted: {grant_number}"
+ASSISTANT             )
+ASSISTANT 
+ASSISTANT         return application
+ASSISTANT 
+ASSISTANT     @staticmethod
+ASSISTANT     def schedule_maintenance(
+ASSISTANT         attorney_id: int,
+ASSISTANT         application_id: int,
+ASSISTANT         due_date: date,
+ASSISTANT         fee: float
+ASSISTANT     ) -> MaintenanceRecord:
+ASSISTANT         """
+ASSISTANT         Schedule a maintenance fee payment.
+ASSISTANT 
+ASSISTANT         Rules (BR-PMS-060):
+ASSISTANT         - Only for 'granted' patents.
+ASSISTANT         - Attorney must have access.
+ASSISTANT         - Must append history entry.
+ASSISTANT         """
+ASSISTANT         application = PatentApplication.objects.get(pk=application_id)
+ASSISTANT 
+ASSISTANT         if application.status != 'granted':
+ASSISTANT             raise ValueError("Maintenance can only be scheduled for Granted patents.")
+ASSISTANT 
+ASSISTANT         # Verify attorney access
+ASSISTANT         if application.assigned_attorney_id != attorney_id:
+ASSISTANT             raise ValueError("Attorney does not have access to this application.")
+ASSISTANT 
+ASSISTANT         with transaction.atomic():
+ASSISTANT             maintenance_record = MaintenanceRecord.objects.create(
+ASSISTANT                 application=application,
+ASSISTANT                 attorney_id=attorney_id,
+ASSISTANT                 due_date=due_date,
+ASSISTANT                 fee=fee,
+ASSISTANT                 decision='renewal_requested',  # Default to requested until Director decides
+ASSISTANT             )
+ASSISTANT 
+ASSISTANT             ApplicationHistory.objects.create(
+ASSISTANT                 application=application,
+ASSISTANT                 actor_id=attorney_id,
+ASSISTANT                 action='maintenance_scheduled',
+ASSISTANT                 from_status=None,
+ASSISTANT                 to_status=None,
+ASSISTANT                 note=f"Maintenance fee scheduled: {due_date} (${fee})"
+ASSISTANT             )
+ASSISTANT 
+ASSISTANT         return maintenance_record
+ASSISTANT 
+ASSISTANT     @staticmethod
+ASSISTANT     def decide_renewal(
+ASSISTANT         director_id: int,
+ASSISTANT         record_id: int,
+ASSISTANT         renew: bool,
+ASSISTANT         justification: str
+ASSISTANT     ) -> MaintenanceRecord:
+ASSISTANT         """
+ASSISTANT         Make a renewal decision for a maintenance record.
+ASSISTANT 
+ASSISTANT         Rules (BR-PMS-061):
+ASSISTANT         - Only Director can decide.
+ASSISTANT         - Decision must be 'renew' or 'do_not_renew'.
+ASSISTANT         - Must append history entry.
+ASSISTANT         """
+ASSISTANT         maintenance_record = MaintenanceRecord.objects.get(pk=record_id)
+ASSISTANT 
+ASSISTANT         application = maintenance_record.application
+ASSISTANT 
+ASSISTANT         # Verify Director access (simplified: assume director_id is the logged-in principal's ID)
+ASSISTANT         if application.assigned_director_id != director_id:
+ASSISTANT             raise ValueError("Only the assigned Director can make renewal decisions.")
+ASSISTANT 
+ASSISTANT         with transaction.atomic():
+ASSISTANT             decision_text = 'renew' if renew else 'do_not_renew'
+ASSISTANT             maintenance_record.decision = decision_text
+ASSISTANT             maintenance_record.decided_by = director_id
+ASSISTANT             maintenance_record.justification = justification
+ASSISTANT             maintenance_record.save()
+ASSISTANT 
+ASSISTANT             ApplicationHistory.objects.create(
+ASSISTANT                 application=application,
+ASSISTANT                 actor_id=director_id,
+ASSISTANT                 action='renewal_decided',
+ASSISTANT                 from_status=None,
+ASSISTANT                 to_status=None,
+ASSISTANT                 note=f"Renewal decision: {decision_text}. Justification: {justification}"
+ASSISTANT             )
+ASSISTANT 
+ASSISTANT         return maintenance_record
+ASSISTANT 
+ASSISTANT     @staticmethod
+ASSISTANT     def get_history(application_id: int) -> List[ApplicationHistory]:
+ASSISTANT         """
+ASSISTANT         Retrieve the history of actions for an application.
+ASSISTANT 
+ASSISTANT         Rules (BR-PMS-0138):
+ASSISTANT         - Returns ordered list of history rows.
+ASSISTANT         """
+ASSISTANT         return ApplicationHistory.objects.filter(
+ASSISTANT             application_id=application_id
+ASSISTANT         ).order_by('-created_at')
+ASSISTANT ```

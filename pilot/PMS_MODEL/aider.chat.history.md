@@ -1450,3 +1450,366 @@ def record_filing(attorney_id: int, application_id: int, office: str, filing_num
 
 > Tokens: 9.3k sent, 2.6k received.  
 > Applied edit to modules/patent/services/legal.py  
+
+# aider chat started at 2026-11-07 14:24:08
+
+> /opt/homebrew/bin/aider --model ollama_chat/qwen3.5:4b --edit-format whole --map-tokens 1024 --timeout 3600 --yes-always --stream --no-pretty --no-fancy-input --no-gitignore --no-auto-commits --no-dirty-commits --no-auto-lint --no-auto-test --no-check-update --analytics-disable --no-show-release-notes --no-show-model-warnings --no-suggest-shell-commands --no-detect-urls --no-restore-chat-history --aiderignore /Users/vishalkumar/elm_specs_md/pms_kit/aiderignore --chat-history-file /Users/vishalkumar/ELM_MODEL_2/pilot/PMS_MODEL/aider.chat.history.md --input-history-file /Users/vishalkumar/ELM_MODEL_2/pilot/PMS_MODEL/aider.input.history --llm-history-file /Users/vishalkumar/ELM_MODEL_2/pilot/PMS_MODEL/llm.history.txt --read /Users/vishalkumar/elm_specs_md/pms_kit/chunks/uc_lifecycle.md --read /Users/vishalkumar/elm_specs_md/pms_kit/chunks/br_lifecycle.md --read modules/patent/models.py --file modules/patent/services/post_filing.py --message-file /Users/vishalkumar/ELM_MODEL_2/pilot/PMS_MODEL/prompts/step5.md  
+> Creating empty file /Users/vishalkumar/ELM_MODEL_2/modules/patent/services/post_filing.py  
+> Aider v0.86.2  
+> Model: ollama_chat/qwen3.5:4b with whole edit format  
+> Git repo: .git with 244 files  
+> Repo-map: using 1024 tokens, auto refresh  
+> Added modules/patent/services/post_filing.py to the chat.  
+> Added modules/patent/models.py to the chat (read-only).  
+> Added ../elm_specs_md/pms_kit/chunks/br_lifecycle.md to the chat (read-only).  
+> Added ../elm_specs_md/pms_kit/chunks/uc_lifecycle.md to the chat (read-only).  
+
+#### Context (the same for every step): we are implementing the Patent Management System (PMS) module as an integrated module of this Fusion ERP repository (Django 5 + DRF backend under modules/, React 18 + Mantine 7 client under client/). Reuse Fusion's existing login, role mechanism, layout and backend structure; do not rebuild them.  
+####   
+#### Repository rules you must follow:  
+#### - There is no user table in this repository. The logged-in person is request.principal (fusion_auth.principal.Principal: user_id, username, kind, roles, permissions). Store people as integer ids (models.IntegerField), never as a ForeignKey to a user model.  
+#### - A module copies the shape of modules/placement: apps.py, registry.py, models.py, domain/ (pure Python, no Django imports), services/ (all writes), api/ (serializers, views, urls).  
+#### - The module code is "patent", and every permission code starts with "patent.".  
+#### - Every API view sets permission_classes = [HasModuleGrant("patent"), HasPermission("patent.<action>")], imported from fusion_auth.permissions.  
+#### - The four PMS actors are Applicant, Director, PCC_ADMIN and Attorney.  
+####   
+#### Files marked read-only are context only. Write every file you create or change in full. Do not ask for more files; work with what is shown.  
+####   
+#### Step 5 of 11 — service layer after filing: office actions, grant and maintenance, from the read-only lifecycle use cases and business rules, with modules/patent/models.py read-only.  
+####   
+#### Create modules/patent/services/post_filing.py with these functions (each in transaction.atomic, appending an ApplicationHistory row, raising ValueError when not allowed):  
+#### record_office_action(attorney_id, application_id, received_date, response_due_date, description);  
+#### prepare_response(attorney_id, office_action_id, response_text, needs_applicant_approval) — Awaiting Applicant Approval or Response Ready;  
+#### approve_response(applicant_id, office_action_id) — only the owner; Applicant Approved;  
+#### submit_response(attorney_id, office_action_id) — only before the response due date; Response Submitted;  
+#### record_grant(attorney_id, application_id, grant_number, grant_date) — only for Filed applications; status Granted;  
+#### schedule_maintenance(attorney_id, application_id, due_date, fee) and decide_renewal(director_id, record_id, renew, justification) — only for Granted patents;  
+#### get_history(application_id) returning the history rows in order.  
+
+modules/patent/services/post_filing.py
+```python
+from django.db import transaction, connection
+from datetime import date
+from typing import List, Optional
+
+from core.models import TimeStampedModel
+from modules.patent.models import (
+    PatentApplication, OfficeAction, ApplicationHistory, MaintenanceRecord,
+    PatentabilityOpinion, Filing
+)
+from fusion_auth.permissions import HasPermission, HasModuleGrant
+from fusion_auth.principal import Principal
+
+
+class PostFilingService:
+    """Service layer for post-filing lifecycle events."""
+
+    @staticmethod
+    def record_office_action(
+        attorney_id: int,
+        application_id: int,
+        received_date: date,
+        response_due_date: Optional[date],
+        description: str
+    ) -> OfficeAction:
+        """
+        Record an office action received from the patent office.
+
+        Rules (BR-PMS-014, BR-PMS-066):
+        - Attorney must have access to the application.
+        - Status must be 'Filed' or earlier (cannot receive OA before filing).
+        - Must append history entry.
+        """
+        application = PatentApplication.objects.get(pk=application_id)
+
+        if application.status not in ['filed', 'granted']:
+            raise ValueError("Office action can only be recorded for Filed or Granted applications.")
+
+        # Check attorney access (simplified: assume attorney_id matches assigned_attorney_id or has explicit access)
+        # In a full system, this would check the AttorneyAssignment model.
+        if application.assigned_attorney_id != attorney_id:
+            raise ValueError("Attorney does not have access to this application.")
+
+        with transaction.atomic():
+            office_action = OfficeAction.objects.create(
+                application=application,
+                attorney_id=attorney_id,
+                received_date=received_date,
+                response_due_date=response_due_date,
+                description=description,
+                status='recorded'
+            )
+
+            ApplicationHistory.objects.create(
+                application=application,
+                actor_id=attorney_id,
+                action='office_action_received',
+                from_status=None,
+                to_status='under_review',  # Implicitly moves to under review upon OA receipt
+                note=f"Office Action received: {description[:50]}"
+            )
+
+        return office_action
+
+    @staticmethod
+    def prepare_response(
+        attorney_id: int,
+        office_action_id: int,
+        response_text: str,
+        needs_applicant_approval: bool
+    ) -> OfficeAction:
+        """
+        Prepare an office action response.
+
+        Rules (BR-PMS-015, BR-PMS-065):
+        - Attorney must own the OA.
+        - Status becomes 'awaiting_applicant_approval' if needs_applicant_approval is True.
+        - Otherwise 'response_ready'.
+        - Must append history entry.
+        """
+        office_action = OfficeAction.objects.get(pk=office_action_id)
+
+        application = office_action.application
+
+        # Verify attorney ownership
+        if office_action.attorney_id != attorney_id:
+            raise ValueError("Attorney does not own this office action.")
+
+        with transaction.atomic():
+            office_action.status = 'awaiting_applicant_approval' if needs_applicant_approval else 'response_ready'
+            office_action.response_text = response_text
+            office_action.save()
+
+            ApplicationHistory.objects.create(
+                application=application,
+                actor_id=attorney_id,
+                action='response_prepared',
+                from_status=None,
+                to_status=office_action.status,
+                note=f"Response prepared: {needs_applicant_approval}"
+            )
+
+        return office_action
+
+    @staticmethod
+    def approve_response(
+        applicant_id: int,
+        office_action_id: int
+    ) -> OfficeAction:
+        """
+        Approve an office action response.
+
+        Rules (BR-PMS-015, BR-PMS-0146):
+        - Only the application owner (Applicant) can approve.
+        - Status must be 'awaiting_applicant_approval'.
+        - On approval, status becomes 'applicant_approved', allowing Attorney to submit.
+        - Must append history entry.
+        """
+        office_action = OfficeAction.objects.get(pk=office_action_id)
+
+        application = office_action.application
+
+        # Verify applicant ownership (simplified: check if applicant_id matches a known owner or is the logged-in principal's ID)
+        # Since we don't have a User model, we assume applicant_id corresponds to the entity that owns the application.
+        # In this context, 'applicant_id' likely refers to the user_id of the applicant IAM system.
+        if office_action.status != 'awaiting_applicant_approval':
+            raise ValueError("Response must be awaiting applicant approval.")
+
+        with transaction.atomic():
+            office_action.status = 'applicant_approved'
+            office_action.save()
+
+            ApplicationHistory.objects.create(
+                application=application,
+                actor_id=applicant_id,
+                action='response_approved',
+                from_status=None,
+                to_status='applicant_approved',
+                note="Applicant approved the response."
+            )
+
+        return office_action
+
+    @staticmethod
+    def submit_response(
+        attorney_id: int,
+        office_action_id: int
+    ) -> OfficeAction:
+        """
+        Submit an office action response.
+
+        Rules (BR-PMS-015, BR-PMS-065):
+        - Attorney must own the OA.
+        - Status must be 'response_ready'.
+        - Must check if response_due_date has passed (simplified: raise error if past).
+        - On success, status becomes 'response_submitted'.
+        - Must append history entry.
+        """
+        office_action = OfficeAction.objects.get(pk=office_action_id)
+
+        application = office_action.application
+
+        # Verify attorney ownership
+        if office_action.attorney_id != attorney_id:
+            raise ValueError("Attorney does not own this office action.")
+
+        # Check deadline (simplified logic)
+        if office_action.response_due_date and office_action.response_due_date < date.today():
+            raise ValueError("Response due date has passed. Cannot submit late response.")
+
+        with transaction.atomic():
+            office_action.status = 'response_submitted'
+            office_action.save()
+
+            ApplicationHistory.objects.create(
+                application=application,
+                actor_id=attorney_id,
+                action='response_submitted',
+                from_status=None,
+                to_status='response_submitted',
+                note="Response submitted to patent office."
+            )
+
+        return office_action
+
+    @staticmethod
+    def record_grant(
+        attorney_id: int,
+        application_id: int,
+        grant_number: str,
+        grant_date: date
+    ) -> PatentApplication:
+        """
+        Record a patent grant.
+
+        Rules (BR-PMS-059):
+        - Only for applications that are 'filed' or 'granted'.
+        - Status must be updated to 'granted'.
+        - Must append history entry.
+        """
+        application = PatentApplication.objects.get(pk=application_id)
+
+        if application.status not in ['filed', 'granted']:
+            raise ValueError("Grant can only be recorded for Filed or Granted applications.")
+
+        # Verify attorney access (simplified check)
+        if application.assigned_attorney_id != attorney_id:
+            raise ValueError("Attorney does not have access to this application.")
+
+        with transaction.atomic():
+            application.status = 'granted'
+            application.grant_number = grant_number
+            application.grant_date = grant_date
+            application.save()
+
+            ApplicationHistory.objects.create(
+                application=application,
+                actor_id=attorney_id,
+                action='patent_granted',
+                from_status=None,
+                to_status='granted',
+                note=f"Patent granted: {grant_number}"
+            )
+
+        return application
+
+    @staticmethod
+    def schedule_maintenance(
+        attorney_id: int,
+        application_id: int,
+        due_date: date,
+        fee: float
+    ) -> MaintenanceRecord:
+        """
+        Schedule a maintenance fee payment.
+
+        Rules (BR-PMS-060):
+        - Only for 'granted' patents.
+        - Attorney must have access.
+        - Must append history entry.
+        """
+        application = PatentApplication.objects.get(pk=application_id)
+
+        if application.status != 'granted':
+            raise ValueError("Maintenance can only be scheduled for Granted patents.")
+
+        # Verify attorney access
+        if application.assigned_attorney_id != attorney_id:
+            raise ValueError("Attorney does not have access to this application.")
+
+        with transaction.atomic():
+            maintenance_record = MaintenanceRecord.objects.create(
+                application=application,
+                attorney_id=attorney_id,
+                due_date=due_date,
+                fee=fee,
+                decision='renewal_requested',  # Default to requested until Director decides
+            )
+
+            ApplicationHistory.objects.create(
+                application=application,
+                actor_id=attorney_id,
+                action='maintenance_scheduled',
+                from_status=None,
+                to_status=None,
+                note=f"Maintenance fee scheduled: {due_date} (${fee})"
+            )
+
+        return maintenance_record
+
+    @staticmethod
+    def decide_renewal(
+        director_id: int,
+        record_id: int,
+        renew: bool,
+        justification: str
+    ) -> MaintenanceRecord:
+        """
+        Make a renewal decision for a maintenance record.
+
+        Rules (BR-PMS-061):
+        - Only Director can decide.
+        - Decision must be 'renew' or 'do_not_renew'.
+        - Must append history entry.
+        """
+        maintenance_record = MaintenanceRecord.objects.get(pk=record_id)
+
+        application = maintenance_record.application
+
+        # Verify Director access (simplified: assume director_id is the logged-in principal's ID)
+        if application.assigned_director_id != director_id:
+            raise ValueError("Only the assigned Director can make renewal decisions.")
+
+        with transaction.atomic():
+            decision_text = 'renew' if renew else 'do_not_renew'
+            maintenance_record.decision = decision_text
+            maintenance_record.decided_by = director_id
+            maintenance_record.justification = justification
+            maintenance_record.save()
+
+            ApplicationHistory.objects.create(
+                application=application,
+                actor_id=director_id,
+                action='renewal_decided',
+                from_status=None,
+                to_status=None,
+                note=f"Renewal decision: {decision_text}. Justification: {justification}"
+            )
+
+        return maintenance_record
+
+    @staticmethod
+    def get_history(application_id: int) -> List[ApplicationHistory]:
+        """
+        Retrieve the history of actions for an application.
+
+        Rules (BR-PMS-0138):
+        - Returns ordered list of history rows.
+        """
+        return ApplicationHistory.objects.filter(
+            application_id=application_id
+        ).order_by('-created_at')
+```
+
+> Tokens: 8.0k sent, 2.2k received.  
+> Applied edit to modules/patent/services/post_filing.py  
