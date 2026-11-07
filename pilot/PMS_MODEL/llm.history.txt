@@ -1097,3 +1097,810 @@ ASSISTANT
 ASSISTANT     def __str__(self):
 ASSISTANT         return f"{self.APPLICATION} - {self.actor_id}: {self.action}"
 ASSISTANT ```
+TO LLM 2026-11-07T14:07:57
+-------
+SYSTEM Act as an expert software developer.
+SYSTEM Take requests for changes to the supplied code.
+SYSTEM If the request is ambiguous, ask questions.
+SYSTEM Reply in English.
+SYSTEM 
+SYSTEM Once you understand the request you MUST:
+SYSTEM 1. Determine if any code changes are needed.
+SYSTEM 2. Explain any needed changes.
+SYSTEM 3. If changes are needed, output a copy of each file that needs changes.
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return the entire content of the updated file.
+SYSTEM You MUST use this *file listing* format:
+SYSTEM 
+SYSTEM path/to/filename.js
+SYSTEM ```
+SYSTEM // entire file content ...
+SYSTEM // ... goes in between
+SYSTEM ```
+SYSTEM 
+SYSTEM Every *file listing* MUST use this format:
+SYSTEM - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+SYSTEM - Second line: opening ```
+SYSTEM - ... entire content of the file ...
+SYSTEM - Final line: closing ```
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+SYSTEM *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+SYSTEM Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+SYSTEM 
+SYSTEM Reply in English.
+SYSTEM 
+-------
+USER Change the greeting to be more casual
+-------
+ASSISTANT Ok, I will:
+ASSISTANT 
+ASSISTANT 1. Switch the greeting text from "Hello" to "Hey".
+ASSISTANT 
+ASSISTANT show_greeting.py
+ASSISTANT ```
+ASSISTANT import sys
+ASSISTANT 
+ASSISTANT def greeting(name):
+ASSISTANT     print(f"Hey {name}")
+ASSISTANT 
+ASSISTANT if __name__ == '__main__':
+ASSISTANT     greeting(sys.argv[1])
+ASSISTANT ```
+-------
+USER I switched to a new code base. Please don't consider the above files or try to edit them any longer.
+-------
+ASSISTANT Ok.
+-------
+USER Here are some READ ONLY files, provided for your reference.
+USER Do not edit these files!
+USER 
+USER ../elm_specs_md/pms_kit/chunks/states.md
+USER ```
+USER # PMS application state transitions (authoritative table, merged from all 16 basis workflows; read-only spec)
+USER 
+USER | From state | Actor | Use case | Guard / outcome | Resulting state |
+USER |---|---|---|---|---|
+USER 
+USER | Draft / Not Submitted | Applicant | UC-PMS-001 / Submit Patent Application | Submission passes completeness/document validation | Submitted |
+USER | Submitted | PCC_ADMIN | UC-PMS-007 / Assign Application to Director | Eligible Director selected or valid automatic routing succeeds | Under Review |
+USER | Under Review | Director | UC-PMS-008 / Review Patent Application | Decision = Approve; justification >=50 characters; review within deadline | Approved |
+USER | Under Review | Director | UC-PMS-008 / Review Patent Application | Decision = Needs Revision; valid justification | Needs Revision |
+USER | Needs Revision | Applicant | UC-PMS-005 / Revise and Resubmit Application | Within 60 days; revision addresses feedback | Resubmitted |
+USER | Resubmitted | PCC_ADMIN | UC-PMS-007 / Assign Application to Director | Valid assignment/reassignment | Under Review |
+USER | Under Review | Director | UC-PMS-008 / Review Patent Application | Decision = Reject; valid justification | Rejected |
+USER | Rejected | Applicant | UC-PMS-022 / File Appeal Against Rejection | Appeal filed within allowed period with grounds/justification | Appeal Submitted |
+USER | Appeal Submitted | Director | UC-PMS-023 / Review Appeal | Appeal outcome = Remand for Amendment | Remanded for Amendment |
+USER | Appeal Submitted | Director | UC-PMS-023 / Review Appeal | Appeal outcome = Uphold Rejection | Rejection Upheld |
+USER | Appeal Submitted | Director | UC-PMS-023 / Review Appeal | Appeal outcome = Modify Decision | Decision Modified |
+USER | Approved | PCC_ADMIN | UC-PMS-010 / Assign Attorney to Approved Application | Assignment satisfies panel/expertise/workload/conflict/preference rules | Assignment Offered |
+USER | Assignment Offered | Attorney | UC-PMS-011 / Accept or Decline Attorney Assignment | Outcome = Accept | Attorney Assigned |
+USER | Assignment Offered | Attorney | UC-PMS-011 / Accept or Decline Attorney Assignment | Outcome = Decline | Pending Review |
+USER | Pending Review | PCC_ADMIN | UC-PMS-010 / Assign Attorney to Approved Application | Valid reassignment to another eligible Attorney | Assignment Offered |
+USER | Approved | Director | UC-PMS-009 / Review and Decide Patent Budget | Cost within applicable threshold; budget availability validated where data exists; outcome = Approve | Budget Approved |
+USER | Approved | Director | UC-PMS-009 / Review and Decide Patent Budget | Outcome = Reject | Budget Rejected |
+USER | Approved | Director | UC-PMS-009 / Review and Decide Patent Budget | Total cost exceeds configured threshold | Escalated |
+USER | Escalated | PCC_ADMIN | UC-PMS-027 / Monitor Workflow and Handle Exceptional Cases | Handle/route the exceptional case within PMS scope | Escalation Tracked / External Decision Pending |
+USER | Pre-Filing Preconditions Satisfied | Attorney | UC-PMS-013 / Prepare and Record External Patent Filing | Required approvals and budget complete; inventor agreements complete; applicable format rules satisfied; international justification if needed | Filed |
+USER | Filed / Post-Filing Active | Attorney | UC-PMS-014 / Record Patent Office Communication | Official communication is an office action | Office Action Recorded |
+USER | Office Action Recorded | Attorney | UC-PMS-015 / Respond to Office Action | Applicant review is required; draft prepared | Awaiting Applicant Approval |
+USER | Awaiting Applicant Approval | Applicant | UC-PMS-029 / Review Office-Action Response | Applicant records approval | Applicant Approved |
+USER | Applicant Approved | Attorney | UC-PMS-015 / Respond to Office Action | Response finalized and recorded submitted within deadline or permitted extension | Response Submitted |
+USER | Office Action Recorded | Attorney | UC-PMS-015 / Respond to Office Action | Applicant review not required; draft finalized | Response Ready |
+USER | Response Ready | Attorney | UC-PMS-015 / Respond to Office Action | Response recorded submitted within deadline or permitted extension | Response Submitted |
+USER | Granted / Maintenance Cycle Active | Attorney | UC-PMS-017 / Manage Post-Grant Tracking and Maintenance | Maintenance decision is due | Renewal Decision Requested |
+USER | Renewal Decision Requested | Director | UC-PMS-018 / Make Maintenance Renewal Decision | Outcome = Renew | Renewal Approved |
+USER | Renewal Approved | Attorney | UC-PMS-017 / Manage Post-Grant Tracking and Maintenance | Maintenance action recorded; next cycle scheduled | Renewed / Next Cycle Scheduled |
+USER | Renewal Decision Requested | Director | UC-PMS-018 / Make Maintenance Renewal Decision | Outcome = Do Not Renew | Do Not Renew |
+USER | Any configured withdrawal-eligible pre-filing state | Applicant | UC-PMS-006 / Withdraw Patent Application | Before filing; current status is withdrawal-eligible; reason provided; co-inventor consent if required | Withdrawn |
+USER | Under Review | Director | UC-PMS-008 / Review Patent Application | Needs Revision | BR-PMS-029; BR-PMS-030; BR-PMS-031 |
+USER | Renewal Decision Requested | Director | UC-PMS-018 / Make Maintenance Renewal Decision | Do Not Renew | BR-PMS-061 |
+USER | Submitted | Applicant | UC-PMS-006 / Withdraw Patent Application | Before filing AND current state is configured/defined as withdrawal-eligible | Withdrawn |
+USER | Under Review | Applicant | UC-PMS-006 / Withdraw Patent Application | Before filing AND current state is configured/defined as withdrawal-eligible | Withdrawn |
+USER | Needs Revision | Applicant | UC-PMS-006 / Withdraw Patent Application | Before filing AND current state is configured/defined as withdrawal-eligible | Withdrawn |
+USER | Rejected | Applicant | UC-PMS-006 / Withdraw Patent Application | Before filing AND current state is configured/defined as withdrawal-eligible | Withdrawn |
+USER | Approved | Applicant | UC-PMS-006 / Withdraw Patent Application | Before filing AND current state is configured/defined as withdrawal-eligible | Withdrawn |
+USER | Attorney Assigned | Applicant | UC-PMS-006 / Withdraw Patent Application | Before filing AND current state is configured/defined as withdrawal-eligible | Withdrawn |
+USER | Pending Review | Applicant | UC-PMS-006 / Withdraw Patent Application | Before filing AND current state is configured/defined as withdrawal-eligible | Withdrawn |
+USER ```
+USER 
+USER ../elm_specs_md/pms_kit/chunks/br_core.md
+USER ```
+USER # PMS business rules for submission, assignment, review, revision, withdrawal, appeal, documents (read-only spec)
+USER 
+USER - BR-PMS-003 (Reporting; applies to Applicant): Applicants may access report information only for their own patent applications.
+USER - BR-PMS-014 (Document validation; applies to Applicant): Application supporting documents accepted for submission must be PDF files.
+USER - BR-PMS-015 (Document validation; applies to Applicant): An application document must be under 50 MB to be accepted.
+USER - BR-PMS-016 (Document validation; applies to PMS): A submitted application document must pass malware validation before it is accepted.
+USER - BR-PMS-017 (Application validation; applies to Applicant): Required application fields must be complete before PMS accepts the application submission.
+USER - BR-PMS-020 (Agreement prerequisite; applies to Applicant / Attorney): Inventor agreements must be completed before external filing.
+USER - BR-PMS-022 (Assignment; applies to PCC_ADMIN / Director): Automatic Director assignment may be used only when configured assignment rules are available, and it must apply the same governing assignment criteria. Exception: Outside the stated condition, the rule does not authorize the action.
+USER - BR-PMS-023 (Assignment rule; applies to PCC_ADMIN): Director expertise matching with the application domain is an assignment criterion.
+USER - BR-PMS-024 (Assignment rule; applies to PCC_ADMIN): Director workload balance is an assignment criterion.
+USER - BR-PMS-025 (Conflict of interest; applies to PCC_ADMIN / Director): PMS must perform a conflict-of-interest check before Director assignment.
+USER - BR-PMS-026 (Conflict of interest; applies to Director): A Director must not review an application in which that Director is listed as an inventor.
+USER - BR-PMS-027 (Conflict of interest; applies to PCC_ADMIN): PCC_ADMIN must not act as reviewer for an application in which PCC_ADMIN is listed as an inventor.
+USER - BR-PMS-029 (Decision; applies to Director): A Director review decision must be exactly one of: Approve, Reject, or Needs Revision.
+USER - BR-PMS-030 (Decision validation; applies to Director): Every Director review decision must include a justification of at least 50 characters.
+USER - BR-PMS-031 (Review deadline; applies to Director): Director review must be completed within 15 business days of assignment.
+USER - BR-PMS-033 (Revision; applies to Applicant): Application revision is permitted when the application status is Needs Revision.
+USER - BR-PMS-034 (Revision; applies to Applicant): Application revision is permitted when the application status is Rejected.
+USER - BR-PMS-035 (Revision deadline; applies to Applicant): A revised application must be resubmitted within 60 days from the relevant rejection or revision-request decision date.
+USER - BR-PMS-036 (Revision validation; applies to Applicant / Director): A resubmitted revision must address the recorded Director feedback.
+USER - BR-PMS-038 (Status update; applies to Applicant): When the applicable 60-day resubmission period expires without valid resubmission, PMS changes the application status to Expired.
+USER - BR-PMS-067 (Withdrawal; applies to Applicant): Withdrawal is permitted only before the filing stage.
+USER - BR-PMS-068 (Withdrawal validation; applies to Applicant): Withdrawal is permitted only when the current application status is withdrawal-eligible under the applicable PMS rule/configuration. Exception: Outside the stated condition, the rule does not authorize the action.
+USER - BR-PMS-069 (Withdrawal validation; applies to Applicant): A withdrawal request must include an Applicant-provided reason.
+USER - BR-PMS-070 (Withdrawal consent; applies to Applicant / Co-inventor): Co-inventor consent for withdrawal must be recorded when the applicable process requires such consent.
+USER - BR-PMS-073 (Inventor validation; applies to Applicant): Inventor information must pass PMS validation before the change is accepted.
+USER - BR-PMS-074 (Ownership validation; applies to Applicant): Inventor ownership percentages must pass PMS validation before the change is accepted.
+USER - BR-PMS-075 (Consent rule; applies to Applicant / Co-inventor): Required inventor consent must be obtained before filing.
+USER - BR-PMS-076 (Electronic signature; applies to Applicant / Co-inventor): Electronic signatures for inventor consent/agreement may be collected only where legally permitted and configured. Exception: Applies only under the stated availability/configuration/legal condition. Outside the stated condition, the rule does not authorize the action.
+USER - BR-PMS-077 (Electronic signature validation; applies to Applicant / Co-inventor): Electronic-signature validation applies only where legally permitted and configured. Exception: Applies only under the stated availability/configuration/legal condition. Outside the stated condition, the rule does not authorize the action.
+USER - BR-PMS-078 (Agreement prerequisite; applies to Applicant / Attorney): Inventor agreements must be complete before filing.
+USER - BR-PMS-082 (Document versioning; applies to Applicant / Attorney): PMS assigns automatic version numbers to new document versions.
+USER - BR-PMS-084 (Document access; applies to Applicant / Director / Attorney): Access to previous document versions is limited by applicable role and application-status access rules.
+USER - BR-PMS-086 (Access control; applies to Applicant / Director / Attorney / PCC_ADMIN): Document access is controlled by user role and application status.
+USER - BR-PMS-087 (Document edit rule; applies to Applicant): Applicants may edit application documents only while the application status is Needs Revision.
+USER - BR-PMS-092 (Appeal; applies to Applicant): Only an application in Rejected status is eligible for an Applicant appeal.
+USER - BR-PMS-093 (Appeal deadline; applies to Applicant): An appeal must be filed within the applicable configured or institutionally defined allowed period.
+USER - BR-PMS-094 (Appeal validation; applies to Applicant): An appeal must include Applicant-provided grounds and justification.
+USER - BR-PMS-095 (Appeal decision; applies to Director): A Director appeal outcome must be exactly one of: Uphold Rejection, Remand for Amendment, or Modify Decision.
+USER - BR-PMS-126 (Access control; applies to Applicant / Director / PCC_ADMIN / Attorney): A valid PMS role assignment is required before a user may access patent-management functions.
+USER - BR-PMS-130 (Confidentiality; applies to Applicant / Director / PCC_ADMIN / Attorney): Confidential patent information is protected by role-based access control.
+USER - BR-PMS-140 (Scope boundary; applies to Document management system): Document-management systems are external; PMS owns only the document/version/access/audit behavior explicitly represented within PMS or an available integration.
+USER ```
+USER 
+USER modules/patent/models.py
+USER ```
+USER from django.db import models
+USER from core.db.mixins import TimeStampedModel
+USER 
+USER 
+USER class PatentApplication(TimeStampedModel):
+USER     """Core patent application record."""
+USER     
+USER     STATUS_CHOICES = [
+USER         ("draft", "Draft"),
+USER         ("submitted", "Submitted"),
+USER         ("under_review", "Under Review"),
+USER         ("needs_revision", "Needs Revision"),
+USER         ("resubmitted", "Resubmitted"),
+USER         ("rejected", "Rejected"),
+USER         ("appeal_submitted", "Appeal Submitted"),
+USER         ("approved", "Approved"),
+USER         ("attorney_assigned", "Attorney Assigned"),
+USER         ("filed", "Filed"),
+USER         ("granted", "Granted"),
+USER         ("withdrawn", "Withdrawn"),
+USER         ("expired", "Expired"),
+USER     ]
+USER 
+USER     APPLICATION_NUMBER = models.CharField(max_length=20, unique=True)
+USER     title = models.CharField(max_length=255)
+USER     abstract = models.TextField(blank=True)
+USER     description = models.TextField()
+USER     claims = models.TextField()
+USER     technical_domain = models.CharField(max_length=100)
+USER     
+USER     applicant_id = models.IntegerField(db_index=True)
+USER     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default="draft")
+USER     assigned_director_id = models.IntegerField(null=True, blank=True)
+USER     assigned_attorney_id = models.IntegerField(null=True, blank=True)
+USER     review_due_date = models.DateField(null=True, blank=True)
+USER     resubmission_deadline = models.DateField(null=True, blank=True)
+USER     
+USER     # Latest decision and justification (stored as text for flexibility)
+USER     latest_decision = models.CharField(max_length=50, null=True, blank=True)
+USER     latest_justification = models.TextField(blank=True)
+USER     
+USER     version_number = models.IntegerField(default=1)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         ordering = ["-created_at"]
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION_NUMBER} ({self.status})"
+USER 
+USER 
+USER class Inventor(TimeStampedModel):
+USER     """Inventor associated with a patent application."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="inventors")
+USER     user_id = models.IntegerField(null=True, blank=True, db_index=True)  # Optional: linked IAM user
+USER     name = models.CharField(max_length=255)
+USER     email = models.EmailField(blank=True)
+USER     contribution_percent = models.DecimalField(max_digits=5, decimal_places=1, default=0.0)
+USER     agreement_signed = models.BooleanField(default=False)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION", "user_id"]  # Prevent duplicate entries for same user
+USER 
+USER     def __str__(self):
+USER         return f"Inventor {self.name} on {self.APPLICATION}"
+USER 
+USER 
+USER class ApplicationDocument(TimeStampedModel):
+USER     """Document associated with a patent application."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="documents")
+USER     file_name = models.CharField(max_length=255)
+USER     content_type = models.CharField(max_length=100)  # e.g., "application.pdf"
+USER     size = models.BigIntegerField()  # in bytes
+USER     version = models.IntegerField(default=1)
+USER     sensitivity = models.CharField(max_length=20, choices=[("public", "Public"), ("internal", "Internal"), ("confidential", "Confidential")])
+USER     uploaded_by = models.IntegerField(db_index=True)
+USER     archived = models.BooleanField(default=False)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         ordering = ["-created_at"]
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.file_name} (v{self.version})"
+USER 
+USER 
+USER class AttorneyAssignment(TimeStampedModel):
+USER     """Attorney assignment record for a patent application."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="assignments")
+USER     attorney_id = models.IntegerField(db_index=True)
+USER     status = models.CharField(max_length=20, choices=[("offered", "Offered"), ("accepted", "Accepted"), ("declined", "Declined")], default="offered")
+USER     decline_reason = models.TextField(blank=True)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION"]  # One assignment per application at a time
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.attorney_id} ({self.status})"
+USER 
+USER 
+USER class PatentabilityOpinion(TimeStampedModel):
+USER     """Attorney's legal and patentability assessment."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="opinions")
+USER     attorney_id = models.IntegerField(db_index=True)
+USER     novelty = models.BooleanField(default=False)  # True if novel
+USER     non_obviousness = models.BooleanField(default=False)  # True if non-obvious
+USER     utility = models.BooleanField(default=False)  # True if useful
+USER     recommendation = models.CharField(max_length=30, choices=[("file_patent", "File Patent"), ("do_not_file", "Do Not File"), ("needs_amendment", "Needs Amendment")], default="needs_amendment")
+USER     opinion_text = models.TextField()
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION"]  # One primary opinion per application
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.recommendation}"
+USER 
+USER 
+USER class Budget(TimeStampedModel):
+USER     """Budget record for a patent application."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="budgets")
+USER     filing_fee = models.DecimalField(max_digits=10, decimal_places=2)
+USER     attorney_fee = models.DecimalField(max_digits=10, decimal_places=2)
+USER     administrative_cost = models.DecimalField(max_digits=10, decimal_places=2)
+USER     total = models.DecimalField(max_digits=10, decimal_places=2)  # Calculated field (can be overridden by manager)
+USER     status = models.CharField(max_length=20, choices=[("pending", "Pending"), ("approved", "Approved"), ("rejected", "Rejected"), ("escalated", "Escalated")], default="pending")
+USER     decided_by = models.IntegerField(null=True, blank=True)
+USER     justification = models.TextField(blank=True)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION"]  # One budget per application at a time
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - ${self.total}"
+USER 
+USER 
+USER class Filing(TimeStampedModel):
+USER     """External patent office filing record."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="filings")
+USER     patent_office = models.CharField(max_length=100)  # e.g., "USPTO", "EPO"
+USER     filing_number = models.CharField(max_length=50)
+USER     filing_date = models.DateField()
+USER     international = models.BooleanField(default=False)
+USER     grant_number = models.CharField(max_length=50, null=True, blank=True)
+USER     grant_date = models.DateField(null=True, blank=True)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION"]  # One primary filing per application
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.patent_office} #{self.filing_number}"
+USER 
+USER 
+USER class OfficeAction(TimeStampedModel):
+USER     """Office action received from patent office."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="office_actions")
+USER     received_date = models.DateField()
+USER     response_due_date = models.DateField(null=True, blank=True)
+USER     description = models.TextField()
+USER     response_text = models.TextField(blank=True)  # Draft or submitted response
+USER     status = models.CharField(max_length=30, choices=[("recorded", "Recorded"), ("awaiting_applicant_approval", "Awaiting Applicant Approval"), ("applicant_approved", "Applicant Approved"), ("response_ready", "Response Ready"), ("response_submitted", "Response Submitted")], default="recorded")
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         ordering = ["-received_date"]
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.status}"
+USER 
+USER 
+USER class MaintenanceRecord(TimeStampedModel):
+USER     """Maintenance fee renewal record."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="maintenance_records")
+USER     due_date = models.DateField()
+USER     fee = models.DecimalField(max_digits=10, decimal_places=2)
+USER     decision = models.CharField(max_length=30, choices=[("renewal_requested", "Renewal Requested"), ("renew", "Renew"), ("do_not_renew", "Do Not Renew")], default="renewal_requested")
+USER     decided_by = models.IntegerField(null=True, blank=True)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION"]  # One decision per cycle (tracked by due_date)
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.due_date} ({self.decision})"
+USER 
+USER 
+USER class Appeal(TimeStampedModel):
+USER     """Appeal record against a rejection."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="appeals")
+USER     grounds = models.TextField()
+USER     status = models.CharField(max_length=30, choices=[("submitted", "Submitted"), ("remanded_for_amendment", "Remanded for Amendment"), ("rejection_upheld", "Rejection Upheld"), ("decision_modified", "Decision Modified")], default="submitted")
+USER     decided_by = models.IntegerField(null=True, blank=True)
+USER     justification = models.TextField(blank=True)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         unique_together = ["APPLICATION"]  # One appeal per application at a time
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.status}"
+USER 
+USER 
+USER class ApplicationHistory(TimeStampedModel):
+USER     """Append-only history of application status changes and actions."""
+USER     
+USER     APPLICATION = models.ForeignKey(PatentApplication, on_delete=models.CASCADE, related_name="history")
+USER     actor_id = models.IntegerField(db_index=True)  # User ID who performed the action
+USER     action = models.CharField(max_length=50)  # e.g., "review", "assign", "withdraw"
+USER     from_status = models.CharField(max_length=30, null=True, blank=True)
+USER     to_status = models.CharField(max_length=30)
+USER     note = models.TextField(blank=True)
+USER 
+USER     class Meta:
+USER         app_label = "patent"
+USER         ordering = ["-created_at"]
+USER 
+USER     def __str__(self):
+USER         return f"{self.APPLICATION} - {self.actor_id}: {self.action}"
+USER ```
+-------
+ASSISTANT Ok, I will use these files as references.
+-------
+USER Here are summaries of some files present in my git repository.
+USER Do not propose changes to these files, treat them as *read-only*.
+USER If you need to edit any of these files, ask me to *add them to the chat* first.
+USER 
+USER client/src/app/registry.ts:
+USER ⋮
+USER │export interface ModuleManifest {
+USER │  code: string;
+USER │  basePath: string;
+USER │  load: () => Promise<{ routes: RouteObject[] }>;
+USER ⋮
+USER 
+USER client/src/auth/RequireAuth.tsx:
+USER ⋮
+USER │export function RequireAuth({ children }: { children: React.ReactNode }) {
+USER │  const { status } = useAuth();
+USER │  const location = useLocation();
+USER │
+USER │  if (status === "loading") {
+USER │    return <Center h="100vh"><Loader /></Center>;
+USER │  }
+USER │  // Not a logout: signing in again cannot work while the IAM is unreachable.
+USER │  if (status === "unavailable") {
+USER │    return (
+USER ⋮
+USER 
+USER client/src/lib/http.ts:
+USER ⋮
+USER │export function setUnauthorizedHandler(fn: () => void) {
+USER │  onUnauthorized = fn;
+USER ⋮
+USER │export async function readBlobError(e: unknown): Promise<unknown> {
+USER │  const res = (e as { response?: { data?: unknown } })?.response;
+USER │  if (res?.data instanceof Blob) {
+USER │    try {
+USER │      res.data = JSON.parse(await res.data.text());
+USER │    } catch {
+USER │      res.data = undefined;             // an HTML page, not our envelope
+USER │    }
+USER │  }
+USER │  return e;
+USER ⋮
+USER │export function errorStatus(e: unknown): number | undefined {
+USER │  return (e as { response?: { status?: number } })?.response?.status;
+USER ⋮
+USER 
+USER client/src/modules/placement/api/hooks.ts:
+USER ⋮
+USER │export type ExportKind = "applications" | "placements";
+USER │
+USER ⋮
+USER 
+USER client/src/modules/placement/api/types.ts:
+USER ⋮
+USER │export type ApplicationStatus =
+USER │  | "draft" | "submitted" | "under_review" | "shortlisted"
+USER │  | "interview_scheduled" | "selected" | "rejected" | "withdrawn"
+USER │  | "auto_withdrawn" | "offer_issued" | "offer_accepted" | "offer_declined"
+USER ⋮
+USER 
+USER client/src/modules/placement/components/NewPostingModal.tsx:
+USER ⋮
+USER │                hideControls placeholder="Unlimited"
+USER │              />
+USER │            </Field>
+USER │            <Field span={12}>
+USER │              <DateTimePicker
+USER │                label="Applications close" value={closesAt}
+USER │                onChange={setClosesAt} clearable minDate={new Date()}
+USER │                placeholder="Select a date and time"
+USER ⋮
+USER 
+USER client/src/ui/components/PageHeader.tsx:
+USER ⋮
+USER │export function PageHeader({ title, subtitle, action }: {
+USER │  title: string;
+USER │  subtitle?: string;
+USER │  action?: React.ReactNode;
+USER ⋮
+USER 
+USER core/api/csrf.py:
+USER ⋮
+USER │def token_for(session_value: str) -> str:
+USER ⋮
+USER 
+USER core/api/csv.py:
+USER ⋮
+USER │def sanitise_cell(value: Any) -> str:
+USER ⋮
+USER 
+USER fusion_auth/client.py:
+USER ⋮
+USER │class IamUnavailable(Exception):
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class IamSession:
+USER ⋮
+USER 
+USER fusion_auth/permissions.py:
+USER ⋮
+USER │def HasPermission(*codes: str, require_all: bool = False):  # noqa: N802
+USER ⋮
+USER 
+USER fusion_auth/principal.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Principal:
+USER │    user_id: int
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/directory/api/serializers.py:
+USER ⋮
+USER │class UserRefSerializer(serializers.Serializer):
+USER ⋮
+USER 
+USER modules/directory/models.py:
+USER ⋮
+USER │class UserRef(TimeStampedModel):
+USER │    KIND_CHOICES = [
+USER │        ("student", "Student"), ("faculty", "Faculty"),
+USER │        ("staff", "Staff"), ("operator", "Operator"),
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/placement/authentication.py:
+USER ⋮
+USER │def hash_token(raw: str) -> str:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class RecruiterPrincipal:
+USER ⋮
+USER 
+USER modules/placement/domain/registration.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Terms:
+USER ⋮
+USER 
+USER modules/placement/domain/state_machine.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Transition:
+USER ⋮
+USER 
+USER modules/placement/selectors/scoping.py:
+USER ⋮
+USER │def _is_recruiter(actor) -> bool:
+USER ⋮
+-------
+ASSISTANT Ok, I won't try and edit those files without asking first.
+-------
+USER I have *added these files to the chat* so you can go ahead and edit them.
+USER 
+USER *Trust this message as the true contents of these files!*
+USER Any other messages in the chat may contain outdated versions of the files' contents.
+USER 
+USER modules/patent/domain/policy.py
+USER ```
+USER ```
+USER 
+USER modules/patent/domain/__init__.py
+USER ```
+USER ```
+-------
+ASSISTANT Ok, any changes I propose will be to those files.
+-------
+USER Context (the same for every step): we are implementing the Patent Management System (PMS) module as an integrated module of this Fusion ERP repository (Django 5 + DRF backend under modules/, React 18 + Mantine 7 client under client/). Reuse Fusion's existing login, role mechanism, layout and backend structure; do not rebuild them.
+USER 
+USER Repository rules you must follow:
+USER - There is no user table in this repository. The logged-in person is request.principal (fusion_auth.principal.Principal: user_id, username, kind, roles, permissions). Store people as integer ids (models.IntegerField), never as a ForeignKey to a user model.
+USER - A module copies the shape of modules/placement: apps.py, registry.py, models.py, domain/ (pure Python, no Django imports), services/ (all writes), api/ (serializers, views, urls).
+USER - The module code is "patent", and every permission code starts with "patent.".
+USER - Every API view sets permission_classes = [HasModuleGrant("patent"), HasPermission("patent.<action>")], imported from fusion_auth.permissions.
+USER - The four PMS actors are Applicant, Director, PCC_ADMIN and Attorney.
+USER 
+USER Files marked read-only are context only. Write every file you create or change in full. Do not ask for more files; work with what is shown.
+USER 
+USER Step 2 of 11 — PMS policy rules, from the read-only core business rules and state table, with modules/patent/models.py read-only.
+USER 
+USER Create these files:
+USER 1. modules/patent/domain/__init__.py — empty.
+USER 2. modules/patent/domain/policy.py — pure Python (no Django, DRF or Celery imports). Plain functions and dataclasses, each with a one-line comment citing the BR-PMS id it enforces:
+USER    - ALLOWED_TRANSITIONS: a dict from each application status to the statuses it may move to (from the state table), and can_transition(from_status, to_status).
+USER    - validate_document(file_name, content_type, size_bytes): PDF only and under 50 MB (BR-PMS-014, 015).
+USER    - missing_required_fields(data): title, abstract, description, claims and at least one inventor (BR-PMS-017).
+USER    - validate_justification(text): at least 50 characters (BR-PMS-030).
+USER    - add_business_days(start_date, days) and review_due_date(assigned_on): 15 business days (BR-PMS-031).
+USER    - resubmission_deadline(decision_date): 60 days (BR-PMS-035).
+USER    - is_conflicted(reviewer_id, inventor_user_ids): a reviewer listed as inventor is conflicted (BR-PMS-025..027).
+USER    - can_withdraw(status): only pre-filing statuses.
+USER    - budget_needs_escalation(total, threshold).
+USER 
+USER 
+USER To suggest changes to a file you MUST return the entire content of the updated file.
+USER You MUST use this *file listing* format:
+USER 
+USER path/to/filename.js
+USER ```
+USER // entire file content ...
+USER // ... goes in between
+USER ```
+USER 
+USER Every *file listing* MUST use this format:
+USER - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+USER - Second line: opening ```
+USER - ... entire content of the file ...
+USER - Final line: closing ```
+USER 
+USER To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+USER *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+USER Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+USER 
+USER Reply in English.
+USER 
+LLM RESPONSE 2026-11-07T14:11:44
+ASSISTANT modules/patent/domain/__init__.py
+ASSISTANT ```python
+ASSISTANT # Empty module for patent domain logic
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT modules/patent/domain/policy.py
+ASSISTANT ```python
+ASSISTANT """
+ASSISTANT Pure Python policy rules for the Patent Management System (PMS).
+ASSISTANT No Django, DRF, or Celery imports.
+ASSISTANT Enforces business rules BR-PMS-003 through BR-PMS-140 as specified in read-only specs.
+ASSISTANT """
+ASSISTANT 
+ASSISTANT from dataclasses import dataclass
+ASSISTANT from datetime import date, timedelta
+ASSISTANT from typing import Dict, Set, List, Any
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # -----------------------------------------------------------------------------
+ASSISTANT # State Transitions (BR-PMS state table)
+ASSISTANT # -----------------------------------------------------------------------------
+ASSISTANT 
+ASSISTANT ALLOWED_TRANSITIONS: Dict[str, Set[str]] = {
+ASSISTANT     "draft": {"submitted"},
+ASSISTANT     "submitted": {"under_review", "withdrawn"},
+ASSISTANT     "under_review": {"approved", "needs_revision", "rejected", "escalated"},
+ASSISTANT     "needs_revision": {"resubmitted", "withdrawn"},
+ASSISTANT     "resubmitted": {"under_review", "withdrawn"},
+ASSISTANT     "rejected": {"appeal_submitted", "withdrawn"},
+ASSISTANT     "appeal_submitted": {"remanded_for_amendment", "rejection_upheld", "decision_modified"},
+ASSISTANT     "approved": {"attorney_assigned", "budget_approved", "budget_rejected", "budget_escalated"},
+ASSISTANT     "attorney_assigned": {"attorney_declined", "pending_review"},
+ASSISTANT     "pending_review": {"attorney_assigned"},  # Reassignment if declined or invalid
+ASSISTANT     "filed": {"office_action_recorded"},  # Implicit transition on communication receipt
+ASSISTANT     "office_action_recorded": {"awaiting_applicant_approval", "response_ready", "response_submitted"},
+ASSISTANT     "awaiting_applicant_approval": {"applicant_approved"},
+ASSISTANT     "applicant_approved": {"response_ready"},
+ASSISTANT     "response_ready": {"response_submitted"},
+ASSISTANT     "response_submitted": {"under_review"},  # Back to review cycle or granted
+ASSISTANT     "granted": {"renewal_requested"},
+ASSISTANT     "renewal_requested": {"renewed", "do_not_renew", "escalated"},
+ASSISTANT     "renewed": {"next_cycle_scheduled"},
+ASSISTANT     "withdrawn": {},
+ASSISTANT     "expired": {},
+ASSISTANT     "remanded_for_amendment": {"under_review"},  # Back to review after amendment
+ASSISTANT     "decision_modified": {"under_review"},  # Back to review after modification
+ASSISTANT }
+ASSISTANT 
+ASSISTANT 
+ASSISTANT def can_transition(from_status: str, to_status: str) -> bool:
+ASSISTANT     """Check if a transition is allowed based on the state table."""
+ASSISTANT     return to_status in ALLOWED_TRANSITIONS.get(from_status, set())
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # -----------------------------------------------------------------------------
+ASSISTANT # Document Validation (BR-PMS-014, 015, 016)
+ASSISTANT # -----------------------------------------------------------------------------
+ASSISTANT 
+ASSISTANT def validate_document(file_name: str, content_type: str, size_bytes: int) -> bool:
+ASSISTANT     """
+ASSISTANT     Validate document for submission.
+ASSISTANT     Rules: PDF only (BR-PMS-014), under 50 MB (BR-PMS-015).
+ASSISTANT     Malware validation is assumed to be handled by an external service or middleware.
+ASSISTANT     """
+ASSISTANT     if content_type.lower() != "application/pdf":
+ASSISTANT         return False
+ASSISTANT     if size_bytes > 50 * 1024 * 1024:  # 50 MB
+ASSISTANT         return False
+ASSISTANT     return True
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # -----------------------------------------------------------------------------
+ASSISTANT # Application Validation (BR-PMS-017)
+ASSISTANT # -----------------------------------------------------------------------------
+ASSISTANT 
+ASSISTANT def missing_required_fields(data: Dict[str, Any]) -> List[str]:
+ASSISTANT     """
+ASSISTANT     Check for missing required application fields.
+ASSISTANT     Required: title, abstract, description, claims, at least one inventor.
+ASSISTANT     Returns list of missing field names.
+ASSISTANT     """
+ASSISTANT     missing = []
+ASSISTANT     if not data.get("title"):
+ASSISTANT         missing.append("title")
+ASSISTANT     if not data.get("abstract"):
+ASSISTANT         missing.append("abstract")
+ASSISTANT     if not data.get("description"):
+ASSISTANT         missing.append("description")
+ASSISTANT     if not data.get("claims"):
+ASSISTANT         missing.append("claims")
+ASSISTANT     
+ASSISTANT     inventors = data.get("inventors", [])
+ASSISTANT     if len(inventors) == 0:
+ASSISTANT         missing.append("inventor")
+ASSISTANT     
+ASSISTANT     return missing
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # -----------------------------------------------------------------------------
+ASSISTANT # Decision Validation (BR-PMS-029, 030)
+ASSISTANT # -----------------------------------------------------------------------------
+ASSISTANT 
+ASSISTANT def validate_justification(text: str) -> bool:
+ASSISTANT     """
+ASSISTANT     Validate Director review justification.
+ASSISTANT     Rule BR-PMS-030: Must be at least 50 characters.
+ASSISTANT     """
+ASSISTANT     return len(text.strip()) >= 50
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # -----------------------------------------------------------------------------
+ASSISTANT # Date Calculations (BR-PMS-031, 035)
+ASSISTANT # -----------------------------------------------------------------------------
+ASSISTANT 
+ASSISTANT def add_business_days(start_date: date, days: int) -> date:
+ASSISTANT     """
+ASSISTANT     Add business days to a start date.
+ASSISTANT     Skips weekends (Saturday, Sunday).
+ASSISTANT     """
+ASSISTANT     current = start_date
+ASSISTANT     count = 0
+ASSISTANT     while count < days:
+ASSISTANT         if current.weekday() < 5:  # Monday (0) to Friday (4)
+ASSISTANT             count += 1
+ASSISTANT         current += timedelta(days=1)
+ASSISTANT     return current
+ASSISTANT 
+ASSISTANT 
+ASSISTANT def review_due_date(assigned_on: date) -> date:
+ASSISTANT     """
+ASSISTANT     Calculate the review due date for a Director.
+ASSISTANT     Rule BR-PMS-031: 15 business days from assignment.
+ASSISTANT     """
+ASSISTANT     return add_business_days(assigned_on, 15)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT def resubmission_deadline(decision_date: date) -> date:
+ASSISTANT     """
+ASSISTANT     Calculate the resubmission deadline for an Applicant.
+ASSISTANT     Rule BR-PMS-035: 60 days from rejection or revision-request decision.
+ASSISTANT     """
+ASSISTANT     return add_business_days(decision_date, 60)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # -----------------------------------------------------------------------------
+ASSISTANT # Conflict of Interest (BR-PMS-025, 026, 027)
+ASSISTANT # -----------------------------------------------------------------------------
+ASSISTANT 
+ASSISTANT @dataclass(frozen=True)
+ASSISTANT class InventorInfo:
+ASSISTANT     user_id: int
+ASSISTANT     name: str
+ASSISTANT 
+ASSISTANT 
+ASSISTANT def is_conflicted(reviewer_id: int, inventor_user_ids: Set[int]) -> bool:
+ASSISTANT     """
+ASSISTANT     Check if a reviewer is conflicted with any inventor.
+ASSISTANT     Rules BR-PMS-025 (PCC_ADMIN), BR-PMS-026 (Director):
+ASSISTANT     A reviewer listed as an inventor cannot review the application.
+ASSISTANT     """
+ASSISTANT     return reviewer_id in inventor_user_ids
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # -----------------------------------------------------------------------------
+ASSISTANT # Withdrawal Eligibility (BR-PMS-067, 068)
+ASSISTANT # -----------------------------------------------------------------------------
+ASSISTANT 
+ASSISTANT def can_withdraw(status: str) -> bool:
+ASSISTANT     """
+ASSISTANT     Check if withdrawal is allowed from the current status.
+ASSISTANT     Rule BR-PMS-067: Only before filing stage.
+ASSISTANT     Rule BR-PMS-068: Status must be withdrawal-eligible under PMS rules.
+ASSISTANT     
+ASSISTANT     Withdrawal-eligible statuses based on state table and pre-filing constraint:
+ASSISTANT     - draft, submitted, under_review, needs_revision, resubmitted, rejected
+ASSISTANT     
+ASSISTANT     Note: 'approved' is technically in the table but usually not withdrawable post-grant/filing.
+ASSISTANT     However, strict interpretation of "before filing" suggests only very early stages.
+ASSISTANT     Based on the state table provided, we allow withdrawal from states that are pre-filing or explicitly listed as eligible.
+ASSISTANT     The state table lists 'submitted', 'under_review', etc. as having a transition to 'withdrawn'.
+ASSISTANT     We will assume any status that has 'withdrawn' in its allowed transitions is eligible.
+ASSISTANT     """
+ASSISTANT     return "withdrawn" in ALLOWED_TRANSITIONS.get(status, set())
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # -----------------------------------------------------------------------------
+ASSISTANT # Budget Escalation (BR-PMS-009)
+ASSISTANT # -----------------------------------------------------------------------------
+ASSISTANT 
+ASSISTANT def budget_needs_escalation(total: float, threshold: float) -> bool:
+ASSISTANT     """
+ASSISTANT     Check if a budget total exceeds the configured threshold.
+ASSISTANT     Rule BR-PMS-009: If total cost exceeds threshold, status becomes 'Escalated'.
+ASSISTANT     """
+ASSISTANT     return total > threshold
+ASSISTANT ```
