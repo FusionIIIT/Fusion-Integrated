@@ -1,0 +1,43 @@
+# PMS business rules for submission, assignment, review, revision, withdrawal, appeal, documents (read-only spec)
+
+- BR-PMS-003 (Reporting; applies to Applicant): Applicants may access report information only for their own patent applications.
+- BR-PMS-014 (Document validation; applies to Applicant): Application supporting documents accepted for submission must be PDF files.
+- BR-PMS-015 (Document validation; applies to Applicant): An application document must be under 50 MB to be accepted.
+- BR-PMS-016 (Document validation; applies to PMS): A submitted application document must pass malware validation before it is accepted.
+- BR-PMS-017 (Application validation; applies to Applicant): Required application fields must be complete before PMS accepts the application submission.
+- BR-PMS-020 (Agreement prerequisite; applies to Applicant / Attorney): Inventor agreements must be completed before external filing.
+- BR-PMS-022 (Assignment; applies to PCC_ADMIN / Director): Automatic Director assignment may be used only when configured assignment rules are available, and it must apply the same governing assignment criteria. Exception: Outside the stated condition, the rule does not authorize the action.
+- BR-PMS-023 (Assignment rule; applies to PCC_ADMIN): Director expertise matching with the application domain is an assignment criterion.
+- BR-PMS-024 (Assignment rule; applies to PCC_ADMIN): Director workload balance is an assignment criterion.
+- BR-PMS-025 (Conflict of interest; applies to PCC_ADMIN / Director): PMS must perform a conflict-of-interest check before Director assignment.
+- BR-PMS-026 (Conflict of interest; applies to Director): A Director must not review an application in which that Director is listed as an inventor.
+- BR-PMS-027 (Conflict of interest; applies to PCC_ADMIN): PCC_ADMIN must not act as reviewer for an application in which PCC_ADMIN is listed as an inventor.
+- BR-PMS-029 (Decision; applies to Director): A Director review decision must be exactly one of: Approve, Reject, or Needs Revision.
+- BR-PMS-030 (Decision validation; applies to Director): Every Director review decision must include a justification of at least 50 characters.
+- BR-PMS-031 (Review deadline; applies to Director): Director review must be completed within 15 business days of assignment.
+- BR-PMS-033 (Revision; applies to Applicant): Application revision is permitted when the application status is Needs Revision.
+- BR-PMS-034 (Revision; applies to Applicant): Application revision is permitted when the application status is Rejected.
+- BR-PMS-035 (Revision deadline; applies to Applicant): A revised application must be resubmitted within 60 days from the relevant rejection or revision-request decision date.
+- BR-PMS-036 (Revision validation; applies to Applicant / Director): A resubmitted revision must address the recorded Director feedback.
+- BR-PMS-038 (Status update; applies to Applicant): When the applicable 60-day resubmission period expires without valid resubmission, PMS changes the application status to Expired.
+- BR-PMS-067 (Withdrawal; applies to Applicant): Withdrawal is permitted only before the filing stage.
+- BR-PMS-068 (Withdrawal validation; applies to Applicant): Withdrawal is permitted only when the current application status is withdrawal-eligible under the applicable PMS rule/configuration. Exception: Outside the stated condition, the rule does not authorize the action.
+- BR-PMS-069 (Withdrawal validation; applies to Applicant): A withdrawal request must include an Applicant-provided reason.
+- BR-PMS-070 (Withdrawal consent; applies to Applicant / Co-inventor): Co-inventor consent for withdrawal must be recorded when the applicable process requires such consent.
+- BR-PMS-073 (Inventor validation; applies to Applicant): Inventor information must pass PMS validation before the change is accepted.
+- BR-PMS-074 (Ownership validation; applies to Applicant): Inventor ownership percentages must pass PMS validation before the change is accepted.
+- BR-PMS-075 (Consent rule; applies to Applicant / Co-inventor): Required inventor consent must be obtained before filing.
+- BR-PMS-076 (Electronic signature; applies to Applicant / Co-inventor): Electronic signatures for inventor consent/agreement may be collected only where legally permitted and configured. Exception: Applies only under the stated availability/configuration/legal condition. Outside the stated condition, the rule does not authorize the action.
+- BR-PMS-077 (Electronic signature validation; applies to Applicant / Co-inventor): Electronic-signature validation applies only where legally permitted and configured. Exception: Applies only under the stated availability/configuration/legal condition. Outside the stated condition, the rule does not authorize the action.
+- BR-PMS-078 (Agreement prerequisite; applies to Applicant / Attorney): Inventor agreements must be complete before filing.
+- BR-PMS-082 (Document versioning; applies to Applicant / Attorney): PMS assigns automatic version numbers to new document versions.
+- BR-PMS-084 (Document access; applies to Applicant / Director / Attorney): Access to previous document versions is limited by applicable role and application-status access rules.
+- BR-PMS-086 (Access control; applies to Applicant / Director / Attorney / PCC_ADMIN): Document access is controlled by user role and application status.
+- BR-PMS-087 (Document edit rule; applies to Applicant): Applicants may edit application documents only while the application status is Needs Revision.
+- BR-PMS-092 (Appeal; applies to Applicant): Only an application in Rejected status is eligible for an Applicant appeal.
+- BR-PMS-093 (Appeal deadline; applies to Applicant): An appeal must be filed within the applicable configured or institutionally defined allowed period.
+- BR-PMS-094 (Appeal validation; applies to Applicant): An appeal must include Applicant-provided grounds and justification.
+- BR-PMS-095 (Appeal decision; applies to Director): A Director appeal outcome must be exactly one of: Uphold Rejection, Remand for Amendment, or Modify Decision.
+- BR-PMS-126 (Access control; applies to Applicant / Director / PCC_ADMIN / Attorney): A valid PMS role assignment is required before a user may access patent-management functions.
+- BR-PMS-130 (Confidentiality; applies to Applicant / Director / PCC_ADMIN / Attorney): Confidential patent information is protected by role-based access control.
+- BR-PMS-140 (Scope boundary; applies to Document management system): Document-management systems are external; PMS owns only the document/version/access/audit behavior explicitly represented within PMS or an available integration.
