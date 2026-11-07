@@ -7148,3 +7148,2170 @@ ASSISTANT
 ASSISTANT class NotFoundResponse(Exception):
 ASSISTANT     pass
 ASSISTANT ```
+TO LLM 2026-11-07T14:38:28
+-------
+SYSTEM Act as an expert software developer.
+SYSTEM Take requests for changes to the supplied code.
+SYSTEM If the request is ambiguous, ask questions.
+SYSTEM Reply in English.
+SYSTEM 
+SYSTEM Once you understand the request you MUST:
+SYSTEM 1. Determine if any code changes are needed.
+SYSTEM 2. Explain any needed changes.
+SYSTEM 3. If changes are needed, output a copy of each file that needs changes.
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return the entire content of the updated file.
+SYSTEM You MUST use this *file listing* format:
+SYSTEM 
+SYSTEM path/to/filename.js
+SYSTEM ```
+SYSTEM // entire file content ...
+SYSTEM // ... goes in between
+SYSTEM ```
+SYSTEM 
+SYSTEM Every *file listing* MUST use this format:
+SYSTEM - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+SYSTEM - Second line: opening ```
+SYSTEM - ... entire content of the file ...
+SYSTEM - Final line: closing ```
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+SYSTEM *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+SYSTEM Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+SYSTEM 
+SYSTEM Reply in English.
+SYSTEM 
+-------
+USER Change the greeting to be more casual
+-------
+ASSISTANT Ok, I will:
+ASSISTANT 
+ASSISTANT 1. Switch the greeting text from "Hello" to "Hey".
+ASSISTANT 
+ASSISTANT show_greeting.py
+ASSISTANT ```
+ASSISTANT import sys
+ASSISTANT 
+ASSISTANT def greeting(name):
+ASSISTANT     print(f"Hey {name}")
+ASSISTANT 
+ASSISTANT if __name__ == '__main__':
+ASSISTANT     greeting(sys.argv[1])
+ASSISTANT ```
+-------
+USER I switched to a new code base. Please don't consider the above files or try to edit them any longer.
+-------
+ASSISTANT Ok.
+-------
+USER Here are some READ ONLY files, provided for your reference.
+USER Do not edit these files!
+USER 
+USER modules/patent/services/post_filing.py
+USER ```
+USER from django.db import transaction, connection
+USER from datetime import date
+USER from typing import List, Optional
+USER 
+USER from core.models import TimeStampedModel
+USER from modules.patent.models import (
+USER     PatentApplication, OfficeAction, ApplicationHistory, MaintenanceRecord,
+USER     PatentabilityOpinion, Filing
+USER )
+USER from fusion_auth.permissions import HasPermission, HasModuleGrant
+USER from fusion_auth.principal import Principal
+USER 
+USER 
+USER class PostFilingService:
+USER     """Service layer for post-filing lifecycle events."""
+USER 
+USER     @staticmethod
+USER     def record_office_action(
+USER         attorney_id: int,
+USER         application_id: int,
+USER         received_date: date,
+USER         response_due_date: Optional[date],
+USER         description: str
+USER     ) -> OfficeAction:
+USER         """
+USER         Record an office action received from the patent office.
+USER 
+USER         Rules (BR-PMS-014, BR-PMS-066):
+USER         - Attorney must have access to the application.
+USER         - Status must be 'Filed' or earlier (cannot receive OA before filing).
+USER         - Must append history entry.
+USER         """
+USER         application = PatentApplication.objects.get(pk=application_id)
+USER 
+USER         if application.status not in ['filed', 'granted']:
+USER             raise ValueError("Office action can only be recorded for Filed or Granted applications.")
+USER 
+USER         # Check attorney access (simplified: assume attorney_id matches assigned_attorney_id or has explicit access)
+USER         # In a full system, this would check the AttorneyAssignment model.
+USER         if application.assigned_attorney_id != attorney_id:
+USER             raise ValueError("Attorney does not have access to this application.")
+USER 
+USER         with transaction.atomic():
+USER             office_action = OfficeAction.objects.create(
+USER                 application=application,
+USER                 attorney_id=attorney_id,
+USER                 received_date=received_date,
+USER                 response_due_date=response_due_date,
+USER                 description=description,
+USER                 status='recorded'
+USER             )
+USER 
+USER             ApplicationHistory.objects.create(
+USER                 application=application,
+USER                 actor_id=attorney_id,
+USER                 action='office_action_received',
+USER                 from_status=None,
+USER                 to_status='under_review',  # Implicitly moves to under review upon OA receipt
+USER                 note=f"Office Action received: {description[:50]}"
+USER             )
+USER 
+USER         return office_action
+USER 
+USER     @staticmethod
+USER     def prepare_response(
+USER         attorney_id: int,
+USER         office_action_id: int,
+USER         response_text: str,
+USER         needs_applicant_approval: bool
+USER     ) -> OfficeAction:
+USER         """
+USER         Prepare an office action response.
+USER 
+USER         Rules (BR-PMS-015, BR-PMS-065):
+USER         - Attorney must own the OA.
+USER         - Status becomes 'awaiting_applicant_approval' if needs_applicant_approval is True.
+USER         - Otherwise 'response_ready'.
+USER         - Must append history entry.
+USER         """
+USER         office_action = OfficeAction.objects.get(pk=office_action_id)
+USER 
+USER         application = office_action.application
+USER 
+USER         # Verify attorney ownership
+USER         if office_action.attorney_id != attorney_id:
+USER             raise ValueError("Attorney does not own this office action.")
+USER 
+USER         with transaction.atomic():
+USER             office_action.status = 'awaiting_applicant_approval' if needs_applicant_approval else 'response_ready'
+USER             office_action.response_text = response_text
+USER             office_action.save()
+USER 
+USER             ApplicationHistory.objects.create(
+USER                 application=application,
+USER                 actor_id=attorney_id,
+USER                 action='response_prepared',
+USER                 from_status=None,
+USER                 to_status=office_action.status,
+USER                 note=f"Response prepared: {needs_applicant_approval}"
+USER             )
+USER 
+USER         return office_action
+USER 
+USER     @staticmethod
+USER     def approve_response(
+USER         applicant_id: int,
+USER         office_action_id: int
+USER     ) -> OfficeAction:
+USER         """
+USER         Approve an office action response.
+USER 
+USER         Rules (BR-PMS-015, BR-PMS-0146):
+USER         - Only the application owner (Applicant) can approve.
+USER         - Status must be 'awaiting_applicant_approval'.
+USER         - On approval, status becomes 'applicant_approved', allowing Attorney to submit.
+USER         - Must append history entry.
+USER         """
+USER         office_action = OfficeAction.objects.get(pk=office_action_id)
+USER 
+USER         application = office_action.application
+USER 
+USER         # Verify applicant ownership (simplified: check if applicant_id matches a known owner or is the logged-in principal's ID)
+USER         # Since we don't have a User model, we assume applicant_id corresponds to the entity that owns the application.
+USER         # In this context, 'applicant_id' likely refers to the user_id of the applicant IAM system.
+USER         if office_action.status != 'awaiting_applicant_approval':
+USER             raise ValueError("Response must be awaiting applicant approval.")
+USER 
+USER         with transaction.atomic():
+USER             office_action.status = 'applicant_approved'
+USER             office_action.save()
+USER 
+USER             ApplicationHistory.objects.create(
+USER                 application=application,
+USER                 actor_id=applicant_id,
+USER                 action='response_approved',
+USER                 from_status=None,
+USER                 to_status='applicant_approved',
+USER                 note="Applicant approved the response."
+USER             )
+USER 
+USER         return office_action
+USER 
+USER     @staticmethod
+USER     def submit_response(
+USER         attorney_id: int,
+USER         office_action_id: int
+USER     ) -> OfficeAction:
+USER         """
+USER         Submit an office action response.
+USER 
+USER         Rules (BR-PMS-015, BR-PMS-065):
+USER         - Attorney must own the OA.
+USER         - Status must be 'response_ready'.
+USER         - Must check if response_due_date has passed (simplified: raise error if past).
+USER         - On success, status becomes 'response_submitted'.
+USER         - Must append history entry.
+USER         """
+USER         office_action = OfficeAction.objects.get(pk=office_action_id)
+USER 
+USER         application = office_action.application
+USER 
+USER         # Verify attorney ownership
+USER         if office_action.attorney_id != attorney_id:
+USER             raise ValueError("Attorney does not own this office action.")
+USER 
+USER         # Check deadline (simplified logic)
+USER         if office_action.response_due_date and office_action.response_due_date < date.today():
+USER             raise ValueError("Response due date has passed. Cannot submit late response.")
+USER 
+USER         with transaction.atomic():
+USER             office_action.status = 'response_submitted'
+USER             office_action.save()
+USER 
+USER             ApplicationHistory.objects.create(
+USER                 application=application,
+USER                 actor_id=attorney_id,
+USER                 action='response_submitted',
+USER                 from_status=None,
+USER                 to_status='response_submitted',
+USER                 note="Response submitted to patent office."
+USER             )
+USER 
+USER         return office_action
+USER 
+USER     @staticmethod
+USER     def record_grant(
+USER         attorney_id: int,
+USER         application_id: int,
+USER         grant_number: str,
+USER         grant_date: date
+USER     ) -> PatentApplication:
+USER         """
+USER         Record a patent grant.
+USER 
+USER         Rules (BR-PMS-059):
+USER         - Only for applications that are 'filed' or 'granted'.
+USER         - Status must be updated to 'granted'.
+USER         - Must append history entry.
+USER         """
+USER         application = PatentApplication.objects.get(pk=application_id)
+USER 
+USER         if application.status not in ['filed', 'granted']:
+USER             raise ValueError("Grant can only be recorded for Filed or Granted applications.")
+USER 
+USER         # Verify attorney access (simplified check)
+USER         if application.assigned_attorney_id != attorney_id:
+USER             raise ValueError("Attorney does not have access to this application.")
+USER 
+USER         with transaction.atomic():
+USER             application.status = 'granted'
+USER             application.grant_number = grant_number
+USER             application.grant_date = grant_date
+USER             application.save()
+USER 
+USER             ApplicationHistory.objects.create(
+USER                 application=application,
+USER                 actor_id=attorney_id,
+USER                 action='patent_granted',
+USER                 from_status=None,
+USER                 to_status='granted',
+USER                 note=f"Patent granted: {grant_number}"
+USER             )
+USER 
+USER         return application
+USER 
+USER     @staticmethod
+USER     def schedule_maintenance(
+USER         attorney_id: int,
+USER         application_id: int,
+USER         due_date: date,
+USER         fee: float
+USER     ) -> MaintenanceRecord:
+USER         """
+USER         Schedule a maintenance fee payment.
+USER 
+USER         Rules (BR-PMS-060):
+USER         - Only for 'granted' patents.
+USER         - Attorney must have access.
+USER         - Must append history entry.
+USER         """
+USER         application = PatentApplication.objects.get(pk=application_id)
+USER 
+USER         if application.status != 'granted':
+USER             raise ValueError("Maintenance can only be scheduled for Granted patents.")
+USER 
+USER         # Verify attorney access
+USER         if application.assigned_attorney_id != attorney_id:
+USER             raise ValueError("Attorney does not have access to this application.")
+USER 
+USER         with transaction.atomic():
+USER             maintenance_record = MaintenanceRecord.objects.create(
+USER                 application=application,
+USER                 attorney_id=attorney_id,
+USER                 due_date=due_date,
+USER                 fee=fee,
+USER                 decision='renewal_requested',  # Default to requested until Director decides
+USER             )
+USER 
+USER             ApplicationHistory.objects.create(
+USER                 application=application,
+USER                 actor_id=attorney_id,
+USER                 action='maintenance_scheduled',
+USER                 from_status=None,
+USER                 to_status=None,
+USER                 note=f"Maintenance fee scheduled: {due_date} (${fee})"
+USER             )
+USER 
+USER         return maintenance_record
+USER 
+USER     @staticmethod
+USER     def decide_renewal(
+USER         director_id: int,
+USER         record_id: int,
+USER         renew: bool,
+USER         justification: str
+USER     ) -> MaintenanceRecord:
+USER         """
+USER         Make a renewal decision for a maintenance record.
+USER 
+USER         Rules (BR-PMS-061):
+USER         - Only Director can decide.
+USER         - Decision must be 'renew' or 'do_not_renew'.
+USER         - Must append history entry.
+USER         """
+USER         maintenance_record = MaintenanceRecord.objects.get(pk=record_id)
+USER 
+USER         application = maintenance_record.application
+USER 
+USER         # Verify Director access (simplified: assume director_id is the logged-in principal's ID)
+USER         if application.assigned_director_id != director_id:
+USER             raise ValueError("Only the assigned Director can make renewal decisions.")
+USER 
+USER         with transaction.atomic():
+USER             decision_text = 'renew' if renew else 'do_not_renew'
+USER             maintenance_record.decision = decision_text
+USER             maintenance_record.decided_by = director_id
+USER             maintenance_record.justification = justification
+USER             maintenance_record.save()
+USER 
+USER             ApplicationHistory.objects.create(
+USER                 application=application,
+USER                 actor_id=director_id,
+USER                 action='renewal_decided',
+USER                 from_status=None,
+USER                 to_status=None,
+USER                 note=f"Renewal decision: {decision_text}. Justification: {justification}"
+USER             )
+USER 
+USER         return maintenance_record
+USER 
+USER     @staticmethod
+USER     def get_history(application_id: int) -> List[ApplicationHistory]:
+USER         """
+USER         Retrieve the history of actions for an application.
+USER 
+USER         Rules (BR-PMS-0138):
+USER         - Returns ordered list of history rows.
+USER         """
+USER         return ApplicationHistory.objects.filter(
+USER             application_id=application_id
+USER         ).order_by('-created_at')
+USER ```
+USER 
+USER fusion_auth/permissions.py
+USER ```
+USER """Two gates on every request, both server-side.
+USER 
+USER     HasModuleGrant   is this module yours at all?   (coarse — drives the sidebar)
+USER     HasPermission    may you do this action?        (fine)
+USER 
+USER Both must pass. The default is deny: a view that declares nothing gets
+USER IsAuthenticatedPrincipal and nothing more, so forgetting to think about
+USER authorization fails closed rather than open.
+USER """
+USER from rest_framework.permissions import BasePermission
+USER 
+USER 
+USER class IsAuthenticatedPrincipal(BasePermission):
+USER     message = "Authentication required."
+USER 
+USER     def has_permission(self, request, view):
+USER         return getattr(request, "principal", None) is not None
+USER 
+USER 
+USER class _HasModuleGrant(BasePermission):
+USER     module_code = ""
+USER     message = "This module is not available to your role."
+USER 
+USER     def has_permission(self, request, view):
+USER         p = getattr(request, "principal", None)
+USER         return p is not None and p.has_module(self.module_code)
+USER 
+USER 
+USER def HasModuleGrant(module_code: str):                       # noqa: N802
+USER     return type("HasModuleGrant_" + module_code,
+USER                 (_HasModuleGrant,), {"module_code": module_code})
+USER 
+USER 
+USER class _HasPermission(BasePermission):
+USER     codes: tuple[str, ...] = ()
+USER     require_all = False
+USER     message = "You do not have permission to perform this action."
+USER 
+USER     def has_permission(self, request, view):
+USER         p = getattr(request, "principal", None)
+USER         if p is None:
+USER             return False
+USER         if self.require_all:
+USER             return all(p.has_permission(c) for c in self.codes)
+USER         return p.has_any_permission(*self.codes)
+USER 
+USER 
+USER def HasPermission(*codes: str, require_all: bool = False):  # noqa: N802
+USER     return type("HasPermission_" + "_".join(codes).replace(".", "_"),
+USER                 (_HasPermission,), {"codes": codes, "require_all": require_all})
+USER ```
+USER 
+USER modules/patent/api/serializers.py
+USER ```
+USER from rest_framework import serializers
+USER from django.utils.translation import gettext_lazy as _
+USER 
+USER from ..models import (
+USER     PatentApplication, Inventor, ApplicationDocument,
+USER     AttorneyAssignment, PatentabilityOpinion, Budget, Filing,
+USER     OfficeAction, MaintenanceRecord, Appeal, ApplicationHistory
+USER )
+USER 
+USER 
+USER # --- Core Application Serializers ---
+USER 
+USER class PatentApplicationSerializer(serializers.ModelSerializer):
+USER     """Read-only serializer for the core application record."""
+USER     
+USER     class Meta:
+USER         model = PatentApplication
+USER         fields = [
+USER             'id', 'APPLICATION_NUMBER', 'title', 'abstract', 'description', 
+USER             'claims', 'technical_domain', 'applicant_id', 'status', 
+USER             'assigned_director_id', 'assigned_attorney_id', 'review_due_date', 
+USER             'resubmission_deadline', 'latest_decision', 'latest_justification',
+USER             'version_number', 'created_at', 'updated_at'
+USER         ]
+USER         read_only_fields = [
+USER             'APPLICATION_NUMBER', 'status', 'assigned_director_id', 
+USER             'assigned_attorney_id', 'review_due_date', 'resubmission_deadline',
+USER             'latest_decision', 'latest_justification', 'version_number',
+USER             'created_at', 'updated_at'
+USER         ]
+USER 
+USER     def to_internal_representation(self, instance):
+USER         return {
+USER             'id': instance.id,
+USER             'application_number': instance.APPLICATION_NUMBER,
+USER             'title': instance.title,
+USER             'abstract': instance.abstract,
+USER             'description': instance.description,
+USER             'claims': instance.claims,
+USER             'technical_domain': instance.technical_domain,
+USER             'applicant_id': instance.applicant_id,
+USER             'status': instance.status,
+USER             'assigned_director_id': instance.assigned_director_id,
+USER             'assigned_attorney_id': instance.assigned_attorney_id,
+USER             'review_due_date': instance.review_due_date,
+USER             'resubmission_deadline': instance.resubmission_deadline,
+USER             'latest_decision': instance.latest_decision,
+USER             'latest_justification': instance.latest_justification,
+USER             'version_number': instance.version_number,
+USER         }
+USER 
+USER 
+USER class ApplicationDetailSerializer(serializers.ModelSerializer):
+USER     """Extended read serializer including inventors and documents."""
+USER     
+USER     inventors_count = serializers.IntegerField(source='inventors.count', read_only=True)
+USER     documents_count = serializers.IntegerField(source='documents.count', read_only=True)
+USER 
+USER     class Meta:
+USER         model = PatentApplication
+USER         fields = [
+USER             'id', 'application_number', 'title', 'abstract', 'description', 
+USER             'claims', 'technical_domain', 'applicant_id', 'status', 
+USER             'assigned_director_id', 'assigned_attorney_id', 'review_due_date', 
+USER             'resubmission_deadline', 'latest_decision', 'latest_justification',
+USER             'version_number', 'created_at', 'updated_at',
+USER             'inventors_count', 'documents_count'
+USER         ]
+USER 
+USER 
+USER # --- Input Serializers for Actions ---
+USER 
+USER class SubmitApplicationSerializer(serializers.Serializer):
+USER     """Input data for submitting a new application."""
+USER     
+USER     applicant_id = serializers.IntegerField(required=True, label=_('Applicant ID'))
+USER     title = serializers.CharField(max_length=255, required=True, label=_('Title'))
+USER     abstract = serializers.CharField(required=False, allow_blank=True, label=_('Abstract'))
+USER     description = serializers.CharField(required=True, label=_('Description'))
+USER     claims = serializers.CharField(required=True, label=_('Claims'))
+USER     technical_domain = serializers.CharField(max_length=100, required=True, label=_('Technical Domain'))
+USER     
+USER     inventors = serializers.ListChild(
+USER         child=serializers.DictField(
+USER             child_keys=['user_id', 'name', 'email', 'contribution_percent', 'agreement_signed'],
+USER             required=False
+USER         ),
+USER         required=True,
+USER         label=_('Inventors')
+USER     )
+USER     
+USER     documents = serializers.ListChild(
+USER         child=serializers.DictField(
+USER             child_keys=['file_name', 'content_type', 'size'],
+USER             required=True
+USER         ),
+USER         required=True,
+USER         label=_('Documents')
+USER     )
+USER 
+USER 
+USER class AssignDirectorSerializer(serializers.Serializer):
+USER     """Input data for assigning a director."""
+USER     
+USER     director_id = serializers.IntegerField(required=True, label=_('Director ID'))
+USER     # admin_id is implicitly the actor performing the action via request.principal
+USER 
+USER 
+USER class ReviewApplicationSerializer(serializers.Serializer):
+USER     """Input data for reviewing an application."""
+USER     
+USER     decision = serializers.ChoiceField(
+USER         choices=['approve', 'reject', 'needs_revision'],
+USER         required=True,
+USER         label=_('Decision')
+USER     )
+USER     justification = serializers.CharField(min_length=50, required=True, label=_('Justification'))
+USER 
+USER 
+USER class ResubmitApplicationSerializer(serializers.Serializer):
+USER     """Input data for resubmitting an application."""
+USER     
+USER     changes = serializers.DictField(required=True, label=_('Changes'))
+USER     response_to_feedback = serializers.CharField(required=True, label=_('Response to Feedback'))
+USER     # applicant_id is implicitly the actor via request.principal
+USER 
+USER 
+USER class WithdrawApplicationSerializer(serializers.Serializer):
+USER     """Input data for withdrawing an application."""
+USER     
+USER     reason = serializers.CharField(required=True, label=_('Reason'))
+USER     # applicant_id is implicitly the actor via request.principal
+USER 
+USER 
+USER # --- Input Serializers for Appeals ---
+USER 
+USER class FileAppealSerializer(serializers.Serializer):
+USER     """Input data for filing an appeal."""
+USER     
+USER     grounds = serializers.CharField(required=True, label=_('Grounds'))
+USER     # applicant_id is implicitly the actor via request.principal
+USER 
+USER 
+USER class DecideAppealSerializer(serializers.Serializer):
+USER     """Input data for deciding an appeal."""
+USER     
+USER     outcome = serializers.ChoiceField(
+USER         choices=['uphold_rejection', 'remand_for_amendment', 'modify_decision'],
+USER         required=True,
+USER         label=_('Outcome')
+USER     )
+USER     justification = serializers.CharField(required=True, label=_('Justification'))
+USER     # director_id is implicitly the actor via request.principal
+USER 
+USER 
+USER # --- Document and Other Models ---
+USER 
+USER class ApplicationDocumentSerializer(serializers.ModelSerializer):
+USER     """Read-only serializer for application documents."""
+USER     
+USER     class Meta:
+USER         model = ApplicationDocument
+USER         fields = [
+USER             'id', 'file_name', 'content_type', 'size', 'version', 
+USER             'sensitivity', 'uploaded_by', 'archived', 'created_at'
+USER         ]
+USER 
+USER 
+USER class InventorSerializer(serializers.ModelSerializer):
+USER     """Read-only serializer for inventors."""
+USER     
+USER     class Meta:
+USER         model = Inventor
+USER         fields = [
+USER             'id', 'user_id', 'name', 'email', 'contribution_percent', 
+USER             'agreement_signed', 'created_at'
+USER         ]
+USER 
+USER 
+USER class AttorneyAssignmentSerializer(serializers.ModelSerializer):
+USER     """Read-only serializer for attorney assignments."""
+USER     
+USER     class Meta:
+USER         model = AttorneyAssignment
+USER         fields = [
+USER             'id', 'attorney_id', 'status', 'decline_reason', 'created_at'
+USER         ]
+USER 
+USER 
+USER class PatentabilityOpinionSerializer(serializers.ModelSerializer):
+USER     """Read-only serializer for patentability opinions."""
+USER     
+USER     class Meta:
+USER         model = PatentabilityOpinion
+USER         fields = [
+USER             'id', 'attorney_id', 'novelty', 'non_obviousness', 'utility', 
+USER             'recommendation', 'opinion_text', 'created_at'
+USER         ]
+USER 
+USER 
+USER class BudgetSerializer(serializers.ModelSerializer):
+USER     """Read-only serializer for budgets."""
+USER     
+USER     class Meta:
+USER         model = Budget
+USER         fields = [
+USER             'id', 'filing_fee', 'attorney_fee', 'administrative_cost', 
+USER             'total', 'status', 'decided_by', 'justification', 'created_at'
+USER         ]
+USER 
+USER 
+USER class FilingSerializer(serializers.ModelSerializer):
+USER     """Read-only serializer for external filings."""
+USER     
+USER     class Meta:
+USER         model = Filing
+USER         fields = [
+USER             'id', 'patent_office', 'filing_number', 'filing_date', 
+USER             'international', 'grant_number', 'grant_date', 'created_at'
+USER         ]
+USER 
+USER 
+USER class OfficeActionSerializer(serializers.ModelSerializer):
+USER     """Read-only serializer for office actions."""
+USER     
+USER     class Meta:
+USER         model = OfficeAction
+USER         fields = [
+USER             'id', 'received_date', 'response_due_date', 'description', 
+USER             'response_text', 'status', 'created_at'
+USER         ]
+USER 
+USER 
+USER class MaintenanceRecordSerializer(serializers.ModelSerializer):
+USER     """Read-only serializer for maintenance records."""
+USER     
+USER     class Meta:
+USER         model = MaintenanceRecord
+USER         fields = [
+USER             'id', 'due_date', 'fee', 'decision', 'decided_by', 'created_at'
+USER         ]
+USER 
+USER 
+USER class AppealSerializer(serializers.ModelSerializer):
+USER     """Read-only serializer for appeals."""
+USER     
+USER     class Meta:
+USER         model = Appeal
+USER         fields = [
+USER             'id', 'grounds', 'status', 'decided_by', 'justification', 
+USER             'created_at'
+USER         ]
+USER 
+USER 
+USER class ApplicationHistorySerializer(serializers.ModelSerializer):
+USER     """Read-only serializer for application history."""
+USER     
+USER     class Meta:
+USER         model = ApplicationHistory
+USER         fields = [
+USER             'id', 'actor_id', 'action', 'from_status', 'to_status', 
+USER             'note', 'created_at'
+USER         ]
+USER ```
+USER 
+USER modules/patent/api/views.py
+USER ```
+USER from rest_framework import generics, mixins, status
+USER from rest_framework.decorators import action
+USER from rest_framework.response import Response
+USER from django.db.models import Q
+USER 
+USER from fusion_auth.permissions import HasModuleGrant, HasPermission
+USER 
+USER from ..models import (
+USER     PatentApplication, Inventor, ApplicationDocument,
+USER     AttorneyAssignment, PatentabilityOpinion, Budget, Filing,
+USER     OfficeAction, MaintenanceRecord, Appeal, ApplicationHistory
+USER )
+USER from ..services.applications import (
+USER     submit_application, assign_director, review_application, resubmit_application,
+USER     withdraw_application, expire_overdue_resubmissions, file_appeal, decide_appeal
+USER )
+USER 
+USER 
+USER # --- Permission Classes ---
+USER 
+USER class PatentApplicationListMixin(generics.ListAPIView):
+USER     """Base mixin for list views that filter by the requesting principal."""
+USER     
+USER     permission_classes = [HasModuleGrant("patent")]
+USER     
+USER     def get_queryset(self):
+USER         principal = getattr(self.request, "principal", None)
+USER         if not principal:
+USER             return PatentApplication.objects.none()
+USER         
+USER         # Filter based on user kind/role logic (simplified for this step)
+USER         # In a real system, this would check roles against registry.py ROLE_GRANTS
+USER         user_kind = getattr(principal, 'kind', None)
+USER         
+USER         if user_kind == 'student':  # Applicant
+USER             return PatentApplication.objects.filter(applicant_id=principal.user_id)
+USER         elif user_kind == 'director':
+USER             # Directors can review applications assigned to them
+USER             return PatentApplication.objects.filter(assigned_director_id=principal.user_id)
+USER         elif user_kind == 'admin':  # PCC_ADMIN
+USER             return PatentApplication.objects.all()
+USER         else:  # Default to self or all if logic is complex, here we assume admin access for safety in this snippet context or extend based on specific role checks
+USER             # For simplicity in this step, assuming Admin sees all, others see self or assigned
+USER             # A robust implementation would check registry.py ROLE_GRANTS explicitly
+USER             return PatentApplication.objects.all()
+USER 
+USER 
+USER # --- Application Views ---
+USER 
+USER class ApplicationListView(PatentApplicationListMixin):
+USER     """List applications for the current user."""
+USER     
+USER     permission_classes = [HasModuleGrant("patent")]
+USER     
+USER     def get_queryset(self):
+USER         principal = getattr(self.request, "principal", None)
+USER         if not principal:
+USER             return PatentApplication.objects.none()
+USER         
+USER         user_kind = getattr(principal, 'kind', None)
+USER         
+USER         if user_kind == 'student':  # Applicant
+USER             return PatentApplication.objects.filter(applicant_id=principal.user_id).order_by('-created_at')
+USER         elif user_kind == 'director':
+USER             return PatentApplication.objects.filter(assigned_director_id=principal.user_id).order_by('-created_at')
+USER         elif user_kind == 'admin':  # PCC_ADMIN
+USER             return PatentApplication.objects.all().order_by('-created_at')
+USER         else:
+USER             # Fallback for other roles if not explicitly handled above, default to self or empty
+USER             # Assuming only Student/Director/Admin exist based on context
+USER             return PatentApplication.objects.none()
+USER 
+USER 
+USER class ApplicationDetailView(generics.RetrieveUpdateAPIView):
+USER     """Retrieve and update application details."""
+USER     
+USER     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.application.manage")]
+USER     
+USER     def get_queryset(self):
+USER         principal = getattr(self.request, "principal", None)
+USER         if not principal:
+USER             return PatentApplication.objects.none()
+USER         
+USER         user_kind = getattr(principal, 'kind', None)
+USER         
+USER         if user_kind == 'student':  # Applicant
+USER             return PatentApplication.objects.filter(applicant_id=principal.user_id)
+USER         elif user_kind == 'director':
+USER             return PatentApplication.objects.filter(assigned_director_id=principal.user_id)
+USER         elif user_kind == 'admin':
+USER             return PatentApplication.objects.all()
+USER         else:
+USER             return PatentApplication.objects.none()
+USER 
+USER     def get_object(self):
+USER         queryset = self.get_queryset()
+USER         try:
+USER             return queryset.get(pk=self.kwargs['pk'])
+USER         except PatentApplication.DoesNotExist:
+USER             raise NotFoundResponse("Application not found.")
+USER 
+USER 
+USER class ApplicationHistoryView(generics.RetrieveAPIView):
+USER     """Retrieve application history."""
+USER     
+USER     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.application.manage")]
+USER     
+USER     def get_queryset(self):
+USER         principal = getattr(self.request, "principal", None)
+USER         if not principal:
+USER             return ApplicationHistory.objects.none()
+USER         
+USER         user_kind = getattr(principal, "kind", None)
+USER         
+USER         if user_kind == 'student':  # Applicant
+USER             return PatentApplication.objects.filter(applicant_id=principal.user_id).order_by('-created_at')
+USER         elif user_kind == 'director':
+USER             return PatentApplication.objects.filter(assigned_director_id=principal.user_id).order_by('-created_at')
+USER         elif user_kind == 'admin':
+USER             return PatentApplication.objects.all().order_by('-created_at')
+USER         else:
+USER             return PatentApplication.objects.none()
+USER 
+USER     def get_object(self):
+USER         queryset = self.get_queryset()
+USER         try:
+USER             return queryset.get(pk=self.kwargs['pk'])
+USER         except PatentApplication.DoesNotExist:
+USER             raise NotFoundResponse("Application not found.")
+USER 
+USER 
+USER # --- Action Views ---
+USER 
+USER class SubmitApplicationView(generics.CreateAPIView):
+USER     """Submit a new patent application."""
+USER     
+USER     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.application.create")]
+USER     
+USER     def create(self, request, *args, **kwargs):
+USER         try:
+USER             data = request.data
+USER             applicant_id = request.principal.user_id if hasattr(request, 'principal') else None
+USER             
+USER             # Validate and submit via service
+USER             app = submit_application(
+USER                 applicant_id=applicant_id,
+USER                 data=data,
+USER                 inventors=request.data.get('inventors', []),
+USER                 documents=request.data.get('documents', []),
+USER                 actor_id=applicant_id
+USER             )
+USER             
+USER             return Response(PatentApplicationSerializer(app).data, status=status.HTTP_201_CREATED)
+USER         except ValueError as e:
+USER             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+USER 
+USER 
+USER class AssignDirectorView(generics.UpdateAPIView):
+USER     """Assign a director to an application."""
+USER     
+USER     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.application.manage")]
+USER     
+USER     def put(self, request, *args, **kwargs):
+USER         try:
+USER             app = PatentApplication.objects.get(pk=kwargs['pk'])
+USER             
+USER             data = request.data
+USER             director_id = data.get('director_id')
+USER             admin_id = request.principal.user_id if hasattr(request, 'principal') else None
+USER             
+USER             # Validate and assign via service
+USER             app = assign_director(
+USER                 admin_id=admin_id,
+USER                 application_id=app.id,
+USER                 director_id=director_id
+USER             )
+USER             
+USER             return Response(PatentApplicationSerializer(app).data, status=status.HTTP_200_OK)
+USER         except ValueError as e:
+USER             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+USER 
+USER 
+USER class ReviewApplicationView(generics.UpdateAPIView):
+USER     """Record a director's review decision."""
+USER     
+USER     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.application.review")]
+USER     
+USER     def put(self, request, *args, **kwargs):
+USER         try:
+USER             app = PatentApplication.objects.get(pk=kwargs['pk'])
+USER             
+USER             data = request.data
+USER             director_id = request.principal.user_id if hasattr(request, 'principal') else None
+USER             
+USER             # Validate and review via service
+USER             app = review_application(
+USER                 director_id=director_id,
+USER                 application_id=app.id,
+USER                 decision=data.get('decision'),
+USER                 justification=data.get('justification')
+USER             )
+USER             
+USER             return Response(PatentApplicationSerializer(app).data, status=status.HTTP_200_OK)
+USER         except ValueError as e:
+USER             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+USER 
+USER 
+USER class ResubmitApplicationView(generics.UpdateAPIView):
+USER     """Resubmit an application after revision."""
+USER     
+USER     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.application.manage")]
+USER     
+USER     def put(self, request, *args, **kwargs):
+USER         try:
+USER             app = PatentApplication.objects.get(pk=kwargs['pk'])
+USER             
+USER             data = request.data
+USER             applicant_id = request.principal.user_id if hasattr(request, 'principal') else None
+USER             
+USER             # Validate and resubmit via service
+USER             app = resubmit_application(
+USER                 applicant_id=applicant_id,
+USER                 application_id=app.id,
+USER                 changes=data.get('changes', {}),
+USER                 response_to_feedback=data.get('response_to_feedback'),
+USER                 actor_id=applicant_id
+USER             )
+USER             
+USER             return Response(PatentApplicationSerializer(app).data, status=status.HTTP_200_OK)
+USER         except ValueError as e:
+USER             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+USER 
+USER 
+USER class WithdrawApplicationView(generics.UpdateAPIView):
+USER     """Withdraw an application."""
+USER     
+USER     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.application.manage")]
+USER     
+USER     def put(self, request, *args, **kwargs):
+USER         try:
+USER             app = PatentApplication.objects.get(pk=kwargs['pk'])
+USER             
+USER             data = request.data
+USER             applicant_id = request.principal.user_id if hasattr(request, 'principal') else None
+USER             
+USER             # Validate and withdraw via service
+USER             app = withdraw_application(
+USER                 applicant_id=applicant_id,
+USER                 application_id=app.id,
+USER                 reason=data.get('reason')
+USER             )
+USER             
+USER             return Response(PatentApplicationSerializer(app).data, status=status.HTTP_200_OK)
+USER         except ValueError as e:
+USER             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+USER 
+USER 
+USER class FileAppealView(generics.CreateAPIView):
+USER     """File an appeal against a rejection."""
+USER     
+USER     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.application.manage")]
+USER     
+USER     def create(self, request, *args, **kwargs):
+USER         try:
+USER             app = PatentApplication.objects.get(pk=kwargs['pk'])
+USER             
+USER             data = request.data
+USER             applicant_id = request.principal.user_id if hasattr(request, 'principal') else None
+USER             
+USER             # Validate and file appeal via service
+USER             appeal = file_appeal(
+USER                 applicant_id=applicant_id,
+USER                 application_id=app.id,
+USER                 grounds=data.get('grounds')
+USER             )
+USER             
+USER             return Response({'id': appeal.id, 'status': appeal.status}, status=status.HTTP_201_CREATED)
+USER         except ValueError as e:
+USER             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+USER 
+USER 
+USER class DecideAppealView(generics.UpdateAPIView):
+USER     """Record a director's decision on an appeal."""
+USER     
+USER     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.appeal.review")]
+USER     
+USER     def put(self, request, *args, **kwargs):
+USER         try:
+USER             appeal = Appeal.objects.get(pk=kwargs['pk'])
+USER             
+USER             data = request.data
+USER             director_id = request.principal.user_id if hasattr(request, 'principal') else None
+USER             
+USER             # Validate and decide via service
+USER             appeal = decide_appeal(
+USER                 director_id=director_id,
+USER                 appeal_id=appeal.id,
+USER                 outcome=data.get('outcome'),
+USER                 justification=data.get('justification')
+USER             )
+USER             
+USER             return Response({'id': appeal.id, 'status': appeal.status}, status=status.HTTP_200_OK)
+USER         except ValueError as e:
+USER             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+USER 
+USER 
+USER # --- Admin Views ---
+USER 
+USER class ExpireOverdueResubmissionsView(generics.GenericAPIView):
+USER     """Set status to Expired for applications where resubmission deadline has passed."""
+USER     
+USER     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.admin.manage")]
+USER     
+USER     def post(self, request):
+USER         today = request.data.get('today')
+USER         if not today:
+USER             from datetime import date
+USER             today = date.today()
+USER         
+USER         expired_apps = expire_overdue_resubmissions(today)
+USER         
+USER         return Response({
+USER             'count': len(expired_apps),
+USER             'expired_applications': [app.APPLICATION_NUMBER for app in expired_apps]
+USER         }, status=status.HTTP_200_OK)
+USER 
+USER 
+USER class AdminApplicationListView(PatentApplicationListMixin):
+USER     """Admin list of all submitted applications."""
+USER     
+USER     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.admin.manage")]
+USER     
+USER     def get_queryset(self):
+USER         return PatentApplication.objects.all().order_by('-created_at')
+USER 
+USER 
+USER class NotFoundResponse(Exception):
+USER     pass
+USER ```
+USER 
+USER modules/patent/registry.py
+USER ```
+USER """What the server tells the shell about this module (ADR-0010).
+USER 
+USER PMS nav items carry `required_permission` and the server filters before sending —
+USER the client does zero filtering, so a link a role cannot use never reaches the
+USER browser at all.
+USER """
+USER MODULE = {
+USER     "code": "patent", "label": "Patent Management", "icon": "FileText",
+USER     "base_path": "/patent", "nav_section": "Patent", "sort_order": 20,
+USER     "status": "active",
+USER }
+USER 
+USER NAV_ITEMS = [
+USER     # -- Applicant: personal view and submission ----------------------------
+USER     {"code": "patent.mine", "label": "My Applications",
+USER      "icon": "UserCheck", "to": "/patent/mine",
+USER      "required_permission": "patent.application.view_self",
+USER      "sort_order": 5},
+USER     {"code": "patent.submit", "label": "Submit Application",
+USER      "icon": "Plus", "to": "/patent/submit",
+USER      "required_permission": "patent.application.create",
+USER      "sort_order": 10},
+USER 
+USER     # -- Director: review and decision -------------------------------------
+USER     {"code": "patent.review", "label": "Review Applications",
+USER      "icon": "ClipboardCheck", "to": "/patent/review",
+USER      "required_permission": "patent.application.review",
+USER      "sort_order": 15},
+USER 
+USER     # -- PCC_ADMIN: administration and coordination ------------------------
+USER     {"code": "patent.admin", "label": "Administration",
+USER      "icon": "Cog", "to": "/patent/admin",
+USER      "required_permission": "patent.admin.manage",
+USER      "sort_order": 25},
+USER 
+USER     # -- Attorney: legal and filing support --------------------------------
+USER     {"code": "patent.attorney", "label": "Legal & Filing",
+USER      "icon": "Gavel", "to": "/patent/attorney",
+USER      "required_permission": "patent.legal.review",
+USER      "sort_order": 30},
+USER ]
+USER 
+USER #: Every permission this module recognises; ROLE_GRANTS below says who holds each.
+USER PERMISSIONS = [
+USER     ("patent.application.view_self", "See one's own applications"),
+USER     ("patent.application.create", "Submit a new patent application"),
+USER     ("patent.application.review", "Review and decide on applications"),
+USER     ("patent.application.manage", "Manage application lifecycle (assign, withdraw, etc.)"),
+USER     ("patent.admin.manage", "Manage PMS configuration, roles, and global settings"),
+USER     ("patent.legal.review", "Conduct legal review, prior art search, and file patents"),
+USER     ("patent.budget.approve", "Approve or reject patent application budgets"),
+USER     ("patent.filing.record", "Record external patent office filings"),
+USER     ("patent.maintenance.manage", "Manage maintenance fee renewals"),
+USER     ("patent.appeal.review", "Review and decide on appeals"),
+USER ]
+USER 
+USER #: Performed by a service or a scheduled task, so no designation holds them.
+USER SYSTEM_PERMISSIONS = [
+USER     "patent.application.auto_withdraw",  # System auto-withdrawal if deadline missed
+USER     "patent.filing.expire",              # System filing expiry tracking
+USER ]
+USER 
+USER _STUDENT = [
+USER     "patent.application.view_self",
+USER     "patent.application.create",
+USER     "patent.application.delete",
+USER     "patent.application.withdraw",
+USER ]
+USER 
+USER _DIRECTOR = [
+USER     "patent.application.review",
+USER     "patent.budget.approve",
+USER     "patent.maintenance.manage",
+USER     "patent.appeal.review",
+USER ]
+USER 
+USER _PCC_ADMIN = [
+USER     "patent.admin.manage",
+USER     "patent.application.manage",
+USER     "patent.legal.review",  # PCC_ADMIN can oversee attorney work
+USER     "patent.budget.approve",
+USER     "patent.filing.record",
+USER ]
+USER 
+USER _ATTORNEY = [
+USER     "patent.legal.review",
+USER     "patent.filing.record",
+USER     "patent.maintenance.manage",
+USER ]
+USER 
+USER #: Keyed by the designation name as it exists in globals_designation.
+USER ROLE_GRANTS = {
+USER     "Applicant": _STUDENT,
+USER     "Director": _DIRECTOR,
+USER     "PCC_ADMIN": _PCC_ADMIN,
+USER     "Attorney": _ATTORNEY,
+USER }
+USER ```
+USER 
+USER modules/patent/services/legal.py
+USER ```
+USER from django.db import transaction, connection
+USER from datetime import date
+USER from typing import Tuple
+USER 
+USER from core.exceptions import BusinessRuleViolation
+USER from fusion_auth.permissions import HasPermission, HasModuleGrant
+USER from modules.patent.models import (
+USER     PatentApplication, AttorneyAssignment, PatentabilityOpinion,
+USER     Budget, Filing, Inventor, ApplicationHistory,
+USER )
+USER from modules.patent.domain.policy import (
+USER     can_transition, is_conflicted, validate_justification,
+USER     budget_needs_escalation, missing_required_fields,
+USER )
+USER 
+USER 
+USER def assign_attorney(admin_id: int, application_id: int, attorney_id: int) -> AttorneyAssignment:
+USER     """
+USER     Assign an attorney to an approved application.
+USER     
+USER     Rules enforced (BR-PMS-040, 041, 042, 043, 044, 045, 127):
+USER     - Only PCC_ADMIN can assign.
+USER     - Application must be 'approved'.
+USER     - Attorney must not be conflicted with inventors (BR-PMS-044).
+USER     - Institutional exception handling is assumed to be pre-validated or handled externally; 
+USER       this function assumes the attorney is eligible per panel rules unless conflict exists.
+USER     
+USER     Creates an AttorneyAssignment with status 'offered'.
+USER     """
+USER     application = PatentApplication.objects.get(pk=application_id)
+USER     
+USER     # BR-PMS-040: Only PCC_ADMIN may assign to Approved applications.
+USER     if not can_transition(application.status, "attorney_assigned"):
+USER         raise BusinessRuleViolation(f"Cannot assign attorney from status {application.status}. Must be 'approved'.")
+USER     
+USER     # Check conflict of interest (BR-PMS-044)
+USER     inventors = Inventor.objects.filter(application=application).values_list("user_id", flat=True)
+USER     if is_conflicted(attorney_id, inventors):
+USER         raise BusinessRuleViolation(f"Attorney {attorney_id} has a conflict of interest with the application's inventors.")
+USER     
+USER     # Create assignment record
+USER     assignment = AttorneyAssignment.objects.create(
+USER         application=application,
+USER         attorney_id=attorney_id,
+USER         status="offered",
+USER     )
+USER     
+USER     # Record history
+USER     ApplicationHistory.objects.create(
+USER         application=application,
+USER         actor_id=admin_id,
+USER         action="assign_attorney",
+USER         from_status=application.status,
+USER         to_status="attorney_assigned",
+USER         note=f"Attorney {attorney_id} assigned.",
+USER     )
+USER     
+USER     return assignment
+USER 
+USER 
+USER def respond_to_assignment(attorney_id: int, assignment_id: int, accept: bool, reason: str = "") -> PatentApplication:
+USER     """
+USER     Record an attorney's response to an assignment.
+USER     
+USER     Rules enforced (BR-PMS-126):
+USER     - Accept sets application status to 'attorney_assigned'.
+USER     - Decline records the reason and allows reassignment (transition back to 'approved' via policy logic).
+USER     
+USER     Updates the AttorneyAssignment status and triggers state transition in the application.
+USER     """
+USER     assignment = AttorneyAssignment.objects.get(pk=assignment_id)
+USER     application = assignment.application
+USER     
+USER     # Validate justification if declining (BR-PMS-030 implies Director review needs 50 chars, 
+USER     # though this is an attorney decline, we assume a similar policy check applies to formal reasons)
+USER     if not accept and reason:
+USER         if len(reason.strip()) < 50:
+USER             raise BusinessRuleViolation("Decline reason must be at least 50 characters.")
+USER     
+USER     if accept:
+USER         # Transition to Attorney Assigned
+USER         assignment.status = "accepted"
+USER         application.status = "attorney_assigned"
+USER         action_note = f"Attorney {attorney_id} accepted assignment."
+USER     else:
+USER         # Transition back to Approved (allows reassignment)
+USER         assignment.status = "declined"
+USER         application.status = "approved"
+USER         action_note = f"Attorney {attorney_id} declined assignment. Reason: {reason}"
+USER     
+USER     assignment.save()
+USER     
+USER     ApplicationHistory.objects.create(
+USER         application=application,
+USER         actor_id=attorney_id,
+USER         action="respond_to_assignment",
+USER         from_status=application.status,  # Capture status before change for history accuracy if needed, 
+USER                                        # but models.py logic might handle the 'to' state differently.
+USER                                        # We record the action taken.
+USER         to_status=application.status,
+USER         note=action_note,
+USER     )
+USER     
+USER     return application
+USER 
+USER 
+USER def record_opinion(attorney_id: int, application_id: int, novelty: bool, non_obviousness: bool, 
+USER                    utility: bool, recommendation: str, text: str) -> PatentabilityOpinion:
+USER     """
+USER     Record a patentability opinion by the assigned attorney.
+USER     
+USER     Rules enforced (BR-PMS-046):
+USER     - Only the assigned attorney can record an opinion.
+USER     - Recommendation must be one of: File Patent, Do Not File, Needs Amendment.
+USER     - Opinion text validation is assumed to be handled by the service or middleware.
+USER     
+USER     Creates a PatentabilityOpinion.
+USER     """
+USER     application = PatentApplication.objects.get(pk=application_id)
+USER     
+USER     # Check if attorney is assigned (BR-PMS-046 implies Attorney performs assessment)
+USER     assignment = AttorneyAssignment.objects.filter(
+USER         application=application, 
+USER         attorney_id=attorney_id,
+USER         status="accepted"
+USER     ).first()
+USER     
+USER     if not assignment:
+USER         raise BusinessRuleViolation(f"Attorney {attorney_id} is not assigned to application {application_id}.")
+USER     
+USER     # Validate recommendation choices (BR-PMS-046)
+USER     valid_recommendations = ["file_patent", "do_not_file", "needs_amendment"]
+USER     if recommendation not in valid_recommendations:
+USER         raise BusinessRuleViolation(f"Invalid recommendation. Must be one of: {valid_recommendations}.")
+USER     
+USER     opinion = PatentabilityOpinion.objects.create(
+USER         application=application,
+USER         attorney_id=attorney_id,
+USER         novelty=novelty,
+USER         non_obviousness=non_obviousness,
+USER         utility=utility,
+USER         recommendation=recommendation,
+USER         opinion_text=text,
+USER     )
+USER     
+USER     ApplicationHistory.objects.create(
+USER         application=application,
+USER         actor_id=attorney_id,
+USER         action="record_opinion",
+USER         from_status=application.status,
+USER         to_status=application.status,  # Status doesn't change here, but action is recorded
+USER         note=f"Patentability opinion recorded. Recommendation: {recommendation}.",
+USER     )
+USER     
+USER     return opinion
+USER 
+USER 
+USER def propose_budget(admin_id: int, application_id: int, filing_fee: float, attorney_fee: float, admin_cost: float) -> Budget:
+USER     """
+USER     Propose a budget for an approved application.
+USER     
+USER     Rules enforced (BR-PMS-048, 049, 050):
+USER     - Only PCC_ADMIN can propose.
+USER     - Application must be 'approved'.
+USER     - Budget must include filing fees, attorney fees, and administrative costs.
+USER     
+USER     Creates a Budget with status 'pending'.
+USER     """
+USER     application = PatentApplication.objects.get(pk=application_id)
+USER     
+USER     # BR-PMS-052: Budget approval is permitted only when status is Approved. 
+USER     # This function proposes, so we check if it's approved to allow proposal.
+USER     if not can_transition(application.status, "approved"):
+USER         raise BusinessRuleViolation(f"Cannot propose budget from status {application.status}. Must be 'approved'.")
+USER     
+USER     total = filing_fee + attorney_fee + admin_cost
+USER     
+USER     budget = Budget.objects.create(
+USER         application=application,
+USER         filing_fee=filing_fee,
+USER         attorney_fee=attorney_fee,
+USER         administrative_cost=admin_cost,
+USER         total=total,
+USER         status="pending",
+USER         decided_by=admin_id,
+USER     )
+USER     
+USER     ApplicationHistory.objects.create(
+USER         application=application,
+USER         actor_id=admin_id,
+USER         action="propose_budget",
+USER         from_status=application.status,
+USER         to_status=application.status,
+USER         note=f"Budget proposed. Total: ${total:.2f}.",
+USER     )
+USER     
+USER     return budget
+USER 
+USER 
+USER def decide_budget(director_id: int, budget_id: int, approve: bool, justification: str, threshold: float) -> Tuple[Budget, bool]:
+USER     """
+USER     Decide on a budget proposal.
+USER     
+USER     Rules enforced (BR-PMS-051):
+USER     - If total exceeds threshold, escalate instead of approving.
+USER     - Justification must be at least 50 characters (BR-PMS-030).
+USER     
+USER     Returns the updated Budget and whether it was escalated.
+USER     """
+USER     budget = Budget.objects.get(pk=budget_id)
+USER     application = budget.application
+USER     
+USER     # Validate justification length (BR-PMS-030)
+USER     if len(justification.strip()) < 50:
+USER         raise BusinessRuleViolation("Budget justification must be at least 50 characters.")
+USER     
+USER     total = budget.total
+USER     
+USER     escalated = False
+USER     if not approve and total > threshold:
+USER         # If rejecting due to exceeding threshold, we escalate
+USER         escalated = True
+USER         budget.status = "escalated"
+USER         budget.decided_by = director_id
+USER         budget.justification = justification
+USER         budget.save()
+USER         
+USER         ApplicationHistory.objects.create(
+USER             application=application,
+USER             actor_id=director_id,
+USER             action="decide_budget",
+USER             from_status=budget.status,
+USER             to_status=budget.status,
+USER             note=f"Budget escalated due to exceeding threshold (${threshold:.2f}). Total: ${total:.2f}. Justification: {justification}",
+USER         )
+USER     else:
+USER         # Approve or Reject within threshold
+USER         if approve:
+USER             budget.status = "approved"
+USER             budget.decided_by = director_id
+USER             budget.justification = justification
+USER             budget.save()
+USER             
+USER             ApplicationHistory.objects.create(
+USER                 application=application,
+USER                 actor_id=director_id,
+USER                 action="decide_budget",
+USER                 from_status=budget.status,
+USER                 to_status=budget.status,
+USER                 note=f"Budget approved. Total: ${total:.2f}. Justification: {justification}",
+USER             )
+USER         else:
+USER             # Reject within threshold (not escalation)
+USER             budget.status = "rejected"
+USER             budget.decided_by = director_id
+USER             budget.justification = justification
+USER             budget.save()
+USER             
+USER             ApplicationHistory.objects.create(
+USER                 application=application,
+USER                 actor_id=director_id,
+USER                 action="decide_budget",
+USER                 from_status=budget.status,
+USER                 to_status=budget.status,
+USER                 note=f"Budget rejected. Total: ${total:.2f}. Justification: {justification}",
+USER             )
+USER     
+USER     return budget, escalated
+USER 
+USER 
+USER def record_filing(attorney_id: int, application_id: int, office: str, filing_number: str, 
+USER                   filing_date: date, international: bool) -> Filing:
+USER     """
+USER     Record an external patent filing.
+USER     
+USER     Rules enforced (BR-PMS-020, 055, 056, 128):
+USER     - Only the assigned attorney can record a filing.
+USER     - Budget must be 'approved'.
+USER     - Every inventor agreement must be signed (BR-PMS-020).
+USER     - International filings require additional justification (assumed handled externally or via text field).
+USER     
+USER     Creates a Filing and updates application status to 'filed'.
+USER     """
+USER     application = PatentApplication.objects.get(pk=application_id)
+USER     
+USER     # Check budget approval (BR-PMS-128: External filing must not occur until required approvals... complete)
+USER     budget = Budget.objects.filter(application=application, status="approved").first()
+USER     if not budget:
+USER         raise BusinessRuleViolation("Budget must be approved to file the patent.")
+USER     
+USER     # Check inventor agreements (BR-PMS-020)
+USER     inventors = Inventor.objects.filter(application=application)
+USER     for inventor in inventors:
+USER         if not inventor.agreement_signed:
+USER             raise BusinessRuleViolation(f"Inventor {inventor.name} has not signed the agreement.")
+USER     
+USER     # Check attorney assignment (BR-PMS-013 implies Attorney prepares and submits)
+USER     assignment = AttorneyAssignment.objects.filter(
+USER         application=application, 
+USER         attorney_id=attorney_id,
+USER         status="accepted"
+USER     ).first()
+USER     
+USER     if not assignment:
+USER         raise BusinessRuleViolation(f"Attorney {attorney_id} is not assigned to application {application_id}.")
+USER     
+USER     # Create filing record
+USER     filing = Filing.objects.create(
+USER         application=application,
+USER         patent_office=office,
+USER         filing_number=filing_number,
+USER         filing_date=filing_date,
+USER         international=international,
+USER     )
+USER     
+USER     # Update application status to Filed (BR-PMS-013: PMS sets application status to Filed)
+USER     application.status = "filed"
+USER     application.save()
+USER     
+USER     ApplicationHistory.objects.create(
+USER         application=application,
+USER         actor_id=attorney_id,
+USER         action="record_filing",
+USER         from_status=application.status,
+USER         to_status="filed",
+USER         note=f"Filing recorded with {office}. Number: {filing_number}. Date: {filing_date}. International: {international}.",
+USER     )
+USER     
+USER     return filing
+USER ```
+-------
+ASSISTANT Ok, I will use these files as references.
+-------
+USER Here are summaries of some files present in my git repository.
+USER Do not propose changes to these files, treat them as *read-only*.
+USER If you need to edit any of these files, ask me to *add them to the chat* first.
+USER 
+USER client/src/app/registry.ts:
+USER ⋮
+USER │export interface ModuleManifest {
+USER │  code: string;
+USER │  basePath: string;
+USER │  load: () => Promise<{ routes: RouteObject[] }>;
+USER ⋮
+USER 
+USER client/src/auth/RequireAuth.tsx:
+USER ⋮
+USER │export function RequireAuth({ children }: { children: React.ReactNode }) {
+USER │  const { status } = useAuth();
+USER │  const location = useLocation();
+USER │
+USER │  if (status === "loading") {
+USER │    return <Center h="100vh"><Loader /></Center>;
+USER │  }
+USER │  // Not a logout: signing in again cannot work while the IAM is unreachable.
+USER │  if (status === "unavailable") {
+USER │    return (
+USER ⋮
+USER 
+USER client/src/modules/placement/api/hooks.ts:
+USER ⋮
+USER │export type ExportKind = "applications" | "placements";
+USER │
+USER ⋮
+USER 
+USER client/src/modules/placement/api/types.ts:
+USER ⋮
+USER │export type ApplicationStatus =
+USER │  | "draft" | "submitted" | "under_review" | "shortlisted"
+USER │  | "interview_scheduled" | "selected" | "rejected" | "withdrawn"
+USER │  | "auto_withdrawn" | "offer_issued" | "offer_accepted" | "offer_declined"
+USER ⋮
+USER 
+USER client/src/modules/placement/components/NewPostingModal.tsx:
+USER ⋮
+USER │                hideControls placeholder="Unlimited"
+USER │              />
+USER │            </Field>
+USER │            <Field span={12}>
+USER │              <DateTimePicker
+USER │                label="Applications close" value={closesAt}
+USER │                onChange={setClosesAt} clearable minDate={new Date()}
+USER │                placeholder="Select a date and time"
+USER ⋮
+USER 
+USER client/src/ui/components/PageHeader.tsx:
+USER ⋮
+USER │export function PageHeader({ title, subtitle, action }: {
+USER │  title: string;
+USER │  subtitle?: string;
+USER │  action?: React.ReactNode;
+USER ⋮
+USER 
+USER client/src/ui/layout/AppShellLayout.tsx:
+USER ⋮
+USER │export interface NavGroupItem {
+USER │  code: string;
+USER │  label: string;
+USER │  icon?: string;
+USER │  to?: string;
+USER │  app?: string;
+USER │  links?: NavLinkItem[];
+USER ⋮
+USER 
+USER core/api/csrf.py:
+USER ⋮
+USER │def token_for(session_value: str) -> str:
+USER ⋮
+USER 
+USER core/api/csv.py:
+USER ⋮
+USER │def sanitise_cell(value: Any) -> str:
+USER ⋮
+USER 
+USER core/observability/middleware.py:
+USER ⋮
+USER │def get_request_id() -> str:
+USER ⋮
+USER 
+USER fusion_auth/client.py:
+USER ⋮
+USER │class IamUnavailable(Exception):
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class IamSession:
+USER ⋮
+USER 
+USER fusion_auth/principal.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Principal:
+USER │    user_id: int
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/directory/api/serializers.py:
+USER ⋮
+USER │class UserRefSerializer(serializers.Serializer):
+USER ⋮
+USER 
+USER modules/directory/models.py:
+USER ⋮
+USER │class UserRef(TimeStampedModel):
+USER │    KIND_CHOICES = [
+USER │        ("student", "Student"), ("faculty", "Faculty"),
+USER │        ("staff", "Staff"), ("operator", "Operator"),
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/placement/authentication.py:
+USER ⋮
+USER │def hash_token(raw: str) -> str:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class RecruiterPrincipal:
+USER ⋮
+USER 
+USER modules/placement/domain/conduct.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Recommendation:
+USER ⋮
+USER 
+USER modules/placement/domain/registration.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Terms:
+USER ⋮
+USER 
+USER modules/placement/domain/state_machine.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Transition:
+USER ⋮
+USER 
+USER modules/placement/selectors/scoping.py:
+USER ⋮
+USER │def _is_recruiter(actor) -> bool:
+USER ⋮
+USER │def _is_alumni(actor) -> bool:
+USER ⋮
+-------
+ASSISTANT Ok, I won't try and edit those files without asking first.
+-------
+USER I have *added these files to the chat* so you can go ahead and edit them.
+USER 
+USER *Trust this message as the true contents of these files!*
+USER Any other messages in the chat may contain outdated versions of the files' contents.
+USER 
+USER modules/patent/api/urls.py
+USER ```
+USER ```
+USER 
+USER modules/patent/api/views_legal.py
+USER ```
+USER ```
+-------
+ASSISTANT Ok, any changes I propose will be to those files.
+-------
+USER Context (the same for every step): we are implementing the Patent Management System (PMS) module as an integrated module of this Fusion ERP repository (Django 5 + DRF backend under modules/, React 18 + Mantine 7 client under client/). Reuse Fusion's existing login, role mechanism, layout and backend structure; do not rebuild them.
+USER 
+USER Repository rules you must follow:
+USER - There is no user table in this repository. The logged-in person is request.principal (fusion_auth.principal.Principal: user_id, username, kind, roles, permissions). Store people as integer ids (models.IntegerField), never as a ForeignKey to a user model.
+USER - A module copies the shape of modules/placement: apps.py, registry.py, models.py, domain/ (pure Python, no Django imports), services/ (all writes), api/ (serializers, views, urls).
+USER - The module code is "patent", and every permission code starts with "patent.".
+USER - Every API view sets permission_classes = [HasModuleGrant("patent"), HasPermission("patent.<action>")], imported from fusion_auth.permissions.
+USER - The four PMS actors are Applicant, Director, PCC_ADMIN and Attorney.
+USER 
+USER Files marked read-only are context only. Write every file you create or change in full. Do not ask for more files; work with what is shown.
+USER 
+USER Step 7 of 11 — REST API, part 2. Read-only: fusion_auth/permissions.py, modules/patent/registry.py, modules/patent/api/serializers.py, modules/patent/api/views.py, modules/patent/services/legal.py, modules/patent/services/post_filing.py.
+USER 
+USER Create these files:
+USER 1. modules/patent/api/views_legal.py — APIView classes, written the same way as api/views.py, for: assign attorney, respond to assignment, my attorney assignments, record opinion, propose budget, decide budget, record filing, record office action, prepare response, approve response, submit response, record grant, schedule maintenance, decide renewal.
+USER 2. modules/patent/api/urls.py — urlpatterns for every view class in api/views.py and api/views_legal.py, using <int:pk> for ids.
+USER 
+USER 
+USER To suggest changes to a file you MUST return the entire content of the updated file.
+USER You MUST use this *file listing* format:
+USER 
+USER path/to/filename.js
+USER ```
+USER // entire file content ...
+USER // ... goes in between
+USER ```
+USER 
+USER Every *file listing* MUST use this format:
+USER - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+USER - Second line: opening ```
+USER - ... entire content of the file ...
+USER - Final line: closing ```
+USER 
+USER To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+USER *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+USER Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+USER 
+USER Reply in English.
+USER 
+LLM RESPONSE 2026-11-07T14:49:34
+ASSISTANT modules/patent/api/views_legal.py
+ASSISTANT ```python
+ASSISTANT from rest_framework import generics, mixins, status
+ASSISTANT from rest_framework.decorators import action
+ASSISTANT from rest_framework.response import Response
+ASSISTANT from django.db.models import Q
+ASSISTANT 
+ASSISTANT from fusion_auth.permissions import HasModuleGrant, HasPermission
+ASSISTANT 
+ASSISTANT from ..models import (
+ASSISTANT     PatentApplication, AttorneyAssignment, PatentabilityOpinion,
+ASSISTANT     Budget, Filing, OfficeAction, MaintenanceRecord, ApplicationHistory
+ASSISTANT )
+ASSISTANT from ..services.legal import (
+ASSISTANT     assign_attorney, respond_to_assignment, record_opinion, propose_budget, decide_budget,
+ASSISTANT     record_filing
+ASSISTANT )
+ASSISTANT from ..services.post_filing import (
+ASSISTANT     record_office_action, prepare_response, approve_response, submit_response,
+ASSISTANT     record_grant, schedule_maintenance, decide_renewal
+ASSISTANT )
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # --- Permission Classes ---
+ASSISTANT 
+ASSISTANT class AttorneyAssignmentListMixin(generics.ListAPIView):
+ASSISTANT     """Base mixin for list views that filter by the requesting principal."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent")]
+ASSISTANT     
+ASSISTANT     def get_queryset(self):
+ASSISTANT         principal = getattr(self.request, "principal", None)
+ASSISTANT         if not principal:
+ASSISTANT             return AttorneyAssignment.objects.none()
+ASSISTANT         
+ASSISTANT         # Filter based on user kind/role logic (simplified for this step)
+ASSISTANT         user_kind = getattr(principal, 'kind', None)
+ASSISTANT         
+ASSISTANT         if user_kind == 'student':  # Applicant
+ASSISTANT             # Applicants can see assignments for their own applications
+ASSISTANT             return AttorneyAssignment.objects.filter(
+ASSISTANT                 application__applicant_id=principal.user_id
+ASSISTANT             ).order_by('-created_at')
+ASSISTANT         elif user_kind == 'director':
+ASSISTANT             # Directors can see assignments for applications assigned to them
+ASSISTANT             return AttorneyAssignment.objects.filter(
+ASSISTANT                 application__assigned_director_id=principal.user_id
+ASSISTANT             ).order_by('-created_at')
+ASSISTANT         elif user_kind == 'admin':  # PCC_ADMIN
+ASSISTANT             return AttorneyAssignment.objects.all().order_by('-created_at')
+ASSISTANT         else:  # Default to self or all if logic is complex, here we assume admin access for safety in this snippet context or extend based on specific role checks
+ASSISTANT             return AttorneyAssignment.objects.all().order_by('-created_at')
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # --- Legal Service Views ---
+ASSISTANT 
+ASSISTANT class AssignAttorneyView(generics.UpdateAPIView):
+ASSISTANT     """Assign an attorney to an approved application."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.legal.review")]
+ASSISTANT     
+ASSISTANT     def put(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             app = PatentApplication.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             data = request.data
+ASSISTANT             admin_id = request.principal.user_id if hasattr(request, 'principal') else None
+ASSISTANT             attorney_id = data.get('attorney_id')
+ASSISTANT             
+ASSISTANT             # Validate and assign via service
+ASSISTANT             assignment = assign_attorney(
+ASSISTANT                 admin_id=admin_id,
+ASSISTANT                 application_id=app.id,
+ASSISTANT                 attorney_id=attorney_id
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response({'id': assignment.id, 'status': assignment.status}, status=status.HTTP_200_OK)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class RespondToAssignmentView(generics.UpdateAPIView):
+ASSISTANT     """Record an attorney's response to an assignment."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.legal.review")]
+ASSISTANT     
+ASSISTANT     def put(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             assignment = AttorneyAssignment.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             data = request.data
+ASSISTANT             attorney_id = request.principal.user_id if hasattr(request, 'principal') else None
+ASSISTANT             
+ASSISTANT             # Validate and respond via service
+ASSISTANT             application = respond_to_assignment(
+ASSISTANT                 attorney_id=attorney_id,
+ASSISTANT                 assignment_id=assignment.id,
+ASSISTANT                 accept=data.get('accept', False),
+ASSISTANT                 reason=data.get('reason', '')
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response({'id': application.id, 'status': application.status}, status=status.HTTP_200_OK)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class MyAttorneyAssignmentsView(AttorneyAssignmentListMixin):
+ASSISTANT     """Retrieve attorney assignments for the current user's applications."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.legal.review")]
+ASSISTANT     
+ASSISTANT     def get_queryset(self):
+ASSISTANT         principal = getattr(self.request, "principal", None)
+ASSISTANT         if not principal:
+ASSISTANT             return AttorneyAssignment.objects.none()
+ASSISTANT         
+ASSISTANT         user_kind = getattr(principal, 'kind', None)
+ASSISTANT         
+ASSISTANT         if user_kind == 'student':  # Applicant
+ASSISTANT             return AttorneyAssignment.objects.filter(
+ASSISTANT                 application__applicant_id=principal.user_id
+ASSISTANT             ).order_by('-created_at')
+ASSISTANT         elif user_kind == 'director':
+ASSISTANT             return AttorneyAssignment.objects.filter(
+ASSISTANT                 application__assigned_director_id=principal.user_id
+ASSISTANT             ).order_by('-created_at')
+ASSISTANT         elif user_kind == 'admin':  # PCC_ADMIN
+ASSISTANT             return AttorneyAssignment.objects.all().order_by('-created_at')
+ASSISTANT         else:
+ASSISTANT             return AttorneyAssignment.objects.none()
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # --- Legal Service Views (Opinion & Budget) ---
+ASSISTANT 
+ASSISTANT class RecordOpinionView(generics.CreateAPIView):
+ASSISTANT     """Record a patentability opinion by the assigned attorney."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.legal.review")]
+ASSISTANT     
+ASSISTANT     def create(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             app = PatentApplication.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             data = request.data
+ASSISTANT             attorney_id = request.principal.user_id if hasattr(request, 'principal') else None
+ASSISTANT             
+ASSISTANT             # Validate and record opinion via service
+ASSISTANT             opinion = record_opinion(
+ASSISTANT                 attorney_id=attorney_id,
+ASSISTANT                 application_id=app.id,
+ASSISTANT                 novelty=data.get('novelty', False),
+ASSISTANT                 non_obviousness=data.get('non_obviousness', False),
+ASSISTANT                 utility=data.get('utility', False),
+ASSISTANT                 recommendation=data.get('recommendation'),
+ASSISTANT                 text=data.get('text', '')
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response(PatentabilityOpinionSerializer(opinion).data, status=status.HTTP_201_CREATED)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class ProposeBudgetView(generics.CreateAPIView):
+ASSISTANT     """Propose a budget for an approved application."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.legal.review")]
+ASSISTANT     
+ASSISTANT     def create(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             app = PatentApplication.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             data = request.data
+ASSISTANT             admin_id = request.principal.user_id if hasattr(request, 'principal') else None
+ASSISTANT             
+ASSISTANT             # Validate and propose budget via service
+ASSISTANT             budget = propose_budget(
+ASSISTANT                 admin_id=admin_id,
+ASSISTANT                 application_id=app.id,
+ASSISTANT                 filing_fee=data.get('filing_fee', 0),
+ASSISTANT                 attorney_fee=data.get('attorney_fee', 0),
+ASSISTANT                 admin_cost=data.get('admin_cost', 0)
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response(BudgetSerializer(budget).data, status=status.HTTP_201_CREATED)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class DecideBudgetView(generics.UpdateAPIView):
+ASSISTANT     """Decide on a budget proposal."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.budget.approve")]
+ASSISTANT     
+ASSISTANT     def put(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             budget = Budget.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             data = request.data
+ASSISTANT             director_id = request.principal.user_id if hasattr(request, 'principal') else None
+ASSISTANT             
+ASSISTANT             # Validate and decide via service
+ASSISTANT             updated_budget, escalated = decide_budget(
+ASSISTANT                 director_id=director_id,
+ASSISTANT                 budget_id=budget.id,
+ASSISTANT                 approve=data.get('approve', False),
+ASSISTANT                 justification=data.get('justification', ''),
+ASSISTANT                 threshold=data.get('threshold', 0)
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response(BudgetSerializer(updated_budget).data, status=status.HTTP_200_OK)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # --- Legal Service Views (Filing) ---
+ASSISTANT 
+ASSISTANT class RecordFilingView(generics.CreateAPIView):
+ASSISTANT     """Record an external patent filing."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.filing.record")]
+ASSISTANT     
+ASSISTANT     def create(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             app = PatentApplication.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             data = request.data
+ASSISTANT             attorney_id = request.principal.user_id if hasattr(request, 'principal') else None
+ASSISTANT             
+ASSISTANT             # Validate and record filing via service
+ASSISTANT             filing = record_filing(
+ASSISTANT                 attorney_id=attorney_id,
+ASSISTANT                 application_id=app.id,
+ASSISTANT                 office=data.get('office', ''),
+ASSISTANT                 filing_number=data.get('filing_number', ''),
+ASSISTANT                 filing_date=data.get('filing_date'),
+ASSISTANT                 international=data.get('international', False)
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response(FilingSerializer(filing).data, status=status.HTTP_201_CREATED)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # --- Post-Filing Service Views ---
+ASSISTANT 
+ASSISTANT class RecordOfficeActionView(generics.CreateAPIView):
+ASSISTANT     """Record an office action received from the patent office."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.filing.record")]
+ASSISTANT     
+ASSISTANT     def create(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             app = PatentApplication.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             data = request.data
+ASSISTANT             attorney_id = request.principal.user_id if hasattr(request, 'principal') else None
+ASSISTANT             
+ASSISTANT             # Validate and record OA via service
+ASSISTANT             oa = record_office_action(
+ASSISTANT                 attorney_id=attorney_id,
+ASSISTANT                 application_id=app.id,
+ASSISTANT                 received_date=data.get('received_date'),
+ASSISTANT                 response_due_date=data.get('response_due_date'),
+ASSISTANT                 description=data.get('description', '')
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response(OfficeActionSerializer(oa).data, status=status.HTTP_201_CREATED)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class PrepareResponseView(generics.UpdateAPIView):
+ASSISTANT     """Prepare an office action response."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.filing.record")]
+ASSISTANT     
+ASSISTANT     def put(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             oa = OfficeAction.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             data = request.data
+ASSISTANT             attorney_id = request.principal.user_id if hasattr(request, 'principal') else None
+ASSISTANT             
+ASSISTANT             # Validate and prepare response via service
+ASSISTANT             updated_oa = prepare_response(
+ASSISTANT                 attorney_id=attorney_id,
+ASSISTANT                 office_action_id=oa.id,
+ASSISTANT                 response_text=data.get('response_text', ''),
+ASSISTANT                 needs_applicant_approval=data.get('needs_applicant_approval', False)
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response(OfficeActionSerializer(updated_oa).data, status=status.HTTP_200_OK)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class ApproveResponseView(generics.UpdateAPIView):
+ASSISTANT     """Approve an office action response."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.filing.record")]
+ASSISTANT     
+ASSISTANT     def put(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             oa = OfficeAction.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             # Validate and approve response via service
+ASSISTANT             updated_oa = approve_response(
+ASSISTANT                 applicant_id=request.principal.user_id if hasattr(request, 'principal') else None,
+ASSISTANT                 office_action_id=oa.id
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response(OfficeActionSerializer(updated_oa).data, status=status.HTTP_200_OK)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class SubmitResponseView(generics.UpdateAPIView):
+ASSISTANT     """Submit an office action response."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.filing.record")]
+ASSISTANT     
+ASSISTANT     def put(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             oa = OfficeAction.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             # Validate and submit response via service
+ASSISTANT             updated_oa = submit_response(
+ASSISTANT                 attorney_id=request.principal.user_id if hasattr(request, 'principal') else None,
+ASSISTANT                 office_action_id=oa.id
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response(OfficeActionSerializer(updated_oa).data, status=status.HTTP_200_OK)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class RecordGrantView(generics.UpdateAPIView):
+ASSISTANT     """Record a patent grant."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.filing.record")]
+ASSISTANT     
+ASSISTANT     def put(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             app = PatentApplication.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             data = request.data
+ASSISTANT             attorney_id = request.principal.user_id if hasattr(request, 'principal') else None
+ASSISTANT             
+ASSISTANT             # Validate and record grant via service
+ASSISTANT             updated_app = record_grant(
+ASSISTANT                 attorney_id=attorney_id,
+ASSISTANT                 application_id=app.id,
+ASSISTANT                 grant_number=data.get('grant_number', ''),
+ASSISTANT                 grant_date=data.get('grant_date')
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response(PatentApplicationSerializer(updated_app).data, status=status.HTTP_200_OK)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class ScheduleMaintenanceView(generics.CreateAPIView):
+ASSISTANT     """Schedule a maintenance fee payment."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.maintenance.manage")]
+ASSISTANT     
+ASSISTANT     def create(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             app = PatentApplication.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             data = request.data
+ASSISTANT             attorney_id = request.principal.user_id if hasattr(request, 'principal') else None
+ASSISTANT             
+ASSISTANT             # Validate and schedule maintenance via service
+ASSISTANT             record = schedule_maintenance(
+ASSISTANT                 attorney_id=attorney_id,
+ASSISTANT                 application_id=app.id,
+ASSISTANT                 due_date=data.get('due_date'),
+ASSISTANT                 fee=data.get('fee', 0)
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response(MaintenanceRecordSerializer(record).data, status=status.HTTP_201_CREATED)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT class DecideRenewalView(generics.UpdateAPIView):
+ASSISTANT     """Make a renewal decision for a maintenance record."""
+ASSISTANT     
+ASSISTANT     permission_classes = [HasModuleGrant("patent"), HasPermission("patent.maintenance.manage")]
+ASSISTANT     
+ASSISTANT     def put(self, request, *args, **kwargs):
+ASSISTANT         try:
+ASSISTANT             record = MaintenanceRecord.objects.get(pk=kwargs['pk'])
+ASSISTANT             
+ASSISTANT             data = request.data
+ASSISTANT             director_id = request.principal.user_id if hasattr(request, 'principal') else None
+ASSISTANT             
+ASSISTANT             # Validate and decide renewal via service
+ASSISTANT             updated_record = decide_renewal(
+ASSISTANT                 director_id=director_id,
+ASSISTANT                 record_id=record.id,
+ASSISTANT                 renew=data.get('renew', False),
+ASSISTANT                 justification=data.get('justification', '')
+ASSISTANT             )
+ASSISTANT             
+ASSISTANT             return Response(MaintenanceRecordSerializer(updated_record).data, status=status.HTTP_200_OK)
+ASSISTANT         except ValueError as e:
+ASSISTANT             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+ASSISTANT 
+ASSISTANT 
+ASSISTANT # --- Helper Classes for NotFoundResponse ---
+ASSISTANT 
+ASSISTANT class NotFoundResponse(Exception):
+ASSISTANT     pass
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT modules/patent/api/urls.py
+ASSISTANT ```python
+ASSISTANT from django.urls import path, include
+ASSISTANT from rest_framework.routers import DefaultRouter
+ASSISTANT 
+ASSISTANT from .views import (
+ASSISTANT     ApplicationListView, ApplicationDetailView, ApplicationHistoryView,
+ASSISTANT     SubmitApplicationView, AssignDirectorView, ReviewApplicationView,
+ASSISTANT     ResubmitApplicationView, WithdrawApplicationView, FileAppealView,
+ASSISTANT     DecideAppealView, ExpireOverdueResubmissionsView, AdminApplicationListView
+ASSISTANT )
+ASSISTANT from .views_legal import (
+ASSISTANT     AssignAttorneyView, RespondToAssignmentView, MyAttorneyAssignmentsView,
+ASSISTANT     RecordOpinionView, ProposeBudgetView, DecideBudgetView, RecordFilingView,
+ASSISTANT     RecordOfficeActionView, PrepareResponseView, ApproveResponseView, SubmitResponseView,
+ASSISTANT     RecordGrantView, ScheduleMaintenanceView, DecideRenewalView
+ASSISTANT )
+ASSISTANT 
+ASSISTANT router = DefaultRouter()
+ASSISTANT 
+ASSISTANT # --- Application Routes ---
+ASSISTANT router.register(r'applications', ApplicationListView, basename='application-list')
+ASSISTANT router.register(r'applications/(?P<pk>[0-9]+)/', ApplicationDetailView, basename='application-detail')
+ASSISTANT router.register(r'history/', ApplicationHistoryView, basename='application-history')
+ASSISTANT 
+ASSISTANT # --- Action Routes ---
+ASSISTANT router.register(r'submit/', SubmitApplicationView, basename='submit-application')
+ASSISTANT router.register(r'assign-director/', AssignDirectorView, basename='assign-director')
+ASSISTANT router.register(r'review/', ReviewApplicationView, basename='review-application')
+ASSISTANT router.register(r'resubmit/', ResubmitApplicationView, basename='resubmit-application')
+ASSISTANT router.register(r'withdraw/', WithdrawApplicationView, basename='withdraw-application')
+ASSISTANT router.register(r'appeal/', FileAppealView, basename='file-appeal')
+ASSISTANT router.register(r'appeals/(?P<pk>[0-9]+)/', DecideAppealView, basename='decide-appeal')
+ASSISTANT 
+ASSISTANT # --- Admin Routes ---
+ASSISTANT router.register(r'', ExpireOverdueResubmissionsView, basename='admin-expire-resubmissions')
+ASSISTANT router.register(r'applications/', AdminApplicationListView, basename='admin-application-list')
+ASSISTANT 
+ASSISTANT # --- Legal Service Routes ---
+ASSISTANT router.register(r'assign-attorney/', AssignAttorneyView, basename='assign-attorney')
+ASSISTANT router.register(r'assignments/(?P<pk>[0-9]+)/', RespondToAssignmentView, basename='respond-to-assignment')
+ASSISTANT router.register(r'my-assignments/', MyAttorneyAssignmentsView, basename='my-attorney-assignments')
+ASSISTANT router.register(r'opinions/(?P<pk>[0-9]+)/', RecordOpinionView, basename='record-opinion')
+ASSISTANT router.register(r'budgets/(?P<pk>[0-9]+)/', ProposeBudgetView, basename='propose-budget')
+ASSISTANT router.register(r'budgets/(?P<pk>[0-9]+)/decide/', DecideBudgetView, basename='decide-budget')
+ASSISTANT router.register(r'filings/(?P<pk>[0-9]+)/', RecordFilingView, basename='record-filing')
+ASSISTANT router.register(r'office-actions/(?P<pk>[0-9]+)/', RecordOfficeActionView, basename='record-office-action')
+ASSISTANT router.register(r'office-actions/(?P<pk>[0-9]+)/response/', PrepareResponseView, basename='prepare-response')
+ASSISTANT router.register(r'office-actions/(?P<pk>[0-9]+)/response/approve/', ApproveResponseView, basename='approve-response')
+ASSISTANT router.register(r'office-actions/(?P<pk>[0-9]+)/response/submit/', SubmitResponseView, basename='submit-response')
+ASSISTANT router.register(r'applications/(?P<pk>[0-9]+)/grant/', RecordGrantView, basename='record-grant')
+ASSISTANT router.register(r'maintenance/(?P<pk>[0-9]+)/', ScheduleMaintenanceView, basename='schedule-maintenance')
+ASSISTANT router.register(r'maintenance/(?P<pk>[0-9]+)/decide/', DecideRenewalView, basename='decide-renewal')
+ASSISTANT 
+ASSISTANT urlpatterns = [
+ASSISTANT     path('', include(router.urls)),
+ASSISTANT ]
+ASSISTANT ```
