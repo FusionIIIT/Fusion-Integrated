@@ -3353,3 +3353,469 @@ export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
 > Applied edit to client/src/modules/patent/api.ts  
 > Applied edit to client/src/app/registry.ts  
 > Applied edit to client/src/modules/patent/routes.tsx  
+
+# aider chat started at 2026-11-07 15:01:15
+
+> /opt/homebrew/bin/aider --model ollama_chat/qwen3.5:4b --edit-format whole --map-tokens 1024 --timeout 3600 --yes-always --stream --no-pretty --no-fancy-input --no-gitignore --no-auto-commits --no-dirty-commits --no-auto-lint --no-auto-test --no-check-update --analytics-disable --no-show-release-notes --no-show-model-warnings --no-suggest-shell-commands --no-detect-urls --no-restore-chat-history --aiderignore /Users/vishalkumar/elm_specs_md/pms_kit/aiderignore --chat-history-file /Users/vishalkumar/ELM_MODEL_2/pilot/PMS_MODEL/aider.chat.history.md --input-history-file /Users/vishalkumar/ELM_MODEL_2/pilot/PMS_MODEL/aider.input.history --llm-history-file /Users/vishalkumar/ELM_MODEL_2/pilot/PMS_MODEL/llm.history.txt --read client/src/modules/placement/pages/MyApplicationsPage.tsx --read client/src/modules/patent/api.ts --read client/src/modules/patent/routes.tsx --file client/src/modules/patent/pages/SubmitApplicationPage.tsx --file client/src/modules/patent/pages/MyApplicationsPage.tsx --message-file /Users/vishalkumar/ELM_MODEL_2/pilot/PMS_MODEL/prompts/step10.md  
+> Creating empty file /Users/vishalkumar/ELM_MODEL_2/client/src/modules/patent/pages/SubmitApplicationPage.tsx  
+> Creating empty file /Users/vishalkumar/ELM_MODEL_2/client/src/modules/patent/pages/MyApplicationsPage.tsx  
+> Aider v0.86.2  
+> Model: ollama_chat/qwen3.5:4b with whole edit format  
+> Git repo: .git with 252 files  
+> Repo-map: using 1024 tokens, auto refresh  
+> Added client/src/modules/patent/pages/MyApplicationsPage.tsx to the chat.  
+> Added client/src/modules/patent/pages/SubmitApplicationPage.tsx to the chat.  
+> Added client/src/modules/patent/api.ts to the chat (read-only).  
+> Added client/src/modules/patent/routes.tsx to the chat (read-only).  
+> Added client/src/modules/placement/pages/MyApplicationsPage.tsx to the chat (read-only).  
+
+#### Context (the same for every step): we are implementing the Patent Management System (PMS) module as an integrated module of this Fusion ERP repository (Django 5 + DRF backend under modules/, React 18 + Mantine 7 client under client/). Reuse Fusion's existing login, role mechanism, layout and backend structure; do not rebuild them.  
+####   
+#### Repository rules you must follow:  
+#### - There is no user table in this repository. The logged-in person is request.principal (fusion_auth.principal.Principal: user_id, username, kind, roles, permissions). Store people as integer ids (models.IntegerField), never as a ForeignKey to a user model.  
+#### - A module copies the shape of modules/placement: apps.py, registry.py, models.py, domain/ (pure Python, no Django imports), services/ (all writes), api/ (serializers, views, urls).  
+#### - The module code is "patent", and every permission code starts with "patent.".  
+#### - Every API view sets permission_classes = [HasModuleGrant("patent"), HasPermission("patent.<action>")], imported from fusion_auth.permissions.  
+#### - The four PMS actors are Applicant, Director, PCC_ADMIN and Attorney.  
+####   
+#### Files marked read-only are context only. Write every file you create or change in full. Do not ask for more files; work with what is shown.  
+####   
+#### Step 10 of 11 — client pages for the Applicant. Read-only: client/src/modules/placement/pages/MyApplicationsPage.tsx (the page pattern to follow), client/src/modules/patent/api.ts, client/src/modules/patent/routes.tsx.  
+####   
+#### Create these pages, each with a default export, reusing PageHeader, DataTable, StatusBadge and ErrorState from client/src/ui/components and Mantine 7 inputs:  
+#### 1. client/src/modules/patent/pages/SubmitApplicationPage.tsx — the submission form (title, abstract, description, claims, technical domain, inventors with name, email and contribution percent).  
+#### 2. client/src/modules/patent/pages/MyApplicationsPage.tsx — my applications with status, plus withdraw, resubmit, appeal and approve-office-action-response actions where the status allows them.  
+
+client/src/modules/patent/pages/SubmitApplicationPage.tsx
+```tsx
+import { useState, useEffect } from "react";
+import {
+  ActionIcon, Button, Card, Container, Group, Input, NumberInput,
+  Select, Text, TextInput, Stack, Title,
+} from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { FaPlus, FaTrash } from "react-icons/fa";
+
+import { errorMessage } from "../../../lib/http";
+import { createPatentApplication } from "../../../api";
+import { PageHeader } from "../../../ui/components/PageHeader";
+import { ErrorState } from "../../../ui/components/ErrorState";
+
+interface Inventor {
+  name: string;
+  email: string;
+  contribution_percent: number;
+}
+
+export default function SubmitApplicationPage() {
+  const [formData, setFormData] = useState({
+    title: "",
+    abstract: "",
+    description: "",
+    claims: "",
+    technical_domain: "",
+    inventors: [{ name: "", email: "", contribution_percent: 0 }],
+    filing_date: new Date().toISOString().split("T")[0],
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Set today's date as default for filing date
+    setFormData(prev => ({
+      ...prev,
+      filing_date: new Date().toISOString().split("T")[0],
+    }));
+  }, []);
+
+  const handleInputChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const addInventor = () => {
+    setFormData(prev => ({
+      ...prev,
+      inventors: [...prev.inventors, { name: "", email: "", contribution_percent: 0 }],
+    }));
+  };
+
+  const removeInventor = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      inventors: prev.inventors.filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateInventor = (index: number, field: keyof Inventor, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      inventors: prev.inventors.map((inv: Inventor, i) =>
+        i === index ? { ...inv, [field]: value } : inv
+      ),
+    }));
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      // Basic validation
+      if (!formData.title.trim()) {
+        setError("Title is required.");
+        return;
+      }
+      if (!formData.abstract.trim()) {
+        setError("Abstract is required.");
+        return;
+      }
+      if (formData.inventors.length === 0) {
+        setError("At least one inventor is required.");
+        return;
+      }
+      for (const inv of formData.inventors) {
+        if (!inv.name.trim()) {
+          setError("All inventors must have a name.");
+          return;
+        }
+        if (!inv.email.trim()) {
+          setError("All inventors must have an email.");
+          return;
+        }
+        if (inv.contribution_percent < 0 || inv.contribution_percent > 100) {
+          setError(`Contribution percentage for ${inv.name} must be between 0 and 100.`);
+          return;
+        }
+      }
+
+      const data = {
+        title: formData.title,
+        abstract: formData.abstract,
+        inventor_names: formData.inventors.map(inv => inv.name),
+        filing_date: formData.filing_date,
+      };
+
+      await createPatentApplication(data);
+      notifications.show({
+        message: "Application submitted successfully!",
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred while submitting the application.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (error) {
+    return (
+      <Container size="xl">
+        <ErrorState error={error} />
+      </Container>
+    );
+  }
+
+  return (
+    <Container size="xl">
+      <PageHeader
+        title="Submit Patent Application"
+        subtitle="Fill in the details to submit a new patent application."
+      />
+      <Card padding="lg">
+        <Stack gap="md">
+          <Title order={2}>Application Details</Title>
+          
+          <TextInput
+            label="Title"
+            value={formData.title}
+            onChange={(e) => handleInputChange("title", e.target.value)}
+            placeholder="Enter the title of your invention"
+            required
+          />
+
+          <TextInput
+            label="Abstract"
+            value={formData.abstract}
+            onChange={(e) => handleInputChange("abstract", e.target.value)}
+            placeholder="Provide a brief summary of your invention"
+            required
+          />
+
+          <TextInput
+            label="Description"
+            value={formData.description}
+            onChange={(e) => handleInputChange("description", e.target.value)}
+            placeholder="Describe your invention in detail"
+          />
+
+          <TextInput
+            label="Claims"
+            value={formData.claims}
+            onChange={(e) => handleInputChange("claims", e.target.value)}
+            placeholder="List the claims of your invention"
+          />
+
+          <TextInput
+            label="Technical Domain"
+            value={formData.technical_domain}
+            onChange={(e) => handleInputChange("technical_domain", e.target.value)}
+            placeholder="Specify the technical domain of your invention"
+          />
+
+          <Title order={3}>Inventors</Title>
+          
+          {formData.inventors.map((inv, index) => (
+            <Card key={index} padding="sm" radius="md">
+              <Stack gap="xs">
+                <TextInput
+                  label={`Name ${index + 1}`}
+                  value={inv.name}
+                  onChange={(e) => updateInventor(index, "name", e.target.value)}
+                  placeholder="Enter inventor's name"
+                />
+
+                <TextInput
+                  label={`Email ${index + 1}`}
+                  type="email"
+                  value={inv.email}
+                  onChange={(e) => updateInventor(index, "email", e.target.value)}
+                  placeholder="Enter inventor's email"
+                />
+
+                <NumberInput
+                  label={`Contribution Percentage ${index + 1}`}
+                  value={inv.contribution_percent}
+                  onChange={(value) => updateInventor(index, "contribution_percent", Number(value))}
+                  min={0}
+                  max={100}
+                  step={1}
+                />
+
+                {formData.inventors.length > 1 && (
+                  <ActionIcon
+                    variant="subtle"
+                    color="red"
+                    onClick={() => removeInventor(index)}
+                  >
+                    <FaTrash size={14} />
+                  </ActionIcon>
+                )}
+              </Stack>
+            </Card>
+          ))}
+
+          <Button
+            variant="outline"
+            leftSection={<FaPlus />}
+            onClick={addInventor}
+          >
+            Add Inventor
+          </Button>
+
+          <Title order={3}>Filing Date</Title>
+
+          <TextInput
+            label="Filing Date"
+            type="date"
+            value={formData.filing_date}
+            onChange={(e) => handleInputChange("filing_date", e.target.value)}
+          />
+
+          <Button
+            type="button"
+            onClick={handleSubmit}
+            loading={isSubmitting}
+            fullWidth
+            color="blue"
+          >
+            Submit Application
+          </Button>
+        </Stack>
+      </Card>
+    </Container>
+  );
+}
+```
+
+client/src/modules/patent/pages/MyApplicationsPage.tsx
+```tsx
+import { useState } from "react";
+import {
+  ActionIcon, Button, Card, Container, Group, Stack, Text,
+} from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { FaHistory, FaUserCheck } from "react-icons/fa";
+
+import { errorMessage } from "../../../lib/http";
+import { DataTable } from "../../../ui/components/DataTable";
+import { ErrorState } from "../../../ui/components/ErrorState";
+import { PageHeader } from "../../../ui/components/PageHeader";
+import { StatusBadge } from "../../../ui/components/StatusBadge";
+import { useMyApplications, useTransition } from "../../../api/hooks";
+import type { PatentApplication } from "../../../api/types";
+
+export default function MyApplicationsPage() {
+  const { data, isPending, error } = useMyApplications();
+  const transition = useTransition();
+  const [historyFor, setHistoryFor] = useState<number | null>(null);
+
+  if (error) return <Container size="xl"><ErrorState error={error} /></Container>;
+
+  function withdraw(app: PatentApplication) {
+    transition.mutate(
+      { id: app.id, to_status: "withdrawn", reason: "Withdrawn by the student" },
+      {
+        onSuccess: () => notifications.show({
+          color: "gray", title: "Withdrawn",
+          message: `Your application to ${app.title} has been withdrawn.`,
+        }),
+        onError: (e) => notifications.show({
+          color: "red", title: "Could not withdraw", message: errorMessage(e),
+        }),
+      },
+    );
+  }
+
+  function resubmit(app: PatentApplication) {
+    transition.mutate(
+      { id: app.id, to_status: "draft", reason: "Resubmitted by the student" },
+      {
+        onSuccess: () => notifications.show({
+          color: "gray", title: "Resubmitted",
+          message: `Your application to ${app.title} has been resubmitted.`,
+        }),
+        onError: (e) => notifications.show({
+          color: "red", title: "Could not resubmit", message: errorMessage(e),
+        }),
+      },
+    );
+  }
+
+  function appeal(app: PatentApplication) {
+    transition.mutate(
+      { id: app.id, to_status: "appeal_pending", reason: "Appealed by the student" },
+      {
+        onSuccess: () => notifications.show({
+          color: "gray", title: "Appealed",
+          message: `Your appeal for ${app.title} has been filed.`,
+        }),
+        onError: (e) => notifications.show({
+          color: "red", title: "Could not appeal", message: errorMessage(e),
+        }),
+      },
+    );
+  }
+
+  function approveOfficeAction(app: PatentApplication) {
+    transition.mutate(
+      { id: app.id, to_status: "under_review", reason: "Office action response approved" },
+      {
+        onSuccess: () => notifications.show({
+          color: "gray", title: "Approved",
+          message: `Your response to the office action for ${app.title} has been approved.`,
+        }),
+        onError: (e) => notifications.show({
+          color: "red", title: "Could not approve", message: errorMessage(e),
+        }),
+      },
+    );
+  }
+
+  const canWithdraw = app.status === "submitted" || app.status === "under_review";
+  const canResubmit = app.status === "rejected" || app.status === "withdrawn";
+  const canAppeal = app.status === "rejected" || app.status === "shortlisted";
+  const canApproveOfficeAction = app.status === "under_review";
+
+  return (
+    <Container size="xl">
+      <PageHeader
+        title="My Applications"
+        subtitle="Every application you have submitted, and where it stands"
+      />
+      <Card padding="lg">
+        <DataTable<PatentApplication>
+          rows={(data?.results ?? []) as PatentApplication[]}
+          loading={isPending}
+          rowKey={(r) => r.id}
+          minWidth={900}
+          columns={[
+            {
+              key: "title", header: "Title",
+              render: (r) => <Text fw={600}>{r.title}</Text>,
+            },
+            {
+              key: "filing_date", header: "Filing Date",
+              render: (r) => r.filing_date
+                ? new Date(r.filing_date).toLocaleDateString() : "—" ,
+            },
+            { key: "status", header: "Status",
+              render: (r) => <StatusBadge status={r.status} /> },
+            {
+              key: "actions", header: "", align: "right",
+              render: (r) => (
+                <Group justify="flex-end" gap="xs">
+                  {canWithdraw && (
+                    <Button
+                      size="xs" variant="subtle" color="gray"
+                      loading={transition.isPending}
+                      onClick={() => withdraw(r)}
+                    >
+                      Withdraw
+                    </Button>
+                  )}
+                  {canResubmit && (
+                    <Button
+                      size="xs" variant="subtle" color="blue"
+                      loading={transition.isPending}
+                      onClick={() => resubmit(r)}
+                    >
+                      Resubmit
+                    </Button>
+                  )}
+                  {canAppeal && (
+                    <Button
+                      size="xs" variant="subtle" color="red"
+                      loading={transition.isPending}
+                      onClick={() => appeal(r)}
+                    >
+                      Appeal
+                    </Button>
+                  )}
+                  {canApproveOfficeAction && (
+                    <Button
+                      size="xs" variant="subtle" color="green"
+                      loading={transition.isPending}
+                      onClick={() => approveOfficeAction(r)}
+                    >
+                      Approve Response
+                    </Button>
+                  )}
+                  <ActionIcon
+                    variant="subtle" color="gray" aria-label="History"
+                    onClick={() => setHistoryFor(r.id)}
+                  >
+                    <FaHistory size={12} />
+                  </ActionIcon>
+                </Group>
+              ),
+            },
+          ]}
+          empty={{
+            icon: FaUserCheck,
+            title: "You have not submitted any applications yet",
+            description: "Submit a new application to see it here.",
+          }}
+        />
+      </Card>
+
+      <HistoryDrawer
+        applicationId={historyFor} onClose={() => setHistoryFor(null)}
+      />
+    </Container>
+  );
+}
+```
+
+> Tokens: 4.8k sent, 2.9k received.  
+> Applied edit to client/src/modules/patent/pages/MyApplicationsPage.tsx  
+> Applied edit to client/src/modules/patent/pages/SubmitApplicationPage.tsx  

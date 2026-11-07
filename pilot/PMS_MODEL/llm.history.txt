@@ -10898,3 +10898,1056 @@ ASSISTANT     load: () => import("../modules/patent/routes"),
 ASSISTANT   },
 ASSISTANT };
 ASSISTANT ```
+TO LLM 2026-11-07T15:01:18
+-------
+SYSTEM Act as an expert software developer.
+SYSTEM Take requests for changes to the supplied code.
+SYSTEM If the request is ambiguous, ask questions.
+SYSTEM Reply in English.
+SYSTEM 
+SYSTEM Once you understand the request you MUST:
+SYSTEM 1. Determine if any code changes are needed.
+SYSTEM 2. Explain any needed changes.
+SYSTEM 3. If changes are needed, output a copy of each file that needs changes.
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return the entire content of the updated file.
+SYSTEM You MUST use this *file listing* format:
+SYSTEM 
+SYSTEM path/to/filename.js
+SYSTEM ```
+SYSTEM // entire file content ...
+SYSTEM // ... goes in between
+SYSTEM ```
+SYSTEM 
+SYSTEM Every *file listing* MUST use this format:
+SYSTEM - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+SYSTEM - Second line: opening ```
+SYSTEM - ... entire content of the file ...
+SYSTEM - Final line: closing ```
+SYSTEM 
+SYSTEM To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+SYSTEM *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+SYSTEM Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+SYSTEM 
+SYSTEM Reply in English.
+SYSTEM 
+-------
+USER Change the greeting to be more casual
+-------
+ASSISTANT Ok, I will:
+ASSISTANT 
+ASSISTANT 1. Switch the greeting text from "Hello" to "Hey".
+ASSISTANT 
+ASSISTANT show_greeting.py
+ASSISTANT ```
+ASSISTANT import sys
+ASSISTANT 
+ASSISTANT def greeting(name):
+ASSISTANT     print(f"Hey {name}")
+ASSISTANT 
+ASSISTANT if __name__ == '__main__':
+ASSISTANT     greeting(sys.argv[1])
+ASSISTANT ```
+-------
+USER I switched to a new code base. Please don't consider the above files or try to edit them any longer.
+-------
+ASSISTANT Ok.
+-------
+USER Here are some READ ONLY files, provided for your reference.
+USER Do not edit these files!
+USER 
+USER client/src/modules/patent/api.ts
+USER ```
+USER import { http } from "../../lib/http";
+USER import type { ApplicationStatus } from "./types";
+USER 
+USER /**
+USER  * Patent API types and hooks.
+USER  *
+USER  * Endpoints are under /patent/ in the backend, so axios calls use paths like "/patent/mine".
+USER  */
+USER 
+USER // --- Types ---
+USER 
+USER export interface PatentApplication {
+USER   id: number;
+USER   title: string;
+USER   abstract: string;
+USER   inventor_names: string[];
+USER   filing_date: string; // ISO date string
+USER   status: ApplicationStatus;
+USER   assigned_director_id: number | null;
+USER   attorney_assigned: boolean;
+USER   budget_total: number | null;
+USER   created_at: string;
+USER   updated_at: string;
+USER }
+USER 
+USER export interface PatentApplicationCreateData {
+USER   title: string;
+USER   abstract: string;
+USER   inventor_names: string[];
+USER   filing_date: string; // ISO date string
+USER }
+USER 
+USER // --- Hooks ---
+USER 
+USER /** Fetches the current user's patent applications. */
+USER export function useMyApplications() {
+USER   return http.get<PatentApplication[]>("/patent/mine");
+USER }
+USER 
+USER /** Creates a new patent application. */
+USER export async function createPatentApplication(
+USER   data: PatentApplicationCreateData,
+USER ): Promise<PatentApplication> {
+USER   const res = await http.post<PatentApplication>(
+USER     "/patent/submit",
+USER     data,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Fetches a single patent application by ID. */
+USER export function usePatentApplication(id: number) {
+USER   return http.get<PatentApplication>(`/patent/applications/${id}/`);
+USER }
+USER 
+USER /** Updates the status or metadata of a patent application (e.g., assign director, withdraw). */
+USER export async function updatePatentApplication(
+USER   id: number,
+USER   data: Partial<PatentApplication>,
+USER ): Promise<PatentApplication> {
+USER   const res = await http.patch<PatentApplication>(
+USER     `/patent/applications/${id}/`,
+USER     data,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Fetches pending applications for review (Director role). */
+USER export function usePendingApplications() {
+USER   // Assuming a dedicated endpoint or filtering on the list. 
+USER   // For now, we'll assume a specific endpoint exists: /patent/review/pending
+USER   // If not, this would need to be adjusted based on actual backend implementation.
+USER   return http.get<PatentApplication[]>("/patent/review/pending");
+USER }
+USER 
+USER /** Fetches admin applications (PCC_ADMIN role). */
+USER export function useAdminApplications() {
+USER   return http.get<PatentApplication[]>("/patent/admin/applications");
+USER }
+USER 
+USER // --- Legal & Filing Hooks (Attorney) ---
+USER 
+USER /** Records an external patent office filing. */
+USER export async function recordFiling(filingData: any) {
+USER   const res = await http.post(
+USER     "/patent/filings/",
+USER     filingData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Records an office action received from the patent office. */
+USER export async function recordOfficeAction(actionData: any) {
+USER   const res = await http.post(
+USER     "/patent/office-actions/",
+USER     actionData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Prepares a response to an office action. */
+USER export async function prepareResponse(responseData: any) {
+USER   const res = await http.post(
+USER     "/patent/office-actions/prepare/",
+USER     responseData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Approves a prepared response. */
+USER export async function approveResponse(id: number) {
+USER   const res = await http.post(`/patent/office-actions/${id}/approve/`);
+USER   return res.data;
+USER }
+USER 
+USER /** Submits the final response to the patent office. */
+USER export async function submitResponse(id: number, responseData: any) {
+USER   const res = await http.post(
+USER     `/patent/office-actions/${id}/response/submit/`,
+USER     responseData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Records a grant decision for an application. */
+USER export async function recordGrant(applicationId: number, grantData: any) {
+USER   const res = await http.post(
+USER     `/patent/applications/${applicationId}/grant/`,
+USER     grantData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Schedules a maintenance fee payment. */
+USER export async function scheduleMaintenance(applicationId: number, data: any) {
+USER   const res = await http.post(
+USER     `/patent/maintenance/${applicationId}/`,
+USER     data,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Decides on a renewal request. */
+USER export async function decideRenewal(applicationId: number, decisionData: any) {
+USER   const res = await http.post(
+USER     `/patent/maintenance/${applicationId}/decide/`,
+USER     decisionData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Proposes a budget for an application. */
+USER export async function proposeBudget(applicationId: number, budgetData: any) {
+USER   const res = await http.post(
+USER     `/patent/budgets/${applicationId}/`,
+USER     budgetData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Decides on a proposed budget. */
+USER export async function decideBudget(applicationId: number, decisionData: any) {
+USER   const res = await http.post(
+USER     `/patent/budgets/${applicationId}/decide/`,
+USER     decisionData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Records an opinion from the attorney. */
+USER export async function recordOpinion(opinionData: any) {
+USER   const res = await http.post(
+USER     "/patent/opinions/",
+USER     opinionData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER // --- Appeals Hooks ---
+USER 
+USER /** Files an appeal for an application. */
+USER export async function fileAppeal(applicationId: number, appealData: any) {
+USER   const res = await http.post(
+USER     `/patent/applications/${applicationId}/appeal/`,
+USER     appealData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER /** Reviews and decides on an appeal. */
+USER export async function decideAppeal(appealId: number, decisionData: any) {
+USER   const res = await http.post(
+USER     `/patent/appeals/${appealId}/`,
+USER     decisionData,
+USER   );
+USER   return res.data;
+USER }
+USER 
+USER // --- Admin Hooks ---
+USER 
+USER /** Expire overdue resubmissions (system trigger). */
+USER export async function expireOverdueResubmissions() {
+USER   const res = await http.post("/patent/admin/expire-resubmissions/");
+USER   return res.data;
+USER }
+USER ```
+USER 
+USER client/src/modules/patent/routes.tsx
+USER ```
+USER import { lazy } from "react";
+USER import { Navigate, type RouteObject } from "react-router-dom";
+USER 
+USER /** One lazy chunk per page. Vite can only split these if the import() argument
+USER  *  is a static literal — a computed path silently bundles everything. */
+USER const MyApplicationsPage = lazy(() => import("./pages/MyApplicationsPage"));
+USER const SubmitApplicationPage = lazy(() => import("./pages/SubmitApplicationPage"));
+USER const ReviewPage = lazy(() => import("./pages/ReviewPage"));
+USER const AdminPage = lazy(() => import("./pages/AdminPage"));
+USER const AttorneyPage = lazy(() => import("./pages/AttorneyPage"));
+USER 
+USER /** Paths are RELATIVE — the shell mounts them under the manifest's basePath.
+USER  *
+USER  *  Every entry here has a matching nav item in the server's registry.py, and
+USER  *  that correspondence matters: the sidebar is built server-side, so a nav item
+USER  *  without a route here renders a link that goes nowhere. */
+USER export const routes: RouteObject[] = [
+USER   { index: true, element: <Navigate to="mine" replace /> },
+USER   { path: "mine", element: <MyApplicationsPage /> },
+USER   { path: "submit", element: <SubmitApplicationPage /> },
+USER   { path: "review", element: <ReviewPage /> },
+USER   { path: "admin", element: <AdminPage /> },
+USER   { path: "attorney", element: <AttorneyPage /> },
+USER ];
+USER ```
+USER 
+USER client/src/modules/placement/pages/MyApplicationsPage.tsx
+USER ```
+USER import { useState } from "react";
+USER import {
+USER   ActionIcon, Button, Card, Container, Group, Stack, Text,
+USER } from "@mantine/core";
+USER import { notifications } from "@mantine/notifications";
+USER import { FaHistory, FaUserCheck } from "react-icons/fa";
+USER 
+USER import { errorMessage } from "../../../lib/http";
+USER import { DataTable } from "../../../ui/components/DataTable";
+USER import { ErrorState } from "../../../ui/components/ErrorState";
+USER import { PageHeader } from "../../../ui/components/PageHeader";
+USER import { StatusBadge } from "../../../ui/components/StatusBadge";
+USER import { CpiBadge } from "../components/CpiBadge";
+USER import { HistoryDrawer } from "../components/HistoryDrawer";
+USER import { useApplications, useTransition } from "../api/hooks";
+USER import type { Application } from "../api/types";
+USER 
+USER export default function MyApplicationsPage() {
+USER   const { data, isPending, error } = useApplications();
+USER   const transition = useTransition();
+USER   const [historyFor, setHistoryFor] = useState<number | null>(null);
+USER 
+USER   if (error) return <Container size="xl"><ErrorState error={error} /></Container>;
+USER 
+USER   function withdraw(app: Application) {
+USER     transition.mutate(
+USER       { id: app.id, to_status: "withdrawn", reason: "Withdrawn by the student" },
+USER       {
+USER         onSuccess: () => notifications.show({
+USER           color: "gray", title: "Withdrawn",
+USER           message: `Your application to ${app.posting.title} has been withdrawn.`,
+USER         }),
+USER         onError: (e) => notifications.show({
+USER           color: "red", title: "Could not withdraw", message: errorMessage(e),
+USER         }),
+USER       },
+USER     );
+USER   }
+USER 
+USER   return (
+USER     <Container size="xl">
+USER       <PageHeader
+USER         title="My Applications"
+USER         subtitle="Every application you have submitted, and where it stands"
+USER       />
+USER       <Card padding="lg">
+USER         <DataTable<Application>
+USER           rows={(data?.results ?? []) as Application[]}
+USER           loading={isPending}
+USER           rowKey={(r) => r.id}
+USER           minWidth={900}
+USER           columns={[
+USER             {
+USER               key: "posting", header: "Role",
+USER               render: (r) => (
+USER                 <Stack gap={0}>
+USER                   <Text fw={600}>{r.posting?.title}</Text>
+USER                   <Text size="xs" c="dimmed">{r.posting?.company?.name}</Text>
+USER                 </Stack>
+USER               ),
+USER             },
+USER             {
+USER               key: "cpi_at_apply", header: "CPI at apply",
+USER               // The frozen value: what the decision was made on, not today's CPI.
+USER               render: (r) => (
+USER                 <CpiBadge
+USER                   cpi={r.cpi_at_apply}
+USER                   standing={{
+USER                     semester: r.semester_at_apply, semester_type: null,
+USER                     declared_seq: null, synced_at: null, computed_by: null,
+USER                   }}
+USER                 />
+USER               ),
+USER             },
+USER             { key: "applied_at", header: "Applied",
+USER               render: (r) => r.applied_at
+USER                 ? new Date(r.applied_at).toLocaleDateString() : "—" },
+USER             { key: "status", header: "Status",
+USER               render: (r) => <StatusBadge status={r.status} /> },
+USER             {
+USER               key: "actions", header: "", align: "right",
+USER               render: (r) => (
+USER                 <Group justify="flex-end" gap="xs">
+USER                   {/* "Why is my application at this status?" answered without
+USER                       a support request. */}
+USER                   <ActionIcon
+USER                     variant="subtle" color="gray" aria-label="History"
+USER                     onClick={() => setHistoryFor(r.id)}
+USER                   >
+USER                     <FaHistory size={12} />
+USER                   </ActionIcon>
+USER                   {r.allowed_transitions?.includes("withdrawn") && (
+USER                     <Button
+USER                       size="xs" variant="subtle" color="gray"
+USER                       loading={transition.isPending}
+USER                       onClick={() => withdraw(r)}
+USER                     >
+USER                       Withdraw
+USER                     </Button>
+USER                   )}
+USER                 </Group>
+USER               ),
+USER             },
+USER           ]}
+USER           empty={{
+USER             icon: FaUserCheck,
+USER             title: "You have not applied to anything yet",
+USER             description: "Applications you submit will be tracked here.",
+USER           }}
+USER         />
+USER       </Card>
+USER 
+USER       <HistoryDrawer
+USER         applicationId={historyFor} onClose={() => setHistoryFor(null)}
+USER       />
+USER     </Container>
+USER   );
+USER }
+USER ```
+-------
+ASSISTANT Ok, I will use these files as references.
+-------
+USER Here are summaries of some files present in my git repository.
+USER Do not propose changes to these files, treat them as *read-only*.
+USER If you need to edit any of these files, ask me to *add them to the chat* first.
+USER 
+USER client/src/app/registry.ts:
+USER ⋮
+USER │export interface ModuleManifest {
+USER │  code: string;
+USER │  basePath: string;
+USER │  load: () => Promise<{ routes: RouteObject[] }>;
+USER ⋮
+USER 
+USER client/src/modules/placement/api/hooks.ts:
+USER ⋮
+USER │export type ExportKind = "applications" | "placements";
+USER │
+USER ⋮
+USER 
+USER client/src/modules/placement/api/types.ts:
+USER ⋮
+USER │export type ApplicationStatus =
+USER │  | "draft" | "submitted" | "under_review" | "shortlisted"
+USER │  | "interview_scheduled" | "selected" | "rejected" | "withdrawn"
+USER │  | "auto_withdrawn" | "offer_issued" | "offer_accepted" | "offer_declined"
+USER ⋮
+USER │export interface AcademicStanding {
+USER │  semester: number | null;
+USER │  semester_type: string | null;
+USER │  declared_seq: number | null;
+USER │  synced_at: string | null;
+USER │  computed_by: string | null;
+USER ⋮
+USER 
+USER client/src/modules/placement/components/NewPostingModal.tsx:
+USER ⋮
+USER │                hideControls placeholder="Unlimited"
+USER │              />
+USER │            </Field>
+USER │            <Field span={12}>
+USER │              <DateTimePicker
+USER │                label="Applications close" value={closesAt}
+USER │                onChange={setClosesAt} clearable minDate={new Date()}
+USER │                placeholder="Select a date and time"
+USER ⋮
+USER 
+USER client/src/ui/components/PageHeader.tsx:
+USER ⋮
+USER │export function PageHeader({ title, subtitle, action }: {
+USER │  title: string;
+USER │  subtitle?: string;
+USER │  action?: React.ReactNode;
+USER ⋮
+USER 
+USER client/src/ui/components/StatusBadge.tsx:
+USER ⋮
+USER │export function StatusBadge({ status }: { status: string }) {
+USER │  return (
+USER │    <Badge color={COLORS[status] ?? "gray"} variant="light" size="sm">
+USER │      {status.replace(/_/g, " ")}
+USER │    </Badge>
+USER │  );
+USER ⋮
+USER 
+USER core/api/csrf.py:
+USER ⋮
+USER │def token_for(session_value: str) -> str:
+USER ⋮
+USER 
+USER core/api/csv.py:
+USER ⋮
+USER │def sanitise_cell(value: Any) -> str:
+USER ⋮
+USER 
+USER fusion_auth/client.py:
+USER ⋮
+USER │class IamUnavailable(Exception):
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class IamSession:
+USER ⋮
+USER 
+USER fusion_auth/permissions.py:
+USER ⋮
+USER │def HasModuleGrant(module_code: str):                       # noqa: N802
+USER ⋮
+USER │def HasPermission(*codes: str, require_all: bool = False):  # noqa: N802
+USER ⋮
+USER 
+USER fusion_auth/principal.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Principal:
+USER │    user_id: int
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/directory/api/serializers.py:
+USER ⋮
+USER │class UserRefSerializer(serializers.Serializer):
+USER ⋮
+USER 
+USER modules/placement/authentication.py:
+USER ⋮
+USER │def hash_token(raw: str) -> str:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class RecruiterPrincipal:
+USER ⋮
+USER 
+USER modules/placement/domain/registration.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Terms:
+USER ⋮
+USER 
+USER modules/placement/domain/state_machine.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Transition:
+USER ⋮
+USER 
+USER modules/placement/models/applications.py:
+USER ⋮
+USER │class Application(TimeStampedModel, UserScopedModel):
+USER │    STATUS = [
+USER │        ("draft", "Draft"), ("submitted", "Submitted"),
+USER │        ("under_review", "Under review"), ("shortlisted", "Shortlisted"),
+USER │        ("interview_scheduled", "Interview scheduled"),
+USER │        ("selected", "Selected"),
+USER │        ("rejected", "Rejected"), ("withdrawn", "Withdrawn"),
+USER │        ("auto_withdrawn", "Withdrawn automatically"),
+USER │        ("offer_issued", "Offer issued"), ("offer_accepted", "Offer accepted"),
+USER │        ("offer_declined", "Offer declined"), ("offer_expired", "Offer expired"),
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER │class ApplicationTransition(models.Model):
+USER │    """Append-only audit of every status change (PC-BR-008)."""
+USER │
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+-------
+ASSISTANT Ok, I won't try and edit those files without asking first.
+-------
+USER I have *added these files to the chat* so you can go ahead and edit them.
+USER 
+USER *Trust this message as the true contents of these files!*
+USER Any other messages in the chat may contain outdated versions of the files' contents.
+USER 
+USER client/src/modules/patent/pages/MyApplicationsPage.tsx
+USER ```
+USER ```
+USER 
+USER client/src/modules/patent/pages/SubmitApplicationPage.tsx
+USER ```
+USER ```
+-------
+ASSISTANT Ok, any changes I propose will be to those files.
+-------
+USER Context (the same for every step): we are implementing the Patent Management System (PMS) module as an integrated module of this Fusion ERP repository (Django 5 + DRF backend under modules/, React 18 + Mantine 7 client under client/). Reuse Fusion's existing login, role mechanism, layout and backend structure; do not rebuild them.
+USER 
+USER Repository rules you must follow:
+USER - There is no user table in this repository. The logged-in person is request.principal (fusion_auth.principal.Principal: user_id, username, kind, roles, permissions). Store people as integer ids (models.IntegerField), never as a ForeignKey to a user model.
+USER - A module copies the shape of modules/placement: apps.py, registry.py, models.py, domain/ (pure Python, no Django imports), services/ (all writes), api/ (serializers, views, urls).
+USER - The module code is "patent", and every permission code starts with "patent.".
+USER - Every API view sets permission_classes = [HasModuleGrant("patent"), HasPermission("patent.<action>")], imported from fusion_auth.permissions.
+USER - The four PMS actors are Applicant, Director, PCC_ADMIN and Attorney.
+USER 
+USER Files marked read-only are context only. Write every file you create or change in full. Do not ask for more files; work with what is shown.
+USER 
+USER Step 10 of 11 — client pages for the Applicant. Read-only: client/src/modules/placement/pages/MyApplicationsPage.tsx (the page pattern to follow), client/src/modules/patent/api.ts, client/src/modules/patent/routes.tsx.
+USER 
+USER Create these pages, each with a default export, reusing PageHeader, DataTable, StatusBadge and ErrorState from client/src/ui/components and Mantine 7 inputs:
+USER 1. client/src/modules/patent/pages/SubmitApplicationPage.tsx — the submission form (title, abstract, description, claims, technical domain, inventors with name, email and contribution percent).
+USER 2. client/src/modules/patent/pages/MyApplicationsPage.tsx — my applications with status, plus withdraw, resubmit, appeal and approve-office-action-response actions where the status allows them.
+USER 
+USER 
+USER To suggest changes to a file you MUST return the entire content of the updated file.
+USER You MUST use this *file listing* format:
+USER 
+USER path/to/filename.js
+USER ```
+USER // entire file content ...
+USER // ... goes in between
+USER ```
+USER 
+USER Every *file listing* MUST use this format:
+USER - First line: the filename with any originally provided path; no extra markup, punctuation, comments, etc. **JUST** the filename with path.
+USER - Second line: opening ```
+USER - ... entire content of the file ...
+USER - Final line: closing ```
+USER 
+USER To suggest changes to a file you MUST return a *file listing* that contains the entire content of the file.
+USER *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
+USER Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
+USER 
+USER Reply in English.
+USER 
+LLM RESPONSE 2026-11-07T15:10:24
+ASSISTANT client/src/modules/patent/pages/SubmitApplicationPage.tsx
+ASSISTANT ```tsx
+ASSISTANT import { useState, useEffect } from "react";
+ASSISTANT import {
+ASSISTANT   ActionIcon, Button, Card, Container, Group, Input, NumberInput,
+ASSISTANT   Select, Text, TextInput, Stack, Title,
+ASSISTANT } from "@mantine/core";
+ASSISTANT import { notifications } from "@mantine/notifications";
+ASSISTANT import { FaPlus, FaTrash } from "react-icons/fa";
+ASSISTANT 
+ASSISTANT import { errorMessage } from "../../../lib/http";
+ASSISTANT import { createPatentApplication } from "../../../api";
+ASSISTANT import { PageHeader } from "../../../ui/components/PageHeader";
+ASSISTANT import { ErrorState } from "../../../ui/components/ErrorState";
+ASSISTANT 
+ASSISTANT interface Inventor {
+ASSISTANT   name: string;
+ASSISTANT   email: string;
+ASSISTANT   contribution_percent: number;
+ASSISTANT }
+ASSISTANT 
+ASSISTANT export default function SubmitApplicationPage() {
+ASSISTANT   const [formData, setFormData] = useState({
+ASSISTANT     title: "",
+ASSISTANT     abstract: "",
+ASSISTANT     description: "",
+ASSISTANT     claims: "",
+ASSISTANT     technical_domain: "",
+ASSISTANT     inventors: [{ name: "", email: "", contribution_percent: 0 }],
+ASSISTANT     filing_date: new Date().toISOString().split("T")[0],
+ASSISTANT   });
+ASSISTANT 
+ASSISTANT   const [isSubmitting, setIsSubmitting] = useState(false);
+ASSISTANT   const [error, setError] = useState<string | null>(null);
+ASSISTANT 
+ASSISTANT   useEffect(() => {
+ASSISTANT     // Set today's date as default for filing date
+ASSISTANT     setFormData(prev => ({
+ASSISTANT       ...prev,
+ASSISTANT       filing_date: new Date().toISOString().split("T")[0],
+ASSISTANT     }));
+ASSISTANT   }, []);
+ASSISTANT 
+ASSISTANT   const handleInputChange = (field: string, value: any) => {
+ASSISTANT     setFormData(prev => ({ ...prev, [field]: value }));
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   const addInventor = () => {
+ASSISTANT     setFormData(prev => ({
+ASSISTANT       ...prev,
+ASSISTANT       inventors: [...prev.inventors, { name: "", email: "", contribution_percent: 0 }],
+ASSISTANT     }));
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   const removeInventor = (index: number) => {
+ASSISTANT     setFormData(prev => ({
+ASSISTANT       ...prev,
+ASSISTANT       inventors: prev.inventors.filter((_, i) => i !== index),
+ASSISTANT     }));
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   const updateInventor = (index: number, field: keyof Inventor, value: any) => {
+ASSISTANT     setFormData(prev => ({
+ASSISTANT       ...prev,
+ASSISTANT       inventors: prev.inventors.map((inv: Inventor, i) =>
+ASSISTANT         i === index ? { ...inv, [field]: value } : inv
+ASSISTANT       ),
+ASSISTANT     }));
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   const handleSubmit = async () => {
+ASSISTANT     setIsSubmitting(true);
+ASSISTANT     setError(null);
+ASSISTANT 
+ASSISTANT     try {
+ASSISTANT       // Basic validation
+ASSISTANT       if (!formData.title.trim()) {
+ASSISTANT         setError("Title is required.");
+ASSISTANT         return;
+ASSISTANT       }
+ASSISTANT       if (!formData.abstract.trim()) {
+ASSISTANT         setError("Abstract is required.");
+ASSISTANT         return;
+ASSISTANT       }
+ASSISTANT       if (formData.inventors.length === 0) {
+ASSISTANT         setError("At least one inventor is required.");
+ASSISTANT         return;
+ASSISTANT       }
+ASSISTANT       for (const inv of formData.inventors) {
+ASSISTANT         if (!inv.name.trim()) {
+ASSISTANT           setError("All inventors must have a name.");
+ASSISTANT           return;
+ASSISTANT         }
+ASSISTANT         if (!inv.email.trim()) {
+ASSISTANT           setError("All inventors must have an email.");
+ASSISTANT           return;
+ASSISTANT         }
+ASSISTANT         if (inv.contribution_percent < 0 || inv.contribution_percent > 100) {
+ASSISTANT           setError(`Contribution percentage for ${inv.name} must be between 0 and 100.`);
+ASSISTANT           return;
+ASSISTANT         }
+ASSISTANT       }
+ASSISTANT 
+ASSISTANT       const data = {
+ASSISTANT         title: formData.title,
+ASSISTANT         abstract: formData.abstract,
+ASSISTANT         inventor_names: formData.inventors.map(inv => inv.name),
+ASSISTANT         filing_date: formData.filing_date,
+ASSISTANT       };
+ASSISTANT 
+ASSISTANT       await createPatentApplication(data);
+ASSISTANT       notifications.show({
+ASSISTANT         message: "Application submitted successfully!",
+ASSISTANT       });
+ASSISTANT     } catch (err) {
+ASSISTANT       setError(err instanceof Error ? err.message : "An error occurred while submitting the application.");
+ASSISTANT     } finally {
+ASSISTANT       setIsSubmitting(false);
+ASSISTANT     }
+ASSISTANT   };
+ASSISTANT 
+ASSISTANT   if (error) {
+ASSISTANT     return (
+ASSISTANT       <Container size="xl">
+ASSISTANT         <ErrorState error={error} />
+ASSISTANT       </Container>
+ASSISTANT     );
+ASSISTANT   }
+ASSISTANT 
+ASSISTANT   return (
+ASSISTANT     <Container size="xl">
+ASSISTANT       <PageHeader
+ASSISTANT         title="Submit Patent Application"
+ASSISTANT         subtitle="Fill in the details to submit a new patent application."
+ASSISTANT       />
+ASSISTANT       <Card padding="lg">
+ASSISTANT         <Stack gap="md">
+ASSISTANT           <Title order={2}>Application Details</Title>
+ASSISTANT           
+ASSISTANT           <TextInput
+ASSISTANT             label="Title"
+ASSISTANT             value={formData.title}
+ASSISTANT             onChange={(e) => handleInputChange("title", e.target.value)}
+ASSISTANT             placeholder="Enter the title of your invention"
+ASSISTANT             required
+ASSISTANT           />
+ASSISTANT 
+ASSISTANT           <TextInput
+ASSISTANT             label="Abstract"
+ASSISTANT             value={formData.abstract}
+ASSISTANT             onChange={(e) => handleInputChange("abstract", e.target.value)}
+ASSISTANT             placeholder="Provide a brief summary of your invention"
+ASSISTANT             required
+ASSISTANT           />
+ASSISTANT 
+ASSISTANT           <TextInput
+ASSISTANT             label="Description"
+ASSISTANT             value={formData.description}
+ASSISTANT             onChange={(e) => handleInputChange("description", e.target.value)}
+ASSISTANT             placeholder="Describe your invention in detail"
+ASSISTANT           />
+ASSISTANT 
+ASSISTANT           <TextInput
+ASSISTANT             label="Claims"
+ASSISTANT             value={formData.claims}
+ASSISTANT             onChange={(e) => handleInputChange("claims", e.target.value)}
+ASSISTANT             placeholder="List the claims of your invention"
+ASSISTANT           />
+ASSISTANT 
+ASSISTANT           <TextInput
+ASSISTANT             label="Technical Domain"
+ASSISTANT             value={formData.technical_domain}
+ASSISTANT             onChange={(e) => handleInputChange("technical_domain", e.target.value)}
+ASSISTANT             placeholder="Specify the technical domain of your invention"
+ASSISTANT           />
+ASSISTANT 
+ASSISTANT           <Title order={3}>Inventors</Title>
+ASSISTANT           
+ASSISTANT           {formData.inventors.map((inv, index) => (
+ASSISTANT             <Card key={index} padding="sm" radius="md">
+ASSISTANT               <Stack gap="xs">
+ASSISTANT                 <TextInput
+ASSISTANT                   label={`Name ${index + 1}`}
+ASSISTANT                   value={inv.name}
+ASSISTANT                   onChange={(e) => updateInventor(index, "name", e.target.value)}
+ASSISTANT                   placeholder="Enter inventor's name"
+ASSISTANT                 />
+ASSISTANT 
+ASSISTANT                 <TextInput
+ASSISTANT                   label={`Email ${index + 1}`}
+ASSISTANT                   type="email"
+ASSISTANT                   value={inv.email}
+ASSISTANT                   onChange={(e) => updateInventor(index, "email", e.target.value)}
+ASSISTANT                   placeholder="Enter inventor's email"
+ASSISTANT                 />
+ASSISTANT 
+ASSISTANT                 <NumberInput
+ASSISTANT                   label={`Contribution Percentage ${index + 1}`}
+ASSISTANT                   value={inv.contribution_percent}
+ASSISTANT                   onChange={(value) => updateInventor(index, "contribution_percent", Number(value))}
+ASSISTANT                   min={0}
+ASSISTANT                   max={100}
+ASSISTANT                   step={1}
+ASSISTANT                 />
+ASSISTANT 
+ASSISTANT                 {formData.inventors.length > 1 && (
+ASSISTANT                   <ActionIcon
+ASSISTANT                     variant="subtle"
+ASSISTANT                     color="red"
+ASSISTANT                     onClick={() => removeInventor(index)}
+ASSISTANT                   >
+ASSISTANT                     <FaTrash size={14} />
+ASSISTANT                   </ActionIcon>
+ASSISTANT                 )}
+ASSISTANT               </Stack>
+ASSISTANT             </Card>
+ASSISTANT           ))}
+ASSISTANT 
+ASSISTANT           <Button
+ASSISTANT             variant="outline"
+ASSISTANT             leftSection={<FaPlus />}
+ASSISTANT             onClick={addInventor}
+ASSISTANT           >
+ASSISTANT             Add Inventor
+ASSISTANT           </Button>
+ASSISTANT 
+ASSISTANT           <Title order={3}>Filing Date</Title>
+ASSISTANT 
+ASSISTANT           <TextInput
+ASSISTANT             label="Filing Date"
+ASSISTANT             type="date"
+ASSISTANT             value={formData.filing_date}
+ASSISTANT             onChange={(e) => handleInputChange("filing_date", e.target.value)}
+ASSISTANT           />
+ASSISTANT 
+ASSISTANT           <Button
+ASSISTANT             type="button"
+ASSISTANT             onClick={handleSubmit}
+ASSISTANT             loading={isSubmitting}
+ASSISTANT             fullWidth
+ASSISTANT             color="blue"
+ASSISTANT           >
+ASSISTANT             Submit Application
+ASSISTANT           </Button>
+ASSISTANT         </Stack>
+ASSISTANT       </Card>
+ASSISTANT     </Container>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT client/src/modules/patent/pages/MyApplicationsPage.tsx
+ASSISTANT ```tsx
+ASSISTANT import { useState } from "react";
+ASSISTANT import {
+ASSISTANT   ActionIcon, Button, Card, Container, Group, Stack, Text,
+ASSISTANT } from "@mantine/core";
+ASSISTANT import { notifications } from "@mantine/notifications";
+ASSISTANT import { FaHistory, FaUserCheck } from "react-icons/fa";
+ASSISTANT 
+ASSISTANT import { errorMessage } from "../../../lib/http";
+ASSISTANT import { DataTable } from "../../../ui/components/DataTable";
+ASSISTANT import { ErrorState } from "../../../ui/components/ErrorState";
+ASSISTANT import { PageHeader } from "../../../ui/components/PageHeader";
+ASSISTANT import { StatusBadge } from "../../../ui/components/StatusBadge";
+ASSISTANT import { useMyApplications, useTransition } from "../../../api/hooks";
+ASSISTANT import type { PatentApplication } from "../../../api/types";
+ASSISTANT 
+ASSISTANT export default function MyApplicationsPage() {
+ASSISTANT   const { data, isPending, error } = useMyApplications();
+ASSISTANT   const transition = useTransition();
+ASSISTANT   const [historyFor, setHistoryFor] = useState<number | null>(null);
+ASSISTANT 
+ASSISTANT   if (error) return <Container size="xl"><ErrorState error={error} /></Container>;
+ASSISTANT 
+ASSISTANT   function withdraw(app: PatentApplication) {
+ASSISTANT     transition.mutate(
+ASSISTANT       { id: app.id, to_status: "withdrawn", reason: "Withdrawn by the student" },
+ASSISTANT       {
+ASSISTANT         onSuccess: () => notifications.show({
+ASSISTANT           color: "gray", title: "Withdrawn",
+ASSISTANT           message: `Your application to ${app.title} has been withdrawn.`,
+ASSISTANT         }),
+ASSISTANT         onError: (e) => notifications.show({
+ASSISTANT           color: "red", title: "Could not withdraw", message: errorMessage(e),
+ASSISTANT         }),
+ASSISTANT       },
+ASSISTANT     );
+ASSISTANT   }
+ASSISTANT 
+ASSISTANT   function resubmit(app: PatentApplication) {
+ASSISTANT     transition.mutate(
+ASSISTANT       { id: app.id, to_status: "draft", reason: "Resubmitted by the student" },
+ASSISTANT       {
+ASSISTANT         onSuccess: () => notifications.show({
+ASSISTANT           color: "gray", title: "Resubmitted",
+ASSISTANT           message: `Your application to ${app.title} has been resubmitted.`,
+ASSISTANT         }),
+ASSISTANT         onError: (e) => notifications.show({
+ASSISTANT           color: "red", title: "Could not resubmit", message: errorMessage(e),
+ASSISTANT         }),
+ASSISTANT       },
+ASSISTANT     );
+ASSISTANT   }
+ASSISTANT 
+ASSISTANT   function appeal(app: PatentApplication) {
+ASSISTANT     transition.mutate(
+ASSISTANT       { id: app.id, to_status: "appeal_pending", reason: "Appealed by the student" },
+ASSISTANT       {
+ASSISTANT         onSuccess: () => notifications.show({
+ASSISTANT           color: "gray", title: "Appealed",
+ASSISTANT           message: `Your appeal for ${app.title} has been filed.`,
+ASSISTANT         }),
+ASSISTANT         onError: (e) => notifications.show({
+ASSISTANT           color: "red", title: "Could not appeal", message: errorMessage(e),
+ASSISTANT         }),
+ASSISTANT       },
+ASSISTANT     );
+ASSISTANT   }
+ASSISTANT 
+ASSISTANT   function approveOfficeAction(app: PatentApplication) {
+ASSISTANT     transition.mutate(
+ASSISTANT       { id: app.id, to_status: "under_review", reason: "Office action response approved" },
+ASSISTANT       {
+ASSISTANT         onSuccess: () => notifications.show({
+ASSISTANT           color: "gray", title: "Approved",
+ASSISTANT           message: `Your response to the office action for ${app.title} has been approved.`,
+ASSISTANT         }),
+ASSISTANT         onError: (e) => notifications.show({
+ASSISTANT           color: "red", title: "Could not approve", message: errorMessage(e),
+ASSISTANT         }),
+ASSISTANT       },
+ASSISTANT     );
+ASSISTANT   }
+ASSISTANT 
+ASSISTANT   const canWithdraw = app.status === "submitted" || app.status === "under_review";
+ASSISTANT   const canResubmit = app.status === "rejected" || app.status === "withdrawn";
+ASSISTANT   const canAppeal = app.status === "rejected" || app.status === "shortlisted";
+ASSISTANT   const canApproveOfficeAction = app.status === "under_review";
+ASSISTANT 
+ASSISTANT   return (
+ASSISTANT     <Container size="xl">
+ASSISTANT       <PageHeader
+ASSISTANT         title="My Applications"
+ASSISTANT         subtitle="Every application you have submitted, and where it stands"
+ASSISTANT       />
+ASSISTANT       <Card padding="lg">
+ASSISTANT         <DataTable<PatentApplication>
+ASSISTANT           rows={(data?.results ?? []) as PatentApplication[]}
+ASSISTANT           loading={isPending}
+ASSISTANT           rowKey={(r) => r.id}
+ASSISTANT           minWidth={900}
+ASSISTANT           columns={[
+ASSISTANT             {
+ASSISTANT               key: "title", header: "Title",
+ASSISTANT               render: (r) => <Text fw={600}>{r.title}</Text>,
+ASSISTANT             },
+ASSISTANT             {
+ASSISTANT               key: "filing_date", header: "Filing Date",
+ASSISTANT               render: (r) => r.filing_date
+ASSISTANT                 ? new Date(r.filing_date).toLocaleDateString() : "—" ,
+ASSISTANT             },
+ASSISTANT             { key: "status", header: "Status",
+ASSISTANT               render: (r) => <StatusBadge status={r.status} /> },
+ASSISTANT             {
+ASSISTANT               key: "actions", header: "", align: "right",
+ASSISTANT               render: (r) => (
+ASSISTANT                 <Group justify="flex-end" gap="xs">
+ASSISTANT                   {canWithdraw && (
+ASSISTANT                     <Button
+ASSISTANT                       size="xs" variant="subtle" color="gray"
+ASSISTANT                       loading={transition.isPending}
+ASSISTANT                       onClick={() => withdraw(r)}
+ASSISTANT                     >
+ASSISTANT                       Withdraw
+ASSISTANT                     </Button>
+ASSISTANT                   )}
+ASSISTANT                   {canResubmit && (
+ASSISTANT                     <Button
+ASSISTANT                       size="xs" variant="subtle" color="blue"
+ASSISTANT                       loading={transition.isPending}
+ASSISTANT                       onClick={() => resubmit(r)}
+ASSISTANT                     >
+ASSISTANT                       Resubmit
+ASSISTANT                     </Button>
+ASSISTANT                   )}
+ASSISTANT                   {canAppeal && (
+ASSISTANT                     <Button
+ASSISTANT                       size="xs" variant="subtle" color="red"
+ASSISTANT                       loading={transition.isPending}
+ASSISTANT                       onClick={() => appeal(r)}
+ASSISTANT                     >
+ASSISTANT                       Appeal
+ASSISTANT                     </Button>
+ASSISTANT                   )}
+ASSISTANT                   {canApproveOfficeAction && (
+ASSISTANT                     <Button
+ASSISTANT                       size="xs" variant="subtle" color="green"
+ASSISTANT                       loading={transition.isPending}
+ASSISTANT                       onClick={() => approveOfficeAction(r)}
+ASSISTANT                     >
+ASSISTANT                       Approve Response
+ASSISTANT                     </Button>
+ASSISTANT                   )}
+ASSISTANT                   <ActionIcon
+ASSISTANT                     variant="subtle" color="gray" aria-label="History"
+ASSISTANT                     onClick={() => setHistoryFor(r.id)}
+ASSISTANT                   >
+ASSISTANT                     <FaHistory size={12} />
+ASSISTANT                   </ActionIcon>
+ASSISTANT                 </Group>
+ASSISTANT               ),
+ASSISTANT             },
+ASSISTANT           ]}
+ASSISTANT           empty={{
+ASSISTANT             icon: FaUserCheck,
+ASSISTANT             title: "You have not submitted any applications yet",
+ASSISTANT             description: "Submit a new application to see it here.",
+ASSISTANT           }}
+ASSISTANT         />
+ASSISTANT       </Card>
+ASSISTANT 
+ASSISTANT       <HistoryDrawer
+ASSISTANT         applicationId={historyFor} onClose={() => setHistoryFor(null)}
+ASSISTANT       />
+ASSISTANT     </Container>
+ASSISTANT   );
+ASSISTANT }
+ASSISTANT ```
