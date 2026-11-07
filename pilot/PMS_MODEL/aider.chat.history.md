@@ -2983,3 +2983,67 @@ urlpatterns = [
 > Tokens: 13k sent, 4.0k received.  
 > Applied edit to modules/patent/api/views_legal.py  
 > Applied edit to modules/patent/api/urls.py  
+
+# aider chat started at 2026-11-07 14:49:37
+
+> /opt/homebrew/bin/aider --model ollama_chat/qwen3.5:4b --edit-format diff --map-tokens 1024 --timeout 3600 --yes-always --stream --no-pretty --no-fancy-input --no-gitignore --no-auto-commits --no-dirty-commits --no-auto-lint --no-auto-test --no-check-update --analytics-disable --no-show-release-notes --no-show-model-warnings --no-suggest-shell-commands --no-detect-urls --no-restore-chat-history --aiderignore /Users/vishalkumar/elm_specs_md/pms_kit/aiderignore --chat-history-file /Users/vishalkumar/ELM_MODEL_2/pilot/PMS_MODEL/aider.chat.history.md --input-history-file /Users/vishalkumar/ELM_MODEL_2/pilot/PMS_MODEL/aider.input.history --llm-history-file /Users/vishalkumar/ELM_MODEL_2/pilot/PMS_MODEL/llm.history.txt --file config/settings/base.py --file config/urls.py --message-file /Users/vishalkumar/ELM_MODEL_2/pilot/PMS_MODEL/prompts/step8.md  
+> Aider v0.86.2  
+> Model: ollama_chat/qwen3.5:4b with diff edit format  
+> Git repo: .git with 250 files  
+> Repo-map: using 1024 tokens, auto refresh  
+> Added config/settings/base.py to the chat.  
+> Added config/urls.py to the chat.  
+
+#### Context (the same for every step): we are implementing the Patent Management System (PMS) module as an integrated module of this Fusion ERP repository (Django 5 + DRF backend under modules/, React 18 + Mantine 7 client under client/). Reuse Fusion's existing login, role mechanism, layout and backend structure; do not rebuild them.  
+####   
+#### Repository rules you must follow:  
+#### - There is no user table in this repository. The logged-in person is request.principal (fusion_auth.principal.Principal: user_id, username, kind, roles, permissions). Store people as integer ids (models.IntegerField), never as a ForeignKey to a user model.  
+#### - A module copies the shape of modules/placement: apps.py, registry.py, models.py, domain/ (pure Python, no Django imports), services/ (all writes), api/ (serializers, views, urls).  
+#### - The module code is "patent", and every permission code starts with "patent.".  
+#### - Every API view sets permission_classes = [HasModuleGrant("patent"), HasPermission("patent.<action>")], imported from fusion_auth.permissions.  
+#### - The four PMS actors are Applicant, Director, PCC_ADMIN and Attorney.  
+####   
+#### Files marked read-only are context only. Write every file you create or change in full. Do not ask for more files; work with what is shown.  
+####   
+#### Step 8 of 11 — register the new module with the platform, the same way placement is registered. Change only these two files:  
+#### 1. config/settings/base.py — add "modules.patent" to DOMAIN_MODULES. Keep every other line exactly as it is.  
+#### 2. config/urls.py — mount modules.patent.api.urls under "api/v1/patent/" next to the placement entry. Keep every other line exactly as it is.  
+
+To complete Step 8 of 11, I will modify the two configuration files to register the new `patent` module:
+
+1.  **config/settings/base.py**: Add `"modules.patent"` to the `DOMAIN_MODULES` list, following the same pattern as `modules.placement`.
+2.  **config/urls.py**: Add a URL pattern to include `modules.patent.api.urls` under the `api/v1/patent/` path, matching the style of the existing placement entry.
+
+Here are the *SEARCH/REPLACE* blocks:
+
+config/settings/base.py
+```python
+<<<<<<< SEARCH
+DOMAIN_MODULES = [
+    "modules.placement",
+]
+=======
+DOMAIN_MODULES = [
+    "modules.placement",
+    "modules.patent",
+]
+>>>>>>> REPLACE
+```
+
+config/urls.py
+```python
+<<<<<<< SEARCH
+    path("api/v1/directory/", include("modules.directory.api.urls")),
+    path("api/v1/placement/", include("modules.placement.api.urls")),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+=======
+    path("api/v1/directory/", include("modules.directory.api.urls")),
+    path("api/v1/placement/", include("modules.placement.api.urls")),
+    path("api/v1/patent/", include("modules.patent.api.urls")),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+>>>>>>> REPLACE
+```
+
+> Tokens: 6.1k sent, 291 received.  
+> Applied edit to config/urls.py  
+> Applied edit to config/settings/base.py  

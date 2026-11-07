@@ -9315,3 +9315,749 @@ ASSISTANT urlpatterns = [
 ASSISTANT     path('', include(router.urls)),
 ASSISTANT ]
 ASSISTANT ```
+TO LLM 2026-11-07T14:49:39
+-------
+SYSTEM Act as an expert software developer.
+SYSTEM Always use best practices when coding.
+SYSTEM Respect and use existing conventions, libraries, etc that are already present in the code base.
+SYSTEM Reply in English.
+SYSTEM 
+SYSTEM Take requests for changes to the supplied code.
+SYSTEM If the request is ambiguous, ask questions.
+SYSTEM 
+SYSTEM Once you understand the request you MUST:
+SYSTEM 
+SYSTEM 1. Decide if you need to propose *SEARCH/REPLACE* edits to any files that haven't been added to the chat. You can create new files without asking!
+SYSTEM 
+SYSTEM But if you need to propose edits to existing files not already added to the chat, you *MUST* tell the user their full path names and ask them to *add the files to the chat*.
+SYSTEM End your reply and wait for their approval.
+SYSTEM You can keep asking if you then decide you need to edit more files.
+SYSTEM 
+SYSTEM 2. Think step-by-step and explain the needed changes in a few short sentences.
+SYSTEM 
+SYSTEM 3. Describe each change with a *SEARCH/REPLACE block* per the examples below.
+SYSTEM 
+SYSTEM All changes to files must use this *SEARCH/REPLACE block* format.
+SYSTEM ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+SYSTEM 
+SYSTEM Keep in mind these details about the user's platform and environment:
+SYSTEM - Platform: macOS-27.2-arm64-arm-64bit
+SYSTEM - Shell: SHELL=/bin/zsh
+SYSTEM - Language: English
+SYSTEM - Current date: 2026-11-07
+SYSTEM - The user is operating inside a git repository
+SYSTEM 
+SYSTEM 
+SYSTEM 
+SYSTEM # *SEARCH/REPLACE block* Rules:
+SYSTEM 
+SYSTEM Every *SEARCH/REPLACE block* must use this format:
+SYSTEM 1. The *FULL* file path alone on a line, verbatim. No bold asterisks, no quotes around it, no escaping of characters, etc.
+SYSTEM 2. The opening fence and code language, eg: ```python
+SYSTEM 3. The start of search block: <<<<<<< SEARCH
+SYSTEM 4. A contiguous chunk of lines to search for in the existing source code
+SYSTEM 5. The dividing line: =======
+SYSTEM 6. The lines to replace into the source code
+SYSTEM 7. The end of the replace block: >>>>>>> REPLACE
+SYSTEM 8. The closing fence: ```
+SYSTEM 
+SYSTEM Use the *FULL* file path, as shown to you by the user.
+SYSTEM 
+SYSTEM Every *SEARCH* section must *EXACTLY MATCH* the existing file content, character for character, including all comments, docstrings, etc.
+SYSTEM If the file contains code or other data wrapped/escaped in json/xml/quotes or other containers, you need to propose edits to the literal contents of the file, including the container markup.
+SYSTEM 
+SYSTEM *SEARCH/REPLACE* blocks will *only* replace the first match occurrence.
+SYSTEM Including multiple unique *SEARCH/REPLACE* blocks if needed.
+SYSTEM Include enough lines in each SEARCH section to uniquely match each set of lines that need to change.
+SYSTEM 
+SYSTEM Keep *SEARCH/REPLACE* blocks concise.
+SYSTEM Break large *SEARCH/REPLACE* blocks into a series of smaller blocks that each change a small portion of the file.
+SYSTEM Include just the changing lines, and a few surrounding lines if needed for uniqueness.
+SYSTEM Do not include long runs of unchanging lines in *SEARCH/REPLACE* blocks.
+SYSTEM 
+SYSTEM Only create *SEARCH/REPLACE* blocks for files that the user has added to the chat!
+SYSTEM 
+SYSTEM To move code within a file, use 2 *SEARCH/REPLACE* blocks: 1 to delete it from its current location, 1 to insert it in the new location.
+SYSTEM 
+SYSTEM Pay attention to which filenames the user wants you to edit, especially if they are asking you to create a new file.
+SYSTEM 
+SYSTEM If you want to put code in a new file, use a *SEARCH/REPLACE block* with:
+SYSTEM - A new file path, including dir name if needed
+SYSTEM - An empty `SEARCH` section
+SYSTEM - The new file's contents in the `REPLACE` section
+SYSTEM 
+SYSTEM If the user just says something like "ok" or "go ahead" or "do that" they probably want you to make SEARCH/REPLACE blocks for the code changes you just proposed.
+SYSTEM The user will say when they've applied your edits. If they haven't explicitly confirmed the edits have been applied, they probably want proper SEARCH/REPLACE blocks.
+SYSTEM 
+SYSTEM Reply in English.
+SYSTEM ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+SYSTEM 
+-------
+USER Change get_factorial() to use math.factorial
+-------
+ASSISTANT To make this change we need to modify `mathweb/flask/app.py` to:
+ASSISTANT 
+ASSISTANT 1. Import the math package.
+ASSISTANT 2. Remove the existing factorial() function.
+ASSISTANT 3. Update get_factorial() to call math.factorial instead.
+ASSISTANT 
+ASSISTANT Here are the *SEARCH/REPLACE* blocks:
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT from flask import Flask
+ASSISTANT =======
+ASSISTANT import math
+ASSISTANT from flask import Flask
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT def factorial(n):
+ASSISTANT     "compute factorial"
+ASSISTANT 
+ASSISTANT     if n == 0:
+ASSISTANT         return 1
+ASSISTANT     else:
+ASSISTANT         return n * factorial(n-1)
+ASSISTANT 
+ASSISTANT =======
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT     return str(factorial(n))
+ASSISTANT =======
+ASSISTANT     return str(math.factorial(n))
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+-------
+USER Refactor hello() into its own file.
+-------
+ASSISTANT To make this change we need to modify `main.py` and make a new file `hello.py`:
+ASSISTANT 
+ASSISTANT 1. Make a new hello.py file with hello() in it.
+ASSISTANT 2. Remove hello() from main.py and replace it with an import.
+ASSISTANT 
+ASSISTANT Here are the *SEARCH/REPLACE* blocks:
+ASSISTANT 
+ASSISTANT hello.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT def hello():
+ASSISTANT     "print a greeting"
+ASSISTANT 
+ASSISTANT     print("hello")
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT main.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT def hello():
+ASSISTANT     "print a greeting"
+ASSISTANT 
+ASSISTANT     print("hello")
+ASSISTANT =======
+ASSISTANT from hello import hello
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+-------
+USER I switched to a new code base. Please don't consider the above files or try to edit them any longer.
+-------
+ASSISTANT Ok.
+-------
+USER Here are summaries of some files present in my git repository.
+USER Do not propose changes to these files, treat them as *read-only*.
+USER If you need to edit any of these files, ask me to *add them to the chat* first.
+USER 
+USER client/src/app/registry.ts:
+USER ⋮
+USER │export interface ModuleManifest {
+USER │  code: string;
+USER │  basePath: string;
+USER │  load: () => Promise<{ routes: RouteObject[] }>;
+USER ⋮
+USER 
+USER client/src/auth/RequireAuth.tsx:
+USER ⋮
+USER │export function RequireAuth({ children }: { children: React.ReactNode }) {
+USER │  const { status } = useAuth();
+USER │  const location = useLocation();
+USER │
+USER │  if (status === "loading") {
+USER │    return <Center h="100vh"><Loader /></Center>;
+USER │  }
+USER │  // Not a logout: signing in again cannot work while the IAM is unreachable.
+USER │  if (status === "unavailable") {
+USER │    return (
+USER ⋮
+USER 
+USER client/src/lib/http.ts:
+USER ⋮
+USER │export function setUnauthorizedHandler(fn: () => void) {
+USER │  onUnauthorized = fn;
+USER ⋮
+USER │export async function readBlobError(e: unknown): Promise<unknown> {
+USER │  const res = (e as { response?: { data?: unknown } })?.response;
+USER │  if (res?.data instanceof Blob) {
+USER │    try {
+USER │      res.data = JSON.parse(await res.data.text());
+USER │    } catch {
+USER │      res.data = undefined;             // an HTML page, not our envelope
+USER │    }
+USER │  }
+USER │  return e;
+USER ⋮
+USER │export function errorStatus(e: unknown): number | undefined {
+USER │  return (e as { response?: { status?: number } })?.response?.status;
+USER ⋮
+USER 
+USER client/src/modules/placement/api/hooks.ts:
+USER ⋮
+USER │export type ExportKind = "applications" | "placements";
+USER │
+USER ⋮
+USER 
+USER client/src/modules/placement/api/types.ts:
+USER ⋮
+USER │export type ApplicationStatus =
+USER │  | "draft" | "submitted" | "under_review" | "shortlisted"
+USER │  | "interview_scheduled" | "selected" | "rejected" | "withdrawn"
+USER │  | "auto_withdrawn" | "offer_issued" | "offer_accepted" | "offer_declined"
+USER ⋮
+USER 
+USER client/src/modules/placement/components/NewPostingModal.tsx:
+USER ⋮
+USER │                hideControls placeholder="Unlimited"
+USER │              />
+USER │            </Field>
+USER │            <Field span={12}>
+USER │              <DateTimePicker
+USER │                label="Applications close" value={closesAt}
+USER │                onChange={setClosesAt} clearable minDate={new Date()}
+USER │                placeholder="Select a date and time"
+USER ⋮
+USER 
+USER client/src/ui/components/PageHeader.tsx:
+USER ⋮
+USER │export function PageHeader({ title, subtitle, action }: {
+USER │  title: string;
+USER │  subtitle?: string;
+USER │  action?: React.ReactNode;
+USER ⋮
+USER 
+USER client/src/ui/layout/AppShellLayout.tsx:
+USER ⋮
+USER │export interface NavGroupItem {
+USER │  code: string;
+USER │  label: string;
+USER │  icon?: string;
+USER │  to?: string;
+USER │  app?: string;
+USER │  links?: NavLinkItem[];
+USER ⋮
+USER 
+USER core/api/csrf.py:
+USER ⋮
+USER │def token_for(session_value: str) -> str:
+USER ⋮
+USER 
+USER core/api/csv.py:
+USER ⋮
+USER │def sanitise_cell(value: Any) -> str:
+USER ⋮
+USER 
+USER core/observability/middleware.py:
+USER ⋮
+USER │def get_request_id() -> str:
+USER ⋮
+USER 
+USER fusion_auth/client.py:
+USER ⋮
+USER │class IamUnavailable(Exception):
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class IamSession:
+USER ⋮
+USER 
+USER fusion_auth/permissions.py:
+USER ⋮
+USER │def HasModuleGrant(module_code: str):                       # noqa: N802
+USER ⋮
+USER │def HasPermission(*codes: str, require_all: bool = False):  # noqa: N802
+USER ⋮
+USER 
+USER fusion_auth/principal.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Principal:
+USER │    user_id: int
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/directory/api/serializers.py:
+USER ⋮
+USER │class UserRefSerializer(serializers.Serializer):
+USER ⋮
+USER 
+USER modules/directory/models.py:
+USER ⋮
+USER │class UserRef(TimeStampedModel):
+USER │    KIND_CHOICES = [
+USER │        ("student", "Student"), ("faculty", "Faculty"),
+USER │        ("staff", "Staff"), ("operator", "Operator"),
+USER ⋮
+USER │    class Meta:
+USER ⋮
+USER │    def __str__(self) -> str:
+USER ⋮
+USER 
+USER modules/placement/authentication.py:
+USER ⋮
+USER │def hash_token(raw: str) -> str:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class RecruiterPrincipal:
+USER ⋮
+USER 
+USER modules/placement/domain/conduct.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Recommendation:
+USER ⋮
+USER 
+USER modules/placement/domain/registration.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Terms:
+USER ⋮
+USER 
+USER modules/placement/domain/state_machine.py:
+USER ⋮
+USER │@dataclass(frozen=True)
+USER │class Transition:
+USER ⋮
+USER 
+USER modules/placement/selectors/scoping.py:
+USER ⋮
+USER │def _is_recruiter(actor) -> bool:
+USER ⋮
+USER │def _is_alumni(actor) -> bool:
+USER ⋮
+-------
+ASSISTANT Ok, I won't try and edit those files without asking first.
+-------
+USER I have *added these files to the chat* so you can go ahead and edit them.
+USER 
+USER *Trust this message as the true contents of these files!*
+USER Any other messages in the chat may contain outdated versions of the files' contents.
+USER 
+USER config/urls.py
+USER ```
+USER """Root URLs.
+USER 
+USER Every module mounts itself under /api/v1/<module>/. A module that is not in
+USER INSTALLED_APPS contributes no URLs at all — that is what "independent" means
+USER here: removing a module is deleting a directory and one settings line.
+USER """
+USER from django.urls import include, path
+USER from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+USER 
+USER import core.api.schema  # noqa: F401  registers the auth schemes by import
+USER from core.api.health import healthz, readyz
+USER 
+USER urlpatterns = [
+USER     path("healthz", healthz, name="healthz"),
+USER     path("readyz", readyz, name="readyz"),
+USER     path("api/v1/", include("fusion_auth.urls")),
+USER     path("api/v1/directory/", include("modules.directory.api.urls")),
+USER     path("api/v1/placement/", include("modules.placement.api.urls")),
+USER     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+USER     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="docs"),
+USER ]
+USER ```
+USER 
+USER config/settings/base.py
+USER ```
+USER """Fusion-Integrated — base settings.
+USER 
+USER Every value comes from the environment. This service holds NO user table:
+USER identity, RBAC and directory data all come from Fusion_System_Administrator
+USER over HTTP — see fusion_auth/.
+USER """
+USER import os
+USER from pathlib import Path
+USER 
+USER BASE_DIR = Path(__file__).resolve().parent.parent.parent
+USER 
+USER 
+USER def _load_env_file(path):
+USER     """Fill in from .env whatever the environment has not already set.
+USER 
+USER     Local development only in practice: production passes real variables
+USER     through systemd, and setdefault means those always win. Without this,
+USER     `cp .env.example .env` does nothing and every entry point depends on one
+USER     shell's exports.
+USER     """
+USER     try:
+USER         lines = path.read_text().splitlines()
+USER     except OSError:
+USER         return
+USER     for line in lines:
+USER         line = line.strip()
+USER         if not line or line.startswith("#") or "=" not in line:
+USER             continue
+USER         name, _, value = line.partition("=")
+USER         os.environ.setdefault(name.strip(), value.strip().strip('"').strip("'"))
+USER 
+USER 
+USER _load_env_file(BASE_DIR / ".env")
+USER 
+USER 
+USER def env(name, default=None):
+USER     v = os.environ.get(name)
+USER     return default if v is None or v.strip() == "" else v.strip()
+USER 
+USER 
+USER def env_bool(name, default=False):
+USER     raw = env(name)
+USER     return default if raw is None else raw.lower() in ("1", "true", "yes", "on")
+USER 
+USER 
+USER def env_int(name, default=None):
+USER     raw = env(name)
+USER     try:
+USER         return int(raw) if raw is not None else default
+USER     except ValueError:
+USER         return default
+USER 
+USER 
+USER def env_list(name, default=None):
+USER     raw = env(name)
+USER     if raw is None:
+USER         return list(default or [])
+USER     return [x.strip() for x in raw.split(",") if x.strip()]
+USER 
+USER 
+USER SECRET_KEY = env("DJANGO_SECRET_KEY", "django-insecure-dev-only-change-me")
+USER DEBUG = False
+USER ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", ["localhost", "127.0.0.1"])
+USER 
+USER # django.contrib.auth is here because DRF needs it; fusion_auth authenticates.
+USER DJANGO_APPS = [
+USER     "django.contrib.contenttypes",
+USER     "django.contrib.auth",
+USER     "django.contrib.staticfiles",
+USER ]
+USER 
+USER THIRD_PARTY_APPS = [
+USER     "rest_framework",
+USER     "corsheaders",
+USER     "django_filters",
+USER     "drf_spectacular",
+USER ]
+USER 
+USER # No models. Installed so its AppConfig runs and registers the session checks.
+USER LOCAL_APPS = [
+USER     "fusion_auth",
+USER ]
+USER 
+USER # Each module is an independent Django app: own tables, migrations and contract.
+USER PLATFORM_MODULES = [
+USER     "modules.directory",         # who people are, projected from IAM
+USER     "modules.accesscontrol",     # which modules a role may enter
+USER ]
+USER 
+USER # See docs/03-platform/module-authoring-guide.md to add one.
+USER DOMAIN_MODULES = [
+USER     "modules.placement",
+USER ]
+USER 
+USER INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+USER                   + PLATFORM_MODULES + DOMAIN_MODULES)
+USER 
+USER MIDDLEWARE = [
+USER     "corsheaders.middleware.CorsMiddleware",
+USER     "django.middleware.security.SecurityMiddleware",
+USER     "core.observability.middleware.RequestIDMiddleware",
+USER     "django.middleware.common.CommonMiddleware",
+USER     # X_FRAME_OPTIONS is inert without this; only this middleware emits it.
+USER     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+USER ]
+USER 
+USER # No CsrfViewMiddleware: core/api/csrf.py does it from the authentication classes.
+USER 
+USER ROOT_URLCONF = "config.urls"
+USER WSGI_APPLICATION = "config.wsgi.application"
+USER 
+USER TEMPLATES = [
+USER     {
+USER         "BACKEND": "django.template.backends.django.DjangoTemplates",
+USER         "DIRS": [],
+USER         "APP_DIRS": True,
+USER         "OPTIONS": {"context_processors": []},
+USER     }
+USER ]
+USER 
+USER # One database, owned by this service; person data comes from modules.directory.
+USER DATABASES = {
+USER     "default": {
+USER         "ENGINE": "django.db.backends.postgresql",
+USER         "NAME": env("DB_NAME", "fusion_integrated"),
+USER         "USER": env("DB_USER", "fusion_admin"),
+USER         "PASSWORD": env("DB_PASSWORD", ""),
+USER         "HOST": env("DB_HOST", "127.0.0.1"),
+USER         "PORT": env("DB_PORT", "5432"),
+USER         # MUST stay 0 under PgBouncer transaction pooling, which leaks session state.
+USER         "CONN_MAX_AGE": env_int("DB_CONN_MAX_AGE", 0),
+USER     }
+USER }
+USER DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+USER 
+USER #: How long a cached directory row may be trusted before it is refetched.
+USER DIRECTORY_MAX_AGE_SECONDS = env_int("DIRECTORY_MAX_AGE_SECONDS", 6 * 60 * 60)
+USER 
+USER # The IAM. This service is a client of it and caches nothing it cannot rebuild.
+USER IAM_BASE_URL = env("IAM_BASE_URL", "http://127.0.0.1:8001")
+USER IAM_API_PREFIX = env("IAM_API_PREFIX", "/api")
+USER IAM_SERVICE_TOKEN = env("IAM_SERVICE_TOKEN", "")
+USER IAM_TIMEOUT_SECONDS = env_int("IAM_TIMEOUT_SECONDS", 5)
+USER IAM_SESSION_CACHE_SECONDS = env_int("IAM_SESSION_CACHE_SECONDS", 60)
+USER IAM_AUTH_COOKIE_NAME = env("IAM_AUTH_COOKIE_NAME", "fusion_session")
+USER 
+USER CACHES = {
+USER     "default": (
+USER         {
+USER             "BACKEND": "django.core.cache.backends.redis.RedisCache",
+USER             "LOCATION": env("REDIS_CACHE_URL"),
+USER         }
+USER         if env("REDIS_CACHE_URL")
+USER         else {
+USER             "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+USER             "LOCATION": "fusion-integrated",
+USER         }
+USER     )
+USER }
+USER 
+USER CELERY_BROKER_URL = env("REDIS_BROKER_URL", "memory://")
+USER CELERY_TASK_ALWAYS_EAGER = env_bool("CELERY_TASK_ALWAYS_EAGER", False)
+USER CELERY_TASK_ACKS_LATE = True
+USER CELERY_TASK_REJECT_ON_WORKER_LOST = True
+USER 
+USER # Console by default, so a laptop never mails 3,000 students by accident.
+USER EMAIL_BACKEND = env("DJANGO_EMAIL_BACKEND",
+USER                     "django.core.mail.backends.console.EmailBackend")
+USER EMAIL_HOST = env("EMAIL_HOST", "localhost")
+USER EMAIL_PORT = env_int("EMAIL_PORT", 25)
+USER EMAIL_HOST_USER = env("EMAIL_HOST_USER", "")
+USER EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", "")
+USER EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", False)
+USER DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL",
+USER                          "Placement Cell <placement@iiitdmj.ac.in>")
+USER 
+USER #: Ceiling per worker pass, so a runaway loop cannot mail the institute.
+USER NOTIFY_MAX_PER_RUN = env_int("NOTIFY_MAX_PER_RUN", 500)
+USER #: Attempts before a notification is parked as failed for a human to look at.
+USER NOTIFY_MAX_ATTEMPTS = env_int("NOTIFY_MAX_ATTEMPTS", 5)
+USER #: A dozen events a day is legitimate during a drive; thirty is a bug.
+USER NOTIFY_DAILY_CAP_PER_RECIPIENT = env_int("NOTIFY_DAILY_CAP_PER_RECIPIENT", 20)
+USER 
+USER #: Pre-Drive uploads, still served but never written; outside BASE_DIR or boot fails.
+USER PLACEMENT_UPLOAD_ROOT = env(
+USER     "PLACEMENT_UPLOAD_ROOT",
+USER     str(Path.home() / ".local" / "share" / "fusion-integrated" / "uploads"))
+USER #: When set, legacy reads go to nginx via X-Accel-Redirect. Must be `internal;`.
+USER PLACEMENT_UPLOAD_INTERNAL_PREFIX = env("PLACEMENT_UPLOAD_INTERNAL_PREFIX", "")
+USER 
+USER # No multipart endpoints remain, so this only caps the JSON body.
+USER DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
+USER 
+USER REST_FRAMEWORK = {
+USER     "DEFAULT_AUTHENTICATION_CLASSES": [
+USER         "fusion_auth.authentication.IamSessionAuthentication",
+USER     ],
+USER     "DEFAULT_PERMISSION_CLASSES": [
+USER         "fusion_auth.permissions.IsAuthenticatedPrincipal",
+USER     ],
+USER     "DEFAULT_PAGINATION_CLASS": "core.api.pagination.CursorPagination",
+USER     "PAGE_SIZE": 25,
+USER     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+USER     "EXCEPTION_HANDLER": "core.api.exceptions.exception_handler",
+USER     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+USER     "UNAUTHENTICATED_USER": None,
+USER     # Unset, DRF throttles on the whole client-controlled X-Forwarded-For.
+USER     "NUM_PROXIES": env_int("DJANGO_NUM_PROXIES", 1),
+USER     # Not DRF's ScopedRateThrottle: it keys on request.user.pk, absent here.
+USER     "DEFAULT_THROTTLE_CLASSES": ["core.api.throttling.PrincipalScopedThrottle"],
+USER     # Only endpoints opting in via `throttle_scope` are limited.
+USER     "DEFAULT_THROTTLE_RATES": {
+USER         "recruiter_login": "5/min",
+USER         "recruiter_invite_accept": "10/hour",
+USER         "apply": "30/hour",
+USER         "export": "5/hour",
+USER         "upload": "20/hour",
+USER         "directory_search": "120/hour",
+USER     },
+USER }
+USER 
+USER # Recruiter passwords only; PBKDF2 verifies an older hash, then upgrades it.
+USER PASSWORD_HASHERS = [
+USER     "django.contrib.auth.hashers.Argon2PasswordHasher",
+USER     "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+USER ]
+USER 
+USER SPECTACULAR_SETTINGS = {
+USER     "TITLE": "Fusion-Integrated API",
+USER     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
+USER     "VERSION": "1.0.0",
+USER     "SERVE_INCLUDE_SCHEMA": False,
+USER }
+USER 
+USER CORS_ALLOW_ALL_ORIGINS = False
+USER CORS_ALLOWED_ORIGINS = env_list("DJANGO_CORS_ALLOWED_ORIGINS", ["http://localhost:5173"])
+USER CORS_ALLOW_CREDENTIALS = True
+USER 
+USER LANGUAGE_CODE = "en-us"
+USER TIME_ZONE = "Asia/Kolkata"
+USER # After TIME_ZONE, which it reads, or a crontab entry fires at the wrong hour.
+USER CELERY_TIMEZONE = TIME_ZONE
+USER CELERY_ENABLE_UTC = True
+USER USE_I18N = True
+USER USE_TZ = True
+USER STATIC_URL = "/static/"
+USER STATIC_ROOT = BASE_DIR / "staticfiles"
+USER 
+USER SECURE_CONTENT_TYPE_NOSNIFF = True
+USER SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+USER # SAMEORIGIN, not DENY: Fusion-client embeds these screens, same origin in prod.
+USER X_FRAME_OPTIONS = "SAMEORIGIN"
+USER 
+USER # W003: CSRF is enforced by core/api/csrf.py. See the note above MIDDLEWARE.
+USER # W019: the portal frames these screens deliberately, and only same origin.
+USER SILENCED_SYSTEM_CHECKS = ["security.W003", "security.W019"]
+USER 
+USER # Without this, nothing is configured and every INFO audit line is discarded.
+USER LOGGING = {
+USER     "version": 1,
+USER     "disable_existing_loggers": False,
+USER     "formatters": {
+USER         "plain": {
+USER             "format": "%(asctime)s %(levelname)s %(name)s %(message)s",
+USER             "datefmt": "%Y-%m-%d %H:%M:%S",
+USER         },
+USER     },
+USER     "handlers": {
+USER         "console": {"class": "logging.StreamHandler", "formatter": "plain"},
+USER     },
+USER     "root": {"handlers": ["console"], "level": "WARNING"},
+USER     "loggers": {
+USER         # Raise the level to quiet a host down; do not remove the handler.
+USER         "fusion": {"level": env("FUSION_LOG_LEVEL", "INFO"), "propagate": True},
+USER     },
+USER }
+USER ```
+-------
+ASSISTANT Ok, any changes I propose will be to those files.
+-------
+USER Context (the same for every step): we are implementing the Patent Management System (PMS) module as an integrated module of this Fusion ERP repository (Django 5 + DRF backend under modules/, React 18 + Mantine 7 client under client/). Reuse Fusion's existing login, role mechanism, layout and backend structure; do not rebuild them.
+USER 
+USER Repository rules you must follow:
+USER - There is no user table in this repository. The logged-in person is request.principal (fusion_auth.principal.Principal: user_id, username, kind, roles, permissions). Store people as integer ids (models.IntegerField), never as a ForeignKey to a user model.
+USER - A module copies the shape of modules/placement: apps.py, registry.py, models.py, domain/ (pure Python, no Django imports), services/ (all writes), api/ (serializers, views, urls).
+USER - The module code is "patent", and every permission code starts with "patent.".
+USER - Every API view sets permission_classes = [HasModuleGrant("patent"), HasPermission("patent.<action>")], imported from fusion_auth.permissions.
+USER - The four PMS actors are Applicant, Director, PCC_ADMIN and Attorney.
+USER 
+USER Files marked read-only are context only. Write every file you create or change in full. Do not ask for more files; work with what is shown.
+USER 
+USER Step 8 of 11 — register the new module with the platform, the same way placement is registered. Change only these two files:
+USER 1. config/settings/base.py — add "modules.patent" to DOMAIN_MODULES. Keep every other line exactly as it is.
+USER 2. config/urls.py — mount modules.patent.api.urls under "api/v1/patent/" next to the placement entry. Keep every other line exactly as it is.
+USER 
+USER 
+USER # *SEARCH/REPLACE block* Rules:
+USER 
+USER Every *SEARCH/REPLACE block* must use this format:
+USER 1. The *FULL* file path alone on a line, verbatim. No bold asterisks, no quotes around it, no escaping of characters, etc.
+USER 2. The opening fence and code language, eg: ```python
+USER 3. The start of search block: <<<<<<< SEARCH
+USER 4. A contiguous chunk of lines to search for in the existing source code
+USER 5. The dividing line: =======
+USER 6. The lines to replace into the source code
+USER 7. The end of the replace block: >>>>>>> REPLACE
+USER 8. The closing fence: ```
+USER 
+USER Use the *FULL* file path, as shown to you by the user.
+USER 
+USER Every *SEARCH* section must *EXACTLY MATCH* the existing file content, character for character, including all comments, docstrings, etc.
+USER If the file contains code or other data wrapped/escaped in json/xml/quotes or other containers, you need to propose edits to the literal contents of the file, including the container markup.
+USER 
+USER *SEARCH/REPLACE* blocks will *only* replace the first match occurrence.
+USER Including multiple unique *SEARCH/REPLACE* blocks if needed.
+USER Include enough lines in each SEARCH section to uniquely match each set of lines that need to change.
+USER 
+USER Keep *SEARCH/REPLACE* blocks concise.
+USER Break large *SEARCH/REPLACE* blocks into a series of smaller blocks that each change a small portion of the file.
+USER Include just the changing lines, and a few surrounding lines if needed for uniqueness.
+USER Do not include long runs of unchanging lines in *SEARCH/REPLACE* blocks.
+USER 
+USER Only create *SEARCH/REPLACE* blocks for files that the user has added to the chat!
+USER 
+USER To move code within a file, use 2 *SEARCH/REPLACE* blocks: 1 to delete it from its current location, 1 to insert it in the new location.
+USER 
+USER Pay attention to which filenames the user wants you to edit, especially if they are asking you to create a new file.
+USER 
+USER If you want to put code in a new file, use a *SEARCH/REPLACE block* with:
+USER - A new file path, including dir name if needed
+USER - An empty `SEARCH` section
+USER - The new file's contents in the `REPLACE` section
+USER 
+USER If the user just says something like "ok" or "go ahead" or "do that" they probably want you to make SEARCH/REPLACE blocks for the code changes you just proposed.
+USER The user will say when they've applied your edits. If they haven't explicitly confirmed the edits have been applied, they probably want proper SEARCH/REPLACE blocks.
+USER 
+USER Reply in English.
+USER ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+USER 
+LLM RESPONSE 2026-11-07T14:52:35
+ASSISTANT To complete Step 8 of 11, I will modify the two configuration files to register the new `patent` module:
+ASSISTANT 
+ASSISTANT 1.  **config/settings/base.py**: Add `"modules.patent"` to the `DOMAIN_MODULES` list, following the same pattern as `modules.placement`.
+ASSISTANT 2.  **config/urls.py**: Add a URL pattern to include `modules.patent.api.urls` under the `api/v1/patent/` path, matching the style of the existing placement entry.
+ASSISTANT 
+ASSISTANT Here are the *SEARCH/REPLACE* blocks:
+ASSISTANT 
+ASSISTANT config/settings/base.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT DOMAIN_MODULES = [
+ASSISTANT     "modules.placement",
+ASSISTANT ]
+ASSISTANT =======
+ASSISTANT DOMAIN_MODULES = [
+ASSISTANT     "modules.placement",
+ASSISTANT     "modules.patent",
+ASSISTANT ]
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT config/urls.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT     path("api/v1/directory/", include("modules.directory.api.urls")),
+ASSISTANT     path("api/v1/placement/", include("modules.placement.api.urls")),
+ASSISTANT     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+ASSISTANT =======
+ASSISTANT     path("api/v1/directory/", include("modules.directory.api.urls")),
+ASSISTANT     path("api/v1/placement/", include("modules.placement.api.urls")),
+ASSISTANT     path("api/v1/patent/", include("modules.patent.api.urls")),
+ASSISTANT     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
