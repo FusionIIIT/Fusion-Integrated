@@ -6,4 +6,5 @@ CORS_ALLOW_ALL_ORIGINS = True
 CELERY_TASK_ALWAYS_EAGER = True
 
 # Dev-only fixtures that legitimately touch every module; never in production.
-INSTALLED_APPS = [*INSTALLED_APPS, "devtools"]
+INSTALLED_APPS = [*INSTALLED_APPS, "devtools","applications.leave"]
+

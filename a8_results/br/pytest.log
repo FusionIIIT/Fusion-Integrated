@@ -1,0 +1,56 @@
+...F..................ss...............                                  [100%]
+=================================== FAILURES ===================================
+_ TestStudentLeadershipAndFacultyValidation.test_tc_br_04_valid_faculty_councillor_prohibited _
+
+self = <br.test_br.TestStudentLeadershipAndFacultyValidation object at 0x76df04b670b0>
+
+    def test_tc_br_04_valid_faculty_councillor_prohibited(self):
+        """TC-BR-04 (source_id: BR-GYM-002-prohibited):
+        Verify prohibited outcome of BR-GYM-002 when Club Faculty Councillor is invalid.
+        """
+        student_admin = _make_user("admin_br04", is_staff=True)
+        student_coord = _make_user("coord_br04")
+        student_cocoord = _make_user("cocoord_br04")
+        student_non_faculty = _make_user("non_faculty_br04")  # student, not a faculty member
+    
+        client = APIClient()
+        client.force_authenticate(user=student_admin)
+    
+        payload = {
+            "name": _unique_name("InvalidFacultyClub"),
+            "category": "technical",
+            "coordinator": student_coord.pk,
+            "co_coordinator": student_cocoord.pk,
+            "faculty_councillor": student_non_faculty.pk,
+            "description": "Non-faculty user assigned as faculty councillor",
+        }
+        resp = client.post("/api/gymkhana/clubs/", payload, format="json")
+>       assert resp.status_code == status.HTTP_400_BAD_REQUEST, (
+            f"Expected rejection with faculty validation error, got {resp.status_code}: {resp.data}"
+        )
+E       AssertionError: Expected rejection with faculty validation error, got 201: {'id': 3, 'name': 'InvalidFacultyClub_21', 'description': 'Non-faculty user assigned as faculty councillor', 'category': 'technical', 'coordinator': 15, 'co_coordinator': 16, 'faculty_councillor': 17, 'status': 'open', 'created_at': '2026-11-09T02:26:15.304341+05:30', 'updated_at': '2026-11-09T02:26:15.304352+05:30'}
+E       assert 201 == 400
+E        +  where 201 = <Response status_code=201, "application/json">.status_code
+E        +  and   400 = status.HTTP_400_BAD_REQUEST
+
+tests/a8/br/test_br.py:205: AssertionError
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.3-final-0 ________________
+
+Name                                               Stmts   Miss Branch BrPart  Cover   Missing
+----------------------------------------------------------------------------------------------
+applications/gymkhana/__init__.py                      0      0      0      0   100%
+applications/gymkhana/apps.py                          5      0      0      0   100%
+applications/gymkhana/migrations/0001_initial.py       7      0      0      0   100%
+applications/gymkhana/migrations/__init__.py           0      0      0      0   100%
+applications/gymkhana/models.py                      186     22     22      5    84%   67, 71-74, 111, 115-116, 133, 163, 168, 172->exit, 210, 215, 217->exit, 254, 285, 302, 320, 355, 359-360, 396, 435
+applications/gymkhana/serializers.py                 129      8     32     10    89%   55, 88->97, 91, 144, 209, 213, 216->220, 218, 245, 266
+applications/gymkhana/tests.py                       266    266      0      0     0%   20-549
+applications/gymkhana/urls.py                         14      0      0      0   100%
+applications/gymkhana/views.py                       149     28     22      6    79%   101, 139, 165, 171, 201, 209-212, 215-220, 233, 245-250, 296, 320-323, 343
+----------------------------------------------------------------------------------------------
+TOTAL                                                756    324     76     21    58%
+Coverage XML written to file a8_results/br/coverage.xml
+=========================== short test summary info ============================
+FAILED tests/a8/br/test_br.py::TestStudentLeadershipAndFacultyValidation::test_tc_br_04_valid_faculty_councillor_prohibited
+1 failed, 36 passed, 2 skipped in 3.33s
