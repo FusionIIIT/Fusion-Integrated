@@ -8,3 +8,15 @@ IAM_SESSION_CACHE_SECONDS = 0
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache",
                       "LOCATION": "test"}}
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": ":memory:",
+    }
+}
+
+# Keep test scope clean and isolated to FTS and platform
+DOMAIN_MODULES = [
+    "modules.fts",
+]
+INSTALLED_APPS = [app for app in (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS + PLATFORM_MODULES + DOMAIN_MODULES) if app != "modules.placement"]

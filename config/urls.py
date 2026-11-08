@@ -4,6 +4,7 @@ Every module mounts itself under /api/v1/<module>/. A module that is not in
 INSTALLED_APPS contributes no URLs at all — that is what "independent" means
 here: removing a module is deleting a directory and one settings line.
 """
+from django.conf import settings
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
@@ -15,7 +16,12 @@ urlpatterns = [
     path("readyz", readyz, name="readyz"),
     path("api/v1/", include("fusion_auth.urls")),
     path("api/v1/directory/", include("modules.directory.api.urls")),
-    path("api/v1/placement/", include("modules.placement.api.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="docs"),
 ]
+
+if "modules.placement" in settings.INSTALLED_APPS:
+    urlpatterns.append(path("api/v1/placement/", include("modules.placement.api.urls")))
+
+if "modules.fts" in settings.INSTALLED_APPS:
+    urlpatterns.append(path("api/v1/fts/", include("modules.fts.api.urls")))
