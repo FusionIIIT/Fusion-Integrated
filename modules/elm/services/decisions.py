@@ -1,4 +1,3 @@
-
 """Transactional and authorized decisions for employee leave applications."""
 
 from decimal import Decimal
@@ -31,11 +30,7 @@ def decide_leave_application(
 ) -> LeaveApplication:
     """Approve or reject a pending request as its assigned final authority."""
 
-    application = (
-        LeaveApplication.objects.select_for_update()
-        .filter(pk=application_id)
-        .first()
-    )
+    application = LeaveApplication.objects.select_for_update().filter(pk=application_id).first()
 
     if application is None:
         raise LeaveRuleError("Leave application does not exist.")
@@ -49,9 +44,7 @@ def decide_leave_application(
         )
 
     check = getattr(actor, "has_permission", None)
-    if not callable(check) or not check(
-        "elm.leave_application.decide"
-    ):
+    if not callable(check) or not check("elm.leave_application.decide"):
         raise PermissionDeniedError(
             "You do not have permission to decide leave applications.",
             code="permission_denied",
@@ -60,8 +53,7 @@ def decide_leave_application(
     # The authority must be assigned to this particular application.
     if (
         application.assigned_final_authority_user_id is None
-        or getattr(actor, "user_id", None)
-        != application.assigned_final_authority_user_id
+        or getattr(actor, "user_id", None) != application.assigned_final_authority_user_id
     ):
         raise PermissionDeniedError(
             "You are not the assigned final authority for this request.",
@@ -75,9 +67,7 @@ def decide_leave_application(
         raise LeaveRuleError("Decision must be approved or rejected.")
 
     if application.status != LeaveApplicationStatus.PENDING:
-        raise LeaveRuleError(
-            "Only pending leave applications can be decided."
-        )
+        raise LeaveRuleError("Only pending leave applications can be decided.")
 
     if application.leave_type in {LeaveType.CL, LeaveType.RH}:
         allowed_stages = {"awaiting_unit_head_review"}
@@ -90,14 +80,11 @@ def decide_leave_application(
 
     if application.workflow_stage not in allowed_stages:
         raise LeaveRuleError(
-            "This application has not completed the required "
-            "review and processing stages."
+            "This application has not completed the required review and processing stages."
         )
 
     if decision == LeaveApplicationStatus.APPROVED:
-        crosses_years = (
-            application.start_date.year != application.end_date.year
-        )
+        crosses_years = application.start_date.year != application.end_date.year
 
         if crosses_years and application.leave_type not in {
             LeaveType.EL,
@@ -134,9 +121,7 @@ def decide_leave_application(
             .order_by("leave_year")
         )
 
-        balances_by_year = {
-            balance.leave_year: balance for balance in balances
-        }
+        balances_by_year = {balance.leave_year: balance for balance in balances}
 
         if crosses_years:
             days_by_year = _calendar_year_day_counts(
@@ -146,8 +131,7 @@ def decide_leave_application(
 
             if sum(days_by_year.values()) != application.requested_days:
                 raise LeaveRuleError(
-                    "Cross-year requested days do not match "
-                    "the inclusive calendar-day count."
+                    "Cross-year requested days do not match the inclusive calendar-day count."
                 )
 
             # Validate all years before deducting any balance.
@@ -156,8 +140,7 @@ def decide_leave_application(
 
                 if balance is None:
                     raise LeaveRuleError(
-                        f"No {application.leave_type} balance exists "
-                        f"for year {year}."
+                        f"No {application.leave_type} balance exists for year {year}."
                     )
 
                 validate_sufficient_balance(
@@ -168,18 +151,14 @@ def decide_leave_application(
             for year, year_days in days_by_year.items():
                 balance = balances_by_year[year]
                 balance.available_balance -= Decimal(str(year_days))
-                balance.save(
-                    update_fields=["available_balance", "updated_at"]
-                )
+                balance.save(update_fields=["available_balance", "updated_at"])
 
         else:
             year = application.start_date.year
             balance = balances_by_year.get(year)
 
             if balance is None:
-                raise LeaveRuleError(
-                    "No balance exists for this leave type and year."
-                )
+                raise LeaveRuleError("No balance exists for this leave type and year.")
 
             validate_sufficient_balance(
                 balance.available_balance,
@@ -187,9 +166,7 @@ def decide_leave_application(
             )
 
             balance.available_balance -= application.requested_days
-            balance.save(
-                update_fields=["available_balance", "updated_at"]
-            )
+            balance.save(update_fields=["available_balance", "updated_at"])
 
     application.status = decision
     application.save(update_fields=["status", "updated_at"])

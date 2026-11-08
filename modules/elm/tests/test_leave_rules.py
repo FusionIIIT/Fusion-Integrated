@@ -33,9 +33,7 @@ def test_vl_conversion_rejects_invalid_balances(unused_vl):
 
 
 def test_date_range_counts_both_start_and_end_dates():
-    assert inclusive_calendar_days(
-        date(2026, 12, 30), date(2027, 1, 2)
-    ) == 4
+    assert inclusive_calendar_days(date(2026, 12, 30), date(2027, 1, 2)) == 4
 
 
 def test_date_range_rejects_end_before_start():
@@ -58,6 +56,4 @@ def test_leave_request_within_balance_is_valid():
 )
 def test_invalid_leave_balance_or_request_is_rejected(available, requested):
     with pytest.raises(LeaveRuleError):
-        validate_sufficient_balance(
-            Decimal(available), Decimal(requested)
-        )
+        validate_sufficient_balance(Decimal(available), Decimal(requested))

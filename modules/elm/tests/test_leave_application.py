@@ -2,24 +2,19 @@ from datetime import date
 from decimal import Decimal
 
 import pytest
+
 from modules.directory.models import UserRef
 from modules.elm.domain.leave_rules import LeaveRuleError
 from modules.elm.models import (
     LeaveApplication,
     LeaveApplicationStatus,
     LeaveBalance,
+    LeaveRoutingRule,
     LeaveType,
 )
 from modules.elm.services.leave_application import (
     submit_leave_application,
     validate_leave_application,
-)
-from modules.elm.models import (
-    LeaveApplication,
-    LeaveApplicationStatus,
-    LeaveBalance,
-    LeaveRoutingRule,
-    LeaveType,
 )
 
 
@@ -63,10 +58,13 @@ def test_valid_cl_request_passes(cl_balance):
 
 @pytest.mark.django_db
 def test_half_day_cl_request_passes(cl_balance):
-    assert validate_cl(
-        requested_days=Decimal("0.5"),
-        half_day="first_half",
-    ) is None
+    assert (
+        validate_cl(
+            requested_days=Decimal("0.5"),
+            half_day="first_half",
+        )
+        is None
+    )
 
 
 @pytest.mark.django_db
@@ -81,7 +79,7 @@ def test_half_day_not_allowed_for_multiple_dates(cl_balance):
 
 @pytest.mark.django_db
 def test_half_day_must_be_half_a_day(cl_balance):
-    with pytest.raises(LeaveRuleError, match="exactly 0.5"):
+    with pytest.raises(LeaveRuleError, match=r"exactly 0\.5"):
         validate_cl(
             requested_days=Decimal("1"),
             half_day="first_half",
@@ -115,10 +113,13 @@ def test_opposite_cl_halves_can_coexist(cl_balance):
         status=LeaveApplicationStatus.APPROVED,
     )
 
-    assert validate_cl(
-        requested_days=Decimal("0.5"),
-        half_day="second_half",
-    ) is None
+    assert (
+        validate_cl(
+            requested_days=Decimal("0.5"),
+            half_day="second_half",
+        )
+        is None
+    )
 
 
 @pytest.mark.django_db
@@ -154,7 +155,6 @@ def test_withdrawn_request_does_not_block_new_request(cl_balance):
     assert validate_cl() is None
 
 
-
 @pytest.mark.django_db
 def test_insufficient_balance_is_rejected(cl_balance):
     with pytest.raises(LeaveRuleError, match="Insufficient"):
@@ -162,7 +162,6 @@ def test_insufficient_balance_is_rejected(cl_balance):
             requested_days=Decimal("9"),
             end_date=date(2026, 10, 28),
         )
-
 
 
 @pytest.mark.django_db
@@ -184,13 +183,16 @@ def test_cross_year_el_checks_both_year_balances():
 
     # Dec 29, 2026 through Jan 3, 2027 = 6 calendar days:
     # 3 days in 2026 and 3 days in 2027.
-    assert validate_leave_application(
-        user_id=301,
-        leave_type=LeaveType.EL,
-        start_date=date(2026, 12, 29),
-        end_date=date(2027, 1, 3),
-        requested_days=Decimal("6"),
-    ) is None
+    assert (
+        validate_leave_application(
+            user_id=301,
+            leave_type=LeaveType.EL,
+            start_date=date(2026, 12, 29),
+            end_date=date(2027, 1, 3),
+            requested_days=Decimal("6"),
+        )
+        is None
+    )
 
 
 @pytest.mark.django_db
@@ -240,7 +242,6 @@ def test_cross_year_el_requires_both_year_balances():
         )
 
 
-
 @pytest.mark.django_db
 def test_cross_year_cl_requires_balance_for_each_year(cl_balance):
     with pytest.raises(
@@ -254,8 +255,6 @@ def test_cross_year_cl_requires_balance_for_each_year(cl_balance):
             end_date=date(2027, 1, 1),
             requested_days=Decimal("2"),
         )
-
-
 
 
 @pytest.mark.django_db
@@ -313,6 +312,7 @@ def test_submission_creates_pending_request_without_deducting_balance(
     assert application.establishment_required is False
     assert cl_balance.available_balance == Decimal("8")
 
+
 @pytest.mark.django_db
 def test_submission_rejects_invalid_request_without_creating_application(
     cl_balance,
@@ -324,7 +324,7 @@ def test_submission_rejects_invalid_request_without_creating_application(
 
     with pytest.raises(LeaveRuleError):
         submit_leave_application(
-            actor = actor,
+            actor=actor,
             user_id=201,
             leave_type=LeaveType.CL,
             start_date=date(2026, 10, 21),
@@ -335,9 +335,6 @@ def test_submission_rejects_invalid_request_without_creating_application(
     assert not LeaveApplication.objects.filter(user_id=201).exists()
     cl_balance.refresh_from_db()
     assert cl_balance.available_balance == Decimal("8")
-
-
-
 
 
 @pytest.mark.django_db

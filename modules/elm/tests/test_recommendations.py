@@ -1,4 +1,3 @@
-
 from datetime import date
 
 import pytest
@@ -15,7 +14,6 @@ from modules.elm.services.recommendations import (
     RECOMMENDED,
     recommend_leave_application,
 )
-
 
 UNIT_HEAD_ID = 902
 FINAL_AUTHORITY_ID = 903
@@ -73,9 +71,7 @@ def test_recommendation_forwards_to_final_authority(
 
     assert application.status == LeaveApplicationStatus.PENDING
     assert application.unit_head_recommendation == recommendation
-    assert application.unit_head_recommendation_remarks == (
-        "Reviewed by Unit Head."
-    )
+    assert application.unit_head_recommendation_remarks == ("Reviewed by Unit Head.")
     assert application.unit_head_recommended_by_user_id == UNIT_HEAD_ID
     assert application.workflow_stage == "awaiting_final_sanction"
 

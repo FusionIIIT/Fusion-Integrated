@@ -2,9 +2,8 @@
 
 from datetime import date, timedelta
 from decimal import Decimal
-from modules.elm.services.authz import require_permission
+
 from django.db import transaction
-from modules.elm.services.routing import resolve_leave_route
 
 from modules.elm.domain.leave_rules import (
     LeaveRuleError,
@@ -18,7 +17,8 @@ from modules.elm.models import (
     LeaveBalance,
     LeaveType,
 )
-
+from modules.elm.services.authz import require_permission
+from modules.elm.services.routing import resolve_leave_route
 
 
 def _calendar_year_day_counts(start_date: date, end_date: date) -> dict[int, int]:
@@ -37,7 +37,6 @@ def _calendar_year_day_counts(start_date: date, end_date: date) -> dict[int, int
         current = segment_end + timedelta(days=1)
 
     return counts
-
 
 
 def validate_leave_application(
@@ -65,12 +64,8 @@ def validate_leave_application(
     if half_day not in valid_half_days:
         raise LeaveRuleError("Invalid half-day selection.")
 
-    if half_day and (
-        leave_type != LeaveType.CL or start_date != end_date
-    ):
-        raise LeaveRuleError(
-            "Half-day leave is allowed only for a single-date CL request."
-        )
+    if half_day and (leave_type != LeaveType.CL or start_date != end_date):
+        raise LeaveRuleError("Half-day leave is allowed only for a single-date CL request.")
 
     try:
         requested = Decimal(str(requested_days))
@@ -80,14 +75,11 @@ def validate_leave_application(
     if not requested.is_finite() or requested <= 0:
         raise LeaveRuleError("Requested leave must be greater than zero.")
 
-
     crosses_year = start_date.year != end_date.year
 
     # EL, COL and VL count every calendar day in the interval.
     if leave_type in {LeaveType.EL, LeaveType.COL, LeaveType.VL}:
-        expected_days = Decimal(
-            inclusive_calendar_days(start_date, end_date)
-        )
+        expected_days = Decimal(inclusive_calendar_days(start_date, end_date))
         if requested != expected_days:
             raise LeaveRuleError(
                 f"{leave_type} requests must count every calendar day "
@@ -96,9 +88,7 @@ def validate_leave_application(
 
     # Half-day CL must consume exactly half a day.
     if half_day and requested != Decimal("0.5"):
-        raise LeaveRuleError(
-            "A half-day CL request must be exactly 0.5 days."
-        )
+        raise LeaveRuleError("A half-day CL request must be exactly 0.5 days.")
 
     # For other leave types, the requested amount cannot exceed
     # the inclusive date range. Their specific holiday/calendar
@@ -108,17 +98,11 @@ def validate_leave_application(
         and leave_type not in {LeaveType.EL, LeaveType.COL, LeaveType.VL}
         and requested > inclusive_calendar_days(start_date, end_date)
     ):
-        raise LeaveRuleError(
-            "Requested days cannot exceed the inclusive date range."
-        )
-
-
+        raise LeaveRuleError("Requested days cannot exceed the inclusive date range.")
 
     # 4. Check every relevant year's balance.
     if crosses_year:
-        for leave_year, year_days in _calendar_year_day_counts(
-            start_date, end_date
-        ).items():
+        for leave_year, year_days in _calendar_year_day_counts(start_date, end_date).items():
             try:
                 balance = LeaveBalance.objects.get(
                     user_id=user_id,
@@ -143,9 +127,7 @@ def validate_leave_application(
                 leave_year=leave_year,
             )
         except LeaveBalance.DoesNotExist as exc:
-            raise LeaveRuleError(
-                "No balance exists for this leave type and year."
-            ) from exc
+            raise LeaveRuleError("No balance exists for this leave type and year.") from exc
 
         validate_sufficient_balance(
             balance.available_balance,
@@ -186,10 +168,7 @@ def validate_leave_application(
         if opposite_cl_halves:
             continue
 
-        raise LeaveRuleError(
-            "This request overlaps an existing pending or approved leave."
-        )
-
+        raise LeaveRuleError("This request overlaps an existing pending or approved leave.")
 
 
 @transaction.atomic

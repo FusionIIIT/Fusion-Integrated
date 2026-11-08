@@ -1,4 +1,3 @@
-
 """Fail-closed authorization helpers for Employee Leave Management."""
 
 from core.api.exceptions import PermissionDeniedError

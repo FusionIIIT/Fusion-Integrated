@@ -1,4 +1,3 @@
-
 """Unit Head recommendations for higher-sanction leave applications."""
 
 from django.db import transaction
@@ -10,7 +9,6 @@ from modules.elm.models import (
     LeaveApplicationStatus,
     LeaveType,
 )
-
 
 RECOMMENDED = "recommended"
 NOT_RECOMMENDED = "not_recommended"
@@ -33,11 +31,7 @@ def recommend_leave_application(
 ) -> LeaveApplication:
     """Record the Unit Head's recommendation and forward the request."""
 
-    application = (
-        LeaveApplication.objects.select_for_update()
-        .filter(pk=application_id)
-        .first()
-    )
+    application = LeaveApplication.objects.select_for_update().filter(pk=application_id).first()
 
     if application is None:
         raise LeaveRuleError("Leave application does not exist.")
@@ -49,9 +43,7 @@ def recommend_leave_application(
         )
 
     check = getattr(actor, "has_permission", None)
-    if not callable(check) or not check(
-        "elm.leave_application.recommend"
-    ):
+    if not callable(check) or not check("elm.leave_application.recommend"):
         raise PermissionDeniedError(
             "You do not have permission to recommend leave applications.",
             code="permission_denied",
@@ -59,8 +51,7 @@ def recommend_leave_application(
 
     if (
         application.assigned_unit_head_user_id is None
-        or getattr(actor, "user_id", None)
-        != application.assigned_unit_head_user_id
+        or getattr(actor, "user_id", None) != application.assigned_unit_head_user_id
     ):
         raise PermissionDeniedError(
             "You are not the Unit Head assigned to this request.",
@@ -68,29 +59,19 @@ def recommend_leave_application(
         )
 
     if application.status != LeaveApplicationStatus.PENDING:
-        raise LeaveRuleError(
-            "Only pending leave applications can be recommended."
-        )
+        raise LeaveRuleError("Only pending leave applications can be recommended.")
 
     if application.leave_type not in HIGHER_SANCTION_TYPES:
-        raise LeaveRuleError(
-            "Unit Head recommendations apply only to higher-sanction leave."
-        )
+        raise LeaveRuleError("Unit Head recommendations apply only to higher-sanction leave.")
 
     if application.workflow_stage != "awaiting_unit_head_review":
-        raise LeaveRuleError(
-            "This application is not awaiting Unit Head review."
-        )
+        raise LeaveRuleError("This application is not awaiting Unit Head review.")
 
     if recommendation not in {RECOMMENDED, NOT_RECOMMENDED}:
-        raise LeaveRuleError(
-            "Recommendation must be recommended or not_recommended."
-        )
+        raise LeaveRuleError("Recommendation must be recommended or not_recommended.")
 
     if application.assigned_final_authority_user_id is None:
-        raise LeaveRuleError(
-            "No final sanctioning authority is assigned to this request."
-        )
+        raise LeaveRuleError("No final sanctioning authority is assigned to this request.")
 
     application.unit_head_recommendation = recommendation
     application.unit_head_recommendation_remarks = remarks.strip()

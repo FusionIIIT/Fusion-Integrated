@@ -26,12 +26,8 @@ def test_year_end_conversion_credits_el_and_clears_vl():
 
     result = convert_vl_to_el(user_id=101, source_year=2026)
 
-    vl = LeaveBalance.objects.get(
-        user_id=101, leave_type=LeaveType.VL, leave_year=2026
-    )
-    el = LeaveBalance.objects.get(
-        user_id=101, leave_type=LeaveType.EL, leave_year=2027
-    )
+    vl = LeaveBalance.objects.get(user_id=101, leave_type=LeaveType.VL, leave_year=2026)
+    el = LeaveBalance.objects.get(user_id=101, leave_type=LeaveType.EL, leave_year=2027)
 
     assert result.unused_vl == Decimal("5.5")
     assert result.converted_el == Decimal("2.75")
@@ -54,13 +50,9 @@ def test_year_end_conversion_cannot_be_applied_twice():
     with pytest.raises(LeaveRuleError, match="already been recorded"):
         convert_vl_to_el(user_id=102, source_year=2026)
 
-    el = LeaveBalance.objects.get(
-        user_id=102, leave_type=LeaveType.EL, leave_year=2027
-    )
+    el = LeaveBalance.objects.get(user_id=102, leave_type=LeaveType.EL, leave_year=2027)
     assert el.available_balance == Decimal("2.5")
-    assert YearEndConversion.objects.filter(
-        user_id=102, source_year=2026
-    ).count() == 1
+    assert YearEndConversion.objects.filter(user_id=102, source_year=2026).count() == 1
 
 
 @pytest.mark.django_db

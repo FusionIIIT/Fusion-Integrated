@@ -1,4 +1,3 @@
-
 import pytest
 
 from core.api.exceptions import PermissionDeniedError
@@ -7,7 +6,6 @@ from modules.elm.services.authz import (
     require_employee_access,
     require_permission,
 )
-
 
 PERMISSION = "elm.leave_application.create"
 

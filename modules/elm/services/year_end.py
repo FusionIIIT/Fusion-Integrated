@@ -34,18 +34,14 @@ def convert_vl_to_el(*, user_id: int, source_year: int) -> YearEndConversion:
             leave_year=source_year,
         )
     except LeaveBalance.DoesNotExist as exc:
-        raise LeaveRuleError(
-            "No VL balance exists for this employee and source year."
-        ) from exc
+        raise LeaveRuleError("No VL balance exists for this employee and source year.") from exc
 
     # A unique database constraint also prevents duplicate conversion rows.
     if YearEndConversion.objects.filter(
         user_id=user_id,
         source_year=source_year,
     ).exists():
-        raise LeaveRuleError(
-            "VL conversion has already been recorded for this year."
-        )
+        raise LeaveRuleError("VL conversion has already been recorded for this year.")
 
     unused_vl = vl_balance.available_balance
     converted_el = convert_unused_vl_to_el(unused_vl)
@@ -79,8 +75,6 @@ def convert_vl_to_el(*, user_id: int, source_year: int) -> YearEndConversion:
         )
     except IntegrityError as exc:
         # The atomic transaction rolls back the balance changes too.
-        raise LeaveRuleError(
-            "VL conversion has already been recorded for this year."
-        ) from exc
+        raise LeaveRuleError("VL conversion has already been recorded for this year.") from exc
 
     return conversion

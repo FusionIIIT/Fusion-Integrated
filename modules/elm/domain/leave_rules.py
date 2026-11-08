@@ -1,4 +1,3 @@
-
 """Pure business rules for Employee Leave Management (ELM).
 
 This module deliberately has no Django or database dependencies.
@@ -6,7 +5,6 @@ This module deliberately has no Django or database dependencies.
 
 from datetime import date
 from decimal import Decimal, InvalidOperation
-
 
 VL_TO_EL_RATIO = Decimal("2")
 

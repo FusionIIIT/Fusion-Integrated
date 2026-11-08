@@ -13,7 +13,6 @@ from modules.elm.models import (
 )
 from modules.elm.services.decisions import decide_leave_application
 
-
 FINAL_AUTHORITY_ID = 900
 DECISION_PERMISSION = "elm.leave_application.decide"
 
@@ -60,9 +59,7 @@ def pending_cl_request(db):
 
 
 @pytest.mark.django_db
-def test_approval_deducts_balance_and_updates_status(
-    pending_cl_request, authorized_actor
-):
+def test_approval_deducts_balance_and_updates_status(pending_cl_request, authorized_actor):
     application, balance = pending_cl_request
 
     result = decide_leave_application(
@@ -78,9 +75,7 @@ def test_approval_deducts_balance_and_updates_status(
 
 
 @pytest.mark.django_db
-def test_rejection_does_not_deduct_balance(
-    pending_cl_request, authorized_actor
-):
+def test_rejection_does_not_deduct_balance(pending_cl_request, authorized_actor):
     application, balance = pending_cl_request
 
     result = decide_leave_application(
@@ -96,9 +91,7 @@ def test_rejection_does_not_deduct_balance(
 
 
 @pytest.mark.django_db
-def test_already_decided_request_cannot_be_decided_again(
-    pending_cl_request, authorized_actor
-):
+def test_already_decided_request_cannot_be_decided_again(pending_cl_request, authorized_actor):
     application, balance = pending_cl_request
 
     decide_leave_application(
@@ -119,9 +112,7 @@ def test_already_decided_request_cannot_be_decided_again(
 
 
 @pytest.mark.django_db
-def test_invalid_decision_is_rejected(
-    pending_cl_request, authorized_actor
-):
+def test_invalid_decision_is_rejected(pending_cl_request, authorized_actor):
     application, balance = pending_cl_request
 
     with pytest.raises(LeaveRuleError, match="Decision must be"):

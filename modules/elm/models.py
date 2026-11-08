@@ -1,4 +1,3 @@
-
 """Database models for Employee Leave Management."""
 
 from django.core.validators import MinValueValidator
@@ -90,7 +89,6 @@ class LeaveApplication(TimeStampedModel, UserScopedModel):
     )
     reason = models.TextField(blank=True)
 
-
     workflow_stage = models.CharField(
         max_length=40,
         default="awaiting_unit_head_review",
@@ -147,7 +145,7 @@ class LeaveApplication(TimeStampedModel, UserScopedModel):
     unit_head_recommendation = models.CharField(
         max_length=20,
         choices=UNIT_HEAD_RECOMMENDATION_CHOICES,
-        null=True,
+        default="",
         blank=True,
     )
 
@@ -192,8 +190,6 @@ class YearEndConversion(TimeStampedModel, UserScopedModel):
         )
 
 
-
-
 class LeaveRoutingRule(TimeStampedModel):
     """Configured approval route for an employee and leave category."""
 
@@ -235,8 +231,4 @@ class LeaveRoutingRule(TimeStampedModel):
         ]
 
     def __str__(self):
-        return (
-            f"{self.department} | "
-            f"{self.applicant_designation} | "
-            f"{self.leave_type}"
-        )
+        return f"{self.department} | {self.applicant_designation} | {self.leave_type}"

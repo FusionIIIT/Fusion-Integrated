@@ -1,12 +1,12 @@
-
 """Fail-closed routing resolution for Employee Leave Management."""
 
 from dataclasses import dataclass
 
 from core.api.exceptions import PermissionDeniedError
+from modules.directory.contracts import get_users
 from modules.elm.domain.leave_rules import LeaveRuleError
 from modules.elm.models import LeaveRoutingRule, LeaveType
-from modules.directory.models import UserRef
+
 
 @dataclass(frozen=True)
 class LeaveRoute:
@@ -17,13 +17,10 @@ class LeaveRoute:
 
 
 def _require_active_employee(user_id: int, label: str) -> None:
-    if not UserRef.objects.filter(
-        user_id=user_id,
-        is_active=True,
-    ).exists():
-        raise LeaveRuleError(
-            f"The configured {label} is missing or inactive in the directory."
-        )
+    employee = get_users([user_id]).get(user_id)
+
+    if employee is None or not employee.is_active:
+        raise LeaveRuleError(f"The configured {label} is missing or inactive in the directory.")
 
 
 def resolve_leave_route(
@@ -43,24 +40,15 @@ def resolve_leave_route(
     designation = getattr(actor, "active_role", None)
 
     if not designation:
-        raise LeaveRuleError(
-            "Select an active designation before submitting a leave request."
-        )
+        raise LeaveRuleError("Select an active designation before submitting a leave request.")
 
-    try:
-        applicant = UserRef.objects.get(
-            user_id=applicant_user_id,
-            is_active=True,
-        )
-    except UserRef.DoesNotExist as exc:
-        raise LeaveRuleError(
-            "Applicant directory information is missing or inactive."
-        ) from exc
+    applicant = get_users([applicant_user_id]).get(applicant_user_id)
+
+    if applicant is None or not applicant.is_active:
+        raise LeaveRuleError("Applicant directory information is missing or inactive.")
 
     if not applicant.department:
-        raise LeaveRuleError(
-            "Applicant department is missing. Contact the ELM administrator."
-        )
+        raise LeaveRuleError("Applicant department is missing. Contact the ELM administrator.")
 
     rules = LeaveRoutingRule.objects.filter(
         department=applicant.department,
@@ -86,9 +74,7 @@ def resolve_leave_route(
         )
 
     if not rule.unit_head_user_id:
-        raise LeaveRuleError(
-            "The routing rule has no configured Unit Head."
-        )
+        raise LeaveRuleError("The routing rule has no configured Unit Head.")
 
     _require_active_employee(
         rule.unit_head_user_id,
@@ -101,9 +87,7 @@ def resolve_leave_route(
         final_authority_id = rule.final_authority_user_id
 
         if not final_authority_id:
-            raise LeaveRuleError(
-                "The routing rule has no configured final sanctioning authority."
-            )
+            raise LeaveRuleError("The routing rule has no configured final sanctioning authority.")
 
         _require_active_employee(
             final_authority_id,
@@ -114,9 +98,7 @@ def resolve_leave_route(
         LeaveType.CL,
         LeaveType.RH,
     }:
-        raise LeaveRuleError(
-            "Establishment processing cannot be configured for CL/RH routing."
-        )
+        raise LeaveRuleError("Establishment processing cannot be configured for CL/RH routing.")
 
     return LeaveRoute(
         unit_head_user_id=rule.unit_head_user_id,
