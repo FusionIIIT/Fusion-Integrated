@@ -109,6 +109,23 @@ def record_blacklist_hit(*, actor, hit, visitor_label: str) -> Alert:
     return alert
 
 
+def rescreen_request(vr, *, checkpoint, actor):
+    """Re-check the published blacklist for an existing request (BR-051/116).
+
+    On a hit the alert is committed in its own block and the caller must refuse;
+    returns True when blocked. Call it outside any transaction that is about to
+    be rolled back.
+    """
+    v = vr.visitor
+    hit = blacklist.check(checkpoint=checkpoint, name=v.full_name,
+                          id_doc_number=v.id_doc_number, phone=v.phone, email=v.email)
+    if hit is None:
+        return False
+    with transaction.atomic():
+        record_blacklist_hit(actor=actor, hit=hit, visitor_label=v.full_name)
+    return True
+
+
 # --- visitor master data (CFR-032, CFR-029) ----------------------------------------------
 
 def resolve_visitor(*, session_visitor, data: dict, update_existing=True) -> Visitor:
@@ -225,7 +242,8 @@ def submit(*, session_visitor, data: dict) -> VisitRequest:
     with transaction.atomic():
         visitor = resolve_visitor(session_visitor=session_visitor, data=data)
         if VisitRequest.objects.filter(
-                visitor=visitor, host_user_id=host_id, scheduled_start=start,
+                visitor=visitor, host_user_id=host_id, scheduled_start__lt=end,
+                scheduled_end__gt=start,
                 status__in=[VisitRequest.Status.PENDING, VisitRequest.Status.AWAITING_ADMIN,
                             VisitRequest.Status.APPROVED]).exists():
             raise BadRequestError("A request already exists for this visit.",

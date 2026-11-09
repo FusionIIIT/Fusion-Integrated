@@ -19,7 +19,7 @@ from core.api.exceptions import (
 )
 from modules.vms.domain import request_state
 from modules.vms.models import VisitPass, VisitRequest
-from modules.vms.services import passes, policy
+from modules.vms.services import passes, policy, registration
 from modules.vms.services.common import audit, authz, notify
 
 APPROVE, REJECT = "approve", "reject"
@@ -56,6 +56,19 @@ def _notify_visitor(vr, topic, subject, body):
                        subject=subject, body=body, visitor=visitor)
 
 
+def _rescreen(host_actor, request_id):
+    """BR-051/116: a blacklist published after submission still blocks approval."""
+    vr = (VisitRequest.objects.select_related("visitor")
+          .filter(pk=request_id, host_user_id=host_actor.user_id,
+                  status=VisitRequest.Status.PENDING).first())
+    if vr is None:
+        return          # not found / not pending: reported by the locked path below
+    checkpoint = "walk_in" if _kind(vr) == request_state.WALK_IN else "pre_registration"
+    if registration.rescreen_request(vr, checkpoint=checkpoint, actor=host_actor):
+        raise BadRequestError("This visitor is not permitted entry.",
+                              code="visitor_blacklisted")
+
+
 def decide(*, host_actor, request_id: int, decision: str, note: str = "",
            zones=None, window=None):
     """Host approves or rejects. Returns ``(request, pass_or_None)``.
@@ -72,6 +85,8 @@ def decide(*, host_actor, request_id: int, decision: str, note: str = "",
         raise BadRequestError("A reason is required to reject a request.",
                               code="reason_required")
     now = timezone.now()
+    if decision == APPROVE:
+        _rescreen(host_actor, request_id)
     with transaction.atomic():
         vr = (VisitRequest.objects.select_for_update(of=("self",))
               .select_related("visitor", "created_by_visitor")

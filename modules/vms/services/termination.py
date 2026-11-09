@@ -54,6 +54,8 @@ def terminate(*, actor, pass_id: int, reason: str) -> VisitPass:
         is_admin = _is_admin_for(actor, vp)
         if not is_admin and vr.host_user_id != actor.user_id:
             raise NotFoundError()                             # no id enumeration
+        if vr.status == VisitRequest.Status.COMPLETED:
+            raise ConflictError("The visit is already completed.", code="visit_completed")
         if not vp.is_active or vp.terminated_at is not None:
             raise ConflictError("This pass is already inactive.", code="pass_not_active")
         vr = VisitRequest.objects.select_for_update().get(pk=vr.pk)

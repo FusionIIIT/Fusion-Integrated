@@ -149,7 +149,6 @@ def test_uc_036_admin_terminate_requires_reason_and_audits(admin):
     assert Notification.objects.filter(topic="pass.terminated", recipient_user_id=555).exists()
 
 
-@pytest.mark.xfail(strict=True, reason="BUG: terminate() silently deactivates the pass of an already completed visit")
 def test_uc_036_admin_terminate_completed_visit_conflicts(admin, security):
     """VMS-UC-036: terminal state cannot be terminated."""
     vp = on_site_pass(host_id=555)
