@@ -68,12 +68,10 @@ def test_uc_040_reminder_sent_to_host_with_channel_per_setting():
     assert req.visitor.pk not in {r.recipient_visitor_id for r in rows}
 
 
-@pytest.mark.xfail(strict=True, reason="BUG: send_reminders only considers PENDING, so an "
-                   "urgent awaiting_admin request never reminds the admins")
 def test_uc_040_reminder_for_urgent_awaiting_admin_goes_to_admins():
     """VMS-UC-040: urgent reminders."""
-    f.make_role_assignment(user_id=4001, role="admin")
     with freeze_time(T0):
+        f.make_role_assignment(user_id=4001, role="admin")
         _setup(status="awaiting_admin", is_urgent=True)
     with freeze_time("2026-06-01 21:00:00+00:00"):
         scheduler_work.send_reminders()
