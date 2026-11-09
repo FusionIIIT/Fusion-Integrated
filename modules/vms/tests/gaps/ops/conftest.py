@@ -14,7 +14,7 @@ from modules.vms.tests import factories as f
 
 SEC, ADMIN, HOST = 3001, 4001, 2001
 SEC_PERMS = ("vms.monitor.view", "vms.muster.trigger", "vms.muster.rollcall")
-ADMIN_PERMS = SEC_PERMS + ("vms.report.export",)
+ADMIN_PERMS = (*SEC_PERMS, "vms.report.export")
 EVENT_PERMS = ("vms.event.manage", "vms.pass.terminate", "vms.monitor.view")
 GATE_PERMS = ("vms.gate.operate", "vms.gate.sync", "vms.monitor.view")
 HEADER = "name,phone,email,id_doc_type,id_doc_number,slot_start,slot_end\n"
