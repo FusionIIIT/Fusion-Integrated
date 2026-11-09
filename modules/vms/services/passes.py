@@ -5,7 +5,7 @@ import secrets
 
 from django.db import connection, transaction
 
-from core.api.exceptions import ConflictError
+from core.api.exceptions import BadRequestError, ConflictError
 from modules.vms.domain import policy_eval
 from modules.vms.models import VisitPass, VisitRequest
 from modules.vms.services import policy
@@ -38,6 +38,8 @@ def issue_pass(*, request, pass_type, issued_by, valid_from=None, valid_until=No
     zones.
     """
     pass_type = getattr(pass_type, "value", pass_type)
+    if pass_type not in VisitPass.PassType.values:                 # BR-211
+        raise BadRequestError("Unknown pass type.", code="invalid_pass_type")
     issuer_id = issued_by if isinstance(issued_by, int) else issued_by.user_id
     with transaction.atomic():
         vr = VisitRequest.objects.select_for_update().get(pk=request.pk)
