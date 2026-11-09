@@ -4,11 +4,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.api.exceptions import BadRequestError, ConflictError, NotFoundError
-from fusion_auth.permissions import HasPermission
+from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.vms.api.events import serializers as s
 from modules.vms.models import EventBatch
 from modules.vms.selectors import events as sel
 from modules.vms.services import bulk_events as svc
+
+MODULE = HasModuleGrant("vms")
 
 LIST_LIMIT = 500
 
@@ -44,7 +46,7 @@ def _kwargs(data) -> dict:
 
 
 class EventListView(APIView):
-    permission_classes = [HasPermission("vms.event.manage")]
+    permission_classes = [MODULE, HasPermission("vms.event.manage")]
 
     def get(self, request):
         rows = sel.events(status=request.query_params.get("status"))[:LIST_LIMIT]
@@ -58,7 +60,7 @@ class EventListView(APIView):
 
 
 class EventDetailView(APIView):
-    permission_classes = [HasPermission("vms.event.manage")]
+    permission_classes = [MODULE, HasPermission("vms.event.manage")]
 
     def get(self, request, pk):
         return Response(_event(_get(pk)))
@@ -72,7 +74,7 @@ class EventDetailView(APIView):
 
 
 class AttendeeListView(APIView):
-    permission_classes = [HasPermission("vms.event.manage")]
+    permission_classes = [MODULE, HasPermission("vms.event.manage")]
 
     def get(self, request, pk):
         _get(pk)
@@ -81,7 +83,7 @@ class AttendeeListView(APIView):
 
 
 class AttendeeUploadView(APIView):
-    permission_classes = [HasPermission("vms.event.manage")]
+    permission_classes = [MODULE, HasPermission("vms.event.manage")]
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, pk):
@@ -93,7 +95,7 @@ class AttendeeUploadView(APIView):
 
 
 class AttendeeDetailView(APIView):
-    permission_classes = [HasPermission("vms.event.manage")]
+    permission_classes = [MODULE, HasPermission("vms.event.manage")]
     parser_classes = [JSONParser, FormParser]
 
     def delete(self, request, pk, aid):
@@ -105,7 +107,7 @@ class AttendeeDetailView(APIView):
 
 
 class ApproveView(APIView):
-    permission_classes = [HasPermission("vms.event.manage")]
+    permission_classes = [MODULE, HasPermission("vms.event.manage")]
 
     def post(self, request, pk):
         ser = s.ApproveSerializer(data=request.data)
@@ -115,7 +117,7 @@ class ApproveView(APIView):
 
 
 class CancelView(APIView):
-    permission_classes = [HasPermission("vms.event.manage")]
+    permission_classes = [MODULE, HasPermission("vms.event.manage")]
 
     def post(self, request, pk):
         ser = s.ReasonSerializer(data=request.data)
@@ -125,14 +127,14 @@ class CancelView(APIView):
 
 
 class AttendanceView(APIView):
-    permission_classes = [HasPermission("vms.event.manage", "vms.monitor.view")]
+    permission_classes = [MODULE, HasPermission("vms.event.manage", "vms.monitor.view")]
 
     def get(self, request, pk):
         return Response(sel.attendance(_get(pk)))
 
 
 class ThroughputView(APIView):
-    permission_classes = [HasPermission("vms.event.manage", "vms.monitor.view")]
+    permission_classes = [MODULE, HasPermission("vms.event.manage", "vms.monitor.view")]
 
     def get(self, request, pk):
         raw = request.query_params.get("bucket_minutes", "5")
@@ -142,7 +144,7 @@ class ThroughputView(APIView):
 
 
 class FastLaneManifestView(APIView):
-    permission_classes = [HasPermission("vms.gate.sync")]
+    permission_classes = [MODULE, HasPermission("vms.gate.sync")]
 
     def get(self, request, pk):
         ev = _get(pk)

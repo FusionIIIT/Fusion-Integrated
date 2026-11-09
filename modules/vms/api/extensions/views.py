@@ -2,7 +2,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from fusion_auth.permissions import HasPermission
+from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.vms.api.extensions.serializers import (
     ExtensionCreateSerializer,
     ExtensionDecisionSerializer,
@@ -10,11 +10,13 @@ from modules.vms.api.extensions.serializers import (
 )
 from modules.vms.services import extensions
 
+MODULE = HasModuleGrant("vms")
+
 HOST_OR_ADMIN = ("vms.request.decide", "vms.extension.decide")
 
 
 class ExtensionListCreateView(APIView):
-    permission_classes = [HasPermission(*HOST_OR_ADMIN)]
+    permission_classes = [MODULE, HasPermission(*HOST_OR_ADMIN)]
 
     def get(self, request):
         qs = extensions.list_extensions(actor=request.principal,
@@ -29,7 +31,7 @@ class ExtensionListCreateView(APIView):
 
 
 class ExtensionDetailView(APIView):
-    permission_classes = [HasPermission(*HOST_OR_ADMIN)]
+    permission_classes = [MODULE, HasPermission(*HOST_OR_ADMIN)]
 
     def get(self, request, pk):
         ext = extensions.get_extension(actor=request.principal, extension_id=pk)
@@ -37,7 +39,7 @@ class ExtensionDetailView(APIView):
 
 
 class ExtensionDecisionView(APIView):
-    permission_classes = [HasPermission("vms.extension.decide")]
+    permission_classes = [MODULE, HasPermission("vms.extension.decide")]
 
     def post(self, request, pk):
         ser = ExtensionDecisionSerializer(data=request.data)

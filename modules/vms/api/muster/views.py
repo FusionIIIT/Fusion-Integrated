@@ -4,9 +4,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.api.exceptions import BadRequestError
-from fusion_auth.permissions import HasPermission
+from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.vms.api.muster import serializers as s
 from modules.vms.services import muster as svc
+
+MODULE = HasModuleGrant("vms")
 
 LIST_LIMIT = 2000
 
@@ -17,7 +19,7 @@ def _shape(muster) -> dict:
 
 
 class MusterTriggerView(APIView):
-    permission_classes = [HasPermission("vms.muster.trigger")]
+    permission_classes = [MODULE, HasPermission("vms.muster.trigger")]
 
     def post(self, request):
         ser = s.TriggerSerializer(data=request.data)
@@ -27,7 +29,7 @@ class MusterTriggerView(APIView):
 
 
 class MusterCurrentView(APIView):
-    permission_classes = [HasPermission("vms.monitor.view")]
+    permission_classes = [MODULE, HasPermission("vms.monitor.view")]
 
     def get(self, request):
         muster = svc.current_for(actor=request.principal)
@@ -35,14 +37,14 @@ class MusterCurrentView(APIView):
 
 
 class MusterDetailView(APIView):
-    permission_classes = [HasPermission("vms.monitor.view")]
+    permission_classes = [MODULE, HasPermission("vms.monitor.view")]
 
     def get(self, request, pk):
         return Response(_shape(svc.get(actor=request.principal, muster_id=pk)))
 
 
 class MusterRosterView(APIView):
-    permission_classes = [HasPermission("vms.monitor.view")]
+    permission_classes = [MODULE, HasPermission("vms.monitor.view")]
 
     def get(self, request, pk):
         status = request.query_params.get("status") or None
@@ -54,7 +56,7 @@ class MusterRosterView(APIView):
 
 
 class RollCallView(APIView):
-    permission_classes = [HasPermission("vms.muster.rollcall")]
+    permission_classes = [MODULE, HasPermission("vms.muster.rollcall")]
 
     def post(self, request, pk):
         ser = s.RollCallSerializer(data=request.data)
@@ -64,7 +66,7 @@ class RollCallView(APIView):
 
 
 class BulkRollCallView(APIView):
-    permission_classes = [HasPermission("vms.muster.rollcall")]
+    permission_classes = [MODULE, HasPermission("vms.muster.rollcall")]
 
     def post(self, request, pk):
         ser = s.BulkRollCallSerializer(data=request.data)
@@ -75,7 +77,7 @@ class BulkRollCallView(APIView):
 
 
 class ReconcileView(APIView):
-    permission_classes = [HasPermission("vms.muster.rollcall")]
+    permission_classes = [MODULE, HasPermission("vms.muster.rollcall")]
 
     def post(self, request, pk):
         ser = s.ReconcileSerializer(data=request.data)
@@ -86,7 +88,7 @@ class ReconcileView(APIView):
 
 
 class CloseView(APIView):
-    permission_classes = [HasPermission("vms.muster.trigger")]
+    permission_classes = [MODULE, HasPermission("vms.muster.trigger")]
 
     def post(self, request, pk):
         ser = s.CloseSerializer(data=request.data)
@@ -96,14 +98,14 @@ class CloseView(APIView):
 
 
 class ReportView(APIView):
-    permission_classes = [HasPermission("vms.monitor.view")]
+    permission_classes = [MODULE, HasPermission("vms.monitor.view")]
 
     def get(self, request, pk):
         return Response(svc.report(actor=request.principal, muster_id=pk))
 
 
 class ReportCsvView(APIView):
-    permission_classes = [HasPermission("vms.report.export")]
+    permission_classes = [MODULE, HasPermission("vms.report.export")]
 
     def get(self, request, pk):
         name, text = svc.report_csv(actor=request.principal, muster_id=pk)
