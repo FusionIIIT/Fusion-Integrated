@@ -14,17 +14,19 @@ BLACKLISTED = "blacklisted"
 ZONE_NOT_PERMITTED = "zone_not_permitted"
 ALREADY_INSIDE = "already_inside"
 TERMINATED = "terminated"
+NOT_ON_SITE = "not_on_site"
 
 #: Evaluation order (BR-077, 190, 112, 191, then state conflicts).
 FAILURE_ORDER = (NOT_ACTIVE, OUTSIDE_VALIDITY, OUTSIDE_SLOT, BLACKLISTED,
-                 ZONE_NOT_PERMITTED, ALREADY_INSIDE, TERMINATED)
+                 ZONE_NOT_PERMITTED, ALREADY_INSIDE, TERMINATED, NOT_ON_SITE)
 
 #: Failures an Admin may override (BR-085, decision D-14). One-line edit to change the answer.
 OVERRIDE_ELIGIBLE = frozenset({NOT_ACTIVE, OUTSIDE_VALIDITY, ZONE_NOT_PERMITTED, OUTSIDE_SLOT})
 
 _RULE = {NOT_ACTIVE: "VMS-BR-077", OUTSIDE_VALIDITY: "VMS-BR-190", OUTSIDE_SLOT: "VMS-BR-190",
          BLACKLISTED: "VMS-BR-112", ZONE_NOT_PERMITTED: "VMS-BR-191",
-         ALREADY_INSIDE: "VMS-BR-082", TERMINATED: "VMS-BR-077"}
+         ALREADY_INSIDE: "VMS-BR-082", TERMINATED: "VMS-BR-077",
+         NOT_ON_SITE: "VMS-UC-023"}
 
 
 @dataclass(frozen=True)

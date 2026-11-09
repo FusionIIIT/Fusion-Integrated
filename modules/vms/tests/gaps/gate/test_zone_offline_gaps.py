@@ -1,4 +1,5 @@
 """Gap tests for zone access, elevation, alerts and offline reconciliation."""
+import inspect
 import uuid
 from datetime import timedelta
 
@@ -15,6 +16,15 @@ from modules.vms.tests import factories as f
 from modules.vms.tests.gaps.gate.conftest import blacklist, cred
 
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture(autouse=True)
+def _on_site(request):
+    """Zone checks need an open check-in (UC-023); tests that check a zone start on site."""
+    src = inspect.getsource(request.function)
+    if ("check(" in src and "validate_and_check_in" not in src and "not_on_site" not in src
+            and "vpass" in request.fixturenames):
+        f.make_visit_log(visit_pass=request.getfixturevalue("vpass"))
 
 
 @pytest.fixture
@@ -35,8 +45,6 @@ def grant(admin, vp, zone, minutes=30, reason="Escorted"):
 
 # --- zone checks ---------------------------------------------------------------------
 
-@pytest.mark.xfail(strict=True, reason="BUG: check_zone does not require the visitor to be "
-                   "on site (no open check-in), so a never-checked-in pass is allowed")
 def test_uc_023_zone_check_for_visitor_not_on_site_denied(sec, vpass, gate):
     """VMS-UC-023: a visitor not inside gets a denial."""
     zone = f.make_zone()
@@ -83,10 +91,11 @@ def test_br_191_empty_pass_zones_deny_restricted_target(sec, vpass, zone, gate):
 def test_bw_12_service_token_zone_allowed(vpass, zone, gate):
     """BW-VMS-12: access-control-system caller gets an allowed zone logged."""
     vpass.allowed_zones.add(zone)
+    f.make_visit_log(visit_pass=vpass)
     svc_actor = f.make_actor(kind="service", user_id=9001)
     res = za.check_zone(actor=svc_actor, pass_id=vpass.pk, zone_id=zone.pk, reader_id="acs-1")
     assert res["allowed"] and not Alert.objects.exists()
-    log = vpass.logs.get()
+    log = vpass.logs.exclude(event="check_in").get()
     assert (log.event, log.device_id, log.logged_by_user_id) == ("zone_allowed", "acs-1", 9001)
 
 
@@ -119,8 +128,6 @@ def test_uc_025_handle_alert_twice_conflicts(sec, vpass, zone, gate):
 
 # --- elevation -----------------------------------------------------------------------
 
-@pytest.mark.xfail(strict=True, reason="BUG: elevation is time-boxed only; there is no "
-                   "single-use limit, so unlimited re-validations succeed")
 def test_uc_024_elevation_allows_exactly_one_revalidation(sec, admin, vpass, zone, gate):
     """VMS-UC-024: a second re-validation after the elevation was used is denied."""
     grant(admin, vpass, zone)
@@ -173,7 +180,7 @@ def test_bw_14_denied_elevated_revalidated_then_denied_after_revoke(
     assert check(sec, vpass, zone, gate)["allowed"]
     za.revoke_elevation(admin_actor=admin, elevation_id=el.pk)
     assert not check(sec, vpass, zone, gate)["allowed"]
-    assert list(vpass.logs.order_by("id").values_list("event", flat=True)) == [
+    assert list(vpass.logs.exclude(event="check_in").order_by("id").values_list("event", flat=True)) == [
         "zone_denied", "zone_allowed", "zone_denied"]
 
 
