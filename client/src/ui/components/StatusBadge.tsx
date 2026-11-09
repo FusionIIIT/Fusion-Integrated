@@ -6,6 +6,10 @@ const COLORS: Record<string, string> = {
   shortlisted: "violet", offer_issued: "orange", offer_accepted: "green",
   offer_declined: "gray", rejected: "red", withdrawn: "gray",
   published: "green", closed: "gray", cancelled: "red", active: "green",
+  deactivated: "orange", suspended: "orange", archived: "gray",
+  reversible: "yellow", permanent_non_restorable: "dark", restored: "teal",
+  pending_it_head: "yellow", approved: "blue", purged: "red",
+  scheduled: "cyan", expired: "gray", revoked: "red", extended: "indigo",
 };
 
 export function StatusBadge({ status }: { status: string }) {
