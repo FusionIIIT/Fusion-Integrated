@@ -13,7 +13,7 @@ LIST_LIMIT = 2000
 
 def _shape(muster) -> dict:
     return {**s.MusterSerializer(muster).data, "counts": svc.counts(muster),
-            "reason": (muster.summary or {}).get("reason", "")}
+            "reason": muster.reason}
 
 
 class MusterTriggerView(APIView):

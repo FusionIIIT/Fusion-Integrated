@@ -13,15 +13,11 @@ def requests_as_host(actor):
 
 
 def requests_as_visitor(actor):
-    """A visitor session sees its own; an IAM principal sees requests filed for
-    the visitor record carrying the principal's email."""
+    """A visitor session sees the requests it filed or that name it."""
     visitor_id = getattr(actor, "visitor_id", None)
     if visitor_id is not None:
         return VisitRequest.objects.filter(
             Q(visitor_id=visitor_id) | Q(created_by_visitor_id=visitor_id))
-    email = getattr(actor, "email", "")
-    if email:
-        return VisitRequest.objects.filter(visitor__email__iexact=email)
     return VisitRequest.objects.none()
 
 

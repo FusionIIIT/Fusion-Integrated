@@ -73,6 +73,8 @@ class VisitLog(AppendOnlyModel):
     entry_point = models.CharField(max_length=80, blank=True)
     device_id = models.CharField(max_length=80, blank=True)
     reason = models.CharField(max_length=255, blank=True)
+    # Structured facts: failures (list of codes), vip_override, override, manual.
+    detail = models.JSONField(default=dict, blank=True)
     # Null for system-generated events (auto check-out, scheduled work).
     logged_by_user_id = models.IntegerField(null=True, blank=True)
     offline = models.BooleanField(default=False)

@@ -11,7 +11,7 @@ from core.api.exceptions import (
     PermissionDeniedError,
 )
 from modules.vms.models import Alert, AuditLog, Notification, Visitor, VisitPass, VisitRequest
-from modules.vms.services import blacklist, walkin
+from modules.vms.services import walkin
 from modules.vms.tests import factories as f
 
 from .conftest import HOST, walkin_data
@@ -54,8 +54,8 @@ def test_register_host_unavailable_awaits_admin(security):
 
 
 def test_br_051_walkin_blacklist_rejected_before_pass(security):
-    f.make_blacklist_version(version=1, status="published", published_at=timezone.now())
-    blacklist.add_entry(actor=None, name="x", id_doc_number="WK123456", reason="barred")
+    live = f.make_blacklist_version(version=1, status="published", published_at=timezone.now())
+    f.make_blacklist_entry(version=live, name="x", id_doc_number="WK123456", reason="barred")
     with pytest.raises(BadRequestError) as e:
         _register(security)
     assert e.value.code == "visitor_blacklisted"
@@ -188,3 +188,9 @@ def test_list_registrations_filters_status(security):
     _register(security, host_available=False, id_doc_number="Z9")
     assert walkin.list_registrations(actor=security).count() == 2
     assert walkin.list_registrations(actor=security, status="awaiting_admin").count() == 1
+
+
+def test_walkin_records_its_gate(security):
+    gate = f.make_gate()
+    vr = _register(security, gate_id=gate.pk, id_doc_number="G1")
+    assert vr.gate_id == gate.pk

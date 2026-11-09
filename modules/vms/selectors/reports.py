@@ -41,9 +41,12 @@ from django.db.models.functions import (
 )
 from django.utils import timezone
 
+from core.api.exceptions import NotFoundError
 from modules.vms.models import (
     AccessPolicy,
     Alert,
+    EmergencyMuster,
+    EventBatch,
     Gate,
     GateOverride,
     VisitLog,
@@ -386,3 +389,49 @@ def blacklist_hits(start, end, filters) -> dict:
         result["truncated"] = truncated or t2
     return result
 
+
+
+# --- event_attendance -------------------------------------------------------------------
+
+def event_attendance(start, end, filters) -> dict:
+    """Entry/exit throughput per 5-minute bucket, with the event's attendance counts."""
+    event = EventBatch.objects.filter(pk=filters.get("event_id")).first()
+    if event is None:
+        raise NotFoundError("Event not found.")
+    from modules.vms.selectors import events as event_sel
+    rows = [{"bucket_start": timezone.localtime(r["bucket_start"]).isoformat(),
+             "check_ins": r["check_ins"], "check_outs": r["check_outs"]}
+            for r in event_sel.throughput(event)]
+    summary = {k: v for k, v in event_sel.attendance(event).items() if k != "event_id"}
+    return _result(["bucket_start", "check_ins", "check_outs"], rows, summary)
+
+
+# --- muster_history ---------------------------------------------------------------------
+
+MUSTER_COLUMNS = ["id", "triggered_at", "closed_at", "status", "trigger_role",
+                  "duration_seconds", "total", "accounted", "evacuated", "unaccounted",
+                  "accounted_ratio"]
+
+
+def muster_history(start, end, filters) -> dict:
+    qs = EmergencyMuster.objects.filter(triggered_at__gte=start, triggered_at__lt=end)
+    musters, truncated = _capped(qs.order_by("triggered_at", "id"))
+    rows = []
+    for m in musters:
+        totals = (m.summary or {}).get("totals", {})
+        total = totals.get("total", 0)
+        accounted = totals.get("accounted", 0)
+        duration = int((m.closed_at - m.triggered_at).total_seconds()) if m.closed_at else None
+        rows.append({
+            "id": m.pk, "triggered_at": timezone.localtime(m.triggered_at).isoformat(),
+            "closed_at": timezone.localtime(m.closed_at).isoformat() if m.closed_at else None,
+            "status": m.status, "trigger_role": m.trigger_role,
+            "duration_seconds": duration, "total": total, "accounted": accounted,
+            "evacuated": totals.get("evacuated", 0),
+            "unaccounted": totals.get("unaccounted", 0),
+            "accounted_ratio": round(accounted / total, 3) if total else None})
+    total = sum(r["total"] for r in rows)
+    accounted = sum(r["accounted"] for r in rows)
+    return _result(MUSTER_COLUMNS, rows, {
+        "musters": len(rows), "total": total, "accounted": accounted,
+        "accounted_ratio": round(accounted / total, 3) if total else None}, truncated)

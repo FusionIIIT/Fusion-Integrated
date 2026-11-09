@@ -13,8 +13,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 # --- kinds -------------------------------------------------------------------------------
-PRE_REGISTERED, WALK_IN = "pre_registered", "walk_in"
-KINDS = (PRE_REGISTERED, WALK_IN)
+PRE_REGISTERED, WALK_IN, BULK = "pre_registered", "walk_in", "bulk"
+KINDS = (PRE_REGISTERED, WALK_IN, BULK)
 
 # --- states ------------------------------------------------------------------------------
 #: Pseudo-state: the request does not exist yet ("Not Submitted"/"Not Registered"). Never stored.
@@ -39,9 +39,12 @@ ADMIN_REJECT_CONTINGENCY = "admin_reject_contingency"
 URGENT_APPROVE = "urgent_approve"
 URGENT_REJECT = "urgent_reject"
 COMPLETE = "complete"
+TERMINATE = "terminate"                    # host/admin ends an approved visit before check-in
+ADMIN_BULK_APPROVE = "admin_bulk_approve"  # event batch approval (UC-008 step 3)
 
 EVENTS = (SUBMIT, HOST_APPROVE, HOST_REJECT, AUTO_EXPIRE, ADMIN_APPROVE_CONTINGENCY,
-          ADMIN_REJECT_CONTINGENCY, URGENT_APPROVE, URGENT_REJECT, COMPLETE)
+          ADMIN_REJECT_CONTINGENCY, URGENT_APPROVE, URGENT_REJECT, COMPLETE, TERMINATE,
+          ADMIN_BULK_APPROVE)
 
 # --- actors ------------------------------------------------------------------------------
 VISITOR, HOST, ADMIN, SECURITY, SYSTEM = "visitor", "host", "admin", "security", "system"
@@ -95,6 +98,8 @@ TABLE: tuple[Transition, ...] = (
     _t(PRE_REGISTERED, PENDING, AUTO_EXPIRE, SYSTEM, EXPIRED, "BW-03 R2"),
     _t(PRE_REGISTERED, AWAITING_ADMIN, URGENT_APPROVE, ADMIN, PENDING, "BW-22 R2"),
     _t(PRE_REGISTERED, AWAITING_ADMIN, URGENT_REJECT, ADMIN, REJECTED, "UC-035 reject"),
+    # An urgent request nobody decides must not wait forever (BR-062, service request e-1).
+    _t(PRE_REGISTERED, AWAITING_ADMIN, AUTO_EXPIRE, SYSTEM, EXPIRED, "BR-062; e-1"),
     _t(PRE_REGISTERED, APPROVED, COMPLETE, SECURITY, COMPLETED, "BW-01 R4; BW-22 R5"),
     _t(PRE_REGISTERED, APPROVED, COMPLETE, SYSTEM, COMPLETED, "BR-101 auto check-out"),
     # --- walk-in: BW-VMS-06/07/08 ---
@@ -105,11 +110,27 @@ TABLE: tuple[Transition, ...] = (
     _t(WALK_IN, PENDING, HOST_REJECT, HOST, REJECTED, "BW-08 R2"),
     # BR-062 is stated for any pending request; BW-03 only draws the pre-registered case.
     _t(WALK_IN, PENDING, AUTO_EXPIRE, SYSTEM, EXPIRED, "BR-062"),
+    # Host silent past contingency_sla_minutes: Admin decides a pending walk-in (D-13, BR-050).
+    _t(WALK_IN, PENDING, ADMIN_APPROVE_CONTINGENCY, ADMIN, APPROVED, "BR-050; D-13"),
+    _t(WALK_IN, PENDING, ADMIN_REJECT_CONTINGENCY, ADMIN, REJECTED, "BR-050; D-13"),
     _t(WALK_IN, AWAITING_ADMIN, ADMIN_APPROVE_CONTINGENCY, ADMIN, APPROVED, "BW-07 R2"),
     _t(WALK_IN, AWAITING_ADMIN, ADMIN_REJECT_CONTINGENCY, ADMIN, REJECTED, "UC-033 reject"),
     _t(WALK_IN, APPROVED, COMPLETE, SECURITY, COMPLETED, "BW-06 R4; BW-07 R4"),
     _t(WALK_IN, APPROVED, COMPLETE, SYSTEM, COMPLETED, "BR-101 auto check-out"),
+    # --- event batch (bulk): admin approval of an attendee list, UC-008 ---
+    _t(BULK, NOT_SUBMITTED, ADMIN_BULK_APPROVE, ADMIN, APPROVED, "UC-008 step 3"),
+    _t(BULK, APPROVED, COMPLETE, SECURITY, COMPLETED, "BW-21 check-out"),
+    _t(BULK, APPROVED, COMPLETE, SYSTEM, COMPLETED, "BR-101 auto check-out"),
+    # --- early termination before check-in (BW-15/17); on-site termination keeps the visit open ---
+    *(_t(kind, APPROVED, TERMINATE, actor, COMPLETED, "BW-15; BW-17")
+      for kind in KINDS for actor in (HOST, ADMIN)),
 )
+
+
+def kind_for_source(source: str) -> str:
+    """State-machine kind of a stored `VisitRequest.source` (vip and
+    pre_authorized requests follow the pre-registered table)."""
+    return {WALK_IN: WALK_IN, BULK: BULK}.get(source, PRE_REGISTERED)
 
 
 def resolve(kind: str, frm: str, event: str, actor: str,

@@ -70,22 +70,6 @@ def test_snapshot_for_request_older_than_any_policy_uses_oldest():
     assert policy.snapshot_for(f.make_visit_request()).version == 4
 
 
-def test_publish_marks_published_and_audits():
-    draft = f.make_access_policy(version=7)
-    out = policy.publish(policy_id=draft.pk, actor=f.make_actor(user_id=8))
-    assert out.status == "published" and out.published_at
-    assert AuditLog.objects.filter(action="vms.policy.published",
-                                   entity_id=str(draft.pk)).exists()
-
-
-def test_publish_twice_is_idempotent_and_unknown_is_none():
-    draft = f.make_access_policy(version=8)
-    first = policy.publish(policy_id=draft.pk, actor=None)
-    again = policy.publish(policy_id=draft.pk, actor=None)
-    assert again.published_at == first.published_at
-    assert policy.publish(policy_id=999999, actor=None) is None
-
-
 # --- blacklist -----------------------------------------------------------------------
 
 @pytest.fixture
@@ -175,14 +159,6 @@ def test_br_119_expired_or_revoked_safe_list_does_not_exempt(live_version):
 def test_unknown_checkpoint_is_rejected():
     with pytest.raises(ValueError):
         blacklist.check(checkpoint="lobby")
-
-
-def test_add_entry_goes_into_the_published_version_and_takes_effect():
-    actor = f.make_actor(user_id=3)
-    entry = blacklist.add_entry(actor=actor, name="N", id_doc_number="ADD1", reason="r")
-    assert entry.version.status == "published"
-    assert blacklist.check(checkpoint="pre_registration", id_doc_number="ADD1")
-    assert AuditLog.objects.filter(action="vms.blacklist.entry_added").exists()
 
 
 # --- passes --------------------------------------------------------------------------

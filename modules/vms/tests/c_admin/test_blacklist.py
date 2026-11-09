@@ -113,8 +113,8 @@ def test_only_one_open_draft(admin_actor):
 # --- safe list ---------------------------------------------------------------------
 
 def test_br_119_safelist_expiry_respected(admin_actor):
-    f.make_blacklist_version(version=1, status="published", published_at=timezone.now())
-    blacklist.add_entry(actor=None, name="A", id_doc_number="S1", reason="r")
+    live = f.make_blacklist_version(version=1, status="published", published_at=timezone.now())
+    f.make_blacklist_entry(version=live, name="A", id_doc_number="S1", reason="r")
     assert _probe(id_doc_number="S1") is not None
     entry = blacklist_admin.add_safelist(
         actor=admin_actor, id_doc_number="S1", reason="Cleared",

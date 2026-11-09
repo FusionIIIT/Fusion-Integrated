@@ -312,6 +312,36 @@ def test_walkin_allowance_counts_event_walkins(admin, event):
     assert later["used"] == 0
 
 
+def _event_walkin(sec, gate, event, n):
+    from modules.vms.services import walkin
+    data = {"full_name": f"Walker {n}", "phone": "9123456789", "id_doc_type": "passport",
+            "id_doc_number": f"EW{n:05d}", "purpose": "Open day", "gate_id": gate.pk,
+            "event_id": event.pk}
+    return walkin.register(security_actor=sec, data=data, host_user_id=5001)
+
+
+def test_register_enforces_event_walkin_limit(admin, sec, gate, event):     # service request g-2
+    upload(admin, event, csv_rows(1))
+    svc.approve_batch(admin_actor=admin, event_id=event.pk)
+    desk = f.make_actor("staff", permissions=("vms.walkin.register",), user_id=sec.user_id)
+    first = _event_walkin(desk, gate, event, 1)
+    assert first.event_id == event.pk and first.gate_id == gate.pk
+    _event_walkin(desk, gate, event, 2)
+    with pytest.raises(ConflictError) as exc:
+        _event_walkin(desk, gate, event, 3)
+    assert exc.value.code == "event_walkin_rate_limited"
+    assert svc.walkin_allowance(event.pk)["used"] == 2
+
+
+def test_register_for_inactive_or_unknown_event_is_refused(admin, sec, gate, event):
+    desk = f.make_actor("staff", permissions=("vms.walkin.register",), user_id=sec.user_id)
+    with pytest.raises(ConflictError):          # still a draft
+        _event_walkin(desk, gate, event, 1)
+    event.pk, unknown = 999999, event
+    with pytest.raises(BadRequestError):
+        _event_walkin(desk, gate, unknown, 2)
+
+
 def test_walkin_allowance_inactive_event_not_allowed(admin, event):
     assert svc.walkin_allowance(event.pk)["allowed"] is False      # still a draft
 

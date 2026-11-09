@@ -85,32 +85,14 @@ class _Skip(Exception):
     pass
 
 
-# --- last-attempt marker -------------------------------------------------------------
-# SCHEMA-REQUEST e-1: no `next_attempt_at` column. The time of the last failed
-# attempt is kept as a "[<iso>] " prefix of `last_error` until a column exists.
-
-def _stamp(now: datetime, error: str) -> str:
-    return f"[{now.isoformat()}] {error}"[:500]
-
-
-def _last_attempt(row: Notification) -> datetime | None:
-    err = row.last_error
-    if err.startswith("[") and "]" in err:
-        try:
-            return datetime.fromisoformat(err[1:err.index("]")])
-        except ValueError:
-            return None
-    return None
-
+# --- retry backoff --------------------------------------------------------------------
 
 def _backoff_ready(row: Notification, now: datetime) -> bool:
-    if row.attempts == 0:
-        return True
-    last = _last_attempt(row)
-    if last is None:
-        return True
-    wait = BACKOFF_MINUTES[min(row.attempts, len(BACKOFF_MINUTES)) - 1]
-    return now - last >= timedelta(minutes=wait)
+    return row.next_attempt_at is None or row.next_attempt_at <= now
+
+
+def _next_attempt(attempts: int, now: datetime) -> datetime:
+    return now + timedelta(minutes=BACKOFF_MINUTES[min(attempts, len(BACKOFF_MINUTES)) - 1])
 
 
 # --- addressing -----------------------------------------------------------------------
@@ -151,6 +133,17 @@ def _send(row: Notification, address: str) -> None:
     sender(row, address)
 
 
+def _check_still_in_scope(row: Notification, now: datetime) -> None:
+    """Role-holder notices go only to users who still hold the role (BR-182)."""
+    scope = row.detail or {}
+    if not scope.get("roles") or row.recipient_user_id is None:
+        return
+    holders = role_holder_ids(tuple(scope["roles"]), zone_id=scope.get("zone_id"),
+                              gate_id=scope.get("gate_id"), at=now)
+    if row.recipient_user_id not in holders:
+        raise _Skip("recipient no longer holds the role for this scope")
+
+
 def _deliver_one(pk: int, emails: dict[int, str], now: datetime, report: DeliveryReport) -> None:
     with transaction.atomic():
         row = (Notification.objects.select_for_update(skip_locked=True)
@@ -161,25 +154,29 @@ def _deliver_one(pk: int, emails: dict[int, str], now: datetime, report: Deliver
         if not _backoff_ready(row, now):
             return
         try:
+            _check_still_in_scope(row, now)
             _send(row, _address(row, emails))
         except _Skip as why:
             row.status, row.last_error = Notification.Status.SKIPPED, str(why)[:500]
             report.skipped += 1
         except Exception as exc:                                     # noqa: BLE001
             row.attempts += 1
-            row.last_error = _stamp(now, f"{exc.__class__.__name__}: {exc}")
+            row.last_error = f"{exc.__class__.__name__}: {exc}"[:500]
             if row.attempts >= MAX_ATTEMPTS:
                 row.status = Notification.Status.FAILED
+                row.next_attempt_at = None
                 report.failed += 1
             else:
+                row.next_attempt_at = _next_attempt(row.attempts, now)
                 report.retrying += 1
             log.warning("vms.notify.error id=%s attempts=%s %s", row.pk, row.attempts, exc)
         else:
             row.status, row.last_error = Notification.Status.SENT, ""
+            row.next_attempt_at = None
             row.sent_at = now
             row.attempts += 1
             report.sent += 1
-        row.save(update_fields=["status", "attempts", "last_error", "sent_at"])
+        row.save(update_fields=["status", "attempts", "last_error", "next_attempt_at", "sent_at"])
 
 
 def _user_emails(ids: list[int]) -> dict[int, str]:
@@ -233,13 +230,16 @@ def notify_role_holders(*, topic, dedupe_key, subject, body, roles=("security", 
                         zone_id=None, gate_id=None, channels=("inapp", "email")):
     """Fan a security/admin topic out to whoever holds the role right now.
 
-    One row per user and channel; the assignment table is read at call time so
-    a reassignment (BR-182) takes effect at once.
+    One row per user and channel; the assignment table is read at call time, and
+    the scope is stored in `Notification.detail` so delivery re-checks that the
+    user still holds the role (BR-182) when the row is finally sent.
     """
     rows = []
     for uid in role_holder_ids(roles, zone_id=zone_id, gate_id=gate_id):
-        rows += notify.enqueue(topic=topic, dedupe_key=f"{dedupe_key}:u{uid}", subject=subject,
-                               body=body, user_id=uid, channels=channels)
+        rows += notify.enqueue(
+            topic=topic, dedupe_key=f"{dedupe_key}:u{uid}", subject=subject, body=body,
+            user_id=uid, channels=channels,
+            detail={"roles": list(roles), "zone_id": zone_id, "gate_id": gate_id})
     return rows
 
 
@@ -279,7 +279,8 @@ def retry_failed(notification_id: int, *, actor) -> Notification:
         if row.status != Notification.Status.FAILED:
             raise ConflictError("Only failed notifications can be retried.")
         row.status, row.attempts, row.last_error = Notification.Status.PENDING, 0, ""
-        row.save(update_fields=["status", "attempts", "last_error"])
+        row.next_attempt_at = None
+        row.save(update_fields=["status", "attempts", "last_error", "next_attempt_at"])
         audit.record(actor=actor, action="vms.notification.retried", entity=row,
                      detail={"topic": row.topic, "channel": row.channel})
     return row

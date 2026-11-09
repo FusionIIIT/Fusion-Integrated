@@ -132,3 +132,42 @@ def test_legal_events():
     assert rs.legal_events(rs.PRE_REGISTERED, rs.PENDING, rs.HOST) == {rs.HOST_APPROVE, rs.HOST_REJECT}
     assert rs.legal_events(rs.PRE_REGISTERED, rs.PENDING) == {
         rs.HOST_APPROVE, rs.HOST_REJECT, rs.AUTO_EXPIRE}
+
+
+# --- phase 3a additions (service requests d-2, e-1, g-1) ---------------------------------
+@pytest.mark.parametrize("kind", rs.KINDS)
+@pytest.mark.parametrize("actor", [rs.HOST, rs.ADMIN])
+def test_terminate_before_check_in_completes_the_visit(kind, actor):
+    assert rs.next_state(kind, rs.APPROVED, rs.TERMINATE, actor) == rs.COMPLETED
+
+
+def test_terminate_is_not_available_to_visitor_security_or_unapproved():
+    for actor in (rs.VISITOR, rs.SECURITY, rs.SYSTEM):
+        with pytest.raises(rs.InvalidTransition):
+            rs.resolve(rs.PRE_REGISTERED, rs.APPROVED, rs.TERMINATE, actor)
+    with pytest.raises(rs.InvalidTransition):
+        rs.resolve(rs.WALK_IN, rs.PENDING, rs.TERMINATE, rs.HOST)
+
+
+def test_pending_walkin_can_be_decided_by_admin_after_sla():
+    assert rs.next_state(rs.WALK_IN, rs.PENDING, rs.ADMIN_APPROVE_CONTINGENCY, rs.ADMIN) == rs.APPROVED
+    assert rs.next_state(rs.WALK_IN, rs.PENDING, rs.ADMIN_REJECT_CONTINGENCY, rs.ADMIN) == rs.REJECTED
+    with pytest.raises(rs.InvalidTransition):      # pre-registered has no contingency
+        rs.resolve(rs.PRE_REGISTERED, rs.PENDING, rs.ADMIN_APPROVE_CONTINGENCY, rs.ADMIN)
+
+
+def test_urgent_request_awaiting_admin_can_auto_expire():
+    assert rs.next_state(rs.PRE_REGISTERED, rs.AWAITING_ADMIN, rs.AUTO_EXPIRE, rs.SYSTEM) == rs.EXPIRED
+    with pytest.raises(rs.InvalidTransition):      # a walk-in contingency waits for an Admin
+        rs.resolve(rs.WALK_IN, rs.AWAITING_ADMIN, rs.AUTO_EXPIRE, rs.SYSTEM)
+
+
+def test_bulk_admin_approval_and_checkout():
+    assert walk(rs.BULK, [(rs.ADMIN_BULK_APPROVE, rs.ADMIN, {}),
+                          (rs.COMPLETE, rs.SECURITY, {})]) == rs.COMPLETED
+
+
+def test_kind_for_source():
+    assert [rs.kind_for_source(s) for s in ("walk_in", "bulk", "vip", "pre_authorized",
+                                            "pre_registered")] == [
+        rs.WALK_IN, rs.BULK, rs.PRE_REGISTERED, rs.PRE_REGISTERED, rs.PRE_REGISTERED]

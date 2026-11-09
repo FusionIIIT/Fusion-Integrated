@@ -4,7 +4,6 @@ from modules.vms.api.gate import views
 
 urlpatterns = [
     path("gate/validate", views.GateValidateView.as_view(), name="vms-gate-validate"),
-    path("gate/checkout", views.GateCheckoutView.as_view(), name="vms-gate-checkout"),
     path("gate/override", views.GateOverrideView.as_view(), name="vms-gate-override"),
     path("gate/escalations", views.EscalationCreateView.as_view(), name="vms-gate-escalate"),
     path("gate/escalations/<int:pk>/resolve", views.EscalationResolveView.as_view(),

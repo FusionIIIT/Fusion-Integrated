@@ -28,7 +28,7 @@ E = VisitLog.Event
 
 
 def _kind(vr) -> str:
-    return rs.WALK_IN if vr.source == VisitRequest.Source.WALK_IN else rs.PRE_REGISTERED
+    return rs.kind_for_source(vr.source)
 
 
 def _setting_on(key: str, default: bool) -> bool:

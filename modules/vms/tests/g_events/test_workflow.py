@@ -33,7 +33,7 @@ def test_bw_vms_21_bulk_event_entry(api_as, admin, sec, gate, event):
                     format="json")
     assert ok.status_code == 200
     # R4 check-out (BR-105)
-    out = guard.post(BASE + "gate/checkout", {"qr_token": tokens[0]}, format="json")
+    out = guard.post(BASE + "visit/check-out", {"credential": tokens[0]}, format="json")
     assert out.status_code == 200
     att = api_as(user_id=ADMIN_ID, permissions=("vms.event.manage",)).get(
         BASE + f"events/{event.pk}/attendance")

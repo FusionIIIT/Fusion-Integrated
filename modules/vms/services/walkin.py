@@ -20,14 +20,14 @@ from core.api.exceptions import (
 from modules.vms.domain import request_state as rs
 from modules.vms.models import (
     Alert,
-    AuditLog,
+    EventBatch,
     Gate,
     Visitor,
     VisitPass,
     VisitRequest,
     Zone,
 )
-from modules.vms.services import blacklist, passes, policy
+from modules.vms.services import blacklist, bulk_events, passes, policy
 from modules.vms.services.common import audit, authz, notify
 
 REGISTER_PERM = "vms.walkin.register"
@@ -53,16 +53,21 @@ def _walkin_count_last_hour(now, gate_id):
     if gate_id is None:
         return VisitRequest.objects.filter(source=VisitRequest.Source.WALK_IN,
                                            created_at__gte=since).count()
-    # SCHEMA-REQUEST d-1: VisitRequest has no gate column; per-gate counts use the audit trail.
-    return AuditLog.objects.filter(action="vms.walkin.registered", created_at__gte=since,
-                                   detail__gate_id=gate_id).count()
+    return VisitRequest.objects.filter(source=VisitRequest.Source.WALK_IN, gate_id=gate_id,
+                                       created_at__gte=since).count()
+
+
+def _lock_event(event_id) -> None:
+    EventBatch.objects.select_for_update().filter(pk=event_id).first()
 
 
 def register(*, security_actor, data: dict, host_user_id: int) -> VisitRequest:
     """Register a walk-in at the gate (UC-017, BW-VMS-06/07/08 row 1).
 
     `data`: full_name, phone, id_doc_type, id_doc_number, purpose (mandatory);
-    email, gate_id, zone_ids, host_available (default True) optional.
+    email, gate_id, zone_ids, host_available (default True), event_id optional.
+    With ``event_id`` the registration is an event walk-in: it counts against the
+    event's ``walkin_rate_limit`` (VMS-AFR-163) and is tied to the event.
     Raises BadRequestError(code="visitor_blacklisted") on a blacklist hit
     (BR-051, checkpoint BR-112) after recording an Alert.
     """
@@ -81,6 +86,9 @@ def register(*, security_actor, data: dict, host_user_id: int) -> VisitRequest:
     if zone_ids and Zone.objects.filter(pk__in=zone_ids, is_active=True).count() != len(zone_ids):
         raise BadRequestError("Unknown zone.", code="unknown_zone")
     host_available = bool(data.get("host_available", True))
+    event_id = data.get("event_id")
+    if event_id is not None and not EventBatch.objects.filter(pk=event_id).exists():
+        raise BadRequestError("Unknown event.", code="unknown_event")
     now = timezone.now()
 
     hit = blacklist.check(checkpoint="walk_in", name=data["full_name"],
@@ -105,6 +113,13 @@ def register(*, security_actor, data: dict, host_user_id: int) -> VisitRequest:
 
     pol = policy.effective(now)
     with transaction.atomic():
+        if event_id is not None:
+            _lock_event(event_id)       # serialise concurrent event walk-ins
+            allowance = bulk_events.walkin_allowance(event_id, now=now)
+            if not allowance["allowed"]:
+                raise ConflictError(
+                    "Event walk-in limit reached or the event is not active.",
+                    code="event_walkin_rate_limited", details=[allowance])
         if _walkin_count_last_hour(now, gate_id) >= pol.walkin_rate_limit_per_hour:
             raise ConflictError("Walk-in registration limit reached for this hour.",
                                 code="walkin_rate_limited")
@@ -118,12 +133,13 @@ def register(*, security_actor, data: dict, host_user_id: int) -> VisitRequest:
         vr = VisitRequest.objects.create(
             visitor=visitor, host_user_id=host_user_id, purpose=data["purpose"].strip(),
             scheduled_start=start, scheduled_end=end, status=to,
-            source=VisitRequest.Source.WALK_IN,
+            source=VisitRequest.Source.WALK_IN, gate_id=gate_id, event_id=event_id,
             contingency_requested_at=None if host_available else now)
         if zone_ids:
             vr.requested_zones.set(zone_ids)
         audit.record(actor=security_actor, action="vms.walkin.registered", entity=vr, detail={
-            "gate_id": gate_id, "host_available": host_available, "status": to,
+            "gate_id": gate_id, "event_id": event_id, "host_available": host_available,
+            "status": to,
             "pass_hours": (end - start).total_seconds() / 3600})
         notify.enqueue(
             topic="walkin.submitted", dedupe_key=f"walkin-submitted:{vr.pk}",
@@ -222,10 +238,10 @@ def contingency_decide(*, admin_actor, request_id: int, decision: str, note: str
         elif vr.status != VisitRequest.Status.AWAITING_ADMIN:
             raise ConflictError("This walk-in is not awaiting a contingency decision.",
                                 code="contingency_not_allowed")
-        # An unresponsive host past the SLA is treated as unavailable (D-13).
+        # PENDING past the SLA and AWAITING_ADMIN both have an admin row (D-13).
         event = (rs.ADMIN_APPROVE_CONTINGENCY if decision == APPROVE
                  else rs.ADMIN_REJECT_CONTINGENCY)
-        new = rs.next_state(rs.WALK_IN, rs.AWAITING_ADMIN, event, rs.ADMIN)
+        new = rs.next_state(rs.WALK_IN, vr.status, event, rs.ADMIN)
         return _finish(vr, new, admin_actor, contingency_by=admin_actor.user_id, note=note,
                        now=now, audit_action="vms.walkin.contingency_decided")
 

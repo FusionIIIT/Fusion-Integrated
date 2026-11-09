@@ -25,6 +25,7 @@ from core.api.exceptions import (
     DomainError,
     NotFoundError,
 )
+from modules.vms.domain import request_state
 from modules.vms.models import (
     EventAttendee,
     EventBatch,
@@ -348,10 +349,13 @@ def _approve_one(admin_actor, ev, att, now) -> VisitPass:
         visitor = registration.resolve_visitor(session_visitor=None, update_existing=False, data={
             "full_name": att.name, "phone": att.phone, "email": att.email,
             "id_doc_type": att.id_doc_type, "id_doc_number": att.id_doc_number})
+        status = request_state.next_state(
+            request_state.BULK, request_state.NOT_SUBMITTED, request_state.ADMIN_BULK_APPROVE,
+            request_state.ADMIN)
         vr = VisitRequest.objects.create(
             visitor=visitor, host_user_id=admin_actor.user_id,
             purpose=f"Event: {ev.name}"[:255], scheduled_start=ev.valid_from,
-            scheduled_end=ev.valid_until, status=VisitRequest.Status.APPROVED,
+            scheduled_end=ev.valid_until, status=status,
             source=VisitRequest.Source.BULK, event=ev, decided_at=now)
         zones = list(ev.zones.all())
         vr.requested_zones.set(zones)

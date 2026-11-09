@@ -4,9 +4,6 @@ from datetime import timedelta
 import pytest
 from django.utils import timezone
 
-from modules.vms.models import (
-    AuditLog,
-)
 from modules.vms.tests import factories as f
 
 pytestmark = pytest.mark.django_db
@@ -33,7 +30,6 @@ def _payload(host=2001, **over):
 
 ENDPOINTS = [
     ("post", "gate/validate", "vms.gate.operate"),
-    ("post", "gate/checkout", "vms.gate.operate"),
     ("get", "blacklist", "vms.blacklist.manage"),
     ("post", "blacklist", "vms.blacklist.manage"),
     ("get", "policies", "vms.policy.publish"),
@@ -71,37 +67,6 @@ def _events(vp):
 
 
 # gate/validate behaviour moved to modules/vms/tests/b_gate (lane B).
-
-
-def test_checkout_completes_the_visit(api_as, gate_pass):
-    client = _gate(api_as)
-    f.make_visit_log(visit_pass=gate_pass, event="check_in")
-    r = client.post(BASE + "gate/checkout", {"qr_token": gate_pass.qr_token}, format="json")
-    assert r.status_code == 200 and r.json() == {"detail": "Checked out."}
-    gate_pass.visit_request.refresh_from_db()
-    assert gate_pass.visit_request.status == "completed"
-    assert [e for e, _ in _events(gate_pass)] == ["check_in", "check_out"]
-    assert AuditLog.objects.filter(action="vms.visit.completed").exists()
-
-
-def test_checkout_without_check_in_is_400(api_as, gate_pass):
-    r = _gate(api_as).post(BASE + "gate/checkout", {"qr_token": gate_pass.qr_token}, format="json")
-    assert r.status_code == 400
-    gate_pass.visit_request.refresh_from_db()
-    assert gate_pass.visit_request.status == "approved"
-
-
-def test_checkout_unknown_pass_is_404(api_as):
-    r = _gate(api_as).post(BASE + "gate/checkout", {"qr_token": "nope"}, format="json")
-    assert r.status_code == 404
-
-
-def test_checkout_twice_is_400(api_as, gate_pass):
-    client = _gate(api_as)
-    f.make_visit_log(visit_pass=gate_pass, event="check_in")
-    client.post(BASE + "gate/checkout", {"qr_token": gate_pass.qr_token}, format="json")
-    assert client.post(BASE + "gate/checkout", {"qr_token": gate_pass.qr_token},
-                       format="json").status_code == 400
 
 
 # --- blacklist and policies ----------------------------------------------------------

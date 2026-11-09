@@ -137,7 +137,7 @@ def trigger(*, actor, reason: str = "") -> EmergencyMuster:
             raise ConflictError("A muster is already open.", code="muster_already_open")
         muster = EmergencyMuster.objects.create(
             triggered_by_user_id=actor.user_id, trigger_role=role,
-            summary={"reason": reason})
+            reason=reason)
         rows = list(monitor_sel.with_last_seen(roster.on_site()).values_list(
             "pk", "last_zone_id", "last_seen_at", "visit_request__visitor_id"))
         MusterEntry.objects.bulk_create([
@@ -353,7 +353,7 @@ def close(*, actor, muster_id, note: str = "", force: bool = False) -> Emergency
             raise BadRequestError("A note is required to close with unaccounted visitors.",
                                   code="note_required")
         now = timezone.now()
-        reason = (muster.summary or {}).get("reason", "")
+        reason = muster.reason
         muster.status = ms.resolve(muster.status, ms.CLOSE)
         muster.closed_at = now
         muster.summary = _build_summary(
@@ -395,7 +395,7 @@ def report(*, actor, muster_id) -> dict:
         summary, provisional = muster.summary, False
     else:
         summary = _build_summary(
-            muster, _entry_rows(muster), reason=(muster.summary or {}).get("reason", ""),
+            muster, _entry_rows(muster), reason=muster.reason,
             note="", forced=False, closed_at=None, closed_by=None)
         provisional = True
     return {"muster_id": muster.pk, "status": muster.status, "provisional": provisional,

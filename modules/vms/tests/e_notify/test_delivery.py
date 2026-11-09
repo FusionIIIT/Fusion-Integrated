@@ -167,3 +167,30 @@ def test_two_workers_deliver_the_same_row_once(monkeypatch):
     [t.start() for t in ts]
     [t.join() for t in ts]
     assert len(sent) == 1
+
+
+def test_backoff_uses_next_attempt_at_column(monkeypatch):
+    monkeypatch.setattr(delivery, "send_mail", lambda **kw: (_ for _ in ()).throw(OSError("x")))
+    n = f.make_notification(channel="email")
+    t = timezone.now()
+    delivery.deliver_pending(now=t)
+    n.refresh_from_db()
+    assert n.next_attempt_at == t + timedelta(minutes=1)
+    assert n.last_error == "OSError: x"          # no timestamp prefix
+    monkeypatch.setattr(delivery, "send_mail", lambda **kw: 1)
+    delivery.deliver_pending(now=t + timedelta(minutes=1))
+    n.refresh_from_db()
+    assert n.status == "sent" and n.next_attempt_at is None
+
+
+def test_role_holder_notice_skipped_after_reassignment():
+    zone = f.make_zone()
+    ra = f.make_role_assignment(user_id=777, role="security", scope_type="zone", scope_id=zone.pk)
+    rows = delivery.notify_role_holders(topic="zone.violation", dedupe_key="zv:1", subject="s",
+                                        body="b", zone_id=zone.pk, channels=("inapp",))
+    assert rows[0].detail["zone_id"] == zone.pk
+    ra.revoked_at = timezone.now()
+    ra.save()
+    delivery.deliver_pending()
+    rows[0].refresh_from_db()
+    assert rows[0].status == "skipped" and "no longer holds" in rows[0].last_error

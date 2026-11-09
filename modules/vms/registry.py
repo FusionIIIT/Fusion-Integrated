@@ -95,6 +95,11 @@ _SYSTEM = [
     ("vms.request.auto_expire", "System expiry of unanswered requests"),
 ]
 
+#: Admins terminate passes too (UC-036), and event revoke/cancel reach the same
+#: service (service request g-3), so Admin designations are granted the host
+#: permission as well. It is listed once, under _HOST, in PERMISSIONS.
+_ADMIN_TERMINATE = [("vms.pass.terminate", "Terminate a visitor's pass early")]
+
 PERMISSIONS = _HOST + _ANY + _SECURITY + _ADMIN + _SUPER_ADMIN + _SYSTEM
 
 #: Performed by scheduled work, so no designation holds them.
@@ -111,7 +116,7 @@ ROLE_GRANTS = {
     "faculty": _codes(_HOST, _ANY),                    # host, implicit (BR-185)
     "staff": _codes(_HOST, _ANY),
     "vms_security": _codes(_SECURITY, _ANY),           # new ERP designation
-    "Registrar": _codes(_ADMIN, _ANY),
-    "acadadmin": _codes(_ADMIN, _ANY),
-    "Director": _codes(_ADMIN, _SUPER_ADMIN, _ANY),    # Super Admin
+    "Registrar": _codes(_ADMIN, _ANY, _ADMIN_TERMINATE),
+    "acadadmin": _codes(_ADMIN, _ANY, _ADMIN_TERMINATE),
+    "Director": _codes(_ADMIN, _SUPER_ADMIN, _ANY, _ADMIN_TERMINATE),    # Super Admin
 }

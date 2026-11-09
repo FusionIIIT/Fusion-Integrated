@@ -137,11 +137,12 @@ def out_of_bounds(onsite_qs, scope: Scope) -> list[dict]:
     qs = onsite_qs.annotate(zone_ev=_latest(_ZONE_EVENTS, "event"),
                             zone_ev_zone=_latest(_ZONE_EVENTS, "zone_id"),
                             zone_ev_at=_latest(_ZONE_EVENTS, "created_at"),
-                            zone_ev_reason=_latest(_ZONE_EVENTS, "reason")
+                            zone_ev_reason=_latest(_ZONE_EVENTS, "reason"),
+                            zone_ev_detail=_latest(_ZONE_EVENTS, "detail")
                             ).filter(zone_ev__isnull=False)
     rows = list(qs.values_list(
         "pk", "zone_ev", "zone_ev_zone", "zone_ev_at", "zone_ev_reason",
-        "visit_request__visitor__full_name", "visit_request__host_user_id"))
+        "visit_request__visitor__full_name", "visit_request__host_user_id", "zone_ev_detail"))
     if not scope.all:
         rows = [r for r in rows if r[2] in scope.zone_ids]
     if not rows:
@@ -157,12 +158,12 @@ def out_of_bounds(onsite_qs, scope: Scope) -> list[dict]:
         visit_pass_id__in=pass_ids, revoked_at__isnull=True,
         starts_at__lte=now, ends_at__gt=now).values_list("visit_pass_id", "zone_id"))
     out = []
-    for pk, ev, zone_id, at, reason, name, host in rows:
+    for pk, ev, zone_id, at, reason, name, host, log_detail in rows:
         info = zones.get(zone_id, {})
         if ev == E.ZONE_DENIED:
             why = "zone_denied"
         elif (info.get("is_restricted") and (pk, zone_id) not in permitted
-              and reason != "vip_override"):
+              and not (log_detail or {}).get("vip_override")):
             why = "restricted_without_permission"
         else:
             continue

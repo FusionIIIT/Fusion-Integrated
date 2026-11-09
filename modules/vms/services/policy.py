@@ -1,17 +1,12 @@
-"""Read side of the access policy (VMS-BR-125..129). Writes belong to lane C
-(`services/policy_admin.py`); `publish` below is the port of the legacy publish
-endpoint and is superseded by it.
+"""Read side of the access policy (VMS-BR-125..129). Writes live in
+`services/policy_admin.py`.
 """
 from __future__ import annotations
 
 import datetime
 from dataclasses import dataclass
 
-from django.db import transaction
-from django.utils import timezone
-
 from modules.vms.models import AccessPolicy, Zone
-from modules.vms.services.common import audit
 
 
 @dataclass(frozen=True)
@@ -86,20 +81,3 @@ def snapshot_for(request) -> EffectivePolicy:
          .order_by("-version").first()
          or _published().order_by("version").first())
     return _freeze(p) if p else _defaults()
-
-
-def publish(*, policy_id: int, actor) -> AccessPolicy | None:
-    """Legacy publish (TODO lane C: replace with policy_admin). Idempotent;
-    returns None when the policy does not exist."""
-    with transaction.atomic():
-        policy = AccessPolicy.objects.select_for_update().filter(pk=policy_id).first()
-        if policy is None:
-            return None
-        if policy.status == AccessPolicy.Status.PUBLISHED:
-            return policy
-        policy.status = AccessPolicy.Status.PUBLISHED
-        policy.published_at = timezone.now()
-        policy.save(update_fields=["status", "published_at"])
-        audit.record(actor=actor, action="vms.policy.published", entity=policy,
-                     detail={"version": policy.version})
-    return policy

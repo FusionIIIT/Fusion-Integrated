@@ -93,9 +93,8 @@ def test_terminate_reason_required_400(api_as):
 
 
 def test_blacklisted_walkin_400(api_as):
-    from modules.vms.services import blacklist
-    f.make_blacklist_version(version=1, status="published", published_at=timezone.now())
-    blacklist.add_entry(actor=None, name="x", id_doc_number="WK123456", reason="r")
+    live = f.make_blacklist_version(version=1, status="published", published_at=timezone.now())
+    f.make_blacklist_entry(version=live, name="x", id_doc_number="WK123456", reason="r")
     f.make_role_assignment(user_id=SEC, role="security")
     client = api_as(user_id=SEC, permissions=["vms.walkin.register"])
     r = client.post(BASE + "walkin/registrations", {**walkin_data(), "host_user_id": HOST},

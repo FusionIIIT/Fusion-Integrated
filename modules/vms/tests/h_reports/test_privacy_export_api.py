@@ -10,6 +10,7 @@ from django.test.utils import CaptureQueriesContext, override_settings
 from core.api.exceptions import PermissionDeniedError
 from modules.vms.models import AuditLog
 from modules.vms.services import reports
+from modules.vms.tests import factories as f
 from modules.vms.tests.h_reports.conftest import D1, D2, D3, EXPORT, PII, VIEW
 
 pytestmark = pytest.mark.django_db
@@ -89,6 +90,12 @@ def test_audit_trail_and_blacklist_names_only_with_pii(data, pii_reporter):
 ALL_KEYS = list(reports.CATALOGUE)
 
 
+def _params(key):
+    if key == "event_attendance":
+        return {**MARCH, "event_id": f.make_event_batch().pk}
+    return MARCH
+
+
 def _writes(ctx):
     return [q["sql"] for q in ctx.captured_queries
             if q["sql"].lstrip().upper().startswith(("INSERT", "UPDATE", "DELETE"))]
@@ -96,8 +103,9 @@ def _writes(ctx):
 
 @pytest.mark.parametrize("key", ALL_KEYS)
 def test_report_is_read_only(data, reporter, key):
+    params = _params(key)
     with CaptureQueriesContext(connection) as ctx:
-        reports.run(reporter, key, MARCH)
+        reports.run(reporter, key, params)
     assert _writes(ctx) == []
 
 
@@ -110,8 +118,9 @@ def test_only_audit_rows_are_written_for_pii(data, pii_reporter):
 
 @pytest.mark.parametrize("key", ALL_KEYS)
 def test_query_budget_per_report(data, reporter, key, django_assert_max_num_queries):
-    with django_assert_max_num_queries(4):
-        reports.run(reporter, key, MARCH)
+    params = _params(key)
+    with django_assert_max_num_queries(10 if key == "event_attendance" else 4):
+        reports.run(reporter, key, params)
 
 
 # --- export ----------------------------------------------------------------------------
