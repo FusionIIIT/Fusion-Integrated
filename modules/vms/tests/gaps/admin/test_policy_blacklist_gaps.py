@@ -155,7 +155,6 @@ def test_uc_006_blacklist_entry_edit_creates_change_in_draft_only(admin_actor):
                                      entry_id=live.pk, severity="high")
 
 
-@pytest.mark.xfail(strict=True, reason="BUG: publishing a draft with no changes is accepted")
 def test_uc_006_blacklist_publish_with_no_changes_rejected(admin_actor):
     """VMS-UC-006: an empty publish (identical to live) is refused."""
     _publish_entry(admin_actor, id_doc_number="E1")
@@ -164,7 +163,6 @@ def test_uc_006_blacklist_publish_with_no_changes_rejected(admin_actor):
         blacklist_admin.publish(actor=admin_actor, version_id=d2.pk)
 
 
-@pytest.mark.xfail(strict=True, reason="BUG: add_entry accepts an expiry_date in the past")
 def test_uc_006_blacklist_entry_expiry_before_now_rejected(admin_actor):
     """VMS-UC-006: an entry already expired at creation is a 400."""
     d = blacklist_admin.create_version(actor=admin_actor)
