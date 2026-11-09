@@ -175,6 +175,12 @@ class AuditFilterInput(serializers.Serializer):
     date_from = serializers.DateTimeField(required=False)
     date_to = serializers.DateTimeField(required=False)
 
+    def validate(self, attrs):
+        start, end = attrs.get("date_from"), attrs.get("date_to")
+        if start and end and start > end:
+            raise serializers.ValidationError("date_from must not be after date_to.")
+        return attrs
+
     def filters(self) -> dict:
         d = self.validated_data
         return {"actor_user_id": d.get("actor"), "action": d.get("action"),
