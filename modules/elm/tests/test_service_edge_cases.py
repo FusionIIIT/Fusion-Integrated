@@ -1,3 +1,20 @@
+"""
+ELM test expansion for PR #304
+
+Added backend and frontend tests against PR head `2418063`.
+
+Coverage added: rule boundaries and edge cases; model uniqueness and delete behavior; serializer fields and input validation; module/role registry contracts; API route resolution, access control, ownership scoping, filters, and invalid inputs; leave application, substitute, review, withdrawal, cancellation, extension, resumption, year-end and offline-record service paths; React Query hooks; and employee/task page interactions.
+
+Results:
+- Backend: 216 tests collected. 215 pass; one fails because `record_offline_sanctioned_leave` deducts leave even when the user's balance is insufficient, allowing a negative balance.
+- Frontend: 23 tests pass.
+- TypeScript typecheck: passes.
+- Vite production build: passes.
+- Ruff on the added backend test files: passes.
+
+The failing backend test is intentionally retained to document the offline-record balance defect. These results describe the PR head plus the added tests; no production implementation was changed.
+"""
+
 from datetime import date
 from decimal import Decimal
 
@@ -274,8 +291,13 @@ def test_offline_record_is_audited_and_records_reference():
 
 
 def test_offline_leave_cannot_make_balance_negative():
+    # Defect Note (Retained test):
+    # This test currently fails because record_offline_sanctioned_leave deducts leave
+    # even when the user's balance is insufficient, allowing a negative balance.
+    # It is intentionally retained to document and track the offline-record balance defect.
     _balance(balance="0")
     with pytest.raises(DomainError, match="Insufficient balance"):
         record_offline_sanctioned_leave(admin_id=9, user_id=101, category="CL",
                                         start_date=date(2026, 11, 2), end_date=date(2026, 11, 2),
                                         purpose="Offline", sanction_reference="OFF/1")
+
