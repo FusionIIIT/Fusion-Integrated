@@ -21,6 +21,9 @@ class ImmutableFieldModificationError(SystemAdminError):
     code = "immutable_field_modification_error"
 
 
+ImmutabilityViolationError = ImmutableFieldModificationError
+
+
 class RoleLifecycleError(SystemAdminError):
     code = "role_lifecycle_error"
 
