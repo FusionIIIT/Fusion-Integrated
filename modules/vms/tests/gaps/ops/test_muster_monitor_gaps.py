@@ -68,8 +68,6 @@ def test_bw_19_visitor_checking_out_during_muster_still_in_snapshot(security, zo
     assert m.entries.count() == 1
 
 
-@pytest.mark.xfail(strict=True, reason="BUG: muster.close notifies only admins; hosts of "
-                   "unaccounted visitors get no notice (BW-VMS-20)")
 def test_bw_20_completed_muster_notifies_host_of_unaccounted(security, zone):
     """BW-VMS-20: closing with unaccounted visitors tells their hosts."""
     put_on_site(zone, host=2555)

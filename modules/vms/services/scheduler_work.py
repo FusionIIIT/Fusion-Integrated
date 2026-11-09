@@ -20,7 +20,7 @@ from django.utils import timezone
 
 from modules.vms.domain import request_state as rs
 from modules.vms.models import VisitRequest
-from modules.vms.services import policy
+from modules.vms.services import delivery, policy
 from modules.vms.services.common import audit, notify
 
 log = logging.getLogger("fusion.vms.scheduler")
@@ -41,10 +41,13 @@ def _reminder_at(req: VisitRequest, snap) -> datetime:
 
 
 def send_reminders(now: datetime | None = None) -> int:
-    """Remind the host once per still-pending request (UC-040). Idempotent."""
+    """Remind the host once per pending request, and the admins once per urgent
+    request awaiting admin approval (UC-040). Idempotent."""
     now = now or timezone.now()
     ids = list(VisitRequest.objects.filter(
-        status=VisitRequest.Status.PENDING, reminded_at__isnull=True,
+        Q(status=VisitRequest.Status.PENDING)
+        | Q(status=VisitRequest.Status.AWAITING_ADMIN, is_urgent=True),
+        reminded_at__isnull=True,
     ).values_list("pk", flat=True))
     sent = 0
     for pk in ids:
@@ -52,17 +55,30 @@ def send_reminders(now: datetime | None = None) -> int:
             with transaction.atomic():
                 req = (VisitRequest.objects.select_for_update().select_related("visitor")
                        .get(pk=pk))
-                if req.status != VisitRequest.Status.PENDING or req.reminded_at:
+                to_admins = (req.status == VisitRequest.Status.AWAITING_ADMIN
+                             and req.is_urgent)
+                if (req.status != VisitRequest.Status.PENDING and not to_admins) \
+                        or req.reminded_at:
                     continue
                 snap = policy.snapshot_for(req)
                 if now < _reminder_at(req, snap) or now >= _expiry_at(req, snap):
                     continue
-                notify.enqueue(
-                    topic="request.reminder", dedupe_key=f"request.reminder:{req.pk}",
-                    user_id=req.host_user_id, channels=("inapp", "email"),
-                    subject="Reminder: a visit request awaits your decision",
-                    body=(f"{req.visitor.full_name} has asked to visit you ({req.purpose}). "
-                          "The request expires automatically if it is not decided."))
+                if to_admins:
+                    delivery.notify_role_holders(
+                        topic="request.reminder",
+                        dedupe_key=f"request.reminder:{req.pk}:admin", roles=("admin",),
+                        subject="Reminder: an urgent visit request awaits approval",
+                        body=(f"The urgent request for {req.visitor.full_name} "
+                              f"({req.purpose}) is still awaiting an Admin decision. "
+                              "It expires automatically if it is not decided."))
+                else:
+                    notify.enqueue(
+                        topic="request.reminder", dedupe_key=f"request.reminder:{req.pk}",
+                        user_id=req.host_user_id, channels=("inapp", "email"),
+                        subject="Reminder: a visit request awaits your decision",
+                        body=(f"{req.visitor.full_name} has asked to visit you "
+                              f"({req.purpose}). The request expires automatically if it "
+                              "is not decided."))
                 req.reminded_at = now
                 req.save(update_fields=["reminded_at"])
                 sent += 1

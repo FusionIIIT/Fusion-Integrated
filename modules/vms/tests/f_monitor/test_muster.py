@@ -276,7 +276,8 @@ def test_report_totals_match_entries(security, admin):
     assert rep["responder"]["marks_by_user"] == {"3001": 3}
     assert rep["timings"]["duration_seconds"] >= 0 and rep["reason"] == "fire drill"
     report_mail = Notification.objects.filter(topic="muster.report")
-    assert {n.recipient_user_id for n in report_mail} == {4001}
+    host_ids = {vps[3].visit_request.host_user_id}       # the one unaccounted visitor
+    assert {n.recipient_user_id for n in report_mail} == {4001} | host_ids
 
 
 def test_report_csv(security, admin, zone):
