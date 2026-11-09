@@ -1,1 +1,1 @@
-from .employees import Employee, Department, Position, Leave, Appraisal, LTC, CPDA, Approval\n
+from .employees import Employee, Department, Position, Leave, Appraisal, LTC, CPDA, Approval

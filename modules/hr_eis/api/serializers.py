@@ -1,1 +1,20 @@
-from rest_framework import serializers\nfrom modules.hr_eis.models import Employee, Department, Position\n\n\nclass EmployeeSerializer(serializers.ModelSerializer):\n    class Meta:\n        model = Employee\n        fields = "__all__"\n\n\nclass DepartmentSerializer(serializers.ModelSerializer):\n    class Meta:\n        model = Department\n        fields = "__all__"\n\n\nclass PositionSerializer(serializers.ModelSerializer):\n    class Meta:\n        model = Position\n        fields = "__all__"\n
+from rest_framework import serializers
+from modules.hr_eis.models import Employee, Department, Position
+
+
+class EmployeeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = "__all__"
+
+
+class DepartmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Department
+        fields = "__all__"
+
+
+class PositionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Position
+        fields = "__all__"

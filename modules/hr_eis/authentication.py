@@ -1,1 +1,8 @@
-from rest_framework.authentication import TokenAuthentication\nfrom rest_framework.permissions import IsAuthenticated\n\nclass CustomTokenAuthentication(TokenAuthentication):\n    pass\n\nclass CustomPermission(IsAuthenticated):\n    pass\n
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+
+class CustomTokenAuthentication(TokenAuthentication):
+    pass
+
+class CustomPermission(IsAuthenticated):
+    pass

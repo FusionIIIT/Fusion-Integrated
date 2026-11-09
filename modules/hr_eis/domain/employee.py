@@ -1,1 +1,11 @@
-from modules.hr_eis.services.employee import get_employee_by_id\n\n\ndef get_employee_details(employee_id):\n    employee = get_employee_by_id(employee_id)\n    return {\n        'id': employee.id,\n        'name': employee.name,\n        'email': employee.email,\n        'department': employee.department.name,\n    }\n
+from modules.hr_eis.services.employee import get_employee_by_id
+
+
+def get_employee_details(employee_id):
+    employee = get_employee_by_id(employee_id)
+    return {
+        'id': employee.id,
+        'name': employee.name,
+        'email': employee.email,
+        'department': employee.department.name,
+    }

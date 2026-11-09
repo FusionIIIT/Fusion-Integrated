@@ -1,1 +1,10 @@
-from modules.hr_eis.services.department import get_department_by_id\n\n\ndef get_department_details(department_id):\n    department = get_department_by_id(department_id)\n    return {\n        'id': department.id,\n        'name': department.name,\n        'location': department.location,\n    }\n
+from modules.hr_eis.services.department import get_department_by_id
+
+
+def get_department_details(department_id):
+    department = get_department_by_id(department_id)
+    return {
+        'id': department.id,
+        'name': department.name,
+        'location': department.location,
+    }

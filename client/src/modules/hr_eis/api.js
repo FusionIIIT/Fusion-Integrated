@@ -1,1 +1,18 @@
-import axios from 'axios';\n\nconst API_URL = '/api/v1/hr-eis/';\n\nexport const getEmployees = async () => {\n    const response = await axios.get(`${API_URL}employees/`);\n    return response.data;\n};\n\nexport const getDepartments = async () => {\n    const response = await axios.get(`${API_URL}departments/`);\n    return response.data;\n};\n\nexport const getPositions = async () => {\n    const response = await axios.get(`${API_URL}positions/`);\n    return response.data;\n};\n
+import axios from 'axios';
+
+const API_URL = '/api/v1/hr-eis/';
+
+export const getEmployees = async () => {
+    const response = await axios.get(`${API_URL}employees/`);
+    return response.data;
+};
+
+export const getDepartments = async () => {
+    const response = await axios.get(`${API_URL}departments/`);
+    return response.data;
+};
+
+export const getPositions = async () => {
+    const response = await axios.get(`${API_URL}positions/`);
+    return response.data;
+};

@@ -1,1 +1,10 @@
-from django.core.mail import send_mail\n\ndef send_employee_added_email(employee_name, department_name):\n    send_mail(\n        'Employee Added',\n        f'Employee {employee_name} has been added to department {department_name}.',\n        'from@example.com',\n        ['to@example.com'],\n        fail_silently=True,\n    )\n
+from django.core.mail import send_mail
+
+def send_employee_added_email(employee_name, department_name):
+    send_mail(
+        'Employee Added',
+        f'Employee {employee_name} has been added to department {department_name}.',
+        'from@example.com',
+        ['to@example.com'],
+        fail_silently=True,
+    )

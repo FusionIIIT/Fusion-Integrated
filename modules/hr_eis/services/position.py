@@ -1,1 +1,5 @@
-from modules.hr_eis.models import Position\n\n\ndef get_position_by_id(position_id):\n    return Position.objects.get(id=position_id)\n
+from modules.hr_eis.models import Position
+
+
+def get_position_by_id(position_id):
+    return Position.objects.get(id=position_id)

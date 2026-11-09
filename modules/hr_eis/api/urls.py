@@ -1,1 +1,12 @@
-from django.urls import path, include\nfrom rest_framework.routers import DefaultRouter\nfrom modules.hr_eis.api.views import EmployeeViewSet, DepartmentViewSet, PositionViewSet\n\nrouter = DefaultRouter()\nrouter.register(r'employees', EmployeeViewSet)\nrouter.register(r'departments', DepartmentViewSet)\nrouter.register(r'positions', PositionViewSet)\n\nurlpatterns = [\n    path('', include(router.urls)),\n]\n
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from modules.hr_eis.api.views import EmployeeViewSet, DepartmentViewSet, PositionViewSet
+
+router = DefaultRouter()
+router.register(r'employees', EmployeeViewSet)
+router.register(r'departments', DepartmentViewSet)
+router.register(r'positions', PositionViewSet)
+
+urlpatterns = [
+    path('', include(router.urls)),
+]

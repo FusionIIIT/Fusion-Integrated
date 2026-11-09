@@ -1,1 +1,18 @@
-from rest_framework import viewsets\nfrom modules.hr_eis.models import Employee, Department, Position\nfrom .serializers import EmployeeSerializer, DepartmentSerializer, PositionSerializer\n\n\nclass EmployeeViewSet(viewsets.ModelViewSet):\n    queryset = Employee.objects.all()\n    serializer_class = EmployeeSerializer\n\n\nclass DepartmentViewSet(viewsets.ModelViewSet):\n    queryset = Department.objects.all()\n    serializer_class = DepartmentSerializer\n\n\nclass PositionViewSet(viewsets.ModelViewSet):\n    queryset = Position.objects.all()\n    serializer_class = PositionSerializer\n
+from rest_framework import viewsets
+from modules.hr_eis.models import Employee, Department, Position
+from .serializers import EmployeeSerializer, DepartmentSerializer, PositionSerializer
+
+
+class EmployeeViewSet(viewsets.ModelViewSet):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+
+
+class DepartmentViewSet(viewsets.ModelViewSet):
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer
+
+
+class PositionViewSet(viewsets.ModelViewSet):
+    queryset = Position.objects.all()
+    serializer_class = PositionSerializer

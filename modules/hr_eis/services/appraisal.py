@@ -1,1 +1,8 @@
-\nfrom modules.hr_eis.models import Appraisal, Employee\n\n\ndef create_appraisal(employee_id, performance_score, feedback):\n    employee = Employee.objects.get(id=employee_id)\n    appraisal = Appraisal.objects.create(employee=employee, performance_score=performance_score, feedback=feedback)\n    return appraisal\n
+
+from modules.hr_eis.models import Appraisal, Employee
+
+
+def create_appraisal(employee_id, performance_score, feedback):
+    employee = Employee.objects.get(id=employee_id)
+    appraisal = Appraisal.objects.create(employee=employee, performance_score=performance_score, feedback=feedback)
+    return appraisal

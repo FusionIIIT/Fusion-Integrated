@@ -1,1 +1,7 @@
-from modules.hr_eis.models import CPDA, Employee\n\n\ndef create_cpda(employee_id, amount, purpose):\n    employee = Employee.objects.get(id=employee_id)\n    cpda = CPDA.objects.create(employee=employee, amount=amount, purpose=purpose)\n    return cpda\n
+from modules.hr_eis.models import CPDA, Employee
+
+
+def create_cpda(employee_id, amount, purpose):
+    employee = Employee.objects.get(id=employee_id)
+    cpda = CPDA.objects.create(employee=employee, amount=amount, purpose=purpose)
+    return cpda
