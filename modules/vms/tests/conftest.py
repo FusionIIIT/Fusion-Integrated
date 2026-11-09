@@ -3,6 +3,19 @@ import pytest
 from rest_framework.test import APIClient
 
 from fusion_auth.client import IamSession
+from modules.directory.contracts import UserDTO
+
+
+@pytest.fixture(autouse=True)
+def _directory_hosts(monkeypatch):
+    """Any user id below 100000 is a staff member; larger ids do not exist.
+
+    Directories with their own roster (gaps/registration) override this fixture.
+    """
+    def fake_get_users(ids):
+        return {i: UserDTO(user_id=i, username=f"u{i}", display_name=f"User {i}",
+                           kind="staff") for i in ids if i < 100000}
+    monkeypatch.setattr("modules.directory.contracts.get_users", fake_get_users)
 
 
 @pytest.fixture

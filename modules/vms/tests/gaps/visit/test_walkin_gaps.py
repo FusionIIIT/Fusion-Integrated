@@ -21,14 +21,12 @@ def _register(security, **over):
                            host_user_id=host_user)
 
 
-@pytest.mark.xfail(strict=True, reason="BUG: walkin.register never validates the host exists")
 def test_uc_017_walkin_registration_host_not_found_rejected(security):
     """VMS-UC-017: unknown host yields 400."""
     with pytest.raises(BadRequestError):
         _register(security, host_user_id=987654321)
 
 
-@pytest.mark.xfail(strict=True, reason="BUG: walk-in ignores VIP status (BR-195/196)")
 def test_uc_017_walkin_vip_visitor_skips_host_approval(security):
     """VMS-UC-017: VIP walk-in skips host approval."""
     v = f.make_visitor(full_name="Wanda Walker", phone="9123456789", id_doc_number="WK123456")
@@ -37,7 +35,6 @@ def test_uc_017_walkin_vip_visitor_skips_host_approval(security):
     assert vr.status == "approved"
 
 
-@pytest.mark.xfail(strict=True, reason="BUG: walk-in ignores active pre-authorization")
 def test_uc_017_walkin_with_active_preauth_issues_pass(security):
     """VMS-UC-017: pre-auth honoured at walk-in."""
     v = f.make_visitor(full_name="Wanda Walker", phone="9123456789", id_doc_number="WK123456")
@@ -54,7 +51,6 @@ def test_uc_017_walkin_notifies_host_with_decision_link(security):
     assert all("Wanda Walker" in n.body and "Delivery" in n.body for n in rows)
 
 
-@pytest.mark.xfail(strict=True, reason="BUG: no duplicate-pending check on walk-in (BR-038)")
 def test_uc_017_walkin_duplicate_pending_same_visitor_rejected(security):
     """VMS-UC-017 / BR-038: same pending visitor+host rejected for walk-in."""
     _register(security)
@@ -124,7 +120,6 @@ def test_bw_08_rejected_walkin_gate_denied(security, host):
     assert res.outcome != gate.CHECKED_IN
 
 
-@pytest.mark.xfail(strict=True, reason="BUG: contingency decision notifies only the visitor, not host/security")
 def test_uc_033_contingency_admin_notifies_security_and_host(security, admin):
     """VMS-UC-033: host is notified of the contingency decision."""
     vr = _register(security, host_available=False)
@@ -141,7 +136,6 @@ def test_uc_033_contingency_decision_notifies_visitor(security, admin):
                                        recipient_visitor=vr.visitor).exists()
 
 
-@pytest.mark.xfail(strict=True, reason="BUG: contingency_decide does not re-check blacklist")
 def test_uc_033_contingency_blacklisted_since_registration_blocked(security, admin):
     """VMS-UC-033: blacklist published after registration blocks approval."""
     vr = _register(security, host_available=False)

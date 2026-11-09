@@ -7,6 +7,7 @@ unavailable, an Admin decides the contingency (UC-033). All moves go through
 from __future__ import annotations
 
 from datetime import timedelta
+from types import SimpleNamespace
 
 from django.db import transaction
 from django.utils import timezone
@@ -22,12 +23,11 @@ from modules.vms.models import (
     Alert,
     EventBatch,
     Gate,
-    Visitor,
     VisitPass,
     VisitRequest,
     Zone,
 )
-from modules.vms.services import blacklist, bulk_events, passes, policy
+from modules.vms.services import blacklist, bulk_events, passes, policy, registration
 from modules.vms.services.common import audit, authz, notify
 
 REGISTER_PERM = "vms.walkin.register"
@@ -80,6 +80,7 @@ def register(*, security_actor, data: dict, host_user_id: int) -> VisitRequest:
     if missing:
         raise BadRequestError("Missing mandatory fields.", code="missing_fields",
                               details=missing)
+    registration.ensure_host(int(host_user_id))
     if gate_id is not None and not Gate.objects.filter(pk=gate_id, is_active=True).exists():
         raise BadRequestError("Unknown gate.", code="unknown_gate")
     zone_ids = list(set(data.get("zone_ids") or []))
@@ -126,13 +127,28 @@ def register(*, security_actor, data: dict, host_user_id: int) -> VisitRequest:
         start, end = _pass_window(now, pol)
         to = rs.next_state(rs.WALK_IN, rs.NOT_SUBMITTED, rs.SUBMIT, rs.SECURITY,
                            {"host_available": host_available})
-        visitor = Visitor.objects.create(
-            full_name=data["full_name"].strip(), phone=data["phone"].strip(),
-            email=(data.get("email") or "").strip(), id_doc_type=data["id_doc_type"].strip(),
-            id_doc_number=data["id_doc_number"].strip())
+        visitor = registration.resolve_visitor(
+            session_visitor=None,
+            data={**data, "id_doc_type": data["id_doc_type"].strip()})
+        if VisitRequest.objects.filter(          # BR-038
+                visitor=visitor, host_user_id=host_user_id,
+                scheduled_start__lt=end, scheduled_end__gt=start,
+                status__in=[VisitRequest.Status.PENDING, VisitRequest.Status.AWAITING_ADMIN,
+                            VisitRequest.Status.APPROVED]).exists():
+            raise BadRequestError("A request already exists for this visit.",
+                                  code="duplicate_request")
+        zset = set(zone_ids)
+        vip = registration.active_vip(visitor, start, end, zset, now)
+        pre_auth = None if vip else registration.matching_pre_authorization(
+            visitor=visitor, host_user_id=host_user_id, start=start, end=end,
+            zone_ids=zset, now=now, lock=True)
+        bypass = vip is not None or pre_auth is not None     # BR-195/196/197
+        if bypass:
+            to = VisitRequest.Status.APPROVED
         vr = VisitRequest.objects.create(
             visitor=visitor, host_user_id=host_user_id, purpose=data["purpose"].strip(),
             scheduled_start=start, scheduled_end=end, status=to,
+            decided_at=now if bypass else None,
             source=VisitRequest.Source.WALK_IN, gate_id=gate_id, event_id=event_id,
             contingency_requested_at=None if host_available else now)
         if zone_ids:
@@ -141,6 +157,27 @@ def register(*, security_actor, data: dict, host_user_id: int) -> VisitRequest:
             "gate_id": gate_id, "event_id": event_id, "host_available": host_available,
             "status": to,
             "pass_hours": (end - start).total_seconds() / 3600})
+        if bypass:
+            vp = passes.issue_pass(request=vr, pass_type=VisitPass.PassType.WALK_IN,
+                                   issued_by=security_actor, valid_from=start, valid_until=end)
+            if pre_auth is not None:
+                pre_auth.used_visits += 1
+                pre_auth.save(update_fields=["used_visits"])
+                audit.record(actor=security_actor, action="vms.preauth.used", entity=pre_auth,
+                             detail={"request_id": vr.pk, "used_visits": pre_auth.used_visits})
+            else:
+                audit.record(actor=security_actor, action="vms.request.vip_override",
+                             entity=vr, detail={"vip_permission_id": vip.pk})
+            notify.enqueue(
+                topic="pass.issued", dedupe_key=f"pass-issued:{vp.pk}",
+                subject="Your visit pass is ready",
+                body="You may proceed to the gate.", visitor=visitor)
+            notify.enqueue(
+                topic="walkin.submitted", dedupe_key=f"walkin-submitted:{vr.pk}",
+                subject="Pre-cleared walk-in visitor admitted",
+                body=f"{visitor.full_name} is at the gate: {vr.purpose}.",
+                user_id=host_user_id)
+            return vr
         notify.enqueue(
             topic="walkin.submitted", dedupe_key=f"walkin-submitted:{vr.pk}",
             subject=("Walk-in visitor awaiting your approval" if host_available
@@ -215,6 +252,27 @@ def _admin_covers(actor, vr) -> bool:
     return False
 
 
+def _notify_contingency(vr, status):
+    """UC-033: tell the host and the Security staff in scope (the visitor is told by _finish)."""
+    recipients = {vr.host_user_id}
+    zone_ids = list(vr.requested_zones.values_list("pk", flat=True)) or [None]
+    for uid in registration.role_user_ids("security"):
+        who = SimpleNamespace(user_id=uid)
+        for zid in zone_ids:
+            try:
+                authz.require_role(who, "security", gate_id=vr.gate_id, zone_id=zid)
+            except PermissionDeniedError:
+                continue
+            recipients.add(uid)
+            break
+    for uid in sorted(recipients):
+        notify.enqueue(
+            topic="walkin.contingency_decided", dedupe_key=f"walkin-contingency:{vr.pk}:{uid}",
+            subject=f"Walk-in contingency {status}",
+            body=f"An Admin decided the walk-in for {vr.visitor.full_name}: {status}.",
+            user_id=uid)
+
+
 def contingency_decide(*, admin_actor, request_id: int, decision: str, note: str = ""):
     """Admin decides a walk-in whose host is unavailable (UC-033; BW-VMS-07 R2).
 
@@ -226,6 +284,13 @@ def contingency_decide(*, admin_actor, request_id: int, decision: str, note: str
     _check_decision(decision)
     authz.require(admin_actor, CONTINGENCY_PERM)
     now = timezone.now()
+    if decision == APPROVE:
+        pre = VisitRequest.objects.select_related("visitor").filter(
+            pk=request_id, source=VisitRequest.Source.WALK_IN).first()
+        if pre is not None and registration.rescreen_request(
+                pre, checkpoint="walk_in", actor=admin_actor):
+            raise BadRequestError("This visitor is not permitted entry.",
+                                  code="visitor_blacklisted")
     with transaction.atomic():
         vr = _locked_walkin(request_id)
         if not _admin_covers(admin_actor, vr):
@@ -242,8 +307,10 @@ def contingency_decide(*, admin_actor, request_id: int, decision: str, note: str
         event = (rs.ADMIN_APPROVE_CONTINGENCY if decision == APPROVE
                  else rs.ADMIN_REJECT_CONTINGENCY)
         new = rs.next_state(rs.WALK_IN, vr.status, event, rs.ADMIN)
-        return _finish(vr, new, admin_actor, contingency_by=admin_actor.user_id, note=note,
-                       now=now, audit_action="vms.walkin.contingency_decided")
+        out = _finish(vr, new, admin_actor, contingency_by=admin_actor.user_id, note=note,
+                      now=now, audit_action="vms.walkin.contingency_decided")
+        _notify_contingency(vr, new)
+        return out
 
 
 def list_registrations(*, actor, status: str | None = None):
