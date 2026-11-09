@@ -1,6 +1,6 @@
 import uuid
+
 from django.db import models
-from django.utils import timezone
 
 
 class FtsFile(models.Model):
@@ -65,7 +65,12 @@ class FtsFileMovement(models.Model):
     sender_id = models.UUIDField()
     receiver_id = models.UUIDField()
     comment = models.TextField()
-    movement_type = models.CharField(max_length=10, choices=['FORWARD', 'RETURN'])
+    movement_type = models.CharField(
+        max_length=10,
+        choices=[
+            ('FORWARD', 'Forward'),
+            ('RETURN', 'Return')
+        ])
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

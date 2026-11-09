@@ -1,5 +1,13 @@
 from django.urls import path
-from .views import FileCreateView, FileEditView, FileDiscardView, FileForwardView, FileReturnView
+
+from .views import (
+    FileArchiveView,
+    FileCreateView,
+    FileDiscardView,
+    FileEditView,
+    FileForwardView,
+    FileReturnView,
+)
 
 app_name = 'fts'
 
@@ -10,4 +18,5 @@ urlpatterns = [
     path('<uuid:file_id>/discard/', FileDiscardView.as_view(), name='file-discard'),
     path('<uuid:file_id>/forward/', FileForwardView.as_view(), name='file-forward'),
     path('<uuid:file_id>/return/', FileReturnView.as_view(), name='file-return'),
+    path('<uuid:file_id>/archive/', FileArchiveView.as_view(), name='file-archive'),
 ]

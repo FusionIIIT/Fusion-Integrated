@@ -1,23 +1,42 @@
 from django.db import transaction
 from django.utils import timezone
-from .models import FtsFile, FtsFileMovement, FtsFileComment, FtsFileAttachment, FtsAuditLog
-from .domain import commands
+
+from modules.fts.domain import commands
+from modules.fts.models import (
+    FtsAuditLog,
+    FtsFile,
+    FtsFileAttachment,
+    FtsFileComment,
+    FtsFileMovement,
+)
 
 
-def forward_file_service(actor_id: str, file_id: str, receiver_id: str, movement_comment: str, attachment_urls: list[str] = None) -> FtsFile:
+def forward_file_service(
+        actor_id: str,
+        file_id: str,
+        receiver_id: str,
+        movement_comment: str,
+        attachment_urls: list[str] | None = None
+    ) -> FtsFile:
     file = FtsFile.objects.filter(id=file_id).first()
     if not file:
         raise ValueError("File not found.")
-    
+
     if file.current_holder_id is None:
-        if file.owner_id != actor_id:
+        if str(file.owner_id) != actor_id:
             raise ValueError("You are not the current holder of this file.")
     else:
-        if file.current_holder_id != actor_id:
+        if str(file.current_holder_id) != actor_id:
             raise ValueError("You are not the current holder of this file.")
-    
-    movement_details = commands.forward_file(file.status, actor_id, receiver_id, movement_comment, attachment_urls)
-    
+
+    movement_details = commands.forward_file(
+        file.status,
+        actor_id,
+        receiver_id,
+        movement_comment,
+        attachment_urls
+    )
+
     with transaction.atomic():
         FtsFileMovement.objects.create(
             file_id=file.id,
@@ -27,12 +46,12 @@ def forward_file_service(actor_id: str, file_id: str, receiver_id: str, movement
             movement_type='FORWARD',
             created_at=timezone.now()
         )
-        
+
         file.current_holder_id = receiver_id
         file.status = 'CIRCULATED'
         file.updated_at = timezone.now()
         file.save()
-        
+
         FtsFileComment.objects.create(
             file_id=file.id,
             actor_id=actor_id,
@@ -40,7 +59,7 @@ def forward_file_service(actor_id: str, file_id: str, receiver_id: str, movement
             is_initial=False,
             created_at=timezone.now()
         )
-        
+
         if attachment_urls:
             for url in attachment_urls:
                 FtsFileAttachment.objects.create(
@@ -49,7 +68,7 @@ def forward_file_service(actor_id: str, file_id: str, receiver_id: str, movement
                     file_url=url,
                     created_at=timezone.now()
                 )
-        
+
         FtsAuditLog.objects.create(
             file_id=file.id,
             actor_id=actor_id,
@@ -57,26 +76,44 @@ def forward_file_service(actor_id: str, file_id: str, receiver_id: str, movement
             details=movement_details,
             created_at=timezone.now()
         )
-    
+
     return file
 
 
-def return_file_service(actor_id: str, file_id: str, movement_comment: str, attachment_urls: list[str] = None) -> FtsFile:
+def return_file_service(
+        actor_id: str,
+        file_id: str,
+        movement_comment: str,
+        attachment_urls: list[str] | None = None
+    ) -> FtsFile:
+
     file = FtsFile.objects.filter(id=file_id).first()
     if not file:
         raise ValueError("File not found.")
-    
+
     if file.current_holder_id != actor_id:
         raise ValueError("You are not the current holder of this file.")
-    
+
     if not FtsFileMovement.objects.filter(file_id=file_id).exists():
         raise ValueError("Cannot return a file that has not been forwarded.")
-    
-    previous_movement = FtsFileMovement.objects.filter(file_id=file_id).order_by('-created_at').first()
+
+    previous_movement = (
+        FtsFileMovement.objects
+        .filter(file_id=file_id)
+        .order_by('-created_at')
+        .first()
+    )
+
     receiver_id = previous_movement.sender_id
-    
-    movement_details = commands.return_file(file.status, actor_id, receiver_id, movement_comment, attachment_urls)
-    
+
+    movement_details = commands.return_file(
+        file.status,
+        actor_id,
+        receiver_id,
+        movement_comment,
+        attachment_urls
+    )
+
     with transaction.atomic():
         FtsFileMovement.objects.create(
             file_id=file.id,
@@ -86,11 +123,11 @@ def return_file_service(actor_id: str, file_id: str, movement_comment: str, atta
             movement_type='RETURN',
             created_at=timezone.now()
         )
-        
+
         file.current_holder_id = receiver_id
         file.updated_at = timezone.now()
         file.save()
-        
+
         FtsFileComment.objects.create(
             file_id=file.id,
             actor_id=actor_id,
@@ -98,7 +135,7 @@ def return_file_service(actor_id: str, file_id: str, movement_comment: str, atta
             is_initial=False,
             created_at=timezone.now()
         )
-        
+
         if attachment_urls:
             for url in attachment_urls:
                 FtsFileAttachment.objects.create(
@@ -107,7 +144,7 @@ def return_file_service(actor_id: str, file_id: str, movement_comment: str, atta
                     file_url=url,
                     created_at=timezone.now()
                 )
-        
+
         FtsAuditLog.objects.create(
             file_id=file.id,
             actor_id=actor_id,
@@ -115,5 +152,5 @@ def return_file_service(actor_id: str, file_id: str, movement_comment: str, atta
             details=movement_details,
             created_at=timezone.now()
         )
-    
+
     return file

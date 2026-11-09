@@ -6,7 +6,13 @@ the client does zero filtering, so a link a role cannot use never reaches the
 browser at all.
 """
 MODULE = {
-    "id": "fts", "name": "File Tracking System", "url": "/fts/",
+    "code": "fts",
+    "label": "File Tracking System",
+    "icon": "Folder",
+    "base_path": "/fts",
+    "nav_section": "Modules",
+    "sort_order": 20,
+    "status": "active",
 }
 
 NAV_ITEMS = [
