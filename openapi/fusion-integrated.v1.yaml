@@ -1674,6 +1674,402 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/system_admin/archive/historical-data:
+    post:
+      operationId: v1_system_admin_archive_historical_data_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/archive/purge-requests:
+    get:
+      operationId: v1_system_admin_archive_purge_requests_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_system_admin_archive_purge_requests_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/archive/purge-requests/{request_id}/authorize:
+    post:
+      operationId: v1_system_admin_archive_purge_requests_authorize_create
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/archive/records:
+    get:
+      operationId: v1_system_admin_archive_records_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/archive/records/{archive_id}/restore:
+    post:
+      operationId: v1_system_admin_archive_records_restore_create
+      parameters:
+      - in: path
+        name: archive_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/archive/users:
+    get:
+      operationId: v1_system_admin_archive_users_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/archive/users/{user_id}/archive:
+    post:
+      operationId: v1_system_admin_archive_users_archive_create
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/archive/users/{user_id}/restore:
+    post:
+      operationId: v1_system_admin_archive_users_restore_create
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/audit/export:
+    get:
+      operationId: v1_system_admin_audit_export_retrieve
+      description: 'AFR-SA-065C: Export audit report to CSV format.'
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/audit/logs:
+    get:
+      operationId: v1_system_admin_audit_logs_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/auth/login:
+    post:
+      operationId: v1_system_admin_auth_login_create
+      description: |-
+        UC-SA-033: Authenticate Super Admin and Establish Session.
+
+        (AFR-SA-073A..C, AFR-SA-074A..C).
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/auth/logout:
+    post:
+      operationId: v1_system_admin_auth_logout_create
+      description: 'UC-SA-034: Terminate Super Admin Session.'
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/config:
+    get:
+      operationId: v1_system_admin_config_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: v1_system_admin_config_partial_update
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/dashboard:
+    get:
+      operationId: v1_system_admin_dashboard_retrieve
+      description: 'CFR-SA-018, AFR-SA-066: Super Admin Dashboard metrics.'
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/roles/assignments:
+    get:
+      operationId: v1_system_admin_roles_assignments_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_system_admin_roles_assignments_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/roles/assignments/{assignment_id}/extend:
+    post:
+      operationId: v1_system_admin_roles_assignments_extend_create
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/roles/assignments/{assignment_id}/reassign:
+    post:
+      operationId: v1_system_admin_roles_assignments_reassign_create
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/roles/assignments/{assignment_id}/revoke:
+    post:
+      operationId: v1_system_admin_roles_assignments_revoke_create
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/roles/definitions:
+    get:
+      operationId: v1_system_admin_roles_definitions_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/roles/switch-active:
+    post:
+      operationId: v1_system_admin_roles_switch_active_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/roles/vacancies:
+    get:
+      operationId: v1_system_admin_roles_vacancies_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/users:
+    get:
+      operationId: v1_system_admin_users_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BasicUserRead'
+          description: ''
+    post:
+      operationId: v1_system_admin_users_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/users/{user_id}:
+    get:
+      operationId: v1_system_admin_users_retrieve
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: v1_system_admin_users_partial_update
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/users/{user_id}/deactivate:
+    post:
+      operationId: v1_system_admin_users_deactivate_create
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/users/{user_id}/reactivate:
+    post:
+      operationId: v1_system_admin_users_reactivate_create
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/users/bulk-create:
+    post:
+      operationId: v1_system_admin_users_bulk_create_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/system_admin/users/bulk-status:
+    post:
+      operationId: v1_system_admin_users_bulk_status_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
 components:
   schemas:
     AcademicDirectory:
@@ -1993,6 +2389,140 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BasicUserRead:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          readOnly: true
+        institute_id:
+          type: string
+          readOnly: true
+        user_type:
+          allOf:
+          - $ref: '#/components/schemas/UserTypeEnum'
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        first_name:
+          type: string
+          readOnly: true
+        last_name:
+          type: string
+          readOnly: true
+        display_name:
+          type: string
+          readOnly: true
+        contact_number:
+          type: string
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        programme:
+          type: string
+          readOnly: true
+        discipline:
+          type: string
+          readOnly: true
+        batch_year:
+          type: integer
+          readOnly: true
+          nullable: true
+        employee_id:
+          type: string
+          readOnly: true
+        date_of_joining:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        expected_completion_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/BasicUserReadStatusEnum'
+          readOnly: true
+        dashboard_access_enabled:
+          type: boolean
+          readOnly: true
+        deactivated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        deactivation_reason:
+          type: string
+          readOnly: true
+        archived_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        archival_reason:
+          type: string
+          readOnly: true
+        reversible_until:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        is_permanently_archived:
+          type: boolean
+          readOnly: true
+        has_pending_transactions:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - archival_reason
+      - archived_at
+      - batch_year
+      - contact_number
+      - created_at
+      - dashboard_access_enabled
+      - date_of_joining
+      - deactivated_at
+      - deactivation_reason
+      - department
+      - discipline
+      - display_name
+      - email
+      - employee_id
+      - expected_completion_date
+      - first_name
+      - has_pending_transactions
+      - institute_id
+      - is_permanently_archived
+      - last_name
+      - programme
+      - reversible_until
+      - status
+      - updated_at
+      - user_id
+      - user_type
+    BasicUserReadStatusEnum:
+      enum:
+      - active
+      - deactivated
+      - archived
+      type: string
+      description: |-
+        * `active` - Active
+        * `deactivated` - Deactivated
+        * `archived` - Archived
     BulkOutcome:
       type: object
       properties:
@@ -3814,6 +4344,16 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    UserTypeEnum:
+      enum:
+      - student
+      - faculty
+      - staff
+      type: string
+      description: |-
+        * `student` - Student
+        * `faculty` - Faculty
+        * `staff` - Staff
     WaiveIncident:
       type: object
       properties:
