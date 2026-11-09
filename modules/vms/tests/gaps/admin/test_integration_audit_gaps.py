@@ -45,8 +45,6 @@ def test_uc_002_integration_notification_channels_setting_roundtrip(super_actor)
     assert "notification_channels" in keys
 
 
-@pytest.mark.xfail(strict=True,
-                   reason="BUG: notify.enqueue ignores the notification_channels setting")
 def test_br_174_disabled_channel_in_setting_not_enqueued(super_actor):
     """VMS-BR-174: a disabled email channel produces no email row."""
     integration.set_value(actor=super_actor, key="notification_channels",
@@ -56,8 +54,6 @@ def test_br_174_disabled_channel_in_setting_not_enqueued(super_actor):
     assert not Notification.objects.filter(channel="email").exists()
 
 
-@pytest.mark.xfail(strict=True,
-                   reason="BUG: notify.enqueue ignores the notification_channels setting")
 def test_br_174_channel_setting_per_event_type_selects_channels(super_actor):
     """VMS-BR-174: configured channels decide which rows a host notice gets."""
     integration.set_value(actor=super_actor, key="notification_channels",
@@ -101,8 +97,6 @@ def test_uc_004_audit_filter_by_visitor_and_action_combined(super_actor):
     assert rows[0].actor_user_id == 5 and rows[0].entity_id == "9"
 
 
-@pytest.mark.xfail(strict=True,
-                   reason="BUG: inverted audit date range returns 200/empty, not 400")
 def test_uc_004_audit_date_range_inverted_rejected(api_as):
     """VMS-UC-004: date_from after date_to is a 400."""
     client = api_as(permissions=["vms.audit.view"])

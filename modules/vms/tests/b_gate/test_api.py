@@ -204,6 +204,7 @@ def test_access_check_endpoint(api_as, sec, gate, vpass):
                                                 "gate_id": gate.pk},
                   format="json").status_code == 404
     vpass.allowed_zones.add(zone)
+    f.make_visit_log(visit_pass=vpass)        # UC-023: visitor must be on site
     r = c.post(BASE + "zones/access-check", {"pass_id": vpass.pk, "zone_id": zone.pk,
                                              "gate_id": gate.pk}, format="json")
     assert r.status_code == 200 and r.json()["allowed"] is True

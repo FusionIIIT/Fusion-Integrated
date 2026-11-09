@@ -64,7 +64,7 @@ def permitted_zone_ids(vp: VisitPass, at, pol) -> set[int]:
     replacing it."""
     allowed = set(vp.allowed_zones.values_list("pk", flat=True))
     elevated = set(vp.elevations.filter(starts_at__lte=at, ends_at__gt=at,
-                                        revoked_at__isnull=True)
+                                        revoked_at__isnull=True, used_at__isnull=True)
                    .values_list("zone_id", flat=True))
     if elevated and not allowed:
         allowed = set(Zone.objects.filter(is_active=True)
@@ -140,8 +140,17 @@ def check_zone(*, actor, pass_id: int, zone_id: int, reader_id: str = "", gate_i
         if vp is None:
             raise NotFoundError("Pass not found.")
         ev = evaluate(vp, now=now, zone_id=zone_id)
+        if gate_sel.open_check_in(vp.pk) is None:      # UC-023: visitor must be on site
+            ev.failures.append(pass_rules._fail(
+                pass_rules.NOT_ON_SITE, "Visitor has no open check-in."))
         actor_id = getattr(actor, "user_id", None)
         if not ev.failures:
+            # BW-VMS-14: an elevation covers exactly one re-validation.
+            if zone_id not in set(vp.allowed_zones.values_list("pk", flat=True)):
+                (ZoneElevation.objects.filter(
+                    visit_pass=vp, zone_id=zone_id, starts_at__lte=now, ends_at__gt=now,
+                    revoked_at__isnull=True, used_at__isnull=True)
+                 .update(used_at=now))
             log = VisitLog.objects.create(
                 visit_pass=vp, event=E.ZONE_ALLOWED, zone=zone, device_id=reader_id[:80],
                 gate_id=gate_id, logged_by_user_id=actor_id,

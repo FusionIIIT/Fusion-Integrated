@@ -15,7 +15,7 @@ from modules.vms.tests import factories as f
 #: blacklist (2), log insert, audit insert, host notice (get_or_create). The lane file
 #: asked for 6, which cannot hold once the audit row, host notice and role check are
 #: written. The point of the test is that it is constant, not that it grows with history.
-VALIDATE_QUERY_BUDGET = 14
+VALIDATE_QUERY_BUDGET = 15      # +1: notify.enqueue reads notification_channels (BR-174)
 DENIED_QUERY_BUDGET = 18
 
 

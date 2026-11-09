@@ -17,7 +17,6 @@ def _ends(days=30):
     return timezone.now() + timedelta(days=days)
 
 
-@pytest.mark.xfail(strict=True, reason="BUG: roles.assign never notifies the assignee")
 def test_uc_001_assign_role_notifies_assignee(directory, super_actor):
     """VMS-UC-001: assignee receives a notice."""
     directory[10] = "staff"
@@ -127,7 +126,6 @@ def test_uc_003_vip_list_filters_active_expired_revoked(super_actor):
     assert list(vip.list_permissions(actor=super_actor, active_only=True)) == [live]
 
 
-@pytest.mark.xfail(strict=True, reason="BUG: vip.grant does not check the blacklist")
 def test_uc_003_vip_grant_for_blacklisted_visitor_rejected(super_actor):
     """VMS-UC-003: blacklist beats VIP at grant time."""
     ver = f.make_blacklist_version(status="published", published_at=timezone.now())

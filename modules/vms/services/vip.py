@@ -11,6 +11,7 @@ from django.utils import timezone
 
 from core.api.exceptions import BadRequestError, ConflictError, NotFoundError
 from modules.vms.models import VipPermission, Visitor, Zone
+from modules.vms.services import blacklist
 from modules.vms.services.common import audit, authz
 
 PERM = "vms.vip.manage"
@@ -72,6 +73,11 @@ def grant(*, actor, valid_until, valid_from=None, zone_ids=(), restricted_zone_i
                            id_doc_number=id_doc_number, full_name=full_name,
                            phone=phone, email=email)
         list(Visitor.objects.select_for_update().filter(pk=visitor.pk))
+        if blacklist.check(checkpoint="gate", name=visitor.full_name,
+                           id_doc_number=visitor.id_doc_number, phone=visitor.phone,
+                           email=visitor.email, at=now):
+            # BR-197: a VIP permission never bypasses the blacklist.
+            raise BadRequestError("This visitor is blacklisted.", code="blacklisted")
         if VipPermission.objects.filter(
                 visitor=visitor, revoked_at__isnull=True,
                 valid_from__lt=valid_until, valid_until__gt=valid_from).exists():

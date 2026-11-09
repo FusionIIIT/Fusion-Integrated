@@ -40,6 +40,9 @@ def _clean(fields: dict, *, partial: bool) -> dict:
     if "severity" in fields and fields["severity"] not in blacklist_match.SEVERITIES:
         raise BadRequestError("severity must be low, medium, high or critical.",
                               code="validation_error")
+    expiry = fields.get("expiry_date")
+    if expiry is not None and expiry < timezone.localdate():
+        raise BadRequestError("expiry_date is already in the past.", code="validation_error")
     return fields
 
 
@@ -174,6 +177,9 @@ def publish(*, actor, version_id: int) -> BlacklistVersion:
     with transaction.atomic():
         version = _draft_for_update(version_id)
         previous = blacklist_read.published_version()
+        if previous is not None and not any(changelog(previous, version).values()):
+            raise BadRequestError("The draft has no changes from the live version.",
+                                  code="no_changes")
         newest = BlacklistVersion.objects.filter(status=Status.PUBLISHED).aggregate(
             m=Max("version"))["m"] or 0
         if version.version < newest:

@@ -105,6 +105,8 @@ class ZoneElevation(models.Model):
     granted_by_user_id = models.IntegerField()
     reason = models.CharField(max_length=255)
     revoked_at = models.DateTimeField(null=True, blank=True)
+    # Set by the one re-validation the elevation allows (BW-VMS-14).
+    used_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         pass

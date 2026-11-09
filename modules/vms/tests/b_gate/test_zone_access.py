@@ -1,4 +1,5 @@
 """Zone checks, elevation and alert handling (BW-VMS-12/13/14)."""
+import inspect
 from datetime import timedelta
 
 import pytest
@@ -11,6 +12,15 @@ from modules.vms.tests import factories as f
 from modules.vms.tests.b_gate.conftest import blacklist
 
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture(autouse=True)
+def _on_site(request):
+    """Zone checks need an open check-in (UC-023); tests that check a zone start on site."""
+    src = inspect.getsource(request.function)
+    if ("check(" in src and "validate_and_check_in" not in src and "not_on_site" not in src
+            and "vpass" in request.fixturenames):
+        f.make_visit_log(visit_pass=request.getfixturevalue("vpass"))
 
 
 @pytest.fixture
@@ -26,7 +36,7 @@ def test_zone_allowed_is_logged(sec, vpass, zone, gate):
     vpass.allowed_zones.add(zone)
     res = check(sec, vpass, zone, gate_id=gate.pk)
     assert res["allowed"]
-    log = vpass.logs.get()
+    log = vpass.logs.exclude(event="check_in").get()
     assert (log.event, log.zone_id, log.device_id) == ("zone_allowed", zone.pk, "rdr-1")
     assert not Alert.objects.exists()
 
@@ -34,7 +44,7 @@ def test_zone_allowed_is_logged(sec, vpass, zone, gate):
 def test_br_191_zone_denied_logged(sec, vpass, zone, gate, admin):
     res = check(sec, vpass, zone, gate_id=gate.pk)
     assert not res["allowed"]
-    log = vpass.logs.get()
+    log = vpass.logs.exclude(event="check_in").get()
     assert log.event == "zone_denied" and log.reason == "zone_not_permitted"
     alert = Alert.objects.get(kind="zone_violation")
     assert alert.severity == "high" and alert.ref_id == log.pk       # restricted zone

@@ -1,9 +1,25 @@
 """Notification outbox (VMS-CFR-028, CFR-021). Writes rows; lane E delivers them."""
 from __future__ import annotations
 
-from modules.vms.models import Notification
+from modules.vms.models import IntegrationSetting, Notification
 
 CHANNELS = {c.value for c in Notification.Channel}
+
+
+def _enabled_channels(topic, channels):
+    """Apply the notification_channels setting (BR-174). Accepts a flat
+    {channel: bool} map, a list of enabled channels, or {topic: [channels]};
+    a channel absent from a flat map stays enabled."""
+    row = IntegrationSetting.objects.filter(key="notification_channels").first()
+    value = row.value if row else None
+    if isinstance(value, dict) and value and not all(
+            isinstance(v, bool) for v in value.values()):
+        value = value.get(topic, value.get("default", value.get("*")))
+    if isinstance(value, (list, tuple, set)):
+        return [c for c in channels if c in value]
+    if isinstance(value, dict) and all(isinstance(v, bool) for v in value.values()):
+        return [c for c in channels if value.get(c, True)]
+    return list(channels)
 
 
 def enqueue(*, topic, dedupe_key, subject, body, user_id=None, visitor=None,
@@ -19,6 +35,7 @@ def enqueue(*, topic, dedupe_key, subject, body, user_id=None, visitor=None,
     if unknown:
         raise ValueError(f"unknown channel(s): {sorted(unknown)}")
     rows = []
+    channels = _enabled_channels(topic, channels)
     for channel in dict.fromkeys(channels):   # order-preserving de-dup
         row, _ = Notification.objects.get_or_create(
             dedupe_key=f"{dedupe_key}:{channel}"[:200],
