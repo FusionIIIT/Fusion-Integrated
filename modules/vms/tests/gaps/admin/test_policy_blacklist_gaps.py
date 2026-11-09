@@ -142,7 +142,7 @@ def test_uc_005_policy_restricted_zone_flag_change_applies_next_validation(
 
 def test_uc_006_blacklist_entry_edit_creates_change_in_draft_only(admin_actor):
     """VMS-UC-006: editing a carried-forward entry touches the draft copy, not the live row."""
-    v1, live = _publish_entry(admin_actor, id_doc_number="E1", severity="low")
+    _, live = _publish_entry(admin_actor, id_doc_number="E1", severity="low")
     d2 = blacklist_admin.create_version(actor=admin_actor)
     copy = d2.entries.get()
     blacklist_admin.update_entry(actor=admin_actor, version_id=d2.pk, entry_id=copy.pk,
