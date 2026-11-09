@@ -6,7 +6,7 @@ import pytest
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
-from core.api.exceptions import ConflictError, PermissionDeniedError
+from core.api.exceptions import ConflictError, DomainError, PermissionDeniedError
 from modules.vms.models import Notification, VisitPass, VisitRequest
 from modules.vms.services import approval, registration, scheduler_work
 from modules.vms.tests import factories as f
@@ -141,7 +141,7 @@ def test_uc_013_host_approve_blocked_if_visitor_blacklisted_since_submission(
     """VMS-UC-013: approve after a new blacklist publication fails."""
     v = f.make_blacklist_version(status="published", published_at=timezone.now())
     f.make_blacklist_entry(version=v, id_doc_number="P1234567")
-    with pytest.raises(Exception):
+    with pytest.raises(DomainError):
         approval.decide(host_actor=host_actor, request_id=pending.pk, decision="approve")
     assert not VisitPass.objects.exists()
 
