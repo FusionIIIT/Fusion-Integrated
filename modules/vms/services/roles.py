@@ -115,6 +115,12 @@ def assign(*, actor, user_id: int, role: str, scope_type: str = Scope.CAMPUS,
         audit.record(actor=actor, action="vms.role.assigned", entity=row,
                      detail={"user_id": user_id, "role": role, "scope_type": scope_type,
                              "scope_id": scope_id, "ends_at": ends_at.isoformat()})
+        notify.enqueue(
+            topic="role.assigned", dedupe_key=f"role-assigned:{row.pk}",
+            subject="You were assigned a VMS role",
+            body=(f"You now hold the {role} role until "
+                  f"{ends_at:%Y-%m-%d %H:%M}."),
+            user_id=user_id, channels=("inapp",))
     return row
 
 
