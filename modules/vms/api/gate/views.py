@@ -3,12 +3,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.api.exceptions import BadRequestError
-from fusion_auth.permissions import HasPermission
+from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.vms.api.gate import serializers as s
 from modules.vms.selectors import gate as gate_sel
 from modules.vms.services import gate as gate_svc
 from modules.vms.services import offline_sync, zone_access
 from modules.vms.services.common import authz
+
+MODULE = HasModuleGrant("vms")
 
 LIST_LIMIT = 200
 
@@ -34,7 +36,7 @@ def result_response(res, ok_detail="Checked in."):
 
 
 class GateValidateView(APIView):
-    permission_classes = [HasPermission("vms.gate.operate")]
+    permission_classes = [MODULE, HasPermission("vms.gate.operate")]
 
     def post(self, request):
         ser = s.GateValidateSerializer(data=request.data)
@@ -47,7 +49,7 @@ class GateValidateView(APIView):
 
 
 class GateOverrideView(APIView):
-    permission_classes = [HasPermission("vms.gate.override")]
+    permission_classes = [MODULE, HasPermission("vms.gate.override")]
 
     def post(self, request):
         ser = s.OverrideSerializer(data=request.data)
@@ -57,7 +59,7 @@ class GateOverrideView(APIView):
 
 
 class EscalationCreateView(APIView):
-    permission_classes = [HasPermission("vms.gate.escalate")]
+    permission_classes = [MODULE, HasPermission("vms.gate.escalate")]
 
     def post(self, request):
         ser = s.EscalationCreateSerializer(data=request.data)
@@ -67,7 +69,7 @@ class EscalationCreateView(APIView):
 
 
 class EscalationResolveView(APIView):
-    permission_classes = [HasPermission("vms.gate.override")]
+    permission_classes = [MODULE, HasPermission("vms.gate.override")]
 
     def post(self, request, pk):
         ser = s.NoteSerializer(data=request.data)
@@ -78,7 +80,7 @@ class EscalationResolveView(APIView):
 
 
 class ManualEntryView(APIView):
-    permission_classes = [HasPermission("vms.gate.operate")]
+    permission_classes = [MODULE, HasPermission("vms.gate.operate")]
 
     def post(self, request):
         ser = s.ManualEntrySerializer(data=request.data)
@@ -91,7 +93,7 @@ class ManualEntryView(APIView):
 
 
 class DenialListView(APIView):
-    permission_classes = [HasPermission("vms.gate.operate")]
+    permission_classes = [MODULE, HasPermission("vms.gate.operate")]
 
     def get(self, request):
         authz.require_role(request.principal, "security")
@@ -101,7 +103,7 @@ class DenialListView(APIView):
 
 
 class AlertListView(APIView):
-    permission_classes = [HasPermission("vms.monitor.view")]
+    permission_classes = [MODULE, HasPermission("vms.monitor.view")]
 
     def get(self, request):
         authz.require_role(request.principal, "security")
@@ -112,7 +114,7 @@ class AlertListView(APIView):
 
 
 class AlertHandleView(APIView):
-    permission_classes = [HasPermission("vms.gate.operate")]
+    permission_classes = [MODULE, HasPermission("vms.gate.operate")]
 
     def post(self, request, pk):
         ser = s.AlertHandleSerializer(data=request.data)
@@ -123,7 +125,7 @@ class AlertHandleView(APIView):
 
 
 class SyncView(APIView):
-    permission_classes = [HasPermission("vms.gate.sync")]
+    permission_classes = [MODULE, HasPermission("vms.gate.sync")]
 
     def post(self, request):
         ser = s.SyncSerializer(data=request.data)
@@ -136,7 +138,7 @@ class SyncView(APIView):
 
 
 class CachedRosterView(APIView):
-    permission_classes = [HasPermission("vms.gate.sync")]
+    permission_classes = [MODULE, HasPermission("vms.gate.sync")]
 
     def get(self, request):
         try:

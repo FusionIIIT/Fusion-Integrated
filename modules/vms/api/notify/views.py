@@ -2,7 +2,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from fusion_auth.permissions import HasPermission
+from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.vms.api.notify.serializers import (
     ArrivalSerializer,
     NotificationSerializer,
@@ -11,6 +11,8 @@ from modules.vms.api.notify.serializers import (
 from modules.vms.auth import IsVisitorSession, VisitorSessionAuthentication
 from modules.vms.selectors import notifications as sel
 from modules.vms.services import delivery
+
+MODULE = HasModuleGrant("vms")
 
 VIEW_SELF = HasPermission("vms.notification.view_self")
 AUDIT_VIEW = HasPermission("vms.audit.view")
@@ -28,7 +30,7 @@ def _page(request, qs):
 # --- host / staff ---------------------------------------------------------------------
 
 class InboxView(APIView):
-    permission_classes = [VIEW_SELF]
+    permission_classes = [MODULE, VIEW_SELF]
 
     def get(self, request):
         qs = sel.inbox_for_user(request.principal.user_id,
@@ -37,14 +39,14 @@ class InboxView(APIView):
 
 
 class UnreadCountView(APIView):
-    permission_classes = [VIEW_SELF]
+    permission_classes = [MODULE, VIEW_SELF]
 
     def get(self, request):
         return Response({"unread": sel.unread_count_for_user(request.principal.user_id)})
 
 
 class MarkReadView(APIView):
-    permission_classes = [VIEW_SELF]
+    permission_classes = [MODULE, VIEW_SELF]
 
     def post(self, request, pk):
         row = delivery.mark_read(pk, user_id=request.principal.user_id)
@@ -52,7 +54,7 @@ class MarkReadView(APIView):
 
 
 class ReadAllView(APIView):
-    permission_classes = [VIEW_SELF]
+    permission_classes = [MODULE, VIEW_SELF]
 
     def post(self, request):
         n = delivery.mark_all_read(user_id=request.principal.user_id)
@@ -60,7 +62,7 @@ class ReadAllView(APIView):
 
 
 class ArrivalsView(APIView):
-    permission_classes = [VIEW_SELF]
+    permission_classes = [MODULE, VIEW_SELF]
 
     def get(self, request):
         limit = sel.clamp_limit(request.query_params.get("limit"), default=20)
@@ -71,7 +73,7 @@ class ArrivalsView(APIView):
 # --- ops outbox -------------------------------------------------------------------------
 
 class OutboxView(APIView):
-    permission_classes = [AUDIT_VIEW]
+    permission_classes = [MODULE, AUDIT_VIEW]
 
     def get(self, request):
         qs = sel.outbox(status=request.query_params.get("status") or None,
@@ -81,7 +83,7 @@ class OutboxView(APIView):
 
 
 class OutboxRetryView(APIView):
-    permission_classes = [AUDIT_VIEW]
+    permission_classes = [MODULE, AUDIT_VIEW]
 
     def post(self, request, pk):
         row = delivery.retry_failed(pk, actor=request.principal)

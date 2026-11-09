@@ -2,17 +2,19 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from fusion_auth.permissions import HasPermission
+from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.vms.api.zones import serializers as s
 from modules.vms.selectors import gate as gate_sel
 from modules.vms.services import zone_access
 from modules.vms.services.common import authz
 
+MODULE = HasModuleGrant("vms")
+
 LIST_LIMIT = 200
 
 
 class AccessCheckView(APIView):
-    permission_classes = [HasPermission("vms.gate.operate")]
+    permission_classes = [MODULE, HasPermission("vms.gate.operate")]
 
     def post(self, request):
         ser = s.AccessCheckSerializer(data=request.data)
@@ -29,7 +31,7 @@ class AccessCheckView(APIView):
 
 
 class ElevationListCreateView(APIView):
-    permission_classes = [HasPermission("vms.zone.elevate")]
+    permission_classes = [MODULE, HasPermission("vms.zone.elevate")]
 
     def get(self, request):
         authz.require_role(request.principal, "admin")
@@ -47,7 +49,7 @@ class ElevationListCreateView(APIView):
 
 
 class ElevationRevokeView(APIView):
-    permission_classes = [HasPermission("vms.zone.elevate")]
+    permission_classes = [MODULE, HasPermission("vms.zone.elevate")]
 
     def post(self, request, pk):
         el = zone_access.revoke_elevation(admin_actor=request.principal, elevation_id=pk)

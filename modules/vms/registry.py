@@ -10,14 +10,10 @@ the OTP session cookie and are deliberately absent from ROLE_GRANTS.
 MODULE = {
     "code": "vms", "label": "Visitors", "icon": "IdentificationBadge",
     "base_path": "/vms", "nav_section": "Visitors", "sort_order": 40,
-    "status": "planned",   # stays planned until Phase 3 ships the screens
+    "status": "active",
 }
 
-#: The screens the Phase 3 UI will need. They are parked here, not in NAV_ITEMS,
-#: because ops/checks/nav_matches_routes.py fails any nav item that has no client
-#: route (client/src/modules/vms does not exist yet). Phase 3 renames this to
-#: NAV_ITEMS in the same change that adds routes.tsx.
-PLANNED_NAV_ITEMS = [
+NAV_ITEMS = [
     {"code": "vms.visits", "label": "My Visits", "icon": "UsersThree",
      "to": "/vms/visits", "required_permission": "vms.notification.view_self",
      "sort_order": 10},
@@ -43,8 +39,6 @@ PLANNED_NAV_ITEMS = [
      "to": "/vms/admin", "required_permission": "vms.policy.manage",
      "sort_order": 80},
 ]
-
-NAV_ITEMS = []
 
 _HOST = [
     ("vms.request.decide", "Approve or reject a visit request for oneself"),

@@ -2,7 +2,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from fusion_auth.permissions import HasPermission
+from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.vms.api.visit.serializers import (
     CheckOutSerializer,
     SelfCheckOutSerializer,
@@ -12,9 +12,11 @@ from modules.vms.auth import IsVisitorSession, VisitorSessionAuthentication
 from modules.vms.selectors import roster
 from modules.vms.services import checkout, termination
 
+MODULE = HasModuleGrant("vms")
+
 
 class CheckOutView(APIView):
-    permission_classes = [HasPermission("vms.gate.operate")]
+    permission_classes = [MODULE, HasPermission("vms.gate.operate")]
 
     def post(self, request):
         ser = CheckOutSerializer(data=request.data)
@@ -40,7 +42,7 @@ class SelfCheckOutView(APIView):
 
 
 class TerminatePassView(APIView):
-    permission_classes = [HasPermission("vms.pass.terminate")]
+    permission_classes = [MODULE, HasPermission("vms.pass.terminate")]
 
     def post(self, request, pk):
         ser = TerminateSerializer(data=request.data)
@@ -52,7 +54,7 @@ class TerminatePassView(APIView):
 
 
 class OnSiteView(APIView):
-    permission_classes = [HasPermission("vms.monitor.view")]
+    permission_classes = [MODULE, HasPermission("vms.monitor.view")]
 
     def get(self, request):
         zone = request.query_params.get("zone_id")

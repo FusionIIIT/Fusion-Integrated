@@ -203,7 +203,7 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 25,
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     "EXCEPTION_HANDLER": "core.api.exceptions.exception_handler",
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_SCHEMA_CLASS": "core.api.schema.UntypedBodyAutoSchema",
     "UNAUTHENTICATED_USER": None,
     # Unset, DRF throttles on the whole client-controlled X-Forwarded-For.
     "NUM_PROXIES": env_int("DJANGO_NUM_PROXIES", 1),

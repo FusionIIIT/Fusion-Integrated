@@ -4,9 +4,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.api.exceptions import BadRequestError
-from fusion_auth.permissions import HasPermission
+from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.vms.api.monitor import serializers as s
 from modules.vms.services import monitor as svc
+
+MODULE = HasModuleGrant("vms")
 
 
 def _int(request, name):
@@ -20,14 +22,14 @@ def _int(request, name):
 
 
 class DashboardView(APIView):
-    permission_classes = [HasPermission("vms.monitor.view")]
+    permission_classes = [MODULE, HasPermission("vms.monitor.view")]
 
     def get(self, request):
         return Response(svc.dashboard(actor=request.principal, zone_id=_int(request, "zone_id")))
 
 
 class OnSiteView(APIView):
-    permission_classes = [HasPermission("vms.monitor.view")]
+    permission_classes = [MODULE, HasPermission("vms.monitor.view")]
 
     def get(self, request):
         rows = svc.on_site(actor=request.principal, zone_id=_int(request, "zone_id"))
@@ -35,7 +37,7 @@ class OnSiteView(APIView):
 
 
 class MovementsView(APIView):
-    permission_classes = [HasPermission("vms.monitor.view")]
+    permission_classes = [MODULE, HasPermission("vms.monitor.view")]
 
     def get(self, request):
         since = request.query_params.get("since")
@@ -49,7 +51,7 @@ class MovementsView(APIView):
 
 
 class OutOfBoundsView(APIView):
-    permission_classes = [HasPermission("vms.monitor.view")]
+    permission_classes = [MODULE, HasPermission("vms.monitor.view")]
 
     def get(self, request):
         rows = svc.out_of_bounds(actor=request.principal)

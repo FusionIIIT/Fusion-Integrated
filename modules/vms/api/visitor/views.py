@@ -3,6 +3,7 @@ login endpoints are anonymous and throttled, everything else needs the
 `vms_visitor` session cookie (`VisitorSessionAuthentication`)."""
 from django.conf import settings
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
@@ -95,6 +96,7 @@ def _own_request(request, pk):
 
 
 class RequestDetailView(_VisitorView):
+    @extend_schema(operation_id="vms_visitor_requests_detail")
     def get(self, request, pk):
         return Response(s.VisitRequestDetailSerializer(_own_request(request, pk)).data)
 

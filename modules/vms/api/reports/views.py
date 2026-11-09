@@ -1,4 +1,5 @@
 """Report endpoints (VMS-UC-007). GET only: reports never change data."""
+from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -28,6 +29,7 @@ class ReportRunView(APIView):
     permission_classes = [MODULE, HasPermission("vms.report.view")]
     http_method_names = ["get", "head", "options"]
 
+    @extend_schema(operation_id="vms_reports_run")
     def get(self, request, key):
         return Response(reports.run(request.principal, key, _params(request)))
 

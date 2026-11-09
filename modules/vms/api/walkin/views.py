@@ -2,13 +2,15 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from fusion_auth.permissions import HasPermission
+from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.vms.api.walkin.serializers import (
     WalkinDecisionSerializer,
     WalkinRegisterSerializer,
     request_payload,
 )
 from modules.vms.services import walkin
+
+MODULE = HasModuleGrant("vms")
 
 
 class WalkinRegistrationsView(APIView):
@@ -32,7 +34,7 @@ class WalkinRegistrationsView(APIView):
 
 
 class WalkinHostDecisionView(APIView):
-    permission_classes = [HasPermission("vms.request.decide")]
+    permission_classes = [MODULE, HasPermission("vms.request.decide")]
 
     def post(self, request, pk):
         ser = WalkinDecisionSerializer(data=request.data)
@@ -43,7 +45,7 @@ class WalkinHostDecisionView(APIView):
 
 
 class WalkinContingencyView(APIView):
-    permission_classes = [HasPermission("vms.walkin.contingency_decide")]
+    permission_classes = [MODULE, HasPermission("vms.walkin.contingency_decide")]
 
     def post(self, request, pk):
         ser = WalkinDecisionSerializer(data=request.data)

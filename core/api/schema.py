@@ -4,6 +4,9 @@ Without these, every view carrying a custom authenticator is emitted with no
 scheme at all, and the docs read as though the endpoint is open.
 """
 from drf_spectacular.extensions import OpenApiAuthenticationExtension
+from drf_spectacular.openapi import AutoSchema
+from rest_framework.generics import GenericAPIView
+from rest_framework.views import APIView
 
 
 class IamSessionScheme(OpenApiAuthenticationExtension):
@@ -36,3 +39,36 @@ class RecruiterScheme(OpenApiAuthenticationExtension):
                 "httpOnly `recruiter_session` cookie set at portal login. "
                 "A separate pool from institute users."),
         }
+
+
+class VisitorSessionScheme(OpenApiAuthenticationExtension):
+    target_class = "modules.vms.auth.VisitorSessionAuthentication"
+    name = "visitorSession"
+
+    def get_security_definition(self, auto_schema):
+        return {
+            "type": "apiKey",
+            "in": "cookie",
+            "name": "vms_visitor",
+            "description": (
+                "OTP-verified visitor session cookie (not an IAM principal). "
+                "Mutating calls also carry the CSRF header."),
+        }
+
+
+class UntypedBodyAutoSchema(AutoSchema):
+    """AutoSchema that stays quiet for a bare APIView with no serializer hook.
+
+    Several modules hand-build their JSON payloads (the VMS service layer
+    returns dicts). Those views are still listed, path and auth included, with
+    an untyped body, instead of failing `spectacular --fail-on-warn` once per
+    method. A view that declares a serializer or `@extend_schema` is unaffected.
+    """
+
+    def _get_serializer(self):
+        view = self.view
+        if (not isinstance(view, GenericAPIView) and isinstance(view, APIView)
+                and not any(hasattr(view, a) for a in (
+                    "get_serializer", "get_serializer_class", "serializer_class"))):
+            return None
+        return super()._get_serializer()

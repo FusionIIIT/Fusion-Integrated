@@ -1674,6 +1674,1475 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/vms/admin-requests/{id}/urgent-decision:
+    post:
+      operationId: v1_vms_admin_requests_urgent_decision_create
+      description: |-
+        Admin exception for a same-day urgent request. The IAM permission is
+        checked here, the time-bound Admin role in the service.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/audit:
+    get:
+      operationId: v1_vms_audit_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/audit/export.csv:
+    get:
+      operationId: v1_vms_audit_export.csv_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/blacklist:
+    get:
+      operationId: v1_vms_blacklist_retrieve
+      description: |-
+        Flat entry list/add kept from the first version of the API. POST adds to
+        the open draft (created if none): nothing is enforced until published (BR-120).
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_vms_blacklist_create
+      description: |-
+        Flat entry list/add kept from the first version of the API. POST adds to
+        the open draft (created if none): nothing is enforced until published (BR-120).
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/blacklist/versions:
+    get:
+      operationId: v1_vms_blacklist_versions_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_vms_blacklist_versions_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/blacklist/versions/{id}/entries:
+    get:
+      operationId: v1_vms_blacklist_versions_entries_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_vms_blacklist_versions_entries_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/blacklist/versions/{id}/entries/{entry_id}:
+    patch:
+      operationId: v1_vms_blacklist_versions_entries_partial_update
+      parameters:
+      - in: path
+        name: entry_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: v1_vms_blacklist_versions_entries_destroy
+      description: Deactivates; an entry is never removed.
+      parameters:
+      - in: path
+        name: entry_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/vms/blacklist/versions/{id}/publish:
+    post:
+      operationId: v1_vms_blacklist_versions_publish_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/events:
+    get:
+      operationId: v1_vms_events_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_vms_events_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/events/{id}:
+    get:
+      operationId: vms_events_detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: v1_vms_events_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/events/{id}/approve:
+    post:
+      operationId: v1_vms_events_approve_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/events/{id}/attendance:
+    get:
+      operationId: v1_vms_events_attendance_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/events/{id}/attendees:
+    get:
+      operationId: v1_vms_events_attendees_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/events/{id}/attendees/{aid}:
+    delete:
+      operationId: v1_vms_events_attendees_destroy
+      parameters:
+      - in: path
+        name: aid
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/vms/events/{id}/attendees/upload:
+    post:
+      operationId: v1_vms_events_attendees_upload_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/events/{id}/cancel:
+    post:
+      operationId: v1_vms_events_cancel_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/events/{id}/fast-lane-manifest:
+    get:
+      operationId: v1_vms_events_fast_lane_manifest_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/events/{id}/throughput:
+    get:
+      operationId: v1_vms_events_throughput_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/extensions:
+    get:
+      operationId: v1_vms_extensions_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_vms_extensions_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/extensions/{id}:
+    get:
+      operationId: vms_extensions_detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/extensions/{id}/decision:
+    post:
+      operationId: v1_vms_extensions_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/gate/alerts:
+    get:
+      operationId: v1_vms_gate_alerts_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/gate/alerts/{id}/handle:
+    post:
+      operationId: v1_vms_gate_alerts_handle_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/gate/cached-roster:
+    get:
+      operationId: v1_vms_gate_cached_roster_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/gate/denials:
+    get:
+      operationId: v1_vms_gate_denials_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/gate/escalations:
+    post:
+      operationId: v1_vms_gate_escalations_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/gate/escalations/{id}/resolve:
+    post:
+      operationId: v1_vms_gate_escalations_resolve_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/gate/manual-entries:
+    post:
+      operationId: v1_vms_gate_manual_entries_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/gate/override:
+    post:
+      operationId: v1_vms_gate_override_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/gate/sync:
+    post:
+      operationId: v1_vms_gate_sync_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/gate/validate:
+    post:
+      operationId: v1_vms_gate_validate_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/gates:
+    get:
+      operationId: v1_vms_gates_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_vms_gates_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/gates/{id}:
+    patch:
+      operationId: v1_vms_gates_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/host/pre-authorizations:
+    get:
+      operationId: v1_vms_host_pre_authorizations_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_vms_host_pre_authorizations_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/host/pre-authorizations/{id}/revoke:
+    post:
+      operationId: v1_vms_host_pre_authorizations_revoke_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/host/requests:
+    get:
+      operationId: v1_vms_host_requests_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/host/requests/{id}/decision:
+    post:
+      operationId: v1_vms_host_requests_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/host/requests/bulk-decision:
+    post:
+      operationId: v1_vms_host_requests_bulk_decision_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/integrations:
+    get:
+      operationId: v1_vms_integrations_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/integrations/{key}:
+    get:
+      operationId: vms_integrations_detail
+      parameters:
+      - in: path
+        name: key
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: v1_vms_integrations_update
+      parameters:
+      - in: path
+        name: key
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/monitor/dashboard:
+    get:
+      operationId: v1_vms_monitor_dashboard_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/monitor/movements:
+    get:
+      operationId: v1_vms_monitor_movements_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/monitor/on-site:
+    get:
+      operationId: v1_vms_monitor_on_site_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/monitor/out-of-bounds:
+    get:
+      operationId: v1_vms_monitor_out_of_bounds_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/muster:
+    post:
+      operationId: v1_vms_muster_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/muster/{id}:
+    get:
+      operationId: v1_vms_muster_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/muster/{id}/close:
+    post:
+      operationId: v1_vms_muster_close_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/muster/{id}/reconcile:
+    post:
+      operationId: v1_vms_muster_reconcile_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/muster/{id}/report:
+    get:
+      operationId: v1_vms_muster_report_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/muster/{id}/report.csv:
+    get:
+      operationId: v1_vms_muster_report.csv_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/muster/{id}/roll-call:
+    post:
+      operationId: v1_vms_muster_roll_call_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/muster/{id}/roll-call/bulk:
+    post:
+      operationId: v1_vms_muster_roll_call_bulk_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/muster/{id}/roster:
+    get:
+      operationId: v1_vms_muster_roster_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/muster/current:
+    get:
+      operationId: v1_vms_muster_current_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/notify/{id}/read:
+    post:
+      operationId: v1_vms_notify_read_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/notify/arrivals:
+    get:
+      operationId: v1_vms_notify_arrivals_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/notify/inbox:
+    get:
+      operationId: v1_vms_notify_inbox_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/notify/outbox:
+    get:
+      operationId: v1_vms_notify_outbox_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/notify/outbox/{id}/retry:
+    post:
+      operationId: v1_vms_notify_outbox_retry_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/notify/read-all:
+    post:
+      operationId: v1_vms_notify_read_all_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/notify/unread-count:
+    get:
+      operationId: v1_vms_notify_unread_count_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/policies:
+    get:
+      operationId: v1_vms_policies_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_vms_policies_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/policies/{a}/diff/{b}:
+    get:
+      operationId: v1_vms_policies_diff_retrieve
+      parameters:
+      - in: path
+        name: a
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: b
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/policies/{id}:
+    get:
+      operationId: vms_policies_detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: v1_vms_policies_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/policies/{id}/publish:
+    post:
+      operationId: v1_vms_policies_publish_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/reports:
+    get:
+      operationId: v1_vms_reports_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/reports/{key}:
+    get:
+      operationId: vms_reports_run
+      parameters:
+      - in: path
+        name: key
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/reports/{key}/export:
+    get:
+      operationId: v1_vms_reports_export_retrieve
+      parameters:
+      - in: path
+        name: key
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/roles:
+    get:
+      operationId: v1_vms_roles_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_vms_roles_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/roles/{id}/reassign:
+    post:
+      operationId: v1_vms_roles_reassign_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/roles/{id}/revoke:
+    post:
+      operationId: v1_vms_roles_revoke_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/roles/me:
+    get:
+      operationId: v1_vms_roles_me_retrieve
+      description: 'Any signed-in user: their own active VMS roles (BR-181).'
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/safelist:
+    get:
+      operationId: v1_vms_safelist_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_vms_safelist_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/safelist/{id}/revoke:
+    post:
+      operationId: v1_vms_safelist_revoke_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/vip:
+    get:
+      operationId: v1_vms_vip_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_vms_vip_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/vip/{id}/revoke:
+    post:
+      operationId: v1_vms_vip_revoke_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/visit/check-out:
+    post:
+      operationId: v1_vms_visit_check_out_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/visit/on-site:
+    get:
+      operationId: v1_vms_visit_on_site_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/visit/passes/{id}/terminate:
+    post:
+      operationId: v1_vms_visit_passes_terminate_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/visit/self-check-out:
+    post:
+      operationId: v1_vms_visit_self_check_out_create
+      tags:
+      - v1
+      security:
+      - visitorSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/visitor/notifications:
+    get:
+      operationId: v1_vms_visitor_notifications_retrieve
+      tags:
+      - v1
+      security:
+      - visitorSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/visitor/notifications/{id}/read:
+    post:
+      operationId: v1_vms_visitor_notifications_read_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - visitorSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/visitor/pre-registrations:
+    post:
+      operationId: v1_vms_visitor_pre_registrations_create
+      tags:
+      - v1
+      security:
+      - visitorSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/visitor/requests:
+    get:
+      operationId: v1_vms_visitor_requests_retrieve
+      tags:
+      - v1
+      security:
+      - visitorSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/visitor/requests/{id}:
+    get:
+      operationId: vms_visitor_requests_detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - visitorSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/visitor/requests/{id}/pass:
+    get:
+      operationId: v1_vms_visitor_requests_pass_retrieve
+      description: 'UC-012: only for an approved request with an active pass; marks
+        it viewed.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - visitorSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/visitor/session/otp:
+    post:
+      operationId: v1_vms_visitor_session_otp_create
+      tags:
+      - v1
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/visitor/session/verify:
+    post:
+      operationId: v1_vms_visitor_session_verify_create
+      tags:
+      - v1
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/walkin/registrations:
+    get:
+      operationId: v1_vms_walkin_registrations_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_vms_walkin_registrations_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/walkin/registrations/{id}/contingency:
+    post:
+      operationId: v1_vms_walkin_registrations_contingency_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/walkin/registrations/{id}/host-decision:
+    post:
+      operationId: v1_vms_walkin_registrations_host_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/zones:
+    get:
+      operationId: v1_vms_zones_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_vms_zones_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/zones/{id}:
+    patch:
+      operationId: v1_vms_zones_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/zones/access-check:
+    post:
+      operationId: v1_vms_zones_access_check_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/zones/elevations:
+    get:
+      operationId: v1_vms_zones_elevations_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_vms_zones_elevations_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/vms/zones/elevations/{id}/revoke:
+    post:
+      operationId: v1_vms_zones_elevations_revoke_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
 components:
   schemas:
     AcademicDirectory:
@@ -3844,3 +5313,9 @@ components:
       description: '`Recruiter <value>` for an external company account, or the httpOnly
         `recruiter_session` cookie set at portal login. A separate pool from institute
         users.'
+    visitorSession:
+      type: apiKey
+      in: cookie
+      name: vms_visitor
+      description: OTP-verified visitor session cookie (not an IAM principal). Mutating
+        calls also carry the CSRF header.

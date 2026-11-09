@@ -1,4 +1,5 @@
 """Admin configuration endpoints (lane C). Thin: validate, call a service, shape."""
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -82,6 +83,7 @@ class IntegrationListView(APIView):
 class IntegrationView(APIView):
     permission_classes = [MODULE, HasPermission("vms.integration.manage")]
 
+    @extend_schema(operation_id="vms_integrations_detail")
     def get(self, request, key):
         return Response(integration.get(actor=request.principal, key=key))
 
@@ -142,6 +144,7 @@ class PolicyDetailView(APIView):
             else HasPermission("vms.policy.manage")
         return [MODULE(), perm()]
 
+    @extend_schema(operation_id="vms_policies_detail")
     def get(self, request, pk):
         return Response(s.PolicySerializer(policy_admin.get(pk)).data)
 

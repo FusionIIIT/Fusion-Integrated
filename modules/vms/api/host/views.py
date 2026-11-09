@@ -5,10 +5,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.api.pagination import CursorPagination
-from fusion_auth.permissions import HasPermission
+from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.vms.api.host import serializers as s
 from modules.vms.selectors import requests as selectors
 from modules.vms.services import approval, preauth
+
+MODULE = HasModuleGrant("vms")
 
 
 def _page(view, request, rows, serializer):
@@ -18,7 +20,7 @@ def _page(view, request, rows, serializer):
 
 
 class HostRequestListView(APIView):
-    permission_classes = [HasPermission("vms.request.view_assigned")]
+    permission_classes = [MODULE, HasPermission("vms.request.view_assigned")]
 
     def get(self, request):
         rows = selectors.host_requests(
@@ -27,7 +29,7 @@ class HostRequestListView(APIView):
 
 
 class HostDecisionView(APIView):
-    permission_classes = [HasPermission("vms.request.decide")]
+    permission_classes = [MODULE, HasPermission("vms.request.decide")]
 
     def post(self, request, pk):
         ser = s.DecisionSerializer(data=request.data)
@@ -42,7 +44,7 @@ class HostDecisionView(APIView):
 
 
 class HostBulkDecisionView(APIView):
-    permission_classes = [HasPermission("vms.request.decide")]
+    permission_classes = [MODULE, HasPermission("vms.request.decide")]
 
     def post(self, request):
         ser = s.BulkDecisionSerializer(data=request.data)
@@ -56,7 +58,7 @@ class HostBulkDecisionView(APIView):
 class UrgentDecisionView(APIView):
     """Admin exception for a same-day urgent request. The IAM permission is
     checked here, the time-bound Admin role in the service."""
-    permission_classes = [HasPermission("vms.urgent.decide")]
+    permission_classes = [MODULE, HasPermission("vms.urgent.decide")]
 
     def post(self, request, pk):
         ser = s.UrgentDecisionSerializer(data=request.data)
@@ -67,7 +69,7 @@ class UrgentDecisionView(APIView):
 
 
 class PreAuthorizationListCreateView(APIView):
-    permission_classes = [HasPermission("vms.preauth.manage")]
+    permission_classes = [MODULE, HasPermission("vms.preauth.manage")]
 
     def get(self, request):
         rows = selectors.host_pre_authorizations(
@@ -84,7 +86,7 @@ class PreAuthorizationListCreateView(APIView):
 
 
 class PreAuthorizationRevokeView(APIView):
-    permission_classes = [HasPermission("vms.preauth.manage")]
+    permission_classes = [MODULE, HasPermission("vms.preauth.manage")]
 
     def post(self, request, pk):
         pa = preauth.revoke(host_actor=request.principal, preauth_id=pk)
