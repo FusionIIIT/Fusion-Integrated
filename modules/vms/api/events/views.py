@@ -1,4 +1,5 @@
 """Event endpoints (lane G). Thin: parse, call services/bulk_events.py, shape the response."""
+from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -62,6 +63,7 @@ class EventListView(APIView):
 class EventDetailView(APIView):
     permission_classes = [MODULE, HasPermission("vms.event.manage")]
 
+    @extend_schema(operation_id="vms_events_detail")
     def get(self, request, pk):
         return Response(_event(_get(pk)))
 

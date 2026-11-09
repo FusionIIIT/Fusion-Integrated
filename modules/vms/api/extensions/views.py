@@ -1,4 +1,5 @@
 """Visit extension endpoints (UC-034; BW-VMS-23)."""
+from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -33,6 +34,7 @@ class ExtensionListCreateView(APIView):
 class ExtensionDetailView(APIView):
     permission_classes = [MODULE, HasPermission(*HOST_OR_ADMIN)]
 
+    @extend_schema(operation_id="vms_extensions_detail")
     def get(self, request, pk):
         ext = extensions.get_extension(actor=request.principal, extension_id=pk)
         return Response(ExtensionSerializer(ext).data)
