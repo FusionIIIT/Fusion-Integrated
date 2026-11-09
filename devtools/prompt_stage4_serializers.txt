@@ -1,0 +1,43 @@
+You are Qwen2.5-Coder 7B running locally in the Fusion ERP repository.
+Implement serializers for ELM in `modules/elm/api/serializers.py`:
+
+Use DRF `serializers.ModelSerializer` and `serializers.Serializer`.
+1. `LeaveBalanceSerializer`:
+   Model: `LeaveBalance`
+   Fields: `['id', 'user_id', 'category', 'year', 'credited', 'availed', 'balance']`
+   Read only: all fields.
+
+2. `SubstituteAssignmentSerializer`:
+   Model: `SubstituteAssignment`
+   Fields: `['id', 'leave_request_id', 'substitute_id', 'status', 'remarks', 'responded_at', 'created_at']`
+
+3. `LeaveActionHistorySerializer`:
+   Model: `LeaveActionHistory`
+   Fields: `['id', 'actor_id', 'action', 'comments', 'created_at']`
+
+4. `LeaveRequestSerializer`:
+   Model: `LeaveRequest`
+   Fields: `['id', 'user_id', 'category', 'start_date', 'end_date', 'half_day', 'leave_days', 'purpose', 'status', 'is_station_leave', 'destination', 'emergency_contact', 'substitute_id', 'current_reviewer_id', 'rejection_reason', 'created_at', 'substitute_assignments', 'actions']`
+   Include nested serializers `substitute_assignments` (many=True, read_only=True) and `actions` (many=True, read_only=True).
+
+5. `ApplyLeaveInputSerializer`:
+   Serializer with fields:
+   `category`: CharField(max_length=10)
+   `start_date`: DateField()
+   `end_date`: DateField()
+   `half_day`: CharField(max_length=10, required=False, allow_null=True)
+   `purpose`: CharField()
+   `is_station_leave`: BooleanField(default=False)
+   `destination`: CharField(required=False, allow_blank=True)
+   `emergency_contact`: CharField(required=False, allow_blank=True)
+   `substitute_id`: IntegerField(required=False, allow_null=True)
+
+6. `SubstituteActionInputSerializer`:
+   `action`: ChoiceField(choices=['accept', 'decline'])
+   `remarks`: CharField(required=False, allow_blank=True)
+
+7. `ReviewActionInputSerializer`:
+   `action`: ChoiceField(choices=['approve', 'reject', 'recommend'])
+   `reason`: CharField(required=False, allow_blank=True)
+
+Output ONLY valid Python code in ```python fences.

@@ -1,0 +1,14 @@
+You are Qwen2.5-Coder 7B running locally.
+Review this function from `modules/elm/domain/rules.py`:
+```python
+def count_leave_days(category: str, start: date, end: date, half_day: str | None = None, closed_dates: set[date] | None = None) -> Decimal:
+    ...
+    if current_date not in closed_dates:
+```
+Notice that when `closed_dates` is None (the default argument), `current_date not in closed_dates` raises `TypeError: argument of type 'NoneType' is not iterable`.
+Also, in `calculate_vl_to_el_conversion`:
+When `converted` exceeds `(max_el_cap - current_el)`, any excess VL that could not be converted due to the cap should also be tracked as lapsed/forfeited.
+Also ensure `Decimal` comparison with 0 (use `Decimal('0')`).
+
+Please fix `modules/elm/domain/rules.py` and output the complete clean corrected file.
+Return ONLY valid Python code inside standard ```python fences.

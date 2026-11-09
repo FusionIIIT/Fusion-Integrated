@@ -1,0 +1,163 @@
+﻿### Findings:
+
+1. **Data-Model Gap**:
+   - No Django models are defined, leading to a lack of persistence for lea[3D[K
+leave applications, entitlements, and user data.
+   - Missing tables for `LeaveRequest`, `Entitlement`, and `User` data.
+
+2. **API Gap**:
+   - No API endpoints for creating, updating, or deleting leave requests.
+   - Missing endpoints for submitting, approving, or canceling leave reques[6D[K
+requests.
+
+3. **Authorization Gap**:
+   - Role and ownership checks are not server-side, leading to potential vu[2D[K
+vulnerabilities.
+   - Missing authentication and authorization mechanisms for leave requests[8D[K
+requests.
+
+4. **Workflow Gap**:
+   - No workflow logic is implemented for leave requests, including applica[7D[K
+application, approval, and cancellation processes.
+
+5. **Test Gap**:
+   - No tests are written for any of the existing functionality, including [K
+domain rules and API views.
+
+6. **Integration Gap**:
+   - The module does not integrate with Fusion Auth for role and ownership [K
+checks, which is a requirement.
+
+7. **API Gap**:
+   - The existing API view for the leave catalog is insufficient for managi[6D[K
+managing leave requests.
+
+### Priorities:
+
+1. **Data-Model Implementation**:
+   - Implement Django models for `LeaveRequest`, `Entitlement`, and `User`.[7D[K
+`User`.
+
+2. **API Endpoints**:
+   - Create API endpoints for applying, submitting, approving, and cancelin[8D[K
+canceling leave requests.
+
+3. **Authorization Mechanisms**:
+   - Implement server-side role and ownership checks.
+
+4. **Workflow Implementation**:
+   - Implement a basic workflow for leave requests.
+
+5. **Unit Tests**:
+   - Write unit tests for the domain rules and API views.
+
+6. **Fusion Auth Integration**:
+   - Integrate the module with Fusion Auth for role and ownership checks.
+
+### First Repair-Slice Plan:
+
+1. **Implement Django Models**:
+   - Create models for `LeaveRequest`, `Entitlement`, and `User`.
+   - Define relationships and constraints.
+
+2. **Create API Endpoints**:
+   - Implement endpoints for applying, submitting, approving, and canceling[9D[K
+canceling leave requests.
+   - Ensure that these endpoints interact with the new models.
+
+3. **Server-Side Authorization**:
+   - Implement role and ownership checks in the API views.
+   - Use Fusion Auth permissions to enforce access control.
+
+4. **Basic Workflow Implementation**:
+   - Implement a basic workflow for leave requests, including application a[1D[K
+and approval.
+
+5. **Unit Tests**:
+   - Write unit tests for the domain rules and API views.
+
+### Implementation Steps:
+
+1. **Create Models**:
+   ```python
+   # models.py
+   from django.db import models
+   from django.contrib.auth.models import User
+
+   class Entitlement(models.Model):
+       user = models.ForeignKey(User, on_delete=models.CASCADE)
+       category = models.CharField(max_length=3, choices=[("CL", "Casual Le[2D[K
+Leave"), ("RH", "Recess Half"), ("SCL", "Special Casual Leave"), ("EL", "Ea[3D[K
+"Earned Leave"), ("VL", "Vacation Leave"), ("COL", "Compensation Leave")])
+       balance = models.DecimalField(max_digits=5, decimal_places=2)
+
+   class LeaveRequest(models.Model):
+       user = models.ForeignKey(User, on_delete=models.CASCADE)
+       category = models.CharField(max_length=3, choices=[("CL", "Casual Le[2D[K
+Leave"), ("RH", "Recess Half"), ("SCL", "Special Casual Leave"), ("EL", "Ea[3D[K
+"Earned Leave"), ("VL", "Vacation Leave"), ("COL", "Compensation Leave")])
+       start_date = models.DateField()
+       end_date = models.DateField()
+       half_day = models.CharField(max_length=10, null=True, blank=True, ch[2D[K
+choices=[("first", "First Half"), ("second", "Second Half")])
+       status = models.CharField(max_length=10, choices=[("pending", "Pendi[6D[K
+"Pending"), ("approved", "Approved"), ("cancelled", "Cancelled")])
+       submitted_on = models.DateTimeField(auto_now_add=True)
+       approved_on = models.DateTimeField(null=True, blank=True)
+   ```
+
+2. **Create API Endpoints**:
+   ```python
+   # api/views.py
+   from rest_framework.response import Response
+   from rest_framework.views import APIView
+   from fusion_auth.permissions import HasModuleGrant, HasPermission
+   from .domain.rules import count_leave_days
+   from .models import LeaveRequest, Entitlement
+
+   class LeaveRequestView(APIView):
+       permission_classes = [HasModuleGrant("elm"), HasPermission("elm.leav[23D[K
+HasPermission("elm.leave.apply")]
+
+       def post(self, request):
+           user = request.user
+           category = request.data.get("category")
+           start_date = request.data.get("start_date")
+           end_date = request.data.get("end_date")
+           half_day = request.data.get("half_day", None)
+
+           entitlement = Entitlement.objects.get(user=user, category=catego[15D[K
+category=category)
+           days = count_leave_days(category, start_date, end_date, half_day[8D[K
+half_day)
+           if days > entitlement.balance:
+               return Response({"error": "Insufficient balance"}, status=40[9D[K
+status=400)
+
+           leave_request = LeaveRequest.objects.create(
+               user=user,
+               category=category,
+               start_date=start_date,
+               end_date=end_date,
+               half_day=half_day,
+               status="pending"
+           )
+
+           return Response({"message": "Leave request submitted successfull[11D[K
+successfully", "leave_request_id": leave_request.id})
+   ```
+
+3. **Server-Side Authorization**:
+   - Ensure that Fusion Auth permissions are checked in the `LeaveRequestVi[15D[K
+`LeaveRequestView` to enforce access control.
+
+4. **Basic Workflow Implementation**:
+   - Implement a basic workflow for leave requests, including application a[1D[K
+and approval.
+
+5. **Unit Tests**:
+   - Write unit tests for the domain rules and API views.
+
+By following this plan, you can address the highest-priority gaps and creat[5D[K
+create a robust foundation for further development.
+

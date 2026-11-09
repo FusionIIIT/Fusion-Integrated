@@ -1,0 +1,40 @@
+You are Qwen2.5-Coder 7B running locally in the Fusion ERP repository.
+Implement the ELM leave lifecycle services in `modules/elm/services/leave.py` adhering to official specifications:
+
+Use pure Django ORM operations with atomic transactions (`django.db.transaction.atomic`) and exceptions from `core.api.exceptions` (`DomainError, ConflictError, NotFoundError, PermissionDeniedError`).
+
+Functions to implement:
+1. `apply_for_leave(*, user_id: int, category: str, start_date, end_date, half_day=None, purpose: str, is_station_leave=False, destination="", emergency_contact="", substitute_id=None, closed_dates=None) -> LeaveRequest`:
+   - Validate category and calculate `leave_days = count_leave_days(category, start_date, end_date, half_day=half_day, closed_dates=closed_dates)`.
+   - Validate station leave via `validate_station_leave(is_station_leave, destination, emergency_contact)`.
+   - Validate substitute if provided via `can_substitute(user_id, substitute_id)`.
+   - Check applicant existing active leaves for date collision via `intervals_overlap`.
+   - Check `LeaveBalance` for `user_id, category, year=start_date.year`. Must have `balance >= leave_days`.
+   - Initial status: if `substitute_id` is provided, `status = 'awaiting_substitute'`; else `status = 'under_review'`.
+   - Create `LeaveRequest`, create `SubstituteAssignment(status='pending')` if substitute nominated, and create `LeaveActionHistory(actor_id=user_id, action='submitted')`.
+   - Return created `LeaveRequest`.
+
+2. `respond_substitute(*, substitute_id: int, request_id: int, action: str, remarks: str = "") -> SubstituteAssignment`:
+   - `action` is 'accept' or 'decline'.
+   - Verify `substitute_id` owns the pending `SubstituteAssignment`.
+   - If 'accept': update assignment status to 'accepted', update `LeaveRequest.status = 'under_review'`. Record `LeaveActionHistory`.
+   - If 'decline': update assignment status to 'declined', update `LeaveRequest.status = 'awaiting_substitute'`. Record `LeaveActionHistory`.
+
+3. `review_leave_request(*, reviewer_id: int, request_id: int, action: str, reason: str = "") -> LeaveRequest`:
+   - `action` in ('approve', 'reject', 'recommend').
+   - For 'CL'/'RH': Unit Head gives final sanction ('approve' -> 'sanctioned') or 'reject' -> 'rejected'.
+   - On final 'sanctioned': decrement `LeaveBalance.balance -= leave.leave_days` and increment `LeaveBalance.availed += leave.leave_days`.
+   - For higher leave ('EL', 'VL', 'COL', 'SCL'): Unit Head gives 'recommend' -> 'recommended'.
+   - On 'reject': set `status = 'rejected'`, record reason.
+   - Record `LeaveActionHistory`.
+
+4. `withdraw_leave_request(*, user_id: int, request_id: int) -> LeaveRequest`:
+   - BR-EL-022: Only allowed while pending ('submitted', 'awaiting_substitute', 'under_review', 'recommended').
+   - Set `status = 'withdrawn'`. Record `LeaveActionHistory`.
+
+5. `cancel_approved_leave(*, user_id: int, request_id: int, today_date) -> LeaveRequest`:
+   - BR-EL-023: Allowed only before `start_date` (`today_date < leave.start_date`) for `status == 'sanctioned'`.
+   - Restore `LeaveBalance.balance += leave.leave_days` and `LeaveBalance.availed -= leave.leave_days`.
+   - Set `status = 'cancelled'`. Record `LeaveActionHistory`.
+
+Write clean, robust, production-quality Python code. Output ONLY code inside ```python fences.

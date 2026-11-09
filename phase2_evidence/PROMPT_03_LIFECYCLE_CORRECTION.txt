@@ -1,0 +1,21 @@
+You are Qwen2.5-Coder-7B. Your preceding Phase-2 response was reviewed and must not be applied. Correct only the pure lifecycle layer and its tests now. Return complete replacement contents for ONLY these two files, one fenced Python code block per path, with no prose:
+
+1. modules/elm/domain/lifecycle.py
+2. modules/elm/tests/test_lifecycle.py
+
+Important corrections to make:
+- This is pure Python: import only standard-library modules. Do not import Django or models.
+- Do not use floats. All day and entitlement values must use Decimal.
+- Do not use a boolean half_day. Use half_day: str | None where valid values are "first" and "second".
+- Use date values, not datetime values.
+- Supported category strings are CL, RH, SCL, EL, COL, VL. Annual entitlements are Decimal("8"), Decimal("2"), Decimal("15"), Decimal("30"), Decimal("20"), Decimal("60") respectively.
+- `count_leave_days(category, start, end, half_day=None, closed_dates=None)` must: reject unknown categories and end before start; permit a half day only for CL and only when start == end; return Decimal("0.5") for a valid CL half day; exclude the supplied closed dates for CL/RH/SCL; count every calendar day inclusively for EL/COL/VL.
+- `intervals_overlap(a_start, a_end, a_half, b_start, b_end, b_half)` must return False for two different valid CL halves on the same single day and otherwise treat intersecting inclusive date ranges as overlapping.
+- Define status strings: draft, submitted, unit_head_recommended, unit_head_not_recommended, pending_final_approval, approved, rejected, withdrawn, cancellation_pending, cancelled. Define terminal states and a TransitionError.
+- Provide `validate_transition(current, target, actor_role)` using actor roles employee, unit_head, final_authority. Employee may submit draft, withdraw submitted/pending states, and request cancellation from approved. Unit head may recommend/not recommend from submitted, may approve or reject CL/RH directly, and may send higher categories to pending_final_approval. Final authority may approve/reject pending_final_approval and approve/reject cancellation_pending. Illegal actions must raise TransitionError.
+- `validate_pending_withdrawal(status)` must allow withdrawal only while the request is pending, never terminal/final.
+- `validate_cancellation_request(status, start_date, today)` must allow only approved leave where today is strictly before start_date.
+- `validate_final_cancellation(status, start_date, today)` must allow only cancellation_pending before the start date.
+- Tests must use pytest with date and Decimal. Include tests for closed-date handling, EL inclusive counting, invalid half-day requests, different half-day CL non-overlap, valid immediate withdrawal, blocked withdrawal from approved, valid pre-start cancellation, rejected post-start cancellation, Unit Head direct CL approval, final-authority approval of higher-category leave, and an illegal employee approval.
+
+Do not write database models, migrations, API code, or a user model in this response.

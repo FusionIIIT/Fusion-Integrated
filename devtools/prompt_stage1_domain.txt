@@ -1,0 +1,25 @@
+You are Qwen2.5-Coder 7B running locally.
+Provide ONLY valid Python code for `modules/elm/domain/rules.py` implementing the official Fusion ELM business rules without any Django imports.
+
+Requirements to implement:
+1. ENTITLEMENTS dictionary:
+   CL: 8, RH: 2, SCL: 15, EL: 30, VL: 60, COL: 20 (all Decimal)
+2. count_leave_days(category: str, start: date, end: date, half_day: str | None = None, closed_dates: set[date] | None = None) -> Decimal:
+   - Validate category in ENTITLEMENTS and start <= end.
+   - For 'CL' half-day ('first' or 'second'): requires start == end, returns Decimal('0.5').
+   - For 'EL', 'COL', 'VL': continuous days count including weekends/closed days (Decimal((end - start).days + 1)).
+   - For 'CL', 'SCL', 'RH': working days only, skipping any dates in closed_dates.
+3. intervals_overlap(a_start: date, a_end: date, a_half: str | None, b_start: date, b_end: date, b_half: str | None) -> bool:
+   - Returns True if date intervals overlap.
+   - Exception: When a_start == a_end == b_start == b_end, and one is 'first' half and the other is 'second' half, they DO NOT overlap (return False).
+4. calculate_vl_to_el_conversion(unutilized_vl: Decimal, current_el: Decimal, max_el_cap: Decimal = Decimal('300')) -> tuple[Decimal, Decimal, Decimal]:
+   - BR-EL-007 / BR-EL-008: Convert unutilized VL to EL at 2 VL : 1 EL. Floor division: converted = int(unutilized_vl // 2).
+   - Space available in EL balance before reaching max_el_cap. Credited EL is min(converted, max(0, max_el_cap - current_el)).
+   - Forfeited/lapsed VL is any VL that didn't result in credited EL.
+   - Returns (credited_el, forfeited_vl, new_el_balance).
+5. validate_station_leave(is_station_leave: bool, destination: str | None, emergency_contact: str | None) -> bool:
+   - BR-EL-013: If is_station_leave is True, destination and emergency_contact must be non-empty strings. Returns True if valid, False otherwise.
+6. can_substitute(applicant_id: int, substitute_id: int) -> bool:
+   - BR-EL-014: applicant_id != substitute_id.
+
+Return ONLY pure Python code. Do not wrap in markdown quotes if possible, or use standard ```python fences.

@@ -1,0 +1,22 @@
+You are Qwen2.5-Coder-7B running locally. Continue Phase 2 repair of the Fusion ELM module. Your prior review correctly found missing persistence and lifecycle functionality, but one suggestion was incompatible with Fusion: DO NOT create a Django User model and DO NOT add a ForeignKey to django.contrib.auth User. Fusion has no user table in this database. Every institute person reference must be a plain integer user_id using core.db.mixins.UserScopedModel.
+
+Generate the complete contents of ONLY these new files, each in its own fenced code block with the file path as the heading. Do not modify any existing files in this response. Do not include prose outside the headings and code blocks.
+
+1. modules/elm/models.py
+2. modules/elm/migrations/__init__.py
+3. modules/elm/migrations/0001_initial.py
+4. modules/elm/domain/lifecycle.py
+5. modules/elm/tests/__init__.py
+6. modules/elm/tests/test_lifecycle.py
+
+Repository conventions:
+- Use Django 5.2 models, core.db.mixins.TimeStampedModel, and UserScopedModel.
+- Local foreign keys are allowed only between ELM tables. Use on_delete=models.CASCADE or PROTECT deliberately.
+- The initial schema must contain: LeaveAccount (user_id, leave_year, category, opening_balance, available_balance); LeaveRequest (user_id, category, start_date, end_date, half_day nullable, reason, station_leave_details, chargeable_days, status, submitted_at, finalised_at); LeaveTransition (local FK request, from_status, to_status, actor_user_id plain nullable integer, reason, at); LeaveTransaction (local FK account and request nullable, delta, reason, effective_at). Include useful indexes and constraints.
+- Categories are only CL, RH, SCL, EL, COL, VL. Statuses must include draft, submitted, unit_head_recommended, unit_head_not_recommended, pending_final_approval, approved, rejected, withdrawn, cancellation_pending, cancelled.
+- A submitted request is immutable except for state transitions. Pending withdrawal is immediate and terminal. Cancellation is allowed only from approved before start, and final cancellation restores a balance transaction.
+- The pure domain file must not import Django. It should define category constants, annual entitlements, terminal states, a TransitionError, allowed target transition functions for employee / unit_head / final_authority, validate_pending_withdrawal, validate_cancellation_request, validate_final_cancellation, count_leave_days (CL/SCL/RH exclude closed dates; EL/COL/VL count every calendar day; CL half-day is 0.5 only for a one-day request), and intervals_overlap (different valid CL halves on one same date do not overlap).
+- Tests must be pure Python pytest tests for day counting, half-day overlap, blocked invalid transitions, valid immediate withdrawal, cancellation before start, and cancellation rejection after start.
+- The migration must accurately represent the supplied models and use db_table names beginning elm_. Use only standard Django migration syntax.
+
+Do not invent authentication, external dependencies, notifications, or a user table. Keep this a small, correct persistence-and-domain slice which later services and APIs can use.

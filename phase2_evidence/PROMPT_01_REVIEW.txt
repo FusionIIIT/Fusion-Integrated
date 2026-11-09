@@ -1,0 +1,66 @@
+You are Qwen2.5-Coder-7B running locally. This is Phase 2 of a Fusion ERP Employee Leave Management assignment. Review the inherited Phase-1 ELM implementation below. Do not write code in this response. Identify the highest-priority correctness, integration, data-model, API, authorization, workflow, and test gaps. Recommend a small, coherent first repair slice that can be implemented and verified without inventing dependencies outside this repository.
+
+Assignment requirements to prioritize: preserve Phase 1; improve a Fusion-integrated ELM module; employee leave applications for CL, RH, SCL, EL, COL and VL; validate category eligibility, balance, calendar/date conditions, and overlapping leave; allow different CL halves on one date; CL 8/year, RH 2/year, SCL 15/year, non-faculty EL 30/year, faculty VL 60/year, COL 20/year; CL/SCL/RH count only working dates while EL/COL/VL count calendar days; pending requests can be withdrawn immediately and terminally; approved leave can be cancelled only before start with balance restoration after approval; role and ownership checks must be server-side; database records must use plain user_id rather than a foreign key to a user table.
+
+Inherited module files:
+
+modules/elm/domain/rules.py
+from datetime import date, timedelta
+from decimal import Decimal
+
+ENTITLEMENTS = {"CL": Decimal("8"), "RH": Decimal("2"), "SCL": Decimal("15"),
+                "EL": Decimal("30"), "VL": Decimal("60"), "COL": Decimal("20")}
+
+
+def count_leave_days(category: str, start: date, end: date, half_day: str | None = None,
+                     closed_dates: set[date] | None = None) -> Decimal:
+    if category not in ENTITLEMENTS or end < start:
+        raise ValueError("Invalid leave category or interval")
+    if category == "CL" and half_day in {"first", "second"}:
+        if start != end:
+            raise ValueError("Half-day CL must be one date")
+        return Decimal("0.5")
+    if category in {"EL", "COL", "VL"}:
+        return Decimal((end - start).days + 1)
+    closed_dates = closed_dates or set()
+    total, current = 0, start
+    while current <= end:
+        if current not in closed_dates:
+            total += 1
+        current += timedelta(days=1)
+    return Decimal(total)
+
+
+def intervals_overlap(a_start: date, a_end: date, a_half: str | None,
+                      b_start: date, b_end: date, b_half: str | None) -> bool:
+    if a_end < b_start or b_end < a_start:
+        return False
+    return not (a_start == a_end == b_start == b_end
+                and a_half in {"first", "second"} and b_half in {"first", "second"}
+                and a_half != b_half)
+
+modules/elm/api/views.py
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from fusion_auth.permissions import HasModuleGrant, HasPermission
+from modules.elm.domain.rules import ENTITLEMENTS
+
+
+class LeaveCatalogView(APIView):
+    permission_classes = [HasModuleGrant("elm"), HasPermission("elm.leave.view_self")]
+
+    def get(self, request):
+        return Response({"entitlements": {key: str(value) for key, value in ENTITLEMENTS.items()}})
+
+modules/elm/registry.py
+MODULE = {"code": "elm", "label": "Employee Leave Management", "icon": "CalendarCheck", "base_path": "/elm", "nav_section": "Employee Services", "sort_order": 20, "status": "active"}
+NAV_ITEMS = [
+ {"code": "elm.mine", "label": "My Leave", "icon": "CalendarCheck", "to": "/elm/mine", "required_permission": "elm.leave.view_self", "sort_order": 10},
+ {"code": "elm.tasks", "label": "Leave Tasks", "icon": "ListChecks", "to": "/elm/tasks", "required_permission": "elm.leave.review", "sort_order": 20},
+]
+PERMISSIONS = [("elm.leave.view_self", "View own leave balances and requests"), ("elm.leave.apply", "Apply for leave"), ("elm.leave.review", "Review assigned leave requests"), ("elm.policy.manage", "Maintain leave policy and calendars")]
+
+Current module has no Django models, migrations, selectors, services, serializers, lifecycle APIs, or tests.
+
+Respond with concise findings, ranked priorities, and a first repair-slice plan. Do not claim a feature exists if it does not.

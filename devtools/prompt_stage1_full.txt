@@ -1,0 +1,35 @@
+You are Qwen2.5-Coder 7B running locally.
+Do NOT use placeholders like '# Your existing code logic here' or 'pass'.
+Return the COMPLETE, WORKING file content for `modules/elm/domain/rules.py` with ALL functions fully implemented.
+
+```python
+from datetime import date, timedelta
+from decimal import Decimal
+
+ENTITLEMENTS = {
+    'CL': Decimal('8'),
+    'RH': Decimal('2'),
+    'SCL': Decimal('15'),
+    'EL': Decimal('30'),
+    'VL': Decimal('60'),
+    'COL': Decimal('20'),
+}
+```
+Include:
+1. `count_leave_days(category: str, start: date, end: date, half_day: str | None = None, closed_dates: set[date] | None = None) -> Decimal`:
+   - Must handle `if closed_dates is None: closed_dates = set()`
+   - Raise `ValueError` if `category not in ENTITLEMENTS` or `start > end`.
+   - If `category == 'CL'` and `half_day in ('first', 'second')`: if `start != end` raise `ValueError`, else return `Decimal('0.5')`.
+   - If `category in ('EL', 'COL', 'VL')`: continuous days: `Decimal((end - start).days + 1)`.
+   - Else (working days for CL full day, SCL, RH): iterate from `start` to `end`, increment count for each date not in `closed_dates`. Return `Decimal(working_days)`.
+2. `intervals_overlap(a_start: date, a_end: date, a_half: str | None, b_start: date, b_end: date, b_half: str | None) -> bool`:
+   - Opposite half-days ('first' vs 'second') on the exact same date do NOT overlap (return False).
+   - Standard interval overlap check for other cases.
+3. `calculate_vl_to_el_conversion(unutilized_vl: Decimal, current_el: Decimal, max_el_cap: Decimal = Decimal('300')) -> tuple[Decimal, Decimal, Decimal]`:
+   - Full 2 VL : 1 EL conversion with ceiling cap at max_el_cap.
+4. `validate_station_leave(is_station_leave: bool, destination: str | None, emergency_contact: str | None) -> bool`:
+   - If `is_station_leave`, checks `bool(destination and destination.strip() and emergency_contact and emergency_contact.strip())`. Else True.
+5. `can_substitute(applicant_id: int, substitute_id: int) -> bool`:
+   - `applicant_id != substitute_id`.
+
+Output ONLY the complete Python code block.
