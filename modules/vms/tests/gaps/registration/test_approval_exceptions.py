@@ -134,8 +134,6 @@ def test_uc_013_host_reject_notifies_visitor_with_reason(pending, host_actor):
     assert not VisitPass.objects.exists()
 
 
-@pytest.mark.xfail(strict=True, reason="BUG: approval.decide never re-screens the blacklist, "
-                   "so a visitor blacklisted after submission can still be approved")
 def test_uc_013_host_approve_blocked_if_visitor_blacklisted_since_submission(
         pending, host_actor):
     """VMS-UC-013: approve after a new blacklist publication fails."""
