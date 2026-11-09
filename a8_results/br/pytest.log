@@ -1,0 +1,75 @@
+s..s......................................s...s..s.s.s....s.........ss.. [ 85%]
+.sF..ss.....                                                             [100%]
+=================================== FAILURES ===================================
+________________________ test_frozen_br_case[TC-BR-075] ________________________
+
+test_case = {'id': 'TC-BR-075', 'business_rule_id': 'BR-MMS-039', 'objective': 'Verify the Caretaker can add, modify, and delete weekly menu items.', 'preconditions': ['Actor is active Caretaker.', 'A weekly menu exists or can be created.'], ...}
+stub_iam = <function stub_iam.<locals>._install at 0x777029ef4c20>
+user_ref = <function user_ref.<locals>._make at 0x777029ef40e0>
+
+    @pytest.mark.parametrize(
+        "test_case",
+        [pytest.param(case, id=case["id"]) for case in CASES],
+    )
+    def test_frozen_br_case(test_case, stub_iam, user_ref):
+        case_id = test_case["id"]
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        assert case_id in HANDLERS, f"No handler for frozen BR case {case_id}"
+>       HANDLERS[case_id](BRFixture(stub_iam, user_ref))
+
+tests/a8/br/test_br_cases.py:1152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = <test_br_cases.BRFixture object at 0x777029d517c0>, role = 'caretaker'
+
+    def _case_075_076(h, role):
+        if role == "caretaker":
+            h.assignment(3001, role)
+            client = h.client(3001, role)
+            week = _published_menu(item="Existing")
+            for operation in ("add", "modify", "delete"):
+                if operation == "add":
+                    start = week.week_start + timedelta(days=7)
+                    response = client.post(
+                        "/api/v1/mms/menu",
+                        {"week_start": start.isoformat(), "entries": _week_entries("Added")},
+                        format="json",
+                    )
+                    assert response.status_code == 201
+                    assert MenuWeek.objects.get(week_start=start).entries.filter(
+                        item="Added").count() == 21
+                elif operation == "modify":
+                    response = client.post(
+                        "/api/v1/mms/menu",
+                        {"week_start": week.week_start.isoformat(),
+                         "entries": _week_entries("Changed")},
+                        format="json",
+                    )
+                    assert response.status_code == 201
+                    week.refresh_from_db()
+                    assert week.entries.filter(item="Changed").count() == 21
+                else:
+                    entries = _week_entries("Changed")
+                    entries.pop()
+                    response = client.post(
+                        "/api/v1/mms/menu",
+                        {"week_start": week.week_start.isoformat(), "entries": entries},
+                        format="json",
+                    )
+>                   assert response.status_code == 201
+E                   assert 409 == 201
+E                    +  where 409 = <Response status_code=409, "application/json">.status_code
+
+tests/a8/br/test_br_cases.py:988: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-10 08:49:06 WARNING django.request Conflict: /api/v1/mms/menu
+------------------------------ Captured log call -------------------------------
+WARNING  django.request:log.py:253 Conflict: /api/v1/mms/menu
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.16-final-0 _______________
+
+Coverage XML written to file a8_results/br/coverage.xml
+=========================== short test summary info ============================
+FAILED tests/a8/br/test_br_cases.py::test_frozen_br_case[TC-BR-075] - assert ...
+1 failed, 70 passed, 13 skipped in 5.36s

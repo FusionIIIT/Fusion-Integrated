@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="14" tests="128" time="7.771" timestamp="2026-11-10T08:32:14.490779+05:30" hostname="Aspire"><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-001]" time="3.774" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-002]" time="0.101" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-003]" time="0.031"><failure message="assert 201 == 409&#10; +  where 201 = &lt;Response status_code=201, &quot;application/json&quot;&gt;.status_code">test_case = {'id': 'TC-UC-003', 'source_use_case': 'MMS-UC-001', 'flow': 'Alternative Flow A1: conflicting role assignment', 'obje... MMS prevents a role assignment that would violate exactly-one-active-role cardinality for its effective period.', ...}
+stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x7f628d6645e0&gt;
+user_ref = &lt;function user_ref.&lt;locals&gt;._make at 0x7f628d664ae0&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f628d6543b0&gt;
+
+    @pytest.mark.parametrize(
+        "test_case",
+        [pytest.param(case, id=case["id"]) for case in _TEST_CASES],
+    )
+    def test_frozen_uc_case(test_case, stub_iam, user_ref, monkeypatch):
+        case_id = test_case["id"]
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+&gt;       _dispatch(case_id, UCHarness(stub_iam, user_ref), monkeypatch)
+
+tests/a8/uc/test_uc_cases.py:1522: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/a8/uc/test_uc_cases.py:1470: in _dispatch
+    return runner(h)
+           ^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = &lt;test_uc_cases.UCHarness object at 0x7f628dda8890&gt;
+
+    def _case_003(h):
+        h.employee(4101)
+        h.employee(4102)
+        incumbent = h.active_role(4101, "caretaker")
+        response = h.client(9000, "admin").post(
+            "/api/v1/mms/roles",
+            {"role": "caretaker", "user_id": 4102,
+             "ends_at": (timezone.now() + timedelta(days=30)).isoformat()},
+            format="json",
+        )
+&gt;       assert response.status_code == 409
+E       assert 201 == 409
+E        +  where 201 = &lt;Response status_code=201, "application/json"&gt;.status_code
+
+tests/a8/uc/test_uc_cases.py:304: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-004]" time="0.018" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-005]" time="0.019" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-006]" time="0.020" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-007]" time="0.014" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-008]" time="0.009" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-009]" time="0.025" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-010]" time="0.016" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-011]" time="0.005"><skipped type="pytest.skip" message="The specification does not enumerate the required registration-detail fields or identify which omission constitutes this alternative. Do not invent a field set or input shape.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/uc/test_uc_cases.py:1521: The specification does not enumerate the required registration-detail fields or identify which omission constitutes this alternative. Do not invent a field set or input shape.</skipped></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-012]" time="0.016" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-013]" time="0.036" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-014]" time="0.037" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-015]" time="0.026" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-016]" time="0.014" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-017]" time="0.026" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-018]" time="0.013" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-019]" time="0.011" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-020]" time="0.019" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-021]" time="0.029" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-022]" time="0.018" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-023]" time="0.012" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-024]" time="0.019" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-025]" time="0.019" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-026]" time="0.098" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-027]" time="0.029" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-028]" time="0.027" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-029]" time="0.023" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-030]" time="0.023" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-031]" time="0.026" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-032]" time="0.007"><skipped type="pytest.skip" message="The UC explicitly leaves Mess Admin menu visibility unfixed because the frozen problem statement conflicts between menu visibility and the Admin's operational-data boundary.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/uc/test_uc_cases.py:1521: The UC explicitly leaves Mess Admin menu visibility unfixed because the frozen problem statement conflicts between menu visibility and the Admin's operational-data boundary.</skipped></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-033]" time="0.008"><skipped type="pytest.skip" message="The UC says access is according to actor rights but does not identify a denied actor for this view; Mess Admin's access is explicitly unresolved, and no additional actor role may be invented.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/uc/test_uc_cases.py:1521: The UC says access is according to actor rights but does not identify a denied actor for this view; Mess Admin's access is explicitly unresolved, and no additional actor role may be invented.</skipped></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-034]" time="0.167" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-035]" time="0.027" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-036]" time="0.014" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-037]" time="0.017" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-038]" time="0.011" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-039]" time="0.012" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-040]" time="0.011" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-041]" time="0.010" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-042]" time="0.010" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-043]" time="0.016" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-044]" time="0.019" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-045]" time="0.012" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-046]" time="0.013"><failure message="assert 200 == 403&#10; +  where 200 = &lt;Response status_code=200, &quot;application/json&quot;&gt;.status_code">test_case = {'id': 'TC-UC-046', 'source_use_case': 'MMS-UC-013', 'flow': 'Exception Flow: unauthorized feedback view', 'objective': 'Verify an actor without the stated feedback-view role cannot view feedback entries.', ...}
+stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x7f628de9f380&gt;
+user_ref = &lt;function user_ref.&lt;locals&gt;._make at 0x7f628e94be20&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f628e5ccb90&gt;
+
+    @pytest.mark.parametrize(
+        "test_case",
+        [pytest.param(case, id=case["id"]) for case in _TEST_CASES],
+    )
+    def test_frozen_uc_case(test_case, stub_iam, user_ref, monkeypatch):
+        case_id = test_case["id"]
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+&gt;       _dispatch(case_id, UCHarness(stub_iam, user_ref), monkeypatch)
+
+tests/a8/uc/test_uc_cases.py:1522: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/a8/uc/test_uc_cases.py:1470: in _dispatch
+    return runner(h)
+           ^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = &lt;test_uc_cases.UCHarness object at 0x7f628e5cd610&gt;
+
+    def _case_046(h):
+        Feedback.objects.create(user_id=1001, message="Private feedback")
+        response = h.client(2002).get("/api/v1/mms/feedback")
+&gt;       assert response.status_code == 403
+E       assert 200 == 403
+E        +  where 200 = &lt;Response status_code=200, "application/json"&gt;.status_code
+
+tests/a8/uc/test_uc_cases.py:728: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-047]" time="0.036" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-048]" time="0.026" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-049]" time="0.033" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-050]" time="0.024" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-051]" time="0.019" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-052]" time="0.019" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-053]" time="0.020" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-054]" time="0.015" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-055]" time="0.013" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-056]" time="0.030" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-057]" time="0.038" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-058]" time="0.005"><skipped type="pytest.skip" message="The specifications condition date changes on external mess policy but do not define its permitted limits or rules. No modified date range or acceptance outcome can be asserted.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/uc/test_uc_cases.py:1521: The specifications condition date changes on external mess policy but do not define its permitted limits or rules. No modified date range or acceptance outcome can be asserted.</skipped></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-059]" time="0.018" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-060]" time="0.014" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-061]" time="0.034" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-062]" time="0.017" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-063]" time="0.007"><skipped type="pytest.skip" message="Reminder timing/cadence is explicitly unspecified. MMS-UC-031 models a reminder event but does not supply a schedule.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/uc/test_uc_cases.py:1521: Reminder timing/cadence is explicitly unspecified. MMS-UC-031 models a reminder event but does not supply a schedule.</skipped></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-064]" time="0.009" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-065]" time="0.014"><failure message="assert 409 == 200&#10; +  where 409 = &lt;Response status_code=409, &quot;application/json&quot;&gt;.status_code">test_case = {'id': 'TC-UC-065', 'source_use_case': 'MMS-UC-017', 'flow': 'Main Success Scenario, steps 1-5: explicit Yes response'...Verify a currently registered Student submits and MMS records an explicit Yes response while the survey is open.', ...}
+stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x7f628de9eac0&gt;
+user_ref = &lt;function user_ref.&lt;locals&gt;._make at 0x7f628de9e700&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f628e5ed160&gt;
+
+    @pytest.mark.parametrize(
+        "test_case",
+        [pytest.param(case, id=case["id"]) for case in _TEST_CASES],
+    )
+    def test_frozen_uc_case(test_case, stub_iam, user_ref, monkeypatch):
+        case_id = test_case["id"]
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+&gt;       _dispatch(case_id, UCHarness(stub_iam, user_ref), monkeypatch)
+
+tests/a8/uc/test_uc_cases.py:1522: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/a8/uc/test_uc_cases.py:1447: in _dispatch
+    return _case_065_068_069_070(h, case_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = &lt;test_uc_cases.UCHarness object at 0x7f628e020830&gt;, case_id = 'TC-UC-065'
+
+    def _case_065_068_069_070(h, case_id):
+        survey = _create_survey()
+        if case_id in {"TC-UC-065", "TC-UC-066"}:
+            h.enrollment(1001)
+            response = h.client(1001).post(
+                f"/api/v1/mms/vacation-surveys/{survey.pk}/responses",
+                {"response": "Yes" if case_id == "TC-UC-065" else "No"},
+                format="json",
+            )
+&gt;           assert response.status_code == 200
+E           assert 409 == 200
+E            +  where 409 = &lt;Response status_code=409, "application/json"&gt;.status_code
+
+tests/a8/uc/test_uc_cases.py:890: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-066]" time="0.019"><failure message="assert 409 == 200&#10; +  where 409 = &lt;Response status_code=409, &quot;application/json&quot;&gt;.status_code">test_case = {'id': 'TC-UC-066', 'source_use_case': 'MMS-UC-017', 'flow': 'Main Success Scenario, steps 1-5: explicit No response',...'Verify a currently registered Student submits and MMS records an explicit No response while the survey is open.', ...}
+stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x7f628de9e8e0&gt;
+user_ref = &lt;function user_ref.&lt;locals&gt;._make at 0x7f628de9d3a0&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f628e5cdf70&gt;
+
+    @pytest.mark.parametrize(
+        "test_case",
+        [pytest.param(case, id=case["id"]) for case in _TEST_CASES],
+    )
+    def test_frozen_uc_case(test_case, stub_iam, user_ref, monkeypatch):
+        case_id = test_case["id"]
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+&gt;       _dispatch(case_id, UCHarness(stub_iam, user_ref), monkeypatch)
+
+tests/a8/uc/test_uc_cases.py:1522: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/a8/uc/test_uc_cases.py:1447: in _dispatch
+    return _case_065_068_069_070(h, case_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = &lt;test_uc_cases.UCHarness object at 0x7f628e5ed400&gt;, case_id = 'TC-UC-066'
+
+    def _case_065_068_069_070(h, case_id):
+        survey = _create_survey()
+        if case_id in {"TC-UC-065", "TC-UC-066"}:
+            h.enrollment(1001)
+            response = h.client(1001).post(
+                f"/api/v1/mms/vacation-surveys/{survey.pk}/responses",
+                {"response": "Yes" if case_id == "TC-UC-065" else "No"},
+                format="json",
+            )
+&gt;           assert response.status_code == 200
+E           assert 409 == 200
+E            +  where 409 = &lt;Response status_code=409, "application/json"&gt;.status_code
+
+tests/a8/uc/test_uc_cases.py:890: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-067]" time="0.017" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-068]" time="0.018" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-069]" time="0.014" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-070]" time="0.016" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-071]" time="0.025" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-072]" time="0.014" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-073]" time="0.005"><skipped type="pytest.skip" message="MMS-UC-018 names only the Caretaker as primary actor, while Problem Statement §3.3.9 says the Warden can view vacation survey response summaries. The specifications do not resolve whether this specific view is shared.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/uc/test_uc_cases.py:1521: MMS-UC-018 names only the Caretaker as primary actor, while Problem Statement §3.3.9 says the Warden can view vacation survey response summaries. The specifications do not resolve whether this specific view is shared.</skipped></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-074]" time="0.024" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-075]" time="0.021" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-076]" time="0.052" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-077]" time="0.011" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-078]" time="0.025"><failure message="assert 409 == 200&#10; +  where 409 = &lt;Response status_code=409, &quot;application/json&quot;&gt;.status_code">test_case = {'id': 'TC-UC-078', 'source_use_case': 'MMS-UC-020', 'flow': 'Main Success Scenario, steps 1-4: approve within stipula... special-food request within the applicable institution-defined period and the outcome is recorded and notified.', ...}
+stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x7f628df17740&gt;
+user_ref = &lt;function user_ref.&lt;locals&gt;._make at 0x7f628d510f40&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f628e5ef6e0&gt;
+
+    @pytest.mark.parametrize(
+        "test_case",
+        [pytest.param(case, id=case["id"]) for case in _TEST_CASES],
+    )
+    def test_frozen_uc_case(test_case, stub_iam, user_ref, monkeypatch):
+        case_id = test_case["id"]
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+&gt;       _dispatch(case_id, UCHarness(stub_iam, user_ref), monkeypatch)
+
+tests/a8/uc/test_uc_cases.py:1522: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/a8/uc/test_uc_cases.py:1470: in _dispatch
+    return runner(h)
+           ^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = &lt;test_uc_cases.UCHarness object at 0x7f628e9ce360&gt;
+
+    def _case_078(h):
+        h.active_role(3001, "caretaker")
+        request = SpecialFoodRequest.objects.create(
+            user_id=1001, reason="illness", requested_for=date(2026, 12, 1))
+        response = _decide_special(h.client(3001, "caretaker"), request, True)
+&gt;       assert response.status_code == 200
+E       assert 409 == 200
+E        +  where 409 = &lt;Response status_code=409, "application/json"&gt;.status_code
+
+tests/a8/uc/test_uc_cases.py:973: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-079]" time="0.030" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-080]" time="0.020" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-081]" time="0.006"><skipped type="pytest.skip" message="The problem statement mentions 12 hours as intended, but the UC specification leaves the period institution-defined. No numeric deadline or boundary result can be asserted.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/uc/test_uc_cases.py:1521: The problem statement mentions 12 hours as intended, but the UC specification leaves the period institution-defined. No numeric deadline or boundary result can be asserted.</skipped></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-082]" time="0.015" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-083]" time="0.032" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-084]" time="0.029" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-085]" time="0.023" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-086]" time="0.007"><skipped type="pytest.skip" message="The use case names Caretaker, but its note says fulfillment ownership is not explicit in the Problem Statement (ISS-MMS-014). A separate actor-authorization expectation cannot be independently asserted.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/uc/test_uc_cases.py:1521: The use case names Caretaker, but its note says fulfillment ownership is not explicit in the Problem Statement (ISS-MMS-014). A separate actor-authorization expectation cannot be independently asserted.</skipped></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-087]" time="0.006"><skipped type="pytest.skip" message="The use case and Problem Statement explicitly leave billing treatment after Cancelled unresolved (ISS-MMS-015).">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/uc/test_uc_cases.py:1521: The use case and Problem Statement explicitly leave billing treatment after Cancelled unresolved (ISS-MMS-015).</skipped></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-088]" time="0.031" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-089]" time="0.026" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-090]" time="0.011" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-091]" time="0.013" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-092]" time="0.032" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-093]" time="0.013" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-094]" time="0.007"><skipped type="pytest.skip" message="The UC says all actors view subject to access rights and interprets Admin access through those rights, while the Problem Statement limits Admin to role management and denies operational-data access. No explicit announcement-history permission outcome is specified.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/uc/test_uc_cases.py:1521: The UC says all actors view subject to access rights and interprets Admin access through those rights, while the Problem Statement limits Admin to role management and denies operational-data access. No explicit announcement-history permission outcome is specified.</skipped></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-095]" time="0.005"><skipped type="pytest.skip" message="Apart from the explicitly ambiguous Mess Admin case, the specifications do not identify a denied actor for announcement history; no additional actor role or permission boundary is invented.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/uc/test_uc_cases.py:1521: Apart from the explicitly ambiguous Mess Admin case, the specifications do not identify a denied actor for announcement history; no additional actor role or permission boundary is invented.</skipped></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-096]" time="0.013" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-097]" time="0.015" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-098]" time="0.020" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-099]" time="0.011" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-100]" time="0.010" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-101]" time="0.017" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-102]" time="0.017" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-103]" time="0.018" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-104]" time="0.012" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-105]" time="0.011" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-106]" time="0.019" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-107]" time="0.009" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-108]" time="0.012" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-109]" time="0.026" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-110]" time="0.027" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-111]" time="0.034" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-112]" time="0.032" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-113]" time="0.021" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-114]" time="0.022" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-115]" time="0.020" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-116]" time="0.024" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-117]" time="0.015" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-118]" time="0.023" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-119]" time="0.007"><skipped type="pytest.skip" message="The exact special-food decision period is institution-defined and is not frozen by the specifications (ISS-MMS-013).">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/uc/test_uc_cases.py:1521: The exact special-food decision period is institution-defined and is not frozen by the specifications (ISS-MMS-013).</skipped></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-120]" time="0.024" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-121]" time="0.023" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-122]" time="0.034" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-123]" time="0.025" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-124]" time="0.014" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-125]" time="0.006"><skipped type="pytest.skip" message="The specification explicitly states external email-delivery failure handling is outside MMS scope unless separately specified.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/uc/test_uc_cases.py:1521: The specification explicitly states external email-delivery failure handling is outside MMS scope unless separately specified.</skipped></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-126]" time="0.008"><skipped type="pytest.skip" message="Reminder timing/cadence is institution-defined and unspecified (ISS-MMS-019); no schedule is inferred.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/uc/test_uc_cases.py:1521: Reminder timing/cadence is institution-defined and unspecified (ISS-MMS-019); no schedule is inferred.</skipped></testcase><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-127]" time="0.010" /><testcase classname="tests.a8.uc.test_uc_cases" name="test_frozen_uc_case[TC-UC-128]" time="0.056" /></testsuite></testsuites>

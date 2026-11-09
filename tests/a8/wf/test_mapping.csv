@@ -1,0 +1,40 @@
+test_id,workflow_id,workflow_name,workflow_path_or_transition,coverage_status,blocked_reason
+TC-WF-001,BW-MMS-01,Registration — Approved,Open window -> valid student submission -> Caretaker approves,TESTABLE,
+TC-WF-002,BW-MMS-02,Registration — Rejected,Open window -> valid student submission -> Caretaker rejects,TESTABLE,
+TC-WF-001,CW-MMS-01,Registration Request Lifecycle,Common window-opening and submission prefix -> approval,TESTABLE,
+TC-WF-002,CW-MMS-01,Registration Request Lifecycle,Common window-opening and submission prefix -> rejection,TESTABLE,
+TC-WF-004,BW-MMS-03,Deregistration — Approved,Valid submission -> approval awaiting effective date -> activation at next calendar day,TESTABLE,
+TC-WF-005,BW-MMS-04,Deregistration — Rejected,Valid submission -> rejection; student remains registered,TESTABLE,
+TC-WF-004,CW-MMS-02,Deregistration Request Lifecycle,Valid submission -> approval -> next-calendar-day activation,TESTABLE,
+TC-WF-005,CW-MMS-02,Deregistration Request Lifecycle,Valid submission -> rejection; student remains registered,TESTABLE,
+TC-WF-006,BW-MMS-05,Rebate — Approved as Submitted,Valid request -> approval without date modification,TESTABLE,
+TC-WF-007,BW-MMS-06,Rebate — Dates Modified then Approved,Pending request -> policy-permitted date modification -> approval using modified dates,BLOCKED,Permitted rebate date modifications depend on external policy not defined in the specifications.
+TC-WF-008,BW-MMS-07,Rebate — Rejected,Valid request -> rejection,TESTABLE,
+TC-WF-006,CW-MMS-03,Rebate Request Lifecycle,Valid request -> approval without modification,TESTABLE,
+TC-WF-007,CW-MMS-03,Rebate Request Lifecycle,Pending request -> policy-permitted date modification -> approval,BLOCKED,Permitted rebate date modifications depend on external policy not defined in the specifications.
+TC-WF-008,CW-MMS-03,Rebate Request Lifecycle,Valid request -> rejection,TESTABLE,
+TC-WF-013,BW-MMS-08,Vacation Survey — Yes Response,Create survey for currently registered students -> explicit Yes before deadline,TESTABLE,
+TC-WF-014,BW-MMS-09,Vacation Survey — No Response,Create survey -> explicit No before deadline,TESTABLE,
+TC-WF-015,BW-MMS-10,Vacation Survey — Default No,Create survey -> deadline reached with no response -> system Default No,TESTABLE,
+TC-WF-013,CW-MMS-04,Vacation Food Continuity Response Lifecycle,Survey creation -> explicit Yes before deadline,TESTABLE,
+TC-WF-014,CW-MMS-04,Vacation Food Continuity Response Lifecycle,Survey creation -> explicit No before deadline,TESTABLE,
+TC-WF-015,CW-MMS-04,Vacation Food Continuity Response Lifecycle,Survey creation -> no response at deadline -> system Default No,TESTABLE,
+TC-WF-017,BW-MMS-11,Special Food — Rejected by Caretaker,Valid request -> Caretaker rejects within stipulated period,TESTABLE,
+TC-WF-018,BW-MMS-12,Special Food — Default Rejected,Valid request -> stipulated period expires without decision -> system default rejection,BLOCKED,The special-food decision period is institution-defined; the stated 12 hours is intended, not a confirmed test value.
+TC-WF-019,BW-MMS-13,"Special Food — Approved, Awaiting Fulfillment",Valid request -> Caretaker approval,TESTABLE,
+TC-WF-020,BW-MMS-14,Special Food — Served,Valid request -> approval -> Served,TESTABLE,
+TC-WF-021,BW-MMS-15,Special Food — Cancelled,Valid request -> approval -> Cancelled,TESTABLE,
+TC-WF-017,CW-MMS-05,Special Food Request Lifecycle,Valid request -> explicit Caretaker rejection,TESTABLE,
+TC-WF-018,CW-MMS-05,Special Food Request Lifecycle,Valid request -> no decision by deadline -> default rejection,BLOCKED,The special-food decision period is institution-defined; the stated 12 hours is intended, not a confirmed test value.
+TC-WF-019,CW-MMS-05,Special Food Request Lifecycle,Valid request -> approval,TESTABLE,
+TC-WF-020,CW-MMS-05,Special Food Request Lifecycle,Approval -> Served,TESTABLE,
+TC-WF-021,CW-MMS-05,Special Food Request Lifecycle,Approval -> Cancelled,TESTABLE,
+TC-WF-023,BW-MMS-16,Monthly Billing — Generated to Published,Calendar-month event -> bill generated -> Caretaker reviews/finalizes -> bill published,TESTABLE,
+TC-WF-024,BW-MMS-16,Monthly Billing — Generated to Published,Supplemental numeric-calculation assertion (not a distinct state transition),BLOCKED,"Rates, component amounts, detailed calculation rules, and rounding behavior are absent, so no exact numeric expected total can be derived."
+TC-WF-003,Registration Management,Closed-window registration submission,Attempt registration submission while Registration Window is Not Open,BLOCKED,"Registration outside an open window is prohibited, but violation response and record behavior are unspecified."
+TC-WF-009,Rebate Management,Minimum-duration guard,Attempt rebate submission with duration below 3 days,BLOCKED,"The below-minimum rebate duration is prohibited, but the validation outcome is unspecified."
+TC-WF-010,Rebate Management,Lead-time guard,Attempt rebate submission less than one calendar day before its start date,BLOCKED,The insufficient rebate lead-time validation outcome is unspecified.
+TC-WF-011,Rebate Management,Overlapping-request guard,Attempt a rebate submission whose dates overlap another request for the same student,BLOCKED,"Overlapping rebate requests are prohibited, but the system response and record behavior are unspecified."
+TC-WF-012,Rebate Management,Mandatory explanation for other,Attempt a rebate submission with reason other and no explanation,BLOCKED,"The explanation is mandatory for rebate reason other, but the missing-explanation outcome is unspecified."
+TC-WF-016,Vacation Food Continuity,Response exactly at deadline,Attempt explicit Yes or No at the exact response deadline,BLOCKED,Precedence between an explicit vacation response and the system default at the exact deadline is unspecified.
+TC-WF-022,Special Food Arrangement,One-calendar-day lead-time guard,Attempt special-food request less than one calendar day before requested date,BLOCKED,Special-food submissions with less than one calendar day of lead time have no specified validation outcome.
