@@ -367,6 +367,15 @@ def close(*, actor, muster_id, note: str = "", force: bool = False) -> Emergency
             body=(f"Muster {muster.pk} closed: {totals['accounted']} accounted, "
                   f"{totals['evacuated']} evacuated, {totals['unaccounted']} unaccounted "
                   f"of {totals['total']}."))
+        by_host: dict[int, list[str]] = {}
+        for row in _entry_rows(muster, status=ms.UNACCOUNTED):
+            by_host.setdefault(row["host_user_id"], []).append(row["visitor_name"])
+        for host_id, names in by_host.items():
+            notify.enqueue(
+                topic=TOPIC_REPORT, dedupe_key=f"{TOPIC_REPORT}:{muster.pk}:host:{host_id}",
+                user_id=host_id, subject="Emergency muster: your visitor is unaccounted for",
+                body=(f"Muster {muster.pk} closed with your visitor(s) still unaccounted "
+                      f"for: {', '.join(names)}."))
         audit.record(actor=actor, action="vms.muster.closed", entity=muster,
                      detail={"forced": bool(remaining), "unaccounted": remaining,
                              "note": note})
