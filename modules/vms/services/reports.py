@@ -6,9 +6,8 @@ and exports. Reports are anonymised by default (D-9): names become
 an id) and phone/email/ID are masked. Un-masked output needs
 ``vms.report.view_pii`` *and* an explicit ``anonymize=false``, and is audited.
 
-Catalogue is exactly the reports SRS 3.10 names. TODO(integration): add
-``event_attendance`` (lane G, selectors/events.py) and ``muster_history``
-(lane F); neither lane's data was available when this lane was built.
+Catalogue is the reports SRS 3.10 names plus ``event_attendance`` (selectors/events.py)
+and ``muster_history`` (EmergencyMuster rows).
 PDF export: no PDF library is installed, so ``fmt=pdf`` answers 501
 (service request h-1); no dependency was added.
 """
@@ -74,6 +73,8 @@ CATALOGUE: dict[str, ReportDef] = {d.key: d for d in (
     ReportDef("audit_trail", "Audit trail", sel.audit_trail, ("visitor_id",), identity=True),
     ReportDef("zone_access", "Zone access", sel.zone_access),
     ReportDef("blacklist_hits", "Blacklist hits", sel.blacklist_hits, identity=True),
+    ReportDef("event_attendance", "Event attendance", sel.event_attendance, ("event_id",)),
+    ReportDef("muster_history", "Emergency muster history", sel.muster_history),
 )}
 
 
@@ -87,6 +88,7 @@ class Params:
     granularity: str = "day"
     top: int = 10
     visitor_id: int | None = None
+    event_id: int | None = None
     extra: dict = field(default_factory=dict)
 
     def public(self) -> dict:
@@ -172,11 +174,14 @@ def validate(key: str, params: dict | None) -> Params:
     if gran not in GRANULARITIES:
         raise BadRequestError("granularity must be day, week or month.",
                               code="validation_error")
+    if key == "event_attendance" and _to_int("event_id", p.get("event_id"), 1, 2**31 - 1) is None:
+        raise BadRequestError("event_id is required.", code="validation_error")
     return Params(
         key=key, start=start, end=end, zone=_to_int("zone", p.get("zone"), 1, 2**31 - 1),
         anonymize=_to_bool(p.get("anonymize")), granularity=gran,
         top=_to_int("top", p.get("top"), 1, sel.TOP_MAX) or 10,
-        visitor_id=_to_int("visitor_id", p.get("visitor_id"), 1, 2**31 - 1))
+        visitor_id=_to_int("visitor_id", p.get("visitor_id"), 1, 2**31 - 1),
+        event_id=_to_int("event_id", p.get("event_id"), 1, 2**31 - 1))
 
 
 # --- scope ------------------------------------------------------------------------------
@@ -310,7 +315,7 @@ def _build(actor, p: Params) -> dict:
     d = CATALOGUE[p.key]
     filters = {"zone_ids": _effective_zones(actor, p), "granularity": p.granularity,
                "top": p.top, "visitor_id": p.visitor_id,
-               "with_names": not p.anonymize}
+               "event_id": p.event_id, "with_names": not p.anonymize}
     start, end = _tz_bounds(p)
     result = d.fn(start, end, filters)
     if p.key == "sla_compliance":

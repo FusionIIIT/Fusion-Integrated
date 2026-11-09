@@ -2,6 +2,7 @@
 from datetime import timedelta
 
 import pytest
+from django.utils import timezone
 
 from core.api.exceptions import BadRequestError, NotFoundError, PermissionDeniedError
 from modules.vms.services import reports
@@ -160,7 +161,8 @@ def test_unbuilt_reports_are_not_in_catalogue(reporter):
     keys = {c["key"] for c in reports.catalogue(reporter)}
     assert keys == {"daily_summary", "volume_trend", "peak_hours", "frequent_visitors",
                     "denial_stats", "sla_compliance", "audit_trail", "zone_access",
-                    "blacklist_hits"}
+                    "blacklist_hits",
+                    "event_attendance", "muster_history"}
 
 
 def test_admin_scope_limited_to_own_zones(data, zone_admin):
@@ -199,3 +201,44 @@ def test_missing_permission(data):
         reports.run(nobody, "daily_summary", {})
     with pytest.raises(PermissionDeniedError):
         reports.export(f.make_actor(permissions=["vms.report.view"]), "daily_summary", {})
+
+
+def test_event_attendance_report_exact_numbers(reporter):
+    now = timezone.now()
+    ev = f.make_event_batch(valid_from=now - timedelta(hours=2),
+                            valid_until=now + timedelta(hours=1))
+    p1, p2 = f.make_visit_pass(event=ev), f.make_visit_pass(event=ev)
+    f.make_event_attendee(batch=ev, visit_pass=p1)
+    f.make_event_attendee(batch=ev, visit_pass=p2)
+    f.make_event_attendee(batch=ev)
+    f.make_visit_log(visit_pass=p1, event="check_in")
+    f.make_visit_log(visit_pass=p2, event="check_in")
+    f.make_visit_log(visit_pass=p2, event="check_out")
+    res = reports.run(reporter, "event_attendance", {"event_id": ev.pk})
+    assert res["summary"]["invited"] == 3
+    assert res["summary"]["passes_issued"] == 2
+    assert res["summary"]["checked_in"] == 2
+    assert res["summary"]["current_inside"] == 1
+    assert sum(r["check_ins"] for r in res["rows"]) == 2
+    assert sum(r["check_outs"] for r in res["rows"]) == 1
+    with pytest.raises(BadRequestError):
+        reports.run(reporter, "event_attendance", {})
+    with pytest.raises(NotFoundError):
+        reports.run(reporter, "event_attendance", {"event_id": 999999})
+
+
+def test_muster_history_report_exact_numbers(reporter):
+    now = timezone.now()
+    f.make_emergency_muster(
+        status="closed", closed_at=now,
+        summary={"totals": {"total": 4, "accounted": 3, "evacuated": 0, "unaccounted": 1}})
+    m = f.make_emergency_muster(
+        status="closed", closed_at=now,
+        summary={"totals": {"total": 2, "accounted": 1, "evacuated": 1, "unaccounted": 0}})
+    type(m).objects.filter(pk=m.pk).update(triggered_at=now - timedelta(seconds=90))
+    res = reports.run(reporter, "muster_history", {})
+    assert res["summary"] == {"musters": 2, "total": 6, "accounted": 4,
+                              "accounted_ratio": 0.667}
+    by_id = {r["id"]: r for r in res["rows"]}
+    assert by_id[m.pk]["accounted_ratio"] == 0.5
+    assert by_id[m.pk]["duration_seconds"] == 90
