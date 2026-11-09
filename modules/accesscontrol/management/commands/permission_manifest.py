@@ -155,33 +155,6 @@ def known_gaps(manifest: dict) -> list[str]:
 KNOWN_UNENFORCED = frozenset({
     # vms: declared in Phase 0 (0c); each line is removed by the lane that
     # adds its endpoint.
-    "vms.audit.view",
-    "vms.blacklist.publish",
-    "vms.event.manage",
-    "vms.extension.decide",
-    "vms.gate.escalate",
-    "vms.gate.override",
-    "vms.gate.sync",
-    "vms.integration.manage",
-    "vms.monitor.view",
-    "vms.muster.rollcall",
-    "vms.muster.trigger",
-    "vms.notification.view_self",
-    "vms.pass.terminate",
-    "vms.policy.manage",
-    "vms.preauth.manage",
-    "vms.report.export",
-    "vms.report.view",
-    "vms.report.view_pii",
-    "vms.request.view_assigned",
-    "vms.role.assign",
-    "vms.safelist.manage",
-    "vms.urgent.decide",
-    "vms.vip.manage",
-    "vms.walkin.contingency_decide",
-    "vms.walkin.register",
-    "vms.zone.elevate",
-    "vms.zone.manage",
 })
 
 

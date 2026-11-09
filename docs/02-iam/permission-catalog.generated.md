@@ -46,7 +46,7 @@ For the intended taxonomy of modules not yet built, see
 | `vms.request.decide` | Approve or reject a visit request for oneself | `faculty`, `staff` |
 | `vms.request.view_assigned` | See visit requests assigned to oneself | `faculty`, `staff` |
 | `vms.preauth.manage` | Pre-authorise recurring visitors | `faculty`, `staff` |
-| `vms.pass.terminate` | Terminate a visitor's pass early | `faculty`, `staff` |
+| `vms.pass.terminate` | Terminate a visitor's pass early | `Director`, `Registrar`, `acadadmin`, `faculty`, `staff` |
 | `vms.notification.view_self` | See one's own VMS notifications | `Director`, `Registrar`, `acadadmin`, `faculty`, `staff`, `vms_security` |
 | `vms.walkin.register` | Register a walk-in visitor at the gate | `vms_security` |
 | `vms.gate.operate` | Check visitors in and out at the gate | `vms_security` |
