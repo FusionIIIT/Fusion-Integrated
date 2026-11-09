@@ -13,6 +13,23 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `mess_management`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `mess_management.student.use` | Use student mess services | `student` |
+| `mess_management.operations.view` | View mess operational services | `mess_caretaker`, `mess_warden` |
+| `mess_management.operations.manage` | Manage mess operational services | `mess_caretaker` |
+| `mess_management.requests.review` | Decide student mess requests | `mess_caretaker` |
+| `mess_management.menu.manage` | Maintain weekly menu | `mess_caretaker` |
+| `mess_management.billing.manage` | Generate, finalize and publish bills | `mess_caretaker` |
+| `mess_management.feedback.view` | Review student feedback | `mess_caretaker`, `mess_warden` |
+| `mess_management.surveys.manage` | Manage vacation surveys | `mess_caretaker` |
+| `mess_management.announcements.publish` | Publish mess announcements | `mess_caretaker`, `mess_warden` |
+| `mess_management.reports.warden` | View supervisory reports | `mess_warden` |
+| `mess_management.reports.caretaker` | Generate operational reports | `mess_caretaker` |
+| `mess_management.roles.manage` | Assign mess roles | `mess_admin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

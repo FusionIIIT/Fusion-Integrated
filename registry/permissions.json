@@ -34,6 +34,125 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "mess_management": {
+      "grants": {
+        "mess_admin": [
+          "mess_management.roles.manage"
+        ],
+        "mess_caretaker": [
+          "mess_management.announcements.publish",
+          "mess_management.billing.manage",
+          "mess_management.feedback.view",
+          "mess_management.menu.manage",
+          "mess_management.operations.manage",
+          "mess_management.operations.view",
+          "mess_management.reports.caretaker",
+          "mess_management.requests.review",
+          "mess_management.surveys.manage"
+        ],
+        "mess_warden": [
+          "mess_management.announcements.publish",
+          "mess_management.feedback.view",
+          "mess_management.operations.view",
+          "mess_management.reports.warden"
+        ],
+        "student": [
+          "mess_management.student.use"
+        ]
+      },
+      "module_grants": [
+        "mess_admin",
+        "mess_caretaker",
+        "mess_warden",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/mms",
+        "icon": "FaLayerGroup",
+        "items": [
+          {
+            "code": "mms.student",
+            "icon": "FaUserCheck",
+            "label": "My Mess",
+            "required_permission": "mess_management.student.use",
+            "sort_order": 10,
+            "to": "/mms/student"
+          },
+          {
+            "code": "mms.operations",
+            "icon": "FaClipboardList",
+            "label": "Operations",
+            "required_permission": "mess_management.operations.view",
+            "sort_order": 20,
+            "to": "/mms/operations"
+          },
+          {
+            "code": "mms.roles",
+            "icon": "FaUsers",
+            "label": "Role Management",
+            "required_permission": "mess_management.roles.manage",
+            "sort_order": 30,
+            "to": "/mms/roles"
+          }
+        ],
+        "label": "Mess Management",
+        "nav_section": "Mess Management",
+        "sort_order": 40,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "mess_management.student.use",
+          "label": "Use student mess services"
+        },
+        {
+          "code": "mess_management.operations.view",
+          "label": "View mess operational services"
+        },
+        {
+          "code": "mess_management.operations.manage",
+          "label": "Manage mess operational services"
+        },
+        {
+          "code": "mess_management.requests.review",
+          "label": "Decide student mess requests"
+        },
+        {
+          "code": "mess_management.menu.manage",
+          "label": "Maintain weekly menu"
+        },
+        {
+          "code": "mess_management.billing.manage",
+          "label": "Generate, finalize and publish bills"
+        },
+        {
+          "code": "mess_management.feedback.view",
+          "label": "Review student feedback"
+        },
+        {
+          "code": "mess_management.surveys.manage",
+          "label": "Manage vacation surveys"
+        },
+        {
+          "code": "mess_management.announcements.publish",
+          "label": "Publish mess announcements"
+        },
+        {
+          "code": "mess_management.reports.warden",
+          "label": "View supervisory reports"
+        },
+        {
+          "code": "mess_management.reports.caretaker",
+          "label": "Generate operational reports"
+        },
+        {
+          "code": "mess_management.roles.manage",
+          "label": "Assign mess roles"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
