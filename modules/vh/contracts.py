@@ -5,7 +5,7 @@ a sequence of IDs rather than singular IDs to prevent N+1 queries.
 """
 from collections.abc import Sequence
 
-from .models import Bill, Booking, Room
+from .models import Bill, Booking, Room, VHMSUserRole
 
 
 def get_bookings_for_users(user_ids: Sequence[int]) -> list[dict]:
@@ -53,3 +53,28 @@ def get_bills_for_bookings(booking_ids: Sequence[int]) -> list[dict]:
         }
         for bill in qs
     ]
+
+
+def get_active_operational_roles(role_types: Sequence[str]) -> list[dict]:
+    """Retrieve active operational roles for given role types (CARETAKER, IN_CHARGE)."""
+    qs = VHMSUserRole.objects.filter(role_type__in=role_types, is_active=True)
+    return [
+        {
+            "id": role.id,
+            "role_type": role.role_type,
+            "user_id": role.user_id,
+            "start_date": str(role.start_date),
+            "end_date": str(role.end_date) if role.end_date else None,
+            "is_active": role.is_active,
+        }
+        for role in qs
+    ]
+
+
+def get_pending_booking_counts_for_users(user_ids: Sequence[int]) -> list[dict]:
+    """Retrieve counts of pending bookings for given indenter IDs."""
+    results = []
+    for uid in user_ids:
+        cnt = Booking.objects.filter(indenter_id=uid, status="PENDING").count()
+        results.append({"user_id": uid, "pending_count": cnt})
+    return results
