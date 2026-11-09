@@ -24,10 +24,6 @@ class GateValidateSerializer(GateCredentialMixin):
                                       max_length=80)
 
 
-class GateCheckoutSerializer(serializers.Serializer):
-    qr_token = serializers.CharField(required=False, allow_blank=True, default="")
-
-
 class OverrideSerializer(serializers.Serializer):
     denial_log_id = serializers.IntegerField()
     justification = serializers.CharField(max_length=500)

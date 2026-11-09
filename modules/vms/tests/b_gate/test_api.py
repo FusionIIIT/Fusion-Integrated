@@ -229,8 +229,14 @@ def test_elevation_endpoints(api_as, admin, vpass):
     assert adm.get(BASE + "zones/elevations?active=1").json()["results"] == []
 
 
-def test_legacy_checkout_route_still_works(api_as, sec, gate, vpass):
+def test_validate_then_visit_check_out(api_as, sec, gate, vpass):
     c = api_as(user_id=3001, permissions=SECURITY_PERMS)
     c.post(BASE + "gate/validate", {"qr_token": vpass.qr_token, "gate_id": gate.pk}, format="json")
-    r = c.post(BASE + "gate/checkout", {"qr_token": vpass.qr_token}, format="json")
-    assert r.status_code == 200 and r.json() == {"detail": "Checked out."}
+    r = c.post(BASE + "visit/check-out", {"credential": vpass.qr_token}, format="json")
+    assert r.status_code == 200
+    vpass.visit_request.refresh_from_db()
+    assert vpass.visit_request.status == "completed"
+    assert c.post(BASE + "visit/check-out", {"credential": vpass.qr_token},
+                  format="json").status_code in (400, 409)
+    assert c.post(BASE + "gate/checkout", {"qr_token": vpass.qr_token},
+                  format="json").status_code == 404        # legacy route is gone

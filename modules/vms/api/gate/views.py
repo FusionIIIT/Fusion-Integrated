@@ -7,7 +7,7 @@ from fusion_auth.permissions import HasPermission
 from modules.vms.api.gate import serializers as s
 from modules.vms.selectors import gate as gate_sel
 from modules.vms.services import gate as gate_svc
-from modules.vms.services import legacy_flow, offline_sync, zone_access
+from modules.vms.services import offline_sync, zone_access
 from modules.vms.services.common import authz
 
 LIST_LIMIT = 200
@@ -44,18 +44,6 @@ class GateValidateView(APIView):
             security_actor=request.principal, credential=ser.credential(),
             gate_id=d["gate_id"], zone_id=d.get("zone_id"), device_id=d["device_id"])
         return result_response(res)
-
-
-class GateCheckoutView(APIView):
-    """Legacy route, kept as is until lane D's visit/check-out supersedes it."""
-    permission_classes = [HasPermission("vms.gate.operate")]
-
-    def post(self, request):
-        ser = s.GateCheckoutSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-        legacy_flow.gate_checkout(actor=request.principal,
-                                  qr_token=ser.validated_data["qr_token"])
-        return Response({"detail": "Checked out."})
 
 
 class GateOverrideView(APIView):

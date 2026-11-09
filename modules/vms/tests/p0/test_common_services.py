@@ -191,13 +191,12 @@ def test_visible_requests_host_sees_own_only():
     assert list(qs) == [mine]
 
 
-def test_visible_requests_principal_sees_requests_for_own_email():
+def test_visible_requests_staff_principal_does_not_match_by_email():   # a-2: branch removed
     v = f.make_visitor(email="me@example.com")
-    mine = f.make_visit_request(visitor=v, host_user_id=99)
-    f.make_visit_request()
+    f.make_visit_request(visitor=v, host_user_id=99)
     actor = f.make_actor(user_id=53)
     object.__setattr__(actor, "email", "ME@example.com")
-    assert list(scope.visible_requests(actor)) == [mine]
+    assert list(scope.visible_requests(actor)) == []
 
 
 def test_visible_requests_visitor_session_sees_own():

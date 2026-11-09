@@ -1,7 +1,6 @@
 """Blacklist check at the runtime checkpoints (VMS-BR-112, 116-120, decision D-2).
 
-Reads the PUBLISHED version only. Writes belong to lane C
-(`services/blacklist_admin.py`); `add_entry` is the port of the legacy POST.
+Reads the PUBLISHED version only. Writes live in `services/blacklist_admin.py`.
 """
 from __future__ import annotations
 
@@ -11,11 +10,9 @@ from django.utils import timezone
 
 from modules.vms.domain import blacklist_match
 from modules.vms.models import (
-    BlacklistEntry,
     BlacklistVersion,
     SafeListEntry,
 )
-from modules.vms.services.common import audit
 
 CHECKPOINTS = ("pre_registration", "walk_in", "gate")
 
@@ -78,18 +75,3 @@ def check(*, checkpoint: str, name="", id_doc_number="", phone="", email="",
     return BlacklistHit(entry_id=entry.pk, version=version.version,
                         severity=entry.severity, reason=entry.reason,
                         matched_fields=tuple(fields), checkpoint=checkpoint)
-
-
-def add_entry(*, actor, **fields) -> BlacklistEntry:
-    """Legacy POST (TODO lane C: replace with blacklist_admin). Adds to the
-    published version, creating published v1 if none exists, so an added entry
-    takes effect as it did before versioning."""
-    version = published_version()
-    if version is None:
-        version = BlacklistVersion.objects.create(
-            version=1, status=BlacklistVersion.Status.PUBLISHED,
-            published_at=timezone.now(), published_by_user_id=getattr(actor, "user_id", None))
-    entry = BlacklistEntry.objects.create(version=version, **fields)
-    audit.record(actor=actor, action="vms.blacklist.entry_added", entity=entry,
-                 detail={"version": version.version})
-    return entry
