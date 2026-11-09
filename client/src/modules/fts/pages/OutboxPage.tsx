@@ -1,19 +1,22 @@
-import { Alert, Loader, Stack, Title } from "@mantine/core";
-import { errorMessage, useOutbox } from "../api/hooks";
-import FileTable from "../components/FileTable";
+import { PageHeader } from "../../../ui/components/PageHeader";
+import { useOutbox } from "../api/hooks";
+import FileRows from "../components/FileRows";
+import { FtsError } from "../components/FtsError";
 
-function OutboxPage() {
-  const { data, isLoading, error } = useOutbox();
-
+export function OutboxPage() {
+  const { data, isPending, error } = useOutbox();
   return (
-    <Stack gap="md">
-      <Title order={2}>Outbox</Title>
-      {isLoading && <Loader />}
-      {error && <Alert color="red">{errorMessage(error)}</Alert>}
-      {!isLoading && !error && <FileTable files={data ?? []} emptyText="No files sent." />}
-    </Stack>
+    <>
+      <PageHeader title="Outbox" subtitle="Files you sent that someone else now holds" />
+      {error != null ? <FtsError error={error} /> : (
+        <FileRows
+          rows={data ?? []} loading={isPending}
+          emptyTitle="Nothing in your outbox"
+          emptyDescription="Files you forward or return will appear here."
+        />
+      )}
+    </>
   );
 }
 
-export { OutboxPage };
 export default OutboxPage;

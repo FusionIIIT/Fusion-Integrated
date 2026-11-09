@@ -1,48 +1,120 @@
 import { useState } from "react";
-import { Alert, Badge, Button, Group, Loader, Stack, Text, Title } from "@mantine/core";
-import { Link, useParams } from "react-router-dom";
-import { errorMessage, useArchiveFile, useFile, useFileHistory } from "../api/hooks";
-import HistoryList from "../components/HistoryList";
+import { useParams } from "react-router-dom";
+import {
+  Alert, Badge, Button, Card, Container, Group, Loader, Stack, Text, Title,
+} from "@mantine/core";
+
+import { useAuth } from "../../../auth/AuthProvider";
+import { PageHeader } from "../../../ui/components/PageHeader";
+import { useFile, useFileHistory } from "../api/hooks";
+import ArchiveModal from "../components/ArchiveModal";
+import { FileStatusBadge, PriorityBadge } from "../components/Badges";
+import { FtsError } from "../components/FtsError";
+import HistoryTimeline from "../components/HistoryTimeline";
 import MovementModal from "../components/MovementModal";
+import { formatTime } from "../lib/format";
+import { actionsFor } from "../lib/rules";
 
-const FileDetailPage: React.FC = () => {
+type Dialog = "forward" | "return" | "archive" | null;
+
+/** FTS-UC-005 (open a file) and UC-006 (tracking history), with the actions
+ *  UC-003, -004 and -007 available to the current holder. */
+export function FileDetailPage() {
   const id = Number(useParams().id);
-  const { data: file, isLoading, error } = useFile(id);
-  const { data: history } = useFileHistory(id);
-  const archive = useArchiveFile(id);
-  const [modal, setModal] = useState<"forward" | "return" | null>(null);
+  const { session } = useAuth();
+  const me = session?.user.username;
+  const role = session?.active_role || "Employee";
 
-  if (isLoading) {
-    return <Loader />;
-  }
+  const file = useFile(id);
+  const history = useFileHistory(id);
+  const [dialog, setDialog] = useState<Dialog>(null);
 
-  if (error) {
-    return <Alert color="red">{errorMessage(error)}</Alert>;
-  }
+  if (file.isPending) return <Container><Loader size="sm" /></Container>;
+  if (file.error != null) return <Container><FtsError error={file.error} /></Container>;
+
+  const f = file.data;
+  const actions = actionsFor(f, me);
+  const events = history.data ?? [];
+  const initialComment = events.find((m) => m.action === "created")
+    ?.comments[0]?.remarks;
 
   return (
-    <Stack>
-      <Title order={2}>{file?.subject}</Title>
-      <Badge color={file?.status === "archived" ? "gray" : file?.status === "circulated" ? "blue" : "green"}>{file?.status}</Badge>
-      <Text>Owner: {file?.owner_name}</Text>
-      <Text>Current Holder: {file?.holder_name ?? "-"}</Text>
-      <Text>Comment: {file?.comment}</Text>
-      <Text>Attachments: {file?.attachments.join(", ")}</Text>
-      {file?.status === "archived" && <Badge color="gray">Read-only</Badge>}
-      {file?.status !== "archived" && (
-        <Group>
-          {file?.permissions.can_edit_draft && <Button component={Link} to={`/fts/files/${id}/edit`}>Edit draft</Button>}
-          {file?.permissions.can_forward && <Button onClick={() => setModal("forward")}>Forward</Button>}
-          {file?.permissions.can_return && <Button onClick={() => setModal("return")}>Return</Button>}
-          {file?.permissions.can_archive && <Button onClick={() => { if (window.confirm("Archive this file?")) archive.mutate(); }}>Archive</Button>}
-        </Group>
+    <>
+      <PageHeader
+        title={f.subject}
+        subtitle={`File no. ${f.uin}`}
+        action={
+          <Group gap="xs">
+            <FileStatusBadge status={f.status} />
+            {actions.readOnly && <Badge color="dark">Read-only</Badge>}
+          </Group>
+        }
+      />
+
+      {actions.readOnly && (
+        <Alert color="gray" mb="md">
+          This file is archived. It stays readable but cannot be changed or forwarded.
+        </Alert>
       )}
-      <MovementModal opened={modal !== null} onClose={() => setModal(null)} fileId={id} mode={modal ?? "forward"} />
-      <Title order={3}>Tracking history</Title>
-      <HistoryList events={history ?? []} />
-    </Stack>
+
+      <Card withBorder padding="lg" mb="lg">
+        <Stack gap={6}>
+          <Group gap="xl">
+            <Group gap="xs">
+              <Text size="sm">Priority:</Text>
+              <PriorityBadge priority={f.priority} />
+            </Group>
+            <Text size="sm">Category: {f.category}</Text>
+          </Group>
+          <Text size="sm">
+            Created by {f.creator_id}{f.creator_role ? ` (${f.creator_role})` : ""} on {formatTime(f.created_at)}
+          </Text>
+          <Text size="sm">
+            Currently held by {f.current_holder_id}
+            {f.current_holder_role ? ` (${f.current_holder_role})` : ""}
+          </Text>
+          {f.description && <Text size="sm">{f.description}</Text>}
+          {initialComment && (
+            <Text size="sm" fs="italic">“{initialComment}”</Text>
+          )}
+        </Stack>
+
+        {(actions.canForward || actions.canReturn || actions.canArchive) && (
+          <Group mt="lg">
+            {actions.canForward && (
+              <Button onClick={() => setDialog("forward")}>
+                {f.status === "draft" ? "Send" : "Forward"}
+              </Button>
+            )}
+            {actions.canReturn && (
+              <Button variant="default" onClick={() => setDialog("return")}>
+                Return
+              </Button>
+            )}
+            {actions.canArchive && (
+              <Button color="red" variant="light" onClick={() => setDialog("archive")}>
+                Archive
+              </Button>
+            )}
+          </Group>
+        )}
+      </Card>
+
+      <Title order={3} mb="sm">Tracking history</Title>
+      {history.error != null
+        ? <FtsError error={history.error} />
+        : <HistoryTimeline events={events} />}
+
+      {(dialog === "forward" || dialog === "return") && (
+        <MovementModal
+          fileId={id} mode={dialog} role={role} onClose={() => setDialog(null)}
+        />
+      )}
+      {dialog === "archive" && (
+        <ArchiveModal fileId={id} role={role} onClose={() => setDialog(null)} />
+      )}
+    </>
   );
-};
+}
 
 export default FileDetailPage;
-export { FileDetailPage };

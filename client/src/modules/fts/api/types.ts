@@ -1,67 +1,124 @@
-export type FileStatus = 'draft' | 'circulated' | 'archived';
+/** Types mirror the FTS backend (modules/fts) exactly. Employee ids are
+ *  strings, and the status vocabulary is the backend's, not the spec prose. */
 
-export type FileSummary = {
+export type FileStatus =
+  | "draft" | "in_transit" | "received" | "returned" | "archived";
+
+export type Priority = "low" | "medium" | "high" | "urgent";
+
+/** Rows of GET /fts/files/inbox/ and /outbox/. */
+export interface FileSummary {
   id: number;
+  uin: string;
   subject: string;
+  priority: Priority;
+  category: string;
   status: FileStatus;
-  owner_name: string;
-  holder_name: string | null;
-  updated_at: string;
-};
+  creator_id: string;
+  current_holder_id: string;
+  updated_at: string | null;
+}
 
-export type FilePermissions = {
-  can_edit_draft: boolean;
-  can_forward: boolean;
-  can_return: boolean;
-  can_archive: boolean;
-};
-
-export type FileDetail = {
-  status: FileStatus;
-  owner_name: string;
-  holder_name: string | null;
+/** Rows of GET /fts/files/drafts/. */
+export interface DraftSummary {
   id: number;
+  uin: string;
   subject: string;
-  comment: string;
-  attachments: string[];
-  permissions: FilePermissions;
+  description: string;
+  priority: Priority;
+  category: string;
+  status: FileStatus;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+/** GET /fts/files/{id}/ (FTSFileSerializer). */
+export interface FileDetail {
+  id: number;
+  uin: string;
+  subject: string;
+  description: string;
+  priority: Priority;
+  category: string;
+  status: FileStatus;
+  creator_id: string;
+  creator_role: string;
+  current_holder_id: string;
+  current_holder_role: string;
+  is_draft: boolean;
   created_at: string;
   updated_at: string;
-};
+}
 
-export type HistoryEventType = 'created' | 'edited' | 'forwarded' | 'returned' | 'archived';
+export type MovementAction = "created" | "forwarded" | "returned" | "archived";
 
-export type HistoryEvent = {
-  id: number;
-  event: HistoryEventType;
-  sender_name: string;
-  receiver_name: string | null;
-  comment: string;
-  attachments: string[];
-  created_at: string;
-};
+export interface HistoryComment {
+  author_id: string;
+  author_role: string;
+  remarks: string;
+  created_at: string | null;
+}
 
-export type Recipient = {
-  id: number;
-  name: string;
-  designation: string;
-};
+/** One entry of GET /fts/files/{id}/history/, oldest first. */
+export interface HistoryMovement {
+  movement_id: number;
+  action: MovementAction;
+  from_user_id: string;
+  from_role: string;
+  to_user_id: string;
+  to_role: string;
+  created_at: string | null;
+  comments: HistoryComment[];
+}
 
-export type CreateFileInput = {
+export interface CreateDraftInput {
   subject: string;
-  comment: string;
-};
+  initial_comment: string;
+  description: string;
+  priority: Priority;
+  category: string;
+  creator_role: string;
+}
 
-export type UpdateFileInput = {
-  subject?: string;
-  comment?: string;
-};
-
-export type ForwardInput = {
-  recipient_id: number;
+export interface ForwardInput {
+  receiver_id: string;
+  /** Omit when unknown: the backend rejects a blank string. */
+  receiver_role?: string;
   comment: string;
-};
+  sender_role: string;
+}
 
-export type MovementCommentInput = {
+export interface ReturnInput {
   comment: string;
-};
+  sender_role: string;
+  target_receiver_id?: string;
+}
+
+export interface ArchiveInput {
+  remarks: string;
+  user_role: string;
+}
+
+export interface CreateDraftResult {
+  file_id: number;
+  uin: string;
+  subject: string;
+  status: FileStatus;
+  is_draft: boolean;
+}
+
+export interface MovementResult {
+  file_id: number;
+  uin: string;
+  new_status: FileStatus;
+  movement_id: number;
+  current_holder_id?: string;
+  returned_to_id?: string;
+}
+
+export interface ArchiveResult {
+  file_id: number;
+  uin: string;
+  status: FileStatus;
+  archived_by: string;
+}

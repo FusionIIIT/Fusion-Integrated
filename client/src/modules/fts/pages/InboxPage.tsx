@@ -1,19 +1,22 @@
-import { Alert, Loader, Stack, Title } from "@mantine/core";
-import { errorMessage, useInbox } from "../api/hooks";
-import FileTable from "../components/FileTable";
+import { PageHeader } from "../../../ui/components/PageHeader";
+import { useInbox } from "../api/hooks";
+import FileRows from "../components/FileRows";
+import { FtsError } from "../components/FtsError";
 
-function InboxPage() {
-  const { data, isLoading, error } = useInbox();
-
+export function InboxPage() {
+  const { data, isPending, error } = useInbox();
   return (
-    <Stack gap="md">
-      <Title order={2}>Inbox</Title>
-      {isLoading && <Loader />}
-      {error && <Alert color="red">{errorMessage(error)}</Alert>}
-      {!isLoading && !error && <FileTable files={data ?? []} emptyText="No files received." />}
-    </Stack>
+    <>
+      <PageHeader title="Inbox" subtitle="Files currently held by you" />
+      {error != null ? <FtsError error={error} /> : (
+        <FileRows
+          rows={data ?? []} loading={isPending}
+          emptyTitle="Your inbox is empty"
+          emptyDescription="Files sent to you will appear here."
+        />
+      )}
+    </>
   );
 }
 
-export { InboxPage };
 export default InboxPage;
