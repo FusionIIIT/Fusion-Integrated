@@ -99,8 +99,6 @@ def test_br_038_duplicate_check_ignores_other_host(me):
     assert vr.host_user_id == 2002 and VisitRequest.objects.count() == 2
 
 
-@pytest.mark.xfail(strict=True, reason="BUG: duplicate check matches scheduled_start exactly, "
-                   "so a partially overlapping window for the same visitor+host is accepted")
 def test_br_038_duplicate_check_overlapping_window_rejected(me):
     """VMS-BR-038: partially overlapping window for same visitor+host rejected."""
     start, end = local_slot(hour=10, hours=2)
@@ -147,8 +145,9 @@ def test_br_202_advance_window_exact_boundary_accepted_and_one_minute_over_urgen
     _freeze(monkeypatch, fixed)
     f.make_role_assignment(user_id=4001, role="admin")
     ok = fixed + timedelta(hours=2)
-    assert _submit(me, scheduled_start=ok,
-                   scheduled_end=ok + timedelta(hours=1)).status == "pending"
+    # A different host: overlapping windows for one visitor+host are a duplicate (BR-038).
+    assert _submit(me, scheduled_start=ok, scheduled_end=ok + timedelta(hours=1),
+                   host_user_id=2002).status == "pending"
     short = fixed + timedelta(hours=2) - timedelta(minutes=1)
     vr = _submit(me, scheduled_start=short, scheduled_end=short + timedelta(hours=1),
                  purpose="second")
@@ -176,8 +175,6 @@ def test_br_211_pass_type_set_per_origin(me):
     assert pa_vr.passes.get().pass_type == VisitPass.PassType.PRE_REGISTERED
 
 
-@pytest.mark.xfail(strict=True, reason="BUG: passes.issue_pass has no pass_type domain check; "
-                   "an unknown type surfaces as a raw DB IntegrityError, not a validation error")
 def test_br_211_pass_type_outside_domain_rejected():
     """VMS-BR-211: issuing a pass with an unknown type raises a validation error."""
     vr = f.make_visit_request(status="approved")
