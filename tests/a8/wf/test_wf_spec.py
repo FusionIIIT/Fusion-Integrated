@@ -5,24 +5,15 @@ a8_design/WF_DESIGN.json specification requirements (Basic & Composite Workflows
 """
 
 import pytest
-from modules.fts.models import FTSFile, FTSMovement, FTSComment, FTSAttachment
+
 from modules.fts.domain.workflow import (
     can_forward_file,
-    can_return_file,
-    can_archive_file,
-    can_edit_draft,
-    STATUS_DRAFT,
-    STATUS_IN_TRANSIT,
-    STATUS_RETURNED,
-    STATUS_ARCHIVED,
 )
-from modules.fts.services.drafts import create_file_draft, update_file_draft, discard_file_draft
-from modules.fts.services.movements import forward_file, return_file
+from modules.fts.models import FTSFile
+from modules.fts.selectors.movements import get_file_movement_history
 from modules.fts.services.archival import archive_file
-from modules.fts.selectors.drafts import get_user_draft_files, get_draft_by_id
-from modules.fts.selectors.inbox_outbox import get_user_inbox_files, get_user_outbox_files
-from modules.fts.selectors.movements import get_file_movement_history, get_previous_senders_for_file
-from modules.fts.contracts import get_files_by_uins, get_active_inbox_files_for_employees
+from modules.fts.services.drafts import create_file_draft, discard_file_draft, update_file_draft
+from modules.fts.services.movements import forward_file, return_file
 
 
 @pytest.mark.django_db
@@ -54,7 +45,7 @@ def test_tc_wf_002():
     forward_file(fid, "sender_1", "Officer", "rec_1", "Staff", "Step 1")
     res = forward_file(fid, "rec_1", "Staff", "rec_2", "Dean", "Step 2 from active state")
     assert res["new_status"] == "in_transit"
-    assert res["current_holder_id"] == "rec_2" 
+    assert res["current_holder_id"] == "rec_2"
 
 @pytest.mark.django_db
 def test_tc_wf_003():
@@ -198,7 +189,7 @@ def test_tc_wf_012():
     forward_file(fid, "sender_1", "Officer", "rec_1", "Staff", "Init fwd")
     ret = return_file(fid, "rec_1", "Staff", "Returning to sender_1", target_receiver_id="sender_1")
     assert ret["new_status"] == "returned"
-    assert ret["returned_to_id"] == "sender_1" 
+    assert ret["returned_to_id"] == "sender_1"
 
 @pytest.mark.django_db
 def test_tc_wf_013():
@@ -259,7 +250,7 @@ def test_tc_wf_016():
     arch = archive_file(fid, "sender_1", "Officer", "Archival remarks")
     assert arch["status"] == "archived"
     f_obj = FTSFile.objects.get(id=fid)
-    assert f_obj.status == "archived" 
+    assert f_obj.status == "archived"
 
 @pytest.mark.django_db
 def test_tc_wf_017():
@@ -316,7 +307,7 @@ def test_tc_wf_020():
     fid = draft["file_id"]
     fwd = forward_file(fid, "owner_user", "Officer", "rec_1", "Staff", "Direct circulation")
     assert fwd["new_status"] == "in_transit"
-    assert fwd["current_holder_id"] == "rec_1" 
+    assert fwd["current_holder_id"] == "rec_1"
 
 @pytest.mark.django_db
 def test_tc_wf_021():
@@ -379,7 +370,7 @@ def test_tc_wf_025():
     up = update_file_draft(fid, "owner_user", subject="Updated Title")
     assert up["subject"] == "Updated Title"
     fwd = forward_file(fid, "owner_user", "Officer", "rec_1", "Staff", "Sending updated draft")
-    assert fwd["new_status"] == "in_transit" 
+    assert fwd["new_status"] == "in_transit"
 
 @pytest.mark.django_db
 def test_tc_wf_026():
@@ -529,7 +520,7 @@ def test_tc_wf_036():
     forward_file(fid, "owner_user", "Officer", "rec_1", "Staff", "Step 1")
     return_file(fid, "rec_1", "Staff", "Back to owner", target_receiver_id="owner_user")
     arch = archive_file(fid, "owner_user", "Officer", "Archived 36")
-    assert arch["status"] == "archived" 
+    assert arch["status"] == "archived"
 
 @pytest.mark.django_db
 def test_tc_wf_037():
@@ -545,7 +536,7 @@ def test_tc_wf_037():
     forward_file(fid, "rec_1", "Staff", "rec_2", "Director", "Step 2")
     return_file(fid, "rec_2", "Director", "Back to owner", target_receiver_id="owner_user")
     arch = archive_file(fid, "owner_user", "Officer", "Archived 37")
-    assert arch["status"] == "archived" 
+    assert arch["status"] == "archived"
 
 @pytest.mark.django_db
 def test_tc_wf_038():
@@ -560,7 +551,7 @@ def test_tc_wf_038():
     forward_file(fid, "owner_user", "Officer", "rec_1", "Staff", "Step 1")
     ret = return_file(fid, "rec_1", "Staff", "Immediate return", target_receiver_id="owner_user")
     assert ret["new_status"] == "returned"
-    assert ret["returned_to_id"] == "owner_user" 
+    assert ret["returned_to_id"] == "owner_user"
 
 @pytest.mark.django_db
 def test_tc_wf_039():
@@ -576,7 +567,7 @@ def test_tc_wf_039():
     forward_file(fid, "rec_1", "Staff", "rec_2", "Director", "Step 2")
     ret = return_file(fid, "rec_2", "Director", "Return to rec_1", target_receiver_id="rec_1")
     assert ret["new_status"] == "returned"
-    assert ret["returned_to_id"] == "rec_1" 
+    assert ret["returned_to_id"] == "rec_1"
 
 @pytest.mark.django_db
 def test_tc_wf_040():
@@ -591,7 +582,7 @@ def test_tc_wf_040():
     forward_file(fid, "owner_user", "Officer", "rec_1", "Staff", "Step 1")
     return_file(fid, "rec_1", "Staff", "Back to owner", target_receiver_id="owner_user")
     arch = archive_file(fid, "owner_user", "Officer", "Archiving after return")
-    assert arch["status"] == "archived" 
+    assert arch["status"] == "archived"
 
 @pytest.mark.django_db
 def test_tc_wf_041():
@@ -609,7 +600,7 @@ def test_tc_wf_041():
     arch = archive_file(fid, "owner_user", "Officer", "Lifecycle closing archival")
     assert arch["status"] == "archived"
     f_obj = FTSFile.objects.get(id=fid)
-    assert f_obj.status == "archived" 
+    assert f_obj.status == "archived"
 
 @pytest.mark.django_db
 def test_tc_wf_042():
@@ -652,7 +643,7 @@ def test_tc_wf_044():
     draft = create_file_draft("owner_user", "Officer", "Composite 44", "Initial note")
     fid = draft["file_id"]
     fwd = forward_file(fid, "owner_user", "Officer", "rec_1", "Staff", "Direct send")
-    assert fwd["new_status"] == "in_transit" 
+    assert fwd["new_status"] == "in_transit"
 
 @pytest.mark.django_db
 def test_tc_wf_045():
@@ -666,7 +657,7 @@ def test_tc_wf_045():
     fid = draft["file_id"]
     update_file_draft(fid, "owner_user", subject="Updated 45")
     fwd = forward_file(fid, "owner_user", "Officer", "rec_1", "Staff", "Send after edit")
-    assert fwd["new_status"] == "in_transit" 
+    assert fwd["new_status"] == "in_transit"
 
 @pytest.mark.django_db
 def test_tc_wf_046():

@@ -5,28 +5,17 @@ a8_design/FR_DESIGN.json specification requirements (CFR & AFR).
 """
 
 import pytest
-from django.utils import timezone
-from modules.fts.models import FTSFile, FTSMovement, FTSComment, FTSAttachment
+
+from modules.fts.contracts import get_active_inbox_files_for_employees, get_files_by_uins
 from modules.fts.domain.workflow import (
-    validate_initial_file_data,
-    generate_file_uin,
     can_forward_file,
-    can_return_file,
-    can_archive_file,
-    can_edit_draft,
-    STATUS_DRAFT,
-    STATUS_IN_TRANSIT,
-    STATUS_RECEIVED,
-    STATUS_RETURNED,
-    STATUS_ARCHIVED,
 )
-from modules.fts.services.drafts import create_file_draft, update_file_draft, discard_file_draft
-from modules.fts.services.movements import forward_file, return_file
-from modules.fts.services.archival import archive_file
-from modules.fts.selectors.drafts import get_user_draft_files, get_draft_by_id
+from modules.fts.models import FTSAttachment, FTSFile
 from modules.fts.selectors.inbox_outbox import get_user_inbox_files, get_user_outbox_files
-from modules.fts.selectors.movements import get_file_movement_history, get_previous_senders_for_file
-from modules.fts.contracts import get_files_by_uins, get_active_inbox_files_for_employees
+from modules.fts.selectors.movements import get_file_movement_history
+from modules.fts.services.archival import archive_file
+from modules.fts.services.drafts import create_file_draft, discard_file_draft, update_file_draft
+from modules.fts.services.movements import forward_file, return_file
 
 
 @pytest.mark.django_db
@@ -116,7 +105,7 @@ def test_tc_fr_005():
     forward_file(fid, "emp_a", "Officer", "emp_b", "Director", "Fwd")
     return_file(fid, "emp_b", "Director", "Back to owner", target_receiver_id="emp_a")
     res = archive_file(fid, "emp_a", "Officer", "Completed archival")
-    assert res["status"] == "archived" 
+    assert res["status"] == "archived"
 
 @pytest.mark.django_db
 def test_tc_fr_006():
@@ -148,7 +137,7 @@ def test_tc_fr_007():
     draft = create_file_draft("faculty_1", "Assistant Professor", "Exam Papers", "Confidential", "urgent", "academic")
     assert draft["uin"].startswith("FTS-")
     f_obj = FTSFile.objects.get(id=draft["file_id"])
-    assert f_obj.creator_role == "Assistant Professor" 
+    assert f_obj.creator_role == "Assistant Professor"
 
 @pytest.mark.django_db
 def test_tc_fr_008():
@@ -291,7 +280,7 @@ def test_tc_fr_019():
     f1 = FTSFile.objects.get(id=d1["file_id"])
     f2 = FTSFile.objects.get(id=d2["file_id"])
     assert f1.creator_role == "Role_A"
-    assert f2.creator_role == "Role_B" 
+    assert f2.creator_role == "Role_B"
 
 @pytest.mark.django_db
 def test_tc_fr_020():
@@ -363,7 +352,7 @@ def test_tc_fr_025():
     updated = update_file_draft(fid, "emp_1", subject="Draft 1 Updated")
     assert updated["subject"] == "Draft 1 Updated"
     discarded = discard_file_draft(fid, "emp_1")
-    assert discarded["status"] == "discarded" 
+    assert discarded["status"] == "discarded"
 
 @pytest.mark.django_db
 def test_tc_fr_026():
@@ -374,7 +363,7 @@ def test_tc_fr_026():
     Test Type: positive
     """
     res = create_file_draft("emp_1", "Officer", "Draft 26", "Note")
-    assert res["status"] == "draft" 
+    assert res["status"] == "draft"
 
 @pytest.mark.django_db
 def test_tc_fr_027():
@@ -388,7 +377,7 @@ def test_tc_fr_027():
     fid = res["file_id"]
     up = update_file_draft(fid, "emp_1", subject="Subject 27 Edited", priority="urgent")
     assert up["subject"] == "Subject 27 Edited"
-    assert FTSFile.objects.get(id=fid).priority == "urgent" 
+    assert FTSFile.objects.get(id=fid).priority == "urgent"
 
 @pytest.mark.django_db
 def test_tc_fr_028():
@@ -462,7 +451,7 @@ def test_tc_fr_032():
     forward_file(fid, "emp_1", "Officer", "emp_2", "Reviewer", "To review")
     return_file(fid, "emp_2", "Reviewer", "Returning to sender", target_receiver_id="emp_1")
     f_obj = FTSFile.objects.get(id=fid)
-    assert f_obj.current_holder_id == "emp_1" 
+    assert f_obj.current_holder_id == "emp_1"
 
 @pytest.mark.django_db
 def test_tc_fr_033():
@@ -475,7 +464,7 @@ def test_tc_fr_033():
     res = create_file_draft("emp_1", "Officer", "File 33", "Init")
     fid = res["file_id"]
     res_fwd = forward_file(fid, "emp_1", "Officer", "emp_2", "Officer", "Sent to emp 2")
-    assert res_fwd["current_holder_id"] == "emp_2" 
+    assert res_fwd["current_holder_id"] == "emp_2"
 
 @pytest.mark.django_db
 def test_tc_fr_034():
@@ -488,7 +477,7 @@ def test_tc_fr_034():
     res = create_file_draft("emp_1", "Staff", "File 34", "Init")
     fid = res["file_id"]
     res_fwd = forward_file(fid, "emp_1", "Staff", "faculty_dean", "Dean", "To Dean directly")
-    assert res_fwd["current_holder_id"] == "faculty_dean" 
+    assert res_fwd["current_holder_id"] == "faculty_dean"
 
 @pytest.mark.django_db
 def test_tc_fr_035():
@@ -528,7 +517,7 @@ def test_tc_fr_037():
     res = create_file_draft("emp_1", "Officer", "File 37", "Init")
     fid = res["file_id"]
     res_fwd = forward_file(fid, "emp_1", "Officer", "emp_2", "Reviewer", "Valid comment")
-    assert res_fwd["current_holder_id"] == "emp_2" 
+    assert res_fwd["current_holder_id"] == "emp_2"
 
 @pytest.mark.django_db
 def test_tc_fr_038():
@@ -571,7 +560,7 @@ def test_tc_fr_040():
     fid = res["file_id"]
     forward_file(fid, "emp_1", "Officer", "emp_2", "Reviewer", "Fwd 1")
     fwd2 = forward_file(fid, "emp_2", "Reviewer", "emp_3", "Final Approver", "Fwd 2")
-    assert fwd2["current_holder_id"] == "emp_3" 
+    assert fwd2["current_holder_id"] == "emp_3"
 
 @pytest.mark.django_db
 def test_tc_fr_041():
@@ -585,7 +574,7 @@ def test_tc_fr_041():
     fid = res["file_id"]
     forward_file(fid, "emp_1", "Officer", "emp_2", "Reviewer", "Fwd 1")
     ret = return_file(fid, "emp_2", "Reviewer", "Returning to creator", target_receiver_id="emp_1")
-    assert ret["returned_to_id"] == "emp_1" 
+    assert ret["returned_to_id"] == "emp_1"
 
 @pytest.mark.django_db
 def test_tc_fr_042():
@@ -602,7 +591,7 @@ def test_tc_fr_042():
     hist = get_file_movement_history(fid)
     assert len(hist) == 3
     assert hist[1]["action"] == "forwarded"
-    assert hist[2]["action"] == "forwarded" 
+    assert hist[2]["action"] == "forwarded"
 
 @pytest.mark.django_db
 def test_tc_fr_043():
@@ -618,7 +607,7 @@ def test_tc_fr_043():
     return_file(fid, "emp_2", "Reviewer", "Ret", target_receiver_id="emp_1")
     hist = get_file_movement_history(fid)
     assert len(hist) == 3
-    assert hist[2]["action"] == "returned" 
+    assert hist[2]["action"] == "returned"
 
 @pytest.mark.django_db
 def test_tc_fr_044():
@@ -633,7 +622,7 @@ def test_tc_fr_044():
     fwd = forward_file(fid, "emp_1", "Officer", "emp_2", "Reviewer", "Fwd")
     assert fwd["current_holder_id"] == "emp_2"
     f_obj = FTSFile.objects.get(id=fid)
-    assert f_obj.current_holder_id == "emp_2" 
+    assert f_obj.current_holder_id == "emp_2"
 
 @pytest.mark.django_db
 def test_tc_fr_045():
@@ -648,7 +637,7 @@ def test_tc_fr_045():
     fwd = forward_file(fid, "emp_1", "Officer", "emp_2", "Reviewer", "Fwd")
     assert fwd["current_holder_id"] == "emp_2"
     f_obj = FTSFile.objects.get(id=fid)
-    assert f_obj.current_holder_id == "emp_2" 
+    assert f_obj.current_holder_id == "emp_2"
 
 @pytest.mark.django_db
 def test_tc_fr_046():
@@ -707,7 +696,7 @@ def test_tc_fr_049():
     forward_file(fid, "emp_1", "Officer", "emp_2", "Reviewer", "Fwd")
     inbox = get_user_inbox_files("emp_2")
     target = next(f for f in inbox if f["id"] == fid)
-    assert target["subject"] == "File 49" 
+    assert target["subject"] == "File 49"
 
 @pytest.mark.django_db
 def test_tc_fr_050():
@@ -722,7 +711,7 @@ def test_tc_fr_050():
     forward_file(fid, "emp_1", "Officer", "emp_2", "Reviewer", "Fwd")
     outbox = get_user_outbox_files("emp_1")
     target = next(f for f in outbox if f["id"] == fid)
-    assert target["subject"] == "File 50" 
+    assert target["subject"] == "File 50"
 
 @pytest.mark.django_db
 def test_tc_fr_051():
@@ -737,7 +726,7 @@ def test_tc_fr_051():
     forward_file(fid, "emp_1", "Officer", "emp_2", "Reviewer", "Fwd")
     # emp_2 acts on file in inbox
     res2 = forward_file(fid, "emp_2", "Reviewer", "emp_3", "Manager", "Pass along")
-    assert res2["current_holder_id"] == "emp_3" 
+    assert res2["current_holder_id"] == "emp_3"
 
 @pytest.mark.django_db
 def test_tc_fr_052():
@@ -810,7 +799,7 @@ def test_tc_fr_056():
     fid = res["file_id"]
     forward_file(fid, "emp_1", "Officer", "emp_2", "Reviewer", "Fwd")
     hist = get_file_movement_history(fid)
-    assert hist[-1]["from_user_id"] == "emp_1" 
+    assert hist[-1]["from_user_id"] == "emp_1"
 
 @pytest.mark.django_db
 def test_tc_fr_057():
@@ -824,7 +813,7 @@ def test_tc_fr_057():
     fid = res["file_id"]
     forward_file(fid, "emp_1", "Officer", "emp_2", "Reviewer", "Fwd")
     hist = get_file_movement_history(fid)
-    assert hist[-1]["to_user_id"] == "emp_2" 
+    assert hist[-1]["to_user_id"] == "emp_2"
 
 @pytest.mark.django_db
 def test_tc_fr_058():
@@ -911,7 +900,7 @@ def test_tc_fr_063():
     forward_file(fid, "emp_owner", "Officer", "emp_reviewer", "Reviewer", "Please review")
     return_file(fid, "emp_reviewer", "Reviewer", "Back", target_receiver_id="emp_owner")
     arch = archive_file(fid, "emp_owner", "Officer", "Archiving completed file")
-    assert arch["status"] == "archived" 
+    assert arch["status"] == "archived"
 
 @pytest.mark.django_db
 def test_tc_fr_064():
@@ -926,7 +915,7 @@ def test_tc_fr_064():
     forward_file(fid, "emp_owner", "Officer", "emp_reviewer", "Reviewer", "Please review")
     return_file(fid, "emp_reviewer", "Reviewer", "Back", target_receiver_id="emp_owner")
     arch = archive_file(fid, "emp_owner", "Officer", "Archiving completed file")
-    assert arch["status"] == "archived" 
+    assert arch["status"] == "archived"
 
 @pytest.mark.django_db
 def test_tc_fr_065():
@@ -955,7 +944,7 @@ def test_tc_fr_066():
     forward_file(fid, "emp_owner", "Officer", "emp_other", "Reviewer", "Fwd")
     return_file(fid, "emp_other", "Reviewer", "Back", target_receiver_id="emp_owner")
     arch = archive_file(fid, "emp_owner", "Officer", "Workflow complete")
-    assert arch["status"] == "archived" 
+    assert arch["status"] == "archived"
 
 @pytest.mark.django_db
 def test_tc_fr_067():
@@ -971,7 +960,7 @@ def test_tc_fr_067():
     return_file(fid, "emp_other", "Reviewer", "Back", target_receiver_id="emp_owner")
     archive_file(fid, "emp_owner", "Officer", "Archived permanently")
     f_obj = FTSFile.objects.get(id=fid)
-    assert f_obj.status == "archived" 
+    assert f_obj.status == "archived"
 
 @pytest.mark.django_db
 def test_tc_fr_068():
@@ -1106,7 +1095,7 @@ def test_tc_fr_076():
     forward_file(fid, "user_multi", "Role_2", "emp_x", "Role_X", "Switched role during forward")
     f_obj = FTSFile.objects.get(id=fid)
     assert f_obj.creator_id == "user_multi"
-    assert f_obj.creator_role == "Role_1" 
+    assert f_obj.creator_role == "Role_1"
 
 @pytest.mark.django_db
 def test_tc_fr_077():
@@ -1121,7 +1110,7 @@ def test_tc_fr_077():
     forward_file(fid, "user_multi", "Role_2", "emp_x", "Role_X", "Switched role during forward")
     f_obj = FTSFile.objects.get(id=fid)
     assert f_obj.creator_id == "user_multi"
-    assert f_obj.creator_role == "Role_1" 
+    assert f_obj.creator_role == "Role_1"
 
 @pytest.mark.django_db
 def test_tc_fr_078():
@@ -1449,5 +1438,5 @@ def test_tc_fr_102():
     """
     # FTS handles generic file tracking without embedding domain-specific approval business logic of callers
     res = create_file_draft("leave_app", "Applicant", "Medical Leave Track", "FTS only tracks files")
-    assert res["status"] == "draft" 
+    assert res["status"] == "draft"
 

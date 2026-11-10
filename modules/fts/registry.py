@@ -10,7 +10,36 @@ MODULE = {
     "status": "active",
 }
 
-NAV_ITEMS: list[dict] = []
+NAV_ITEMS: list[dict] = [
+    {
+        "code": "fts.inbox",
+        "label": "Inbox",
+        "icon": "FaClipboardCheck",
+        "to": "/fts/inbox",
+        "sort_order": 10,
+    },
+    {
+        "code": "fts.outbox",
+        "label": "Outbox",
+        "icon": "FaExternalLinkAlt",
+        "to": "/fts/outbox",
+        "sort_order": 20,
+    },
+    {
+        "code": "fts.drafts",
+        "label": "Drafts",
+        "icon": "FaClipboardList",
+        "to": "/fts/drafts",
+        "sort_order": 30,
+    },
+    {
+        "code": "fts.new",
+        "label": "New File",
+        "icon": "FaFileSignature",
+        "to": "/fts/new",
+        "sort_order": 40,
+    },
+]
 
 PERMISSIONS: list[tuple[str, str]] = []
 

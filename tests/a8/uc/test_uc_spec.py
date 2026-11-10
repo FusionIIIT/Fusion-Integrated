@@ -5,24 +5,17 @@ a8_design/UC_DESIGN.json specification requirements (Main, Alternative & Excepti
 """
 
 import pytest
-from modules.fts.models import FTSFile, FTSMovement, FTSComment, FTSAttachment
+
+from modules.fts.contracts import get_files_by_uins
 from modules.fts.domain.workflow import (
     can_forward_file,
-    can_return_file,
-    can_archive_file,
-    can_edit_draft,
-    STATUS_DRAFT,
-    STATUS_IN_TRANSIT,
-    STATUS_RETURNED,
-    STATUS_ARCHIVED,
 )
-from modules.fts.services.drafts import create_file_draft, update_file_draft, discard_file_draft
-from modules.fts.services.movements import forward_file, return_file
-from modules.fts.services.archival import archive_file
-from modules.fts.selectors.drafts import get_user_draft_files, get_draft_by_id
+from modules.fts.models import FTSAttachment, FTSFile
 from modules.fts.selectors.inbox_outbox import get_user_inbox_files, get_user_outbox_files
-from modules.fts.selectors.movements import get_file_movement_history, get_previous_senders_for_file
-from modules.fts.contracts import get_files_by_uins, get_active_inbox_files_for_employees
+from modules.fts.selectors.movements import get_file_movement_history
+from modules.fts.services.archival import archive_file
+from modules.fts.services.drafts import create_file_draft, discard_file_draft, update_file_draft
+from modules.fts.services.movements import forward_file, return_file
 
 
 @pytest.mark.django_db
@@ -107,7 +100,7 @@ def test_tc_uc_006():
     updated = update_file_draft(fid, "emp_user", subject="Updated Title")
     assert updated["subject"] == "Updated Title"
     f_obj = FTSFile.objects.get(id=fid)
-    assert f_obj.subject == "Updated Title" 
+    assert f_obj.subject == "Updated Title"
 
 @pytest.mark.django_db
 def test_tc_uc_007():
@@ -180,7 +173,7 @@ def test_tc_uc_011():
     forward_file(fid, "emp_user", "Staff", "emp_rec1", "Officer", "Step 1")
     fwd2 = forward_file(fid, "emp_rec1", "Officer", "emp_rec2", "Dean", "Step 2")
     assert fwd2["current_holder_id"] == "emp_rec2"
-    assert fwd2["new_status"] == "in_transit" 
+    assert fwd2["new_status"] == "in_transit"
 
 @pytest.mark.django_db
 def test_tc_uc_012():
@@ -374,7 +367,7 @@ def test_tc_uc_024():
     inbox = get_user_inbox_files("emp_user")
     assert not any(f["id"] == fid for f in inbox)
     f_obj = FTSFile.objects.get(id=fid)
-    assert f_obj.status == "archived" 
+    assert f_obj.status == "archived"
 
 @pytest.mark.django_db
 def test_tc_uc_025():
@@ -469,7 +462,7 @@ def test_tc_uc_030():
     arch = archive_file(fid, "emp_owner", "Staff", "Final archival")
     assert arch["status"] == "archived"
     f_obj = FTSFile.objects.get(id=fid)
-    assert f_obj.status == "archived" 
+    assert f_obj.status == "archived"
 
 @pytest.mark.django_db
 def test_tc_uc_031():
@@ -535,7 +528,7 @@ def test_tc_uc_034():
         forward_file(fid, "stranger", "Officer", "other", "Staff", "Rogue action")
     f_obj = FTSFile.objects.get(id=fid)
     assert f_obj.current_holder_id == "emp_rec"
-    assert f_obj.status == "in_transit" 
+    assert f_obj.status == "in_transit"
 
 @pytest.mark.django_db
 def test_tc_uc_035():
@@ -551,7 +544,7 @@ def test_tc_uc_035():
     assert f_obj.creator_role == "Role_Alpha"
     forward_file(fid, "emp_role_test", "Role_Alpha", "receiver", "Role_Beta", "Fwd under Role_Alpha")
     f_obj.refresh_from_db()
-    assert f_obj.creator_id == "emp_role_test" 
+    assert f_obj.creator_id == "emp_role_test"
 
 @pytest.mark.django_db
 def test_tc_uc_036():
@@ -564,7 +557,7 @@ def test_tc_uc_036():
     draft = create_file_draft("emp_single_role", "Faculty", "Single Role File", "Note")
     fid = draft["file_id"]
     f_obj = FTSFile.objects.get(id=fid)
-    assert f_obj.creator_role == "Faculty" 
+    assert f_obj.creator_role == "Faculty"
 
 @pytest.mark.django_db
 def test_tc_uc_037():
@@ -717,5 +710,5 @@ def test_tc_uc_048():
     """
     # Consuming module retains its own domain-specific business rules
     draft = create_file_draft("student_affairs", "Coordinator", "Scholarship Request", "Tracking only")
-    assert draft["status"] == "draft" 
+    assert draft["status"] == "draft"
 
