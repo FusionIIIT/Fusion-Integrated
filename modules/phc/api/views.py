@@ -2,153 +2,92 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from fusion_auth.permissions import HasPermission
-from modules.phc.models import ReimbursementClaim, AuditEvent
-from modules.phc.api.serializers import ReimbursementClaimSerializer, AuditEventSerializer
-from rest_framework.exceptions import NotFound
+from modules.phc.models import InventoryItem, Requisition
+from modules.phc.api.serializers import InventoryItemSerializer, RequisitionSerializer, DecisionSerializer
+from modules.phc.services.inventory import adjust_stock, create_requisition, decide_requisition, fulfill_requisition
 
-class ClaimListView(APIView):
-    permission_classes = [HasPermission("phc.reimbursement.create")]
+class InventoryListView(APIView):
+    permission_classes = [HasPermission("phc.inventory.view")]
 
     @extend_schema(
-        request=ReimbursementClaimSerializer,
-        responses={201: ReimbursementClaimSerializer}
+        responses={200: InventoryItemSerializer(many=True)}
+    )
+    def get(self, request):
+        qs = InventoryItem.objects.all().order_by("-name")
+        serializer = InventoryItemSerializer(qs, many=True)
+        return Response(serializer.data)
+
+class InventoryCreateView(APIView):
+    permission_classes = [HasPermission("phc.inventory.create")]
+
+    @extend_schema(
+        request=InventoryItemSerializer,
+        responses={201: InventoryItemSerializer}
     )
     def post(self, request):
-        serializer = ReimbursementClaimSerializer(data=request.data)
+        serializer = InventoryItemSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        claim = serializer.save()
+        inventory_item = serializer.save()
         return Response(serializer.data, status=201)
 
+class InventoryAdjustView(APIView):
+    permission_classes = [HasPermission("phc.inventory.update")]
+
     @extend_schema(
-        responses={200: ReimbursementClaimSerializer(many=True)}
+        request={"application/json": DecisionSerializer},
+        responses={200: InventoryItemSerializer}
     )
-    def get(self, request):
-        qs = ReimbursementClaim.objects.filter(claimant_user_id=request.user.user_id).order_by("-submitted_at")
-        serializer = ReimbursementClaimSerializer(qs, many=True)
-        return Response(serializer.data)
+    def post(self, request, pk):
+        inventory_item = InventoryItem.objects.get(id=pk)
+        serializer = DecisionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        adjust_stock(inventory_item, serializer.validated_data["delta"], serializer.validated_data["reason"], request.user.user_id)
+        return Response({"message": "Stock adjusted successfully"})
 
-class ClaimDetailView(APIView):
-    permission_classes = [HasPermission("phc.reimbursement.view")]
+class RequisitionListView(APIView):
+    permission_classes = [HasPermission("phc.requisition.create")]
 
     @extend_schema(
-        responses={200: ReimbursementClaimSerializer}
+        request=RequisitionSerializer,
+        responses={201: RequisitionSerializer}
+    )
+    def post(self, request):
+        serializer = RequisitionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        requisition = create_requisition(serializer.validated_data["lines"], request.user.user_id)
+        return Response(serializer.to_representation(requisition), status=201)
+
+class RequisitionDetailView(APIView):
+    permission_classes = [HasPermission("phc.requisition.view")]
+
+    @extend_schema(
+        responses={200: RequisitionSerializer}
     )
     def get(self, request, pk):
-        claim = ReimbursementClaim.objects.filter(id=pk, claimant_user_id=request.user.user_id).first()
-        if not claim:
-            raise NotFound("Claim not found")
-        serializer = ReimbursementClaimSerializer(claim)
+        requisition = Requisition.objects.get(id=pk)
+        serializer = RequisitionSerializer(requisition)
         return Response(serializer.data)
 
-class ClaimReviewListView(APIView):
-    permission_classes = [HasPermission("phc.reimbursement.review")]
+class RequisitionDecideView(APIView):
+    permission_classes = [HasPermission("phc.requisition.approve")]
 
     @extend_schema(
-        responses={200: ReimbursementClaimSerializer(many=True)}
-    )
-    def get(self, request):
-        qs = ReimbursementClaim.objects.filter(status="PENDING_PHC_REVIEW").order_by("-submitted_at")
-        serializer = ReimbursementClaimSerializer(qs, many=True)
-        return Response(serializer.data)
-
-class ClaimReviewView(APIView):
-    permission_classes = [HasPermission("phc.reimbursement.review")]
-
-    @extend_schema(
-        request=ReimbursementClaimSerializer,
-        responses={200: ReimbursementClaimSerializer}
+        request=DecisionSerializer,
+        responses={200: RequisitionSerializer}
     )
     def post(self, request, pk):
-        claim = ReimbursementClaim.objects.filter(id=pk).first()
-        if not claim:
-            raise NotFound("Claim not found")
-        serializer = ReimbursementClaimSerializer(claim, data=request.data)
+        serializer = DecisionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        claim = serializer.save()
-        return Response(serializer.data)
+        decision = serializer.validated_data["decision"]
+        decide_requisition(pk, decision, request.user.user_id)
+        return Response({"message": f"Requisition {pk} decided as {decision}"})
 
-class ClaimVerificationListView(APIView):
-    permission_classes = [HasPermission("phc.reimbursement_audit.review")]
-
-    @extend_schema(
-        responses={200: ReimbursementClaimSerializer(many=True)}
-    )
-    def get(self, request):
-        qs = ReimbursementClaim.objects.filter(status="PENDING_ACCOUNTS_VERIFICATION").order_by("-submitted_at")
-        serializer = ReimbursementClaimSerializer(qs, many=True)
-        return Response(serializer.data)
-
-class ClaimVerificationView(APIView):
-    permission_classes = [HasPermission("phc.reimbursement_audit.review")]
+class RequisitionFulfillView(APIView):
+    permission_classes = [HasPermission("phc.requisition.update")]
 
     @extend_schema(
-        request=ReimbursementClaimSerializer,
-        responses={200: ReimbursementClaimSerializer}
+        responses={200: RequisitionSerializer}
     )
     def post(self, request, pk):
-        claim = ReimbursementClaim.objects.filter(id=pk).first()
-        if not claim:
-            raise NotFound("Claim not found")
-        serializer = ReimbursementClaimSerializer(claim, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        claim = serializer.save()
-        return Response(serializer.data)
-
-class ClaimSanctionListView(APIView):
-    permission_classes = [HasPermission("phc.reimbursement.approve")]
-
-    @extend_schema(
-        responses={200: ReimbursementClaimSerializer(many=True)}
-    )
-    def get(self, request):
-        qs = ReimbursementClaim.objects.filter(status="PENDING_SANCTION").order_by("-submitted_at")
-        serializer = ReimbursementClaimSerializer(qs, many=True)
-        return Response(serializer.data)
-
-class ClaimSanctionView(APIView):
-    permission_classes = [HasPermission("phc.reimbursement.approve")]
-
-    @extend_schema(
-        request=ReimbursementClaimSerializer,
-        responses={200: ReimbursementClaimSerializer}
-    )
-    def post(self, request, pk):
-        claim = ReimbursementClaim.objects.filter(id=pk).first()
-        if not claim:
-            raise NotFound("Claim not found")
-        serializer = ReimbursementClaimSerializer(claim, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        claim = serializer.save()
-        return Response(serializer.data)
-
-class ClaimPaymentListView(APIView):
-    permission_classes = [HasPermission("phc.reimbursement_payment.create")]
-
-    @extend_schema(
-        request=ReimbursementClaimSerializer,
-        responses={200: ReimbursementClaimSerializer}
-    )
-    def post(self, request, pk):
-        claim = ReimbursementClaim.objects.filter(id=pk).first()
-        if not claim:
-            raise NotFound("Claim not found")
-        serializer = ReimbursementClaimSerializer(claim, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        claim = serializer.save()
-        return Response(serializer.data)
-
-class ClaimPaymentView(APIView):
-    permission_classes = [HasPermission("phc.reimbursement_payment.create")]
-
-    @extend_schema(
-        request=ReimbursementClaimSerializer,
-        responses={200: ReimbursementClaimSerializer}
-    )
-    def post(self, request, pk):
-        claim = ReimbursementClaim.objects.filter(id=pk).first()
-        if not claim:
-            raise NotFound("Claim not found")
-        serializer = ReimbursementClaimSerializer(claim, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        claim = serializer.save()
-        return Response(serializer.data)
+        fulfill_requisition(pk, request.user.user_id)
+        return Response({"message": f"Requisition {pk} fulfilled"})

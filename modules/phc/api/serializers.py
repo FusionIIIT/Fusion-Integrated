@@ -1,19 +1,27 @@
 from rest_framework import serializers
-from modules.phc.models import ReimbursementClaim, AuditEvent
+from modules.phc.models import InventoryItem, Requisition, RequisitionLine
 
-class ReimbursementClaimSerializer(serializers.ModelSerializer):
+class InventoryItemSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ReimbursementClaim
+        model = InventoryItem
         fields = [
-            "id", "claimant_user_id", "prescription", "expense_date",
-            "claimed_amount", "status", "submitted_at", "updated_at"
+            "id", "name", "unit", "quantity", "reorder_threshold"
         ]
-        read_only_fields = ["id", "claimant_user_id", "status", "submitted_at", "updated_at"]
+        read_only_fields = ["id"]
 
-class AuditEventSerializer(serializers.ModelSerializer):
+class RequisitionLineSerializer(serializers.Serializer):
+    inventory_item = serializers.PrimaryKeyRelatedField(queryset=InventoryItem.objects.all())
+    quantity = serializers.IntegerField(min_value=1)
+
+class RequisitionSerializer(serializers.ModelSerializer):
+    lines = RequisitionLineSerializer(many=True, required=False)
+    
     class Meta:
-        model = AuditEvent
+        model = Requisition
         fields = [
-            "entity_type", "entity_id", "action", "from_status", "to_status",
-            "actor_user_id", "note", "at"
+            "id", "requested_by_user_id", "status", "created_at", "decided_by_user_id", "decided_at", "lines"
         ]
+        read_only_fields = ["id", "created_at"]
+
+class DecisionSerializer(serializers.Serializer):
+    decision = serializers.ChoiceField(choices=[RequisitionState.APPROVED.value, RequisitionState.REJECTED.value])
