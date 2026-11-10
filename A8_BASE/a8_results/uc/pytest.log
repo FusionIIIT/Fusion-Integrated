@@ -1,0 +1,83 @@
+Failed to find real location of C:\Python313\python.exe
+.........................F....sssssssssssssssssssssssssssssssssssssssss  [100%]
+================================== FAILURES ===================================
+_______ test_tc_021_uc009_alt_a1_issue_blocked_when_reservation_invalid _______
+
+make_indent = <function make_indent.<locals>._make at 0x000001F8272098A0>
+make_stock_item = <function make_stock_item.<locals>._make at 0x000001F827209A80>
+
+    def test_tc_021_uc009_alt_a1_issue_blocked_when_reservation_invalid(make_indent, make_stock_item):
+        """TC-021 | PSM-UC-009 Alternative A1
+    
+        Reserved stock was invalidated by an inventory correction (stock now 0).
+        Expected: issue cannot proceed and no dispatch/approved state is recorded.
+        """
+        item = make_stock_item(central_stock=10, department_stock=0, reserved_stock=10)
+        StockItem.objects.filter(pk=item.pk).update(central_stock=0)
+        ind = make_indent(quantity=10)
+>       with pytest.raises((BadRequestError, NotFoundError)):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE any of (BadRequestError, NotFoundError)
+
+tests\a8\uc\test_uc_stock.py:72: Failed
+============================== warnings summary ===============================
+venv\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\venv\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_BACKEND setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+venv\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\venv\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_HOST setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+venv\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\venv\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_USE_TLS setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+venv\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\venv\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_PORT setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+venv\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\venv\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_HOST_USER setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+venv\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\venv\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_HOST_PASSWORD setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.7-final-0 _______________
+
+Name                                                                                                 Stmts   Miss Branch BrPart  Cover   Missing
+------------------------------------------------------------------------------------------------------------------------------------------------
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\__init__.py                          0      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\apps.py                              5      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\contracts.py                        20     11      6      1    38%   12-17, 36-41, 55
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\domain\__init__.py                   4      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\domain\duplicate_check.py            6      6      4      0     0%   1-12
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\domain\indent_state.py              27      2      4      2    87%   62, 64
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\domain\rules.py                     71     23     36     12    65%   17, 22, 27, 37-39, 45-47, 63-64, 78, 82, 86-87, 91, 92->74, 94->74, 97, 106, 120-124
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\domain\three_way_match.py           19     16      8      0    11%   31-62
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\migrations\0001_initial.py           6      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\migrations\__init__.py               0      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\models.py                           76      7      0      0    91%   17, 30, 66, 78, 103, 116, 136
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\registry.py                          9      9      0      0     0%   6-90
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\selectors\__init__.py                5      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\selectors\indents.py                22      7      6      1    64%   13-16, 27-28, 35
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\selectors\scoping.py                37     12     24      7    59%   15, 18-22, 28, 30, 47, 50-51, 67
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\selectors\stock.py                  19      7      4      0    61%   20-21, 26, 31-34
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\selectors\vendors.py                13      8      2      0    33%   12-15, 20-23
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\services\__init__.py                 4      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\services\indents.py                 82      6     28      7    88%   47, 82, 86, 128, 151, 156->160, 189
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\services\procurement.py             64     12     26     12    73%   28, 30, 33, 52, 77, 80, 87, 91, 95, 123, 128, 130
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\services\stock.py                   55      5     24      7    85%   22, 48, 50->68, 52->68, 83, 86, 90
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\tests\__init__.py                    0      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\tests\test_domain.py               108    108      4      0     0%   6-237
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\tests\test_services_and_api.py     104    104      0      0     0%   5-299
+------------------------------------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                                                  756    343    176     49    54%
+Coverage XML written to file a8_results/uc/coverage.xml
+=========================== short test summary info ===========================
+FAILED tests/a8/uc/test_uc_stock.py::test_tc_021_uc009_alt_a1_issue_blocked_when_reservation_invalid
+1 failed, 29 passed, 41 skipped, 6 warnings in 9.23s
