@@ -115,3 +115,68 @@ class ReimbursementPayment(models.Model):
 
     def __str__(self) -> str:
         return f"Payment for claim by u{self.claim.claimant_user_id} on {self.paid_on}"
+
+
+class InventoryItem(models.Model):
+    """Represents a medicine or consumable in stock (PHC-BR-07)."""
+
+    name = models.CharField(max_length=100)
+    unit = models.CharField(max_length=50)
+    quantity = models.IntegerField(default=0)
+    reorder_threshold = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = "phc_inventory_item"
+        ordering = ["name"]
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.quantity})"
+
+
+class StockAdjustment(models.Model):
+    """Logs an addition or deduction of stock (PHC-BR-07, PHC-BR-09)."""
+
+    inventory_item = models.ForeignKey(InventoryItem, related_name="adjustments", on_delete=models.CASCADE)
+    delta = models.IntegerField()
+    reason = models.CharField(max_length=300)
+    adjusted_by_user_id = models.IntegerField(null=True, blank=True)
+    at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "phc_stock_adjustment"
+        ordering = ["-at"]
+
+    def __str__(self) -> str:
+        return f"Adjustment of {self.inventory_item.name} by u{self.adjusted_by_user_id} on {self.at}"
+
+
+class Requisition(models.Model):
+    """A procurement request created by PHC staff (PHC-BR-10, PHC-BR-11)."""
+
+    requested_by_user_id = models.IntegerField(db_index=True)
+    status = models.CharField(max_length=40, default="PENDING_APPROVAL")
+    created_at = models.DateTimeField(auto_now_add=True)
+    decided_by_user_id = models.IntegerField(null=True, blank=True)
+    decided_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "phc_requisition"
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"Requisition by u{self.requested_by_user_id} on {self.created_at}"
+
+
+class RequisitionLine(models.Model):
+    """Line items inside a requisition (PHC-BR-10, PHC-BR-11)."""
+
+    requisition = models.ForeignKey(Requisition, related_name="lines", on_delete=models.CASCADE)
+    inventory_item = models.ForeignKey(InventoryItem, related_name="requisitions", on_delete=models.PROTECT)
+    quantity = models.PositiveIntegerField()
+
+    class Meta:
+        db_table = "phc_requisition_line"
+        ordering = ["-quantity"]
+
+    def __str__(self) -> str:
+        return f"Line item for {self.inventory_item.name} in requisition by u{self.requisition.requested_by_user_id}"
