@@ -120,14 +120,13 @@ class ReimbursementPayment(models.Model):
 class InventoryItem(models.Model):
     """Represents a medicine or consumable in stock (PHC-BR-07)."""
 
-    name = models.CharField(max_length=100)
-    unit = models.CharField(max_length=50)
+    name = models.CharField(max_length=120)
+    unit = models.CharField(max_length=20)
     quantity = models.IntegerField(default=0)
     reorder_threshold = models.IntegerField(default=0)
 
     class Meta:
         db_table = "phc_inventory_item"
-        ordering = ["name"]
 
     def __str__(self) -> str:
         return f"{self.name} ({self.quantity})"
@@ -136,32 +135,30 @@ class InventoryItem(models.Model):
 class StockAdjustment(models.Model):
     """Logs an addition or deduction of stock (PHC-BR-07, PHC-BR-09)."""
 
-    inventory_item = models.ForeignKey(InventoryItem, related_name="adjustments", on_delete=models.CASCADE)
+    item = models.ForeignKey(InventoryItem, related_name="adjustments", on_delete=models.CASCADE)
     delta = models.IntegerField()
-    reason = models.CharField(max_length=300)
-    adjusted_by_user_id = models.IntegerField(null=True, blank=True)
+    reason = models.CharField(max_length=200)
+    adjusted_by_user_id = models.IntegerField()
     at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "phc_stock_adjustment"
-        ordering = ["-at"]
 
     def __str__(self) -> str:
-        return f"Adjustment of {self.inventory_item.name} by u{self.adjusted_by_user_id} on {self.at}"
+        return f"Adjustment of {self.item.name} by u{self.adjusted_by_user_id} on {self.at}"
 
 
 class Requisition(models.Model):
     """A procurement request created by PHC staff (PHC-BR-10, PHC-BR-11)."""
 
     requested_by_user_id = models.IntegerField(db_index=True)
-    status = models.CharField(max_length=40, default="PENDING_APPROVAL")
+    status = models.CharField(max_length=32, default="PENDING_APPROVAL")
     created_at = models.DateTimeField(auto_now_add=True)
     decided_by_user_id = models.IntegerField(null=True, blank=True)
     decided_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = "phc_requisition"
-        ordering = ["-created_at"]
 
     def __str__(self) -> str:
         return f"Requisition by u{self.requested_by_user_id} on {self.created_at}"
@@ -171,92 +168,11 @@ class RequisitionLine(models.Model):
     """Line items inside a requisition (PHC-BR-10, PHC-BR-11)."""
 
     requisition = models.ForeignKey(Requisition, related_name="lines", on_delete=models.CASCADE)
-    inventory_item = models.ForeignKey(InventoryItem, related_name="requisitions", on_delete=models.PROTECT)
-    quantity = models.PositiveIntegerField()
+    item = models.ForeignKey(InventoryItem, related_name="requisitions", on_delete=models.PROTECT)
+    quantity = models.IntegerField()
 
     class Meta:
         db_table = "phc_requisition_line"
-        ordering = ["-quantity"]
 
     def __str__(self) -> str:
-        return f"Line item for {self.inventory_item.name} in requisition by u{self.requisition.requested_by_user_id}"
-
-
-class Doctor(models.Model):
-    """Doctor model with name and specialty."""
-
-    name = models.CharField(max_length=100)
-    specialty = models.CharField(max_length=100)
-
-    class Meta:
-        db_table = "phc_doctor"
-        ordering = ["name"]
-
-    def __str__(self) -> str:
-        return f"{self.name} ({self.specialty})"
-
-
-class ScheduleSlot(models.Model):
-    """Schedule slot for a doctor."""
-
-    doctor = models.ForeignKey(Doctor, related_name="slots", on_delete=models.CASCADE)
-    weekday = models.IntegerField(choices=[(i, i) for i in range(7)])
-    start_time = models.TimeField()
-    end_time = models.TimeField()
-    is_published = models.BooleanField(default=False)
-
-    class Meta:
-        db_table = "phc_schedule_slot"
-        ordering = ["weekday", "start_time"]
-
-    def __str__(self) -> str:
-        return f"{self.doctor.name} - {self.weekday} {self.start_time}-{self.end_time}"
-
-
-class DoctorAttendance(models.Model):
-    """Doctor attendance record."""
-
-    doctor = models.ForeignKey(Doctor, related_name="attendances", on_delete=models.CASCADE)
-    date = models.DateField()
-    status = models.CharField(max_length=10, choices=[("ARRIVED", "Arrived"), ("DEPARTED", "Departed")])
-    updated_by_user_id = models.IntegerField(null=True, blank=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = "phc_doctor_attendance"
-        unique_together = [("doctor", "date")]
-
-    def __str__(self) -> str:
-        return f"{self.doctor.name} - {self.date} {self.status}"
-
-
-class AmbulanceLog(models.Model):
-    """Ambulance log with details."""
-
-    logged_at = models.DateTimeField(auto_now_add=True)
-    patient_name = models.CharField(max_length=100)
-    destination = models.CharField(max_length=255)
-    recorded_by_user_id = models.IntegerField(null=True, blank=True)
-
-    class Meta:
-        db_table = "phc_ambulance_log"
-        ordering = ["-logged_at"]
-
-    def __str__(self) -> str:
-        return f"Ambulance log for {self.patient_name} at {self.destination}"
-
-
-class Announcement(models.Model):
-    """Announcement model with title and body."""
-
-    title = models.CharField(max_length=255)
-    body = models.TextField()
-    published_by_user_id = models.IntegerField(null=True, blank=True)
-    published_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = "phc_announcement"
-        ordering = ["-published_at"]
-
-    def __str__(self) -> str:
-        return f"{self.title} - {self.published_at}"
+        return f"Line item for {self.item.name} in requisition by u{self.requisition.requested_by_user_id}"
