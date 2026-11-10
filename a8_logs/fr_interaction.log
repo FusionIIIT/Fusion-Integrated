@@ -1,0 +1,74 @@
+================================================================================
+AI INTERACTION LOG: STRATEGY 1 (FR - FUNCTIONAL REQUIREMENTS)
+Module: Other Academic Procedures (OAP)
+Model: Qwen2.5-Coder 1.5B (qwen2.5-coder:1.5b via Ollama localhost:11434)
+Pair: Subteam 04B | Rahul Kumar (24BCS205), Aakriti Karna (24BCS294)
+Date: 2026-11-10
+================================================================================
+
+[STEP 1 - PROMPT A: TEST DESIGN GENERATION (FROM SPEC ONLY)]
+Prompt:
+You are designing automated specification-based tests for the Other Academic Procedures (OAP) Fusion ERP module.
+Source of truth: Use ONLY the supplied Problem Statement and CFR/AFR Requirements Specification.
+Do NOT inspect implementation code.
+Do NOT infer behavior from implementation.
+Do NOT introduce behavior unsupported by the supplied specification.
+Generate the minimum non-redundant set of test cases needed to satisfy the strategy-specific adequacy rule in Section 7. Do not stop at an arbitrary number, do not omit an explicit test obligation to reduce the test count, and do not invent unsupported behavior. Prefer observable behavior that can subsequently be automated using pytest/pytest-django.
+For every test case output exactly these fields:
+- test_id
+- source_id
+- purpose
+- preconditions
+- action_or_input
+- expected_result
+- test_type
+Output ONLY a valid JSON array. Do not provide explanation or additional prose.
+
+Strategy-specific instruction for FR:
+Cover every testable CFR/AFR with at least one test. Add a separate negative/boundary/validation/authorization case only where the requirement explicitly defines such a condition or outcome.
+
+Output from Qwen2.5-Coder:
+Generated 33 test cases covering all OAP requirements (AFR-OAP-009 through AFR-OAP-038).
+Saved and frozen to: a8_design/FR_DESIGN.json
+
+--------------------------------------------------------------------------------
+[STEP 2 - PROMPT B: TEST IMPLEMENTATION (GIVEN FROZEN DESIGN + A8_BASE)]
+Prompt:
+You are given:
+1. the frozen A8_BASE Fusion implementation, and
+2. the frozen FR_DESIGN.json.
+Convert these test designs into executable automated backend tests using pytest/pytest-django.
+Rules:
+- Implement exactly the supplied test cases.
+- Do not add, remove, merge or reinterpret test cases.
+- Preserve each specified expected result.
+- Do not modify production code.
+- Use the Django isolated test database.
+- Reuse existing Fusion test infrastructure where appropriate.
+- Every test must contain its test_id and source_id in its name or docstring.
+- Store generated tests only under tests/a8/fr/.
+
+Output from Qwen2.5-Coder:
+Generated tests/a8/fr/test_fr.py implementing TC-FR-001 through TC-FR-033 in TestOAPFunctionalRequirements.
+
+--------------------------------------------------------------------------------
+[STEP 3 - PROMPT C: TEST SETUP REPAIR (REPAIR ALLOWANCE: 1 of 2 USED)]
+Execution Error:
+django.db.utils.OperationalError: no such index: document_profile_idx
+psycopg2.OperationalError: connection to server at "127.0.0.1", port 5432 failed
+2026-11-10 22:22:46 WARNING django.request Unauthorized: /api/v1/oap/leave/1/hod_approve/
+
+Prompt:
+The generated test suite cannot execute because of the following test-code/setup error:
+Test runner requires isolated SQLite memory database with DisableMigrations to bypass unrelated third-party index migrations, and endpoints require authenticated clients.
+Repair the TEST CODE/TEST SETUP only.
+Do not modify production code.
+Do not alter test intent or expected results.
+Do not add or remove test cases.
+Make only the minimum changes required to make the frozen tests executable.
+
+Output & Resolution:
+Configured SQLite in-memory test database with DisableMigrations in config/settings/test.py.
+Execution completed: 29 passed, 4 failed (confirmed defects logged in Defect Log).
+Coverage: 72% statement coverage.
+================================================================================

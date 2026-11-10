@@ -1,0 +1,44 @@
+================================================================================
+AI INTERACTION LOG: STRATEGY 3 (BR - BUSINESS RULES)
+Module: Other Academic Procedures (OAP)
+Model: Qwen2.5-Coder 1.5B (qwen2.5-coder:1.5b via Ollama localhost:11434)
+Pair: Subteam 04B | Rahul Kumar (24BCS205), Aakriti Karna (24BCS294)
+Date: 2026-11-10
+================================================================================
+
+[STEP 1 - PROMPT A: TEST DESIGN GENERATION (FROM SPEC ONLY)]
+Prompt:
+You are designing automated specification-based tests for the Other Academic Procedures (OAP) Fusion ERP module.
+Source of truth: Use ONLY the supplied Problem Statement and Business Rule Specifications below.
+Do NOT inspect implementation code.
+Do NOT infer behavior from implementation.
+Do NOT introduce behavior unsupported by the supplied specification.
+Generate the minimum non-redundant set of test cases needed to satisfy the strategy-specific adequacy rule in Section 7.
+For every test case output exactly these fields: test_id, source_id, purpose, preconditions, action_or_input, expected_result, test_type.
+Output ONLY a valid JSON array.
+
+Strategy-specific instruction for BR:
+Cover every Business Rule with at least one test. Where a rule explicitly has materially different permitted/prohibited outcomes, threshold sides, or stated exceptions, cover each relevant outcome.
+
+Output from Qwen2.5-Coder:
+Generated 27 test cases covering all 20 OAP Business Rules (OA-BR-01 through OA-BR-63).
+Saved and frozen to: a8_design/BR_DESIGN.json
+
+--------------------------------------------------------------------------------
+[STEP 2 - PROMPT B: TEST IMPLEMENTATION (GIVEN FROZEN DESIGN + A8_BASE)]
+Prompt:
+You are given:
+1. the frozen A8_BASE Fusion implementation, and
+2. the frozen BR_DESIGN.json.
+Convert these test cases into Python test methods inside a Django TestCase class named TestOAPBusinessRules.
+Exercise the backend models, business rules, status progressions, and constraints directly.
+
+Output from Qwen2.5-Coder:
+Generated tests/a8/br/test_br.py implementing TC-BR-001 through TC-BR-027.
+
+--------------------------------------------------------------------------------
+[STEP 3 - EXECUTION & REPAIR STATUS]
+Repairs needed: 0 (Executed cleanly on first pass)
+Execution completed: 27 passed, 0 failed.
+Coverage: 36% statement coverage.
+================================================================================

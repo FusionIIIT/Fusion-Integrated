@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="11" skipped="40" tests="53" time="1.655" timestamp="2026-11-10T23:18:12.574841+05:30" hostname="panther"><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_001_OA_UC_01" time="0.657"><failure message="AssertionError: 404 != 200">self = &lt;test_uc.TestOAPUseCases testMethod=test_TC_UC_001_OA_UC_01&gt;
+
+    def test_TC_UC_001_OA_UC_01(self):
+        """
+        Test ID: TC-UC-001 | Source ID: OA-UC-01
+        Purpose: Ensure student can open the leave application function.
+        Expected: User is presented with the leave request input.
+        """
+        """Ensure student can open the leave application function."""
+        client = APIClient()
+        response = client.get('/api/oap/leave/')
+&gt;       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:28: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_002_OA_UC_01" time="0.004"><failure message="AssertionError: 404 != 200">self = &lt;test_uc.TestOAPUseCases testMethod=test_TC_UC_002_OA_UC_01&gt;
+
+    def test_TC_UC_002_OA_UC_01(self):
+        """
+        Test ID: TC-UC-002 | Source ID: OA-UC-01
+        Purpose: Ensure system displays the leave request input.
+        Expected: User is presented with the leave request input.
+        """
+        """Ensure system displays the leave request input."""
+        client = APIClient()
+        response = client.post('/api/oap/leave/', {'content': 'Leave request'})
+&gt;       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:39: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_003_OA_UC_01" time="0.003"><failure message="AssertionError: 404 != 200">self = &lt;test_uc.TestOAPUseCases testMethod=test_TC_UC_003_OA_UC_01&gt;
+
+    def test_TC_UC_003_OA_UC_01(self):
+        """
+        Test ID: TC-UC-003 | Source ID: OA-UC-01
+        Purpose: Ensure student can optionally attach supporting documents.
+        Expected: User can upload supporting documents if needed.
+        """
+        """Ensure student can optionally attach supporting documents."""
+        client = APIClient()
+        response = client.post('/api/oap/leave/', {'content': 'Leave request', 'file': 'path/to/document'})
+&gt;       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:50: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_004_OA_UC_01" time="0.004"><failure message="AssertionError: 404 != 200">self = &lt;test_uc.TestOAPUseCases testMethod=test_TC_UC_004_OA_UC_01&gt;
+
+    def test_TC_UC_004_OA_UC_01(self):
+        """
+        Test ID: TC-UC-004 | Source ID: OA-UC-01
+        Purpose: Ensure student can submit the application.
+        Expected: Application is submitted and made available to the HoD.
+        """
+        """Ensure student can submit the application."""
+        client = APIClient()
+        response = client.post('/api/oap/leave/', {'content': 'Leave request', 'file': 'path/to/document'})
+&gt;       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:61: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_005_OA_UC_01" time="0.003"><failure message="AssertionError: 404 != 200">self = &lt;test_uc.TestOAPUseCases testMethod=test_TC_UC_005_OA_UC_01&gt;
+
+    def test_TC_UC_005_OA_UC_01(self):
+        """
+        Test ID: TC-UC-005 | Source ID: OA-UC-01
+        Purpose: Ensure system records the submitted application.
+        Expected: Application is submitted and recorded by the system.
+        """
+        """Ensure system records the submitted application."""
+        client = APIClient()
+        response = client.post('/api/oap/leave/', {'content': 'Leave request', 'file': 'path/to/document'})
+&gt;       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:72: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_006_OA_UC_01" time="0.003"><failure message="AssertionError: 404 != 200">self = &lt;test_uc.TestOAPUseCases testMethod=test_TC_UC_006_OA_UC_01&gt;
+
+    def test_TC_UC_006_OA_UC_01(self):
+        """
+        Test ID: TC-UC-006 | Source ID: OA-UC-01
+        Purpose: Ensure system triggers the required submission notification.
+        Expected: Notification is triggered to the student.
+        """
+        """Ensure system triggers the required submission notification."""
+        client = APIClient()
+        response = client.post('/api/oap/leave/', {'content': 'Leave request', 'file': 'path/to/document'})
+&gt;       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:83: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_007_OA_UC_01" time="0.004"><failure message="AssertionError: 404 != 200">self = &lt;test_uc.TestOAPUseCases testMethod=test_TC_UC_007_OA_UC_01&gt;
+
+    def test_TC_UC_007_OA_UC_01(self):
+        """
+        Test ID: TC-UC-007 | Source ID: OA-UC-01
+        Purpose: Ensure submitted application is available to the HoD.
+        Expected: Application is made available to the HoD.
+        """
+        """Ensure submitted application is available to the HoD."""
+        client = APIClient()
+        response = client.post('/api/oap/leave/', {'content': 'Leave request', 'file': 'path/to/document'})
+&gt;       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:94: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_008_OA_UC_02" time="0.005"><failure message="AssertionError: 404 != 200">self = &lt;test_uc.TestOAPUseCases testMethod=test_TC_UC_008_OA_UC_02&gt;
+
+    def test_TC_UC_008_OA_UC_02(self):
+        """
+        Test ID: TC-UC-008 | Source ID: OA-UC-02
+        Purpose: Ensure HoD can open a submitted leave application.
+        Expected: HoD is presented with the submitted leave request.
+        """
+        """Ensure HoD can open a submitted leave application."""
+        client = APIClient()
+        response = client.get('/api/oap/leave/123/')
+&gt;       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:105: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_009_OA_UC_02" time="0.004"><failure message="AssertionError: 404 != 200">self = &lt;test_uc.TestOAPUseCases testMethod=test_TC_UC_009_OA_UC_02&gt;
+
+    def test_TC_UC_009_OA_UC_02(self):
+        """
+        Test ID: TC-UC-009 | Source ID: OA-UC-02
+        Purpose: Ensure system displays the submitted leave request.
+        Expected: HoD can view the submitted leave request.
+        """
+        """Ensure system displays the submitted leave request."""
+        client = APIClient()
+        response = client.get('/api/oap/leave/123/')
+&gt;       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:116: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_010_OA_UC_02" time="0.004"><failure message="AssertionError: 404 != 200">self = &lt;test_uc.TestOAPUseCases testMethod=test_TC_UC_010_OA_UC_02&gt;
+
+    def test_TC_UC_010_OA_UC_02(self):
+        """
+        Test ID: TC-UC-010 | Source ID: OA-UC-02
+        Purpose: Ensure HoD can review the application.
+        Expected: HoD can review the submitted leave request.
+        """
+        """Ensure HoD can review the application."""
+        client = APIClient()
+        response = client.put('/api/oap/leave/123/', {'status': 'approved'})
+&gt;       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:127: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_011_OA_UC_02" time="0.001"><skipped type="pytest.skip" message="NOT_AUTOMATED: Ensure HoD can record an Approve or Reject decision.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:130: NOT_AUTOMATED: Ensure HoD can record an Approve or Reject decision.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_012_OA_UC_02" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Ensure system records the decision and updates the application status.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:142: NOT_AUTOMATED: Ensure system records the decision and updates the application status.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_013_OA_UC_02" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Ensure system triggers the required decision notification to the student.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:154: NOT_AUTOMATED: Ensure system triggers the required decision notification to the student.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_014_OA_UC_03" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Ensure student can open the bonafide request function.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:166: NOT_AUTOMATED: Ensure student can open the bonafide request function.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_015_OA_UC_03" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Ensure system displays the bonafide request input.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:178: NOT_AUTOMATED: Ensure system displays the bonafide request input.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_016_OA_UC_03" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Ensure student can submit the request.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:190: NOT_AUTOMATED: Ensure student can submit the request.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_017_OA_UC_03" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Ensure system records the submitted request.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:202: NOT_AUTOMATED: Ensure system records the submitted request.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_018_OA_UC_03" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Ensure system triggers the required submission notification to the student.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:214: NOT_AUTOMATED: Ensure system triggers the required submission notification to the student.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_019_OA_UC_04" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Ensure student can view the current leave status and request history.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:226: NOT_AUTOMATED: Ensure student can view the current leave status and request history.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_020_OA_UC_21" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Verify the initiation of no-dues clearance and route verification in parallel to all seven mandatory clearance authorities.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:238: NOT_AUTOMATED: Verify the initiation of no-dues clearance and route verification in parallel to all seven mandatory clearance authorities.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_021_OA_UC_21" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:249: NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_022_OA_UC_21" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:259: NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_023_OA_UC_21" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:269: NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_024_OA_UC_21" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:279: NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_025_OA_UC_21" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:289: NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_026_OA_UC_22" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:299: NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_027_OA_UC_22" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:309: NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_028_OA_UC_22" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:319: NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_029_OA_UC_22" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:329: NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_030_OA_UC_22" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:339: NOT_AUTOMATED: No automated way to directly test UI navigation, page opening, or external email services.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_031_OA_UC_22" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Verify that an authority records that dues/obligations remain outstanding; the domain is not marked clear.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:349: NOT_AUTOMATED: Verify that an authority records that dues/obligations remain outstanding; the domain is not marked clear.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_032_OA_UC_23" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Verify that the consolidated seven-authority no-dues results and finalize clearance only when all seven required clearances are clear.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:359: NOT_AUTOMATED: Verify that the consolidated seven-authority no-dues results and finalize clearance only when all seven required clearances are clear.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_033_OA_UC_23" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Verify that the consolidated seven-authority no-dues results and finalize clearance only when all seven required clearances are clear.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:369: NOT_AUTOMATED: Verify that the consolidated seven-authority no-dues results and finalize clearance only when all seven required clearances are clear.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_034_OA_UC_23" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Verify that the consolidated seven-authority no-dues results and finalize clearance only when all seven required clearances are clear.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:379: NOT_AUTOMATED: Verify that the consolidated seven-authority no-dues results and finalize clearance only when all seven required clearances are clear.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_035_OA_UC_23" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Verify that the consolidated seven-authority no-dues results and finalize clearance only when all seven required clearances are clear.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:389: NOT_AUTOMATED: Verify that the consolidated seven-authority no-dues results and finalize clearance only when all seven required clearances are clear.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_036_OA_UC_23" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Verify that the consolidated seven-authority no-dues results and finalize clearance only when all seven required clearances are clear.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:399: NOT_AUTOMATED: Verify that the consolidated seven-authority no-dues results and finalize clearance only when all seven required clearances are clear.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_037_OA_UC_23" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Verify that finalization cannot be persisted; previous statuses are retained.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:409: NOT_AUTOMATED: Verify that finalization cannot be persisted; previous statuses are retained.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_038_OA_UC_31" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Testing the main success flow for submitting an assistantship claim.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:419: NOT_AUTOMATED: Testing the main success flow for submitting an assistantship claim.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_039_OA_UC_31" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Testing the system acceptance of the claim information.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:429: NOT_AUTOMATED: Testing the system acceptance of the claim information.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_040_OA_UC_31" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Testing the system routing the claim to both the assigned Thesis Supervisor and assigned TA Supervisor for role-specific verification.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:439: NOT_AUTOMATED: Testing the system routing the claim to both the assigned Thesis Supervisor and assigned TA Supervisor for role-specific verification.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_041_OA_UC_31" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Student is within PG scope.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:449: NOT_AUTOMATED: Student is within PG scope.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_042_OA_UC_31" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Supervisor reviews the claim.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:459: NOT_AUTOMATED: Supervisor reviews the claim.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_043_OA_UC_31" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Supervisor records verification for that role.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:469: NOT_AUTOMATED: Supervisor records verification for that role.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_044_OA_UC_31" time="0.001"><skipped type="pytest.skip" message="NOT_AUTOMATED: System records the forwarding state and triggers the relevant notification.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:479: NOT_AUTOMATED: System records the forwarding state and triggers the relevant notification.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_045_OA_UC_31" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: System displays the claim and both supervisor-role verifications.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:489: NOT_AUTOMATED: System displays the claim and both supervisor-role verifications.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_046_OA_UC_51" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: PG student opens the seminar scheduling request.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:499: NOT_AUTOMATED: PG student opens the seminar scheduling request.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_047_OA_UC_51" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: The system triggers the required submission notification.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:509: NOT_AUTOMATED: The system triggers the required submission notification.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_048_OA_UC_53" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Department Administrator opens a pending seminar scheduling request and determines the seminar schedule successfully.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:519: NOT_AUTOMATED: Department Administrator opens a pending seminar scheduling request and determines the seminar schedule successfully.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_049_OA_UC_53" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: The system triggers relevant notifications for the scheduled seminar.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:529: NOT_AUTOMATED: The system triggers relevant notifications for the scheduled seminar.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_050_OA_UC_54" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: An authorized user opens the seminar schedule and displays the available seminar schedule successfully.">C:\Users\rahul\Downloads\4-OtherAcademicProcedure-20260906T090256Z-1-001\4-OtherAcademicProcedure\Phase2_ELM_Subteam_04B\tests\a8\uc\test_uc.py:539: NOT_AUTOMATED: An authorized user opens the seminar schedule and displays the available seminar schedule successfully.</skipped></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_051_OA_UC_54" time="0.015"><failure message="AssertionError: 404 != 200">self = &lt;test_uc.TestOAPUseCases testMethod=test_TC_UC_051_OA_UC_54&gt;
+
+    def test_TC_UC_051_OA_UC_54(self):
+        """
+        Test ID: TC-UC-051 | Source ID: OA-UC-54
+        Purpose: Verify that the system displays an empty schedule if no scheduled seminars exist.
+        Expected: The system displays an empty schedule.
+        """
+        """Verify that the system displays an empty schedule if no scheduled seminars exist."""
+        # Assuming the API client and necessary setup for viewing seminar schedules
+        client = APIClient()
+        response = client.get('/seminar/schedule')
+&gt;       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:559: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_052_OA_UC_91" time="0.002" /><testcase classname="tests.a8.uc.test_uc.TestOAPUseCases" name="test_TC_UC_053_OA_UC_92" time="0.002" /></testsuite></testsuites>
