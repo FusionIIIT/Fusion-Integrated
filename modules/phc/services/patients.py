@@ -1,11 +1,11 @@
 from django.db import transaction, IntegrityError
-from rest_framework.exceptions import BadRequestError
+from core.api.exceptions import BadRequestError  # Updated import
 from modules.phc.models import PatientVisit, Prescription, AuditEvent
 from modules.phc.services.common import record_audit
 
 def record_patient_visit_and_prescription(patient_user_id: int, notes: str, prescription_details: str, recorded_by_user_id: int) -> None:
     if not notes or not prescription_details:
-        raise BadRequestError("Notes and prescription details cannot be blank")
+        raise BadRequestError("Notes and prescription details cannot be blank")  # Updated arguments
 
     with transaction.atomic():
         visit = PatientVisit.objects.create(

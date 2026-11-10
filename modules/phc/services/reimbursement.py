@@ -1,7 +1,7 @@
 from django.db import transaction
 from rest_framework.exceptions import NotFound
 
-from core.api.exceptions import BadRequestError
+from core.api.exceptions import BadRequestError  # Updated import
 from modules.phc.domain.reimbursement import (
     PENDING_PHC_REVIEW,
     PENDING_ACCOUNTS_VERIFICATION,
@@ -18,7 +18,7 @@ from modules.phc.services.common import record_audit, notify
 def submit_claim(prescription_id: int, claimant_user_id: int) -> ReimbursementClaim:
     """Submit a reimbursement claim."""
     from django.conf import settings
-    from core.api.exceptions import BadRequestError
+    from core.api.exceptions import BadRequestError  # Updated import
 
     window_days = getattr(settings, "PHC_REIMBURSEMENT_WINDOW_DAYS", 30)
     prescription = Prescription.objects.filter(id=prescription_id).first()
@@ -44,7 +44,7 @@ def submit_claim(prescription_id: int, claimant_user_id: int) -> ReimbursementCl
 
 def advance_claim(claim_id: int, action: str, actor_user_id: int) -> ReimbursementClaim:
     """Advance a reimbursement claim through review."""
-    from core.api.exceptions import BadRequestError
+    from core.api.exceptions import BadRequestError  # Updated import
 
     claim = ReimbursementClaim.objects.filter(id=claim_id).first()
     if not claim:
@@ -66,7 +66,7 @@ def advance_claim(claim_id: int, action: str, actor_user_id: int) -> Reimburseme
 
 def record_payment(claim_id: int, paid_on: str, reference: str, actor_user_id: int) -> ReimbursementClaim:
     """Record payment for a reimbursement claim."""
-    from core.api.exceptions import BadRequestError
+    from core.api.exceptions import BadRequestError  # Updated import
 
     claim = ReimbursementClaim.objects.filter(id=claim_id).first()
     if not claim:
