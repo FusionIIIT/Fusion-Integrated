@@ -1,0 +1,467 @@
+You are designing automated specification-based tests for the LMS (Course Management) Fusion ERP module.
+
+Source of truth: Use ONLY the supplied Problem Statement and Use Cases from the Use Case Specifications.
+Do NOT inspect implementation code.
+Do NOT infer behavior from implementation.
+Do NOT introduce behavior unsupported by the supplied specification.
+Generate the minimum non-redundant set of test cases needed to satisfy the strategy-specific adequacy rule below. Do not stop at an arbitrary number, do not omit an explicit test obligation to reduce the test count, and do not invent unsupported behavior. Prefer observable behavior that can subsequently be automated using pytest/pytest-django.
+
+For every test case output exactly these fields:
+- test_id
+- source_id
+- purpose
+- preconditions
+- action_or_input
+- expected_result
+- test_type
+- source_id must identify the exact obligation covered (for example: AFR-03, UC-05 Main Flow, UC-05 Alternative A1, BR-07 condition-false, WF-02 approval-rejected path).
+
+Output ONLY a valid JSON array. Do not provide explanation or additional prose.
+
+=== STRATEGY-SPECIFIC ADEQUACY RULE (apply exactly) ===
+Cover the main success flow of every Use Case and every explicitly specified alternative/exception flow with at least one test. Do not invent additional flows.
+
+Test obligation = one explicitly specified behavior/flow/rule/path that the rule above requires to be tested. A single test may cover more than one closely related obligation, but unrelated obligations should not be merged merely to reduce the number of tests.
+
+=== PROBLEM STATEMENT (v1.0, unchanged) ===
+[Title] LMS (Course Management)
+Problem Statement
+--- TABLE ---
+Module | LMS (Course Management) | Status | DRAFT
+Version | v1.0 | Date | 2026-08-31
+--- END TABLE ---
+[Heading 1] 1. Overview
+Right now, when a student opens a course in Fusion, they just see basic course info. This module, LMS (Course Management), adds a proper course page for every course, similar to how Canvas works. When a student clicks on a course they are registered in, it opens that course's own page with its details, materials, announcements, and assignments, all in one place.
+Inside a course page, students can view materials, read announcements, submit assignments, and check their grades. Faculty can post materials and announcements, create assignments, and grade student submissions. TAs help with grading and posting updates. Observers can only view the course, without touching or seeing student-specific data.
+This module uses the course registration data that already exists in Fusion. It does not change how registration, add/drop, or the academic calendar work. The focus here is simple: the right people should see the right course content, and assignments should move smoothly from posted to submitted to graded.
+[Heading 1] 2. Actors
+[Heading 2] 2.1 Student
+[List Paragraph] Views course details, materials, and announcements for courses they are registered in.
+[List Paragraph] Views and downloads published assignments.
+[List Paragraph] Submits assignment work within the configured submission window.
+[List Paragraph] Views their own submission status and grade/feedback once released.
+[Heading 2] 2.2 Faculty
+[List Paragraph] Owns and configures the course workspace for assigned courses.
+[List Paragraph] Publishes and edits course details and materials.
+[List Paragraph] Posts announcements.
+[List Paragraph] Creates, edits, and publishes assignments, including due date, instructions, submission type, and points possible.
+[List Paragraph] Grades submissions and releases grades/feedback to students.
+[Heading 2] 2.3 Teaching Assistant (TA)
+[List Paragraph] Views course details, materials, and announcements.
+[List Paragraph] Posts announcements where permitted by Faculty for the course.
+[List Paragraph] Views student submissions for the assigned course.
+[List Paragraph] Grades submissions; grading actions are attributed to the TA.
+[List Paragraph] Cannot create or edit assignments, materials, or course structure.
+[Heading 2] 2.4 Observer
+[List Paragraph] Has read-only access to course details, materials, and announcements for a course they are linked to.
+[List Paragraph] Cannot view individual student submissions, grades, or any other student-specific data.
+[List Paragraph] Has no write access anywhere in the module.
+[Heading 1] 3. Functional Scope
+[Heading 2] 3.1 Course Access and Details
+[List Paragraph] Clicking a registered course opens a dedicated course workspace (course home page).
+[List Paragraph] Course home displays syllabus, schedule, instructor(s), and TA(s) for the course.
+[List Paragraph] Access to a course workspace is restricted to users enrolled in, or linked to, that specific course.
+[Heading 2] 3.2 Course Materials
+[List Paragraph] Faculty upload and organize materials (files, links, notes) into modules or weekly sections.
+[List Paragraph] Materials may be scheduled for a future release date.
+[List Paragraph] Students, TAs, and Observers have read-only access to published materials.
+[Heading 2] 3.3 Announcements
+[List Paragraph] Faculty, and TAs where permitted, post course-wide announcements.
+[List Paragraph] Announcements are timestamped and visible to all users enrolled in, or linked to, the course.
+[List Paragraph] Notification delivery channel for new announcements is to be defined.
+[Heading 2] 3.4 Assignments
+[List Paragraph] Faculty create assignments with a due date, instructions, submission type, and points possible.
+[List Paragraph] Assignments have a draft state before they are published to students.
+[List Paragraph] Assignment visibility to students follows the configured release date.
+[Heading 2] 3.5 Assignment Submission
+[List Paragraph] Students submit work (file, text, or link, per the assignment's configured submission type) before the due date.
+[List Paragraph] Late-submission handling is to be defined (e.g., blocked, flagged as late, or admin-overridable).
+[List Paragraph] Students can view their own submission history and status (submitted, late, missing).
+[List Paragraph] Resubmission policy is to be defined.
+[Heading 2] 3.6 Grading
+[List Paragraph] Faculty and TAs grade individual submissions and enter points and feedback.
+[List Paragraph] Grades are held in a draft state until released; students cannot see a grade before release.
+[List Paragraph] Once released, students view their grade and feedback in read-only form.
+[List Paragraph] Grade changes made after release are logged, recording who made the change and when.
+[Heading 1] 4. Out of Scope for the Current Baseline
+[List Paragraph] Course registration, add/drop, and waitlist management (handled by the existing academic-registration functionality).
+[List Paragraph] Final result computation and official grade-sheet publication (handled by the Examination (EX) module).
+[List Paragraph] Plagiarism detection or originality checking.
+[List Paragraph] Live classes, video conferencing, or real-time chat.
+[List Paragraph] Discussion forums or Q&A boards.
+[List Paragraph] Peer review or peer grading.
+[List Paragraph] Rubric-based structured grading (single score plus feedback only, for this baseline).
+[List Paragraph] Group assignments and group submissions.
+[Heading 1] 5. Open Questions for Discussion
+[List Paragraph] Exact late-submission policy: hard block, flag-as-late, or Faculty/admin override.
+[List Paragraph] Whether TA announcement and grading permissions are configurable per course or fixed for all courses.
+[List Paragraph] Notification channel(s) for announcements and grade release (email, in-app, or both).
+[List Paragraph] Whether an Observer account is linked to one specific student or to an entire course section.
+[List Paragraph] Resubmission policy: number of attempts allowed, and whether late resubmissions are treated differently.
+
+=== Use Cases from the Use Case Specifications ===
+[Title] LMS (Course Management)
+Use Case Specifications — Version 1.0
+SYNCHRONIZED DRAFT — open PS questions retained
+[Heading 1] 1. Scope and conventions
+These Use Cases are derived only from LMS (Course Management) Problem Statement v1.0. Actor-triggered and event-triggered services use one common UC formalism. The LMS system is not its own UC actor. Unresolved late-submission, resubmission, notification, TA-permission, Observer-linkage, and post-release-grade-change matters remain explicit issues rather than invented behavior.
+[Heading 1] 2. Use Case Registrys
+--- TABLE ---
+UC ID | Use Case Name | UC Type | Primary Actor | Related CFRs | Related WFs
+UC-LMS-001 | Access Course Workspace | Actor-triggered | Student / Faculty / TA / Observer (role-specific authorized course user) |  | N/A
+UC-LMS-002 | Manage Course Details | Actor-triggered | Faculty |  | N/A
+UC-LMS-003 | Manage Course Materials | Actor-triggered | Faculty |  | BW-LMS-01 when future release is configured
+UC-LMS-004 | View Published Course Materials | Actor-triggered | Student / TA / Observer |  | N/A
+UC-LMS-005 | Post Course Announcement | Actor-triggered | Faculty / permitted TA |  | N/A
+UC-LMS-006 | View Course Announcements | Actor-triggered | Student / Faculty / TA / Observer |  | N/A
+UC-LMS-007 | Create or Edit Assignment | Actor-triggered | Faculty |  | BW-LMS-02, BW-LMS-03; CW-LMS-01
+UC-LMS-008 | Publish Assignment | Actor-triggered | Faculty |  | BW-LMS-02, BW-LMS-03; CW-LMS-01
+UC-LMS-009 | View or Download Published Assignment | Actor-triggered | Student |  | N/A
+UC-LMS-010 | Submit Assignment | Actor-triggered | Student |  | BW-LMS-02, BW-LMS-03; CW-LMS-01
+UC-LMS-011 | View Submission History and Status | Actor-triggered | Student |  | N/A
+UC-LMS-012 | Grade Submission | Actor-triggered | Faculty / TA |  | BW-LMS-04, BW-LMS-05; CW-LMS-02
+UC-LMS-013 | Release Grades and Feedback | Actor-triggered | Faculty |  | BW-LMS-04, BW-LMS-05; CW-LMS-02
+UC-LMS-014 | View Released Grade and Feedback | Actor-triggered | Student |  | N/A
+UC-LMS-015 | Process Scheduled Content Release | Event-triggered | N.A. — Event-triggered |  | BW-LMS-01, BW-LMS-03; CW-LMS-01
+--- END TABLE ---
+[Heading 2] UC-LMS-001 — Access Course Workspace
+--- TABLE ---
+UC Type | Actor-triggered
+Primary Actor | Student / Faculty / TA / Observer (role-specific authorized course user)
+Supporting Actors / Systems | Existing course-registration/association data source
+Goal / Description | Open the dedicated workspace for a course the user is authorized to access and view course-home information.
+Trigger | User selects a course from Fusion.
+Preconditions | Course exists; user is enrolled in, assigned to, or linked to the course according to available source data.
+Success Postcondition | Authorized user views the course home.
+Failure / Minimal Guarantee | No unauthorized course content is exposed.
+Related Business Rules | BR-LMS-001, BR-LMS-002, BR-LMS-003, BR-LMS-004
+Related CFRs | 
+Related Workflow(s) | N/A
+--- END TABLE ---
+[Heading 3] Main Success Scenario
+[List Bullet] 1. System identifies the selected course and requesting user.
+[List Bullet] 2. System validates course-specific access.
+[List Bullet] 3. System opens the dedicated course workspace.
+[List Bullet] 4. System displays syllabus, schedule, instructor(s), and TA(s).
+[Heading 3] Alternative Flows
+[List Bullet] If access is not authorized for the selected course, access is denied.
+[Heading 3] Exception Flows
+[List Bullet] If authoritative registration/link data are unavailable, the system cannot confirm access and shall not expose the workspace.
+[Heading 2] UC-LMS-002 — Manage Course Details
+--- TABLE ---
+UC Type | Actor-triggered
+Primary Actor | Faculty
+Supporting Actors / Systems | N/A
+Goal / Description | Configure the assigned course workspace and publish/edit course details.
+Trigger | Faculty opens course-management controls for an assigned course.
+Preconditions | Faculty is assigned to the course.
+Success Postcondition | Course details are updated for the assigned course.
+Failure / Minimal Guarantee | Existing course details remain unchanged.
+Related Business Rules | BR-LMS-001, BR-LMS-004
+Related CFRs | 
+Related Workflow(s) | N/A
+--- END TABLE ---
+[Heading 3] Main Success Scenario
+[List Bullet] 1. System verifies Faculty authorization for the course.
+[List Bullet] 2. Faculty edits/configures course workspace details.
+[List Bullet] 3. Faculty saves/publishes the changes.
+[List Bullet] 4. System stores and presents the updated course details.
+[Heading 3] Alternative Flows
+[List Bullet] Faculty may edit previously published course details.
+[Heading 3] Exception Flows
+[List Bullet] Unauthorized Faculty-course combinations are rejected.
+[Heading 2] UC-LMS-003 — Manage Course Materials
+--- TABLE ---
+UC Type | Actor-triggered
+Primary Actor | Faculty
+Supporting Actors / Systems | N/A
+Goal / Description | Add and organize course materials and optionally schedule their release.
+Trigger | Faculty opens material-management controls for an assigned course.
+Preconditions | Faculty is assigned to the course.
+Success Postcondition | Material is saved as published or scheduled according to Faculty choice.
+Failure / Minimal Guarantee | No invalid or unauthorized material change is committed.
+Related Business Rules | BR-LMS-004, BR-LMS-005, BR-LMS-006
+Related CFRs | 
+Related Workflow(s) | BW-LMS-01 when future release is configured
+--- END TABLE ---
+[Heading 3] Main Success Scenario
+[List Bullet] 1. Faculty adds a file, link, or note.
+[List Bullet] 2. Faculty places the material in a module or weekly section.
+[List Bullet] 3. Faculty chooses publication/release timing.
+[List Bullet] 4. System validates and saves the material configuration.
+[List Bullet] 5. If immediate publication is selected, the system makes the material published; if future release is selected, the system marks it Scheduled.
+[Heading 3] Alternative Flows
+[List Bullet] Faculty may edit/reorganize existing material.
+[Heading 3] Exception Flows
+[List Bullet] TA/Observer/Student write attempts are rejected.
+[Heading 2] UC-LMS-004 — View Published Course Materials
+--- TABLE ---
+UC Type | Actor-triggered
+Primary Actor | Student / TA / Observer
+Supporting Actors / Systems | N/A
+Goal / Description | View published course materials for an authorized course.
+Trigger | User opens the Materials area.
+Preconditions | User has course access; material is published.
+Success Postcondition | User views published material.
+Failure / Minimal Guarantee | Unpublished or unauthorized material is not exposed.
+Related Business Rules | BR-LMS-001, BR-LMS-003, BR-LMS-004, BR-LMS-005
+Related CFRs | 
+Related Workflow(s) | N/A
+--- END TABLE ---
+[Heading 3] Main Success Scenario
+[List Bullet] 1. System lists published materials available to the user.
+[List Bullet] 2. User opens a material item.
+[List Bullet] 3. System displays the material in read-only form.
+[Heading 3] Alternative Flows
+[List Bullet] Scheduled/unpublished material is omitted until released.
+[Heading 3] Exception Flows
+[List Bullet] Unauthorized course access is denied.
+[Heading 2] UC-LMS-005 — Post Course Announcement
+--- TABLE ---
+UC Type | Actor-triggered
+Primary Actor | Faculty / permitted TA
+Supporting Actors / Systems | N/A
+Goal / Description | Post a course-wide announcement.
+Trigger | Authorized poster chooses to create an announcement.
+Preconditions | Poster has access to the course; if poster is TA, TA announcement permission applies.
+Success Postcondition | Timestamped announcement is visible to authorized course users.
+Failure / Minimal Guarantee | No unauthorized announcement is posted.
+Related Business Rules | BR-LMS-007, BR-LMS-008
+Related CFRs | 
+Related Workflow(s) | N/A
+--- END TABLE ---
+[Heading 3] Main Success Scenario
+[List Bullet] 1. Poster enters announcement content.
+[List Bullet] 2. System verifies posting authority.
+[List Bullet] 3. Poster submits the announcement.
+[List Bullet] 4. System timestamps and stores the announcement.
+[List Bullet] 5. System makes it visible course-wide.
+[Heading 3] Alternative Flows
+[List Bullet] TA posting is allowed only where permitted.
+[Heading 3] Exception Flows
+[List Bullet] Unauthorized posting is rejected.
+[Heading 2] UC-LMS-006 — View Course Announcements
+--- TABLE ---
+UC Type | Actor-triggered
+Primary Actor | Student / Faculty / TA / Observer
+Supporting Actors / Systems | N/A
+Goal / Description | Read course-wide announcements for an authorized course.
+Trigger | User opens the Announcements area.
+Preconditions | User has authorized course access.
+Success Postcondition | User views course announcements.
+Failure / Minimal Guarantee | Unauthorized announcements are not exposed.
+Related Business Rules | BR-LMS-001, BR-LMS-008
+Related CFRs | 
+Related Workflow(s) | N/A
+--- END TABLE ---
+[Heading 3] Main Success Scenario
+[List Bullet] 1. System retrieves course announcements.
+[List Bullet] 2. System displays announcements with timestamps.
+[List Bullet] 3. User reads announcement content.
+[Heading 3] Exception Flows
+[List Bullet] Unauthorized course access is denied.
+[Heading 2] UC-LMS-007 — Create or Edit Assignment
+--- TABLE ---
+UC Type | Actor-triggered
+Primary Actor | Faculty
+Supporting Actors / Systems | N/A
+Goal / Description | Create or edit an assignment and maintain it in Draft state until publication.
+Trigger | Faculty opens assignment authoring for an assigned course.
+Preconditions | Faculty is assigned to the course.
+Success Postcondition | Valid assignment is saved in Draft state.
+Failure / Minimal Guarantee | Invalid/unauthorized changes are not committed.
+Related Business Rules | BR-LMS-004, BR-LMS-009, BR-LMS-010
+Related CFRs | 
+Related Workflow(s) | BW-LMS-02, BW-LMS-03; CW-LMS-01
+--- END TABLE ---
+[Heading 3] Main Success Scenario
+[List Bullet] 1. Faculty creates a new assignment or opens an existing editable assignment.
+[List Bullet] 2. Faculty enters/updates due date, instructions, submission type, and points possible.
+[List Bullet] 3. System validates required assignment data.
+[List Bullet] 4. Faculty saves the assignment.
+[List Bullet] 5. System stores the assignment in Draft state until publication.
+[Heading 3] Alternative Flows
+[List Bullet] Faculty edits an existing Draft assignment.
+[Heading 3] Exception Flows
+[List Bullet] TA/Student/Observer assignment-authoring attempts are rejected.
+[Heading 2] UC-LMS-008 — Publish Assignment
+--- TABLE ---
+UC Type | Actor-triggered
+Primary Actor | Faculty
+Supporting Actors / Systems | N/A
+Goal / Description | Publish a Draft assignment and establish its release timing.
+Trigger | Faculty chooses Publish for a valid Draft assignment.
+Preconditions | Assignment is Draft and has required configuration.
+Success Postcondition | Assignment is Published and either Available or Scheduled for Release.
+Failure / Minimal Guarantee | Assignment remains Draft.
+Related Business Rules | BR-LMS-009, BR-LMS-010, BR-LMS-011
+Related CFRs | 
+Related Workflow(s) | BW-LMS-02, BW-LMS-03; CW-LMS-01
+--- END TABLE ---
+[Heading 3] Main Success Scenario
+[List Bullet] 1. System validates the assignment configuration.
+[List Bullet] 2. Faculty confirms publication.
+[List Bullet] 3. System marks the assignment Published.
+[List Bullet] 4. If release is immediate, system makes it Available to Students; if release is future-dated, system marks it Scheduled for Release.
+[Heading 3] Alternative Flows
+[List Bullet] Future-dated release waits for UC-LMS-015.
+[Heading 3] Exception Flows
+[List Bullet] Invalid Draft assignment cannot be published.
+[Heading 2] UC-LMS-009 — View or Download Published Assignment
+--- TABLE ---
+UC Type | Actor-triggered
+Primary Actor | Student
+Supporting Actors / Systems | N/A
+Goal / Description | View/download an assignment after it is released.
+Trigger | Student opens the Assignments area for a registered course.
+Preconditions | Student is registered in the course; assignment release condition is satisfied.
+Success Postcondition | Student views/downloads the released assignment.
+Failure / Minimal Guarantee | Unreleased/unauthorized assignment content is not exposed.
+Related Business Rules | BR-LMS-001, BR-LMS-011
+Related CFRs | 
+Related Workflow(s) | N/A
+--- END TABLE ---
+[Heading 3] Main Success Scenario
+[List Bullet] 1. System lists assignments currently visible to the Student.
+[List Bullet] 2. Student selects an assignment.
+[List Bullet] 3. System displays assignment details and permits download of published assignment content.
+[Heading 3] Alternative Flows
+[List Bullet] Future-dated unreleased assignments are not shown.
+[Heading 3] Exception Flows
+[List Bullet] Unauthorized course access is denied.
+[Heading 2] UC-LMS-010 — Submit Assignment
+--- TABLE ---
+UC Type | Actor-triggered
+Primary Actor | Student
+Supporting Actors / Systems | N/A
+Goal / Description | Submit assignment work using the configured submission type.
+Trigger | Student chooses Submit for an available assignment.
+Preconditions | Student is registered; assignment is available; baseline case is before due date.
+Success Postcondition | On-time submission is recorded.
+Failure / Minimal Guarantee | No invalid submission is recorded.
+Related Business Rules | BR-LMS-012, BR-LMS-013, BR-LMS-014
+Related CFRs | 
+Related Workflow(s) | BW-LMS-02, BW-LMS-03; CW-LMS-01
+--- END TABLE ---
+[Heading 3] Main Success Scenario
+[List Bullet] 1. System displays the configured submission type.
+[List Bullet] 2. Student provides file, text, or link as configured.
+[List Bullet] 3. System validates submission type and timing.
+[List Bullet] 4. Student confirms submission.
+[List Bullet] 5. System records the submission and submission timestamp/status.
+[Heading 3] Alternative Flows
+[List Bullet] Late-submission behavior is not specified in the current PS; see ISS-LMS-001.
+[List Bullet] Resubmission behavior is not specified; see ISS-LMS-005.
+[Heading 3] Exception Flows
+[List Bullet] Submission with a type inconsistent with assignment configuration is rejected.
+[Heading 2] UC-LMS-011 — View Submission History and Status
+--- TABLE ---
+UC Type | Actor-triggered
+Primary Actor | Student
+Supporting Actors / Systems | N/A
+Goal / Description | View own assignment submission history and status.
+Trigger | Student opens submission details/history.
+Preconditions | Student is registered and assignment exists.
+Success Postcondition | Student views own history/status only.
+Failure / Minimal Guarantee | No other Student’s data are exposed.
+Related Business Rules | BR-LMS-014
+Related CFRs | 
+Related Workflow(s) | N/A
+--- END TABLE ---
+[Heading 3] Main Success Scenario
+[List Bullet] 1. System identifies the requesting Student.
+[List Bullet] 2. System retrieves only that Student’s submissions for the assignment.
+[List Bullet] 3. System displays submission history and status.
+[Heading 3] Alternative Flows
+[List Bullet] Status may include submitted, late, or missing where applicable.
+[Heading 3] Exception Flows
+[List Bullet] Access to another Student’s submission data is denied.
+[Heading 2] UC-LMS-012 — Grade Submission
+--- TABLE ---
+UC Type | Actor-triggered
+Primary Actor | Faculty / TA
+Supporting Actors / Systems | N/A
+Goal / Description | Grade an individual Student submission by recording points and feedback.
+Trigger | Faculty or TA opens a Student submission for grading.
+Preconditions | Actor is Faculty or TA for the course; submission exists.
+Success Postcondition | Grade/feedback is recorded with actor attribution.
+Failure / Minimal Guarantee | No unauthorized grade change is committed.
+Related Business Rules | BR-LMS-004, BR-LMS-015, BR-LMS-016, BR-LMS-019
+Related CFRs | 
+Related Workflow(s) | BW-LMS-04, BW-LMS-05; CW-LMS-02
+--- END TABLE ---
+[Heading 3] Main Success Scenario
+[List Bullet] 1. System verifies grading authority and course context.
+[List Bullet] 2. Actor reviews the submission.
+[List Bullet] 3. Actor enters points and feedback.
+[List Bullet] 4. System records the grading action and actor identity.
+[List Bullet] 5. System stores grade/feedback in Draft state unless already released.
+[Heading 3] Alternative Flows
+[List Bullet] If a released grade is changed, the system creates an audit record with actor and time; post-release authorization/effect remains subject to ISS-LMS-006.
+[Heading 3] Exception Flows
+[List Bullet] Unauthorized grader/course combination is rejected.
+[Heading 2] UC-LMS-013 — Release Grades and Feedback
+--- TABLE ---
+UC Type | Actor-triggered
+Primary Actor | Faculty
+Supporting Actors / Systems | N/A
+Goal / Description | Release draft grades/feedback to Students.
+Trigger | Faculty chooses to release graded submissions.
+Preconditions | Draft grades/feedback exist for the course.
+Success Postcondition | Selected grades/feedback are Released and visible to corresponding Students.
+Failure / Minimal Guarantee | Draft grades remain hidden.
+Related Business Rules | BR-LMS-016, BR-LMS-017, BR-LMS-018
+Related CFRs | 
+Related Workflow(s) | BW-LMS-04, BW-LMS-05; CW-LMS-02
+--- END TABLE ---
+[Heading 3] Main Success Scenario
+[List Bullet] 1. System verifies Faculty release authority.
+[List Bullet] 2. Faculty selects/initiates release.
+[List Bullet] 3. System changes applicable grades from Draft to Released.
+[List Bullet] 4. System makes released grades/feedback available to the corresponding Students.
+[Heading 3] Exception Flows
+[List Bullet] TA cannot perform grade release under the current PS baseline.
+[Heading 2] UC-LMS-014 — View Released Grade and Feedback
+--- TABLE ---
+UC Type | Actor-triggered
+Primary Actor | Student
+Supporting Actors / Systems | N/A
+Goal / Description | View own released grade and feedback in read-only form.
+Trigger | Student opens Grades for an assignment/course.
+Preconditions | Grade/feedback has been released for the Student.
+Success Postcondition | Student views own released grade/feedback.
+Failure / Minimal Guarantee | Unreleased/other-student grade data are not exposed.
+Related Business Rules | BR-LMS-016, BR-LMS-018
+Related CFRs | 
+Related Workflow(s) | N/A
+--- END TABLE ---
+[Heading 3] Main Success Scenario
+[List Bullet] 1. System retrieves the Student’s released grade/feedback.
+[List Bullet] 2. System displays the grade/feedback in read-only form.
+[Heading 3] Alternative Flows
+[List Bullet] Draft/unreleased grade is not shown.
+[Heading 3] Exception Flows
+[List Bullet] Access to another Student’s grade is denied.
+[Heading 2] UC-LMS-015 — Process Scheduled Content Release
+--- TABLE ---
+UC Type | Event-triggered
+Primary Actor | N.A. — Event-triggered
+Supporting Actors / Systems | N/A
+Goal / Description | Make scheduled course material or an assignment available when its configured release time is reached.
+Trigger | Configured future release date/time for a scheduled material or published assignment is reached.
+Preconditions | Content is in Scheduled state and remains valid for publication.
+Success Postcondition | Scheduled content becomes Published/Available.
+Failure / Minimal Guarantee | Content is not exposed prematurely.
+Related Business Rules | BR-LMS-005, BR-LMS-006, BR-LMS-011
+Related CFRs | 
+Related Workflow(s) | BW-LMS-01, BW-LMS-03; CW-LMS-01
+--- END TABLE ---
+[Heading 3] Main Success Scenario
+[List Bullet] 1. System identifies scheduled content whose release time has been reached.
+[List Bullet] 2. System verifies the content is still eligible for release.
+[List Bullet] 3. System changes the content state to Published/Available.
+[List Bullet] 4. System makes the content visible to the authorized audience.
+[Heading 3] Alternative Flows
+[List Bullet] If scheduled content was withdrawn/unpublished before release, no release occurs.
+[Heading 3] Exception Flows
+[List Bullet] If release processing fails, content remains unavailable and the failure is recorded for operational handling.

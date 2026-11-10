@@ -13,6 +13,28 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `lms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `lms.course.view` | View course workspace and details | `admin`, `administrator`, `assistant_professor`, `associate_professor`, `faculty`, `instructor`, `observer`, `professor`, `student`, `ta`, `teaching_assistant` |
+| `lms.course.manage` | Configure course details, syllabus, schedule, and settings | `admin`, `administrator`, `assistant_professor`, `associate_professor`, `faculty`, `instructor`, `professor` |
+| `lms.material.view` | View published course materials | `admin`, `administrator`, `assistant_professor`, `associate_professor`, `faculty`, `instructor`, `observer`, `professor`, `student`, `ta`, `teaching_assistant` |
+| `lms.material.manage` | Add, organize, edit, and schedule course materials | `admin`, `administrator`, `assistant_professor`, `associate_professor`, `faculty`, `instructor`, `professor` |
+| `lms.announcement.view` | View course announcements | `admin`, `administrator`, `assistant_professor`, `associate_professor`, `faculty`, `instructor`, `observer`, `professor`, `student`, `ta`, `teaching_assistant` |
+| `lms.announcement.post` | Post course announcements | `admin`, `administrator`, `assistant_professor`, `associate_professor`, `faculty`, `instructor`, `professor`, `ta`, `teaching_assistant` |
+| `lms.assignment.view` | View published assignments | `admin`, `administrator`, `assistant_professor`, `associate_professor`, `faculty`, `instructor`, `professor`, `student`, `ta`, `teaching_assistant` |
+| `lms.assignment.manage` | Create, edit, and publish assignments | `admin`, `administrator`, `assistant_professor`, `associate_professor`, `faculty`, `instructor`, `professor` |
+| `lms.submission.create` | Submit assignment work | `admin`, `administrator`, `student` |
+| `lms.submission.view_self` | View own submission history and status | `admin`, `administrator`, `student` |
+| `lms.submission.view_all` | View student submissions for course | `admin`, `administrator`, `assistant_professor`, `associate_professor`, `faculty`, `instructor`, `professor`, `ta`, `teaching_assistant` |
+| `lms.grade.manage` | Grade student submissions | `admin`, `administrator`, `assistant_professor`, `associate_professor`, `faculty`, `instructor`, `professor`, `ta`, `teaching_assistant` |
+| `lms.grade.release` | Release draft grades to students | `admin`, `administrator`, `assistant_professor`, `associate_professor`, `faculty`, `instructor`, `professor` |
+| `lms.grade.view` | Access grades view | `admin`, `administrator`, `assistant_professor`, `associate_professor`, `faculty`, `instructor`, `professor`, `student`, `ta`, `teaching_assistant` |
+| `lms.grade.view_self` | View own released grades and feedback | `admin`, `administrator`, `student` |
+| `lms.grade.view_all` | View all student grades for course | `admin`, `administrator`, `assistant_professor`, `associate_professor`, `faculty`, `instructor`, `professor`, `ta`, `teaching_assistant` |
+| `lms.audit.view` | View post-release grade change audit logs | `admin`, `administrator`, `assistant_professor`, `associate_professor`, `faculty`, `instructor`, `professor` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
