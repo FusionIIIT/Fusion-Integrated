@@ -1,0 +1,64 @@
+================================================================================
+AI INTERACTION LOG: STRATEGY UC (Use Cases)
+================================================================================
+Model: Gemini 3.8 Flash (High)
+Agent: Google Antigravity
+Strategy: Use Case Specifications (Main + Alternative + Exception Flows)
+Source Specification: 01_BA_Problem_Statement_v1.2_SYNCHRONIZED_DRAFT.docx, 03_BA_Use_Case_Specifications_v1.2_FINAL.docx
+
+--------------------------------------------------------------------------------
+PROMPT A: GENERATE FROZEN TEST DESIGN
+--------------------------------------------------------------------------------
+You are designing automated specification-based tests for the BADMS Fusion ERP module.
+Source of truth: Use ONLY the supplied Problem Statement and Use Cases.
+Do NOT inspect implementation code.
+Do NOT infer behavior from implementation.
+Do NOT introduce behavior unsupported by the supplied specification.
+Generate the minimum non-redundant set of test cases needed to satisfy the strategy-specific adequacy rule in Section 7. Do not stop at an arbitrary number, do not omit an explicit test obligation to reduce the test count, and do not invent unsupported behavior. Prefer observable behavior that can subsequently be automated using pytest/pytest-django.
+For every test case output exactly these fields:
+- test_id
+- source_id
+- purpose
+- preconditions
+- action_or_input
+- expected_result
+- test_type
+source_id must identify the exact obligation covered.
+Output ONLY a valid JSON array. Do not provide explanation or additional prose.
+[Strategy-specific instruction]: Cover the main success flow of every Use Case and every explicitly specified alternative/exception flow with at least one test. Do not invent additional flows.
+
+Output saved to: a8_design/UC_DESIGN.json (64 test cases frozen across 23 Use Cases)
+
+--------------------------------------------------------------------------------
+PROMPT B: CONVERT FROZEN DESIGN INTO EXECUTABLE TESTS
+--------------------------------------------------------------------------------
+You are given:
+1. the frozen A8_BASE Fusion implementation, and
+2. the frozen UC_DESIGN.json.
+Convert these test designs into executable automated backend tests using pytest/pytest-django.
+Rules:
+- Implement exactly the supplied test cases.
+- Do not add, remove, merge or reinterpret test cases.
+- Preserve each specified expected result.
+- Do not modify production code.
+- Use the Django isolated test database.
+- Reuse existing Fusion test infrastructure where appropriate.
+- Do not mock the behavior being tested; mocks may be used only for unavailable external dependencies.
+- Do not use xfail to hide failures.
+- Every test must contain its test_id and source_id in its name or docstring.
+- Store generated tests only under tests/a8/uc/.
+
+Tests generated at: tests/a8/uc/test_uc.py
+
+--------------------------------------------------------------------------------
+PROMPT C: PERMITTED REPAIR PROMPTS
+--------------------------------------------------------------------------------
+No repair prompts required (0 of 2 used). Tests executed directly against A8_BASE.
+
+--------------------------------------------------------------------------------
+FINAL EXECUTION RESULT
+--------------------------------------------------------------------------------
+pytest tests/a8/uc --junitxml=a8_results/uc/junit.xml --cov=modules.badms --cov-branch --cov-report=xml:a8_results/uc/coverage.xml
+Total: 64 tests | Passed: 56 | Failed: 6 | Skipped: 2
+Statement Coverage: 89.11% | Branch Coverage: 72.22%
+Confirmed Implementation Defects Found: 5 (DEF-01, DEF-02, DEF-03, DEF-04, DEF-05)

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="1" tests="40" time="4.496" timestamp="2026-11-10T22:44:28.411548+05:30" hostname="black"><testcase classname="tests.a8.fr.test_fr" name="test_fr_001_manual_backup_authorized" time="3.180" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_002_manual_backup_unauthorized" time="0.004" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_003_manual_backup_captures_artifacts" time="0.006" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_004_manual_backup_integrity_verification" time="0.006" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_005_manual_backup_outcome_success" time="0.006" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_006_failed_backup_outcome_recording" time="0.004" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_007_automatic_backup_schedule_properties" time="0.008" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_008_automatic_backup_repository_reachability" time="0.004"><skipped type="pytest.skip" message="NOT_AUTOMATED: External storage daemon reachability probe is handled outside Django service layer">C:\Fusion-Integrated\tests\a8\fr\test_fr.py:101: NOT_AUTOMATED: External storage daemon reachability probe is handled outside Django service layer</skipped></testcase><testcase classname="tests.a8.fr.test_fr" name="test_fr_009_view_backup_schedules" time="0.008" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_010_configure_local_backup_schedule" time="0.007" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_011_schedule_validation_rejects_invalid_params" time="0.007"><failure message="Failed: DID NOT RAISE any of (BadRequestError, ValueError)">def test_fr_011_schedule_validation_rejects_invalid_params():
+        """TEST-FR-011 | AFR-BA-014: Validation rejects conflicting or invalid schedule parameters."""
+        admin = sysadmin_actor(user_id=1)
+        # The specification states that invalid schedule parameters must be rejected.
+        # If the implementation accepts negative retention_days or malformed cron without validation, it violates AFR-BA-014.
+&gt;       with pytest.raises((BadRequestError, ValueError)):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE any of (BadRequestError, ValueError)
+
+tests\a8\fr\test_fr.py:128: Failed</failure></testcase><testcase classname="tests.a8.fr.test_fr" name="test_fr_012_schedule_configuration_audit_log" time="0.009" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_013_backup_history_maintenance" time="0.008" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_014_submit_archival_request" time="0.008" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_015_archival_request_captured_metadata" time="0.005" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_016_archival_request_parameter_validation" time="0.006" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_017_archival_request_initial_status_submitted" time="0.005" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_018_routed_hod_reviews_request" time="0.007" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_019_hod_decision_approve_and_reject" time="0.013" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_020_hod_department_scoping_enforced" time="0.010"><failure message="Failed: DID NOT RAISE PermissionDeniedError">def test_fr_020_hod_department_scoping_enforced():
+        """TEST-FR-020 | AFR-BA-026: Only the HoD of requester's department can approve/reject request."""
+        user = regular_user_actor(user_id=16, dept="ECE")
+        ece_req = ops.submit_archival_request(
+            actor=user, department="ECE", file_name="ece_file.dat", file_type="dat", file_size_bytes=500, reason="ECE test"
+        )
+        cse_hod = hod_actor(user_id=20, dept="CSE")
+        # AFR-BA-026: only the HoD of the requester's department shall be permitted to approve or reject
+&gt;       with pytest.raises(PermissionDeniedError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PermissionDeniedError
+
+tests\a8\fr\test_fr.py:260: Failed</failure></testcase><testcase classname="tests.a8.fr.test_fr" name="test_fr_021_sysadmin_classify_archival_request" time="0.012" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_022_initial_classification_default" time="0.005" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_023_sensitive_classification_routing" time="0.013" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_024_it_security_encryption_configuration" time="0.015" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_025_sensitive_encryption_aes256_enforced" time="0.015"><failure message="Failed: DID NOT RAISE any of (BadRequestError, ValueError)">def test_fr_025_sensitive_encryption_aes256_enforced():
+        """TEST-FR-025 | AFR-BA-034: AES-256 encryption algorithm is strictly enforced for Sensitive data."""
+        user = regular_user_actor(user_id=21, dept="CSE")
+        cse_hod = hod_actor(user_id=20, dept="CSE")
+        admin = sysadmin_actor(user_id=1)
+        sec = it_security_actor(user_id=30)
+    
+        req = ops.submit_archival_request(
+            actor=user, department="CSE", file_name="secret.csv", file_type="csv", file_size_bytes=400, reason="Secrets"
+        )
+        ops.hod_review_archival(actor=cse_hod, request_id=req.pk, action="approve")
+        ops.sysadmin_classify_archival(actor=admin, request_id=req.pk, authoritative_classification="sensitive")
+    
+        # AFR-BA-034: Data classified as Sensitive shall use AES-256 encryption. Non-AES algorithm must be rejected.
+&gt;       with pytest.raises((BadRequestError, ValueError)):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE any of (BadRequestError, ValueError)
+
+tests\a8\fr\test_fr.py:335: Failed</failure></testcase><testcase classname="tests.a8.fr.test_fr" name="test_fr_026_user_tracks_own_archival_request" time="0.008" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_027_superadmin_special_archival_operation" time="0.004"><failure message="AssertionError: special_archival_operation service is missing from operations.py&#10;assert False&#10; +  where False = hasattr(ops, 'special_archival_operation')">def test_fr_027_superadmin_special_archival_operation():
+        """TEST-FR-027 | AFR-BA-037: Super Admin can perform special archival operation."""
+        superadmin = superadmin_actor(user_id=102)
+        # CFR-BA-010 / AFR-BA-037 requires special archival operation by Super Admin.
+        # If the operation function is not implemented on ops, this will raise AttributeError (candidate defect).
+&gt;       assert hasattr(ops, "special_archival_operation"), "special_archival_operation service is missing from operations.py"
+E       AssertionError: special_archival_operation service is missing from operations.py
+E       assert False
+E        +  where False = hasattr(ops, 'special_archival_operation')
+
+tests\a8\fr\test_fr.py:357: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr" name="test_fr_028_non_superadmin_denied_special_archival" time="0.004"><failure message="AssertionError: special_archival_operation service is missing from operations.py&#10;assert False&#10; +  where False = hasattr(ops, 'special_archival_operation')">def test_fr_028_non_superadmin_denied_special_archival():
+        """TEST-FR-028 | AFR-BA-038: Non-Super Admin denied special archival operation."""
+        user = regular_user_actor(user_id=24)
+&gt;       assert hasattr(ops, "special_archival_operation"), "special_archival_operation service is missing from operations.py"
+E       AssertionError: special_archival_operation service is missing from operations.py
+E       assert False
+E        +  where False = hasattr(ops, 'special_archival_operation')
+
+tests\a8\fr\test_fr.py:368: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr" name="test_fr_029_submit_restoration_request" time="0.011" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_030_sensitive_restoration_requires_sysadmin_approval" time="0.010" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_031_non_sensitive_restoration_standard_path" time="0.007" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_032_submit_storage_extension_when_quota_full" time="0.011" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_033_storage_extension_rejected_if_quota_not_reached" time="0.005" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_034_hod_storage_extension_decision_allocates_storage" time="0.011" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_035_storage_threshold_monitoring" time="0.006" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_036_superadmin_global_backup_schedule" time="0.007" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_037_local_schedule_overrides_global" time="0.003" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_038_retention_rules_by_classification" time="0.003" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_039_consecutive_backup_failures_escalation" time="0.004" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_040_audit_log_recording" time="0.344" /></testsuite></testsuites>
