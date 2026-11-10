@@ -1,8 +1,19 @@
 from rest_framework import serializers
-from modules.phc.models import Notification
+from modules.phc.models import ReimbursementClaim, AuditEvent
 
-class NotificationSerializer(serializers.ModelSerializer):
+class ReimbursementClaimSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Notification
-        fields = ["id", "kind", "message", "entity_type", "entity_id", "created_at", "read_at"]
-        read_only_fields = fields
+        model = ReimbursementClaim
+        fields = [
+            "id", "claimant_user_id", "prescription", "expense_date",
+            "claimed_amount", "status", "submitted_at", "updated_at"
+        ]
+        read_only_fields = ["id", "claimant_user_id", "status", "submitted_at", "updated_at"]
+
+class AuditEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AuditEvent
+        fields = [
+            "entity_type", "entity_id", "action", "from_status", "to_status",
+            "actor_user_id", "note", "at"
+        ]
