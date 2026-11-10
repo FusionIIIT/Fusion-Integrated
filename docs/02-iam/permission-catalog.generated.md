@@ -13,6 +13,12 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `institute_accounts_audits`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `institute_accounts_audits.workspace.access` | Open IAA; actions require an assigned active IAA role | `Auditor`, `Basic User`, `Dean`, `Director`, `Finance Staff`, `HoD`, `System Admin` |
+
 ## `leave_management`
 
 | Code | What it allows | Held by |

@@ -1,9 +1,11 @@
 import { Container, Text, Title } from "@mantine/core";
-import { Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../auth/AuthProvider";
 import { AppShellLayout } from "../ui/layout/AppShellLayout";
+
+const IaaDashboard = lazy(() => import("../modules/iaa/DashboardWidget"));
 
 /** Fusion-client owns the sidebar, roles and header; a second set would drift. */
 export function isEmbedded(): boolean {
@@ -52,6 +54,8 @@ export function Shell() {
       roles={session.roles}
       role={session.active_role}
       onRoleChange={switchRole}
+      onBellClick={session.modules.includes("institute_accounts_audits")
+        ? () => navigate("/iaa/workspace?tab=notifications") : undefined}
     >
       <Suspense fallback={null}>
         <Outlet />
@@ -89,6 +93,9 @@ export function Dashboard() {
             ? `Your ${granted} granted module(s) are served by another Fusion app.`
             : "No modules have been granted to your role yet."}
       </Text>
+      {session?.modules.includes("institute_accounts_audits") && <Suspense fallback={null}>
+        <IaaDashboard />
+      </Suspense>}
     </Container>
   );
 }

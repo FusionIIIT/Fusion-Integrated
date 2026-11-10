@@ -91,6 +91,7 @@ PLATFORM_MODULES = [
 DOMAIN_MODULES = [
     "modules.placement",
     "modules.leave",
+    "modules.iaa",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -227,6 +228,12 @@ PASSWORD_HASHERS = [
 ]
 
 SPECTACULAR_SETTINGS = {
+    "ENUM_NAME_OVERRIDES": {
+        "IaaRequestStateEnum": "modules.iaa.domain.rules.STATE_CHOICES",
+        "IaaRequestKindEnum": [("expense", "Expense / voucher"), ("ta", "TA")],
+        "IaaRouteKindEnum": [("expense", "Expense"), ("ta", "TA")],
+        "IaaInputKindEnum": [("expense", "expense"), ("ta", "ta")],
+    },
     "TITLE": "Fusion-Integrated API",
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",

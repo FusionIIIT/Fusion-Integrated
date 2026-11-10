@@ -14,6 +14,7 @@ type = forbidden
 source_modules =
     modules.placement
     modules.leave
+    modules.iaa
     modules.directory
     modules.accesscontrol
 forbidden_modules =
@@ -22,6 +23,11 @@ forbidden_modules =
     modules.placement.selectors
     modules.placement.api
     modules.placement.domain
+    modules.iaa.models
+    modules.iaa.services
+    modules.iaa.selectors
+    modules.iaa.api
+    modules.iaa.domain
     modules.leave.models
     modules.leave.services
     modules.leave.selectors
@@ -45,6 +51,7 @@ source_modules =
 # Every module's domain, not just the first one written.
     modules.placement.domain
     modules.leave.domain
+    modules.iaa.domain
 forbidden_modules =
     django
     rest_framework
@@ -83,3 +90,13 @@ layers =
     modules.leave.selectors
     modules.leave.models
     modules.leave.domain
+
+[importlinter:contract:iaa-layers]
+name = Layering inside IAA
+type = layers
+layers =
+    modules.iaa.api
+    modules.iaa.services
+    modules.iaa.selectors
+    modules.iaa.models
+    modules.iaa.domain
