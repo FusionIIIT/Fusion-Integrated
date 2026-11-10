@@ -1,11 +1,15 @@
 """Serializers for Course Workspace endpoints."""
+from decimal import Decimal
+
 from rest_framework import serializers
 
 from modules.lms.domain.entities import (
+    AssignmentStatus,
     CourseStatus,
     MaterialStatus,
     MaterialType,
     SectionType,
+    SubmissionType,
 )
 
 
@@ -143,3 +147,56 @@ class CourseAnnouncementCreateSerializer(serializers.Serializer):
     content = serializers.CharField()
 
 
+class CourseAssignmentItemSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    course_code = serializers.CharField()
+    title = serializers.CharField()
+    instructions = serializers.CharField(allow_blank=True)
+    submission_type = serializers.CharField()
+    points_possible = serializers.FloatField()
+    status = serializers.CharField()
+    due_at = serializers.CharField(allow_null=True)
+    release_at = serializers.CharField(allow_null=True)
+    file_name = serializers.CharField(allow_blank=True)
+    file_size = serializers.IntegerField(allow_null=True)
+    has_file = serializers.BooleanField()
+    created_by_user_id = serializers.IntegerField()
+    created_at = serializers.CharField(allow_null=True)
+    updated_at = serializers.CharField(allow_null=True)
+
+
+class CourseAssignmentsResponseSerializer(serializers.Serializer):
+    course_code = serializers.CharField()
+    course_title = serializers.CharField()
+    role = serializers.CharField()
+    can_manage = serializers.BooleanField()
+    assignments = CourseAssignmentItemSerializer(many=True)
+    total_count = serializers.IntegerField()
+
+
+class CourseAssignmentCreateSerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=200)
+    instructions = serializers.CharField(required=False, allow_blank=True, default="")
+    submission_type = serializers.ChoiceField(
+        choices=sorted(SubmissionType.ALL), default=SubmissionType.FILE
+    )
+    points_possible = serializers.DecimalField(
+        max_digits=6, decimal_places=2, required=False, default=Decimal("100.00")
+    )
+    status = serializers.ChoiceField(
+        choices=sorted(AssignmentStatus.ALL), default=AssignmentStatus.DRAFT
+    )
+    due_at = serializers.DateTimeField(required=False, allow_null=True, default=None)
+    release_at = serializers.DateTimeField(required=False, allow_null=True, default=None)
+    file = serializers.FileField(required=False, allow_null=True, default=None)
+
+
+class CourseAssignmentUpdateSerializer(serializers.Serializer):
+    title = serializers.CharField(required=False, max_length=200)
+    instructions = serializers.CharField(required=False, allow_blank=True)
+    submission_type = serializers.ChoiceField(choices=sorted(SubmissionType.ALL), required=False)
+    points_possible = serializers.DecimalField(max_digits=6, decimal_places=2, required=False)
+    status = serializers.ChoiceField(choices=sorted(AssignmentStatus.ALL), required=False)
+    due_at = serializers.DateTimeField(required=False, allow_null=True)
+    release_at = serializers.DateTimeField(required=False, allow_null=True)
+    file = serializers.FileField(required=False, allow_null=True)

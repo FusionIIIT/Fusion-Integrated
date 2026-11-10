@@ -1,10 +1,13 @@
 """Unit tests for LMS pure domain rules and entities."""
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 
 import pytest
 
 from modules.lms.domain.entities import (
     AnnouncementDetails,
+    AssignmentDetails,
+    AssignmentStatus,
     CourseDetails,
     CourseRole,
     CourseStatus,
@@ -12,11 +15,15 @@ from modules.lms.domain.entities import (
     MaterialStatus,
     MaterialType,
     SectionType,
+    SubmissionType,
     validate_announcement_details,
+    validate_assignment_details,
     validate_course_details,
     validate_material_details,
 )
 from modules.lms.domain.errors import (
+    AssignmentAccessDeniedError,
+    AssignmentAuthoringDeniedError,
     CourseAccessDeniedError,
     CourseEditingDeniedError,
     LMSRuleError,
@@ -217,3 +224,160 @@ def test_validate_announcement_details_invalid():
         validate_announcement_details(title="Valid title", content="   ")
 
 
+def test_assignment_details_dataclass():
+    a = AssignmentDetails(
+        title="Project Milestone 1",
+        instructions="Complete ER design and schema diagrams.",
+        submission_type=SubmissionType.FILE,
+        points_possible=Decimal("150.00"),
+        status=AssignmentStatus.DRAFT,
+    )
+    assert a.title == "Project Milestone 1"
+    assert a.submission_type == "file"
+    assert a.points_possible == Decimal("150.00")
+    assert a.status == "draft"
+
+
+def test_validate_assignment_details_valid():
+    now = datetime.now(UTC)
+    due = now + timedelta(days=7)
+    release = now + timedelta(days=1)
+
+    # Valid draft
+    validate_assignment_details(
+        title="Draft Homework",
+        submission_type=SubmissionType.FILE,
+        status=AssignmentStatus.DRAFT,
+    )
+
+    # Valid published
+    validate_assignment_details(
+        title="Published Homework",
+        instructions="Submit PDF.",
+        submission_type=SubmissionType.FILE,
+        status=AssignmentStatus.PUBLISHED,
+        points_possible=100,
+        due_at=due,
+    )
+
+    # Valid scheduled
+    validate_assignment_details(
+        title="Scheduled Homework",
+        instructions="Submit link.",
+        submission_type=SubmissionType.LINK,
+        status=AssignmentStatus.SCHEDULED,
+        points_possible=50,
+        due_at=due,
+        release_at=release,
+    )
+
+
+def test_validate_assignment_details_invalid_title():
+    with pytest.raises(LMSRuleError, match="Assignment title cannot be empty"):
+        validate_assignment_details(
+            title="",
+            submission_type=SubmissionType.FILE,
+            status=AssignmentStatus.DRAFT,
+        )
+
+    with pytest.raises(LMSRuleError, match="exceed 200 characters"):
+        validate_assignment_details(
+            title="X" * 201,
+            submission_type=SubmissionType.FILE,
+            status=AssignmentStatus.DRAFT,
+        )
+
+
+def test_validate_assignment_details_invalid_submission_type_and_status():
+    with pytest.raises(LMSRuleError, match="Invalid submission type"):
+        validate_assignment_details(
+            title="Assignment",
+            submission_type="video",
+            status=AssignmentStatus.DRAFT,
+        )
+
+    with pytest.raises(LMSRuleError, match="Invalid assignment status"):
+        validate_assignment_details(
+            title="Assignment",
+            submission_type=SubmissionType.FILE,
+            status="archived",
+        )
+
+
+def test_validate_assignment_details_invalid_points():
+    with pytest.raises(LMSRuleError, match="greater than zero"):
+        validate_assignment_details(
+            title="Assignment",
+            submission_type=SubmissionType.FILE,
+            status=AssignmentStatus.DRAFT,
+            points_possible=0,
+        )
+
+    with pytest.raises(LMSRuleError, match="greater than zero"):
+        validate_assignment_details(
+            title="Assignment",
+            submission_type=SubmissionType.FILE,
+            status=AssignmentStatus.DRAFT,
+            points_possible=-10,
+        )
+
+
+def test_validate_assignment_details_publication_requirements():
+    now = datetime.now(UTC)
+    due = now + timedelta(days=7)
+
+    # Published without instructions fails BR-LMS-009
+    with pytest.raises(LMSRuleError, match="Published assignment requires instructions"):
+        validate_assignment_details(
+            title="Assignment",
+            submission_type=SubmissionType.FILE,
+            status=AssignmentStatus.PUBLISHED,
+            due_at=due,
+            points_possible=100,
+            instructions="",
+        )
+
+    # Published without due_at fails BR-LMS-009
+    with pytest.raises(LMSRuleError, match="Published assignment requires a valid due date"):
+        validate_assignment_details(
+            title="Assignment",
+            submission_type=SubmissionType.FILE,
+            status=AssignmentStatus.PUBLISHED,
+            due_at=None,
+            points_possible=100,
+            instructions="Submit work.",
+        )
+
+
+def test_validate_assignment_details_scheduled_and_date_order():
+    now = datetime.now(UTC)
+    due = now + timedelta(days=5)
+
+    # Scheduled without release_at
+    with pytest.raises(LMSRuleError, match="Scheduled assignment requires a valid release date"):
+        validate_assignment_details(
+            title="Assignment",
+            submission_type=SubmissionType.TEXT,
+            status=AssignmentStatus.SCHEDULED,
+            due_at=due,
+            points_possible=100,
+            instructions="Write essay.",
+            release_at=None,
+        )
+
+    # Release after due date
+    with pytest.raises(LMSRuleError, match="release date cannot be after the due date"):
+        validate_assignment_details(
+            title="Assignment",
+            submission_type=SubmissionType.TEXT,
+            status=AssignmentStatus.SCHEDULED,
+            due_at=now,
+            release_at=now + timedelta(days=1),
+            points_possible=100,
+            instructions="Write essay.",
+        )
+
+
+def test_assignment_domain_errors():
+    assert issubclass(AssignmentAccessDeniedError, LMSRuleError)
+    assert issubclass(AssignmentAuthoringDeniedError, LMSRuleError)

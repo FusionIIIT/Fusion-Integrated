@@ -14,6 +14,10 @@ from modules.lms.api.serializers import (
     CourseAnnouncementCreateSerializer,
     CourseAnnouncementItemSerializer,
     CourseAnnouncementsResponseSerializer,
+    CourseAssignmentCreateSerializer,
+    CourseAssignmentItemSerializer,
+    CourseAssignmentsResponseSerializer,
+    CourseAssignmentUpdateSerializer,
     CourseMaterialCreateSerializer,
     CourseMaterialItemSerializer,
     CourseMaterialsResponseSerializer,
@@ -26,6 +30,11 @@ from modules.lms.selectors.announcements import (
     get_course_announcement_detail,
     list_course_announcements,
 )
+from modules.lms.selectors.assignments import (
+    get_assignment_for_download,
+    get_course_assignment_detail,
+    list_course_assignments,
+)
 from modules.lms.selectors.courses import course_workspace_details, visible_courses
 from modules.lms.selectors.materials import (
     get_course_material_detail,
@@ -33,6 +42,7 @@ from modules.lms.selectors.materials import (
     list_course_materials,
 )
 from modules.lms.services import announcements as announcement_service
+from modules.lms.services import assignments as assignment_service
 from modules.lms.services import courses as course_service
 from modules.lms.services import materials as material_service
 
@@ -43,6 +53,8 @@ P_MAT_VIEW = "lms.material.view"
 P_MAT_MANAGE = "lms.material.manage"
 P_ANN_VIEW = "lms.announcement.view"
 P_ANN_MANAGE = "lms.announcement.manage"
+P_ASG_VIEW = "lms.assignment.view"
+P_ASG_MANAGE = "lms.assignment.manage"
 
 
 
@@ -307,3 +319,137 @@ class CourseAnnouncementDetailView(APIView):
             raise NotFoundError("Course announcement not found.")
         return Response(CourseAnnouncementItemSerializer(detail).data)
 
+
+class CourseAssignmentListView(APIView):
+    """List assignments or create a new assignment for a course."""
+
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get_permissions(self):
+        perm = P_ASG_VIEW if self.request.method == "GET" else P_ASG_MANAGE
+        return [MODULE(), HasPermission(perm)()]
+
+    @extend_schema(
+        operation_id="v1_lms_course_assignments_list",
+        summary="List course assignments",
+        tags=["lms"],
+        responses={200: CourseAssignmentsResponseSerializer},
+    )
+    def get(self, request, code: str):
+        data = list_course_assignments(principal=request.principal, course_code=code)
+        if data is None:
+            raise NotFoundError("Course not found or you are not authorized to access it.")
+        return Response(CourseAssignmentsResponseSerializer(data).data)
+
+    @extend_schema(
+        operation_id="v1_lms_course_assignments_create",
+        summary="Create a new course assignment (Faculty only)",
+        tags=["lms"],
+        request=CourseAssignmentCreateSerializer,
+        responses={201: CourseAssignmentItemSerializer},
+    )
+    def post(self, request, code: str):
+        payload = CourseAssignmentCreateSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+
+        assignment = assignment_service.create_course_assignment(
+            actor=request.principal,
+            course_code=code,
+            **payload.validated_data,
+        )
+
+        detail = get_course_assignment_detail(
+            principal=request.principal,
+            course_code=code,
+            assignment_id=assignment.id,
+        )
+        return Response(
+            CourseAssignmentItemSerializer(detail).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class CourseAssignmentDetailView(APIView):
+    """Retrieve, update, or delete a course assignment."""
+
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get_permissions(self):
+        perm = P_ASG_VIEW if self.request.method == "GET" else P_ASG_MANAGE
+        return [MODULE(), HasPermission(perm)()]
+
+    @extend_schema(
+        operation_id="v1_lms_course_assignments_retrieve",
+        summary="Retrieve course assignment details",
+        tags=["lms"],
+        responses={200: CourseAssignmentItemSerializer},
+    )
+    def get(self, request, code: str, assignment_id: int):
+        detail = get_course_assignment_detail(
+            principal=request.principal,
+            course_code=code,
+            assignment_id=assignment_id,
+        )
+        if detail is None:
+            raise NotFoundError("Course assignment not found.")
+        return Response(CourseAssignmentItemSerializer(detail).data)
+
+    @extend_schema(
+        operation_id="v1_lms_course_assignments_update",
+        summary="Update a course assignment (Faculty only)",
+        tags=["lms"],
+        request=CourseAssignmentUpdateSerializer,
+        responses={200: CourseAssignmentItemSerializer},
+    )
+    def patch(self, request, code: str, assignment_id: int):
+        payload = CourseAssignmentUpdateSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+
+        assignment = assignment_service.update_course_assignment(
+            actor=request.principal,
+            course_code=code,
+            assignment_id=assignment_id,
+            **payload.validated_data,
+        )
+
+        detail = get_course_assignment_detail(
+            principal=request.principal,
+            course_code=code,
+            assignment_id=assignment.id,
+        )
+        return Response(CourseAssignmentItemSerializer(detail).data)
+
+    @extend_schema(
+        operation_id="v1_lms_course_assignments_destroy",
+        summary="Delete a course assignment (Faculty only)",
+        tags=["lms"],
+        responses={204: None},
+    )
+    def delete(self, request, code: str, assignment_id: int):
+        assignment_service.delete_course_assignment(
+            actor=request.principal,
+            course_code=code,
+            assignment_id=assignment_id,
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CourseAssignmentDownloadView(APIView):
+    """Download attached file for a released assignment."""
+
+    permission_classes = [MODULE, HasPermission(P_ASG_VIEW)]
+
+    @extend_schema(
+        operation_id="v1_lms_course_assignments_download",
+        summary="Download attached assignment file",
+        tags=["lms"],
+        responses={200: {"type": "string", "format": "binary"}},
+    )
+    def get(self, request, code: str, assignment_id: int):
+        assignment, file_path = get_assignment_for_download(
+            principal=request.principal,
+            course_code=code,
+            assignment_id=assignment_id,
+        )
+        filename = assignment.file_name or os.path.basename(file_path)
+        return FileResponse(open(file_path, "rb"), as_attachment=True, filename=filename)

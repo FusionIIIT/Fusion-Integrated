@@ -267,4 +267,118 @@ export function usePostCourseAnnouncement() {
   });
 }
 
+export interface CourseAssignmentItem {
+  id: number;
+  course_code: string;
+  title: string;
+  instructions: string;
+  submission_type: "file" | "text" | "link";
+  points_possible: number;
+  status: "draft" | "published" | "scheduled";
+  due_at: string | null;
+  release_at: string | null;
+  file_name: string;
+  file_size: number | null;
+  has_file: boolean;
+  created_by_user_id: number;
+  created_at: string | null;
+  updated_at: string | null;
+}
 
+export interface CourseAssignmentsResponse {
+  course_code: string;
+  course_title: string;
+  role: "faculty" | "student" | "ta" | "observer";
+  can_manage: boolean;
+  assignments: CourseAssignmentItem[];
+  total_count: number;
+}
+
+export interface CreateAssignmentPayload {
+  title: string;
+  instructions?: string;
+  submission_type: "file" | "text" | "link";
+  points_possible?: number;
+  status: "draft" | "published" | "scheduled";
+  due_at?: string | null;
+  release_at?: string | null;
+  file?: File | null;
+}
+
+export interface UpdateAssignmentPayload {
+  title?: string;
+  instructions?: string;
+  submission_type?: "file" | "text" | "link";
+  points_possible?: number;
+  status?: "draft" | "published" | "scheduled";
+  due_at?: string | null;
+  release_at?: string | null;
+  file?: File | null;
+}
+
+export function useCourseAssignments(code: string | null) {
+  return useQuery({
+    queryKey: [KEY, "assignments", code],
+    queryFn: async () => {
+      if (!code) return null;
+      return (
+        await http.get<CourseAssignmentsResponse>(`/lms/courses/${code}/assignments`)
+      ).data;
+    },
+    enabled: Boolean(code),
+  });
+}
+
+export function useCreateAssignment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ code, body }: { code: string; body: CreateAssignmentPayload }) => {
+      const payload = toPayloadData(body as unknown as Record<string, unknown>);
+      return (
+        await http.post<CourseAssignmentItem>(`/lms/courses/${code}/assignments`, payload)
+      ).data;
+    },
+    onSuccess: (_, { code }) => {
+      qc.invalidateQueries({ queryKey: [KEY, "assignments", code] });
+    },
+  });
+}
+
+export function useUpdateAssignment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      code,
+      assignmentId,
+      body,
+    }: {
+      code: string;
+      assignmentId: number;
+      body: UpdateAssignmentPayload;
+    }) => {
+      const payload = toPayloadData(body as unknown as Record<string, unknown>);
+      return (
+        await http.patch<CourseAssignmentItem>(
+          `/lms/courses/${code}/assignments/${assignmentId}`,
+          payload,
+        )
+      ).data;
+    },
+    onSuccess: (_, { code }) => {
+      qc.invalidateQueries({ queryKey: [KEY, "assignments", code] });
+    },
+  });
+}
+
+export function useDeleteAssignment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ code, assignmentId }: { code: string; assignmentId: number }) => {
+      await http.delete(`/lms/courses/${code}/assignments/${assignmentId}`);
+      return { code, assignmentId };
+    },
+    onSuccess: (_, { code }) => {
+      qc.invalidateQueries({ queryKey: [KEY, "assignments", code] });
+    },
+  });
+}

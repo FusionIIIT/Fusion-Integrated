@@ -28,6 +28,8 @@ PERMISSIONS = [
     ("lms.material.manage", "Create, edit, organize, and schedule course materials"),
     ("lms.announcement.view", "View course announcements"),
     ("lms.announcement.manage", "Post and manage course announcements"),
+    ("lms.assignment.view", "View published course assignments"),
+    ("lms.assignment.manage", "Create, edit, and publish course assignments"),
 ]
 
 SYSTEM_PERMISSIONS = []
@@ -36,6 +38,7 @@ _STUDENT = [
     "lms.course.view",
     "lms.material.view",
     "lms.announcement.view",
+    "lms.assignment.view",
 ]
 _FACULTY = [
     "lms.course.view",
@@ -44,11 +47,14 @@ _FACULTY = [
     "lms.material.manage",
     "lms.announcement.view",
     "lms.announcement.manage",
+    "lms.assignment.view",
+    "lms.assignment.manage",
 ]
 _STAFF = [
     "lms.course.view",
     "lms.material.view",
     "lms.announcement.view",
+    "lms.assignment.view",
 ]
 
 

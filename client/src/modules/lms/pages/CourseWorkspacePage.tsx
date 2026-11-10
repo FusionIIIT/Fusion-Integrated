@@ -41,6 +41,7 @@ import {
   FaInfoCircle,
   FaPlus,
   FaStickyNote,
+  FaTasks,
   FaTrash,
   FaUserGraduate,
 } from "react-icons/fa";
@@ -51,18 +52,25 @@ import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { StatusBadge } from "../../../ui/components/StatusBadge";
 import {
+  type CourseAssignmentItem,
   type CourseMaterialItem,
   type CourseWorkspaceDetail,
+  type CreateAssignmentPayload,
   type CreateMaterialPayload,
+  type UpdateAssignmentPayload,
   type UpdateCourseWorkspacePayload,
   type UpdateMaterialPayload,
   useCourseAnnouncements,
+  useCourseAssignments,
   useCourseMaterials,
   useCourses,
   useCourseWorkspace,
+  useCreateAssignment,
   useCreateMaterial,
+  useDeleteAssignment,
   useDeleteMaterial,
   usePostCourseAnnouncement,
+  useUpdateAssignment,
   useUpdateCourseWorkspace,
   useUpdateMaterial,
 } from "../api/hooks";
@@ -127,11 +135,20 @@ export default function CourseWorkspacePage() {
     error: announcementsError,
   } = useCourseAnnouncements(selectedCode);
 
+  const {
+    data: assignmentsData,
+    isPending: assignmentsLoading,
+    error: assignmentsError,
+  } = useCourseAssignments(selectedCode);
+
   const updateMutation = useUpdateCourseWorkspace();
   const createMaterialMutation = useCreateMaterial();
   const updateMaterialMutation = useUpdateMaterial();
   const deleteMaterialMutation = useDeleteMaterial();
   const postAnnouncementMutation = usePostCourseAnnouncement();
+  const createAssignmentMutation = useCreateAssignment();
+  const updateAssignmentMutation = useUpdateAssignment();
+  const deleteAssignmentMutation = useDeleteAssignment();
 
   const [editOpened, setEditOpened] = useState(false);
   const [editForm, setEditForm] = useState<UpdateCourseWorkspacePayload>({});
@@ -140,6 +157,26 @@ export default function CourseWorkspacePage() {
   const [postAnnouncementOpened, setPostAnnouncementOpened] = useState(false);
   const [announcementTitle, setAnnouncementTitle] = useState("");
   const [announcementContent, setAnnouncementContent] = useState("");
+
+  // Assignment states
+  const [addAssignmentOpened, setAddAssignmentOpened] = useState(false);
+  const [addAssignmentForm, setAddAssignmentForm] = useState<CreateAssignmentPayload>({
+    title: "",
+    instructions: "",
+    submission_type: "file",
+    points_possible: 100,
+    status: "draft",
+    due_at: "",
+    release_at: "",
+    file: null,
+  });
+
+  const [editAssignmentOpened, setEditAssignmentOpened] = useState(false);
+  const [editingAssignmentId, setEditingAssignmentId] = useState<number | null>(null);
+  const [editAssignmentForm, setEditAssignmentForm] = useState<UpdateAssignmentPayload>({});
+
+  const [assignmentDetailOpened, setAssignmentDetailOpened] = useState(false);
+  const [viewingAssignment, setViewingAssignment] = useState<CourseAssignmentItem | null>(null);
 
   // Materials modal states
 
@@ -373,6 +410,119 @@ export default function CourseWorkspacePage() {
       },
     );
   }
+
+  function handleCreateAssignment() {
+    if (!selectedCode) return;
+    if (!addAssignmentForm.title.trim()) {
+      notifications.show({
+        title: "Validation error",
+        message: "Assignment title cannot be empty.",
+        color: "red",
+      });
+      return;
+    }
+    createAssignmentMutation.mutate(
+      { code: selectedCode, body: addAssignmentForm },
+      {
+        onSuccess: () => {
+          notifications.show({
+            title: "Assignment Created",
+            message: "Course assignment has been created successfully.",
+            color: "teal",
+          });
+          setAddAssignmentOpened(false);
+          setAddAssignmentForm({
+            title: "",
+            instructions: "",
+            submission_type: "file",
+            points_possible: 100,
+            status: "draft",
+            due_at: "",
+            release_at: "",
+            file: null,
+          });
+        },
+        onError: (err) => {
+          notifications.show({
+            title: "Could not create assignment",
+            message: errorMessage(err),
+            color: "red",
+          });
+        },
+      },
+    );
+  }
+
+  function openEditAssignmentModal(a: CourseAssignmentItem) {
+    setEditingAssignmentId(a.id);
+    setEditAssignmentForm({
+      title: a.title,
+      instructions: a.instructions,
+      submission_type: a.submission_type,
+      points_possible: a.points_possible,
+      status: a.status,
+      due_at: a.due_at ? a.due_at.slice(0, 16) : "",
+      release_at: a.release_at ? a.release_at.slice(0, 16) : "",
+      file: null,
+    });
+    setEditAssignmentOpened(true);
+  }
+
+  function handleSaveAssignment() {
+    if (!selectedCode || editingAssignmentId === null) return;
+    updateAssignmentMutation.mutate(
+      {
+        code: selectedCode,
+        assignmentId: editingAssignmentId,
+        body: editAssignmentForm,
+      },
+      {
+        onSuccess: () => {
+          notifications.show({
+            title: "Assignment Updated",
+            message: "Course assignment details updated successfully.",
+            color: "teal",
+          });
+          setEditAssignmentOpened(false);
+          setEditingAssignmentId(null);
+        },
+        onError: (err) => {
+          notifications.show({
+            title: "Could not update assignment",
+            message: errorMessage(err),
+            color: "red",
+          });
+        },
+      },
+    );
+  }
+
+  function handleDeleteAssignment(assignmentId: number, title: string) {
+    if (!selectedCode) return;
+    if (!window.confirm(`Are you sure you want to delete assignment "${title}"?`)) {
+      return;
+    }
+    deleteAssignmentMutation.mutate(
+      { code: selectedCode, assignmentId },
+      {
+        onSuccess: () => {
+          notifications.show({
+            title: "Assignment Deleted",
+            message: `Assignment "${title}" was removed.`,
+            color: "teal",
+          });
+        },
+        onError: (err) => {
+          notifications.show({
+            title: "Could not delete assignment",
+            message: errorMessage(err),
+            color: "red",
+          });
+        },
+      },
+    );
+  }
+
 
   // 1. Course Listing View (when no course code is selected)
 
@@ -617,6 +767,19 @@ export default function CourseWorkspacePage() {
             }
           >
             Announcements
+          </Tabs.Tab>
+          <Tabs.Tab
+            value="assignments"
+            leftSection={<FaTasks size={14} />}
+            rightSection={
+              assignmentsData?.total_count !== undefined ? (
+                <Badge size="xs" variant="light" circle>
+                  {assignmentsData.total_count}
+                </Badge>
+              ) : null
+            }
+          >
+            Assignments
           </Tabs.Tab>
         </Tabs.List>
 
@@ -1092,6 +1255,178 @@ export default function CourseWorkspacePage() {
             )}
           </Stack>
         </Tabs.Panel>
+
+        {/* TAB 4: ASSIGNMENTS (CFR-LMS-006, CFR-LMS-007) */}
+        <Tabs.Panel value="assignments">
+          <Stack gap="lg">
+            <Group justify="space-between" align="center">
+              <div>
+                <Title order={3}>Course Assignments</Title>
+                <Text size="sm" c="dimmed">
+                  Manage and view assignments, instructions, and due dates for {workspace.code} - {workspace.title}
+                </Text>
+              </div>
+
+              {assignmentsData?.can_manage ? (
+                <Button
+                  leftSection={<FaPlus size={14} />}
+                  onClick={() => setAddAssignmentOpened(true)}
+                  color="indigo"
+                >
+                  Create Assignment
+                </Button>
+              ) : (
+                <Badge variant="outline" color={roleBadgeColor(workspace.role)}>
+                  {roleLabel(workspace.role)} (Read-only)
+                </Badge>
+              )}
+            </Group>
+
+            {assignmentsLoading ? (
+              <Group justify="center" p="xl">
+                <Loader size="md" />
+              </Group>
+            ) : assignmentsError ? (
+              <Alert icon={<FaInfoCircle size={16} />} title="Error loading assignments" color="red">
+                {errorMessage(assignmentsError)}
+              </Alert>
+            ) : !assignmentsData?.assignments || assignmentsData.assignments.length === 0 ? (
+              <Paper p="xl" withBorder radius="md" style={{ textAlign: "center" }}>
+                <ThemeIcon size={48} radius="xl" color="gray" variant="light" mb="sm">
+                  <FaTasks size={24} />
+                </ThemeIcon>
+                <Title order={4} mb="xs">
+                  No Assignments Yet
+                </Title>
+                <Text size="sm" c="dimmed" maw={420} mx="auto">
+                  There are currently no assignments published for this course.
+                  {assignmentsData?.can_manage
+                    ? " Click 'Create Assignment' above to draft the first assignment."
+                    : " Check back later for updates from your course instructors."}
+                </Text>
+              </Paper>
+            ) : (
+              <Stack gap="md">
+                {assignmentsData.assignments.map((asg) => (
+                  <Card key={asg.id} padding="lg" radius="md" withBorder shadow="xs">
+                    <Group justify="space-between" align="flex-start" mb="xs">
+                      <div>
+                        <Group gap="sm" align="center">
+                          <Title order={4}>{asg.title}</Title>
+                          <Badge
+                            size="sm"
+                            variant="filled"
+                            color={
+                              asg.status === "published"
+                                ? "green"
+                                : asg.status === "scheduled"
+                                ? "orange"
+                                : "gray"
+                            }
+                          >
+                            {asg.status.toUpperCase()}
+                          </Badge>
+                          <Badge size="sm" variant="light" color="blue">
+                            {asg.submission_type === "file"
+                              ? "File Upload"
+                              : asg.submission_type === "text"
+                              ? "Text Entry"
+                              : "Link Submission"}
+                          </Badge>
+                          <Badge size="sm" variant="light" color="violet">
+                            {asg.points_possible} pts
+                          </Badge>
+                        </Group>
+
+                        <Group gap="md" mt={6}>
+                          {asg.due_at && (
+                            <Group gap={4}>
+                              <FaCalendarAlt size={12} color="gray" />
+                              <Text size="xs" c="dimmed">
+                                Due: {new Date(asg.due_at).toLocaleString(undefined, {
+                                  dateStyle: "medium",
+                                  timeStyle: "short",
+                                })}
+                              </Text>
+                            </Group>
+                          )}
+                          {asg.release_at && asg.status === "scheduled" && (
+                            <Text size="xs" c="orange">
+                              Releases: {new Date(asg.release_at).toLocaleString(undefined, {
+                                dateStyle: "medium",
+                                timeStyle: "short",
+                              })}
+                            </Text>
+                          )}
+                        </Group>
+                      </div>
+
+                      {assignmentsData.can_manage && (
+                        <Group gap="xs">
+                          <ActionIcon
+                            variant="subtle"
+                            color="blue"
+                            onClick={() => openEditAssignmentModal(asg)}
+                            title="Edit Assignment"
+                          >
+                            <FaEdit size={14} />
+                          </ActionIcon>
+                          <ActionIcon
+                            variant="subtle"
+                            color="red"
+                            onClick={() => handleDeleteAssignment(asg.id, asg.title)}
+                            title="Delete Assignment"
+                          >
+                            <FaTrash size={14} />
+                          </ActionIcon>
+                        </Group>
+                      )}
+                    </Group>
+
+                    <Divider my="sm" />
+
+                    {asg.instructions ? (
+                      <Text size="sm" lineClamp={3} style={{ whiteSpace: "pre-line", lineHeight: 1.6 }}>
+                        {asg.instructions}
+                      </Text>
+                    ) : (
+                      <Text size="sm" c="dimmed" fs="italic">
+                        No instructions provided.
+                      </Text>
+                    )}
+
+                    <Group justify="space-between" align="center" mt="md">
+                      <Button
+                        size="xs"
+                        variant="subtle"
+                        leftSection={<FaEye size={12} />}
+                        onClick={() => {
+                          setViewingAssignment(asg);
+                          setAssignmentDetailOpened(true);
+                        }}
+                      >
+                        View Details & Instructions
+                      </Button>
+
+                      {asg.has_file && (
+                        <Button
+                          component="a"
+                          href={`/api/v1/lms/courses/${workspace.code}/assignments/${asg.id}/download`}
+                          download={asg.file_name}
+                          size="xs"
+                          variant="light"
+                          leftSection={<FaDownload size={12} />}
+                        >
+                          {asg.file_name || "Download Attachment"}
+                        </Button>
+                      )}
+                    </Group>
+                  </Card>
+                ))}
+              </Stack>
+            )}
+          </Stack>
+        </Tabs.Panel>
       </Tabs>
 
 
@@ -1500,6 +1835,344 @@ export default function CourseWorkspacePage() {
           </Group>
         </Stack>
       </Modal>
+
+      {/* Create Assignment Modal (Faculty only, UC-LMS-007, BR-LMS-009) */}
+      <Modal
+        opened={addAssignmentOpened}
+        onClose={() => setAddAssignmentOpened(false)}
+        title={`Create Assignment (${workspace?.code})`}
+        size="lg"
+        centered
+      >
+        <Stack gap="md">
+          <TextInput
+            label="Assignment Title"
+            placeholder="e.g. Homework 1: ER Modeling and Relational Algebra"
+            value={addAssignmentForm.title}
+            onChange={(e) =>
+              setAddAssignmentForm({ ...addAssignmentForm, title: e.currentTarget.value })
+            }
+            required
+            maxLength={200}
+          />
+
+          <Textarea
+            label="Instructions"
+            placeholder="Detailed instructions, guidelines, requirements..."
+            value={addAssignmentForm.instructions ?? ""}
+            onChange={(e) =>
+              setAddAssignmentForm({ ...addAssignmentForm, instructions: e.currentTarget.value })
+            }
+            minRows={4}
+          />
+
+          <Group grow>
+            <Select
+              label="Submission Type"
+              value={addAssignmentForm.submission_type}
+              data={[
+                { value: "file", label: "File Upload" },
+                { value: "text", label: "Text Entry" },
+                { value: "link", label: "Website Link" },
+              ]}
+              onChange={(val) =>
+                val &&
+                setAddAssignmentForm({
+                  ...addAssignmentForm,
+                  submission_type: val as "file" | "text" | "link",
+                })
+              }
+              required
+            />
+
+            <TextInput
+              label="Points Possible"
+              type="number"
+              value={addAssignmentForm.points_possible ?? 100}
+              onChange={(e) =>
+                setAddAssignmentForm({
+                  ...addAssignmentForm,
+                  points_possible: Number(e.currentTarget.value) || 0,
+                })
+              }
+              required
+            />
+          </Group>
+
+          <Group grow>
+            <Select
+              label="Initial Status"
+              value={addAssignmentForm.status}
+              data={[
+                { value: "draft", label: "Draft (not visible to students)" },
+                { value: "published", label: "Published (immediately visible)" },
+                { value: "scheduled", label: "Scheduled (released at specified date)" },
+              ]}
+              onChange={(val) =>
+                val &&
+                setAddAssignmentForm({
+                  ...addAssignmentForm,
+                  status: val as "draft" | "published" | "scheduled",
+                })
+              }
+            />
+
+            <TextInput
+              label="Due Date & Time"
+              type="datetime-local"
+              value={addAssignmentForm.due_at ?? ""}
+              onChange={(e) =>
+                setAddAssignmentForm({ ...addAssignmentForm, due_at: e.currentTarget.value })
+              }
+            />
+          </Group>
+
+          {addAssignmentForm.status === "scheduled" && (
+            <TextInput
+              label="Release Date & Time"
+              type="datetime-local"
+              value={addAssignmentForm.release_at ?? ""}
+              onChange={(e) =>
+                setAddAssignmentForm({ ...addAssignmentForm, release_at: e.currentTarget.value })
+              }
+              required
+              description="Assignment remains hidden from students until this release timestamp."
+            />
+          )}
+
+          <FileInput
+            label="Optional Attachment"
+            placeholder="Select file (e.g. worksheet, starter code, rubric)"
+            value={addAssignmentForm.file ?? null}
+            onChange={(file) => setAddAssignmentForm({ ...addAssignmentForm, file })}
+            clearable
+          />
+
+          <Group justify="flex-end" mt="md">
+            <Button variant="default" onClick={() => setAddAssignmentOpened(false)}>
+              Cancel
+            </Button>
+            <Button
+              color="indigo"
+              onClick={handleCreateAssignment}
+              loading={createAssignmentMutation.isPending}
+            >
+              Create Assignment
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+
+      {/* Edit Assignment Modal (Faculty only, UC-LMS-007) */}
+      <Modal
+        opened={editAssignmentOpened}
+        onClose={() => setEditAssignmentOpened(false)}
+        title={`Edit Assignment (${workspace?.code})`}
+        size="lg"
+        centered
+      >
+        <Stack gap="md">
+          <TextInput
+            label="Assignment Title"
+            value={editAssignmentForm.title ?? ""}
+            onChange={(e) =>
+              setEditAssignmentForm({ ...editAssignmentForm, title: e.currentTarget.value })
+            }
+            required
+            maxLength={200}
+          />
+
+          <Textarea
+            label="Instructions"
+            value={editAssignmentForm.instructions ?? ""}
+            onChange={(e) =>
+              setEditAssignmentForm({
+                ...editAssignmentForm,
+                instructions: e.currentTarget.value,
+              })
+            }
+            minRows={4}
+          />
+
+          <Group grow>
+            <Select
+              label="Submission Type"
+              value={editAssignmentForm.submission_type ?? "file"}
+              data={[
+                { value: "file", label: "File Upload" },
+                { value: "text", label: "Text Entry" },
+                { value: "link", label: "Website Link" },
+              ]}
+              onChange={(val) =>
+                val &&
+                setEditAssignmentForm({
+                  ...editAssignmentForm,
+                  submission_type: val as "file" | "text" | "link",
+                })
+              }
+            />
+
+            <TextInput
+              label="Points Possible"
+              type="number"
+              value={editAssignmentForm.points_possible ?? 100}
+              onChange={(e) =>
+                setEditAssignmentForm({
+                  ...editAssignmentForm,
+                  points_possible: Number(e.currentTarget.value) || 0,
+                })
+              }
+            />
+          </Group>
+
+          <Group grow>
+            <Select
+              label="Status"
+              value={editAssignmentForm.status ?? "draft"}
+              data={[
+                { value: "draft", label: "Draft" },
+                { value: "published", label: "Published" },
+                { value: "scheduled", label: "Scheduled" },
+              ]}
+              onChange={(val) =>
+                val &&
+                setEditAssignmentForm({
+                  ...editAssignmentForm,
+                  status: val as "draft" | "published" | "scheduled",
+                })
+              }
+            />
+
+            <TextInput
+              label="Due Date & Time"
+              type="datetime-local"
+              value={editAssignmentForm.due_at ?? ""}
+              onChange={(e) =>
+                setEditAssignmentForm({ ...editAssignmentForm, due_at: e.currentTarget.value })
+              }
+            />
+          </Group>
+
+          {editAssignmentForm.status === "scheduled" && (
+            <TextInput
+              label="Release Date & Time"
+              type="datetime-local"
+              value={editAssignmentForm.release_at ?? ""}
+              onChange={(e) =>
+                setEditAssignmentForm({
+                  ...editAssignmentForm,
+                  release_at: e.currentTarget.value,
+                })
+              }
+            />
+          )}
+
+          <FileInput
+            label="Replace Attachment"
+            placeholder="Select replacement file"
+            value={editAssignmentForm.file ?? null}
+            onChange={(file) => setEditAssignmentForm({ ...editAssignmentForm, file })}
+            clearable
+          />
+
+          <Group justify="flex-end" mt="md">
+            <Button variant="default" onClick={() => setEditAssignmentOpened(false)}>
+              Cancel
+            </Button>
+            <Button
+              color="indigo"
+              onClick={handleSaveAssignment}
+              loading={updateAssignmentMutation.isPending}
+            >
+              Save Changes
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+
+      {/* View Assignment Details Modal */}
+      <Modal
+        opened={assignmentDetailOpened}
+        onClose={() => setAssignmentDetailOpened(false)}
+        title={viewingAssignment?.title ?? "Assignment Details"}
+        size="lg"
+        centered
+      >
+        {viewingAssignment && (
+          <Stack gap="md">
+            <Group justify="space-between" align="center">
+              <Group gap="xs">
+                <Badge
+                  size="sm"
+                  color={
+                    viewingAssignment.status === "published"
+                      ? "green"
+                      : viewingAssignment.status === "scheduled"
+                      ? "orange"
+                      : "gray"
+                  }
+                >
+                  {viewingAssignment.status.toUpperCase()}
+                </Badge>
+                <Badge size="sm" variant="light" color="blue">
+                  {viewingAssignment.submission_type === "file"
+                    ? "File Upload"
+                    : viewingAssignment.submission_type === "text"
+                    ? "Text Entry"
+                    : "Website Link"}
+                </Badge>
+                <Badge size="sm" variant="light" color="violet">
+                  {viewingAssignment.points_possible} pts
+                </Badge>
+              </Group>
+
+              {viewingAssignment.due_at && (
+                <Text size="xs" c="dimmed">
+                  Due: {new Date(viewingAssignment.due_at).toLocaleString()}
+                </Text>
+              )}
+            </Group>
+
+            <Divider />
+
+            <div>
+              <Text size="sm" fw={600} mb="xs">
+                Instructions:
+              </Text>
+              <Paper p="md" withBorder radius="sm" bg="gray.0">
+                <Text style={{ whiteSpace: "pre-line", lineHeight: 1.6 }} size="sm">
+                  {viewingAssignment.instructions || "No instructions provided."}
+                </Text>
+              </Paper>
+            </div>
+
+            {viewingAssignment.has_file && (
+              <Group justify="space-between" align="center" mt="xs">
+                <Text size="xs" c="dimmed">
+                  Attachment: {viewingAssignment.file_name} ({formatBytes(viewingAssignment.file_size)})
+                </Text>
+                <Button
+                  component="a"
+                  href={`/api/v1/lms/courses/${workspace.code}/assignments/${viewingAssignment.id}/download`}
+                  download={viewingAssignment.file_name}
+                  size="xs"
+                  variant="light"
+                  leftSection={<FaDownload size={12} />}
+                >
+                  Download File
+                </Button>
+              </Group>
+            )}
+
+            <Group justify="flex-end" mt="md">
+              <Button variant="default" onClick={() => setAssignmentDetailOpened(false)}>
+                Close
+              </Button>
+            </Group>
+          </Stack>
+        )}
+      </Modal>
+
     </Container>
   );
 }

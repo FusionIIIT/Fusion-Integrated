@@ -1,24 +1,38 @@
 """Integration tests for LMS Course Workspace and Materials services."""
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 
 import pytest
 
 from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from fusion_auth.principal import Principal
-from modules.lms.contracts import get_course_announcements
+from modules.lms.contracts import get_course_announcements, get_course_assignments
 from modules.lms.domain.entities import (
+    AssignmentStatus,
     CourseRole,
     CourseStatus,
     MaterialStatus,
     MaterialType,
     SectionType,
+    SubmissionType,
 )
-from modules.lms.models import Course, CourseAnnouncement, CourseMaterial, CourseMembership
+from modules.lms.models import (
+    Course,
+    CourseAnnouncement,
+    CourseAssignment,
+    CourseMaterial,
+    CourseMembership,
+)
 from modules.lms.selectors.announcements import (
     get_course_announcement_detail,
     list_course_announcements,
 )
+from modules.lms.selectors.assignments import (
+    get_course_assignment_detail,
+    list_course_assignments,
+)
 from modules.lms.services import announcements as announcement_service
+from modules.lms.services import assignments as assignment_service
 from modules.lms.services import courses as course_service
 from modules.lms.services import materials as material_service
 
@@ -486,3 +500,292 @@ def test_contract_get_course_announcements():
     assert len(res["NONEXISTENT"]) == 0
 
 
+@pytest.mark.django_db
+def test_faculty_can_create_draft_assignment():
+    course = Course.objects.create(code="CS601", title="Algorithms", status=CourseStatus.PUBLISHED)
+    CourseMembership.objects.create(course=course, user_id=101, role=CourseRole.FACULTY)
+    faculty = make_principal(101, "faculty", ("lms.assignment.view", "lms.assignment.manage"))
+
+    asg = assignment_service.create_course_assignment(
+        actor=faculty,
+        course_code="CS601",
+        title="Divide and Conquer",
+        submission_type=SubmissionType.FILE,
+        points_possible=100,
+        status=AssignmentStatus.DRAFT,
+    )
+
+    assert asg.id is not None
+    assert asg.title == "Divide and Conquer"
+    assert asg.status == AssignmentStatus.DRAFT
+    assert asg.submission_type == "file"
+    assert asg.points_possible == Decimal("100.00")
+    assert asg.created_by_user_id == 101
+
+
+@pytest.mark.django_db
+def test_faculty_can_create_and_publish_assignment():
+    course = Course.objects.create(code="CS602", title="Networking", status=CourseStatus.PUBLISHED)
+    CourseMembership.objects.create(course=course, user_id=101, role=CourseRole.FACULTY)
+    faculty = make_principal(101, "faculty", ("lms.assignment.view", "lms.assignment.manage"))
+
+    now = datetime.now(UTC)
+    due = now + timedelta(days=7)
+
+    asg = assignment_service.create_course_assignment(
+        actor=faculty,
+        course_code="CS602",
+        title="Socket Programming",
+        instructions="Implement TCP client and server in Python.",
+        submission_type=SubmissionType.FILE,
+        points_possible=50,
+        status=AssignmentStatus.PUBLISHED,
+        due_at=due,
+    )
+
+    assert asg.status == AssignmentStatus.PUBLISHED
+    assert asg.instructions == "Implement TCP client and server in Python."
+
+
+@pytest.mark.django_db
+def test_faculty_can_edit_assignment():
+    course = Course.objects.create(code="CS603", title="AI", status=CourseStatus.PUBLISHED)
+    CourseMembership.objects.create(course=course, user_id=101, role=CourseRole.FACULTY)
+    faculty = make_principal(101, "faculty", ("lms.assignment.view", "lms.assignment.manage"))
+
+    asg = assignment_service.create_course_assignment(
+        actor=faculty,
+        course_code="CS603",
+        title="Search Algorithms Draft",
+        status=AssignmentStatus.DRAFT,
+    )
+
+    now = datetime.now(UTC)
+    due = now + timedelta(days=5)
+
+    updated = assignment_service.update_course_assignment(
+        actor=faculty,
+        course_code="CS603",
+        assignment_id=asg.id,
+        title="Search Algorithms Final",
+        instructions="Implement A* search.",
+        status=AssignmentStatus.PUBLISHED,
+        due_at=due,
+        points_possible=75,
+    )
+
+    assert updated.title == "Search Algorithms Final"
+    assert updated.status == AssignmentStatus.PUBLISHED
+    assert updated.instructions == "Implement A* search."
+    assert updated.points_possible == Decimal("75.00")
+
+
+@pytest.mark.django_db
+def test_faculty_can_delete_assignment():
+    course = Course.objects.create(code="CS604", title="Databases", status=CourseStatus.PUBLISHED)
+    CourseMembership.objects.create(course=course, user_id=101, role=CourseRole.FACULTY)
+    faculty = make_principal(101, "faculty", ("lms.assignment.view", "lms.assignment.manage"))
+
+    asg = assignment_service.create_course_assignment(
+        actor=faculty,
+        course_code="CS604",
+        title="To Be Deleted",
+        status=AssignmentStatus.DRAFT,
+    )
+
+    assignment_service.delete_course_assignment(
+        actor=faculty, course_code="CS604", assignment_id=asg.id
+    )
+
+    assert not CourseAssignment.objects.filter(id=asg.id).exists()
+
+
+@pytest.mark.django_db
+def test_ta_cannot_create_or_edit_assignments():
+    course = Course.objects.create(code="CS605", title="OS", status=CourseStatus.PUBLISHED)
+    CourseMembership.objects.create(course=course, user_id=201, role=CourseRole.TA)
+    ta = make_principal(201, "ta", ("lms.assignment.view", "lms.assignment.manage"))
+
+    # TA creation rejected
+    with pytest.raises(PermissionDeniedError, match="Teaching Assistants are not permitted"):
+        assignment_service.create_course_assignment(
+            actor=ta,
+            course_code="CS605",
+            title="TA Assignment",
+            status=AssignmentStatus.DRAFT,
+        )
+
+    # Pre-existing assignment created by faculty
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Kernel Modules",
+        instructions="Instructions",
+        submission_type="file",
+        status=AssignmentStatus.DRAFT,
+        created_by_user_id=101,
+    )
+
+    # TA edit rejected
+    with pytest.raises(PermissionDeniedError, match="Teaching Assistants are not permitted"):
+        assignment_service.update_course_assignment(
+            actor=ta,
+            course_code="CS605",
+            assignment_id=asg.id,
+            title="TA Edited",
+        )
+
+
+@pytest.mark.django_db
+def test_student_and_observer_cannot_author_assignments():
+    course = Course.objects.create(code="CS606", title="Compilers", status=CourseStatus.PUBLISHED)
+    CourseMembership.objects.create(course=course, user_id=301, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=course, user_id=302, role=CourseRole.OBSERVER)
+
+    student = make_principal(301, "student", ("lms.assignment.view", "lms.assignment.manage"))
+    observer = make_principal(302, "observer", ("lms.assignment.view", "lms.assignment.manage"))
+
+    with pytest.raises(PermissionDeniedError, match="Students cannot create"):
+        assignment_service.create_course_assignment(
+            actor=student,
+            course_code="CS606",
+            title="Student Assignment",
+        )
+
+    with pytest.raises(PermissionDeniedError, match="Observers have read-only"):
+        assignment_service.create_course_assignment(
+            actor=observer,
+            course_code="CS606",
+            title="Observer Assignment",
+        )
+
+
+@pytest.mark.django_db
+def test_student_cannot_view_draft_or_unreleased_scheduled_assignments():
+    course = Course.objects.create(code="CS607", title="Security", status=CourseStatus.PUBLISHED)
+    CourseMembership.objects.create(course=course, user_id=101, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=401, role=CourseRole.STUDENT)
+
+    now = datetime.now(UTC)
+    future_release = now + timedelta(days=2)
+    due = now + timedelta(days=7)
+
+    # 1. Draft assignment
+    draft = CourseAssignment.objects.create(
+        course=course,
+        title="Draft Exam",
+        instructions="Hidden draft",
+        status=AssignmentStatus.DRAFT,
+        created_by_user_id=101,
+    )
+
+    # 2. Future-scheduled assignment
+    scheduled = CourseAssignment.objects.create(
+        course=course,
+        title="Scheduled Crypto",
+        instructions="Hidden future assignment",
+        status=AssignmentStatus.SCHEDULED,
+        release_at=future_release,
+        due_at=due,
+        created_by_user_id=101,
+    )
+
+    # 3. Published available assignment
+    published = CourseAssignment.objects.create(
+        course=course,
+        title="Available Lab 1",
+        instructions="Buffer overflow lab",
+        status=AssignmentStatus.PUBLISHED,
+        due_at=due,
+        created_by_user_id=101,
+    )
+
+    student = make_principal(401, "student", ("lms.assignment.view",))
+    data = list_course_assignments(principal=student, course_code="CS607")
+
+    assert data is not None
+    assert data["can_manage"] is False
+    assert len(data["assignments"]) == 1
+    assert data["assignments"][0]["id"] == published.id
+    assert data["assignments"][0]["title"] == "Available Lab 1"
+
+    # Detail check: draft and scheduled should return None for student
+    assert get_course_assignment_detail(
+        principal=student, course_code="CS607", assignment_id=draft.id
+    ) is None
+    assert get_course_assignment_detail(
+        principal=student, course_code="CS607", assignment_id=scheduled.id
+    ) is None
+
+    # Published detail works
+    pub_detail = get_course_assignment_detail(
+        principal=student, course_code="CS607", assignment_id=published.id
+    )
+    assert pub_detail is not None
+    assert pub_detail["title"] == "Available Lab 1"
+
+
+@pytest.mark.django_db
+def test_release_scheduled_assignments():
+    course = Course.objects.create(code="CS608", title="Networks", status=CourseStatus.PUBLISHED)
+    past = datetime.now(UTC) - timedelta(hours=1)
+    future = datetime.now(UTC) + timedelta(hours=2)
+
+    # Ready for release
+    asg_ready = CourseAssignment.objects.create(
+        course=course,
+        title="Ready to Release",
+        instructions="Instructions",
+        status=AssignmentStatus.SCHEDULED,
+        release_at=past,
+        created_by_user_id=1,
+    )
+
+    # Not ready for release
+    asg_not_ready = CourseAssignment.objects.create(
+        course=course,
+        title="Not Ready",
+        instructions="Instructions",
+        status=AssignmentStatus.SCHEDULED,
+        release_at=future,
+        created_by_user_id=1,
+    )
+
+    count = assignment_service.release_scheduled_assignments()
+    assert count == 1
+
+    asg_ready.refresh_from_db()
+    asg_not_ready.refresh_from_db()
+
+    assert asg_ready.status == AssignmentStatus.PUBLISHED
+    assert asg_not_ready.status == AssignmentStatus.SCHEDULED
+
+
+@pytest.mark.django_db
+def test_contract_get_course_assignments():
+    c1 = Course.objects.create(code="CS609A", title="Course A", status=CourseStatus.PUBLISHED)
+    c2 = Course.objects.create(code="CS609B", title="Course B", status=CourseStatus.PUBLISHED)
+
+    CourseAssignment.objects.create(
+        course=c1,
+        title="A1",
+        instructions="Ins A1",
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=1,
+    )
+    CourseAssignment.objects.create(
+        course=c2,
+        title="B1",
+        instructions="Ins B1",
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=1,
+    )
+
+    res = get_course_assignments(["CS609A", "CS609B", "NONEXISTENT"])
+    assert "CS609A" in res
+    assert "CS609B" in res
+    assert "NONEXISTENT" in res
+    assert len(res["CS609A"]) == 1
+    assert res["CS609A"][0]["title"] == "A1"
+    assert len(res["CS609B"]) == 1
+    assert res["CS609B"][0]["title"] == "B1"
+    assert len(res["NONEXISTENT"]) == 0

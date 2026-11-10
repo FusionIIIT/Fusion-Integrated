@@ -218,6 +218,175 @@ paths:
               schema:
                 $ref: '#/components/schemas/CourseAnnouncementItem'
           description: ''
+  /api/v1/lms/courses/{code}/assignments:
+    get:
+      operationId: v1_lms_course_assignments_list
+      description: List assignments or create a new assignment for a course.
+      summary: List course assignments
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseAssignmentsResponse'
+          description: ''
+    post:
+      operationId: v1_lms_course_assignments_create
+      description: List assignments or create a new assignment for a course.
+      summary: Create a new course assignment (Faculty only)
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CourseAssignmentCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CourseAssignmentCreate'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseAssignmentCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseAssignmentItem'
+          description: ''
+  /api/v1/lms/courses/{code}/assignments/{assignment_id}:
+    get:
+      operationId: v1_lms_course_assignments_retrieve
+      description: Retrieve, update, or delete a course assignment.
+      summary: Retrieve course assignment details
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseAssignmentItem'
+          description: ''
+    patch:
+      operationId: v1_lms_course_assignments_update
+      description: Retrieve, update, or delete a course assignment.
+      summary: Update a course assignment (Faculty only)
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseAssignmentUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseAssignmentUpdate'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseAssignmentUpdate'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseAssignmentItem'
+          description: ''
+    delete:
+      operationId: v1_lms_course_assignments_destroy
+      description: Retrieve, update, or delete a course assignment.
+      summary: Delete a course assignment (Faculty only)
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/lms/courses/{code}/assignments/{assignment_id}/download:
+    get:
+      operationId: v1_lms_course_assignments_download
+      description: Download attached file for a released assignment.
+      summary: Download attached assignment file
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: ''
   /api/v1/lms/courses/{code}/materials:
     get:
       operationId: v1_lms_course_materials_list
@@ -2684,6 +2853,121 @@ components:
       - course_title
       - role
       - total_count
+    CourseAssignmentCreate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        instructions:
+          type: string
+          default: ''
+        submission_type:
+          allOf:
+          - $ref: '#/components/schemas/SubmissionTypeEnum'
+          default: file
+        points_possible:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          default: '100.00'
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status243Enum'
+          default: draft
+        due_at:
+          type: string
+          format: date-time
+          nullable: true
+        release_at:
+          type: string
+          format: date-time
+          nullable: true
+        file:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - title
+    CourseAssignmentItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        course_code:
+          type: string
+        title:
+          type: string
+        instructions:
+          type: string
+        submission_type:
+          type: string
+        points_possible:
+          type: number
+          format: double
+        status:
+          type: string
+        due_at:
+          type: string
+          nullable: true
+        release_at:
+          type: string
+          nullable: true
+        file_name:
+          type: string
+        file_size:
+          type: integer
+          nullable: true
+        has_file:
+          type: boolean
+        created_by_user_id:
+          type: integer
+        created_at:
+          type: string
+          nullable: true
+        updated_at:
+          type: string
+          nullable: true
+      required:
+      - course_code
+      - created_at
+      - created_by_user_id
+      - due_at
+      - file_name
+      - file_size
+      - has_file
+      - id
+      - instructions
+      - points_possible
+      - release_at
+      - status
+      - submission_type
+      - title
+      - updated_at
+    CourseAssignmentsResponse:
+      type: object
+      properties:
+        course_code:
+          type: string
+        course_title:
+          type: string
+        role:
+          type: string
+        can_manage:
+          type: boolean
+        assignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseAssignmentItem'
+        total_count:
+          type: integer
+      required:
+      - assignments
+      - can_manage
+      - course_code
+      - course_title
+      - role
+      - total_count
     CourseMaterialCreate:
       type: object
       properties:
@@ -3609,6 +3893,34 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PatchedCourseAssignmentUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        instructions:
+          type: string
+        submission_type:
+          $ref: '#/components/schemas/SubmissionTypeEnum'
+        points_possible:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+        status:
+          $ref: '#/components/schemas/Status243Enum'
+        due_at:
+          type: string
+          format: date-time
+          nullable: true
+        release_at:
+          type: string
+          format: date-time
+          nullable: true
+        file:
+          type: string
+          format: uri
+          nullable: true
     PatchedCourseMaterialUpdate:
       type: object
       properties:
@@ -4463,6 +4775,16 @@ components:
       - missing_fields
       - updated_at
       - user_id
+    SubmissionTypeEnum:
+      enum:
+      - file
+      - link
+      - text
+      type: string
+      description: |-
+        * `file` - file
+        * `link` - link
+        * `text` - text
     SubmitOfferLetter:
       type: object
       properties:

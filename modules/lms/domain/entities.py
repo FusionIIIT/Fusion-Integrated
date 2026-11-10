@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 from typing import Final
 
 from modules.lms.domain.errors import LMSRuleError
@@ -49,6 +50,22 @@ class MaterialStatus:
     ALL: Final[frozenset[str]] = frozenset({DRAFT, PUBLISHED, SCHEDULED})
 
 
+class SubmissionType:
+    FILE: Final[str] = "file"
+    TEXT: Final[str] = "text"
+    LINK: Final[str] = "link"
+
+    ALL: Final[frozenset[str]] = frozenset({FILE, TEXT, LINK})
+
+
+class AssignmentStatus:
+    DRAFT: Final[str] = "draft"
+    PUBLISHED: Final[str] = "published"
+    SCHEDULED: Final[str] = "scheduled"
+
+    ALL: Final[frozenset[str]] = frozenset({DRAFT, PUBLISHED, SCHEDULED})
+
+
 @dataclass(frozen=True)
 class CourseDetails:
     code: str
@@ -77,6 +94,17 @@ class MaterialDetails:
 class AnnouncementDetails:
     title: str
     content: str
+
+
+@dataclass(frozen=True)
+class AssignmentDetails:
+    title: str
+    instructions: str = ""
+    submission_type: str = SubmissionType.FILE
+    points_possible: Decimal = Decimal("100.00")
+    status: str = AssignmentStatus.DRAFT
+    due_at: datetime | None = None
+    release_at: datetime | None = None
 
 
 
@@ -153,5 +181,60 @@ def validate_announcement_details(*, title: str, content: str) -> None:
         raise LMSRuleError("Announcement title cannot exceed 200 characters.")
     if not content or not content.strip():
         raise LMSRuleError("Announcement content cannot be empty.")
+
+
+def validate_assignment_details(
+    *,
+    title: str,
+    submission_type: str,
+    status: str,
+    points_possible: Decimal | float | int | str | None = None,
+    instructions: str = "",
+    due_at: datetime | None = None,
+    release_at: datetime | None = None,
+) -> None:
+    """Validate course assignment parameters.
+
+    Adheres to CFR-LMS-006, BR-LMS-009, BR-LMS-010, and BR-LMS-011.
+    """
+    if not title or not title.strip():
+        raise LMSRuleError("Assignment title cannot be empty.")
+    if len(title.strip()) > 200:
+        raise LMSRuleError("Assignment title cannot exceed 200 characters.")
+
+    if submission_type not in SubmissionType.ALL:
+        choices = sorted(SubmissionType.ALL)
+        raise LMSRuleError(
+            f"Invalid submission type: '{submission_type}'. Must be one of {choices}."
+        )
+
+    if status not in AssignmentStatus.ALL:
+        choices = sorted(AssignmentStatus.ALL)
+        raise LMSRuleError(
+            f"Invalid assignment status: '{status}'. Must be one of {choices}."
+        )
+
+    if points_possible is not None:
+        try:
+            pts = Decimal(str(points_possible))
+        except (InvalidOperation, TypeError, ValueError) as exc:
+            raise LMSRuleError("Points possible must be a valid positive number.") from exc
+        if pts <= 0:
+            raise LMSRuleError("Points possible must be greater than zero.")
+
+    # Publication validation (BR-LMS-009)
+    if status in {AssignmentStatus.PUBLISHED, AssignmentStatus.SCHEDULED}:
+        if not instructions or not instructions.strip():
+            raise LMSRuleError("Published assignment requires instructions.")
+        if due_at is None:
+            raise LMSRuleError("Published assignment requires a valid due date.")
+        if points_possible is None:
+            raise LMSRuleError("Published assignment requires points possible.")
+
+    if status == AssignmentStatus.SCHEDULED and release_at is None:
+        raise LMSRuleError("Scheduled assignment requires a valid release date and time.")
+
+    if release_at is not None and due_at is not None and release_at > due_at:
+        raise LMSRuleError("Assignment release date cannot be after the due date.")
 
 

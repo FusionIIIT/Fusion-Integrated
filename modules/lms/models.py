@@ -4,15 +4,19 @@ User ids deliberately remain plain integers: IAM owns identities and directory
 facts, so course memberships must not introduce cross-module foreign keys
 (ADR-0013).
 """
+from decimal import Decimal
+
 from django.db import models
 
 from core.db.mixins import TimeStampedModel
 from modules.lms.domain.entities import (
+    AssignmentStatus,
     CourseRole,
     CourseStatus,
     MaterialStatus,
     MaterialType,
     SectionType,
+    SubmissionType,
 )
 
 
@@ -152,5 +156,57 @@ class CourseAnnouncement(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"Announcement({self.title}) in {self.course.code}"
+
+
+class CourseAssignment(TimeStampedModel):
+    """A course assignment offering in the LMS.
+
+    Captures due date, instructions, submission type, and points possible,
+    with draft state before publication and release date visibility control
+    (CFR-LMS-006, CFR-LMS-007, BR-LMS-009, BR-LMS-010, BR-LMS-011).
+    """
+
+    SUBMISSION_CHOICES = [
+        (SubmissionType.FILE, "File Upload"),
+        (SubmissionType.TEXT, "Text Entry"),
+        (SubmissionType.LINK, "Website Link"),
+    ]
+
+    STATUS_CHOICES = [
+        (AssignmentStatus.DRAFT, "Draft"),
+        (AssignmentStatus.PUBLISHED, "Published"),
+        (AssignmentStatus.SCHEDULED, "Scheduled"),
+    ]
+
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="assignments")
+    title = models.CharField(max_length=200)
+    instructions = models.TextField(blank=True)
+    submission_type = models.CharField(
+        max_length=16, choices=SUBMISSION_CHOICES, default=SubmissionType.FILE
+    )
+    points_possible = models.DecimalField(
+        max_digits=6, decimal_places=2, default=Decimal("100.00")
+    )
+    status = models.CharField(
+        max_length=16, choices=STATUS_CHOICES, default=AssignmentStatus.DRAFT
+    )
+    due_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    release_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    file = models.FileField(upload_to="lms/assignments/%Y/%m/", null=True, blank=True)
+    file_name = models.CharField(max_length=255, blank=True)
+    file_size = models.BigIntegerField(null=True, blank=True)
+    created_by_user_id = models.IntegerField(db_index=True)
+
+    class Meta:
+        db_table = "lms_course_assignment"
+        ordering = ["due_at", "-created_at"]
+        indexes = [
+            models.Index(fields=["course", "status"], name="lms_asg_course_status_idx"),
+            models.Index(fields=["course", "due_at"], name="lms_asg_course_due_idx"),
+            models.Index(fields=["status", "release_at"], name="lms_asg_status_rel_idx"),
+        ]
+
+    def __str__(self) -> str:
+        return f"Assignment({self.title}) in {self.course.code} [{self.status}]"
 
 

@@ -9,8 +9,14 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from modules.lms.domain.entities import MaterialStatus
-from modules.lms.models import Course, CourseAnnouncement, CourseMaterial, CourseMembership
+from modules.lms.domain.entities import AssignmentStatus, MaterialStatus
+from modules.lms.models import (
+    Course,
+    CourseAnnouncement,
+    CourseAssignment,
+    CourseMaterial,
+    CourseMembership,
+)
 
 
 @dataclass(frozen=True)
@@ -103,3 +109,29 @@ def get_course_announcements(
     return result
 
 
+def get_course_assignments(
+    course_codes: Sequence[str],
+) -> dict[str, list[dict[str, Any]]]:
+    """Retrieve published course assignments, batched by course codes (contracts_are_plural)."""
+    codes = {str(c).strip() for c in course_codes if c}
+    if not codes:
+        return {}
+    assignments = (
+        CourseAssignment.objects.filter(course__code__in=codes, status=AssignmentStatus.PUBLISHED)
+        .select_related("course")
+        .order_by("course__code", "due_at", "-created_at")
+    )
+    result: dict[str, list[dict[str, Any]]] = {code: [] for code in codes}
+    for a in assignments:
+        result.setdefault(a.course.code, []).append({
+            "id": a.id,
+            "title": a.title,
+            "instructions": a.instructions,
+            "submission_type": a.submission_type,
+            "points_possible": float(a.points_possible),
+            "status": a.status,
+            "due_at": a.due_at.isoformat() if a.due_at else None,
+            "release_at": a.release_at.isoformat() if a.release_at else None,
+            "file_name": a.file_name,
+        })
+    return result

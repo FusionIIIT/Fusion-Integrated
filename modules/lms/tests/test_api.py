@@ -8,12 +8,13 @@ from rest_framework.test import APIClient
 from conftest import make_session
 from fusion_auth.client import UserRef
 from modules.lms.domain.entities import (
+    AssignmentStatus,
     CourseRole,
     CourseStatus,
     MaterialStatus,
     MaterialType,
 )
-from modules.lms.models import Course, CourseMaterial, CourseMembership
+from modules.lms.models import Course, CourseAssignment, CourseMaterial, CourseMembership
 
 pytestmark = pytest.mark.django_db
 
@@ -24,6 +25,8 @@ MAT_VIEW = "lms.material.view"
 MAT_MANAGE = "lms.material.manage"
 ANN_VIEW = "lms.announcement.view"
 ANN_MANAGE = "lms.announcement.manage"
+ASG_VIEW = "lms.assignment.view"
+ASG_MANAGE = "lms.assignment.manage"
 URL_COURSES = "/api/v1/lms/courses"
 
 
@@ -451,3 +454,206 @@ def test_announcements_course_isolation_and_validation(stub_iam):
     assert resp_bad.status_code == 400
 
 
+def test_assignment_crud_lifecycle_for_faculty(stub_iam):
+    course = Course.objects.create(code="CS701", title="Algorithms")
+    CourseMembership.objects.create(course=course, user_id=9001, role=CourseRole.FACULTY)
+
+    faculty_client = api_client(
+        stub_iam, user_id=9001, role="faculty", permissions=(VIEW, ASG_VIEW, ASG_MANAGE)
+    )
+
+    # 1. Faculty creates draft assignment
+    create_payload = {
+        "title": "Homework 1: Graph Traversal",
+        "instructions": "Implement BFS and DFS in Python.",
+        "submission_type": "file",
+        "points_possible": 100.0,
+        "status": "draft",
+    }
+    resp_create = faculty_client.post(
+        f"{URL_COURSES}/CS701/assignments",
+        create_payload,
+        format="json",
+    )
+    assert resp_create.status_code == 201
+    asg_id = resp_create.data["id"]
+    assert resp_create.data["title"] == "Homework 1: Graph Traversal"
+    assert resp_create.data["status"] == "draft"
+
+    # 2. Faculty retrieves detail
+    resp_get = faculty_client.get(f"{URL_COURSES}/CS701/assignments/{asg_id}")
+    assert resp_get.status_code == 200
+    assert resp_get.data["title"] == "Homework 1: Graph Traversal"
+
+    # 3. Faculty updates assignment to published with due date
+    now = datetime.now(UTC)
+    due = (now + timedelta(days=7)).isoformat()
+    update_payload = {
+        "status": "published",
+        "due_at": due,
+        "points_possible": 120.0,
+    }
+    resp_patch = faculty_client.patch(
+        f"{URL_COURSES}/CS701/assignments/{asg_id}",
+        update_payload,
+        format="json",
+    )
+    assert resp_patch.status_code == 200
+    assert resp_patch.data["status"] == "published"
+    assert resp_patch.data["points_possible"] == 120.0
+
+    # 4. Faculty deletes assignment
+    resp_del = faculty_client.delete(f"{URL_COURSES}/CS701/assignments/{asg_id}")
+    assert resp_del.status_code == 204
+
+    # Confirm deletion
+    resp_after = faculty_client.get(f"{URL_COURSES}/CS701/assignments/{asg_id}")
+    assert resp_after.status_code == 404
+
+
+def test_assignment_list_filters_draft_and_scheduled_from_students(stub_iam):
+    course = Course.objects.create(code="CS702", title="Networking")
+    CourseMembership.objects.create(course=course, user_id=9001, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=1001, role=CourseRole.STUDENT)
+
+    now = datetime.now(UTC)
+    due = now + timedelta(days=5)
+    future_release = now + timedelta(days=2)
+
+    draft = CourseAssignment.objects.create(
+        course=course,
+        title="Draft Exam",
+        instructions="Hidden draft",
+        status=AssignmentStatus.DRAFT,
+        created_by_user_id=9001,
+    )
+    scheduled = CourseAssignment.objects.create(
+        course=course,
+        title="Scheduled Lab",
+        instructions="Hidden lab",
+        status=AssignmentStatus.SCHEDULED,
+        release_at=future_release,
+        due_at=due,
+        created_by_user_id=9001,
+    )
+    published = CourseAssignment.objects.create(
+        course=course,
+        title="Published Project",
+        instructions="Public project",
+        status=AssignmentStatus.PUBLISHED,
+        due_at=due,
+        created_by_user_id=9001,
+    )
+
+    student_client = api_client(
+        stub_iam, user_id=1001, role="student", permissions=(VIEW, ASG_VIEW)
+    )
+
+    # List endpoint strictly shows only published
+    resp_list = student_client.get(f"{URL_COURSES}/CS702/assignments")
+    assert resp_list.status_code == 200
+    assert resp_list.data["can_manage"] is False
+    assert len(resp_list.data["assignments"]) == 1
+    assert resp_list.data["assignments"][0]["id"] == published.id
+
+    # Direct detail access
+    assert student_client.get(f"{URL_COURSES}/CS702/assignments/{draft.id}").status_code == 404
+    assert student_client.get(f"{URL_COURSES}/CS702/assignments/{scheduled.id}").status_code == 404
+    assert student_client.get(f"{URL_COURSES}/CS702/assignments/{published.id}").status_code == 200
+
+
+def test_ta_student_observer_cannot_author_or_modify_assignments(stub_iam):
+    course = Course.objects.create(code="CS703", title="OS")
+    CourseMembership.objects.create(course=course, user_id=9001, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=1001, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=course, user_id=2001, role=CourseRole.TA)
+    CourseMembership.objects.create(course=course, user_id=3001, role=CourseRole.OBSERVER)
+
+    student_client = api_client(
+        stub_iam, user_id=1001, role="student", permissions=(VIEW, ASG_VIEW, ASG_MANAGE)
+    )
+    ta_client = api_client(
+        stub_iam, user_id=2001, role="ta", permissions=(VIEW, ASG_VIEW, ASG_MANAGE)
+    )
+    obs_client = api_client(
+        stub_iam, user_id=3001, role="observer", permissions=(VIEW, ASG_VIEW, ASG_MANAGE)
+    )
+
+    payload = {"title": "Unauthorized Assignment", "status": "draft"}
+
+    # Post is forbidden (403)
+    assert student_client.post(f"{URL_COURSES}/CS703/assignments", payload).status_code == 403
+    assert ta_client.post(f"{URL_COURSES}/CS703/assignments", payload).status_code == 403
+    assert obs_client.post(f"{URL_COURSES}/CS703/assignments", payload).status_code == 403
+
+    # Existing assignment
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Faculty Assignment",
+        status=AssignmentStatus.DRAFT,
+        created_by_user_id=9001,
+    )
+
+    # Patch is forbidden (403)
+    patch_payload = {"title": "Hacked Title"}
+    assert (
+        student_client.patch(
+            f"{URL_COURSES}/CS703/assignments/{asg.id}", patch_payload
+        ).status_code
+        == 403
+    )
+    assert (
+        ta_client.patch(
+            f"{URL_COURSES}/CS703/assignments/{asg.id}", patch_payload
+        ).status_code
+        == 403
+    )
+    assert (
+        obs_client.patch(
+            f"{URL_COURSES}/CS703/assignments/{asg.id}", patch_payload
+        ).status_code
+        == 403
+    )
+
+    # Delete is forbidden (403)
+    assert student_client.delete(f"{URL_COURSES}/CS703/assignments/{asg.id}").status_code == 403
+    assert ta_client.delete(f"{URL_COURSES}/CS703/assignments/{asg.id}").status_code == 403
+    assert obs_client.delete(f"{URL_COURSES}/CS703/assignments/{asg.id}").status_code == 403
+
+
+def test_assignment_download_endpoint(stub_iam):
+    course = Course.objects.create(code="CS704", title="Databases")
+    CourseMembership.objects.create(course=course, user_id=9001, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=1001, role=CourseRole.STUDENT)
+
+    faculty_client = api_client(
+        stub_iam, user_id=9001, role="faculty", permissions=(VIEW, ASG_VIEW, ASG_MANAGE)
+    )
+
+    test_file = SimpleUploadedFile("assignment1.pdf", b"%PDF-1.4 dummy assignment content")
+    now = datetime.now(UTC)
+    due = (now + timedelta(days=7)).isoformat()
+
+    resp_create = faculty_client.post(
+        f"{URL_COURSES}/CS704/assignments",
+        {
+            "title": "SQL Assignment with File",
+            "instructions": "Download and solve the problems.",
+            "submission_type": "file",
+            "points_possible": 100,
+            "status": "published",
+            "due_at": due,
+            "file": test_file,
+        },
+        format="multipart",
+    )
+    assert resp_create.status_code == 201
+    asg_id = resp_create.data["id"]
+
+    # Student downloads attachment
+    student_client = api_client(
+        stub_iam, user_id=1001, role="student", permissions=(VIEW, ASG_VIEW)
+    )
+    resp_dl = student_client.get(f"{URL_COURSES}/CS704/assignments/{asg_id}/download")
+    assert resp_dl.status_code == 200
+    assert b"%PDF-1.4" in b"".join(resp_dl.streaming_content)

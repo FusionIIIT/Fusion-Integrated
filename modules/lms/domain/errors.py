@@ -21,3 +21,11 @@ class MaterialAccessDeniedError(LMSRuleError):
 class MaterialAuthoringDeniedError(LMSRuleError):
     """Raised when a non-faculty user (TA, Student, Observer) attempts to author material."""
 
+
+class AssignmentAccessDeniedError(LMSRuleError):
+    """Raised when an unauthorized user attempts to view an assignment."""
+
+
+class AssignmentAuthoringDeniedError(LMSRuleError):
+    """Raised when a non-faculty user (TA, Student, Observer) attempts to author an assignment."""
+
