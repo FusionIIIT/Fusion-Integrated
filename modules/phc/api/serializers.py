@@ -1,28 +1,19 @@
 from rest_framework import serializers
-from modules.phc.models import InventoryItem, Requisition, RequisitionLine
+from modules.phc.models import PatientVisit, Prescription
 from modules.phc.domain.inventory import RequisitionState
 
-class InventoryItemSerializer(serializers.ModelSerializer):
+class PatientVisitSerializer(serializers.ModelSerializer):
     class Meta:
-        model = InventoryItem
+        model = PatientVisit
         fields = [
-            "id", "name", "unit", "quantity", "reorder_threshold"
+            "id", "patient_user_id", "visited_on", "notes", "recorded_by_user_id"
         ]
         read_only_fields = ["id"]
 
-class RequisitionLineSerializer(serializers.Serializer):
-    inventory_item = serializers.PrimaryKeyRelatedField(queryset=InventoryItem.objects.all())
-    quantity = serializers.IntegerField(min_value=1)
-
-class RequisitionSerializer(serializers.ModelSerializer):
-    lines = RequisitionLineSerializer(many=True, required=False)
-    
+class PrescriptionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Requisition
+        model = Prescription
         fields = [
-            "id", "requested_by_user_id", "status", "created_at", "decided_by_user_id", "decided_at", "lines"
+            "id", "patient_visit", "details", "issued_on"
         ]
-        read_only_fields = ["id", "created_at"]
-
-class DecisionSerializer(serializers.Serializer):
-    decision = serializers.ChoiceField(choices=[RequisitionState.APPROVED.value, RequisitionState.REJECTED.value])
+        read_only_fields = ["id"]
