@@ -1,0 +1,1577 @@
+[
+  {
+    "test_id": "TEST-FR-001",
+    "source_id": "CFR-CMS-001 Nominal",
+    "purpose": "Verify nominal capability of Complaint Submission and Acceptance under standard inputs.",
+    "preconditions": "Authenticated user with appropriate role and active session.",
+    "action_or_input": "Execute standard CFR-CMS-001 action via API endpoint.",
+    "expected_result": "Operation succeeds with 200/201 and persistent state recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-002",
+    "source_id": "CFR-CMS-001 Boundary/Constraint",
+    "purpose": "Verify negative boundary/constraint handling for Complaint Submission and Acceptance.",
+    "preconditions": "System initialized with boundary or invalid payload.",
+    "action_or_input": "Invoke CFR-CMS-001 endpoint with missing or edge payload.",
+    "expected_result": "Request returns 400 Bad Request or enforces domain boundary.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-003",
+    "source_id": "CFR-CMS-002 Nominal",
+    "purpose": "Verify nominal capability of Complaint Handling Setup under standard inputs.",
+    "preconditions": "Authenticated user with appropriate role and active session.",
+    "action_or_input": "Execute standard CFR-CMS-002 action via API endpoint.",
+    "expected_result": "Operation succeeds with 200/201 and persistent state recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-004",
+    "source_id": "CFR-CMS-002 Boundary/Constraint",
+    "purpose": "Verify negative boundary/constraint handling for Complaint Handling Setup.",
+    "preconditions": "System initialized with boundary or invalid payload.",
+    "action_or_input": "Invoke CFR-CMS-002 endpoint with missing or edge payload.",
+    "expected_result": "Request returns 400 Bad Request or enforces domain boundary.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-005",
+    "source_id": "CFR-CMS-003 Nominal",
+    "purpose": "Verify nominal capability of Complaint Tracking and Progress History under standard inputs.",
+    "preconditions": "Authenticated user with appropriate role and active session.",
+    "action_or_input": "Execute standard CFR-CMS-003 action via API endpoint.",
+    "expected_result": "Operation succeeds with 200/201 and persistent state recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-006",
+    "source_id": "CFR-CMS-003 Boundary/Constraint",
+    "purpose": "Verify negative boundary/constraint handling for Complaint Tracking and Progress History.",
+    "preconditions": "System initialized with boundary or invalid payload.",
+    "action_or_input": "Invoke CFR-CMS-003 endpoint with missing or edge payload.",
+    "expected_result": "Request returns 400 Bad Request or enforces domain boundary.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-007",
+    "source_id": "CFR-CMS-004 Nominal",
+    "purpose": "Verify nominal capability of Complaint Lifecycle Outcome Management under standard inputs.",
+    "preconditions": "Authenticated user with appropriate role and active session.",
+    "action_or_input": "Execute standard CFR-CMS-004 action via API endpoint.",
+    "expected_result": "Operation succeeds with 200/201 and persistent state recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-008",
+    "source_id": "CFR-CMS-004 Boundary/Constraint",
+    "purpose": "Verify negative boundary/constraint handling for Complaint Lifecycle Outcome Management.",
+    "preconditions": "System initialized with boundary or invalid payload.",
+    "action_or_input": "Invoke CFR-CMS-004 endpoint with missing or edge payload.",
+    "expected_result": "Request returns 400 Bad Request or enforces domain boundary.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-009",
+    "source_id": "CFR-CMS-005 Nominal",
+    "purpose": "Verify nominal capability of Closure Verification under standard inputs.",
+    "preconditions": "Authenticated user with appropriate role and active session.",
+    "action_or_input": "Execute standard CFR-CMS-005 action via API endpoint.",
+    "expected_result": "Operation succeeds with 200/201 and persistent state recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-010",
+    "source_id": "CFR-CMS-005 Boundary/Constraint",
+    "purpose": "Verify negative boundary/constraint handling for Closure Verification.",
+    "preconditions": "System initialized with boundary or invalid payload.",
+    "action_or_input": "Invoke CFR-CMS-005 endpoint with missing or edge payload.",
+    "expected_result": "Request returns 400 Bad Request or enforces domain boundary.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-011",
+    "source_id": "CFR-CMS-006 Nominal",
+    "purpose": "Verify nominal capability of Complaint Reopening under standard inputs.",
+    "preconditions": "Authenticated user with appropriate role and active session.",
+    "action_or_input": "Execute standard CFR-CMS-006 action via API endpoint.",
+    "expected_result": "Operation succeeds with 200/201 and persistent state recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-012",
+    "source_id": "CFR-CMS-006 Defect Check (BR-CMS-026/AFR-CMS-024)",
+    "purpose": "Verify that High priority complaint assigns a 24-hour SLA due date.",
+    "preconditions": "Complaint submitted in Submitted status.",
+    "action_or_input": "Handler assigns complaint with priority='High'.",
+    "expected_result": "sla_due_date is set within 24 hours of assignment.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-FR-013",
+    "source_id": "CFR-CMS-007 Nominal",
+    "purpose": "Verify nominal capability of Feedback Management under standard inputs.",
+    "preconditions": "Authenticated user with appropriate role and active session.",
+    "action_or_input": "Execute standard CFR-CMS-007 action via API endpoint.",
+    "expected_result": "Operation succeeds with 200/201 and persistent state recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-014",
+    "source_id": "CFR-CMS-007 Boundary/Constraint",
+    "purpose": "Verify negative boundary/constraint handling for Feedback Management.",
+    "preconditions": "System initialized with boundary or invalid payload.",
+    "action_or_input": "Invoke CFR-CMS-007 endpoint with missing or edge payload.",
+    "expected_result": "Request returns 400 Bad Request or enforces domain boundary.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-015",
+    "source_id": "CFR-CMS-008 Nominal",
+    "purpose": "Verify nominal capability of Manual Escalation and Oversight under standard inputs.",
+    "preconditions": "Authenticated user with appropriate role and active session.",
+    "action_or_input": "Execute standard CFR-CMS-008 action via API endpoint.",
+    "expected_result": "Operation succeeds with 200/201 and persistent state recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-016",
+    "source_id": "CFR-CMS-008 Boundary/Constraint",
+    "purpose": "Verify negative boundary/constraint handling for Manual Escalation and Oversight.",
+    "preconditions": "System initialized with boundary or invalid payload.",
+    "action_or_input": "Invoke CFR-CMS-008 endpoint with missing or edge payload.",
+    "expected_result": "Request returns 400 Bad Request or enforces domain boundary.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-017",
+    "source_id": "CFR-CMS-009 Nominal",
+    "purpose": "Verify nominal capability of SLA-Driven Reminder and Automatic Escalation under standard inputs.",
+    "preconditions": "Authenticated user with appropriate role and active session.",
+    "action_or_input": "Execute standard CFR-CMS-009 action via API endpoint.",
+    "expected_result": "Operation succeeds with 200/201 and persistent state recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-018",
+    "source_id": "CFR-CMS-009 Boundary/Constraint",
+    "purpose": "Verify negative boundary/constraint handling for SLA-Driven Reminder and Automatic Escalation.",
+    "preconditions": "System initialized with boundary or invalid payload.",
+    "action_or_input": "Invoke CFR-CMS-009 endpoint with missing or edge payload.",
+    "expected_result": "Request returns 400 Bad Request or enforces domain boundary.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-019",
+    "source_id": "CFR-CMS-010 Nominal",
+    "purpose": "Verify nominal capability of Complaint Announcements under standard inputs.",
+    "preconditions": "Authenticated user with appropriate role and active session.",
+    "action_or_input": "Execute standard CFR-CMS-010 action via API endpoint.",
+    "expected_result": "Operation succeeds with 200/201 and persistent state recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-020",
+    "source_id": "CFR-CMS-010 Boundary/Constraint",
+    "purpose": "Verify negative boundary/constraint handling for Complaint Announcements.",
+    "preconditions": "System initialized with boundary or invalid payload.",
+    "action_or_input": "Invoke CFR-CMS-010 endpoint with missing or edge payload.",
+    "expected_result": "Request returns 400 Bad Request or enforces domain boundary.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-021",
+    "source_id": "CFR-CMS-011 Nominal",
+    "purpose": "Verify nominal capability of Complaint Reporting and Analytics Visibility under standard inputs.",
+    "preconditions": "Authenticated user with appropriate role and active session.",
+    "action_or_input": "Execute standard CFR-CMS-011 action via API endpoint.",
+    "expected_result": "Operation succeeds with 200/201 and persistent state recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-022",
+    "source_id": "CFR-CMS-011 Boundary/Constraint",
+    "purpose": "Verify negative boundary/constraint handling for Complaint Reporting and Analytics Visibility.",
+    "preconditions": "System initialized with boundary or invalid payload.",
+    "action_or_input": "Invoke CFR-CMS-011 endpoint with missing or edge payload.",
+    "expected_result": "Request returns 400 Bad Request or enforces domain boundary.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-023",
+    "source_id": "CFR-CMS-012 Nominal",
+    "purpose": "Verify nominal capability of Notification Triggering under standard inputs.",
+    "preconditions": "Authenticated user with appropriate role and active session.",
+    "action_or_input": "Execute standard CFR-CMS-012 action via API endpoint.",
+    "expected_result": "Operation succeeds with 200/201 and persistent state recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-024",
+    "source_id": "CFR-CMS-012 Boundary/Constraint",
+    "purpose": "Verify negative boundary/constraint handling for Notification Triggering.",
+    "preconditions": "System initialized with boundary or invalid payload.",
+    "action_or_input": "Invoke CFR-CMS-012 endpoint with missing or edge payload.",
+    "expected_result": "Request returns 400 Bad Request or enforces domain boundary.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-025",
+    "source_id": "CFR-CMS-013 Nominal",
+    "purpose": "Verify nominal capability of CMS Role Management under standard inputs.",
+    "preconditions": "Authenticated user with appropriate role and active session.",
+    "action_or_input": "Execute standard CFR-CMS-013 action via API endpoint.",
+    "expected_result": "Operation succeeds with 200/201 and persistent state recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-026",
+    "source_id": "CFR-CMS-013 Boundary/Constraint",
+    "purpose": "Verify negative boundary/constraint handling for CMS Role Management.",
+    "preconditions": "System initialized with boundary or invalid payload.",
+    "action_or_input": "Invoke CFR-CMS-013 endpoint with missing or edge payload.",
+    "expected_result": "Request returns 400 Bad Request or enforces domain boundary.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-027",
+    "source_id": "CFR-CMS-014 Nominal",
+    "purpose": "Verify nominal capability of CMS Functional Scope Boundaries under standard inputs.",
+    "preconditions": "Authenticated user with appropriate role and active session.",
+    "action_or_input": "Execute standard CFR-CMS-014 action via API endpoint.",
+    "expected_result": "Operation succeeds with 200/201 and persistent state recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-028",
+    "source_id": "CFR-CMS-014 Boundary/Constraint",
+    "purpose": "Verify negative boundary/constraint handling for CMS Functional Scope Boundaries.",
+    "preconditions": "System initialized with boundary or invalid payload.",
+    "action_or_input": "Invoke CFR-CMS-014 endpoint with missing or edge payload.",
+    "expected_result": "Request returns 400 Bad Request or enforces domain boundary.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-029",
+    "source_id": "AFR-CMS-001 Positive",
+    "purpose": "Verify compliance with AFR-CMS-001: CMS shall allow a User / Complainant to submit a complaint at any time....",
+    "preconditions": "Active user session mapped to CFR-CMS-001.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-001.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-001.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-030",
+    "source_id": "AFR-CMS-001 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-001.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-001.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-031",
+    "source_id": "AFR-CMS-002 Positive",
+    "purpose": "Verify compliance with AFR-CMS-002: CMS shall record the complaint category for each submitted complaint....",
+    "preconditions": "Active user session mapped to CFR-CMS-001.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-002.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-002.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-032",
+    "source_id": "AFR-CMS-002 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-002.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-002.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-033",
+    "source_id": "AFR-CMS-003 Positive",
+    "purpose": "Verify compliance with AFR-CMS-003: CMS shall record the complaint description for each submitted complaint....",
+    "preconditions": "Active user session mapped to CFR-CMS-001.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-003.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-003.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-034",
+    "source_id": "AFR-CMS-003 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-003.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-003.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-035",
+    "source_id": "AFR-CMS-004 Positive",
+    "purpose": "Verify compliance with AFR-CMS-004: CMS shall record the submission date/time for each submitted complaint....",
+    "preconditions": "Active user session mapped to CFR-CMS-001.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-004.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-004.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-036",
+    "source_id": "AFR-CMS-004 Invariant/Check",
+    "purpose": "Verify attachment constraints validate and reject invalid file format/mime-type.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-004.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-FR-037",
+    "source_id": "AFR-CMS-005 Positive",
+    "purpose": "Verify compliance with AFR-CMS-005: CMS shall allow complaint submissions to include supporting attachments....",
+    "preconditions": "Active user session mapped to CFR-CMS-001.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-005.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-005.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-038",
+    "source_id": "AFR-CMS-005 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-005.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-005.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-039",
+    "source_id": "AFR-CMS-006 Positive",
+    "purpose": "Verify compliance with AFR-CMS-006: CMS shall validate mandatory complaint fields before accepting a complaint submi...",
+    "preconditions": "Active user session mapped to CFR-CMS-001.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-006.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-006.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-040",
+    "source_id": "AFR-CMS-006 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-006.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-006.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-041",
+    "source_id": "AFR-CMS-007 Positive",
+    "purpose": "Verify compliance with AFR-CMS-007: CMS shall validate accepted attachment constraints before accepting submitted at...",
+    "preconditions": "Active user session mapped to CFR-CMS-001.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-007.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-007.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-042",
+    "source_id": "AFR-CMS-007 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-007.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-007.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-043",
+    "source_id": "AFR-CMS-008 Positive",
+    "purpose": "Verify compliance with AFR-CMS-008: CMS shall treat the exact attachment file-type, file-size, and format limits as ...",
+    "preconditions": "Active user session mapped to CFR-CMS-001.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-008.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-008.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-044",
+    "source_id": "AFR-CMS-008 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-008.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-008.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-045",
+    "source_id": "AFR-CMS-009 Positive",
+    "purpose": "Verify compliance with AFR-CMS-009: CMS shall generate a unique complaint identifier for each submitted complaint....",
+    "preconditions": "Active user session mapped to CFR-CMS-001.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-009.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-009.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-046",
+    "source_id": "AFR-CMS-009 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-009.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-009.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-047",
+    "source_id": "AFR-CMS-010 Positive",
+    "purpose": "Verify compliance with AFR-CMS-010: CMS shall provide complaint submission confirmation or notification to the User ...",
+    "preconditions": "Active user session mapped to CFR-CMS-001.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-010.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-010.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-048",
+    "source_id": "AFR-CMS-010 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-010.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-010.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-049",
+    "source_id": "AFR-CMS-011 Positive",
+    "purpose": "Verify compliance with AFR-CMS-011: CMS shall allow the Complaint Handler to manually assign submitted complaints fo...",
+    "preconditions": "Active user session mapped to CFR-CMS-002.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-011.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-011.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-050",
+    "source_id": "AFR-CMS-011 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-011.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-011.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-051",
+    "source_id": "AFR-CMS-012 Positive",
+    "purpose": "Verify compliance with AFR-CMS-012: CMS shall allow the Complaint Handler to categorize complaints by complaint cate...",
+    "preconditions": "Active user session mapped to CFR-CMS-002.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-012.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-012.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-052",
+    "source_id": "AFR-CMS-012 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-012.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-012.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-053",
+    "source_id": "AFR-CMS-013 Positive",
+    "purpose": "Verify compliance with AFR-CMS-013: CMS shall allow the Complaint Handler to assign complaint priority as Low, Mediu...",
+    "preconditions": "Active user session mapped to CFR-CMS-002.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-013.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-013.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-054",
+    "source_id": "AFR-CMS-013 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-013.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-013.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-055",
+    "source_id": "AFR-CMS-014 Positive",
+    "purpose": "Verify compliance with AFR-CMS-014: CMS shall record assignment information for downstream complaint handling, remin...",
+    "preconditions": "Active user session mapped to CFR-CMS-002.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-014.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-014.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-056",
+    "source_id": "AFR-CMS-014 Invariant/Check",
+    "purpose": "Verify resolution details enforce substantive explanation (>= 10 chars).",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-014.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-FR-057",
+    "source_id": "AFR-CMS-015 Positive",
+    "purpose": "Verify compliance with AFR-CMS-015: CMS shall record priority information for downstream complaint handling, reminde...",
+    "preconditions": "Active user session mapped to CFR-CMS-002.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-015.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-015.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-058",
+    "source_id": "AFR-CMS-015 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-015.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-015.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-059",
+    "source_id": "AFR-CMS-016 Positive",
+    "purpose": "Verify compliance with AFR-CMS-016: CMS shall allow a User / Complainant to track the status of the User / Complaina...",
+    "preconditions": "Active user session mapped to CFR-CMS-003.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-016.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-016.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-060",
+    "source_id": "AFR-CMS-016 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-016.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-016.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-061",
+    "source_id": "AFR-CMS-017 Positive",
+    "purpose": "Verify compliance with AFR-CMS-017: CMS shall allow a User / Complainant to track the history of the User / Complain...",
+    "preconditions": "Active user session mapped to CFR-CMS-003.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-017.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-017.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-062",
+    "source_id": "AFR-CMS-017 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-017.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-017.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-063",
+    "source_id": "AFR-CMS-018 Positive",
+    "purpose": "Verify compliance with AFR-CMS-018: CMS shall allow Complaint Handlers to review complaints assigned for handling....",
+    "preconditions": "Active user session mapped to CFR-CMS-003.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-018.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-018.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-064",
+    "source_id": "AFR-CMS-018 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-018.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-018.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-065",
+    "source_id": "AFR-CMS-019 Positive",
+    "purpose": "Verify compliance with AFR-CMS-019: CMS shall allow Complaint Handlers to update complaint progress during processin...",
+    "preconditions": "Active user session mapped to CFR-CMS-003.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-019.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-019.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-066",
+    "source_id": "AFR-CMS-019 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-019.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-019.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-067",
+    "source_id": "AFR-CMS-020 Positive",
+    "purpose": "Verify compliance with AFR-CMS-020: CMS shall maintain complaint status history throughout the lifecycle of each com...",
+    "preconditions": "Active user session mapped to CFR-CMS-003.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-020.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-020.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-068",
+    "source_id": "AFR-CMS-020 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-020.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-020.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-069",
+    "source_id": "AFR-CMS-021 Positive",
+    "purpose": "Verify compliance with AFR-CMS-021: CMS shall maintain complaint progress history throughout the lifecycle of each c...",
+    "preconditions": "Active user session mapped to CFR-CMS-003.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-021.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-021.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-070",
+    "source_id": "AFR-CMS-021 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-021.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-021.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-071",
+    "source_id": "AFR-CMS-022 Positive",
+    "purpose": "Verify compliance with AFR-CMS-022: CMS shall recognize Submitted, In Progress, Resolved, Rejected, and Closed as co...",
+    "preconditions": "Active user session mapped to CFR-CMS-004.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-022.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-022.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-072",
+    "source_id": "AFR-CMS-022 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-022.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-022.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-073",
+    "source_id": "AFR-CMS-023 Positive",
+    "purpose": "Verify compliance with AFR-CMS-023: CMS shall record complaint resolution details for resolved complaints....",
+    "preconditions": "Active user session mapped to CFR-CMS-004.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-023.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-023.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-074",
+    "source_id": "AFR-CMS-023 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-023.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-023.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-075",
+    "source_id": "AFR-CMS-024 Positive",
+    "purpose": "Verify compliance with AFR-CMS-024: CMS shall record rejection details or rejection reason information for rejected ...",
+    "preconditions": "Active user session mapped to CFR-CMS-004.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-024.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-024.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-076",
+    "source_id": "AFR-CMS-024 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-024.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-024.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-077",
+    "source_id": "AFR-CMS-025 Positive",
+    "purpose": "Verify compliance with AFR-CMS-025: CMS shall notify Users / Complainants of complaint outcome updates....",
+    "preconditions": "Active user session mapped to CFR-CMS-004.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-025.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-025.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-078",
+    "source_id": "AFR-CMS-025 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-025.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-025.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-079",
+    "source_id": "AFR-CMS-026 Positive",
+    "purpose": "Verify compliance with AFR-CMS-026: CMS shall notify Users / Complainants of complaint status updates....",
+    "preconditions": "Active user session mapped to CFR-CMS-004.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-026.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-026.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-080",
+    "source_id": "AFR-CMS-026 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-026.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-026.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-081",
+    "source_id": "AFR-CMS-027 Positive",
+    "purpose": "Verify compliance with AFR-CMS-027: CMS shall support User / Complainant verification of a resolved complaint when t...",
+    "preconditions": "Active user session mapped to CFR-CMS-005.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-027.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-027.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-082",
+    "source_id": "AFR-CMS-027 Invariant/Check",
+    "purpose": "Verify duplicate satisfaction rating for single complaint is rejected.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-027.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-083",
+    "source_id": "AFR-CMS-028 Positive",
+    "purpose": "Verify compliance with AFR-CMS-028: CMS shall support Complaint Supervisor verification of a resolved complaint when...",
+    "preconditions": "Active user session mapped to CFR-CMS-005.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-028.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-028.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-084",
+    "source_id": "AFR-CMS-028 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-028.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-028.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-085",
+    "source_id": "AFR-CMS-029 Positive",
+    "purpose": "Verify compliance with AFR-CMS-029: CMS shall record complaint closure after successful verification when verificati...",
+    "preconditions": "Active user session mapped to CFR-CMS-005.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-029.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-029.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-086",
+    "source_id": "AFR-CMS-029 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-029.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-029.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-087",
+    "source_id": "AFR-CMS-030 Positive",
+    "purpose": "Verify compliance with AFR-CMS-030: CMS shall allow Users / Complainants to request reopening of a closed complaint ...",
+    "preconditions": "Active user session mapped to CFR-CMS-006.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-030.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-030.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-088",
+    "source_id": "AFR-CMS-030 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-030.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-030.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-089",
+    "source_id": "AFR-CMS-031 Positive",
+    "purpose": "Verify compliance with AFR-CMS-031: CMS shall allow the Complaint Supervisor to review complaint reopening requests....",
+    "preconditions": "Active user session mapped to CFR-CMS-006.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-031.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-031.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-090",
+    "source_id": "AFR-CMS-031 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-031.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-031.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-091",
+    "source_id": "AFR-CMS-032 Positive",
+    "purpose": "Verify compliance with AFR-CMS-032: CMS shall reopen the complaint when a reopening request is approved....",
+    "preconditions": "Active user session mapped to CFR-CMS-006.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-032.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-032.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-092",
+    "source_id": "AFR-CMS-032 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-032.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-032.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-093",
+    "source_id": "AFR-CMS-033 Positive",
+    "purpose": "Verify compliance with AFR-CMS-033: CMS shall update the complaint status accordingly when reopening is approved....",
+    "preconditions": "Active user session mapped to CFR-CMS-006.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-033.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-033.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-094",
+    "source_id": "AFR-CMS-033 Invariant/Check",
+    "purpose": "Verify manual escalation records audit actor_role as 'complainant'.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-033.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-FR-095",
+    "source_id": "AFR-CMS-034 Positive",
+    "purpose": "Verify compliance with AFR-CMS-034: CMS shall record the outcome of the complaint reopening request....",
+    "preconditions": "Active user session mapped to CFR-CMS-006.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-034.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-034.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-096",
+    "source_id": "AFR-CMS-034 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-034.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-034.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-097",
+    "source_id": "AFR-CMS-035 Positive",
+    "purpose": "Verify compliance with AFR-CMS-035: CMS shall allow Users / Complainants to submit feedback after complaint resoluti...",
+    "preconditions": "Active user session mapped to CFR-CMS-007.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-035.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-035.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-098",
+    "source_id": "AFR-CMS-035 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-035.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-035.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-099",
+    "source_id": "AFR-CMS-036 Positive",
+    "purpose": "Verify compliance with AFR-CMS-036: CMS shall allow Complaint Handlers to review submitted feedback....",
+    "preconditions": "Active user session mapped to CFR-CMS-007.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-036.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-036.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-100",
+    "source_id": "AFR-CMS-036 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-036.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-036.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-101",
+    "source_id": "AFR-CMS-037 Positive",
+    "purpose": "Verify compliance with AFR-CMS-037: CMS shall allow Complaint Supervisors to review submitted feedback....",
+    "preconditions": "Active user session mapped to CFR-CMS-007.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-037.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-037.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-102",
+    "source_id": "AFR-CMS-037 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-037.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-037.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-103",
+    "source_id": "AFR-CMS-038 Positive",
+    "purpose": "Verify compliance with AFR-CMS-038: CMS shall allow unresolved complaints to be escalated manually....",
+    "preconditions": "Active user session mapped to CFR-CMS-008.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-038.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-038.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-104",
+    "source_id": "AFR-CMS-038 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-038.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-038.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-105",
+    "source_id": "AFR-CMS-039 Positive",
+    "purpose": "Verify compliance with AFR-CMS-039: CMS shall track escalation status....",
+    "preconditions": "Active user session mapped to CFR-CMS-008.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-039.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-039.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-106",
+    "source_id": "AFR-CMS-039 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-039.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-039.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-107",
+    "source_id": "AFR-CMS-040 Positive",
+    "purpose": "Verify compliance with AFR-CMS-040: CMS shall allow Complaint Supervisors to monitor escalated complaints....",
+    "preconditions": "Active user session mapped to CFR-CMS-008.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-040.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-040.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-108",
+    "source_id": "AFR-CMS-040 Invariant/Check",
+    "purpose": "Verify active announcements filter excludes expired notices.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-040.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-109",
+    "source_id": "AFR-CMS-041 Positive",
+    "purpose": "Verify compliance with AFR-CMS-041: CMS shall associate complaint priority with applicable SLA timelines....",
+    "preconditions": "Active user session mapped to CFR-CMS-009.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-041.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-041.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-110",
+    "source_id": "AFR-CMS-041 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-041.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-041.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-111",
+    "source_id": "AFR-CMS-042 Positive",
+    "purpose": "Verify compliance with AFR-CMS-042: CMS shall not specify exact SLA duration values in the module baseline....",
+    "preconditions": "Active user session mapped to CFR-CMS-009.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-042.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-042.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-112",
+    "source_id": "AFR-CMS-042 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-042.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-042.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-113",
+    "source_id": "AFR-CMS-043 Positive",
+    "purpose": "Verify compliance with AFR-CMS-043: CMS shall send reminder notifications when a complaint approaches the applicable...",
+    "preconditions": "Active user session mapped to CFR-CMS-009.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-043.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-043.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-114",
+    "source_id": "AFR-CMS-043 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-043.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-043.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-115",
+    "source_id": "AFR-CMS-044 Positive",
+    "purpose": "Verify compliance with AFR-CMS-044: CMS shall automatically escalate a complaint if it is not resolved within the ap...",
+    "preconditions": "Active user session mapped to CFR-CMS-009.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-044.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-044.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-116",
+    "source_id": "AFR-CMS-044 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-044.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-044.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-117",
+    "source_id": "AFR-CMS-045 Positive",
+    "purpose": "Verify compliance with AFR-CMS-045: CMS shall allow Complaint Handlers to publish complaint-related announcements....",
+    "preconditions": "Active user session mapped to CFR-CMS-010.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-045.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-045.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-118",
+    "source_id": "AFR-CMS-045 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-045.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-045.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-119",
+    "source_id": "AFR-CMS-046 Positive",
+    "purpose": "Verify compliance with AFR-CMS-046: CMS shall allow Complaint Supervisors to publish complaint-related announcements...",
+    "preconditions": "Active user session mapped to CFR-CMS-010.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-046.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-046.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-120",
+    "source_id": "AFR-CMS-046 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-046.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-046.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-121",
+    "source_id": "AFR-CMS-047 Positive",
+    "purpose": "Verify compliance with AFR-CMS-047: CMS shall allow Users / Complainants to view complaint-related announcements....",
+    "preconditions": "Active user session mapped to CFR-CMS-010.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-047.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-047.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-122",
+    "source_id": "AFR-CMS-047 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-047.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-047.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-123",
+    "source_id": "AFR-CMS-048 Positive",
+    "purpose": "Verify compliance with AFR-CMS-048: CMS shall send announcement-related notifications to Users / Complainants where ...",
+    "preconditions": "Active user session mapped to CFR-CMS-010.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-048.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-048.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-124",
+    "source_id": "AFR-CMS-048 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-048.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-048.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-125",
+    "source_id": "AFR-CMS-049 Positive",
+    "purpose": "Verify compliance with AFR-CMS-049: CMS shall allow Complaint Handlers to generate operational complaint reports....",
+    "preconditions": "Active user session mapped to CFR-CMS-011.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-049.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-049.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-126",
+    "source_id": "AFR-CMS-049 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-049.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-049.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-127",
+    "source_id": "AFR-CMS-050 Positive",
+    "purpose": "Verify compliance with AFR-CMS-050: CMS shall allow Complaint Supervisors to view complaint summaries....",
+    "preconditions": "Active user session mapped to CFR-CMS-011.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-050.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-050.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-128",
+    "source_id": "AFR-CMS-050 Invariant/Check",
+    "purpose": "Verify complaint operational reports filter records by start_date and end_date.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-050.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-FR-129",
+    "source_id": "AFR-CMS-051 Positive",
+    "purpose": "Verify compliance with AFR-CMS-051: CMS shall allow Complaint Supervisors to view escalation summaries....",
+    "preconditions": "Active user session mapped to CFR-CMS-011.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-051.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-051.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-130",
+    "source_id": "AFR-CMS-051 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-051.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-051.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-131",
+    "source_id": "AFR-CMS-052 Positive",
+    "purpose": "Verify compliance with AFR-CMS-052: CMS shall allow System Admin to view complaint reports available within CMS....",
+    "preconditions": "Active user session mapped to CFR-CMS-011.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-052.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-052.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-132",
+    "source_id": "AFR-CMS-052 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-052.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-052.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-133",
+    "source_id": "AFR-CMS-053 Positive",
+    "purpose": "Verify compliance with AFR-CMS-053: CMS shall allow System Admin to view analytics available within CMS....",
+    "preconditions": "Active user session mapped to CFR-CMS-011.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-053.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-053.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-134",
+    "source_id": "AFR-CMS-053 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-053.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-053.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-135",
+    "source_id": "AFR-CMS-054 Positive",
+    "purpose": "Verify compliance with AFR-CMS-054: CMS shall limit analytics scope to complaint reports, complaint summaries, escal...",
+    "preconditions": "Active user session mapped to CFR-CMS-011.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-054.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-054.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-136",
+    "source_id": "AFR-CMS-054 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-054.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-054.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-137",
+    "source_id": "AFR-CMS-055 Positive",
+    "purpose": "Verify compliance with AFR-CMS-055: CMS shall trigger email notifications for complaint submission events....",
+    "preconditions": "Active user session mapped to CFR-CMS-012.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-055.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-055.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-138",
+    "source_id": "AFR-CMS-055 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-055.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-055.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-139",
+    "source_id": "AFR-CMS-056 Positive",
+    "purpose": "Verify compliance with AFR-CMS-056: CMS shall trigger email notifications for complaint status update events....",
+    "preconditions": "Active user session mapped to CFR-CMS-012.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-056.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-056.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-140",
+    "source_id": "AFR-CMS-056 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-056.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-056.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-141",
+    "source_id": "AFR-CMS-057 Positive",
+    "purpose": "Verify compliance with AFR-CMS-057: CMS shall trigger email notifications for complaint resolution events....",
+    "preconditions": "Active user session mapped to CFR-CMS-012.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-057.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-057.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-142",
+    "source_id": "AFR-CMS-057 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-057.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-057.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-143",
+    "source_id": "AFR-CMS-058 Positive",
+    "purpose": "Verify compliance with AFR-CMS-058: CMS shall trigger email notifications for complaint rejection events....",
+    "preconditions": "Active user session mapped to CFR-CMS-012.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-058.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-058.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-144",
+    "source_id": "AFR-CMS-058 Invariant/Check",
+    "purpose": "Verify assigning handler for category does not deactivate handlers of other categories.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-058.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-FR-145",
+    "source_id": "AFR-CMS-059 Positive",
+    "purpose": "Verify compliance with AFR-CMS-059: CMS shall trigger email notifications for complaint escalation events....",
+    "preconditions": "Active user session mapped to CFR-CMS-012.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-059.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-059.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-146",
+    "source_id": "AFR-CMS-059 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-059.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-059.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-147",
+    "source_id": "AFR-CMS-060 Positive",
+    "purpose": "Verify compliance with AFR-CMS-060: CMS shall trigger email notifications for complaint reopening outcome events whe...",
+    "preconditions": "Active user session mapped to CFR-CMS-012.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-060.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-060.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-148",
+    "source_id": "AFR-CMS-060 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-060.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-060.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-149",
+    "source_id": "AFR-CMS-061 Positive",
+    "purpose": "Verify compliance with AFR-CMS-061: CMS shall trigger email notifications for feedback-related events where applicab...",
+    "preconditions": "Active user session mapped to CFR-CMS-012.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-061.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-061.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-150",
+    "source_id": "AFR-CMS-061 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-061.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-061.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-151",
+    "source_id": "AFR-CMS-062 Positive",
+    "purpose": "Verify compliance with AFR-CMS-062: CMS shall trigger email notifications for complaint-related announcement events....",
+    "preconditions": "Active user session mapped to CFR-CMS-012.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-062.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-062.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-152",
+    "source_id": "AFR-CMS-062 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-062.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-062.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-153",
+    "source_id": "AFR-CMS-063 Positive",
+    "purpose": "Verify compliance with AFR-CMS-063: CMS shall limit module responsibility to notification triggering, not central em...",
+    "preconditions": "Active user session mapped to CFR-CMS-012.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-063.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-063.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-154",
+    "source_id": "AFR-CMS-063 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-063.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-063.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-155",
+    "source_id": "AFR-CMS-064 Positive",
+    "purpose": "Verify compliance with AFR-CMS-064: CMS shall allow System Admin to assign the Complaint Handler role to an existing...",
+    "preconditions": "Active user session mapped to CFR-CMS-013.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-064.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-064.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-156",
+    "source_id": "AFR-CMS-064 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-064.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-064.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-157",
+    "source_id": "AFR-CMS-065 Positive",
+    "purpose": "Verify compliance with AFR-CMS-065: CMS shall allow System Admin to assign the Complaint Supervisor role to an exist...",
+    "preconditions": "Active user session mapped to CFR-CMS-013.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-065.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-065.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-158",
+    "source_id": "AFR-CMS-065 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-065.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-065.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-159",
+    "source_id": "AFR-CMS-066 Positive",
+    "purpose": "Verify compliance with AFR-CMS-066: CMS shall allow System Admin to reassign Complaint Handler and Complaint Supervi...",
+    "preconditions": "Active user session mapped to CFR-CMS-013.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-066.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-066.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-160",
+    "source_id": "AFR-CMS-066 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-066.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-066.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-161",
+    "source_id": "AFR-CMS-067 Positive",
+    "purpose": "Verify compliance with AFR-CMS-067: CMS shall enforce exactly one active Complaint Handler role-holder at a time wit...",
+    "preconditions": "Active user session mapped to CFR-CMS-013.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-067.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-067.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-162",
+    "source_id": "AFR-CMS-067 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-067.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-067.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-163",
+    "source_id": "AFR-CMS-068 Positive",
+    "purpose": "Verify compliance with AFR-CMS-068: CMS shall enforce exactly one active Complaint Supervisor role-holder at a time ...",
+    "preconditions": "Active user session mapped to CFR-CMS-013.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-068.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-068.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-164",
+    "source_id": "AFR-CMS-068 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-068.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-068.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-165",
+    "source_id": "AFR-CMS-069 Positive",
+    "purpose": "Verify compliance with AFR-CMS-069: CMS role assignment shall be limited to CMS-specific operational and supervisory...",
+    "preconditions": "Active user session mapped to CFR-CMS-013.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-069.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-069.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-166",
+    "source_id": "AFR-CMS-069 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-069.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-069.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-167",
+    "source_id": "AFR-CMS-070 Positive",
+    "purpose": "Verify compliance with AFR-CMS-070: CMS shall exclude HR master-data management, payroll, employment records, and pl...",
+    "preconditions": "Active user session mapped to CFR-CMS-013.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-070.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-070.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-168",
+    "source_id": "AFR-CMS-070 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-070.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-070.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-169",
+    "source_id": "AFR-CMS-071 Positive",
+    "purpose": "Verify compliance with AFR-CMS-071: CMS shall not perform payment, accounting, payroll, procurement, inventory, phys...",
+    "preconditions": "Active user session mapped to CFR-CMS-014.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-071.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-071.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-170",
+    "source_id": "AFR-CMS-071 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-071.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-071.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-171",
+    "source_id": "AFR-CMS-072 Positive",
+    "purpose": "Verify compliance with AFR-CMS-072: CMS shall limit complaints involving external services or departments to recordi...",
+    "preconditions": "Active user session mapped to CFR-CMS-014.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-072.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-072.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-172",
+    "source_id": "AFR-CMS-072 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-072.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-072.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-173",
+    "source_id": "AFR-CMS-073 Positive",
+    "purpose": "Verify compliance with AFR-CMS-073: CMS shall treat external institutional policies, manuals, guidelines, and depart...",
+    "preconditions": "Active user session mapped to CFR-CMS-014.",
+    "action_or_input": "Invoke relevant CMS operation exercising AFR-CMS-073.",
+    "expected_result": "Behavior conforms to requirement statement AFR-CMS-073.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-174",
+    "source_id": "AFR-CMS-073 Invariant/Check",
+    "purpose": "Verify constraint and state protection for AFR-CMS-073.",
+    "preconditions": "System initialized with relevant domain objects.",
+    "action_or_input": "Execute constraint verification for AFR-CMS-073.",
+    "expected_result": "Invariants maintained or violation rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-175",
+    "source_id": "CFR-CMS-003 End-to-End Audit",
+    "purpose": "Verify complete audit history trail across full complaint lifecycle.",
+    "preconditions": "Complaint in progress with assigned handler.",
+    "action_or_input": "Query progress history and verify sequential timestamps.",
+    "expected_result": "Chronologically ordered audit trail preserved.",
+    "test_type": "positive"
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "task": "p1_04_registry",
+  "model": "Qwen2.5-Coder-7B-Instruct",
+  "model_family": "Qwen",
+  "parameter_size": "7B",
+  "quantization": "Q4_K_M",
+  "runtime": "Ollama",
+  "system_prompt": "You are an expert Python Django and React TypeScript software engineer working on Fusion ERP. Generate strictly valid, complete, syntactically clean code blocks without conversational filler.",
+  "prompt": "Write the Fusion ERP module registry in `modules/cms/registry.py`.\nDefine MODULE dict with code='cms', label='Complaint Management', icon='ExclamationMark', base_path='/cms', nav_section='Services', sort_order=15, status='active'.\nDefine NAV_ITEMS list with items for 'My Complaints', 'Handler Queue', 'Escalations'.\nDefine PERMISSIONS list and ROLE_GRANTS dict.\nReturn ONLY the valid Python code in ```python ... ```.",
+  "response": "```python\nfrom fusion_inventory.modules.registry import Module, NavItem, Permission, RoleGrant\n\nMODULE = Module(\n    code='cms',\n    label='Complaint Management',\n    icon='ExclamationMark',\n    base_path='/cms',\n    nav_section='Services',\n    sort_order=15,\n    status='active'\n)\n\nNAV_ITEMS = [\n    NavItem(label='My Complaints', path='/cms/my-complaints', icon='List', sort_order=1),\n    NavItem(label='Handler Queue', path='/cms/handler-queue', icon='Clock', sort_order=2),\n    NavItem(label='Escalations', path='/cms/escalations', icon='ExclamationTriangle', sort_order=3)\n]\n\nPERMISSIONS = [\n    Permission(name='view_complaints', label='View Complaints'),\n    Permission(name='create_complaints', label='Create Complaints'),\n    Permission(name='edit_complaints', label='Edit Complaints'),\n    Permission(name='delete_complaints', label='Delete Complaints')\n]\n\nROLE_GRANTS = {\n    'admin': ['view_complaints', 'create_complaints', 'edit_complaints', 'delete_complaints'],\n    'user': ['view_complaints', 'create_complaints'],\n    'guest': ['view_complaints']\n}\n```\n",
+  "stats": {
+    "elapsed_seconds": 58.5537428855896,
+    "total_tokens": 377,
+    "tokens_per_second": 6.438529484556346
+  }
+}

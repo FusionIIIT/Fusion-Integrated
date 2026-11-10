@@ -7,6 +7,22 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `cms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `cms.complaint.submit_self` | Submit complaints on behalf of self | `Dean Academic`, `acadadmin`, `complaint_handler`, `complaint_supervisor`, `faculty`, `placement_chairman`, `staff`, `student` |
+| `cms.complaint.view_self` | View self submitted complaints | `Dean Academic`, `acadadmin`, `complaint_handler`, `complaint_supervisor`, `faculty`, `placement_chairman`, `staff`, `student` |
+| `cms.complaint.view_all` | View all complaints across departments | `Dean Academic`, `acadadmin`, `complaint_supervisor`, `placement_chairman` |
+| `cms.complaint.handle` | Triage, update status, and investigate complaints | `Dean Academic`, `acadadmin`, `complaint_handler`, `complaint_supervisor`, `placement_chairman` |
+| `cms.complaint.resolve` | Mark complaints resolved or rejected | `Dean Academic`, `acadadmin`, `complaint_handler`, `complaint_supervisor`, `placement_chairman` |
+| `cms.complaint.escalate` | Escalate overdue or critical complaints | `Dean Academic`, `acadadmin`, `complaint_supervisor`, `placement_chairman` |
+| `cms.complaint.reopen` | Request or approve complaint reopening | `Dean Academic`, `acadadmin`, `complaint_handler`, `complaint_supervisor`, `faculty`, `placement_chairman`, `staff`, `student` |
+| `cms.announcement.view` | View active campus announcements | `Dean Academic`, `acadadmin`, `complaint_handler`, `complaint_supervisor`, `faculty`, `placement_chairman`, `staff`, `student` |
+| `cms.announcement.manage` | Publish and expire announcements | `Dean Academic`, `acadadmin`, `complaint_supervisor`, `placement_chairman` |
+| `cms.report.view` | View analytics and resolution SLA metrics | `Dean Academic`, `acadadmin`, `complaint_supervisor`, `placement_chairman` |
+| `cms.role.manage` | Assign and manage handler/supervisor roles | `Dean Academic`, `acadadmin`, `complaint_supervisor`, `placement_chairman` |
+
 ## `directory`
 
 | Code | What it allows | Held by |

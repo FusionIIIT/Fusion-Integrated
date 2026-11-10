@@ -1,0 +1,16 @@
+{
+  "task": "p1_02_serializers",
+  "model": "Qwen2.5-Coder-7B-Instruct",
+  "model_family": "Qwen",
+  "parameter_size": "7B",
+  "quantization": "Q4_K_M",
+  "runtime": "Ollama",
+  "system_prompt": "You are an expert Python Django and React TypeScript software engineer working on Fusion ERP. Generate strictly valid, complete, syntactically clean code blocks without conversational filler.",
+  "prompt": "Write the Django REST Framework serializers in `modules/cms/api/serializers.py` for CMS.\nImport Complaint, ComplaintAttachment, ComplaintProgress from ..models.\nInclude ComplaintSerializer, ComplaintCreateSerializer, ComplaintAttachmentSerializer, ComplaintProgressSerializer.\nReturn ONLY the valid Python code in ```python ... ```.",
+  "response": "```python\nfrom rest_framework import serializers\nfrom modules.cms.models import Complaint, ComplaintAttachment, ComplaintProgress\n\nclass ComplaintSerializer(serializers.ModelSerializer):\n    class Meta:\n        model = Complaint\n        fields = '__all__'\n\nclass ComplaintCreateSerializer(serializers.ModelSerializer):\n    class Meta:\n        model = Complaint\n        fields = '__all__'\n\nclass ComplaintAttachmentSerializer(serializers.ModelSerializer):\n    class Meta:\n        model = ComplaintAttachment\n        fields = '__all__'\n\nclass ComplaintProgressSerializer(serializers.ModelSerializer):\n    class Meta:\n        model = ComplaintProgress\n        fields = '__all__'\n```\n",
+  "stats": {
+    "elapsed_seconds": 28.646275758743286,
+    "total_tokens": 177,
+    "tokens_per_second": 6.178813661178168
+  }
+}

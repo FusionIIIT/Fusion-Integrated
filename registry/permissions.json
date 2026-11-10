@@ -1,5 +1,205 @@
 {
   "modules": {
+    "cms": {
+      "grants": {
+        "Dean Academic": [
+          "cms.announcement.manage",
+          "cms.announcement.view",
+          "cms.complaint.escalate",
+          "cms.complaint.handle",
+          "cms.complaint.reopen",
+          "cms.complaint.resolve",
+          "cms.complaint.submit_self",
+          "cms.complaint.view_all",
+          "cms.complaint.view_self",
+          "cms.report.view",
+          "cms.role.manage"
+        ],
+        "acadadmin": [
+          "cms.announcement.manage",
+          "cms.announcement.view",
+          "cms.complaint.escalate",
+          "cms.complaint.handle",
+          "cms.complaint.reopen",
+          "cms.complaint.resolve",
+          "cms.complaint.submit_self",
+          "cms.complaint.view_all",
+          "cms.complaint.view_self",
+          "cms.report.view",
+          "cms.role.manage"
+        ],
+        "complaint_handler": [
+          "cms.announcement.view",
+          "cms.complaint.handle",
+          "cms.complaint.reopen",
+          "cms.complaint.resolve",
+          "cms.complaint.submit_self",
+          "cms.complaint.view_self"
+        ],
+        "complaint_supervisor": [
+          "cms.announcement.manage",
+          "cms.announcement.view",
+          "cms.complaint.escalate",
+          "cms.complaint.handle",
+          "cms.complaint.reopen",
+          "cms.complaint.resolve",
+          "cms.complaint.submit_self",
+          "cms.complaint.view_all",
+          "cms.complaint.view_self",
+          "cms.report.view",
+          "cms.role.manage"
+        ],
+        "faculty": [
+          "cms.announcement.view",
+          "cms.complaint.reopen",
+          "cms.complaint.submit_self",
+          "cms.complaint.view_self"
+        ],
+        "placement_chairman": [
+          "cms.announcement.manage",
+          "cms.announcement.view",
+          "cms.complaint.escalate",
+          "cms.complaint.handle",
+          "cms.complaint.reopen",
+          "cms.complaint.resolve",
+          "cms.complaint.submit_self",
+          "cms.complaint.view_all",
+          "cms.complaint.view_self",
+          "cms.report.view",
+          "cms.role.manage"
+        ],
+        "staff": [
+          "cms.announcement.view",
+          "cms.complaint.reopen",
+          "cms.complaint.submit_self",
+          "cms.complaint.view_self"
+        ],
+        "student": [
+          "cms.announcement.view",
+          "cms.complaint.reopen",
+          "cms.complaint.submit_self",
+          "cms.complaint.view_self"
+        ]
+      },
+      "module_grants": [
+        "Dean Academic",
+        "acadadmin",
+        "complaint_handler",
+        "complaint_supervisor",
+        "faculty",
+        "placement_chairman",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/cms",
+        "icon": "WarningCircle",
+        "items": [
+          {
+            "code": "cms.my_complaints",
+            "icon": "ListBullets",
+            "label": "My Complaints",
+            "required_permission": "cms.complaint.view_self",
+            "sort_order": 10,
+            "to": "/cms"
+          },
+          {
+            "code": "cms.handler_queue",
+            "icon": "Tray",
+            "label": "Handler Queue",
+            "required_permission": "cms.complaint.handle",
+            "sort_order": 20,
+            "to": "/cms/queue"
+          },
+          {
+            "code": "cms.escalations",
+            "icon": "Warning",
+            "label": "Escalations",
+            "required_permission": "cms.complaint.escalate",
+            "sort_order": 30,
+            "to": "/cms/escalations"
+          },
+          {
+            "code": "cms.announcements",
+            "icon": "Megaphone",
+            "label": "Announcements",
+            "required_permission": "cms.announcement.view",
+            "sort_order": 40,
+            "to": "/cms/announcements"
+          },
+          {
+            "code": "cms.reports",
+            "icon": "ChartBar",
+            "label": "Analytics & Reports",
+            "required_permission": "cms.report.view",
+            "sort_order": 50,
+            "to": "/cms/reports"
+          },
+          {
+            "code": "cms.roles",
+            "icon": "UsersThree",
+            "label": "Role Governance",
+            "required_permission": "cms.role.manage",
+            "sort_order": 60,
+            "to": "/cms/roles"
+          }
+        ],
+        "label": "Complaint Management",
+        "nav_section": "Services",
+        "sort_order": 15,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "cms.complaint.submit_self",
+          "label": "Submit complaints on behalf of self"
+        },
+        {
+          "code": "cms.complaint.view_self",
+          "label": "View self submitted complaints"
+        },
+        {
+          "code": "cms.complaint.view_all",
+          "label": "View all complaints across departments"
+        },
+        {
+          "code": "cms.complaint.handle",
+          "label": "Triage, update status, and investigate complaints"
+        },
+        {
+          "code": "cms.complaint.resolve",
+          "label": "Mark complaints resolved or rejected"
+        },
+        {
+          "code": "cms.complaint.escalate",
+          "label": "Escalate overdue or critical complaints"
+        },
+        {
+          "code": "cms.complaint.reopen",
+          "label": "Request or approve complaint reopening"
+        },
+        {
+          "code": "cms.announcement.view",
+          "label": "View active campus announcements"
+        },
+        {
+          "code": "cms.announcement.manage",
+          "label": "Publish and expire announcements"
+        },
+        {
+          "code": "cms.report.view",
+          "label": "View analytics and resolution SLA metrics"
+        },
+        {
+          "code": "cms.role.manage",
+          "label": "Assign and manage handler/supervisor roles"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "cms.complaint.auto_escalate"
+      ]
+    },
     "directory": {
       "grants": {
         "Dean Academic": [
