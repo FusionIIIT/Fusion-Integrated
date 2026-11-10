@@ -1,0 +1,64 @@
+================================================================================
+AI INTERACTION LOG: STRATEGY BR (Business Rules)
+================================================================================
+Model: Gemini 3.8 Flash (High)
+Agent: Google Antigravity
+Strategy: Business Rule Specifications (Conditions, Outcomes, Thresholds, Exceptions)
+Source Specification: 01_BA_Problem_Statement_v1.2_SYNCHRONIZED_DRAFT.docx, 04_BA_Business_Rule_Specifications_v1.2_FINAL.docx
+
+--------------------------------------------------------------------------------
+PROMPT A: GENERATE FROZEN TEST DESIGN
+--------------------------------------------------------------------------------
+You are designing automated specification-based tests for the BADMS Fusion ERP module.
+Source of truth: Use ONLY the supplied Problem Statement and Business Rules.
+Do NOT inspect implementation code.
+Do NOT infer behavior from implementation.
+Do NOT introduce behavior unsupported by the supplied specification.
+Generate the minimum non-redundant set of test cases needed to satisfy the strategy-specific adequacy rule in Section 7. Do not stop at an arbitrary number, do not omit an explicit test obligation to reduce the test count, and do not invent unsupported behavior. Prefer observable behavior that can subsequently be automated using pytest/pytest-django.
+For every test case output exactly these fields:
+- test_id
+- source_id
+- purpose
+- preconditions
+- action_or_input
+- expected_result
+- test_type
+source_id must identify the exact obligation covered.
+Output ONLY a valid JSON array. Do not provide explanation or additional prose.
+[Strategy-specific instruction]: Cover every Business Rule with at least one test. Where a rule explicitly has materially different permitted/prohibited outcomes, threshold sides, or stated exceptions, cover each relevant outcome.
+
+Output saved to: a8_design/BR_DESIGN.json (37 test cases frozen across 21 Business Rules)
+
+--------------------------------------------------------------------------------
+PROMPT B: CONVERT FROZEN DESIGN INTO EXECUTABLE TESTS
+--------------------------------------------------------------------------------
+You are given:
+1. the frozen A8_BASE Fusion implementation, and
+2. the frozen BR_DESIGN.json.
+Convert these test designs into executable automated backend tests using pytest/pytest-django.
+Rules:
+- Implement exactly the supplied test cases.
+- Do not add, remove, merge or reinterpret test cases.
+- Preserve each specified expected result.
+- Do not modify production code.
+- Use the Django isolated test database.
+- Reuse existing Fusion test infrastructure where appropriate.
+- Do not mock the behavior being tested; mocks may be used only for unavailable external dependencies.
+- Do not use xfail to hide failures.
+- Every test must contain its test_id and source_id in its name or docstring.
+- Store generated tests only under tests/a8/br/.
+
+Tests generated at: tests/a8/br/test_br.py
+
+--------------------------------------------------------------------------------
+PROMPT C: PERMITTED REPAIR PROMPTS
+--------------------------------------------------------------------------------
+No repair prompts required (0 of 2 used). Tests executed directly against A8_BASE.
+
+--------------------------------------------------------------------------------
+FINAL EXECUTION RESULT
+--------------------------------------------------------------------------------
+pytest tests/a8/br --junitxml=a8_results/br/junit.xml --cov=modules.badms --cov-branch --cov-report=xml:a8_results/br/coverage.xml
+Total: 37 tests | Passed: 30 | Failed: 6 | Skipped: 1
+Statement Coverage: 75.42% | Branch Coverage: 48.61%
+Confirmed Implementation Defects Found: 5 (DEF-01, DEF-02, DEF-03, DEF-04, DEF-05)

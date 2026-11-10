@@ -1,0 +1,578 @@
+[
+  {
+    "test_id": "TEST-UC-001",
+    "source_id": "BA-UC-001 Main Flow",
+    "purpose": "BA-UC-001: SysAdmin triggers manual backup",
+    "preconditions": "Preconditions established for BA-UC-001 Main Flow.",
+    "action_or_input": "Manual backup triggered with valid params",
+    "expected_result": "BackupOperation created with status='success' and audit log recorded",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-002",
+    "source_id": "BA-UC-001 Alt A1",
+    "purpose": "BA-UC-001: Backup creation fails",
+    "preconditions": "Preconditions established for BA-UC-001 Alt A1.",
+    "action_or_input": "Backup operation fails during execution",
+    "expected_result": "Status set to 'failed', error recorded, SysAdmin alerted",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-003",
+    "source_id": "BA-UC-001 Exc E1",
+    "purpose": "BA-UC-001: Authorization failure",
+    "preconditions": "Preconditions established for BA-UC-001 Exc E1.",
+    "action_or_input": "Non-admin user attempts to trigger backup",
+    "expected_result": "PermissionDeniedError raised, trigger denied",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-004",
+    "source_id": "BA-UC-002 Main Flow",
+    "purpose": "BA-UC-002: User submits archival request",
+    "preconditions": "Preconditions established for BA-UC-002 Main Flow.",
+    "action_or_input": "User provides all valid file details and classification",
+    "expected_result": "Request created in 'submitted' status and routed to HoD",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-005",
+    "source_id": "BA-UC-002 Alt A1",
+    "purpose": "BA-UC-002: Initial classification omitted",
+    "preconditions": "Preconditions established for BA-UC-002 Alt A1.",
+    "action_or_input": "User submits request without initial classification",
+    "expected_result": "System assigns 'routine' classification by default",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-006",
+    "source_id": "BA-UC-002 Exc E1",
+    "purpose": "BA-UC-002: Validation fails",
+    "preconditions": "Preconditions established for BA-UC-002 Exc E1.",
+    "action_or_input": "User submits invalid/empty parameters",
+    "expected_result": "Validation error returned, request remains unsubmitted",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-007",
+    "source_id": "BA-UC-003 Main Flow",
+    "purpose": "BA-UC-003: HoD reviews archival request",
+    "preconditions": "Preconditions established for BA-UC-003 Main Flow.",
+    "action_or_input": "HoD opens submitted request in their department",
+    "expected_result": "Request details displayed for decision",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-008",
+    "source_id": "BA-UC-003 Alt A1",
+    "purpose": "BA-UC-003: HoD approves request",
+    "preconditions": "Preconditions established for BA-UC-003 Alt A1.",
+    "action_or_input": "HoD records approve decision",
+    "expected_result": "Status updated to 'hod_approved' and routed to SysAdmin",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-009",
+    "source_id": "BA-UC-003 Alt A2",
+    "purpose": "BA-UC-003: HoD rejects request",
+    "preconditions": "Preconditions established for BA-UC-003 Alt A2.",
+    "action_or_input": "HoD records reject decision with remarks",
+    "expected_result": "Status updated to 'hod_rejected' and requester notified",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-010",
+    "source_id": "BA-UC-003 Exc E1",
+    "purpose": "BA-UC-003: Request outside HoD department",
+    "preconditions": "Preconditions established for BA-UC-003 Exc E1.",
+    "action_or_input": "HoD attempts to decide request from different department",
+    "expected_result": "PermissionDeniedError raised, action denied",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-011",
+    "source_id": "BA-UC-004 Main Flow",
+    "purpose": "BA-UC-004: SysAdmin reviews approved request",
+    "preconditions": "Preconditions established for BA-UC-004 Main Flow.",
+    "action_or_input": "SysAdmin inspects HoD-approved request",
+    "expected_result": "Displays metadata for authoritative classification",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-012",
+    "source_id": "BA-UC-004 Alt A1",
+    "purpose": "BA-UC-004: Non-Sensitive classification",
+    "preconditions": "Preconditions established for BA-UC-004 Alt A1.",
+    "action_or_input": "SysAdmin assigns Routine or Archival tier",
+    "expected_result": "Status becomes 'completed', retention calculated, no encryption route",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-013",
+    "source_id": "BA-UC-004 Alt A2",
+    "purpose": "BA-UC-004: Sensitive classification",
+    "preconditions": "Preconditions established for BA-UC-004 Alt A2.",
+    "action_or_input": "SysAdmin assigns Sensitive tier",
+    "expected_result": "Status becomes 'classified' and routed to IT Security Team",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-014",
+    "source_id": "BA-UC-004 Exc E1",
+    "purpose": "BA-UC-004: Classification save failure",
+    "preconditions": "Preconditions established for BA-UC-004 Exc E1.",
+    "action_or_input": "Invalid classification tier provided",
+    "expected_result": "Error returned, prior request state preserved",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-015",
+    "source_id": "BA-UC-005 Main Flow",
+    "purpose": "BA-UC-005: IT Security configures encryption",
+    "preconditions": "Preconditions established for BA-UC-005 Main Flow.",
+    "action_or_input": "IT Security configures AES-256 for Sensitive request",
+    "expected_result": "is_encrypted=True, algorithm='AES-256', status='completed'",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-016",
+    "source_id": "BA-UC-005 Exc E1",
+    "purpose": "BA-UC-005: Encryption configuration failure",
+    "preconditions": "Preconditions established for BA-UC-005 Exc E1.",
+    "action_or_input": "Weak or invalid encryption algorithm specified",
+    "expected_result": "Rejection or failure recorded, state preserved",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-017",
+    "source_id": "BA-UC-006 Main Flow",
+    "purpose": "BA-UC-006: Scheduled automatic backup execution",
+    "preconditions": "Preconditions established for BA-UC-006 Main Flow.",
+    "action_or_input": "Trigger automatic backup at scheduled time",
+    "expected_result": "Eligible datasets backed up, verified and recorded",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-018",
+    "source_id": "BA-UC-006 Alt A1",
+    "purpose": "BA-UC-006: Local schedule exists",
+    "preconditions": "Preconditions established for BA-UC-006 Alt A1.",
+    "action_or_input": "Dataset has local schedule overriding global",
+    "expected_result": "Local schedule is executed",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-019",
+    "source_id": "BA-UC-006 Alt A2",
+    "purpose": "BA-UC-006: No local schedule exists",
+    "preconditions": "Preconditions established for BA-UC-006 Alt A2.",
+    "action_or_input": "Dataset has no local schedule",
+    "expected_result": "Global schedule default is executed",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-020",
+    "source_id": "BA-UC-006 Exc E1",
+    "purpose": "BA-UC-006: Repository unreachable",
+    "preconditions": "Preconditions established for BA-UC-006 Exc E1.",
+    "action_or_input": "Backup destination repository unreachable",
+    "expected_result": "Execution fails, failure handling applied",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-021",
+    "source_id": "BA-UC-007 Main Flow",
+    "purpose": "BA-UC-007: User submits storage extension",
+    "preconditions": "Preconditions established for BA-UC-007 Main Flow.",
+    "action_or_input": "User with full quota requests additional storage",
+    "expected_result": "Request created in 'submitted' status routed to HoD",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-022",
+    "source_id": "BA-UC-007 Exc E1",
+    "purpose": "BA-UC-007: Quota not full validation fails",
+    "preconditions": "Preconditions established for BA-UC-007 Exc E1.",
+    "action_or_input": "User whose quota is not reached submits request",
+    "expected_result": "Validation fails with RuleViolation, request not submitted",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-023",
+    "source_id": "BA-UC-008 Main Flow",
+    "purpose": "BA-UC-008: HoD reviews extension request",
+    "preconditions": "Preconditions established for BA-UC-008 Main Flow.",
+    "action_or_input": "HoD inspects pending extension in department",
+    "expected_result": "Displays requested storage and justification",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-024",
+    "source_id": "BA-UC-008 Alt A1",
+    "purpose": "BA-UC-008: HoD approves extension",
+    "preconditions": "Preconditions established for BA-UC-008 Alt A1.",
+    "action_or_input": "HoD approves valid storage extension",
+    "expected_result": "Status becomes 'approved', user quota increased by requested MB",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-025",
+    "source_id": "BA-UC-008 Alt A2",
+    "purpose": "BA-UC-008: HoD rejects extension",
+    "preconditions": "Preconditions established for BA-UC-008 Alt A2.",
+    "action_or_input": "HoD rejects storage extension",
+    "expected_result": "Status becomes 'rejected', quota remains unchanged",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-026",
+    "source_id": "BA-UC-008 Exc E1",
+    "purpose": "BA-UC-008: Outside departmental scope",
+    "preconditions": "Preconditions established for BA-UC-008 Exc E1.",
+    "action_or_input": "HoD from other department attempts decision",
+    "expected_result": "PermissionDeniedError raised, decision denied",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-027",
+    "source_id": "BA-UC-009 Main Flow",
+    "purpose": "BA-UC-009: SysAdmin opens local schedule config",
+    "preconditions": "Preconditions established for BA-UC-009 Main Flow.",
+    "action_or_input": "SysAdmin accesses schedule config",
+    "expected_result": "Displays local schedules",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-028",
+    "source_id": "BA-UC-009 Alt A1",
+    "purpose": "BA-UC-009: Create new local schedule",
+    "preconditions": "Preconditions established for BA-UC-009 Alt A1.",
+    "action_or_input": "SysAdmin configures new local dataset schedule",
+    "expected_result": "Schedule saved and activated",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-029",
+    "source_id": "BA-UC-009 Alt A2",
+    "purpose": "BA-UC-009: Modify existing schedule",
+    "preconditions": "Preconditions established for BA-UC-009 Alt A2.",
+    "action_or_input": "SysAdmin updates cron expression of local schedule",
+    "expected_result": "Updated schedule saved",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-030",
+    "source_id": "BA-UC-009 Exc E1",
+    "purpose": "BA-UC-009: Invalid/conflicting parameters",
+    "preconditions": "Preconditions established for BA-UC-009 Exc E1.",
+    "action_or_input": "SysAdmin supplies invalid cron parameters",
+    "expected_result": "Validation error shown, existing schedule preserved",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-031",
+    "source_id": "BA-UC-010 Main Flow",
+    "purpose": "BA-UC-010: Super Admin performs special archival",
+    "preconditions": "Preconditions established for BA-UC-010 Main Flow.",
+    "action_or_input": "Super Admin initiates special archival with valid details",
+    "expected_result": "Special archive executed, status='special_executed', audited",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-032",
+    "source_id": "BA-UC-010 Exc E1",
+    "purpose": "BA-UC-010: Non-Super Admin attempt",
+    "preconditions": "Preconditions established for BA-UC-010 Exc E1.",
+    "action_or_input": "Unauthorized user attempts special archival",
+    "expected_result": "PermissionDeniedError raised, operation prevented",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-033",
+    "source_id": "BA-UC-011 Main Flow",
+    "purpose": "BA-UC-011: Super Admin defines global schedule",
+    "preconditions": "Preconditions established for BA-UC-011 Main Flow.",
+    "action_or_input": "Super Admin saves institution-wide global schedule",
+    "expected_result": "Global schedule active for all unoverridden datasets",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-034",
+    "source_id": "BA-UC-011 Exc E1",
+    "purpose": "BA-UC-011: Invalid configuration / unauthorized",
+    "preconditions": "Preconditions established for BA-UC-011 Exc E1.",
+    "action_or_input": "Non-Super Admin attempts global schedule change",
+    "expected_result": "PermissionDeniedError raised, global config unchanged",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-035",
+    "source_id": "BA-UC-012 Main Flow",
+    "purpose": "BA-UC-012: SysAdmin views audit logs",
+    "preconditions": "Preconditions established for BA-UC-012 Main Flow.",
+    "action_or_input": "SysAdmin requests audit log entries",
+    "expected_result": "Returns chronological audit log records",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-036",
+    "source_id": "BA-UC-012 Exc E1",
+    "purpose": "BA-UC-012: Access denied",
+    "preconditions": "Preconditions established for BA-UC-012 Exc E1.",
+    "action_or_input": "Regular unprivileged user requests audit logs",
+    "expected_result": "Access denied or filtered",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-037",
+    "source_id": "BA-UC-013 Main Flow",
+    "purpose": "BA-UC-013: IT Security reviews security logs",
+    "preconditions": "Preconditions established for BA-UC-013 Main Flow.",
+    "action_or_input": "IT Security queries security activity events",
+    "expected_result": "Returns security logs",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-038",
+    "source_id": "BA-UC-013 Exc E1",
+    "purpose": "BA-UC-013: Unauthorized actor",
+    "preconditions": "Preconditions established for BA-UC-013 Exc E1.",
+    "action_or_input": "Non-security actor attempts security review",
+    "expected_result": "Access denied",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-039",
+    "source_id": "BA-UC-014 Main Flow",
+    "purpose": "BA-UC-014: Authorized actor views backup history",
+    "preconditions": "Preconditions established for BA-UC-014 Main Flow.",
+    "action_or_input": "Actor queries backup operations within scope",
+    "expected_result": "Returns backup history",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-040",
+    "source_id": "BA-UC-014 Exc E1",
+    "purpose": "BA-UC-014: Unauthorized scope request",
+    "preconditions": "Preconditions established for BA-UC-014 Exc E1.",
+    "action_or_input": "Actor requests out-of-scope backup history",
+    "expected_result": "Access denied or empty results",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-041",
+    "source_id": "BA-UC-015 Main Flow",
+    "purpose": "BA-UC-015: Requester tracks own request status",
+    "preconditions": "Preconditions established for BA-UC-015 Main Flow.",
+    "action_or_input": "User queries status of own archival request",
+    "expected_result": "Returns request status and timestamps",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-042",
+    "source_id": "BA-UC-015 Exc E1",
+    "purpose": "BA-UC-015: User queries other's request",
+    "preconditions": "Preconditions established for BA-UC-015 Exc E1.",
+    "action_or_input": "User attempts to access another user's request",
+    "expected_result": "Request not disclosed (filtered out or 404)",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-043",
+    "source_id": "BA-UC-016 Main Flow",
+    "purpose": "BA-UC-016: User requests data restoration",
+    "preconditions": "Preconditions established for BA-UC-016 Main Flow.",
+    "action_or_input": "User requests restoration of archived file",
+    "expected_result": "Restoration request created",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-044",
+    "source_id": "BA-UC-016 Alt A1",
+    "purpose": "BA-UC-016: Sensitive archive restoration",
+    "preconditions": "Preconditions established for BA-UC-016 Alt A1.",
+    "action_or_input": "Restoration requested for Sensitive classified archive",
+    "expected_result": "Status set to 'submitted' pending SysAdmin review",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-045",
+    "source_id": "BA-UC-016 Alt A2",
+    "purpose": "BA-UC-016: Non-Sensitive archive restoration",
+    "preconditions": "Preconditions established for BA-UC-016 Alt A2.",
+    "action_or_input": "Restoration requested for Routine classified archive",
+    "expected_result": "Standard path executed, status='completed'",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-046",
+    "source_id": "BA-UC-016 Exc E1",
+    "purpose": "BA-UC-016: Archive not found or unauthorized",
+    "preconditions": "Preconditions established for BA-UC-016 Exc E1.",
+    "action_or_input": "User requests restoration of non-existent archive",
+    "expected_result": "Request rejected with error",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-047",
+    "source_id": "BA-UC-017 Main Flow",
+    "purpose": "BA-UC-017: SysAdmin reviews sensitive restoration",
+    "preconditions": "Preconditions established for BA-UC-017 Main Flow.",
+    "action_or_input": "SysAdmin inspects pending sensitive restoration",
+    "expected_result": "Displays request details",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-048",
+    "source_id": "BA-UC-017 Alt A1",
+    "purpose": "BA-UC-017: SysAdmin approves restoration",
+    "preconditions": "Preconditions established for BA-UC-017 Alt A1.",
+    "action_or_input": "SysAdmin approves sensitive restoration",
+    "expected_result": "Status updated to 'completed' / technical restore proceeds",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-049",
+    "source_id": "BA-UC-017 Alt A2",
+    "purpose": "BA-UC-017: SysAdmin rejects restoration",
+    "preconditions": "Preconditions established for BA-UC-017 Alt A2.",
+    "action_or_input": "SysAdmin rejects sensitive restoration",
+    "expected_result": "Status updated to 'sysadmin_rejected'",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-050",
+    "source_id": "BA-UC-017 Exc E1",
+    "purpose": "BA-UC-017: Unauthorized reviewer",
+    "preconditions": "Preconditions established for BA-UC-017 Exc E1.",
+    "action_or_input": "Non-SysAdmin attempts sensitive restoration decision",
+    "expected_result": "PermissionDeniedError raised, decision blocked",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-051",
+    "source_id": "BA-UC-018 Main Flow",
+    "purpose": "BA-UC-018: Execute approved data restoration",
+    "preconditions": "Preconditions established for BA-UC-018 Main Flow.",
+    "action_or_input": "Restoration process unpacks archive",
+    "expected_result": "File restored and timestamp recorded",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-052",
+    "source_id": "BA-UC-018 Exc E1",
+    "purpose": "BA-UC-018: Restoration execution fails",
+    "preconditions": "Preconditions established for BA-UC-018 Exc E1.",
+    "action_or_input": "Archive corrupt or unpack failure",
+    "expected_result": "Failure recorded in audit log",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-053",
+    "source_id": "BA-UC-019 Main Flow",
+    "purpose": "BA-UC-019: IT Security assigns permission",
+    "preconditions": "Preconditions established for BA-UC-019 Main Flow.",
+    "action_or_input": "IT Security modifies role permissions",
+    "expected_result": "Permission updated",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-054",
+    "source_id": "BA-UC-019 Exc E1",
+    "purpose": "BA-UC-019: Unauthorized permission modification",
+    "preconditions": "Preconditions established for BA-UC-019 Exc E1.",
+    "action_or_input": "Non-IT Security actor attempts RBAC change",
+    "expected_result": "PermissionDeniedError raised",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-055",
+    "source_id": "BA-UC-020 Main Flow",
+    "purpose": "BA-UC-020: IT Security updates security policy",
+    "preconditions": "Preconditions established for BA-UC-020 Main Flow.",
+    "action_or_input": "IT Security defines password/encryption policy",
+    "expected_result": "Security policy updated",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-056",
+    "source_id": "BA-UC-020 Exc E1",
+    "purpose": "BA-UC-020: Invalid policy configuration",
+    "preconditions": "Preconditions established for BA-UC-020 Exc E1.",
+    "action_or_input": "Actor supplies invalid policy parameters",
+    "expected_result": "Rejection and prior policy retained",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-057",
+    "source_id": "BA-UC-021 Main Flow",
+    "purpose": "BA-UC-021: HoD views departmental reports",
+    "preconditions": "Preconditions established for BA-UC-021 Main Flow.",
+    "action_or_input": "HoD queries reports for own department",
+    "expected_result": "Returns department-scoped reports",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-058",
+    "source_id": "BA-UC-021 Exc E1",
+    "purpose": "BA-UC-021: HoD requests other department report",
+    "preconditions": "Preconditions established for BA-UC-021 Exc E1.",
+    "action_or_input": "HoD requests report for another department",
+    "expected_result": "Denied or filtered out",
+    "test_type": "use-case-negative"
+  },
+  {
+    "test_id": "TEST-UC-059",
+    "source_id": "BA-UC-022 Main Flow",
+    "purpose": "BA-UC-022: System monitors storage quota threshold",
+    "preconditions": "Preconditions established for BA-UC-022 Main Flow.",
+    "action_or_input": "System checks user usage vs allocated quota",
+    "expected_result": "is_quota_full evaluated correctly",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-060",
+    "source_id": "BA-UC-022 Alt A1",
+    "purpose": "BA-UC-022: Usage below threshold",
+    "preconditions": "Preconditions established for BA-UC-022 Alt A1.",
+    "action_or_input": "User usage is below allocated quota",
+    "expected_result": "Status remains normal; extension not forced",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-061",
+    "source_id": "BA-UC-022 Exc E1",
+    "purpose": "BA-UC-022: Usage data missing/corrupt",
+    "preconditions": "Preconditions established for BA-UC-022 Exc E1.",
+    "action_or_input": "User storage quota missing",
+    "expected_result": "Default quota assumed without error",
+    "test_type": "use-case-boundary-positive"
+  },
+  {
+    "test_id": "TEST-UC-062",
+    "source_id": "BA-UC-023 Main Flow",
+    "purpose": "BA-UC-023: Record user action audit event",
+    "preconditions": "Preconditions established for BA-UC-023 Main Flow.",
+    "action_or_input": "Action performed by authenticated user",
+    "expected_result": "BadmsAuditLog entry created with actor_user_id",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-063",
+    "source_id": "BA-UC-023 Alt A1",
+    "purpose": "BA-UC-023: Record system-originated audit event",
+    "preconditions": "Preconditions established for BA-UC-023 Alt A1.",
+    "action_or_input": "System background process executes event",
+    "expected_result": "BadmsAuditLog entry created with actor_user_id=0 or system identifier",
+    "test_type": "use-case-positive"
+  },
+  {
+    "test_id": "TEST-UC-064",
+    "source_id": "BA-UC-023 Exc E1",
+    "purpose": "BA-UC-023: Audit persistence error handling",
+    "preconditions": "Preconditions established for BA-UC-023 Exc E1.",
+    "action_or_input": "Audit event logging invoked",
+    "expected_result": "Audit log saved reliably",
+    "test_type": "use-case-positive"
+  }
+]

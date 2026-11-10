@@ -1,0 +1,65 @@
+================================================================================
+AI INTERACTION LOG: STRATEGY WF (Workflows)
+================================================================================
+Model: Gemini 3.8 Flash (High)
+Agent: Google Antigravity
+Strategy: Workflow Specifications (State Transitions & Decision Paths)
+Source Specification: 01_BA_Problem_Statement_v1.2_SYNCHRONIZED_DRAFT.docx, 05_BA_Workflow_Specifications_v1.1_FINAL.docx
+
+--------------------------------------------------------------------------------
+PROMPT A: GENERATE FROZEN TEST DESIGN
+--------------------------------------------------------------------------------
+You are designing automated specification-based tests for the BADMS Fusion ERP module.
+Source of truth: Use ONLY the supplied Problem Statement and Workflows.
+Do NOT inspect implementation code.
+Do NOT infer behavior from implementation.
+Do NOT introduce behavior unsupported by the supplied specification.
+Generate the minimum non-redundant set of test cases needed to satisfy the strategy-specific adequacy rule in Section 7. Do not stop at an arbitrary number, do not omit an explicit test obligation to reduce the test count, and do not invent unsupported behavior. Prefer observable behavior that can subsequently be automated using pytest/pytest-django.
+For every test case output exactly these fields:
+- test_id
+- source_id
+- purpose
+- preconditions
+- action_or_input
+- expected_result
+- test_type
+source_id must identify the exact obligation covered.
+Output ONLY a valid JSON array. Do not provide explanation or additional prose.
+[Strategy-specific instruction]: Cover every explicitly specified distinct workflow path/decision outcome. Ensure every important stated transition is exercised at least once; do not enumerate unsupported combinations.
+
+Output saved to: a8_design/WF_DESIGN.json (18 test cases frozen across 10 Workflows)
+
+--------------------------------------------------------------------------------
+PROMPT B: CONVERT FROZEN DESIGN INTO EXECUTABLE TESTS
+--------------------------------------------------------------------------------
+You are given:
+1. the frozen A8_BASE Fusion implementation, and
+2. the frozen WF_DESIGN.json.
+Convert these test designs into executable automated backend tests using pytest/pytest-django.
+Rules:
+- Implement exactly the supplied test cases.
+- Do not add, remove, merge or reinterpret test cases.
+- Preserve each specified expected result.
+- Do not modify production code.
+- Use the Django isolated test database.
+- Reuse existing Fusion test infrastructure where appropriate.
+- Do not mock the behavior being tested; mocks may be used only for unavailable external dependencies.
+- Do not use xfail to hide failures.
+- Every test must contain its test_id and source_id in its name or docstring.
+- Store generated tests only under tests/a8/wf/.
+
+Tests generated at: tests/a8/wf/test_wf.py
+
+--------------------------------------------------------------------------------
+PROMPT C: PERMITTED REPAIR PROMPTS
+--------------------------------------------------------------------------------
+No repair prompts required (0 of 2 used). Tests executed directly against A8_BASE.
+
+--------------------------------------------------------------------------------
+FINAL EXECUTION RESULT
+--------------------------------------------------------------------------------
+pytest tests/a8/wf --junitxml=a8_results/wf/junit.xml --cov=modules.badms --cov-branch --cov-report=xml:a8_results/wf/coverage.xml
+Total: 18 tests | Passed: 18 | Failed: 0 | Skipped: 0
+Statement Coverage: 68.72% | Branch Coverage: 33.33%
+Confirmed Implementation Defects Found: 0
+Interpretation: All specified valid state transitions and rejection flows in the workflow specifications are correctly implemented by the state machine and service functions.

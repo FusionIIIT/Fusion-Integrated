@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="6" skipped="1" tests="37" time="4.347" timestamp="2026-11-10T22:46:35.727548+05:30" hostname="black"><testcase classname="tests.a8.br.test_br" name="test_br_001_manual_backup_allow" time="2.997" /><testcase classname="tests.a8.br.test_br" name="test_br_002_manual_backup_deny" time="0.005" /><testcase classname="tests.a8.br.test_br" name="test_br_003_hod_approval_same_dept_allow" time="0.011" /><testcase classname="tests.a8.br.test_br" name="test_br_004_hod_approval_cross_dept_deny" time="0.010"><failure message="Failed: DID NOT RAISE PermissionDeniedError">def test_br_004_hod_approval_cross_dept_deny():
+        """TEST-BR-004 | BR-BA-002-CROSS-DEPT: HoD of different department denied archival decision."""
+        user = regular_user_actor(user_id=10, dept="ECE")
+        ece_req = ops.submit_archival_request(actor=user, department="ECE", file_name="ece.pdf", file_type="pdf", file_size_bytes=100, reason="ECE Archival")
+        cse_hod = hod_actor(user_id=20, dept="CSE")
+        # BR-BA-002 &amp; BR-BA-010: Route to and authorize decision by the respective HoD only.
+&gt;       with pytest.raises(PermissionDeniedError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PermissionDeniedError
+
+tests\a8\br\test_br.py:63: Failed</failure></testcase><testcase classname="tests.a8.br.test_br" name="test_br_005_encryption_it_security_allow" time="0.015" /><testcase classname="tests.a8.br.test_br" name="test_br_006_encryption_non_security_deny" time="0.013" /><testcase classname="tests.a8.br.test_br" name="test_br_007_classification_sysadmin_allow" time="0.012" /><testcase classname="tests.a8.br.test_br" name="test_br_008_classification_non_sysadmin_deny" time="0.009" /><testcase classname="tests.a8.br.test_br" name="test_br_009_restoration_sensitive_blocked" time="0.011" /><testcase classname="tests.a8.br.test_br" name="test_br_010_restoration_non_sensitive_allow" time="0.007" /><testcase classname="tests.a8.br.test_br" name="test_br_011_initial_classification_provided" time="0.006" /><testcase classname="tests.a8.br.test_br" name="test_br_012_initial_classification_default" time="0.005" /><testcase classname="tests.a8.br.test_br" name="test_br_013_sensitive_data_encryption_aes256" time="0.014" /><testcase classname="tests.a8.br.test_br" name="test_br_014_sensitive_data_encryption_non_aes_rejected" time="0.015"><failure message="Failed: DID NOT RAISE any of (BadRequestError, ValueError)">def test_br_014_sensitive_data_encryption_non_aes_rejected():
+        """TEST-BR-014 | BR-BA-007-NON-AES-REJECT: Non-AES encryption algorithm rejected for Sensitive data."""
+        user = regular_user_actor(user_id=15, dept="CSE")
+        cse_hod = hod_actor(user_id=20, dept="CSE")
+        admin = sysadmin_actor(user_id=1)
+        sec = it_security_actor(user_id=30)
+        req = ops.submit_archival_request(actor=user, department="CSE", file_name="f.dat", file_type="dat", file_size_bytes=100, reason="R")
+        ops.hod_review_archival(actor=cse_hod, request_id=req.pk, action="approve")
+        ops.sysadmin_classify_archival(actor=admin, request_id=req.pk, authoritative_classification="sensitive")
+        # BR-BA-007: Data classified Sensitive must be encrypted using AES-256 both at rest and in transit.
+&gt;       with pytest.raises((BadRequestError, ValueError)):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE any of (BadRequestError, ValueError)
+
+tests\a8\br\test_br.py:180: Failed</failure></testcase><testcase classname="tests.a8.br.test_br" name="test_br_015_retention_years_definitions" time="0.004" /><testcase classname="tests.a8.br.test_br" name="test_br_016_hod_storage_extension_same_dept_allow" time="0.016" /><testcase classname="tests.a8.br.test_br" name="test_br_017_hod_storage_extension_cross_dept_deny" time="0.012"><failure message="Failed: DID NOT RAISE PermissionDeniedError">def test_br_017_hod_storage_extension_cross_dept_deny():
+        """TEST-BR-017 | BR-BA-010-CROSS-DEPT-STORAGE: HoD denied storage extension decision for other department."""
+        user = regular_user_actor(user_id=17, dept="ECE")
+        cse_hod = hod_actor(user_id=20, dept="CSE")
+        StorageQuota.objects.create(user_id=17, allocated_mb=5120, used_mb=5120)
+        ext = ops.submit_storage_extension(actor=user, department="ECE", requested_additional_mb=1024, reason="ECE expansion")
+        # BR-BA-010: HoD may act only on requests belonging to HoD's own department.
+&gt;       with pytest.raises(PermissionDeniedError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PermissionDeniedError
+
+tests\a8\br\test_br.py:213: Failed</failure></testcase><testcase classname="tests.a8.br.test_br" name="test_br_018_local_schedule_override" time="0.003" /><testcase classname="tests.a8.br.test_br" name="test_br_019_global_schedule_fallback" time="0.004" /><testcase classname="tests.a8.br.test_br" name="test_br_020_schedule_valid_parameters" time="0.009" /><testcase classname="tests.a8.br.test_br" name="test_br_021_schedule_invalid_parameters_rejected" time="0.010"><failure message="Failed: DID NOT RAISE any of (BadRequestError, ValueError)">def test_br_021_schedule_invalid_parameters_rejected():
+        """TEST-BR-021 | BR-BA-012-INVALID: Invalid schedule parameters rejected."""
+        admin = sysadmin_actor(user_id=1)
+        # BR-BA-012: A new or modified backup schedule must pass parameter and conflict validation before it is applied.
+&gt;       with pytest.raises((BadRequestError, ValueError)):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE any of (BadRequestError, ValueError)
+
+tests\a8\br\test_br.py:247: Failed</failure></testcase><testcase classname="tests.a8.br.test_br" name="test_br_022_scheduled_repository_reachability" time="0.003"><skipped type="pytest.skip" message="NOT_AUTOMATED: External repository network daemon probe is not automated in unit tests">C:\Fusion-Integrated\tests\a8\br\test_br.py:255: NOT_AUTOMATED: External repository network daemon probe is not automated in unit tests</skipped></testcase><testcase classname="tests.a8.br.test_br" name="test_br_023_backup_failure_alert" time="0.004" /><testcase classname="tests.a8.br.test_br" name="test_br_024_repeated_failure_escalates_on_three" time="0.003" /><testcase classname="tests.a8.br.test_br" name="test_br_025_repeated_failure_no_escalate_below_three" time="0.003" /><testcase classname="tests.a8.br.test_br" name="test_br_026_storage_quota_threshold_reached" time="0.003" /><testcase classname="tests.a8.br.test_br" name="test_br_027_storage_quota_threshold_below" time="0.003" /><testcase classname="tests.a8.br.test_br" name="test_br_028_storage_extension_approve_allocates_storage" time="0.012" /><testcase classname="tests.a8.br.test_br" name="test_br_029_storage_extension_reject_retains_quota" time="0.011" /><testcase classname="tests.a8.br.test_br" name="test_br_030_special_archival_superadmin_allow" time="0.004"><failure message="AssertionError: special_archival_operation service missing from operations.py&#10;assert False&#10; +  where False = hasattr(ops, 'special_archival_operation')">def test_br_030_special_archival_superadmin_allow():
+        """TEST-BR-030 | BR-BA-018-SUPERADMIN-ALLOW: Super Admin executes special archival operation."""
+        superadmin = superadmin_actor(user_id=102)
+        # BR-BA-018: Only Super Admin may perform special archival operation.
+&gt;       assert hasattr(ops, "special_archival_operation"), "special_archival_operation service missing from operations.py"
+E       AssertionError: special_archival_operation service missing from operations.py
+E       assert False
+E        +  where False = hasattr(ops, 'special_archival_operation')
+
+tests\a8\br\test_br.py:324: AssertionError</failure></testcase><testcase classname="tests.a8.br.test_br" name="test_br_031_special_archival_non_superadmin_deny" time="0.004"><failure message="AssertionError: special_archival_operation service missing from operations.py&#10;assert False&#10; +  where False = hasattr(ops, 'special_archival_operation')">def test_br_031_special_archival_non_superadmin_deny():
+        """TEST-BR-031 | BR-BA-018-NON-SUPERADMIN-DENY: Non-Super Admin denied special archival operation."""
+        user = regular_user_actor(user_id=20)
+&gt;       assert hasattr(ops, "special_archival_operation"), "special_archival_operation service missing from operations.py"
+E       AssertionError: special_archival_operation service missing from operations.py
+E       assert False
+E        +  where False = hasattr(ops, 'special_archival_operation')
+
+tests\a8\br\test_br.py:332: AssertionError</failure></testcase><testcase classname="tests.a8.br.test_br" name="test_br_032_global_backup_schedule_superadmin_allow" time="0.007" /><testcase classname="tests.a8.br.test_br" name="test_br_033_global_backup_schedule_non_superadmin_deny" time="0.004" /><testcase classname="tests.a8.br.test_br" name="test_br_034_scoping_user_sees_own_records" time="0.009" /><testcase classname="tests.a8.br.test_br" name="test_br_035_scoping_hod_sees_department_records" time="0.007" /><testcase classname="tests.a8.br.test_br" name="test_br_036_security_manage_allow" time="0.003" /><testcase classname="tests.a8.br.test_br" name="test_br_037_security_manage_deny" time="0.316" /></testsuite></testsuites>

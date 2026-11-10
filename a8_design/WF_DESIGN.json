@@ -1,0 +1,164 @@
+[
+  {
+    "test_id": "TEST-WF-001",
+    "source_id": "BW-BA-01-T1",
+    "purpose": "BW-BA-01: Transition from Not Submitted to Submitted",
+    "preconditions": "User has valid archival payload.",
+    "action_or_input": "submit_archival_request()",
+    "expected_result": "Request status is 'submitted'.",
+    "test_type": "workflow-transition"
+  },
+  {
+    "test_id": "TEST-WF-002",
+    "source_id": "BW-BA-01-T2",
+    "purpose": "BW-BA-01: Transition from Submitted to Rejected by HoD",
+    "preconditions": "Request is in 'submitted' status.",
+    "action_or_input": "hod_review_archival(action='reject')",
+    "expected_result": "Request status transitions to 'hod_rejected'.",
+    "test_type": "workflow-transition"
+  },
+  {
+    "test_id": "TEST-WF-003",
+    "source_id": "BW-BA-02-T2",
+    "purpose": "BW-BA-02: Transition from Submitted to HoD Approved",
+    "preconditions": "Request is in 'submitted' status.",
+    "action_or_input": "hod_review_archival(action='approve')",
+    "expected_result": "Request status transitions to 'hod_approved'.",
+    "test_type": "workflow-transition"
+  },
+  {
+    "test_id": "TEST-WF-004",
+    "source_id": "BW-BA-02-T3",
+    "purpose": "BW-BA-02: Transition from HoD Approved to Completed (Non-Sensitive)",
+    "preconditions": "Request is in 'hod_approved' status.",
+    "action_or_input": "sysadmin_classify_archival(authoritative_classification='routine')",
+    "expected_result": "Request status transitions to 'completed' with retention date calculated.",
+    "test_type": "workflow-transition"
+  },
+  {
+    "test_id": "TEST-WF-005",
+    "source_id": "BW-BA-03-T3",
+    "purpose": "BW-BA-03: Transition from HoD Approved to Classified (Sensitive)",
+    "preconditions": "Request is in 'hod_approved' status.",
+    "action_or_input": "sysadmin_classify_archival(authoritative_classification='sensitive')",
+    "expected_result": "Request status transitions to 'classified' (pending encryption).",
+    "test_type": "workflow-transition"
+  },
+  {
+    "test_id": "TEST-WF-006",
+    "source_id": "BW-BA-03-T4",
+    "purpose": "BW-BA-03: Transition from Classified to Sensitive Archive Encrypted",
+    "preconditions": "Request is in 'classified' status with tier='sensitive'.",
+    "action_or_input": "it_security_configure_encryption(algorithm='AES-256')",
+    "expected_result": "Request status transitions to 'completed' with is_encrypted=True.",
+    "test_type": "workflow-transition"
+  },
+  {
+    "test_id": "TEST-WF-007",
+    "source_id": "CW-BA-01-COMPOSITE-NON-SENSITIVE",
+    "purpose": "CW-BA-01: End-to-end composite archival lifecycle for non-sensitive data",
+    "preconditions": "New request initiated.",
+    "action_or_input": "Execute submit -> hod_approve -> sysadmin_classify_routine sequence",
+    "expected_result": "Transitions through submitted -> hod_approved -> completed successfully.",
+    "test_type": "workflow-composite"
+  },
+  {
+    "test_id": "TEST-WF-008",
+    "source_id": "CW-BA-01-COMPOSITE-SENSITIVE",
+    "purpose": "CW-BA-01: End-to-end composite archival lifecycle for sensitive data",
+    "preconditions": "New request initiated.",
+    "action_or_input": "Execute submit -> hod_approve -> sysadmin_classify_sensitive -> it_security_encrypt sequence",
+    "expected_result": "Transitions through submitted -> hod_approved -> classified -> completed successfully.",
+    "test_type": "workflow-composite"
+  },
+  {
+    "test_id": "TEST-WF-009",
+    "source_id": "CW-BA-01-COMPOSITE-REJECTION",
+    "purpose": "CW-BA-01: End-to-end composite archival lifecycle ending in rejection",
+    "preconditions": "New request initiated.",
+    "action_or_input": "Execute submit -> hod_reject sequence",
+    "expected_result": "Transitions from submitted -> hod_rejected and terminates.",
+    "test_type": "workflow-composite"
+  },
+  {
+    "test_id": "TEST-WF-010",
+    "source_id": "BW-BA-04-T1",
+    "purpose": "BW-BA-04: Transition Not Submitted to Submitted for Storage Extension",
+    "preconditions": "User storage quota full.",
+    "action_or_input": "submit_storage_extension(requested_additional_mb=1024)",
+    "expected_result": "Request status is 'submitted'.",
+    "test_type": "workflow-transition"
+  },
+  {
+    "test_id": "TEST-WF-011",
+    "source_id": "BW-BA-04-T2",
+    "purpose": "BW-BA-04: Transition Submitted to Rejected for Storage Extension",
+    "preconditions": "Storage extension request in 'submitted' status.",
+    "action_or_input": "hod_review_storage_extension(action='reject')",
+    "expected_result": "Request status transitions to 'rejected', quota unmodified.",
+    "test_type": "workflow-transition"
+  },
+  {
+    "test_id": "TEST-WF-012",
+    "source_id": "BW-BA-05-T2",
+    "purpose": "BW-BA-05: Transition Submitted to Approved for Storage Extension",
+    "preconditions": "Storage extension request in 'submitted' status.",
+    "action_or_input": "hod_review_storage_extension(action='approve')",
+    "expected_result": "Request status transitions to 'approved', user quota updated.",
+    "test_type": "workflow-transition"
+  },
+  {
+    "test_id": "TEST-WF-013",
+    "source_id": "CW-BA-02-COMPOSITE-EXTENSION",
+    "purpose": "CW-BA-02: Composite storage extension lifecycle",
+    "preconditions": "User quota full.",
+    "action_or_input": "Execute submit_extension -> hod_approve sequence",
+    "expected_result": "Transitions submitted -> approved, storage quota allocated correctly.",
+    "test_type": "workflow-composite"
+  },
+  {
+    "test_id": "TEST-WF-014",
+    "source_id": "BW-BA-06-T1",
+    "purpose": "BW-BA-06: Restoration Non-Sensitive Standard Path transition to Restored",
+    "preconditions": "Archive has non-sensitive classification.",
+    "action_or_input": "submit_restoration_request()",
+    "expected_result": "Transitions directly to 'completed' (restored).",
+    "test_type": "workflow-transition"
+  },
+  {
+    "test_id": "TEST-WF-015",
+    "source_id": "BW-BA-07-T1",
+    "purpose": "BW-BA-07: Sensitive Restoration transition to Pending Approval",
+    "preconditions": "Archive has sensitive classification.",
+    "action_or_input": "submit_restoration_request()",
+    "expected_result": "Transitions to 'submitted' (pending approval).",
+    "test_type": "workflow-transition"
+  },
+  {
+    "test_id": "TEST-WF-016",
+    "source_id": "BW-BA-07-T2-REJECT",
+    "purpose": "BW-BA-07: Sensitive Restoration rejected by SysAdmin",
+    "preconditions": "Restoration request in 'submitted' status.",
+    "action_or_input": "sysadmin_review_restoration(action='reject')",
+    "expected_result": "Transitions to 'sysadmin_rejected'.",
+    "test_type": "workflow-transition"
+  },
+  {
+    "test_id": "TEST-WF-017",
+    "source_id": "BW-BA-07-T2-APPROVE",
+    "purpose": "BW-BA-07: Sensitive Restoration approved by SysAdmin",
+    "preconditions": "Restoration request in 'submitted' status.",
+    "action_or_input": "sysadmin_review_restoration(action='approve')",
+    "expected_result": "Transitions to 'completed' (restored).",
+    "test_type": "workflow-transition"
+  },
+  {
+    "test_id": "TEST-WF-018",
+    "source_id": "CW-BA-03-COMPOSITE-RESTORATION-SENSITIVE",
+    "purpose": "CW-BA-03: Composite restoration lifecycle for sensitive archive",
+    "preconditions": "Completed sensitive archive exists.",
+    "action_or_input": "Execute submit_restoration -> sysadmin_approve sequence",
+    "expected_result": "Transitions submitted -> completed successfully.",
+    "test_type": "workflow-composite"
+  }
+]

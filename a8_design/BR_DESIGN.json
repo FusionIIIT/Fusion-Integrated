@@ -1,0 +1,335 @@
+[
+  {
+    "test_id": "TEST-BR-001",
+    "source_id": "BR-BA-001-ALLOW",
+    "purpose": "BR-BA-001: Authorized SysAdmin triggers manual backup",
+    "preconditions": "Actor has backup.trigger permission.",
+    "action_or_input": "trigger_manual_backup(actor=actor)",
+    "expected_result": "BackupOperation created successfully.",
+    "test_type": "rule-allow"
+  },
+  {
+    "test_id": "TEST-BR-002",
+    "source_id": "BR-BA-001-DENY",
+    "purpose": "BR-BA-001: Unauthorized actor denied manual backup",
+    "preconditions": "Actor lacks backup.trigger permission.",
+    "action_or_input": "trigger_manual_backup(actor=actor)",
+    "expected_result": "PermissionDeniedError raised.",
+    "test_type": "rule-deny"
+  },
+  {
+    "test_id": "TEST-BR-003",
+    "source_id": "BR-BA-002-SAME-DEPT",
+    "purpose": "BR-BA-002: HoD of requester department approves archival request",
+    "preconditions": "Request department is CSE; actor is HoD of CSE.",
+    "action_or_input": "hod_review_archival(actor=actor, request_id=req.id, action='approve')",
+    "expected_result": "Status updated to 'hod_approved'.",
+    "test_type": "rule-allow"
+  },
+  {
+    "test_id": "TEST-BR-004",
+    "source_id": "BR-BA-002-CROSS-DEPT",
+    "purpose": "BR-BA-002/BR-BA-010: HoD of different department denied archival decision",
+    "preconditions": "Request department is ECE; actor is HoD of CSE.",
+    "action_or_input": "hod_review_archival(actor=actor, request_id=req.id, action='approve')",
+    "expected_result": "PermissionDeniedError raised (department mismatch).",
+    "test_type": "rule-deny"
+  },
+  {
+    "test_id": "TEST-BR-005",
+    "source_id": "BR-BA-003-ALLOW",
+    "purpose": "BR-BA-003: IT Security configures encryption for Sensitive data",
+    "preconditions": "Actor has badms.security.manage permission; request is classified sensitive.",
+    "action_or_input": "it_security_configure_encryption(actor=actor, request_id=req.id)",
+    "expected_result": "Encryption configured, status='completed'.",
+    "test_type": "rule-allow"
+  },
+  {
+    "test_id": "TEST-BR-006",
+    "source_id": "BR-BA-003-DENY",
+    "purpose": "BR-BA-003: Non-IT Security actor denied encryption configuration",
+    "preconditions": "Actor lacks security.manage permission.",
+    "action_or_input": "it_security_configure_encryption(actor=actor, request_id=req.id)",
+    "expected_result": "PermissionDeniedError raised.",
+    "test_type": "rule-deny"
+  },
+  {
+    "test_id": "TEST-BR-007",
+    "source_id": "BR-BA-004-ALLOW",
+    "purpose": "BR-BA-004: SysAdmin assigns authoritative classification",
+    "preconditions": "Actor has classification.assign permission; request is hod_approved.",
+    "action_or_input": "sysadmin_classify_archival(actor=actor, request_id=req.id, authoritative_classification='critical')",
+    "expected_result": "Classification set to 'critical'.",
+    "test_type": "rule-allow"
+  },
+  {
+    "test_id": "TEST-BR-008",
+    "source_id": "BR-BA-004-DENY",
+    "purpose": "BR-BA-004: Non-SysAdmin denied authoritative classification",
+    "preconditions": "Actor lacks classification.assign permission.",
+    "action_or_input": "sysadmin_classify_archival(actor=actor, request_id=req.id, authoritative_classification='critical')",
+    "expected_result": "PermissionDeniedError raised.",
+    "test_type": "rule-deny"
+  },
+  {
+    "test_id": "TEST-BR-009",
+    "source_id": "BR-BA-005-SENSITIVE-BLOCK",
+    "purpose": "BR-BA-005: Restoration of Sensitive data blocked until SysAdmin approval",
+    "preconditions": "Archive has authoritative_classification='sensitive'.",
+    "action_or_input": "submit_restoration_request(actor=actor, archival_request_id=req.id, reason='Audit')",
+    "expected_result": "Restoration request status is 'submitted' (pending approval), not completed.",
+    "test_type": "rule-constraint"
+  },
+  {
+    "test_id": "TEST-BR-010",
+    "source_id": "BR-BA-005-NON-SENSITIVE-ALLOW",
+    "purpose": "BR-BA-005: Restoration of non-Sensitive data proceeds without SysAdmin approval",
+    "preconditions": "Archive has authoritative_classification='routine'.",
+    "action_or_input": "submit_restoration_request(actor=actor, archival_request_id=req.id, reason='Normal restore')",
+    "expected_result": "Restoration request auto-completes with status='completed'.",
+    "test_type": "rule-allow"
+  },
+  {
+    "test_id": "TEST-BR-011",
+    "source_id": "BR-BA-006-PROVIDED",
+    "purpose": "BR-BA-006: User-provided initial classification preserved",
+    "preconditions": "User specifies initial_classification='sensitive'.",
+    "action_or_input": "submit_archival_request(..., initial_classification='sensitive')",
+    "expected_result": "initial_classification is 'sensitive'.",
+    "test_type": "rule-allow"
+  },
+  {
+    "test_id": "TEST-BR-012",
+    "source_id": "BR-BA-006-DEFAULT",
+    "purpose": "BR-BA-006: Missing/omitted initial classification defaults to Routine",
+    "preconditions": "User omits initial classification or passes invalid tier.",
+    "action_or_input": "submit_archival_request(..., initial_classification='invalid')",
+    "expected_result": "initial_classification defaults to 'routine'.",
+    "test_type": "rule-default"
+  },
+  {
+    "test_id": "TEST-BR-013",
+    "source_id": "BR-BA-007-AES256",
+    "purpose": "BR-BA-007: Sensitive data encrypted using AES-256",
+    "preconditions": "Sensitive archival request in 'classified' status.",
+    "action_or_input": "it_security_configure_encryption(..., algorithm='AES-256')",
+    "expected_result": "Encryption applied with AES-256 algorithm.",
+    "test_type": "rule-allow"
+  },
+  {
+    "test_id": "TEST-BR-014",
+    "source_id": "BR-BA-007-NON-AES-REJECT",
+    "purpose": "BR-BA-007: Non-AES encryption algorithm rejected for Sensitive data",
+    "preconditions": "Actor attempts encryption with non-AES algorithm (e.g. 'DES').",
+    "action_or_input": "it_security_configure_encryption(..., algorithm='DES')",
+    "expected_result": "Validation error or rejection because AES-256 is mandatory.",
+    "test_type": "rule-deny"
+  },
+  {
+    "test_id": "TEST-BR-015",
+    "source_id": "BR-BA-008-TIERS",
+    "purpose": "BR-BA-008: Verify retention years defined across all tiers",
+    "preconditions": "Classification tiers routine, archival, sensitive, critical.",
+    "action_or_input": "Check sm.RETENTION_YEARS mapping.",
+    "expected_result": "routine=1, archival=5, sensitive=7, critical=10.",
+    "test_type": "rule-lookup"
+  },
+  {
+    "test_id": "TEST-BR-016",
+    "source_id": "BR-BA-009-ALLOW",
+    "purpose": "BR-BA-009: HoD decides storage extension for own department",
+    "preconditions": "Extension request in CSE; actor is HoD of CSE.",
+    "action_or_input": "hod_review_storage_extension(actor=actor, request_id=req.id, action='approve')",
+    "expected_result": "Status updated to 'approved' and quota allocated.",
+    "test_type": "rule-allow"
+  },
+  {
+    "test_id": "TEST-BR-017",
+    "source_id": "BR-BA-010-CROSS-DEPT-STORAGE",
+    "purpose": "BR-BA-010: HoD denied storage extension decision for other department",
+    "preconditions": "Extension request in ECE; actor is HoD of CSE.",
+    "action_or_input": "hod_review_storage_extension(actor=actor, request_id=req.id, action='approve')",
+    "expected_result": "PermissionDeniedError raised (department mismatch).",
+    "test_type": "rule-deny"
+  },
+  {
+    "test_id": "TEST-BR-018",
+    "source_id": "BR-BA-011-OVERRIDE",
+    "purpose": "BR-BA-011: Local backup schedule overrides global schedule",
+    "preconditions": "Local schedule exists for 'finance_db'.",
+    "action_or_input": "calculate_effective_schedule('finance_db', local_schedules, global_schedule)",
+    "expected_result": "Returns local schedule.",
+    "test_type": "rule-precedence"
+  },
+  {
+    "test_id": "TEST-BR-019",
+    "source_id": "BR-BA-011-FALLBACK",
+    "purpose": "BR-BA-011: Global schedule applies when no local schedule exists",
+    "preconditions": "No local schedule for 'unknown_db'.",
+    "action_or_input": "calculate_effective_schedule('unknown_db', local_schedules, global_schedule)",
+    "expected_result": "Returns global schedule.",
+    "test_type": "rule-default"
+  },
+  {
+    "test_id": "TEST-BR-020",
+    "source_id": "BR-BA-012-VALID",
+    "purpose": "BR-BA-012: Valid schedule parameters applied",
+    "preconditions": "Valid cron expression and positive retention days.",
+    "action_or_input": "configure_schedule(scope='local', dataset_code='cse', cron_expression='0 0 * * *', retention_days=30)",
+    "expected_result": "Schedule saved successfully.",
+    "test_type": "rule-allow"
+  },
+  {
+    "test_id": "TEST-BR-021",
+    "source_id": "BR-BA-012-INVALID",
+    "purpose": "BR-BA-012: Invalid schedule parameters rejected",
+    "preconditions": "Invalid cron expression or negative retention days.",
+    "action_or_input": "configure_schedule(..., cron_expression='invalid', retention_days=-5)",
+    "expected_result": "Validation error raised, configuration rejected.",
+    "test_type": "rule-deny"
+  },
+  {
+    "test_id": "TEST-BR-022",
+    "source_id": "BR-BA-013-UNREACHABLE",
+    "purpose": "BR-BA-013: Scheduled backup fails when repository unreachable",
+    "preconditions": "Backup target storage is offline/unreachable.",
+    "action_or_input": "Execute scheduled backup against unreachable repo.",
+    "expected_result": "Backup status recorded as failed.",
+    "test_type": "rule-constraint"
+  },
+  {
+    "test_id": "TEST-BR-023",
+    "source_id": "BR-BA-014-ALERT",
+    "purpose": "BR-BA-014: Failed backup creates SysAdmin alert",
+    "preconditions": "BackupOperation fails.",
+    "action_or_input": "Inspect alert generation for failed backup.",
+    "expected_result": "Alert triggered with failure details.",
+    "test_type": "rule-event"
+  },
+  {
+    "test_id": "TEST-BR-024",
+    "source_id": "BR-BA-015-ESCALATE-TRUE",
+    "purpose": "BR-BA-015: 3 or more consecutive failures trigger escalation",
+    "preconditions": "consecutive_failures >= 3.",
+    "action_or_input": "check_repeated_failure_escalation(3)",
+    "expected_result": "Returns True.",
+    "test_type": "rule-threshold"
+  },
+  {
+    "test_id": "TEST-BR-025",
+    "source_id": "BR-BA-015-ESCALATE-FALSE",
+    "purpose": "BR-BA-015: Less than 3 consecutive failures do not trigger escalation",
+    "preconditions": "consecutive_failures < 3.",
+    "action_or_input": "check_repeated_failure_escalation(2)",
+    "expected_result": "Returns False.",
+    "test_type": "rule-threshold"
+  },
+  {
+    "test_id": "TEST-BR-026",
+    "source_id": "BR-BA-016-QUOTA-FULL",
+    "purpose": "BR-BA-016: Storage extension permitted when quota is reached/exceeded",
+    "preconditions": "current_usage_mb >= quota_mb.",
+    "action_or_input": "validate_storage_quota_threshold(current_usage_mb=5120, quota_mb=5120)",
+    "expected_result": "Validation passes without exception.",
+    "test_type": "rule-threshold"
+  },
+  {
+    "test_id": "TEST-BR-027",
+    "source_id": "BR-BA-016-QUOTA-BELOW",
+    "purpose": "BR-BA-016: Storage extension prohibited when quota is not reached",
+    "preconditions": "current_usage_mb < quota_mb.",
+    "action_or_input": "validate_storage_quota_threshold(current_usage_mb=4000, quota_mb=5120)",
+    "expected_result": "RuleViolation raised.",
+    "test_type": "rule-deny"
+  },
+  {
+    "test_id": "TEST-BR-028",
+    "source_id": "BR-BA-017-APPROVE",
+    "purpose": "BR-BA-017: HoD extension decision allocates additional storage",
+    "preconditions": "HoD approves extension of 2048MB.",
+    "action_or_input": "hod_review_storage_extension(action='approve')",
+    "expected_result": "User quota increased by 2048MB.",
+    "test_type": "rule-allow"
+  },
+  {
+    "test_id": "TEST-BR-029",
+    "source_id": "BR-BA-017-REJECT",
+    "purpose": "BR-BA-017: HoD extension rejection leaves quota unchanged",
+    "preconditions": "HoD rejects extension.",
+    "action_or_input": "hod_review_storage_extension(action='reject')",
+    "expected_result": "User quota remains at original allocation.",
+    "test_type": "rule-allow"
+  },
+  {
+    "test_id": "TEST-BR-030",
+    "source_id": "BR-BA-018-SUPERADMIN-ALLOW",
+    "purpose": "BR-BA-018: Super Admin executes special archival operation",
+    "preconditions": "Actor is Super Admin.",
+    "action_or_input": "Execute special archival operation.",
+    "expected_result": "Operation succeeds and special archive recorded.",
+    "test_type": "rule-allow"
+  },
+  {
+    "test_id": "TEST-BR-031",
+    "source_id": "BR-BA-018-NON-SUPERADMIN-DENY",
+    "purpose": "BR-BA-018: Non-Super Admin denied special archival operation",
+    "preconditions": "Actor is regular user or SysAdmin.",
+    "action_or_input": "Attempt special archival operation.",
+    "expected_result": "PermissionDeniedError raised.",
+    "test_type": "rule-deny"
+  },
+  {
+    "test_id": "TEST-BR-032",
+    "source_id": "BR-BA-019-GLOBAL-ALLOW",
+    "purpose": "BR-BA-019: Super Admin configures global backup schedule",
+    "preconditions": "Actor has schedule.manage_global permission.",
+    "action_or_input": "configure_schedule(scope='global', ...)",
+    "expected_result": "Global schedule updated.",
+    "test_type": "rule-allow"
+  },
+  {
+    "test_id": "TEST-BR-033",
+    "source_id": "BR-BA-019-GLOBAL-DENY",
+    "purpose": "BR-BA-019: Non-Super Admin denied global backup schedule config",
+    "preconditions": "Actor lacks schedule.manage_global permission.",
+    "action_or_input": "configure_schedule(scope='global', ...)",
+    "expected_result": "PermissionDeniedError raised.",
+    "test_type": "rule-deny"
+  },
+  {
+    "test_id": "TEST-BR-034",
+    "source_id": "BR-BA-020-SCOPING-USER",
+    "purpose": "BR-BA-020: User sees only own requests and reports",
+    "preconditions": "User1 and User2 have archival requests.",
+    "action_or_input": "visible_archival_requests(user1_actor)",
+    "expected_result": "Returns User1 requests only.",
+    "test_type": "rule-scoping"
+  },
+  {
+    "test_id": "TEST-BR-035",
+    "source_id": "BR-BA-020-SCOPING-HOD",
+    "purpose": "BR-BA-020: HoD sees only requests from own department",
+    "preconditions": "CSE and ECE requests exist; actor is HoD of CSE.",
+    "action_or_input": "visible_archival_requests(cse_hod_actor)",
+    "expected_result": "Returns CSE requests only, no ECE requests.",
+    "test_type": "rule-scoping"
+  },
+  {
+    "test_id": "TEST-BR-036",
+    "source_id": "BR-BA-021-ALLOW",
+    "purpose": "BR-BA-021: IT Security manages security permissions",
+    "preconditions": "Actor is IT Security.",
+    "action_or_input": "Perform security/RBAC configuration.",
+    "expected_result": "Allowed.",
+    "test_type": "rule-allow"
+  },
+  {
+    "test_id": "TEST-BR-037",
+    "source_id": "BR-BA-021-DENY",
+    "purpose": "BR-BA-021: Non-IT Security actor denied security/RBAC config",
+    "preconditions": "Actor lacks security authority.",
+    "action_or_input": "Attempt security configuration.",
+    "expected_result": "PermissionDeniedError raised.",
+    "test_type": "rule-deny"
+  }
+]
