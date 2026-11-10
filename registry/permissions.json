@@ -278,6 +278,314 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "vms": {
+      "grants": {
+        "Director": [
+          "vms.audit.view",
+          "vms.blacklist.manage",
+          "vms.blacklist.publish",
+          "vms.event.manage",
+          "vms.extension.decide",
+          "vms.gate.override",
+          "vms.integration.manage",
+          "vms.notification.view_self",
+          "vms.pass.terminate",
+          "vms.policy.manage",
+          "vms.policy.publish",
+          "vms.report.export",
+          "vms.report.view",
+          "vms.report.view_pii",
+          "vms.role.assign",
+          "vms.safelist.manage",
+          "vms.urgent.decide",
+          "vms.vip.manage",
+          "vms.walkin.contingency_decide",
+          "vms.zone.elevate",
+          "vms.zone.manage"
+        ],
+        "Registrar": [
+          "vms.blacklist.manage",
+          "vms.blacklist.publish",
+          "vms.event.manage",
+          "vms.extension.decide",
+          "vms.gate.override",
+          "vms.notification.view_self",
+          "vms.pass.terminate",
+          "vms.policy.manage",
+          "vms.policy.publish",
+          "vms.report.export",
+          "vms.report.view",
+          "vms.safelist.manage",
+          "vms.urgent.decide",
+          "vms.walkin.contingency_decide",
+          "vms.zone.elevate",
+          "vms.zone.manage"
+        ],
+        "acadadmin": [
+          "vms.blacklist.manage",
+          "vms.blacklist.publish",
+          "vms.event.manage",
+          "vms.extension.decide",
+          "vms.gate.override",
+          "vms.notification.view_self",
+          "vms.pass.terminate",
+          "vms.policy.manage",
+          "vms.policy.publish",
+          "vms.report.export",
+          "vms.report.view",
+          "vms.safelist.manage",
+          "vms.urgent.decide",
+          "vms.walkin.contingency_decide",
+          "vms.zone.elevate",
+          "vms.zone.manage"
+        ],
+        "faculty": [
+          "vms.notification.view_self",
+          "vms.pass.terminate",
+          "vms.preauth.manage",
+          "vms.request.decide",
+          "vms.request.view_assigned"
+        ],
+        "staff": [
+          "vms.notification.view_self",
+          "vms.pass.terminate",
+          "vms.preauth.manage",
+          "vms.request.decide",
+          "vms.request.view_assigned"
+        ],
+        "vms_security": [
+          "vms.gate.escalate",
+          "vms.gate.operate",
+          "vms.gate.sync",
+          "vms.monitor.view",
+          "vms.muster.rollcall",
+          "vms.muster.trigger",
+          "vms.notification.view_self",
+          "vms.walkin.register"
+        ]
+      },
+      "module_grants": [
+        "Director",
+        "Registrar",
+        "acadadmin",
+        "faculty",
+        "staff",
+        "vms_security"
+      ],
+      "nav": {
+        "base_path": "/vms",
+        "icon": "IdentificationBadge",
+        "items": [
+          {
+            "code": "vms.visits",
+            "icon": "UsersThree",
+            "label": "My Visits",
+            "required_permission": "vms.notification.view_self",
+            "sort_order": 10,
+            "to": "/vms/visits"
+          },
+          {
+            "code": "vms.approvals",
+            "icon": "Stamp",
+            "label": "Approvals",
+            "required_permission": "vms.request.view_assigned",
+            "sort_order": 20,
+            "to": "/vms/approvals"
+          },
+          {
+            "code": "vms.gate",
+            "icon": "Door",
+            "label": "Gate",
+            "required_permission": "vms.gate.operate",
+            "sort_order": 30,
+            "to": "/vms/gate"
+          },
+          {
+            "code": "vms.roster",
+            "icon": "ListChecks",
+            "label": "Roster",
+            "required_permission": "vms.monitor.view",
+            "sort_order": 40,
+            "to": "/vms/roster"
+          },
+          {
+            "code": "vms.muster",
+            "icon": "Siren",
+            "label": "Muster",
+            "required_permission": "vms.muster.rollcall",
+            "sort_order": 50,
+            "to": "/vms/muster"
+          },
+          {
+            "code": "vms.events",
+            "icon": "CalendarStar",
+            "label": "Events",
+            "required_permission": "vms.event.manage",
+            "sort_order": 60,
+            "to": "/vms/events"
+          },
+          {
+            "code": "vms.reports",
+            "icon": "ChartBar",
+            "label": "Reports",
+            "required_permission": "vms.report.view",
+            "sort_order": 70,
+            "to": "/vms/reports"
+          },
+          {
+            "code": "vms.admin",
+            "icon": "Gear",
+            "label": "Administration",
+            "required_permission": "vms.policy.manage",
+            "sort_order": 80,
+            "to": "/vms/admin"
+          }
+        ],
+        "label": "Visitors",
+        "nav_section": "Visitors",
+        "sort_order": 40,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "vms.request.decide",
+          "label": "Approve or reject a visit request for oneself"
+        },
+        {
+          "code": "vms.request.view_assigned",
+          "label": "See visit requests assigned to oneself"
+        },
+        {
+          "code": "vms.preauth.manage",
+          "label": "Pre-authorise recurring visitors"
+        },
+        {
+          "code": "vms.pass.terminate",
+          "label": "Terminate a visitor's pass early"
+        },
+        {
+          "code": "vms.notification.view_self",
+          "label": "See one's own VMS notifications"
+        },
+        {
+          "code": "vms.walkin.register",
+          "label": "Register a walk-in visitor at the gate"
+        },
+        {
+          "code": "vms.gate.operate",
+          "label": "Check visitors in and out at the gate"
+        },
+        {
+          "code": "vms.gate.escalate",
+          "label": "Escalate a gate denial to an Admin"
+        },
+        {
+          "code": "vms.gate.sync",
+          "label": "Upload offline gate events"
+        },
+        {
+          "code": "vms.muster.trigger",
+          "label": "Trigger an emergency muster"
+        },
+        {
+          "code": "vms.muster.rollcall",
+          "label": "Mark visitors accounted for during a muster"
+        },
+        {
+          "code": "vms.monitor.view",
+          "label": "See live occupancy, roster and alerts"
+        },
+        {
+          "code": "vms.walkin.contingency_decide",
+          "label": "Decide a walk-in when the host is unavailable"
+        },
+        {
+          "code": "vms.urgent.decide",
+          "label": "Decide a same-day urgent request"
+        },
+        {
+          "code": "vms.extension.decide",
+          "label": "Approve or reject a visit extension"
+        },
+        {
+          "code": "vms.gate.override",
+          "label": "Override an eligible gate denial"
+        },
+        {
+          "code": "vms.zone.elevate",
+          "label": "Grant a time-boxed zone elevation"
+        },
+        {
+          "code": "vms.zone.manage",
+          "label": "Maintain zones and gates"
+        },
+        {
+          "code": "vms.blacklist.manage",
+          "label": "Maintain the visitor blacklist"
+        },
+        {
+          "code": "vms.blacklist.publish",
+          "label": "Publish a blacklist version"
+        },
+        {
+          "code": "vms.safelist.manage",
+          "label": "Maintain the visitor safe-list"
+        },
+        {
+          "code": "vms.policy.manage",
+          "label": "Edit a draft access policy"
+        },
+        {
+          "code": "vms.policy.publish",
+          "label": "Publish an access policy version"
+        },
+        {
+          "code": "vms.event.manage",
+          "label": "Create and manage event batches"
+        },
+        {
+          "code": "vms.report.view",
+          "label": "See anonymised visitor reports"
+        },
+        {
+          "code": "vms.report.export",
+          "label": "Export visitor reports"
+        },
+        {
+          "code": "vms.report.view_pii",
+          "label": "DANGEROUS: see un-masked visitor identity in reports"
+        },
+        {
+          "code": "vms.role.assign",
+          "label": "Assign Admin and Security roles and scopes"
+        },
+        {
+          "code": "vms.integration.manage",
+          "label": "Maintain integration settings"
+        },
+        {
+          "code": "vms.vip.manage",
+          "label": "Grant and revoke VIP permissions"
+        },
+        {
+          "code": "vms.audit.view",
+          "label": "Read the VMS audit log"
+        },
+        {
+          "code": "vms.visit.auto_checkout",
+          "label": "System auto-checkout at pass expiry"
+        },
+        {
+          "code": "vms.request.auto_expire",
+          "label": "System expiry of unanswered requests"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "vms.request.auto_expire",
+        "vms.visit.auto_checkout"
+      ]
     }
   },
   "publisher": "integrated",
