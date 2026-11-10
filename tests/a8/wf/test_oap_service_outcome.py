@@ -1,6 +1,7 @@
 import json
 from django.test import TestCase
 from modules.oap.models import OAPApplication, OAPServiceRequest, OAPServiceOutcome
+from modules.oap.domain.state_machine import OAPServiceOutcomeStateMachine
 
 class TestOAPServiceOutcomeWorkflow(TestCase):
     def setUp(self):
