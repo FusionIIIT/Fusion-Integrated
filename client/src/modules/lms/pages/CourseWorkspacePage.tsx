@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActionIcon,
   Alert,
   Badge,
   Button,
   Card,
+  Checkbox,
   Container,
   Divider,
   FileInput,
@@ -16,6 +17,7 @@ import {
   Select,
   SimpleGrid,
   Stack,
+  Table,
   Tabs,
   Text,
   TextInput,
@@ -31,6 +33,7 @@ import {
   FaBullhorn,
   FaCalendarAlt,
   FaChalkboardTeacher,
+  FaClock,
   FaDownload,
   FaEdit,
   FaEnvelope,
@@ -60,6 +63,8 @@ import {
   type UpdateAssignmentPayload,
   type UpdateCourseWorkspacePayload,
   type UpdateMaterialPayload,
+  useAssignmentDeadline,
+  useAssignmentExtensions,
   useCourseAnnouncements,
   useCourseAssignments,
   useCourseMaterials,
@@ -69,9 +74,12 @@ import {
   useCreateMaterial,
   useDeleteAssignment,
   useDeleteMaterial,
+  useGrantExtension,
   usePostCourseAnnouncement,
+  useRevokeExtension,
   useUpdateAssignment,
   useUpdateCourseWorkspace,
+  useUpdateDeadlineWindow,
   useUpdateMaterial,
 } from "../api/hooks";
 
@@ -110,6 +118,493 @@ function formatBytes(bytes: number | null): string {
   const sizes = ["Bytes", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+}
+
+function renderWindowStatusBadge(status?: string) {
+  switch (status) {
+    case "open":
+      return (
+        <Badge color="green" variant="light">
+          Window Open
+        </Badge>
+      );
+    case "late_allowed":
+      return (
+        <Badge color="yellow" variant="light">
+          Late Submissions Allowed
+        </Badge>
+      );
+    case "closed":
+      return (
+        <Badge color="red" variant="light">
+          Submissions Closed
+        </Badge>
+      );
+    case "not_open":
+    default:
+      return (
+        <Badge color="gray" variant="light">
+          No Deadline
+        </Badge>
+      );
+  }
+}
+
+function AssignmentDeadlineSection({
+  courseCode,
+  assignmentId,
+}: {
+  courseCode: string;
+  assignmentId: number;
+}) {
+  const { data: deadline, isPending } = useAssignmentDeadline(courseCode, assignmentId);
+  if (isPending || !deadline) return null;
+
+  return (
+    <Paper p="sm" withBorder radius="sm" bg="gray.0">
+      <Group justify="space-between" align="center" mb={6}>
+        <Text size="xs" fw={700} c="dimmed" tt="uppercase">
+          Deadline & Submission Window
+        </Text>
+        {renderWindowStatusBadge(deadline.window_status)}
+      </Group>
+
+      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xs">
+        <div>
+          <Text size="xs" c="dimmed">
+            Original Due Date
+          </Text>
+          <Text size="sm" fw={500}>
+            {deadline.original_due_at
+              ? new Date(deadline.original_due_at).toLocaleString()
+              : "No due date set"}
+          </Text>
+        </div>
+        <div>
+          <Text size="xs" c="dimmed">
+            Cutoff / Closes At
+          </Text>
+          <Text size="sm" fw={500}>
+            {deadline.closes_at
+              ? new Date(deadline.closes_at).toLocaleString()
+              : "No hard cutoff (closes at due date)"}
+          </Text>
+        </div>
+        <div>
+          <Text size="xs" c="dimmed">
+            Late Policy
+          </Text>
+          <Text size="sm" fw={500}>
+            {deadline.allow_late
+              ? "Late submissions permitted"
+              : "Strict deadline — no late submissions"}
+          </Text>
+        </div>
+        <div>
+          <Text size="xs" c="dimmed">
+            Your Effective Deadline
+          </Text>
+          <Text
+            size="sm"
+            fw={600}
+            c={deadline.is_extended ? "violet.7" : undefined}
+          >
+            {deadline.effective_due_at
+              ? new Date(deadline.effective_due_at).toLocaleString()
+              : "None"}
+          </Text>
+        </div>
+      </SimpleGrid>
+
+      {deadline.is_extended && (
+        <Alert color="violet" mt="xs" p="xs" title="Individual Extension Active">
+          <Text size="xs">
+            You have received an extension until{" "}
+            <strong>
+              {deadline.extended_due_at
+                ? new Date(deadline.extended_due_at).toLocaleString()
+                : ""}
+            </strong>
+            .{deadline.extension_reason && ` Reason: ${deadline.extension_reason}`}
+          </Text>
+        </Alert>
+      )}
+
+      {deadline.can_manage_deadlines && (
+        <Text size="xs" c="dimmed" mt="xs">
+          Total active extensions for this assignment: {deadline.total_extensions}
+        </Text>
+      )}
+    </Paper>
+  );
+}
+
+interface DeadlinesModalProps {
+  opened: boolean;
+  onClose: () => void;
+  courseCode: string;
+  assignment: CourseAssignmentItem | null;
+}
+
+function DeadlinesModal({ opened, onClose, courseCode, assignment }: DeadlinesModalProps) {
+  const assignmentId = assignment?.id ?? null;
+  const { data: deadlineInfo, isPending: deadlineLoading } = useAssignmentDeadline(
+    courseCode,
+    assignmentId,
+  );
+  const { data: extensions = [], isPending: extensionsLoading } = useAssignmentExtensions(
+    courseCode,
+    assignmentId,
+    opened,
+  );
+
+  const updateWindowMutation = useUpdateDeadlineWindow();
+  const grantExtensionMutation = useGrantExtension();
+  const revokeExtensionMutation = useRevokeExtension();
+
+  const [dueAt, setDueAt] = useState("");
+  const [closesAt, setClosesAt] = useState("");
+  const [allowLate, setAllowLate] = useState(false);
+
+  const [targetUserId, setTargetUserId] = useState<string>("");
+  const [extendedDueAt, setExtendedDueAt] = useState("");
+  const [extensionReason, setExtensionReason] = useState("");
+
+  useEffect(() => {
+    if (assignment) {
+      setDueAt(assignment.due_at ? assignment.due_at.slice(0, 16) : "");
+      setClosesAt(assignment.closes_at ? assignment.closes_at.slice(0, 16) : "");
+      setAllowLate(Boolean(assignment.allow_late));
+    }
+  }, [assignment, opened]);
+
+  if (!assignment) return null;
+
+  function handleSaveWindow() {
+    if (!assignment) return;
+    updateWindowMutation.mutate(
+      {
+        code: courseCode,
+        assignmentId: assignment.id,
+        body: {
+          due_at: dueAt || null,
+          closes_at: closesAt || null,
+          allow_late: allowLate,
+        },
+      },
+      {
+        onSuccess: () => {
+          notifications.show({
+            title: "Deadline Window Updated",
+            message: "Submission window and deadline policies have been saved.",
+            color: "teal",
+          });
+        },
+        onError: (err) => {
+          notifications.show({
+            title: "Could not update deadline window",
+            message: errorMessage(err),
+            color: "red",
+          });
+        },
+      },
+    );
+  }
+
+  function handleGrantExtension() {
+    if (!assignment || !targetUserId || !extendedDueAt) {
+      notifications.show({
+        title: "Missing Information",
+        message: "Please enter a student user ID and extended due date.",
+        color: "yellow",
+      });
+      return;
+    }
+    const studentId = parseInt(targetUserId, 10);
+    if (isNaN(studentId) || studentId <= 0) {
+      notifications.show({
+        title: "Invalid Student ID",
+        message: "Student User ID must be a positive integer.",
+        color: "yellow",
+      });
+      return;
+    }
+
+    grantExtensionMutation.mutate(
+      {
+        code: courseCode,
+        assignmentId: assignment.id,
+        body: {
+          student_user_id: studentId,
+          extended_due_at: extendedDueAt,
+          reason: extensionReason.trim(),
+        },
+      },
+      {
+        onSuccess: () => {
+          notifications.show({
+            title: "Extension Granted",
+            message: `Deadline extension granted for student #${studentId}.`,
+            color: "teal",
+          });
+          setTargetUserId("");
+          setExtendedDueAt("");
+          setExtensionReason("");
+        },
+        onError: (err) => {
+          notifications.show({
+            title: "Could not grant extension",
+            message: errorMessage(err),
+            color: "red",
+          });
+        },
+      },
+    );
+  }
+
+  function handleRevokeExtension(extId: number, studentName: string) {
+    if (!assignment) return;
+    if (!window.confirm(`Revoke deadline extension for ${studentName}?`)) return;
+
+    revokeExtensionMutation.mutate(
+      {
+        code: courseCode,
+        assignmentId: assignment.id,
+        extensionId: extId,
+      },
+      {
+        onSuccess: () => {
+          notifications.show({
+            title: "Extension Revoked",
+            message: `Deadline extension for ${studentName} was removed.`,
+            color: "teal",
+          });
+        },
+        onError: (err) => {
+          notifications.show({
+            title: "Could not revoke extension",
+            message: errorMessage(err),
+            color: "red",
+          });
+        },
+      },
+    );
+  }
+
+  return (
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title={
+        <Group gap="xs">
+          <FaClock size={16} />
+          <Title order={4}>Deadline & Extension Management</Title>
+        </Group>
+      }
+      size="lg"
+      centered
+    >
+      <Stack gap="md">
+        <div>
+          <Text fw={600} size="md">
+            {assignment.title}
+          </Text>
+          <Text size="xs" c="dimmed">
+            Course: {courseCode} | Assignment ID: {assignment.id}
+          </Text>
+        </div>
+
+        {deadlineLoading ? (
+          <Group justify="center" p="md">
+            <Loader size="sm" />
+          </Group>
+        ) : (
+          <Paper p="sm" withBorder radius="sm" bg="gray.0">
+            <Group justify="space-between" align="center">
+              <div>
+                <Text size="xs" c="dimmed">
+                  Current Status
+                </Text>
+                <Text size="sm" fw={600}>
+                  {deadlineInfo?.window_status
+                    ? deadlineInfo.window_status.toUpperCase().replace("_", " ")
+                    : "UNKNOWN"}
+                </Text>
+              </div>
+              <div>{renderWindowStatusBadge(deadlineInfo?.window_status)}</div>
+            </Group>
+          </Paper>
+        )}
+
+        <Tabs defaultValue="window">
+          <Tabs.List>
+            <Tabs.Tab value="window">Submission Window</Tabs.Tab>
+            <Tabs.Tab
+              value="extensions"
+              rightSection={
+                extensions.length > 0 ? (
+                  <Badge size="xs" circle variant="light" color="indigo">
+                    {extensions.length}
+                  </Badge>
+                ) : null
+              }
+            >
+              Student Extensions
+            </Tabs.Tab>
+          </Tabs.List>
+
+          <Tabs.Panel value="window" pt="md">
+            <Stack gap="md">
+              <TextInput
+                label="Assignment Due Date & Time"
+                type="datetime-local"
+                value={dueAt}
+                onChange={(e) => setDueAt(e.currentTarget.value)}
+                description="Standard deadline for all enrolled students without individual extensions."
+              />
+
+              <TextInput
+                label="Window Cutoff / Closes At"
+                type="datetime-local"
+                value={closesAt}
+                onChange={(e) => setClosesAt(e.currentTarget.value)}
+                description="Hard cutoff timestamp after which no submissions are accepted."
+              />
+
+              <Checkbox
+                label="Allow late submissions"
+                description="When enabled, students can submit after the due date up until the closing cutoff."
+                checked={allowLate}
+                onChange={(e) => setAllowLate(e.currentTarget.checked)}
+              />
+
+              <Group justify="flex-end" mt="sm">
+                <Button
+                  color="indigo"
+                  onClick={handleSaveWindow}
+                  loading={updateWindowMutation.isPending}
+                >
+                  Save Window Settings
+                </Button>
+              </Group>
+            </Stack>
+          </Tabs.Panel>
+
+          <Tabs.Panel value="extensions" pt="md">
+            <Stack gap="md">
+              <div>
+                <Text size="sm" fw={600}>
+                  Active Individual Extensions
+                </Text>
+                <Text size="xs" c="dimmed">
+                  Extensions override the due date for specific students. Only faculty can grant or revoke extensions.
+                </Text>
+              </div>
+
+              {extensionsLoading ? (
+                <Loader size="sm" />
+              ) : extensions.length === 0 ? (
+                <Text size="sm" c="dimmed" fs="italic">
+                  No individual extensions have been granted for this assignment.
+                </Text>
+              ) : (
+                <Table striped highlightOnHover withTableBorder withColumnBorders>
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th>Student</Table.Th>
+                      <Table.Th>Extended Due Date</Table.Th>
+                      <Table.Th>Reason</Table.Th>
+                      <Table.Th>Granted By</Table.Th>
+                      <Table.Th>Actions</Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>
+                    {extensions.map((ext) => (
+                      <Table.Tr key={ext.id}>
+                        <Table.Td>
+                          <Text size="xs" fw={600}>
+                            {ext.student_name}
+                          </Text>
+                          <Text size="xs" c="dimmed">
+                            ID: {ext.user_id}
+                          </Text>
+                        </Table.Td>
+                        <Table.Td>
+                          <Text size="xs" fw={600} c="violet.7">
+                            {new Date(ext.extended_due_at).toLocaleString()}
+                          </Text>
+                        </Table.Td>
+                        <Table.Td>
+                          <Text size="xs">{ext.reason || "—"}</Text>
+                        </Table.Td>
+                        <Table.Td>
+                          <Text size="xs">{ext.granted_by_name}</Text>
+                        </Table.Td>
+                        <Table.Td>
+                          <ActionIcon
+                            size="sm"
+                            color="red"
+                            variant="subtle"
+                            title="Revoke Extension"
+                            onClick={() => handleRevokeExtension(ext.id, ext.student_name)}
+                            loading={revokeExtensionMutation.isPending}
+                          >
+                            <FaTrash size={12} />
+                          </ActionIcon>
+                        </Table.Td>
+                      </Table.Tr>
+                    ))}
+                  </Table.Tbody>
+                </Table>
+              )}
+
+              <Divider my="xs" />
+
+              <div>
+                <Text size="sm" fw={600} mb="xs">
+                  Grant Student Extension
+                </Text>
+                <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
+                  <TextInput
+                    label="Student User ID"
+                    placeholder="e.g. 2"
+                    type="number"
+                    value={targetUserId}
+                    onChange={(e) => setTargetUserId(e.currentTarget.value)}
+                    required
+                  />
+                  <TextInput
+                    label="Extended Due Date & Time"
+                    type="datetime-local"
+                    value={extendedDueAt}
+                    onChange={(e) => setExtendedDueAt(e.currentTarget.value)}
+                    required
+                  />
+                </SimpleGrid>
+                <TextInput
+                  mt="sm"
+                  label="Reason / Notes"
+                  placeholder="e.g. Medical excuse, Dean approval"
+                  value={extensionReason}
+                  onChange={(e) => setExtensionReason(e.currentTarget.value)}
+                />
+                <Group justify="flex-end" mt="sm">
+                  <Button
+                    size="sm"
+                    color="teal"
+                    onClick={handleGrantExtension}
+                    loading={grantExtensionMutation.isPending}
+                  >
+                    Grant Extension
+                  </Button>
+                </Group>
+              </div>
+            </Stack>
+          </Tabs.Panel>
+        </Tabs>
+      </Stack>
+    </Modal>
+  );
 }
 
 export default function CourseWorkspacePage() {
@@ -168,6 +663,8 @@ export default function CourseWorkspacePage() {
     status: "draft",
     due_at: "",
     release_at: "",
+    closes_at: "",
+    allow_late: false,
     file: null,
   });
 
@@ -177,6 +674,14 @@ export default function CourseWorkspacePage() {
 
   const [assignmentDetailOpened, setAssignmentDetailOpened] = useState(false);
   const [viewingAssignment, setViewingAssignment] = useState<CourseAssignmentItem | null>(null);
+
+  const [deadlineModalOpened, setDeadlineModalOpened] = useState(false);
+  const [deadlineAssignment, setDeadlineAssignment] = useState<CourseAssignmentItem | null>(null);
+
+  function openDeadlineModal(a: CourseAssignmentItem) {
+    setDeadlineAssignment(a);
+    setDeadlineModalOpened(true);
+  }
 
   // Materials modal states
 
@@ -439,6 +944,8 @@ export default function CourseWorkspacePage() {
             status: "draft",
             due_at: "",
             release_at: "",
+            closes_at: "",
+            allow_late: false,
             file: null,
           });
         },
@@ -463,6 +970,8 @@ export default function CourseWorkspacePage() {
       status: a.status,
       due_at: a.due_at ? a.due_at.slice(0, 16) : "",
       release_at: a.release_at ? a.release_at.slice(0, 16) : "",
+      closes_at: a.closes_at ? a.closes_at.slice(0, 16) : "",
+      allow_late: a.allow_late ?? false,
       file: null,
     });
     setEditAssignmentOpened(true);
@@ -1338,7 +1847,7 @@ export default function CourseWorkspacePage() {
                           </Badge>
                         </Group>
 
-                        <Group gap="md" mt={6}>
+                        <Group gap="md" mt={6} wrap="wrap">
                           {asg.due_at && (
                             <Group gap={4}>
                               <FaCalendarAlt size={12} color="gray" />
@@ -1349,6 +1858,19 @@ export default function CourseWorkspacePage() {
                                 })}
                               </Text>
                             </Group>
+                          )}
+                          {asg.closes_at && (
+                            <Text size="xs" c="dimmed">
+                              Cutoff: {new Date(asg.closes_at).toLocaleString(undefined, {
+                                dateStyle: "medium",
+                                timeStyle: "short",
+                              })}
+                            </Text>
+                          )}
+                          {asg.allow_late && (
+                            <Badge size="xs" variant="outline" color="yellow">
+                              Late Submissions Allowed
+                            </Badge>
                           )}
                           {asg.release_at && asg.status === "scheduled" && (
                             <Text size="xs" c="orange">
@@ -1363,6 +1885,14 @@ export default function CourseWorkspacePage() {
 
                       {assignmentsData.can_manage && (
                         <Group gap="xs">
+                          <ActionIcon
+                            variant="subtle"
+                            color="teal"
+                            onClick={() => openDeadlineModal(asg)}
+                            title="Manage Deadlines & Extensions"
+                          >
+                            <FaClock size={14} />
+                          </ActionIcon>
                           <ActionIcon
                             variant="subtle"
                             color="blue"
@@ -1927,6 +2457,27 @@ export default function CourseWorkspacePage() {
             />
           </Group>
 
+          <Group grow>
+            <TextInput
+              label="Cutoff / Closes At (Optional)"
+              type="datetime-local"
+              value={addAssignmentForm.closes_at ?? ""}
+              onChange={(e) =>
+                setAddAssignmentForm({ ...addAssignmentForm, closes_at: e.currentTarget.value })
+              }
+              description="Hard cutoff after which no submissions are accepted."
+            />
+            <Checkbox
+              mt="xl"
+              label="Allow late submissions"
+              description="Permit submissions between due date and cutoff."
+              checked={addAssignmentForm.allow_late ?? false}
+              onChange={(e) =>
+                setAddAssignmentForm({ ...addAssignmentForm, allow_late: e.currentTarget.checked })
+              }
+            />
+          </Group>
+
           {addAssignmentForm.status === "scheduled" && (
             <TextInput
               label="Release Date & Time"
@@ -2053,6 +2604,27 @@ export default function CourseWorkspacePage() {
             />
           </Group>
 
+          <Group grow>
+            <TextInput
+              label="Cutoff / Closes At (Optional)"
+              type="datetime-local"
+              value={editAssignmentForm.closes_at ?? ""}
+              onChange={(e) =>
+                setEditAssignmentForm({ ...editAssignmentForm, closes_at: e.currentTarget.value })
+              }
+              description="Hard cutoff after which no submissions are accepted."
+            />
+            <Checkbox
+              mt="xl"
+              label="Allow late submissions"
+              description="Permit submissions between due date and cutoff."
+              checked={editAssignmentForm.allow_late ?? false}
+              onChange={(e) =>
+                setEditAssignmentForm({ ...editAssignmentForm, allow_late: e.currentTarget.checked })
+              }
+            />
+          </Group>
+
           {editAssignmentForm.status === "scheduled" && (
             <TextInput
               label="Release Date & Time"
@@ -2146,6 +2718,11 @@ export default function CourseWorkspacePage() {
               </Paper>
             </div>
 
+            <AssignmentDeadlineSection
+              courseCode={workspace.code}
+              assignmentId={viewingAssignment.id}
+            />
+
             {viewingAssignment.has_file && (
               <Group justify="space-between" align="center" mt="xs">
                 <Text size="xs" c="dimmed">
@@ -2164,7 +2741,20 @@ export default function CourseWorkspacePage() {
               </Group>
             )}
 
-            <Group justify="flex-end" mt="md">
+            <Group justify="space-between" mt="md">
+              {assignmentsData?.can_manage && (
+                <Button
+                  variant="light"
+                  color="teal"
+                  leftSection={<FaClock size={14} />}
+                  onClick={() => {
+                    setAssignmentDetailOpened(false);
+                    openDeadlineModal(viewingAssignment);
+                  }}
+                >
+                  Manage Deadlines & Extensions
+                </Button>
+              )}
               <Button variant="default" onClick={() => setAssignmentDetailOpened(false)}>
                 Close
               </Button>
@@ -2173,7 +2763,16 @@ export default function CourseWorkspacePage() {
         )}
       </Modal>
 
+      <DeadlinesModal
+        opened={deadlineModalOpened}
+        onClose={() => {
+          setDeadlineModalOpened(false);
+          setDeadlineAssignment(null);
+        }}
+        courseCode={workspace?.code ?? ""}
+        assignment={deadlineAssignment}
+      />
+
     </Container>
   );
 }
-

@@ -34,6 +34,8 @@ def create_course_assignment(
     status: str = AssignmentStatus.DRAFT,
     due_at: datetime | None = None,
     release_at: datetime | None = None,
+    closes_at: datetime | None = None,
+    allow_late: bool = False,
     file: Any = None,
     file_name: str = "",
     file_size: int | None = None,
@@ -89,6 +91,7 @@ def create_course_assignment(
             instructions=cleaned_instructions,
             due_at=due_at,
             release_at=release_at,
+            closes_at=closes_at,
         )
     except LMSRuleError as exc:
         raise ConflictError(str(exc), code="lms_validation_failed") from exc
@@ -110,6 +113,8 @@ def create_course_assignment(
         status=cleaned_status,
         due_at=due_at,
         release_at=release_at,
+        closes_at=closes_at,
+        allow_late=allow_late,
         file=file,
         file_name=f_name,
         file_size=f_size,
@@ -130,6 +135,8 @@ def update_course_assignment(
     status: str | None = None,
     due_at: datetime | None = None,
     release_at: datetime | None = None,
+    closes_at: datetime | None = None,
+    allow_late: bool | None = None,
     file: Any = None,
     file_name: str | None = None,
     file_size: int | None = None,
@@ -174,6 +181,8 @@ def update_course_assignment(
     new_status = assignment.status if status is None else status.strip()
     new_due_at = assignment.due_at if due_at is None else due_at
     new_release_at = assignment.release_at if release_at is None else release_at
+    new_closes_at = assignment.closes_at if closes_at is None else closes_at
+    new_allow_late = assignment.allow_late if allow_late is None else allow_late
 
     if points_possible is not None:
         new_points = Decimal(str(points_possible))
@@ -196,6 +205,7 @@ def update_course_assignment(
             instructions=new_instructions,
             due_at=new_due_at,
             release_at=new_release_at,
+            closes_at=new_closes_at,
         )
     except LMSRuleError as exc:
         raise ConflictError(str(exc), code="lms_validation_failed") from exc
@@ -207,6 +217,8 @@ def update_course_assignment(
     assignment.status = new_status
     assignment.due_at = new_due_at
     assignment.release_at = new_release_at
+    assignment.closes_at = new_closes_at
+    assignment.allow_late = new_allow_late
 
     if file is not None:
         assignment.file = file

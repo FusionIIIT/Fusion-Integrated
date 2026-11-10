@@ -6,11 +6,16 @@ import pytest
 
 from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from fusion_auth.principal import Principal
-from modules.lms.contracts import get_course_announcements, get_course_assignments
+from modules.lms.contracts import (
+    get_assignment_deadlines,
+    get_course_announcements,
+    get_course_assignments,
+)
 from modules.lms.domain.entities import (
     AssignmentStatus,
     CourseRole,
     CourseStatus,
+    DeadlineWindowStatus,
     MaterialStatus,
     MaterialType,
     SectionType,
@@ -20,6 +25,7 @@ from modules.lms.models import (
     Course,
     CourseAnnouncement,
     CourseAssignment,
+    CourseAssignmentExtension,
     CourseMaterial,
     CourseMembership,
 )
@@ -31,9 +37,15 @@ from modules.lms.selectors.assignments import (
     get_course_assignment_detail,
     list_course_assignments,
 )
+from modules.lms.selectors.deadlines import (
+    calculate_deadline_info,
+    get_assignment_deadline_info,
+    list_assignment_extensions,
+)
 from modules.lms.services import announcements as announcement_service
 from modules.lms.services import assignments as assignment_service
 from modules.lms.services import courses as course_service
+from modules.lms.services import deadlines as deadline_service
 from modules.lms.services import materials as material_service
 
 
@@ -789,3 +801,285 @@ def test_contract_get_course_assignments():
     assert len(res["CS609B"]) == 1
     assert res["CS609B"][0]["title"] == "B1"
     assert len(res["NONEXISTENT"]) == 0
+
+
+@pytest.mark.django_db
+def test_update_assignment_window_faculty_success():
+    course = Course.objects.create(code="CS701", title="Algorithms", status=CourseStatus.PUBLISHED)
+    faculty_user_id = 10
+    CourseMembership.objects.create(course=course, user_id=faculty_user_id, role=CourseRole.FACULTY)
+
+    now = datetime.now(UTC)
+    due = now + timedelta(days=4)
+    closes = now + timedelta(days=7)
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Dynamic Programming",
+        instructions="Solve knapsack",
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=faculty_user_id,
+        due_at=due,
+    )
+
+    faculty = make_principal(
+        user_id=faculty_user_id,
+        role="faculty",
+        permissions=("lms.course.view", "lms.assignment.manage", "lms.deadline.manage"),
+    )
+
+    info = deadline_service.update_assignment_window(
+        actor=faculty,
+        course_code="CS701",
+        assignment_id=asg.id,
+        due_at=due,
+        closes_at=closes,
+        allow_late=True,
+    )
+
+    assert info.closes_at == closes
+    assert info.allow_late is True
+    assert calculate_deadline_info(info)["window_status"] == DeadlineWindowStatus.OPEN
+
+    asg.refresh_from_db()
+    assert asg.closes_at == closes
+    assert asg.allow_late is True
+
+
+@pytest.mark.django_db
+def test_update_assignment_window_permission_denied_for_ta_and_student():
+    course = Course.objects.create(code="CS702", title="AI", status=CourseStatus.PUBLISHED)
+    CourseMembership.objects.create(course=course, user_id=11, role=CourseRole.TA)
+    CourseMembership.objects.create(course=course, user_id=12, role=CourseRole.STUDENT)
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Search Trees",
+        instructions="Solve search",
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=1,
+    )
+
+    ta = make_principal(
+        user_id=11,
+        role="ta",
+        permissions=("lms.course.view", "lms.deadline.view"),
+    )
+    student = make_principal(
+        user_id=12,
+        role="student",
+        permissions=("lms.course.view", "lms.deadline.view"),
+    )
+
+    with pytest.raises(PermissionDeniedError):
+        deadline_service.update_assignment_window(
+            actor=ta,
+            course_code="CS702",
+            assignment_id=asg.id,
+            allow_late=True,
+        )
+
+    with pytest.raises(PermissionDeniedError):
+        deadline_service.update_assignment_window(
+            actor=student,
+            course_code="CS702",
+            assignment_id=asg.id,
+            allow_late=True,
+        )
+
+
+@pytest.mark.django_db
+def test_grant_and_revoke_assignment_extension():
+    course = Course.objects.create(code="CS703", title="Networks", status=CourseStatus.PUBLISHED)
+    faculty_user_id = 20
+    student_user_id = 30
+    unenrolled_student_id = 99
+
+    CourseMembership.objects.create(course=course, user_id=faculty_user_id, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=student_user_id, role=CourseRole.STUDENT)
+
+    now = datetime.now(UTC)
+    due = now + timedelta(days=2)
+    ext_due = now + timedelta(days=5)
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Routing Protocols",
+        instructions="Implement Dijkstra",
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=faculty_user_id,
+        due_at=due,
+    )
+
+    faculty = make_principal(
+        user_id=faculty_user_id,
+        role="faculty",
+        permissions=("lms.course.view", "lms.assignment.manage", "lms.deadline.manage"),
+    )
+
+    # 1. Unenrolled student cannot receive extension
+    with pytest.raises(ConflictError, match="not an enrolled student"):
+        deadline_service.grant_assignment_extension(
+            actor=faculty,
+            course_code="CS703",
+            assignment_id=asg.id,
+            student_user_id=unenrolled_student_id,
+            extended_due_at=ext_due,
+            reason="Accommodation",
+        )
+
+    # 2. Enrolled student receives extension
+    ext = deadline_service.grant_assignment_extension(
+        actor=faculty,
+        course_code="CS703",
+        assignment_id=asg.id,
+        student_user_id=student_user_id,
+        extended_due_at=ext_due,
+        reason="Medical accommodation",
+    )
+    assert ext.user_id == student_user_id
+    assert ext.extended_due_at == ext_due
+    assert ext.reason == "Medical accommodation"
+    assert ext.granted_by_user_id == faculty_user_id
+
+    # 3. Revoke extension
+    deadline_service.revoke_assignment_extension(
+        actor=faculty,
+        course_code="CS703",
+        assignment_id=asg.id,
+        extension_id=ext.id,
+    )
+    assert CourseAssignmentExtension.objects.filter(id=ext.id).count() == 0
+
+
+@pytest.mark.django_db
+def test_student_extension_privacy_and_effective_deadline():
+    course = Course.objects.create(code="CS704", title="OS", status=CourseStatus.PUBLISHED)
+    faculty_user_id = 40
+    student1_user_id = 41
+    student2_user_id = 42
+    ta_user_id = 43
+
+    CourseMembership.objects.create(course=course, user_id=faculty_user_id, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=student1_user_id, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=course, user_id=student2_user_id, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=course, user_id=ta_user_id, role=CourseRole.TA)
+
+    now = datetime.now(UTC)
+    due = now + timedelta(days=3)
+    ext_due = now + timedelta(days=6)
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Threads & Locks",
+        instructions="Implement mutex",
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=faculty_user_id,
+        due_at=due,
+    )
+
+    # Grant extension ONLY to student 1
+    CourseAssignmentExtension.objects.create(
+        assignment=asg,
+        user_id=student1_user_id,
+        extended_due_at=ext_due,
+        reason="Dean approved leave",
+        granted_by_user_id=faculty_user_id,
+    )
+
+    s1_principal = make_principal(
+        user_id=student1_user_id,
+        role="student",
+        permissions=("lms.course.view", "lms.deadline.view"),
+    )
+    s2_principal = make_principal(
+        user_id=student2_user_id,
+        role="student",
+        permissions=("lms.course.view", "lms.deadline.view"),
+    )
+    ta_principal = make_principal(
+        user_id=ta_user_id,
+        role="ta",
+        permissions=("lms.course.view", "lms.deadline.view"),
+    )
+
+    # Student 1 sees their personal extension and effective deadline
+    info1 = get_assignment_deadline_info(
+        principal=s1_principal,
+        course_code="CS704",
+        assignment_id=asg.id,
+    )
+    assert info1["is_extended"] is True
+    assert info1["extended_due_at"] is not None
+    assert info1["extension_reason"] == "Dean approved leave"
+
+    # Student 2 cannot see student 1's extension (strict privacy)
+    info2 = get_assignment_deadline_info(
+        principal=s2_principal,
+        course_code="CS704",
+        assignment_id=asg.id,
+    )
+    assert info2["is_extended"] is False
+    assert info2["extended_due_at"] is None
+    assert info2["extension_reason"] == ""
+
+    # Student cannot list extensions of peers (selector returns None for unauthorized roles)
+    assert (
+        list_assignment_extensions(
+            principal=s1_principal,
+            course_code="CS704",
+            assignment_id=asg.id,
+        )
+        is None
+    )
+
+    # TA can list all extensions for grading context (AFR-LMS-014.2)
+    ta_exts = list_assignment_extensions(
+        principal=ta_principal,
+        course_code="CS704",
+        assignment_id=asg.id,
+    )
+    assert ta_exts is not None
+    assert len(ta_exts) == 1
+    assert ta_exts[0]["user_id"] == student1_user_id
+
+
+@pytest.mark.django_db
+def test_contract_get_assignment_deadlines():
+    course = Course.objects.create(code="CS705", title="Security", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    asg1 = CourseAssignment.objects.create(
+        course=course,
+        title="RSA",
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=1,
+        due_at=now + timedelta(days=2),
+    )
+    asg2 = CourseAssignment.objects.create(
+        course=course,
+        title="AES",
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=1,
+        due_at=now + timedelta(days=4),
+        closes_at=now + timedelta(days=6),
+        allow_late=True,
+    )
+
+    # Extension for student 55 on asg1
+    CourseAssignmentExtension.objects.create(
+        assignment=asg1,
+        user_id=55,
+        extended_due_at=now + timedelta(days=5),
+        reason="Medical",
+        granted_by_user_id=1,
+    )
+
+    deadlines = get_assignment_deadlines([asg1.id, asg2.id, 99999], student_user_id=55)
+    assert asg1.id in deadlines
+    assert asg2.id in deadlines
+    assert 99999 not in deadlines
+
+    assert deadlines[asg1.id]["is_extended"] is True
+    assert deadlines[asg2.id]["is_extended"] is False
+    assert deadlines[asg2.id]["allow_late"] is True

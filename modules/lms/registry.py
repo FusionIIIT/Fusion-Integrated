@@ -30,6 +30,8 @@ PERMISSIONS = [
     ("lms.announcement.manage", "Post and manage course announcements"),
     ("lms.assignment.view", "View published course assignments"),
     ("lms.assignment.manage", "Create, edit, and publish course assignments"),
+    ("lms.deadline.view", "View assignment deadlines and submission window status"),
+    ("lms.deadline.manage", "Configure submission windows and grant extensions"),
 ]
 
 SYSTEM_PERMISSIONS = []
@@ -39,6 +41,7 @@ _STUDENT = [
     "lms.material.view",
     "lms.announcement.view",
     "lms.assignment.view",
+    "lms.deadline.view",
 ]
 _FACULTY = [
     "lms.course.view",
@@ -49,12 +52,15 @@ _FACULTY = [
     "lms.announcement.manage",
     "lms.assignment.view",
     "lms.assignment.manage",
+    "lms.deadline.view",
+    "lms.deadline.manage",
 ]
 _STAFF = [
     "lms.course.view",
     "lms.material.view",
     "lms.announcement.view",
     "lms.assignment.view",
+    "lms.deadline.view",
 ]
 
 

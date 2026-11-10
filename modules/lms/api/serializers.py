@@ -157,6 +157,8 @@ class CourseAssignmentItemSerializer(serializers.Serializer):
     status = serializers.CharField()
     due_at = serializers.CharField(allow_null=True)
     release_at = serializers.CharField(allow_null=True)
+    closes_at = serializers.CharField(allow_null=True)
+    allow_late = serializers.BooleanField()
     file_name = serializers.CharField(allow_blank=True)
     file_size = serializers.IntegerField(allow_null=True)
     has_file = serializers.BooleanField()
@@ -188,6 +190,8 @@ class CourseAssignmentCreateSerializer(serializers.Serializer):
     )
     due_at = serializers.DateTimeField(required=False, allow_null=True, default=None)
     release_at = serializers.DateTimeField(required=False, allow_null=True, default=None)
+    closes_at = serializers.DateTimeField(required=False, allow_null=True, default=None)
+    allow_late = serializers.BooleanField(required=False, default=False)
     file = serializers.FileField(required=False, allow_null=True, default=None)
 
 
@@ -199,4 +203,51 @@ class CourseAssignmentUpdateSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=sorted(AssignmentStatus.ALL), required=False)
     due_at = serializers.DateTimeField(required=False, allow_null=True)
     release_at = serializers.DateTimeField(required=False, allow_null=True)
+    closes_at = serializers.DateTimeField(required=False, allow_null=True)
+    allow_late = serializers.BooleanField(required=False)
     file = serializers.FileField(required=False, allow_null=True)
+
+
+class AssignmentDeadlineInfoSerializer(serializers.Serializer):
+    assignment_id = serializers.IntegerField()
+    course_code = serializers.CharField()
+    title = serializers.CharField()
+    original_due_at = serializers.CharField(allow_null=True)
+    closes_at = serializers.CharField(allow_null=True)
+    allow_late = serializers.BooleanField()
+    effective_due_at = serializers.CharField(allow_null=True)
+    is_extended = serializers.BooleanField()
+    extension_id = serializers.IntegerField(allow_null=True)
+    extended_due_at = serializers.CharField(allow_null=True)
+    extension_reason = serializers.CharField(allow_blank=True)
+    window_status = serializers.CharField()
+    is_submission_allowed = serializers.BooleanField()
+    role = serializers.CharField()
+    can_manage_deadlines = serializers.BooleanField()
+    total_extensions = serializers.IntegerField()
+
+
+class AssignmentExtensionItemSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    assignment_id = serializers.IntegerField()
+    user_id = serializers.IntegerField()
+    student_name = serializers.CharField()
+    student_email = serializers.CharField(allow_blank=True)
+    extended_due_at = serializers.CharField()
+    reason = serializers.CharField(allow_blank=True)
+    granted_by_user_id = serializers.IntegerField()
+    granted_by_name = serializers.CharField()
+    created_at = serializers.CharField()
+    updated_at = serializers.CharField()
+
+
+class GrantExtensionSerializer(serializers.Serializer):
+    student_user_id = serializers.IntegerField()
+    extended_due_at = serializers.DateTimeField()
+    reason = serializers.CharField(required=False, allow_blank=True, default="")
+
+
+class UpdateDeadlineWindowSerializer(serializers.Serializer):
+    due_at = serializers.DateTimeField(required=False, allow_null=True)
+    closes_at = serializers.DateTimeField(required=False, allow_null=True)
+    allow_late = serializers.BooleanField(required=False)

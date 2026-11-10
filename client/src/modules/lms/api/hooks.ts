@@ -277,6 +277,8 @@ export interface CourseAssignmentItem {
   status: "draft" | "published" | "scheduled";
   due_at: string | null;
   release_at: string | null;
+  closes_at: string | null;
+  allow_late: boolean;
   file_name: string;
   file_size: number | null;
   has_file: boolean;
@@ -302,6 +304,8 @@ export interface CreateAssignmentPayload {
   status: "draft" | "published" | "scheduled";
   due_at?: string | null;
   release_at?: string | null;
+  closes_at?: string | null;
+  allow_late?: boolean;
   file?: File | null;
 }
 
@@ -313,6 +317,8 @@ export interface UpdateAssignmentPayload {
   status?: "draft" | "published" | "scheduled";
   due_at?: string | null;
   release_at?: string | null;
+  closes_at?: string | null;
+  allow_late?: boolean;
   file?: File | null;
 }
 
@@ -379,6 +385,173 @@ export function useDeleteAssignment() {
     },
     onSuccess: (_, { code }) => {
       qc.invalidateQueries({ queryKey: [KEY, "assignments", code] });
+    },
+  });
+}
+
+export interface AssignmentDeadlineInfo {
+  assignment_id: number;
+  course_code: string;
+  title: string;
+  original_due_at: string | null;
+  closes_at: string | null;
+  allow_late: boolean;
+  effective_due_at: string | null;
+  is_extended: boolean;
+  extension_id: number | null;
+  extended_due_at: string | null;
+  extension_reason: string;
+  window_status: "not_open" | "open" | "late_allowed" | "closed";
+  is_submission_allowed: boolean;
+  role: "faculty" | "student" | "ta" | "observer";
+  can_manage_deadlines: boolean;
+  total_extensions: number;
+}
+
+export interface AssignmentExtensionItem {
+  id: number;
+  assignment_id: number;
+  user_id: number;
+  student_name: string;
+  student_email: string;
+  extended_due_at: string;
+  reason: string;
+  granted_by_user_id: number;
+  granted_by_name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GrantExtensionPayload {
+  student_user_id: number;
+  extended_due_at: string;
+  reason?: string;
+}
+
+export interface UpdateDeadlineWindowPayload {
+  due_at?: string | null;
+  closes_at?: string | null;
+  allow_late?: boolean;
+}
+
+export function useAssignmentDeadline(code: string | null, assignmentId: number | null) {
+  return useQuery({
+    queryKey: [KEY, "assignments", code, assignmentId, "deadline"],
+    queryFn: async () => {
+      if (!code || !assignmentId) return null;
+      return (
+        await http.get<AssignmentDeadlineInfo>(
+          `/lms/courses/${code}/assignments/${assignmentId}/deadline`,
+        )
+      ).data;
+    },
+    enabled: Boolean(code && assignmentId),
+  });
+}
+
+export function useAssignmentExtensions(
+  code: string | null,
+  assignmentId: number | null,
+  enabled: boolean = true,
+) {
+  return useQuery({
+    queryKey: [KEY, "assignments", code, assignmentId, "extensions"],
+    queryFn: async () => {
+      if (!code || !assignmentId) return [];
+      return (
+        await http.get<AssignmentExtensionItem[]>(
+          `/lms/courses/${code}/assignments/${assignmentId}/extensions`,
+        )
+      ).data;
+    },
+    enabled: Boolean(code && assignmentId && enabled),
+  });
+}
+
+export function useUpdateDeadlineWindow() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      code,
+      assignmentId,
+      body,
+    }: {
+      code: string;
+      assignmentId: number;
+      body: UpdateDeadlineWindowPayload;
+    }) => {
+      return (
+        await http.patch<AssignmentDeadlineInfo>(
+          `/lms/courses/${code}/assignments/${assignmentId}/window`,
+          body,
+        )
+      ).data;
+    },
+    onSuccess: (_, { code, assignmentId }) => {
+      qc.invalidateQueries({ queryKey: [KEY, "assignments", code] });
+      qc.invalidateQueries({
+        queryKey: [KEY, "assignments", code, assignmentId, "deadline"],
+      });
+    },
+  });
+}
+
+export function useGrantExtension() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      code,
+      assignmentId,
+      body,
+    }: {
+      code: string;
+      assignmentId: number;
+      body: GrantExtensionPayload;
+    }) => {
+      return (
+        await http.post<AssignmentExtensionItem>(
+          `/lms/courses/${code}/assignments/${assignmentId}/extensions`,
+          body,
+        )
+      ).data;
+    },
+    onSuccess: (_, { code, assignmentId }) => {
+      qc.invalidateQueries({ queryKey: [KEY, "assignments", code] });
+      qc.invalidateQueries({
+        queryKey: [KEY, "assignments", code, assignmentId, "deadline"],
+      });
+      qc.invalidateQueries({
+        queryKey: [KEY, "assignments", code, assignmentId, "extensions"],
+      });
+    },
+  });
+}
+
+export function useRevokeExtension() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      code,
+      assignmentId,
+      extensionId,
+    }: {
+      code: string;
+      assignmentId: number;
+      extensionId: number;
+    }) => {
+      await http.delete(
+        `/lms/courses/${code}/assignments/${assignmentId}/extensions/${extensionId}`,
+      );
+      return { code, assignmentId, extensionId };
+    },
+    onSuccess: (_, { code, assignmentId }) => {
+      qc.invalidateQueries({ queryKey: [KEY, "assignments", code] });
+      qc.invalidateQueries({
+        queryKey: [KEY, "assignments", code, assignmentId, "deadline"],
+      });
+      qc.invalidateQueries({
+        queryKey: [KEY, "assignments", code, assignmentId, "extensions"],
+      });
     },
   });
 }

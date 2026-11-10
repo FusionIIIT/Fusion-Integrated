@@ -27,6 +27,8 @@ ANN_VIEW = "lms.announcement.view"
 ANN_MANAGE = "lms.announcement.manage"
 ASG_VIEW = "lms.assignment.view"
 ASG_MANAGE = "lms.assignment.manage"
+DL_VIEW = "lms.deadline.view"
+DL_MANAGE = "lms.deadline.manage"
 URL_COURSES = "/api/v1/lms/courses"
 
 
@@ -657,3 +659,171 @@ def test_assignment_download_endpoint(stub_iam):
     resp_dl = student_client.get(f"{URL_COURSES}/CS704/assignments/{asg_id}/download")
     assert resp_dl.status_code == 200
     assert b"%PDF-1.4" in b"".join(resp_dl.streaming_content)
+
+
+def test_assignment_deadline_endpoint_privacy(stub_iam):
+    course = Course.objects.create(code="CS801", title="Compiler", status=CourseStatus.PUBLISHED)
+    CourseMembership.objects.create(course=course, user_id=2001, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=2002, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=course, user_id=2003, role=CourseRole.STUDENT)
+
+    now = datetime.now(UTC)
+    due = now + timedelta(days=2)
+    ext_due = now + timedelta(days=5)
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Lexer",
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=2001,
+        due_at=due,
+    )
+
+    from modules.lms.models import CourseAssignmentExtension
+
+    CourseAssignmentExtension.objects.create(
+        assignment=asg,
+        user_id=2002,
+        extended_due_at=ext_due,
+        reason="Medical emergency",
+        granted_by_user_id=2001,
+    )
+
+    # 1. Student 1 checks deadline: sees personal extension
+    client_s1 = api_client(
+        stub_iam, user_id=2002, role="student", permissions=(VIEW, ASG_VIEW, DL_VIEW)
+    )
+    r1 = client_s1.get(f"{URL_COURSES}/CS801/assignments/{asg.id}/deadline")
+    assert r1.status_code == 200
+    assert r1.data["is_extended"] is True
+    assert r1.data["extension_reason"] == "Medical emergency"
+    assert r1.data["can_manage_deadlines"] is False
+
+    # 2. Student 2 checks deadline: does NOT see student 1's extension (privacy)
+    client_s2 = api_client(
+        stub_iam, user_id=2003, role="student", permissions=(VIEW, ASG_VIEW, DL_VIEW)
+    )
+    r2 = client_s2.get(f"{URL_COURSES}/CS801/assignments/{asg.id}/deadline")
+    assert r2.status_code == 200
+    assert r2.data["is_extended"] is False
+    assert r2.data["extended_due_at"] is None
+    assert r2.data["extension_reason"] == ""
+
+    # 3. Faculty checks deadline: can manage deadlines and see total extensions count
+    client_fac = api_client(
+        stub_iam, user_id=2001, role="faculty", permissions=(VIEW, ASG_VIEW, DL_VIEW, DL_MANAGE)
+    )
+    rf = client_fac.get(f"{URL_COURSES}/CS801/assignments/{asg.id}/deadline")
+    assert rf.status_code == 200
+    assert rf.data["can_manage_deadlines"] is True
+    assert rf.data["total_extensions"] == 1
+
+
+def test_assignment_window_patch_endpoint(stub_iam):
+    course = Course.objects.create(code="CS802", title="Graphics", status=CourseStatus.PUBLISHED)
+    CourseMembership.objects.create(course=course, user_id=2001, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=2002, role=CourseRole.STUDENT)
+
+    now = datetime.now(UTC)
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Ray Tracing",
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=2001,
+        due_at=now + timedelta(days=3),
+    )
+
+    client_fac = api_client(
+        stub_iam, user_id=2001, role="faculty", permissions=(VIEW, ASG_VIEW, DL_VIEW, DL_MANAGE)
+    )
+    patch_data = {
+        "due_at": (now + timedelta(days=4)).isoformat(),
+        "closes_at": (now + timedelta(days=7)).isoformat(),
+        "allow_late": True,
+    }
+    rf = client_fac.patch(f"{URL_COURSES}/CS802/assignments/{asg.id}/window", patch_data, format="json")
+    assert rf.status_code == 200
+    assert rf.data["allow_late"] is True
+    assert rf.data["window_status"] == "open"
+
+    # Student cannot patch window
+    client_s = api_client(
+        stub_iam, user_id=2002, role="student", permissions=(VIEW, ASG_VIEW, DL_VIEW)
+    )
+    rs = client_s.patch(f"{URL_COURSES}/CS802/assignments/{asg.id}/window", patch_data, format="json")
+    assert rs.status_code == 403
+
+
+def test_assignment_extensions_crud_and_rbac(stub_iam):
+    course = Course.objects.create(code="CS803", title="Cloud", status=CourseStatus.PUBLISHED)
+    CourseMembership.objects.create(course=course, user_id=3001, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=3002, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=course, user_id=3003, role=CourseRole.TA)
+
+    now = datetime.now(UTC)
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Microservices",
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=3001,
+        due_at=now + timedelta(days=2),
+    )
+
+    def faculty_c():
+        return api_client(
+            stub_iam, user_id=3001, role="faculty", permissions=(VIEW, ASG_VIEW, DL_VIEW, DL_MANAGE)
+        )
+
+    def ta_c():
+        return api_client(
+            stub_iam, user_id=3003, role="ta", permissions=(VIEW, ASG_VIEW, DL_VIEW)
+        )
+
+    def student_c():
+        return api_client(
+            stub_iam, user_id=3002, role="student", permissions=(VIEW, ASG_VIEW, DL_VIEW)
+        )
+
+    # 1. Student cannot list all extensions (privacy)
+    rs_list = student_c().get(f"{URL_COURSES}/CS803/assignments/{asg.id}/extensions")
+    assert rs_list.status_code == 403
+
+    # 2. TA can list extensions (empty initially)
+    rta_list = ta_c().get(f"{URL_COURSES}/CS803/assignments/{asg.id}/extensions")
+    assert rta_list.status_code == 200
+    assert len(rta_list.data) == 0
+
+    # 3. TA cannot grant extension (faculty only)
+    ext_payload = {
+        "student_user_id": 3002,
+        "extended_due_at": (now + timedelta(days=5)).isoformat(),
+        "reason": "Family emergency",
+    }
+    rta_post = ta_c().post(
+        f"{URL_COURSES}/CS803/assignments/{asg.id}/extensions", ext_payload, format="json"
+    )
+    assert rta_post.status_code == 403
+
+    # 4. Faculty grants extension
+    rf_post = faculty_c().post(
+        f"{URL_COURSES}/CS803/assignments/{asg.id}/extensions", ext_payload, format="json"
+    )
+    assert rf_post.status_code == 201
+    ext_id = rf_post.data["id"]
+    assert rf_post.data["user_id"] == 3002
+    assert rf_post.data["reason"] == "Family emergency"
+
+    # 5. TA can now view this extension in the list
+    rta_list2 = ta_c().get(f"{URL_COURSES}/CS803/assignments/{asg.id}/extensions")
+    assert rta_list2.status_code == 200
+    assert len(rta_list2.data) == 1
+    assert rta_list2.data[0]["id"] == ext_id
+
+    # 6. Faculty revokes extension
+    rf_del = faculty_c().delete(f"{URL_COURSES}/CS803/assignments/{asg.id}/extensions/{ext_id}")
+    assert rf_del.status_code == 204
+
+    # 7. TA checks list again -> empty
+    rta_list3 = ta_c().get(f"{URL_COURSES}/CS803/assignments/{asg.id}/extensions")
+    assert rta_list3.status_code == 200
+    assert len(rta_list3.data) == 0

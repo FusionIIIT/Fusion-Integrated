@@ -6,7 +6,11 @@ from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from typing import Final
 
-from modules.lms.domain.errors import LMSRuleError
+from modules.lms.domain.errors import (
+    DeadlineWindowError,
+    ExtensionDeniedError,
+    LMSRuleError,
+)
 
 
 class CourseRole:
@@ -66,6 +70,15 @@ class AssignmentStatus:
     ALL: Final[frozenset[str]] = frozenset({DRAFT, PUBLISHED, SCHEDULED})
 
 
+class DeadlineWindowStatus:
+    NOT_OPEN: Final[str] = "not_open"
+    OPEN: Final[str] = "open"
+    LATE_ALLOWED: Final[str] = "late_allowed"
+    CLOSED: Final[str] = "closed"
+
+    ALL: Final[frozenset[str]] = frozenset({NOT_OPEN, OPEN, LATE_ALLOWED, CLOSED})
+
+
 @dataclass(frozen=True)
 class CourseDetails:
     code: str
@@ -105,6 +118,22 @@ class AssignmentDetails:
     status: str = AssignmentStatus.DRAFT
     due_at: datetime | None = None
     release_at: datetime | None = None
+    closes_at: datetime | None = None
+    allow_late: bool = False
+
+
+@dataclass(frozen=True)
+class DeadlineInfo:
+    assignment_id: int
+    original_due_at: datetime | None
+    closes_at: datetime | None
+    allow_late: bool
+    effective_due_at: datetime | None
+    is_extended: bool
+    extended_due_at: datetime | None = None
+    extension_reason: str = ""
+    window_status: str = DeadlineWindowStatus.OPEN
+    is_submission_allowed: bool = True
 
 
 
@@ -192,6 +221,7 @@ def validate_assignment_details(
     instructions: str = "",
     due_at: datetime | None = None,
     release_at: datetime | None = None,
+    closes_at: datetime | None = None,
 ) -> None:
     """Validate course assignment parameters.
 
@@ -237,4 +267,48 @@ def validate_assignment_details(
     if release_at is not None and due_at is not None and release_at > due_at:
         raise LMSRuleError("Assignment release date cannot be after the due date.")
 
+    if closes_at is not None and due_at is not None and closes_at < due_at:
+        raise LMSRuleError("Closing cutoff date cannot be earlier than the due date.")
 
+
+def validate_deadline_window(
+    *,
+    due_at: datetime | None,
+    closes_at: datetime | None = None,
+    release_at: datetime | None = None,
+    allow_late: bool = False,
+) -> tuple[datetime | None, datetime | None, bool]:
+    """Validate submission window opening, due, and closing dates."""
+    if release_at is not None and due_at is not None and release_at > due_at:
+        raise DeadlineWindowError("Assignment release date cannot be after the due date.")
+    if closes_at is not None and due_at is None:
+        raise DeadlineWindowError(
+            "Assignment due date must be set if a closing cutoff is configured."
+        )
+    if closes_at is not None and due_at is not None and closes_at < due_at:
+        raise DeadlineWindowError("Closing cutoff date cannot be earlier than the due date.")
+    return due_at, closes_at, allow_late
+
+
+def validate_extension_details(
+    *,
+    student_user_id: int,
+    extended_due_at: datetime | None,
+    assignment_due_at: datetime | None = None,
+    original_due_at: datetime | None = None,
+    reason: str = "",
+) -> tuple[datetime, str]:
+    """Validate student deadline extension parameters."""
+    if student_user_id <= 0:
+        raise ExtensionDeniedError("Valid student user ID is required.")
+    if extended_due_at is None:
+        raise ExtensionDeniedError("Extended due date cannot be empty.")
+    base_due = assignment_due_at if assignment_due_at is not None else original_due_at
+    if base_due is not None and extended_due_at <= base_due:
+        raise ExtensionDeniedError(
+            "Extended due date must be strictly later than the assignment due date."
+        )
+    cleaned_reason = reason.strip() if reason else ""
+    if len(cleaned_reason) > 500:
+        raise ExtensionDeniedError("Reason cannot exceed 500 characters.")
+    return extended_due_at, cleaned_reason

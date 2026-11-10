@@ -11,6 +11,7 @@ from modules.lms.domain.entities import (
     CourseDetails,
     CourseRole,
     CourseStatus,
+    DeadlineWindowStatus,
     MaterialDetails,
     MaterialStatus,
     MaterialType,
@@ -19,6 +20,8 @@ from modules.lms.domain.entities import (
     validate_announcement_details,
     validate_assignment_details,
     validate_course_details,
+    validate_deadline_window,
+    validate_extension_details,
     validate_material_details,
 )
 from modules.lms.domain.errors import (
@@ -26,6 +29,9 @@ from modules.lms.domain.errors import (
     AssignmentAuthoringDeniedError,
     CourseAccessDeniedError,
     CourseEditingDeniedError,
+    DeadlineWindowError,
+    ExtensionDeniedError,
+    ExtensionNotFoundError,
     LMSRuleError,
     MaterialAccessDeniedError,
     MaterialAuthoringDeniedError,
@@ -381,3 +387,113 @@ def test_validate_assignment_details_scheduled_and_date_order():
 def test_assignment_domain_errors():
     assert issubclass(AssignmentAccessDeniedError, LMSRuleError)
     assert issubclass(AssignmentAuthoringDeniedError, LMSRuleError)
+
+
+def test_deadline_window_status_enum():
+    assert DeadlineWindowStatus.NOT_OPEN == "not_open"
+    assert DeadlineWindowStatus.OPEN == "open"
+    assert DeadlineWindowStatus.LATE_ALLOWED == "late_allowed"
+    assert DeadlineWindowStatus.CLOSED == "closed"
+    assert len(DeadlineWindowStatus.ALL) == 4
+
+
+def test_validate_deadline_window_valid():
+    now = datetime.now(UTC)
+    due = now + timedelta(days=5)
+    closes = now + timedelta(days=7)
+
+    # Normal window with cutoff and late submissions
+    v_due, v_closes, v_late = validate_deadline_window(
+        due_at=due, closes_at=closes, allow_late=True
+    )
+    assert v_due == due
+    assert v_closes == closes
+    assert v_late is True
+
+    # No cutoff, no late
+    v_due2, v_closes2, v_late2 = validate_deadline_window(
+        due_at=due, closes_at=None, allow_late=False
+    )
+    assert v_due2 == due
+    assert v_closes2 is None
+    assert v_late2 is False
+
+    # No due date at all
+    v_due3, v_closes3, v_late3 = validate_deadline_window(
+        due_at=None, closes_at=None, allow_late=False
+    )
+    assert v_due3 is None
+    assert v_closes3 is None
+    assert v_late3 is False
+
+
+def test_validate_deadline_window_invalid():
+    now = datetime.now(UTC)
+    due = now + timedelta(days=5)
+    closes = now + timedelta(days=2)
+
+    # Cutoff earlier than due date
+    with pytest.raises(DeadlineWindowError, match="cannot be earlier than the due date"):
+        validate_deadline_window(due_at=due, closes_at=closes, allow_late=True)
+
+    # Cutoff set without due date
+    with pytest.raises(DeadlineWindowError, match="due date must be set"):
+        validate_deadline_window(due_at=None, closes_at=closes, allow_late=True)
+
+
+def test_validate_extension_details_valid():
+    now = datetime.now(UTC)
+    due = now + timedelta(days=3)
+    ext = now + timedelta(days=6)
+
+    ext_dt, r = validate_extension_details(
+        student_user_id=42,
+        extended_due_at=ext,
+        assignment_due_at=due,
+        reason="  Medical extension  ",
+    )
+    assert ext_dt == ext
+    assert r == "Medical extension"
+
+
+def test_validate_extension_details_invalid():
+    now = datetime.now(UTC)
+    due = now + timedelta(days=5)
+
+    # Invalid user id
+    with pytest.raises(ExtensionDeniedError, match="Valid student user ID is required"):
+        validate_extension_details(
+            student_user_id=0,
+            extended_due_at=now + timedelta(days=7),
+            assignment_due_at=due,
+        )
+
+    # Extension earlier than or equal to original due date
+    with pytest.raises(ExtensionDeniedError, match="strictly later than the assignment due date"):
+        validate_extension_details(
+            student_user_id=1,
+            extended_due_at=due - timedelta(days=1),
+            assignment_due_at=due,
+        )
+
+    with pytest.raises(ExtensionDeniedError, match="strictly later than the assignment due date"):
+        validate_extension_details(
+            student_user_id=1,
+            extended_due_at=due,
+            assignment_due_at=due,
+        )
+
+    # Reason exceeds 500 chars
+    with pytest.raises(ExtensionDeniedError, match="cannot exceed 500 characters"):
+        validate_extension_details(
+            student_user_id=1,
+            extended_due_at=due + timedelta(days=1),
+            assignment_due_at=due,
+            reason="x" * 501,
+        )
+
+
+def test_deadline_domain_errors():
+    assert issubclass(DeadlineWindowError, LMSRuleError)
+    assert issubclass(ExtensionDeniedError, LMSRuleError)
+    assert issubclass(ExtensionNotFoundError, LMSRuleError)

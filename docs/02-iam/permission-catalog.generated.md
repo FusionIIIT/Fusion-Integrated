@@ -25,6 +25,8 @@ For the intended taxonomy of modules not yet built, see
 | `lms.announcement.manage` | Post and manage course announcements | `faculty` |
 | `lms.assignment.view` | View published course assignments | `faculty`, `staff`, `student` |
 | `lms.assignment.manage` | Create, edit, and publish course assignments | `faculty` |
+| `lms.deadline.view` | View assignment deadlines and submission window status | `faculty`, `staff`, `student` |
+| `lms.deadline.manage` | Configure submission windows and grant extensions | `faculty` |
 
 ## `placement_cell`
 

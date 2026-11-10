@@ -4,9 +4,13 @@ from django.urls import path
 from modules.lms.api.views import (
     CourseAnnouncementDetailView,
     CourseAnnouncementListView,
+    CourseAssignmentDeadlineView,
     CourseAssignmentDetailView,
     CourseAssignmentDownloadView,
+    CourseAssignmentExtensionDetailView,
+    CourseAssignmentExtensionsView,
     CourseAssignmentListView,
+    CourseAssignmentWindowView,
     CourseListView,
     CourseMaterialDetailView,
     CourseMaterialDownloadView,
@@ -61,5 +65,24 @@ urlpatterns = [
         CourseAssignmentDownloadView.as_view(),
         name="course-assignment-download",
     ),
+    path(
+        "courses/<str:code>/assignments/<int:assignment_id>/deadline",
+        CourseAssignmentDeadlineView.as_view(),
+        name="course-assignment-deadline",
+    ),
+    path(
+        "courses/<str:code>/assignments/<int:assignment_id>/window",
+        CourseAssignmentWindowView.as_view(),
+        name="course-assignment-window",
+    ),
+    path(
+        "courses/<str:code>/assignments/<int:assignment_id>/extensions",
+        CourseAssignmentExtensionsView.as_view(),
+        name="course-assignment-extensions",
+    ),
+    path(
+        "courses/<str:code>/assignments/<int:assignment_id>/extensions/<int:extension_id>",
+        CourseAssignmentExtensionDetailView.as_view(),
+        name="course-assignment-extension-detail",
+    ),
 ]
-

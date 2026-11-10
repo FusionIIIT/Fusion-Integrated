@@ -192,6 +192,8 @@ class CourseAssignment(TimeStampedModel):
     )
     due_at = models.DateTimeField(null=True, blank=True, db_index=True)
     release_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    closes_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    allow_late = models.BooleanField(default=False)
     file = models.FileField(upload_to="lms/assignments/%Y/%m/", null=True, blank=True)
     file_name = models.CharField(max_length=255, blank=True)
     file_size = models.BigIntegerField(null=True, blank=True)
@@ -210,3 +212,34 @@ class CourseAssignment(TimeStampedModel):
         return f"Assignment({self.title}) in {self.course.code} [{self.status}]"
 
 
+class CourseAssignmentExtension(TimeStampedModel):
+    """An approved deadline extension granted to a student for an assignment.
+
+    Maintains student privacy and establishes the effective submission deadline
+    while preserving the original assignment due date (CFR-LMS-008, AFR-LMS-009.2).
+    """
+
+    assignment = models.ForeignKey(
+        CourseAssignment, on_delete=models.CASCADE, related_name="extensions"
+    )
+    user_id = models.IntegerField(db_index=True)
+    extended_due_at = models.DateTimeField(db_index=True)
+    reason = models.CharField(max_length=255, blank=True)
+    granted_by_user_id = models.IntegerField(db_index=True)
+
+    class Meta:
+        db_table = "lms_course_assignment_extension"
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["assignment", "user_id"],
+                name="lms_asg_ext_unique",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["assignment", "user_id"], name="lms_asg_ext_usr_idx"),
+            models.Index(fields=["user_id", "extended_due_at"], name="lms_asg_ext_due_idx"),
+        ]
+
+    def __str__(self) -> str:
+        return f"Extension for User({self.user_id}) on {self.assignment.title}"

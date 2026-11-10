@@ -359,6 +359,33 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/lms/courses/{code}/assignments/{assignment_id}/deadline:
+    get:
+      operationId: v1_lms_course_assignments_deadline_retrieve
+      description: View submission deadline and window controls for an assignment.
+      summary: Retrieve assignment deadline and submission window status
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignmentDeadlineInfo'
+          description: ''
   /api/v1/lms/courses/{code}/assignments/{assignment_id}/download:
     get:
       operationId: v1_lms_course_assignments_download
@@ -386,6 +413,139 @@ paths:
               schema:
                 type: string
                 format: binary
+          description: ''
+  /api/v1/lms/courses/{code}/assignments/{assignment_id}/extensions:
+    get:
+      operationId: v1_lms_course_assignments_extensions_list
+      description: List or grant student deadline extensions for an assignment.
+      summary: List all granted deadline extensions (Faculty and TA only)
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AssignmentExtensionItem'
+          description: ''
+    post:
+      operationId: v1_lms_course_assignments_extensions_create
+      description: List or grant student deadline extensions for an assignment.
+      summary: Grant student deadline extension (Faculty only)
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GrantExtension'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GrantExtension'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GrantExtension'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignmentExtensionItem'
+          description: ''
+  /api/v1/lms/courses/{code}/assignments/{assignment_id}/extensions/{extension_id}:
+    delete:
+      operationId: v1_lms_course_assignments_extensions_destroy
+      description: Revoke a student deadline extension (Faculty only).
+      summary: Revoke an approved student deadline extension
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: extension_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/lms/courses/{code}/assignments/{assignment_id}/window:
+    patch:
+      operationId: v1_lms_course_assignments_window_update
+      description: Configure submission window and deadline parameters (Faculty only).
+      summary: Update assignment deadline window and late policy
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateDeadlineWindow'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateDeadlineWindow'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateDeadlineWindow'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignmentDeadlineInfo'
           description: ''
   /api/v1/lms/courses/{code}/materials:
     get:
@@ -2488,6 +2648,100 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    AssignmentDeadlineInfo:
+      type: object
+      properties:
+        assignment_id:
+          type: integer
+        course_code:
+          type: string
+        title:
+          type: string
+        original_due_at:
+          type: string
+          nullable: true
+        closes_at:
+          type: string
+          nullable: true
+        allow_late:
+          type: boolean
+        effective_due_at:
+          type: string
+          nullable: true
+        is_extended:
+          type: boolean
+        extension_id:
+          type: integer
+          nullable: true
+        extended_due_at:
+          type: string
+          nullable: true
+        extension_reason:
+          type: string
+        window_status:
+          type: string
+        is_submission_allowed:
+          type: boolean
+        role:
+          type: string
+        can_manage_deadlines:
+          type: boolean
+        total_extensions:
+          type: integer
+      required:
+      - allow_late
+      - assignment_id
+      - can_manage_deadlines
+      - closes_at
+      - course_code
+      - effective_due_at
+      - extended_due_at
+      - extension_id
+      - extension_reason
+      - is_extended
+      - is_submission_allowed
+      - original_due_at
+      - role
+      - title
+      - total_extensions
+      - window_status
+    AssignmentExtensionItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        assignment_id:
+          type: integer
+        user_id:
+          type: integer
+        student_name:
+          type: string
+        student_email:
+          type: string
+        extended_due_at:
+          type: string
+        reason:
+          type: string
+        granted_by_user_id:
+          type: integer
+        granted_by_name:
+          type: string
+        created_at:
+          type: string
+        updated_at:
+          type: string
+      required:
+      - assignment_id
+      - created_at
+      - extended_due_at
+      - granted_by_name
+      - granted_by_user_id
+      - id
+      - reason
+      - student_email
+      - student_name
+      - updated_at
+      - user_id
     AudienceEnum:
       enum:
       - students
@@ -2883,6 +3137,13 @@ components:
           type: string
           format: date-time
           nullable: true
+        closes_at:
+          type: string
+          format: date-time
+          nullable: true
+        allow_late:
+          type: boolean
+          default: false
         file:
           type: string
           format: uri
@@ -2913,6 +3174,11 @@ components:
         release_at:
           type: string
           nullable: true
+        closes_at:
+          type: string
+          nullable: true
+        allow_late:
+          type: boolean
         file_name:
           type: string
         file_size:
@@ -2929,6 +3195,8 @@ components:
           type: string
           nullable: true
       required:
+      - allow_late
+      - closes_at
       - course_code
       - created_at
       - created_by_user_id
@@ -3306,6 +3574,20 @@ components:
       - fee_reference
       - season
       - user_id
+    GrantExtension:
+      type: object
+      properties:
+        student_user_id:
+          type: integer
+        extended_due_at:
+          type: string
+          format: date-time
+        reason:
+          type: string
+          default: ''
+      required:
+      - extended_due_at
+      - student_user_id
     IncidentRecorded:
       type: object
       properties:
@@ -3917,6 +4199,12 @@ components:
           type: string
           format: date-time
           nullable: true
+        closes_at:
+          type: string
+          format: date-time
+          nullable: true
+        allow_late:
+          type: boolean
         file:
           type: string
           format: uri
@@ -4047,6 +4335,19 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PatchedUpdateDeadlineWindow:
+      type: object
+      properties:
+        due_at:
+          type: string
+          format: date-time
+          nullable: true
+        closes_at:
+          type: string
+          format: date-time
+          nullable: true
+        allow_late:
+          type: boolean
     PlacementRecordDetail:
       type: object
       description: A student's own record, with what rules 22 and 24 still want from

@@ -132,6 +132,28 @@ def get_course_assignments(
             "status": a.status,
             "due_at": a.due_at.isoformat() if a.due_at else None,
             "release_at": a.release_at.isoformat() if a.release_at else None,
+            "closes_at": a.closes_at.isoformat() if a.closes_at else None,
+            "allow_late": a.allow_late,
             "file_name": a.file_name,
         })
     return result
+
+
+def get_assignment_deadlines(
+    assignment_ids: Sequence[int],
+    student_user_id: int | None = None,
+) -> dict[int, dict[str, Any]]:
+    """Retrieve deadline and window status for assignments (contracts_are_plural)."""
+    ids = {int(aid) for aid in assignment_ids if aid is not None}
+    if not ids:
+        return {}
+    assignments = (
+        CourseAssignment.objects.filter(id__in=ids)
+        .prefetch_related("extensions")
+    )
+    from modules.lms.selectors.deadlines import calculate_deadline_info
+
+    return {
+        a.id: calculate_deadline_info(a, student_user_id=student_user_id)
+        for a in assignments
+    }

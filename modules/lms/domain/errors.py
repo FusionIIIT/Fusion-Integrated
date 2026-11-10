@@ -29,3 +29,14 @@ class AssignmentAccessDeniedError(LMSRuleError):
 class AssignmentAuthoringDeniedError(LMSRuleError):
     """Raised when a non-faculty user (TA, Student, Observer) attempts to author an assignment."""
 
+
+class DeadlineWindowError(LMSRuleError):
+    """Raised when submission window configuration violates deadline rules."""
+
+
+class ExtensionDeniedError(LMSRuleError):
+    """Raised when an extension request is unauthorized or invalid."""
+
+
+class ExtensionNotFoundError(LMSRuleError):
+    """Raised when a specified extension record does not exist."""

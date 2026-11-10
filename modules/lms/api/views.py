@@ -8,9 +8,11 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.api.exceptions import NotFoundError
+from core.api.exceptions import NotFoundError, PermissionDeniedError
 from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.lms.api.serializers import (
+    AssignmentDeadlineInfoSerializer,
+    AssignmentExtensionItemSerializer,
     CourseAnnouncementCreateSerializer,
     CourseAnnouncementItemSerializer,
     CourseAnnouncementsResponseSerializer,
@@ -25,6 +27,8 @@ from modules.lms.api.serializers import (
     CourseSummarySerializer,
     CourseWorkspaceDetailSerializer,
     CourseWorkspaceUpdateSerializer,
+    GrantExtensionSerializer,
+    UpdateDeadlineWindowSerializer,
 )
 from modules.lms.selectors.announcements import (
     get_course_announcement_detail,
@@ -36,6 +40,10 @@ from modules.lms.selectors.assignments import (
     list_course_assignments,
 )
 from modules.lms.selectors.courses import course_workspace_details, visible_courses
+from modules.lms.selectors.deadlines import (
+    get_assignment_deadline_info,
+    list_assignment_extensions,
+)
 from modules.lms.selectors.materials import (
     get_course_material_detail,
     get_material_for_download,
@@ -44,6 +52,7 @@ from modules.lms.selectors.materials import (
 from modules.lms.services import announcements as announcement_service
 from modules.lms.services import assignments as assignment_service
 from modules.lms.services import courses as course_service
+from modules.lms.services import deadlines as deadline_service
 from modules.lms.services import materials as material_service
 
 MODULE = HasModuleGrant("lms")
@@ -55,6 +64,8 @@ P_ANN_VIEW = "lms.announcement.view"
 P_ANN_MANAGE = "lms.announcement.manage"
 P_ASG_VIEW = "lms.assignment.view"
 P_ASG_MANAGE = "lms.assignment.manage"
+P_DDL_VIEW = "lms.deadline.view"
+P_DDL_MANAGE = "lms.deadline.manage"
 
 
 
@@ -453,3 +464,148 @@ class CourseAssignmentDownloadView(APIView):
         )
         filename = assignment.file_name or os.path.basename(file_path)
         return FileResponse(open(file_path, "rb"), as_attachment=True, filename=filename)
+
+
+class CourseAssignmentDeadlineView(APIView):
+    """View submission deadline and window controls for an assignment."""
+
+    permission_classes = [MODULE, HasPermission(P_DDL_VIEW)]
+
+    @extend_schema(
+        operation_id="v1_lms_course_assignments_deadline_retrieve",
+        summary="Retrieve assignment deadline and submission window status",
+        tags=["lms"],
+        responses={200: AssignmentDeadlineInfoSerializer},
+    )
+    def get(self, request, code: str, assignment_id: int):
+        info = get_assignment_deadline_info(
+            principal=request.principal,
+            course_code=code,
+            assignment_id=assignment_id,
+        )
+        if info is None:
+            raise NotFoundError("Course assignment not found or access denied.")
+        return Response(AssignmentDeadlineInfoSerializer(info).data)
+
+
+class CourseAssignmentWindowView(APIView):
+    """Configure submission window and deadline parameters (Faculty only)."""
+
+    permission_classes = [MODULE, HasPermission(P_DDL_MANAGE)]
+
+    @extend_schema(
+        operation_id="v1_lms_course_assignments_window_update",
+        summary="Update assignment deadline window and late policy",
+        tags=["lms"],
+        request=UpdateDeadlineWindowSerializer,
+        responses={200: AssignmentDeadlineInfoSerializer},
+    )
+    def patch(self, request, code: str, assignment_id: int):
+        payload = UpdateDeadlineWindowSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+
+        asg = deadline_service.update_assignment_window(
+            actor=request.principal,
+            course_code=code,
+            assignment_id=assignment_id,
+            **payload.validated_data,
+        )
+
+        info = get_assignment_deadline_info(
+            principal=request.principal,
+            course_code=code,
+            assignment_id=asg.id,
+        )
+        return Response(AssignmentDeadlineInfoSerializer(info).data)
+
+
+class CourseAssignmentExtensionsView(APIView):
+    """List or grant student deadline extensions for an assignment."""
+
+    def get_permissions(self):
+        perm = P_DDL_VIEW if self.request.method == "GET" else P_DDL_MANAGE
+        return [MODULE(), HasPermission(perm)()]
+
+    @extend_schema(
+        operation_id="v1_lms_course_assignments_extensions_list",
+        summary="List all granted deadline extensions (Faculty and TA only)",
+        tags=["lms"],
+        responses={200: AssignmentExtensionItemSerializer(many=True)},
+    )
+    def get(self, request, code: str, assignment_id: int):
+        extensions = list_assignment_extensions(
+            principal=request.principal,
+            course_code=code,
+            assignment_id=assignment_id,
+        )
+        if extensions is None:
+            raise PermissionDeniedError(
+                "You are not authorized to view extensions for this course."
+            )
+        return Response(AssignmentExtensionItemSerializer(extensions, many=True).data)
+
+    @extend_schema(
+        operation_id="v1_lms_course_assignments_extensions_create",
+        summary="Grant student deadline extension (Faculty only)",
+        tags=["lms"],
+        request=GrantExtensionSerializer,
+        responses={201: AssignmentExtensionItemSerializer},
+    )
+    def post(self, request, code: str, assignment_id: int):
+        payload = GrantExtensionSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+
+        ext = deadline_service.grant_assignment_extension(
+            actor=request.principal,
+            course_code=code,
+            assignment_id=assignment_id,
+            **payload.validated_data,
+        )
+
+        # Retrieve formatted detail with student/grantor names
+        extensions = list_assignment_extensions(
+            principal=request.principal,
+            course_code=code,
+            assignment_id=assignment_id,
+        )
+        detail = next((item for item in (extensions or []) if item["id"] == ext.id), None)
+        if detail is None:
+            detail = {
+                "id": ext.id,
+                "assignment_id": ext.assignment_id,
+                "user_id": ext.user_id,
+                "student_name": f"User {ext.user_id}",
+                "student_email": "",
+                "extended_due_at": ext.extended_due_at.isoformat(),
+                "reason": ext.reason,
+                "granted_by_user_id": ext.granted_by_user_id,
+                "granted_by_name": f"User {ext.granted_by_user_id}",
+                "created_at": ext.created_at.isoformat(),
+                "updated_at": ext.updated_at.isoformat(),
+            }
+
+        return Response(
+            AssignmentExtensionItemSerializer(detail).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class CourseAssignmentExtensionDetailView(APIView):
+    """Revoke a student deadline extension (Faculty only)."""
+
+    permission_classes = [MODULE, HasPermission(P_DDL_MANAGE)]
+
+    @extend_schema(
+        operation_id="v1_lms_course_assignments_extensions_destroy",
+        summary="Revoke an approved student deadline extension",
+        tags=["lms"],
+        responses={204: None},
+    )
+    def delete(self, request, code: str, assignment_id: int, extension_id: int):
+        deadline_service.revoke_assignment_extension(
+            actor=request.principal,
+            course_code=code,
+            assignment_id=assignment_id,
+            extension_id=extension_id,
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)

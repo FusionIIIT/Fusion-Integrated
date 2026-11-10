@@ -22,6 +22,8 @@ def _assignment_to_dict(a: CourseAssignment) -> dict[str, Any]:
         "status": a.status,
         "due_at": a.due_at.isoformat() if a.due_at else None,
         "release_at": a.release_at.isoformat() if a.release_at else None,
+        "closes_at": a.closes_at.isoformat() if a.closes_at else None,
+        "allow_late": a.allow_late,
         "file_name": a.file_name or (a.file.name if a.file else ""),
         "file_size": a.file_size,
         "has_file": bool(a.file),
