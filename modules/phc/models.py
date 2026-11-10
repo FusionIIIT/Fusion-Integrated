@@ -180,3 +180,83 @@ class RequisitionLine(models.Model):
 
     def __str__(self) -> str:
         return f"Line item for {self.inventory_item.name} in requisition by u{self.requisition.requested_by_user_id}"
+
+
+class Doctor(models.Model):
+    """Doctor model with name and specialty."""
+
+    name = models.CharField(max_length=100)
+    specialty = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = "phc_doctor"
+        ordering = ["name"]
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.specialty})"
+
+
+class ScheduleSlot(models.Model):
+    """Schedule slot for a doctor."""
+
+    doctor = models.ForeignKey(Doctor, related_name="slots", on_delete=models.CASCADE)
+    weekday = models.IntegerField(choices=[(i, i) for i in range(7)])
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    is_published = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "phc_schedule_slot"
+        ordering = ["weekday", "start_time"]
+
+    def __str__(self) -> str:
+        return f"{self.doctor.name} - {self.weekday} {self.start_time}-{self.end_time}"
+
+
+class DoctorAttendance(models.Model):
+    """Doctor attendance record."""
+
+    doctor = models.ForeignKey(Doctor, related_name="attendances", on_delete=models.CASCADE)
+    date = models.DateField()
+    status = models.CharField(max_length=10, choices=[("ARRIVED", "Arrived"), ("DEPARTED", "Departed")])
+    updated_by_user_id = models.IntegerField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "phc_doctor_attendance"
+        unique_together = [("doctor", "date")]
+
+    def __str__(self) -> str:
+        return f"{self.doctor.name} - {self.date} {self.status}"
+
+
+class AmbulanceLog(models.Model):
+    """Ambulance log with details."""
+
+    logged_at = models.DateTimeField(auto_now_add=True)
+    patient_name = models.CharField(max_length=100)
+    destination = models.CharField(max_length=255)
+    recorded_by_user_id = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        db_table = "phc_ambulance_log"
+        ordering = ["-logged_at"]
+
+    def __str__(self) -> str:
+        return f"Ambulance log for {self.patient_name} at {self.destination}"
+
+
+class Announcement(models.Model):
+    """Announcement model with title and body."""
+
+    title = models.CharField(max_length=255)
+    body = models.TextField()
+    published_by_user_id = models.IntegerField(null=True, blank=True)
+    published_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "phc_announcement"
+        ordering = ["-published_at"]
+
+    def __str__(self) -> str:
+        return f"{self.title} - {self.published_at}"
