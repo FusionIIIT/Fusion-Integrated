@@ -56,3 +56,19 @@ class SubmissionWindowClosedError(SubmissionError):
 
 class SubmissionAccessDeniedError(SubmissionError):
     """Raised when an unauthorized user attempts to view or download a submission."""
+
+
+class GradingError(LMSRuleError):
+    """Base exception for all grading and evaluation rule violations."""
+
+
+class ScoreValidationError(GradingError):
+    """Raised when score is missing, non-numeric, negative, or exceeds maximum points."""
+
+
+class GradingPermissionDeniedError(GradingError):
+    """Raised when an unauthorized user attempts to grade a submission."""
+
+
+class GradingConflictError(GradingError):
+    """Raised when grading action conflicts with submission or course state."""

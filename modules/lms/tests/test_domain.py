@@ -12,6 +12,8 @@ from modules.lms.domain.entities import (
     CourseRole,
     CourseStatus,
     DeadlineWindowStatus,
+    EvaluationDetails,
+    GradeStatus,
     MaterialDetails,
     MaterialStatus,
     MaterialType,
@@ -23,6 +25,7 @@ from modules.lms.domain.entities import (
     validate_assignment_details,
     validate_course_details,
     validate_deadline_window,
+    validate_evaluation_score,
     validate_extension_details,
     validate_material_details,
     validate_submission_details,
@@ -35,9 +38,13 @@ from modules.lms.domain.errors import (
     DeadlineWindowError,
     ExtensionDeniedError,
     ExtensionNotFoundError,
+    GradingConflictError,
+    GradingError,
+    GradingPermissionDeniedError,
     LMSRuleError,
     MaterialAccessDeniedError,
     MaterialAuthoringDeniedError,
+    ScoreValidationError,
     SubmissionAccessDeniedError,
     SubmissionError,
     SubmissionTypeError,
@@ -616,3 +623,89 @@ def test_submission_domain_errors():
     assert issubclass(SubmissionTypeError, SubmissionError)
     assert issubclass(SubmissionWindowClosedError, SubmissionError)
     assert issubclass(SubmissionAccessDeniedError, SubmissionError)
+
+
+def test_evaluation_details_dataclass():
+    now = datetime.now(UTC)
+    ev = EvaluationDetails(
+        submission_id=10,
+        assignment_id=5,
+        student_user_id=42,
+        score=Decimal("95.50"),
+        graded_by_user_id=1,
+        status=GradeStatus.DRAFT,
+        graded_at=now,
+    )
+    assert ev.submission_id == 10
+    assert ev.assignment_id == 5
+    assert ev.student_user_id == 42
+    assert ev.score == Decimal("95.50")
+    assert ev.graded_by_user_id == 1
+    assert ev.status == "draft"
+    assert ev.graded_at == now
+
+
+def test_validate_evaluation_score_valid():
+    pts_possible = Decimal("100.00")
+
+    # Regular score
+    score = validate_evaluation_score(score="85.50", points_possible=pts_possible)
+    assert score == Decimal("85.50")
+
+    # Int score
+    score = validate_evaluation_score(score=90, points_possible=pts_possible)
+    assert score == Decimal("90.00")
+
+    # Decimal score
+    score = validate_evaluation_score(score=Decimal("75.25"), points_possible=pts_possible)
+    assert score == Decimal("75.25")
+
+
+def test_validate_evaluation_score_boundaries():
+    pts_possible = Decimal("100.00")
+
+    # Exactly zero
+    assert validate_evaluation_score(score="0.00", points_possible=pts_possible) == Decimal("0.00")
+
+    # Exactly max points
+    assert validate_evaluation_score(score="100.00", points_possible=pts_possible) == Decimal("100.00")
+
+
+def test_validate_evaluation_score_exceeds_max():
+    pts_possible = Decimal("100.00")
+    with pytest.raises(ScoreValidationError, match="cannot exceed maximum points possible"):
+        validate_evaluation_score(score="100.01", points_possible=pts_possible)
+
+    with pytest.raises(ScoreValidationError, match="cannot exceed maximum points possible"):
+        validate_evaluation_score(score="150", points_possible=pts_possible)
+
+
+def test_validate_evaluation_score_negative():
+    pts_possible = Decimal("100.00")
+    with pytest.raises(ScoreValidationError, match="cannot be negative"):
+        validate_evaluation_score(score="-0.01", points_possible=pts_possible)
+
+    with pytest.raises(ScoreValidationError, match="cannot be negative"):
+        validate_evaluation_score(score="-10", points_possible=pts_possible)
+
+
+def test_validate_evaluation_score_invalid_types():
+    pts_possible = Decimal("100.00")
+    with pytest.raises(ScoreValidationError, match="Score is required"):
+        validate_evaluation_score(score=None, points_possible=pts_possible)
+
+    with pytest.raises(ScoreValidationError, match="Invalid numeric score"):
+        validate_evaluation_score(score="invalid_number", points_possible=pts_possible)
+
+
+def test_validate_evaluation_score_excess_precision():
+    pts_possible = Decimal("100.00")
+    with pytest.raises(ScoreValidationError, match="cannot have more than 2 decimal places"):
+        validate_evaluation_score(score="85.123", points_possible=pts_possible)
+
+
+def test_grading_domain_errors():
+    assert issubclass(GradingError, LMSRuleError)
+    assert issubclass(ScoreValidationError, GradingError)
+    assert issubclass(GradingPermissionDeniedError, GradingError)
+    assert issubclass(GradingConflictError, GradingError)

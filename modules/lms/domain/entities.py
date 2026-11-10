@@ -10,6 +10,7 @@ from modules.lms.domain.errors import (
     DeadlineWindowError,
     ExtensionDeniedError,
     LMSRuleError,
+    ScoreValidationError,
     SubmissionTypeError,
 )
 
@@ -88,6 +89,13 @@ class SubmissionStatus:
     ALL: Final[frozenset[str]] = frozenset({SUBMITTED, LATE, MISSING})
 
 
+class GradeStatus:
+    DRAFT: Final[str] = "draft"
+    RELEASED: Final[str] = "released"
+
+    ALL: Final[frozenset[str]] = frozenset({DRAFT, RELEASED})
+
+
 @dataclass(frozen=True)
 class CourseDetails:
     code: str
@@ -156,6 +164,17 @@ class SubmissionDetails:
     content_text: str = ""
     link_url: str = ""
     attempt_number: int = 1
+
+
+@dataclass(frozen=True)
+class EvaluationDetails:
+    submission_id: int
+    assignment_id: int
+    student_user_id: int
+    score: Decimal
+    graded_by_user_id: int
+    status: str = GradeStatus.DRAFT
+    graded_at: datetime | None = None
 
 
 
@@ -382,3 +401,35 @@ def validate_submission_details(
             raise SubmissionTypeError("Link URL must start with 'http://' or 'https://'.")
         if len(cleaned_url) > 500:
             raise SubmissionTypeError("Link URL cannot exceed 500 characters.")
+
+
+def validate_evaluation_score(*, score: Any, points_possible: Decimal) -> Decimal:
+    """Validate numeric score against assignment points possible and precision constraints.
+
+    Enforces:
+    - Score is provided and convertable to Decimal.
+    - Score cannot be negative (score >= 0.00).
+    - Score cannot exceed points_possible (CFR-LMS-010, AFR-LMS-010.1).
+    - Score has at most 2 decimal places.
+    """
+    if score is None:
+        raise ScoreValidationError("Score is required.")
+    try:
+        dec_score = Decimal(str(score))
+    except (InvalidOperation, ValueError, TypeError) as exc:
+        raise ScoreValidationError(f"Invalid numeric score: '{score}'.") from exc
+
+    if dec_score < Decimal("0.00"):
+        raise ScoreValidationError("Score cannot be negative.")
+
+    if points_possible is not None and dec_score > points_possible:
+        raise ScoreValidationError(
+            f"Score ({dec_score}) cannot exceed maximum points possible ({points_possible})."
+        )
+
+    # Check decimal precision (at most 2 decimal places)
+    exp = dec_score.as_tuple().exponent
+    if isinstance(exp, int) and exp < -2:
+        raise ScoreValidationError("Score cannot have more than 2 decimal places.")
+
+    return dec_score.quantize(Decimal("0.01"))

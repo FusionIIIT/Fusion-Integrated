@@ -586,6 +586,26 @@ export interface CourseSubmissionHistory {
   deadline_info: AssignmentDeadlineInfo;
 }
 
+export interface CourseSubmissionGradeItem {
+  id: number;
+  submission_id: number;
+  assignment_id: number;
+  student_user_id: number;
+  score: string;
+  points_possible: string;
+  status: "draft" | "released";
+  graded_by_user_id: number;
+  graded_by_name: string;
+  graded_by_email: string;
+  graded_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RecordGradePayload {
+  score: number | string;
+}
+
 export interface CourseSubmissionsListEntry {
   student_user_id: number;
   student_name: string;
@@ -594,6 +614,7 @@ export interface CourseSubmissionsListEntry {
   status: "submitted" | "late" | "missing" | "not_submitted";
   submitted_at: string | null;
   attempt_count: number;
+  grade: CourseSubmissionGradeItem | null;
 }
 
 export interface CourseSubmissionsListResponse {
@@ -680,6 +701,58 @@ export function useSubmitAssignment() {
       });
       qc.invalidateQueries({
         queryKey: [KEY, "assignments", code, assignmentId, "submissions"],
+      });
+    },
+  });
+}
+
+export function useSubmissionGrade(
+  code: string | null,
+  assignmentId: number | null,
+  submissionId: number | null,
+  enabled: boolean = true,
+) {
+  return useQuery({
+    queryKey: [KEY, "assignments", code, assignmentId, "submissions", submissionId, "grade"],
+    queryFn: async () => {
+      if (!code || !assignmentId || !submissionId) return null;
+      return (
+        await http.get<CourseSubmissionGradeItem>(
+          `/lms/courses/${code}/assignments/${assignmentId}/submissions/${submissionId}/grade`,
+        )
+      ).data;
+    },
+    enabled: Boolean(code && assignmentId && submissionId && enabled),
+  });
+}
+
+export function useRecordSubmissionGrade() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      code,
+      assignmentId,
+      submissionId,
+      body,
+    }: {
+      code: string;
+      assignmentId: number;
+      submissionId: number;
+      body: RecordGradePayload;
+    }) => {
+      return (
+        await http.post<CourseSubmissionGradeItem>(
+          `/lms/courses/${code}/assignments/${assignmentId}/submissions/${submissionId}/grade`,
+          body,
+        )
+      ).data;
+    },
+    onSuccess: (_, { code, assignmentId, submissionId }) => {
+      qc.invalidateQueries({
+        queryKey: [KEY, "assignments", code, assignmentId, "submissions"],
+      });
+      qc.invalidateQueries({
+        queryKey: [KEY, "assignments", code, assignmentId, "submissions", submissionId, "grade"],
       });
     },
   });

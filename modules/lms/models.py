@@ -292,3 +292,47 @@ class CourseSubmission(TimeStampedModel):
             f"Submission #{self.attempt_number} by User({self.student_user_id}) "
             f"for {self.assignment.title}"
         )
+
+
+class CourseSubmissionGrade(TimeStampedModel):
+    """Evaluation score and attribution for an individual student submission.
+
+    Enforces:
+    - Association with evaluated submission, assignment, and student
+      (CFR-LMS-010, AFR-LMS-010.1).
+    - Grader attribution with user ID, timestamp, and role context (AFR-LMS-010.3, BR-LMS-015).
+    - Initial 'draft' status holding grade before formal release
+      (CFR-LMS-011, AFR-LMS-011.1, BR-LMS-016).
+    """
+
+    STATUS_CHOICES = [
+        ("draft", "Draft"),
+        ("released", "Released"),
+    ]
+
+    submission = models.OneToOneField(
+        CourseSubmission, on_delete=models.CASCADE, related_name="grade"
+    )
+    assignment = models.ForeignKey(
+        CourseAssignment, on_delete=models.CASCADE, related_name="grades"
+    )
+    student_user_id = models.IntegerField(db_index=True)
+    score = models.DecimalField(max_digits=6, decimal_places=2)
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default="draft", db_index=True)
+    graded_by_user_id = models.IntegerField(db_index=True)
+    graded_at = models.DateTimeField(db_index=True)
+
+    class Meta:
+        db_table = "lms_course_submission_grade"
+        ordering = ["-graded_at"]
+        indexes = [
+            models.Index(fields=["assignment", "student_user_id"], name="lms_grd_asg_std_idx"),
+            models.Index(fields=["assignment", "status"], name="lms_grd_asg_status_idx"),
+            models.Index(fields=["graded_by_user_id", "graded_at"], name="lms_grd_by_date_idx"),
+        ]
+
+    def __str__(self) -> str:
+        return (
+            f"Grade {self.score} for Submission({self.submission_id}) "
+            f"by Grader({self.graded_by_user_id})"
+        )

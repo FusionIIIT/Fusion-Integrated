@@ -17,6 +17,7 @@ from modules.lms.api.views import (
     CourseMaterialDownloadView,
     CourseMaterialListView,
     CourseSubmissionDownloadView,
+    CourseSubmissionGradeView,
     CourseSubmissionMineView,
     CourseWorkspaceDetailView,
 )
@@ -102,5 +103,10 @@ urlpatterns = [
         "courses/<str:code>/assignments/<int:assignment_id>/submissions/<int:submission_id>/download",
         CourseSubmissionDownloadView.as_view(),
         name="course-assignment-submission-download",
+    ),
+    path(
+        "courses/<str:code>/assignments/<int:assignment_id>/submissions/<int:submission_id>/grade",
+        CourseSubmissionGradeView.as_view(),
+        name="course-assignment-submission-grade",
     ),
 ]

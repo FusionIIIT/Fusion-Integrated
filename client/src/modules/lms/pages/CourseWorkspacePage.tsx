@@ -13,6 +13,7 @@ import {
   Group,
   Loader,
   Modal,
+  NumberInput,
   Paper,
   Select,
   SimpleGrid,
@@ -59,6 +60,7 @@ import { StatusBadge } from "../../../ui/components/StatusBadge";
 import {
   type CourseAssignmentItem,
   type CourseMaterialItem,
+  type CourseSubmissionsListEntry,
   type CourseWorkspaceDetail,
   type CreateAssignmentPayload,
   type CreateMaterialPayload,
@@ -79,6 +81,7 @@ import {
   useDeleteMaterial,
   useGrantExtension,
   usePostCourseAnnouncement,
+  useRecordSubmissionGrade,
   useRevokeExtension,
   useStudentSubmission,
   useSubmitAssignment,
@@ -903,6 +906,139 @@ function SubmitAssignmentModal({
   );
 }
 
+interface GradeSubmissionModalProps {
+  opened: boolean;
+  onClose: () => void;
+  courseCode: string;
+  assignment: CourseAssignmentItem;
+  target: CourseSubmissionsListEntry;
+}
+
+function GradeSubmissionModal({
+  opened,
+  onClose,
+  courseCode,
+  assignment,
+  target,
+}: GradeSubmissionModalProps) {
+  const [score, setScore] = useState<number | string>(
+    target.grade ? target.grade.score : "",
+  );
+  const [error, setError] = useState<string | null>(null);
+  const recordGrade = useRecordSubmissionGrade();
+
+  const maxPoints = Number(assignment.points_possible) || 0;
+
+  useEffect(() => {
+    setScore(target.grade ? target.grade.score : "");
+    setError(null);
+  }, [target]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!target.submission) return;
+    setError(null);
+
+    const num = typeof score === "string" ? parseFloat(score) : score;
+    if (isNaN(num)) {
+      setError("Please enter a valid numeric score.");
+      return;
+    }
+    if (num < 0 || num > maxPoints) {
+      setError(`Score must be between 0 and ${maxPoints}.`);
+      return;
+    }
+
+    try {
+      await recordGrade.mutateAsync({
+        code: courseCode,
+        assignmentId: assignment.id,
+        submissionId: target.submission.id,
+        body: { score: num },
+      });
+      notifications.show({
+        title: "Grade Recorded",
+        message: `Grade of ${num} / ${maxPoints} saved as Draft for ${target.student_name}.`,
+        color: "green",
+      });
+      onClose();
+    } catch (err) {
+      setError(errorMessage(err));
+    }
+  };
+
+  return (
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title={`Evaluate Submission — ${target.student_name}`}
+      size="md"
+      centered
+    >
+      <form onSubmit={handleSubmit}>
+        <Stack gap="md">
+          <Paper p="sm" withBorder radius="sm" bg="gray.0">
+            <Text size="xs" c="dimmed">Student</Text>
+            <Text size="sm" fw={600}>
+              {target.student_name} ({target.student_email || `ID: ${target.student_user_id}`})
+            </Text>
+            <Group mt="xs" gap="xs">
+              <Badge size="xs" color="blue">Attempt #{target.submission?.attempt_number ?? 1}</Badge>
+              {target.status === "late" && <Badge size="xs" color="orange">Late Submission</Badge>}
+              <Text size="xs" c="dimmed">
+                Submitted: {target.submitted_at ? new Date(target.submitted_at).toLocaleString() : "—"}
+              </Text>
+            </Group>
+          </Paper>
+
+          <Alert color="blue" title="Draft Grade Notice">
+            <Text size="xs">
+              All evaluations are saved in <strong>Draft</strong> status. Draft grades are strictly hidden from students until faculty releases them.
+            </Text>
+          </Alert>
+
+          {error && (
+            <Alert color="red" title="Grading Error">
+              {error}
+            </Alert>
+          )}
+
+          <NumberInput
+            label={`Score (out of ${maxPoints})`}
+            description="Enter points awarded. Up to 2 decimal places allowed."
+            placeholder="e.g. 85.50"
+            min={0}
+            max={maxPoints}
+            step={0.5}
+            decimalScale={2}
+            required
+            value={score}
+            onChange={(val) => setScore(val)}
+          />
+
+          {target.grade && (
+            <Paper p="xs" withBorder radius="sm" bg="blue.0">
+              <Text size="xs" c="dimmed">
+                Previously evaluated by {target.grade.graded_by_name || "Staff"} on{" "}
+                {target.grade.graded_at ? new Date(target.grade.graded_at).toLocaleString() : "—"}
+              </Text>
+            </Paper>
+          )}
+
+          <Group justify="flex-end" mt="md">
+            <Button variant="default" onClick={onClose} disabled={recordGrade.isPending}>
+              Cancel
+            </Button>
+            <Button type="submit" loading={recordGrade.isPending}>
+              {target.grade ? "Update Grade" : "Save Grade"}
+            </Button>
+          </Group>
+        </Stack>
+      </form>
+    </Modal>
+  );
+}
+
 interface SubmissionsListModalProps {
   opened: boolean;
   onClose: () => void;
@@ -923,6 +1059,7 @@ function SubmissionsListModal({
   );
 
   const [selectedTextContent, setSelectedTextContent] = useState<string | null>(null);
+  const [gradingTarget, setGradingTarget] = useState<CourseSubmissionsListEntry | null>(null);
 
   if (!assignment) return null;
 
@@ -978,6 +1115,8 @@ function SubmissionsListModal({
                   <Table.Th>Attempts</Table.Th>
                   <Table.Th>Submitted At</Table.Th>
                   <Table.Th>Submission Work</Table.Th>
+                  <Table.Th>Grade / Score</Table.Th>
+                  <Table.Th>Actions</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -1040,6 +1179,48 @@ function SubmissionsListModal({
                           <Text size="xs" c="dimmed">—</Text>
                         )}
                       </Table.Td>
+                      <Table.Td>
+                        {sub.submission ? (
+                          sub.grade ? (
+                            <Stack gap={2}>
+                              <Group gap="xs">
+                                <Badge color="blue" variant="filled" size="sm">
+                                  {sub.grade.score} / {assignment.points_possible}
+                                </Badge>
+                                <Badge color="gray" variant="outline" size="xs">
+                                  Draft
+                                </Badge>
+                              </Group>
+                              {sub.grade.graded_by_name && (
+                                <Text size="xs" c="dimmed">
+                                  By {sub.grade.graded_by_name}
+                                </Text>
+                              )}
+                            </Stack>
+                          ) : (
+                            <Badge color="gray" variant="light" size="sm">
+                              Not Graded
+                            </Badge>
+                          )
+                        ) : (
+                          <Text size="xs" c="dimmed">—</Text>
+                        )}
+                      </Table.Td>
+                      <Table.Td>
+                        {sub.submission ? (
+                          <Button
+                            size="xs"
+                            variant={sub.grade ? "light" : "filled"}
+                            color={sub.grade ? "violet" : "blue"}
+                            leftSection={sub.grade ? <FaEdit size={12} /> : undefined}
+                            onClick={() => setGradingTarget(sub)}
+                          >
+                            {sub.grade ? "Edit Grade" : "Grade"}
+                          </Button>
+                        ) : (
+                          <Text size="xs" c="dimmed">—</Text>
+                        )}
+                      </Table.Td>
                     </Table.Tr>
                   );
                 })}
@@ -1062,6 +1243,16 @@ function SubmissionsListModal({
               </Text>
             </Paper>
           </Modal>
+        )}
+
+        {gradingTarget && (
+          <GradeSubmissionModal
+            opened={Boolean(gradingTarget)}
+            onClose={() => setGradingTarget(null)}
+            courseCode={courseCode}
+            assignment={assignment}
+            target={gradingTarget}
+          />
         )}
 
         <Group justify="flex-end" mt="md">

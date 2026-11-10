@@ -8,6 +8,7 @@ from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedEr
 from fusion_auth.principal import Principal
 from modules.lms.contracts import (
     get_assignment_deadlines,
+    get_assignment_grades,
     get_assignment_submissions,
     get_course_announcements,
     get_course_assignments,
@@ -17,6 +18,7 @@ from modules.lms.domain.entities import (
     CourseRole,
     CourseStatus,
     DeadlineWindowStatus,
+    GradeStatus,
     MaterialStatus,
     MaterialType,
     SectionType,
@@ -31,6 +33,7 @@ from modules.lms.models import (
     CourseMaterial,
     CourseMembership,
     CourseSubmission,
+    CourseSubmissionGrade,
 )
 from modules.lms.selectors.announcements import (
     get_course_announcement_detail,
@@ -45,6 +48,7 @@ from modules.lms.selectors.deadlines import (
     get_assignment_deadline_info,
     list_assignment_extensions,
 )
+from modules.lms.selectors.grades import get_submission_grade
 from modules.lms.selectors.submissions import (
     get_student_submission_history,
     get_submission_for_download,
@@ -54,6 +58,7 @@ from modules.lms.services import announcements as announcement_service
 from modules.lms.services import assignments as assignment_service
 from modules.lms.services import courses as course_service
 from modules.lms.services import deadlines as deadline_service
+from modules.lms.services import grades as grade_service
 from modules.lms.services import materials as material_service
 from modules.lms.services import submissions as submission_service
 
@@ -1555,3 +1560,336 @@ def test_contract_get_assignment_submissions():
     assert results[99999] == []
     assert results[asg.id][0]["attempt_number"] == 1
     assert results[asg.id][0]["status"] == "submitted"
+
+
+@pytest.mark.django_db
+def test_grading_service_faculty_and_ta_evaluation():
+    course = Course.objects.create(code="CS950", title="Networks", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    CourseMembership.objects.create(course=course, user_id=1, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=2, role=CourseRole.TA)
+    CourseMembership.objects.create(course=course, user_id=300, role=CourseRole.STUDENT)
+
+    faculty_principal = make_principal(
+        user_id=1,
+        role="faculty",
+        permissions=("lms.grade.grade", "lms.grade.view", "lms.assignment.view"),
+    )
+    ta_principal = make_principal(
+        user_id=2,
+        role="ta",
+        permissions=("lms.grade.grade", "lms.grade.view", "lms.assignment.view"),
+    )
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Routing Lab",
+        points_possible=Decimal("100.00"),
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=1,
+        due_at=now + timedelta(days=2),
+    )
+
+    sub = CourseSubmission.objects.create(
+        assignment=asg,
+        student_user_id=300,
+        submission_type=SubmissionType.TEXT,
+        status=SubmissionStatus.SUBMITTED,
+        submitted_at=now,
+        content_text="BGP routing table config",
+        attempt_number=1,
+        is_latest=True,
+    )
+
+    # 1. Faculty grades submission
+    grade1 = grade_service.record_submission_grade(
+        actor=faculty_principal,
+        course_code="CS950",
+        assignment_id=asg.id,
+        submission_id=sub.id,
+        score="92.50",
+    )
+    assert grade1.score == Decimal("92.50")
+    assert grade1.status == GradeStatus.DRAFT
+    assert grade1.graded_by_user_id == 1
+    assert grade1.submission_id == sub.id
+    assert grade1.assignment_id == asg.id
+    assert grade1.student_user_id == 300
+
+    # 2. TA updates/re-grades submission (authorized under CFR-LMS-010, AFR-LMS-010.2)
+    grade2 = grade_service.record_submission_grade(
+        actor=ta_principal,
+        course_code="CS950",
+        assignment_id=asg.id,
+        submission_id=sub.id,
+        score="95.00",
+    )
+    assert grade2.id == grade1.id
+    assert grade2.score == Decimal("95.00")
+    assert grade2.status == GradeStatus.DRAFT
+    assert grade2.graded_by_user_id == 2  # Attribution updated to TA
+
+
+@pytest.mark.django_db
+def test_grading_service_score_validation_and_errors():
+    course = Course.objects.create(code="CS951", title="Databases", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    CourseMembership.objects.create(course=course, user_id=1, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=310, role=CourseRole.STUDENT)
+
+    faculty_principal = make_principal(
+        user_id=1,
+        role="faculty",
+        permissions=("lms.grade.grade", "lms.grade.view", "lms.assignment.view"),
+    )
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="SQL Quiz",
+        points_possible=Decimal("50.00"),
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=1,
+        due_at=now + timedelta(days=2),
+    )
+
+    sub = CourseSubmission.objects.create(
+        assignment=asg,
+        student_user_id=310,
+        submission_type=SubmissionType.TEXT,
+        status=SubmissionStatus.SUBMITTED,
+        submitted_at=now,
+        content_text="SELECT * FROM students;",
+        attempt_number=1,
+        is_latest=True,
+    )
+
+    # Score exceeds points_possible
+    with pytest.raises(ConflictError, match="cannot exceed maximum points possible"):
+        grade_service.record_submission_grade(
+            actor=faculty_principal,
+            course_code="CS951",
+            assignment_id=asg.id,
+            submission_id=sub.id,
+            score="50.50",
+        )
+
+    # Negative score
+    with pytest.raises(ConflictError, match="cannot be negative"):
+        grade_service.record_submission_grade(
+            actor=faculty_principal,
+            course_code="CS951",
+            assignment_id=asg.id,
+            submission_id=sub.id,
+            score="-1.00",
+        )
+
+    # Non-existent submission
+    with pytest.raises(NotFoundError, match="Student submission not found"):
+        grade_service.record_submission_grade(
+            actor=faculty_principal,
+            course_code="CS951",
+            assignment_id=asg.id,
+            submission_id=99999,
+            score="40.00",
+        )
+
+
+@pytest.mark.django_db
+def test_grading_service_authorization_and_visibility():
+    course = Course.objects.create(code="CS952", title="Security", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    CourseMembership.objects.create(course=course, user_id=1, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=2, role=CourseRole.TA)
+    CourseMembership.objects.create(course=course, user_id=320, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=course, user_id=321, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=course, user_id=330, role=CourseRole.OBSERVER)
+
+    faculty_principal = make_principal(
+        user_id=1,
+        role="faculty",
+        permissions=("lms.grade.grade", "lms.grade.view", "lms.assignment.view"),
+    )
+    ta_principal = make_principal(
+        user_id=2,
+        role="ta",
+        permissions=("lms.grade.grade", "lms.grade.view", "lms.assignment.view"),
+    )
+    s1_principal = make_principal(
+        user_id=320,
+        role="student",
+        permissions=("lms.submission.submit", "lms.submission.view", "lms.grade.view", "lms.assignment.view"),
+    )
+    s2_principal = make_principal(
+        user_id=321,
+        role="student",
+        permissions=("lms.submission.submit", "lms.submission.view", "lms.grade.view", "lms.assignment.view"),
+    )
+    obs_principal = make_principal(
+        user_id=330,
+        role="observer",
+        permissions=("lms.assignment.view",),
+    )
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Crypto Lab",
+        points_possible=Decimal("100.00"),
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=1,
+        due_at=now + timedelta(days=2),
+    )
+
+    sub = CourseSubmission.objects.create(
+        assignment=asg,
+        student_user_id=320,
+        submission_type=SubmissionType.TEXT,
+        status=SubmissionStatus.SUBMITTED,
+        submitted_at=now,
+        content_text="RSA key exchange",
+        attempt_number=1,
+        is_latest=True,
+    )
+
+    # Student without grade permission cannot grade (403 PermissionDeniedError)
+    with pytest.raises(PermissionDeniedError):
+        grade_service.record_submission_grade(
+            actor=s1_principal,
+            course_code="CS952",
+            assignment_id=asg.id,
+            submission_id=sub.id,
+            score="100.00",
+        )
+
+    # Observer cannot grade (403 PermissionDeniedError)
+    with pytest.raises(PermissionDeniedError):
+        grade_service.record_submission_grade(
+            actor=obs_principal,
+            course_code="CS952",
+            assignment_id=asg.id,
+            submission_id=sub.id,
+            score="100.00",
+        )
+
+    # Student even with permission granted cannot grade because of role constraint
+    s_with_perm = make_principal(
+        user_id=320,
+        role="student",
+        permissions=("lms.grade.grade", "lms.grade.view"),
+    )
+    with pytest.raises(PermissionDeniedError, match="Only Faculty and Teaching Assistants"):
+        grade_service.record_submission_grade(
+            actor=s_with_perm,
+            course_code="CS952",
+            assignment_id=asg.id,
+            submission_id=sub.id,
+            score="100.00",
+        )
+
+    # Faculty grades
+    grade_service.record_submission_grade(
+        actor=faculty_principal,
+        course_code="CS952",
+        assignment_id=asg.id,
+        submission_id=sub.id,
+        score="88.00",
+    )
+
+    # 1. Faculty can view draft grade
+    g_fac = get_submission_grade(
+        principal=faculty_principal,
+        course_code="CS952",
+        assignment_id=asg.id,
+        submission_id=sub.id,
+    )
+    assert g_fac is not None
+    assert g_fac["score"] == "88.00"
+    assert g_fac["status"] == "draft"
+
+    # 2. TA can view draft grade
+    g_ta = get_submission_grade(
+        principal=ta_principal,
+        course_code="CS952",
+        assignment_id=asg.id,
+        submission_id=sub.id,
+    )
+    assert g_ta is not None
+    assert g_ta["score"] == "88.00"
+
+    # 3. Student CANNOT view draft grade (hidden per BR-LMS-016, AFR-LMS-011.2)
+    assert (
+        get_submission_grade(
+            principal=s1_principal,
+            course_code="CS952",
+            assignment_id=asg.id,
+            submission_id=sub.id,
+        )
+        is None
+    )
+
+    # 4. Peer student cannot view grade
+    assert (
+        get_submission_grade(
+            principal=s2_principal,
+            course_code="CS952",
+            assignment_id=asg.id,
+            submission_id=sub.id,
+        )
+        is None
+    )
+
+    # 5. Observer cannot view grade (CFR-LMS-015, AFR-LMS-015.3)
+    assert (
+        get_submission_grade(
+            principal=obs_principal,
+            course_code="CS952",
+            assignment_id=asg.id,
+            submission_id=sub.id,
+        )
+        is None
+    )
+
+
+@pytest.mark.django_db
+def test_contract_get_assignment_grades():
+    course = Course.objects.create(code="CS953", title="Theory", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Turing Machines",
+        points_possible=Decimal("100.00"),
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=1,
+        due_at=now + timedelta(days=1),
+    )
+
+    sub = CourseSubmission.objects.create(
+        assignment=asg,
+        student_user_id=340,
+        submission_type=SubmissionType.TEXT,
+        status="submitted",
+        submitted_at=now,
+        content_text="Decidability proofs",
+        attempt_number=1,
+        is_latest=True,
+    )
+
+    CourseSubmissionGrade.objects.create(
+        submission=sub,
+        assignment=asg,
+        student_user_id=340,
+        score=Decimal("94.00"),
+        status="draft",
+        graded_by_user_id=1,
+        graded_at=now,
+    )
+
+    results = get_assignment_grades([asg.id, 99999], student_user_id=340)
+    assert asg.id in results
+    assert results[99999] == []
+    assert len(results[asg.id]) == 1
+    assert results[asg.id][0]["score"] == "94.00"
+    assert results[asg.id][0]["graded_by_user_id"] == 1

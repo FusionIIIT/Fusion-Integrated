@@ -306,6 +306,7 @@ class CourseSubmissionsListEntrySerializer(serializers.Serializer):
     attempt_number = serializers.IntegerField()
     is_latest = serializers.BooleanField()
     created_at = serializers.CharField()
+    grade = serializers.DictField(allow_null=True, required=False)
 
 
 class CourseSubmissionsListResponseSerializer(serializers.Serializer):
@@ -317,3 +318,23 @@ class CourseSubmissionsListResponseSerializer(serializers.Serializer):
     on_time_count = serializers.IntegerField()
     late_count = serializers.IntegerField()
     submissions = CourseSubmissionsListEntrySerializer(many=True)
+
+
+class CourseSubmissionGradeDetailSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    submission_id = serializers.IntegerField()
+    assignment_id = serializers.IntegerField()
+    student_user_id = serializers.IntegerField()
+    score = serializers.CharField()
+    points_possible = serializers.CharField()
+    status = serializers.CharField()
+    graded_by_user_id = serializers.IntegerField()
+    graded_by_name = serializers.CharField()
+    graded_by_email = serializers.CharField(allow_blank=True)
+    graded_at = serializers.CharField()
+    created_at = serializers.CharField()
+    updated_at = serializers.CharField()
+
+
+class RecordSubmissionGradeSerializer(serializers.Serializer):
+    score = serializers.DecimalField(max_digits=6, decimal_places=2, min_value=0)

@@ -25,6 +25,7 @@ from modules.lms.api.serializers import (
     CourseMaterialsResponseSerializer,
     CourseMaterialUpdateSerializer,
     CourseSubmissionCreateSerializer,
+    CourseSubmissionGradeDetailSerializer,
     CourseSubmissionHistorySerializer,
     CourseSubmissionItemSerializer,
     CourseSubmissionsListResponseSerializer,
@@ -32,6 +33,7 @@ from modules.lms.api.serializers import (
     CourseWorkspaceDetailSerializer,
     CourseWorkspaceUpdateSerializer,
     GrantExtensionSerializer,
+    RecordSubmissionGradeSerializer,
     UpdateDeadlineWindowSerializer,
 )
 from modules.lms.selectors.announcements import (
@@ -48,6 +50,7 @@ from modules.lms.selectors.deadlines import (
     get_assignment_deadline_info,
     list_assignment_extensions,
 )
+from modules.lms.selectors.grades import get_submission_grade
 from modules.lms.selectors.materials import (
     get_course_material_detail,
     get_material_for_download,
@@ -63,6 +66,7 @@ from modules.lms.services import announcements as announcement_service
 from modules.lms.services import assignments as assignment_service
 from modules.lms.services import courses as course_service
 from modules.lms.services import deadlines as deadline_service
+from modules.lms.services import grades as grade_service
 from modules.lms.services import materials as material_service
 from modules.lms.services import submissions as submission_service
 
@@ -79,6 +83,8 @@ P_DDL_VIEW = "lms.deadline.view"
 P_DDL_MANAGE = "lms.deadline.manage"
 P_SUB_VIEW = "lms.submission.view"
 P_SUB_SUBMIT = "lms.submission.submit"
+P_GRD_VIEW = "lms.grade.view"
+P_GRD_GRADE = "lms.grade.grade"
 
 
 
@@ -721,3 +727,58 @@ class CourseSubmissionDownloadView(APIView):
 
         f_name = sub.file_name or os.path.basename(sub.file.name)
         return FileResponse(sub.file.open("rb"), as_attachment=True, filename=f_name)
+
+
+class CourseSubmissionGradeView(APIView):
+    """Retrieve or record/update evaluation score for a student submission."""
+
+    def get_permissions(self):
+        perm = P_GRD_VIEW if self.request.method == "GET" else P_GRD_GRADE
+        return [MODULE(), HasPermission(perm)()]
+
+    @extend_schema(
+        operation_id="v1_lms_course_assignment_submission_grade_retrieve",
+        summary="Retrieve submission grade and evaluation details",
+        tags=["lms"],
+        responses={200: CourseSubmissionGradeDetailSerializer},
+    )
+    def get(self, request, code: str, assignment_id: int, submission_id: int):
+        grade = get_submission_grade(
+            principal=request.principal,
+            course_code=code,
+            assignment_id=assignment_id,
+            submission_id=submission_id,
+        )
+        if grade is None:
+            raise NotFoundError("Evaluation record not found or access denied.")
+        return Response(CourseSubmissionGradeDetailSerializer(grade).data)
+
+    @extend_schema(
+        operation_id="v1_lms_course_assignment_submission_grade_record",
+        summary="Record or update submission evaluation score (Faculty and TA only)",
+        tags=["lms"],
+        request=RecordSubmissionGradeSerializer,
+        responses={201: CourseSubmissionGradeDetailSerializer},
+    )
+    def post(self, request, code: str, assignment_id: int, submission_id: int):
+        payload = RecordSubmissionGradeSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+
+        grade_service.record_submission_grade(
+            actor=request.principal,
+            course_code=code,
+            assignment_id=assignment_id,
+            submission_id=submission_id,
+            score=payload.validated_data["score"],
+        )
+
+        grade_detail = get_submission_grade(
+            principal=request.principal,
+            course_code=code,
+            assignment_id=assignment_id,
+            submission_id=submission_id,
+        )
+        return Response(
+            CourseSubmissionGradeDetailSerializer(grade_detail).data,
+            status=status.HTTP_201_CREATED,
+        )

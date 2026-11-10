@@ -162,14 +162,20 @@ def list_assignment_submissions(
         return None
 
     latest_submissions = list(
-        CourseSubmission.objects.filter(assignment=assignment, is_latest=True).order_by(
-            "-submitted_at"
-        )
+        CourseSubmission.objects.filter(assignment=assignment, is_latest=True)
+        .select_related("grade")
+        .order_by("-submitted_at")
     )
 
-    # Resolve student facts via directory contract lookup
-    user_ids = list({s.student_user_id for s in latest_submissions})
-    user_facts = directory.get_users(user_ids) if user_ids else {}
+    # Resolve student and grader facts via directory contract lookup
+    student_user_ids = {s.student_user_id for s in latest_submissions}
+    grader_user_ids = {
+        s.grade.graded_by_user_id
+        for s in latest_submissions
+        if hasattr(s, "grade") and s.grade
+    }
+    all_user_ids = list(student_user_ids | grader_user_ids)
+    user_facts = directory.get_users(all_user_ids) if all_user_ids else {}
 
     items = []
     on_time_count = 0
@@ -181,6 +187,29 @@ def list_assignment_submissions(
             on_time_count += 1
         elif s.status == SubmissionStatus.LATE:
             late_count += 1
+
+        grade_obj = getattr(s, "grade", None)
+        grade_dict = None
+        if grade_obj:
+            grader_info = user_facts.get(grade_obj.graded_by_user_id)
+            g_name = (
+                grader_info.display_name
+                if grader_info
+                else f"User {grade_obj.graded_by_user_id}"
+            )
+            grade_dict = {
+                "id": grade_obj.id,
+                "submission_id": grade_obj.submission_id,
+                "assignment_id": grade_obj.assignment_id,
+                "student_user_id": grade_obj.student_user_id,
+                "score": str(grade_obj.score),
+                "points_possible": str(assignment.points_possible),
+                "status": grade_obj.status,
+                "graded_by_user_id": grade_obj.graded_by_user_id,
+                "graded_by_name": g_name,
+                "graded_by_email": grader_info.email if grader_info else "",
+                "graded_at": grade_obj.graded_at.isoformat() if grade_obj.graded_at else "",
+            }
 
         items.append({
             "id": s.id,
@@ -199,6 +228,7 @@ def list_assignment_submissions(
             "attempt_number": s.attempt_number,
             "is_latest": s.is_latest,
             "created_at": s.created_at.isoformat(),
+            "grade": grade_dict,
         })
 
     return {

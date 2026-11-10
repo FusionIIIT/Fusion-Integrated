@@ -566,6 +566,81 @@ paths:
       responses:
         '200':
           description: No response body
+  /api/v1/lms/courses/{code}/assignments/{assignment_id}/submissions/{submission_id}/grade:
+    get:
+      operationId: v1_lms_course_assignment_submission_grade_retrieve
+      description: Retrieve or record/update evaluation score for a student submission.
+      summary: Retrieve submission grade and evaluation details
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: submission_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseSubmissionGradeDetail'
+          description: ''
+    post:
+      operationId: v1_lms_course_assignment_submission_grade_record
+      description: Retrieve or record/update evaluation score for a student submission.
+      summary: Record or update submission evaluation score (Faculty and TA only)
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: submission_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - lms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordSubmissionGrade'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RecordSubmissionGrade'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RecordSubmissionGrade'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseSubmissionGradeDetail'
+          description: ''
   /api/v1/lms/courses/{code}/assignments/{assignment_id}/submissions/mine:
     get:
       operationId: v1_lms_course_assignment_submission_mine
@@ -3539,6 +3614,49 @@ components:
           default: ''
       required:
       - submission_type
+    CourseSubmissionGradeDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        submission_id:
+          type: integer
+        assignment_id:
+          type: integer
+        student_user_id:
+          type: integer
+        score:
+          type: string
+        points_possible:
+          type: string
+        status:
+          type: string
+        graded_by_user_id:
+          type: integer
+        graded_by_name:
+          type: string
+        graded_by_email:
+          type: string
+        graded_at:
+          type: string
+        created_at:
+          type: string
+        updated_at:
+          type: string
+      required:
+      - assignment_id
+      - created_at
+      - graded_at
+      - graded_by_email
+      - graded_by_name
+      - graded_by_user_id
+      - id
+      - points_possible
+      - score
+      - status
+      - student_user_id
+      - submission_id
+      - updated_at
     CourseSubmissionHistory:
       type: object
       properties:
@@ -3657,6 +3775,10 @@ components:
           type: boolean
         created_at:
           type: string
+        grade:
+          type: object
+          additionalProperties: {}
+          nullable: true
       required:
       - assignment_id
       - attempt_number
@@ -4822,6 +4944,15 @@ components:
         * `consent_failure` - consent_failure
         * `code_of_conduct` - code_of_conduct
         * `misrepresentation` - misrepresentation
+    RecordSubmissionGrade:
+      type: object
+      properties:
+        score:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+      required:
+      - score
     RecruiterAccept:
       type: object
       properties:

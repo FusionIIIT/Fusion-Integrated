@@ -178,3 +178,24 @@ def get_assignment_submissions(
     for sub in qs.order_by("-submitted_at"):
         results[sub.assignment_id].append(_submission_to_dict(sub))
     return results
+
+
+def get_assignment_grades(
+    assignment_ids: Sequence[int],
+    student_user_id: int | None = None,
+) -> dict[int, list[dict[str, Any]]]:
+    """Retrieve evaluation grades for assignments (contracts_are_plural)."""
+    ids = {int(aid) for aid in assignment_ids if aid is not None}
+    if not ids:
+        return {}
+    from modules.lms.models import CourseSubmissionGrade
+    from modules.lms.selectors.grades import _grade_to_dict
+
+    qs = CourseSubmissionGrade.objects.filter(assignment_id__in=ids).select_related("assignment")
+    if student_user_id is not None:
+        qs = qs.filter(student_user_id=student_user_id)
+
+    results: dict[int, list[dict[str, Any]]] = {aid: [] for aid in ids}
+    for g in qs.order_by("-graded_at"):
+        results[g.assignment_id].append(_grade_to_dict(g))
+    return results

@@ -15,7 +15,13 @@ from modules.lms.domain.entities import (
     MaterialType,
     SubmissionType,
 )
-from modules.lms.models import Course, CourseAssignment, CourseMaterial, CourseMembership
+from modules.lms.models import (
+    Course,
+    CourseAssignment,
+    CourseMaterial,
+    CourseMembership,
+    CourseSubmission,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -32,6 +38,8 @@ DL_VIEW = "lms.deadline.view"
 DL_MANAGE = "lms.deadline.manage"
 SUB_VIEW = "lms.submission.view"
 SUB_SUBMIT = "lms.submission.submit"
+GRD_VIEW = "lms.grade.view"
+GRD_GRADE = "lms.grade.grade"
 URL_COURSES = "/api/v1/lms/courses"
 
 
@@ -1098,3 +1106,227 @@ def test_submission_api_deadline_closed_and_mismatch(stub_iam):
     )
     assert r_mismatch.status_code == 409
     assert "does not match" in str(r_mismatch.data)
+
+
+def test_grading_api_faculty_and_ta_flow(stub_iam):
+    course = Course.objects.create(code="CS905", title="Distributed Systems", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    CourseMembership.objects.create(course=course, user_id=5001, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=5002, role=CourseRole.TA)
+    CourseMembership.objects.create(course=course, user_id=5010, role=CourseRole.STUDENT)
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Raft Consensus",
+        points_possible=100,
+        submission_type=SubmissionType.TEXT,
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=5001,
+        due_at=now + timedelta(days=2),
+    )
+
+    sub = CourseSubmission.objects.create(
+        assignment=asg,
+        student_user_id=5010,
+        submission_type=SubmissionType.TEXT,
+        status="submitted",
+        submitted_at=now,
+        content_text="Raft leader election code",
+        attempt_number=1,
+        is_latest=True,
+    )
+
+    def fac_c():
+        return api_client(
+            stub_iam,
+            user_id=5001,
+            role="faculty",
+            permissions=(VIEW, ASG_VIEW, SUB_VIEW, GRD_VIEW, GRD_GRADE),
+        )
+
+    def ta_c():
+        return api_client(
+            stub_iam,
+            user_id=5002,
+            role="ta",
+            permissions=(VIEW, ASG_VIEW, SUB_VIEW, GRD_VIEW, GRD_GRADE),
+        )
+
+    # 1. Faculty grades submission
+    rf_post = fac_c().post(
+        f"{URL_COURSES}/CS905/assignments/{asg.id}/submissions/{sub.id}/grade",
+        {"score": "88.50"},
+        format="json",
+    )
+    assert rf_post.status_code == 201
+    assert rf_post.data["score"] == "88.50"
+    assert rf_post.data["points_possible"] == "100.00"
+    assert rf_post.data["status"] == "draft"
+    assert rf_post.data["graded_by_user_id"] == 5001
+
+    # 2. Faculty retrieves grade
+    rf_get = fac_c().get(
+        f"{URL_COURSES}/CS905/assignments/{asg.id}/submissions/{sub.id}/grade"
+    )
+    assert rf_get.status_code == 200
+    assert rf_get.data["score"] == "88.50"
+
+    # 3. TA updates grade
+    rta_post = ta_c().post(
+        f"{URL_COURSES}/CS905/assignments/{asg.id}/submissions/{sub.id}/grade",
+        {"score": "92.00"},
+        format="json",
+    )
+    assert rta_post.status_code == 201
+    assert rta_post.data["score"] == "92.00"
+    assert rta_post.data["graded_by_user_id"] == 5002
+
+    # 4. TA retrieves grade
+    rta_get = ta_c().get(
+        f"{URL_COURSES}/CS905/assignments/{asg.id}/submissions/{sub.id}/grade"
+    )
+    assert rta_get.status_code == 200
+    assert rta_get.data["score"] == "92.00"
+
+
+def test_grading_api_student_and_observer_restrictions(stub_iam):
+    course = Course.objects.create(code="CS906", title="Cloud Computing", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    CourseMembership.objects.create(course=course, user_id=5020, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=5030, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=course, user_id=5040, role=CourseRole.OBSERVER)
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="MapReduce Lab",
+        points_possible=100,
+        submission_type=SubmissionType.TEXT,
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=5020,
+        due_at=now + timedelta(days=2),
+    )
+
+    sub = CourseSubmission.objects.create(
+        assignment=asg,
+        student_user_id=5030,
+        submission_type=SubmissionType.TEXT,
+        status="submitted",
+        submitted_at=now,
+        content_text="Mapper and Reducer implementation",
+        attempt_number=1,
+        is_latest=True,
+    )
+
+    def fac_c():
+        return api_client(
+            stub_iam,
+            user_id=5020,
+            role="faculty",
+            permissions=(VIEW, ASG_VIEW, SUB_VIEW, GRD_VIEW, GRD_GRADE),
+        )
+
+    def std_c():
+        return api_client(
+            stub_iam,
+            user_id=5030,
+            role="student",
+            permissions=(VIEW, ASG_VIEW, SUB_VIEW, SUB_SUBMIT, GRD_VIEW),
+        )
+
+    def obs_c():
+        return api_client(
+            stub_iam,
+            user_id=5040,
+            role="observer",
+            permissions=(VIEW, ASG_VIEW, SUB_VIEW),
+        )
+
+    # 1. Student cannot grade -> 403 Forbidden
+    r_std_post = std_c().post(
+        f"{URL_COURSES}/CS906/assignments/{asg.id}/submissions/{sub.id}/grade",
+        {"score": "100.00"},
+        format="json",
+    )
+    assert r_std_post.status_code == 403
+
+    # 2. Observer cannot grade -> 403 Forbidden
+    r_obs_post = obs_c().post(
+        f"{URL_COURSES}/CS906/assignments/{asg.id}/submissions/{sub.id}/grade",
+        {"score": "100.00"},
+        format="json",
+    )
+    assert r_obs_post.status_code == 403
+
+    # Faculty records grade
+    fac_c().post(
+        f"{URL_COURSES}/CS906/assignments/{asg.id}/submissions/{sub.id}/grade",
+        {"score": "80.00"},
+        format="json",
+    )
+
+    # 3. Student GET draft grade -> 404 (hidden until release, BR-LMS-016, AFR-LMS-011.2)
+    r_std_get = std_c().get(
+        f"{URL_COURSES}/CS906/assignments/{asg.id}/submissions/{sub.id}/grade"
+    )
+    assert r_std_get.status_code == 404
+
+    # 4. Observer GET grade -> 403 Forbidden
+    r_obs_get = obs_c().get(
+        f"{URL_COURSES}/CS906/assignments/{asg.id}/submissions/{sub.id}/grade"
+    )
+    assert r_obs_get.status_code == 403
+
+
+def test_grading_api_score_validation(stub_iam):
+    course = Course.objects.create(code="CS907", title="ML", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    CourseMembership.objects.create(course=course, user_id=5050, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=5060, role=CourseRole.STUDENT)
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Linear Regression",
+        points_possible=50,
+        submission_type=SubmissionType.TEXT,
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=5050,
+        due_at=now + timedelta(days=2),
+    )
+
+    sub = CourseSubmission.objects.create(
+        assignment=asg,
+        student_user_id=5060,
+        submission_type=SubmissionType.TEXT,
+        status="submitted",
+        submitted_at=now,
+        content_text="Gradient descent code",
+        attempt_number=1,
+        is_latest=True,
+    )
+
+    client = api_client(
+        stub_iam,
+        user_id=5050,
+        role="faculty",
+        permissions=(VIEW, ASG_VIEW, SUB_VIEW, GRD_VIEW, GRD_GRADE),
+    )
+
+    # Score exceeding points_possible (50) -> 409 Conflict
+    r_over = client.post(
+        f"{URL_COURSES}/CS907/assignments/{asg.id}/submissions/{sub.id}/grade",
+        {"score": "51.00"},
+        format="json",
+    )
+    assert r_over.status_code == 409
+    assert "cannot exceed maximum points possible" in str(r_over.data)
+
+    # Negative score -> 400 Bad Request (serializer min_value=0)
+    r_neg = client.post(
+        f"{URL_COURSES}/CS907/assignments/{asg.id}/submissions/{sub.id}/grade",
+        {"score": "-5.00"},
+        format="json",
+    )
+    assert r_neg.status_code == 400

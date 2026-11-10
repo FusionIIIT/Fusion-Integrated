@@ -29,6 +29,8 @@ For the intended taxonomy of modules not yet built, see
 | `lms.deadline.manage` | Configure submission windows and grant extensions | `faculty` |
 | `lms.submission.submit` | Submit assignment work (Student only) | `student` |
 | `lms.submission.view` | View assignment submissions (own for student, all for faculty/TA) | `faculty`, `staff`, `student` |
+| `lms.grade.view` | View assignment grades and evaluation records | `faculty`, `staff` |
+| `lms.grade.grade` | Evaluate and record grades for student submissions | `faculty`, `staff` |
 
 ## `placement_cell`
 
