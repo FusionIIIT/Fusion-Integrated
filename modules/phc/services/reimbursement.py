@@ -15,23 +15,23 @@ from modules.phc.domain.reimbursement import (
 from modules.phc.models import ReimbursementClaim, Prescription, ReimbursementPayment  # Import the ReimbursementPayment model
 from modules.phc.services.common import record_audit, notify
 
-def submit_claim(prescription_id: int, claimant_user_id: int) -> ReimbursementClaim:
-    """Submit a reimbursement claim."""
+@transaction.atomic
+def create_claim(claimant_user_id: int, claimant_kind: str, prescription_id: int, expense_date, claimed_amount, description: str) -> ReimbursementClaim:
+    """Create a reimbursement claim."""
     from django.conf import settings
-    from core.api.exceptions import BadRequestError  # Updated import
-
     window_days = getattr(settings, "PHC_REIMBURSEMENT_WINDOW_DAYS", 30)
     prescription = Prescription.objects.filter(id=prescription_id).first()
     if not prescription:
         raise NotFound("Prescription not found")  # PHC-BR-11
 
-    validate_submission(claimant_user_kind="faculty", prescription_patient_user_id=prescription.patient_user_id, expense_date=prescription.issued_on, window_days=window_days)
+    validate_submission(claimant_user_kind=claimant_kind, prescription_patient_user_id=prescription.patient_user_id, expense_date=expense_date, window_days=window_days)
 
     claim = ReimbursementClaim.objects.create(
         claimant_user_id=claimant_user_id,
         prescription=prescription,
-        expense_date=prescription.issued_on,
-        claimed_amount=0.0,  # This should be set based on the actual claim amount
+        expense_date=expense_date,
+        claimed_amount=claimed_amount,
+        description=description,
         status=PENDING_PHC_REVIEW,
     )
 
@@ -42,11 +42,12 @@ def submit_claim(prescription_id: int, claimant_user_id: int) -> ReimbursementCl
     return claim
 
 
-def advance_claim(claim_id: int, action: str, actor_user_id: int) -> ReimbursementClaim:
-    """Advance a reimbursement claim through review."""
+@transaction.atomic
+def transition_claim(claim_id: int, action: str, actor_user_id: int, actor_role: str, note: str = "") -> ReimbursementClaim:
+    """Transition a reimbursement claim through review."""
     from core.api.exceptions import BadRequestError  # Updated import
 
-    claim = ReimbursementClaim.objects.filter(id=claim_id).first()
+    claim = ReimbursementClaim.objects.select_for_update().filter(id=claim_id).first()
     if not claim:
         raise NotFound("Claim not found")  # PHC-BR-11
 
@@ -57,18 +58,19 @@ def advance_claim(claim_id: int, action: str, actor_user_id: int) -> Reimburseme
     claim.status = next_status
     claim.save()
 
-    record_audit(entity_type="ReimbursementClaim", entity_id=claim.id, action=action, actor_user_id=actor_user_id, from_status=claim.status, to_status=next_status)  # PHC-BR-09
+    record_audit(entity_type="ReimbursementClaim", entity_id=claim.id, action=action, actor_user_id=actor_user_id, from_status=claim.status, to_status=next_status, note=note)  # PHC-BR-09
 
     notify(recipient_user_id=claim.claimant_user_id, kind="claim_status_changed", message=f"Your claim status has been changed to {next_status}.")
 
     return claim
 
 
-def record_payment(claim_id: int, paid_on: str, reference: str, actor_user_id: int) -> ReimbursementClaim:
+@transaction.atomic
+def pay_claim(claim_id: int, actor_user_id: int, actor_role: str, paid_on, reference: str) -> ReimbursementPayment:
     """Record payment for a reimbursement claim."""
     from core.api.exceptions import BadRequestError  # Updated import
 
-    claim = ReimbursementClaim.objects.filter(id=claim_id).first()
+    claim = ReimbursementClaim.objects.select_for_update().filter(id=claim_id).first()
     if not claim:
         raise NotFound("Claim not found")  # PHC-BR-11
 
@@ -89,4 +91,4 @@ def record_payment(claim_id: int, paid_on: str, reference: str, actor_user_id: i
 
     notify(recipient_user_id=claim.claimant_user_id, kind="payment_recorded", message=f"Your claim has been paid on {paid_on} with reference {reference}.")
 
-    return claim
+    return payment
