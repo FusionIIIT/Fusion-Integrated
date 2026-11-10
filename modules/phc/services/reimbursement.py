@@ -9,8 +9,9 @@ from modules.phc.domain.reimbursement import (
     APPROVED_FOR_PAYMENT,
     REIMBURSED,
     REJECTED,
+    validate_submission,  # Import the validate_submission function
 )
-from modules.phc.models import ReimbursementClaim, Prescription
+from modules.phc.models import ReimbursementClaim, Prescription, ReimbursementPayment  # Import the ReimbursementPayment model
 from modules.phc.services.common import record_audit, notify
 
 def submit_claim(prescription_id: int, claimant_user_id: int) -> ReimbursementClaim:
