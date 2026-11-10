@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="8" skipped="0" tests="175" time="6.424" timestamp="2026-11-10T22:22:02.641619+05:30" hostname="Shl0k"><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_001_cfr_cms_001_nominal" time="2.886" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_002_cfr_cms_001_boundary" time="0.010" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_003_cfr_cms_002_nominal" time="0.012" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_004_cfr_cms_002_boundary" time="0.007" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_005_cfr_cms_003_nominal" time="0.010" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_006_cfr_cms_003_boundary" time="0.008" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_007_cfr_cms_004_nominal" time="0.010" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_008_cfr_cms_004_boundary" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_009_cfr_cms_005_nominal" time="0.012" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_010_cfr_cms_005_boundary" time="0.007" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_011_cfr_cms_006_nominal" time="0.010" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_012_cfr_cms_002_sla_high_boundary" time="0.017"><failure message="AssertionError: Expected High SLA &lt;= 24h, got 1 day, 23:59:59.992693&#10;assert datetime.datetime(2026, 11, 12, 16, 52, 6, 939797, tzinfo=datetime.timezone.utc) &lt;= datetime.datetime(2026, 11, 11, 18, 52, 6, 947104, tzinfo=datetime.timezone.utc)&#10; +  where datetime.datetime(2026, 11, 12, 16, 52, 6, 939797, tzinfo=datetime.timezone.utc) = &lt;Complaint: CMS-2026-FR0012 (Submitted)&gt;.sla_due_date">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x000001E9176D18A0&gt;
+
+    def test_fr_012_cfr_cms_002_sla_high_boundary(stub_iam):
+        """TEST-FR-012: High priority complaint SLA assignment boundary (Defect 1)."""
+        client = auth_client(stub_iam, user_id=2012, kind="staff", roles=("complaint_handler",))
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-FR0012",
+            complainant_user_id=1012,
+            category="network",
+            description="Critical core switch outage in central data center.",
+            status="Submitted",
+            priority="Low"
+        )
+        res = client.post(f"/api/v1/cms/complaints/{c.id}/assign/", data={"assigned_handler_id": 2012, "priority": "High"}, format="json")
+        assert res.status_code == 200
+        c.refresh_from_db()
+        # Specification requirement: High priority SLA is 24 hours (1 day)
+        now = timezone.now()
+        expected_max = now + timedelta(hours=26) # 24h + 2h margin
+&gt;       assert c.sla_due_date &lt;= expected_max, f"Expected High SLA &lt;= 24h, got {c.sla_due_date - now}"
+E       AssertionError: Expected High SLA &lt;= 24h, got 1 day, 23:59:59.992693
+E       assert datetime.datetime(2026, 11, 12, 16, 52, 6, 939797, tzinfo=datetime.timezone.utc) &lt;= datetime.datetime(2026, 11, 11, 18, 52, 6, 947104, tzinfo=datetime.timezone.utc)
+E        +  where datetime.datetime(2026, 11, 12, 16, 52, 6, 939797, tzinfo=datetime.timezone.utc) = &lt;Complaint: CMS-2026-FR0012 (Submitted)&gt;.sla_due_date
+
+tests\a8\fr\test_fr_suite.py:192: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_013_cfr_cms_007_nominal" time="0.013" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_014_cfr_cms_007_boundary" time="0.009" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_015_cfr_cms_008_nominal" time="0.013" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_016_cfr_cms_008_boundary" time="0.009" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_017_cfr_cms_009_nominal" time="0.012" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_018_cfr_cms_009_boundary" time="0.007" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_019_cfr_cms_010_nominal" time="0.013" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_020_cfr_cms_010_boundary" time="0.007" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_021_cfr_cms_011_nominal" time="0.011" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_022_cfr_cms_011_boundary" time="0.008" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_023_cfr_cms_012_nominal" time="0.012" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_024_cfr_cms_012_boundary" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_025_cfr_cms_013_nominal" time="0.010" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_026_cfr_cms_013_boundary" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_027_cfr_cms_014_nominal" time="0.010" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_028_cfr_cms_014_boundary" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_029_afr_cms_001_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_030_afr_cms_001_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_031_afr_cms_002_positive" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_032_afr_cms_002_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_033_afr_cms_003_positive" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_034_afr_cms_003_invariant" time="0.007" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_035_afr_cms_004_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_036_afr_cms_004_attachment_format_defect" time="0.006"><failure message="AssertionError: Disallowed file type accepted: application/x-dosexec&#10;assert 'application/x-dosexec' in ['image/jpeg', 'image/png', 'application/pdf']&#10; +  where 'application/x-dosexec' = &lt;ComplaintAttachment: malware.exe (1)&gt;.file_type">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x000001E9179340E0&gt;
+
+    def test_fr_036_afr_cms_004_attachment_format_defect(stub_iam):
+        """TEST-FR-036: AFR-CMS-004 - Attachment file format/mime-type constraint validation (Defect 3)."""
+        client = auth_client(stub_iam, user_id=3036)
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-FR0036",
+            complainant_user_id=3036,
+            category="hostel",
+            description="Attachment validation test.",
+            status="Submitted"
+        )
+        # Attempt to attach disallowed executable file type
+        att = ComplaintAttachment(complaint=c, file_name="malware.exe", file_size=0, file_type="application/x-dosexec")
+        # Specification requires attachment validation rejection of unallowed formats or empty sizes
+&gt;       assert att.file_type in ["image/jpeg", "image/png", "application/pdf"], f"Disallowed file type accepted: {att.file_type}"
+E       AssertionError: Disallowed file type accepted: application/x-dosexec
+E       assert 'application/x-dosexec' in ['image/jpeg', 'image/png', 'application/pdf']
+E        +  where 'application/x-dosexec' = &lt;ComplaintAttachment: malware.exe (1)&gt;.file_type
+
+tests\a8\fr\test_fr_suite.py:530: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_037_afr_cms_005_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_038_afr_cms_005_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_039_afr_cms_006_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_040_afr_cms_006_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_041_afr_cms_007_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_042_afr_cms_007_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_043_afr_cms_008_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_044_afr_cms_008_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_045_afr_cms_009_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_046_afr_cms_009_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_047_afr_cms_010_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_048_afr_cms_010_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_049_afr_cms_011_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_050_afr_cms_011_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_051_afr_cms_012_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_052_afr_cms_012_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_053_afr_cms_013_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_054_afr_cms_013_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_055_afr_cms_014_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_056_afr_cms_014_resolution_substantive_defect" time="0.021"><failure message="AssertionError: Substantive resolution details requirement violated (accepted trivial 3 chars)&#10;assert 200 == 400&#10; +  where 200 = &lt;Response status_code=200, &quot;application/json&quot;&gt;.status_code">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x000001E917934B80&gt;
+
+    def test_fr_056_afr_cms_014_resolution_substantive_defect(stub_iam):
+        """TEST-FR-056: AFR-CMS-014 - Resolution details substantive length validation (Defect 7)."""
+        client = auth_client(stub_iam, user_id=4056, kind="staff", roles=("complaint_handler",))
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-FR0056",
+            complainant_user_id=3056,
+            category="maintenance",
+            description="Air conditioner leaking refrigerant.",
+            status="In Progress"
+        )
+        # Specification requires substantive details (&gt;= 10 chars), not trivial 3 chars like 'Fix'
+        res = client.post(f"/api/v1/cms/complaints/{c.id}/resolve/", data={"resolution_details": "Fix"}, format="json")
+&gt;       assert res.status_code == 400, "Substantive resolution details requirement violated (accepted trivial 3 chars)"
+E       AssertionError: Substantive resolution details requirement violated (accepted trivial 3 chars)
+E       assert 200 == 400
+E        +  where 200 = &lt;Response status_code=200, "application/json"&gt;.status_code
+
+tests\a8\fr\test_fr_suite.py:904: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_057_afr_cms_015_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_058_afr_cms_015_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_059_afr_cms_016_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_060_afr_cms_016_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_061_afr_cms_017_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_062_afr_cms_017_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_063_afr_cms_018_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_064_afr_cms_018_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_065_afr_cms_019_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_066_afr_cms_019_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_067_afr_cms_020_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_068_afr_cms_020_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_069_afr_cms_021_positive" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_070_afr_cms_021_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_071_afr_cms_022_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_072_afr_cms_022_invariant" time="0.007" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_073_afr_cms_023_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_074_afr_cms_023_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_075_afr_cms_024_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_076_afr_cms_024_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_077_afr_cms_025_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_078_afr_cms_025_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_079_afr_cms_026_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_080_afr_cms_026_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_081_afr_cms_027_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_082_afr_cms_027_duplicate_feedback_defect" time="0.016"><failure message="AssertionError: Duplicate feedback allowed for single complaint&#10;assert 201 == 400&#10; +  where 201 = &lt;Response status_code=201, &quot;application/json&quot;&gt;.status_code">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x000001E9178CD440&gt;
+
+    def test_fr_082_afr_cms_027_duplicate_feedback_defect(stub_iam):
+        """TEST-FR-082: AFR-CMS-027 - Prevention of duplicate feedback submissions (Defect 5)."""
+        client = auth_client(stub_iam, user_id=3082)
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-FR0082",
+            complainant_user_id=3082,
+            category="mess",
+            description="Cold food served at breakfast counter.",
+            status="Closed"
+        )
+        res1 = client.post("/api/v1/cms/feedback/", data={"complaint": c.id, "rating": 4, "comments": "Resolved satisfactorily."}, format="json")
+        assert res1.status_code == 201
+        # Second feedback for the same closed complaint must be rejected
+        res2 = client.post("/api/v1/cms/feedback/", data={"complaint": c.id, "rating": 1, "comments": "Changed my mind."}, format="json")
+&gt;       assert res2.status_code == 400, "Duplicate feedback allowed for single complaint"
+E       AssertionError: Duplicate feedback allowed for single complaint
+E       assert 201 == 400
+E        +  where 201 = &lt;Response status_code=201, "application/json"&gt;.status_code
+
+tests\a8\fr\test_fr_suite.py:1393: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_083_afr_cms_028_positive" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_084_afr_cms_028_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_085_afr_cms_029_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_086_afr_cms_029_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_087_afr_cms_030_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_088_afr_cms_030_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_089_afr_cms_031_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_090_afr_cms_031_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_091_afr_cms_032_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_092_afr_cms_032_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_093_afr_cms_033_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_094_afr_cms_033_escalate_actor_role_defect" time="0.016"><failure message="AssertionError: Expected actor_role 'complainant', got 'complaint_handler'&#10;assert 'complaint_handler' == 'complainant'&#10;  &#10;  - complainant&#10;  + complaint_handler">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x000001E9178A7C40&gt;
+
+    def test_fr_094_afr_cms_033_escalate_actor_role_defect(stub_iam):
+        """TEST-FR-094: AFR-CMS-033 - Audit logs complainant actor role on manual escalation (Defect 9)."""
+        client = auth_client(stub_iam, user_id=3094, kind="student", roles=("student",))
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-FR0094",
+            complainant_user_id=3094,
+            category="academic",
+            description="Lab computer workstation monitor failing.",
+            status="In Progress"
+        )
+        res = client.post(f"/api/v1/cms/complaints/{c.id}/escalate/", data={"escalation_remarks": "Exam week pending."}, format="json")
+        assert res.status_code == 200
+        prog = c.progress_history.filter(action="escalated_manual").last()
+        assert prog is not None
+&gt;       assert prog.actor_role == "complainant", f"Expected actor_role 'complainant', got '{prog.actor_role}'"
+E       AssertionError: Expected actor_role 'complainant', got 'complaint_handler'
+E       assert 'complaint_handler' == 'complainant'
+E         
+E         - complainant
+E         + complaint_handler
+
+tests\a8\fr\test_fr_suite.py:1616: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_095_afr_cms_034_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_096_afr_cms_034_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_097_afr_cms_035_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_098_afr_cms_035_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_099_afr_cms_036_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_100_afr_cms_036_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_101_afr_cms_037_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_102_afr_cms_037_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_103_afr_cms_038_positive" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_104_afr_cms_038_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_105_afr_cms_039_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_106_afr_cms_039_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_107_afr_cms_040_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_108_afr_cms_040_announcement_expiry_defect" time="0.005"><failure message="AssertionError: ComplaintAnnouncement lacks mandatory expires_at support in schema/queryset&#10;assert False">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x000001E9178A6980&gt;
+
+    def test_fr_108_afr_cms_040_announcement_expiry_defect(stub_iam):
+        """TEST-FR-108: AFR-CMS-040 - Announcement expiration date filtering (Defect 11)."""
+        client = auth_client(stub_iam, user_id=3108)
+        ann = ComplaintAnnouncement.objects.create(
+            author_user_id=9999,
+            author_role="staff",
+            title="Expired Water Outage Notice",
+            content="Notice for last month.",
+            is_active=True
+        )
+        # Specification requires filtering out expired announcements
+        # Implementation lacks expires_at field check in queryset
+        has_expiry_filter = hasattr(ComplaintAnnouncement, 'expires_at')
+&gt;       assert has_expiry_filter, "ComplaintAnnouncement lacks mandatory expires_at support in schema/queryset"
+E       AssertionError: ComplaintAnnouncement lacks mandatory expires_at support in schema/queryset
+E       assert False
+
+tests\a8\fr\test_fr_suite.py:1876: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_109_afr_cms_041_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_110_afr_cms_041_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_111_afr_cms_042_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_112_afr_cms_042_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_113_afr_cms_043_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_114_afr_cms_043_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_115_afr_cms_044_positive" time="0.007" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_116_afr_cms_044_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_117_afr_cms_045_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_118_afr_cms_045_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_119_afr_cms_046_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_120_afr_cms_046_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_121_afr_cms_047_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_122_afr_cms_047_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_123_afr_cms_048_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_124_afr_cms_048_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_125_afr_cms_049_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_126_afr_cms_049_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_127_afr_cms_050_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_128_afr_cms_050_reports_date_filter_defect" time="0.011"><failure message="AssertionError: Reports endpoint ignores date filters (returned 1)&#10;assert 1 == 0">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x000001E9178A68E0&gt;
+
+    def test_fr_128_afr_cms_050_reports_date_filter_defect(stub_iam):
+        """TEST-FR-128: AFR-CMS-050 - Complaint reports date range filter (Defect 12)."""
+        client = auth_client(stub_iam, user_id=3128)
+        Complaint.objects.create(
+            complaint_id="CMS-2026-FR0128",
+            complainant_user_id=3128,
+            category="hostel",
+            description="Complaint for date filter defect test.",
+            status="Submitted"
+        )
+        res = client.get("/api/v1/cms/complaints/reports/?start_date=2099-01-01&amp;end_date=2099-12-31")
+        assert res.status_code == 200
+&gt;       assert res.data["total"] == 0, f"Reports endpoint ignores date filters (returned {res.data['total']})"
+E       AssertionError: Reports endpoint ignores date filters (returned 1)
+E       assert 1 == 0
+
+tests\a8\fr\test_fr_suite.py:2249: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_129_afr_cms_051_positive" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_130_afr_cms_051_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_131_afr_cms_052_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_132_afr_cms_052_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_133_afr_cms_053_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_134_afr_cms_053_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_135_afr_cms_054_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_136_afr_cms_054_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_137_afr_cms_055_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_138_afr_cms_055_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_139_afr_cms_056_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_140_afr_cms_056_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_141_afr_cms_057_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_142_afr_cms_057_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_143_afr_cms_058_positive" time="0.007" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_144_afr_cms_058_category_role_deactivation_defect" time="0.013"><failure message="AssertionError: Assigning handler deactivated all existing active handlers unconditionally&#10;assert False is True&#10; +  where False = &lt;CmsRoleAssignment: complaint_handler - User 7001&gt;.is_active">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x000001E9178E6200&gt;
+
+    def test_fr_144_afr_cms_058_category_role_deactivation_defect(stub_iam):
+        """TEST-FR-144: AFR-CMS-058 - Assigning handler preserves handlers of other categories (Defect 6)."""
+        client = auth_client(stub_iam, user_id=9999, kind="staff", roles=("complaint_supervisor",))
+        # Active hostel handler
+        h1 = CmsRoleAssignment.objects.create(
+            user_id=7001,
+            role_type="complaint_handler",
+            start_date=date(2026, 1, 1),
+            end_date=date(2026, 12, 31),
+            is_active=True,
+            assigned_by_id=9999
+        )
+        # Assign new maintenance handler
+        res = client.post("/api/v1/cms/roles/", data={
+            "user_id": 7002,
+            "role_type": "complaint_handler",
+            "start_date": "2026-02-01",
+            "end_date": "2026-12-31",
+            "is_active": True
+        }, format="json")
+        assert res.status_code == 201
+        h1.refresh_from_db()
+        # Invariant: assigning a new handler should not deactivate handlers of distinct queues
+&gt;       assert h1.is_active is True, "Assigning handler deactivated all existing active handlers unconditionally"
+E       AssertionError: Assigning handler deactivated all existing active handlers unconditionally
+E       assert False is True
+E        +  where False = &lt;CmsRoleAssignment: complaint_handler - User 7001&gt;.is_active
+
+tests\a8\fr\test_fr_suite.py:2557: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_145_afr_cms_059_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_146_afr_cms_059_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_147_afr_cms_060_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_148_afr_cms_060_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_149_afr_cms_061_positive" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_150_afr_cms_061_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_151_afr_cms_062_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_152_afr_cms_062_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_153_afr_cms_063_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_154_afr_cms_063_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_155_afr_cms_064_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_156_afr_cms_064_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_157_afr_cms_065_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_158_afr_cms_065_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_159_afr_cms_066_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_160_afr_cms_066_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_161_afr_cms_067_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_162_afr_cms_067_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_163_afr_cms_068_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_164_afr_cms_068_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_165_afr_cms_069_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_166_afr_cms_069_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_167_afr_cms_070_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_168_afr_cms_070_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_169_afr_cms_071_positive" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_170_afr_cms_071_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_171_afr_cms_072_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_172_afr_cms_072_invariant" time="0.006" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_173_afr_cms_073_positive" time="0.004" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_174_afr_cms_073_invariant" time="0.005" /><testcase classname="tests.a8.fr.test_fr_suite" name="test_fr_175_end_to_end_audit_trail" time="0.007" /></testsuite></testsuites>

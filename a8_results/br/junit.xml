@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="10" skipped="0" tests="205" time="7.772" timestamp="2026-11-10T22:22:27.257187+05:30" hostname="Shl0k"><testcase classname="tests.a8.br.test_br_suite" name="test_br_001_br_cms_001_condition_true" time="2.763" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_002_br_cms_001_condition_false" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_003_br_cms_001_boundary" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_004_br_cms_001_role_guard" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_005_br_cms_001_invariant" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_006_br_cms_002_condition_true" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_007_br_cms_002_condition_false" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_008_br_cms_002_boundary" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_009_br_cms_002_role_guard" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_010_br_cms_002_invariant" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_011_br_cms_003_condition_true" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_012_br_cms_003_condition_false" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_013_br_cms_003_boundary" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_014_br_cms_003_role_guard" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_015_br_cms_003_invariant" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_016_br_cms_004_condition_true" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_017_br_cms_004_condition_false" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_018_br_cms_004_boundary" time="0.005"><failure message="AssertionError: Invalid file format accepted: text/x-shellscript&#10;assert 'text/x-shellscript' in ['image/jpeg', 'image/png', 'application/pdf']&#10; +  where 'text/x-shellscript' = &lt;ComplaintAttachment: script.sh (1)&gt;.file_type">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x0000016C54C9E700&gt;
+
+    def test_br_018_br_cms_004_boundary(stub_iam):
+        """TEST-BR-018: BR-CMS-004 boundary - Attachment format constraint validation (Defect 3)."""
+        client = auth_client(stub_iam, user_id=5000 + 18)
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-BR0018",
+            complainant_user_id=5000 + 18,
+            category="hostel",
+            description="Testing attachment constraints.",
+            status="Submitted"
+        )
+        # Binary executable file must be rejected by attachment constraints
+        att = ComplaintAttachment(complaint=c, file_name="script.sh", file_size=0, file_type="text/x-shellscript")
+&gt;       assert att.file_type in ["image/jpeg", "image/png", "application/pdf"], f"Invalid file format accepted: {att.file_type}"
+E       AssertionError: Invalid file format accepted: text/x-shellscript
+E       assert 'text/x-shellscript' in ['image/jpeg', 'image/png', 'application/pdf']
+E        +  where 'text/x-shellscript' = &lt;ComplaintAttachment: script.sh (1)&gt;.file_type
+
+tests\a8\br\test_br_suite.py:323: AssertionError</failure></testcase><testcase classname="tests.a8.br.test_br_suite" name="test_br_019_br_cms_004_role_guard" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_020_br_cms_004_invariant" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_021_br_cms_005_condition_true" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_022_br_cms_005_condition_false" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_023_br_cms_005_boundary" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_024_br_cms_005_role_guard" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_025_br_cms_005_invariant" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_026_br_cms_006_condition_true" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_027_br_cms_006_condition_false" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_028_br_cms_006_boundary" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_029_br_cms_006_role_guard" time="0.013" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_030_br_cms_006_invariant" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_031_br_cms_007_condition_true" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_032_br_cms_007_condition_false" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_033_br_cms_007_boundary" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_034_br_cms_007_role_guard" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_035_br_cms_007_invariant" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_036_br_cms_008_condition_true" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_037_br_cms_008_condition_false" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_038_br_cms_008_boundary" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_039_br_cms_008_role_guard" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_040_br_cms_008_invariant" time="0.015"><failure message="AssertionError: Category modification allowed on in-progress complaint&#10;assert 200 == 400&#10; +  where 200 = &lt;Response status_code=200, &quot;application/json&quot;&gt;.status_code">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x0000016C54C9CE00&gt;
+
+    def test_br_040_br_cms_008_invariant(stub_iam):
+        """TEST-BR-040: BR-CMS-008 invariant - Category modification rejection after progress underway (Defect 15)."""
+        client = auth_client(stub_iam, user_id=6040, kind="staff", roles=("complaint_handler",))
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-BR0040",
+            complainant_user_id=5040,
+            category="network",
+            description="Wi-Fi AP dropped.",
+            status="In Progress",
+            priority="Medium"
+        )
+        ComplaintProgress.objects.create(complaint=c, actor_user_id=6040, actor_role="handler", action="progress_update", remarks="Work started")
+        # BR-CMS-008 requires rejecting category change once progress has commenced
+        res = client.post(f"/api/v1/cms/complaints/{c.id}/assign/", data={"assigned_handler_id": 6040, "category": "hostel"}, format="json")
+&gt;       assert res.status_code == 400, "Category modification allowed on in-progress complaint"
+E       AssertionError: Category modification allowed on in-progress complaint
+E       assert 200 == 400
+E        +  where 200 = &lt;Response status_code=200, "application/json"&gt;.status_code
+
+tests\a8\br\test_br_suite.py:676: AssertionError</failure></testcase><testcase classname="tests.a8.br.test_br_suite" name="test_br_041_br_cms_009_condition_true" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_042_br_cms_009_condition_false" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_043_br_cms_009_boundary" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_044_br_cms_009_role_guard" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_045_br_cms_009_invariant" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_046_br_cms_010_condition_true" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_047_br_cms_010_condition_false" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_048_br_cms_010_boundary" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_049_br_cms_010_role_guard" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_050_br_cms_010_invariant" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_051_br_cms_011_condition_true" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_052_br_cms_011_condition_false" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_053_br_cms_011_boundary" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_054_br_cms_011_role_guard" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_055_br_cms_011_invariant" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_056_br_cms_012_condition_true" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_057_br_cms_012_condition_false" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_058_br_cms_012_boundary" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_059_br_cms_012_role_guard" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_060_br_cms_012_invariant" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_061_br_cms_013_condition_true" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_062_br_cms_013_condition_false" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_063_br_cms_013_boundary" time="0.021"><failure message="AssertionError: Resolution details &lt; 10 characters accepted&#10;assert 200 == 400&#10; +  where 200 = &lt;Response status_code=200, &quot;application/json&quot;&gt;.status_code">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x0000016C54C39B20&gt;
+
+    def test_br_063_br_cms_013_boundary(stub_iam):
+        """TEST-BR-063: BR-CMS-013 boundary - Resolution details substantive length (Defect 7)."""
+        client = auth_client(stub_iam, user_id=6000 + 63, kind="staff", roles=("complaint_handler",))
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-BR0063",
+            complainant_user_id=5000 + 63,
+            category="maintenance",
+            description="Leaking pipe in restroom.",
+            status="In Progress"
+        )
+        res = client.post(f"/api/v1/cms/complaints/{c.id}/resolve/", data={"resolution_details": "Fix"}, format="json")
+&gt;       assert res.status_code == 400, "Resolution details &lt; 10 characters accepted"
+E       AssertionError: Resolution details &lt; 10 characters accepted
+E       assert 200 == 400
+E        +  where 200 = &lt;Response status_code=200, "application/json"&gt;.status_code
+
+tests\a8\br\test_br_suite.py:1042: AssertionError</failure></testcase><testcase classname="tests.a8.br.test_br_suite" name="test_br_064_br_cms_013_role_guard" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_065_br_cms_013_invariant" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_066_br_cms_014_condition_true" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_067_br_cms_014_condition_false" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_068_br_cms_014_boundary" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_069_br_cms_014_role_guard" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_070_br_cms_014_invariant" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_071_br_cms_015_condition_true" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_072_br_cms_015_condition_false" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_073_br_cms_015_boundary" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_074_br_cms_015_role_guard" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_075_br_cms_015_invariant" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_076_br_cms_016_condition_true" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_077_br_cms_016_condition_false" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_078_br_cms_016_boundary" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_079_br_cms_016_role_guard" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_080_br_cms_016_invariant" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_081_br_cms_017_condition_true" time="0.016" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_082_br_cms_017_condition_false" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_083_br_cms_017_boundary" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_084_br_cms_017_role_guard" time="0.051" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_085_br_cms_017_invariant" time="0.013" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_086_br_cms_018_condition_true" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_087_br_cms_018_condition_false" time="0.010"><failure message="AssertionError: Second pending reopening allowed while first pending&#10;assert 201 == 400&#10; +  where 201 = &lt;Response status_code=201, &quot;application/json&quot;&gt;.status_code">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x0000016C54C3BC40&gt;
+
+    def test_br_087_br_cms_018_condition_false(stub_iam):
+        """TEST-BR-087: BR-CMS-018 condition-false - Duplicate pending reopening prevention (Defect 2)."""
+        client = auth_client(stub_iam, user_id=5000 + 87)
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-BR0087",
+            complainant_user_id=5000 + 87,
+            category="maintenance",
+            description="Window latch broken.",
+            status="Closed"
+        )
+        res1 = client.post(f"/api/v1/cms/complaints/{c.id}/request_reopen/", data={"dissatisfaction_reason": "Still unlatched."}, format="json")
+        assert res1.status_code in [200, 201]
+        res2 = client.post(f"/api/v1/cms/complaints/{c.id}/request_reopen/", data={"dissatisfaction_reason": "Repeated request."}, format="json")
+&gt;       assert res2.status_code == 400, "Second pending reopening allowed while first pending"
+E       AssertionError: Second pending reopening allowed while first pending
+E       assert 201 == 400
+E        +  where 201 = &lt;Response status_code=201, "application/json"&gt;.status_code
+
+tests\a8\br\test_br_suite.py:1426: AssertionError</failure></testcase><testcase classname="tests.a8.br.test_br_suite" name="test_br_088_br_cms_018_boundary" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_089_br_cms_018_role_guard" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_090_br_cms_018_invariant" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_091_br_cms_019_condition_true" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_092_br_cms_019_condition_false" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_093_br_cms_019_boundary" time="0.016" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_094_br_cms_019_role_guard" time="0.019" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_095_br_cms_019_invariant" time="0.015" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_096_br_cms_020_condition_true" time="0.013" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_097_br_cms_020_condition_false" time="0.021"><failure message="AssertionError: Rejection reason was not cleared upon reopening: Duplicate complaint ID&#10;assert 'Duplicate complaint ID' == ''&#10;  &#10;  + Duplicate complaint ID">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x0000016C54DD6DE0&gt;
+
+    def test_br_097_br_cms_020_condition_false(stub_iam):
+        """TEST-BR-097: BR-CMS-020 condition-false - Approved reopening clears rejection reason (Defect 4)."""
+        client = auth_client(stub_iam, user_id=9999, kind="staff", roles=("complaint_supervisor",))
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-BR0097",
+            complainant_user_id=5000 + 97,
+            category="academic",
+            description="Projector lamp replacement.",
+            status="Closed",
+            rejection_reason="Duplicate complaint ID"
+        )
+        reopen = ComplaintReopening.objects.create(
+            complaint=c,
+            complainant_user_id=5000 + 97,
+            dissatisfaction_reason="Not duplicate, distinct lecture room.",
+            status="pending"
+        )
+        res = client.post(f"/api/v1/cms/complaints/{c.id}/decide_reopen/", data={"reopening_id": reopen.id, "decision": "approved", "supervisor_remarks": "Reopened upon review"}, format="json")
+        assert res.status_code == 200
+        c.refresh_from_db()
+        # Invariant: reopening a complaint into 'In Progress' should clear prior rejection remarks
+&gt;       assert c.rejection_reason == "", f"Rejection reason was not cleared upon reopening: {c.rejection_reason}"
+E       AssertionError: Rejection reason was not cleared upon reopening: Duplicate complaint ID
+E       assert 'Duplicate complaint ID' == ''
+E         
+E         + Duplicate complaint ID
+
+tests\a8\br\test_br_suite.py:1594: AssertionError</failure></testcase><testcase classname="tests.a8.br.test_br_suite" name="test_br_098_br_cms_020_boundary" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_099_br_cms_020_role_guard" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_100_br_cms_020_invariant" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_101_br_cms_021_condition_true" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_102_br_cms_021_condition_false" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_103_br_cms_021_boundary" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_104_br_cms_021_role_guard" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_105_br_cms_021_invariant" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_106_br_cms_022_condition_true" time="0.015" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_107_br_cms_022_condition_false" time="0.020"><failure message="AssertionError: Allowed duplicate feedback for single complaint&#10;assert 201 == 400&#10; +  where 201 = &lt;Response status_code=201, &quot;application/json&quot;&gt;.status_code">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x0000016C54C9C400&gt;
+
+    def test_br_107_br_cms_022_condition_false(stub_iam):
+        """TEST-BR-107: BR-CMS-022 condition-false - Feedback cardinality (Defect 5)."""
+        client = auth_client(stub_iam, user_id=5000 + 107)
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-BR0107",
+            complainant_user_id=5000 + 107,
+            category="mess",
+            description="Mess food issue.",
+            status="Closed"
+        )
+        res1 = client.post("/api/v1/cms/feedback/", data={"complaint": c.id, "rating": 5, "comments": "First feedback."}, format="json")
+        assert res1.status_code == 201
+        res2 = client.post("/api/v1/cms/feedback/", data={"complaint": c.id, "rating": 3, "comments": "Second feedback."}, format="json")
+&gt;       assert res2.status_code == 400, "Allowed duplicate feedback for single complaint"
+E       AssertionError: Allowed duplicate feedback for single complaint
+E       assert 201 == 400
+E        +  where 201 = &lt;Response status_code=201, "application/json"&gt;.status_code
+
+tests\a8\br\test_br_suite.py:1754: AssertionError</failure></testcase><testcase classname="tests.a8.br.test_br_suite" name="test_br_108_br_cms_022_boundary" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_109_br_cms_022_role_guard" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_110_br_cms_022_invariant" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_111_br_cms_023_condition_true" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_112_br_cms_023_condition_false" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_113_br_cms_023_boundary" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_114_br_cms_023_role_guard" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_115_br_cms_023_invariant" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_116_br_cms_024_condition_true" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_117_br_cms_024_condition_false" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_118_br_cms_024_boundary" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_119_br_cms_024_role_guard" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_120_br_cms_024_invariant" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_121_br_cms_025_condition_true" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_122_br_cms_025_condition_false" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_123_br_cms_025_boundary" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_124_br_cms_025_role_guard" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_125_br_cms_025_invariant" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_126_br_cms_026_condition_true" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_127_br_cms_026_condition_false" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_128_br_cms_026_boundary" time="0.020"><failure message="AssertionError: High priority SLA exceeds 24h (got 1 day, 23:59:59.988626)&#10;assert datetime.datetime(2026, 11, 12, 16, 52, 33, 419414, tzinfo=datetime.timezone.utc) &lt;= (datetime.datetime(2026, 11, 10, 16, 52, 33, 430788, tzinfo=datetime.timezone.utc) + datetime.timedelta(days=1, seconds=7200))&#10; +  where datetime.datetime(2026, 11, 12, 16, 52, 33, 419414, tzinfo=datetime.timezone.utc) = &lt;Complaint: CMS-2026-BR0128 (Submitted)&gt;.sla_due_date&#10; +  and   datetime.timedelta(days=1, seconds=7200) = timedelta(hours=26)">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x0000016C54CDDBC0&gt;
+
+    def test_br_128_br_cms_026_boundary(stub_iam):
+        """TEST-BR-128: BR-CMS-026 boundary - High priority SLA duration (Defect 1)."""
+        client = auth_client(stub_iam, user_id=6000 + 128, kind="staff", roles=("complaint_handler",))
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-BR0128",
+            complainant_user_id=5000 + 128,
+            category="network",
+            description="Core fiber trunk severance.",
+            status="Submitted",
+            priority="Low"
+        )
+        res = client.post(f"/api/v1/cms/complaints/{c.id}/assign/", data={"assigned_handler_id": 6000 + 128, "priority": "High"}, format="json")
+        assert res.status_code == 200
+        c.refresh_from_db()
+        # High priority SLA must be 24h
+        now = timezone.now()
+&gt;       assert c.sla_due_date &lt;= now + timedelta(hours=26), f"High priority SLA exceeds 24h (got {c.sla_due_date - now})"
+E       AssertionError: High priority SLA exceeds 24h (got 1 day, 23:59:59.988626)
+E       assert datetime.datetime(2026, 11, 12, 16, 52, 33, 419414, tzinfo=datetime.timezone.utc) &lt;= (datetime.datetime(2026, 11, 10, 16, 52, 33, 430788, tzinfo=datetime.timezone.utc) + datetime.timedelta(days=1, seconds=7200))
+E        +  where datetime.datetime(2026, 11, 12, 16, 52, 33, 419414, tzinfo=datetime.timezone.utc) = &lt;Complaint: CMS-2026-BR0128 (Submitted)&gt;.sla_due_date
+E        +  and   datetime.timedelta(days=1, seconds=7200) = timedelta(hours=26)
+
+tests\a8\br\test_br_suite.py:2093: AssertionError</failure></testcase><testcase classname="tests.a8.br.test_br_suite" name="test_br_129_br_cms_026_role_guard" time="0.014" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_130_br_cms_026_invariant" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_131_br_cms_027_condition_true" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_132_br_cms_027_condition_false" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_133_br_cms_027_boundary" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_134_br_cms_027_role_guard" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_135_br_cms_027_invariant" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_136_br_cms_028_condition_true" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_137_br_cms_028_condition_false" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_138_br_cms_028_boundary" time="0.011"><failure message="AssertionError: Pre-breach reminder triggered prematurely at 22h remaining for 24h SLA&#10;assert True is False&#10; +  where True = &lt;Complaint: CMS-2026-BR0138 (In Progress)&gt;.sla_reminder_sent">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x0000016C54C380E0&gt;
+
+    def test_br_138_br_cms_028_boundary(stub_iam):
+        """TEST-BR-138: BR-CMS-028 boundary - Pre-breach reminder window threshold (Defect 10)."""
+        client = auth_client(stub_iam, user_id=5000 + 138)
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-BR0138",
+            complainant_user_id=5000 + 138,
+            category="other",
+            description="General maintenance.",
+            status="In Progress",
+            priority="High",
+            sla_due_date=timezone.now() + timedelta(hours=22),
+            sla_reminder_sent=False
+        )
+        res = client.post("/api/v1/cms/complaints/check_sla/", format="json")
+        assert res.status_code == 200
+        c.refresh_from_db()
+&gt;       assert c.sla_reminder_sent is False, "Pre-breach reminder triggered prematurely at 22h remaining for 24h SLA"
+E       AssertionError: Pre-breach reminder triggered prematurely at 22h remaining for 24h SLA
+E       assert True is False
+E        +  where True = &lt;Complaint: CMS-2026-BR0138 (In Progress)&gt;.sla_reminder_sent
+
+tests\a8\br\test_br_suite.py:2256: AssertionError</failure></testcase><testcase classname="tests.a8.br.test_br_suite" name="test_br_139_br_cms_028_role_guard" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_140_br_cms_028_invariant" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_141_br_cms_029_condition_true" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_142_br_cms_029_condition_false" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_143_br_cms_029_boundary" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_144_br_cms_029_role_guard" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_145_br_cms_029_invariant" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_146_br_cms_030_condition_true" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_147_br_cms_030_condition_false" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_148_br_cms_030_boundary" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_149_br_cms_030_role_guard" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_150_br_cms_030_invariant" time="0.013" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_151_br_cms_031_condition_true" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_152_br_cms_031_condition_false" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_153_br_cms_031_boundary" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_154_br_cms_031_role_guard" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_155_br_cms_031_invariant" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_156_br_cms_032_condition_true" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_157_br_cms_032_condition_false" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_158_br_cms_032_boundary" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_159_br_cms_032_role_guard" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_160_br_cms_032_invariant" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_161_br_cms_033_condition_true" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_162_br_cms_033_condition_false" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_163_br_cms_033_boundary" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_164_br_cms_033_role_guard" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_165_br_cms_033_invariant" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_166_br_cms_034_condition_true" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_167_br_cms_034_condition_false" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_168_br_cms_034_boundary" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_169_br_cms_034_role_guard" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_170_br_cms_034_invariant" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_171_br_cms_035_condition_true" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_172_br_cms_035_condition_false" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_173_br_cms_035_boundary" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_174_br_cms_035_role_guard" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_175_br_cms_035_invariant" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_176_br_cms_036_condition_true" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_177_br_cms_036_condition_false" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_178_br_cms_036_boundary" time="0.013"><failure message="AssertionError: CmsRoleAssignment lacks handover audit tracking log for mid-cycle reassignment&#10;assert False">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x0000016C56731D00&gt;
+
+    def test_br_178_br_cms_036_boundary(stub_iam):
+        """TEST-BR-178: BR-CMS-036 boundary - Mid-cycle role reassignment handover audit (Defect 16)."""
+        client = auth_client(stub_iam, user_id=9999, kind="staff", roles=("complaint_supervisor",))
+        h1 = CmsRoleAssignment.objects.create(
+            user_id=9016,
+            role_type="complaint_handler",
+            start_date=date(2026, 1, 1),
+            end_date=date(2026, 12, 31),
+            is_active=True,
+            assigned_by_id=9999
+        )
+        res = client.post("/api/v1/cms/roles/", data={
+            "user_id": 9017,
+            "role_type": "complaint_handler",
+            "start_date": "2026-06-01",
+            "end_date": "2026-12-31",
+            "is_active": True
+        }, format="json")
+        assert res.status_code == 201
+        # Specification requires explicit handover audit log recording previous and successor user_id
+        has_audit_model = hasattr(CmsRoleAssignment, 'handover_logs')
+&gt;       assert has_audit_model, "CmsRoleAssignment lacks handover audit tracking log for mid-cycle reassignment"
+E       AssertionError: CmsRoleAssignment lacks handover audit tracking log for mid-cycle reassignment
+E       assert False
+
+tests\a8\br\test_br_suite.py:2904: AssertionError</failure></testcase><testcase classname="tests.a8.br.test_br_suite" name="test_br_179_br_cms_036_role_guard" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_180_br_cms_036_invariant" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_181_br_cms_037_condition_true" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_182_br_cms_037_condition_false" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_183_br_cms_037_boundary" time="0.009"><failure message="AssertionError: Assigning new handler globally deactivated all existing handlers&#10;assert False is True&#10; +  where False = &lt;CmsRoleAssignment: complaint_handler - User 9001&gt;.is_active">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x0000016C56733BA0&gt;
+
+    def test_br_183_br_cms_037_boundary(stub_iam):
+        """TEST-BR-183: BR-CMS-037 boundary - Active role cardinality category scoped (Defect 6)."""
+        client = auth_client(stub_iam, user_id=9999, kind="staff", roles=("complaint_supervisor",))
+        h1 = CmsRoleAssignment.objects.create(
+            user_id=9001,
+            role_type="complaint_handler",
+            start_date=date(2026, 1, 1),
+            end_date=date(2026, 12, 31),
+            is_active=True,
+            assigned_by_id=9999
+        )
+        res = client.post("/api/v1/cms/roles/", data={
+            "user_id": 9002,
+            "role_type": "complaint_handler",
+            "start_date": "2026-03-01",
+            "end_date": "2026-12-31",
+            "is_active": True
+        }, format="json")
+        assert res.status_code == 201
+        h1.refresh_from_db()
+&gt;       assert h1.is_active is True, "Assigning new handler globally deactivated all existing handlers"
+E       AssertionError: Assigning new handler globally deactivated all existing handlers
+E       assert False is True
+E        +  where False = &lt;CmsRoleAssignment: complaint_handler - User 9001&gt;.is_active
+
+tests\a8\br\test_br_suite.py:2991: AssertionError</failure></testcase><testcase classname="tests.a8.br.test_br_suite" name="test_br_184_br_cms_037_role_guard" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_185_br_cms_037_invariant" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_186_br_cms_038_condition_true" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_187_br_cms_038_condition_false" time="0.013" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_188_br_cms_038_boundary" time="0.013" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_189_br_cms_038_role_guard" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_190_br_cms_038_invariant" time="0.009" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_191_br_cms_039_condition_true" time="0.010" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_192_br_cms_039_condition_false" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_193_br_cms_039_boundary" time="0.013" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_194_br_cms_039_role_guard" time="0.013" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_195_br_cms_039_invariant" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_196_br_cms_040_condition_true" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_197_br_cms_040_condition_false" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_198_br_cms_040_boundary" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_199_br_cms_040_role_guard" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_200_br_cms_040_invariant" time="0.013" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_201_br_cms_041_condition_true" time="0.014" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_202_br_cms_041_condition_false" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_203_br_cms_041_boundary" time="0.012" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_204_br_cms_041_role_guard" time="0.011" /><testcase classname="tests.a8.br.test_br_suite" name="test_br_205_br_cms_041_invariant" time="0.011" /></testsuite></testsuites>
