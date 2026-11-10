@@ -4,12 +4,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
-from typing import Final
+from typing import Any, Final
 
 from modules.lms.domain.errors import (
     DeadlineWindowError,
     ExtensionDeniedError,
     LMSRuleError,
+    SubmissionTypeError,
 )
 
 
@@ -79,6 +80,14 @@ class DeadlineWindowStatus:
     ALL: Final[frozenset[str]] = frozenset({NOT_OPEN, OPEN, LATE_ALLOWED, CLOSED})
 
 
+class SubmissionStatus:
+    SUBMITTED: Final[str] = "submitted"
+    LATE: Final[str] = "late"
+    MISSING: Final[str] = "missing"
+
+    ALL: Final[frozenset[str]] = frozenset({SUBMITTED, LATE, MISSING})
+
+
 @dataclass(frozen=True)
 class CourseDetails:
     code: str
@@ -134,6 +143,19 @@ class DeadlineInfo:
     extension_reason: str = ""
     window_status: str = DeadlineWindowStatus.OPEN
     is_submission_allowed: bool = True
+
+
+@dataclass(frozen=True)
+class SubmissionDetails:
+    assignment_id: int
+    student_user_id: int
+    submission_type: str
+    status: str = SubmissionStatus.SUBMITTED
+    file_name: str = ""
+    file_size: int | None = None
+    content_text: str = ""
+    link_url: str = ""
+    attempt_number: int = 1
 
 
 
@@ -312,3 +334,51 @@ def validate_extension_details(
     if len(cleaned_reason) > 500:
         raise ExtensionDeniedError("Reason cannot exceed 500 characters.")
     return extended_due_at, cleaned_reason
+
+
+def validate_submission_details(
+    *,
+    assignment_submission_type: str,
+    submission_type: str,
+    file: Any = None,
+    content_text: str = "",
+    link_url: str = "",
+) -> None:
+    """Validate student submission parameters against assignment configuration.
+
+    Enforces BR-LMS-012 (Submission-type conformity) and AFR-LMS-008.1.
+    """
+    if submission_type not in SubmissionType.ALL:
+        choices = sorted(SubmissionType.ALL)
+        raise SubmissionTypeError(
+            f"Invalid submission type: '{submission_type}'. Must be one of {choices}."
+        )
+
+    if submission_type != assignment_submission_type:
+        raise SubmissionTypeError(
+            f"Submission type '{submission_type}' does not match the assignment's "
+            f"configured type '{assignment_submission_type}'."
+        )
+
+    if submission_type == SubmissionType.FILE:
+        if not file:
+            raise SubmissionTypeError("File submission requires an uploaded file attachment.")
+        f_size = getattr(file, "size", None)
+        if f_size is not None and f_size > 50 * 1024 * 1024:
+            raise SubmissionTypeError("Submission file size exceeds maximum limit of 50 MB.")
+
+    elif submission_type == SubmissionType.TEXT:
+        cleaned_text = content_text.strip() if content_text else ""
+        if not cleaned_text:
+            raise SubmissionTypeError("Text submission requires non-empty content text.")
+        if len(cleaned_text) > 50000:
+            raise SubmissionTypeError("Text submission content cannot exceed 50,000 characters.")
+
+    elif submission_type == SubmissionType.LINK:
+        cleaned_url = link_url.strip() if link_url else ""
+        if not cleaned_url:
+            raise SubmissionTypeError("Link submission requires a valid URL.")
+        if not cleaned_url.startswith(("http://", "https://")):
+            raise SubmissionTypeError("Link URL must start with 'http://' or 'https://'.")
+        if len(cleaned_url) > 500:
+            raise SubmissionTypeError("Link URL cannot exceed 500 characters.")

@@ -157,3 +157,24 @@ def get_assignment_deadlines(
         a.id: calculate_deadline_info(a, student_user_id=student_user_id)
         for a in assignments
     }
+
+
+def get_assignment_submissions(
+    assignment_ids: Sequence[int],
+    student_user_id: int | None = None,
+) -> dict[int, list[dict[str, Any]]]:
+    """Retrieve submissions for assignments (contracts_are_plural)."""
+    ids = {int(aid) for aid in assignment_ids if aid is not None}
+    if not ids:
+        return {}
+    from modules.lms.models import CourseSubmission
+    from modules.lms.selectors.submissions import _submission_to_dict
+
+    qs = CourseSubmission.objects.filter(assignment_id__in=ids, is_latest=True)
+    if student_user_id is not None:
+        qs = qs.filter(student_user_id=student_user_id)
+
+    results: dict[int, list[dict[str, Any]]] = {aid: [] for aid in ids}
+    for sub in qs.order_by("-submitted_at"):
+        results[sub.assignment_id].append(_submission_to_dict(sub))
+    return results

@@ -555,3 +555,132 @@ export function useRevokeExtension() {
     },
   });
 }
+
+export interface CourseSubmissionItem {
+  id: number;
+  assignment_id: number;
+  student_user_id: number;
+  submission_type: "file" | "text" | "link";
+  status: "submitted" | "late" | "missing";
+  submitted_at: string;
+  file_name?: string;
+  file_size?: number | null;
+  has_file: boolean;
+  content_text?: string;
+  link_url?: string;
+  attempt_number: number;
+  is_latest: boolean;
+  student_name?: string;
+  student_email?: string;
+}
+
+export interface CourseSubmissionHistory {
+  assignment_id: number;
+  course_code: string;
+  student_user_id: number;
+  status: "submitted" | "late" | "missing" | "not_submitted";
+  has_submitted: boolean;
+  latest_submission: CourseSubmissionItem | null;
+  history: CourseSubmissionItem[];
+  total_attempts: number;
+  deadline_info: AssignmentDeadlineInfo;
+}
+
+export interface CourseSubmissionsListEntry {
+  student_user_id: number;
+  student_name: string;
+  student_email: string;
+  submission: CourseSubmissionItem | null;
+  status: "submitted" | "late" | "missing" | "not_submitted";
+  submitted_at: string | null;
+  attempt_count: number;
+}
+
+export interface CourseSubmissionsListResponse {
+  assignment_id: number;
+  assignment_title: string;
+  course_code: string;
+  total_enrolled_students: number;
+  total_submissions: number;
+  submissions: CourseSubmissionsListEntry[];
+}
+
+export interface SubmitAssignmentPayload {
+  submission_type: "file" | "text" | "link";
+  file?: File | null;
+  content_text?: string;
+  link_url?: string;
+}
+
+export function useStudentSubmission(code: string, assignmentId: number, enabled = true) {
+  return useQuery({
+    queryKey: [KEY, "assignments", code, assignmentId, "submission", "mine"],
+    queryFn: async () => {
+      return (
+        await http.get<CourseSubmissionHistory>(
+          `/lms/courses/${code}/assignments/${assignmentId}/submissions/mine`,
+        )
+      ).data;
+    },
+    enabled: Boolean(code) && Boolean(assignmentId) && enabled,
+  });
+}
+
+export function useAssignmentSubmissions(code: string, assignmentId: number, enabled = true) {
+  return useQuery({
+    queryKey: [KEY, "assignments", code, assignmentId, "submissions"],
+    queryFn: async () => {
+      return (
+        await http.get<CourseSubmissionsListResponse>(
+          `/lms/courses/${code}/assignments/${assignmentId}/submissions`,
+        )
+      ).data;
+    },
+    enabled: Boolean(code) && Boolean(assignmentId) && enabled,
+  });
+}
+
+export function useSubmitAssignment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      code,
+      assignmentId,
+      body,
+    }: {
+      code: string;
+      assignmentId: number;
+      body: SubmitAssignmentPayload;
+    }) => {
+      let data: FormData | SubmitAssignmentPayload;
+      let headers = {};
+
+      if (body.submission_type === "file" && body.file) {
+        const formData = new FormData();
+        formData.append("submission_type", "file");
+        formData.append("file", body.file);
+        data = formData;
+        headers = { "Content-Type": "multipart/form-data" };
+      } else {
+        data = body;
+      }
+
+      return (
+        await http.post<CourseSubmissionItem>(
+          `/lms/courses/${code}/assignments/${assignmentId}/submissions/mine`,
+          data,
+          { headers },
+        )
+      ).data;
+    },
+    onSuccess: (_, { code, assignmentId }) => {
+      qc.invalidateQueries({ queryKey: [KEY, "assignments", code] });
+      qc.invalidateQueries({
+        queryKey: [KEY, "assignments", code, assignmentId, "submission", "mine"],
+      });
+      qc.invalidateQueries({
+        queryKey: [KEY, "assignments", code, assignmentId, "submissions"],
+      });
+    },
+  });
+}

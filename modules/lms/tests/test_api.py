@@ -13,6 +13,7 @@ from modules.lms.domain.entities import (
     CourseStatus,
     MaterialStatus,
     MaterialType,
+    SubmissionType,
 )
 from modules.lms.models import Course, CourseAssignment, CourseMaterial, CourseMembership
 
@@ -29,6 +30,8 @@ ASG_VIEW = "lms.assignment.view"
 ASG_MANAGE = "lms.assignment.manage"
 DL_VIEW = "lms.deadline.view"
 DL_MANAGE = "lms.deadline.manage"
+SUB_VIEW = "lms.submission.view"
+SUB_SUBMIT = "lms.submission.submit"
 URL_COURSES = "/api/v1/lms/courses"
 
 
@@ -827,3 +830,271 @@ def test_assignment_extensions_crud_and_rbac(stub_iam):
     rta_list3 = ta_c().get(f"{URL_COURSES}/CS803/assignments/{asg.id}/extensions")
     assert rta_list3.status_code == 200
     assert len(rta_list3.data) == 0
+
+
+def test_submission_api_student_flow(stub_iam):
+    course = Course.objects.create(code="CS901", title="Algorithms", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    CourseMembership.objects.create(course=course, user_id=4001, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=4002, role=CourseRole.STUDENT)
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Dynamic Programming",
+        submission_type=SubmissionType.TEXT,
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=4001,
+        due_at=now + timedelta(days=4),
+    )
+
+    client = api_client(
+        stub_iam,
+        user_id=4002,
+        role="student",
+        permissions=(VIEW, ASG_VIEW, SUB_VIEW, SUB_SUBMIT),
+    )
+
+    # 1. GET /mine initially -> not_submitted
+    r_mine = client.get(f"{URL_COURSES}/CS901/assignments/{asg.id}/submissions/mine")
+    assert r_mine.status_code == 200
+    assert r_mine.data["status"] == "not_submitted"
+    assert r_mine.data["has_submitted"] is False
+    assert r_mine.data["total_attempts"] == 0
+
+    # 2. POST submission
+    payload1 = {
+        "submission_type": "text",
+        "content_text": "def knapsack(): pass",
+    }
+    r_sub1 = client.post(
+        f"{URL_COURSES}/CS901/assignments/{asg.id}/submissions/mine",
+        payload1,
+        format="json",
+    )
+    assert r_sub1.status_code == 201
+    assert r_sub1.data["attempt_number"] == 1
+    assert r_sub1.data["status"] == "submitted"
+    assert r_sub1.data["content_text"] == "def knapsack(): pass"
+
+    # 3. GET /mine after submission -> submitted, 1 attempt
+    r_mine2 = client.get(f"{URL_COURSES}/CS901/assignments/{asg.id}/submissions/mine")
+    assert r_mine2.status_code == 200
+    assert r_mine2.data["status"] == "submitted"
+    assert r_mine2.data["has_submitted"] is True
+    assert r_mine2.data["total_attempts"] == 1
+    assert len(r_mine2.data["history"]) == 1
+
+    # 4. Resubmission
+    payload2 = {
+        "submission_type": "text",
+        "content_text": "def knapsack(): return 42",
+    }
+    r_sub2 = client.post(
+        f"{URL_COURSES}/CS901/assignments/{asg.id}/submissions/mine",
+        payload2,
+        format="json",
+    )
+    assert r_sub2.status_code == 201
+    assert r_sub2.data["attempt_number"] == 2
+    assert r_sub2.data["status"] == "submitted"
+
+    # 5. GET /mine after resubmission -> 2 attempts in history
+    r_mine3 = client.get(f"{URL_COURSES}/CS901/assignments/{asg.id}/submissions/mine")
+    assert r_mine3.status_code == 200
+    assert r_mine3.data["total_attempts"] == 2
+    assert len(r_mine3.data["history"]) == 2
+    assert r_mine3.data["history"][0]["attempt_number"] == 2
+    assert r_mine3.data["history"][1]["attempt_number"] == 1
+
+
+def test_submission_api_file_upload_and_download(stub_iam):
+    course = Course.objects.create(code="CS902", title="Networks", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    CourseMembership.objects.create(course=course, user_id=4010, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=4011, role=CourseRole.TA)
+    CourseMembership.objects.create(course=course, user_id=4012, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=course, user_id=4013, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=course, user_id=4014, role=CourseRole.OBSERVER)
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Packet Tracer",
+        submission_type=SubmissionType.FILE,
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=4010,
+        due_at=now + timedelta(days=2),
+    )
+
+    def s1_c():
+        return api_client(
+            stub_iam,
+            user_id=4012,
+            role="student",
+            permissions=(VIEW, ASG_VIEW, SUB_VIEW, SUB_SUBMIT),
+        )
+
+    def s2_c():
+        return api_client(
+            stub_iam,
+            user_id=4013,
+            role="student",
+            permissions=(VIEW, ASG_VIEW, SUB_VIEW, SUB_SUBMIT),
+        )
+
+    def ta_c():
+        return api_client(
+            stub_iam,
+            user_id=4011,
+            role="ta",
+            permissions=(VIEW, ASG_VIEW, SUB_VIEW),
+        )
+
+    def obs_c():
+        return api_client(
+            stub_iam,
+            user_id=4014,
+            role="observer",
+            permissions=(VIEW, ASG_VIEW, SUB_VIEW),
+        )
+
+    # 1. Student 1 submits file
+    file_data = SimpleUploadedFile("network.pkt", b"PKT_DUMMY_CONTENT")
+    r_sub = s1_c().post(
+        f"{URL_COURSES}/CS902/assignments/{asg.id}/submissions/mine",
+        {"submission_type": "file", "file": file_data},
+        format="multipart",
+    )
+    assert r_sub.status_code == 201
+    sub_id = r_sub.data["id"]
+    assert r_sub.data["file_name"] == "network.pkt"
+
+    # 2. Student 1 downloads own file -> 200
+    r_dl_s1 = s1_c().get(
+        f"{URL_COURSES}/CS902/assignments/{asg.id}/submissions/{sub_id}/download"
+    )
+    assert r_dl_s1.status_code == 200
+
+    # 3. Student 2 cannot download Student 1's file -> 404 (or access denied)
+    r_dl_s2 = s2_c().get(
+        f"{URL_COURSES}/CS902/assignments/{asg.id}/submissions/{sub_id}/download"
+    )
+    assert r_dl_s2.status_code == 404
+
+    # 4. TA can download Student 1's file -> 200
+    r_dl_ta = ta_c().get(
+        f"{URL_COURSES}/CS902/assignments/{asg.id}/submissions/{sub_id}/download"
+    )
+    assert r_dl_ta.status_code == 200
+
+    # 5. Observer cannot download Student 1's file -> 404
+    r_dl_obs = obs_c().get(
+        f"{URL_COURSES}/CS902/assignments/{asg.id}/submissions/{sub_id}/download"
+    )
+    assert r_dl_obs.status_code == 404
+
+
+def test_submission_api_list_permissions(stub_iam):
+    course = Course.objects.create(code="CS903", title="Databases", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    CourseMembership.objects.create(course=course, user_id=4020, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=4021, role=CourseRole.TA)
+    CourseMembership.objects.create(course=course, user_id=4022, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=course, user_id=4023, role=CourseRole.OBSERVER)
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Schema Design",
+        submission_type=SubmissionType.TEXT,
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=4020,
+        due_at=now + timedelta(days=1),
+    )
+
+    def s_c():
+        return api_client(
+            stub_iam,
+            user_id=4022,
+            role="student",
+            permissions=(VIEW, ASG_VIEW, SUB_VIEW),
+        )
+
+    def obs_c():
+        return api_client(
+            stub_iam,
+            user_id=4023,
+            role="observer",
+            permissions=(VIEW, ASG_VIEW, SUB_VIEW),
+        )
+
+    def ta_c():
+        return api_client(
+            stub_iam,
+            user_id=4021,
+            role="ta",
+            permissions=(VIEW, ASG_VIEW, SUB_VIEW),
+        )
+
+    # 1. Student cannot list submissions -> 403
+    r_s = s_c().get(f"{URL_COURSES}/CS903/assignments/{asg.id}/submissions")
+    assert r_s.status_code == 403
+
+    # 2. Observer cannot list submissions -> 403
+    r_obs = obs_c().get(f"{URL_COURSES}/CS903/assignments/{asg.id}/submissions")
+    assert r_obs.status_code == 403
+
+    # 3. TA can list submissions -> 200
+    r_ta = ta_c().get(f"{URL_COURSES}/CS903/assignments/{asg.id}/submissions")
+    assert r_ta.status_code == 200
+    assert "submissions" in r_ta.data
+    assert "total_submissions" in r_ta.data
+
+
+def test_submission_api_deadline_closed_and_mismatch(stub_iam):
+    course = Course.objects.create(code="CS904", title="Web", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    CourseMembership.objects.create(course=course, user_id=4030, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=4031, role=CourseRole.STUDENT)
+
+    # Past due, late not allowed
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="HTML Form",
+        submission_type=SubmissionType.LINK,
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=4030,
+        due_at=now - timedelta(days=1),
+        allow_late=False,
+    )
+
+    s_client = api_client(
+        stub_iam,
+        user_id=4031,
+        role="student",
+        permissions=(VIEW, ASG_VIEW, SUB_VIEW, SUB_SUBMIT),
+    )
+
+    # 1. Closed deadline rejected with 409 Conflict
+    r_closed = s_client.post(
+        f"{URL_COURSES}/CS904/assignments/{asg.id}/submissions/mine",
+        {"submission_type": "link", "link_url": "https://example.com"},
+        format="json",
+    )
+    assert r_closed.status_code == 409
+    assert "submission_window_closed" in str(r_closed.data)
+
+    # Update assignment to open
+    asg.due_at = now + timedelta(days=3)
+    asg.save()
+
+    # 2. Type mismatch rejected with 409 Conflict
+    r_mismatch = s_client.post(
+        f"{URL_COURSES}/CS904/assignments/{asg.id}/submissions/mine",
+        {"submission_type": "text", "content_text": "text not link"},
+        format="json",
+    )
+    assert r_mismatch.status_code == 409
+    assert "does not match" in str(r_mismatch.data)

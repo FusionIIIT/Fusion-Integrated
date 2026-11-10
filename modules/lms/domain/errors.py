@@ -40,3 +40,19 @@ class ExtensionDeniedError(LMSRuleError):
 
 class ExtensionNotFoundError(LMSRuleError):
     """Raised when a specified extension record does not exist."""
+
+
+class SubmissionError(LMSRuleError):
+    """Base exception for submission rule violations."""
+
+
+class SubmissionTypeError(SubmissionError):
+    """Raised when submission type is invalid or incompatible with assignment configuration."""
+
+
+class SubmissionWindowClosedError(SubmissionError):
+    """Raised when submission is attempted outside the allowable submission window."""
+
+
+class SubmissionAccessDeniedError(SubmissionError):
+    """Raised when an unauthorized user attempts to view or download a submission."""

@@ -509,6 +509,130 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/lms/courses/{code}/assignments/{assignment_id}/submissions:
+    get:
+      operationId: v1_lms_course_assignment_submissions_list
+      description: List all student submissions for an assignment (Faculty and TA
+        only).
+      summary: List student submissions for an assignment (Faculty and TA only)
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseSubmissionsListResponse'
+          description: ''
+  /api/v1/lms/courses/{code}/assignments/{assignment_id}/submissions/{submission_id}/download:
+    get:
+      operationId: v1_lms_course_assignment_submission_download
+      description: Download attached submission file with student ownership / instructor
+        verification.
+      summary: Download student submission attachment
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: submission_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/lms/courses/{code}/assignments/{assignment_id}/submissions/mine:
+    get:
+      operationId: v1_lms_course_assignment_submission_mine
+      description: Retrieve own submission history or submit assignment work (Student
+        only).
+      summary: View own assignment submission history and status
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseSubmissionHistory'
+          description: ''
+    post:
+      operationId: v1_lms_course_assignment_submission_create
+      description: Retrieve own submission history or submit assignment work (Student
+        only).
+      summary: Submit assignment work (file, text, or link)
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - lms
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CourseSubmissionCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CourseSubmissionCreate'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseSubmissionCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseSubmissionItem'
+          description: ''
   /api/v1/lms/courses/{code}/assignments/{assignment_id}/window:
     patch:
       operationId: v1_lms_course_assignments_window_update
@@ -3398,6 +3522,188 @@ components:
       - display_name
       - email
       - user_id
+    CourseSubmissionCreate:
+      type: object
+      properties:
+        submission_type:
+          $ref: '#/components/schemas/SubmissionTypeEnum'
+        file:
+          type: string
+          format: uri
+          nullable: true
+        content_text:
+          type: string
+          default: ''
+        link_url:
+          type: string
+          default: ''
+      required:
+      - submission_type
+    CourseSubmissionHistory:
+      type: object
+      properties:
+        assignment_id:
+          type: integer
+        course_code:
+          type: string
+        student_user_id:
+          type: integer
+        status:
+          type: string
+        has_submitted:
+          type: boolean
+        latest_submission:
+          allOf:
+          - $ref: '#/components/schemas/CourseSubmissionItem'
+          nullable: true
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseSubmissionItem'
+        total_attempts:
+          type: integer
+        deadline_info:
+          type: object
+          additionalProperties: {}
+      required:
+      - assignment_id
+      - course_code
+      - has_submitted
+      - history
+      - latest_submission
+      - status
+      - student_user_id
+      - total_attempts
+    CourseSubmissionItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        assignment_id:
+          type: integer
+        student_user_id:
+          type: integer
+        submission_type:
+          type: string
+        status:
+          type: string
+        submitted_at:
+          type: string
+        file_name:
+          type: string
+        file_size:
+          type: integer
+          nullable: true
+        has_file:
+          type: boolean
+        content_text:
+          type: string
+        link_url:
+          type: string
+        attempt_number:
+          type: integer
+        is_latest:
+          type: boolean
+        created_at:
+          type: string
+      required:
+      - assignment_id
+      - attempt_number
+      - content_text
+      - created_at
+      - file_name
+      - file_size
+      - has_file
+      - id
+      - is_latest
+      - link_url
+      - status
+      - student_user_id
+      - submission_type
+      - submitted_at
+    CourseSubmissionsListEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        assignment_id:
+          type: integer
+        student_user_id:
+          type: integer
+        student_name:
+          type: string
+        student_email:
+          type: string
+        submission_type:
+          type: string
+        status:
+          type: string
+        submitted_at:
+          type: string
+        file_name:
+          type: string
+        file_size:
+          type: integer
+          nullable: true
+        has_file:
+          type: boolean
+        content_text:
+          type: string
+        link_url:
+          type: string
+        attempt_number:
+          type: integer
+        is_latest:
+          type: boolean
+        created_at:
+          type: string
+      required:
+      - assignment_id
+      - attempt_number
+      - content_text
+      - created_at
+      - file_name
+      - file_size
+      - has_file
+      - id
+      - is_latest
+      - link_url
+      - status
+      - student_email
+      - student_name
+      - student_user_id
+      - submission_type
+      - submitted_at
+    CourseSubmissionsListResponse:
+      type: object
+      properties:
+        assignment_id:
+          type: integer
+        course_code:
+          type: string
+        assignment_title:
+          type: string
+        submission_type:
+          type: string
+        total_submissions:
+          type: integer
+        on_time_count:
+          type: integer
+        late_count:
+          type: integer
+        submissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseSubmissionsListEntry'
+      required:
+      - assignment_id
+      - assignment_title
+      - course_code
+      - late_count
+      - on_time_count
+      - submission_type
+      - submissions
+      - total_submissions
     CourseSummary:
       type: object
       properties:

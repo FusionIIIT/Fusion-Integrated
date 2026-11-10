@@ -16,6 +16,8 @@ from modules.lms.domain.entities import (
     MaterialStatus,
     MaterialType,
     SectionType,
+    SubmissionDetails,
+    SubmissionStatus,
     SubmissionType,
     validate_announcement_details,
     validate_assignment_details,
@@ -23,6 +25,7 @@ from modules.lms.domain.entities import (
     validate_deadline_window,
     validate_extension_details,
     validate_material_details,
+    validate_submission_details,
 )
 from modules.lms.domain.errors import (
     AssignmentAccessDeniedError,
@@ -35,6 +38,10 @@ from modules.lms.domain.errors import (
     LMSRuleError,
     MaterialAccessDeniedError,
     MaterialAuthoringDeniedError,
+    SubmissionAccessDeniedError,
+    SubmissionError,
+    SubmissionTypeError,
+    SubmissionWindowClosedError,
 )
 
 
@@ -497,3 +504,115 @@ def test_deadline_domain_errors():
     assert issubclass(DeadlineWindowError, LMSRuleError)
     assert issubclass(ExtensionDeniedError, LMSRuleError)
     assert issubclass(ExtensionNotFoundError, LMSRuleError)
+
+
+def test_submission_details_dataclass():
+    s = SubmissionDetails(
+        assignment_id=1,
+        student_user_id=10,
+        submission_type=SubmissionType.FILE,
+        status=SubmissionStatus.SUBMITTED,
+        file_name="solution.pdf",
+        file_size=1024,
+        attempt_number=1,
+    )
+    assert s.assignment_id == 1
+    assert s.student_user_id == 10
+    assert s.submission_type == "file"
+    assert s.status == "submitted"
+    assert s.file_name == "solution.pdf"
+    assert s.file_size == 1024
+    assert s.attempt_number == 1
+
+
+def test_validate_submission_details_valid_file():
+    class DummyFile:
+        name = "report.pdf"
+        size = 2048
+
+    dummy = DummyFile()
+    validate_submission_details(
+        assignment_submission_type="file",
+        submission_type="file",
+        file=dummy,
+    )
+
+
+def test_validate_submission_details_valid_text():
+    validate_submission_details(
+        assignment_submission_type="text",
+        submission_type="text",
+        content_text="   print('Hello World')   ",
+    )
+
+
+def test_validate_submission_details_valid_link():
+    validate_submission_details(
+        assignment_submission_type="link",
+        submission_type="link",
+        link_url="  https://github.com/student/project  ",
+    )
+
+
+def test_validate_submission_details_type_mismatch():
+    with pytest.raises(SubmissionTypeError, match="does not match the assignment"):
+        validate_submission_details(
+            assignment_submission_type="file",
+            submission_type="text",
+            content_text="here is my code",
+        )
+
+    with pytest.raises(SubmissionTypeError, match="does not match the assignment"):
+        validate_submission_details(
+            assignment_submission_type="text",
+            submission_type="link",
+            link_url="https://example.com",
+        )
+
+
+def test_validate_submission_details_file_missing():
+    with pytest.raises(SubmissionTypeError, match="requires an uploaded file attachment"):
+        validate_submission_details(
+            assignment_submission_type="file",
+            submission_type="file",
+            file=None,
+        )
+
+
+def test_validate_submission_details_text_empty():
+    with pytest.raises(SubmissionTypeError, match="requires non-empty content text"):
+        validate_submission_details(
+            assignment_submission_type="text",
+            submission_type="text",
+            content_text="   ",
+        )
+
+
+def test_validate_submission_details_link_invalid():
+    with pytest.raises(SubmissionTypeError, match="requires a valid URL"):
+        validate_submission_details(
+            assignment_submission_type="link",
+            submission_type="link",
+            link_url="   ",
+        )
+
+    with pytest.raises(SubmissionTypeError, match="must start with 'http://' or 'https://'"):
+        validate_submission_details(
+            assignment_submission_type="link",
+            submission_type="link",
+            link_url="not-a-valid-url",
+        )
+
+    with pytest.raises(SubmissionTypeError, match="must start with 'http://' or 'https://'"):
+        validate_submission_details(
+            assignment_submission_type="link",
+            submission_type="link",
+            link_url="ftp://ftp.example.com/file",
+        )
+
+
+def test_submission_domain_errors():
+    assert issubclass(SubmissionError, LMSRuleError)
+    assert issubclass(SubmissionTypeError, SubmissionError)
+    assert issubclass(SubmissionWindowClosedError, SubmissionError)
+    assert issubclass(SubmissionAccessDeniedError, SubmissionError)

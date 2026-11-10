@@ -41,11 +41,13 @@ import {
   FaEye,
   FaFileAlt,
   FaFolderOpen,
+  FaHistory,
   FaInfoCircle,
   FaPlus,
   FaStickyNote,
   FaTasks,
   FaTrash,
+  FaUpload,
   FaUserGraduate,
 } from "react-icons/fa";
 
@@ -65,6 +67,7 @@ import {
   type UpdateMaterialPayload,
   useAssignmentDeadline,
   useAssignmentExtensions,
+  useAssignmentSubmissions,
   useCourseAnnouncements,
   useCourseAssignments,
   useCourseMaterials,
@@ -77,6 +80,8 @@ import {
   useGrantExtension,
   usePostCourseAnnouncement,
   useRevokeExtension,
+  useStudentSubmission,
+  useSubmitAssignment,
   useUpdateAssignment,
   useUpdateCourseWorkspace,
   useUpdateDeadlineWindow,
@@ -233,6 +238,165 @@ function AssignmentDeadlineSection({
       {deadline.can_manage_deadlines && (
         <Text size="xs" c="dimmed" mt="xs">
           Total active extensions for this assignment: {deadline.total_extensions}
+        </Text>
+      )}
+    </Paper>
+  );
+}
+
+function renderSubmissionStatusBadge(status?: string) {
+  switch (status) {
+    case "submitted":
+      return (
+        <Badge color="green" variant="filled">
+          Submitted
+        </Badge>
+      );
+    case "late":
+      return (
+        <Badge color="yellow" variant="filled">
+          Submitted Late
+        </Badge>
+      );
+    case "missing":
+      return (
+        <Badge color="red" variant="filled">
+          Missing
+        </Badge>
+      );
+    case "not_submitted":
+    default:
+      return (
+        <Badge color="gray" variant="light">
+          Not Submitted
+        </Badge>
+      );
+  }
+}
+
+function StudentSubmissionCardSection({
+  courseCode,
+  assignment,
+  onOpenSubmit,
+}: {
+  courseCode: string;
+  assignment: CourseAssignmentItem;
+  onOpenSubmit: () => void;
+}) {
+  const { data: subData, isPending } = useStudentSubmission(courseCode, assignment.id);
+  const [showHistory, setShowHistory] = useState(false);
+
+  if (isPending) {
+    return (
+      <Group justify="center" p="xs">
+        <Loader size="xs" />
+      </Group>
+    );
+  }
+
+  const latest = subData?.latest_submission;
+  const isSubmissionAllowed = subData?.deadline_info?.is_submission_allowed ?? true;
+
+  return (
+    <Paper p="sm" withBorder radius="sm" bg="blue.0" mt="xs">
+      <Group justify="space-between" align="center" mb={6}>
+        <Group gap="xs">
+          <Text size="xs" fw={700} c="dimmed" tt="uppercase">
+            Your Submission Status
+          </Text>
+          {renderSubmissionStatusBadge(subData?.status)}
+        </Group>
+        {isSubmissionAllowed && (
+          <Button
+            size="xs"
+            color="teal"
+            variant="filled"
+            leftSection={<FaUpload size={12} />}
+            onClick={onOpenSubmit}
+          >
+            {subData?.has_submitted ? "Resubmit Work" : "Submit Work"}
+          </Button>
+        )}
+      </Group>
+
+      {latest ? (
+        <Stack gap="xs" mt="xs">
+          <Group justify="space-between" align="center">
+            <Text size="xs" c="dimmed">
+              Submitted at: {new Date(latest.submitted_at).toLocaleString()} (Attempt #{latest.attempt_number})
+            </Text>
+            {assignment.submission_type === "file" && latest.file_name && (
+              <Button
+                component="a"
+                href={`/api/v1/lms/courses/${courseCode}/assignments/${assignment.id}/submissions/${latest.id}/download`}
+                download={latest.file_name}
+                size="xs"
+                variant="subtle"
+                leftSection={<FaDownload size={12} />}
+              >
+                {latest.file_name} {latest.file_size ? `(${formatBytes(latest.file_size)})` : ""}
+              </Button>
+            )}
+          </Group>
+
+          {assignment.submission_type === "text" && latest.content_text && (
+            <Paper p="xs" bg="white" withBorder radius="xs">
+              <Text size="xs" fw={500} c="dimmed" mb={2}>Submitted Text:</Text>
+              <Text size="xs" lineClamp={3} style={{ whiteSpace: "pre-wrap" }}>
+                {latest.content_text}
+              </Text>
+            </Paper>
+          )}
+
+          {assignment.submission_type === "link" && latest.link_url && (
+            <Group gap="xs">
+              <Text size="xs" c="dimmed">Submitted URL:</Text>
+              <Text
+                component="a"
+                href={latest.link_url}
+                target="_blank"
+                rel="noreferrer"
+                size="xs"
+                c="blue"
+                style={{ textDecoration: "underline" }}
+              >
+                {latest.link_url}
+              </Text>
+            </Group>
+          )}
+
+          {subData && subData.history.length > 1 && (
+            <div>
+              <Button
+                variant="subtle"
+                size="compact-xs"
+                onClick={() => setShowHistory((prev) => !prev)}
+                leftSection={<FaHistory size={10} />}
+              >
+                {showHistory ? "Hide Previous Attempts" : `Show All ${subData.history.length} Attempts`}
+              </Button>
+              {showHistory && (
+                <Stack gap={4} mt={6}>
+                  {subData.history.map((att) => (
+                    <Paper key={att.id} p={6} bg="white" withBorder radius="xs">
+                      <Group justify="space-between">
+                        <Text size="xs">
+                          Attempt #{att.attempt_number} — {new Date(att.submitted_at).toLocaleString()}
+                        </Text>
+                        <Badge size="xs" variant="outline">
+                          {att.status.toUpperCase()}
+                        </Badge>
+                      </Group>
+                    </Paper>
+                  ))}
+                </Stack>
+              )}
+            </div>
+          )}
+        </Stack>
+      ) : (
+        <Text size="xs" c="dimmed" mt={4}>
+          No submission uploaded yet for this assignment.
         </Text>
       )}
     </Paper>
@@ -607,6 +771,309 @@ function DeadlinesModal({ opened, onClose, courseCode, assignment }: DeadlinesMo
   );
 }
 
+interface SubmitAssignmentModalProps {
+  opened: boolean;
+  onClose: () => void;
+  courseCode: string;
+  assignment: CourseAssignmentItem | null;
+}
+
+function SubmitAssignmentModal({
+  opened,
+  onClose,
+  courseCode,
+  assignment,
+}: SubmitAssignmentModalProps) {
+  const submitMutation = useSubmitAssignment();
+  const [file, setFile] = useState<File | null>(null);
+  const [contentText, setContentText] = useState("");
+  const [linkUrl, setLinkUrl] = useState("");
+
+  useEffect(() => {
+    if (opened) {
+      setFile(null);
+      setContentText("");
+      setLinkUrl("");
+    }
+  }, [opened]);
+
+  if (!assignment) return null;
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!assignment) return;
+    try {
+      await submitMutation.mutateAsync({
+        code: courseCode,
+        assignmentId: assignment.id,
+        body: {
+          submission_type: assignment.submission_type,
+          file,
+          content_text: contentText,
+          link_url: linkUrl,
+        },
+      });
+      notifications.show({
+        title: "Assignment Submitted",
+        message: "Your submission has been recorded successfully.",
+        color: "teal",
+      });
+      onClose();
+    } catch (err) {
+      notifications.show({
+        title: "Submission Failed",
+        message: errorMessage(err),
+        color: "red",
+      });
+    }
+  }
+
+  return (
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title={`Submit Assignment — ${assignment.title}`}
+      size="md"
+      centered
+    >
+      <form onSubmit={handleSubmit}>
+        <Stack gap="md">
+          <Paper p="xs" bg="gray.0" withBorder radius="xs">
+            <Group justify="space-between">
+              <Text size="xs" fw={600} tt="uppercase" c="dimmed">
+                Required Submission Type
+              </Text>
+              <Badge size="sm" color="indigo" variant="light">
+                {assignment.submission_type.toUpperCase()}
+              </Badge>
+            </Group>
+          </Paper>
+
+          {assignment.submission_type === "file" && (
+            <FileInput
+              label="Submission File"
+              description="Upload your completed solution or document (Max 50MB)"
+              placeholder="Click to select file"
+              leftSection={<FaUpload size={14} />}
+              required
+              value={file}
+              onChange={setFile}
+            />
+          )}
+
+          {assignment.submission_type === "text" && (
+            <Textarea
+              label="Response / Solution Text"
+              description="Type or paste your text solution below"
+              placeholder="Enter your assignment response..."
+              required
+              minRows={6}
+              value={contentText}
+              onChange={(e) => setContentText(e.currentTarget.value)}
+            />
+          )}
+
+          {assignment.submission_type === "link" && (
+            <TextInput
+              label="Repository or Project URL"
+              description="Provide the public URL (http:// or https://)"
+              placeholder="https://github.com/username/project"
+              required
+              value={linkUrl}
+              onChange={(e) => setLinkUrl(e.currentTarget.value)}
+            />
+          )}
+
+          <Group justify="flex-end" mt="md">
+            <Button variant="default" onClick={onClose} disabled={submitMutation.isPending}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              color="teal"
+              loading={submitMutation.isPending}
+              leftSection={<FaUpload size={14} />}
+            >
+              Confirm Submission
+            </Button>
+          </Group>
+        </Stack>
+      </form>
+    </Modal>
+  );
+}
+
+interface SubmissionsListModalProps {
+  opened: boolean;
+  onClose: () => void;
+  courseCode: string;
+  assignment: CourseAssignmentItem | null;
+}
+
+function SubmissionsListModal({
+  opened,
+  onClose,
+  courseCode,
+  assignment,
+}: SubmissionsListModalProps) {
+  const { data, isPending } = useAssignmentSubmissions(
+    courseCode,
+    assignment?.id ?? 0,
+    opened && Boolean(assignment),
+  );
+
+  const [selectedTextContent, setSelectedTextContent] = useState<string | null>(null);
+
+  if (!assignment) return null;
+
+  return (
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title={`Class Submissions — ${assignment.title}`}
+      size="xl"
+      centered
+    >
+      <Stack gap="md">
+        <Paper p="sm" withBorder radius="sm" bg="gray.0">
+          <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="xs">
+            <div>
+              <Text size="xs" c="dimmed">Enrolled Students</Text>
+              <Text size="lg" fw={700}>{data?.total_enrolled_students ?? 0}</Text>
+            </div>
+            <div>
+              <Text size="xs" c="dimmed">Submissions Received</Text>
+              <Text size="lg" fw={700} c="teal">{data?.total_submissions ?? 0}</Text>
+            </div>
+            <div>
+              <Text size="xs" c="dimmed">Configured Type</Text>
+              <Text size="sm" fw={600} tt="uppercase">{assignment.submission_type}</Text>
+            </div>
+            <div>
+              <Text size="xs" c="dimmed">Submission Rate</Text>
+              <Text size="sm" fw={600}>
+                {data && data.total_enrolled_students > 0
+                  ? `${Math.round((data.total_submissions / data.total_enrolled_students) * 100)}%`
+                  : "0%"}
+              </Text>
+            </div>
+          </SimpleGrid>
+        </Paper>
+
+        {isPending ? (
+          <Group justify="center" p="xl">
+            <Loader size="sm" />
+          </Group>
+        ) : !data || data.submissions.length === 0 ? (
+          <Text size="sm" c="dimmed" ta="center" py="md">
+            No enrolled students or submissions found.
+          </Text>
+        ) : (
+          <Table.ScrollContainer minWidth={600}>
+            <Table striped highlightOnHover>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Student</Table.Th>
+                  <Table.Th>Status</Table.Th>
+                  <Table.Th>Attempts</Table.Th>
+                  <Table.Th>Submitted At</Table.Th>
+                  <Table.Th>Submission Work</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {data.submissions.map((sub) => {
+                  const s = sub.submission;
+                  return (
+                    <Table.Tr key={sub.student_user_id}>
+                      <Table.Td>
+                        <Text size="sm" fw={500}>{sub.student_name}</Text>
+                        <Text size="xs" c="dimmed">{sub.student_email || `User ID: ${sub.student_user_id}`}</Text>
+                      </Table.Td>
+                      <Table.Td>
+                        {renderSubmissionStatusBadge(sub.status)}
+                      </Table.Td>
+                      <Table.Td>
+                        <Text size="sm">{sub.attempt_count > 0 ? `${sub.attempt_count}` : "—"}</Text>
+                      </Table.Td>
+                      <Table.Td>
+                        <Text size="xs" c="dimmed">
+                          {sub.submitted_at ? new Date(sub.submitted_at).toLocaleString() : "—"}
+                        </Text>
+                      </Table.Td>
+                      <Table.Td>
+                        {s ? (
+                          s.submission_type === "file" && s.file_name ? (
+                            <Button
+                              component="a"
+                              href={`/api/v1/lms/courses/${courseCode}/assignments/${assignment.id}/submissions/${s.id}/download`}
+                              download={s.file_name}
+                              size="xs"
+                              variant="light"
+                              leftSection={<FaDownload size={12} />}
+                            >
+                              Download ({s.file_name})
+                            </Button>
+                          ) : s.submission_type === "text" ? (
+                            <Button
+                              size="xs"
+                              variant="subtle"
+                              onClick={() => setSelectedTextContent(s.content_text || "No text")}
+                            >
+                              View Text
+                            </Button>
+                          ) : s.submission_type === "link" && s.link_url ? (
+                            <Button
+                              component="a"
+                              href={s.link_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              size="xs"
+                              variant="subtle"
+                              leftSection={<FaExternalLinkAlt size={12} />}
+                            >
+                              Open Link
+                            </Button>
+                          ) : (
+                            <Text size="xs" c="dimmed">None</Text>
+                          )
+                        ) : (
+                          <Text size="xs" c="dimmed">—</Text>
+                        )}
+                      </Table.Td>
+                    </Table.Tr>
+                  );
+                })}
+              </Table.Tbody>
+            </Table>
+          </Table.ScrollContainer>
+        )}
+
+        {selectedTextContent && (
+          <Modal
+            opened={Boolean(selectedTextContent)}
+            onClose={() => setSelectedTextContent(null)}
+            title="Student Text Submission"
+            size="md"
+            centered
+          >
+            <Paper p="sm" bg="gray.0" withBorder>
+              <Text size="sm" style={{ whiteSpace: "pre-wrap" }}>
+                {selectedTextContent}
+              </Text>
+            </Paper>
+          </Modal>
+        )}
+
+        <Group justify="flex-end" mt="md">
+          <Button variant="default" onClick={onClose}>
+            Close
+          </Button>
+        </Group>
+      </Stack>
+    </Modal>
+  );
+}
+
 export default function CourseWorkspacePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedCode = searchParams.get("code");
@@ -681,6 +1148,22 @@ export default function CourseWorkspacePage() {
   function openDeadlineModal(a: CourseAssignmentItem) {
     setDeadlineAssignment(a);
     setDeadlineModalOpened(true);
+  }
+
+  const [submitModalOpened, setSubmitModalOpened] = useState(false);
+  const [submitAssignment, setSubmitAssignment] = useState<CourseAssignmentItem | null>(null);
+
+  const [submissionsListOpened, setSubmissionsListOpened] = useState(false);
+  const [submissionsListAssignment, setSubmissionsListAssignment] = useState<CourseAssignmentItem | null>(null);
+
+  function openSubmitModal(a: CourseAssignmentItem) {
+    setSubmitAssignment(a);
+    setSubmitModalOpened(true);
+  }
+
+  function openSubmissionsListModal(a: CourseAssignmentItem) {
+    setSubmissionsListAssignment(a);
+    setSubmissionsListOpened(true);
   }
 
   // Materials modal states
@@ -1883,32 +2366,44 @@ export default function CourseWorkspacePage() {
                         </Group>
                       </div>
 
-                      {assignmentsData.can_manage && (
+                      {(assignmentsData.can_manage || workspace.role === "ta") && (
                         <Group gap="xs">
                           <ActionIcon
                             variant="subtle"
-                            color="teal"
-                            onClick={() => openDeadlineModal(asg)}
-                            title="Manage Deadlines & Extensions"
+                            color="violet"
+                            onClick={() => openSubmissionsListModal(asg)}
+                            title="View Class Submissions"
                           >
-                            <FaClock size={14} />
+                            <FaTasks size={14} />
                           </ActionIcon>
-                          <ActionIcon
-                            variant="subtle"
-                            color="blue"
-                            onClick={() => openEditAssignmentModal(asg)}
-                            title="Edit Assignment"
-                          >
-                            <FaEdit size={14} />
-                          </ActionIcon>
-                          <ActionIcon
-                            variant="subtle"
-                            color="red"
-                            onClick={() => handleDeleteAssignment(asg.id, asg.title)}
-                            title="Delete Assignment"
-                          >
-                            <FaTrash size={14} />
-                          </ActionIcon>
+                          {assignmentsData.can_manage && (
+                            <>
+                              <ActionIcon
+                                variant="subtle"
+                                color="teal"
+                                onClick={() => openDeadlineModal(asg)}
+                                title="Manage Deadlines & Extensions"
+                              >
+                                <FaClock size={14} />
+                              </ActionIcon>
+                              <ActionIcon
+                                variant="subtle"
+                                color="blue"
+                                onClick={() => openEditAssignmentModal(asg)}
+                                title="Edit Assignment"
+                              >
+                                <FaEdit size={14} />
+                              </ActionIcon>
+                              <ActionIcon
+                                variant="subtle"
+                                color="red"
+                                onClick={() => handleDeleteAssignment(asg.id, asg.title)}
+                                title="Delete Assignment"
+                              >
+                                <FaTrash size={14} />
+                              </ActionIcon>
+                            </>
+                          )}
                         </Group>
                       )}
                     </Group>
@@ -1923,6 +2418,14 @@ export default function CourseWorkspacePage() {
                       <Text size="sm" c="dimmed" fs="italic">
                         No instructions provided.
                       </Text>
+                    )}
+
+                    {workspace.role === "student" && (
+                      <StudentSubmissionCardSection
+                        courseCode={workspace.code}
+                        assignment={asg}
+                        onOpenSubmit={() => openSubmitModal(asg)}
+                      />
                     )}
 
                     <Group justify="space-between" align="center" mt="md">
@@ -2741,20 +3244,46 @@ export default function CourseWorkspacePage() {
               </Group>
             )}
 
+            {workspace.role === "student" && (
+              <StudentSubmissionCardSection
+                courseCode={workspace.code}
+                assignment={viewingAssignment}
+                onOpenSubmit={() => {
+                  setAssignmentDetailOpened(false);
+                  openSubmitModal(viewingAssignment);
+                }}
+              />
+            )}
+
             <Group justify="space-between" mt="md">
-              {assignmentsData?.can_manage && (
-                <Button
-                  variant="light"
-                  color="teal"
-                  leftSection={<FaClock size={14} />}
-                  onClick={() => {
-                    setAssignmentDetailOpened(false);
-                    openDeadlineModal(viewingAssignment);
-                  }}
-                >
-                  Manage Deadlines & Extensions
-                </Button>
-              )}
+              <Group gap="xs">
+                {(assignmentsData?.can_manage || workspace.role === "ta") && (
+                  <Button
+                    variant="light"
+                    color="violet"
+                    leftSection={<FaTasks size={14} />}
+                    onClick={() => {
+                      setAssignmentDetailOpened(false);
+                      openSubmissionsListModal(viewingAssignment);
+                    }}
+                  >
+                    View Class Submissions
+                  </Button>
+                )}
+                {assignmentsData?.can_manage && (
+                  <Button
+                    variant="light"
+                    color="teal"
+                    leftSection={<FaClock size={14} />}
+                    onClick={() => {
+                      setAssignmentDetailOpened(false);
+                      openDeadlineModal(viewingAssignment);
+                    }}
+                  >
+                    Manage Deadlines & Extensions
+                  </Button>
+                )}
+              </Group>
               <Button variant="default" onClick={() => setAssignmentDetailOpened(false)}>
                 Close
               </Button>
@@ -2771,6 +3300,26 @@ export default function CourseWorkspacePage() {
         }}
         courseCode={workspace?.code ?? ""}
         assignment={deadlineAssignment}
+      />
+
+      <SubmitAssignmentModal
+        opened={submitModalOpened}
+        onClose={() => {
+          setSubmitModalOpened(false);
+          setSubmitAssignment(null);
+        }}
+        courseCode={workspace?.code ?? ""}
+        assignment={submitAssignment}
+      />
+
+      <SubmissionsListModal
+        opened={submissionsListOpened}
+        onClose={() => {
+          setSubmissionsListOpened(false);
+          setSubmissionsListAssignment(null);
+        }}
+        courseCode={workspace?.code ?? ""}
+        assignment={submissionsListAssignment}
       />
 
     </Container>

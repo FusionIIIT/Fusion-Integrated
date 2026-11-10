@@ -27,6 +27,8 @@ For the intended taxonomy of modules not yet built, see
 | `lms.assignment.manage` | Create, edit, and publish course assignments | `faculty` |
 | `lms.deadline.view` | View assignment deadlines and submission window status | `faculty`, `staff`, `student` |
 | `lms.deadline.manage` | Configure submission windows and grant extensions | `faculty` |
+| `lms.submission.submit` | Submit assignment work (Student only) | `student` |
+| `lms.submission.view` | View assignment submissions (own for student, all for faculty/TA) | `faculty`, `staff`, `student` |
 
 ## `placement_cell`
 

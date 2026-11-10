@@ -8,6 +8,7 @@ from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedEr
 from fusion_auth.principal import Principal
 from modules.lms.contracts import (
     get_assignment_deadlines,
+    get_assignment_submissions,
     get_course_announcements,
     get_course_assignments,
 )
@@ -19,6 +20,7 @@ from modules.lms.domain.entities import (
     MaterialStatus,
     MaterialType,
     SectionType,
+    SubmissionStatus,
     SubmissionType,
 )
 from modules.lms.models import (
@@ -28,6 +30,7 @@ from modules.lms.models import (
     CourseAssignmentExtension,
     CourseMaterial,
     CourseMembership,
+    CourseSubmission,
 )
 from modules.lms.selectors.announcements import (
     get_course_announcement_detail,
@@ -42,11 +45,17 @@ from modules.lms.selectors.deadlines import (
     get_assignment_deadline_info,
     list_assignment_extensions,
 )
+from modules.lms.selectors.submissions import (
+    get_student_submission_history,
+    get_submission_for_download,
+    list_assignment_submissions,
+)
 from modules.lms.services import announcements as announcement_service
 from modules.lms.services import assignments as assignment_service
 from modules.lms.services import courses as course_service
 from modules.lms.services import deadlines as deadline_service
 from modules.lms.services import materials as material_service
+from modules.lms.services import submissions as submission_service
 
 
 def make_principal(user_id: int, role: str, permissions: tuple[str, ...]) -> Principal:
@@ -1083,3 +1092,466 @@ def test_contract_get_assignment_deadlines():
     assert deadlines[asg1.id]["is_extended"] is True
     assert deadlines[asg2.id]["is_extended"] is False
     assert deadlines[asg2.id]["allow_late"] is True
+
+
+@pytest.mark.django_db
+def test_submission_service_on_time_text_and_resubmission():
+    from conftest import make_principal
+
+    course = Course.objects.create(code="CS801", title="Compiler Design", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    # Faculty, Student
+    CourseMembership.objects.create(course=course, user_id=1, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=20, role=CourseRole.STUDENT)
+
+    student_principal = make_principal(
+        user_id=20,
+        kind="student",
+        roles=("student",),
+        active_role="student",
+        permissions=("lms.submission.submit", "lms.submission.view", "lms.assignment.view"),
+        modules=("lms",),
+    )
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Lexer Implementation",
+        submission_type=SubmissionType.TEXT,
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=1,
+        due_at=now + timedelta(days=3),
+    )
+
+    # 1. Initial on-time submission
+    sub1 = submission_service.create_submission(
+        actor=student_principal,
+        course_code="CS801",
+        assignment_id=asg.id,
+        submission_type="text",
+        content_text="def tokenize(s): return s.split()",
+    )
+    assert sub1.attempt_number == 1
+    assert sub1.is_latest is True
+    assert sub1.status == SubmissionStatus.SUBMITTED
+    assert sub1.content_text == "def tokenize(s): return s.split()"
+
+    # 2. Resubmission (attempt 2)
+    sub2 = submission_service.create_submission(
+        actor=student_principal,
+        course_code="CS801",
+        assignment_id=asg.id,
+        submission_type="text",
+        content_text="def tokenize_v2(s): import re; return re.findall(r'\\w+', s)",
+    )
+    assert sub2.attempt_number == 2
+    assert sub2.is_latest is True
+    assert sub2.status == SubmissionStatus.SUBMITTED
+
+    # Check that previous submission is no longer latest
+    sub1.refresh_from_db()
+    assert sub1.is_latest is False
+
+    # Check student history selector
+    hist = get_student_submission_history(
+        principal=student_principal,
+        course_code="CS801",
+        assignment_id=asg.id,
+    )
+    assert hist is not None
+    assert hist["status"] == "submitted"
+    assert hist["total_attempts"] == 2
+    assert len(hist["history"]) == 2
+    assert hist["history"][0]["attempt_number"] == 2
+    assert hist["history"][1]["attempt_number"] == 1
+
+
+@pytest.mark.django_db
+def test_submission_service_file_and_download():
+    from django.core.files.uploadedfile import SimpleUploadedFile
+
+    from conftest import make_principal
+
+    course = Course.objects.create(code="CS802", title="OS", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    CourseMembership.objects.create(course=course, user_id=1, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=2, role=CourseRole.TA)
+    CourseMembership.objects.create(course=course, user_id=30, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=course, user_id=31, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=course, user_id=40, role=CourseRole.OBSERVER)
+
+    s1_principal = make_principal(
+        user_id=30,
+        kind="student",
+        roles=("student",),
+        active_role="student",
+        permissions=("lms.submission.submit", "lms.submission.view", "lms.assignment.view"),
+        modules=("lms",),
+    )
+    s2_principal = make_principal(
+        user_id=31,
+        kind="student",
+        roles=("student",),
+        active_role="student",
+        permissions=("lms.submission.submit", "lms.submission.view", "lms.assignment.view"),
+        modules=("lms",),
+    )
+    faculty_principal = make_principal(
+        user_id=1,
+        kind="faculty",
+        roles=("faculty",),
+        active_role="faculty",
+        permissions=("lms.submission.view", "lms.assignment.view"),
+        modules=("lms",),
+    )
+    ta_principal = make_principal(
+        user_id=2,
+        kind="ta",
+        roles=("ta",),
+        active_role="ta",
+        permissions=("lms.submission.view", "lms.assignment.view"),
+        modules=("lms",),
+    )
+    observer_principal = make_principal(
+        user_id=40,
+        kind="observer",
+        roles=("observer",),
+        active_role="observer",
+        permissions=("lms.assignment.view",),
+        modules=("lms",),
+    )
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Kernel Patch",
+        submission_type=SubmissionType.FILE,
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=1,
+        due_at=now + timedelta(days=2),
+    )
+
+    uploaded_file = SimpleUploadedFile("patch.diff", b"diff --git a/main.c b/main.c\n+ok")
+    sub = submission_service.create_submission(
+        actor=s1_principal,
+        course_code="CS802",
+        assignment_id=asg.id,
+        submission_type="file",
+        file=uploaded_file,
+    )
+    assert sub.submission_type == "file"
+    assert sub.file_name == "patch.diff"
+    assert sub.file_size is not None
+
+    # Student 1 can download own file
+    d1 = get_submission_for_download(
+        principal=s1_principal,
+        course_code="CS802",
+        assignment_id=asg.id,
+        submission_id=sub.id,
+    )
+    assert d1 is not None
+    assert d1.id == sub.id
+
+    # Student 2 cannot download Student 1's file (privacy enforcement, BR-LMS-014)
+    d2 = get_submission_for_download(
+        principal=s2_principal,
+        course_code="CS802",
+        assignment_id=asg.id,
+        submission_id=sub.id,
+    )
+    assert d2 is None
+
+    # Faculty can download
+    d_fac = get_submission_for_download(
+        principal=faculty_principal,
+        course_code="CS802",
+        assignment_id=asg.id,
+        submission_id=sub.id,
+    )
+    assert d_fac is not None
+
+    # TA can download
+    d_ta = get_submission_for_download(
+        principal=ta_principal,
+        course_code="CS802",
+        assignment_id=asg.id,
+        submission_id=sub.id,
+    )
+    assert d_ta is not None
+
+    # Observer cannot download
+    d_obs = get_submission_for_download(
+        principal=observer_principal,
+        course_code="CS802",
+        assignment_id=asg.id,
+        submission_id=sub.id,
+    )
+    assert d_obs is None
+
+
+@pytest.mark.django_db
+def test_submission_service_link_and_type_mismatch():
+    from conftest import make_principal
+
+    course = Course.objects.create(code="CS803", title="Web Dev", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    CourseMembership.objects.create(course=course, user_id=1, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=50, role=CourseRole.STUDENT)
+
+    student_principal = make_principal(
+        user_id=50,
+        kind="student",
+        roles=("student",),
+        active_role="student",
+        permissions=("lms.submission.submit", "lms.submission.view", "lms.assignment.view"),
+        modules=("lms",),
+    )
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Portfolio Site",
+        submission_type=SubmissionType.LINK,
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=1,
+        due_at=now + timedelta(days=5),
+    )
+
+    # Valid link submission
+    sub = submission_service.create_submission(
+        actor=student_principal,
+        course_code="CS803",
+        assignment_id=asg.id,
+        submission_type="link",
+        link_url="https://student-portfolio.example.com",
+    )
+    assert sub.submission_type == "link"
+    assert sub.link_url == "https://student-portfolio.example.com"
+
+    # Type mismatch rejected
+    with pytest.raises(ConflictError, match="does not match"):
+        submission_service.create_submission(
+            actor=student_principal,
+            course_code="CS803",
+            assignment_id=asg.id,
+            submission_type="text",
+            content_text="my link is inside text",
+        )
+
+
+@pytest.mark.django_db
+def test_submission_service_late_and_closed_deadlines():
+    from conftest import make_principal
+
+    course = Course.objects.create(code="CS804", title="Algorithms", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    CourseMembership.objects.create(course=course, user_id=1, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=60, role=CourseRole.STUDENT)
+
+    student_principal = make_principal(
+        user_id=60,
+        kind="student",
+        roles=("student",),
+        active_role="student",
+        permissions=("lms.submission.submit", "lms.submission.view", "lms.assignment.view"),
+        modules=("lms",),
+    )
+
+    # 1. Assignment with late allowed: past due but before closes_at
+    asg_late = CourseAssignment.objects.create(
+        course=course,
+        title="Sorting",
+        submission_type=SubmissionType.TEXT,
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=1,
+        due_at=now - timedelta(hours=2),
+        closes_at=now + timedelta(days=2),
+        allow_late=True,
+    )
+    sub_late = submission_service.create_submission(
+        actor=student_principal,
+        course_code="CS804",
+        assignment_id=asg_late.id,
+        submission_type="text",
+        content_text="quicksort code",
+    )
+    assert sub_late.status == SubmissionStatus.LATE
+
+    # 2. Assignment strictly past deadline: no late allowed
+    asg_closed = CourseAssignment.objects.create(
+        course=course,
+        title="Graphs",
+        submission_type=SubmissionType.TEXT,
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=1,
+        due_at=now - timedelta(hours=1),
+        allow_late=False,
+    )
+    with pytest.raises(ConflictError, match="Submission deadline window is closed"):
+        submission_service.create_submission(
+            actor=student_principal,
+            course_code="CS804",
+            assignment_id=asg_closed.id,
+            submission_type="text",
+            content_text="dijkstra code",
+        )
+
+
+@pytest.mark.django_db
+def test_submission_service_extension_overrides_late():
+    from conftest import make_principal
+
+    course = Course.objects.create(code="CS805", title="Networks", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    CourseMembership.objects.create(course=course, user_id=1, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=70, role=CourseRole.STUDENT)
+
+    student_principal = make_principal(
+        user_id=70,
+        kind="student",
+        roles=("student",),
+        active_role="student",
+        permissions=("lms.submission.submit", "lms.submission.view", "lms.assignment.view"),
+        modules=("lms",),
+    )
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Socket Lab",
+        submission_type=SubmissionType.TEXT,
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=1,
+        due_at=now - timedelta(hours=5),
+        closes_at=now + timedelta(days=2),
+        allow_late=True,
+    )
+
+    # Student 70 has an approved extension in the future
+    CourseAssignmentExtension.objects.create(
+        assignment=asg,
+        user_id=70,
+        extended_due_at=now + timedelta(days=1),
+        reason="Medical emergency",
+        granted_by_user_id=1,
+    )
+
+    # Submission should be SUBMITTED (on-time), not LATE, because effective_due_at is extended
+    sub = submission_service.create_submission(
+        actor=student_principal,
+        course_code="CS805",
+        assignment_id=asg.id,
+        submission_type="text",
+        content_text="import socket",
+    )
+    assert sub.status == SubmissionStatus.SUBMITTED
+
+
+@pytest.mark.django_db
+def test_submission_service_access_control():
+    from conftest import make_principal
+
+    course = Course.objects.create(code="CS806", title="AI", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    CourseMembership.objects.create(course=course, user_id=1, role=CourseRole.FACULTY)
+    CourseMembership.objects.create(course=course, user_id=2, role=CourseRole.TA)
+    CourseMembership.objects.create(course=course, user_id=80, role=CourseRole.STUDENT)
+    CourseMembership.objects.create(course=course, user_id=90, role=CourseRole.OBSERVER)
+
+    observer_principal = make_principal(
+        user_id=90,
+        kind="observer",
+        roles=("observer",),
+        active_role="observer",
+        permissions=("lms.submission.submit", "lms.submission.view", "lms.assignment.view"),
+        modules=("lms",),
+    )
+    student_principal = make_principal(
+        user_id=80,
+        kind="student",
+        roles=("student",),
+        active_role="student",
+        permissions=("lms.submission.submit", "lms.submission.view", "lms.assignment.view"),
+        modules=("lms",),
+    )
+    faculty_principal = make_principal(
+        user_id=1,
+        kind="faculty",
+        roles=("faculty",),
+        active_role="faculty",
+        permissions=("lms.submission.view", "lms.assignment.view"),
+        modules=("lms",),
+    )
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Search Lab",
+        submission_type=SubmissionType.TEXT,
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=1,
+        due_at=now + timedelta(days=2),
+    )
+
+    # Observer cannot submit (403 PermissionDeniedError)
+    with pytest.raises(PermissionDeniedError, match="Only enrolled students can submit"):
+        submission_service.create_submission(
+            actor=observer_principal,
+            course_code="CS806",
+            assignment_id=asg.id,
+            submission_type="text",
+            content_text="observer text",
+        )
+
+    # Student cannot view all submissions (returns None)
+    assert (
+        list_assignment_submissions(
+            principal=student_principal,
+            course_code="CS806",
+            assignment_id=asg.id,
+        )
+        is None
+    )
+
+    # Faculty can view submissions
+    subs_list = list_assignment_submissions(
+        principal=faculty_principal,
+        course_code="CS806",
+        assignment_id=asg.id,
+    )
+    assert subs_list is not None
+    assert subs_list["assignment_id"] == asg.id
+
+
+@pytest.mark.django_db
+def test_contract_get_assignment_submissions():
+    course = Course.objects.create(code="CS807", title="Math", status=CourseStatus.PUBLISHED)
+    now = datetime.now(UTC)
+
+    asg = CourseAssignment.objects.create(
+        course=course,
+        title="Linear Algebra",
+        submission_type=SubmissionType.TEXT,
+        status=AssignmentStatus.PUBLISHED,
+        created_by_user_id=1,
+        due_at=now + timedelta(days=1),
+    )
+
+    CourseSubmission.objects.create(
+        assignment=asg,
+        student_user_id=100,
+        submission_type="text",
+        status="submitted",
+        submitted_at=now,
+        content_text="Matrix solutions",
+        attempt_number=1,
+        is_latest=True,
+    )
+
+    results = get_assignment_submissions([asg.id, 99999], student_user_id=100)
+    assert asg.id in results
+    assert results[99999] == []
+    assert results[asg.id][0]["attempt_number"] == 1
+    assert results[asg.id][0]["status"] == "submitted"

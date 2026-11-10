@@ -251,3 +251,69 @@ class UpdateDeadlineWindowSerializer(serializers.Serializer):
     due_at = serializers.DateTimeField(required=False, allow_null=True)
     closes_at = serializers.DateTimeField(required=False, allow_null=True)
     allow_late = serializers.BooleanField(required=False)
+
+
+class CourseSubmissionItemSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    assignment_id = serializers.IntegerField()
+    student_user_id = serializers.IntegerField()
+    submission_type = serializers.CharField()
+    status = serializers.CharField()
+    submitted_at = serializers.CharField()
+    file_name = serializers.CharField(allow_blank=True)
+    file_size = serializers.IntegerField(allow_null=True)
+    has_file = serializers.BooleanField()
+    content_text = serializers.CharField(allow_blank=True)
+    link_url = serializers.CharField(allow_blank=True)
+    attempt_number = serializers.IntegerField()
+    is_latest = serializers.BooleanField()
+    created_at = serializers.CharField()
+
+
+class CourseSubmissionHistorySerializer(serializers.Serializer):
+    assignment_id = serializers.IntegerField()
+    course_code = serializers.CharField()
+    student_user_id = serializers.IntegerField()
+    status = serializers.CharField()
+    has_submitted = serializers.BooleanField()
+    latest_submission = CourseSubmissionItemSerializer(allow_null=True)
+    history = CourseSubmissionItemSerializer(many=True)
+    total_attempts = serializers.IntegerField()
+    deadline_info = serializers.DictField(required=False)
+
+
+class CourseSubmissionCreateSerializer(serializers.Serializer):
+    submission_type = serializers.ChoiceField(choices=sorted(SubmissionType.ALL))
+    file = serializers.FileField(required=False, allow_null=True)
+    content_text = serializers.CharField(required=False, allow_blank=True, default="")
+    link_url = serializers.CharField(required=False, allow_blank=True, default="")
+
+
+class CourseSubmissionsListEntrySerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    assignment_id = serializers.IntegerField()
+    student_user_id = serializers.IntegerField()
+    student_name = serializers.CharField()
+    student_email = serializers.CharField(allow_blank=True)
+    submission_type = serializers.CharField()
+    status = serializers.CharField()
+    submitted_at = serializers.CharField()
+    file_name = serializers.CharField(allow_blank=True)
+    file_size = serializers.IntegerField(allow_null=True)
+    has_file = serializers.BooleanField()
+    content_text = serializers.CharField(allow_blank=True)
+    link_url = serializers.CharField(allow_blank=True)
+    attempt_number = serializers.IntegerField()
+    is_latest = serializers.BooleanField()
+    created_at = serializers.CharField()
+
+
+class CourseSubmissionsListResponseSerializer(serializers.Serializer):
+    assignment_id = serializers.IntegerField()
+    course_code = serializers.CharField()
+    assignment_title = serializers.CharField()
+    submission_type = serializers.CharField()
+    total_submissions = serializers.IntegerField()
+    on_time_count = serializers.IntegerField()
+    late_count = serializers.IntegerField()
+    submissions = CourseSubmissionsListEntrySerializer(many=True)

@@ -243,3 +243,52 @@ class CourseAssignmentExtension(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"Extension for User({self.user_id}) on {self.assignment.title}"
+
+
+class CourseSubmission(TimeStampedModel):
+    """An individual student submission for an assignment.
+
+    Captures file, text, or link submissions with timestamping, attempt history,
+    and on-time vs late status determination (CFR-LMS-008, CFR-LMS-009, BR-LMS-012,
+    BR-LMS-013, BR-LMS-014).
+    """
+
+    STATUS_CHOICES = [
+        ("submitted", "Submitted"),
+        ("late", "Late"),
+    ]
+
+    assignment = models.ForeignKey(
+        CourseAssignment, on_delete=models.CASCADE, related_name="submissions"
+    )
+    student_user_id = models.IntegerField(db_index=True)
+    submission_type = models.CharField(
+        max_length=16, choices=CourseAssignment.SUBMISSION_CHOICES
+    )
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default="submitted")
+    submitted_at = models.DateTimeField(db_index=True)
+    file = models.FileField(upload_to="lms/submissions/%Y/%m/", null=True, blank=True)
+    file_name = models.CharField(max_length=255, blank=True)
+    file_size = models.BigIntegerField(null=True, blank=True)
+    content_text = models.TextField(blank=True)
+    link_url = models.CharField(max_length=500, blank=True)
+    attempt_number = models.PositiveIntegerField(default=1)
+    is_latest = models.BooleanField(default=True, db_index=True)
+
+    class Meta:
+        db_table = "lms_course_submission"
+        ordering = ["-submitted_at"]
+        indexes = [
+            models.Index(
+                fields=["assignment", "student_user_id", "is_latest"],
+                name="lms_sub_asg_std_lat_idx",
+            ),
+            models.Index(fields=["assignment", "status"], name="lms_sub_asg_status_idx"),
+            models.Index(fields=["student_user_id", "-submitted_at"], name="lms_sub_std_date_idx"),
+        ]
+
+    def __str__(self) -> str:
+        return (
+            f"Submission #{self.attempt_number} by User({self.student_user_id}) "
+            f"for {self.assignment.title}"
+        )

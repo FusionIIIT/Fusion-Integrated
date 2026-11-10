@@ -24,6 +24,10 @@ from modules.lms.api.serializers import (
     CourseMaterialItemSerializer,
     CourseMaterialsResponseSerializer,
     CourseMaterialUpdateSerializer,
+    CourseSubmissionCreateSerializer,
+    CourseSubmissionHistorySerializer,
+    CourseSubmissionItemSerializer,
+    CourseSubmissionsListResponseSerializer,
     CourseSummarySerializer,
     CourseWorkspaceDetailSerializer,
     CourseWorkspaceUpdateSerializer,
@@ -49,11 +53,18 @@ from modules.lms.selectors.materials import (
     get_material_for_download,
     list_course_materials,
 )
+from modules.lms.selectors.submissions import (
+    _submission_to_dict,
+    get_student_submission_history,
+    get_submission_for_download,
+    list_assignment_submissions,
+)
 from modules.lms.services import announcements as announcement_service
 from modules.lms.services import assignments as assignment_service
 from modules.lms.services import courses as course_service
 from modules.lms.services import deadlines as deadline_service
 from modules.lms.services import materials as material_service
+from modules.lms.services import submissions as submission_service
 
 MODULE = HasModuleGrant("lms")
 P_VIEW = "lms.course.view"
@@ -66,6 +77,8 @@ P_ASG_VIEW = "lms.assignment.view"
 P_ASG_MANAGE = "lms.assignment.manage"
 P_DDL_VIEW = "lms.deadline.view"
 P_DDL_MANAGE = "lms.deadline.manage"
+P_SUB_VIEW = "lms.submission.view"
+P_SUB_SUBMIT = "lms.submission.submit"
 
 
 
@@ -609,3 +622,102 @@ class CourseAssignmentExtensionDetailView(APIView):
             extension_id=extension_id,
         )
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CourseSubmissionMineView(APIView):
+    """Retrieve own submission history or submit assignment work (Student only)."""
+
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get_permissions(self):
+        perm = P_SUB_VIEW if self.request.method == "GET" else P_SUB_SUBMIT
+        return [MODULE(), HasPermission(perm)()]
+
+    @extend_schema(
+        operation_id="v1_lms_course_assignment_submission_mine",
+        summary="View own assignment submission history and status",
+        tags=["lms"],
+        responses={200: CourseSubmissionHistorySerializer},
+    )
+    def get(self, request, code: str, assignment_id: int):
+        data = get_student_submission_history(
+            principal=request.principal,
+            course_code=code,
+            assignment_id=assignment_id,
+        )
+        if data is None:
+            raise NotFoundError("Course assignment not found or you are not authorized.")
+        return Response(CourseSubmissionHistorySerializer(data).data)
+
+    @extend_schema(
+        operation_id="v1_lms_course_assignment_submission_create",
+        summary="Submit assignment work (file, text, or link)",
+        tags=["lms"],
+        request=CourseSubmissionCreateSerializer,
+        responses={201: CourseSubmissionItemSerializer},
+    )
+    def post(self, request, code: str, assignment_id: int):
+        payload = CourseSubmissionCreateSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+
+        submission = submission_service.create_submission(
+            actor=request.principal,
+            course_code=code,
+            assignment_id=assignment_id,
+            **payload.validated_data,
+        )
+        return Response(
+            CourseSubmissionItemSerializer(_submission_to_dict(submission)).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class CourseAssignmentSubmissionsListView(APIView):
+    """List all student submissions for an assignment (Faculty and TA only)."""
+
+    permission_classes = [MODULE, HasPermission(P_SUB_VIEW)]
+
+    @extend_schema(
+        operation_id="v1_lms_course_assignment_submissions_list",
+        summary="List student submissions for an assignment (Faculty and TA only)",
+        tags=["lms"],
+        responses={200: CourseSubmissionsListResponseSerializer},
+    )
+    def get(self, request, code: str, assignment_id: int):
+        data = list_assignment_submissions(
+            principal=request.principal,
+            course_code=code,
+            assignment_id=assignment_id,
+        )
+        if data is None:
+            raise PermissionDeniedError(
+                "You are not authorized to view submissions for this course."
+            )
+        return Response(CourseSubmissionsListResponseSerializer(data).data)
+
+
+class CourseSubmissionDownloadView(APIView):
+    """Download attached submission file with student ownership / instructor verification."""
+
+    permission_classes = [MODULE, HasPermission(P_SUB_VIEW)]
+
+    @extend_schema(
+        operation_id="v1_lms_course_assignment_submission_download",
+        summary="Download student submission attachment",
+        tags=["lms"],
+        responses={200: None},
+    )
+    def get(self, request, code: str, assignment_id: int, submission_id: int):
+        sub = get_submission_for_download(
+            principal=request.principal,
+            course_code=code,
+            assignment_id=assignment_id,
+            submission_id=submission_id,
+        )
+        if sub is None:
+            raise NotFoundError(
+                "Submission file not found or you are not authorized to download it."
+            )
+
+        f_name = sub.file_name or os.path.basename(sub.file.name)
+        return FileResponse(sub.file.open("rb"), as_attachment=True, filename=f_name)
