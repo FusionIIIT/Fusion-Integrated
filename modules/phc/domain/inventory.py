@@ -6,18 +6,15 @@ class RequisitionState(Enum):
     REJECTED = "REJECTED"
     FULFILLED = "FULFILLED"
 
-def is_valid_stock_adjustment(inventory_item, delta):
-    new_quantity = inventory_item.quantity + delta
-    return new_quantity >= 0 and new_quantity < inventory_item.reorder_threshold
+def validate_stock_adjustment(current_quantity: int, delta: int) -> None:
+    new_quantity = current_quantity + delta
+    if new_quantity < 0:
+        raise ValueError("Invalid stock adjustment")
 
-def validate_requisition_lines(lines):
-    if not lines:
-        raise ValueError("A requisition must have at least one line")
-    for line in lines:
-        if line.quantity <= 0:
-            raise ValueError("All line quantities must be positive")
+def is_low_stock(quantity: int, threshold: int) -> bool:
+    return quantity < threshold
 
-def can_transition(current_state, new_state):
+def can_transition(current_state: RequisitionState, new_state: RequisitionState) -> bool:
     if current_state == RequisitionState.PENDING_APPROVAL and new_state in [RequisitionState.APPROVED, RequisitionState.REJECTED]:
         return True
     elif current_state == RequisitionState.APPROVED and new_state == RequisitionState.FULFILLED:
