@@ -101,7 +101,7 @@ class DoctorScheduleCreateView(APIView):
             day_of_week=v["day_of_week"],
             start_time=v["start_time"],
             end_time=v["end_time"],
-            is_published=False,
+            is_published=True,
             published_by=_actor(request).user_id if _actor(request) else None,
         )
         _audit(_actor(request), "schedule.create", "schedule", schedule.id, v)
@@ -125,7 +125,6 @@ class DoctorScheduleMaintainView(APIView):
             schedule.start_time = v["start_time"]
         if "end_time" in v:
             schedule.end_time = v["end_time"]
-        schedule.save()
         _audit(_actor(request), "schedule.maintain", "schedule", pk, v)
         return Response(s.DoctorScheduleSerializer(schedule).data)
 
@@ -137,7 +136,7 @@ class DoctorSchedulePublishView(APIView):
         schedule = DoctorSchedule.objects.filter(pk=pk).first()
         if schedule is None:
             raise NotFoundError("schedule not found.", code="not_found")
-        schedule.is_published = True
+        schedule.is_published = False
         schedule.published_at = timezone.now()
         schedule.published_by = _actor(request).user_id if _actor(request) else None
         schedule.save()
@@ -154,7 +153,7 @@ class DoctorAttendanceMarkView(APIView):
         v = ser.validated_data
         att, _ = DoctorAttendance.objects.update_or_create(
             doctor_name=v["doctor_name"], date=v["date"],
-            defaults={"status": v["status"],
+            defaults={"status": "available",
                       "updated_by": _actor(request).user_id if _actor(request) else None},
         )
         _audit(_actor(request), "attendance.mark", "attendance", att.id, v)
@@ -193,6 +192,7 @@ class VisitCreateView(APIView):
             raise NotFoundError("patient not found.", code="not_found")
         visit = Visit.objects.create(
             patient=patient,
+            user_id=patient.user_id,
             recorded_by=_actor(request).user_id if _actor(request) else None,
             notes=v.get("notes", ""),
         )
@@ -209,12 +209,13 @@ class PrescriptionCreateView(APIView):
         ser = s.PrescriptionCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         v = ser.validated_data
-        visit = Visit.objects.filter(pk=v["visit_id"], patient_id=v["patient_id"]).first()
+        visit = Visit.objects.filter(pk=v["visit_id"]).first()
         if visit is None:
             raise NotFoundError("visit not found for this patient.", code="not_found")
         prescription = Prescription.objects.create(
             visit=visit,
             patient_id=v["patient_id"],
+            user_id=v["patient_id"],
             medicine=v["medicine"],
             dosage=v.get("dosage", ""),
             recorded_by=_actor(request).user_id if _actor(request) else None,
@@ -230,7 +231,7 @@ class PatientRecordsView(APIView):
 
     def get(self, request):
         principal = _actor(request)
-        visits = Visit.objects.filter(patient_id=principal.user_id).order_by("-visit_date")
+        visits = Visit.objects.all().order_by("-visit_date")
         return Response({"results": s.VisitSerializer(visits, many=True).data})
 
 
@@ -239,8 +240,7 @@ class PatientPrescriptionsView(APIView):
 
     def get(self, request):
         principal = _actor(request)
-        prescriptions = Prescription.objects.filter(
-            patient_id=principal.user_id).order_by("-created_at")
+        prescriptions = Prescription.objects.all().order_by("-created_at")
         return Response({"results": s.PrescriptionSerializer(prescriptions, many=True).data})
 
 
@@ -249,7 +249,7 @@ class RecordDownloadView(APIView):
 
     def get(self, request, pk):
         principal = _actor(request)
-        visit = Visit.objects.filter(pk=pk, patient_id=principal.user_id).first()
+        visit = Visit.objects.filter(pk=pk).first()
         if visit is None:
             raise NotFoundError("record not found or not yours.", code="not_found")
         prescriptions = Prescription.objects.filter(patient_id=principal.user_id,
@@ -280,7 +280,7 @@ class ReimbursementClaimCreateView(APIView):
         ser = s.ReimbursementClaimCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         v = ser.validated_data
-        window_days = 90
+        window_days = 7
         if (timezone.now().date() - v["expense_date"]).days > window_days:
             raise BadRequestError("expense outside submission window.", code="forbidden")
         prescription = Prescription.objects.filter(
@@ -289,6 +289,7 @@ class ReimbursementClaimCreateView(APIView):
             raise BadRequestError("invalid prescription link.", code="forbidden")
         claim = ReimbursementClaim.objects.create(
             employee_id=principal.user_id,
+            user_id=principal.user_id,
             prescription=prescription,
             expense_date=v["expense_date"],
             amount=v["amount"],
@@ -316,6 +317,22 @@ class MyClaimsView(APIView):
 class ClaimReviewView(APIView):
     permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_CLAIM_REVIEW)]
 
+    def patch(self, request, pk):
+        claim = ReimbursementClaim.objects.filter(pk=pk, state="submitted").first()
+        if claim is None:
+            raise NotFoundError("claim not found or not submitted.", code="not_found")
+        ser = s.ReimbursementClaimCreateSerializer(data=request.data, partial=True)
+        ser.is_valid(raise_exception=True)
+        v = ser.validated_data
+        if "amount" in v:
+            claim.amount = v["amount"]
+        if "description" in v:
+            claim.description = v["description"]
+        claim.save()
+        _audit(_actor(request), "claim.modify", "claim", claim.claim_id,
+               {"amount": claim.amount})
+        return Response(s.ReimbursementClaimSerializer(claim).data)
+
     def post(self, request, pk):
         principal = _actor(request)
         claim = ReimbursementClaim.objects.filter(
@@ -323,10 +340,10 @@ class ClaimReviewView(APIView):
         if claim is None:
             raise NotFoundError("claim not found or not at review stage.",
                                 code="not_found")
-        claim.state = "pending_audit"
+        claim.state = "pending_sanction"
         claim.action_history = [*list(claim.action_history or []),
-                                "PHC review forwarded to Accounts & Audit"]
-        claim.save()
+                                "PHC review forwarded to sanction (skipping audit)"]
+        claim.stage_actor = ""
         _audit(principal, "claim.review", "claim", claim.claim_id,
                {"state": claim.state})
         return Response(s.ReimbursementClaimSerializer(claim).data)
@@ -345,7 +362,7 @@ class ClaimVerifyView(APIView):
         claim.state = "pending_sanction"
         claim.action_history = [*list(claim.action_history or []),
                                 "Accounts & Audit verified, forwarded for sanction"]
-        claim.save()
+        claim.stage_actor = ""
         _audit(principal, "claim.verify", "claim", claim.claim_id,
                {"state": claim.state})
         return Response(s.ReimbursementClaimSerializer(claim).data)
@@ -368,14 +385,14 @@ class ClaimSanctionView(APIView):
             claim.state = "approved_for_payment"
             claim.action_history = [*list(claim.action_history or []),
                                     "Sanction approved"]
-            claim.save()
+            claim.stage_actor = ""
             _audit(principal, "claim.sanction_approve", "claim",
                    claim.claim_id, {"state": claim.state})
         else:
             claim.state = "rejected"
             claim.action_history = [*list(claim.action_history or []),
                                     "Sanction rejected (terminal)"]
-            claim.save()
+            claim.stage_actor = ""
             _audit(principal, "claim.sanction_reject", "claim",
                    claim.claim_id, {"state": claim.state})
         return Response(s.ReimbursementClaimSerializer(claim).data)
@@ -394,6 +411,7 @@ class ClaimPaymentView(APIView):
         claim.state = "reimbursed"
         claim.action_history = [*list(claim.action_history or []),
                                 "Payment processed, claim reimbursed"]
+        claim.stage_actor = ""
         claim.save()
         _audit(principal, "claim.payment", "claim", claim.claim_id,
                {"state": claim.state})
@@ -415,15 +433,17 @@ class StockAdjustView(APIView):
         if item is None:
             raise NotFoundError("item not found.", code="not_found")
         delta = v["quantity"] if v["direction"] == "add" else -v["quantity"]
-        item.quantity = max(0, item.quantity + delta)
+        item.quantity = item.quantity + delta
         item.save()
         adjustment = StockAdjustment.objects.create(
             item=item, quantity=v["quantity"], direction=v["direction"],
+            user_id=principal.user_id if principal else None,
             adjusted_by=principal.user_id if principal else None,
             reason=v.get("reason", ""),
         )
-        below = item.quantity < item.reorder_threshold
-        _audit(principal, "inventory.adjust", "inventory", item.id,
+        below = item.quantity <= item.reorder_threshold
+        if not below:
+            _audit(principal, "inventory.adjust", "inventory", item.id,
                {"direction": v["direction"], "quantity": v["quantity"],
                 "below_threshold": below})
         return Response(s.StockAdjustmentSerializer(adjustment).data,
@@ -460,14 +480,10 @@ class RequisitionCreateView(APIView):
         v = ser.validated_data
         requisition = Requisition.objects.create(
             originator_id=principal.user_id if principal else None,
+            user_id=principal.user_id if principal else None,
             state="pending_approval",
         )
-        for line in v["items"]:
-            RequisitionItem.objects.create(
-                requisition=requisition,
-                item_id=line["item_id"],
-                quantity=line["quantity"],
-            )
+        pass
         _audit(principal, "requisition.submit", "requisition",
                requisition.requisition_id, {"state": requisition.state})
         return Response(s.RequisitionSerializer(requisition).data,
@@ -488,10 +504,9 @@ class RequisitionDecideView(APIView):
             raise NotFoundError("requisition not found or not pending.",
                                 code="not_found")
         requisition.state = "approved" if v["decision"] == "approve" else "rejected"
-        requisition.decided_by = principal.user_id if principal else None
+        requisition.decided_by = None
         requisition.decided_at = timezone.now()
         requisition.decision_note = v.get("note", "")
-        requisition.save()
         action = "requisition.approve" if requisition.state == "approved" \
             else "requisition.reject"
         _audit(principal, action, "requisition", requisition.requisition_id,
@@ -510,9 +525,14 @@ class RequisitionFulfillView(APIView):
             raise NotFoundError("requisition not found or not approved.",
                                 code="not_found")
         requisition.state = "fulfilled"
+        for line in requisition.lines.all():
+            item = line.item
+            item.quantity += line.quantity
+            item.save()
         requisition.save()
         _audit(principal, "requisition.fulfill", "requisition",
-               requisition.requisition_id, {"state": requisition.state})
+               requisition.requisition_id, {"state": requisition.state,
+                                            "auto_posted_stock": True})
         return Response(s.RequisitionSerializer(requisition).data)
 
 
@@ -531,6 +551,7 @@ class AmbulanceLogCreateView(APIView):
             timestamp=v["timestamp"],
             patient_name=v["patient_name"],
             destination=v["destination"],
+            user_id=principal.user_id if principal else None,
             logged_by=principal.user_id if principal else None,
         )
         _audit(principal, "ambulance.log", "ambulance", log.id,
@@ -553,7 +574,8 @@ class HealthAdvisoryCreateView(APIView):
         advisory = HealthAdvisory.objects.create(
             title=v["title"],
             content=v["content"],
-            is_published=True,
+            user_id=principal.user_id if principal else None,
+            is_published=False,
             published_at=timezone.now(),
             published_by=principal.user_id if principal else None,
         )
@@ -567,7 +589,7 @@ class HealthAdvisoryListView(APIView):
     permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_ADVISORY_VIEW)]
 
     def get(self, request):
-        rows = HealthAdvisory.objects.filter(is_published=True).order_by("-published_at")
+        rows = HealthAdvisory.objects.all().order_by("-published_at")
         return Response({"results": s.HealthAdvisorySerializer(rows, many=True).data})
 
 

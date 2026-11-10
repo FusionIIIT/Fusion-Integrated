@@ -1,0 +1,128 @@
+[
+  {
+    "test_id": "BR-01",
+    "source_id": "PHC-BR-01",
+    "purpose": "Doctor schedule creation, maintenance, and publication are performed by the consolidated PHC Staff actor.",
+    "preconditions": "A doctor schedule must be created, maintained, or published.",
+    "action_or_input": "PHC Staff performs schedule creation, maintenance, or publication.",
+    "expected_result": "Schedule management remains a PHC Staff responsibility; no PHC Staff-to-Administrator handoff is required.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-02",
+    "source_id": "PHC-BR-02",
+    "purpose": "Patient medical-data access is controlled by role and ownership; a patient must not access another patient's records.",
+    "preconditions": "A patient attempts to access medical data.",
+    "action_or_input": "Access to patient medical data is attempted by role and ownership.",
+    "expected_result": "Only role-permitted access is authorized; a patient cannot access another patient's records.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-03",
+    "source_id": "PHC-BR-03",
+    "purpose": "Access to PHC functions is restricted according to the authenticated user's assigned role.",
+    "preconditions": "A user attempts to access a PHC function.",
+    "action_or_input": "Access to a PHC function is attempted by a user with a given role.",
+    "expected_result": "Access is authorized or denied based on the assigned role.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-04",
+    "source_id": "PHC-BR-04",
+    "purpose": "Only institute employees may submit reimbursement claims.",
+    "preconditions": "A user attempts to start a reimbursement claim.",
+    "action_or_input": "A user who is not an institute employee attempts reimbursement submission.",
+    "expected_result": "Submission is denied; only employees are eligible.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-05",
+    "source_id": "PHC-BR-05",
+    "purpose": "Each submitted claim must be linked to a valid prescription already recorded in the system for the claimant.",
+    "preconditions": "A claim submission is attempted.",
+    "action_or_input": "The claim is validated for a prescription link belonging to the claimant.",
+    "expected_result": "The claim is accepted only when linked to a valid recorded prescription for the claimant.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-06",
+    "source_id": "PHC-BR-06",
+    "purpose": "The configured reimbursement submission window is enforced against the medical expense date.",
+    "preconditions": "A claim submission is attempted.",
+    "action_or_input": "The expense date is checked against the configured submission window.",
+    "expected_result": "The claim is accepted only when it falls within the configured submission window.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-07",
+    "source_id": "PHC-BR-07",
+    "purpose": "After each stock update, the system compares the level with the item's reorder threshold.",
+    "preconditions": "An inventory stock level is updated.",
+    "action_or_input": "The updated stock level is compared with the reorder threshold.",
+    "expected_result": "The stock level is evaluated against the threshold.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-08",
+    "source_id": "PHC-BR-08",
+    "purpose": "The reimbursement progression is forward-only: submission -> PHC Staff review -> Accounts & Audit verification -> Approving Authority sanction -> Accounts & Audit payment.",
+    "preconditions": "A claim is in the reimbursement progression.",
+    "action_or_input": "The claim advances through the workflow stages.",
+    "expected_result": "The claim follows the defined forward path only; no reject/return/clarification branch at PHC Staff or Accounts & Audit stages.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-09",
+    "source_id": "PHC-BR-09",
+    "purpose": "Successful actions that create, modify, or delete sensitive patient records, inventory levels, or reimbursement-claim status are recorded in an immutable audit trail.",
+    "preconditions": "A covered sensitive-data action succeeds.",
+    "action_or_input": "A sensitive-data change action is performed.",
+    "expected_result": "An immutable audit record is appended for the action.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-10",
+    "source_id": "PHC-BR-10",
+    "purpose": "The Approving Authority approves or rejects a pending inventory requisition.",
+    "preconditions": "A requisition is pending decision by the Approving Authority.",
+    "action_or_input": "The Approving Authority decides on the requisition.",
+    "expected_result": "The requisition is Approved or Rejected.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-11",
+    "source_id": "PHC-BR-11",
+    "purpose": "The originating PHC Staff member is notified when an inventory requisition is approved or rejected.",
+    "preconditions": "A requisition becomes Approved or Rejected.",
+    "action_or_input": "A requisition decision is recorded.",
+    "expected_result": "A status notification is generated for the requisition originator.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-12",
+    "source_id": "PHC-BR-12",
+    "purpose": "Reports protect patient-identifiable information and present patient-derived reporting data in anonymized form.",
+    "preconditions": "An administrative report containing patient-derived data is generated.",
+    "action_or_input": "A report is generated.",
+    "expected_result": "Patient-identifiable information is not exposed; output is anonymized.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-13",
+    "source_id": "PHC-BR-13",
+    "purpose": "Employees can view the current status and action history of their own reimbursement claims.",
+    "preconditions": "An employee opens their reimbursement claims.",
+    "action_or_input": "The employee views their claim status and history.",
+    "expected_result": "Current workflow status and recorded action history are displayed for the employee's claims.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-14",
+    "source_id": "PHC-BR-14",
+    "purpose": "A submitted claim is not modified or reopened; if the employee needs to change a submitted claim or apply again after rejection, a new reimbursement application must be submitted.",
+    "preconditions": "A claim is submitted or rejected and the employee needs to change it or reapply.",
+    "action_or_input": "The employee attempts to change a submitted claim or reapply after rejection.",
+    "expected_result": "The existing claim and history are preserved; a separate new reimbursement claim is required.",
+    "test_type": "negative"
+  }
+]

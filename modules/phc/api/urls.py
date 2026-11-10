@@ -6,8 +6,6 @@ urlpatterns = [
     # ---- Doctor schedule & availability (CFR-001 / AFR-001..005) --------
     path("schedule", v.DoctorScheduleListView.as_view(),
          name="phc-schedule"),
-    path("schedule/patient", v.PatientScheduleView.as_view(),
-         name="phc-patient-schedule"),
 
     path("staff/schedule", v.DoctorScheduleCreateView.as_view(),
          name="phc-staff-schedule-create"),
