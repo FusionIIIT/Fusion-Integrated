@@ -1,0 +1,167 @@
+[Title] LMS (Course Management)
+Workflow Specifications — Version 1.0
+SYNCHRONIZED DRAFT — supported paths only
+[Heading 1] 1. Scope and authority
+Workflows are derived from the synchronized state-changing UCs and applicable BRs. The State-Transition Table (STT) is authoritative; diagrams are corresponding visual views. Informational/view UCs remain outside workflows. Event-triggered UC-LMS-015 is used as a System-performed workflow step only when it changes content from Scheduled to Published/Available.
+[Heading 1] 2. Workflow derivation decisions
+[List Bullet] A Basis Workflow is a complete finite valid progression from a meaningful start/context to a meaningful business outcome; prefixes or isolated actions are not promoted to BWs.
+[List Bullet] A Composite Workflow combines related Basis Workflows only where the integrated view improves understanding.
+[List Bullet] Business Rules constrain transitions through guards/conditions and are not workflow activities.
+[List Bullet] System may appear in the STT Actor column only for a meaningful automatic state-changing transition. A time event is a trigger/guard, not an actor.
+[List Bullet] Late submission and resubmission paths are not modeled because their policies are explicitly unresolved in PS v1.0.
+[List Bullet] Post-release grade-change lifecycle is not modeled beyond the audit obligation because authority/effect are unresolved.
+[List Bullet] No complete all-inclusive workflow is forced; assignment publication/submission and grading/release remain separate composites.
+[Heading 1] 3. Workflow Registry
+--- TABLE ---
+Workflow ID | Workflow Name | Type | Purpose / Scope | Constituent Workflows | Primary Related UCs
+BW-LMS-01 | Scheduled Course Material Release | Basis | Process a course material from Faculty scheduling through automatic release at the configured time. | N/A | UC-LMS-003, UC-LMS-015
+BW-LMS-02 | Assignment Immediate Release and On-Time Submission | Basis | Process an assignment from Faculty creation through immediate publication/release to an on-time Student submission. | N/A | UC-LMS-007, UC-LMS-008, UC-LMS-010
+BW-LMS-03 | Assignment Scheduled Release and On-Time Submission | Basis | Process an assignment from Faculty creation through future scheduled release to an on-time Student submission. | N/A | UC-LMS-007, UC-LMS-008, UC-LMS-015, UC-LMS-010
+BW-LMS-04 | Faculty Grading and Grade Release | Basis | Process a recorded Student submission through Faculty grading to Faculty release of grade/feedback. | N/A | UC-LMS-012, UC-LMS-013
+BW-LMS-05 | TA Grading and Faculty Grade Release | Basis | Process a recorded Student submission through TA grading and subsequent Faculty release of grade/feedback. | N/A | UC-LMS-012, UC-LMS-013
+CW-LMS-01 | Assignment Publication and Submission | Composite | Integrate immediate and future-scheduled assignment release paths through one on-time Student submission. | BW-LMS-02, BW-LMS-03 | UC-LMS-007, UC-LMS-008, UC-LMS-015, UC-LMS-010
+CW-LMS-02 | Grading and Grade Release | Composite | Integrate Faculty-grading and TA-grading paths through Faculty release of grade/feedback. | BW-LMS-04, BW-LMS-05 | UC-LMS-012, UC-LMS-013
+--- END TABLE ---
+[Heading 2] BW-LMS-01 — Scheduled Course Material Release
+--- TABLE ---
+Type | Basis
+Purpose / Scope | Process a course material from Faculty scheduling through automatic release at the configured time.
+Trigger | Faculty configures a future release date for valid course material.
+Participants | Faculty; System
+Constituent Workflows | N/A
+Related CFRs | 
+Related UCs | UC-LMS-003, UC-LMS-015
+Related BRs | BR-LMS-005, BR-LMS-006
+--- END TABLE ---
+[Heading 3] Authoritative State-Transition Table
+--- TABLE ---
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | Material Draft / Unpublished | Faculty | UC-LMS-003 / Manage Course Materials | Valid material; future release configured | Material Scheduled | BR-LMS-005, BR-LMS-006
+2 | Material Scheduled | System | UC-LMS-015 / Process Scheduled Content Release | Configured material release time reached | Material Published / Available | BR-LMS-005, BR-LMS-006
+--- END TABLE ---
+[Heading 3] Workflow Diagram
+[Heading 2] BW-LMS-02 — Assignment Immediate Release and On-Time Submission
+--- TABLE ---
+Type | Basis
+Purpose / Scope | Process an assignment from Faculty creation through immediate publication/release to an on-time Student submission.
+Trigger | Faculty creates a new assignment intended for immediate Student release.
+Participants | Faculty; Student
+Constituent Workflows | N/A
+Related CFRs | 
+Related UCs | UC-LMS-007, UC-LMS-008, UC-LMS-010
+Related BRs | BR-LMS-009–013
+--- END TABLE ---
+[Heading 3] Authoritative State-Transition Table
+--- TABLE ---
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No Assignment / New | Faculty | UC-LMS-007 / Create or Edit Assignment | Required configuration valid | Assignment Draft | BR-LMS-009, BR-LMS-010
+2 | Assignment Draft | Faculty | UC-LMS-008 / Publish Assignment | Publish valid; release condition immediate | Assignment Available for Submission | BR-LMS-009–011
+3 | Assignment Available for Submission | Student | UC-LMS-010 / Submit Assignment | Submission type valid; before due date | Student Submission Recorded | BR-LMS-012–014
+--- END TABLE ---
+[Heading 3] Workflow Diagram
+[Heading 2] BW-LMS-03 — Assignment Scheduled Release and On-Time Submission
+--- TABLE ---
+Type | Basis
+Purpose / Scope | Process an assignment from Faculty creation through future scheduled release to an on-time Student submission.
+Trigger | Faculty creates a new assignment with a future release date.
+Participants | Faculty; System; Student
+Constituent Workflows | N/A
+Related CFRs | 
+Related UCs | UC-LMS-007, UC-LMS-008, UC-LMS-015, UC-LMS-010
+Related BRs | BR-LMS-009–013
+--- END TABLE ---
+[Heading 3] Authoritative State-Transition Table
+--- TABLE ---
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No Assignment / New | Faculty | UC-LMS-007 / Create or Edit Assignment | Required configuration valid | Assignment Draft | BR-LMS-009, BR-LMS-010
+2 | Assignment Draft | Faculty | UC-LMS-008 / Publish Assignment | Publish valid; future release configured | Assignment Published / Scheduled for Release | BR-LMS-009–011
+3 | Assignment Published / Scheduled for Release | System | UC-LMS-015 / Process Scheduled Content Release | Configured assignment release time reached | Assignment Available for Submission | BR-LMS-011
+4 | Assignment Available for Submission | Student | UC-LMS-010 / Submit Assignment | Submission type valid; before due date | Student Submission Recorded | BR-LMS-012–014
+--- END TABLE ---
+[Heading 3] Workflow Diagram
+[Heading 2] BW-LMS-04 — Faculty Grading and Grade Release
+--- TABLE ---
+Type | Basis
+Purpose / Scope | Process a recorded Student submission through Faculty grading to Faculty release of grade/feedback.
+Trigger | Faculty opens a recorded Student submission for grading.
+Participants | Faculty
+Constituent Workflows | N/A
+Related CFRs | 
+Related UCs | UC-LMS-012, UC-LMS-013
+Related BRs | BR-LMS-015–018
+--- END TABLE ---
+[Heading 3] Authoritative State-Transition Table
+--- TABLE ---
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | Student Submission Recorded | Faculty | UC-LMS-012 / Grade Submission | Authorized Faculty enters points/feedback | Grade Draft | BR-LMS-015, BR-LMS-016
+2 | Grade Draft | Faculty | UC-LMS-013 / Release Grades and Feedback | Faculty releases grade/feedback | Grade Released / Student Visible | BR-LMS-016–018
+--- END TABLE ---
+[Heading 3] Workflow Diagram
+[Heading 2] BW-LMS-05 — TA Grading and Faculty Grade Release
+--- TABLE ---
+Type | Basis
+Purpose / Scope | Process a recorded Student submission through TA grading and subsequent Faculty release of grade/feedback.
+Trigger | TA opens a recorded Student submission for grading.
+Participants | TA; Faculty
+Constituent Workflows | N/A
+Related CFRs | 
+Related UCs | UC-LMS-012, UC-LMS-013
+Related BRs | BR-LMS-004, BR-LMS-015–018
+--- END TABLE ---
+[Heading 3] Authoritative State-Transition Table
+--- TABLE ---
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | Student Submission Recorded | TA | UC-LMS-012 / Grade Submission | Authorized TA enters points/feedback | Grade Draft | BR-LMS-004, BR-LMS-015, BR-LMS-016
+2 | Grade Draft | Faculty | UC-LMS-013 / Release Grades and Feedback | Faculty releases grade/feedback | Grade Released / Student Visible | BR-LMS-016–018
+--- END TABLE ---
+[Heading 3] Workflow Diagram
+[Heading 2] CW-LMS-01 — Assignment Publication and Submission
+--- TABLE ---
+Type | Composite
+Purpose / Scope | Integrate immediate and future-scheduled assignment release paths through one on-time Student submission.
+Trigger | Faculty creates an assignment.
+Participants | Faculty; System where scheduled; Student
+Constituent Workflows | BW-LMS-02, BW-LMS-03
+Related CFRs | 
+Related UCs | UC-LMS-007, UC-LMS-008, UC-LMS-015, UC-LMS-010
+Related BRs | BR-LMS-009–014
+--- END TABLE ---
+[Heading 3] Authoritative State-Transition Table
+--- TABLE ---
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | No Assignment / New | Faculty | UC-LMS-007 / Create or Edit Assignment | Required configuration valid | Assignment Draft | BR-LMS-009, BR-LMS-010
+2 | Assignment Draft | Faculty | UC-LMS-008 / Publish Assignment | Release condition immediate | Assignment Available for Submission | BR-LMS-009–011
+3 | Assignment Draft | Faculty | UC-LMS-008 / Publish Assignment | Future release configured | Assignment Published / Scheduled for Release | BR-LMS-009–011
+4 | Assignment Published / Scheduled for Release | System | UC-LMS-015 / Process Scheduled Content Release | Configured release time reached | Assignment Available for Submission | BR-LMS-011
+5 | Assignment Available for Submission | Student | UC-LMS-010 / Submit Assignment | Submission type valid; before due date | Student Submission Recorded | BR-LMS-012–014
+--- END TABLE ---
+[Heading 3] Workflow Diagram
+[Heading 2] CW-LMS-02 — Grading and Grade Release
+--- TABLE ---
+Type | Composite
+Purpose / Scope | Integrate Faculty-grading and TA-grading paths through Faculty release of grade/feedback.
+Trigger | A recorded Student submission is opened for grading.
+Participants | Faculty; TA where applicable
+Constituent Workflows | BW-LMS-04, BW-LMS-05
+Related CFRs | 
+Related UCs | UC-LMS-012, UC-LMS-013
+Related BRs | BR-LMS-004, BR-LMS-015–018
+--- END TABLE ---
+[Heading 3] Authoritative State-Transition Table
+--- TABLE ---
+S. No. | From State | Actor | Use Case ID / Name | Guard / Outcome | Resulting State | BR Reference(s)
+1 | Student Submission Recorded | Faculty | UC-LMS-012 / Grade Submission | Faculty grades submission | Grade Draft | BR-LMS-015, BR-LMS-016
+2 | Student Submission Recorded | TA | UC-LMS-012 / Grade Submission | TA grades submission | Grade Draft | BR-LMS-004, BR-LMS-015, BR-LMS-016
+3 | Grade Draft | Faculty | UC-LMS-013 / Release Grades and Feedback | Faculty releases grade/feedback | Grade Released / Student Visible | BR-LMS-016–018
+--- END TABLE ---
+[Heading 3] Workflow Diagram
+[Heading 1] 4. Functions intentionally outside the Workflow Registry
+--- TABLE ---
+Artifact / Capability | Reason not represented as Workflow | Retained Representation
+UC-LMS-001, 004, 006, 009, 011, 014 | Primarily informational/view access; no independent persistent progression. | Use Cases + BRs
+UC-LMS-002 | Faculty course-detail management is a direct authoring capability; no multi-step lifecycle is established in PS. | Use Case + BRs
+UC-LMS-005 | Posting an announcement is an isolated state-changing actor goal; no connected progression is specified. | Use Case + BR-LMS-007/008
+Immediate material publication in UC-LMS-003 | Single actor service with no additional connected state-changing step. | UC-LMS-003 + BR-LMS-005
+Late submission / resubmission | Policies unresolved. | Issue Register: ISS-LMS-001 / ISS-LMS-005
+Post-release grade change lifecycle | Only audit logging is specified; authority/effect unresolved. | UC-LMS-012 + BR-LMS-019 + ISS-LMS-006
+--- END TABLE ---
