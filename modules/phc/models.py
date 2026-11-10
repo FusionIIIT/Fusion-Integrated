@@ -47,3 +47,71 @@ class Notification(models.Model):
 
     def __str__(self) -> str:
         return f"to u{self.recipient_user_id}: {self.kind}"
+
+
+class PatientVisit(models.Model):
+    """Tracks a patient's clinic visit (PHC-BR-02)."""
+
+    patient_user_id = models.IntegerField(db_index=True)
+    visited_on = models.DateField()
+    notes = models.TextField(blank=True, null=True)
+    recorded_by_user_id = models.IntegerField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "phc_patient_visit"
+        ordering = ["-visited_on", "-created_at"]
+
+    def __str__(self) -> str:
+        return f"Visit by u{self.patient_user_id} on {self.visited_on}"
+
+
+class Prescription(models.Model):
+    """A digitized prescription linked to a PatientVisit (PHC-BR-02, PHC-BR-05)."""
+
+    patient_visit = models.ForeignKey(PatientVisit, related_name="prescriptions", on_delete=models.CASCADE)
+    details = models.TextField()
+    issued_on = models.DateField()
+
+    class Meta:
+        db_table = "phc_prescription"
+        ordering = ["-issued_on"]
+
+    def __str__(self) -> str:
+        return f"Prescription for visit by u{self.patient_visit.patient_user_id} on {self.issued_on}"
+
+
+class ReimbursementClaim(models.Model):
+    """An employee's medical bill claim (PHC-BR-04, PHC-BR-08)."""
+
+    claimant_user_id = models.IntegerField(db_index=True)
+    prescription = models.ForeignKey(Prescription, related_name="claims", on_delete=models.PROTECT)
+    expense_date = models.DateField()
+    claimed_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.CharField(max_length=300, blank=True, null=True)
+    status = models.CharField(max_length=40, default="PENDING_PHC_REVIEW")
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "phc_reimbursement_claim"
+        ordering = ["-submitted_at"]
+
+    def __str__(self) -> str:
+        return f"Claim by u{self.claimant_user_id} for prescription on {self.expense_date}"
+
+
+class ReimbursementPayment(models.Model):
+    """Tracks final payment of a claim (PHC-BR-08)."""
+
+    claim = models.OneToOneField(ReimbursementClaim, related_name="payment", on_delete=models.PROTECT)
+    paid_on = models.DateField()
+    reference = models.CharField(max_length=100)
+    recorded_by_user_id = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        db_table = "phc_reimbursement_payment"
+        ordering = ["-paid_on"]
+
+    def __str__(self) -> str:
+        return f"Payment for claim by u{self.claim.claimant_user_id} on {self.paid_on}"
