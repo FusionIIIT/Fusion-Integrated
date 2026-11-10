@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema
 
-from core.api.permissions import HasPermission
+from fusion_auth.permissions import HasPermission
 from modules.phc.domain.reimbursement import (
     PENDING_PHC_REVIEW,
     PENDING_ACCOUNTS_VERIFICATION,

@@ -9,7 +9,7 @@ from modules.phc.domain.reimbursement import (
     APPROVED_FOR_PAYMENT,
     REIMBURSED,
     REJECTED,
-    validate_submission,  # Import the validate_submission function
+    validate_claim_submission,  # Import the validate_claim_submission function
     get_next_status,  # Import the get_next_status function
 )
 from modules.phc.models import ReimbursementClaim, Prescription, ReimbursementPayment  # Import the ReimbursementPayment model
@@ -24,7 +24,7 @@ def create_claim(claimant_user_id: int, claimant_kind: str, prescription_id: int
     if not prescription:
         raise NotFound("Prescription not found")  # PHC-BR-11
 
-    validate_submission(claimant_user_kind=claimant_kind, prescription_patient_user_id=prescription.patient_user_id, expense_date=expense_date, window_days=window_days)
+    validate_claim_submission(claimant_user_kind=claimant_kind, prescription_patient_user_id=prescription.patient_user_id, expense_date=expense_date, window_days=window_days)
 
     claim = ReimbursementClaim.objects.create(
         claimant_user_id=claimant_user_id,

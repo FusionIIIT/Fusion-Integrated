@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.utils import timezone
-from rest_framework.exceptions import NotFound, BadRequestError
+from rest_framework.exceptions import NotFound
+from core.api.exceptions import BadRequestError
 from modules.phc.models import InventoryItem, StockAdjustment, AuditEvent, Notification, Requisition, RequisitionLine
 from modules.phc.domain.inventory import validate_stock_adjustment, is_low_stock, can_transition, RequisitionState
 
