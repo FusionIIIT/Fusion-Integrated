@@ -1,0 +1,56 @@
+================================================================================
+AI INTERACTION LOG: STRATEGY 2 (UC - USE CASES)
+Module: Other Academic Procedures (OAP)
+Model: Qwen2.5-Coder 1.5B (qwen2.5-coder:1.5b via Ollama localhost:11434)
+Pair: Subteam 04B | Rahul Kumar (24BCS205), Aakriti Karna (24BCS294)
+Date: 2026-11-10
+================================================================================
+
+[STEP 1 - PROMPT A: TEST DESIGN GENERATION (FROM SPEC ONLY)]
+Prompt:
+You are designing automated specification-based tests for the Other Academic Procedures (OAP) Fusion ERP module.
+Source of truth: Use ONLY the supplied Problem Statement and Use Case Specifications below.
+Do NOT inspect implementation code.
+Do NOT infer behavior from implementation.
+Do NOT introduce behavior unsupported by the supplied specification.
+Generate the minimum non-redundant set of test cases needed to satisfy the strategy-specific adequacy rule in Section 7.
+For every test case output exactly these fields: test_id, source_id, purpose, preconditions, action_or_input, expected_result, test_type.
+Output ONLY a valid JSON array.
+
+Strategy-specific instruction for UC:
+Cover the main success flow of every Use Case and every explicitly specified alternative/exception flow with at least one test. Do not invent additional flows.
+
+Output from Qwen2.5-Coder:
+Generated 53 test cases covering all 25 OAP Use Cases (OA-UC-01 through OA-UC-92).
+Saved and frozen to: a8_design/UC_DESIGN.json
+
+--------------------------------------------------------------------------------
+[STEP 2 - PROMPT B: TEST IMPLEMENTATION (GIVEN FROZEN DESIGN + A8_BASE)]
+Prompt:
+You are given:
+1. the frozen A8_BASE Fusion implementation, and
+2. the frozen UC_DESIGN.json.
+Convert these test cases into Python test methods inside a Django TestCase class.
+If a test refers to UI navigation, page opening, or external email service that cannot be automated at backend unit level, decorate with @pytest.mark.skip(reason="NOT_AUTOMATED: <short reason>").
+
+Output from Qwen2.5-Coder:
+Generated tests/a8/uc/test_uc.py implementing TC-UC-001 through TC-UC-053.
+
+--------------------------------------------------------------------------------
+[STEP 3 - PROMPT C: TEST CODE REPAIR (REPAIR ALLOWANCE: 1 of 2 USED)]
+Execution Error:
+IndentationError: expected an indented block after function definition on line 108
+SyntaxError: invalid character '-' in identifier (test_OA_UC_21_..._no-dues)
+
+Prompt:
+The generated test suite cannot execute because of syntax errors in function definitions and empty method bodies.
+Repair the TEST CODE/TEST SETUP only.
+Do not modify production code.
+Do not alter test intent or expected results.
+Do not add or remove test cases.
+
+Output & Resolution:
+Sanitized method identifiers, inserted pass in empty bodies, removed unused test_data import.
+Execution completed: 2 passed, 11 failed (unversioned routes), 40 skipped (NOT_AUTOMATED).
+Coverage: 72% statement coverage.
+================================================================================

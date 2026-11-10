@@ -1,0 +1,355 @@
+[
+  {
+    "test_id": "TC-FR-001",
+    "source_id": "AFR-OAP-009",
+    "purpose": "Test the submission of a student leave application",
+    "preconditions": "A student logs in to the OAP Fusion ERP system, has a valid leave request template, and is authorized to submit it",
+    "action_or_input": "Submit the leave application via the OAP Fusion ERP system using the provided template",
+    "expected_result": "The leave application is submitted successfully, and the student receives an acknowledgment of receipt",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-002",
+    "source_id": "AFR-OAP-010",
+    "purpose": "Test the attachment of supporting documents for a medical/academic leave application",
+    "preconditions": "A student logs in to the OAP Fusion ERP system, has a valid leave request template, and is authorized to submit it",
+    "action_or_input": "Attach supporting documents to the leave application using the provided file upload interface",
+    "expected_result": "The supporting documents are attached successfully, and the leave application is submitted successfully",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-003",
+    "source_id": "AFR-OAP-011",
+    "purpose": "Test the automatic routing of a leave request to assigned HoD",
+    "preconditions": "A student logs in to the OAP Fusion ERP system, has a valid leave request template, and is authorized to submit it",
+    "action_or_input": "Submit the leave application via the OAP Fusion ERP system using the provided template, and ensure that the leave request is routed to the correct HoD",
+    "expected_result": "The leave request is automatically routed to the assigned HoD, and the student receives an acknowledgment of receipt",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-004",
+    "source_id": "AFR-OAP-012",
+    "purpose": "Test the HoD review of a submitted leave application",
+    "preconditions": "A student logs in to the OAP Fusion ERP system, has a valid leave request template, and is authorized to submit it",
+    "action_or_input": "Submit the leave application via the OAP Fusion ERP system using the provided template, and ensure that the HoD reviews the leave request",
+    "expected_result": "The HoD reviews the leave request and approves it, and the student receives an acknowledgment of receipt",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-005",
+    "source_id": "AFR-OAP-013",
+    "purpose": "Test the HoD approval or rejection decision recording with remarks",
+    "preconditions": "A student logs in to the OAP Fusion ERP system, has a valid leave request template, and is authorized to submit it",
+    "action_or_input": "Submit the leave application via the OAP Fusion ERP system using the provided template, and ensure that the HoD makes a decision on the leave request",
+    "expected_result": "The HoD makes a decision on the leave request, and the decision record is recorded with remarks, and the student receives an acknowledgment of receipt",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-006",
+    "source_id": "AFR-OAP-014",
+    "purpose": "Test the student viewing current status of own leave requests",
+    "preconditions": "A student logs in to the OAP Fusion ERP system, has a valid leave request template, and is authorized to submit it",
+    "action_or_input": "View the current status of own leave requests via the OAP Fusion ERP system using the provided interface",
+    "expected_result": "The student can view a list of their current leave requests, including the status, start date, end date, and any other relevant information",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-007",
+    "source_id": "AFR-OAP-015",
+    "purpose": "Test the student viewing history of previous leave requests",
+    "preconditions": "A student logs in to the OAP Fusion ERP system, has a valid leave request template, and is authorized to submit it",
+    "action_or_input": "View the history of previous leave requests via the OAP Fusion ERP system using the provided interface",
+    "expected_result": "The student can view a list of their past leave requests, including the status, start date, end date, and any other relevant information",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-008",
+    "source_id": "AFR-OAP-016",
+    "purpose": "Verifies that a student submits a bonafide certificate request specifying the purpose.",
+    "preconditions": "A student has registered with the system and is logged in.",
+    "action_or_input": "POST /bonafide/certificate",
+    "expected_result": "The system receives the bonafide certificate request with the specified purpose.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-009",
+    "source_id": "AFR-OAP-017",
+    "purpose": "Verifies that a bonafide request is routed to the Academic Administrator.",
+    "preconditions": "A student has submitted a bonafide certificate request.",
+    "action_or_input": "Route the bonafide certificate request to the Academic Administrator.",
+    "expected_result": "The bonafide certificate request is routed to the Academic Administrator.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-010",
+    "source_id": "AFR-OAP-018",
+    "purpose": "Verifies that the Academic Administrator verifies the student's academic standing.",
+    "preconditions": "A student has submitted a bonafide certificate request, and the Academic Administrator has access to the student's academic data.",
+    "action_or_input": "The Academic Administrator verifies the student's academic standing.",
+    "expected_result": "The Academic Administrator records the student's academic standing.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-011",
+    "source_id": "AFR-OAP-019",
+    "purpose": "Verifies that the Academic Administrator makes a decision to approve or reject the bonafide certificate request.",
+    "preconditions": "A student has submitted a bonafide certificate request, and the Academic Administrator has access to the student's academic data and decision-making criteria.",
+    "action_or_input": "The Academic Administrator makes a decision to approve or reject the bonafide certificate request.",
+    "expected_result": "The Academic Administrator records the decision.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-012",
+    "source_id": "AFR-OAP-020",
+    "purpose": "Verifies that the student can track the status of their bonafide certificate request.",
+    "preconditions": "A student has submitted a bonafide certificate request, and the system has generated a unique request ID.",
+    "action_or_input": "The student queries the system to track the status of their bonafide certificate request.",
+    "expected_result": "The system provides the status of the bonafide certificate request.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-013",
+    "source_id": "AFR-OAP-021",
+    "purpose": "Verifies that the student can download an approved bonafide certificate with a certificate number.",
+    "preconditions": "A student has submitted a bonafide certificate request, the Academic Administrator has approved it, and the system has generated a unique request ID.",
+    "action_or_input": "The student downloads the approved bonafide certificate.",
+    "expected_result": "The student receives the approved bonafide certificate with a certificate number.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-014",
+    "source_id": "AFR-OAP-022",
+    "purpose": "Verifies that a student can initiate a no-dues clearance request.",
+    "preconditions": "Student is authenticated, has access to the OAP Fusion ERP module.",
+    "action_or_input": "Create a new no-dues clearance request, specifying the student's details.",
+    "expected_result": "The request should be successfully submitted and appear in the student's profile.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-015",
+    "source_id": "AFR-OAP-023",
+    "purpose": "Verifies that a student can submit a no-dues clearance request to all 7 mandatory clearance authorities.",
+    "preconditions": "Student is authenticated, has access to the OAP Fusion ERP module, and has completed all mandatory tasks.",
+    "action_or_input": "Create a new no-dues clearance request, specifying the student's details and routing to all 7 mandatory authorities.",
+    "expected_result": "The request should be successfully submitted and appear in the student's profile for each authority.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-016",
+    "source_id": "AFR-OAP-024",
+    "purpose": "Verifies that a student can independently verify their clearance by the Library authority.",
+    "preconditions": "Student is authenticated, has access to the OAP Fusion ERP module, and has completed all mandatory tasks.",
+    "action_or_input": "Create a new no-dues clearance request, specifying the student's details and independently verifying the clearance with the Library authority.",
+    "expected_result": "The request should be successfully submitted and appear in the student's profile.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-017",
+    "source_id": "AFR-OAP-025",
+    "purpose": "Verifies that a student can independently verify their clearance by the Hostel Warden.",
+    "preconditions": "Student is authenticated, has access to the OAP Fusion ERP module, and has completed all mandatory tasks.",
+    "action_or_input": "Create a new no-dues clearance request, specifying the student's details and independently verifying the clearance with the Hostel Warden.",
+    "expected_result": "The request should be successfully submitted and appear in the student's profile.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-018",
+    "source_id": "AFR-OAP-026",
+    "purpose": "Verifies that a student can independently verify their clearance by the Mess In-charge.",
+    "preconditions": "Student is authenticated, has access to the OAP Fusion ERP module, and has completed all mandatory tasks.",
+    "action_or_input": "Create a new no-dues clearance request, specifying the student's details and independently verifying the clearance with the Mess In-charge.",
+    "expected_result": "The request should be successfully submitted and appear in the student's profile.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-019",
+    "source_id": "AFR-OAP-027",
+    "purpose": "Verifies that a student can independently verify their clearance by the Sports/Gymkhana In-charge.",
+    "preconditions": "Student is authenticated, has access to the OAP Fusion ERP module, and has completed all mandatory tasks.",
+    "action_or_input": "Create a new no-dues clearance request, specifying the student's details and independently verifying the clearance with the Sports/Gymkhana In-charge.",
+    "expected_result": "The request should be successfully submitted and appear in the student's profile.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-020",
+    "source_id": "AFR-OAP-028",
+    "purpose": "Verifies that a student can independently verify their clearance by the Computer Center.",
+    "preconditions": "Student is authenticated, has access to the OAP Fusion ERP module, and has completed all mandatory tasks.",
+    "action_or_input": "Create a new no-dues clearance request, specifying the student's details and independently verifying the clearance with the Computer Center.",
+    "expected_result": "The request should be successfully submitted and appear in the student's profile.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-021",
+    "source_id": "AFR-OAP-052",
+    "purpose": "Verifies that a student can independently verify their clearance by the Department Lab.",
+    "preconditions": "Student is authenticated, has access to the OAP Fusion ERP module, and has completed all mandatory tasks.",
+    "action_or_input": "Create a new no-dues clearance request, specifying the student's details and independently verifying the clearance with the Department Lab.",
+    "expected_result": "The request should be successfully submitted and appear in the student's profile.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-022",
+    "source_id": "AFR-OAP-053",
+    "purpose": "Verifies that a student can independently verify their clearance by the Accounts Section.",
+    "preconditions": "Student is authenticated, has access to the OAP Fusion ERP module, and has completed all mandatory tasks.",
+    "action_or_input": "Create a new no-dues clearance request, specifying the student's details and independently verifying the clearance with the Accounts Section.",
+    "expected_result": "The request should be successfully submitted and appear in the student's profile.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-023",
+    "source_id": "AFR-OAP-029",
+    "purpose": "Verifies that a student can finalize their no-dues clearance only after all 7 cleared.",
+    "preconditions": "Student is authenticated, has access to the OAP Fusion ERP module, and has completed all mandatory tasks.",
+    "action_or_input": "Create a new no-dues clearance request, specifying the student's details and successfully completing all mandatory tasks.",
+    "expected_result": "The student should be unable to finalize their clearance until all 7 clearance authorities have been verified.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-024",
+    "source_id": "AFR-OAP-030",
+    "purpose": "Verifies that a student can generate and download their finalized No-Dues certificate.",
+    "preconditions": "Student is authenticated, has access to the OAP Fusion ERP module, and has completed all mandatory tasks.",
+    "action_or_input": "Create a new no-dues clearance request, successfully completing all mandatory tasks, and generating and downloading the finalized No-Dues certificate.",
+    "expected_result": "The student should be able to generate and download their finalized No-Dues certificate.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-025",
+    "source_id": "AFR-OAP-031",
+    "purpose": "Verify that a PG student can submit a monthly assistantship claim with the correct hours rendered.",
+    "preconditions": {
+      "status": "PG student is registered and has completed the necessary course work.",
+      "hours_rendered": "The hours for the assistantship claim have been rendered by the professor."
+    },
+    "action_or_input": "A PG student submits a monthly assistantship claim through the system.",
+    "expected_result": {
+      "status": "Claim submitted successfully.",
+      "message": "The system has processed the claim and assigned it to the student."
+    },
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-026",
+    "source_id": "AFR-OAP-032",
+    "purpose": "Verify that a submitted claim can be verified by the assigned Thesis Supervisor.",
+    "preconditions": {
+      "claim_id": "The claim ID generated by the system after submission.",
+      "supervisor": "The assigned Thesis Supervisor has logged in to the system."
+    },
+    "action_or_input": "The assigned Thesis Supervisor verifies the claim by logging into the system and accessing the claim details.",
+    "expected_result": {
+      "status": "Claim verified successfully.",
+      "message": "The system has processed the verification request and has verified the claim."
+    },
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-027",
+    "source_id": "AFR-OAP-033",
+    "purpose": "Verify that a submitted claim can be verified by the assigned TA Supervisor.",
+    "preconditions": {
+      "claim_id": "The claim ID generated by the system after submission.",
+      "supervisor": "The assigned TA Supervisor has logged in to the system."
+    },
+    "action_or_input": "The assigned TA Supervisor verifies the claim by logging into the system and accessing the claim details.",
+    "expected_result": {
+      "status": "Claim verified successfully.",
+      "message": "The system has processed the verification request and has verified the claim."
+    },
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-028",
+    "source_id": "AFR-OAP-034",
+    "purpose": "Verify that a department administrator can review and forward a submitted assistantship claim to the HoD.",
+    "preconditions": {
+      "claim_id": "The claim ID generated by the system after submission.",
+      "admin": "A department administrator has logged in to the system.",
+      "ho_d": "The HoD is assigned to the department administrator and is logged in to the system."
+    },
+    "action_or_input": "The department administrator reviews the claim and forwards it to the HoD.",
+    "expected_result": {
+      "status": "Claim forwarded successfully.",
+      "message": "The system has processed the forwarding request and forwarded the claim to the HoD."
+    },
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-029",
+    "source_id": "AFR-OAP-035",
+    "purpose": "Verify that the HoD can approve or reject a forwarded assistantship claim.",
+    "preconditions": {
+      "claim_id": "The claim ID generated by the system after submission.",
+      "ho_d": "The HoD is assigned to the department administrator and is logged in to the system."
+    },
+    "action_or_input": "The HoD approves or rejects the forwarded assistantship claim.",
+    "expected_result": {
+      "status": "Claim approved/rejected successfully.",
+      "message": "The system has processed the approval/rejection request and updated the claim status."
+    },
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-030",
+    "source_id": "AFR-OAP-036",
+    "purpose": "Verify that an academic administrator can process stipend disbursement for approved assistantship claims.",
+    "preconditions": {
+      "claim_id": "The claim ID generated by the system after submission.",
+      "admin": "An academic administrator has logged in to the system.",
+      "stipend": "The stipend amount associated with the claim."
+    },
+    "action_or_input": "The academic administrator processes the stipend disbursement for the approved claim.",
+    "expected_result": {
+      "status": "Stipend disbursed successfully.",
+      "message": "The system has processed the stipend disbursement and updated the claim status."
+    },
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-031",
+    "source_id": "AFR-OAP-041",
+    "purpose": "Verify that a PG student can request a graduate seminar schedule.",
+    "preconditions": {
+      "student": "The PG student has logged in to the system.",
+      "course": "A course that the student has registered for."
+    },
+    "action_or_input": "The PG student requests a graduate seminar schedule for the course.",
+    "expected_result": {
+      "status": "Scheduling request submitted successfully.",
+      "message": "The system has processed the scheduling request and assigned the seminar to the student."
+    },
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-032",
+    "source_id": "AFR-OAP-042",
+    "purpose": "Verify that a department administrator can schedule a graduate seminar with the correct details.",
+    "preconditions": {
+      "admin": "A department administrator has logged in to the system.",
+      "seminar": "A seminar that the department administrator has scheduled."
+    },
+    "action_or_input": "The department administrator schedules the graduate seminar with the correct details.",
+    "expected_result": {
+      "status": "Scheduling request submitted successfully.",
+      "message": "The system has processed the scheduling request and assigned the seminar to the appropriate department."
+    },
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-033",
+    "source_id": "AFR-OAP-043",
+    "purpose": "Verify that students and faculty can view graduate seminar schedules.",
+    "preconditions": {
+      "students": "All students registered for the seminar.",
+      "faculty": "All faculty members assigned to the seminar."
+    },
+    "action_or_input": "Students and faculty members view the graduate seminar schedule.",
+    "expected_result": {
+      "status": "Scheduling information displayed correctly.",
+      "message": "The system has displayed the seminar schedule to all users."
+    },
+    "test_type": "positive"
+  }
+]
