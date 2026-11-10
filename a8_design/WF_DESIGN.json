@@ -1,0 +1,164 @@
+[
+  {
+    "test_id": "TEST-WF-BW01",
+    "source_id": "BW-SPACS-01",
+    "purpose": "New application successful verification path",
+    "preconditions": "Student applies with complete data meeting criteria",
+    "action_or_input": "Execute sequence: submit -> open_verification -> mark_verified",
+    "expected_result": "Application progresses from draft to submitted to under_verification to verified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-BW02",
+    "source_id": "BW-SPACS-02",
+    "purpose": "Correction and resubmission single traversal path",
+    "preconditions": "Application under verification requires correction",
+    "action_or_input": "Execute sequence: request_correction -> resubmit -> mark_verified",
+    "expected_result": "Application transitions under_verification -> correction_required -> resubmitted -> verified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-BW03",
+    "source_id": "BW-SPACS-03",
+    "purpose": "Scholarship approval path by Convener",
+    "preconditions": "Application is in verified state",
+    "action_or_input": "Execute sequence: open_decision -> approve",
+    "expected_result": "Application transitions verified -> under_convener_review -> approved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-BW04",
+    "source_id": "BW-SPACS-04",
+    "purpose": "Scholarship rejection path following verification concern",
+    "preconditions": "Application has verification concern recorded",
+    "action_or_input": "Execute sequence: open_decision -> reject",
+    "expected_result": "Application transitions verification_concern -> under_convener_review -> rejected",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-BW04-ALT",
+    "source_id": "BW-SPACS-04 return-for-correction",
+    "purpose": "Convener returns application for correction during decision review",
+    "preconditions": "Application under convener review",
+    "action_or_input": "Convener returns application for correction",
+    "expected_result": "Application transitions under_convener_review -> correction_required",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-BW05-SUBMITTED",
+    "source_id": "BW-SPACS-05 withdrawal from submitted",
+    "purpose": "Student withdraws application directly from submitted state",
+    "preconditions": "Application in submitted state",
+    "action_or_input": "Student executes withdraw action",
+    "expected_result": "Application transitions submitted -> withdrawn",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-BW05-VERIFICATION",
+    "source_id": "BW-SPACS-05 withdrawal from under_verification",
+    "purpose": "Student withdraws application during assistant verification",
+    "preconditions": "Application in under_verification state",
+    "action_or_input": "Student executes withdraw action",
+    "expected_result": "Application transitions under_verification -> withdrawn",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-BW05-CORRECTION",
+    "source_id": "BW-SPACS-05 withdrawal from correction_required",
+    "purpose": "Student withdraws application from correction_required state",
+    "preconditions": "Application in correction_required state",
+    "action_or_input": "Student executes withdraw action",
+    "expected_result": "Application transitions correction_required -> withdrawn",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-BW05-VERIFIED",
+    "source_id": "BW-SPACS-05 withdrawal from verified",
+    "purpose": "Student withdraws application from verified state before convener review begins",
+    "preconditions": "Application in verified state",
+    "action_or_input": "Student executes withdraw action",
+    "expected_result": "Application transitions verified -> withdrawn",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-BW06",
+    "source_id": "BW-SPACS-06",
+    "purpose": "Renewal submission and verification path",
+    "preconditions": "Student holds previously approved scholarship",
+    "action_or_input": "Execute sequence: submit_renewal -> open_renewal_verification -> mark_renewal_verified",
+    "expected_result": "Application transitions draft -> renewal_submitted -> renewal_under_verification -> renewal_verified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-BW07",
+    "source_id": "BW-SPACS-07",
+    "purpose": "Renewal approval path by Convener",
+    "preconditions": "Renewal in renewal_verified state",
+    "action_or_input": "Execute sequence: open_renewal_decision -> approve_renewal",
+    "expected_result": "Application transitions renewal_verified -> renewal_under_decision -> renewed",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-BW08",
+    "source_id": "BW-SPACS-08",
+    "purpose": "Award candidate preparation and committee evaluation path",
+    "preconditions": "Award cycle open",
+    "action_or_input": "Execute sequence: prepare_pool -> begin_evaluation -> record_committee_result",
+    "expected_result": "Cycle transitions open -> pool_prepared -> under_committee_evaluation -> committee_result_recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-BW09",
+    "source_id": "BW-SPACS-09",
+    "purpose": "Award finalization and publication with immediate approval evidence",
+    "preconditions": "Cycle in committee_result_recorded state with Senate resolution ref",
+    "action_or_input": "Execute sequence: record_approved_outcome -> publish_results",
+    "expected_result": "Cycle transitions committee_result_recorded -> ready_for_publication -> published",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-BW10",
+    "source_id": "BW-SPACS-10",
+    "purpose": "Renewal rejection path by Convener",
+    "preconditions": "Renewal in renewal_verified state",
+    "action_or_input": "Execute sequence: open_renewal_decision -> reject_renewal",
+    "expected_result": "Application transitions renewal_verified -> renewal_under_decision -> renewal_rejected",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-BW11",
+    "source_id": "BW-SPACS-11",
+    "purpose": "Award finalization with institutional approval pending and later recorded",
+    "preconditions": "Cycle in committee_result_recorded state without approval initially",
+    "action_or_input": "Execute sequence: await_approval -> record_approval_received -> publish_results",
+    "expected_result": "Cycle transitions committee_result_recorded -> awaiting_approval -> ready_for_publication -> published",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-CW01",
+    "source_id": "CW-SPACS-01",
+    "purpose": "End-to-End Scholarship Application Lifecycle with correction and approval",
+    "preconditions": "Published scholarship catalogue entry exists",
+    "action_or_input": "Execute complete composite flow: submit -> verify -> request correction -> resubmit -> reverify -> convener review -> approve",
+    "expected_result": "Application reaches approved state with full audit trail and notifications",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-CW02",
+    "source_id": "CW-SPACS-02",
+    "purpose": "End-to-End Scholarship Renewal Lifecycle with correction and final renewal",
+    "preconditions": "Approved scholarship exists from prior cycle",
+    "action_or_input": "Execute renewal flow: initiate -> submit renewal -> request correction -> resubmit -> verify renewal -> convener decision -> renewed",
+    "expected_result": "Renewal reaches renewed state",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-CW03",
+    "source_id": "CW-SPACS-03",
+    "purpose": "End-to-End Convocation Award Lifecycle from open cycle to publication",
+    "preconditions": "Award catalogue entry exists",
+    "action_or_input": "Execute complete flow: open cycle -> prepare pool -> committee evaluate -> await approval -> record approval -> publish results",
+    "expected_result": "Award reaches published state and winners are notified",
+    "test_type": "positive"
+  }
+]

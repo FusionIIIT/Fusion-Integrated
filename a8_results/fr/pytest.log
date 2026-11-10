@@ -1,0 +1,64 @@
+...........................F...................                          [100%]
+=================================== FAILURES ===================================
+_________________________________ test_fr_026 __________________________________
+
+db = None
+
+    @pytest.mark.django_db
+    def test_fr_026(db):
+        """TEST-FR-026 | AFR-SPACS-026: SLA reminders and escalations for pending tasks."""
+        past_time = timezone.now() - timedelta(hours=60)
+        task = SpacsTask.objects.create(
+            task_type="verification",
+            entity_type="application",
+            entity_id="SPACS-SLA-TEST",
+            assigned_role="spacs_assistant",
+            assigned_user_id=25,
+            status="pending",
+        )
+        # simulate aged creation
+        SpacsTask.objects.filter(id=task.id).update(created_at=past_time)
+    
+        escalated = task_svc.check_and_escalate_sla_tasks(sla_hours=48)
+        assert any(t.id == task.id for t in escalated)
+>       assert SpacsNotification.objects.filter(recipient_user_id=25, event_type="sla_reminder").exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = <QuerySet []>.exists
+E        +      where <QuerySet []> = filter(recipient_user_id=25, event_type='sla_reminder')
+E        +        where filter = <django.db.models.manager.Manager object at 0x727625a04830>.filter
+E        +          where <django.db.models.manager.Manager object at 0x727625a04830> = SpacsNotification.objects
+
+tests/a8/fr/test_fr.py:440: AssertionError
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.3-final-0 ________________
+
+Name                                       Stmts   Miss Branch BrPart  Cover   Missing
+--------------------------------------------------------------------------------------
+modules/spacs/__init__.py                      0      0      0      0   100%
+modules/spacs/apps.py                          6      0      0      0   100%
+modules/spacs/contracts.py                    14     14      4      0     0%   7-45
+modules/spacs/domain/__init__.py               2      0      0      0   100%
+modules/spacs/domain/errors.py                10      0      0      0   100%
+modules/spacs/domain/rules.py                118     27     76     25    71%   37->42, 39, 43, 54->53, 70, 72, 75->exit, 78, 92, 107, 116, 153, 157, 165, 183->exit, 203, 207, 221, 223, 232, 246, 250, 252, 271, 278-279, 286, 293, 304-306
+modules/spacs/domain/state_machine.py         56      6     12      4    85%   120, 123, 133, 136, 143, 148
+modules/spacs/migrations/0001_initial.py       6      0      0      0   100%
+modules/spacs/migrations/__init__.py           0      0      0      0   100%
+modules/spacs/models/__init__.py             130      0      2      0   100%
+modules/spacs/registry.py                     10     10      0      0     0%   3-107
+modules/spacs/selectors/__init__.py           22     12      6      0    36%   24-27, 32-37, 42, 49-51
+modules/spacs/services/__init__.py             2      0      0      0   100%
+modules/spacs/services/applications.py       111      3     10      4    94%   98, 100, 255, 280->289
+modules/spacs/services/audit.py                8      0      2      0   100%
+modules/spacs/services/awards.py              75      9     14      4    85%   123->125, 125->127, 127->129, 164-165, 185-200
+modules/spacs/services/catalogue.py           42      2      8      3    90%   69, 72->76, 77->76, 157
+modules/spacs/services/decisions.py           54     23      0      0    57%   85-112, 122-146
+modules/spacs/services/renewals.py            43      0      2      0   100%
+modules/spacs/services/tasks.py               26      0      6      2    94%   49->48, 51->58
+modules/spacs/services/verification.py        61      0      0      0   100%
+--------------------------------------------------------------------------------------
+TOTAL                                        796    106    142     42    83%
+Coverage XML written to file a8_results/fr/coverage.xml
+=========================== short test summary info ============================
+FAILED tests/a8/fr/test_fr.py::test_fr_026 - AssertionError: assert False
+1 failed, 46 passed in 3.29s
