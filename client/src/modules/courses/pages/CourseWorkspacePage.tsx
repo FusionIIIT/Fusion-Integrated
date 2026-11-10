@@ -16,19 +16,25 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import {
-  IconAlertCircle,
-  IconBook,
-  IconCalendar,
-  IconEdit,
-  IconInfoCircle,
-  IconUserCheck,
-  IconUsers,
-} from "@tabler/icons-react";
 import { useEffect, useState } from "react";
+import {
+  TbAlertCircle,
+  TbBook,
+  TbCalendar,
+  TbClipboardList,
+  TbEdit,
+  TbFolder,
+  TbInfoCircle,
+  TbSpeakerphone,
+  TbUserCheck,
+  TbUsers,
+} from "react-icons/tb";
 import { useSearchParams } from "react-router-dom";
 
 import { useWorkspaceDetail, useWorkspaces } from "../api/hooks";
+import { CourseAnnouncementsPanel } from "../components/CourseAnnouncementsPanel";
+import { CourseAssignmentsPanel } from "../components/CourseAssignmentsPanel";
+import { CourseMaterialsPanel } from "../components/CourseMaterialsPanel";
 import { WorkspaceEditModal } from "../components/WorkspaceEditModal";
 
 export default function CourseWorkspacePage() {
@@ -50,10 +56,13 @@ export default function CourseWorkspacePage() {
         return;
       }
     }
-    // Default to the first course
-    const first = workspacesData.results[0].id;
-    setSelectedId(first);
-    setSearchParams({ course: String(first) });
+
+    // Default to the first available workspace
+    const first = workspacesData.results[0];
+    if (first) {
+      setSelectedId(first.id);
+      setSearchParams({ course: String(first.id) }, { replace: true });
+    }
   }, [workspacesData, searchParams, setSearchParams]);
 
   const {
@@ -65,16 +74,16 @@ export default function CourseWorkspacePage() {
 
   const handleSelectCourse = (val: string | null) => {
     if (!val) return;
-    const nextId = parseInt(val, 10);
-    setSelectedId(nextId);
-    setSearchParams({ course: String(nextId) });
+    const parsed = parseInt(val, 10);
+    setSelectedId(parsed);
+    setSearchParams({ course: val });
   };
 
   if (loadingList) {
     return (
       <Container size="lg" py="xl">
         <Group justify="center" py="xl">
-          <Loader />
+          <Loader size="lg" />
         </Group>
       </Container>
     );
@@ -83,7 +92,11 @@ export default function CourseWorkspacePage() {
   if (listError) {
     return (
       <Container size="lg" py="xl">
-        <Alert icon={<IconAlertCircle size={16} />} title="Error" color="red">
+        <Alert
+          icon={<TbAlertCircle size={16} />}
+          title="Error Loading Courses"
+          color="red"
+        >
           {listError}
         </Alert>
       </Container>
@@ -94,7 +107,7 @@ export default function CourseWorkspacePage() {
     return (
       <Container size="lg" py="xl">
         <Alert
-          icon={<IconInfoCircle size={16} />}
+          icon={<TbInfoCircle size={16} />}
           title="No Course Workspaces Found"
           color="blue"
         >
@@ -117,10 +130,11 @@ export default function CourseWorkspacePage() {
     observer: { label: "Observer (Read-Only)", color: "gray" },
   };
 
-  const roleMeta =
-    workspace?.viewer_role && roleLabelMap[workspace.viewer_role]
-      ? roleLabelMap[workspace.viewer_role]
-      : { label: "Member", color: "gray" };
+  const roleMeta: { label: string; color: string } =
+    (workspace?.viewer_role && roleLabelMap[workspace.viewer_role]) || {
+      label: "Member",
+      color: "gray",
+    };
 
   return (
     <Container size="lg" py="md">
@@ -152,62 +166,75 @@ export default function CourseWorkspacePage() {
       )}
 
       {detailError && (
-        <Alert icon={<IconAlertCircle size={16} />} title="Access Refused" color="red">
+        <Alert
+          icon={<TbAlertCircle size={16} />}
+          title="Failed to Load Workspace"
+          color="red"
+          mb="lg"
+        >
           {detailError}
         </Alert>
       )}
 
       {workspace && !loadingDetail && (
         <Stack gap="lg">
-          {/* Course Workspace Header */}
-          <Paper withBorder p="lg" radius="md">
-            <Group justify="space-between" align="flex-start" wrap="wrap">
-              <div>
+          {/* Workspace Hero Header */}
+          <Paper withBorder shadow="xs" p="lg" radius="sm">
+            <Group justify="space-between" align="flex-start" wrap="wrap" gap="md">
+              <div style={{ flex: 1, minWidth: 260 }}>
                 <Group gap="xs" mb="xs">
-                  <Badge size="lg" variant="filled" color="dark">
+                  <Badge size="lg" variant="filled" color="blue">
                     {workspace.code}
                   </Badge>
-                  <Badge variant="outline" color={roleMeta.color}>
+                  <Badge size="md" variant="light" color={roleMeta.color}>
                     {roleMeta.label}
                   </Badge>
-                  <Badge variant="dot" color="blue">
-                    {workspace.semester} · {workspace.academic_year}
-                  </Badge>
-                  <Badge variant="default">{workspace.credits} Credits</Badge>
+                  {!workspace.is_published && (
+                    <Badge size="md" variant="outline" color="red">
+                      Unpublished
+                    </Badge>
+                  )}
                 </Group>
                 <Title order={2}>{workspace.title}</Title>
+                <Text size="sm" c="dimmed" mt={4}>
+                  {workspace.semester} • Academic Year {workspace.academic_year} •{" "}
+                  {workspace.credits} Credits
+                </Text>
                 {workspace.description && (
-                  <Text size="sm" c="dimmed" mt="xs" maw={800}>
+                  <Text size="sm" mt="xs" style={{ maxWidth: 700 }}>
                     {workspace.description}
                   </Text>
                 )}
               </div>
 
-              {/* Faculty configuration button: rendered ONLY for assigned faculty instructors */}
+              {/* Action buttons (Faculty only - AFR-LMS-002.1) */}
               {workspace.can_manage && (
                 <Button
-                  leftSection={<IconEdit size={16} />}
+                  leftSection={<TbEdit size={16} />}
                   onClick={() => setEditOpened(true)}
+                  variant="filled"
                 >
-                  Edit Workspace Details
+                  Configure Workspace
                 </Button>
               )}
             </Group>
+          </Paper>
 
-            {/* Modular Navigation Tabs (Extensible for Materials & Announcements) */}
-            <Tabs defaultValue="home" mt="xl">
+          {/* Tabbed workspace panels */}
+          <Paper withBorder shadow="xs" p="md" radius="sm">
+            <Tabs defaultValue="home">
               <Tabs.List>
-                <Tabs.Tab value="home" leftSection={<IconBook size={14} />}>
+                <Tabs.Tab value="home" leftSection={<TbBook size={14} />}>
                   Course Home
                 </Tabs.Tab>
-                <Tabs.Tab value="materials" disabled>
-                  Materials (Next Stage)
+                <Tabs.Tab value="announcements" leftSection={<TbSpeakerphone size={14} />}>
+                  Announcements
                 </Tabs.Tab>
-                <Tabs.Tab value="announcements" disabled>
-                  Announcements (Next Stage)
+                <Tabs.Tab value="materials" leftSection={<TbFolder size={14} />}>
+                  Materials
                 </Tabs.Tab>
-                <Tabs.Tab value="assignments" disabled>
-                  Assignments (Future Labs)
+                <Tabs.Tab value="assignments" leftSection={<TbClipboardList size={14} />}>
+                  Assignments
                 </Tabs.Tab>
               </Tabs.List>
 
@@ -219,7 +246,7 @@ export default function CourseWorkspacePage() {
                       {/* Syllabus Card (AFR-LMS-001.2) */}
                       <Card withBorder shadow="xs" p="md">
                         <Group gap="xs" mb="sm">
-                          <IconBook size={18} />
+                          <TbBook size={18} />
                           <Title order={4}>Course Syllabus</Title>
                         </Group>
                         <Divider mb="sm" />
@@ -240,7 +267,7 @@ export default function CourseWorkspacePage() {
                       {/* Schedule Card (AFR-LMS-001.2) */}
                       <Card withBorder shadow="xs" p="md">
                         <Group gap="xs" mb="sm">
-                          <IconCalendar size={18} />
+                          <TbCalendar size={18} />
                           <Title order={4}>Class & Lab Schedule</Title>
                         </Group>
                         <Divider mb="sm" />
@@ -266,7 +293,7 @@ export default function CourseWorkspacePage() {
                       {/* Instructors Card (AFR-LMS-001.2) */}
                       <Card withBorder shadow="xs" p="md">
                         <Group gap="xs" mb="sm">
-                          <IconUserCheck size={18} />
+                          <TbUserCheck size={18} />
                           <Title order={4}>Instructors</Title>
                         </Group>
                         <Divider mb="sm" />
@@ -311,7 +338,7 @@ export default function CourseWorkspacePage() {
                       {/* Teaching Assistants Card (AFR-LMS-001.2, AFR-LMS-014.1) */}
                       <Card withBorder shadow="xs" p="md">
                         <Group gap="xs" mb="sm">
-                          <IconUsers size={18} />
+                          <TbUsers size={18} />
                           <Title order={4}>Teaching Assistants</Title>
                         </Group>
                         <Divider mb="sm" />
@@ -355,6 +382,30 @@ export default function CourseWorkspacePage() {
                     </Stack>
                   </Grid.Col>
                 </Grid>
+              </Tabs.Panel>
+
+              {/* Announcements Tab (CFR-LMS-005) */}
+              <Tabs.Panel value="announcements" pt="md">
+                <CourseAnnouncementsPanel
+                  workspaceId={workspace.id}
+                  canManage={workspace.can_manage}
+                />
+              </Tabs.Panel>
+
+              {/* Materials Tab (CFR-LMS-003, CFR-LMS-004) */}
+              <Tabs.Panel value="materials" pt="md">
+                <CourseMaterialsPanel
+                  workspaceId={workspace.id}
+                  canManage={workspace.can_manage}
+                />
+              </Tabs.Panel>
+
+              {/* Assignments Tab (CFR-LMS-006) */}
+              <Tabs.Panel value="assignments" pt="md">
+                <CourseAssignmentsPanel
+                  workspaceId={workspace.id}
+                  canManage={workspace.can_manage}
+                />
               </Tabs.Panel>
             </Tabs>
           </Paper>
