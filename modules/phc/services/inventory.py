@@ -1,6 +1,7 @@
 from django.db import transaction
+from django.utils import timezone
 from modules.phc.models import InventoryItem, StockAdjustment, AuditEvent, Notification, Requisition, RequisitionLine
-from modules.phc.domain.inventory import is_valid_stock_adjustment, validate_requisition_lines, can_transition
+from modules.phc.domain.inventory import is_valid_stock_adjustment, validate_requisition_lines, can_transition, RequisitionState
 
 @transaction.atomic
 def adjust_stock(inventory_item, delta, reason, actor_user_id):

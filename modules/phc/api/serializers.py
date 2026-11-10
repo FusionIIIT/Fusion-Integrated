@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from modules.phc.models import InventoryItem, Requisition, RequisitionLine
+from modules.phc.domain.inventory import RequisitionState
 
 class InventoryItemSerializer(serializers.ModelSerializer):
     class Meta:
