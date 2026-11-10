@@ -4,6 +4,7 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from fusion_auth.permissions import HasPermission
 from modules.phc.models import ReimbursementClaim, AuditEvent
 from modules.phc.api.serializers import ReimbursementClaimSerializer, AuditEventSerializer
+from rest_framework.exceptions import NotFound
 
 class ClaimListView(APIView):
     permission_classes = [HasPermission("phc.reimbursement.create")]
