@@ -1,0 +1,605 @@
+[
+  {
+    "test_id": "FR-T01",
+    "source_id": "AFR-OAP-001 authorized-role access",
+    "purpose": "CFR-OAP-001: an authorized role can use a permitted OAP function.",
+    "preconditions": "A registered student user exists with the Student role.",
+    "action_or_input": "The student submits a leave application (a function permitted to Students).",
+    "expected_result": "The request is accepted and the leave application is created.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-T02",
+    "source_id": "AFR-OAP-001 unauthorized-role denied",
+    "purpose": "CFR-OAP-001: an unauthorized role is denied a protected OAP function.",
+    "preconditions": "A registered student user exists with the Student role only; a submitted leave application exists.",
+    "action_or_input": "The student attempts to approve the leave application (an HoD-only function).",
+    "expected_result": "The action is denied and the leave application status is unchanged.",
+    "test_type": "negative/authorization"
+  },
+  {
+    "test_id": "FR-T03",
+    "source_id": "AFR-OAP-002",
+    "purpose": "CFR-OAP-001: each user is restricted to OAP information/functions relevant to their role.",
+    "preconditions": "Two students (S1, S2) each have a submitted leave application; an HoD exists.",
+    "action_or_input": "S1 retrieves leave records; S2 retrieves leave records.",
+    "expected_result": "Each student can retrieve only their own leave records and cannot retrieve the other student's records.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-T04",
+    "source_id": "AFR-OAP-004",
+    "purpose": "CFR-OAP-002: submission-event notification.",
+    "preconditions": "A student exists; the relevant recipient (HoD) exists.",
+    "action_or_input": "The student submits a leave application.",
+    "expected_result": "A system alert and an email notification are both issued for the submission event to the required recipient.",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "FR-T05",
+    "source_id": "AFR-OAP-005 approval",
+    "purpose": "CFR-OAP-002: approval-event notification.",
+    "preconditions": "A submitted leave application exists; HoD exists.",
+    "action_or_input": "The HoD approves the leave application.",
+    "expected_result": "A system alert and an email notification are both issued for the approval event to the required recipient.",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "FR-T06",
+    "source_id": "AFR-OAP-005 rejection",
+    "purpose": "CFR-OAP-002: rejection-event notification.",
+    "preconditions": "A submitted leave application exists; HoD exists.",
+    "action_or_input": "The HoD rejects the leave application.",
+    "expected_result": "A system alert and an email notification are both issued for the rejection event to the required recipient.",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "FR-T07",
+    "source_id": "AFR-OAP-006",
+    "purpose": "CFR-OAP-002: no-dues verification-completion notification.",
+    "preconditions": "A no-dues case exists with six of seven authority results recorded.",
+    "action_or_input": "The seventh authority records its result so that no-dues verification is complete.",
+    "expected_result": "A system alert and an email notification are both issued for no-dues verification completion to the required recipient.",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "FR-T08",
+    "source_id": "AFR-OAP-007 bonafide certificate",
+    "purpose": "CFR-OAP-002: certificate-availability notification for an approved bonafide certificate.",
+    "preconditions": "A verified bonafide request exists.",
+    "action_or_input": "The Academic Administrator approves the bonafide request so the certificate becomes available.",
+    "expected_result": "The requesting student receives a system alert and an email notification that the certificate is available.",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "FR-T09",
+    "source_id": "AFR-OAP-007 no-dues certificate",
+    "purpose": "CFR-OAP-002: certificate-availability notification for a finalized no-dues certificate.",
+    "preconditions": "A no-dues case exists with all seven results Clear.",
+    "action_or_input": "The Academic Administrator finalizes no-dues clearance so the certificate becomes available.",
+    "expected_result": "The requesting student receives a system alert and an email notification that the certificate is available.",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "FR-T10",
+    "source_id": "AFR-OAP-008",
+    "purpose": "CFR-OAP-002: pending-action reminder to the responsible actor.",
+    "preconditions": "A request is pending an action by a responsible actor and a pending-action reminder condition is configured and met.",
+    "action_or_input": "The reminder condition is triggered.",
+    "expected_result": "The responsible actor is sent a reminder through the supported channel(s). No specific schedule/threshold is asserted.",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "FR-T11",
+    "source_id": "AFR-OAP-009",
+    "purpose": "CFR-OAP-003: student submits a leave application.",
+    "preconditions": "An authorized student exists.",
+    "action_or_input": "The student submits a leave application with the required request data.",
+    "expected_result": "A leave application is created in Submitted state for the student.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T12",
+    "source_id": "AFR-OAP-010 with supporting document",
+    "purpose": "CFR-OAP-003: leave submission with an optional supporting document.",
+    "preconditions": "An authorized student exists; a supporting document is available.",
+    "action_or_input": "The student submits a leave application with the supporting document attached.",
+    "expected_result": "The application is created and the supplied document is retained with the request.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T13",
+    "source_id": "AFR-OAP-010 without supporting document",
+    "purpose": "CFR-OAP-003: leave submission without the optional supporting document.",
+    "preconditions": "An authorized student exists.",
+    "action_or_input": "The student submits a leave application with no supporting document.",
+    "expected_result": "The application is created successfully without a document.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "FR-T14",
+    "source_id": "AFR-OAP-011",
+    "purpose": "CFR-OAP-003: submitted leave is available to the appropriate HoD.",
+    "preconditions": "A student and the student's appropriate HoD exist.",
+    "action_or_input": "The student submits a leave application.",
+    "expected_result": "The leave application is available to the appropriate HoD for review.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T15",
+    "source_id": "AFR-OAP-012",
+    "purpose": "CFR-OAP-004: HoD reviews leave application and supporting info.",
+    "preconditions": "A submitted leave application with a supporting document exists, available to the appropriate HoD.",
+    "action_or_input": "The HoD opens the leave application.",
+    "expected_result": "The HoD can view the application content and the supplied supporting information.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T16",
+    "source_id": "AFR-OAP-013 approve",
+    "purpose": "CFR-OAP-004: HoD approves a leave application.",
+    "preconditions": "A submitted leave application is available to the HoD.",
+    "action_or_input": "The HoD records Approved.",
+    "expected_result": "The leave application's persistent status becomes Approved.",
+    "test_type": "state-transition"
+  },
+  {
+    "test_id": "FR-T17",
+    "source_id": "AFR-OAP-013 reject",
+    "purpose": "CFR-OAP-004: HoD rejects a leave application.",
+    "preconditions": "A submitted leave application is available to the HoD.",
+    "action_or_input": "The HoD records Rejected.",
+    "expected_result": "The leave application's persistent status becomes Rejected.",
+    "test_type": "state-transition"
+  },
+  {
+    "test_id": "FR-T18",
+    "source_id": "AFR-OAP-014",
+    "purpose": "CFR-OAP-005: student tracks current leave status.",
+    "preconditions": "A student has submitted leave applications in differing statuses (e.g., Submitted, Approved).",
+    "action_or_input": "The student retrieves the status of each submitted leave application.",
+    "expected_result": "The current status of each submitted leave application is returned correctly.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T19",
+    "source_id": "AFR-OAP-015",
+    "purpose": "CFR-OAP-005: leave history is maintained and retrievable.",
+    "preconditions": "A student has several past leave requests (including decided ones).",
+    "action_or_input": "The student retrieves their leave history.",
+    "expected_result": "All past leave requests remain represented in the retrievable history.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T20",
+    "source_id": "AFR-OAP-016",
+    "purpose": "CFR-OAP-006: student submits a bonafide request.",
+    "preconditions": "An authorized student exists.",
+    "action_or_input": "The student submits a bonafide certificate request.",
+    "expected_result": "A bonafide request is created in Submitted state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T21",
+    "source_id": "AFR-OAP-017",
+    "purpose": "CFR-OAP-006: submitted bonafide request is available to the Academic Administrator.",
+    "preconditions": "An Academic Administrator exists.",
+    "action_or_input": "A student submits a bonafide request.",
+    "expected_result": "The request becomes available to the Academic Administrator.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T22",
+    "source_id": "AFR-OAP-018",
+    "purpose": "CFR-OAP-007: Academic Administrator verifies a bonafide request.",
+    "preconditions": "A submitted bonafide request exists.",
+    "action_or_input": "The Academic Administrator reviews/verifies the request.",
+    "expected_result": "The administrator can review/verify the submitted request.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T23",
+    "source_id": "AFR-OAP-019 approve",
+    "purpose": "CFR-OAP-007: Academic Administrator approves a verified bonafide request.",
+    "preconditions": "A verified bonafide request exists.",
+    "action_or_input": "The Academic Administrator records Approved.",
+    "expected_result": "The request status becomes Approved.",
+    "test_type": "state-transition"
+  },
+  {
+    "test_id": "FR-T24",
+    "source_id": "AFR-OAP-019 reject",
+    "purpose": "CFR-OAP-007: Academic Administrator rejects a verified bonafide request.",
+    "preconditions": "A verified bonafide request exists.",
+    "action_or_input": "The Academic Administrator records Rejected.",
+    "expected_result": "The request status becomes Rejected.",
+    "test_type": "state-transition"
+  },
+  {
+    "test_id": "FR-T25",
+    "source_id": "AFR-OAP-020",
+    "purpose": "CFR-OAP-008: student monitors bonafide request status.",
+    "preconditions": "A student has submitted bonafide requests.",
+    "action_or_input": "The student retrieves the status of the submitted bonafide requests.",
+    "expected_result": "The current status of each request is returned to the requesting student.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T26",
+    "source_id": "AFR-OAP-021 after approval",
+    "purpose": "CFR-OAP-008: requesting student can download an approved bonafide certificate.",
+    "preconditions": "A bonafide request has been approved.",
+    "action_or_input": "The requesting student downloads the bonafide certificate.",
+    "expected_result": "The certificate is available and downloadable by the requesting student.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T27",
+    "source_id": "AFR-OAP-021 before approval",
+    "purpose": "CFR-OAP-008: certificate is available only after approval.",
+    "preconditions": "A bonafide request exists that is Submitted/not approved (and one that is Rejected).",
+    "action_or_input": "The requesting student attempts to download the bonafide certificate.",
+    "expected_result": "No certificate is available for download.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-T28",
+    "source_id": "AFR-OAP-022",
+    "purpose": "CFR-OAP-009: student initiates no-dues clearance.",
+    "preconditions": "An authorized student exists.",
+    "action_or_input": "The student initiates a no-dues clearance request.",
+    "expected_result": "An active no-dues clearance case is created for the student.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T29",
+    "source_id": "AFR-OAP-023",
+    "purpose": "CFR-OAP-009: no-dues request is routed in parallel to all seven authorities.",
+    "preconditions": "A no-dues case has just been initiated by a student.",
+    "action_or_input": "Inspect the routing of the case after initiation.",
+    "expected_result": "The case is issued to Library, Hostel, Mess, respective Department, Lab, Academic Section and Student Section simultaneously (all seven pending at once).",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T30",
+    "source_id": "AFR-OAP-024",
+    "purpose": "CFR-OAP-010: Library clearance can be recorded by its authority.",
+    "preconditions": "An active no-dues case exists and is routed to the Library authority.",
+    "action_or_input": "The Librarian records the Library clearance result.",
+    "expected_result": "The Library domain result is recorded for the relevant no-dues case.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T31",
+    "source_id": "AFR-OAP-025",
+    "purpose": "CFR-OAP-010: Hostel clearance can be recorded by its authority.",
+    "preconditions": "An active no-dues case exists and is routed to the Hostel authority.",
+    "action_or_input": "The Hostel Warden records the Hostel clearance result.",
+    "expected_result": "The Hostel domain result is recorded for the relevant no-dues case.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T32",
+    "source_id": "AFR-OAP-026",
+    "purpose": "CFR-OAP-010: Mess clearance can be recorded by its authority.",
+    "preconditions": "An active no-dues case exists and is routed to the Mess authority.",
+    "action_or_input": "The Mess In-charge records the Mess clearance result.",
+    "expected_result": "The Mess domain result is recorded for the relevant no-dues case.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T33",
+    "source_id": "AFR-OAP-027",
+    "purpose": "CFR-OAP-010: Lab clearance can be recorded by its authority.",
+    "preconditions": "An active no-dues case exists and is routed to the Lab authority.",
+    "action_or_input": "The Lab Supervisor records the Lab clearance result.",
+    "expected_result": "The Lab domain result is recorded for the relevant no-dues case.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T34",
+    "source_id": "AFR-OAP-052",
+    "purpose": "CFR-OAP-010: Department clearance can be recorded by its authority.",
+    "preconditions": "An active no-dues case exists and is routed to the Department authority.",
+    "action_or_input": "The authorized verifier for the student's respective Department records the Department clearance result.",
+    "expected_result": "The Department domain result is recorded for the relevant no-dues case.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T35",
+    "source_id": "AFR-OAP-053",
+    "purpose": "CFR-OAP-010: Academic Section clearance can be recorded by its authority.",
+    "preconditions": "An active no-dues case exists and is routed to the Academic Section authority.",
+    "action_or_input": "The authorized Academic Section verifier records the Academic Section clearance result.",
+    "expected_result": "The Academic Section domain result is recorded for the relevant no-dues case.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T36",
+    "source_id": "AFR-OAP-054",
+    "purpose": "CFR-OAP-010: Student Section clearance can be recorded by its authority.",
+    "preconditions": "An active no-dues case exists and is routed to the Student Section authority.",
+    "action_or_input": "The authorized Student Section verifier records the Student Section clearance result.",
+    "expected_result": "The Student Section domain result is recorded for the relevant no-dues case.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T37",
+    "source_id": "AFR-OAP-028",
+    "purpose": "CFR-OAP-010: seven authority results are maintained separately.",
+    "preconditions": "An active no-dues case exists.",
+    "action_or_input": "Seven authorities record distinct results (e.g., six Clear and one Not Clear) and the case is retrieved.",
+    "expected_result": "All seven results are stored independently and remain individually distinguishable.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T38",
+    "source_id": "AFR-OAP-029",
+    "purpose": "CFR-OAP-011: Academic Administrator reviews the consolidated set.",
+    "preconditions": "A no-dues case has all seven authority results recorded.",
+    "action_or_input": "The Academic Administrator reviews/consolidates the results.",
+    "expected_result": "The complete set of seven results is available for review.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T39",
+    "source_id": "AFR-OAP-030 all seven clear",
+    "purpose": "CFR-OAP-011: finalization succeeds when all seven results are received and Clear.",
+    "preconditions": "A no-dues case has all seven results recorded as Clear.",
+    "action_or_input": "The Academic Administrator finalizes the no-dues clearance.",
+    "expected_result": "Finalization succeeds.",
+    "test_type": "state-transition"
+  },
+  {
+    "test_id": "FR-T40",
+    "source_id": "AFR-OAP-030 fewer than seven received",
+    "purpose": "CFR-OAP-011: finalization is blocked when not all seven verifications are received.",
+    "preconditions": "A no-dues case has only six results recorded, all Clear.",
+    "action_or_input": "The Academic Administrator attempts to finalize.",
+    "expected_result": "Finalization is refused and the case is not finalized.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-T41",
+    "source_id": "AFR-OAP-030 one result not clear",
+    "purpose": "CFR-OAP-011: finalization is blocked when any result is not Clear.",
+    "preconditions": "A no-dues case has all seven results recorded, six Clear and one Not Clear.",
+    "action_or_input": "The Academic Administrator attempts to finalize.",
+    "expected_result": "Finalization is refused and the case is not finalized.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-T42",
+    "source_id": "AFR-OAP-031",
+    "purpose": "CFR-OAP-012: student tracks no-dues progress by authority.",
+    "preconditions": "A no-dues case has some authority results recorded and others pending.",
+    "action_or_input": "The student views no-dues progress.",
+    "expected_result": "Each authority's status and the overall progress are visible to the student.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T43",
+    "source_id": "AFR-OAP-032",
+    "purpose": "CFR-OAP-012: finalized no-dues certificate is available to the student.",
+    "preconditions": "A no-dues case has been finalized.",
+    "action_or_input": "The requesting student downloads the no-dues certificate.",
+    "expected_result": "The certificate is available and downloadable by the requesting student.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T44",
+    "source_id": "AFR-OAP-033",
+    "purpose": "CFR-OAP-013: PG student submits an assistantship claim.",
+    "preconditions": "An authorized PG student exists.",
+    "action_or_input": "The PG student submits an assistantship claim.",
+    "expected_result": "An assistantship claim is created in Submitted state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T45",
+    "source_id": "AFR-OAP-034",
+    "purpose": "CFR-OAP-013: claim is routed to both assigned supervisors.",
+    "preconditions": "A PG student has an assigned Thesis Supervisor and an assigned TA Supervisor.",
+    "action_or_input": "The PG student submits an assistantship claim.",
+    "expected_result": "The claim is routed for verification to both the assigned Thesis Supervisor role and the assigned TA Supervisor role.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T46",
+    "source_id": "AFR-OAP-035 different faculty",
+    "purpose": "CFR-OAP-014: each supervisor role records its own verification.",
+    "preconditions": "A routed claim exists; Thesis Supervisor and TA Supervisor roles are held by different faculty members.",
+    "action_or_input": "The Thesis Supervisor and the TA Supervisor each record verification for their role.",
+    "expected_result": "Each role's verification is recorded and the two are separately represented.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T47",
+    "source_id": "AFR-OAP-035 same faculty both roles",
+    "purpose": "CFR-OAP-014: one faculty holding both roles records both role-verifications separately.",
+    "preconditions": "A routed claim exists; one faculty member holds both Thesis Supervisor and TA Supervisor roles for the student.",
+    "action_or_input": "The faculty member records verification as Thesis Supervisor and as TA Supervisor.",
+    "expected_result": "Two separate role-verifications are recorded; both are required and separately represented.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T48",
+    "source_id": "AFR-OAP-036 only one verified",
+    "purpose": "CFR-OAP-014: claim is not available to Department Administrator until both verifications exist.",
+    "preconditions": "A routed claim has only one role-verification recorded (test with Thesis-only and with TA-only).",
+    "action_or_input": "The Department Administrator attempts to access the claim for review.",
+    "expected_result": "The claim is not available to the Department Administrator.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-T49",
+    "source_id": "AFR-OAP-036 both verified",
+    "purpose": "CFR-OAP-014: claim becomes available once both verifications are recorded.",
+    "preconditions": "A routed claim; both role-verifications are then recorded.",
+    "action_or_input": "The Department Administrator accesses the claim.",
+    "expected_result": "The claim is available to the Department Administrator.",
+    "test_type": "state-transition"
+  },
+  {
+    "test_id": "FR-T50",
+    "source_id": "AFR-OAP-037",
+    "purpose": "CFR-OAP-015: Department Administrator reviews a fully verified claim.",
+    "preconditions": "A claim has both supervisor-role verifications recorded.",
+    "action_or_input": "The Department Administrator reviews the claim.",
+    "expected_result": "The review succeeds and the claim is recorded as reviewed.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T51",
+    "source_id": "AFR-OAP-038",
+    "purpose": "CFR-OAP-015: Department Administrator forwards a reviewed claim to HoD.",
+    "preconditions": "A claim has been reviewed by the Department Administrator.",
+    "action_or_input": "The Department Administrator forwards the claim.",
+    "expected_result": "The claim is forwarded to and becomes available to the HoD.",
+    "test_type": "state-transition"
+  },
+  {
+    "test_id": "FR-T52",
+    "source_id": "AFR-OAP-039 approve",
+    "purpose": "CFR-OAP-016: HoD approves a reviewed assistantship claim.",
+    "preconditions": "A claim has both verifications and Department Administrator review/forwarding.",
+    "action_or_input": "The HoD records Approved.",
+    "expected_result": "The claim status becomes Approved.",
+    "test_type": "state-transition"
+  },
+  {
+    "test_id": "FR-T53",
+    "source_id": "AFR-OAP-039 reject",
+    "purpose": "CFR-OAP-016: HoD rejects a reviewed assistantship claim.",
+    "preconditions": "A claim has both verifications and Department Administrator review/forwarding.",
+    "action_or_input": "The HoD records Rejected.",
+    "expected_result": "The claim status becomes Rejected.",
+    "test_type": "state-transition"
+  },
+  {
+    "test_id": "FR-T54",
+    "source_id": "AFR-OAP-040 approved",
+    "purpose": "CFR-OAP-016: an HoD-approved claim is available to the Academic Administrator.",
+    "preconditions": "A claim has been approved by the HoD.",
+    "action_or_input": "The Academic Administrator accesses claims awaiting stipend processing.",
+    "expected_result": "The approved claim is available to the Academic Administrator.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T55",
+    "source_id": "AFR-OAP-040 rejected",
+    "purpose": "CFR-OAP-016: only a HoD-approved claim becomes available to the Academic Administrator.",
+    "preconditions": "A claim has been rejected by the HoD.",
+    "action_or_input": "The Academic Administrator accesses claims awaiting stipend processing.",
+    "expected_result": "The rejected claim is not available to the Academic Administrator.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-T56",
+    "source_id": "AFR-OAP-041",
+    "purpose": "CFR-OAP-017: Academic Administrator processes stipend disbursement.",
+    "preconditions": "A HoD-approved claim exists.",
+    "action_or_input": "The Academic Administrator records completion of stipend processing.",
+    "expected_result": "Stipend processing is recorded as complete for the claim.",
+    "test_type": "state-transition"
+  },
+  {
+    "test_id": "FR-T57",
+    "source_id": "AFR-OAP-042",
+    "purpose": "CFR-OAP-018: PG student tracks claim stage.",
+    "preconditions": "A PG student's claim has progressed through at least one stage.",
+    "action_or_input": "The PG student retrieves the claim status.",
+    "expected_result": "The claim's current processing stage/status is returned.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T58",
+    "source_id": "AFR-OAP-043",
+    "purpose": "CFR-OAP-019: record a thesis-supervisor assignment.",
+    "preconditions": "A PG student and a faculty member exist; Department Administrator exists.",
+    "action_or_input": "The Department Administrator records the faculty member as the student's Thesis Supervisor.",
+    "expected_result": "The thesis-supervisor assignment is recorded for the PG student.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T59",
+    "source_id": "AFR-OAP-044 course only",
+    "purpose": "CFR-OAP-019: TA assignment to a course/subject.",
+    "preconditions": "A PG student and a course exist.",
+    "action_or_input": "The Department Administrator records a TA assignment linking the student to the course only.",
+    "expected_result": "The TA assignment is recorded with the course association.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T60",
+    "source_id": "AFR-OAP-044 faculty only",
+    "purpose": "CFR-OAP-019: TA assignment to a faculty member.",
+    "preconditions": "A PG student and a faculty member exist.",
+    "action_or_input": "The Department Administrator records a TA assignment linking the student to the faculty member only.",
+    "expected_result": "The TA assignment is recorded with the faculty association.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T61",
+    "source_id": "AFR-OAP-044 course and faculty",
+    "purpose": "CFR-OAP-019: TA assignment to both a course and a faculty member.",
+    "preconditions": "A PG student, a course and a faculty member exist.",
+    "action_or_input": "The Department Administrator records a TA assignment linking the student to both the course and the faculty member.",
+    "expected_result": "The TA assignment is recorded with both associations.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T62",
+    "source_id": "AFR-OAP-045",
+    "purpose": "CFR-OAP-020: PG student requests seminar scheduling.",
+    "preconditions": "An authorized PG student exists.",
+    "action_or_input": "The PG student submits a graduate-seminar scheduling request.",
+    "expected_result": "A graduate-seminar request is created in Submitted state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T63",
+    "source_id": "AFR-OAP-046",
+    "purpose": "CFR-OAP-020: request is available to the Department Administrator.",
+    "preconditions": "A Department Administrator exists.",
+    "action_or_input": "A PG student submits a seminar request.",
+    "expected_result": "The request becomes available to the Department Administrator.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T64",
+    "source_id": "AFR-OAP-047",
+    "purpose": "CFR-OAP-021: Department Administrator schedules a seminar.",
+    "preconditions": "A submitted seminar request exists.",
+    "action_or_input": "The Department Administrator schedules the seminar.",
+    "expected_result": "The seminar is recorded in Scheduled state.",
+    "test_type": "state-transition"
+  },
+  {
+    "test_id": "FR-T65",
+    "source_id": "AFR-OAP-048",
+    "purpose": "CFR-OAP-021: seminar scheduling history/log is maintained.",
+    "preconditions": "One or more seminars have been scheduled.",
+    "action_or_input": "Retrieve the seminar scheduling history/log.",
+    "expected_result": "A retrievable history/log of the scheduling records exists.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T66",
+    "source_id": "AFR-OAP-049 PG student",
+    "purpose": "CFR-OAP-022: PG student views seminar schedules.",
+    "preconditions": "A seminar has been scheduled; a PG student exists.",
+    "action_or_input": "The PG student views graduate seminar schedules.",
+    "expected_result": "The scheduled seminar is visible to the PG student.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T67",
+    "source_id": "AFR-OAP-049 faculty",
+    "purpose": "CFR-OAP-022: faculty member views seminar schedules.",
+    "preconditions": "A seminar has been scheduled; a faculty member exists.",
+    "action_or_input": "The faculty member views graduate seminar schedules.",
+    "expected_result": "The scheduled seminar is visible to the faculty member.",
+    "test_type": "functional"
+  }
+]
