@@ -91,7 +91,7 @@ def return_file_service(
     if not file:
         raise ValueError("File not found.")
 
-    if file.current_holder_id != actor_id:
+    if str(file.current_holder_id) != actor_id:
         raise ValueError("You are not the current holder of this file.")
 
     if not FtsFileMovement.objects.filter(file_id=file_id).exists():
