@@ -1,0 +1,59 @@
+........sssss...................................................F....... [ 70%]
+..............ssssssss........                                           [100%]
+=================================== FAILURES ===================================
+________________________________ test_tc_fr_065 ________________________________
+
+    @pytest.mark.django_db
+    def test_tc_fr_065():
+        """TC_FR_065 - AFR-FTS-043: Verify users other than the owner cannot archive the file
+    
+        Action/Input: The non-owner attempts to archive the file
+        Expected Result: Archival is blocked and the file remains not archived
+        Test Type: authorization
+        """
+        res = create_file_draft("emp_owner", "Officer", "File 65", "Init")
+        fid = res["file_id"]
+        forward_file(fid, "emp_owner", "Officer", "emp_other", "Reviewer", "Fwd")
+>       with pytest.raises(PermissionError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PermissionError
+
+tests/a8/fr/test_fr_spec.py:931: Failed
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.15-final-0 _______________
+
+Name                                           Stmts   Miss Branch BrPart  Cover   Missing
+------------------------------------------------------------------------------------------
+modules/fts/__init__.py                            0      0      0      0   100%
+modules/fts/api/__init__.py                        0      0      0      0   100%
+modules/fts/api/serializers.py                    26     26      0      0     0%   3-75
+modules/fts/api/urls.py                            5      5      0      0     0%   3-10
+modules/fts/api/views.py                          82     82      2      0     0%   3-146
+modules/fts/apps.py                                4      0      0      0   100%
+modules/fts/contracts.py                          25      1      4      1    93%   36
+modules/fts/domain/__init__.py                     0      0      0      0   100%
+modules/fts/domain/workflow.py                    70     11     36     11    79%   58, 66, 84, 112, 137, 140, 143, 146, 169, 175, 186
+modules/fts/migrations/0001_initial.py             6      0      0      0   100%
+modules/fts/migrations/__init__.py                 0      0      0      0   100%
+modules/fts/models.py                             62      4      0      0    94%   63, 93, 118, 143
+modules/fts/registry.py                           10     10      0      0     0%   3-61
+modules/fts/selectors/__init__.py                  0      0      0      0   100%
+modules/fts/selectors/drafts.py                   11     11      0      0     0%   6-64
+modules/fts/selectors/inbox_outbox.py              9      0      0      0   100%
+modules/fts/selectors/movements.py                15      0      6      0   100%
+modules/fts/services/__init__.py                   0      0      0      0   100%
+modules/fts/services/archival.py                  20      3      4      1    83%   33-34, 38
+modules/fts/services/drafts.py                    48      8     14      5    79%   110-111, 120, 122->128, 125, 129, 135, 152-153
+modules/fts/services/movements.py                 47      9     10      2    77%   42-43, 112-113, 131, 137-140
+modules/fts/tests/__init__.py                      0      0      0      0   100%
+modules/fts/tests/test_archival_and_inbox.py      40     40      0      0     0%   6-122
+modules/fts/tests/test_contracts_and_api.py       50     50      0      0     0%   3-134
+modules/fts/tests/test_domain_workflow.py         96     96      0      0     0%   6-248
+modules/fts/tests/test_draft_services.py          65     65      0      0     0%   6-174
+modules/fts/tests/test_movement_services.py       56     56      0      0     0%   6-175
+------------------------------------------------------------------------------------------
+TOTAL                                            747    477     76     20    39%
+Coverage XML written to file a8_results/fr/coverage.xml
+=========================== short test summary info ============================
+FAILED tests/a8/fr/test_fr_spec.py::test_tc_fr_065 - Failed: DID NOT RAISE Pe...
+1 failed, 88 passed, 13 skipped in 4.55s
