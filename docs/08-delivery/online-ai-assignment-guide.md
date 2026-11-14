@@ -66,6 +66,10 @@ Then install the browser the end-to-end tests use, once per machine:
 `cd client && npx playwright install chromium`. Log in and check that Placement Cell works,
 and that `make e2e` passes on `main`, before you start.
 
+If a test account gets locked after too many failed sign-ins, release it from
+`Fusion_System_Administrator/Backend/backend` with
+`./../venv/bin/python manage.py unlock_login --user <username>`.
+
 ## Step 3: Pick your tools and tell your mentor
 
 Both of your tools must meet three conditions:

@@ -161,9 +161,12 @@ not fix it mid-task.
   `services/offers.py`, `api/permissions.py`, and from `tests/` `test_privilege_escalation.py`,
   `test_recruiter_isolation.py`, `test_query_budgets.py` and `test_schedule.py`. List the
   rest of the folder, and open another file only when a step needs it. For the browser tests,
-  read `client/e2e/support/test.ts`, `client/e2e/accounts.ts`, `client/e2e/auth.spec.ts`
-  and `client/e2e/placement/companies.spec.ts`, and the E2E section of
-  `docs/06-crosscutting/testing-strategy.md`. `domain/clearance.py`
+  read `client/e2e/support/test.ts`, `client/e2e/accounts.ts`, `client/e2e/auth.spec.ts`,
+  `client/e2e/placement/companies.spec.ts` and `client/e2e/placement/office-pages.spec.ts`,
+  and the E2E section of `docs/06-crosscutting/testing-strategy.md`. For closing a page to
+  the roles it is not for, read `client/src/auth/RequirePermission.tsx`, the `office()` helper
+  in `client/src/modules/placement/routes.tsx` and
+  `modules/placement/tests/test_client_route_guards.py` (Step 6.4). `domain/clearance.py`
   and `services/offers.py` show the choke-point pattern you will need even if your module has
   nothing like them.
 - Two things in Placement predate the rules below; do not copy them. Its `MODULE["code"]` is
@@ -374,7 +377,9 @@ Rules that follow from it:
   `<absolute path to Fusion_System_Administrator>/Backend/backend`, run
   `./../venv/bin/python manage.py assign_role --user <dump username> --designation "<name>"`
   (`--remove` takes it away). Log that account out and back in, and the role is live in its
-  session. This works identically in `full-platform` and `module-only`; it needs neither
+  session. The grant is written into the ERP itself, so it lasts through every later refresh
+  and `sync_identity` run until you remove it. This works identically in `full-platform` and
+  `module-only`; it needs neither
   `Fusion-client` nor a real institute. Use a role the institute does not have only once its
   open question has an answer from whoever assigned you the module.
 - **Granting a module is a visibility decision.** Do not grant your module to a role "so they
@@ -400,6 +405,9 @@ and which rule ids it enforces. In `module-only`, also write the `Fusion-client`
 entry this module needs (`id`, `label`, `icon`, `to`, `section`) — you cannot add it
 yourself, so it must be a clean, complete instruction someone else can paste into
 `INTEGRATED_MODULES` without guessing.
+
+For every client route, also write down how it is guarded (Step 6.4): the permission that
+`RequirePermission` checks, or why the page is for every role the module is granted.
 
 Every client route must have a nav item, and every nav item a route —
 `ops/checks/nav_matches_routes.py` fails CI otherwise. So a record's detail opens in a drawer
@@ -749,7 +757,19 @@ the API 500s is a defect.
 ### Step 6.4 — Never render a control permissions do not allow
 
 Navigation arrives from the server already filtered (ADR-0010), and the same must be true
-inside the page.
+inside the page. Hiding the sidebar link is not enough: anyone can type the URL, and that is
+how Placement once showed students the office's "Register company" and "Schedule a round".
+
+- **A page that is for some roles only is closed at its route.** Wrap it in
+  `RequirePermission` with exactly its nav item's `required_permission`, the way the
+  `office()` helper in Placement's `routes.tsx` does. A role without that permission gets
+  `NotPermitted` and the page never mounts, so it fetches nothing either.
+- **A page several roles share stays open and gates each control** with `can()` from
+  `useAuth`, the way Placement's Postings page gates its manage controls.
+- **Pin the guards with a test.** Copy `test_client_route_guards.py` for your module: it fails
+  when a guarded page loses its guard or a guard drifts from its nav item's permission.
+- The server stays the authority (Step 7.7): never rely on a hidden button to refuse an
+  action, and never hide one the server would allow.
 
 ### Step 6.5 — Run the client gate before every commit
 
@@ -799,7 +819,9 @@ import `test` from `../support/test`; start signed in with `signedInAs`; act as 
 `actAs`; reach screens through the sidebar; create the data the journey needs through the UI
 with unique names; select by role and label. No `waitForTimeout`, no `test.only` or
 `test.skip`. Run `make e2e` with the IAM and `make dev` running; every spec must pass, and the
-walkthrough table names the spec that automates each row. Never change
+walkthrough table names the spec that automates each row. For every route you guarded in
+Step 6.4, add a spec that opens it directly as a role without the permission and expects
+`NotPermitted` and no buttons, the way `office-pages.spec.ts` does. Never change
 `client/playwright.config.ts`, `client/e2e/global-setup.ts`, `client/e2e/support/` or another
 folder's specs — those are the harness, and a change there is a shared-file change (§9).
 
@@ -1020,7 +1042,8 @@ Not "tests pass". All of it:
     output at or under 150 kB gzip, and the browser walkthrough done for every role and the
     plain user, with one flow done by keyboard alone, and no console error and no 500
     (Step 6.9). Every live use case's main flow is a Playwright spec in
-    `client/e2e/[module_code]/`, and `make e2e` passes.
+    `client/e2e/[module_code]/`, every guarded route has its deep-link spec, and `make e2e`
+    passes.
 14. The security self-audit (Step 7.7) passes item by item, and the fresh install (Step 7.8)
     has been proved by doing it.
 15. The quality report (Step 7.9) exists and every number in it came from a run made after

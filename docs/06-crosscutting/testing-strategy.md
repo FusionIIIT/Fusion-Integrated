@@ -293,6 +293,8 @@ grant the test accounts their roles. **CI** runs the same thing on every push an
 | `e2e/support/test.ts` | The `test` to import. It fails a test on any uncaught page error, console error or 5xx, and provides `signedInAs`, `actAs`, `openModuleNav`, `signIn` and `uniqueName` |
 | `e2e/auth.spec.ts` | The reference for signing in: a wrong password, a student's role-gated sidebar, a keyboard-only login |
 | `e2e/placement/companies.spec.ts` | The reference for a module journey: an officer registers a company through the UI |
+| `e2e/placement/office-pages.spec.ts` | The reference for a guarded route: a student who opens each office page directly gets `NotPermitted` and no buttons |
+| `e2e/shell.spec.ts` | The collapsed sidebar names each module for a screen reader |
 
 **The login budget.** The IAM allows five logins a minute per caller, and every test signs in from
 the same address. So:
@@ -324,7 +326,7 @@ the same address. So:
 ### Six journeys
 
 The platform-level journeys the suite should hold. The sign-in half of the first already exists in
-`auth.spec.ts`.
+`auth.spec.ts`, and the page-level half of the sixth in `office-pages.spec.ts`.
 
 1. Login → the sidebar shows **exactly** the granted modules.
 2. Role switch → the sidebar changes; cached data is cleared.
