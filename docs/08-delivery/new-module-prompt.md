@@ -4,11 +4,17 @@ One module is already built to this shape: `modules/placement` — the reference
 module that does not look like it is a defect, not a style choice.
 
 **How to use this:** copy everything from the `--- PROMPT BEGINS ---` line to the
-`--- PROMPT ENDS ---` line into a fresh session. Fill in the five bracketed blanks in §0 —
-including `[ENVIRONMENT]`, since §1's reading list depends on it. Do not summarise it, do
+`--- PROMPT ENDS ---` line into a fresh session. Fill in the six blanks — `[MODULE_NAME]`,
+`[SPEC_FOLDER_PATH]`, `[ID_PREFIX]`, `[module_code]`, `[ENVIRONMENT]` and `[NN]` — everywhere
+they appear, not only in §0; §1's reading list depends on `[ENVIRONMENT]`. Do not summarise it, do
 not trim it — the length is what keeps modules identical. Every phase below is a numbered
 sequence of steps — work top to bottom, do not skip ahead, and do not start a phase's
 steps before the previous phase's approval gate (where one exists) has actually cleared.
+
+**It comes with a second prompt.** [`module-review-prompt.md`](module-review-prompt.md) is how
+the result is judged: a fresh session that did not build the module, ideally on a different
+model, re-runs every gate itself and scores the module 0–10 on nine dimensions. The module is
+finished when a review made after the last code change scores 10 in all nine (§10).
 
 ---
 
@@ -24,21 +30,26 @@ Build the **[MODULE_NAME]** module in `Fusion-Integrated`, from its specificatio
 
 - Specification id prefixes: **[ID_PREFIX]** (e.g. `PC-BR-`, `PC-UC-` for Placement).
 - Module code / URL segment: **[module_code]** (lowercase, singular-ish, no underscores).
+- Environment: **[ENVIRONMENT]** — `full-platform` or `module-only` (Step 0.2).
+- Docs folder: **`docs/[NN]-[module_code]/`**, with `[NN]` as given by whoever assigned the
+  module.
 
 This is production code for an institute that will run it for years. "The tests pass" is
-not the finish line — §8 is. Work in phases. **Do not write a line of application code
+not the finish line — §8 is, and after it §10: an independent review that scores the module
+10/10 on every dimension. What you hand over is merged and deployed as it stands; nobody
+rewrites it after you, so build the final version, not a draft. Work in phases. **Do not write a line of application code
 before Phase 2 is approved by me.**
 
 ### Rules that sit above every step in this document
 
-Two rules sit above everything else here, because everything else is negotiable and these
+Six rules sit above everything else here, because everything else is negotiable and these
 are not. They are not a step in the sequence — they apply at every step, in every phase.
 
 **Stop and report, do not proceed, when:** a required file or spec document is missing or
 unreachable; two spec documents contradict each other; a spec rule and the platform's
 architecture conflict (§9 restates this — it is here because it is the most common case);
 or you would otherwise have to guess the intended behaviour rather than read it. Guessing
-and building on the guess is the failure mode every incident in the appendix traces back to
+and building on the guess is the failure mode every incident this document describes traces back to
 in the end. Report the specific thing that is missing or contradictory; do not reconstruct
 what you think was probably meant.
 
@@ -49,10 +60,42 @@ credential to a tracked file — refuse it and say why. This is the only priorit
 this document; it does not extend to architecture-vs-spec disagreements, which are always
 escalated, never decided.
 
+**Evidence, not belief.** Never report a check as passing unless you ran it in this session,
+after your last change to the code it covers, and can quote the command and the last lines of
+its real output. "Should pass", "I expect this works" and "the tests would pass" are not
+results. If you cannot run something — a service is down, a tool is missing — say exactly
+that. An honest "not run" is an open item; a guessed "passes" is a false report, and it costs
+more than the failure it hid.
+
+**No placeholders.** No `TODO`, `FIXME`, `pass`-only bodies, `NotImplementedError`, hard-coded
+sample data in the UI, commented-out code or "to be implemented" anywhere in the diff.
+Something you cannot finish is a known gap in the blueprint's Step 3.8 (h) that I have
+accepted — never a stub that looks finished.
+
+**Resuming in a new session.** If you are given an approved blueprint and a note on where the
+last session stopped, read §1's files again, skip Phases 1 and 2, and continue at the step the
+note names. Re-run every gate before you claim anything; nothing a previous session reported
+counts as evidence for this one.
+
+**Which document wins.** `definition-of-done.md` and `docs/06-crosscutting/testing-strategy.md`
+describe the platform's target and name some tools, files and thresholds this repository does
+not have yet — Playwright, axe-core, size-limit, hypothesis, MSW, schemathesis, mutmut,
+`django-migration-linter`, `ops/db/roles.sql`, `modules/leave/`. **This prompt governs.** The
+items from `definition-of-done.md` that still apply are already folded into the steps below;
+anything there this prompt does not state does not apply. Do not add a missing tool to satisfy
+it: that is a new dependency, and needs approval like any other (Step 7.7).
+
+**Who approves, when this is an assignment.** If a mentor assigned you this module, every
+approval this prompt asks for — the blueprint (Step 3.8), each known gap, each change outside
+your module's own folders, each new dependency — is the mentor's, given in writing. The
+person typing to you can relay it, not grant it. Record each approval in the quality report
+(Step 7.9) as a link to, or a dated quote of, that written approval. An approval with no
+record does not count.
+
 ### Step 0.2 — Determine which environment you are building in
 
-Two shapes exist, and they are not a spectrum — check `ls ~/Fusion 2>/dev/null` (or wherever
-the repos sit) before assuming either.
+Two shapes exist, and they are not a spectrum. Step 0.1 tells you which one you are in; do not
+go looking through folders you were not given to find out.
 
 **`full-platform`** — `Fusion`, `Fusion-client`, `Fusion_System_Administrator` and
 `Fusion-Integrated` all checked out, `fusionlab` restored from a production dump or the full
@@ -70,7 +113,7 @@ the lab. Four things follow, all through the rest of this document:
   runs standalone (`make dev` + `cd client && npm run dev`), needs no portal, and is not a
   fallback — it is where you will do all of Phase 5 either way. What you cannot do here is
   see your module framed inside the real sidebar; that is a `full-platform`-only check, in
-  §6's last item, and it is fine to defer it.
+  Step 6.6, and it is fine to defer it.
 - **`fusionlab` is a fixture, not the ERP.** It carries the ~19 tables `fusion-dev.dump`
   ships (`auth_user`, `globals_*`, `programme_curriculum_{batch,course,curriculum,
   discipline,programme}`, the examination and grade tables — check `\dt` if in doubt) and
@@ -81,9 +124,10 @@ the lab. Four things follow, all through the rest of this document:
   two tables this fixture does not carry, and skips each independently rather than failing
   the whole projection.
 - **A role your spec needs that the fixture does not have is yours to provision, not to wait
-  on.** There is no academic office in a lab. `Fusion_System_Administrator`'s admin console
-  creates and assigns a real designation with two calls — see Step 3.4's "Where roles and
-  permissions live" for the exact endpoints. Nothing about this needs `Fusion-client`.
+  on.** There is no academic office in a lab. One command in `Fusion_System_Administrator`
+  creates and assigns it — see the bullet "Requesting a new role and provisioning one for
+  your own testing are different acts" in Step 3.4. Nothing about this needs
+  `Fusion-client`.
 
 ---
 
@@ -111,9 +155,21 @@ not fix it mid-task.
 
 ### Step 1.2 — Read the reference implementations
 
-- `modules/placement/` in full — this is the shape you are copying. Read
-  `domain/clearance.py`, `services/offers.py` and `selectors/` closely even if your module
-  has nothing like them yet — they demonstrate the choke-point pattern you will need.
+- `modules/placement/` — the shape you are copying. It is too large to read whole without
+  crowding out this prompt, so read these files in full: `registry.py`, `contracts.py`,
+  `schedule.py`, `domain/state_machine.py`, `domain/clearance.py`, `selectors/scoping.py`,
+  `services/offers.py`, `api/permissions.py`, and from `tests/` `test_privilege_escalation.py`,
+  `test_recruiter_isolation.py`, `test_query_budgets.py` and `test_schedule.py`. List the
+  rest of the folder, and open another file only when a step needs it. `domain/clearance.py`
+  and `services/offers.py` show the choke-point pattern you will need even if your module has
+  nothing like them.
+- Two things in Placement predate the rules below; do not copy them. Its `MODULE["code"]` is
+  `placement_cell`, which differs from its folder and URL segment — yours is `[module_code]`
+  in all four places and as the permission prefix. And some of its permission verbs
+  (`view_self`, `self`, `respond`, `issue`, `expire`, `debar`, `schedule`, `auto_withdraw`)
+  are outside the closed list in
+  `docs/02-iam/rbac-model.md` — use that list. Its multi-line docstrings also predate the
+  one-line comment rule (§4); do not copy them.
 - `core/` in full — `api/exceptions.py`, `api/pagination.py`, `api/csrf.py`,
   `api/throttling.py`, `db/mixins.py`. Anything already here you must reuse, not reinvent.
 - `client/src/modules/placement/` — the frontend shape.
@@ -256,7 +312,7 @@ below is one section of that document, in this order.
 
 ### Step 3.1 (a) — Traceability table
 
-One row per live business rule and per live use case:
+One row per live business rule, use case, workflow and requirement id:
 
 | Id | What it requires | Layer it belongs in | Enforcement point (planned) | Notes |
 
@@ -305,17 +361,19 @@ Rules that follow from it:
 - **`student`, `faculty` and `staff` are held by definition**, not assigned, and carry no ERP
   row. Grant to them directly when a permission belongs to everyone of that kind.
 - **Requesting a new role and provisioning one for your own testing are different acts.**
-  Whether the institute should have a "Leave Grievance Officer" post is not yours to decide —
+  Whether the institute should have a "Grievance Officer" post is not yours to decide —
   raise it as an open question in Step 3.8 (h), and in production it is created in the ERP by
   the academic office. But you still need that designation to *exist* to test against it, in
   either environment, and waiting on the academic office is not how you do that in dev.
 
-  The write path is `Fusion_System_Administrator`'s own admin console, not a database edit:
-  `POST /api/create-role/` (a new `globals_designation` row, operator account, `is_staff` on
-  `system_db`) then `PUT /api/update-user-roles/` (assigns it to any test account). Run
-  `sync_identity` — or just log that account back in, since a stale projection now refreshes
-  itself on login — and the role is live in its session. This works identically in
-  `full-platform` and `module-only`; it needs neither `Fusion-client` nor a real institute.
+  The write path is `Fusion_System_Administrator`'s own management command, never a database
+  edit, exactly as `role-assignment-guide.md` Part 5 shows: from
+  `<absolute path to Fusion_System_Administrator>/Backend/backend`, run
+  `./../venv/bin/python manage.py assign_role --user <dump username> --designation "<name>"`
+  (`--remove` takes it away). Log that account out and back in, and the role is live in its
+  session. This works identically in `full-platform` and `module-only`; it needs neither
+  `Fusion-client` nor a real institute. Use a role the institute does not have only once its
+  open question has an answer from whoever assigned you the module.
 - **Granting a module is a visibility decision.** Do not grant your module to a role "so they
   can look" — it puts your module in that role's sidebar permanently.
 - **Permissions are `<module_code>.<singular_noun>.<verb>`**, the verb from the closed list in
@@ -339,6 +397,11 @@ and which rule ids it enforces. In `module-only`, also write the `Fusion-client`
 entry this module needs (`id`, `label`, `icon`, `to`, `section`) — you cannot add it
 yourself, so it must be a clean, complete instruction someone else can paste into
 `INTEGRATED_MODULES` without guessing.
+
+Every client route must have a nav item, and every nav item a route —
+`ops/checks/nav_matches_routes.py` fails CI otherwise. So a record's detail opens in a drawer
+or a modal on its list page, the way Placement's `HistoryDrawer` and `IssueOfferModal` do,
+not on a route of its own.
 
 ### Step 3.6 (f) — Contracts
 
@@ -366,6 +429,10 @@ connection can write to the ERP, so the ERP ends up with two writers and no owne
 moment two services compute the same fact from the same rows, the institute has two answers
 to a question that has one. Placement's eligibility rule needs a CPI and asks for it; it does
 not know which tables a CPI is made of, and that is deliberate.
+
+Never add an `IamClient` method — nor its `FakeIam` twin — for an endpoint the IAM's `main`
+does not already have. The tests would pass against the fake and production would answer 404.
+A dependency on a missing IAM endpoint is a stop: report it to whoever assigned you the module.
 
 In `module-only`, expect every one of these calls to answer with less than `full-platform`
 would give — `fusion-dev.dump` is a fixture, not the ERP, and a sparse answer is correct
@@ -398,16 +465,36 @@ modules/[module_code]/
 ├── models/          Django models, one file per aggregate, package not module
 ├── selectors/        all reads, including scoping.py
 ├── services/         all writes, one file per use-case family
-├── api/              views.py serializers.py urls.py (+ permissions.py if it needs
-│                    its own gate classes if it needs one)
+├── api/              views.py serializers.py urls.py (+ permissions.py, only if the
+│                    module needs gate classes of its own)
 ├── management/commands/
 ├── migrations/
 └── tests/
 ```
 
-Layer rules, enforced by `.importlinter` (add your module to the existing contracts — the
-`domain-is-pure-python` and `modules-only-touch-contracts` contracts each list modules
-explicitly, and a module you forget to add is a module that is **never checked**):
+Layer rules, enforced by `.importlinter`. A module that is not registered there, or in the
+settings, is a module CI **never checks** — so registering it is the first step, not the last.
+
+### Step 4.0 — Register the module
+
+Copy exactly what `placement` does, in each of these places, before writing any layer:
+
+- `config/settings/base.py` — add `"modules.[module_code]"` to `DOMAIN_MODULES`
+  (`nav_matches_routes.py` only checks modules listed there), and one entry in
+  `DEFAULT_THROTTLE_RATES` for each `throttle_scope` your write endpoints use.
+- `config/urls.py` — mount `api/v1/[module_code]/` on `modules.[module_code].api.urls`.
+- `config/celery.py` — merge your `BEAT_SCHEDULE` and `TASK_ROUTES`, the way Placement's are.
+- `client/src/app/registry.ts` — one `MODULE_REGISTRY` entry whose `code` equals
+  `registry.MODULE["code"]`, with a static `import()` of your `routes`.
+- `.importlinter` — add `modules.[module_code]` to `source_modules` of
+  `modules-only-touch-contracts`; add its `models`, `services`, `selectors`, `api` and `domain`
+  to that contract's `forbidden_modules`; add `modules.[module_code].domain` to
+  `domain-is-pure-python`; and copy `placement-layers` as `[module_code]-layers`.
+- `conftest.py` — only if the real `IamClient` grows a method your module needs (Step 5.1).
+
+These lines are pre-approved, and so are the module's teaching-reference script under
+`ops/docs/` (Step 7.6) and the regenerated files from Steps 7.1 and 7.2. Any other change
+outside your module's own folders is not — name it and wait (§9).
 
 ### Step 4.1 — `domain/`
 
@@ -418,7 +505,9 @@ import `core.api.exceptions` from `domain/`.
 ### Step 4.2 — `models/`
 
 May import `domain/`. No `ForeignKey` crosses a module boundary, ever
-(`ops/checks/no_cross_module_fk.py`). Use `TimeStampedModel` / `UserScopedModel`.
+(`ops/checks/no_cross_module_fk.py`). Use `TimeStampedModel` / `UserScopedModel`. Every
+index is named, declared in `Meta.indexes`, and matches a real query's filter and ordering —
+an index no query uses is cost, and a query no index serves is a slow page later.
 
 ### Step 4.3 — `selectors/`
 
@@ -441,13 +530,15 @@ Owns every write. Rules:
 ### Step 4.5 — `api/`
 
 Transport only: parse, delegate, serialise. Two gates on every endpoint — the module grant
-first, then the permission. Query parameters are hostile input: an unparseable `?year=abc`
+first, then the permission. Every endpoint carries an `@extend_schema` with a request and
+response example, so the committed schema documents it. Never `except Exception: pass` —
+or any `except` that swallows an error without handling it. Query parameters are hostile input: an unparseable `?year=abc`
 is a **400, never a 500**.
 
 ### Step 4.6 — `registry.py`
 
 As designed in Step 3.4. `nav_matches_routes.py` will fail CI if a nav entry has no client
-route or a route has no nav entry. Two further rules, because the IAM now builds each
+route or a route has no nav entry. Three further rules, because the IAM now builds each
 role's sidebar from that role alone:
 
 - **Every nav item carries a `required_permission`.** An item without one appears for
@@ -456,7 +547,9 @@ role's sidebar from that role alone:
   none of your screens does not belong in it — granting it "so they can look" puts your
   module in their sidebar permanently.
 - Icons come from the Phosphor set `Fusion-client` renders. A name from another icon pack
-  draws a grey circle and nothing else.
+  draws a grey circle and nothing else. This repository's own `client/` only knows a few
+  `Fa…` names, so here every Phosphor icon draws a circle — that is expected. Never switch to
+  an `Fa…` name to make it look right here; it would break the real sidebar.
 
 ### Step 4.7 — `schedule.py`
 
@@ -487,7 +580,7 @@ session carrying exactly the `permissions`, `modules`, `roles` and `active_role`
 You never seed the IAM to write a test, and a test that needs a running
 `Fusion_System_Administrator` is a test written wrong.
 
-That convenience is also the trap, so three rules come with it:
+That convenience is also the trap, so five rules come with it:
 
 - **Every positive test needs its negative twin.** The fake hands out whatever permission
   set you ask for, so "the coordinator can review" proves nothing on its own. The test that
@@ -534,16 +627,22 @@ Person A must not see person B's rows, including through a filter, a search and 
 
 For anything that credits, allocates, or must happen once. Run real threads against the
 real database. Green single-threaded tests prove nothing here — a double-credit bug in
-leave survived 631 passing tests and was only ever found this way.
+the leave module this platform once had survived 631 passing tests and was only ever found
+this way. Mark the test `django_db(transaction=True)` — the usual per-test transaction hides
+each thread's writes from the others — release the threads together on a `threading.Barrier`
+so they really overlap, and close each thread's database connection when it finishes.
 
 ### Step 5.8 — Query budget tests (`test_query_budgets.py`)
 
 Assert a maximum query count per list endpoint so an N+1 fails CI instead of production.
+Assert the **same** count with 2 rows and with 20: a generous ceiling measured at one size
+hides an N+1.
 
 ### Step 5.9 — Schedule tests
 
 Assert every beat entry your module registers is actually present in `config/celery.py`'s
-merged schedule.
+merged schedule. Then run each task twice in a row, and twice at once, and assert it took
+effect once: tasks here are acknowledged late and can be delivered again after a worker dies.
 
 ### Step 5.10 — Write down a refusal's excluded set
 
@@ -559,20 +658,69 @@ Before you tell me it is done, spend a deliberate pass trying to break your own 
 malicious insider. Specifically ask: can an approver approve their own record? Can a thing
 appear in its own approval queue? Can a balance go negative? Can something be back-dated
 without limit? Can a required third party be someone who is themselves unavailable? Each of
-those five was a real hole in leave that the test suite did not see.
+those five was a real hole in an earlier module on this platform that its test suite did
+not see. Then ask the questions your own module invites: can someone act on a row outside
+their scope by sending its id directly? Can a closed, cancelled or rejected record still be
+changed? Can the same request, sent twice, take effect twice? Every hole you find becomes a
+test before it becomes a fix.
+
+Error paths are tested, not assumed: for each endpoint, the refusal it can give — 401
+without a session, 403 or 404 by design, 409 for a conflict with current state, 400 or 422
+for invalid input, 429 when throttled.
+
+### Step 5.12 — Journey tests: the backend end to end
+
+`tests/test_journeys.py`: one test per live use case's main success scenario, and one per
+alternate or exception flow the spec names. Each drives the module **only through HTTP** —
+`APIClient`, with `make_session` for each actor in turn (the applicant submits, the approver
+acts, the applicant sees the outcome) — against the real database, and asserts the response
+bodies, the rows left behind and the audit trail. Name each test for its use-case id. Unit
+tests prove the parts; these prove the module.
+
+### Step 5.13 — Every live id has a test
+
+Every live BR, UC, workflow and requirement id is cited by at least one test, in the test's
+name or a one-line
+comment on it, so `grep -rn '<ID>' modules/[module_code]/tests` finds it. A live id with no
+test is a rule nobody has shown is enforced.
+
+### Step 5.14 — Coverage is the floor
+
+```bash
+.venv/bin/pytest modules/[module_code] --cov=modules/[module_code] --cov-branch \
+  --cov-report=term-missing --cov-fail-under=90
+.venv/bin/pytest modules/[module_code] --cov=modules/[module_code]/domain --cov-branch \
+  --cov-report=term-missing --cov-fail-under=95
+```
+
+Both must pass. Coverage measures the code under test only: if the report lists a file under
+`tests/` or `migrations/`, the run is invalid — `pyproject.toml`'s `[tool.coverage.run]`
+leaves them out, so check it is on your branch. A `# pragma: no cover` needs a one-line reason a reviewer would accept, and a
+covered line whose effect no test asserts is not tested — coverage is the floor, not the goal.
+
+### Step 5.15 — Prove the tests can fail
+
+Pick the five rules whose failure would hurt most — a scoping filter, a permission gate, a
+balance or limit check, a state transition, a uniqueness constraint. For each: copy the file
+somewhere outside the repository, break the enforcement on purpose (invert the condition,
+drop the filter), run the suite, confirm a test that names that rule fails, then copy the
+file back and confirm the suite is green again. Never use `git checkout`, `git stash` or
+`git reset` for this — they throw away uncommitted work. List the five, and the test that caught each, in the quality report.
+A rule you can break with the suite still green is untested, whatever the coverage says.
 
 ---
 
 ## §6 — Phase 5: frontend
 
-`client/src/modules/[module_code]/`, matching the two existing modules exactly:
+`client/src/modules/[module_code]/`, matching `client/src/modules/placement/` exactly, plus
+the page tests Placement does not have yet (Step 6.7):
 
 ```
 api/types.ts        types mirroring the serializers
 api/hooks.ts        TanStack Query hooks, one per endpoint
 api/hooks.test.tsx
 components/         module-specific components
-pages/              one file per route
+pages/              one file per route, each with its own <Page>.test.tsx
 routes.tsx          the route table nav_matches_routes.py reads
 ```
 
@@ -613,6 +761,36 @@ Add the sidebar entry from the blueprint's Step 3.5 (e) to `Fusion-client`'s
 `react-icons` — a name from the wrong set draws a grey circle) and that the role switcher
 shows only what that role was granted.
 
+### Step 6.7 — Test every page
+
+Each page gets `pages/<Page>.test.tsx` covering five things: the loading state; the empty
+state; the error state (the API answers 500 and the page shows a message, not a spinner); a
+control the principal has no permission for is absent; and the page's main action (fill in,
+submit, see the success or the server's refusal message). Mock at the HTTP boundary — the
+shared axios instance — never inside your own hooks. Query by role and label (`getByRole`,
+`getByLabelText`): if a test cannot find a control that way, neither can a screen reader.
+
+### Step 6.8 — Typed, accessible and honest UI
+
+- Every input has a visible label; every icon-only button has an `aria-label`.
+- No `any`, `@ts-ignore`, `eslint-disable` or `console.log` in the diff.
+- No hard-coded sample data: every value on screen comes from the API.
+- Client-side validation mirrors the server's for convenience only. The server stays the
+  authority, and its refusal message is shown to the user as it was sent.
+
+### Step 6.9 — Walk it in a real browser
+
+With the backend, the IAM and `npm run dev` running, log in as one synthetic dump account for
+each role in Step 3.4, and as the plain user, and carry every live use case's main flow
+through end to end in the browser. Keep the browser console and the server log open: an
+uncaught error, a 500, or a refusal that should not have happened is a defect. Do one flow
+with the keyboard alone: every control reachable by Tab and usable with Enter or Space. Record
+a table in the quality report — role, dump username, use case, result — and under each row
+paste the `runserver` log lines for its requests. If you cannot drive a browser yourself,
+mark the row "not run" and ask me to walk it; never fill in a result you did not see. If `client/e2e/` with
+Playwright exists on `main`, also write each journey as a spec there; do not add Playwright
+yourself — that is a shared-config change (§9).
+
 ---
 
 ## §7 — Phase 6: ops, docs and the seams
@@ -625,8 +803,11 @@ shows only what that role was granted.
 
 `make permissions` — regenerate `registry/permissions.json`, which the IAM seeds from.
 Regenerating is half the job: the IAM only revokes a dropped grant when it is re-seeded
-with `manage.py seed_iam_permissions --manifest <path>`. Run it and read what it says it
-revoked.
+with `seed_iam_permissions --manifest <path>`. Run it from the IAM's checkout, as
+`role-assignment-guide.md` Part 3 shows —
+`cd <absolute path to Fusion_System_Administrator>/Backend/backend && ./../venv/bin/python manage.py
+seed_iam_permissions --manifest /full/path/to/Fusion-Integrated/registry/permissions.json` —
+and read what it says it revoked.
 
 ### Step 7.3 — Clear the deploy-check gate
 
@@ -641,16 +822,128 @@ against an empty table.
 
 ### Step 7.5 — Document and prove the deployment order
 
-Deployment order must be documented and must work: `migrate` → `seed_modules` → grants →
-your readiness command. A readiness command that names the **unmet prerequisites** is
-required; "module is not ready" without saying why is not.
+Deployment order must be documented and must work: `migrate` → your policy-seeding command
+(if the module has one) → `seed_modules` → grants → your readiness command. `seed_modules` already calls your `registry.readiness()`, so that
+function returns the list of **unmet prerequisites**, each a sentence saying what to do, and
+your readiness command prints the same list. "Module is not ready" without saying why is not
+acceptable.
 
 ### Step 7.6 — Write the module's docs
 
 Write the module's docs under `docs/[NN]-[module_code]/`: domain model, state machine,
-and whatever else has a genuine reader. Then generate a teaching reference tracing every
-rule and use case to the code that enforces it, via a script under `ops/docs/`, so that
-every link is **verified to resolve**.
+and whatever else has a genuine reader. Then write `ops/docs/[module_code]_reference.py`. It
+generates `docs/[NN]-[module_code]/[module_code]-reference.md`, with one `file:line` link
+from every live rule, use case, workflow and requirement id to the code that enforces it,
+and exits non-zero if any link does not resolve. Commit both. Run the script as part of your
+gates: afterwards `git status --porcelain` must print nothing, or the committed reference is
+stale.
+
+### Step 7.7 — Security self-audit
+
+Go through every item and fix what fails; the reviewer will check each one.
+
+- Every view sits behind both gates — the module grant, then the permission. No
+  `AllowAny`, and no view reachable outside the module's router.
+- Every serializer lists its `fields` explicitly — never `__all__` or `exclude` — and every
+  server-owned field (status, owner `user_id`, approver, timestamps, ledger amounts) is
+  read-only.
+- Every list and detail read starts from `selectors/scoping.py`. Every id that arrives in a
+  request body (a nominee, a related record) is checked against the caller's scope before it
+  is used — an unchecked id is how one person acts on another's row.
+- No raw SQL, `.extra()`, string-built queries, `eval`, `pickle`, `yaml.load` or
+  `subprocess` on request data.
+- File uploads, if any, go through `core/files`: size and type checked from the content,
+  stored outside the web root, served only by a view that checks permission and scope.
+- Every write endpoint carries a `throttle_scope`.
+- Logs carry ids, never names, roll numbers, tokens or request bodies.
+- No error response carries a stack trace, SQL or a file path.
+- No view overrides `authentication_classes` or `permission_classes` to loosen them. A
+  cookie-authenticated write without the `X-CSRF-Token` header answers 403, and a test
+  proves it.
+- In the client: no `dangerouslySetInnerHTML`, no token in `localStorage`, every call
+  through `lib/http.ts`.
+- No new Python or npm dependency without my approval. If one is approved, `pip-audit` /
+  `npm audit --audit-level=high` must be clean for it.
+- The deploy check passes with production settings, exactly as CI runs it:
+  ```bash
+  DJANGO_SETTINGS_MODULE=config.settings.prod DB_PASSWORD=local-check-only \
+  DJANGO_SECRET_KEY=local-check-only-key-long-enough-to-satisfy-the-length-check \
+  DJANGO_ALLOWED_HOSTS=local.invalid IAM_SERVICE_TOKEN=local \
+  PLACEMENT_UPLOAD_ROOT=/tmp/check-uploads \
+  REDIS_CACHE_URL=redis://127.0.0.1:6379/1 REDIS_BROKER_URL=redis://127.0.0.1:6380/0 \
+  .venv/bin/python manage.py check --deploy --fail-level WARNING
+  ```
+  If your module adds a setting that production requires, add it to that line and to CI's
+  "Deployment checks" step. That is a shared-file change: name it and wait (§9).
+
+### Step 7.8 — Prove a fresh install, start to finish
+
+§8 item 4, done for real on a throwaway database, never on your working one. Run this as
+**one** shell command, with `DB_NAME` on every line: an exported variable does not survive
+from one tool call to the next, and a `make migrate` that has lost it migrates your working
+database instead.
+
+```bash
+docker compose exec -T db dropdb -U fusion_admin --if-exists fusion_integrated_fresh && \
+docker compose exec -T db createdb -U fusion_admin fusion_integrated_fresh && \
+DB_NAME=fusion_integrated_fresh make migrate && \
+DB_NAME=fusion_integrated_fresh .venv/bin/python manage.py migrate [module_code] zero && \
+DB_NAME=fusion_integrated_fresh make migrate && \
+DB_NAME=fusion_integrated_fresh .venv/bin/python manage.py seed_modules && \
+DB_NAME=fusion_integrated_fresh .venv/bin/python manage.py <your readiness command>
+```
+
+If your `readiness()` can report anything, the readiness command must name what is missing
+at this point. Seed the IAM from `make permissions` as in
+Step 7.2 and grant one test account its role. Then run, again as one command with
+`DB_NAME=fusion_integrated_fresh` on every line, your policy-seeding command (if the module
+has one), `seed_modules` and the readiness command: readiness must pass, and `seed_modules`
+must print no "NOT active" warning. Then ask the person running this session to stop `make dev`, start
+`DB_NAME=fusion_integrated_fresh make dev`, perform the first user action in the browser and
+paste you the `runserver` lines for it. When that is done, they restart `make dev` normally
+and you drop the database:
+
+```bash
+docker compose exec -T db dropdb -U fusion_admin --if-exists fusion_integrated_fresh
+```
+
+Paste the real output of each step, and the pasted log lines, into the quality report.
+
+### Step 7.9 — Write the quality report
+
+`docs/[NN]-[module_code]/[module_code]-quality-report.md` is the evidence a reviewer and the
+maintainer read first. It holds, each with the command and the real output's last lines:
+
+1. `make check` and `make check-client`.
+2. Both coverage runs from Step 5.14, with the totals.
+3. Test counts per file, and the journey tests mapped to their use-case ids.
+4. The five broken-on-purpose rules from Step 5.15 and the test that caught each.
+5. The adversarial pass (Step 5.11): each question asked, what you found, what you changed.
+6. The security self-audit (Step 7.7), item by item.
+7. The fresh-install proof (Step 7.8).
+8. The browser walkthrough table (Step 6.9).
+9. Every scheduled task run by hand, and what it changed.
+10. Known gaps that were accepted, each with its spec id, the reason and the approval record.
+11. Every approval this prompt required — the blueprint, each gap, each shared-file change,
+    each dependency — as a link to, or dated quote of, the written approval.
+12. The scorecard of every review round except the last (§10), each with the commit it
+    reviewed. The last round's scorecard goes in the pull request description, because
+    committing it would be a change after the review.
+
+It names no AI tool and contains no production data. It is the module's record, not a
+diary of the session.
+
+### Step 7.10 — Rebase and regenerate before the pull request
+
+Before the round they expect to be the last, the person running this session rebases onto the
+latest `main` — you never run `git rebase`, or any command that rewrites history. A rebase is
+a change, and a review only counts for the commit it saw. Never hand-merge a generated file —
+`openapi/fusion-integrated.v1.yaml`, `registry/permissions.json`,
+`docs/02-iam/permission-catalog.generated.md` — take `main`'s version and regenerate it
+(`make schema`, `make permissions`). While your module has never been merged, keep its
+migrations to one clean initial set: first `.venv/bin/python manage.py migrate [module_code]
+zero` so your database forgets them, then delete your own unmerged migration files and run
+`makemigrations` once. Then run every gate again: a rebase is a change.
 
 ### Changing anything on a running server
 
@@ -708,6 +1001,19 @@ Not "tests pass". All of it:
     a public repo for anyone to read.
 11. **The plain user is tested**, not only the one with an interesting set of roles. Step
     5.2's rule.
+12. Journey tests for every live use case (Step 5.12); every live id cited by a test (Step
+    5.13); both coverage gates pass (Step 5.14); five rules broken on purpose and caught
+    (Step 5.15).
+13. Every page tested for its five states (Step 6.7), the module's chunk in `npm run build`
+    output at or under 150 kB gzip, and the browser walkthrough done for every role and the
+    plain user, with one flow done by keyboard alone, and no console error and no 500
+    (Step 6.9).
+14. The security self-audit (Step 7.7) passes item by item, and the fresh install (Step 7.8)
+    has been proved by doing it.
+15. The quality report (Step 7.9) exists and every number in it came from a run made after
+    the last code change.
+16. §10's review scores 10 in all nine dimensions, from a review made after the last change —
+    or, after round 7, the mentor's written ruling on whatever is still open.
 
 ---
 
@@ -728,6 +1034,43 @@ Not "tests pass". All of it:
   Do not resolve it silently in either direction.
 - If you find yourself about to write "this should probably…", that is an open question for
   Step 3.8 (h), not a decision.
+
+---
+
+## §10 — Review until it is 10/10
+
+You do not score your own work. Read [`module-review-prompt.md`](module-review-prompt.md)
+before you start Phase 3 — it is the bar, and building to it from the first line is cheaper
+than retrofitting it — but the score itself always comes from somewhere else.
+
+### Step 10.1 — Say it is ready, with the evidence
+
+When you believe §8 holds, finish the quality report (Step 7.9) and stop. Tell me it is ready
+for review, and list anything in §8 you could not do yourself. A review only reads committed
+code, so I commit the work locally — not push — before every round; you do not commit.
+
+### Step 10.2 — The review happens outside this session
+
+I run `module-review-prompt.md` in a fresh session that has never seen this one — ideally on a
+different model. It re-runs every gate itself, scores nine dimensions from 0 to 10, and
+returns numbered findings, each with a file and line, the rule it breaks and what done looks
+like.
+
+### Step 10.3 — Fix every finding, then re-run everything
+
+When I paste the findings here, fix every one. Fix the cause, not the symptom: a finding that
+a check is missing in one view means checking every view for the same gap. Then re-run **every**
+gate — not only the ones your fix touched — update the quality report, and go back to Step
+10.1. If you disagree with a finding, do not skip it silently: say why, with evidence, and I
+decide.
+
+### Step 10.4 — When it is finished
+
+The module is finished when a review made **after the last code change** scores 10 in all
+nine dimensions. Any change after that review — even a one-line fix — needs a new review. If
+the same finding comes back three rounds in a row, stop and tell me: that is a disagreement
+about the spec or the architecture, and it is mine to settle, not yours to keep patching.
+After round 7, the mentor's written ruling on whatever is still open replaces the 10/10.
 
 --- PROMPT ENDS ---
 
