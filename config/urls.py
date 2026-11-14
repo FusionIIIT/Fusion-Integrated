@@ -4,6 +4,7 @@ Every module mounts itself under /api/v1/<module>/. A module that is not in
 INSTALLED_APPS contributes no URLs at all — that is what "independent" means
 here: removing a module is deleting a directory and one settings line.
 """
+from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
@@ -18,4 +19,6 @@ urlpatterns = [
     path("api/v1/placement/", include("modules.placement.api.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="docs"),
+    path('admin/', admin.site.urls),
+    path('api/v1/hr-eis/', include('modules.hr_eis.urls')),
 ]
