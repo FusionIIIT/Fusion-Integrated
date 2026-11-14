@@ -1,4 +1,4 @@
-# Your module with an online AI tool: student guide
+# Assignment 9: your module with an online AI tool
 
 In this assignment you build **the module assigned to you** in `Fusion-Integrated`. You use
 an online AI coding tool, run [`new-module-prompt.md`](new-module-prompt.md), and keep going
@@ -23,6 +23,152 @@ prompt governs: it already includes everything from that document that still app
 | Prompt | `new-module-prompt.md` | the same prompt, now with stricter tests and a review loop (§10) |
 | Finish line | the prompt's §8 | §8, then **10/10 in all nine dimensions** from [`module-review-prompt.md`](module-review-prompt.md) |
 | Who scores it | your mentor | a fresh review session each round, then your mentor re-runs the review before merging |
+
+## Your branch and your pull request: every command
+
+`main` on `FusionIIIT/Fusion-Integrated` is the **production branch**: what is on it is what
+gets deployed. You never commit to it. You make your own branch from the latest `main`, do all
+your work there, and raise one pull request from that branch back into `main`.
+
+In every command, replace `<your-username>` with your GitHub username and `<module_code>` with
+your module code.
+
+### 1. Once: fork and clone
+
+Fork `FusionIIIT/Fusion-Integrated` on GitHub with the **Fork** button, or with the GitHub CLI:
+
+```bash
+gh repo fork FusionIIIT/Fusion-Integrated --clone=false
+```
+
+Clone your fork and connect it to the institute's repository:
+
+```bash
+git clone https://github.com/<your-username>/Fusion-Integrated.git
+cd Fusion-Integrated
+git remote add upstream https://github.com/FusionIIIT/Fusion-Integrated.git
+git remote -v
+```
+
+`git remote -v` must show `origin` as your fork and `upstream` as `FusionIIIT`. Then make every
+commit in this repository yours:
+
+```bash
+git config user.name "<your name>"
+git config user.email "<the email on your GitHub account>"
+```
+
+### 2. Make your branch from the production branch
+
+```bash
+git fetch upstream
+git checkout -b module/<module_code> upstream/main
+git branch --show-current
+```
+
+The last command must print `module/<module_code>`. Never work on `main`, and never branch from
+your fork's `main`, which falls behind.
+
+### 3. Work and commit on your branch
+
+Commit before every review round (Step 7). Add files by name, never with `git add .`: that is
+how a `.env`, a key or a tool's files end up in a commit.
+
+```bash
+git status
+git add modules/<module_code> client/src/modules/<module_code>
+git add client/e2e/<module_code> docs/<NN>-<module_code>
+git diff --cached --stat
+git commit -m "<what changed, and why>"
+```
+
+When you change them, add the registration lines and generated files by name as well:
+`config/settings/base.py`, `config/urls.py`, `config/celery.py`, `.importlinter`,
+`client/src/app/registry.ts`, `client/e2e/accounts.ts`, `openapi/fusion-integrated.v1.yaml`,
+`registry/permissions.json` and `docs/02-iam/permission-catalog.generated.md`. Read the
+`git diff --cached --stat` output every time: nothing else should be in it.
+
+### 4. Bring your branch up to date before the last review round
+
+```bash
+git fetch upstream
+git rebase upstream/main
+```
+
+If a generated file conflicts (`openapi/fusion-integrated.v1.yaml`,
+`registry/permissions.json` or `docs/02-iam/permission-catalog.generated.md`), take `main`'s
+version and carry on. You regenerate it at the end:
+
+```bash
+git checkout upstream/main -- <the generated file>
+git add <the generated file>
+git rebase --continue
+```
+
+For any other conflict, edit the file until it is right, then run `git add <file>` and
+`git rebase --continue`. To give up and go back to where you were, run `git rebase --abort`.
+
+When the rebase has finished, regenerate and commit whatever changed:
+
+```bash
+make schema
+make permissions
+git add openapi/fusion-integrated.v1.yaml registry/permissions.json
+git add docs/02-iam/permission-catalog.generated.md
+git diff --cached --quiet || git commit -m "Regenerate the schema and permission manifest"
+```
+
+Then run every gate again, because a rebase is a change.
+
+### 5. Push your branch to your fork
+
+Only when your mentor says the module is ready (Step 9):
+
+```bash
+git push -u origin module/<module_code>
+```
+
+After a rebase your branch's history has changed, so push it with:
+
+```bash
+git push --force-with-lease origin module/<module_code>
+```
+
+Never force-push anything except your own branch.
+
+### 6. Raise the pull request into the production branch
+
+Write the description (Step 9) in a file outside the repository, so it is never committed.
+Then, with the GitHub CLI:
+
+```bash
+gh pr create --repo FusionIIIT/Fusion-Integrated --base main \
+  --head <your-username>:module/<module_code> \
+  --title "<Module name>: <what it does, in one line>" \
+  --body-file ../pr-description.md
+```
+
+Or on GitHub: open your fork, choose **Compare & pull request**, and check all four fields
+before you create it:
+
+- base repository: `FusionIIIT/Fusion-Integrated`
+- base: `main`
+- head repository: `<your-username>/Fusion-Integrated`
+- compare: `module/<module_code>`
+
+Never open it against your fork's `main` or another student's branch.
+
+### 7. After review comments
+
+Fix them on the same branch, then commit and push. The pull request updates itself:
+
+```bash
+git add <the files you changed>
+git commit -m "<what you fixed>"
+git push
+```
+
+Never open a second pull request for the same module.
 
 ## Step 1: Confirm your assignment and read your spec
 
@@ -52,15 +198,8 @@ restored fresh from `fusion-dev.dump`:
 - The IAM runs separately, from `Fusion_System_Administrator`.
 - `make dev` starts the platform.
 
-Fork `Fusion-Integrated`, then branch off the institute's `main`, not your fork's:
-
-```bash
-git clone https://github.com/<your-username>/Fusion-Integrated.git
-cd Fusion-Integrated
-git remote add upstream https://github.com/FusionIIIT/Fusion-Integrated.git
-git fetch upstream
-git checkout -b module/<module_code> upstream/main
-```
+Fork, clone and make your branch from the production branch, `main`, exactly as parts 1 and 2
+of "Your branch and your pull request" above say.
 
 Then install the browser the end-to-end tests use, once per machine:
 `cd client && npx playwright install chromium`. Log in and check that Placement Cell works,
@@ -206,10 +345,11 @@ with:
 When the builder says the module is ready and the quality report
 (`docs/<NN>-<module_code>/<module_code>-quality-report.md`) is written:
 
-1. **Commit everything locally on `module/<module_code>`, but do not push.** The reviewer
-   only reads committed code, and stops if it finds uncommitted changes. (This replaces the
-   student guide's "do not commit until your mentor says": here you commit locally before
-   every round, and you push only when your mentor says.)
+1. **Commit everything locally on `module/<module_code>`, but do not push.** Use part 3 of
+   "Your branch and your pull request". The reviewer only reads committed code, and stops if
+   it finds uncommitted changes. (This replaces the student guide's "do not commit until your
+   mentor says": here you commit locally before every round, and you push only when your
+   mentor says.)
 2. **Make a clean copy for the reviewer.** Clone your branch into a new folder for each
    round, so the reviewer never shares a folder, a memory or an instruction file with the
    builder:
@@ -254,9 +394,9 @@ When the builder says the module is ready and the quality report
    `VERDICT: 10/10 in all nine dimensions`. Even a one-line change after that needs another
    round.
 
-**Rebase before the round you expect to be the last, not after it.** Rebase onto
-`upstream/main`, then regenerate the schema and the permission manifest (Step 7.10 of the
-prompt). If `upstream/main` moves after you get a 10/10, rebase again. Then:
+**Rebase before the round you expect to be the last, not after it.** Use part 4 of "Your
+branch and your pull request": rebase onto `upstream/main`, then regenerate the schema and the
+permission manifest (Step 7.10 of the prompt). If `upstream/main` moves after you get a 10/10, rebase again. Then:
 
 - If you resolved conflicts only in the registration lines and the regenerated files, and
   changed nothing in your module's own folders, re-run the gates (`make check`,
@@ -308,8 +448,9 @@ The tool wrote the code, but you are the one submitting it. Before the pull requ
   ```
 
   The first and third must print nothing. The second must show only you.
-- Push and open the pull request only when your mentor says the module is ready.
-- Open the pull request from `module/<module_code>` to `main` on
+- Push and open the pull request only when your mentor says the module is ready, with parts 5
+  and 6 of "Your branch and your pull request".
+- Open the pull request from `module/<module_code>` into the production branch, `main`, on
   `FusionIIIT/Fusion-Integrated`. In the description, give:
   - your spec folder
   - a link to the blueprint
