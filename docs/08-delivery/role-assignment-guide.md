@@ -98,13 +98,13 @@ Employee Leave Management module, that might look like:
 
 ```python
 PERMISSIONS = [
-    ("leave_elm.application.view", "See leave applications"),
-    ("leave_elm.application.apply", "Submit a leave application"),
-    ("leave_elm.application.approve", "Approve or reject a leave application"),
+    ("leave.application.view", "See leave applications"),
+    ("leave.application.create", "Submit a leave application"),
+    ("leave.application.approve", "Approve or reject a leave application"),
 ]
 
-_EMPLOYEE = ["leave_elm.application.view", "leave_elm.application.apply"]
-_APPROVER = ["leave_elm.application.view", "leave_elm.application.approve"]
+_EMPLOYEE = ["leave.application.view", "leave.application.create"]
+_APPROVER = ["leave.application.view", "leave.application.approve"]
 
 ROLE_GRANTS = {
     "Employee": _EMPLOYEE,
@@ -112,9 +112,13 @@ ROLE_GRANTS = {
 }
 ```
 
-The role name (`"Leave Approver"`) is free text — it does not need to exist
-anywhere else first. You do not need to register it with the IAM team or edit
-any file outside your own module.
+For a role your module introduces, the name (`"Leave Approver"`) is free text. It does not
+need to exist anywhere else first, you do not need to register it with the IAM team, and you
+edit no file outside your own module. Whether the institute should have that role is still
+an open question for whoever assigned you the module (`new-module-prompt.md` Step 3.8 (h)):
+create it for testing, but build on it only once they have answered. For a role the institute already has, copy its exact
+spelling from `globals_designation`, because that spelling is the join key: a typo is a grant
+that reaches nobody.
 
 If your module also has screens, declare `MODULE` and `NAV_ITEMS` the same way
 `placement/registry.py` does — see that file for the full shape, including
