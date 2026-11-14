@@ -39,7 +39,7 @@ async function rolesOf(api: APIRequestContext): Promise<string[] | null> {
   return me.ok() ? ((await me.json()) as { roles: string[] }).roles : null;
 }
 
-// The IAM allows five logins a minute and the API reports a throttled one as a bad password.
+// The IAM allows five logins a minute per caller, and every test signs in from here.
 async function logIn(api: APIRequestContext, account: Account): Promise<void> {
   for (let attempt = 1; attempt <= LOGIN_TRIES; attempt++) {
     const res = await api.post("/api/v1/auth/login",

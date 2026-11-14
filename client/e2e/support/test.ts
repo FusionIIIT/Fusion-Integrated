@@ -40,7 +40,7 @@ export async function signIn(page: Page, key: AccountKey): Promise<void> {
   await submitUntilSignedIn(page, () => page.getByRole("button", { name: "Sign in" }).click());
 }
 
-// The IAM throttles logins and the API calls that a bad password, so a known-good one is retried.
+// The IAM throttles logins per caller, so a refused login with known-good credentials is retried.
 export async function submitUntilSignedIn(page: Page, submit: () => Promise<void>): Promise<void> {
   for (let attempt = 1; attempt <= LOGIN_TRIES; attempt++) {
     const [res] = await Promise.all([

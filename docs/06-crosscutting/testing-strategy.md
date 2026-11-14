@@ -294,8 +294,8 @@ grant the test accounts their roles. **CI** runs the same thing on every push an
 | `e2e/auth.spec.ts` | The reference for signing in: a wrong password, a student's role-gated sidebar, a keyboard-only login |
 | `e2e/placement/companies.spec.ts` | The reference for a module journey: an officer registers a company through the UI |
 
-**The login budget.** The IAM allows five logins a minute, keyed by caller, and every login reaches
-it from this backend. A throttled login comes back as "Incorrect username or password". So:
+**The login budget.** The IAM allows five logins a minute per caller, and every test signs in from
+the same address. So:
 
 - only specs that are about signing in use the login form
 - everything else starts already signed in, with `test.use(signedInAs("<account>"))`
