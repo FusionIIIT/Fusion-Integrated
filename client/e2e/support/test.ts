@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { expect, type Page, test as base } from "@playwright/test";
 
 import { ACCOUNTS, type AccountKey, PASSWORD } from "../accounts";
@@ -25,6 +27,11 @@ export const test = base.extend<{ guard: undefined }>({
 });
 
 export { expect };
+
+// Parallel workers start in the same millisecond, so a timestamp alone collides.
+export function uniqueName(prefix: string): string {
+  return `${prefix} ${Date.now().toString(36)}-${randomUUID().slice(0, 8)}`;
+}
 
 // Start a test already signed in, from the session global setup saved for that account.
 export function signedInAs(key: AccountKey): { storageState: string } {
@@ -63,8 +70,11 @@ export function sidebar(page: Page) {
 
 export async function openSidebar(page: Page): Promise<void> {
   const expand = sidebar(page).getByRole("button", { name: "Expand sidebar" });
+  const collapse = sidebar(page).getByRole("button", { name: "Collapse sidebar" });
+  // Wait for the shell to render first; checking before it has would skip the click.
+  await expect(expand.or(collapse)).toBeVisible();
   if (await expand.isVisible()) await expand.click();
-  await expect(sidebar(page).getByRole("button", { name: "Collapse sidebar" })).toBeVisible();
+  await expect(collapse).toBeVisible();
 }
 
 export async function actAs(page: Page, key: AccountKey): Promise<void> {

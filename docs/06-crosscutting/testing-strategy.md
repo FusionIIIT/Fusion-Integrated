@@ -290,7 +290,7 @@ grant the test accounts their roles. **CI** runs the same thing on every push an
 |---|---|
 | `e2e/accounts.ts` | The synthetic accounts the suite uses, each with the designations it needs |
 | `e2e/global-setup.ts` | Checks the stack is up, grants each account its designations through the IAM's `assign_role`, and saves one signed-in session per account to `e2e/.auth/` |
-| `e2e/support/test.ts` | The `test` to import. It fails a test on any uncaught page error, console error or 5xx, and provides `signedInAs`, `actAs`, `openModuleNav` and `signIn` |
+| `e2e/support/test.ts` | The `test` to import. It fails a test on any uncaught page error, console error or 5xx, and provides `signedInAs`, `actAs`, `openModuleNav`, `signIn` and `uniqueName` |
 | `e2e/auth.spec.ts` | The reference for signing in: a wrong password, a student's role-gated sidebar, a keyboard-only login |
 | `e2e/placement/companies.spec.ts` | The reference for a module journey: an officer registers a company through the UI |
 
@@ -305,8 +305,12 @@ the same address. So:
 **Writing a module's specs.**
 
 - Put them in `client/e2e/<module_code>/`, one spec per live use case's main flow.
-- Create the data a journey needs through the UI, with unique names (`Date.now()`). Never depend
-  on `seed_demo` or on rows another spec made.
+- Create the data a journey needs through the UI, named with `uniqueName()`: parallel workers
+  start in the same millisecond, so a timestamp alone collides. Never depend on `seed_demo` or on
+  rows another spec made.
+- Never sign in with a wrong password as an account other specs use. The IAM counts failures per
+  username over an hour and locks the account — at fifteen, until an administrator unlocks it.
+  Use a fresh unknown username, as `auth.spec.ts` does.
 - Act as a role with `actAs`. Reach screens through the sidebar the way a person would.
 - Select by role and label, never by CSS class or test id.
 - No `waitForTimeout` and no `test.only` or `test.skip`.

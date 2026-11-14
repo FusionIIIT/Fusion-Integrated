@@ -1,10 +1,12 @@
-import { actAs, expect, openModuleNav, sidebar, signedInAs, test } from "../support/test";
+import {
+  actAs, expect, openModuleNav, sidebar, signedInAs, test, uniqueName,
+} from "../support/test";
 
 test.describe("placement: companies", () => {
   test.use(signedInAs("placementOfficer"));
 
   test("a placement officer registers a company and sees it pending approval", async ({ page }) => {
-    const name = `E2E Company ${Date.now()}`;
+    const name = uniqueName("E2E Company");
 
     await page.goto("/");
     await actAs(page, "placementOfficer");

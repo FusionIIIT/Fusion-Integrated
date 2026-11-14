@@ -1,14 +1,18 @@
 import { ACCOUNTS, PASSWORD } from "./accounts";
-import { expect, openModuleNav, sidebar, signIn, submitUntilSignedIn, test } from "./support/test";
+import {
+  expect, openModuleNav, sidebar, signIn, submitUntilSignedIn, test, uniqueName,
+} from "./support/test";
 
 test.describe("sign-in", () => {
   // Real logins share the IAM's five-a-minute budget, so these may wait out a throttle.
   test.describe.configure({ timeout: 90_000 });
 
-  test("a wrong password is refused and the user stays on the login page", async ({ page }) => {
+  // A fresh unknown user each run: the IAM locks accounts that keep failing, and answers alike.
+  test("wrong credentials are refused and the user stays on the login page", async ({ page }) => {
     await page.goto("/login");
     await page.getByRole("button", { name: "Proceed to login" }).click();
-    await page.getByRole("textbox", { name: /username/i }).fill(ACCOUNTS.student.username);
+    await page.getByRole("textbox", { name: /username/i })
+      .fill(uniqueName("e2e-nobody").replace(/\s/g, "-"));
     await page.getByRole("textbox", { name: /password/i }).fill(`${PASSWORD}-wrong`);
     await page.getByRole("button", { name: "Sign in" }).click();
 
