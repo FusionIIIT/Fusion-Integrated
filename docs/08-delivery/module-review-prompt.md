@@ -264,6 +264,7 @@ For each dimension, check every item. Each item that fails becomes a finding.
   - `client/playwright.config.ts`, `client/e2e/global-setup.ts`, `client/e2e/support/`,
     `client/e2e/tsconfig.json`, any spec outside `client/e2e/[module_code]/`, or any change
     to `client/e2e/accounts.ts` beyond new entries
+  - `client/src/auth/` (including `RequirePermission`) or `client/src/ui/components/NotPermitted.tsx`
   - any `[tool.*]` section of `pyproject.toml`, or any new `.coveragerc`, `setup.cfg`,
     `pytest.ini` or `tox.ini`
   - `config/settings/test.py`, `SILENCED_SYSTEM_CHECKS`, or any entry added to
@@ -293,6 +294,11 @@ For each dimension, check every item. Each item that fails becomes a finding.
 
 Probe these yourself, with a throwaway test or an `APIClient` snippet. Do not only read
 the code.
+
+- Open every client route directly, by typing its URL, as a role that is granted the module
+  but not that route's nav permission.
+  - If the page renders a control that role cannot use, that is a Major finding.
+  - If the server would also accept that control's action, it is a Blocker.
 
 - For each refusal an endpoint can give, there is a test. That means 401, 403 or 404, a 409
   for a conflict with current state, 400 or 422 for bad input, and 429 where the view sets
@@ -356,6 +362,8 @@ the code.
 
 ### 6. End-to-end behaviour
 
+- Every guarded route has a spec that opens it directly as a role without the permission
+  and expects `NotPermitted` and no buttons.
 - `client/e2e/[module_code]/` has a Playwright spec for every live use case's main flow, and
   `make e2e` passes in your own run. Each spec does all of these:
   - imports `test` from the harness
@@ -384,6 +392,10 @@ the code.
 
 - The shape matches `client/src/modules/placement/`. The module uses the shared
   `lib/http.ts` and one TanStack hook per endpoint, and ships no second shell.
+- Every page that is for some roles only is wrapped in `RequirePermission` with exactly its
+  nav item's `required_permission`, as the blueprint's Step 3.5 records. The module has a
+  route-guard test like `test_client_route_guards.py`, and it fails when a guard is removed
+  or changed.
 - Every page has a loading, empty and error state, and a test for each of them, plus a test
   for a hidden control and a test for its main action (Step 6.7).
 - No control is rendered that the acting role's permissions do not allow.
