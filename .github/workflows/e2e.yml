@@ -36,13 +36,20 @@ jobs:
           cache-dependency-path: client/package-lock.json
 
       - name: Databases from the public dev dump
+        env:
+          PG_CONTAINER: ${{ job.services.postgres.id }}
         run: |
           curl -fsSL -o "$RUNNER_TEMP/fusion-dev.dump" \
             https://github.com/FusionIIIT/Fusion-README/raw/main/fusion-dev.dump
           createdb fusionlab
           createdb fusion_system_db
           createdb fusion_integrated
-          pg_restore -d fusionlab --no-owner "$RUNNER_TEMP/fusion-dev.dump"
+          # The service's own pg_restore, so the client never outruns the server's version.
+          docker exec -i "$PG_CONTAINER" pg_restore -U fusion_admin -d fusionlab --no-owner \
+            < "$RUNNER_TEMP/fusion-dev.dump"
+          users=$(psql -d fusionlab -tAc "select count(*) from auth_user")
+          echo "restored $users accounts"
+          test "$users" -gt 0
 
       - name: IAM
         working-directory: iam
