@@ -33,4 +33,14 @@ test.describe("placement: companies", () => {
     await expect(row).toBeVisible();
     await expect(row).toContainText(/pending/i);
   });
+
+  test.describe("as a student", () => {
+    test.use(signedInAs("student"));
+
+    test("a student who opens the page directly is told it is not for them", async ({ page }) => {
+      await page.goto("/placement/companies");
+      await expect(page.getByText("Not available to your role")).toBeVisible();
+      await expect(page.getByRole("main").getByRole("button")).toHaveCount(0);
+    });
+  });
 });
