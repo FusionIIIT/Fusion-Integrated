@@ -34,6 +34,66 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "leave_cell": {
+      "grants": {
+        "employee": [
+          "leave_cell.balances.view",
+          "leave_cell.requests.create",
+          "leave_cell.requests.view"
+        ],
+        "hr": [
+          "leave_cell.balances.view",
+          "leave_cell.requests.create",
+          "leave_cell.requests.view"
+        ]
+      },
+      "module_grants": [
+        "employee",
+        "hr"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "Calendar",
+        "items": [
+          {
+            "code": "leave_cell.balances",
+            "icon": "ClipboardList",
+            "label": "Leave Balances",
+            "required_permission": "leave_cell.balances.view",
+            "sort_order": 5,
+            "to": "/leave/balances"
+          },
+          {
+            "code": "leave_cell.requests",
+            "icon": "CalendarCheck",
+            "label": "Leave Requests",
+            "required_permission": "leave_cell.requests.view",
+            "sort_order": 10,
+            "to": "/leave/requests"
+          }
+        ],
+        "label": "Leave Management",
+        "nav_section": "HR",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "leave_cell.balances.view",
+          "label": "View leave balances"
+        },
+        {
+          "code": "leave_cell.requests.view",
+          "label": "View own leave requests"
+        },
+        {
+          "code": "leave_cell.requests.create",
+          "label": "Create leave requests"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

@@ -13,6 +13,14 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave_cell`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave_cell.balances.view` | View leave balances | `employee`, `hr` |
+| `leave_cell.requests.view` | View own leave requests | `employee`, `hr` |
+| `leave_cell.requests.create` | Create leave requests | `employee`, `hr` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
