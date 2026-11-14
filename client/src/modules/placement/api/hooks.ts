@@ -170,12 +170,13 @@ export function useRespondToOffer() {
 
 
 // -- Companies -----------------------------------------------------------------
-export function useCompanies() {
+export function useCompanies({ enabled = true }: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: keys.companies(),
     queryFn: async () =>
       (await http.get<Page<Company>>("/placement/companies")).data,
     staleTime: 30_000,
+    enabled,
   });
 }
 

@@ -5,28 +5,43 @@ import {
 import { notifications } from "@mantine/notifications";
 import { FaBuilding, FaPlus, FaUserPlus } from "react-icons/fa";
 
+import { useAuth } from "../../../auth/AuthProvider";
 import { errorMessage } from "../../../lib/http";
 import { DataTable } from "../../../ui/components/DataTable";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { FormModal } from "../../../ui/components/FormModal";
+import { NotPermitted } from "../../../ui/components/NotPermitted";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import {
   useCompanies, useCompanyDecision, useInviteRecruiter, useRegisterCompany,
 } from "../api/hooks";
 import type { Company } from "../api/types";
 
+const MANAGE = "placement_cell.company.manage";
+
 const APPROVAL_COLOR: Record<string, string> = {
   pending: "yellow", approved: "green", rejected: "red",
 };
 
 export default function CompaniesPage() {
-  const { data, isPending, error } = useCompanies();
+  const { can } = useAuth();
+  const canManage = can(MANAGE);
+  const { data, isPending, error } = useCompanies({ enabled: canManage });
   const decide = useCompanyDecision();
   const [registering, setRegistering] = useState(false);
   const [rejecting, setRejecting] = useState<Company | null>(null);
   const [inviting, setInviting] = useState<Company | null>(null);
   const [note, setNote] = useState("");
 
+  // Every control here registers, approves or invites, and only this permission may.
+  if (!canManage) {
+    return (
+      <Container size="xl">
+        <PageHeader title="Companies" />
+        <NotPermitted />
+      </Container>
+    );
+  }
   if (error) return <Container size="xl"><ErrorState error={error} /></Container>;
 
   function approve(c: Company) {
