@@ -8,6 +8,7 @@ class Department(TimeStampedModel):
     name = models.CharField(max_length=150)
     description = models.TextField(blank=True)
     head_user_id = models.IntegerField(null=True, blank=True, db_index=True)
+    admin_user_id = models.IntegerField(null=True, blank=True, db_index=True)
 
     def __str__(self):
         return self.name

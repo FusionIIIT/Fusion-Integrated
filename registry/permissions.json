@@ -13,7 +13,14 @@
           "department.timetable.manage"
         ],
         "department_head": [
-          "department.detail.propose"
+          "department.announcement.publish",
+          "department.detail.propose",
+          "department.detail.update",
+          "department.feedback.submit",
+          "department.profile.view",
+          "department.resource.view",
+          "department.stock_request.create",
+          "department.timetable.manage"
         ],
         "faculty": [
           "department.announcement.publish",
@@ -36,12 +43,69 @@
       ],
       "nav": {
         "base_path": "/department",
-        "icon": "Buildings",
-        "items": [],
+        "icon": "FaBuilding",
+        "items": [
+          {
+            "code": "department.overview",
+            "icon": "FaBuilding",
+            "label": "Department Info",
+            "required_permission": "department.profile.view",
+            "sort_order": 10,
+            "to": "/department/overview"
+          },
+          {
+            "code": "department.announcements",
+            "icon": "FaBullhorn",
+            "label": "Announcements",
+            "required_permission": "department.profile.view",
+            "sort_order": 20,
+            "to": "/department/announcements"
+          },
+          {
+            "code": "department.inventory",
+            "icon": "FaClipboardList",
+            "label": "Inventory & Stock",
+            "required_permission": "department.stock_request.create",
+            "sort_order": 30,
+            "to": "/department/inventory"
+          },
+          {
+            "code": "department.feedback",
+            "icon": "FaClipboardCheck",
+            "label": "Feedback",
+            "required_permission": "department.feedback.submit",
+            "sort_order": 40,
+            "to": "/department/feedback"
+          },
+          {
+            "code": "department.timetable",
+            "icon": "FaCalendarAlt",
+            "label": "Timetable",
+            "required_permission": "department.profile.view",
+            "sort_order": 50,
+            "to": "/department/timetable"
+          },
+          {
+            "code": "department.faculty_staff",
+            "icon": "FaUsers",
+            "label": "Faculty & Staff",
+            "required_permission": "department.profile.view",
+            "sort_order": 60,
+            "to": "/department/faculty-staff"
+          },
+          {
+            "code": "department.resources",
+            "icon": "FaThLarge",
+            "label": "Lab Resources",
+            "required_permission": "department.resource.view",
+            "sort_order": 70,
+            "to": "/department/resources"
+          }
+        ],
         "label": "Department",
         "nav_section": "Department",
         "sort_order": 20,
-        "status": "planned"
+        "status": "active"
       },
       "permissions": [
         {

@@ -29,8 +29,23 @@ def _domain_to_core(exc):
     return CoreDomainError(getattr(exc, "code", "domain_error"), str(exc))
 
 
-def create_department(*, code, name, description=""):
-    return Department.objects.create(code=code, name=name, description=description)
+def enqueue_notification(*, department_id, event, recipient_user_id, payload=None):
+    return NotificationOutbox.objects.create(
+        department_id=department_id,
+        event=event,
+        recipient_user_id=recipient_user_id,
+        payload=payload or {},
+    )
+
+
+def create_department(*, code, name, description="", head_user_id=None, admin_user_id=None):
+    return Department.objects.create(
+        code=code,
+        name=name,
+        description=description,
+        head_user_id=head_user_id,
+        admin_user_id=admin_user_id,
+    )
 
 
 def create_announcement(
@@ -43,7 +58,7 @@ def create_announcement(
     role_target="",
     created_by_user_id,
 ):
-    return Announcement.objects.create(
+    a = Announcement.objects.create(
         department_id=department_id,
         title=title,
         body=body,
@@ -52,6 +67,13 @@ def create_announcement(
         role_target=role_target,
         created_by_user_id=created_by_user_id,
     )
+    enqueue_notification(
+        department_id=department_id,
+        event="announcement_published",
+        recipient_user_id=created_by_user_id,
+        payload={"announcement_id": a.id, "title": title},
+    )
+    return a
 
 
 def hide_announcement(*, announcement_id):
@@ -92,12 +114,19 @@ def create_stock_request(*, department_id, item_id, requester_user_id, quantity)
     item = InventoryItem.objects.get(pk=item_id, department_id=department_id)
     if quantity > item.quantity:
         raise DomainError("insufficient_stock", "Requested quantity exceeds current inventory.")
-    return StockRequest.objects.create(
+    req = StockRequest.objects.create(
         department_id=department_id,
         item=item,
         requester_user_id=requester_user_id,
         quantity=quantity,
     )
+    enqueue_notification(
+        department_id=department_id,
+        event="stock_request_submitted",
+        recipient_user_id=requester_user_id,
+        payload={"request_id": req.id, "quantity": quantity},
+    )
+    return req
 
 
 def decide_stock_request(*, request_id, to_status, actor_user_id):
@@ -112,6 +141,12 @@ def decide_stock_request(*, request_id, to_status, actor_user_id):
             req.approved_by_user_id = actor_user_id
             req.decided_at = timezone.now()
         req.save(update_fields=["status", "approved_by_user_id", "decided_at", "updated_at"])
+        enqueue_notification(
+            department_id=req.department_id,
+            event="stock_request_decided",
+            recipient_user_id=req.requester_user_id,
+            payload={"request_id": req.id, "status": to_status},
+        )
     return req
 
 
@@ -139,13 +174,26 @@ def issue_stock_request(*, request_id, actor_user_id):
             actor_user_id=actor_user_id,
             request=req,
         )
+        enqueue_notification(
+            department_id=req.department_id,
+            event="stock_issued",
+            recipient_user_id=req.requester_user_id,
+            payload={"request_id": req.id, "quantity": req.quantity},
+        )
     return req
 
 
 def submit_feedback(*, department_id, submitter_user_id, subject, body):
-    return Feedback.objects.create(
+    fb = Feedback.objects.create(
         department_id=department_id, submitter_user_id=submitter_user_id, subject=subject, body=body
     )
+    enqueue_notification(
+        department_id=department_id,
+        event="feedback_submitted",
+        recipient_user_id=submitter_user_id,
+        payload={"feedback_id": fb.id, "subject": subject},
+    )
+    return fb
 
 
 def review_feedback(*, feedback_id, category, reviewer_user_id):
@@ -168,6 +216,12 @@ def resolve_feedback(*, feedback_id, to_status, actor_user_id):
         fb.resolved_by_user_id = actor_user_id
         fb.terminal_at = timezone.now()
         fb.save(update_fields=["status", "resolved_by_user_id", "terminal_at", "updated_at"])
+        enqueue_notification(
+            department_id=fb.department_id,
+            event=f"feedback_{to_status}",
+            recipient_user_id=fb.submitter_user_id,
+            payload={"feedback_id": fb.id, "status": to_status},
+        )
     return fb
 
 
@@ -264,12 +318,3 @@ def decide_detail_change(*, change_id, to_status, decided_by_user_id):
             setattr(detail, ch.field_name, ch.proposed_value)
             detail.save()
     return ch
-
-
-def enqueue_notification(*, department_id, event, recipient_user_id, payload=None):
-    return NotificationOutbox.objects.create(
-        department_id=department_id,
-        event=event,
-        recipient_user_id=recipient_user_id,
-        payload=payload or {},
-    )

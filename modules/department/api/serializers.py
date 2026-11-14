@@ -18,7 +18,16 @@ from modules.department.models import (
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
-        fields = ["id", "code", "name", "description", "head_user_id", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "code",
+            "name",
+            "description",
+            "head_user_id",
+            "admin_user_id",
+            "created_at",
+            "updated_at",
+        ]
 
 
 class AnnouncementSerializer(serializers.ModelSerializer):

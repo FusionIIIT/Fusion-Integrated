@@ -11,14 +11,14 @@ For the intended taxonomy of modules not yet built, see
 
 | Code | What it allows | Held by |
 |---|---|---|
-| `department.announcement.publish` | Publish announcements | `department_admin`, `faculty` |
+| `department.announcement.publish` | Publish announcements | `department_admin`, `department_head`, `faculty` |
 | `department.inventory.manage` | Insert and track inventory | `department_admin` |
-| `department.stock_request.create` | Submit stock requests | `faculty` |
-| `department.feedback.submit` | Submit confidential feedback | `department_admin`, `faculty`, `student` |
-| `department.profile.view` | View department profiles | `department_admin`, `faculty`, `student` |
-| `department.timetable.manage` | Upload and modify timetables | `department_admin` |
-| `department.resource.view` | View lab resource profiles | `department_admin`, `faculty`, `student` |
-| `department.detail.update` | Update general department information | `department_admin` |
+| `department.stock_request.create` | Submit stock requests | `department_head`, `faculty` |
+| `department.feedback.submit` | Submit confidential feedback | `department_admin`, `department_head`, `faculty`, `student` |
+| `department.profile.view` | View department profiles | `department_admin`, `department_head`, `faculty`, `student` |
+| `department.timetable.manage` | Upload and modify timetables | `department_admin`, `department_head` |
+| `department.resource.view` | View lab resource profiles | `department_admin`, `department_head`, `faculty`, `student` |
+| `department.detail.update` | Update general department information | `department_admin`, `department_head` |
 | `department.detail.propose` | Propose official department-detail changes | `department_admin`, `department_head` |
 
 ## `directory`
