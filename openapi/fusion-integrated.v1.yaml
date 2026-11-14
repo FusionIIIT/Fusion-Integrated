@@ -105,6 +105,855 @@ paths:
               schema:
                 $ref: '#/components/schemas/Session'
           description: ''
+  /api/v1/oap/assignments/ta/:
+    get:
+      operationId: v1_oap_assignments_ta_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeachingAssistantAssignment'
+          description: ''
+    post:
+      operationId: v1_oap_assignments_ta_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeachingAssistantAssignmentCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TeachingAssistantAssignmentCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TeachingAssistantAssignmentCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeachingAssistantAssignment'
+          description: ''
+  /api/v1/oap/assignments/thesis/:
+    get:
+      operationId: v1_oap_assignments_thesis_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ThesisSupervisorAssignment'
+          description: ''
+    post:
+      operationId: v1_oap_assignments_thesis_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThesisSupervisorAssignmentCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ThesisSupervisorAssignmentCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ThesisSupervisorAssignmentCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThesisSupervisorAssignment'
+          description: ''
+  /api/v1/oap/assistantship/claims/:
+    get:
+      operationId: v1_oap_assistantship_claims_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AssistantshipClaim'
+          description: ''
+    post:
+      operationId: v1_oap_assistantship_claims_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssistantshipClaimCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AssistantshipClaimCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AssistantshipClaimCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssistantshipClaim'
+          description: ''
+  /api/v1/oap/assistantship/claims/{claim_id}/:
+    get:
+      operationId: v1_oap_assistantship_claims_retrieve
+      parameters:
+      - in: path
+        name: claim_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssistantshipClaim'
+          description: ''
+  /api/v1/oap/assistantship/claims/{claim_id}/decision/:
+    post:
+      operationId: v1_oap_assistantship_claims_decision_create
+      parameters:
+      - in: path
+        name: claim_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssistantshipHodDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AssistantshipHodDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AssistantshipHodDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssistantshipClaim'
+          description: ''
+  /api/v1/oap/assistantship/claims/{claim_id}/disburse/:
+    post:
+      operationId: v1_oap_assistantship_claims_disburse_create
+      parameters:
+      - in: path
+        name: claim_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssistantshipDisburse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AssistantshipDisburse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AssistantshipDisburse'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssistantshipClaim'
+          description: ''
+  /api/v1/oap/assistantship/claims/{claim_id}/forward/:
+    post:
+      operationId: v1_oap_assistantship_claims_forward_create
+      parameters:
+      - in: path
+        name: claim_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssistantshipClaim'
+          description: ''
+  /api/v1/oap/assistantship/claims/{claim_id}/verify/:
+    post:
+      operationId: v1_oap_assistantship_claims_verify_create
+      parameters:
+      - in: path
+        name: claim_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssistantshipSupervisorVerify'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AssistantshipSupervisorVerify'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AssistantshipSupervisorVerify'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssistantshipClaim'
+          description: ''
+  /api/v1/oap/assistantship/dept-queue/:
+    get:
+      operationId: v1_oap_assistantship_dept_queue_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AssistantshipClaim'
+          description: ''
+  /api/v1/oap/assistantship/disbursement-queue/:
+    get:
+      operationId: v1_oap_assistantship_disbursement_queue_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AssistantshipClaim'
+          description: ''
+  /api/v1/oap/assistantship/hod-queue/:
+    get:
+      operationId: v1_oap_assistantship_hod_queue_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AssistantshipClaim'
+          description: ''
+  /api/v1/oap/assistantship/supervisor-queue/:
+    get:
+      operationId: v1_oap_assistantship_supervisor_queue_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AssistantshipClaim'
+          description: ''
+  /api/v1/oap/bonafide/:
+    get:
+      operationId: v1_oap_bonafide_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BonafideRequest'
+          description: ''
+    post:
+      operationId: v1_oap_bonafide_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BonafideRequestCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BonafideRequestCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BonafideRequestCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BonafideRequest'
+          description: ''
+  /api/v1/oap/bonafide/{request_id}/decision/:
+    post:
+      operationId: v1_oap_bonafide_decision_create
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BonafideDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BonafideDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BonafideDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BonafideRequest'
+          description: ''
+  /api/v1/oap/bonafide/{request_id}/download/:
+    get:
+      operationId: v1_oap_bonafide_download_retrieve
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/oap/bonafide/all/:
+    get:
+      operationId: v1_oap_bonafide_all_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BonafideRequest'
+          description: ''
+  /api/v1/oap/leaves/:
+    get:
+      operationId: v1_oap_leaves_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StudentLeaveApplication'
+          description: ''
+    post:
+      operationId: v1_oap_leaves_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveApplicationCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveApplicationCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveApplicationCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentLeaveApplication'
+          description: ''
+  /api/v1/oap/leaves/{leave_id}/:
+    get:
+      operationId: v1_oap_leaves_retrieve
+      parameters:
+      - in: path
+        name: leave_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentLeaveApplication'
+          description: ''
+  /api/v1/oap/leaves/{leave_id}/decision/:
+    post:
+      operationId: v1_oap_leaves_decision_create
+      parameters:
+      - in: path
+        name: leave_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentLeaveApplication'
+          description: ''
+  /api/v1/oap/leaves/department/:
+    get:
+      operationId: v1_oap_leaves_department_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StudentLeaveApplication'
+          description: ''
+  /api/v1/oap/nodues/:
+    get:
+      operationId: v1_oap_nodues_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NoDuesRequest'
+          description: ''
+    post:
+      operationId: v1_oap_nodues_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoDuesInitiate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NoDuesInitiate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NoDuesInitiate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoDuesRequest'
+          description: ''
+  /api/v1/oap/nodues/{request_id}/:
+    get:
+      operationId: v1_oap_nodues_retrieve
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoDuesRequest'
+          description: ''
+  /api/v1/oap/nodues/{request_id}/download/:
+    get:
+      operationId: v1_oap_nodues_download_retrieve
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/oap/nodues/{request_id}/finalize/:
+    post:
+      operationId: v1_oap_nodues_finalize_create
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoDuesRequest'
+          description: ''
+  /api/v1/oap/nodues/{request_id}/verify/:
+    post:
+      operationId: v1_oap_nodues_verify_create
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoDuesClearanceVerify'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NoDuesClearanceVerify'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NoDuesClearanceVerify'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoDuesAuthorityClearance'
+          description: ''
+  /api/v1/oap/nodues/all/:
+    get:
+      operationId: v1_oap_nodues_all_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NoDuesRequest'
+          description: ''
+  /api/v1/oap/nodues/clearances/:
+    get:
+      operationId: v1_oap_nodues_clearances_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NoDuesAuthorityClearance'
+          description: ''
+  /api/v1/oap/notifications/:
+    get:
+      operationId: v1_oap_notifications_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OAPNotification'
+          description: ''
+  /api/v1/oap/notifications/{notification_id}/read/:
+    post:
+      operationId: v1_oap_notifications_read_create
+      parameters:
+      - in: path
+        name: notification_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/oap/seminars/{seminar_id}/schedule/:
+    post:
+      operationId: v1_oap_seminars_schedule_create
+      parameters:
+      - in: path
+        name: seminar_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GraduateSeminarSchedule'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GraduateSeminarSchedule'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GraduateSeminarSchedule'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraduateSeminar'
+          description: ''
+  /api/v1/oap/seminars/admin-queue/:
+    get:
+      operationId: v1_oap_seminars_admin_queue_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GraduateSeminar'
+          description: ''
+  /api/v1/oap/seminars/requests/:
+    get:
+      operationId: v1_oap_seminars_requests_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GraduateSeminar'
+          description: ''
+    post:
+      operationId: v1_oap_seminars_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GraduateSeminarRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GraduateSeminarRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GraduateSeminarRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraduateSeminar'
+          description: ''
+  /api/v1/oap/seminars/schedules/:
+    get:
+      operationId: v1_oap_seminars_schedules_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GraduateSeminar'
+          description: ''
   /api/v1/placement/announcements:
     get:
       operationId: v1_placement_announcements_list
@@ -1981,6 +2830,216 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    AssistantshipClaim:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        month:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        stipend_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        work_summary:
+          type: string
+          readOnly: true
+        hours_worked:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/AssistantshipClaimStatusEnum'
+          readOnly: true
+        thesis_supervisor_user_id:
+          type: integer
+          readOnly: true
+        ta_supervisor_user_id:
+          type: integer
+          readOnly: true
+        thesis_verified:
+          type: boolean
+          readOnly: true
+        ta_verified:
+          type: boolean
+          readOnly: true
+        thesis_verified_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        ta_verified_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        dept_reviewed_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        dept_reviewed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        hod_decided_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        hod_decision_remarks:
+          type: string
+          readOnly: true
+        hod_decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        disbursed_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        disbursed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        disbursement_reference:
+          type: string
+          readOnly: true
+        supervisor_verifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClaimSupervisorVerification'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - department
+      - dept_reviewed_at
+      - dept_reviewed_by_user_id
+      - disbursed_at
+      - disbursed_by_user_id
+      - disbursement_reference
+      - hod_decided_at
+      - hod_decided_by_user_id
+      - hod_decision_remarks
+      - hours_worked
+      - id
+      - month
+      - status
+      - stipend_amount
+      - supervisor_verifications
+      - ta_supervisor_user_id
+      - ta_verified
+      - ta_verified_at
+      - thesis_supervisor_user_id
+      - thesis_verified
+      - thesis_verified_at
+      - updated_at
+      - user_id
+      - work_summary
+      - year
+    AssistantshipClaimCreate:
+      type: object
+      properties:
+        month:
+          type: integer
+          maximum: 12
+          minimum: 1
+        year:
+          type: integer
+          minimum: 2000
+        department:
+          type: string
+          maxLength: 100
+        stipend_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        work_summary:
+          type: string
+        hours_worked:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          default: '0.00'
+        thesis_supervisor_user_id:
+          type: integer
+          nullable: true
+        ta_supervisor_user_id:
+          type: integer
+          nullable: true
+      required:
+      - department
+      - month
+      - stipend_amount
+      - work_summary
+      - year
+    AssistantshipClaimStatusEnum:
+      enum:
+      - awaiting_dual_supervisor_verification
+      - awaiting_other_supervisor_verification
+      - awaiting_department_review
+      - awaiting_hod_decision
+      - approved_awaiting_stipend_processing
+      - rejected
+      - stipend_processed
+      type: string
+      description: |-
+        * `awaiting_dual_supervisor_verification` - awaiting_dual_supervisor_verification
+        * `awaiting_other_supervisor_verification` - awaiting_other_supervisor_verification
+        * `awaiting_department_review` - awaiting_department_review
+        * `awaiting_hod_decision` - awaiting_hod_decision
+        * `approved_awaiting_stipend_processing` - approved_awaiting_stipend_processing
+        * `rejected` - rejected
+        * `stipend_processed` - stipend_processed
+    AssistantshipDisburse:
+      type: object
+      properties:
+        disbursement_reference:
+          type: string
+          default: ''
+    AssistantshipHodDecision:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        remarks:
+          type: string
+          default: ''
+      required:
+      - decision
+    AssistantshipSupervisorVerify:
+      type: object
+      properties:
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        remarks:
+          type: string
+          default: ''
+      required:
+      - role
     AudienceEnum:
       enum:
       - students
@@ -1993,6 +3052,91 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BonafideDecision:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        remarks:
+          type: string
+          default: ''
+      required:
+      - decision
+    BonafideRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        purpose:
+          type: string
+          readOnly: true
+        details:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/BonafideRequestStatusEnum'
+          readOnly: true
+        decision_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decision_remarks:
+          type: string
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        certificate_number:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - certificate_number
+      - created_at
+      - decided_at
+      - decision_by_user_id
+      - decision_remarks
+      - details
+      - id
+      - purpose
+      - status
+      - updated_at
+      - user_id
+    BonafideRequestCreate:
+      type: object
+      properties:
+        purpose:
+          type: string
+          maxLength: 255
+        details:
+          type: string
+          default: ''
+      required:
+      - purpose
+    BonafideRequestStatusEnum:
+      enum:
+      - submitted_awaiting_academic_administrator
+      - approved_certificate_available
+      - rejected
+      type: string
+      description: |-
+        * `submitted_awaiting_academic_administrator` - submitted_awaiting_academic_administrator
+        * `approved_certificate_available` - approved_certificate_available
+        * `rejected` - rejected
     BulkOutcome:
       type: object
       properties:
@@ -2082,6 +3226,40 @@ components:
       - resume_link
       - roll_no
       - user_id
+    ChannelEnum:
+      enum:
+      - system_alert
+      - email
+      type: string
+      description: |-
+        * `system_alert` - system_alert
+        * `email` - email
+    ClaimSupervisorVerification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          readOnly: true
+        supervisor_user_id:
+          type: integer
+          readOnly: true
+        remarks:
+          type: string
+          readOnly: true
+        verified_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - id
+      - remarks
+      - role
+      - supervisor_user_id
+      - verified_at
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2315,6 +3493,14 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DecisionEnum:
+      enum:
+      - approve
+      - reject
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
     Detail:
       type: object
       properties:
@@ -2350,6 +3536,24 @@ components:
         * `certificate` - certificate
         * `offer_letter` - offer_letter
         * `other` - other
+    DomainEnum:
+      enum:
+      - library
+      - hostel
+      - mess
+      - department
+      - lab
+      - academic_section
+      - student_section
+      type: string
+      description: |-
+        * `library` - library
+        * `hostel` - hostel
+        * `mess` - mess
+        * `department` - department
+        * `lab` - lab
+        * `academic_section` - academic_section
+        * `student_section` - student_section
     EligibilityFailure:
       type: object
       properties:
@@ -2423,6 +3627,124 @@ components:
       - fee_reference
       - season
       - user_id
+    GraduateSeminar:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        abstract:
+          type: string
+          readOnly: true
+        preferred_dates:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/GraduateSeminarStatusEnum'
+          readOnly: true
+        scheduled_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        scheduled_time:
+          type: string
+          readOnly: true
+        venue:
+          type: string
+          readOnly: true
+        coordinator_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        scheduled_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        scheduled_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        remarks:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - abstract
+      - coordinator_user_id
+      - created_at
+      - id
+      - preferred_dates
+      - remarks
+      - scheduled_at
+      - scheduled_by_user_id
+      - scheduled_date
+      - scheduled_time
+      - status
+      - title
+      - updated_at
+      - user_id
+      - venue
+    GraduateSeminarRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        abstract:
+          type: string
+        preferred_dates:
+          type: string
+          default: ''
+          maxLength: 255
+      required:
+      - abstract
+      - title
+    GraduateSeminarSchedule:
+      type: object
+      properties:
+        scheduled_date:
+          type: string
+          format: date
+        scheduled_time:
+          type: string
+          maxLength: 50
+        venue:
+          type: string
+          maxLength: 100
+        coordinator_user_id:
+          type: integer
+          nullable: true
+        remarks:
+          type: string
+          default: ''
+      required:
+      - scheduled_date
+      - scheduled_time
+      - venue
+    GraduateSeminarStatusEnum:
+      enum:
+      - awaiting_scheduling
+      - scheduled
+      type: string
+      description: |-
+        * `awaiting_scheduling` - awaiting_scheduling
+        * `scheduled` - scheduled
     IncidentRecorded:
       type: object
       properties:
@@ -2637,6 +3959,37 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveAttachment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        file_name:
+          type: string
+          maxLength: 255
+        file_url:
+          type: string
+          maxLength: 500
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - file_name
+      - file_url
+      - id
+    LeaveDecision:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        remarks:
+          type: string
+          default: ''
+      required:
+      - decision
     LiftSanction:
       type: object
       properties:
@@ -2708,6 +4061,167 @@ components:
       - icon
       - label
       - to
+    NoDuesAuthorityClearance:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        domain:
+          allOf:
+          - $ref: '#/components/schemas/DomainEnum'
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/NoDuesAuthorityClearanceStatusEnum'
+          readOnly: true
+        verified_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        dues_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        remarks:
+          type: string
+          readOnly: true
+        verified_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - domain
+      - dues_amount
+      - id
+      - remarks
+      - status
+      - updated_at
+      - verified_at
+      - verified_by_user_id
+    NoDuesAuthorityClearanceStatusEnum:
+      enum:
+      - pending
+      - clear
+      - dues_outstanding
+      type: string
+      description: |-
+        * `pending` - pending
+        * `clear` - clear
+        * `dues_outstanding` - dues_outstanding
+    NoDuesClearanceVerify:
+      type: object
+      properties:
+        domain:
+          type: string
+          maxLength: 50
+        status:
+          $ref: '#/components/schemas/NoDuesClearanceVerifyStatusEnum'
+        dues_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          default: '0.00'
+        remarks:
+          type: string
+          default: ''
+      required:
+      - domain
+      - status
+    NoDuesClearanceVerifyStatusEnum:
+      enum:
+      - clear
+      - dues_outstanding
+      type: string
+      description: |-
+        * `clear` - clear
+        * `dues_outstanding` - dues_outstanding
+    NoDuesInitiate:
+      type: object
+      properties:
+        department:
+          type: string
+          maxLength: 100
+        programme:
+          type: string
+          default: ug
+          maxLength: 20
+      required:
+      - department
+    NoDuesRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        programme:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/NoDuesRequestStatusEnum'
+          readOnly: true
+        finalized_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        finalized_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        certificate_number:
+          type: string
+          readOnly: true
+        clearances:
+          type: array
+          items:
+            $ref: '#/components/schemas/NoDuesAuthorityClearance'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - certificate_number
+      - clearances
+      - created_at
+      - department
+      - finalized_at
+      - finalized_by_user_id
+      - id
+      - programme
+      - status
+      - updated_at
+      - user_id
+    NoDuesRequestStatusEnum:
+      enum:
+      - verification_in_progress
+      - verification_complete_all_clear
+      - verification_complete_dues_outstanding
+      - finalized_certificate_available
+      type: string
+      description: |-
+        * `verification_in_progress` - verification_in_progress
+        * `verification_complete_all_clear` - verification_complete_all_clear
+        * `verification_complete_dues_outstanding` - verification_complete_dues_outstanding
+        * `finalized_certificate_available` - finalized_certificate_available
     NotJoining:
       type: object
       properties:
@@ -2732,6 +4246,49 @@ components:
       - is_late
       - message
       - record
+    OAPNotification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        recipient_user_id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+        channel:
+          allOf:
+          - $ref: '#/components/schemas/ChannelEnum'
+          readOnly: true
+        related_entity_type:
+          type: string
+          readOnly: true
+        related_entity_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        is_read:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - channel
+      - created_at
+      - id
+      - is_read
+      - message
+      - recipient_user_id
+      - related_entity_id
+      - related_entity_type
+      - title
     OffCampusRecord:
       type: object
       properties:
@@ -3466,6 +5023,14 @@ components:
       - message
       - reason
       - route
+    RoleEnum:
+      enum:
+      - thesis_supervisor
+      - ta_supervisor
+      type: string
+      description: |-
+        * `thesis_supervisor` - thesis_supervisor
+        * `ta_supervisor` - ta_supervisor
     RoundOutcome:
       type: object
       properties:
@@ -3691,6 +5256,122 @@ components:
       required:
       - available
       - season
+    StudentLeaveApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        programme:
+          type: string
+          readOnly: true
+        leave_type:
+          type: string
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+          readOnly: true
+        end_date:
+          type: string
+          format: date
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StudentLeaveApplicationStatusEnum'
+          readOnly: true
+        decision_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decision_remarks:
+          type: string
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveAttachment'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - attachments
+      - created_at
+      - decided_at
+      - decision_by_user_id
+      - decision_remarks
+      - department
+      - end_date
+      - id
+      - leave_type
+      - programme
+      - reason
+      - start_date
+      - status
+      - updated_at
+      - user_id
+    StudentLeaveApplicationCreate:
+      type: object
+      properties:
+        department:
+          type: string
+          maxLength: 100
+        programme:
+          type: string
+          default: ug
+          maxLength: 20
+        leave_type:
+          type: string
+          default: Casual Leave
+          maxLength: 50
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        reason:
+          type: string
+        attachments:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - department
+      - end_date
+      - reason
+      - start_date
+    StudentLeaveApplicationStatusEnum:
+      enum:
+      - submitted_awaiting_hod
+      - approved
+      - rejected
+      type: string
+      description: |-
+        * `submitted_awaiting_hod` - submitted_awaiting_hod
+        * `approved` - approved
+        * `rejected` - rejected
     SubmitOfferLetter:
       type: object
       properties:
@@ -3698,6 +5379,155 @@ components:
           type: integer
       required:
       - document_id
+    TeachingAssistantAssignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_user_id:
+          type: integer
+          readOnly: true
+        ta_supervisor_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        course_code:
+          type: string
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        semester:
+          type: string
+          readOnly: true
+        year:
+          type: integer
+          readOnly: true
+          nullable: true
+        assigned_by_user_id:
+          type: integer
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - assigned_by_user_id
+      - course_code
+      - created_at
+      - department
+      - id
+      - is_active
+      - semester
+      - student_user_id
+      - ta_supervisor_user_id
+      - updated_at
+      - year
+    TeachingAssistantAssignmentCreate:
+      type: object
+      properties:
+        student_user_id:
+          type: integer
+        ta_supervisor_user_id:
+          type: integer
+          nullable: true
+        course_code:
+          type: string
+          default: ''
+          maxLength: 50
+        department:
+          type: string
+          maxLength: 100
+        semester:
+          type: string
+          default: ''
+          maxLength: 20
+        year:
+          type: integer
+          nullable: true
+      required:
+      - department
+      - student_user_id
+    ThesisSupervisorAssignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_user_id:
+          type: integer
+          readOnly: true
+        supervisor_user_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        assigned_by_user_id:
+          type: integer
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - assigned_by_user_id
+      - created_at
+      - department
+      - end_date
+      - id
+      - is_active
+      - start_date
+      - student_user_id
+      - supervisor_user_id
+      - updated_at
+    ThesisSupervisorAssignmentCreate:
+      type: object
+      properties:
+        student_user_id:
+          type: integer
+        supervisor_user_id:
+          type: integer
+        department:
+          type: string
+          maxLength: 100
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - department
+      - student_user_id
+      - supervisor_user_id
     TopicEnum:
       enum:
       - drive
