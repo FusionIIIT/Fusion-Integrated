@@ -308,8 +308,12 @@ the same address. So:
 - Create the data a journey needs through the UI, named with `uniqueName()`: parallel workers
   start in the same millisecond, so a timestamp alone collides. Never depend on `seed_demo` or on
   rows another spec made.
-- Never sign in with a wrong password as an account other specs use. The IAM counts failures per
-  username over an hour and locks the account — at fifteen, until an administrator unlocks it.
+- Never sign in with a wrong password as an account other specs use. The IAM locks a username
+  that keeps failing:
+  - It counts the failures since that username's last successful sign-in, within the last hour.
+  - Five lock it for a minute, eight for five minutes and ten for half an hour.
+  - Fifteen lock it until the failures fall out of that hour.
+
   Use a fresh unknown username, as `auth.spec.ts` does.
 - Act as a role with `actAs`. Reach screens through the sidebar the way a person would.
 - Select by role and label, never by CSS class or test id.
