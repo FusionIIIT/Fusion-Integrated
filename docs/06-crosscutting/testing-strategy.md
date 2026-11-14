@@ -310,9 +310,10 @@ the same address. So:
   rows another spec made.
 - Never sign in with a wrong password as an account other specs use. The IAM locks a username
   that keeps failing:
-  - It counts the failures since that username's last successful sign-in, within the last hour.
-  - Five lock it for a minute, eight for five minutes and ten for half an hour.
-  - Fifteen lock it until the failures fall out of that hour.
+  - It counts the failures since that username's last successful sign-in, within the last hour,
+    in any letter case.
+  - Five lock it for a minute, eight for five minutes, ten for half an hour and fifteen for an hour.
+  - To release a local account early, run the IAM's `manage.py unlock_login --user <name>`.
 
   Use a fresh unknown username, as `auth.spec.ts` does.
 - Act as a role with `actAs`. Reach screens through the sidebar the way a person would.
