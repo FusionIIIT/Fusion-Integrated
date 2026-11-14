@@ -273,9 +273,53 @@ Asserted per page: loading, empty and error are **three distinct** rendered outp
 
 ---
 
-## E2E — six journeys
+## E2E
 
-Playwright against a `docker compose` stack (postgres + 2× redis + iam + platform + shell preview).
+### The harness
+
+Playwright (`client/playwright.config.ts`, specs under `client/e2e/`) drives the real client against
+the real API and the real IAM, on a clean `fusion-dev.dump` restore. Nothing is mocked.
+
+**Run it locally.** Bring the stack up as Fusion-README's quickstart does: the IAM on 8001 and
+`make dev` on 8002. Then run `make e2e`. Playwright starts the client itself. Set `E2E_IAM_DIR` to
+your `Fusion_System_Administrator` checkout if it is not next to this repo, so global setup can
+grant the test accounts their roles. **CI** runs the same thing on every push and pull request
+(`.github/workflows/e2e.yml`): the dump, the IAM, this backend, then `npm run e2e`.
+
+| File | What it is |
+|---|---|
+| `e2e/accounts.ts` | The synthetic accounts the suite uses, each with the designations it needs |
+| `e2e/global-setup.ts` | Checks the stack is up, grants each account its designations through the IAM's `assign_role`, and saves one signed-in session per account to `e2e/.auth/` |
+| `e2e/support/test.ts` | The `test` to import. It fails a test on any uncaught page error, console error or 5xx, and provides `signedInAs`, `actAs`, `openModuleNav`, `signIn` and `uniqueName` |
+| `e2e/auth.spec.ts` | The reference for signing in: a wrong password, a student's role-gated sidebar, a keyboard-only login |
+| `e2e/placement/companies.spec.ts` | The reference for a module journey: an officer registers a company through the UI |
+
+**The login budget.** The IAM allows five logins a minute per caller, and every test signs in from
+the same address. So:
+
+- only specs that are about signing in use the login form
+- everything else starts already signed in, with `test.use(signedInAs("<account>"))`
+- sessions are reused across runs while they are valid
+- the sign-in helpers retry a refusal they know to be a throttle
+
+**Writing a module's specs.**
+
+- Put them in `client/e2e/<module_code>/`, one spec per live use case's main flow.
+- Create the data a journey needs through the UI, named with `uniqueName()`: parallel workers
+  start in the same millisecond, so a timestamp alone collides. Never depend on `seed_demo` or on
+  rows another spec made.
+- Never sign in with a wrong password as an account other specs use. The IAM counts failures per
+  username over an hour and locks the account — at fifteen, until an administrator unlocks it.
+  Use a fresh unknown username, as `auth.spec.ts` does.
+- Act as a role with `actAs`. Reach screens through the sidebar the way a person would.
+- Select by role and label, never by CSS class or test id.
+- No `waitForTimeout` and no `test.only` or `test.skip`.
+- A new role needs one new entry in `accounts.ts`. Nothing else outside your folder changes.
+
+### Six journeys
+
+The platform-level journeys the suite should hold. The sign-in half of the first already exists in
+`auth.spec.ts`.
 
 1. Login → the sidebar shows **exactly** the granted modules.
 2. Role switch → the sidebar changes; cached data is cleared.
@@ -328,8 +372,8 @@ legacy_column_parity       (hazard H2)
 grep guards                (Student.cpi · Spi · raw() outside core/db/sql/)
 ```
 
-Frontend: `turbo lint typecheck test build` → coverage gate → `size-limit` → Playwright (PR: chromium;
-nightly: all browsers + visual).
+Frontend: `turbo lint typecheck test build` → coverage gate → `size-limit` → Playwright (chromium, every
+push and pull request, `.github/workflows/e2e.yml`; nightly all-browser and visual runs are not set up yet).
 
 ---
 

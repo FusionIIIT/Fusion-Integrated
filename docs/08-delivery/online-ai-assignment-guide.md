@@ -62,7 +62,9 @@ git fetch upstream
 git checkout -b module/<module_code> upstream/main
 ```
 
-Log in and check that Placement Cell works before you start.
+Then install the browser the end-to-end tests use, once per machine:
+`cd client && npx playwright install chromium`. Log in and check that Placement Cell works,
+and that `make e2e` passes on `main`, before you start.
 
 ## Step 3: Pick your tools and tell your mentor
 
@@ -218,6 +220,9 @@ When the builder says the module is ready and the quality report
    cd client && npm ci && cd ..
    ```
 
+   Stop the builder's `make dev` and `npm run dev` before the round. The reviewer starts its
+   own from the clone, and refuses to run `make e2e` if something else is already serving.
+
    Turn off the tool's memory feature for the reviewer session. Move any global or
    parent-folder instruction file aside, such as `~/.claude/CLAUDE.md`,
    `~/.gemini/GEMINI.md`, `~/.codex/AGENTS.md` or `~/.config/opencode/AGENTS.md`. Clear
@@ -250,8 +255,9 @@ When the builder says the module is ready and the quality report
 prompt). If `upstream/main` moves after you get a 10/10, rebase again. Then:
 
 - If you resolved conflicts only in the registration lines and the regenerated files, and
-  changed nothing in your module's own folders, re-run the gates (`make check`, `make check-client`, both coverage runs). Record their
-  output in the pull request description. You do not need a new round.
+  changed nothing in your module's own folders, re-run the gates (`make check`,
+  `make check-client`, `make e2e`, both coverage runs). Record their output in the pull request
+  description. You do not need a new round.
 - Otherwise, run one more round.
 
 Six rules keep the loop honest:
@@ -280,7 +286,7 @@ Six rules keep the loop honest:
 
 The tool wrote the code, but you are the one submitting it. Before the pull request:
 
-- Run `make check` and `make check-client` yourself, and read the output.
+- Run `make check`, `make check-client` and `make e2e` yourself, and read the output.
 - Read the whole diff. You must be able to explain any file in it, because your mentor will
   ask.
 - Walk your module in the browser as each role and as the plain user.

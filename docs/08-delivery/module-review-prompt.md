@@ -138,6 +138,7 @@ if the quality report records its approval.
 ```bash
 make check
 make check-client
+make e2e
 .venv/bin/pytest modules/[module_code] --cov=modules/[module_code] --cov-branch \
   --cov-report=term-missing --cov-fail-under=90
 .venv/bin/pytest modules/[module_code] --cov=modules/[module_code]/domain --cov-branch \
@@ -152,12 +153,12 @@ git log --format=%B upstream/main..HEAD | grep -i -E 'co-authored|generated (wit
 git log --format='%an <%ae> | %cn <%ce>' upstream/main..HEAD | sort -u
 git diff --name-only upstream/main...HEAD | grep -i -E '(CLAUDE|GEMINI|AGENTS)\.md|\.cursorrules|\.aider|\.(cursor|claude|gemini|codex|opencode)/|opencode\.json|copilot-instructions|\.github/instructions/'
 grep -rn -i -E 'claude|gemini|copilot|chatgpt|codex|anthropic|openai|deepseek|generated (with|by)' \
-  modules/[module_code] client/src/modules/[module_code] docs/[NN]-[module_code]
+  modules/[module_code] client/src/modules/[module_code] client/e2e/[module_code] docs/[NN]-[module_code]
 grep -rn -E 'pytest\.mark\.(skip|xfail)|pytest\.skip\(|\.skip\(|\.only\(|\.todo\(' \
-  modules/[module_code] client/src/modules/[module_code]
+  modules/[module_code] client/src/modules/[module_code] client/e2e/[module_code]
 .venv/bin/python ops/docs/[module_code]_reference.py && git status --porcelain
 grep -rn -E 'TODO|FIXME|XXX|NotImplementedError|print\(|breakpoint\(|console\.log|@ts-ignore|eslint-disable|: any\b|as any\b|dangerouslySetInnerHTML|fields *= *.__all__|AllowAny|\.extra\(|\.raw\(|noqa|pragma: no cover' \
-  modules/[module_code] client/src/modules/[module_code]
+  modules/[module_code] client/src/modules/[module_code] client/e2e/[module_code]
 ```
 
 These must print nothing:
@@ -167,6 +168,13 @@ These must print nothing:
 - the skipped-test `grep`
 - the `git status` after the reference script The author and committer list
 must show only the student's own identity: no tool and no bot.
+
+`make e2e` must test your clone and nobody else's code. Before you start your own `make dev`
+and run it, check that nothing already listens on ports 8002 or 5173
+(`curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8002/api/v1/me` must fail to
+connect). If something does, stop and report only that. `make e2e` writes test data with
+unique names through the UI; that is expected. The rule against writes below is about your
+own replays.
 
 Also repeat the fresh install from `new-module-prompt.md` Step 7.8. Run it as one shell
 command, with `DB_NAME=fusion_integrated_fresh` on every line, from the `dropdb --if-exists`
@@ -253,6 +261,9 @@ For each dimension, check every item. Each item that fails becomes a finding.
   - `docker-compose.yml`, or the root `conftest.py` except for a method added to `FakeIam`
   - `client/vitest.config.ts`, `client/vite.config.ts`, `client/tsconfig.json`,
     `client/src/test/`, or the `scripts` in `client/package.json`
+  - `client/playwright.config.ts`, `client/e2e/global-setup.ts`, `client/e2e/support/`,
+    `client/e2e/tsconfig.json`, any spec outside `client/e2e/[module_code]/`, or any change
+    to `client/e2e/accounts.ts` beyond new entries
   - any `[tool.*]` section of `pyproject.toml`, or any new `.coveragerc`, `setup.cfg`,
     `pytest.ini` or `tox.ini`
   - `config/settings/test.py`, `SILENCED_SYSTEM_CHECKS`, or any entry added to
@@ -345,6 +356,16 @@ the code.
 
 ### 6. End-to-end behaviour
 
+- `client/e2e/[module_code]/` has a Playwright spec for every live use case's main flow, and
+  `make e2e` passes in your own run. Each spec does all of these:
+  - imports `test` from the harness
+  - starts with `signedInAs` and acts with `actAs`
+  - creates its own data through the UI with unique names
+  - selects by role and label
+  - has no `waitForTimeout`
+
+  A use case with no spec, or a spec that only loads a page without completing the flow, is
+  a Major finding.
 - `tests/test_journeys.py` covers every live use case's main flow, and every alternate flow
   the spec names. Each journey goes through HTTP only, and actors switch the way the spec
   says.

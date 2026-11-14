@@ -160,7 +160,10 @@ not fix it mid-task.
   `schedule.py`, `domain/state_machine.py`, `domain/clearance.py`, `selectors/scoping.py`,
   `services/offers.py`, `api/permissions.py`, and from `tests/` `test_privilege_escalation.py`,
   `test_recruiter_isolation.py`, `test_query_budgets.py` and `test_schedule.py`. List the
-  rest of the folder, and open another file only when a step needs it. `domain/clearance.py`
+  rest of the folder, and open another file only when a step needs it. For the browser tests,
+  read `client/e2e/support/test.ts`, `client/e2e/accounts.ts`, `client/e2e/auth.spec.ts`
+  and `client/e2e/placement/companies.spec.ts`, and the E2E section of
+  `docs/06-crosscutting/testing-strategy.md`. `domain/clearance.py`
   and `services/offers.py` show the choke-point pattern you will need even if your module has
   nothing like them.
 - Two things in Placement predate the rules below; do not copy them. Its `MODULE["code"]` is
@@ -492,7 +495,8 @@ Copy exactly what `placement` does, in each of these places, before writing any 
   `domain-is-pure-python`; and copy `placement-layers` as `[module_code]-layers`.
 - `conftest.py` — only if the real `IamClient` grows a method your module needs (Step 5.1).
 
-These lines are pre-approved, and so are the module's teaching-reference script under
+These lines are pre-approved, and so is one new entry in `client/e2e/accounts.ts` for each role
+your browser tests need. So are the module's teaching-reference script under
 `ops/docs/` (Step 7.6) and the regenerated files from Steps 7.1 and 7.2. Any other change
 outside your module's own folders is not — name it and wait (§9).
 
@@ -787,9 +791,17 @@ uncaught error, a 500, or a refusal that should not have happened is a defect. D
 with the keyboard alone: every control reachable by Tab and usable with Enter or Space. Record
 a table in the quality report — role, dump username, use case, result — and under each row
 paste the `runserver` log lines for its requests. If you cannot drive a browser yourself,
-mark the row "not run" and ask me to walk it; never fill in a result you did not see. If `client/e2e/` with
-Playwright exists on `main`, also write each journey as a spec there; do not add Playwright
-yourself — that is a shared-config change (§9).
+mark the row "not run" and ask me to walk it; never fill in a result you did not see.
+
+Then make each live use case's main flow a Playwright spec in `client/e2e/[module_code]/`, built
+on the harness exactly as the E2E section of `docs/06-crosscutting/testing-strategy.md` says:
+import `test` from `../support/test`; start signed in with `signedInAs`; act as the role with
+`actAs`; reach screens through the sidebar; create the data the journey needs through the UI
+with unique names; select by role and label. No `waitForTimeout`, no `test.only` or
+`test.skip`. Run `make e2e` with the IAM and `make dev` running; every spec must pass, and the
+walkthrough table names the spec that automates each row. Never change
+`client/playwright.config.ts`, `client/e2e/global-setup.ts`, `client/e2e/support/` or another
+folder's specs — those are the harness, and a change there is a shared-file change (§9).
 
 ---
 
@@ -1007,7 +1019,8 @@ Not "tests pass". All of it:
 13. Every page tested for its five states (Step 6.7), the module's chunk in `npm run build`
     output at or under 150 kB gzip, and the browser walkthrough done for every role and the
     plain user, with one flow done by keyboard alone, and no console error and no 500
-    (Step 6.9).
+    (Step 6.9). Every live use case's main flow is a Playwright spec in
+    `client/e2e/[module_code]/`, and `make e2e` passes.
 14. The security self-audit (Step 7.7) passes item by item, and the fresh install (Step 7.8)
     has been proved by doing it.
 15. The quality report (Step 7.9) exists and every number in it came from a run made after
