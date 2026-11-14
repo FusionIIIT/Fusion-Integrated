@@ -187,9 +187,15 @@ to take the role away:
 ./../venv/bin/python manage.py assign_role --user fac00005 --designation "Leave Approver" --remove
 ```
 
-This writes directly — it does not check whether `"Leave Approver"` is a
-"real" institute role, because for your own module's designations it never
-will be. An unrecognised designation is allowed by design (see
+This writes the grant into the ERP itself (`globals_holdsdesignation` in
+`fusionlab`), the same way the admin console's "update user roles" does, and
+then refreshes the IAM's copy at once. Because the ERP holds it, the role
+survives every later refresh and `sync_identity` run until you `--remove` it.
+A designation the ERP does not have yet, such as your invented
+`"Leave Approver"`, is created there first.
+
+It does not check whether `"Leave Approver"` is a "real" institute role,
+because for your own module's designations it never will be. An unrecognised designation is allowed by design (see
 `iam/rbac.py`'s own docstring): only the institute's existing office/rank
 roles (Dean Academic, HOD, and so on) are catalogued, and that catalogue is
 an audit list, not a gate. This also means **any basic kind can hold any role
