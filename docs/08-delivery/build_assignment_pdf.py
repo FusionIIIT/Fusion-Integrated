@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_JUSTIFY
 from reportlab.lib.pagesizes import A4
@@ -79,7 +81,7 @@ def step_heading(n, title):
 
 
 doc = SimpleDocTemplate(
-    "/Users/vikrant/Documents/Fusion/Fusion-Integrated/docs/08-delivery/student-assignment-guide.pdf",
+    str(Path(__file__).with_name("student-assignment-guide.pdf")),
     pagesize=A4, topMargin=2 * cm, bottomMargin=2 * cm, leftMargin=2 * cm, rightMargin=2 * cm,
     title="New Module Assignment — Student Guide",
 )
@@ -96,8 +98,9 @@ story.append(hr())
 story.append(para(
     "<b>This is real work on a real platform.</b> The module you are assigned will go into "
     "production if it clears review. There is no simplified version of the standard for a "
-    "student assignment — <font name='Courier'>definition-of-done.md</font> and §8 of the "
-    "prompt apply exactly as written.", body_style))
+    "student assignment — §8 of the prompt applies exactly as written. It already includes "
+    "what still applies from <font name='Courier'>definition-of-done.md</font>; where the two "
+    "differ, the prompt governs.", body_style))
 story.append(para(
     "You have to follow these steps in order. Do not skip ahead to Step 5 because you already "
     "know what the prompt says — Steps 1 through 4 are what make the prompt work for your "
@@ -152,15 +155,15 @@ story.append(para(
     "instead.", body_style))
 story.append(para("You have to confirm all of this before you go further:", body_style))
 story.extend(checklist([
-    "<font name='Courier'>docker compose up</font> brings up postgres, redis, the IAM and the platform, all healthy",
+    "<font name='Courier'>docker compose up -d</font> brings up Postgres and both Redis instances, healthy; the IAM (from <font name='Courier'>Fusion_System_Administrator</font>) and the platform (<font name='Courier'>make dev</font>) are running",
     "<font name='Courier'>cd client &amp;&amp; npm run dev</font> runs standalone — this is where you will demo your module",
     "You can log in with a test account and see <font name='Courier'>modules/placement</font> working, so you know the fixture is actually loaded",
 ]))
 
-story.append(step_heading(4, "Fill in the prompt's five blanks, before you paste anything"))
+story.append(step_heading(4, "Fill in the prompt's six blanks, before you paste anything"))
 story.append(para(
     "Open <font name='Courier'>new-module-prompt.md</font> but do not paste it yet. You have to "
-    "write down the five values that go in its §0 first, using what you got in Step 1:", body_style))
+    "write down the six values that go in it first, using what you got in Step 1:", body_style))
 table_data = [
     [Paragraph("Blank", cell_head_style), Paragraph("Your value", cell_head_style), Paragraph("Where it came from", cell_head_style)],
     [Paragraph("MODULE_NAME", code_style), Paragraph("you fill this in", cell_style), Paragraph("already given to you — Step 1", cell_style)],
@@ -168,6 +171,7 @@ table_data = [
     [Paragraph("ID_PREFIX", code_style), Paragraph("you fill this in", cell_style), Paragraph("you read it off the spec documents yourself, once you have the folder", cell_style)],
     [Paragraph("module_code", code_style), Paragraph("you fill this in", cell_style), Paragraph("already given to you — Step 1", cell_style)],
     [Paragraph("ENVIRONMENT", code_style), Paragraph("module-only", cell_style), Paragraph("fixed — this is the value for every student assignment", cell_style)],
+    [Paragraph("NN", code_style), Paragraph("you fill this in", cell_style), Paragraph("the number of your module's docs/ folder, from your mentor", cell_style)],
 ]
 tbl = Table(table_data, colWidths=[3.6 * cm, 2.9 * cm, PAGE_W - 6.5 * cm])
 tbl.setStyle(TableStyle([
@@ -180,14 +184,15 @@ tbl.setStyle(TableStyle([
 story.append(tbl)
 story.append(Spacer(1, 0.3 * cm))
 story.append(para(
-    "You have to fill these into the prompt text itself before you paste it. Do not paste the "
+    "You have to fill these into the prompt text itself, everywhere they appear, before you "
+    "paste it. Do not paste the "
     "prompt with the bracketed placeholders still in it and fill them in afterward — the "
     "AI session needs the real values from the first line.", body_style))
 
 story.append(step_heading(5, "Paste the prompt into a fresh AI session"))
 story.append(para(
     "You have to copy everything between <font name='Courier'>--- PROMPT BEGINS ---</font> and "
-    "<font name='Courier'>--- PROMPT ENDS ---</font>, with your five blanks already filled in, "
+    "<font name='Courier'>--- PROMPT ENDS ---</font>, with your six blanks already filled in, "
     "into a <b>brand-new</b> AI coding session — not one that already has other context in "
     "it. Do not summarise the prompt, do not trim it, do not paraphrase a section you think you "
     "already understand. The length is deliberate.", body_style))
@@ -195,7 +200,7 @@ story.append(para(
 story.append(step_heading(6, "Work through the prompt's own steps"))
 story.append(para(
     "From here the prompt drives itself — it is itself written as an explicit numbered "
-    "sequence (Step 0.1 through Step 7.6, covering read → questions → blueprint → "
+    "sequence (Step 0.1 through Step 10.4, covering read → questions → blueprint → "
     "backend → tests → frontend → ops). At each one, you have to <b>answer what it "
     "asks and get approval where it asks for approval</b> — you do not get to skip ahead "
     "because a later step looks easy.", body_style))
@@ -249,10 +254,9 @@ story.append(para(
 
 story.append(step_heading(10, "Self-check against the definition of done, before requesting review"))
 story.append(para(
-    "You have to pull the full checklist from the prompt's §8 and "
-    "<font name='Courier'>definition-of-done.md</font>'s “A pull request” and “A "
-    "module” sections, and run it on yourself before you ask anyone to review. The short "
-    "version:", body_style))
+    "You have to pull the full checklist from the prompt's §8, which already includes what "
+    "still applies from <font name='Courier'>definition-of-done.md</font>, and run it on "
+    "yourself before you ask anyone to review. The short version:", body_style))
 story.extend(checklist([
     "<font name='Courier'>make check</font> and <font name='Courier'>make check-client</font> both green — tsc finished, not just npm test",
     "Every live spec id is implemented and cited at its enforcement point, or listed as a known gap with a reason; no retired id cited anywhere",
