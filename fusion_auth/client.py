@@ -24,6 +24,15 @@ class IamUnavailable(Exception):
     """IAM could not be reached or answered with a server error."""
 
 
+class IamThrottled(Exception):
+    """IAM refused a login for too many attempts: its rate limit, or a locked account."""
+
+    def __init__(self, message: str, retry_after: int | None = None):
+        super().__init__(message)
+        self.message = message
+        self.retry_after = retry_after
+
+
 @dataclass(frozen=True)
 class IamSession:
     """The authenticated principal, as IAM describes it."""
@@ -163,18 +172,23 @@ class IamClient:
             raise IamUnavailable(f"IAM returned {r.status_code}")
         self.forget_session(auth_token)
 
-    def login(self, username: str, password: str) -> str | None:
+    def login(self, username: str, password: str,
+              client_ip: str | None = None) -> str | None:
         """Exchange credentials for a session token at the IAM.
 
         This service never checks a password itself. None means bad
         credentials — deliberately not distinguishing which half was wrong.
         """
+        # The IAM limits logins per caller; without this every user shares our address.
+        headers = {"X-Forwarded-For": client_ip} if client_ip else {}
         try:
             r = requests.post(self._url("iam/v1/auth/login"),
                               json={"username": username, "password": password},
-                              timeout=self.timeout)
+                              headers=headers, timeout=self.timeout)
         except requests.RequestException as exc:
             raise IamUnavailable(str(exc)) from exc
+        if r.status_code == 429:
+            raise IamThrottled(_detail(r), _retry_after(r))
         if r.status_code in (400, 401, 403):
             return None
         if r.status_code >= 500:
@@ -300,6 +314,18 @@ class IamClient:
 
 
 _client: IamClient | None = None
+
+
+def _detail(r: requests.Response) -> str:
+    try:
+        return str(r.json().get("detail") or "")
+    except ValueError:
+        return ""
+
+
+def _retry_after(r: requests.Response) -> int | None:
+    value = r.headers.get("Retry-After", "")
+    return int(value) if value.isdigit() else None
 
 
 def get_client() -> IamClient:

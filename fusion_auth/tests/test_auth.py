@@ -1,11 +1,12 @@
 """The identity boundary: this service trusts IAM and nothing else."""
 import pytest
+import responses
 from django.conf import settings
 from rest_framework.test import APIClient
 
 from conftest import make_session
 from core.api import csrf
-from fusion_auth.client import IamUnavailable
+from fusion_auth.client import IamClient, IamThrottled, IamUnavailable
 
 #: Read, not pinned: the name is configurable and must not
 #: collide with the console's.
@@ -107,6 +108,74 @@ def test_login_when_iam_is_down_is_503_not_401(stub_iam):
     # 503, not 401: the credentials may be fine and the problem is ours.
     assert r.status_code == 503
     assert r.json()["error"]["code"] == "iam_unavailable"
+
+
+def test_a_rate_limited_login_is_429_and_says_when_to_retry(stub_iam):
+    fake = stub_iam(None)
+    fake.login_error = IamThrottled("Request was throttled.", retry_after=37)
+    r = APIClient().post("/api/v1/auth/login",
+                         {"username": "a", "password": "b"}, format="json")
+    # Not 401: telling a user with the right password that it is wrong sends them to reset it.
+    assert r.status_code == 429
+    assert r["Retry-After"] == "37"
+    assert r.json()["error"]["code"] == "too_many_attempts"
+    assert "37 seconds" in r.json()["error"]["message"]
+    assert r.json()["error"]["request_id"]
+
+
+def test_a_locked_account_keeps_the_iams_own_message(stub_iam):
+    fake = stub_iam(None)
+    fake.login_error = IamThrottled("Too many failed attempts. Try again in 15 minute(s).")
+    r = APIClient().post("/api/v1/auth/login",
+                         {"username": "a", "password": "b"}, format="json")
+    assert r.status_code == 429
+    assert "Retry-After" not in r
+    assert r.json()["error"]["message"] == "Too many failed attempts. Try again in 15 minute(s)."
+
+
+def test_login_tells_the_iam_who_is_really_asking(stub_iam):
+    fake = stub_iam(make_session())
+    APIClient().post("/api/v1/auth/login", {"username": "a", "password": "b"},
+                     format="json", HTTP_X_FORWARDED_FOR="6.6.6.6, 203.0.113.9")
+    # The entry our own proxy appended, not the one the caller wrote first.
+    assert fake.login_client_ip == "203.0.113.9"
+
+
+def test_login_without_a_proxy_header_sends_the_peer_address(stub_iam):
+    fake = stub_iam(make_session())
+    APIClient().post("/api/v1/auth/login", {"username": "a", "password": "b"},
+                     format="json", REMOTE_ADDR="198.51.100.4")
+    assert fake.login_client_ip == "198.51.100.4"
+
+
+LOGIN_URL = f"{settings.IAM_BASE_URL.rstrip('/')}{settings.IAM_API_PREFIX.rstrip('/')}/iam/v1/auth/login"
+
+
+@responses.activate
+def test_client_reports_the_iams_rate_limit_and_forwards_the_address():
+    responses.add(responses.POST, LOGIN_URL, status=429, headers={"Retry-After": "37"},
+                  json={"detail": "Request was throttled. Expected available in 37 seconds."})
+    with pytest.raises(IamThrottled) as raised:
+        IamClient().login("a", "b", client_ip="203.0.113.9")
+    assert raised.value.retry_after == 37
+    assert responses.calls[0].request.headers["X-Forwarded-For"] == "203.0.113.9"
+
+
+@responses.activate
+def test_client_reports_a_locked_account_with_the_iams_message():
+    responses.add(responses.POST, LOGIN_URL, status=429,
+                  json={"detail": "Too many failed attempts. Contact the office to unlock."})
+    with pytest.raises(IamThrottled) as raised:
+        IamClient().login("a", "b")
+    assert raised.value.retry_after is None
+    assert raised.value.message == "Too many failed attempts. Contact the office to unlock."
+    assert "X-Forwarded-For" not in responses.calls[0].request.headers
+
+
+@responses.activate
+def test_client_still_treats_a_401_as_bad_credentials():
+    responses.add(responses.POST, LOGIN_URL, status=401, json={"detail": "Invalid."})
+    assert IamClient().login("a", "b") is None
 
 
 def test_logout_clears_the_cookie(stub_iam):
