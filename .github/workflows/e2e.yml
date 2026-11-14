@@ -104,7 +104,9 @@ jobs:
           .venv/bin/python manage.py migrate
           .venv/bin/python manage.py seed_modules
           .venv/bin/python manage.py permission_manifest
-          (cd iam/Backend/backend && ../venv/bin/python manage.py seed_iam_permissions \
+          # This step's settings module and DB_* would override the IAM's own .env.
+          (cd iam/Backend/backend && env -u DJANGO_SETTINGS_MODULE -u DB_NAME -u DB_USER \
+            -u DB_PASSWORD -u DB_HOST ../venv/bin/python manage.py seed_iam_permissions \
             --manifest "$GITHUB_WORKSPACE/registry/permissions.json")
           nohup .venv/bin/python manage.py runserver 127.0.0.1:8002 --noreload \
             > "$RUNNER_TEMP/backend.log" 2>&1 &
