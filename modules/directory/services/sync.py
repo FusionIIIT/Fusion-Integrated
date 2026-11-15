@@ -20,10 +20,14 @@ def ensure_users_cached(user_ids: Iterable[int]) -> int:
     ids = {int(i) for i in user_ids if i is not None}
     if not ids:
         return 0
-    fresh_since = timezone.now() - timedelta(seconds=settings.DIRECTORY_MAX_AGE_SECONDS)
-    # Caching on first sight alone pins a person to the day they were first read.
-    fresh = set(UserRef.objects.filter(user_id__in=ids, synced_at__gte=fresh_since)
-                .values_list("user_id", flat=True))
+    max_age = settings.DIRECTORY_MAX_AGE_SECONDS
+    if max_age <= 0:
+        fresh = set()
+    else:
+        fresh_since = timezone.now() - timedelta(seconds=max_age)
+        # Caching on first sight alone pins a person to the day they were first read.
+        fresh = set(UserRef.objects.filter(user_id__in=ids, synced_at__gte=fresh_since)
+                    .values_list("user_id", flat=True))
     stale = ids - fresh
     if not stale:
         return 0

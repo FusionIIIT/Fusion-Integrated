@@ -1,0 +1,175 @@
+SIM103 Return the negated condition directly
+  --> phase2_evidence\phase1-source\modules\elm\domain\rules.py:55:5
+   |
+53 |       if end < other_start or other_end < start:
+54 |           return False
+55 | /     if (category == "CL" and start == end == other_start == other_end
+56 | |             and half_day_part and other_half_day_part
+57 | |             and half_day_part != other_half_day_part):
+58 | |         return False
+59 | |     return True
+   | |_______________^
+help: Inline condition
+   |
+54 |         return False
+   -     if (category == "CL" and start == end == other_start == other_end
+   -             and half_day_part and other_half_day_part
+   -             and half_day_part != other_half_day_part):
+   -         return False
+   -     return True
+55 +     return not (category == "CL" and start == end == other_start == other_end and half_day_part and other_half_day_part and half_day_part != other_half_day_part)
+56 |
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+DJ008 Model does not define `__str__` method
+   --> phase2_evidence\phase1-source\modules\elm\models.py:292:7
+    |
+292 | class RequestEvent(models.Model):
+    |       ^^^^^^^^^^^^
+293 |     request = models.ForeignKey(LeaveRequest, on_delete=models.CASCADE,
+294 |                                 related_name="events")
+    |
+
+DJ008 Model does not define `__str__` method
+   --> phase2_evidence\phase1-source\modules\elm\models.py:307:7
+    |
+307 | class YearEndRun(models.Model):
+    |       ^^^^^^^^^^
+308 |     year = models.PositiveSmallIntegerField(unique=True)
+309 |     started_at = models.DateTimeField(auto_now_add=True)
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> phase2_evidence\phase1-source\modules\elm\services\leave.py:2:1
+   |
+ 1 |   """Transactional leave application, routing and decision services."""
+ 2 | / from __future__ import annotations
+ 3 | |
+ 4 | | from datetime import date, timedelta
+ 5 | | from decimal import Decimal
+ 6 | |
+ 7 | | from django.db import transaction
+ 8 | | from django.db.models import F, Q
+ 9 | | from django.utils import timezone
+10 | |
+11 | | from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedError
+12 | | from modules.elm.domain.rules import (
+13 | |     LEAVE_TYPES,
+14 | |     annual_entitlement,
+15 | |     count_leave_days,
+16 | |     overlaps,
+17 | | )
+18 | | from modules.elm.models import (
+19 | |     ApprovalRoute,
+20 | |     EmployeeProfile,
+21 | |     Holiday,
+22 | |     HolidayCalendar,
+23 | |     LeaveAccount,
+24 | |     LeavePolicy,
+25 | |     LeaveRequest,
+26 | |     LeaveTransaction,
+27 | |     RequestEvent,
+28 | |     VacationPeriod,
+29 | |     WorkflowTask,
+30 | | )
+   | |_^
+31 |
+32 |   ACTIVE_REQUEST_STATUSES = ("substitute_pending", "pending", "approved")
+   |
+help: Organize imports
+   |
+9  | from django.utils import timezone
+   -
+   - from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedError
+10 | from modules.elm.domain.rules import (
+--------------------------------------------------------------------------------
+29 |
+30 + from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedError
+31 +
+32 | ACTIVE_REQUEST_STATUSES = ("substitute_pending", "pending", "approved")
+   |
+
+F401 [*] `core.api.exceptions.PermissionDeniedError` imported but unused
+  --> phase2_evidence\phase1-source\modules\elm\services\leave.py:11:63
+   |
+ 9 | from django.utils import timezone
+10 |
+11 | from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedError
+   |                                                               ^^^^^^^^^^^^^^^^^^^^^
+12 | from modules.elm.domain.rules import (
+13 |     LEAVE_TYPES,
+   |
+help: Remove unused import: `core.api.exceptions.PermissionDeniedError`
+   |
+10 |
+   - from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedError
+11 + from core.api.exceptions import ConflictError, NotFoundError
+12 | from modules.elm.domain.rules import (
+   |
+
+F401 [*] `modules.elm.models.HolidayCalendar` imported but unused
+  --> phase2_evidence\phase1-source\modules\elm\services\leave.py:22:5
+   |
+20 |     EmployeeProfile,
+21 |     Holiday,
+22 |     HolidayCalendar,
+   |     ^^^^^^^^^^^^^^^
+23 |     LeaveAccount,
+24 |     LeavePolicy,
+   |
+help: Remove unused import: `modules.elm.models.HolidayCalendar`
+   |
+21 |     Holiday,
+   -     HolidayCalendar,
+22 |     LeaveAccount,
+   |
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+   --> phase2_evidence\phase1-source\modules\elm\services\leave.py:121:5
+    |
+120 |   def _check_category_calendar(category: str, start: date, end: date):
+121 | /     if category == "RH":
+122 | |         if start != end or start not in _published_holidays(start.year, kind="restricted"):
+    | |___________________________________________________________________________________________^
+123 |               raise ConflictError(
+124 |                   "RH must match one Restricted Holiday in the effective published calendar.",
+    |
+help: Combine `if` statements using `and`
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> phase2_evidence\phase1-source\modules\elm\services\year_end.py:2:1
+   |
+ 1 |   """Idempotent calendar-year leave-account closure and opening."""
+ 2 | / from decimal import Decimal
+ 3 | |
+ 4 | | from django.db import transaction
+ 5 | | from django.db.models import F
+ 6 | | from django.utils import timezone
+ 7 | |
+ 8 | | from core.api.exceptions import ConflictError
+ 9 | | from modules.elm.domain.rules import LEAVE_TYPES, year_end_credit
+10 | | from modules.elm.models import (
+11 | |     EmployeeProfile,
+12 | |     LeaveAccount,
+13 | |     LeaveTransaction,
+14 | |     YearEndRun,
+15 | | )
+16 | | from modules.elm.services.leave import account_for
+   | |__________________________________________________^
+help: Organize imports
+   |
+6  | from django.utils import timezone
+   -
+   - from core.api.exceptions import ConflictError
+7  | from modules.elm.domain.rules import LEAVE_TYPES, year_end_credit
+--------------------------------------------------------------------------------
+15 |
+16 + from core.api.exceptions import ConflictError
+17 +
+18 |
+   |
+
+Found 8 errors.
+[*] 4 fixable with `--fix` (1 unsafe fix available with `--fix --unsafe-fixes`).
+exit_code=1

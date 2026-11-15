@@ -1,0 +1,33 @@
+.....................F............                                       [100%]
+================================== FAILURES ===================================
+___ test_offline_leave_rejects_duplicate_reference_and_insufficient_balance ___
+
+employee = <EmployeeProfile: EmployeeProfile object (100)>
+
+    def test_offline_leave_rejects_duplicate_reference_and_insufficient_balance(employee):
+        today = date.today()
+        workdays = [
+            today - timedelta(days=offset)
+            for offset in range(1, 15)
+            if (today - timedelta(days=offset)).weekday() < 5
+        ][:2]
+        params = {
+            "applicant_user_id": 100, "actor_id": 900, "category": "CL",
+            "starts_on": min(workdays), "ends_on": max(workdays),
+            "purpose": "Offline leave",
+            "offline_reference": "ORD-2026-002", "offline_reason": "ELM outage",
+            "offline_sanctioned_on": today - timedelta(days=10),
+        }
+        leave.record_offline_leave(**params)
+        with pytest.raises(ConflictError) as duplicate:
+            leave.record_offline_leave(**params)
+>       assert duplicate.value.code == "duplicate_offline_reference"
+E       AssertionError: assert 'leave_overlap' == 'duplicate_offline_reference'
+E         
+E         - duplicate_offline_reference
+E         + leave_overlap
+
+modules\elm\tests\test_services.py:238: AssertionError
+=========================== short test summary info ===========================
+FAILED modules/elm/tests/test_services.py::test_offline_leave_rejects_duplicate_reference_and_insufficient_balance
+exit_code=1
