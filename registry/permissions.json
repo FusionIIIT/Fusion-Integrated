@@ -34,6 +34,236 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "oap": {
+      "grants": {
+        "acadadmin": [
+          "oap.assistantship.disburse",
+          "oap.bonafide.decide",
+          "oap.nodues.finalize",
+          "oap.notification.view"
+        ],
+        "clearance_authority": [
+          "oap.nodues.verify",
+          "oap.notification.view"
+        ],
+        "dept_admin": [
+          "oap.assignment.manage",
+          "oap.assistantship.dept_review",
+          "oap.notification.view",
+          "oap.seminar.schedule"
+        ],
+        "faculty": [
+          "oap.assistantship.verify_ta",
+          "oap.assistantship.verify_thesis",
+          "oap.notification.view",
+          "oap.seminar.view"
+        ],
+        "hod": [
+          "oap.assistantship.decide",
+          "oap.leave.decide",
+          "oap.leave.view_dept",
+          "oap.notification.view",
+          "oap.seminar.view"
+        ],
+        "student": [
+          "oap.assistantship.submit",
+          "oap.assistantship.view",
+          "oap.bonafide.download",
+          "oap.bonafide.request",
+          "oap.bonafide.view",
+          "oap.leave.apply",
+          "oap.leave.view",
+          "oap.nodues.download",
+          "oap.nodues.initiate",
+          "oap.nodues.view",
+          "oap.notification.view",
+          "oap.seminar.request",
+          "oap.seminar.view"
+        ]
+      },
+      "module_grants": [
+        "acadadmin",
+        "clearance_authority",
+        "dept_admin",
+        "faculty",
+        "hod",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/oap",
+        "icon": "GraduationCap",
+        "items": [
+          {
+            "code": "oap.leave",
+            "icon": "CalendarBlank",
+            "label": "Leave Applications",
+            "required_permission": "oap.leave.view",
+            "sort_order": 10,
+            "to": "/oap/leave"
+          },
+          {
+            "code": "oap.bonafide",
+            "icon": "FileText",
+            "label": "Bonafide Certificate",
+            "required_permission": "oap.bonafide.view",
+            "sort_order": 20,
+            "to": "/oap/bonafide"
+          },
+          {
+            "code": "oap.nodues",
+            "icon": "CheckCircle",
+            "label": "No-Dues Clearance",
+            "required_permission": "oap.nodues.view",
+            "sort_order": 30,
+            "to": "/oap/nodues"
+          },
+          {
+            "code": "oap.assistantship",
+            "icon": "CurrencyInr",
+            "label": "PG Assistantship",
+            "required_permission": "oap.assistantship.view",
+            "sort_order": 40,
+            "to": "/oap/assistantship"
+          },
+          {
+            "code": "oap.seminars",
+            "icon": "ChalkboardTeacher",
+            "label": "Graduate Seminars",
+            "required_permission": "oap.seminar.view",
+            "sort_order": 50,
+            "to": "/oap/seminars"
+          },
+          {
+            "code": "oap.assignments",
+            "icon": "Users",
+            "label": "Supervisor & TA Assignments",
+            "required_permission": "oap.assignment.manage",
+            "sort_order": 60,
+            "to": "/oap/assignments"
+          },
+          {
+            "code": "oap.clearance",
+            "icon": "Stamp",
+            "label": "Authority Clearances",
+            "required_permission": "oap.nodues.verify",
+            "sort_order": 70,
+            "to": "/oap/clearances"
+          }
+        ],
+        "label": "Other Academic Procedures",
+        "nav_section": "Academics",
+        "sort_order": 25,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "oap.leave.apply",
+          "label": "Apply for student leave"
+        },
+        {
+          "code": "oap.leave.view",
+          "label": "View own student leave applications"
+        },
+        {
+          "code": "oap.bonafide.request",
+          "label": "Request a bonafide certificate"
+        },
+        {
+          "code": "oap.bonafide.view",
+          "label": "View own bonafide certificate requests"
+        },
+        {
+          "code": "oap.bonafide.download",
+          "label": "Download approved bonafide certificate"
+        },
+        {
+          "code": "oap.nodues.initiate",
+          "label": "Initiate no-dues clearance request"
+        },
+        {
+          "code": "oap.nodues.view",
+          "label": "Track no-dues clearance progress"
+        },
+        {
+          "code": "oap.nodues.download",
+          "label": "Download finalized no-dues certificate"
+        },
+        {
+          "code": "oap.assistantship.submit",
+          "label": "Submit PG assistantship claim"
+        },
+        {
+          "code": "oap.assistantship.view",
+          "label": "View and track own assistantship claims"
+        },
+        {
+          "code": "oap.seminar.request",
+          "label": "Request graduate seminar scheduling"
+        },
+        {
+          "code": "oap.seminar.view",
+          "label": "View graduate seminar schedules"
+        },
+        {
+          "code": "oap.seminar.view",
+          "label": "View graduate seminar schedules as faculty"
+        },
+        {
+          "code": "oap.assistantship.verify_thesis",
+          "label": "Verify assistantship claim as Thesis Supervisor"
+        },
+        {
+          "code": "oap.assistantship.verify_ta",
+          "label": "Verify assistantship claim as TA Supervisor"
+        },
+        {
+          "code": "oap.leave.decide",
+          "label": "Approve or reject student leave as HoD"
+        },
+        {
+          "code": "oap.leave.view_dept",
+          "label": "View department student leave applications as HoD"
+        },
+        {
+          "code": "oap.assistantship.decide",
+          "label": "Approve or reject assistantship claims as HoD"
+        },
+        {
+          "code": "oap.bonafide.decide",
+          "label": "Verify and decide bonafide requests as Academic Administrator"
+        },
+        {
+          "code": "oap.nodues.finalize",
+          "label": "Finalize no-dues clearance as Academic Administrator"
+        },
+        {
+          "code": "oap.assistantship.disburse",
+          "label": "Process stipend disbursement as Academic Administrator"
+        },
+        {
+          "code": "oap.assignment.manage",
+          "label": "Record Thesis and TA assignments as Department Administrator"
+        },
+        {
+          "code": "oap.seminar.schedule",
+          "label": "Schedule graduate seminars as Department Administrator"
+        },
+        {
+          "code": "oap.assistantship.dept_review",
+          "label": "Review and forward assistantship claims as Department Administrator"
+        },
+        {
+          "code": "oap.nodues.verify",
+          "label": "Record authority clearance for student no-dues request"
+        },
+        {
+          "code": "oap.notification.view",
+          "label": "View OAP notifications and alerts"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

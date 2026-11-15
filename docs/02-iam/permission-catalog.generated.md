@@ -13,6 +13,37 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `oap`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `oap.leave.apply` | Apply for student leave | `student` |
+| `oap.leave.view` | View own student leave applications | `student` |
+| `oap.bonafide.request` | Request a bonafide certificate | `student` |
+| `oap.bonafide.view` | View own bonafide certificate requests | `student` |
+| `oap.bonafide.download` | Download approved bonafide certificate | `student` |
+| `oap.nodues.initiate` | Initiate no-dues clearance request | `student` |
+| `oap.nodues.view` | Track no-dues clearance progress | `student` |
+| `oap.nodues.download` | Download finalized no-dues certificate | `student` |
+| `oap.assistantship.submit` | Submit PG assistantship claim | `student` |
+| `oap.assistantship.view` | View and track own assistantship claims | `student` |
+| `oap.seminar.request` | Request graduate seminar scheduling | `student` |
+| `oap.seminar.view` | View graduate seminar schedules | `faculty`, `hod`, `student` |
+| `oap.seminar.view` | View graduate seminar schedules as faculty | `faculty`, `hod`, `student` |
+| `oap.assistantship.verify_thesis` | Verify assistantship claim as Thesis Supervisor | `faculty` |
+| `oap.assistantship.verify_ta` | Verify assistantship claim as TA Supervisor | `faculty` |
+| `oap.leave.decide` | Approve or reject student leave as HoD | `hod` |
+| `oap.leave.view_dept` | View department student leave applications as HoD | `hod` |
+| `oap.assistantship.decide` | Approve or reject assistantship claims as HoD | `hod` |
+| `oap.bonafide.decide` | Verify and decide bonafide requests as Academic Administrator | `acadadmin` |
+| `oap.nodues.finalize` | Finalize no-dues clearance as Academic Administrator | `acadadmin` |
+| `oap.assistantship.disburse` | Process stipend disbursement as Academic Administrator | `acadadmin` |
+| `oap.assignment.manage` | Record Thesis and TA assignments as Department Administrator | `dept_admin` |
+| `oap.seminar.schedule` | Schedule graduate seminars as Department Administrator | `dept_admin` |
+| `oap.assistantship.dept_review` | Review and forward assistantship claims as Department Administrator | `dept_admin` |
+| `oap.nodues.verify` | Record authority clearance for student no-dues request | `clearance_authority` |
+| `oap.notification.view` | View OAP notifications and alerts | `acadadmin`, `clearance_authority`, `dept_admin`, `faculty`, `hod`, `student` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
