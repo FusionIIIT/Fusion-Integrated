@@ -1674,6 +1674,1471 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/vms/alerts/:
+    get:
+      operationId: v1_vms_alerts_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedGateAlertList'
+          description: ''
+  /api/v1/vms/alerts/{id}/:
+    get:
+      operationId: v1_vms_alerts_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this alert.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GateAlert'
+          description: ''
+  /api/v1/vms/blacklist/:
+    get:
+      operationId: v1_vms_blacklist_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBlacklistRecordList'
+          description: ''
+    post:
+      operationId: v1_vms_blacklist_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlacklistRecord'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BlacklistRecord'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BlacklistRecord'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlacklistRecord'
+          description: ''
+  /api/v1/vms/blacklist/{id}/:
+    get:
+      operationId: v1_vms_blacklist_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this blacklist record.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlacklistRecord'
+          description: ''
+    put:
+      operationId: v1_vms_blacklist_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this blacklist record.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlacklistRecord'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BlacklistRecord'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BlacklistRecord'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlacklistRecord'
+          description: ''
+    patch:
+      operationId: v1_vms_blacklist_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this blacklist record.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBlacklistRecord'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBlacklistRecord'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBlacklistRecord'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlacklistRecord'
+          description: ''
+    delete:
+      operationId: v1_vms_blacklist_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this blacklist record.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/vms/campus-zones/:
+    get:
+      operationId: v1_vms_campus_zones_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCampusZoneList'
+          description: ''
+    post:
+      operationId: v1_vms_campus_zones_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CampusZone'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CampusZone'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CampusZone'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampusZone'
+          description: ''
+  /api/v1/vms/campus-zones/{id}/:
+    get:
+      operationId: v1_vms_campus_zones_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this zone.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampusZone'
+          description: ''
+    put:
+      operationId: v1_vms_campus_zones_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this zone.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CampusZone'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CampusZone'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CampusZone'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampusZone'
+          description: ''
+    patch:
+      operationId: v1_vms_campus_zones_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this zone.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCampusZone'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCampusZone'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCampusZone'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampusZone'
+          description: ''
+    delete:
+      operationId: v1_vms_campus_zones_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this zone.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/vms/events/upload/:
+    post:
+      operationId: v1_vms_events_upload_create
+      description: Bulk event upload and mass pass provisioning (BR-021).
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkEventUpload'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BulkEventUpload'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BulkEventUpload'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VisitPass'
+          description: ''
+  /api/v1/vms/gate/check-in/:
+    post:
+      operationId: v1_vms_gate_check_in_create
+      description: 'Gate terminal operations: scanning, check-in, check-out, and walk-in
+        passes.'
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GateCheckIn'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GateCheckIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GateCheckIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitPass'
+          description: ''
+  /api/v1/vms/gate/check-out/:
+    post:
+      operationId: v1_vms_gate_check_out_create
+      description: 'Gate terminal operations: scanning, check-in, check-out, and walk-in
+        passes.'
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GateCheckOut'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GateCheckOut'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GateCheckOut'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitPass'
+          description: ''
+  /api/v1/vms/gate/walk-in/:
+    post:
+      operationId: v1_vms_gate_walk_in_create
+      description: Walk-in on-the-spot registration and immediate pass issuance (BR-032).
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitorRegistration'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VisitorRegistration'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VisitorRegistration'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitPass'
+          description: ''
+  /api/v1/vms/muster/:
+    get:
+      operationId: v1_vms_muster_list
+      description: Emergency evacuation muster initiation, roll-call, and final reporting.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEmergencyMusterList'
+          description: ''
+    post:
+      operationId: v1_vms_muster_create
+      description: Emergency evacuation muster initiation, roll-call, and final reporting.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmergencyMuster'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmergencyMuster'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmergencyMuster'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmergencyMuster'
+          description: ''
+  /api/v1/vms/muster/{id}/:
+    get:
+      operationId: v1_vms_muster_retrieve
+      description: Emergency evacuation muster initiation, roll-call, and final reporting.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this muster.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmergencyMuster'
+          description: ''
+    put:
+      operationId: v1_vms_muster_update
+      description: Emergency evacuation muster initiation, roll-call, and final reporting.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this muster.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmergencyMuster'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmergencyMuster'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmergencyMuster'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmergencyMuster'
+          description: ''
+    patch:
+      operationId: v1_vms_muster_partial_update
+      description: Emergency evacuation muster initiation, roll-call, and final reporting.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this muster.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEmergencyMuster'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEmergencyMuster'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEmergencyMuster'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmergencyMuster'
+          description: ''
+    delete:
+      operationId: v1_vms_muster_destroy
+      description: Emergency evacuation muster initiation, roll-call, and final reporting.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this muster.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/vms/muster/{id}/audit-evictions/:
+    post:
+      operationId: v1_vms_muster_audit_evictions_create
+      description: 'Enforces BR-045: >15 minute muster alerts.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this muster.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmergencyMuster'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmergencyMuster'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmergencyMuster'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/vms/muster/{id}/finalize/:
+    post:
+      operationId: v1_vms_muster_finalize_create
+      description: Emergency evacuation muster initiation, roll-call, and final reporting.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this muster.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmergencyMuster'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmergencyMuster'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmergencyMuster'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmergencyMuster'
+          description: ''
+  /api/v1/vms/muster/{id}/mark-roll-call/:
+    post:
+      operationId: v1_vms_muster_mark_roll_call_create
+      description: Emergency evacuation muster initiation, roll-call, and final reporting.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this muster.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MusterRollCall'
+          description: ''
+  /api/v1/vms/muster/{id}/roster/:
+    get:
+      operationId: v1_vms_muster_roster_list
+      description: Emergency evacuation muster initiation, roll-call, and final reporting.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this muster.
+        required: true
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMusterRollCallList'
+          description: ''
+  /api/v1/vms/passes/:
+    get:
+      operationId: v1_vms_passes_list
+      description: Pass inspection and active credential lookups.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVisitPassList'
+          description: ''
+  /api/v1/vms/passes/{id}/:
+    get:
+      operationId: v1_vms_passes_retrieve
+      description: Pass inspection and active credential lookups.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this pass.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitPass'
+          description: ''
+  /api/v1/vms/passes/by-qr/:
+    get:
+      operationId: v1_vms_passes_by_qr_retrieve
+      description: Pass inspection and active credential lookups.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitPass'
+          description: ''
+  /api/v1/vms/requests/:
+    get:
+      operationId: v1_vms_requests_list
+      description: Host approval lifecycle for visit requests.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVisitRequestList'
+          description: ''
+    post:
+      operationId: v1_vms_requests_create
+      description: Host approval lifecycle for visit requests.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VisitRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VisitRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitRequest'
+          description: ''
+  /api/v1/vms/requests/{id}/:
+    get:
+      operationId: v1_vms_requests_retrieve
+      description: Host approval lifecycle for visit requests.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this visit request.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitRequest'
+          description: ''
+    put:
+      operationId: v1_vms_requests_update
+      description: Host approval lifecycle for visit requests.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this visit request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VisitRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VisitRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitRequest'
+          description: ''
+    patch:
+      operationId: v1_vms_requests_partial_update
+      description: Host approval lifecycle for visit requests.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this visit request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedVisitRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedVisitRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedVisitRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitRequest'
+          description: ''
+    delete:
+      operationId: v1_vms_requests_destroy
+      description: Host approval lifecycle for visit requests.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this visit request.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/vms/requests/{id}/decide/:
+    post:
+      operationId: v1_vms_requests_decide_create
+      description: Host approval lifecycle for visit requests.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this visit request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitRequestDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VisitRequestDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VisitRequestDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitRequest'
+          description: ''
+  /api/v1/vms/requests/{id}/terminate/:
+    post:
+      operationId: v1_vms_requests_terminate_create
+      description: Host approval lifecycle for visit requests.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this visit request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VisitRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VisitRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitRequest'
+          description: ''
+  /api/v1/vms/requests/pending-approvals/:
+    get:
+      operationId: v1_vms_requests_pending_approvals_list
+      description: Host approval lifecycle for visit requests.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVisitRequestList'
+          description: ''
+  /api/v1/vms/safelist/:
+    get:
+      operationId: v1_vms_safelist_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSafeListRecordList'
+          description: ''
+    post:
+      operationId: v1_vms_safelist_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SafeListRecord'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SafeListRecord'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SafeListRecord'
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SafeListRecord'
+          description: ''
+  /api/v1/vms/safelist/{id}/:
+    get:
+      operationId: v1_vms_safelist_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this safe list record.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SafeListRecord'
+          description: ''
+    put:
+      operationId: v1_vms_safelist_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this safe list record.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SafeListRecord'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SafeListRecord'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SafeListRecord'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SafeListRecord'
+          description: ''
+    patch:
+      operationId: v1_vms_safelist_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this safe list record.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSafeListRecord'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSafeListRecord'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSafeListRecord'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SafeListRecord'
+          description: ''
+    delete:
+      operationId: v1_vms_safelist_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this safe list record.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/vms/visitors/:
+    get:
+      operationId: v1_vms_visitors_list
+      description: Visitor profile management and privacy-preserving queries.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVisitorList'
+          description: ''
+    post:
+      operationId: v1_vms_visitors_create
+      description: Visitor profile management and privacy-preserving queries.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Visitor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Visitor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Visitor'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visitor'
+          description: ''
+  /api/v1/vms/visitors/{id}/:
+    get:
+      operationId: v1_vms_visitors_retrieve
+      description: Visitor profile management and privacy-preserving queries.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this visitor.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visitor'
+          description: ''
+    put:
+      operationId: v1_vms_visitors_update
+      description: Visitor profile management and privacy-preserving queries.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this visitor.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Visitor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Visitor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Visitor'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visitor'
+          description: ''
+    patch:
+      operationId: v1_vms_visitors_partial_update
+      description: Visitor profile management and privacy-preserving queries.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this visitor.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedVisitor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedVisitor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedVisitor'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visitor'
+          description: ''
+    delete:
+      operationId: v1_vms_visitors_destroy
+      description: Visitor profile management and privacy-preserving queries.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this visitor.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/vms/visitors/{id}/anonymized/:
+    get:
+      operationId: v1_vms_visitors_anonymized_retrieve
+      description: Visitor profile management and privacy-preserving queries.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this visitor.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visitor'
+          description: ''
+  /api/v1/vms/zones/elevate/:
+    post:
+      operationId: v1_vms_zones_elevate_create
+      description: Zone access scanning and elevation controls.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneElevation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ZoneElevation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ZoneElevation'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitPass'
+          description: ''
+  /api/v1/vms/zones/validate/:
+    post:
+      operationId: v1_vms_zones_validate_create
+      description: Zone access scanning and elevation controls.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneAccessCheck'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ZoneAccessCheck'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ZoneAccessCheck'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
 components:
   schemas:
     AcademicDirectory:
@@ -1774,6 +3239,20 @@ components:
           minItems: 1
       required:
       - application_ids
+    AlertTypeEnum:
+      enum:
+      - BLACKLIST_HIT
+      - ZONE_VIOLATION
+      - GATE_VALIDATION_FAILURE
+      - SUSPICIOUS_GATE_CASE
+      - EMERGENCY_MUSTER
+      type: string
+      description: |-
+        * `BLACKLIST_HIT` - Blacklist hit
+        * `ZONE_VIOLATION` - Zone violation
+        * `GATE_VALIDATION_FAILURE` - Gate validation failure
+        * `SUSPICIOUS_GATE_CASE` - Suspicious gate case
+        * `EMERGENCY_MUSTER` - Emergency muster
     Announcement:
       type: object
       properties:
@@ -1993,6 +3472,71 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BlacklistRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        full_name:
+          type: string
+          maxLength: 160
+        phone:
+          type: string
+          maxLength: 20
+        email:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        id_doc_type:
+          $ref: '#/components/schemas/IdDocTypeEnum'
+        id_doc_number:
+          type: string
+          maxLength: 64
+        reason:
+          type: string
+          maxLength: 255
+        added_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - reason
+    BulkEventUpload:
+      type: object
+      properties:
+        event_name:
+          type: string
+          maxLength: 150
+        duration_hours:
+          type: integer
+          default: 8
+        allowed_zones:
+          type: array
+          items:
+            type: string
+            maxLength: 100
+        attendees:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          description: List of objects containing 'name', 'phone', 'email'
+      required:
+      - attendees
+      - event_name
     BulkOutcome:
       type: object
       properties:
@@ -2045,6 +3589,29 @@ components:
       required:
       - application_ids
       - to_status
+    CampusZone:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 32
+        name:
+          type: string
+          maxLength: 120
+        is_restricted:
+          type: boolean
+        is_vip_designated:
+          type: boolean
+        description:
+          type: string
+          maxLength: 255
+      required:
+      - code
+      - id
+      - name
     Candidate:
       type: object
       description: A person as the ERP portal and the IAM describe them. Read-only
@@ -2315,6 +3882,14 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DecisionEnum:
+      enum:
+      - approved
+      - rejected
+      type: string
+      description: |-
+        * `approved` - approved
+        * `rejected` - rejected
     Detail:
       type: object
       properties:
@@ -2407,6 +3982,46 @@ components:
       - season_decision
       - semester
       - standing
+    EmergencyMuster:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/EmergencyMusterStatusEnum'
+        muster_type:
+          $ref: '#/components/schemas/MusterTypeEnum'
+        reason:
+          type: string
+          maxLength: 255
+        triggered_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        summary:
+          type: string
+          maxLength: 255
+      required:
+      - id
+      - started_at
+      - triggered_by_user_id
+    EmergencyMusterStatusEnum:
+      enum:
+      - IN_PROGRESS
+      - COMPLETED
+      type: string
+      description: |-
+        * `IN_PROGRESS` - In progress
+        * `COMPLETED` - Completed
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2423,6 +4038,104 @@ components:
       - fee_reference
       - season
       - user_id
+    GateAlert:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        alert_type:
+          $ref: '#/components/schemas/AlertTypeEnum'
+        severity:
+          $ref: '#/components/schemas/SeverityEnum'
+        message:
+          type: string
+          maxLength: 255
+        visitor_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        visit_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        pass_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        zone_code:
+          type: string
+          maxLength: 32
+        status:
+          $ref: '#/components/schemas/GateAlertStatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - alert_type
+      - created_at
+      - id
+      - message
+    GateAlertStatusEnum:
+      enum:
+      - OPEN
+      - CLOSED
+      type: string
+      description: |-
+        * `OPEN` - Open
+        * `CLOSED` - Closed
+    GateCheckIn:
+      type: object
+      properties:
+        qr_code_hash:
+          type: string
+          maxLength: 128
+        gate_machine_id:
+          type: string
+          default: GATE-01
+          maxLength: 100
+        gate_name:
+          type: string
+          default: Main Gate
+          maxLength: 100
+      required:
+      - qr_code_hash
+    GateCheckOut:
+      type: object
+      properties:
+        pass_number:
+          type: string
+          maxLength: 50
+        gate_machine_id:
+          type: string
+          default: GATE-01
+          maxLength: 100
+        gate_name:
+          type: string
+          default: Main Gate
+          maxLength: 100
+      required:
+      - pass_number
+    IdDocTypeEnum:
+      enum:
+      - AADHAAR
+      - PAN
+      - PASSPORT
+      - DRIVING_LICENSE
+      - COLLEGE_ID
+      - OTHER
+      type: string
+      description: |-
+        * `AADHAAR` - Aadhaar
+        * `PAN` - PAN
+        * `PASSPORT` - Passport
+        * `DRIVING_LICENSE` - Driving Licence
+        * `COLLEGE_ID` - College ID
+        * `OTHER` - Other
     IncidentRecorded:
       type: object
       properties:
@@ -2671,6 +4384,64 @@ components:
       description: |-
         * `online` - Online
         * `offline` - Offline
+    MusterRollCall:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        muster:
+          type: integer
+        visit_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        visitor_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        host_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        last_seen_zone:
+          type: string
+          maxLength: 32
+        status:
+          $ref: '#/components/schemas/MusterRollCallStatusEnum'
+        marked_present:
+          type: boolean
+        marked_at:
+          type: string
+          format: date-time
+          nullable: true
+        notes:
+          type: string
+          maxLength: 255
+      required:
+      - id
+      - muster
+      - visit_id
+      - visitor_id
+    MusterRollCallStatusEnum:
+      enum:
+      - UNACCOUNTED
+      - ACCOUNTED
+      - EVICTED
+      type: string
+      description: |-
+        * `UNACCOUNTED` - Unaccounted
+        * `ACCOUNTED` - Accounted
+        * `EVICTED` - Evicted
+    MusterTypeEnum:
+      enum:
+      - EMERGENCY
+      - DRILL
+      type: string
+      description: |-
+        * `EMERGENCY` - Emergency
+        * `DRILL` - Drill
     NavGroup:
       type: object
       description: |-
@@ -2924,6 +4695,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Application'
+    PaginatedBlacklistRecordList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BlacklistRecord'
+    PaginatedCampusZoneList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampusZone'
     PaginatedCompanyList:
       type: object
       required:
@@ -2943,6 +4752,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Company'
+    PaginatedEmergencyMusterList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmergencyMuster'
+    PaginatedGateAlertList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/GateAlert'
     PaginatedInterviewRoundList:
       type: object
       required:
@@ -2981,6 +4828,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedMusterRollCallList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/MusterRollCall'
     PaginatedOfferList:
       type: object
       required:
@@ -3000,6 +4866,179 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PaginatedSafeListRecordList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SafeListRecord'
+    PaginatedVisitPassList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/VisitPass'
+    PaginatedVisitRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/VisitRequest'
+    PaginatedVisitorList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Visitor'
+    PassTypeEnum:
+      enum:
+      - PRE_REGISTERED
+      - WALK_IN
+      - VIP
+      - EVENT
+      type: string
+      description: |-
+        * `PRE_REGISTERED` - Pre-registered
+        * `WALK_IN` - Walk-in
+        * `VIP` - VIP
+        * `EVENT` - Event
+    PatchedBlacklistRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        full_name:
+          type: string
+          maxLength: 160
+        phone:
+          type: string
+          maxLength: 20
+        email:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        id_doc_type:
+          $ref: '#/components/schemas/IdDocTypeEnum'
+        id_doc_number:
+          type: string
+          maxLength: 64
+        reason:
+          type: string
+          maxLength: 255
+        added_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedCampusZone:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 32
+        name:
+          type: string
+          maxLength: 120
+        is_restricted:
+          type: boolean
+        is_vip_designated:
+          type: boolean
+        description:
+          type: string
+          maxLength: 255
+    PatchedEmergencyMuster:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/EmergencyMusterStatusEnum'
+        muster_type:
+          $ref: '#/components/schemas/MusterTypeEnum'
+        reason:
+          type: string
+          maxLength: 255
+        triggered_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        summary:
+          type: string
+          maxLength: 255
     PatchedJobPosting:
       type: object
       properties:
@@ -3085,6 +5124,136 @@ components:
       properties:
         active_role:
           type: string
+    PatchedSafeListRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        full_name:
+          type: string
+          maxLength: 160
+        phone:
+          type: string
+          maxLength: 20
+        email:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        id_doc_type:
+          $ref: '#/components/schemas/IdDocTypeEnum'
+        id_doc_number:
+          type: string
+          maxLength: 64
+        expiry_date:
+          type: string
+          format: date
+          nullable: true
+        notes:
+          type: string
+          maxLength: 255
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedVisitRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        visitor_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        host_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        purpose:
+          type: string
+          maxLength: 255
+        requested_start:
+          type: string
+          format: date-time
+          nullable: true
+        requested_end:
+          type: string
+          format: date-time
+          nullable: true
+        requested_zones: {}
+        status:
+          allOf:
+          - $ref: '#/components/schemas/VisitRequestStatusEnum'
+          readOnly: true
+        instructions:
+          type: string
+        decision_notes:
+          type: string
+          maxLength: 255
+        rejection_reason:
+          type: string
+          maxLength: 255
+        decision_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decided_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedVisitor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        full_name:
+          type: string
+          maxLength: 160
+        phone:
+          type: string
+          maxLength: 20
+        email:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        id_doc_type:
+          $ref: '#/components/schemas/IdDocTypeEnum'
+        id_doc_number:
+          type: string
+          maxLength: 64
+        photo_url:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        is_anonymous:
+          type: boolean
+        is_disabled:
+          type: boolean
+        disabled_reason:
+          type: string
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
     PlacementRecordDetail:
       type: object
       description: A student's own record, with what rules 22 and 24 still want from
@@ -3539,6 +5708,46 @@ components:
         * `absent` - Absent
         * `passed` - Passed
         * `failed` - Failed
+    SafeListRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        full_name:
+          type: string
+          maxLength: 160
+        phone:
+          type: string
+          maxLength: 20
+        email:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        id_doc_type:
+          $ref: '#/components/schemas/IdDocTypeEnum'
+        id_doc_number:
+          type: string
+          maxLength: 64
+        expiry_date:
+          type: string
+          format: date
+          nullable: true
+        notes:
+          type: string
+          maxLength: 255
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
     SanctionEnum:
       enum:
       - bar_next_two
@@ -3655,6 +5864,16 @@ components:
       - id
       - kind
       - username
+    SeverityEnum:
+      enum:
+      - LOW
+      - MEDIUM
+      - HIGH
+      type: string
+      description: |-
+        * `LOW` - Low
+        * `MEDIUM` - Medium
+        * `HIGH` - High
     SourceEnum:
       enum:
       - campus
@@ -3814,6 +6033,225 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    VisitPass:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        visit_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        visitor_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        pass_type:
+          $ref: '#/components/schemas/PassTypeEnum'
+        pass_code:
+          type: string
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/VisitPassStatusEnum'
+        valid_from:
+          type: string
+          format: date-time
+        valid_until:
+          type: string
+          format: date-time
+          nullable: true
+        permitted_zones: {}
+        parent_pass_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - pass_code
+      - valid_from
+      - visit_id
+      - visitor_id
+    VisitPassStatusEnum:
+      enum:
+      - ACTIVE
+      - DEACTIVATED
+      - EXPIRED
+      type: string
+      description: |-
+        * `ACTIVE` - Active
+        * `DEACTIVATED` - Deactivated
+        * `EXPIRED` - Expired
+    VisitRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        visitor_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        host_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        purpose:
+          type: string
+          maxLength: 255
+        requested_start:
+          type: string
+          format: date-time
+          nullable: true
+        requested_end:
+          type: string
+          format: date-time
+          nullable: true
+        requested_zones: {}
+        status:
+          allOf:
+          - $ref: '#/components/schemas/VisitRequestStatusEnum'
+          readOnly: true
+        instructions:
+          type: string
+        decision_notes:
+          type: string
+          maxLength: 255
+        rejection_reason:
+          type: string
+          maxLength: 255
+        decision_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decided_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - decided_by_user_id
+      - decision_at
+      - host_user_id
+      - id
+      - purpose
+      - status
+      - visitor_id
+    VisitRequestDecision:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        instructions:
+          type: string
+          default: ''
+        rejection_reason:
+          type: string
+          default: ''
+      required:
+      - decision
+    VisitRequestStatusEnum:
+      enum:
+      - PENDING
+      - APPROVED
+      - REJECTED
+      - EXPIRED
+      - CANCELLED
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
+        * `EXPIRED` - Expired
+        * `CANCELLED` - Cancelled
+    Visitor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        full_name:
+          type: string
+          maxLength: 160
+        phone:
+          type: string
+          maxLength: 20
+        email:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        id_doc_type:
+          $ref: '#/components/schemas/IdDocTypeEnum'
+        id_doc_number:
+          type: string
+          maxLength: 64
+        photo_url:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        is_anonymous:
+          type: boolean
+        is_disabled:
+          type: boolean
+        disabled_reason:
+          type: string
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - full_name
+      - id
+    VisitorRegistration:
+      type: object
+      properties:
+        full_name:
+          type: string
+          maxLength: 150
+        phone:
+          type: string
+          maxLength: 20
+        email:
+          oneOf:
+          - type: string
+            format: email
+            default: ''
+          - type: string
+            maxLength: 0
+        identity_type:
+          type: string
+          default: aadhaar
+          maxLength: 50
+        id_number:
+          type: string
+          maxLength: 100
+        organization:
+          type: string
+          default: ''
+          maxLength: 200
+      required:
+      - full_name
+      - id_number
+      - phone
     WaiveIncident:
       type: object
       properties:
@@ -3830,6 +6268,38 @@ components:
           maxLength: 300
       required:
       - reason
+    ZoneAccessCheck:
+      type: object
+      properties:
+        pass_number:
+          type: string
+          maxLength: 50
+        zone_code:
+          type: string
+          maxLength: 50
+        gate_machine_id:
+          type: string
+          default: READER-01
+          maxLength: 100
+      required:
+      - pass_number
+      - zone_code
+    ZoneElevation:
+      type: object
+      properties:
+        pass_number:
+          type: string
+          maxLength: 50
+        zone_code:
+          type: string
+          maxLength: 50
+        reason:
+          type: string
+          default: Temporary Elevation Granted
+          maxLength: 255
+      required:
+      - pass_number
+      - zone_code
   securitySchemes:
     iamSession:
       type: apiKey
