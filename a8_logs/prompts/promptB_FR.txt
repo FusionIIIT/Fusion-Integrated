@@ -1,0 +1,1635 @@
+You are given:
+1. the frozen A8_BASE Fusion implementation, and
+2. the frozen FR_DESIGN.json.
+
+Convert these test designs into executable automated backend tests using pytest/pytest-django.
+
+Rules:
+- Implement exactly the supplied test cases.
+- Do not add, remove, merge or reinterpret test cases.
+- Preserve each specified expected result.
+- Do not modify production code.
+- Use the Django isolated test database.
+- Reuse existing Fusion test infrastructure where appropriate.
+- Do not mock the behavior being tested; mocks may be used only for unavailable external dependencies.
+- Do not use xfail to hide failures.
+- Every test must contain its test_id and source_id in its name or docstring.
+- Store generated tests only under tests/a8/<strategy>/.
+If a test genuinely cannot be automated using the available interfaces, create it as a skipped pytest test with: NOT_AUTOMATED: <reason>. Do not replace it with a different test.
+
+=== FROZEN FR_DESIGN.json ===
+[
+  {"test_id":"FR-001","source_id":"AFR-LMS-001.1","purpose":"Open a dedicated course workspace for an authorized linked user","preconditions":"Course exists; user has an active course membership","action_or_input":"Authenticated user selects a course they are enrolled/assigned/linked to","expected_result":"Dedicated course workspace opens and course home is displayed","test_type":"positive"},
+  {"test_id":"FR-002","source_id":"AFR-LMS-001.2","purpose":"Display course home information on the course workspace","preconditions":"User authorized for the course","action_or_input":"Open course workspace","expected_result":"Syllabus, schedule, instructor(s), and TA(s) are displayed","test_type":"positive"},
+  {"test_id":"FR-003","source_id":"AFR-LMS-001.3","purpose":"Restrict course workspace to linked users (negative)","preconditions":"Course exists; user has no membership for it","action_or_input":"Unlinked user requests the course workspace","expected_result":"Access denied; no course content exposed","test_type":"negative"},
+  {"test_id":"FR-004","source_id":"AFR-LMS-002.1","purpose":"Faculty configures workspace for an assigned course","preconditions":"User is faculty assigned to the course","action_or_input":"Faculty opens course-management controls and updates course details","expected_result":"Course details updated and stored","test_type":"positive"},
+  {"test_id":"FR-005","source_id":"AFR-LMS-002.2","purpose":"Faculty publishes and edits course details","preconditions":"Faculty assigned to course","action_or_input":"Faculty publishes/edits course details","expected_result":"Updated details presented in the workspace","test_type":"positive"},
+  {"test_id":"FR-006","source_id":"AFR-LMS-002.1","purpose":"Non-faculty cannot configure course workspace (negative)","preconditions":"User is a student/TA/observer for the course","action_or_input":"Non-faculty attempts to configure course details","expected_result":"Request rejected with 403","test_type":"negative"},
+  {"test_id":"FR-007","source_id":"AFR-LMS-003.1","purpose":"Faculty adds course material as file/link/note","preconditions":"Faculty assigned to course","action_or_input":"Faculty creates a material with type file/link/note","expected_result":"Material saved with the chosen type","test_type":"positive"},
+  {"test_id":"FR-008","source_id":"AFR-LMS-003.2","purpose":"Faculty organizes materials into modules/sections","preconditions":"Faculty assigned to course","action_or_input":"Faculty sets a section (e.g. Week 1) on a material","expected_result":"Material grouped under that section","test_type":"positive"},
+  {"test_id":"FR-009","source_id":"AFR-LMS-003.3","purpose":"Faculty schedules a future release date for material","preconditions":"Faculty assigned to course","action_or_input":"Faculty creates material with a future release_date","expected_result":"Material saved in scheduled state","test_type":"positive"},
+  {"test_id":"FR-010","source_id":"AFR-LMS-003.4","purpose":"Scheduled material becomes available at release time","preconditions":"Material in scheduled state with past release_date","action_or_input":"Trigger scheduled-release processing","expected_result":"Material transitions to published/available","test_type":"positive"},
+  {"test_id":"FR-011","source_id":"AFR-LMS-003.1","purpose":"TA cannot create course materials (negative)","preconditions":"TA assigned to course","action_or_input":"TA attempts to create a material","expected_result":"Request rejected with 403","test_type":"negative"},
+  {"test_id":"FR-012","source_id":"AFR-LMS-004.1","purpose":"Student views published materials read-only","preconditions":"Student registered; material published","action_or_input":"Student opens materials list","expected_result":"Published materials shown; no edit controls","test_type":"positive"},
+  {"test_id":"FR-013","source_id":"AFR-LMS-004.2","purpose":"TA views published materials read-only","preconditions":"TA assigned; material published","action_or_input":"TA opens materials list","expected_result":"Published materials shown; no edit controls","test_type":"positive"},
+  {"test_id":"FR-014","source_id":"AFR-LMS-004.3","purpose":"Observer views published materials read-only","preconditions":"Observer linked; material published","action_or_input":"Observer opens materials list","expected_result":"Published materials shown; no edit controls","test_type":"positive"},
+  {"test_id":"FR-015","source_id":"AFR-LMS-004.1","purpose":"Unpublished/scheduled material not exposed to non-faculty (negative)","preconditions":"Scheduled material with future release_date","action_or_input":"Student/TA/Observer opens materials list","expected_result":"Scheduled material omitted from list","test_type":"negative"},
+  {"test_id":"FR-016","source_id":"AFR-LMS-005.1","purpose":"Faculty posts a course announcement","preconditions":"Faculty assigned to course","action_or_input":"Faculty posts announcement with title/content","expected_result":"Announcement stored and visible course-wide","test_type":"positive"},
+  {"test_id":"FR-017","source_id":"AFR-LMS-005.2","purpose":"Permitted TA posts an announcement","preconditions":"TA assigned; allow_ta_announcements=True","action_or_input":"Permitted TA posts announcement","expected_result":"Announcement stored with TA attribution","test_type":"positive"},
+  {"test_id":"FR-018","source_id":"AFR-LMS-005.2","purpose":"TA posting denied when not permitted (negative)","preconditions":"TA assigned; allow_ta_announcements=False","action_or_input":"TA attempts to post announcement","expected_result":"Request rejected with 403","test_type":"negative"},
+  {"test_id":"FR-019","source_id":"AFR-LMS-005.3","purpose":"Announcement is timestamped","preconditions":"Authorized poster","action_or_input":"Post an announcement","expected_result":"Announcement carries a created_at timestamp","test_type":"positive"},
+  {"test_id":"FR-020","source_id":"AFR-LMS-005.4","purpose":"Announcement visible to all authorized course users","preconditions":"Announcement posted","action_or_input":"Any authorized user opens announcements","expected_result":"Announcement appears in the list","test_type":"positive"},
+  {"test_id":"FR-021","source_id":"AFR-LMS-005.1","purpose":"Student cannot post announcements (negative)","preconditions":"Student registered","action_or_input":"Student attempts to post announcement","expected_result":"Request rejected with 403","test_type":"negative"},
+  {"test_id":"FR-022","source_id":"AFR-LMS-006.1","purpose":"Faculty creates an assignment","preconditions":"Faculty assigned to course","action_or_input":"Faculty creates assignment with title","expected_result":"Assignment created in Draft state","test_type":"positive"},
+  {"test_id":"FR-023","source_id":"AFR-LMS-006.2","purpose":"Assignment captures due date, instructions, submission type, points","preconditions":"Faculty creating assignment","action_or_input":"Faculty submits all required fields","expected_result":"All fields persisted on the assignment","test_type":"positive"},
+  {"test_id":"FR-024","source_id":"AFR-LMS-006.2","purpose":"Assignment missing required fields rejected (negative/validation)","preconditions":"Faculty creating assignment","action_or_input":"Faculty submits assignment without due_date/instructions/submission_type/points","expected_result":"Validation error returned","test_type":"negative"},
+  {"test_id":"FR-025","source_id":"AFR-LMS-006.3","purpose":"Faculty edits an assignment","preconditions":"Faculty assigned; assignment exists","action_or_input":"Faculty patches assignment fields","expected_result":"Fields updated","test_type":"positive"},
+  {"test_id":"FR-026","source_id":"AFR-LMS-006.4","purpose":"Assignment stays Draft until published","preconditions":"Assignment created","action_or_input":"Inspect assignment status","expected_result":"Status is draft","test_type":"positive"},
+  {"test_id":"FR-027","source_id":"AFR-LMS-006.1","purpose":"TA cannot create assignments (negative)","preconditions":"TA assigned to course","action_or_input":"TA attempts to create an assignment","expected_result":"Request rejected with 403","test_type":"negative"},
+  {"test_id":"FR-028","source_id":"AFR-LMS-007.1","purpose":"Faculty publishes an assignment","preconditions":"Faculty; assignment in Draft with valid config","action_or_input":"Faculty calls publish endpoint","expected_result":"Assignment status becomes published","test_type":"positive"},
+  {"test_id":"FR-029","source_id":"AFR-LMS-007.2","purpose":"Published assignment withheld until release date","preconditions":"Assignment published with future release_date","action_or_input":"Student lists assignments before release time","expected_result":"Assignment not in student list","test_type":"positive"},
+  {"test_id":"FR-030","source_id":"AFR-LMS-007.3","purpose":"Scheduled assignment released at configured time","preconditions":"Assignment in scheduled state with past release_date","action_or_input":"Trigger scheduled-release processing","expected_result":"Assignment becomes published/available","test_type":"positive"},
+  {"test_id":"FR-031","source_id":"AFR-LMS-007.4","purpose":"Student views and downloads released assignment","preconditions":"Student registered; assignment released","action_or_input":"Student opens assignment detail","expected_result":"Assignment details returned","test_type":"positive"},
+  {"test_id":"FR-032","source_id":"AFR-LMS-007.2","purpose":"Unreleased assignment not visible to student (negative)","preconditions":"Assignment published with future release_date","action_or_input":"Student requests assignment detail","expected_result":"404/not available","test_type":"negative"},
+  {"test_id":"FR-033","source_id":"AFR-LMS-008.1","purpose":"Student submits configured work type","preconditions":"Student registered; assignment available; submission type matches","action_or_input":"Student submits with matching submission_type","expected_result":"Submission recorded, status submitted","test_type":"positive"},
+  {"test_id":"FR-034","source_id":"AFR-LMS-008.1","purpose":"Submission type mismatch rejected (negative)","preconditions":"Assignment requires file; student submits text","action_or_input":"Student submits with wrong submission_type","expected_result":"400 validation error","test_type":"negative"},
+  {"test_id":"FR-035","source_id":"AFR-LMS-008.2","purpose":"On-time submission accepted and recorded","preconditions":"Student; assignment available; before due date","action_or_input":"Student submits before due_date","expected_result":"Submission recorded with status submitted","test_type":"positive"},
+  {"test_id":"FR-036","source_id":"AFR-LMS-008.2","purpose":"Late submission blocked when not allowed (negative)","preconditions":"Assignment allow_late_submissions=False; past due date","action_or_input":"Student submits after due_date","expected_result":"400 rejected","test_type":"negative"},
+  {"test_id":"FR-037","source_id":"AFR-LMS-009.1","purpose":"Student views own submission history","preconditions":"Student has submissions","action_or_input":"Student calls my-submission endpoint","expected_result":"Own submission history returned","test_type":"positive"},
+  {"test_id":"FR-038","source_id":"AFR-LMS-009.2","purpose":"Student sees own submission status","preconditions":"Student has a submission","action_or_input":"Student views submission","expected_result":"Status shown (submitted/late/missing)","test_type":"positive"},
+  {"test_id":"FR-039","source_id":"AFR-LMS-009.1","purpose":"Cannot view another student's submission (negative)","preconditions":"Two students; one has a submission","action_or_input":"Student B requests Student A's submission","expected_result":"404/403; no data leaked","test_type":"negative"},
+  {"test_id":"FR-040","source_id":"AFR-LMS-010.1","purpose":"Faculty grades a submission","preconditions":"Faculty; submission exists","action_or_input":"Faculty posts points_awarded and feedback","expected_result":"Grade created in draft state","test_type":"positive"},
+  {"test_id":"FR-041","source_id":"AFR-LMS-010.2","purpose":"TA grades a submission","preconditions":"TA assigned with grading enabled","action_or_input":"TA posts points and feedback","expected_result":"Grade created in draft; graded_by_role=ta","test_type":"positive"},
+  {"test_id":"FR-042","source_id":"AFR-LMS-010.3","purpose":"Grading action attributed to grader","preconditions":"Grader grades submission","action_or_input":"Inspect grade record","expected_result":"graded_by_user_id and graded_by_role set","test_type":"positive"},
+  {"test_id":"FR-043","source_id":"AFR-LMS-010.1","purpose":"Points cannot exceed points possible (negative)","preconditions":"Submission; points_possible=100","action_or_input":"Grader submits points_awarded=150","expected_result":"Validation error","test_type":"negative"},
+  {"test_id":"FR-044","source_id":"AFR-LMS-010.1","purpose":"Points cannot be negative (negative)","preconditions":"Submission","action_or_input":"Grader submits points_awarded=-5","expected_result":"Validation error","test_type":"negative"},
+  {"test_id":"FR-045","source_id":"AFR-LMS-011.1","purpose":"Grade held in draft until release","preconditions":"Grade created","action_or_input":"Inspect grade status","expected_result":"Status is draft","test_type":"positive"},
+  {"test_id":"FR-046","source_id":"AFR-LMS-011.2","purpose":"Student cannot see draft grade (negative)","preconditions":"Draft grade exists for student","action_or_input":"Student calls my-grades","expected_result":"Grade not in list","test_type":"negative"},
+  {"test_id":"FR-047","source_id":"AFR-LMS-011.3","purpose":"Faculty releases draft grades","preconditions":"Draft grades exist for assignment","action_or_input":"Faculty calls release-grades","expected_result":"Grades transition to released; count returned","test_type":"positive"},
+  {"test_id":"FR-048","source_id":"AFR-LMS-011.3","purpose":"TA cannot release grades (negative)","preconditions":"TA assigned","action_or_input":"TA calls release-grades","expected_result":"403 rejected","test_type":"negative"},
+  {"test_id":"FR-049","source_id":"AFR-LMS-012.1","purpose":"Student views own released grade and feedback","preconditions":"Grade released for student","action_or_input":"Student calls my-grades","expected_result":"Grade and feedback returned","test_type":"positive"},
+  {"test_id":"FR-050","source_id":"AFR-LMS-012.2","purpose":"Released grade read-only to student (negative)","preconditions":"Released grade exists","action_or_input":"Student attempts to modify grade","expected_result":"No write endpoint; read-only","test_type":"negative"},
+  {"test_id":"FR-051","source_id":"AFR-LMS-013.1","purpose":"Post-release grade change logs actor","preconditions":"Released grade exists","action_or_input":"Faculty re-grades the released submission","expected_result":"GradeChangeAudit row created with changed_by_user_id","test_type":"positive"},
+  {"test_id":"FR-052","source_id":"AFR-LMS-013.2","purpose":"Post-release grade change logs timestamp","preconditions":"Released grade changed","action_or_input":"Inspect audit row","expected_result":"changed_at populated","test_type":"positive"},
+  {"test_id":"FR-053","source_id":"AFR-LMS-014.1","purpose":"TA views course content","preconditions":"TA assigned to course","action_or_input":"TA opens course detail/materials/announcements","expected_result":"Read access granted","test_type":"positive"},
+  {"test_id":"FR-054","source_id":"AFR-LMS-014.2","purpose":"TA views student submissions","preconditions":"TA assigned","action_or_input":"TA opens submissions list","expected_result":"Submissions returned","test_type":"positive"},
+  {"test_id":"FR-055","source_id":"AFR-LMS-014.3","purpose":"TA cannot create/edit assignments (negative)","preconditions":"TA assigned","action_or_input":"TA attempts to create/edit assignment","expected_result":"403 rejected","test_type":"negative"},
+  {"test_id":"FR-056","source_id":"AFR-LMS-014.4","purpose":"TA cannot create/edit materials (negative)","preconditions":"TA assigned","action_or_input":"TA attempts to create/edit material","expected_result":"403 rejected","test_type":"negative"},
+  {"test_id":"FR-057","source_id":"AFR-LMS-014.5","purpose":"TA cannot modify course structure (negative)","preconditions":"TA assigned","action_or_input":"TA attempts to patch course details","expected_result":"403 rejected","test_type":"negative"},
+  {"test_id":"FR-058","source_id":"AFR-LMS-015.1","purpose":"Observer reads permitted course content","preconditions":"Observer linked to course","action_or_input":"Observer opens course/materials/announcements","expected_result":"Read access granted","test_type":"positive"},
+  {"test_id":"FR-059","source_id":"AFR-LMS-015.2","purpose":"Observer cannot view submissions (negative)","preconditions":"Observer linked","action_or_input":"Observer opens submissions list","expected_result":"403 rejected","test_type":"negative"},
+  {"test_id":"FR-060","source_id":"AFR-LMS-015.3","purpose":"Observer cannot view grades/student-specific data (negative)","preconditions":"Observer linked","action_or_input":"Observer calls my-grades or roster with student data","expected_result":"403 / no student-specific data","test_type":"negative"},
+  {"test_id":"FR-061","source_id":"AFR-LMS-015.4","purpose":"Observer has no write access (negative)","preconditions":"Observer linked","action_or_input":"Observer attempts any POST/PATCH/DELETE","expected_result":"403 rejected","test_type":"negative"}
+]
+
+
+=== A8_BASE IMPLEMENTATION ===
+--- FILE: modules/lms/models.py ---
+```python
+from django.db import models
+from django.utils import timezone
+from core.db.mixins import TimeStampedModel
+
+
+class Course(TimeStampedModel):
+    code = models.CharField(max_length=32, unique=True, db_index=True)
+    name = models.CharField(max_length=200)
+    academic_year = models.PositiveSmallIntegerField(default=2026)
+    semester = models.CharField(
+        max_length=16,
+        choices=[("autumn", "Autumn"), ("spring", "Spring"), ("summer", "Summer")],
+        default="autumn",
+    )
+    syllabus = models.TextField(blank=True)
+    schedule = models.TextField(blank=True)
+    allow_ta_announcements = models.BooleanField(
+        default=True,
+        help_text="Whether TAs are permitted to post announcements for this course (BR-LMS-007).",
+    )
+    allow_ta_grading = models.BooleanField(
+        default=True,
+        help_text="Whether TAs are permitted to grade submissions for this course (BR-LMS-015).",
+    )
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "lms_course"
+        ordering = ["code"]
+
+    def __str__(self) -> str:
+        return f"{self.code} - {self.name}"
+
+
+class CourseMembership(TimeStampedModel):
+    ROLE_CHOICES = [
+        ("student", "Student"),
+        ("faculty", "Faculty"),
+        ("ta", "Teaching Assistant"),
+        ("observer", "Observer"),
+    ]
+
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="memberships")
+    user_id = models.IntegerField(db_index=True)  # Plain integer, UserScoped, no cross-module FK
+    role = models.CharField(max_length=16, choices=ROLE_CHOICES, db_index=True)
+    is_primary_instructor = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "lms_course_membership"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["course", "user_id", "role"], name="unique_lms_course_user_role"
+            )
+        ]
+        indexes = [
+            models.Index(fields=["user_id", "role"], name="lms_cm_user_role_idx"),
+        ]
+
+    def __str__(self) -> str:
+        return f"User {self.user_id} as {self.role} in {self.course.code}"
+
+
+class CourseMaterial(TimeStampedModel):
+    TYPE_CHOICES = [
+        ("file", "File"),
+        ("link", "Link"),
+        ("note", "Note"),
+    ]
+    STATUS_CHOICES = [
+        ("draft", "Draft"),
+        ("scheduled", "Scheduled"),
+        ("published", "Published"),
+    ]
+
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="materials")
+    title = models.CharField(max_length=200)
+    material_type = models.CharField(max_length=16, choices=TYPE_CHOICES)
+    section = models.CharField(
+        max_length=100,
+        default="General",
+        help_text="Module or weekly section designation (e.g. Week 1, Module 2).",
+    )
+    content = models.TextField(blank=True, help_text="Text content for notes or description.")
+    link_url = models.URLField(max_length=500, blank=True)
+    file_attachment = models.FileField(upload_to="lms/materials/", blank=True, null=True)
+    file_name = models.CharField(max_length=255, blank=True)
+    file_size = models.IntegerField(default=0)
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default="published")
+    release_date = models.DateTimeField(null=True, blank=True)
+    created_by_user_id = models.IntegerField()
+
+    class Meta:
+        db_table = "lms_course_material"
+        ordering = ["section", "created_at"]
+
+    def is_available(self) -> bool:
+        """BR-LMS-005, BR-LMS-006: Available if published and release_date passed."""
+        if self.status != "published":
+            return False
+        if self.release_date and self.release_date > timezone.now():
+            return False
+        return True
+
+    def __str__(self) -> str:
+        return f"{self.title} ({self.material_type}) - {self.course.code}"
+
+
+class CourseAnnouncement(TimeStampedModel):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="announcements")
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    posted_by_user_id = models.IntegerField(db_index=True)
+    posted_by_role = models.CharField(max_length=16)
+    posted_by_name = models.CharField(max_length=150, blank=True)
+    is_pinned = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "lms_course_announcement"
+        ordering = ["-is_pinned", "-created_at"]
+
+    def __str__(self) -> str:
+        return f"[{self.course.code}] {self.title}"
+
+
+class Assignment(TimeStampedModel):
+    SUBMISSION_TYPE_CHOICES = [
+        ("file", "File"),
+        ("text", "Text"),
+        ("link", "Link"),
+    ]
+    STATUS_CHOICES = [
+        ("draft", "Draft"),
+        ("scheduled", "Scheduled"),
+        ("published", "Published"),
+    ]
+
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="assignments")
+    title = models.CharField(max_length=200)
+    instructions = models.TextField()
+    submission_type = models.CharField(max_length=16, choices=SUBMISSION_TYPE_CHOICES)
+    points_possible = models.DecimalField(max_digits=6, decimal_places=2, default=100.00)
+    due_date = models.DateTimeField()
+    release_date = models.DateTimeField(null=True, blank=True)
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default="draft")
+    allow_late_submissions = models.BooleanField(default=True)
+    created_by_user_id = models.IntegerField()
+
+    class Meta:
+        db_table = "lms_assignment"
+        ordering = ["-due_date"]
+
+    def is_available_to_students(self) -> bool:
+        """BR-LMS-010, BR-LMS-011: Available to students if published and release condition met."""
+        if self.status != "published":
+            return False
+        if self.release_date and self.release_date > timezone.now():
+            return False
+        return True
+
+    def __str__(self) -> str:
+        return f"{self.title} - {self.course.code}"
+
+
+class AssignmentSubmission(TimeStampedModel):
+    STATUS_CHOICES = [
+        ("submitted", "Submitted"),
+        ("late", "Late"),
+    ]
+
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name="submissions")
+    student_user_id = models.IntegerField(db_index=True)
+    submission_type = models.CharField(max_length=16)
+    text_response = models.TextField(blank=True)
+    link_url = models.URLField(max_length=500, blank=True)
+    file_submission = models.FileField(upload_to="lms/submissions/", blank=True, null=True)
+    file_name = models.CharField(max_length=255, blank=True)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default="submitted")
+    version = models.PositiveSmallIntegerField(default=1)
+
+    class Meta:
+        db_table = "lms_assignment_submission"
+        ordering = ["-submitted_at"]
+
+    def __str__(self) -> str:
+        return f"Submission by User {self.student_user_id} for {self.assignment.title}"
+
+
+class SubmissionGrade(TimeStampedModel):
+    STATUS_CHOICES = [
+        ("draft", "Draft"),
+        ("released", "Released"),
+    ]
+
+    submission = models.OneToOneField(
+        AssignmentSubmission, on_delete=models.CASCADE, related_name="grade"
+    )
+    points_awarded = models.DecimalField(max_digits=6, decimal_places=2)
+    feedback = models.TextField(blank=True)
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default="draft", db_index=True)
+    graded_by_user_id = models.IntegerField()
+    graded_by_role = models.CharField(max_length=16)
+    graded_by_name = models.CharField(max_length=150, blank=True)
+    released_at = models.DateTimeField(null=True, blank=True)
+    released_by_user_id = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        db_table = "lms_submission_grade"
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"Grade ({self.status}): {self.points_awarded} pts for Submission {self.submission_id}"
+
+
+class GradeChangeAudit(TimeStampedModel):
+    grade = models.ForeignKey(SubmissionGrade, on_delete=models.CASCADE, related_name="audit_logs")
+    previous_points = models.DecimalField(max_digits=6, decimal_places=2)
+    new_points = models.DecimalField(max_digits=6, decimal_places=2)
+    previous_feedback = models.TextField(blank=True)
+    new_feedback = models.TextField(blank=True)
+    changed_by_user_id = models.IntegerField()
+    changed_by_name = models.CharField(max_length=150, blank=True)
+    change_reason = models.TextField(blank=True)
+    changed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "lms_grade_change_audit"
+        ordering = ["-changed_at"]
+
+    def __str__(self) -> str:
+        return f"Grade change on {self.grade_id} by User {self.changed_by_user_id} at {self.changed_at}"
+
+```
+
+--- FILE: modules/lms/services/access.py ---
+```python
+"""Course-level authorization and role checking (BR-LMS-001, BR-LMS-003, BR-LMS-004)."""
+from __future__ import annotations
+
+from typing import Optional
+from rest_framework.exceptions import PermissionDenied, NotFound
+from modules.lms.models import Course, CourseMembership
+
+
+def get_course_membership(course_id: int, user_id: int) -> Optional[CourseMembership]:
+    """Retrieve active course membership for user."""
+    return CourseMembership.objects.filter(
+        course_id=course_id, user_id=user_id, is_active=True
+    ).first()
+
+
+def require_course_access(course_id: int, user_id: int) -> tuple[Course, CourseMembership]:
+    """Verify user is enrolled, assigned, or linked to the course (BR-LMS-001).
+
+    Returns the course and membership. Raises NotFound / PermissionDenied if unlinked.
+    """
+    course = Course.objects.filter(id=course_id, is_active=True).first()
+    if not course:
+        raise NotFound("Course not found.")
+
+    membership = get_course_membership(course_id, user_id)
+    if not membership:
+        raise PermissionDenied("You do not have access to this course workspace.")
+
+    return course, membership
+
+
+def check_faculty_or_ta(membership: CourseMembership) -> bool:
+    return membership.role in ("faculty", "ta")
+
+
+def require_faculty(membership: CourseMembership, error_msg="Only course faculty may perform this action."):
+    if membership.role != "faculty":
+        raise PermissionDenied(error_msg)
+
+
+def require_can_announce(course: Course, membership: CourseMembership):
+    """BR-LMS-007: Faculty may post announcements; TA may post only where permitted."""
+    if membership.role == "faculty":
+        return
+    if membership.role == "ta" and course.allow_ta_announcements:
+        return
+    raise PermissionDenied("You do not have permission to post announcements in this course.")
+
+
+def require_can_grade(course: Course, membership: CourseMembership):
+    """BR-LMS-015, BR-LMS-004: Faculty or TA (if enabled) can grade submissions."""
+    if membership.role == "faculty":
+        return
+    if membership.role == "ta" and course.allow_ta_grading:
+        return
+    raise PermissionDenied("You do not have grading permissions in this course.")
+
+
+def require_non_observer(membership: CourseMembership, error_msg: str = "Observers have read-only access and cannot access student-specific data."):
+    """BR-LMS-003: Observers cannot view student submissions, grades, or perform writes."""
+    if membership.role == "observer":
+        raise PermissionDenied(error_msg)
+
+```
+
+--- FILE: modules/lms/services/grading.py ---
+```python
+"""Grading and grade release services (UC-LMS-012, UC-LMS-013, BR-LMS-015, BR-LMS-019)."""
+from __future__ import annotations
+
+from decimal import Decimal
+from django.utils import timezone
+from rest_framework.exceptions import ValidationError, PermissionDenied
+from modules.lms.models import (
+    Assignment,
+    AssignmentSubmission,
+    SubmissionGrade,
+    GradeChangeAudit,
+    CourseMembership,
+)
+
+
+def grade_submission(
+    submission: AssignmentSubmission,
+    points: Decimal | None = None,
+    feedback: str = "",
+    grader_user_id: int = 0,
+    grader_role: str = "",
+    grader_name: str = "",
+    change_reason: str = "",
+    points_awarded: Decimal | None = None,
+) -> SubmissionGrade:
+    """Record or update a submission grade with attribution (BR-LMS-015).
+
+    If grade was already released, record an audit entry (BR-LMS-019).
+    """
+    if points is None and points_awarded is not None:
+        points = points_awarded
+    if points is None:
+        raise ValidationError("Points awarded is required.")
+
+    if points < 0:
+        raise ValidationError("Points awarded cannot be negative.")
+    if points > submission.assignment.points_possible:
+        raise ValidationError(
+            f"Points awarded ({points}) exceeds points possible ({submission.assignment.points_possible})."
+        )
+
+    grade = getattr(submission, "grade", None)
+    if grade is None:
+        # Create initial grade in draft state (BR-LMS-016)
+        grade = SubmissionGrade.objects.create(
+            submission=submission,
+            points_awarded=points,
+            feedback=feedback,
+            status="draft",
+            graded_by_user_id=grader_user_id,
+            graded_by_role=grader_role,
+            graded_by_name=grader_name,
+        )
+    else:
+        # If grade was already released, create audit log before updating (BR-LMS-019)
+        if grade.status == "released":
+            GradeChangeAudit.objects.create(
+                grade=grade,
+                previous_points=grade.points_awarded,
+                new_points=points,
+                previous_feedback=grade.feedback,
+                new_feedback=feedback,
+                changed_by_user_id=grader_user_id,
+                changed_by_name=grader_name,
+                change_reason=change_reason or "Grade revised post-release",
+            )
+
+        grade.points_awarded = points
+        grade.feedback = feedback
+        grade.graded_by_user_id = grader_user_id
+        grade.graded_by_role = grader_role
+        grade.graded_by_name = grader_name
+        grade.save()
+
+    return grade
+
+
+def release_assignment_grades(assignment: Assignment, faculty_user_id: int) -> int:
+    """Release all draft grades for an assignment to students (BR-LMS-017)."""
+    now = timezone.now()
+    updated = SubmissionGrade.objects.filter(
+        submission__assignment=assignment,
+        status="draft",
+    ).update(
+        status="released",
+        released_at=now,
+        released_by_user_id=faculty_user_id,
+    )
+    return updated
+
+
+def release_single_grade(grade: SubmissionGrade, faculty_user_id: int) -> SubmissionGrade:
+    """Release a single student's draft grade."""
+    grade.status = "released"
+    grade.released_at = timezone.now()
+    grade.released_by_user_id = faculty_user_id
+    grade.save()
+    return grade
+
+```
+
+--- FILE: modules/lms/services/releases.py ---
+```python
+"""Scheduled content release processing (UC-LMS-015, BW-LMS-01, BW-LMS-03)."""
+from django.utils import timezone
+from modules.lms.models import CourseMaterial, Assignment
+
+
+def process_scheduled_releases() -> dict[str, int]:
+    """Find scheduled materials and assignments whose release date has arrived and publish them."""
+    now = timezone.now()
+
+    # Process scheduled materials
+    materials_updated = CourseMaterial.objects.filter(
+        status="scheduled",
+        release_date__lte=now,
+    ).update(status="published")
+
+    # Process scheduled assignments
+    assignments_updated = Assignment.objects.filter(
+        status="scheduled",
+        release_date__lte=now,
+    ).update(status="published")
+
+    return {
+        "materials_released": materials_updated,
+        "assignments_released": assignments_updated,
+    }
+
+```
+
+--- FILE: modules/lms/api/serializers.py ---
+```python
+from rest_framework import serializers
+from django.utils import timezone
+from drf_spectacular.utils import extend_schema_field
+from modules.lms.models import (
+    Course,
+    CourseMembership,
+    CourseMaterial,
+    CourseAnnouncement,
+    Assignment,
+    AssignmentSubmission,
+    SubmissionGrade,
+    GradeChangeAudit,
+)
+
+
+class CourseMembershipSerializer(serializers.ModelSerializer):
+    user_display_name = serializers.CharField(read_only=True, default="")
+    user_email = serializers.CharField(read_only=True, default="")
+
+    class Meta:
+        model = CourseMembership
+        fields = [
+            "id",
+            "course",
+            "user_id",
+            "role",
+            "is_primary_instructor",
+            "is_active",
+            "user_display_name",
+            "user_email",
+            "created_at",
+        ]
+        read_only_fields = ["course", "created_at"]
+
+
+class CourseSerializer(serializers.ModelSerializer):
+    my_role = serializers.CharField(read_only=True, default="")
+    instructors = serializers.SerializerMethodField()
+    tas = serializers.SerializerMethodField()
+    materials_count = serializers.IntegerField(read_only=True, default=0)
+    assignments_count = serializers.IntegerField(read_only=True, default=0)
+    announcements_count = serializers.IntegerField(read_only=True, default=0)
+
+    class Meta:
+        model = Course
+        fields = [
+            "id",
+            "code",
+            "name",
+            "academic_year",
+            "semester",
+            "syllabus",
+            "schedule",
+            "allow_ta_announcements",
+            "allow_ta_grading",
+            "is_active",
+            "created_at",
+            "updated_at",
+            "my_role",
+            "instructors",
+            "tas",
+            "materials_count",
+            "assignments_count",
+            "announcements_count",
+        ]
+
+    def get_instructors(self, obj) -> list[dict]:
+        members = obj.memberships.filter(role="faculty", is_active=True)
+        return [
+            {
+                "user_id": m.user_id,
+                "is_primary": m.is_primary_instructor,
+            }
+            for m in members
+        ]
+
+    def get_tas(self, obj) -> list[dict]:
+        members = obj.memberships.filter(role="ta", is_active=True)
+        return [
+            {
+                "user_id": m.user_id,
+            }
+            for m in members
+        ]
+
+
+class CourseMaterialSerializer(serializers.ModelSerializer):
+    is_available = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CourseMaterial
+        fields = [
+            "id",
+            "course",
+            "title",
+            "material_type",
+            "section",
+            "content",
+            "link_url",
+            "file_name",
+            "file_size",
+            "status",
+            "release_date",
+            "created_by_user_id",
+            "created_at",
+            "updated_at",
+            "is_available",
+        ]
+        read_only_fields = ["course", "created_by_user_id", "created_at", "updated_at", "file_size"]
+
+    def get_is_available(self, obj) -> bool:
+        return obj.is_available()
+
+    def validate(self, attrs):
+        m_type = attrs.get("material_type", getattr(self.instance, "material_type", None))
+        if m_type == "link" and not attrs.get("link_url") and not (self.instance and self.instance.link_url):
+            raise serializers.ValidationError({"link_url": "Link URL is required for link materials."})
+        if m_type == "note" and not attrs.get("content") and not (self.instance and self.instance.content):
+            raise serializers.ValidationError({"content": "Content is required for note materials."})
+        return attrs
+
+
+class CourseAnnouncementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseAnnouncement
+        fields = [
+            "id",
+            "course",
+            "title",
+            "content",
+            "posted_by_user_id",
+            "posted_by_role",
+            "posted_by_name",
+            "is_pinned",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "course",
+            "posted_by_user_id",
+            "posted_by_role",
+            "posted_by_name",
+            "created_at",
+            "updated_at",
+        ]
+
+
+class GradeChangeAuditSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GradeChangeAudit
+        fields = [
+            "id",
+            "grade",
+            "previous_points",
+            "new_points",
+            "previous_feedback",
+            "new_feedback",
+            "changed_by_user_id",
+            "changed_by_name",
+            "change_reason",
+            "changed_at",
+        ]
+        read_only_fields = ["grade", "changed_at"]
+
+
+class SubmissionGradeSerializer(serializers.ModelSerializer):
+    audit_logs = GradeChangeAuditSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = SubmissionGrade
+        fields = [
+            "id",
+            "submission",
+            "points_awarded",
+            "feedback",
+            "status",
+            "graded_by_user_id",
+            "graded_by_role",
+            "graded_by_name",
+            "released_at",
+            "released_by_user_id",
+            "created_at",
+            "updated_at",
+            "audit_logs",
+        ]
+        read_only_fields = [
+            "submission",
+            "graded_by_user_id",
+            "graded_by_role",
+            "graded_by_name",
+            "released_at",
+            "released_by_user_id",
+            "created_at",
+            "updated_at",
+        ]
+
+
+class AssignmentSubmissionSerializer(serializers.ModelSerializer):
+    assignment_title = serializers.CharField(source="assignment.title", read_only=True)
+    assignment_points_possible = serializers.DecimalField(
+        source="assignment.points_possible", max_digits=6, decimal_places=2, read_only=True
+    )
+    grade = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AssignmentSubmission
+        fields = [
+            "id",
+            "assignment",
+            "assignment_title",
+            "assignment_points_possible",
+            "student_user_id",
+            "submission_type",
+            "text_response",
+            "link_url",
+            "file_name",
+            "submitted_at",
+            "status",
+            "version",
+            "created_at",
+            "updated_at",
+            "grade",
+        ]
+        read_only_fields = [
+            "assignment",
+            "student_user_id",
+            "submitted_at",
+            "status",
+            "version",
+            "created_at",
+            "updated_at",
+        ]
+
+    @extend_schema_field(serializers.DictField)
+    def get_grade(self, obj):
+        if not hasattr(obj, "grade") or obj.grade is None:
+            return None
+        # BR-LMS-016: If grade is draft, only return to faculty/ta, hide from student
+        request = self.context.get("request")
+        user_id = getattr(getattr(request, "principal", None), "user_id", None)
+        is_student = (user_id == obj.student_user_id)
+        if is_student and obj.grade.status == "draft":
+            return None
+        return SubmissionGradeSerializer(obj.grade).data
+
+
+class AssignmentSerializer(serializers.ModelSerializer):
+    course_code = serializers.CharField(source="course.code", read_only=True)
+    course_name = serializers.CharField(source="course.name", read_only=True)
+    is_available = serializers.SerializerMethodField()
+    my_submission = serializers.SerializerMethodField()
+    submissions_count = serializers.IntegerField(read_only=True, default=0)
+
+    class Meta:
+        model = Assignment
+        fields = [
+            "id",
+            "course",
+            "course_code",
+            "course_name",
+            "title",
+            "instructions",
+            "submission_type",
+            "points_possible",
+            "due_date",
+            "release_date",
+            "status",
+            "allow_late_submissions",
+            "created_by_user_id",
+            "created_at",
+            "updated_at",
+            "is_available",
+            "my_submission",
+            "submissions_count",
+        ]
+        read_only_fields = ["course", "created_by_user_id", "created_at", "updated_at"]
+
+    def get_is_available(self, obj) -> bool:
+        return obj.is_available_to_students()
+
+    @extend_schema_field(serializers.DictField)
+    def get_my_submission(self, obj):
+        request = self.context.get("request")
+        user_id = getattr(getattr(request, "principal", None), "user_id", None)
+        if not user_id:
+            return None
+        sub = obj.submissions.filter(student_user_id=user_id).order_by("-submitted_at").first()
+        if not sub:
+            return None
+        return AssignmentSubmissionSerializer(sub, context=self.context).data
+
+    def validate(self, attrs):
+        # BR-LMS-009: Required configuration: due_date, instructions, submission_type, points_possible
+        due_date = attrs.get("due_date", getattr(self.instance, "due_date", None))
+        instructions = attrs.get("instructions", getattr(self.instance, "instructions", None))
+        submission_type = attrs.get("submission_type", getattr(self.instance, "submission_type", None))
+        points = attrs.get("points_possible", getattr(self.instance, "points_possible", None))
+
+        if not due_date:
+            raise serializers.ValidationError({"due_date": "Due date is required."})
+        if not instructions or not instructions.strip():
+            raise serializers.ValidationError({"instructions": "Instructions are required."})
+        if not submission_type:
+            raise serializers.ValidationError({"submission_type": "Submission type is required."})
+        if points is None or points <= 0:
+            raise serializers.ValidationError({"points_possible": "Points possible must be greater than zero."})
+
+        return attrs
+
+```
+
+--- FILE: modules/lms/api/urls.py ---
+```python
+from django.urls import path
+from modules.lms.api import views
+
+app_name = "lms"
+
+urlpatterns = [
+    # Courses
+    path("courses/", views.CourseListView.as_view(), name="course_list"),
+    path("courses/<int:course_id>/", views.CourseDetailView.as_view(), name="course_detail"),
+    path("courses/<int:course_id>/roster/", views.CourseRosterView.as_view(), name="course_roster"),
+
+    # Course Materials
+    path("courses/<int:course_id>/materials/", views.CourseMaterialListView.as_view(), name="course_materials"),
+    path("materials/<int:material_id>/", views.CourseMaterialDetailView.as_view(), name="material_detail"),
+
+    # Announcements
+    path("courses/<int:course_id>/announcements/", views.CourseAnnouncementListView.as_view(), name="course_announcements"),
+    path("announcements/<int:announcement_id>/", views.CourseAnnouncementDetailView.as_view(), name="announcement_detail"),
+    path("announcements/", views.AllAnnouncementsView.as_view(), name="all_announcements"),
+
+    # Assignments
+    path("courses/<int:course_id>/assignments/", views.CourseAssignmentListView.as_view(), name="course_assignments"),
+    path("assignments/", views.AllAssignmentsView.as_view(), name="all_assignments"),
+    path("assignments/<int:assignment_id>/", views.AssignmentDetailView.as_view(), name="assignment_detail"),
+    path("assignments/<int:assignment_id>/publish/", views.AssignmentPublishView.as_view(), name="assignment_publish"),
+    path("assignments/<int:assignment_id>/submit/", views.AssignmentSubmitView.as_view(), name="assignment_submit"),
+    path("assignments/<int:assignment_id>/my-submission/", views.MyAssignmentSubmissionView.as_view(), name="my_submission"),
+    path("assignments/<int:assignment_id>/submissions/", views.AssignmentSubmissionsListView.as_view(), name="assignment_submissions"),
+
+    # Grading & Auditing
+    path("submissions/<int:submission_id>/grade/", views.GradeSubmissionView.as_view(), name="grade_submission"),
+    path("assignments/<int:assignment_id>/release-grades/", views.ReleaseGradesView.as_view(), name="release_grades"),
+    path("grades/my-grades/", views.MyGradesListView.as_view(), name="my_grades"),
+    path("grades/<int:grade_id>/audit/", views.GradeAuditListView.as_view(), name="grade_audit"),
+
+    # Scheduled event-triggered releases
+    path("process-scheduled-releases/", views.ProcessScheduledReleasesView.as_view(), name="process_releases"),
+]
+
+```
+
+--- FILE: modules/lms/api/views.py ---
+```python
+from __future__ import annotations
+
+from decimal import Decimal
+from django.db.models import Count, Q
+from django.utils import timezone
+from drf_spectacular.utils import extend_schema
+from rest_framework import status
+from rest_framework.exceptions import PermissionDenied, ValidationError, NotFound
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from fusion_auth.permissions import HasModuleGrant, HasPermission
+from modules.lms.models import (
+    Course,
+    CourseMembership,
+    CourseMaterial,
+    CourseAnnouncement,
+    Assignment,
+    AssignmentSubmission,
+    SubmissionGrade,
+    GradeChangeAudit,
+)
+from modules.lms.api.serializers import (
+    CourseSerializer,
+    CourseMembershipSerializer,
+    CourseMaterialSerializer,
+    CourseAnnouncementSerializer,
+    AssignmentSerializer,
+    AssignmentSubmissionSerializer,
+    SubmissionGradeSerializer,
+    GradeChangeAuditSerializer,
+)
+from modules.lms.services.access import (
+    get_course_membership,
+    require_course_access,
+    require_faculty,
+    require_can_announce,
+    require_can_grade,
+    require_non_observer,
+)
+from modules.lms.services.grading import (
+    grade_submission,
+    release_assignment_grades,
+    release_single_grade,
+)
+from modules.lms.services.releases import process_scheduled_releases
+
+MODULE = HasModuleGrant("lms")
+
+PERM_COURSE_CREATE = "lms.course.create"
+PERM_COURSE_VIEW = "lms.course.view"
+PERM_COURSE_MANAGE = "lms.course.manage"
+PERM_MATERIAL_VIEW = "lms.material.view"
+PERM_MATERIAL_MANAGE = "lms.material.manage"
+PERM_ANNOUNCEMENT_VIEW = "lms.announcement.view"
+PERM_ANNOUNCEMENT_POST = "lms.announcement.post"
+PERM_ASSIGNMENT_VIEW = "lms.assignment.view"
+PERM_ASSIGNMENT_MANAGE = "lms.assignment.manage"
+PERM_SUBMISSION_CREATE = "lms.submission.create"
+PERM_SUBMISSION_VIEW_SELF = "lms.submission.view_self"
+PERM_SUBMISSION_VIEW_ALL = "lms.submission.view_all"
+PERM_GRADE_VIEW = "lms.grade.view"
+PERM_GRADE_VIEW_SELF = "lms.grade.view_self"
+PERM_GRADE_VIEW_ALL = "lms.grade.view_all"
+PERM_GRADE_MANAGE = "lms.grade.manage"
+PERM_GRADE_RELEASE = "lms.grade.release"
+PERM_AUDIT_VIEW = "lms.audit.view"
+
+
+def _actor(request):
+    return getattr(request, "principal", None)
+
+
+class CourseListView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_courses_list", responses=CourseSerializer(many=True))
+    def get(self, request):
+        actor = _actor(request)
+        user_id = actor.user_id if actor else None
+
+        # BR-LMS-001, BR-LMS-002: Return courses the user is enrolled in or assigned to
+        memberships = CourseMembership.objects.filter(user_id=user_id, is_active=True).values_list("course_id", "role")
+        user_course_ids = [m[0] for m in memberships]
+        role_map = {m[0]: m[1] for m in memberships}
+
+        courses = Course.objects.filter(id__in=user_course_ids, is_active=True).annotate(
+            materials_count=Count("materials", filter=Q(materials__status="published"), distinct=True),
+            assignments_count=Count("assignments", filter=Q(assignments__status="published"), distinct=True),
+            announcements_count=Count("announcements", distinct=True),
+        )
+
+        data = CourseSerializer(courses, many=True, context={"request": request}).data
+        for c in data:
+            c["my_role"] = role_map.get(c["id"], "")
+        return Response(data)
+
+    @extend_schema(operation_id="lms_courses_create", request=CourseSerializer, responses=CourseSerializer)
+    def post(self, request):
+        actor = _actor(request)
+        serializer = CourseSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        course = serializer.save()
+
+        # Creator automatically becomes faculty and primary instructor
+        if actor:
+            CourseMembership.objects.create(
+                course=course,
+                user_id=actor.user_id,
+                role="faculty",
+                is_primary_instructor=True,
+            )
+
+        return Response(CourseSerializer(course, context={"request": request}).data, status=status.HTTP_201_CREATED)
+
+
+class CourseDetailView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_course_retrieve", responses=CourseSerializer)
+    def get(self, request, course_id: int):
+        actor = _actor(request)
+        course, membership = require_course_access(course_id, actor.user_id)
+        data = CourseSerializer(course, context={"request": request}).data
+        data["my_role"] = membership.role
+        return Response(data)
+
+    @extend_schema(operation_id="lms_course_update_put", request=CourseSerializer, responses=CourseSerializer)
+    def put(self, request, course_id: int):
+        return self.patch(request, course_id)
+
+    @extend_schema(operation_id="lms_course_update", request=CourseSerializer, responses=CourseSerializer)
+    def patch(self, request, course_id: int):
+        actor = _actor(request)
+        course, membership = require_course_access(course_id, actor.user_id)
+        require_faculty(membership, "Only assigned faculty may edit course details (CFR-LMS-002).")
+
+        serializer = CourseSerializer(course, data=request.data, partial=True, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        updated = serializer.save()
+        data = CourseSerializer(updated, context={"request": request}).data
+        data["my_role"] = membership.role
+        return Response(data)
+
+
+class CourseRosterView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_roster_list", responses=CourseMembershipSerializer(many=True))
+    def get(self, request, course_id: int):
+        actor = _actor(request)
+        course, membership = require_course_access(course_id, actor.user_id)
+        if membership.role == "observer":
+            members = CourseMembership.objects.filter(course=course, role__in=["faculty", "ta"], is_active=True)
+        else:
+            members = CourseMembership.objects.filter(course=course, is_active=True)
+        return Response(CourseMembershipSerializer(members, many=True).data)
+
+    @extend_schema(operation_id="lms_roster_add", request=CourseMembershipSerializer, responses=CourseMembershipSerializer)
+    def post(self, request, course_id: int):
+        actor = _actor(request)
+        course, membership = require_course_access(course_id, actor.user_id)
+        require_faculty(membership, "Only course faculty may add or invite members.")
+
+        user_id = request.data.get("user_id")
+        role = request.data.get("role", "student")
+        if not user_id:
+            raise ValidationError({"user_id": "user_id is required."})
+
+        mem, _ = CourseMembership.objects.update_or_create(
+            course=course,
+            user_id=int(user_id),
+            role=role,
+            defaults={"is_active": True},
+        )
+        return Response(CourseMembershipSerializer(mem).data, status=status.HTTP_201_CREATED)
+
+
+class CourseMaterialListView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_materials_list", responses=CourseMaterialSerializer(many=True))
+    def get(self, request, course_id: int):
+        actor = _actor(request)
+        course, membership = require_course_access(course_id, actor.user_id)
+
+        materials = CourseMaterial.objects.filter(course=course)
+        if membership.role != "faculty":
+            now = timezone.now()
+            materials = materials.filter(
+                status="published"
+            ).filter(Q(release_date__isnull=True) | Q(release_date__lte=now))
+
+        return Response(CourseMaterialSerializer(materials, many=True).data)
+
+    @extend_schema(operation_id="lms_materials_create", request=CourseMaterialSerializer, responses=CourseMaterialSerializer)
+    def post(self, request, course_id: int):
+        actor = _actor(request)
+        course, membership = require_course_access(course_id, actor.user_id)
+        require_faculty(membership, "TAs and students cannot create course materials (BR-LMS-004).")
+
+        serializer = CourseMaterialSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+
+        release_date = serializer.validated_data.get("release_date")
+        stat = serializer.validated_data.get("status", "published")
+        if release_date and release_date > timezone.now() and stat != "draft":
+            stat = "scheduled"
+
+        mat = serializer.save(
+            course=course,
+            status=stat,
+            created_by_user_id=actor.user_id,
+        )
+        return Response(CourseMaterialSerializer(mat).data, status=status.HTTP_201_CREATED)
+
+
+class CourseMaterialDetailView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_material_update_put", request=CourseMaterialSerializer, responses=CourseMaterialSerializer)
+    def put(self, request, material_id: int):
+        return self.patch(request, material_id)
+
+    @extend_schema(operation_id="lms_material_update", request=CourseMaterialSerializer, responses=CourseMaterialSerializer)
+    def patch(self, request, material_id: int):
+        actor = _actor(request)
+        mat = CourseMaterial.objects.filter(id=material_id).first()
+        if not mat:
+            raise NotFound("Material not found.")
+        _, membership = require_course_access(mat.course_id, actor.user_id)
+        require_faculty(membership, "Only course faculty may edit materials (BR-LMS-004).")
+
+        serializer = CourseMaterialSerializer(mat, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        updated = serializer.save()
+        return Response(CourseMaterialSerializer(updated).data)
+
+    @extend_schema(operation_id="lms_material_delete", responses={204: None})
+    def delete(self, request, material_id: int):
+        actor = _actor(request)
+        mat = CourseMaterial.objects.filter(id=material_id).first()
+        if not mat:
+            raise NotFound("Material not found.")
+        _, membership = require_course_access(mat.course_id, actor.user_id)
+        require_faculty(membership, "Only course faculty may delete materials (BR-LMS-004).")
+        mat.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CourseAnnouncementListView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_announcements_list", responses=CourseAnnouncementSerializer(many=True))
+    def get(self, request, course_id: int):
+        actor = _actor(request)
+        course, _ = require_course_access(course_id, actor.user_id)
+        announcements = CourseAnnouncement.objects.filter(course=course)
+        return Response(CourseAnnouncementSerializer(announcements, many=True).data)
+
+    @extend_schema(operation_id="lms_announcements_create", request=CourseAnnouncementSerializer, responses=CourseAnnouncementSerializer)
+    def post(self, request, course_id: int):
+        actor = _actor(request)
+        course, membership = require_course_access(course_id, actor.user_id)
+        require_can_announce(course, membership)
+
+        serializer = CourseAnnouncementSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        announcement = serializer.save(
+            course=course,
+            posted_by_user_id=actor.user_id,
+            posted_by_role=membership.role,
+            posted_by_name=getattr(actor, "display_name", "") or getattr(actor, "username", f"User {actor.user_id}"),
+        )
+        return Response(CourseAnnouncementSerializer(announcement).data, status=status.HTTP_201_CREATED)
+
+
+class CourseAnnouncementDetailView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_announcement_delete", responses={204: None})
+    def delete(self, request, announcement_id: int):
+        actor = _actor(request)
+        ann = CourseAnnouncement.objects.filter(id=announcement_id).first()
+        if not ann:
+            raise NotFound("Announcement not found.")
+        _, membership = require_course_access(ann.course_id, actor.user_id)
+        require_faculty(membership, "Only course faculty may delete announcements.")
+        ann.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AllAnnouncementsView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_all_announcements", responses=CourseAnnouncementSerializer(many=True))
+    def get(self, request):
+        actor = _actor(request)
+        user_id = actor.user_id if actor else None
+        user_course_ids = CourseMembership.objects.filter(user_id=user_id, is_active=True).values_list("course_id", flat=True)
+        announcements = CourseAnnouncement.objects.filter(course_id__in=user_course_ids).order_by("-is_pinned", "-created_at")
+        return Response(CourseAnnouncementSerializer(announcements, many=True).data)
+
+
+class CourseAssignmentListView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_assignments_list", responses=AssignmentSerializer(many=True))
+    def get(self, request, course_id: int):
+        actor = _actor(request)
+        course, membership = require_course_access(course_id, actor.user_id)
+
+        assignments = Assignment.objects.filter(course=course).annotate(
+            submissions_count=Count("submissions", distinct=True)
+        )
+        if membership.role == "student":
+            now = timezone.now()
+            assignments = assignments.filter(status="published").filter(
+                Q(release_date__isnull=True) | Q(release_date__lte=now)
+            )
+
+        return Response(AssignmentSerializer(assignments, many=True, context={"request": request}).data)
+
+    @extend_schema(operation_id="lms_assignments_create", request=AssignmentSerializer, responses=AssignmentSerializer)
+    def post(self, request, course_id: int):
+        actor = _actor(request)
+        course, membership = require_course_access(course_id, actor.user_id)
+        require_faculty(membership, "TAs cannot create assignments (BR-LMS-004).")
+
+        serializer = AssignmentSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+
+        stat = serializer.validated_data.get("status", "draft")
+        asgn = serializer.save(
+            course=course,
+            status=stat,
+            created_by_user_id=actor.user_id,
+        )
+        return Response(AssignmentSerializer(asgn, context={"request": request}).data, status=status.HTTP_201_CREATED)
+
+
+class AllAssignmentsView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_all_assignments", responses=AssignmentSerializer(many=True))
+    def get(self, request):
+        actor = _actor(request)
+        user_id = actor.user_id if actor else None
+        memberships = CourseMembership.objects.filter(user_id=user_id, is_active=True).values_list("course_id", "role")
+        user_course_ids = [m[0] for m in memberships]
+        is_only_student = all(m[1] == "student" for m in memberships) if memberships else True
+
+        assignments = Assignment.objects.filter(course_id__in=user_course_ids).select_related("course")
+        if is_only_student:
+            now = timezone.now()
+            assignments = assignments.filter(status="published").filter(
+                Q(release_date__isnull=True) | Q(release_date__lte=now)
+            )
+        return Response(AssignmentSerializer(assignments, many=True, context={"request": request}).data)
+
+
+class AssignmentDetailView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_assignment_retrieve", responses=AssignmentSerializer)
+    def get(self, request, assignment_id: int):
+        actor = _actor(request)
+        asgn = Assignment.objects.filter(id=assignment_id).first()
+        if not asgn:
+            raise NotFound("Assignment not found.")
+        _, membership = require_course_access(asgn.course_id, actor.user_id)
+
+        if membership.role == "student" and not asgn.is_available_to_students():
+            raise NotFound("Assignment not available yet.")
+
+        return Response(AssignmentSerializer(asgn, context={"request": request}).data)
+
+    @extend_schema(operation_id="lms_assignment_update_put", request=AssignmentSerializer, responses=AssignmentSerializer)
+    def put(self, request, assignment_id: int):
+        return self.patch(request, assignment_id)
+
+    @extend_schema(operation_id="lms_assignment_update", request=AssignmentSerializer, responses=AssignmentSerializer)
+    def patch(self, request, assignment_id: int):
+        actor = _actor(request)
+        asgn = Assignment.objects.filter(id=assignment_id).first()
+        if not asgn:
+            raise NotFound("Assignment not found.")
+        _, membership = require_course_access(asgn.course_id, actor.user_id)
+        require_faculty(membership, "Only course faculty may edit assignments (BR-LMS-004).")
+
+        serializer = AssignmentSerializer(asgn, data=request.data, partial=True, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        updated = serializer.save()
+        return Response(AssignmentSerializer(updated, context={"request": request}).data)
+
+
+class AssignmentPublishView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_assignment_publish", request=None, responses=AssignmentSerializer)
+    def post(self, request, assignment_id: int):
+        actor = _actor(request)
+        asgn = Assignment.objects.filter(id=assignment_id).first()
+        if not asgn:
+            raise NotFound("Assignment not found.")
+        _, membership = require_course_access(asgn.course_id, actor.user_id)
+        require_faculty(membership, "Only course faculty may publish assignments (BR-LMS-004).")
+
+        asgn.status = "published"
+        asgn.save()
+        return Response(AssignmentSerializer(asgn, context={"request": request}).data)
+
+
+class AssignmentSubmitView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_assignment_submit", request=AssignmentSubmissionSerializer, responses=AssignmentSubmissionSerializer)
+    def post(self, request, assignment_id: int):
+        actor = _actor(request)
+        asgn = Assignment.objects.filter(id=assignment_id).first()
+        if not asgn:
+            raise NotFound("Assignment not found.")
+        _, membership = require_course_access(asgn.course_id, actor.user_id)
+        require_non_observer(membership, "Observers cannot submit assignments (BR-LMS-003).")
+
+        if membership.role != "student":
+            raise PermissionDenied("Only enrolled students may submit assignment solutions.")
+
+        now = timezone.now()
+        is_late = now > asgn.due_date
+        if is_late and not asgn.allow_late_submissions:
+            raise ValidationError("Late submissions are not accepted for this assignment (BR-LMS-012).")
+
+        previous_sub = AssignmentSubmission.objects.filter(
+            assignment=asgn, student_user_id=actor.user_id
+        ).order_by("-version").first()
+        version = (previous_sub.version + 1) if previous_sub else 1
+
+        serializer = AssignmentSubmissionSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+
+        sub_type = serializer.validated_data.get("submission_type")
+        if sub_type and sub_type != asgn.submission_type:
+            raise ValidationError(f"Submission type '{sub_type}' does not match required type '{asgn.submission_type}' (BR-LMS-012).")
+
+        submission = serializer.save(
+            assignment=asgn,
+            student_user_id=actor.user_id,
+            status="late" if is_late else "submitted",
+            submitted_at=now,
+            version=version,
+        )
+        return Response(AssignmentSubmissionSerializer(submission, context={"request": request}).data, status=status.HTTP_201_CREATED)
+
+
+class MyAssignmentSubmissionView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_assignment_my_submission", responses=AssignmentSubmissionSerializer)
+    def get(self, request, assignment_id: int):
+        actor = _actor(request)
+        sub = AssignmentSubmission.objects.filter(
+            assignment_id=assignment_id,
+            student_user_id=actor.user_id,
+        ).order_by("-submitted_at").first()
+        if not sub:
+            raise NotFound("No submission found.")
+        return Response(AssignmentSubmissionSerializer(sub, context={"request": request}).data)
+
+
+class AssignmentSubmissionsListView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_submissions_list", responses=AssignmentSubmissionSerializer(many=True))
+    def get(self, request, assignment_id: int):
+        actor = _actor(request)
+        asgn = Assignment.objects.filter(id=assignment_id).first()
+        if not asgn:
+            raise NotFound("Assignment not found.")
+        _, membership = require_course_access(asgn.course_id, actor.user_id)
+        require_non_observer(membership, "Observers cannot view student submissions (BR-LMS-003).")
+
+        if membership.role not in ["faculty", "ta"]:
+            raise PermissionDenied("Only course faculty and TAs may view student submissions (BR-LMS-003).")
+
+        submissions = AssignmentSubmission.objects.filter(assignment=asgn).select_related("grade").order_by("-submitted_at")
+        return Response(AssignmentSubmissionSerializer(submissions, many=True, context={"request": request}).data)
+
+
+class GradeSubmissionView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_submission_grade", request=SubmissionGradeSerializer, responses=SubmissionGradeSerializer)
+    def post(self, request, submission_id: int):
+        actor = _actor(request)
+        sub = AssignmentSubmission.objects.filter(id=submission_id).select_related("assignment__course").first()
+        if not sub:
+            raise NotFound("Submission not found.")
+        course = sub.assignment.course
+        _, membership = require_course_access(course.id, actor.user_id)
+        require_can_grade(course, membership)
+
+        points = request.data.get("points_awarded")
+        if points is None:
+            raise ValidationError({"points_awarded": "points_awarded is required."})
+
+        feedback = request.data.get("feedback", "")
+        change_reason = request.data.get("change_reason", "")
+        grader_name = getattr(actor, "display_name", "") or getattr(actor, "username", f"User {actor.user_id}")
+
+        grade = grade_submission(
+            submission=sub,
+            points=Decimal(str(points)),
+            feedback=feedback,
+            grader_user_id=actor.user_id,
+            grader_role=membership.role,
+            grader_name=grader_name,
+            change_reason=change_reason,
+        )
+        return Response(SubmissionGradeSerializer(grade).data)
+
+
+class ReleaseGradesView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_grades_release", request=None, responses={200: None})
+    def post(self, request, assignment_id: int):
+        actor = _actor(request)
+        asgn = Assignment.objects.filter(id=assignment_id).first()
+        if not asgn:
+            raise NotFound("Assignment not found.")
+        _, membership = require_course_access(asgn.course_id, actor.user_id)
+        require_faculty(membership, "TAs cannot release grades; faculty only (BR-LMS-004, BR-LMS-016).")
+
+        count = release_assignment_grades(asgn, actor.user_id)
+        return Response({"released_count": count, "message": f"Successfully released {count} grade(s)."})
+
+
+class MyGradesListView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_my_grades", responses={200: None})
+    def get(self, request):
+        actor = _actor(request)
+        user_id = actor.user_id if actor else None
+
+        # BR-LMS-016, BR-LMS-018: Student only sees released grades
+        grades = SubmissionGrade.objects.filter(
+            submission__student_user_id=user_id,
+            status="released",
+        ).select_related("submission__assignment__course")
+
+        data = []
+        for g in grades:
+            asgn = g.submission.assignment
+            data.append({
+                "grade_id": g.id,
+                "submission_id": g.submission.id,
+                "assignment_id": asgn.id,
+                "assignment_title": asgn.title,
+                "assignment_points_possible": asgn.points_possible,
+                "points_awarded": g.points_awarded,
+                "feedback": g.feedback,
+                "course_id": asgn.course.id,
+                "course_code": asgn.course.code,
+                "course_name": asgn.course.name,
+                "released_at": g.released_at,
+                "graded_by_name": g.graded_by_name,
+                "status": g.status,
+            })
+
+        return Response(data)
+
+
+class GradeAuditListView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_grade_audit_list", responses=GradeChangeAuditSerializer(many=True))
+    def get(self, request, grade_id: int):
+        actor = _actor(request)
+        grade = SubmissionGrade.objects.filter(id=grade_id).select_related("submission__assignment").first()
+        if not grade:
+            raise NotFound("Grade not found.")
+        _, membership = require_course_access(grade.submission.assignment.course_id, actor.user_id)
+        require_faculty(membership, "Only course faculty may view grade change audit logs (BR-LMS-019).")
+
+        audits = GradeChangeAudit.objects.filter(grade=grade).order_by("-changed_at")
+        return Response(GradeChangeAuditSerializer(audits, many=True).data)
+
+
+class ProcessScheduledReleasesView(APIView):
+    permission_classes = [MODULE]
+
+    @extend_schema(operation_id="lms_process_scheduled_releases", request=None, responses={200: None})
+    def post(self, request):
+        # UC-LMS-015: Event/cron triggered content release processor
+        results = process_scheduled_releases()
+        return Response(results)
+
+```
+
+--- FILE: conftest.py ---
+```python
+"""Shared fixtures. `stub_iam` replaces the IAM client with an in-memory fake,
+so the suite runs with no network and no Fusion_System_Administrator."""
+import sys
+
+import pytest
+
+from fusion_auth import client as iam_client
+from fusion_auth.client import IamSession, UserRef
+from fusion_auth.principal import Principal
+
+
+class FakeIam:
+    """Mirrors IamClient exactly. If the real client grows a method, add it
+    here too — a fake that has drifted is worse than no fake."""
+
+    def __init__(self, session=None, users=None, standings=None):
+        self.session, self.users = session, users or {}
+        #: Override to make the identity service disagree with the projection.
+        self.employees = None
+        self.standings = standings or {}
+        self.calls = []
+        self.login_result = "tok-123"      # override per test
+        self.login_error = None
+        self.standings_error = None
+        self.directory_error = None
+        self.directory = {"count": 0, "limit": 50, "offset": 0, "results": []}
+        self.filters = {"disciplines": [], "batch_years": [], "programmes": []}
+
+    def login(self, username, password):
+        self.calls.append(("login", username))
+        if self.login_error:
+            raise self.login_error
+        return self.login_result
+
+    def logout(self, auth_token):
+        self.calls.append(("logout", auth_token))
+
+    def resolve_session(self, *, auth_token=None, cookies=None):
+        self.calls.append(("resolve_session", auth_token))
+        return self.session
+
+    def get_users(self, user_ids):
+        ids = list(user_ids)
+        self.calls.append(("get_users", tuple(sorted(ids))))
+        return {i: self.users[i] for i in ids if i in self.users}
+
+    def search_users(self, q="", kind=None, limit=25):
+        return list(self.users.values())[:limit]
+
+    def employee_page(self, *, limit=500, offset=0):
+        rows = self._employees()
+        return {"count": len(rows), "limit": limit, "offset": offset,
+                "results": rows[offset:offset + limit]}
+
+    def count_employees(self):
+        return len(self._employees())
+
+    def iter_employees(self, *, page_size=500):
+        yield from self._employees()
+
+    def _employees(self):
+        """Whoever the test put in `users` who is not a student."""
+        if self.employees is not None:
+            return list(self.employees)
+        from modules.directory.models import UserRef
+        return list(UserRef.objects.filter(
+            kind__in=("faculty", "staff"), is_active=True))
+
+    def academic_directory(self, **filters):
+        self.calls.append(("academic_directory", tuple(sorted(filters.items()))))
+        if self.directory_error:
+            raise self.directory_error
+        return self.directory
+
+    def academic_filters(self):
+        self.calls.append(("academic_filters", ()))
+        if self.directory_error:
+            raise self.directory_error
+        return self.filters
+
+    def get_academic_standings(self, user_ids):
+        """A student absent from `standings` has no declared result, which is
+        what the eligibility engine must fail closed on."""
+        ids = list(user_ids)
+        self.calls.append(("get_academic_standings", tuple(sorted(ids))))
+        if self.standings_error:
+            raise self.standings_error
+        return {i: self.standings[i] for i in ids if i in self.standings}
+
+
+def make_session(user_id=1001, permissions=(), modules=(), kind="student",
+                 roles=("student",), active_role="student"):
+    return IamSession(
+        user_id=user_id, username=f"u{user_id}", display_name=f"User {user_id}",
+        kind=kind, active_role=active_role, roles=tuple(roles),
+        permissions=frozenset(permissions), modules=tuple(modules),
+    )
+
+
+def make_principal(**kw):
+    return Principal.from_session(make_session(**kw))
+
+
+@pytest.fixture(autouse=True)
+def _clear_throttle_state():
+    """Throttle counters live in the cache and would otherwise carry from one
+    test into the next — the sixth request of a run failing wherever it landed."""
+    from django.core.cache import cache
+
+    cache.clear()
+    yield
+    cache.clear()
+
+
+@pytest.fixture
+def stub_iam(monkeypatch):
+    fake = FakeIam()
+
+    def _install(session=None, users=None):
+        fake.session = session
+        fake.users = users or {}
+        # `from ... import get_client` binds the name in every importer, so
+        # patching the source alone lets the real client leak through. A
+        # hand-maintained list goes stale silently; sys.modules does not.
+        patched = 0
+        for mod in list(sys.modules.values()):
+            if mod is None:
+                continue
+            name = getattr(mod, "__name__", "")
+            if not name.startswith(("fusion_auth", "modules", "core", "config")):
+                continue
+            if getattr(mod, "get_client", None) is not None:
+                monkeypatch.setattr(mod, "get_client", lambda: fake)
+                patched += 1
+        monkeypatch.setattr(iam_client, "get_client", lambda: fake)
+        assert patched, "no get_client bindings were found to patch"
+        return fake
+
+    _install()
+    return _install
+
+
+@pytest.fixture
+def user_ref():
+    def _make(user_id, name="Asha Verma", kind="student", discipline="CSE"):
+        return UserRef(user_id=user_id, username=f"u{user_id}", display_name=name,
+                       kind=kind, discipline=discipline)
+    return _make
+
+```

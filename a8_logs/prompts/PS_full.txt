@@ -1,0 +1,74 @@
+[Title] LMS (Course Management)
+Problem Statement
+--- TABLE ---
+Module | LMS (Course Management) | Status | DRAFT
+Version | v1.0 | Date | 2026-08-31
+--- END TABLE ---
+[Heading 1] 1. Overview
+Right now, when a student opens a course in Fusion, they just see basic course info. This module, LMS (Course Management), adds a proper course page for every course, similar to how Canvas works. When a student clicks on a course they are registered in, it opens that course's own page with its details, materials, announcements, and assignments, all in one place.
+Inside a course page, students can view materials, read announcements, submit assignments, and check their grades. Faculty can post materials and announcements, create assignments, and grade student submissions. TAs help with grading and posting updates. Observers can only view the course, without touching or seeing student-specific data.
+This module uses the course registration data that already exists in Fusion. It does not change how registration, add/drop, or the academic calendar work. The focus here is simple: the right people should see the right course content, and assignments should move smoothly from posted to submitted to graded.
+[Heading 1] 2. Actors
+[Heading 2] 2.1 Student
+[List Paragraph] Views course details, materials, and announcements for courses they are registered in.
+[List Paragraph] Views and downloads published assignments.
+[List Paragraph] Submits assignment work within the configured submission window.
+[List Paragraph] Views their own submission status and grade/feedback once released.
+[Heading 2] 2.2 Faculty
+[List Paragraph] Owns and configures the course workspace for assigned courses.
+[List Paragraph] Publishes and edits course details and materials.
+[List Paragraph] Posts announcements.
+[List Paragraph] Creates, edits, and publishes assignments, including due date, instructions, submission type, and points possible.
+[List Paragraph] Grades submissions and releases grades/feedback to students.
+[Heading 2] 2.3 Teaching Assistant (TA)
+[List Paragraph] Views course details, materials, and announcements.
+[List Paragraph] Posts announcements where permitted by Faculty for the course.
+[List Paragraph] Views student submissions for the assigned course.
+[List Paragraph] Grades submissions; grading actions are attributed to the TA.
+[List Paragraph] Cannot create or edit assignments, materials, or course structure.
+[Heading 2] 2.4 Observer
+[List Paragraph] Has read-only access to course details, materials, and announcements for a course they are linked to.
+[List Paragraph] Cannot view individual student submissions, grades, or any other student-specific data.
+[List Paragraph] Has no write access anywhere in the module.
+[Heading 1] 3. Functional Scope
+[Heading 2] 3.1 Course Access and Details
+[List Paragraph] Clicking a registered course opens a dedicated course workspace (course home page).
+[List Paragraph] Course home displays syllabus, schedule, instructor(s), and TA(s) for the course.
+[List Paragraph] Access to a course workspace is restricted to users enrolled in, or linked to, that specific course.
+[Heading 2] 3.2 Course Materials
+[List Paragraph] Faculty upload and organize materials (files, links, notes) into modules or weekly sections.
+[List Paragraph] Materials may be scheduled for a future release date.
+[List Paragraph] Students, TAs, and Observers have read-only access to published materials.
+[Heading 2] 3.3 Announcements
+[List Paragraph] Faculty, and TAs where permitted, post course-wide announcements.
+[List Paragraph] Announcements are timestamped and visible to all users enrolled in, or linked to, the course.
+[List Paragraph] Notification delivery channel for new announcements is to be defined.
+[Heading 2] 3.4 Assignments
+[List Paragraph] Faculty create assignments with a due date, instructions, submission type, and points possible.
+[List Paragraph] Assignments have a draft state before they are published to students.
+[List Paragraph] Assignment visibility to students follows the configured release date.
+[Heading 2] 3.5 Assignment Submission
+[List Paragraph] Students submit work (file, text, or link, per the assignment's configured submission type) before the due date.
+[List Paragraph] Late-submission handling is to be defined (e.g., blocked, flagged as late, or admin-overridable).
+[List Paragraph] Students can view their own submission history and status (submitted, late, missing).
+[List Paragraph] Resubmission policy is to be defined.
+[Heading 2] 3.6 Grading
+[List Paragraph] Faculty and TAs grade individual submissions and enter points and feedback.
+[List Paragraph] Grades are held in a draft state until released; students cannot see a grade before release.
+[List Paragraph] Once released, students view their grade and feedback in read-only form.
+[List Paragraph] Grade changes made after release are logged, recording who made the change and when.
+[Heading 1] 4. Out of Scope for the Current Baseline
+[List Paragraph] Course registration, add/drop, and waitlist management (handled by the existing academic-registration functionality).
+[List Paragraph] Final result computation and official grade-sheet publication (handled by the Examination (EX) module).
+[List Paragraph] Plagiarism detection or originality checking.
+[List Paragraph] Live classes, video conferencing, or real-time chat.
+[List Paragraph] Discussion forums or Q&A boards.
+[List Paragraph] Peer review or peer grading.
+[List Paragraph] Rubric-based structured grading (single score plus feedback only, for this baseline).
+[List Paragraph] Group assignments and group submissions.
+[Heading 1] 5. Open Questions for Discussion
+[List Paragraph] Exact late-submission policy: hard block, flag-as-late, or Faculty/admin override.
+[List Paragraph] Whether TA announcement and grading permissions are configurable per course or fixed for all courses.
+[List Paragraph] Notification channel(s) for announcements and grade release (email, in-app, or both).
+[List Paragraph] Whether an Observer account is linked to one specific student or to an entire course section.
+[List Paragraph] Resubmission policy: number of attempts allowed, and whether late resubmissions are treated differently.
