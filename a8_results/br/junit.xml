@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="4" tests="27" time="4.965" timestamp="2026-11-15T21:40:21.337071+05:30" hostname="LAPTOP1234"><testcase classname="tests.a8.br.test_business_rules" name="test_br_001_only_authorized_actor_can_trigger_manual_backup" time="1.705" /><testcase classname="tests.a8.br.test_business_rules" name="test_br_003_only_it_security_can_configure_encryption" time="0.010" /><testcase classname="tests.a8.br.test_business_rules" name="test_br_004_only_authorized_sysadmin_can_set_authoritative_classification" time="0.013" /><testcase classname="tests.a8.br.test_business_rules" name="test_br_005_sensitive_restoration_waits_for_sysadmin_approval" time="0.014" /><testcase classname="tests.a8.br.test_business_rules" name="test_br_006_invalid_initial_classification_uses_specified_default" time="0.009" /><testcase classname="tests.a8.br.test_business_rules" name="test_br_007_sensitive_encryption_rejects_non_aes_256_algorithm" time="0.015"><failure message="Failed: DID NOT RAISE BadRequestError">principal_factory = &lt;function principal_factory.&lt;locals&gt;.make_principal at 0x00000200D53DEC00&gt;
+
+    @pytest.mark.django_db
+    def test_br_007_sensitive_encryption_rejects_non_aes_256_algorithm(principal_factory):
+        """BR-007 / BR-BA-007: sensitive data requires AES-256 at rest and in transit."""
+        from modules.badms.models import SecureArchivalRequest
+        from modules.badms.services.operations import it_security_configure_encryption
+    
+        request = SecureArchivalRequest.objects.create(
+            user_id=510, department="CSE", file_name="sensitive.dat", file_type="application/octet-stream",
+            file_size_bytes=2, reason="Sensitive", authoritative_classification=sm.TIER_SENSITIVE,
+            status=sm.ARCHIVAL_CLASSIFIED,
+        )
+&gt;       with pytest.raises(BadRequestError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE BadRequestError
+
+tests\a8\br\test_business_rules.py:107: Failed</failure></testcase><testcase classname="tests.a8.br.test_business_rules" name="test_br_008_classified_archival_gets_a_retention_deadline" time="0.010" /><testcase classname="tests.a8.br.test_business_rules" name="test_br_010_hod_cannot_review_another_department_archival_request" time="0.013"><failure message="Failed: DID NOT RAISE PermissionDeniedError">@pytest.mark.django_db
+    def test_br_010_hod_cannot_review_another_department_archival_request():
+        """BR-010 / BR-BA-010 own-department decision scope."""
+        from modules.badms.models import SecureArchivalRequest
+        from modules.badms.services.operations import hod_review_archival
+    
+        request = SecureArchivalRequest.objects.create(
+            user_id=514, department="EE", file_name="item.txt", file_type="text/plain", file_size_bytes=1,
+            reason="Other department",
+        )
+        actor = SimpleNamespace(
+            user_id=515, active_role="hod", department="CSE",
+            has_permission=lambda code: code == "badms.department.review",
+        )
+&gt;       with pytest.raises(PermissionDeniedError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PermissionDeniedError
+
+tests\a8\br\test_business_rules.py:153: Failed</failure></testcase><testcase classname="tests.a8.br.test_business_rules" name="test_br_010_hod_cannot_review_another_department_storage_extension" time="0.017"><failure message="Failed: DID NOT RAISE PermissionDeniedError">@pytest.mark.django_db
+    def test_br_010_hod_cannot_review_another_department_storage_extension():
+        """BR-010 / BR-BA-010 own-department scope for storage-extension decisions."""
+        from modules.badms.models import StorageExtensionRequest
+        from modules.badms.services.operations import hod_review_storage_extension
+    
+        request = StorageExtensionRequest.objects.create(
+            user_id=524, department="EE", requested_additional_mb=256, reason="Other department"
+        )
+        actor = SimpleNamespace(
+            user_id=525, active_role="hod", department="CSE",
+            has_permission=lambda code: code == "badms.department.review",
+        )
+&gt;       with pytest.raises(PermissionDeniedError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PermissionDeniedError
+
+tests\a8\br\test_business_rules.py:170: Failed</failure></testcase><testcase classname="tests.a8.br.test_business_rules" name="test_br_012_invalid_schedule_parameters_are_rejected" time="0.015"><failure message="Failed: DID NOT RAISE BadRequestError">principal_factory = &lt;function principal_factory.&lt;locals&gt;.make_principal at 0x00000200D5550040&gt;
+
+    @pytest.mark.django_db
+    def test_br_012_invalid_schedule_parameters_are_rejected(principal_factory):
+        """BR-012 / BR-BA-012 malformed cron and invalid retention boundary."""
+        from modules.badms.services.operations import configure_schedule
+    
+&gt;       with pytest.raises(BadRequestError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE BadRequestError
+
+tests\a8\br\test_business_rules.py:187: Failed</failure></testcase><testcase classname="tests.a8.br.test_business_rules" name="test_br_018_special_archival_is_limited_to_super_admin" time="0.011" /><testcase classname="tests.a8.br.test_business_rules" name="test_br_019_global_schedule_requires_super_admin_permission" time="0.012" /><testcase classname="tests.a8.br.test_business_rules" name="test_br_020_hod_sees_only_requests_in_their_department" time="0.034"><failure message="assert 2 == 0&#10; +  where 2 = count()&#10; +    where count = &lt;QuerySet [&lt;SecureArchivalRequest: SecureArchivalRequest object (2)&gt;, &lt;SecureArchivalRequest: SecureArchivalRequest object (1)&gt;]&gt;.count">principal_factory = &lt;function principal_factory.&lt;locals&gt;.make_principal at 0x00000200D5550A40&gt;
+
+    @pytest.mark.django_db
+    def test_br_020_hod_sees_only_requests_in_their_department(principal_factory):
+        """BR-020 / BR-BA-020 protected-information scope."""
+        from modules.badms.models import SecureArchivalRequest
+        from modules.badms.selectors.scoping import visible_archival_requests
+    
+        SecureArchivalRequest.objects.create(
+            user_id=521, department="CSE", file_name="cse.txt", file_type="text/plain", file_size_bytes=1,
+            reason="CSE request",
+        )
+        SecureArchivalRequest.objects.create(
+            user_id=522, department="EE", file_name="ee.txt", file_type="text/plain", file_size_bytes=1,
+            reason="EE request",
+        )
+        hod = principal_factory(user_id=523, permissions={"badms.department.review"})
+        visible = visible_archival_requests(hod)
+&gt;       assert visible.count() == 0
+E       assert 2 == 0
+E        +  where 2 = count()
+E        +    where count = &lt;QuerySet [&lt;SecureArchivalRequest: SecureArchivalRequest object (2)&gt;, &lt;SecureArchivalRequest: SecureArchivalRequest object (1)&gt;]&gt;.count
+
+tests\a8\br\test_business_rules.py:276: AssertionError</failure></testcase><testcase classname="tests.a8.br.test_business_rules" name="test_br_002_hod_decision_has_the_two_specified_outcomes[approve-hod_approved]" time="0.005" /><testcase classname="tests.a8.br.test_business_rules" name="test_br_002_hod_decision_has_the_two_specified_outcomes[reject-hod_rejected]" time="0.005" /><testcase classname="tests.a8.br.test_business_rules" name="test_br_009_a_second_pending_storage_extension_is_blocked" time="0.004" /><testcase classname="tests.a8.br.test_business_rules" name="test_br_011_local_schedule_overrides_global_and_global_is_fallback" time="0.005" /><testcase classname="tests.a8.br.test_business_rules" name="test_br_013_scheduled_backup_requires_reachable_repository" time="0.001"><skipped type="pytest.skip" message="NOT_AUTOMATED: no scheduled backup/repository execution interface is implemented">D:\Downloads\BADMS\tests\a8\br\test_business_rules.py:194: NOT_AUTOMATED: no scheduled backup/repository execution interface is implemented</skipped></testcase><testcase classname="tests.a8.br.test_business_rules" name="test_br_014_failed_backup_alert_is_sent_within_five_minutes" time="0.001"><skipped type="pytest.skip" message="NOT_AUTOMATED: no backup failure alert adapter exists to exercise the five-minute SLA">D:\Downloads\BADMS\tests\a8\br\test_business_rules.py:200: NOT_AUTOMATED: no backup failure alert adapter exists to exercise the five-minute SLA</skipped></testcase><testcase classname="tests.a8.br.test_business_rules" name="test_br_015_repeated_failure_escalation_boundary[2-False]" time="0.006" /><testcase classname="tests.a8.br.test_business_rules" name="test_br_015_repeated_failure_escalation_boundary[3-True]" time="0.005" /><testcase classname="tests.a8.br.test_business_rules" name="test_br_015_repeated_failure_escalation_boundary[4-True]" time="0.006" /><testcase classname="tests.a8.br.test_business_rules" name="test_br_016_storage_extension_requires_full_quota[99-False]" time="0.003" /><testcase classname="tests.a8.br.test_business_rules" name="test_br_016_storage_extension_requires_full_quota[100-True]" time="0.002" /><testcase classname="tests.a8.br.test_business_rules" name="test_br_016_storage_extension_requires_full_quota[101-True]" time="0.002" /><testcase classname="tests.a8.br.test_business_rules" name="test_br_017_storage_decision_uses_infrastructure_policy_and_justification" time="0.001"><skipped type="pytest.skip" message="NOT_AUTOMATED: decision criteria are not captured as structured service inputs">D:\Downloads\BADMS\tests\a8\br\test_business_rules.py:222: NOT_AUTOMATED: decision criteria are not captured as structured service inputs</skipped></testcase><testcase classname="tests.a8.br.test_business_rules" name="test_br_021_only_it_security_can_manage_rbac_and_security_policies" time="0.002"><skipped type="pytest.skip" message="NOT_AUTOMATED: RBAC/security-policy management endpoints are not implemented in BADMS">D:\Downloads\BADMS\tests\a8\br\test_business_rules.py:279: NOT_AUTOMATED: RBAC/security-policy management endpoints are not implemented in BADMS</skipped></testcase></testsuite></testsuites>
