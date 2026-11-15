@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="11" skipped="0" tests="120" time="2.975" timestamp="2026-11-11T00:30:35.107266+05:30" hostname="mx-ghost"><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_001_01" time="1.264" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_002_01" time="0.006" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_003a_01" time="0.004" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_003a_02" time="0.004" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_003b_01" time="0.008" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_004_01" time="0.006" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_004_02" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_005_01" time="0.006" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_006_01" time="0.006" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_007_01" time="0.004" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_008_01" time="0.004" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_009_01" time="0.004" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_010_01" time="0.004" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_011_01" time="0.006" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_012_01" time="0.007" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_013_01" time="0.009" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_014_01" time="0.009" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_015_01" time="0.005"><failure message="modules.system_admin.domain.exceptions.IdentityValidationError: Identity validation failed: Student requires programme and batch year.">super_admin_principal = Principal(user_id=1, username='admin_master', display_name='Master Super Admin', kind='staff', active_role='super_admi... modules=('system_admin',), navigation=(), email='superadmin@iiitdmj.ac.in', is_authenticated=True, is_anonymous=False)
+
+    @pytest.mark.django_db
+    def test_tc_sa_015_01(super_admin_principal):
+        """TC-SA-015-01 | AFR-SA-015
+        Verify bulk user batch creation from valid predefined CSV template.
+        """
+        csv_data = (
+            "user_kind,name,institute_email,institute_id,contact_number,department\n"
+            "student,Bulk Alpha,bulk_alpha@iiitdmj.ac.in,2026018,9876543228,CSE\n"
+            "student,Bulk Beta,bulk_beta@iiitdmj.ac.in,2026019,9876543229,ECE\n"
+        )
+&gt;       res = user_lifecycle.execute_bulk_user_creation(csv_data, performed_by_id=super_admin_principal.id)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/a8/fr/test_fr.py:470: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+modules/system_admin/services/user_lifecycle.py:296: in execute_bulk_user_creation
+    create_basic_user(spec, performed_by_id)
+modules/system_admin/services/user_lifecycle.py:44: in create_basic_user
+    validators.validate_user_type_required_data(spec)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+spec = UserCreationSpec(user_kind='student', name='Bulk Alpha', institute_email='bulk_alpha@iiitdmj.ac.in', institute_id='202...SE', programme='', discipline='', batch_year=None, employee_id='', date_of_joining=None, expected_completion_date=None)
+
+    def validate_user_type_required_data(spec: UserCreationSpec) -&gt; None:
+        """BR-SA-003: Student requires program/batch; Faculty/Staff requires employee_id/dept."""
+        validate_institute_id(spec.institute_id)
+        validate_institute_email(spec.institute_email)
+        if not spec.name or not spec.name.strip():
+            raise IdentityValidationError("Full name is required.")
+    
+        if spec.user_kind == "student":
+            if not spec.programme or not spec.batch_year:
+&gt;               raise IdentityValidationError("Student requires programme and batch year.")
+E               modules.system_admin.domain.exceptions.IdentityValidationError: Identity validation failed: Student requires programme and batch year.
+
+modules/system_admin/domain/validators.py:63: IdentityValidationError</failure></testcase><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_016_01" time="0.011" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_017_01" time="0.007" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_018a_01" time="0.003" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_018b_01" time="0.004"><failure message="modules.system_admin.domain.exceptions.IdentityValidationError: Identity validation failed: Student requires programme and batch year.">super_admin_principal = Principal(user_id=1, username='admin_master', display_name='Master Super Admin', kind='staff', active_role='super_admi... modules=('system_admin',), navigation=(), email='superadmin@iiitdmj.ac.in', is_authenticated=True, is_anonymous=False)
+
+    @pytest.mark.django_db
+    def test_tc_sa_018b_01(super_admin_principal):
+        """TC-SA-018B-01 | AFR-SA-018B
+        Verify pre-validation of individual records in bulk upload identifying invalid entries.
+        """
+        csv_mixed = (
+            "user_kind,name,institute_email,institute_id,contact_number,department\n"
+            "student,Good One,good1@iiitdmj.ac.in,2026024,9876543230,CSE\n"
+            "student,Bad One,bad1@gmail.com,2026025,9876543231,CSE\n"
+        )
+&gt;       res = user_lifecycle.execute_bulk_user_creation(csv_mixed, performed_by_id=super_admin_principal.id)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/a8/fr/test_fr.py:533: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+modules/system_admin/services/user_lifecycle.py:296: in execute_bulk_user_creation
+    create_basic_user(spec, performed_by_id)
+modules/system_admin/services/user_lifecycle.py:44: in create_basic_user
+    validators.validate_user_type_required_data(spec)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+spec = UserCreationSpec(user_kind='student', name='Good One', institute_email='good1@iiitdmj.ac.in', institute_id='2026024', ...SE', programme='', discipline='', batch_year=None, employee_id='', date_of_joining=None, expected_completion_date=None)
+
+    def validate_user_type_required_data(spec: UserCreationSpec) -&gt; None:
+        """BR-SA-003: Student requires program/batch; Faculty/Staff requires employee_id/dept."""
+        validate_institute_id(spec.institute_id)
+        validate_institute_email(spec.institute_email)
+        if not spec.name or not spec.name.strip():
+            raise IdentityValidationError("Full name is required.")
+    
+        if spec.user_kind == "student":
+            if not spec.programme or not spec.batch_year:
+&gt;               raise IdentityValidationError("Student requires programme and batch year.")
+E               modules.system_admin.domain.exceptions.IdentityValidationError: Identity validation failed: Student requires programme and batch year.
+
+modules/system_admin/domain/validators.py:63: IdentityValidationError</failure></testcase><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_019a_01" time="0.010"><failure message="modules.system_admin.domain.exceptions.IdentityValidationError: Identity validation failed: Student requires programme and batch year.">super_admin_principal = Principal(user_id=1, username='admin_master', display_name='Master Super Admin', kind='staff', active_role='super_admi... modules=('system_admin',), navigation=(), email='superadmin@iiitdmj.ac.in', is_authenticated=True, is_anonymous=False)
+
+    @pytest.mark.django_db
+    def test_tc_sa_019a_01(super_admin_principal):
+        """TC-SA-019A-01 | AFR-SA-019A
+        Verify production of accurate success/failure summary for bulk user operation.
+        """
+        csv_content = (
+            "user_kind,name,institute_email,institute_id,contact_number,department\n"
+            "student,Succ 1,succ1@iiitdmj.ac.in,2026026,9876543232,CSE\n"
+            "student,Fail 1,invalid-email,2026027,9876543233,CSE\n"
+        )
+&gt;       summary = user_lifecycle.execute_bulk_user_creation(csv_content, performed_by_id=super_admin_principal.id)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/a8/fr/test_fr.py:550: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+modules/system_admin/services/user_lifecycle.py:296: in execute_bulk_user_creation
+    create_basic_user(spec, performed_by_id)
+modules/system_admin/services/user_lifecycle.py:44: in create_basic_user
+    validators.validate_user_type_required_data(spec)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+spec = UserCreationSpec(user_kind='student', name='Succ 1', institute_email='succ1@iiitdmj.ac.in', institute_id='2026026', co...SE', programme='', discipline='', batch_year=None, employee_id='', date_of_joining=None, expected_completion_date=None)
+
+    def validate_user_type_required_data(spec: UserCreationSpec) -&gt; None:
+        """BR-SA-003: Student requires program/batch; Faculty/Staff requires employee_id/dept."""
+        validate_institute_id(spec.institute_id)
+        validate_institute_email(spec.institute_email)
+        if not spec.name or not spec.name.strip():
+            raise IdentityValidationError("Full name is required.")
+    
+        if spec.user_kind == "student":
+            if not spec.programme or not spec.batch_year:
+&gt;               raise IdentityValidationError("Student requires programme and batch year.")
+E               modules.system_admin.domain.exceptions.IdentityValidationError: Identity validation failed: Student requires programme and batch year.
+
+modules/system_admin/domain/validators.py:63: IdentityValidationError</failure></testcase><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_019b_01" time="0.004"><failure message="modules.system_admin.domain.exceptions.IdentityValidationError: Identity validation failed: Student requires programme and batch year.">super_admin_principal = Principal(user_id=1, username='admin_master', display_name='Master Super Admin', kind='staff', active_role='super_admi... modules=('system_admin',), navigation=(), email='superadmin@iiitdmj.ac.in', is_authenticated=True, is_anonymous=False)
+
+    @pytest.mark.django_db
+    def test_tc_sa_019b_01(super_admin_principal):
+        """TC-SA-019B-01 | AFR-SA-019B
+        Verify production of detailed processing log with per-record outcomes.
+        """
+        csv_content = (
+            "user_kind,name,institute_email,institute_id,contact_number,department\n"
+            "student,Log User,log_user@iiitdmj.ac.in,2026028,9876543234,CSE\n"
+            "student,Fail User, 2026029,9876543235,CSE\n"
+        )
+&gt;       res = user_lifecycle.execute_bulk_user_creation(csv_content, performed_by_id=super_admin_principal.id)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/a8/fr/test_fr.py:566: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+modules/system_admin/services/user_lifecycle.py:296: in execute_bulk_user_creation
+    create_basic_user(spec, performed_by_id)
+modules/system_admin/services/user_lifecycle.py:44: in create_basic_user
+    validators.validate_user_type_required_data(spec)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+spec = UserCreationSpec(user_kind='student', name='Log User', institute_email='log_user@iiitdmj.ac.in', institute_id='2026028...SE', programme='', discipline='', batch_year=None, employee_id='', date_of_joining=None, expected_completion_date=None)
+
+    def validate_user_type_required_data(spec: UserCreationSpec) -&gt; None:
+        """BR-SA-003: Student requires program/batch; Faculty/Staff requires employee_id/dept."""
+        validate_institute_id(spec.institute_id)
+        validate_institute_email(spec.institute_email)
+        if not spec.name or not spec.name.strip():
+            raise IdentityValidationError("Full name is required.")
+    
+        if spec.user_kind == "student":
+            if not spec.programme or not spec.batch_year:
+&gt;               raise IdentityValidationError("Student requires programme and batch year.")
+E               modules.system_admin.domain.exceptions.IdentityValidationError: Identity validation failed: Student requires programme and batch year.
+
+modules/system_admin/domain/validators.py:63: IdentityValidationError</failure></testcase><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_020_01" time="0.003"><failure message="modules.system_admin.domain.exceptions.IdentityValidationError: Identity validation failed: Student requires programme and batch year.">super_admin_principal = Principal(user_id=1, username='admin_master', display_name='Master Super Admin', kind='staff', active_role='super_admi... modules=('system_admin',), navigation=(), email='superadmin@iiitdmj.ac.in', is_authenticated=True, is_anonymous=False)
+
+    @pytest.mark.django_db
+    def test_tc_sa_020_01(super_admin_principal):
+        """TC-SA-020-01 | AFR-SA-020
+        Verify Super Admin notification upon bulk user operation completion.
+        """
+        csv_data = (
+            "user_kind,name,institute_email,institute_id,contact_number,department\n"
+            "student,Notif User,notif_user@iiitdmj.ac.in,2026030,9876543236,CSE\n"
+        )
+&gt;       user_lifecycle.execute_bulk_user_creation(csv_data, performed_by_id=super_admin_principal.id)
+
+tests/a8/fr/test_fr.py:581: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+modules/system_admin/services/user_lifecycle.py:296: in execute_bulk_user_creation
+    create_basic_user(spec, performed_by_id)
+modules/system_admin/services/user_lifecycle.py:44: in create_basic_user
+    validators.validate_user_type_required_data(spec)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+spec = UserCreationSpec(user_kind='student', name='Notif User', institute_email='notif_user@iiitdmj.ac.in', institute_id='202...SE', programme='', discipline='', batch_year=None, employee_id='', date_of_joining=None, expected_completion_date=None)
+
+    def validate_user_type_required_data(spec: UserCreationSpec) -&gt; None:
+        """BR-SA-003: Student requires program/batch; Faculty/Staff requires employee_id/dept."""
+        validate_institute_id(spec.institute_id)
+        validate_institute_email(spec.institute_email)
+        if not spec.name or not spec.name.strip():
+            raise IdentityValidationError("Full name is required.")
+    
+        if spec.user_kind == "student":
+            if not spec.programme or not spec.batch_year:
+&gt;               raise IdentityValidationError("Student requires programme and batch year.")
+E               modules.system_admin.domain.exceptions.IdentityValidationError: Identity validation failed: Student requires programme and batch year.
+
+modules/system_admin/domain/validators.py:63: IdentityValidationError</failure></testcase><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_021_01" time="0.005" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_022_01" time="0.014" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_023_01" time="0.011" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_024_01" time="0.006" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_024_02" time="0.007" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_025_01" time="0.003" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_026_01" time="0.007" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_027_01" time="0.009" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_028_01" time="0.010" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_029_01" time="0.007" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_030_01" time="0.006" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_031_01" time="0.007" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_032_01" time="0.014" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_033_01" time="0.010"><failure message="modules.system_admin.domain.exceptions.IneligibleRoleUserTypeError: User type 'Handover' cannot hold role 'fr_reassign_33'. Allowed types: {'faculty'}.">super_admin_principal = Principal(user_id=1, username='admin_master', display_name='Master Super Admin', kind='staff', active_role='super_admi... modules=('system_admin',), navigation=(), email='superadmin@iiitdmj.ac.in', is_authenticated=True, is_anonymous=False)
+
+    @pytest.mark.django_db
+    def test_tc_sa_033_01(super_admin_principal):
+        """TC-SA-033-01 | AFR-SA-033
+        Verify handover of access on effective date of role reassignment.
+        """
+        u1 = BasicUser.objects.create(username="fr_u33_1", institute_id="FR2026045", email="fr_u33_1@iiitdmj.ac.in", kind="faculty", status=UserLifecycleStatus.ACTIVE)
+        u2 = BasicUser.objects.create(username="fr_u33_2", institute_id="FR2026046", email="fr_u33_2@iiitdmj.ac.in", kind="faculty", status=UserLifecycleStatus.ACTIVE)
+        role, _ = RoleDefinition.objects.get_or_create(code="fr_reassign_33", defaults={"label": "Reassign 33", "category": RoleCategory.OFFICE, "allowed_kinds": "faculty", "is_singular": True, "is_time_bound": True, "is_active": True})
+        today = datetime.date.today()
+        orig = role_management.assign_role(RoleAssignmentSpec(role_code="fr_reassign_33", target_user_id=u1.id, target_user_kind="faculty", scope="institute", start_date=today, end_date=today + datetime.timedelta(days=30), reason="Old"), super_admin_principal.id)
+&gt;       new_assign = role_management.reassign_role(RoleReassignmentSpec(orig.id, u2.id, "faculty", today, "Handover", PendingTaskDisposition.TRANSFER), super_admin_principal.id)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/a8/fr/test_fr.py:834: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+modules/system_admin/services/role_management.py:129: in reassign_role
+    validators.validate_role_eligibility(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+role_code = 'fr_reassign_33', user_kind = 'Handover'
+allowed_kinds = {'faculty'}
+
+    def validate_role_eligibility(role_code: str, user_kind: str, allowed_kinds: Tuple[str, ...]) -&gt; None:
+        """BR-SA-010: Validates user type eligibility for role."""
+        if user_kind not in allowed_kinds:
+&gt;           raise IneligibleRoleUserTypeError(role_code, user_kind, allowed_kinds)
+E           modules.system_admin.domain.exceptions.IneligibleRoleUserTypeError: User type 'Handover' cannot hold role 'fr_reassign_33'. Allowed types: {'faculty'}.
+
+modules/system_admin/domain/validators.py:74: IneligibleRoleUserTypeError</failure></testcase><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_034_01" time="0.009"><failure message="modules.system_admin.domain.exceptions.IneligibleRoleUserTypeError: User type 'Task transfer' cannot hold role 'fr_tasks_34'. Allowed types: {'faculty'}.">super_admin_principal = Principal(user_id=1, username='admin_master', display_name='Master Super Admin', kind='staff', active_role='super_admi... modules=('system_admin',), navigation=(), email='superadmin@iiitdmj.ac.in', is_authenticated=True, is_anonymous=False)
+
+    @pytest.mark.django_db
+    def test_tc_sa_034_01(super_admin_principal):
+        """TC-SA-034-01 | AFR-SA-034
+        Verify transfer of pending tasks to new holder on reassignment without exposing content to Super Admin.
+        """
+        u1 = BasicUser.objects.create(username="fr_u34_1", institute_id="FR2026047", email="fr_u34_1@iiitdmj.ac.in", kind="faculty", status=UserLifecycleStatus.ACTIVE)
+        u2 = BasicUser.objects.create(username="fr_u34_2", institute_id="FR2026048", email="fr_u34_2@iiitdmj.ac.in", kind="faculty", status=UserLifecycleStatus.ACTIVE)
+        role, _ = RoleDefinition.objects.get_or_create(code="fr_tasks_34", defaults={"label": "Tasks 34", "category": RoleCategory.OFFICE, "allowed_kinds": "faculty", "is_singular": True, "is_time_bound": True, "is_active": True})
+        today = datetime.date.today()
+        orig = role_management.assign_role(RoleAssignmentSpec(role_code="fr_tasks_34", target_user_id=u1.id, target_user_kind="faculty", scope="institute", start_date=today, end_date=today + datetime.timedelta(days=30), reason="Tasks"), super_admin_principal.id)
+&gt;       role_management.reassign_role(RoleReassignmentSpec(orig.id, u2.id, "faculty", today, "Task transfer", PendingTaskDisposition.TRANSFER), super_admin_principal.id)
+
+tests/a8/fr/test_fr.py:850: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+modules/system_admin/services/role_management.py:129: in reassign_role
+    validators.validate_role_eligibility(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+role_code = 'fr_tasks_34', user_kind = 'Task transfer'
+allowed_kinds = {'faculty'}
+
+    def validate_role_eligibility(role_code: str, user_kind: str, allowed_kinds: Tuple[str, ...]) -&gt; None:
+        """BR-SA-010: Validates user type eligibility for role."""
+        if user_kind not in allowed_kinds:
+&gt;           raise IneligibleRoleUserTypeError(role_code, user_kind, allowed_kinds)
+E           modules.system_admin.domain.exceptions.IneligibleRoleUserTypeError: User type 'Task transfer' cannot hold role 'fr_tasks_34'. Allowed types: {'faculty'}.
+
+modules/system_admin/domain/validators.py:74: IneligibleRoleUserTypeError</failure></testcase><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_035a_01" time="0.010"><failure message="modules.system_admin.domain.exceptions.IneligibleRoleUserTypeError: User type 'Handover' cannot hold role 'fr_reassign_35a'. Allowed types: {'faculty'}.">super_admin_principal = Principal(user_id=1, username='admin_master', display_name='Master Super Admin', kind='staff', active_role='super_admi... modules=('system_admin',), navigation=(), email='superadmin@iiitdmj.ac.in', is_authenticated=True, is_anonymous=False)
+
+    @pytest.mark.django_db
+    def test_tc_sa_035a_01(super_admin_principal):
+        """TC-SA-035A-01 | AFR-SA-035A
+        Verify notification to previous and new role holders on role reassignment.
+        """
+        u1 = BasicUser.objects.create(username="fr_u35a_1", institute_id="FR2026049", email="fr_u35a_1@iiitdmj.ac.in", kind="faculty", status=UserLifecycleStatus.ACTIVE)
+        u2 = BasicUser.objects.create(username="fr_u35a_2", institute_id="FR2026050", email="fr_u35a_2@iiitdmj.ac.in", kind="faculty", status=UserLifecycleStatus.ACTIVE)
+        role, _ = RoleDefinition.objects.get_or_create(code="fr_reassign_35a", defaults={"label": "Reassign 35A", "category": RoleCategory.OFFICE, "allowed_kinds": "faculty", "is_singular": True, "is_time_bound": True, "is_active": True})
+        today = datetime.date.today()
+        orig = role_management.assign_role(RoleAssignmentSpec(role_code="fr_reassign_35a", target_user_id=u1.id, target_user_kind="faculty", scope="institute", start_date=today, end_date=today + datetime.timedelta(days=30), reason="Old"), super_admin_principal.id)
+&gt;       role_management.reassign_role(RoleReassignmentSpec(orig.id, u2.id, "faculty", today, "Handover", PendingTaskDisposition.TRANSFER), super_admin_principal.id)
+
+tests/a8/fr/test_fr.py:866: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+modules/system_admin/services/role_management.py:129: in reassign_role
+    validators.validate_role_eligibility(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+role_code = 'fr_reassign_35a', user_kind = 'Handover'
+allowed_kinds = {'faculty'}
+
+    def validate_role_eligibility(role_code: str, user_kind: str, allowed_kinds: Tuple[str, ...]) -&gt; None:
+        """BR-SA-010: Validates user type eligibility for role."""
+        if user_kind not in allowed_kinds:
+&gt;           raise IneligibleRoleUserTypeError(role_code, user_kind, allowed_kinds)
+E           modules.system_admin.domain.exceptions.IneligibleRoleUserTypeError: User type 'Handover' cannot hold role 'fr_reassign_35a'. Allowed types: {'faculty'}.
+
+modules/system_admin/domain/validators.py:74: IneligibleRoleUserTypeError</failure></testcase><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_035b_01" time="0.009"><failure message="modules.system_admin.domain.exceptions.IneligibleRoleUserTypeError: User type 'Reason35B' cannot hold role 'fr_reassign_35b'. Allowed types: {'faculty'}.">super_admin_principal = Principal(user_id=1, username='admin_master', display_name='Master Super Admin', kind='staff', active_role='super_admi... modules=('system_admin',), navigation=(), email='superadmin@iiitdmj.ac.in', is_authenticated=True, is_anonymous=False)
+
+    @pytest.mark.django_db
+    def test_tc_sa_035b_01(super_admin_principal):
+        """TC-SA-035B-01 | AFR-SA-035B
+        Verify retention of complete role-reassignment history.
+        """
+        u1 = BasicUser.objects.create(username="fr_u35b_1", institute_id="FR2026051", email="fr_u35b_1@iiitdmj.ac.in", kind="faculty", status=UserLifecycleStatus.ACTIVE)
+        u2 = BasicUser.objects.create(username="fr_u35b_2", institute_id="FR2026052", email="fr_u35b_2@iiitdmj.ac.in", kind="faculty", status=UserLifecycleStatus.ACTIVE)
+        role, _ = RoleDefinition.objects.get_or_create(code="fr_reassign_35b", defaults={"label": "Reassign 35B", "category": RoleCategory.OFFICE, "allowed_kinds": "faculty", "is_singular": True, "is_time_bound": True, "is_active": True})
+        today = datetime.date.today()
+        orig = role_management.assign_role(RoleAssignmentSpec(role_code="fr_reassign_35b", target_user_id=u1.id, target_user_kind="faculty", scope="institute", start_date=today, end_date=today + datetime.timedelta(days=30), reason="Old"), super_admin_principal.id)
+&gt;       new_assign = role_management.reassign_role(RoleReassignmentSpec(orig.id, u2.id, "faculty", today, "Reason35B", PendingTaskDisposition.TRANSFER), super_admin_principal.id)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/a8/fr/test_fr.py:883: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+modules/system_admin/services/role_management.py:129: in reassign_role
+    validators.validate_role_eligibility(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+role_code = 'fr_reassign_35b', user_kind = 'Reason35B'
+allowed_kinds = {'faculty'}
+
+    def validate_role_eligibility(role_code: str, user_kind: str, allowed_kinds: Tuple[str, ...]) -&gt; None:
+        """BR-SA-010: Validates user type eligibility for role."""
+        if user_kind not in allowed_kinds:
+&gt;           raise IneligibleRoleUserTypeError(role_code, user_kind, allowed_kinds)
+E           modules.system_admin.domain.exceptions.IneligibleRoleUserTypeError: User type 'Reason35B' cannot hold role 'fr_reassign_35b'. Allowed types: {'faculty'}.
+
+modules/system_admin/domain/validators.py:74: IneligibleRoleUserTypeError</failure></testcase><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_036_01" time="0.010"><failure message="modules.system_admin.domain.exceptions.IneligibleRoleUserTypeError: User type 'Handover' cannot hold role 'fr_audit_36'. Allowed types: {'faculty'}.">super_admin_principal = Principal(user_id=1, username='admin_master', display_name='Master Super Admin', kind='staff', active_role='super_admi... modules=('system_admin',), navigation=(), email='superadmin@iiitdmj.ac.in', is_authenticated=True, is_anonymous=False)
+
+    @pytest.mark.django_db
+    def test_tc_sa_036_01(super_admin_principal):
+        """TC-SA-036-01 | AFR-SA-036
+        Verify previous holder read-only access to prior actions during audit period.
+        """
+        u1 = BasicUser.objects.create(username="fr_u36_1", institute_id="FR2026053", email="fr_u36_1@iiitdmj.ac.in", kind="faculty", status=UserLifecycleStatus.ACTIVE)
+        u2 = BasicUser.objects.create(username="fr_u36_2", institute_id="FR2026054", email="fr_u36_2@iiitdmj.ac.in", kind="faculty", status=UserLifecycleStatus.ACTIVE)
+        role, _ = RoleDefinition.objects.get_or_create(code="fr_audit_36", defaults={"label": "Audit 36", "category": RoleCategory.OFFICE, "allowed_kinds": "faculty", "is_singular": True, "is_time_bound": True, "is_active": True})
+        today = datetime.date.today()
+        orig = role_management.assign_role(RoleAssignmentSpec(role_code="fr_audit_36", target_user_id=u1.id, target_user_kind="faculty", scope="institute", start_date=today, end_date=today + datetime.timedelta(days=30), reason="Old"), super_admin_principal.id)
+&gt;       role_management.reassign_role(RoleReassignmentSpec(orig.id, u2.id, "faculty", today, "Handover", PendingTaskDisposition.TRANSFER, audit_access_days=30), super_admin_principal.id)
+
+tests/a8/fr/test_fr.py:900: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+modules/system_admin/services/role_management.py:129: in reassign_role
+    validators.validate_role_eligibility(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+role_code = 'fr_audit_36', user_kind = 'Handover', allowed_kinds = {'faculty'}
+
+    def validate_role_eligibility(role_code: str, user_kind: str, allowed_kinds: Tuple[str, ...]) -&gt; None:
+        """BR-SA-010: Validates user type eligibility for role."""
+        if user_kind not in allowed_kinds:
+&gt;           raise IneligibleRoleUserTypeError(role_code, user_kind, allowed_kinds)
+E           modules.system_admin.domain.exceptions.IneligibleRoleUserTypeError: User type 'Handover' cannot hold role 'fr_audit_36'. Allowed types: {'faculty'}.
+
+modules/system_admin/domain/validators.py:74: IneligibleRoleUserTypeError</failure></testcase><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_036_02" time="0.010"><failure message="modules.system_admin.domain.exceptions.IneligibleRoleUserTypeError: User type 'Handover' cannot hold role 'fr_audit_36_2'. Allowed types: {'faculty'}.">super_admin_principal = Principal(user_id=1, username='admin_master', display_name='Master Super Admin', kind='staff', active_role='super_admi... modules=('system_admin',), navigation=(), email='superadmin@iiitdmj.ac.in', is_authenticated=True, is_anonymous=False)
+
+    @pytest.mark.django_db
+    def test_tc_sa_036_02(super_admin_principal):
+        """TC-SA-036-02 | AFR-SA-036
+        Verify previous holder audit access expires after audit period.
+        """
+        u1 = BasicUser.objects.create(username="fr_u36_2_1", institute_id="FR2026055", email="fr_u36_2_1@iiitdmj.ac.in", kind="faculty", status=UserLifecycleStatus.ACTIVE)
+        u2 = BasicUser.objects.create(username="fr_u36_2_2", institute_id="FR2026056", email="fr_u36_2_2@iiitdmj.ac.in", kind="faculty", status=UserLifecycleStatus.ACTIVE)
+        role, _ = RoleDefinition.objects.get_or_create(code="fr_audit_36_2", defaults={"label": "Audit 36_2", "category": RoleCategory.OFFICE, "allowed_kinds": "faculty", "is_singular": True, "is_time_bound": True, "is_active": True})
+        today = datetime.date.today()
+        orig = role_management.assign_role(RoleAssignmentSpec(role_code="fr_audit_36_2", target_user_id=u1.id, target_user_kind="faculty", scope="institute", start_date=today, end_date=today + datetime.timedelta(days=30), reason="Old"), super_admin_principal.id)
+&gt;       role_management.reassign_role(RoleReassignmentSpec(orig.id, u2.id, "faculty", today, "Handover", PendingTaskDisposition.TRANSFER, audit_access_days=5), super_admin_principal.id)
+
+tests/a8/fr/test_fr.py:915: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+modules/system_admin/services/role_management.py:129: in reassign_role
+    validators.validate_role_eligibility(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+role_code = 'fr_audit_36_2', user_kind = 'Handover', allowed_kinds = {'faculty'}
+
+    def validate_role_eligibility(role_code: str, user_kind: str, allowed_kinds: Tuple[str, ...]) -&gt; None:
+        """BR-SA-010: Validates user type eligibility for role."""
+        if user_kind not in allowed_kinds:
+&gt;           raise IneligibleRoleUserTypeError(role_code, user_kind, allowed_kinds)
+E           modules.system_admin.domain.exceptions.IneligibleRoleUserTypeError: User type 'Handover' cannot hold role 'fr_audit_36_2'. Allowed types: {'faculty'}.
+
+modules/system_admin/domain/validators.py:74: IneligibleRoleUserTypeError</failure></testcase><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_037_01" time="0.014" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_038_01" time="0.008" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_038_02" time="0.005" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_039a_01" time="0.010" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_039b_01" time="0.007" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_039c_01" time="0.008" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_039d_01" time="0.010" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_040a_01" time="0.008" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_040b_01" time="0.008" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_041_01" time="0.007" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_042_01" time="0.006" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_043_01" time="0.008" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_044a_01" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_044b_01" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_045_01" time="0.009" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_047_01" time="0.007" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_048_01" time="0.004" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_048_02" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_049a_01" time="0.007" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_049b_01" time="0.006" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_050_01" time="0.005" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_051a_01" time="0.007" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_051a_02" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_051b_01" time="0.008" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_052_01" time="0.003" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_054b_01" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_055a_01" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_055b_01" time="0.003" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_057_01" time="0.003" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_057_02" time="0.003" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_058_01" time="0.009" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_059a_01" time="0.003" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_060_01" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_061a_01" time="0.004" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_061a_02" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_061b_01" time="0.007" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_061b_02" time="0.004" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_062_01" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_063_01" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_064_01" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_065a_01" time="0.003" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_066_01" time="0.006" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_067_01" time="0.004" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_068_01" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_069_01" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_070_01" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_071a_01" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_071b_01" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_073b_01" time="0.006" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_074a_01" time="0.008" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_074c_01" time="0.006" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_076_01" time="0.004" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_077_01" time="0.001" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_079_01" time="0.003" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_080a_01" time="0.003" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_080b_01" time="0.009" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_081a_01" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_081b_01" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_081d_01" time="0.004" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_046_01" time="0.001" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_046_02" time="0.001" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_053_01" time="0.001" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_054a_01" time="0.002" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_056_01" time="0.001" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_059b_01" time="0.001" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_065b_01" time="0.001" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_065c_01" time="0.001" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_072_01" time="0.001" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_073a_01" time="0.001" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_073c_01" time="0.001" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_074b_01" time="0.001" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_075_01" time="0.001" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_078_01" time="0.001" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_078_02" time="0.001" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_081c_01" time="0.001" /><testcase classname="tests.a8.fr.test_fr" name="test_tc_sa_082_01" time="0.026" /></testsuite></testsuites>

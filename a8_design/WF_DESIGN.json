@@ -1,0 +1,83 @@
+[
+{
+"test_id": "TC-SA-001",
+"source_id": "BW-SA-01 path-approved",
+"purpose": "Verify the successful flow where a retention-expired archived dataset is requested for purge by Super Admin and subsequently approved by IT Head.",
+"preconditions": "An archived data set exists in state 'Archived — Retention Eligible' with retention period elapsed.",
+"action_or_input": "Super Admin submits a request to purge the archived data with authenticated confirmation (UC-SA-022). Then, IT Head authorizes the request with decision 'Approve' (UC-SA-023).",
+"expected_result": "Purge request transitions to 'Purge Request Pending IT Head Authorization' upon Super Admin submission, and reaches 'Permanently Purged' state upon IT Head approval.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-002",
+"source_id": "BW-SA-02 path-rejected",
+"purpose": "Verify the flow where a retention-expired archived dataset purge request is rejected by the IT Head.",
+"preconditions": "An archived data set exists in state 'Archived — Retention Eligible' with retention period elapsed.",
+"action_or_input": "Super Admin submits a request to purge the archived data with authenticated confirmation (UC-SA-022). Then, IT Head authorizes the request with decision 'Reject' (UC-SA-023).",
+"expected_result": "Purge request transitions to 'Purge Request Pending IT Head Authorization' upon Super Admin submission, and transitions to 'Purge Request Rejected; Data Remains Archived' upon IT Head rejection.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-003",
+"source_id": "BW-SA-03 immediate-assignment-to-expiry",
+"purpose": "Verify assignment of an immediate time-bound role and its automatic transition to expired state upon reaching end date.",
+"preconditions": "Target user exists without an active assignment for the specified role.",
+"action_or_input": "Super Admin assigns a valid time-bound role with start date set to effective immediately (UC-SA-008). System subsequently reaches the configured end date without any extension, reassignment, or revocation (UC-SA-029).",
+"expected_result": "Role is created directly in 'Active Time-Bound Role' state upon assignment, and automatically transitions to 'Role Expired / Inactive' state when end date is reached.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-004",
+"source_id": "BW-SA-04 future-dated-assignment-to-expiry",
+"purpose": "Verify scheduled role assignment, automatic activation on start date, and subsequent automatic expiry on end date.",
+"preconditions": "Target user exists without an active assignment for the specified role.",
+"action_or_input": "Super Admin assigns a valid time-bound role with a start date set in the future (UC-SA-008). System reaches configured start date (UC-SA-028), and later reaches configured end date (UC-SA-029).",
+"expected_result": "Role assignment is initially created in 'Scheduled Role Assignment' state, automatically transitions to 'Active Time-Bound Role' on start date, and automatically transitions to 'Role Expired / Inactive' on end date.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-005",
+"source_id": "BW-SA-05 role-validity-extension",
+"purpose": "Verify extending the validity of an active time-bound role prior to expiry and its subsequent expiry at the revised end date.",
+"preconditions": "A user holds an 'Active Time-Bound Role' prior to its current end date.",
+"action_or_input": "Super Admin extends role validity providing a valid new end date and reason (UC-SA-011). System subsequently reaches the revised end date (UC-SA-029).",
+"expected_result": "Role state transitions to 'Active Role — Extended Validity' upon extension, and automatically transitions to 'Role Expired / Inactive' when revised end date is reached.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-006",
+"source_id": "BW-SA-06 deactivated-user-reactivation",
+"purpose": "Verify reactivation of a deactivated basic user account.",
+"preconditions": "A basic user account is in 'Deactivated User' state and is not archived.",
+"action_or_input": "Super Admin selects Reactivate User for the account (UC-SA-005).",
+"expected_result": "User account transitions from 'Deactivated User' to 'Active User' state.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-007",
+"source_id": "BW-SA-07 archived-user-restoration-within-window",
+"purpose": "Verify archival of an eligible deactivated user and successful restoration within the reversible window.",
+"preconditions": "A basic user is in 'Deactivated User' state, deactivation interval elapsed, and no pending transaction blocks archival.",
+"action_or_input": "Super Admin archives the user with critical confirmation (UC-SA-015). Before reversible period expires, Super Admin restores the archived user with required authorization (UC-SA-018).",
+"expected_result": "User transitions to 'Archived User — Reversible' state upon archival, and to 'User Restored from Archive' state upon restoration.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-008",
+"source_id": "BW-SA-08 archived-user-reversibility-window-expiry",
+"purpose": "Verify automatic transition of an archived user to permanently non-restorable status when reversible window expires.",
+"preconditions": "A basic user account is in 'Archived User — Reversible' state.",
+"action_or_input": "System configured reversible period expires without any restoration attempt being completed (UC-SA-031).",
+"expected_result": "User account automatically transitions to 'Archived User — Permanent / Non-Restorable' state and becomes permanently non-restorable.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-009",
+"source_id": "BW-SA-09 historical-data-archive-and-restore",
+"purpose": "Verify archiving eligible historical data after backup and subsequently restoring it to active system.",
+"preconditions": "Historical data meets retention, completion, and dependency criteria in 'Archive-Eligible Historical Data' state.",
+"action_or_input": "Super Admin archives historical data after authenticated confirmation and backup completion (UC-SA-016). Later, Super Admin restores the archived historical data with required approval (UC-SA-019).",
+"expected_result": "Data transitions to 'Archived Historical Data' state upon archival, and to 'Historical Data Restored to Active System' state upon restoration.",
+"test_type": "functional"
+}
+]

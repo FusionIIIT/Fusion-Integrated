@@ -1,0 +1,677 @@
+[
+{
+"test_id": "TC-SA-001-01",
+"source_id": "BR-SA-001 permitted",
+"purpose": "Verify creation of user account with a unique Institute ID.",
+"preconditions": "Institute ID 'INST-1001' does not exist in Fusion.",
+"action_or_input": "Submit user creation request for Student with Institute ID 'INST-1001', valid institute email, program, and batch.",
+"expected_result": "User account created successfully with assigned Institute ID 'INST-1001'.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-001-02",
+"source_id": "BR-SA-001 prohibited-duplicate",
+"purpose": "Verify rejection of user creation when Institute ID already exists.",
+"preconditions": "User account with Institute ID 'INST-1001' already exists in Fusion.",
+"action_or_input": "Submit user creation request for Student with duplicate Institute ID 'INST-1001'.",
+"expected_result": "User creation request rejected due to non-unique Institute ID.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-001-03",
+"source_id": "BR-SA-001 prohibited-alteration",
+"purpose": "Verify rejection of any attempt to change an existing Institute ID during profile update.",
+"preconditions": "User profile exists with Institute ID 'INST-1001'.",
+"action_or_input": "Submit profile update attempting to change Institute ID from 'INST-1001' to 'INST-9999'.",
+"expected_result": "Profile update rejected; Institute ID remains immutable.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-002-01",
+"source_id": "BR-SA-002 permitted",
+"purpose": "Verify acceptance of user account creation with a valid institute email address.",
+"preconditions": "Institute ID is unique.",
+"action_or_input": "Submit user creation request with institute email 'user@iiitdmj.ac.in'.",
+"expected_result": "User account created successfully.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-002-02",
+"source_id": "BR-SA-002 prohibited",
+"purpose": "Verify rejection of user account creation or update with a non-institute email address.",
+"preconditions": "User profile creation/update submitted.",
+"action_or_input": "Submit user email as 'user@gmail.com'.",
+"expected_result": "Operation rejected due to invalid institute email domain/format.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-003-01",
+"source_id": "BR-SA-003 permitted-student",
+"purpose": "Verify student creation succeeds when program, batch, and common mandatory data are present.",
+"preconditions": "Institute ID and institute email are unique and valid.",
+"action_or_input": "Create Student user with program 'B.Tech CSE', batch '2024', and common mandatory fields.",
+"expected_result": "Student user account created successfully.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-003-02",
+"source_id": "BR-SA-003 permitted-faculty-staff",
+"purpose": "Verify Faculty/Staff creation succeeds when employee ID, department, and common mandatory data are present.",
+"preconditions": "Institute ID and institute email are unique and valid.",
+"action_or_input": "Create Faculty user with employee ID 'EMP-501', department 'CSE', and common mandatory fields.",
+"expected_result": "Faculty user account created successfully.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-003-03",
+"source_id": "BR-SA-003 prohibited-incomplete",
+"purpose": "Verify rejection of user creation when type-required data is missing.",
+"preconditions": "None.",
+"action_or_input": "Create Student user without program and batch information.",
+"expected_result": "User creation rejected with report of missing/invalid mandatory fields.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-004-01",
+"source_id": "BR-SA-004 permitted",
+"purpose": "Verify archival of deactivated user after min deactivation interval and no pending transactions.",
+"preconditions": "User account status is 'Deactivated', min deactivation interval has elapsed, 0 pending transactions exist.",
+"action_or_input": "Submit archival request for the eligible deactivated user.",
+"expected_result": "User account is successfully archived.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-004-02",
+"source_id": "BR-SA-004 prohibited-active-status",
+"purpose": "Verify rejection of user archival request for an active user.",
+"preconditions": "User account status is 'Active'.",
+"action_or_input": "Submit archival request for the active user account.",
+"expected_result": "Archival request rejected with reason indicating user is not deactivated.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-004-03",
+"source_id": "BR-SA-004 prohibited-interval-not-elapsed",
+"purpose": "Verify rejection of user archival when configured deactivation interval has not elapsed.",
+"preconditions": "User is deactivated, but deactivation time is less than the configured minimum deactivation interval.",
+"action_or_input": "Submit archival request for the user.",
+"expected_result": "Archival request rejected with reason indicating minimum deactivation interval not met.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-004-04",
+"source_id": "BR-SA-004 prohibited-pending-transactions",
+"purpose": "Verify rejection of user archival when user has pending transactions.",
+"preconditions": "User is deactivated and deactivation interval has elapsed, but has pending transactions.",
+"action_or_input": "Submit archival request for the user.",
+"expected_result": "Archival request rejected with reason detailing pending operational transactions.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-005-01",
+"source_id": "BR-SA-005 permitted",
+"purpose": "Verify restoration of an archived user within the reversible period with required authorization.",
+"preconditions": "User account is archived; current time is within configured reversible window; valid authorization present.",
+"action_or_input": "Submit user restore request for the archived user.",
+"expected_result": "Archived user account restored successfully.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-005-02",
+"source_id": "BR-SA-005 prohibited-expired-window",
+"purpose": "Verify rejection of user restoration after the reversible period has expired.",
+"preconditions": "User account is archived; current time exceeds the configured reversible window.",
+"action_or_input": "Submit user restore request for the archived user with valid authorization.",
+"expected_result": "Restoration request rejected; account remains permanently archived and non-restorable.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-005-03",
+"source_id": "BR-SA-005 prohibited-missing-authorization",
+"purpose": "Verify rejection of user restoration within reversible window when required authorization is missing.",
+"preconditions": "User account is archived; current time is within configured reversible window; request lacks authorization.",
+"action_or_input": "Submit user restore request without required authorization.",
+"expected_result": "Restoration request rejected due to missing authorization.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-006-01",
+"source_id": "BR-SA-006 permitted",
+"purpose": "Verify that a user can be assigned multiple non-conflicting non-singular additional roles simultaneously.",
+"preconditions": "User holds Role A (non-singular, compatible with Role B).",
+"action_or_input": "Assign Role B to the user.",
+"expected_result": "Role B assigned successfully; user holds both Role A and Role B simultaneously.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-007-01",
+"source_id": "BR-SA-007 permitted",
+"purpose": "Verify successful assignment of a singular role when no active holder currently exists for the scope.",
+"preconditions": "Singular Role 'Warden_Hall1' has no active holder.",
+"action_or_input": "Assign Role 'Warden_Hall1' to User X.",
+"expected_result": "Role 'Warden_Hall1' assigned successfully to User X.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-007-02",
+"source_id": "BR-SA-007 prohibited-overlapping-holder",
+"purpose": "Verify rejection of singular role assignment when an active holder already exists for the same scope.",
+"preconditions": "Singular Role 'Warden_Hall1' has an active holder User X.",
+"action_or_input": "Assign Role 'Warden_Hall1' to User Y for the same scope.",
+"expected_result": "Role assignment rejected due to singular role occupancy constraint.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-008-01",
+"source_id": "BR-SA-008 permitted-permanent-role",
+"purpose": "Verify role assignment succeeds with start date when role is permanent (no end date required).",
+"preconditions": "Target user is eligible.",
+"action_or_input": "Assign permanent additional role with valid start date and reason.",
+"expected_result": "Role assignment accepted.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-008-02",
+"source_id": "BR-SA-008 permitted-time-bound-role",
+"purpose": "Verify role assignment succeeds with both start date and end date for time-bound role.",
+"preconditions": "Target user is eligible.",
+"action_or_input": "Assign time-bound role with valid start date and valid end date.",
+"expected_result": "Role assignment accepted.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-008-03",
+"source_id": "BR-SA-008 prohibited-missing-start-date",
+"purpose": "Verify rejection of role assignment missing a start date.",
+"preconditions": "Target user is eligible.",
+"action_or_input": "Submit role assignment without specifying start date.",
+"expected_result": "Role assignment rejected due to missing mandatory start date.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-008-04",
+"source_id": "BR-SA-008 prohibited-missing-end-date",
+"purpose": "Verify rejection of time-bound role assignment missing an end date.",
+"preconditions": "Role metadata defines role as time-bound.",
+"action_or_input": "Submit time-bound role assignment specifying start date but omitting end date.",
+"expected_result": "Role assignment rejected due to missing mandatory end date for time-bound role.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-009-01",
+"source_id": "BR-SA-009 trigger-start-date",
+"purpose": "Verify automatic activation of a future-dated role assignment on its start date.",
+"preconditions": "User has a scheduled role assignment with start date equal to current system date.",
+"action_or_input": "Trigger system date arrival / daily lifecycle batch for start date.",
+"expected_result": "Role status changes automatically to Active and effective access is granted without manual Super Admin action.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-009-02",
+"source_id": "BR-SA-009 trigger-end-date",
+"purpose": "Verify automatic expiry of a time-bound role on its end date.",
+"preconditions": "User holds an active time-bound role with end date equal to current system date.",
+"action_or_input": "Trigger system date arrival / daily lifecycle batch for end date.",
+"expected_result": "Role status changes automatically to Expired and effective access is removed.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-010-01",
+"source_id": "BR-SA-010 permitted",
+"purpose": "Verify assignment of a role to a user type allowed by role eligibility metadata.",
+"preconditions": "Role metadata allows assignment to user type 'Faculty'.",
+"action_or_input": "Assign role to a user with type 'Faculty'.",
+"expected_result": "Role assignment validated and created.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-010-02",
+"source_id": "BR-SA-010 prohibited-student-faculty-role",
+"purpose": "Verify rejection of assignment when a Faculty/Staff-specific role is assigned to a Student.",
+"preconditions": "Role metadata restricts role to 'Faculty'.",
+"action_or_input": "Assign role to a user with type 'Student'.",
+"expected_result": "Role assignment rejected identifying eligibility conflict.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-011-01",
+"source_id": "BR-SA-011 permitted",
+"purpose": "Verify assignment of a role when no compatibility or scope conflict exists.",
+"preconditions": "User holds Role A; proposed Role B has no configured conflict with Role A.",
+"action_or_input": "Assign Role B to user.",
+"expected_result": "Assignment passes conflict check and is created.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-011-02",
+"source_id": "BR-SA-011 prohibited-conflict",
+"purpose": "Verify rejection of role assignment that violates configured role conflict metadata.",
+"preconditions": "User holds Role A; metadata configures Role A and Role B as mutually exclusive.",
+"action_or_input": "Assign Role B to user.",
+"expected_result": "Role assignment rejected with specific role conflict report.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-012-01",
+"source_id": "BR-SA-012 permitted",
+"purpose": "Verify atomic reassignment handover: pending tasks transferred, old access revoked, new access granted without overlapping singular active access.",
+"preconditions": "User A holds singular Role R with pending tasks; User B is eligible for Role R.",
+"action_or_input": "Reassign Role R from User A to User B with effective date.",
+"expected_result": "On effective date, pending tasks transferred to User B, User A access removed, User B access granted; singular role never has two active holders.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-013-01",
+"source_id": "BR-SA-013 permitted",
+"purpose": "Verify previous holder retains read-only audit access to prior actions within the configured audit period.",
+"preconditions": "Role reassigned away from User A 10 days ago (within audit period).",
+"action_or_input": "User A accesses prior actions log performed during tenure of former role.",
+"expected_result": "Read-only access to prior action logs granted.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-013-02",
+"source_id": "BR-SA-013 prohibited-operational-access",
+"purpose": "Verify previous holder cannot perform operational actions under reassigned role.",
+"preconditions": "Role reassigned away from User A.",
+"action_or_input": "User A attempts to execute a new task/approval for former role.",
+"expected_result": "Access denied; no operational role authority retained.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-013-03",
+"source_id": "BR-SA-013 prohibited-post-period-access",
+"purpose": "Verify read-only access to prior actions is denied after configured audit period elapses.",
+"preconditions": "Role reassigned away from User A; time elapsed exceeds configured audit period.",
+"action_or_input": "User A attempts to view prior action logs for the reassigned role.",
+"expected_result": "Read-only audit access expired and access denied.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-014-01",
+"source_id": "BR-SA-014 permitted-standard-revocation",
+"purpose": "Verify standard revocation enforcement with at least 1 day notice, mandatory reason, and task disposition.",
+"preconditions": "User holds active role.",
+"action_or_input": "Schedule standard revocation 2 days in future, with mandatory reason and task disposition set to 'transfer'.",
+"expected_result": "Standard revocation scheduled and executed on effective date with chosen task handling.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-014-02",
+"source_id": "BR-SA-014 prohibited-insufficient-notice",
+"purpose": "Verify rejection of standard role revocation scheduled with less than one day notice.",
+"preconditions": "User holds active role.",
+"action_or_input": "Schedule standard revocation with effective date 2 hours from current time.",
+"expected_result": "Revocation rejected due to failure to meet minimum 1-day notice requirement for standard revocation.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-014-03",
+"source_id": "BR-SA-014 permitted-emergency-revocation",
+"purpose": "Verify emergency revocation bypasses standard notice period and executes immediately.",
+"preconditions": "User holds active role.",
+"action_or_input": "Submit emergency revocation with reason and task disposition set to 'close'.",
+"expected_result": "Role access revoked immediately without requiring 1-day notice period.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-015-01",
+"source_id": "BR-SA-015 trigger-user-deactivation",
+"purpose": "Verify automatic revocation of all assigned active roles when a user account is deactivated.",
+"preconditions": "User has active assigned roles.",
+"action_or_input": "Deactivate the user account.",
+"expected_result": "All active roles for the user are automatically revoked/inactivated and access history is preserved.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-016-01",
+"source_id": "BR-SA-016 trigger-expiry-reminder",
+"purpose": "Verify expiry reminders generated for time-bound roles at configured lead time.",
+"preconditions": "Time-bound role end date is within configured lead time window.",
+"action_or_input": "Execute notification trigger service.",
+"expected_result": "Expiry reminder generated and dispatched to role holder and relevant admin.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-016-02",
+"source_id": "BR-SA-016 permitted-extension",
+"purpose": "Verify valid role extension with new end date and reason.",
+"preconditions": "Role is active or approaching expiry.",
+"action_or_input": "Submit role extension request with a later end date and valid reason.",
+"expected_result": "Role validity end date updated successfully and assignment history updated.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-016-03",
+"source_id": "BR-SA-016 prohibited-invalid-extension",
+"purpose": "Verify rejection of role extension missing a new end date or reason.",
+"preconditions": "Role is approaching expiry.",
+"action_or_input": "Submit role extension omitting mandatory reason.",
+"expected_result": "Extension request rejected due to missing mandatory field.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-017-01",
+"source_id": "BR-SA-017 permitted",
+"purpose": "Verify historical data archival when retention age, business cycle completion, and dependencies are met.",
+"preconditions": "Historical data meets retention age, business cycle completed, 0 open dependencies.",
+"action_or_input": "Submit historical data archival request.",
+"expected_result": "Historical data archived successfully.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-017-02",
+"source_id": "BR-SA-017 prohibited-ineligible",
+"purpose": "Verify rejection of historical data archival when dependency or transaction completion criteria fail.",
+"preconditions": "Historical data has unresolved dependency/pending action.",
+"action_or_input": "Submit historical data archival request for specified range.",
+"expected_result": "Archival request rejected with report of dependency/blocking reasons.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-017-03",
+"source_id": "BR-SA-017 prohibited-audit-log-archival",
+"purpose": "Verify audit logs are excluded from historical data archival execution.",
+"preconditions": "Audit log records submitted in archival target range.",
+"action_or_input": "Submit historical data archival request specifying category containing audit logs.",
+"expected_result": "Archival excludes audit logs, preserving them in primary permanent store.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-018-01",
+"source_id": "BR-SA-018 permitted",
+"purpose": "Verify historical data archival proceeds after successful data backup creation.",
+"preconditions": "Backup service returns success.",
+"action_or_input": "Confirm and initiate eligible historical data archival.",
+"expected_result": "Data backup created, followed by data movement to archive database.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-018-02",
+"source_id": "BR-SA-018 prohibited-backup-failure",
+"purpose": "Verify historical data archival aborts if pre-archival backup fails.",
+"preconditions": "Backup service fails / returns error.",
+"action_or_input": "Confirm and initiate eligible historical data archival.",
+"expected_result": "Archival operation aborted; no data moved to archive database.",
+"test_type": "reliability"
+},
+{
+"test_id": "TC-SA-019-01",
+"source_id": "BR-SA-019 permitted-retention",
+"purpose": "Verify archived data is retained and preserved throughout policy retention duration.",
+"preconditions": "Data archived; retention age less than policy retention duration.",
+"action_or_input": "Query archived data status.",
+"expected_result": "Archived data remains intact and available in archive store.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-019-02",
+"source_id": "BR-SA-019 prohibited-early-purge",
+"purpose": "Verify purge request is rejected while archived data retention period has not elapsed.",
+"preconditions": "Archived data retention period has not expired.",
+"action_or_input": "Request purge of archived data.",
+"expected_result": "Purge operation blocked by retention policy constraint.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-020-01",
+"source_id": "BR-SA-020 permitted-read-only",
+"purpose": "Verify archived records accessed via SA archive interface are strictly read-only and enforce data isolation.",
+"preconditions": "Super Admin searches/retrieves archived user metadata.",
+"action_or_input": "View archived user profile and attempt inline edit on metadata.",
+"expected_result": "Archived data displayed in read-only mode; edit operation unavailable/rejected.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-021-01",
+"source_id": "BR-SA-021 permitted",
+"purpose": "Verify permanent purge request is accepted for evaluation after retention period has fully elapsed.",
+"preconditions": "Archived data retention period has fully expired.",
+"action_or_input": "Submit permanent purge request for expired archived data.",
+"expected_result": "Purge request accepted for dual-authorization workflow.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-021-02",
+"source_id": "BR-SA-021 prohibited-within-retention",
+"purpose": "Verify rejection of permanent purge request for data still within retention period.",
+"preconditions": "Archived data retention period has NOT expired.",
+"action_or_input": "Submit permanent purge request.",
+"expected_result": "Purge request rejected immediately due to unexpired retention period.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-022-01",
+"source_id": "BR-SA-022 permitted-dual-authorized",
+"purpose": "Verify permanent purge executes when authorized by both Super Admin and IT Head.",
+"preconditions": "Purge-eligible data requested by Super Admin; IT Head pending approval.",
+"action_or_input": "IT Head submits positive authorization for the purge request.",
+"expected_result": "Permanent purge executes; data permanently removed.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-022-02",
+"source_id": "BR-SA-022 prohibited-single-authorization",
+"purpose": "Verify permanent purge does not execute with only Super Admin request without IT Head approval.",
+"preconditions": "Purge-eligible data requested by Super Admin; IT Head authorization missing/rejected.",
+"action_or_input": "Attempt purge execution prior to IT Head approval or upon IT Head rejection.",
+"expected_result": "Purge execution blocked; data remains safely archived.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-023-01",
+"source_id": "BR-SA-023 threshold-met",
+"purpose": "Verify role assignment notification is dispatched to affected user within 1 hour of effective operation.",
+"preconditions": "Role assignment becomes effective at T0.",
+"action_or_input": "Check dispatch log timestamp T1 for role assignment notification.",
+"expected_result": "Notification dispatched with (T1 - T0) <= 1 hour.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-023-02",
+"source_id": "BR-SA-023 threshold-revocation-met",
+"purpose": "Verify role revocation notification is dispatched to affected user within 1 hour of effective operation.",
+"preconditions": "Role revocation becomes effective at T0.",
+"action_or_input": "Check dispatch log timestamp T1 for role revocation notification.",
+"expected_result": "Notification dispatched with (T1 - T0) <= 1 hour.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-024-01",
+"source_id": "BR-SA-024 threshold-under",
+"purpose": "Verify failed login attempts are logged but do not trigger security alert when count is below 5.",
+"preconditions": "Super Admin login failed 4 consecutive times.",
+"action_or_input": "Observe system alert log and alert dispatch.",
+"expected_result": "4 failed login attempts logged; security alert is NOT triggered.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-024-02",
+"source_id": "BR-SA-024 threshold-exceeded",
+"purpose": "Verify security alert is triggered upon 5 consecutive failed login attempts.",
+"preconditions": "Super Admin login failed 4 consecutive times.",
+"action_or_input": "Perform 5th consecutive failed login attempt.",
+"expected_result": "5th failure logged; security alert triggered and dispatched via configured critical channels (including optional SMS if enabled).",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-025-01",
+"source_id": "BR-SA-025 permitted-immutability",
+"purpose": "Verify Super Admin audit logs cannot be altered or deleted.",
+"preconditions": "Audit entries exist in system.",
+"action_or_input": "Attempt database UPDATE or DELETE SQL command against Super Admin audit log tables.",
+"expected_result": "Operation rejected; audit log records remain unaltered.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-025-02",
+"source_id": "BR-SA-025 permitted-permanent-retention",
+"purpose": "Verify expired role assignment history remains permanently retained in audit history.",
+"preconditions": "Role expired 5 years ago.",
+"action_or_input": "Query historical audit records for the expired role assignment.",
+"expected_result": "Role assignment history records successfully retrieved.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-026-01",
+"source_id": "BR-SA-026 permitted-metadata-access",
+"purpose": "Verify Super Admin can access user profile metadata, role info, audit logs, and archive metadata.",
+"preconditions": "Super Admin logged in.",
+"action_or_input": "Access user profile list, role list, and audit log viewer.",
+"expected_result": "Access granted to permitted identity, role, and audit metadata.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-026-02",
+"source_id": "BR-SA-026 prohibited-operational-content",
+"purpose": "Verify Super Admin is denied access to operational content (grades, financial details, medical records).",
+"preconditions": "Super Admin logged in.",
+"action_or_input": "Attempt direct query or endpoint access to student grades, financial transactions, or medical records.",
+"expected_result": "Access denied due to Super Admin data isolation boundary enforcement.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-027-01",
+"source_id": "BR-SA-027 permitted-login",
+"purpose": "Verify Super Admin login succeeds with strong password and valid 2FA.",
+"preconditions": "Super Admin credentials valid; 2FA configured.",
+"action_or_input": "Submit valid username, strong password, and correct 2FA code.",
+"expected_result": "Super Admin authenticated and session established.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-027-02",
+"source_id": "BR-SA-027 prohibited-missing-2fa",
+"purpose": "Verify Super Admin login fails if 2FA code is omitted or invalid.",
+"preconditions": "Super Admin credentials valid.",
+"action_or_input": "Submit valid username and password without 2FA code.",
+"expected_result": "Login denied due to mandatory 2FA requirement.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-027-03",
+"source_id": "BR-SA-027 prohibited-concurrent-session",
+"purpose": "Verify single active Super Admin session rule by rejecting second concurrent login.",
+"preconditions": "Super Admin active session exists on Device A.",
+"action_or_input": "Authenticate Super Admin account on Device B.",
+"expected_result": "Second session establishment rejected or prior session terminated per single-session policy.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-027-04",
+"source_id": "BR-SA-027 trigger-inactivity-timeout",
+"purpose": "Verify Super Admin session is terminated after configured inactivity timeout.",
+"preconditions": "Super Admin session active; no user activity for configured timeout duration.",
+"action_or_input": "Submit subsequent HTTP request after timeout elapses.",
+"expected_result": "Session invalidated; user redirected to authentication prompt.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-028-01",
+"source_id": "BR-SA-028 prohibited-self-modification",
+"purpose": "Verify Super Admin cannot grant, revoke, or modify their own Super Admin status in-module.",
+"preconditions": "Logged in as Super Admin User SA1.",
+"action_or_input": "Submit request via module to modify SA1's Super Admin role/status.",
+"expected_result": "Operation rejected; self-modification of Super Admin status prohibited in-module.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-029-01",
+"source_id": "BR-SA-029 permitted-authenticated-confirmation",
+"purpose": "Verify critical operation executes after successful reauthentication confirmation.",
+"preconditions": "Super Admin initiates critical operation (e.g., historical data archival / purge request).",
+"action_or_input": "Prompted for password/auth confirmation; submit correct authentication credentials.",
+"expected_result": "Critical operation authenticated and executed.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-029-02",
+"source_id": "BR-SA-029 prohibited-failed-confirmation",
+"purpose": "Verify critical operation is aborted if reauthentication fails or is cancelled.",
+"preconditions": "Super Admin initiates critical operation.",
+"action_or_input": "Submit invalid password on confirmation prompt.",
+"expected_result": "Critical operation aborted; no action executed.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-030-01",
+"source_id": "BR-SA-030 threshold-under",
+"purpose": "Verify bulk user operation succeeds when record count is 1000.",
+"preconditions": "CSV file contains exactly 1000 valid user records.",
+"action_or_input": "Submit bulk user creation request with 1000 records.",
+"expected_result": "Bulk operation validated and processed.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-030-02",
+"source_id": "BR-SA-030 threshold-exceeded",
+"purpose": "Verify bulk user operation is rejected when record count exceeds 1000.",
+"preconditions": "CSV file contains 1001 user records.",
+"action_or_input": "Submit bulk user creation request with 1001 records.",
+"expected_result": "Bulk operation rejected due to exceeding 1000 record bulk operation limit.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-031-01",
+"source_id": "BR-SA-031 trigger-rotation-interval",
+"purpose": "Verify password change is enforced when Super Admin password age reaches configured rotation interval.",
+"preconditions": "Super Admin password age equals configured rotation interval.",
+"action_or_input": "Super Admin attempts authentication.",
+"expected_result": "System requires mandatory password change before granting module access.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-032-01",
+"source_id": "BR-SA-032 permitted-channels",
+"purpose": "Verify supported events dispatch email and in-system notifications, and optional SMS for critical alerts.",
+"preconditions": "Notification preferences enabled for email, in-system, and optional SMS.",
+"action_or_input": "Trigger role assignment event and critical security alert event.",
+"expected_result": "Role assignment sends email + in-system notification; security alert dispatches email + in-system + SMS.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-033-01",
+"source_id": "BR-SA-033 permitted-audit-schema",
+"purpose": "Verify audit log entry records all mandatory fields upon auditable event.",
+"preconditions": "Auditable event occurs (e.g., user status change).",
+"action_or_input": "Execute user deactivation.",
+"expected_result": "Audit entry created containing timestamp, actor ID, action, target, IP address, result, and reason.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-034-01",
+"source_id": "BR-SA-034 permitted-active-role",
+"purpose": "Verify basic user can select an assigned active role and receive corresponding permissions.",
+"preconditions": "User assigned active Role 'HOD_CSE'.",
+"action_or_input": "User selects 'HOD_CSE' as active role.",
+"expected_result": "Active role context set to 'HOD_CSE' and permissions granted.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-034-02",
+"source_id": "BR-SA-034 prohibited-inactive-role",
+"purpose": "Verify user cannot select an expired, revoked, or unassigned role as active context.",
+"preconditions": "User's role 'Lab_Incharge' is expired/revoked.",
+"action_or_input": "User attempts to switch active role context to 'Lab_Incharge'.",
+"expected_result": "Role selection rejected; effective module access denied.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-035-01",
+"source_id": "BR-SA-035 permitted-system-config",
+"purpose": "Verify Super Admin can update permitted parameters (password policy, session timeout, retention limits).",
+"preconditions": "Super Admin logged in.",
+"action_or_input": "Submit update for session timeout duration within institutional policy bounds.",
+"expected_result": "Configuration updated successfully.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-035-02",
+"source_id": "BR-SA-035 prohibited-out-of-boundary-config",
+"purpose": "Verify Super Admin cannot modify excluded configuration categories (academic calendars, financial rules, workflows).",
+"preconditions": "Super Admin logged in.",
+"action_or_input": "Attempt to update academic calendar schedule or financial policy workflow configuration.",
+"expected_result": "Configuration change rejected as outside Super Admin administrative boundary.",
+"test_type": "security"
+}
+]
