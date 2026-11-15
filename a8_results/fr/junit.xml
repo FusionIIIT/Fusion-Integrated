@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="33" time="1.628" timestamp="2026-11-10T23:18:07.409305+05:30" hostname="panther"><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_001_AFR_OAP_009" time="0.216" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_002_AFR_OAP_010" time="0.002" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_003_AFR_OAP_011" time="0.002" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_004_AFR_OAP_012" time="0.422"><failure message="AssertionError: 401 not found in [200, 204]">self = &lt;test_fr.TestOAPFunctionalRequirements testMethod=test_TC_FR_004_AFR_OAP_012&gt;
+
+    def test_TC_FR_004_AFR_OAP_012(self):
+        """
+        Test ID: TC-FR-004 | Source ID: AFR-OAP-012
+        Purpose: Test the HoD review of a submitted leave application
+        """
+        req = StudentLeaveRequest.objects.create(
+            student_id="24BCS205", student_name="Rahul Kumar",
+            leave_type=LeaveType.MEDICAL, start_date="2026-11-15", end_date="2026-11-17",
+            reason="Medical recovery", status=RequestStatus.PENDING
+        )
+        # HoD decision action endpoint
+        res = self.client.post(f"/api/v1/oap/leave/{req.pk}/hod_approve/")
+&gt;       self.assertIn(res.status_code, [200, 204])
+E       AssertionError: 401 not found in [200, 204]
+
+tests\a8\fr\test_fr.py:56: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_005_AFR_OAP_013" time="0.004"><failure message="AssertionError: 401 not found in [200, 204]">self = &lt;test_fr.TestOAPFunctionalRequirements testMethod=test_TC_FR_005_AFR_OAP_013&gt;
+
+    def test_TC_FR_005_AFR_OAP_013(self):
+        """
+        Test ID: TC-FR-005 | Source ID: AFR-OAP-013
+        Purpose: Test the HoD approval or rejection decision recording with remarks
+        """
+        req = StudentLeaveRequest.objects.create(
+            student_id="24BCS205", student_name="Rahul Kumar",
+            leave_type=LeaveType.MEDICAL, start_date="2026-11-15", end_date="2026-11-17",
+            reason="Medical recovery", status=RequestStatus.PENDING
+        )
+        # HoD decision action endpoint
+        res = self.client.post(f"/api/v1/oap/leave/{req.pk}/hod_approve/")
+&gt;       self.assertIn(res.status_code, [200, 204])
+E       AssertionError: 401 not found in [200, 204]
+
+tests\a8\fr\test_fr.py:70: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_006_AFR_OAP_014" time="0.003" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_007_AFR_OAP_015" time="0.002" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_008_AFR_OAP_016" time="0.003" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_009_AFR_OAP_017" time="0.003" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_010_AFR_OAP_018" time="0.005"><failure message="AssertionError: 401 not found in [200, 204]">self = &lt;test_fr.TestOAPFunctionalRequirements testMethod=test_TC_FR_010_AFR_OAP_018&gt;
+
+    def test_TC_FR_010_AFR_OAP_018(self):
+        """
+        Test ID: TC-FR-010 | Source ID: AFR-OAP-018
+        Purpose: Verifies that the Academic Administrator verifies the student's academic standing.
+        """
+        req = BonafideRequest.objects.create(
+            student_id="24BCS205", purpose="Bank Loan",
+            status=RequestStatus.PENDING
+        )
+        res = self.client.post(f"/api/v1/oap/bonafide/{req.pk}/approve_and_issue/")
+&gt;       self.assertIn(res.status_code, [200, 204])
+E       AssertionError: 401 not found in [200, 204]
+
+tests\a8\fr\test_fr.py:118: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_011_AFR_OAP_019" time="0.005"><failure message="AssertionError: 401 not found in [200, 204]">self = &lt;test_fr.TestOAPFunctionalRequirements testMethod=test_TC_FR_011_AFR_OAP_019&gt;
+
+    def test_TC_FR_011_AFR_OAP_019(self):
+        """
+        Test ID: TC-FR-011 | Source ID: AFR-OAP-019
+        Purpose: Verifies that the Academic Administrator makes a decision to approve or reject the bonafide certificate request.
+        """
+        req = BonafideRequest.objects.create(
+            student_id="24BCS205", purpose="Bank Loan",
+            status=RequestStatus.PENDING
+        )
+        res = self.client.post(f"/api/v1/oap/bonafide/{req.pk}/approve_and_issue/")
+&gt;       self.assertIn(res.status_code, [200, 204])
+E       AssertionError: 401 not found in [200, 204]
+
+tests\a8\fr\test_fr.py:130: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_012_AFR_OAP_020" time="0.002" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_013_AFR_OAP_021" time="0.001" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_014_AFR_OAP_022" time="0.004" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_015_AFR_OAP_023" time="0.003" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_016_AFR_OAP_024" time="0.003" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_017_AFR_OAP_025" time="0.003" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_018_AFR_OAP_026" time="0.003" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_019_AFR_OAP_027" time="0.004" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_020_AFR_OAP_028" time="0.004" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_021_AFR_OAP_052" time="0.003" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_022_AFR_OAP_053" time="0.003" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_023_AFR_OAP_029" time="0.004" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_024_AFR_OAP_030" time="0.004" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_025_AFR_OAP_031" time="0.002" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_026_AFR_OAP_032" time="0.002" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_027_AFR_OAP_033" time="0.002" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_028_AFR_OAP_034" time="0.002" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_029_AFR_OAP_035" time="0.002" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_030_AFR_OAP_036" time="0.002" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_031_AFR_OAP_041" time="0.002" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_032_AFR_OAP_042" time="0.002" /><testcase classname="tests.a8.fr.test_fr.TestOAPFunctionalRequirements" name="test_TC_FR_033_AFR_OAP_043" time="0.003" /></testsuite></testsuites>

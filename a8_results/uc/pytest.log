@@ -1,0 +1,290 @@
+FFFFFFFFFFssssssssssssssssssssssssssssssssssssssssF..                    [100%]
+================================== FAILURES ===================================
+___________________ TestOAPUseCases.test_TC_UC_001_OA_UC_01 ___________________
+
+self = <test_uc.TestOAPUseCases testMethod=test_TC_UC_001_OA_UC_01>
+
+    def test_TC_UC_001_OA_UC_01(self):
+        """
+        Test ID: TC-UC-001 | Source ID: OA-UC-01
+        Purpose: Ensure student can open the leave application function.
+        Expected: User is presented with the leave request input.
+        """
+        """Ensure student can open the leave application function."""
+        client = APIClient()
+        response = client.get('/api/oap/leave/')
+>       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:28: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-10 23:18:13 WARNING django.request Not Found: /api/oap/leave/
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:283 Not Found: /api/oap/leave/
+___________________ TestOAPUseCases.test_TC_UC_002_OA_UC_01 ___________________
+
+self = <test_uc.TestOAPUseCases testMethod=test_TC_UC_002_OA_UC_01>
+
+    def test_TC_UC_002_OA_UC_01(self):
+        """
+        Test ID: TC-UC-002 | Source ID: OA-UC-01
+        Purpose: Ensure system displays the leave request input.
+        Expected: User is presented with the leave request input.
+        """
+        """Ensure system displays the leave request input."""
+        client = APIClient()
+        response = client.post('/api/oap/leave/', {'content': 'Leave request'})
+>       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:39: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-10 23:18:13 WARNING django.request Not Found: /api/oap/leave/
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:283 Not Found: /api/oap/leave/
+___________________ TestOAPUseCases.test_TC_UC_003_OA_UC_01 ___________________
+
+self = <test_uc.TestOAPUseCases testMethod=test_TC_UC_003_OA_UC_01>
+
+    def test_TC_UC_003_OA_UC_01(self):
+        """
+        Test ID: TC-UC-003 | Source ID: OA-UC-01
+        Purpose: Ensure student can optionally attach supporting documents.
+        Expected: User can upload supporting documents if needed.
+        """
+        """Ensure student can optionally attach supporting documents."""
+        client = APIClient()
+        response = client.post('/api/oap/leave/', {'content': 'Leave request', 'file': 'path/to/document'})
+>       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:50: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-10 23:18:13 WARNING django.request Not Found: /api/oap/leave/
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:283 Not Found: /api/oap/leave/
+___________________ TestOAPUseCases.test_TC_UC_004_OA_UC_01 ___________________
+
+self = <test_uc.TestOAPUseCases testMethod=test_TC_UC_004_OA_UC_01>
+
+    def test_TC_UC_004_OA_UC_01(self):
+        """
+        Test ID: TC-UC-004 | Source ID: OA-UC-01
+        Purpose: Ensure student can submit the application.
+        Expected: Application is submitted and made available to the HoD.
+        """
+        """Ensure student can submit the application."""
+        client = APIClient()
+        response = client.post('/api/oap/leave/', {'content': 'Leave request', 'file': 'path/to/document'})
+>       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:61: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-10 23:18:13 WARNING django.request Not Found: /api/oap/leave/
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:283 Not Found: /api/oap/leave/
+___________________ TestOAPUseCases.test_TC_UC_005_OA_UC_01 ___________________
+
+self = <test_uc.TestOAPUseCases testMethod=test_TC_UC_005_OA_UC_01>
+
+    def test_TC_UC_005_OA_UC_01(self):
+        """
+        Test ID: TC-UC-005 | Source ID: OA-UC-01
+        Purpose: Ensure system records the submitted application.
+        Expected: Application is submitted and recorded by the system.
+        """
+        """Ensure system records the submitted application."""
+        client = APIClient()
+        response = client.post('/api/oap/leave/', {'content': 'Leave request', 'file': 'path/to/document'})
+>       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:72: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-10 23:18:13 WARNING django.request Not Found: /api/oap/leave/
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:283 Not Found: /api/oap/leave/
+___________________ TestOAPUseCases.test_TC_UC_006_OA_UC_01 ___________________
+
+self = <test_uc.TestOAPUseCases testMethod=test_TC_UC_006_OA_UC_01>
+
+    def test_TC_UC_006_OA_UC_01(self):
+        """
+        Test ID: TC-UC-006 | Source ID: OA-UC-01
+        Purpose: Ensure system triggers the required submission notification.
+        Expected: Notification is triggered to the student.
+        """
+        """Ensure system triggers the required submission notification."""
+        client = APIClient()
+        response = client.post('/api/oap/leave/', {'content': 'Leave request', 'file': 'path/to/document'})
+>       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:83: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-10 23:18:13 WARNING django.request Not Found: /api/oap/leave/
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:283 Not Found: /api/oap/leave/
+___________________ TestOAPUseCases.test_TC_UC_007_OA_UC_01 ___________________
+
+self = <test_uc.TestOAPUseCases testMethod=test_TC_UC_007_OA_UC_01>
+
+    def test_TC_UC_007_OA_UC_01(self):
+        """
+        Test ID: TC-UC-007 | Source ID: OA-UC-01
+        Purpose: Ensure submitted application is available to the HoD.
+        Expected: Application is made available to the HoD.
+        """
+        """Ensure submitted application is available to the HoD."""
+        client = APIClient()
+        response = client.post('/api/oap/leave/', {'content': 'Leave request', 'file': 'path/to/document'})
+>       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:94: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-10 23:18:13 WARNING django.request Not Found: /api/oap/leave/
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:283 Not Found: /api/oap/leave/
+___________________ TestOAPUseCases.test_TC_UC_008_OA_UC_02 ___________________
+
+self = <test_uc.TestOAPUseCases testMethod=test_TC_UC_008_OA_UC_02>
+
+    def test_TC_UC_008_OA_UC_02(self):
+        """
+        Test ID: TC-UC-008 | Source ID: OA-UC-02
+        Purpose: Ensure HoD can open a submitted leave application.
+        Expected: HoD is presented with the submitted leave request.
+        """
+        """Ensure HoD can open a submitted leave application."""
+        client = APIClient()
+        response = client.get('/api/oap/leave/123/')
+>       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:105: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-10 23:18:13 WARNING django.request Not Found: /api/oap/leave/123/
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:283 Not Found: /api/oap/leave/123/
+___________________ TestOAPUseCases.test_TC_UC_009_OA_UC_02 ___________________
+
+self = <test_uc.TestOAPUseCases testMethod=test_TC_UC_009_OA_UC_02>
+
+    def test_TC_UC_009_OA_UC_02(self):
+        """
+        Test ID: TC-UC-009 | Source ID: OA-UC-02
+        Purpose: Ensure system displays the submitted leave request.
+        Expected: HoD can view the submitted leave request.
+        """
+        """Ensure system displays the submitted leave request."""
+        client = APIClient()
+        response = client.get('/api/oap/leave/123/')
+>       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:116: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-10 23:18:13 WARNING django.request Not Found: /api/oap/leave/123/
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:283 Not Found: /api/oap/leave/123/
+___________________ TestOAPUseCases.test_TC_UC_010_OA_UC_02 ___________________
+
+self = <test_uc.TestOAPUseCases testMethod=test_TC_UC_010_OA_UC_02>
+
+    def test_TC_UC_010_OA_UC_02(self):
+        """
+        Test ID: TC-UC-010 | Source ID: OA-UC-02
+        Purpose: Ensure HoD can review the application.
+        Expected: HoD can review the submitted leave request.
+        """
+        """Ensure HoD can review the application."""
+        client = APIClient()
+        response = client.put('/api/oap/leave/123/', {'status': 'approved'})
+>       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:127: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-10 23:18:13 WARNING django.request Not Found: /api/oap/leave/123/
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:283 Not Found: /api/oap/leave/123/
+___________________ TestOAPUseCases.test_TC_UC_051_OA_UC_54 ___________________
+
+self = <test_uc.TestOAPUseCases testMethod=test_TC_UC_051_OA_UC_54>
+
+    def test_TC_UC_051_OA_UC_54(self):
+        """
+        Test ID: TC-UC-051 | Source ID: OA-UC-54
+        Purpose: Verify that the system displays an empty schedule if no scheduled seminars exist.
+        Expected: The system displays an empty schedule.
+        """
+        """Verify that the system displays an empty schedule if no scheduled seminars exist."""
+        # Assuming the API client and necessary setup for viewing seminar schedules
+        client = APIClient()
+        response = client.get('/seminar/schedule')
+>       self.assertEqual(response.status_code, 200)
+E       AssertionError: 404 != 200
+
+tests\a8\uc\test_uc.py:559: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-10 23:18:13 WARNING django.request Not Found: /seminar/schedule
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:283 Not Found: /seminar/schedule
+============================== warnings summary ===============================
+..\..\..\..\AppData\Local\Programs\Python\Python314\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\rahul\AppData\Local\Programs\Python\Python314\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_PORT setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+..\..\..\..\AppData\Local\Programs\Python\Python314\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\rahul\AppData\Local\Programs\Python\Python314\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_USE_TLS setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+..\..\..\..\AppData\Local\Programs\Python\Python314\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\rahul\AppData\Local\Programs\Python\Python314\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_HOST setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+..\..\..\..\AppData\Local\Programs\Python\Python314\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\rahul\AppData\Local\Programs\Python\Python314\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_BACKEND setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+..\..\..\..\AppData\Local\Programs\Python\Python314\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\rahul\AppData\Local\Programs\Python\Python314\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_HOST_PASSWORD setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+..\..\..\..\AppData\Local\Programs\Python\Python314\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\rahul\AppData\Local\Programs\Python\Python314\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_HOST_USER setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.14.3-final-0 _______________
+
+Name                                     Stmts   Miss Branch BrPart  Cover   Missing
+------------------------------------------------------------------------------------
+modules\oap\__init__.py                      0      0      0      0   100%
+modules\oap\apps.py                          5      0      0      0   100%
+modules\oap\migrations\0001_initial.py       6      6      0      0     0%   3-14
+modules\oap\migrations\__init__.py           0      0      0      0   100%
+modules\oap\models.py                       75      0      0      0   100%
+modules\oap\registry.py                      3      3      0      0     0%   1-15
+modules\oap\serializers.py                  26      0      0      0   100%
+modules\oap\urls.py                         11      0      0      0   100%
+modules\oap\views.py                        96     52      2      0    45%   11-14, 22-25, 35-38, 42-45, 52-55, 63-66, 70-73, 77-80, 84-87, 91-94, 101-103, 106-110, 114-117
+------------------------------------------------------------------------------------
+TOTAL                                      222     61      2      0    72%
+Coverage XML written to file a8_results/uc/coverage.xml
+=========================== short test summary info ===========================
+FAILED tests/a8/uc/test_uc.py::TestOAPUseCases::test_TC_UC_001_OA_UC_01 - Ass...
+FAILED tests/a8/uc/test_uc.py::TestOAPUseCases::test_TC_UC_002_OA_UC_01 - Ass...
+FAILED tests/a8/uc/test_uc.py::TestOAPUseCases::test_TC_UC_003_OA_UC_01 - Ass...
+FAILED tests/a8/uc/test_uc.py::TestOAPUseCases::test_TC_UC_004_OA_UC_01 - Ass...
+FAILED tests/a8/uc/test_uc.py::TestOAPUseCases::test_TC_UC_005_OA_UC_01 - Ass...
+FAILED tests/a8/uc/test_uc.py::TestOAPUseCases::test_TC_UC_006_OA_UC_01 - Ass...
+FAILED tests/a8/uc/test_uc.py::TestOAPUseCases::test_TC_UC_007_OA_UC_01 - Ass...
+FAILED tests/a8/uc/test_uc.py::TestOAPUseCases::test_TC_UC_008_OA_UC_02 - Ass...
+FAILED tests/a8/uc/test_uc.py::TestOAPUseCases::test_TC_UC_009_OA_UC_02 - Ass...
+FAILED tests/a8/uc/test_uc.py::TestOAPUseCases::test_TC_UC_010_OA_UC_02 - Ass...
+FAILED tests/a8/uc/test_uc.py::TestOAPUseCases::test_TC_UC_051_OA_UC_54 - Ass...
+11 failed, 2 passed, 40 skipped, 6 warnings in 1.72s

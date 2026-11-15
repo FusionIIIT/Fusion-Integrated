@@ -1,0 +1,90 @@
+================================================================================
+FUSION ERP CS3010 - ASSIGNMENT #8: AI INTERACTION LOG
+================================================================================
+Strategy:               Strategy 3 — Business Rules (BR)
+Subteam:                Subteam 04B
+Module:                 Other Academic Procedures (OAP) - Module 04
+Student 1:              Rahul Kumar (Roll No. 24BCS205)
+Student 2:              Aakriti Karna (Roll No. 24BCS294)
+Date of Execution:      2026-11-10
+AI Model & Version:     Qwen2.5-Coder 1.5B (qwen2.5-coder:1.5b)
+Inference Runtime:      Local Ollama Server (http://localhost:11434)
+Quantization / Config:  Q4_K_M (Default Ollama GGUF)
+Target Frozen Base:     A8_BASE commit 4e4cb5421a5c02f3ec3d9b6ef86c5bc668bafa44
+Execution Order:        Step 3 of 4 (FR -> UC -> BR -> WF)
+================================================================================
+
+--------------------------------------------------------------------------------
+STUDENT PAIR WORKFLOW & METHODOLOGY NOTES
+--------------------------------------------------------------------------------
+For Strategy 3 (BR), we launched a third isolated Ollama conversation. We provided
+the Problem Statement and the full Business Rule Catalog (OA-BR-01 through OA-BR-63).
+The rule coverage mandate required that each business rule have at least one test,
+and where explicit threshold boundaries or positive/negative decision outcomes
+were stated in the rule, both branches be covered.
+
+--------------------------------------------------------------------------------
+STEP 1: TEST DESIGN GENERATION (FROM SPECIFICATION ONLY)
+--------------------------------------------------------------------------------
+[Pair Input - Prompt A to Qwen2.5-Coder 1.5B]:
+"You are designing automated specification-based tests for the Other Academic Procedures (OAP) Fusion ERP module.
+Source of truth: Use ONLY the supplied Problem Statement and Business Rule Specifications below.
+Do NOT inspect implementation code.
+Do NOT infer behavior from implementation.
+Do NOT introduce behavior unsupported by the supplied specification.
+Generate the minimum non-redundant set of test cases needed to satisfy the strategy-specific adequacy rule in Section 7.
+For every test case output exactly these fields: test_id, source_id, purpose, preconditions, action_or_input, expected_result, test_type.
+Output ONLY a valid JSON array.
+
+Strategy-specific instruction for BR:
+Cover every Business Rule with at least one test. Where a rule explicitly has materially different permitted/prohibited outcomes, threshold sides, or stated exceptions, cover each relevant outcome."
+
+[Model Output Summary]:
+The model synthesized 27 test cases covering the 20 testable business rules
+governing minimum credit requirements, CPI thresholds, leave duration limits,
+approval hierarchy constraints, and clearance prerequisites.
+
+[Pair Verification & Freezing]:
+We verified all 27 cases (TC-BR-001 through TC-BR-027), ensured the schema adhered
+to the required JSON structure, and saved and permanently froze this artifact to:
+`a8_design/BR_DESIGN.json`.
+
+--------------------------------------------------------------------------------
+STEP 2: TEST IMPLEMENTATION (GIVEN FROZEN DESIGN + A8_BASE)
+--------------------------------------------------------------------------------
+[Pair Input - Prompt B to Qwen2.5-Coder 1.5B]:
+"You are given:
+1. the frozen A8_BASE Fusion implementation, and
+2. the frozen BR_DESIGN.json.
+Convert these test cases into Python test methods inside a Django TestCase class named TestOAPBusinessRules.
+Exercise the backend models, business rules, status progressions, and constraints directly.
+Every test must contain its test_id and source_id in its name or docstring.
+Store generated tests under tests/a8/br/."
+
+[Model Output Summary]:
+The model created `tests/a8/br/test_br.py` with 27 unit tests exercising model validations,
+custom constraints, date calculations, and status checks directly against the Django ORM.
+
+--------------------------------------------------------------------------------
+STEP 3: TEST EXECUTION & STATUS (0 Repairs Needed)
+--------------------------------------------------------------------------------
+[Execution Attempt]:
+We executed `pytest tests/a8/br/test_br.py`.
+The suite executed cleanly on the first run without any syntax or runtime errors.
+Because the tests exercised the model logic and validation layers directly rather
+than through broken viewset action wrappers, all 27 tests passed cleanly.
+
+- Repair Prompts Used: 0 of 2 allowed (Clean first-pass execution)
+- Total Tests:         27
+- Passed:              27
+- Failed:              0
+- Skipped:             0
+- Statement Coverage:  36.0% (modules.oap)
+- Branch Coverage:     0%
+- Execution Time:      0.44 seconds
+- Preserved Artifacts: a8_results/br/junit.xml, coverage.xml, pytest.log
+
+[Pair Defect Analysis]:
+No defects observed in this suite; all 27 business rule validations are properly
+supported by the underlying models.
+================================================================================

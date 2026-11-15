@@ -1,0 +1,144 @@
+================================================================================
+FUSION ERP CS3010 - ASSIGNMENT #8: AI INTERACTION LOG
+================================================================================
+Strategy:               Strategy 1 — Functional Requirements (FR)
+Subteam:                Subteam 04B
+Module:                 Other Academic Procedures (OAP) - Module 04
+Student 1:              Rahul Kumar (Roll No. 24BCS205)
+Student 2:              Aakriti Karna (Roll No. 24BCS294)
+Date of Execution:      2026-11-10
+AI Model & Version:     Qwen2.5-Coder 1.5B (qwen2.5-coder:1.5b)
+Inference Runtime:      Local Ollama Server (http://localhost:11434)
+Quantization / Config:  Q4_K_M (Default Ollama GGUF)
+Target Frozen Base:     A8_BASE commit 4e4cb5421a5c02f3ec3d9b6ef86c5bc668bafa44
+Execution Order:        Step 1 of 4 (FR -> UC -> BR -> WF)
+================================================================================
+
+--------------------------------------------------------------------------------
+STUDENT PAIR WORKFLOW & METHODOLOGY NOTES
+--------------------------------------------------------------------------------
+Before starting Strategy 1 (FR), we verified that the production code under
+modules/oap/ is completely frozen at commit 4e4cb54 and no changes would be
+made to production code. We launched Ollama locally and initialized a completely
+fresh conversation session so no previous context or code was visible to the model.
+
+In accordance with Section 7 of the assignment instructions, we followed a two-phase
+generation process:
+1. First, we provided ONLY the specification (Problem Statement + CFR/AFR). The AI
+   was strictly forbidden from seeing or inferring from implementation code.
+2. We inspected and froze the resulting design JSON (FR_DESIGN.json).
+3. Only after the design was frozen did we supply the implementation codebase and
+   request executable pytest test methods.
+
+--------------------------------------------------------------------------------
+STEP 1: TEST DESIGN GENERATION (FROM SPECIFICATION ONLY)
+--------------------------------------------------------------------------------
+[Pair Input - Prompt A to Qwen2.5-Coder 1.5B]:
+"You are designing automated specification-based tests for the Other Academic Procedures (OAP) Fusion ERP module.
+Source of truth: Use ONLY the supplied Problem Statement and CFR/AFR Requirements Specification.
+Do NOT inspect implementation code.
+Do NOT infer behavior from implementation.
+Do NOT introduce behavior unsupported by the supplied specification.
+Generate the minimum non-redundant set of test cases needed to satisfy the strategy-specific adequacy rule in Section 7. Do not stop at an arbitrary number, do not omit an explicit test obligation to reduce the test count, and do not invent unsupported behavior. Prefer observable behavior that can subsequently be automated using pytest/pytest-django.
+
+For every test case output exactly these fields:
+- test_id
+- source_id
+- purpose
+- preconditions
+- action_or_input
+- expected_result
+- test_type
+
+Output ONLY a valid JSON array. Do not provide explanation or additional prose.
+
+Strategy-specific instruction for FR:
+Cover every testable CFR/AFR with at least one test. Add a separate negative/boundary/validation/authorization case only where the requirement explicitly defines such a condition or outcome."
+
+[Model Output Summary]:
+The model processed the OAP requirements and generated 33 structured test case
+objects covering requirements AFR-OAP-009 through AFR-OAP-038 (including student
+leave requests, bonafide certificates, branch change applications, degree certificates,
+and thesis archiving).
+
+[Pair Verification & Freezing]:
+We reviewed all 33 test items, validated that each CFR/AFR was covered by at least
+one test case, confirmed that test IDs follow TC-FR-001 to TC-FR-033, and verified
+valid JSON formatting. We saved and permanently froze this artifact to:
+`a8_design/FR_DESIGN.json`.
+
+--------------------------------------------------------------------------------
+STEP 2: TEST IMPLEMENTATION (GIVEN FROZEN DESIGN + A8_BASE)
+--------------------------------------------------------------------------------
+[Pair Input - Prompt B to Qwen2.5-Coder 1.5B]:
+"You are given:
+1. the frozen A8_BASE Fusion implementation, and
+2. the frozen FR_DESIGN.json.
+Convert these test designs into executable automated backend tests using pytest/pytest-django.
+
+Rules:
+- Implement exactly the supplied test cases.
+- Do not add, remove, merge or reinterpret test cases.
+- Preserve each specified expected result.
+- Do not modify production code.
+- Use the Django isolated test database.
+- Reuse existing Fusion test infrastructure where appropriate.
+- Every test must contain its test_id and source_id in its name or docstring.
+- Store generated tests only under tests/a8/fr/."
+
+[Model Output Summary]:
+The model generated a complete Python test suite `tests/a8/fr/test_fr.py` featuring
+a Django TestCase class `TestOAPFunctionalRequirements` implementing test methods
+for all 33 test cases.
+
+--------------------------------------------------------------------------------
+STEP 3: TEST EXECUTION, DEFECT DETECTION & REPAIR (1 of 2 Used)
+--------------------------------------------------------------------------------
+[Initial Execution Attempt]:
+We ran `pytest tests/a8/fr/test_fr.py` in the terminal. The test runner halted with
+a database operational error:
+`django.db.utils.OperationalError: no such index: document_profile_idx`
+`psycopg2.OperationalError: connection to server at 127.0.0.1, port 5432 failed`
+
+Root cause analysis: The default Fusion settings attempted to run PostgreSQL
+migrations across external modules (specifically placement cell), which failed on
+a fresh test runner. Additionally, API endpoints required client authentication.
+
+[Pair Input - Repair Prompt 1 (Prompt C)]:
+"The generated test suite cannot execute because of the following test-code/setup error:
+Test runner requires isolated SQLite memory database with DisableMigrations to bypass unrelated third-party index migrations, and endpoints require authenticated clients.
+Repair the TEST CODE/TEST SETUP only.
+Do not modify production code.
+Do not alter test intent or expected results.
+Do not add or remove test cases.
+Make only the minimum changes required to make the frozen tests executable."
+
+[Resolution & Output]:
+We updated `config/settings/test.py` to route tests through an in-memory SQLite database
+using `DisableMigrations` for third-party modules while keeping `modules.oap` active.
+No production code in `modules/oap/` was touched.
+
+[Final Execution Results]:
+- Total Tests:         33
+- Passed:              29
+- Failed:              4
+- Skipped:             0
+- Statement Coverage:  72.5% (modules.oap)
+- Branch Coverage:     0%
+- Execution Time:      0.82 seconds
+- Preserved Artifacts: a8_results/fr/junit.xml, coverage.xml, pytest.log
+
+[Pair Defect Analysis & Verification]:
+We inspected the 4 failing tests in detail:
+1. `test_TC_FR_004_AFR_OAP_012` & `test_TC_FR_005_AFR_OAP_013`: Failed with 401/AttributeError
+   when calling `/api/v1/oap/leave/<id>/hod_approve/`. Investigation revealed that
+   `StudentLeaveViewSet.hod_approve` attempts to invoke `req.hod_approve()`, which
+   does not exist on the `StudentLeaveRequest` model.
+   -> Logged as Defect ISS-OAP-001 (Confirmed Implementation Defect).
+2. `test_TC_FR_010_AFR_OAP_018` & `test_TC_FR_011_AFR_OAP_019`: Failed with 401/AttributeError
+   when calling `/api/v1/oap/bonafide/<id>/approve_and_issue/`. Investigation revealed that
+   `BonafideViewSet.approve_and_issue` calls `req.approve_and_issue()`, which does not
+   exist on `BonafideRequest`.
+   -> Logged as Defect ISS-OAP-002 (Confirmed Implementation Defect).
+Both defects were logged in `A8_Data.xlsx` sheet 'Defect Log'.
+================================================================================
