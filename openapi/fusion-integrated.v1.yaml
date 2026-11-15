@@ -63,6 +63,207 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/iaa/requests:
+    get:
+      operationId: v1_iaa_requests_list
+      description: 'GET: requests visible to you. POST: IAA-UC-101 save a Draft.'
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedExpenseRequestList'
+          description: ''
+    post:
+      operationId: v1_iaa_requests_create
+      description: 'GET: requests visible to you. POST: IAA-UC-101 save a Draft.'
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExpenseRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExpenseRequest'
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseRequest'
+          description: ''
+  /api/v1/iaa/requests/{id}:
+    get:
+      operationId: v1_iaa_requests_retrieve
+      description: GET one request; PATCH edits your own Draft (IAA-BR-104).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseRequest'
+          description: ''
+    patch:
+      operationId: v1_iaa_requests_partial_update
+      description: GET one request; PATCH edits your own Draft (IAA-BR-104).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedExpenseRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedExpenseRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedExpenseRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseRequest'
+          description: ''
+  /api/v1/iaa/requests/{id}/decide:
+    post:
+      operationId: v1_iaa_requests_decide_create
+      description: IAA-UC-201 Approve / Reject Request.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Decision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Decision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Decision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseRequest'
+          description: ''
+  /api/v1/iaa/requests/{id}/record:
+    post:
+      operationId: v1_iaa_requests_record_create
+      description: IAA-UC-105 Process & Record Approved Request.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseRequest'
+          description: ''
+  /api/v1/iaa/requests/{id}/submit:
+    post:
+      operationId: v1_iaa_requests_submit_create
+      description: IAA-UC-102 Submit Expense/Voucher Request.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseRequest'
+          description: ''
+  /api/v1/iaa/requests/{id}/validate:
+    post:
+      operationId: v1_iaa_requests_validate_create
+      description: IAA-UC-103 Review & Validate Request (Finance).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseRequest'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -2315,6 +2516,26 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    Decision:
+      type: object
+      description: Remarks may be blank here so IAA-BR-005 is enforced (and cited)
+        by the domain.
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        remarks:
+          type: string
+          default: ''
+      required:
+      - decision
+    DecisionEnum:
+      enum:
+      - approve
+      - reject
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
     Detail:
       type: object
       properties:
@@ -2407,6 +2628,103 @@ components:
       - season_decision
       - semester
       - standing
+    ExpenseRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        creator_user_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          maxLength: 100
+        purpose:
+          type: string
+          maxLength: 255
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ExpenseRequestStatusEnum'
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        finance_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        validated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        approver_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decision_remarks:
+          type: string
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        recorded_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        recorded_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - approver_user_id
+      - created_at
+      - creator_user_id
+      - decided_at
+      - decision_remarks
+      - finance_user_id
+      - id
+      - recorded_at
+      - recorded_by_user_id
+      - status
+      - submitted_at
+      - updated_at
+      - validated_at
+    ExpenseRequestStatusEnum:
+      enum:
+      - draft
+      - submitted
+      - finance_validated
+      - approved
+      - rejected
+      - recorded
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `submitted` - Submitted
+        * `finance_validated` - Finance Validated
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `recorded` - Recorded
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2943,6 +3261,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Company'
+    PaginatedExpenseRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseRequest'
     PaginatedInterviewRoundList:
       type: object
       required:
@@ -3000,6 +3337,73 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PatchedExpenseRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        creator_user_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          maxLength: 100
+        purpose:
+          type: string
+          maxLength: 255
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ExpenseRequestStatusEnum'
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        finance_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        validated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        approver_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decision_remarks:
+          type: string
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        recorded_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        recorded_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
     PatchedJobPosting:
       type: object
       properties:
