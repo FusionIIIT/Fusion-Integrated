@@ -1,7 +1,7 @@
 """Company registration and authorization (PC-UC-014, PC-WF-002, PC-BR-007)."""
 from __future__ import annotations
 
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -11,6 +11,7 @@ from modules.placement.services import notifications
 from modules.placement.services.authz import require
 
 P_MANAGE = "placement_cell.company.manage"
+SLUG_ATTEMPTS = 5
 
 
 def _unique_slug(name: str) -> str:
@@ -20,6 +21,25 @@ def _unique_slug(name: str) -> str:
         n += 1
         slug = f"{base}-{n}"[:80]
     return slug
+
+
+def _is_slug_clash(exc: IntegrityError) -> bool:
+    diag = getattr(exc.__cause__, "diag", None)
+    return getattr(diag, "constraint_name", None) == f"{Company._meta.db_table}_slug_key"
+
+
+def _create_with_unique_slug(**fields) -> Company:
+    # Two registrations of one name can both see a slug as free; the unique index picks the winner.
+    for _ in range(SLUG_ATTEMPTS):
+        try:
+            with transaction.atomic():
+                return Company.objects.create(slug=_unique_slug(fields["name"]), **fields)
+        except IntegrityError as exc:
+            if not _is_slug_clash(exc):
+                raise
+    raise ConflictError(
+        "Several companies with this name are being registered right now. Submit it again.",
+        code="company_slug_contention")
 
 
 @transaction.atomic
@@ -34,8 +54,8 @@ def register(*, name: str, sector: str = "", website: str = "",
     if not name:
         raise ConflictError("A company name is required.", code="name_required")
 
-    company = Company.objects.create(
-        name=name, slug=_unique_slug(name), sector=sector, website=website,
+    company = _create_with_unique_slug(
+        name=name, sector=sector, website=website,
         hq_city=hq_city, approval_status="pending", status="prospect",
         registered_by_user_id=registered_by_user_id,
     )
