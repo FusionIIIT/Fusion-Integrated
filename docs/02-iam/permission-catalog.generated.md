@@ -13,6 +13,15 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `iaa`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `iaa.request.create` | Create and submit one's own expense/voucher requests | `faculty`, `staff` |
+| `iaa.request.validate` | Finance validation of submitted requests | `Finance Staff` |
+| `iaa.request.decide` | Approve or reject finance-validated requests | `Dean`, `Director`, `HoD` |
+| `iaa.request.record` | Record internal completion of approved requests | `Finance Staff` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
