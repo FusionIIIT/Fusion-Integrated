@@ -1,0 +1,120 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.13, pytest-9.2.0, pluggy-1.7.0
+django: version: 5.2.19, settings: settings_sqlite (from option)
+rootdir: D:\Downloads\BADMS
+configfile: pyproject.toml
+plugins: Faker-40.54.0, cov-7.1.0, django-4.14.0
+collected 27 items
+
+tests\a8\br\test_business_rules.py .....F.FFF..F....ss......ss           [100%]
+
+================================== FAILURES ===================================
+_______ test_br_007_sensitive_encryption_rejects_non_aes_256_algorithm ________
+
+principal_factory = <function principal_factory.<locals>.make_principal at 0x000001ADE7156FC0>
+
+    @pytest.mark.django_db
+    def test_br_007_sensitive_encryption_rejects_non_aes_256_algorithm(principal_factory):
+        """BR-007 / BR-BA-007: sensitive data requires AES-256 at rest and in transit."""
+        from modules.badms.models import SecureArchivalRequest
+        from modules.badms.services.operations import it_security_configure_encryption
+    
+        request = SecureArchivalRequest.objects.create(
+            user_id=510, department="CSE", file_name="sensitive.dat", file_type="application/octet-stream",
+            file_size_bytes=2, reason="Sensitive", authoritative_classification=sm.TIER_SENSITIVE,
+            status=sm.ARCHIVAL_CLASSIFIED,
+        )
+>       with pytest.raises(BadRequestError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE BadRequestError
+
+tests\a8\br\test_business_rules.py:107: Failed
+______ test_br_010_hod_cannot_review_another_department_archival_request ______
+
+    @pytest.mark.django_db
+    def test_br_010_hod_cannot_review_another_department_archival_request():
+        """BR-010 / BR-BA-010 own-department decision scope."""
+        from modules.badms.models import SecureArchivalRequest
+        from modules.badms.services.operations import hod_review_archival
+    
+        request = SecureArchivalRequest.objects.create(
+            user_id=514, department="EE", file_name="item.txt", file_type="text/plain", file_size_bytes=1,
+            reason="Other department",
+        )
+        actor = SimpleNamespace(
+            user_id=515, active_role="hod", department="CSE",
+            has_permission=lambda code: code == "badms.department.review",
+        )
+>       with pytest.raises(PermissionDeniedError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PermissionDeniedError
+
+tests\a8\br\test_business_rules.py:153: Failed
+_____ test_br_010_hod_cannot_review_another_department_storage_extension ______
+
+    @pytest.mark.django_db
+    def test_br_010_hod_cannot_review_another_department_storage_extension():
+        """BR-010 / BR-BA-010 own-department scope for storage-extension decisions."""
+        from modules.badms.models import StorageExtensionRequest
+        from modules.badms.services.operations import hod_review_storage_extension
+    
+        request = StorageExtensionRequest.objects.create(
+            user_id=524, department="EE", requested_additional_mb=256, reason="Other department"
+        )
+        actor = SimpleNamespace(
+            user_id=525, active_role="hod", department="CSE",
+            has_permission=lambda code: code == "badms.department.review",
+        )
+>       with pytest.raises(PermissionDeniedError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PermissionDeniedError
+
+tests\a8\br\test_business_rules.py:170: Failed
+____________ test_br_012_invalid_schedule_parameters_are_rejected _____________
+
+principal_factory = <function principal_factory.<locals>.make_principal at 0x000001ADE72C1580>
+
+    @pytest.mark.django_db
+    def test_br_012_invalid_schedule_parameters_are_rejected(principal_factory):
+        """BR-012 / BR-BA-012 malformed cron and invalid retention boundary."""
+        from modules.badms.services.operations import configure_schedule
+    
+>       with pytest.raises(BadRequestError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE BadRequestError
+
+tests\a8\br\test_business_rules.py:187: Failed
+___________ test_br_020_hod_sees_only_requests_in_their_department ____________
+
+principal_factory = <function principal_factory.<locals>.make_principal at 0x000001ADE72C1EE0>
+
+    @pytest.mark.django_db
+    def test_br_020_hod_sees_only_requests_in_their_department(principal_factory):
+        """BR-020 / BR-BA-020 protected-information scope."""
+        from modules.badms.models import SecureArchivalRequest
+        from modules.badms.selectors.scoping import visible_archival_requests
+    
+        SecureArchivalRequest.objects.create(
+            user_id=521, department="CSE", file_name="cse.txt", file_type="text/plain", file_size_bytes=1,
+            reason="CSE request",
+        )
+        SecureArchivalRequest.objects.create(
+            user_id=522, department="EE", file_name="ee.txt", file_type="text/plain", file_size_bytes=1,
+            reason="EE request",
+        )
+        hod = principal_factory(user_id=523, permissions={"badms.department.review"})
+        visible = visible_archival_requests(hod)
+>       assert visible.count() == 0
+E       assert 2 == 0
+E        +  where 2 = count()
+E        +    where count = <QuerySet [<SecureArchivalRequest: SecureArchivalRequest object (2)>, <SecureArchivalRequest: SecureArchivalRequest object (1)>]>.count
+
+tests\a8\br\test_business_rules.py:276: AssertionError
+- generated xml file: D:\Downloads\BADMS\a8_results\br\reproduction.junit.xml -
+=========================== short test summary info ===========================
+FAILED tests/a8/br/test_business_rules.py::test_br_007_sensitive_encryption_rejects_non_aes_256_algorithm
+FAILED tests/a8/br/test_business_rules.py::test_br_010_hod_cannot_review_another_department_archival_request
+FAILED tests/a8/br/test_business_rules.py::test_br_010_hod_cannot_review_another_department_storage_extension
+FAILED tests/a8/br/test_business_rules.py::test_br_012_invalid_schedule_parameters_are_rejected
+FAILED tests/a8/br/test_business_rules.py::test_br_020_hod_sees_only_requests_in_their_department
+=================== 5 failed, 18 passed, 4 skipped in 3.90s ===================
