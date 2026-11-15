@@ -15,6 +15,7 @@ source_modules =
     modules.placement
     modules.directory
     modules.accesscontrol
+    modules.spacs
 forbidden_modules =
     modules.placement.models
     modules.placement.services
@@ -25,6 +26,11 @@ forbidden_modules =
     modules.directory.services
     modules.directory.api
     modules.accesscontrol.models
+    modules.spacs.models
+    modules.spacs.services
+    modules.spacs.selectors
+    modules.spacs.api
+    modules.spacs.domain
 # DIRECT imports only. contracts.py legitimately imports its OWN module's
 # models and services, so following the chain transitively would make this
 # contract impossible to satisfy. What we forbid is a module reaching straight
@@ -38,6 +44,7 @@ type = forbidden
 source_modules =
 # Every module's domain, not just the first one written.
     modules.placement.domain
+    modules.spacs.domain
 forbidden_modules =
     django
     rest_framework
@@ -66,3 +73,12 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+
+[importlinter:contract:spacs-layers]
+name = Layering inside SPACS
+type = layers
+layers =
+    modules.spacs.api
+    modules.spacs.services
+    modules.spacs.models
+    modules.spacs.domain
