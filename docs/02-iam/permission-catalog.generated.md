@@ -13,6 +13,26 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `patent_management`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `patent_management.application.submit` | Submit a patent application | `faculty`, `student` |
+| `patent_management.application.view_own` | See one's own applications | `faculty`, `student` |
+| `patent_management.application.view_assigned` | See applications assigned as Director or Attorney | `patent_attorney`, `patent_director` |
+| `patent_management.application.view_all` | See every application (PCC_ADMIN) | `pcc_admin` |
+| `patent_management.application.revise` | Revise and resubmit | `faculty`, `student` |
+| `patent_management.application.withdraw` | Withdraw before filing | `faculty`, `student` |
+| `patent_management.application.appeal` | File an appeal against a rejection | `faculty`, `student` |
+| `patent_management.route.manage` | Assign Directors and Attorneys | `pcc_admin` |
+| `patent_management.review.decide` | Decide Approve, Reject or Needs Revision | `patent_director` |
+| `patent_management.appeal.decide` | Decide an appeal | `patent_director` |
+| `patent_management.attorney.respond` | Accept assignment, record opinion, budget, filing | `patent_attorney` |
+| `patent_management.budget.decide` | Approve or reject a budget | `patent_director` |
+| `patent_management.report.own` | See one's own application report | `faculty`, `patent_attorney`, `patent_director`, `student` |
+| `patent_management.report.view` | See system-wide PMS reports | `patent_director`, `pcc_admin` |
+| `patent_management.notification.view` | See one's own notifications | `faculty`, `patent_attorney`, `patent_director`, `pcc_admin`, `student` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
