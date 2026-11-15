@@ -1,0 +1,12 @@
+
+# 2026-11-02 22:07:02.995389
++Reply with exactly: READY
+
+# 2026-11-02 22:08:42.829698
++Pass 1 of 3, backend foundation only. Implement the OAP Django app: models for the five workflows, app/registry/permissions/contracts, service/state-transition choke points, API serializers/views/urls, registration in settings and root URLs. Keep scope tight: no frontend, no tests, no migrations yet. Write all source files needed for this pass. Follow the supplied brief exactly and report only after applying the edits.
+
+# 2026-11-02 22:09:53.784036
++Pass 1: implement only the OAP Django data/domain foundation. Create modules/oap with __init__, apps, registry, contracts, models (all OAP entities/statuses), and services enforcing the core lifecycle guards. Register the app in settings. Do not add API, frontend, tests, migrations, root URLs, or change unrelated files. Use the brief's exact invariants. Apply the edits now.
+
+# 2026-11-02 22:10:59.421319
++Replace modules/oap/models.py now. This is a Django 5 app. Use timezone-aware timestamps and integer user_id fields; no cross-module foreign keys. Define: LeaveApplication(student_user_id, details, supporting_document_url blank, status submitted/approved/rejected, decided_by_user_id nullable, decided_at); BonafideRequest(student_user_id, purpose blank, status submitted/approved/rejected, decision fields, certificate_url blank); NoDuesRequest(student_user_id, status in_progress/finalized, finalized fields, certificate_url blank) and NoDuesClearance(request FK, domain choices library/hostel/mess/department/lab/academic_section/student_section, status pending/cleared/dues_outstanding, verifier fields) with unique request/domain; ThesisSupervisorAssignment and TaSupervisorAssignment for PG student and supervisor user IDs (TA also optional subject); AssistantshipClaim(student_user_id, amount Decimal, status submitted/awaiting_department/forwarded_to_hod/approved/rejected/disbursed, snapshot supervisor IDs, each supervisor's decision/timestamp, department/hod/disbursement fields); GraduateSeminar(student_user_id, title, requested_at, scheduled_at nullable, scheduled_by_user_id nullable, venue blank, status requested/scheduled). Add useful indexes and __str__. Do not make unrelated changes. Output valid Aider SEARCH/REPLACE edits and apply them.
