@@ -34,6 +34,265 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "elm": {
+      "grants": {
+        "Deputy Registrar": [
+          "elm.leave_request.review",
+          "elm.resumption.review"
+        ],
+        "Director": [
+          "elm.leave_request.approve",
+          "elm.leave_request.review",
+          "elm.resumption.review"
+        ],
+        "HOD (CSE)": [
+          "elm.leave_request.approve",
+          "elm.leave_request.review",
+          "elm.resumption.review"
+        ],
+        "HOD (Design)": [
+          "elm.leave_request.approve",
+          "elm.leave_request.review",
+          "elm.resumption.review"
+        ],
+        "HOD (ECE)": [
+          "elm.leave_request.approve",
+          "elm.leave_request.review",
+          "elm.resumption.review"
+        ],
+        "HOD (Liberal Arts)": [
+          "elm.leave_request.approve",
+          "elm.leave_request.review",
+          "elm.resumption.review"
+        ],
+        "HOD (ME)": [
+          "elm.leave_request.approve",
+          "elm.leave_request.review",
+          "elm.resumption.review"
+        ],
+        "HOD (NS)": [
+          "elm.leave_request.approve",
+          "elm.leave_request.review",
+          "elm.resumption.review"
+        ],
+        "Leave Administrator": [
+          "elm.calendar.publish",
+          "elm.leave_account.view",
+          "elm.offline_record.create",
+          "elm.policy.publish"
+        ],
+        "Registrar": [
+          "elm.leave_request.approve",
+          "elm.leave_request.review",
+          "elm.resumption.review"
+        ],
+        "SectionHead_HR": [
+          "elm.leave_request.approve",
+          "elm.leave_request.review",
+          "elm.resumption.review"
+        ],
+        "SectionHead_IWD": [
+          "elm.leave_request.approve",
+          "elm.leave_request.review",
+          "elm.resumption.review"
+        ],
+        "SectionHead_PS": [
+          "elm.leave_request.approve",
+          "elm.leave_request.review",
+          "elm.resumption.review"
+        ],
+        "SectionHead_RSPC": [
+          "elm.leave_request.approve",
+          "elm.leave_request.review",
+          "elm.resumption.review"
+        ],
+        "faculty": [
+          "elm.leave_balance.view",
+          "elm.leave_request.create",
+          "elm.leave_request.delete",
+          "elm.leave_request.update",
+          "elm.leave_request.view",
+          "elm.substitution.review"
+        ],
+        "staff": [
+          "elm.leave_balance.view",
+          "elm.leave_request.create",
+          "elm.leave_request.delete",
+          "elm.leave_request.update",
+          "elm.leave_request.view",
+          "elm.substitution.review"
+        ]
+      },
+      "module_grants": [
+        "Deputy Registrar",
+        "Director",
+        "HOD (CSE)",
+        "HOD (Design)",
+        "HOD (ECE)",
+        "HOD (Liberal Arts)",
+        "HOD (ME)",
+        "HOD (NS)",
+        "Leave Administrator",
+        "Registrar",
+        "SectionHead_HR",
+        "SectionHead_IWD",
+        "SectionHead_PS",
+        "SectionHead_RSPC",
+        "faculty",
+        "staff"
+      ],
+      "nav": {
+        "base_path": "/elm",
+        "icon": "CalendarCheck",
+        "items": [
+          {
+            "code": "elm.apply",
+            "icon": "PaperPlaneTilt",
+            "label": "Apply for Leave",
+            "required_permission": "elm.leave_request.create",
+            "sort_order": 10,
+            "to": "/elm/apply"
+          },
+          {
+            "code": "elm.mine",
+            "icon": "ListChecks",
+            "label": "My Leave",
+            "required_permission": "elm.leave_request.view",
+            "sort_order": 20,
+            "to": "/elm/mine"
+          },
+          {
+            "code": "elm.balances",
+            "icon": "Wallet",
+            "label": "Balances & History",
+            "required_permission": "elm.leave_balance.view",
+            "sort_order": 30,
+            "to": "/elm/balances"
+          },
+          {
+            "code": "elm.substitutions",
+            "icon": "UserSwitch",
+            "label": "Substitution Requests",
+            "required_permission": "elm.substitution.review",
+            "sort_order": 40,
+            "to": "/elm/substitutions"
+          },
+          {
+            "code": "elm.queue",
+            "icon": "Stamp",
+            "label": "Leave Approvals",
+            "required_permission": "elm.leave_request.review",
+            "sort_order": 50,
+            "to": "/elm/queue"
+          },
+          {
+            "code": "elm.resumptions",
+            "icon": "SignIn",
+            "label": "Resumptions",
+            "required_permission": "elm.resumption.review",
+            "sort_order": 60,
+            "to": "/elm/resumptions"
+          },
+          {
+            "code": "elm.policies",
+            "icon": "Sliders",
+            "label": "Leave Policy",
+            "required_permission": "elm.policy.publish",
+            "sort_order": 70,
+            "to": "/elm/policies"
+          },
+          {
+            "code": "elm.calendar",
+            "icon": "CalendarBlank",
+            "label": "Holiday Calendar",
+            "required_permission": "elm.calendar.publish",
+            "sort_order": 80,
+            "to": "/elm/calendar"
+          },
+          {
+            "code": "elm.offline",
+            "icon": "Archive",
+            "label": "Offline Leave",
+            "required_permission": "elm.offline_record.create",
+            "sort_order": 90,
+            "to": "/elm/offline"
+          },
+          {
+            "code": "elm.accounts",
+            "icon": "BookOpen",
+            "label": "Leave Accounts",
+            "required_permission": "elm.leave_account.view",
+            "sort_order": 100,
+            "to": "/elm/accounts"
+          }
+        ],
+        "label": "Leave Management",
+        "nav_section": "Leave",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "elm.leave_request.view",
+          "label": "See one's own leave requests"
+        },
+        {
+          "code": "elm.leave_request.create",
+          "label": "Apply for leave or an extension"
+        },
+        {
+          "code": "elm.leave_request.update",
+          "label": "Modify, cancel or resume one's own leave"
+        },
+        {
+          "code": "elm.leave_request.delete",
+          "label": "Withdraw one's own pending request"
+        },
+        {
+          "code": "elm.substitution.review",
+          "label": "Accept or decline a substitute nomination"
+        },
+        {
+          "code": "elm.leave_balance.view",
+          "label": "See one's own balances and leave-account history"
+        },
+        {
+          "code": "elm.leave_request.review",
+          "label": "Review, recommend or forward routed leave"
+        },
+        {
+          "code": "elm.leave_request.approve",
+          "label": "Approve or reject leave as sanctioning authority"
+        },
+        {
+          "code": "elm.resumption.review",
+          "label": "Verify resumption of duty"
+        },
+        {
+          "code": "elm.policy.publish",
+          "label": "Create, revise and publish leave policy and hierarchy"
+        },
+        {
+          "code": "elm.calendar.publish",
+          "label": "Create, revise and publish the holiday/RH calendar"
+        },
+        {
+          "code": "elm.offline_record.create",
+          "label": "Record offline-sanctioned leave"
+        },
+        {
+          "code": "elm.leave_account.view",
+          "label": "See any employee's leave account"
+        }
+      ],
+      "scope_permissions": [
+        "elm.leave_request.view"
+      ],
+      "system_permissions": [
+        "elm.sla.process",
+        "elm.year_end.process"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
