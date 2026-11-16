@@ -1,0 +1,720 @@
+[
+  {
+    "id": "TC-BADMS-301",
+    "strategy": "WF",
+    "title": "Secure Archival - HoD Rejection Workflow (End-to-End)",
+    "primary_obligation": "CW-BA-01 Path 1",
+    "linked_obligations": [
+      "BW-BA-01",
+      "CW-BA-01 Transition 1",
+      "CW-BA-01 Transition 2",
+      "BW-BA-01 Transition 1",
+      "BW-BA-01 Transition 2",
+      "BA-UC-002",
+      "BA-UC-003",
+      "BR-BA-006",
+      "BR-BA-002",
+      "BR-BA-010"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify the complete end-to-end basis workflow BW-BA-01 / composite CW-BA-01 Path 1 where a user submits a valid secure archival request and the respective departmental HoD rejects it.",
+    "pre_conditions": "User is authenticated and belongs to Department CS. Department CS HoD is active. User has sufficient archival quota.",
+    "test_inputs": {
+      "actor_user": "user_cs_01",
+      "department": "CS",
+      "request_metadata": {
+        "file_name": "research_dataset_2026.tar.gz",
+        "date": "2026-11-09",
+        "owners": [
+          "user_cs_01"
+        ],
+        "file_type": "archive/tar",
+        "reason": "Department research archive retention",
+        "attachment": "dataset_manifest.sig",
+        "initial_classification": "Routine"
+      },
+      "actor_hod": "hod_cs",
+      "hod_action": "Reject",
+      "rejection_reason": "Insufficient justification for department archival storage"
+    },
+    "execution_steps": [
+      "Step 1: User submits secure archival request with valid file metadata and initial classification via BA-UC-002.",
+      "Step 2: System validates request parameters and quota, transitions state from Not Submitted to Submitted, and routes request to CS HoD.",
+      "Step 3: CS HoD reviews request details and submits decision Outcome = Reject via BA-UC-003.",
+      "Step 4: System updates archival request state from Submitted to Rejected and records decision notification."
+    ],
+    "expected_outcome": "Request state transitions: Not Submitted -> Submitted -> Rejected. Decision recorded and requester receives rejection notification. Request does not proceed to SysAdmin classification.",
+    "failure_guarantee": "If HoD rejection fails, request state remains Submitted and no unauthorized classification or archival is initiated."
+  },
+  {
+    "id": "TC-BADMS-302",
+    "strategy": "WF",
+    "title": "Secure Archival - HoD Approval with Non-Sensitive SysAdmin Classification",
+    "primary_obligation": "CW-BA-01 Path 2",
+    "linked_obligations": [
+      "BW-BA-02",
+      "CW-BA-01 Transition 1",
+      "CW-BA-01 Transition 3",
+      "CW-BA-01 Transition 4",
+      "BW-BA-02 Transition 1",
+      "BW-BA-02 Transition 2",
+      "BW-BA-02 Transition 3",
+      "BA-UC-002",
+      "BA-UC-003",
+      "BA-UC-004",
+      "BR-BA-006",
+      "BR-BA-002",
+      "BR-BA-010",
+      "BR-BA-004",
+      "BR-BA-008"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify end-to-end workflow BW-BA-02 / CW-BA-01 Path 2 where a secure archival request is approved by HoD and authoritative classification assigned by SysAdmin is non-Sensitive (Routine/Critical/Archival), completing at Classified Non-Sensitive / Policy Applied.",
+    "pre_conditions": "User is authenticated and has available quota. Department HoD and SysAdmin accounts are operational.",
+    "test_inputs": {
+      "actor_user": "user_ee_01",
+      "department": "EE",
+      "request_metadata": {
+        "file_name": "lab_measurements_q3.csv",
+        "date": "2026-11-09",
+        "owners": [
+          "user_ee_01"
+        ],
+        "file_type": "text/csv",
+        "reason": "Semester laboratory experimental data",
+        "attachment": "lab_report.pdf",
+        "initial_classification": "Routine"
+      },
+      "actor_hod": "hod_ee",
+      "hod_action": "Approve",
+      "actor_sysadmin": "sysadmin_01",
+      "authoritative_classification": "Routine"
+    },
+    "execution_steps": [
+      "Step 1: User submits secure archival request via BA-UC-002.",
+      "Step 2: System validates submission, transitions request from Not Submitted to Submitted, and routes to EE HoD.",
+      "Step 3: EE HoD evaluates request and submits decision Outcome = Approve via BA-UC-003.",
+      "Step 4: System updates request state from Submitted to HoD Approved and routes request to SysAdmin queue.",
+      "Step 5: SysAdmin reviews request and assigns authoritative classification Routine (Classification != Sensitive) via BA-UC-004.",
+      "Step 6: System applies non-sensitive retention policy and transitions state to Classified Non-Sensitive / Policy Applied."
+    ],
+    "expected_outcome": "Request transitions: Not Submitted -> Submitted -> HoD Approved -> Classified Non-Sensitive / Policy Applied. Standard retention policy applied; request is NOT routed to IT Security.",
+    "failure_guarantee": "If classification fails, request remains in HoD Approved state without policy application."
+  },
+  {
+    "id": "TC-BADMS-303",
+    "strategy": "WF",
+    "title": "Secure Archival - HoD Approval, Sensitive Classification, and IT Security AES-256 Encryption",
+    "primary_obligation": "CW-BA-01 Path 3",
+    "linked_obligations": [
+      "BW-BA-03",
+      "CW-BA-01 Transition 1",
+      "CW-BA-01 Transition 3",
+      "CW-BA-01 Transition 5",
+      "CW-BA-01 Transition 6",
+      "BW-BA-03 Transition 1",
+      "BW-BA-03 Transition 2",
+      "BW-BA-03 Transition 3",
+      "BW-BA-03 Transition 4",
+      "BA-UC-002",
+      "BA-UC-003",
+      "BA-UC-004",
+      "BA-UC-005",
+      "BR-BA-006",
+      "BR-BA-002",
+      "BR-BA-010",
+      "BR-BA-004",
+      "BR-BA-008",
+      "BR-BA-003",
+      "BR-BA-007"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify complete end-to-end basis workflow BW-BA-03 / composite CW-BA-01 Path 3 through User submission, HoD approval, SysAdmin Sensitive classification, routing to IT Security, and IT Security AES-256 encryption/archive creation.",
+    "pre_conditions": "User belongs to department ME. HoD, SysAdmin, and IT Security accounts are active. Storage quota available.",
+    "test_inputs": {
+      "actor_user": "user_me_01",
+      "department": "ME",
+      "request_metadata": {
+        "file_name": "proprietary_turbine_design.cad",
+        "date": "2026-11-09",
+        "owners": [
+          "user_me_01"
+        ],
+        "file_type": "application/cad",
+        "reason": "Confidential research project CAD models",
+        "attachment": "nda_spec.pdf",
+        "initial_classification": "Sensitive"
+      },
+      "actor_hod": "hod_me",
+      "hod_action": "Approve",
+      "actor_sysadmin": "sysadmin_01",
+      "authoritative_classification": "Sensitive",
+      "actor_security": "it_security_lead",
+      "encryption_algorithm": "AES-256"
+    },
+    "execution_steps": [
+      "Step 1: User submits secure archival request with metadata via BA-UC-002.",
+      "Step 2: System validates request and transitions state to Submitted, routing to ME HoD.",
+      "Step 3: ME HoD approves the request via BA-UC-003; system transitions state to HoD Approved.",
+      "Step 4: SysAdmin assigns authoritative classification Sensitive via BA-UC-004.",
+      "Step 5: System transitions state to Classified Sensitive / Routed to IT Security and places request in IT Security queue.",
+      "Step 6: IT Security Team configures AES-256 encryption parameters and executes archive creation via BA-UC-005.",
+      "Step 7: System verifies encrypted artifact creation at rest and in transit, transitioning state to Sensitive Archive Encrypted."
+    ],
+    "expected_outcome": "Request state transitions: Not Submitted -> Submitted -> HoD Approved -> Classified Sensitive / Routed to IT Security -> Sensitive Archive Encrypted. AES-256 encryption applied.",
+    "failure_guarantee": "If encryption configuration fails, state remains Classified Sensitive / Routed to IT Security; unencrypted archive is never stored."
+  },
+  {
+    "id": "TC-BADMS-304",
+    "strategy": "WF",
+    "title": "Secure Archival Submission - Unsatisfied Submission Guard (Validation Failure)",
+    "primary_obligation": "CW-BA-01 Transition 1 Guard Unsatisfied",
+    "linked_obligations": [
+      "BW-BA-01 Transition 1",
+      "BW-BA-02 Transition 1",
+      "BW-BA-03 Transition 1",
+      "BA-UC-002",
+      "BR-BA-006",
+      "BR-BA-002"
+    ],
+    "test_type": "functional-negative",
+    "description": "Verify that when a user submits a secure archival request that fails parameter validation (e.g. missing required file name or exceeding quota), the submission guard fails and the system does not advance to Submitted state.",
+    "pre_conditions": "User is authenticated. User storage quota is exceeded or submission payload lacks required metadata fields.",
+    "test_inputs": {
+      "actor_user": "user_cs_02",
+      "department": "CS",
+      "request_metadata": {
+        "file_name": "",
+        "date": "2026-11-09",
+        "owners": [],
+        "file_type": "archive/zip",
+        "reason": "",
+        "attachment": null,
+        "initial_classification": "Routine"
+      }
+    },
+    "execution_steps": [
+      "Step 1: User attempts to submit secure archival request missing mandatory fields (file name, owners, reason) via BA-UC-002.",
+      "Step 2: BADMS performs request data and quota validation checks.",
+      "Step 3: System detects validation failures (missing required fields / quota check failure)."
+    ],
+    "expected_outcome": "Validation fails with specific error messages; request state remains Not Submitted; no request is routed to HoD.",
+    "failure_guarantee": "Validation failure produces errors without request-state change; database integrity is preserved."
+  },
+  {
+    "id": "TC-BADMS-305",
+    "strategy": "WF",
+    "title": "Secure Archival Submission - Omitted Initial Classification Defaults to Routine",
+    "primary_obligation": "CW-BA-01 Transition 1 Guard Default",
+    "linked_obligations": [
+      "BW-BA-01 Transition 1",
+      "BW-BA-02 Transition 1",
+      "BA-UC-002",
+      "BR-BA-006"
+    ],
+    "test_type": "boundary",
+    "description": "Verify that when initial classification is omitted by the user during archival submission, BADMS automatically assigns Routine and successfully transitions state from Not Submitted to Submitted.",
+    "pre_conditions": "User is authenticated and has sufficient storage quota.",
+    "test_inputs": {
+      "actor_user": "user_math_01",
+      "department": "Math",
+      "request_metadata": {
+        "file_name": "topology_lecture_notes.pdf",
+        "date": "2026-11-09",
+        "owners": [
+          "user_math_01"
+        ],
+        "file_type": "application/pdf",
+        "reason": "Department course material archival",
+        "attachment": "notes_hash.sha256",
+        "initial_classification": null
+      }
+    },
+    "execution_steps": [
+      "Step 1: User submits secure archival request with all required fields except initial_classification via BA-UC-002.",
+      "Step 2: BADMS detects omitted initial classification and applies default classification Routine.",
+      "Step 3: BADMS validates quota and request metadata.",
+      "Step 4: System creates request in Submitted state and routes to Math HoD."
+    ],
+    "expected_outcome": "Request state transitions to Submitted with initial classification recorded as Routine; routed to respective HoD.",
+    "failure_guarantee": "Absence of classification input never leads to undefined state; default Routine is deterministically set."
+  },
+  {
+    "id": "TC-BADMS-306",
+    "strategy": "WF",
+    "title": "Secure Archival Decision - Cross-Department HoD Scope Restriction (Authorization Guard Unsatisfied)",
+    "primary_obligation": "CW-BA-01 Decision Point HoD Authorization Guard",
+    "linked_obligations": [
+      "BW-BA-01 Transition 2",
+      "BW-BA-02 Transition 2",
+      "BA-UC-003",
+      "BR-BA-002",
+      "BR-BA-010"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that an HoD from a different department cannot decide an archival request, enforcing department-scope restriction and separation of duties.",
+    "pre_conditions": "A secure archival request for a CS department user is in Submitted state pending HoD review.",
+    "test_inputs": {
+      "request_id": "REQ-ARC-CS-101",
+      "request_department": "CS",
+      "actor_attempting": "hod_physics",
+      "action": "Approve"
+    },
+    "execution_steps": [
+      "Step 1: Physics HoD attempts to approve CS department archival request REQ-ARC-CS-101 via BA-UC-003.",
+      "Step 2: BADMS checks separation of duties and department-scope restriction between actor department (Physics) and request department (CS).",
+      "Step 3: BADMS blocks the unauthorized decision and logs security/access violation."
+    ],
+    "expected_outcome": "Decision is rejected with Authorization/Scope error; request state remains Submitted in CS HoD queue.",
+    "failure_guarantee": "HoDs act only within their department; cross-department approval transitions are strictly prohibited."
+  },
+  {
+    "id": "TC-BADMS-307",
+    "strategy": "WF",
+    "title": "Secure Archival Classification - Non-SysAdmin Classification Attempt (Authorization Guard Unsatisfied)",
+    "primary_obligation": "CW-BA-01 Decision Point SysAdmin Authorization Guard",
+    "linked_obligations": [
+      "BW-BA-02 Transition 3",
+      "BW-BA-03 Transition 3",
+      "BA-UC-004",
+      "BR-BA-004",
+      "BR-BA-008"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that only an authorized SysAdmin can assign authoritative archival classification; classification attempts by non-SysAdmin actors are rejected.",
+    "pre_conditions": "Archival request is in HoD Approved state.",
+    "test_inputs": {
+      "request_id": "REQ-ARC-CS-102",
+      "actor_attempting": "user_cs_01",
+      "attempted_classification": "Critical"
+    },
+    "execution_steps": [
+      "Step 1: Standard User (or non-SysAdmin actor) invokes BA-UC-004 to classify request REQ-ARC-CS-102.",
+      "Step 2: BADMS verifies actor role against authoritative classification permission.",
+      "Step 3: BADMS denies access and logs unauthorized classification attempt."
+    ],
+    "expected_outcome": "Action rejected with 403 Forbidden / Unauthorized error; request state remains HoD Approved.",
+    "failure_guarantee": "Authoritative classification authority remains solely with SysAdmin; state cannot advance without authorized SysAdmin action."
+  },
+  {
+    "id": "TC-BADMS-308",
+    "strategy": "WF",
+    "title": "Secure Archival Encryption - IT Security Encryption Failure (Guard Unsatisfied)",
+    "primary_obligation": "CW-BA-01 Transition 6 Guard Unsatisfied",
+    "linked_obligations": [
+      "BW-BA-03 Transition 4",
+      "BA-UC-005",
+      "BR-BA-003",
+      "BR-BA-007"
+    ],
+    "test_type": "functional-negative",
+    "description": "Verify that when AES-256 encryption or archive creation fails during IT Security execution, the system does not transition to Sensitive Archive Encrypted and logs an error.",
+    "pre_conditions": "Request is in state Classified Sensitive / Routed to IT Security.",
+    "test_inputs": {
+      "request_id": "REQ-ARC-SEN-201",
+      "actor_security": "it_security_lead",
+      "simulated_error": "Cryptographic key store unavailable / cipher generation error"
+    },
+    "execution_steps": [
+      "Step 1: IT Security initiates AES-256 encryption and archive creation via BA-UC-005.",
+      "Step 2: System encounters cryptographic service failure during cipher processing.",
+      "Step 3: System catches encryption exception and aborts archive creation."
+    ],
+    "expected_outcome": "Encryption failure error returned; request state remains Classified Sensitive / Routed to IT Security; error logged in security audit.",
+    "failure_guarantee": "Unencrypted or corrupt archives are never marked as Sensitive Archive Encrypted."
+  },
+  {
+    "id": "TC-BADMS-309",
+    "strategy": "WF",
+    "title": "Secure Archival Encryption - Unauthorized Encryption Configuration Attempt by SysAdmin",
+    "primary_obligation": "CW-BA-01 Transition 6 Authorization Guard",
+    "linked_obligations": [
+      "BW-BA-03 Transition 4",
+      "BA-UC-005",
+      "BR-BA-003",
+      "BR-BA-007"
+    ],
+    "test_type": "authorization",
+    "description": "Verify separation of duties: SysAdmin cannot configure encryption for Sensitive data; only IT Security Team has authority to execute BA-UC-005.",
+    "pre_conditions": "Request is in state Classified Sensitive / Routed to IT Security.",
+    "test_inputs": {
+      "request_id": "REQ-ARC-SEN-202",
+      "actor_attempting": "sysadmin_01",
+      "action": "Configure Encryption"
+    },
+    "execution_steps": [
+      "Step 1: SysAdmin attempts to configure encryption and generate sensitive archive via BA-UC-005.",
+      "Step 2: BADMS checks role-boundary separation between SysAdmin and IT Security Team.",
+      "Step 3: BADMS rejects the action due to separation of duties violation."
+    ],
+    "expected_outcome": "Access denied; state remains Classified Sensitive / Routed to IT Security awaiting IT Security action.",
+    "failure_guarantee": "Role separation is enforced; IT Security alone owns encryption configuration for sensitive archives."
+  },
+  {
+    "id": "TC-BADMS-310",
+    "strategy": "WF",
+    "title": "Storage Extension - HoD Rejection Workflow (End-to-End)",
+    "primary_obligation": "CW-BA-02 Path 1",
+    "linked_obligations": [
+      "BW-BA-04",
+      "CW-BA-02 Transition 1",
+      "CW-BA-02 Transition 2",
+      "BW-BA-04 Transition 1",
+      "BW-BA-04 Transition 2",
+      "BA-UC-007",
+      "BA-UC-008",
+      "BR-BA-016",
+      "BR-BA-009",
+      "BR-BA-010",
+      "BR-BA-017"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify end-to-end storage-extension workflow BW-BA-04 / CW-BA-02 Path 1 where a user with full quota requests extension and departmental HoD rejects it.",
+    "pre_conditions": "User storage quota is 100% full. Departmental HoD is active.",
+    "test_inputs": {
+      "actor_user": "user_civil_01",
+      "department": "Civil",
+      "extension_request": {
+        "current_quota_gb": 50,
+        "current_usage_gb": 50,
+        "requested_extension_gb": 20,
+        "justification": "Structural modeling simulation output storage",
+        "attachments": "usage_audit_report.pdf"
+      },
+      "actor_hod": "hod_civil",
+      "decision": "Reject",
+      "rejection_notes": "Exceeds department allocated infrastructure threshold for current quarter"
+    },
+    "execution_steps": [
+      "Step 1: User submits storage-extension request via BA-UC-007.",
+      "Step 2: System validates that current quota is full and available infrastructure is registered; transitions state from Not Submitted to Submitted and routes to Civil HoD.",
+      "Step 3: Civil HoD reviews request, available departmental infrastructure, and justification via BA-UC-008.",
+      "Step 4: HoD selects Outcome = Reject; BADMS records decision and transitions state to Rejected.",
+      "Step 5: System issues decision notification to requester."
+    ],
+    "expected_outcome": "Request state transitions: Not Submitted -> Submitted -> Rejected. Decision recorded; user quota remains at 50 GB.",
+    "failure_guarantee": "If HoD rejection fails, state remains Submitted; quota is not modified."
+  },
+  {
+    "id": "TC-BADMS-311",
+    "strategy": "WF",
+    "title": "Storage Extension - HoD Approval Workflow (End-to-End)",
+    "primary_obligation": "CW-BA-02 Path 2",
+    "linked_obligations": [
+      "BW-BA-05",
+      "CW-BA-02 Transition 1",
+      "CW-BA-02 Transition 3",
+      "BW-BA-05 Transition 1",
+      "BW-BA-05 Transition 2",
+      "BA-UC-007",
+      "BA-UC-008",
+      "BR-BA-016",
+      "BR-BA-009",
+      "BR-BA-010",
+      "BR-BA-017"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify end-to-end storage-extension workflow BW-BA-05 / CW-BA-02 Path 2 where user submits extension request upon full quota and HoD approves, terminating at recorded Approved state.",
+    "pre_conditions": "User storage quota is full. Department infrastructure has capacity for requested extension.",
+    "test_inputs": {
+      "actor_user": "user_aero_01",
+      "department": "Aerospace",
+      "extension_request": {
+        "current_quota_gb": 100,
+        "current_usage_gb": 100,
+        "requested_extension_gb": 50,
+        "justification": "Wind tunnel sensor high-speed telemetry logs",
+        "attachments": "telemetry_plan.pdf"
+      },
+      "actor_hod": "hod_aero",
+      "decision": "Approve"
+    },
+    "execution_steps": [
+      "Step 1: User submits storage-extension request via BA-UC-007.",
+      "Step 2: BADMS validates usage and infrastructure availability, sets state to Submitted, and routes to Aerospace HoD.",
+      "Step 3: Aerospace HoD reviews request details, departmental policy, and justification via BA-UC-008.",
+      "Step 4: HoD selects Outcome = Approve; BADMS records approval and transitions state to Approved.",
+      "Step 5: System issues approval notification to requester; workflow ends at Approved state without additional post-approval processing."
+    ],
+    "expected_outcome": "Request state transitions: Not Submitted -> Submitted -> Approved. Decision recorded; notification sent.",
+    "failure_guarantee": "Workflow terminates cleanly at Approved state as required by current baseline specification."
+  },
+  {
+    "id": "TC-BADMS-312",
+    "strategy": "WF",
+    "title": "Storage Extension Submission - Quota Not Full / Infrastructure Exceeded (Validation Guard Unsatisfied)",
+    "primary_obligation": "CW-BA-02 Transition 1 Guard Unsatisfied",
+    "linked_obligations": [
+      "BW-BA-04 Transition 1",
+      "BW-BA-05 Transition 1",
+      "BA-UC-007",
+      "BR-BA-016"
+    ],
+    "test_type": "functional-negative",
+    "description": "Verify that storage-extension request submission is rejected when user quota is not full or requested extension exceeds available infrastructure.",
+    "pre_conditions": "User current storage usage is 30 GB out of 100 GB allocated quota (quota is NOT full).",
+    "test_inputs": {
+      "actor_user": "user_cs_03",
+      "department": "CS",
+      "extension_request": {
+        "current_quota_gb": 100,
+        "current_usage_gb": 30,
+        "requested_extension_gb": 50,
+        "justification": "Anticipated future storage needs"
+      }
+    },
+    "execution_steps": [
+      "Step 1: User attempts to submit storage-extension request via BA-UC-007 when current quota usage is only 30%.",
+      "Step 2: BADMS evaluates submission guard (storage quota full check).",
+      "Step 3: BADMS detects quota is not full and rejects submission."
+    ],
+    "expected_outcome": "Submission rejected with error 'Storage extension can only be requested when current quota is full'; state remains Not Submitted.",
+    "failure_guarantee": "Premature extension requests are blocked; state invariant Not Submitted is preserved."
+  },
+  {
+    "id": "TC-BADMS-313",
+    "strategy": "WF",
+    "title": "Storage Extension Decision - Unauthorized Decision Attempt by SysAdmin",
+    "primary_obligation": "CW-BA-02 Decision Point HoD Authorization Guard",
+    "linked_obligations": [
+      "BW-BA-04 Transition 2",
+      "BW-BA-05 Transition 2",
+      "BA-UC-008",
+      "BR-BA-009",
+      "BR-BA-010"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that only the respective HoD can approve or reject a storage-extension request; technical SysAdmin cannot approve storage-extension requests.",
+    "pre_conditions": "Storage-extension request is in Submitted state awaiting HoD decision.",
+    "test_inputs": {
+      "request_id": "REQ-EXT-CS-301",
+      "actor_attempting": "sysadmin_01",
+      "action": "Approve"
+    },
+    "execution_steps": [
+      "Step 1: SysAdmin attempts to submit decision for storage-extension request REQ-EXT-CS-301 via BA-UC-008.",
+      "Step 2: BADMS validates actor role against HoD role requirement.",
+      "Step 3: BADMS rejects the decision attempt with authorization error."
+    ],
+    "expected_outcome": "Action blocked; request remains in Submitted state awaiting respective CS HoD decision.",
+    "failure_guarantee": "Storage extension approval authority is strictly reserved for HoD; separation of duties maintained."
+  },
+  {
+    "id": "TC-BADMS-314",
+    "strategy": "WF",
+    "title": "Restoration - Non-Sensitive Standard Path (End-to-End)",
+    "primary_obligation": "CW-BA-03 Path 1",
+    "linked_obligations": [
+      "BW-BA-06",
+      "CW-BA-03 Transition 1",
+      "CW-BA-03 Transition 3",
+      "BW-BA-06 Transition 1",
+      "BW-BA-06 Transition 2",
+      "BA-UC-016",
+      "BA-UC-018"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify end-to-end restoration workflow BW-BA-06 / CW-BA-03 Path 1 for Non-Sensitive data where user requests restoration, system places it on Standard Path, and SysAdmin executes technical restoration to Restored state.",
+    "pre_conditions": "Target dataset is archived with Non-Sensitive classification (Routine or Archival).",
+    "test_inputs": {
+      "actor_user": "user_cs_04",
+      "archive_id": "ARC-NON-SEN-401",
+      "data_classification": "Routine",
+      "target_restore_location": "/shares/cs_lab/restored_data/",
+      "actor_sysadmin": "sysadmin_01"
+    },
+    "execution_steps": [
+      "Step 1: User submits restoration request for non-sensitive archive ARC-NON-SEN-401 via BA-UC-016.",
+      "Step 2: BADMS checks classification (Classification != Sensitive) and transitions state from Not Requested to Restoration Requested / Standard Path.",
+      "Step 3: SysAdmin reviews request and initiates technical restoration execution via BA-UC-018.",
+      "Step 4: Standard integrity and availability checks are satisfied; BADMS transfers data to recovery storage.",
+      "Step 5: System logs restoration timestamp/status and transitions state to Restored."
+    ],
+    "expected_outcome": "Request state transitions: Not Requested -> Restoration Requested / Standard Path -> Restored. Dataset restored without requiring intermediate approval.",
+    "failure_guarantee": "Restoration execution preserves data consistency; if execution fails, state does not advance to Restored."
+  },
+  {
+    "id": "TC-BADMS-315",
+    "strategy": "WF",
+    "title": "Restoration - Sensitive Data with SysAdmin Rejection (End-to-End)",
+    "primary_obligation": "CW-BA-03 Path 2",
+    "linked_obligations": [
+      "BW-BA-07",
+      "CW-BA-03 Transition 2",
+      "CW-BA-03 Transition 4",
+      "BW-BA-07 Transition 1",
+      "BW-BA-07 Transition 2",
+      "BA-UC-016",
+      "BA-UC-017",
+      "BR-BA-005"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify end-to-end Sensitive restoration path BW-BA-07 / CW-BA-03 Path 2 where user requests restoration of Sensitive data, system routes it to SysAdmin approval, and SysAdmin rejects the request.",
+    "pre_conditions": "Target dataset is archived with Sensitive classification.",
+    "test_inputs": {
+      "actor_user": "user_bio_01",
+      "archive_id": "ARC-SEN-501",
+      "data_classification": "Sensitive",
+      "actor_sysadmin": "sysadmin_01",
+      "decision": "Reject",
+      "rejection_reason": "Restoration request lacks necessary security clearance documentation"
+    },
+    "execution_steps": [
+      "Step 1: User requests restoration of Sensitive archive ARC-SEN-501 via BA-UC-016.",
+      "Step 2: System detects Classification = Sensitive and transitions state from Not Requested to Sensitive Restoration Pending Approval.",
+      "Step 3: SysAdmin evaluates request via BA-UC-017 and selects Outcome = Reject.",
+      "Step 4: BADMS records rejection decision and transitions request state to Rejected.",
+      "Step 5: System issues decision notification to requester."
+    ],
+    "expected_outcome": "Request state transitions: Not Requested -> Sensitive Restoration Pending Approval -> Rejected. Technical restoration is never initiated.",
+    "failure_guarantee": "Sensitive data is never restored without explicit SysAdmin approval; state transitions cleanly to Rejected."
+  },
+  {
+    "id": "TC-BADMS-316",
+    "strategy": "WF",
+    "title": "Restoration - Sensitive Data with SysAdmin Approval and Technical Execution (End-to-End)",
+    "primary_obligation": "CW-BA-03 Path 3",
+    "linked_obligations": [
+      "BW-BA-07",
+      "CW-BA-03 Transition 2",
+      "CW-BA-03 Transition 5",
+      "CW-BA-03 Transition 6",
+      "BW-BA-07 Transition 1",
+      "BW-BA-07 Transition 3",
+      "BW-BA-07 Transition 4",
+      "BA-UC-016",
+      "BA-UC-017",
+      "BA-UC-018",
+      "BR-BA-005"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify end-to-end Sensitive restoration path BW-BA-07 / CW-BA-03 Path 3 where user requests Sensitive restoration, SysAdmin approves, and SysAdmin executes technical restoration to Restored state.",
+    "pre_conditions": "Dataset is archived with Sensitive classification. SysAdmin has operational access to recovery storage.",
+    "test_inputs": {
+      "actor_user": "user_chem_01",
+      "archive_id": "ARC-SEN-601",
+      "data_classification": "Sensitive",
+      "actor_sysadmin": "sysadmin_01",
+      "approval_decision": "Approve",
+      "target_restore_location": "/secure_shares/chem/restored/"
+    },
+    "execution_steps": [
+      "Step 1: User requests restoration of Sensitive archive ARC-SEN-601 via BA-UC-016.",
+      "Step 2: BADMS checks classification and transitions request state to Sensitive Restoration Pending Approval.",
+      "Step 3: SysAdmin reviews justification and approves request via BA-UC-017.",
+      "Step 4: BADMS transitions request state to Approved for Restoration.",
+      "Step 5: SysAdmin initiates technical data restoration via BA-UC-018.",
+      "Step 6: Technical execution succeeds: archive decrypted and restored to secure target storage.",
+      "Step 7: BADMS logs restoration completion and transitions state to Restored."
+    ],
+    "expected_outcome": "Request transitions: Not Requested -> Sensitive Restoration Pending Approval -> Approved for Restoration -> Restored.",
+    "failure_guarantee": "Two-stage verification (approval followed by technical execution) is strictly enforced for Sensitive data."
+  },
+  {
+    "id": "TC-BADMS-317",
+    "strategy": "WF",
+    "title": "Restoration Request - Non-Existent Archive Identifier (Guard Unsatisfied)",
+    "primary_obligation": "CW-BA-03 Transition 1 Guard Unsatisfied",
+    "linked_obligations": [
+      "BW-BA-06 Transition 1",
+      "BW-BA-07 Transition 1",
+      "BA-UC-016"
+    ],
+    "test_type": "functional-negative",
+    "description": "Verify that submitting a restoration request for an invalid or non-existent archive identifier fails input validation and leaves state in Not Requested.",
+    "pre_conditions": "User is authenticated.",
+    "test_inputs": {
+      "actor_user": "user_cs_05",
+      "archive_id": "ARC-INVALID-99999",
+      "reason": "Accidental deletion recovery"
+    },
+    "execution_steps": [
+      "Step 1: User attempts to initiate restoration for non-existent archive ID ARC-INVALID-99999 via BA-UC-016.",
+      "Step 2: BADMS queries archive catalog and finds no matching record.",
+      "Step 3: System aborts request creation and returns 'Archive not found' error."
+    ],
+    "expected_outcome": "Validation fails; no restoration request is created; system state remains Not Requested.",
+    "failure_guarantee": "System rejects invalid archive references; no dangling restoration records created."
+  },
+  {
+    "id": "TC-BADMS-318",
+    "strategy": "WF",
+    "title": "Sensitive Restoration Approval - Unauthorized Decision Attempt by HoD",
+    "primary_obligation": "CW-BA-03 Decision Point SysAdmin Authorization Guard",
+    "linked_obligations": [
+      "BW-BA-07 Transition 2",
+      "BW-BA-07 Transition 3",
+      "BA-UC-017",
+      "BR-BA-005"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that an HoD cannot approve or reject Sensitive data restoration (the PS baseline excludes separate HoD retrieval authorization and requires SysAdmin approval alone).",
+    "pre_conditions": "Sensitive restoration request is in Sensitive Restoration Pending Approval state.",
+    "test_inputs": {
+      "request_id": "REQ-RST-SEN-701",
+      "actor_attempting": "hod_cs",
+      "action": "Approve"
+    },
+    "execution_steps": [
+      "Step 1: HoD attempts to approve Sensitive restoration request REQ-RST-SEN-701 via BA-UC-017.",
+      "Step 2: BADMS checks authorization rules for Sensitive restoration (only SysAdmin authorized; HoD retrieval route not supported).",
+      "Step 3: BADMS rejects the HoD approval attempt with authorization failure."
+    ],
+    "expected_outcome": "Action denied; request remains in Sensitive Restoration Pending Approval awaiting authorized SysAdmin decision.",
+    "failure_guarantee": "SysAdmin alone owns Sensitive restoration approval in this module version; HoD approval bypass is blocked."
+  },
+  {
+    "id": "TC-BADMS-319",
+    "strategy": "WF",
+    "title": "Restoration Execution - Technical Execution Failure (Execution Guard Unsatisfied)",
+    "primary_obligation": "CW-BA-03 Transition 3/6 Guard Unsatisfied",
+    "linked_obligations": [
+      "BW-BA-06 Transition 2",
+      "BW-BA-07 Transition 4",
+      "BA-UC-018"
+    ],
+    "test_type": "functional-negative",
+    "description": "Verify that when technical restoration execution fails due to destination storage unavailability or archive corruption, the request does not transition to Restored and failure is logged.",
+    "pre_conditions": "Restoration request is in Approved for Restoration state (or Restoration Requested / Standard Path).",
+    "test_inputs": {
+      "request_id": "REQ-RST-SEN-702",
+      "actor_sysadmin": "sysadmin_01",
+      "simulated_error": "Destination repository I/O error; disk space full during extract"
+    },
+    "execution_steps": [
+      "Step 1: SysAdmin triggers technical restoration execution via BA-UC-018.",
+      "Step 2: System initiates dataset extraction and transfer to recovery storage.",
+      "Step 3: Storage write error occurs during data copy.",
+      "Step 4: System catches failure, records failure audit entry, and aborts state change."
+    ],
+    "expected_outcome": "Execution fails with technical error; request state remains Approved for Restoration; alert logged to SysAdmin.",
+    "failure_guarantee": "Incomplete or corrupt restores are never marked as Restored; data integrity guarantee preserved."
+  },
+  {
+    "id": "TC-BADMS-320",
+    "strategy": "WF",
+    "title": "State Transition Invariance - Out-of-Order Direct Approval on Unsubmitted Archival Request",
+    "primary_obligation": "CW-BA-01 State Transition Guard",
+    "linked_obligations": [
+      "CW-BA-01",
+      "BW-BA-01",
+      "BW-BA-02",
+      "BA-UC-003"
+    ],
+    "test_type": "state-transition",
+    "description": "Verify that the system strictly prevents out-of-order state transitions, rejecting HoD approval actions on requests that are in Not Submitted state.",
+    "pre_conditions": "Request identifier is generated but has not completed valid submission (state is Not Submitted).",
+    "test_inputs": {
+      "request_id": "REQ-ARC-UNSUB-801",
+      "actor_hod": "hod_cs",
+      "action": "Approve"
+    },
+    "execution_steps": [
+      "Step 1: HoD attempts to invoke BA-UC-003 to approve archival request REQ-ARC-UNSUB-801 directly from Not Submitted state.",
+      "Step 2: BADMS workflow engine validates current state transition precondition (requires From State: Submitted).",
+      "Step 3: State check fails; BADMS rejects the transition as illegal."
+    ],
+    "expected_outcome": "Illegal transition rejected with InvalidStateTransitionError; state remains Not Submitted.",
+    "failure_guarantee": "Workflow state machine strictly enforces authoritative transition graph; skipping lifecycle stages is impossible."
+  }
+]
