@@ -13,6 +13,15 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `health_center`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `health_center.schedule.view` | View doctor schedules | `faculty`, `phc_staff`, `staff`, `student` |
+| `health_center.schedule.manage` | Create and modify schedules | `phc_staff` |
+| `health_center.record.view_self` | View own medical records | `faculty`, `phc_staff`, `staff`, `student` |
+| `health_center.record.manage` | Record new visits and update history | `phc_staff` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
