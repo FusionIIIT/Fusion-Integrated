@@ -109,7 +109,13 @@ def test_tc_badms_007_backup_failure_alert():
 
 def test_tc_badms_008_automatic_backup_execution():
     """TC-BADMS-008 | AFR-BA-006: Verify that automatic backup executes at scheduled time without user intervention."""
-    pytest.skip("NOT_AUTOMATED: Autonomous scheduler daemon execution requires external background worker")
+    from modules.badms.services.badms_services import execute_scheduled_backups
+
+    records = execute_scheduled_backups(actor_user_id="system_cron", actor_role="sysadmin")
+    assert len(records) > 0
+    assert records[0].status == "SUCCESS"
+    assert records[0].file_path.endswith(".sql.gz")
+    assert records[0].checksum_sha256 is not None
 
 
 def test_tc_badms_009_automatic_backup_dataset_eligibility():
