@@ -13,11 +13,13 @@ from .badms_services import (
     submit_secure_archival_request,
     submit_storage_extension_request,
     trigger_manual_backup,
+    perform_backup_execution,
     execute_scheduled_backups,
 )
 
 __all__ = [
     "trigger_manual_backup",
+    "perform_backup_execution",
     "execute_scheduled_backups",
     "configure_backup_schedule",
     "submit_secure_archival_request",

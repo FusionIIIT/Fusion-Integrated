@@ -24,8 +24,8 @@ def execute_scheduled_backups_task():
 def enforce_retention_policies_task():
     """Verify and enforce archive retention limits across all records."""
     from .models import EncryptedArchive
-    now = timezone.now()
-    expired = EncryptedArchive.objects.filter(retention_until__lt=now, verified=True)
+    today = timezone.now().date()
+    expired = EncryptedArchive.objects.filter(retention_expiry_date__lt=today)
     count = expired.count()
     logger.info("BADMS retention audit: %d archives reached retention limit.", count)
     return count
