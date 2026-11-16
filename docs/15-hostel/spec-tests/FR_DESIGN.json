@@ -1,0 +1,947 @@
+[
+  {
+    "test_id": "TC-001",
+    "source_id": "AFR-HM-001",
+    "purpose": "Verify Super Admin can create a hostel record",
+    "preconditions": "Logged in as Super Admin; hostel ‘H-New’ does not exist",
+    "action_or_input": "Create hostel record with name ‘H-New’ and required master details",
+    "expected_result": "Hostel record ‘H-New’ is saved and appears in the hostel list",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-002",
+    "source_id": "AFR-HM-002",
+    "purpose": "Verify Super Admin can activate and deactivate a hostel record",
+    "preconditions": "Logged in as Super Admin; active hostel ‘H1’ exists",
+    "action_or_input": "Deactivate ‘H1’, then activate ‘H1’ again",
+    "expected_result": "Hostel status changes to inactive after the first action and back to active after the second",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-003",
+    "source_id": "AFR-HM-003",
+    "purpose": "Verify Super Admin can assign, reassign, activate and deactivate Warden bindings",
+    "preconditions": "Super Admin logged in; hostel ‘H1’ and users W1, W2 with Warden eligibility exist",
+    "action_or_input": "Assign W1 to H1; reassign H1 to W2; deactivate then activate the W2 binding",
+    "expected_result": "Each action is saved and the Warden binding for H1 shows the corresponding holder and status",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-004",
+    "source_id": "AFR-HM-004",
+    "purpose": "Verify Super Admin can assign, reassign, activate and deactivate Caretaker bindings",
+    "preconditions": "Super Admin logged in; hostel ‘H1’ and users C1, C2 exist",
+    "action_or_input": "Assign C1 to H1; reassign H1 to C2; deactivate then activate the C2 binding",
+    "expected_result": "Each action is saved and the Caretaker binding for H1 shows the corresponding holder and status",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-005",
+    "source_id": "AFR-HM-005",
+    "purpose": "Verify hostel-specific role bindings are maintained and role changes are recorded",
+    "preconditions": "Super Admin has made a Warden binding change for H1",
+    "action_or_input": "View the role-binding record and change log for H1",
+    "expected_result": "The binding is stored as hostel-specific and the change record shows the Super Admin action",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-006",
+    "source_id": "AFR-HM-006",
+    "purpose": "Verify Student can submit a hostel accommodation request",
+    "preconditions": "Student logged in",
+    "action_or_input": "Submit the accommodation request form with valid details",
+    "expected_result": "The request is submitted successfully and is visible to the Student as submitted",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-007",
+    "source_id": "AFR-HM-007",
+    "purpose": "Verify accommodation application details and status are recorded",
+    "preconditions": "Student has submitted an accommodation request",
+    "action_or_input": "Open the stored application record",
+    "expected_result": "Entered details and a current status are stored and shown",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-008",
+    "source_id": "AFR-HM-008",
+    "purpose": "Verify Super Admin can record batch hostel and room allotment decisions",
+    "preconditions": "Super Admin logged in; multiple students with accommodation requests; rooms with free capacity",
+    "action_or_input": "Record a batch allotment assigning several students to hostels and rooms",
+    "expected_result": "All allotment decisions in the batch are recorded and room assignments are updated",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-009",
+    "source_id": "AFR-HM-009",
+    "purpose": "Verify Super Admin can manage central re-allotment and formal room-vacation updates",
+    "preconditions": "Super Admin logged in; student S1 allotted to room R1; room R2 has free capacity",
+    "action_or_input": "Record a re-allotment of S1 from R1 to R2; then record a formal vacation of R2 for S1",
+    "expected_result": "Both updates are recorded and institutional occupancy records reflect the changes",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-010",
+    "source_id": "AFR-HM-010",
+    "purpose": "Verify allotment decisions are recorded as entered without a system-prescribed algorithm",
+    "preconditions": "Super Admin logged in; unallotted student S1; room R1 with free capacity",
+    "action_or_input": "Record an allotment of S1 to R1 chosen manually",
+    "expected_result": "The system stores exactly the recorded decision and updates room assignment information without selecting or altering the room automatically",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-011",
+    "source_id": "AFR-HM-011",
+    "purpose": "Verify room assignment history is maintained",
+    "preconditions": "Student S1 has been allotted, re-allotted and vacated across rooms",
+    "action_or_input": "View the room assignment history for S1",
+    "expected_result": "The history lists each assignment change in order for audit and traceability",
+    "test_type": "retention"
+  },
+  {
+    "test_id": "TC-012",
+    "source_id": "AFR-HM-012",
+    "purpose": "Verify Student can view own current and historical room allocation",
+    "preconditions": "Student S1 has a current room and at least one earlier room recorded",
+    "action_or_input": "S1 opens the room allocation view",
+    "expected_result": "Current and historical allocation of S1 are shown",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-013",
+    "source_id": "AFR-HM-013",
+    "purpose": "Verify Caretaker can maintain hostel-level room availability and occupancy information",
+    "preconditions": "Caretaker of H1 logged in",
+    "action_or_input": "Update availability and occupancy details for a room in H1",
+    "expected_result": "The room’s availability and occupancy information is saved",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-014",
+    "source_id": "AFR-HM-014",
+    "purpose": "Verify room occupancy is updated by allotment, re-allotment, vacation and exchange",
+    "preconditions": "Room R1 occupancy known; allotment, re-allotment, vacation and exchange actions available",
+    "action_or_input": "Perform one allotment, one re-allotment, one formal vacation and one recorded exchange affecting R1",
+    "expected_result": "R1 occupancy changes correctly after each action",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-015",
+    "source_id": "AFR-HM-015",
+    "purpose": "Verify Caretaker can record an individual room exchange within the assigned hostel",
+    "preconditions": "Caretaker of H1 logged in; students S1 in R1 and S2 in R2, both in H1",
+    "action_or_input": "Record an exchange of rooms between S1 and S2",
+    "expected_result": "The exchange is recorded and S1 and S2 are shown in each other’s former rooms",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-016",
+    "source_id": "AFR-HM-016",
+    "purpose": "Verify occupancy cannot exceed the defined room capacity",
+    "preconditions": "Room R1 has capacity 2 and occupancy 2",
+    "action_or_input": "Attempt to allot a third student to R1",
+    "expected_result": "The operation is rejected and R1 occupancy remains 2",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-017",
+    "source_id": "AFR-HM-017",
+    "purpose": "Verify occupancy records are updated after allotments, re-allotments, vacations and exchanges",
+    "preconditions": "Room R1 has capacity 3 and occupancy 1",
+    "action_or_input": "Allot one student to R1, then vacate one student from R1",
+    "expected_result": "Occupancy of R1 shows 2 after the allotment and 1 after the vacation",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-018",
+    "source_id": "AFR-HM-018",
+    "purpose": "Verify Warden can review room assignments and occupancy patterns",
+    "preconditions": "Warden of H1 logged in; assignment data exists",
+    "action_or_input": "Open room assignment and occupancy views for H1",
+    "expected_result": "Room assignments and occupancy patterns for H1 are displayed",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-019",
+    "source_id": "AFR-HM-019",
+    "purpose": "Verify up-to-date room status is maintained",
+    "preconditions": "Room R1 is available with free capacity",
+    "action_or_input": "Fill R1 to capacity through an allotment, then view room status",
+    "expected_result": "Room status for R1 reflects the new occupancy immediately",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-020",
+    "source_id": "AFR-HM-020",
+    "purpose": "Verify Caretaker can record and monitor student attendance",
+    "preconditions": "Caretaker of H1 logged in; student S1 in H1",
+    "action_or_input": "Record attendance for S1, then open the attendance monitoring view",
+    "expected_result": "The attendance entry is saved and appears in the monitoring view",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-021",
+    "source_id": "AFR-HM-021",
+    "purpose": "Verify attendance information is available for leave review, disciplinary review, reporting and oversight",
+    "preconditions": "Attendance records exist for S1; a leave request from S1 exists",
+    "action_or_input": "Access S1’s attendance from leave review, disciplinary review, reports and Warden oversight",
+    "expected_result": "Attendance information is available in each of these contexts",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-022",
+    "source_id": "AFR-HM-022",
+    "purpose": "Verify Warden can view attendance summaries, trends and exceptions",
+    "preconditions": "Warden of H1 logged in; attendance data with exceptions exists",
+    "action_or_input": "Open attendance summaries, trends and exceptions",
+    "expected_result": "Summaries, trends and exceptions are shown for H1",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-023",
+    "source_id": "AFR-HM-023",
+    "purpose": "Verify attendance records are retained",
+    "preconditions": "Attendance recorded for S1 on earlier dates",
+    "action_or_input": "Retrieve S1’s earlier attendance records for reporting and review",
+    "expected_result": "Earlier attendance records are still stored and retrievable",
+    "test_type": "retention"
+  },
+  {
+    "test_id": "TC-024",
+    "source_id": "AFR-HM-024",
+    "purpose": "Verify Student can view attendance status",
+    "preconditions": "Attendance recorded for S1",
+    "action_or_input": "S1 opens the attendance view",
+    "expected_result": "S1 sees own attendance status or attendance information",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-025",
+    "source_id": "AFR-HM-025",
+    "purpose": "Verify the attendance-taking procedure is not enforced by HM",
+    "preconditions": "No attendance procedure rules configured as enforced workflow",
+    "action_or_input": "Record attendance by a Caretaker without any procedural prerequisite",
+    "expected_result": "The system records attendance and does not enforce any attendance-taking procedure",
+    "test_type": "scope"
+  },
+  {
+    "test_id": "TC-026",
+    "source_id": "AFR-HM-026",
+    "purpose": "Verify Student can submit a leave request",
+    "preconditions": "Student logged in",
+    "action_or_input": "Submit a leave request with valid dates and reason",
+    "expected_result": "The leave request is submitted and is visible with a pending status",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-027",
+    "source_id": "AFR-HM-027",
+    "purpose": "Verify supporting information or document fields appear where configured",
+    "preconditions": "Leave form configured with a supporting document field",
+    "action_or_input": "Open the leave form and attach a supporting document",
+    "expected_result": "The supporting field is available and the attachment is saved with the request",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-028",
+    "source_id": "AFR-HM-028",
+    "purpose": "Verify Caretaker can review leave requests and record approval or rejection",
+    "preconditions": "Caretaker of H1 logged in; two pending leave requests from H1 students",
+    "action_or_input": "Approve one request and reject the other",
+    "expected_result": "Both decisions are recorded against the respective requests",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-029",
+    "source_id": "AFR-HM-029",
+    "purpose": "Verify Student receives status updates for submitted leave requests",
+    "preconditions": "Student S1 has a pending leave request",
+    "action_or_input": "Caretaker approves the request",
+    "expected_result": "S1 receives a status update and the request shows the new status",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-030",
+    "source_id": "AFR-HM-030",
+    "purpose": "Verify leave records are available for attendance review, security coordination and supervisory planning",
+    "preconditions": "Approved leave record exists for S1",
+    "action_or_input": "Open leave records from attendance review, security coordination and supervisory planning views",
+    "expected_result": "The leave record is visible in each supported view",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-031",
+    "source_id": "AFR-HM-031",
+    "purpose": "Verify leave history is retained",
+    "preconditions": "Past leave requests of S1 exist",
+    "action_or_input": "Retrieve leave history for audit and reporting",
+    "expected_result": "Past leave requests and decisions are retained and retrievable",
+    "test_type": "retention"
+  },
+  {
+    "test_id": "TC-032",
+    "source_id": "AFR-HM-032",
+    "purpose": "Verify Student can view leave status and history",
+    "preconditions": "S1 has several leave requests with different statuses",
+    "action_or_input": "S1 opens leave status and history",
+    "expected_result": "S1 sees status and history of own leave requests",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-033",
+    "source_id": "AFR-HM-033",
+    "purpose": "Verify Warden can review leave information and summaries",
+    "preconditions": "Warden of H1 logged in; leave data exists for H1",
+    "action_or_input": "Open leave information and summary views",
+    "expected_result": "Leave records and summaries for H1 are displayed",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-034",
+    "source_id": "AFR-HM-034",
+    "purpose": "Verify external leave policy is not enforced by HM",
+    "preconditions": "No leave eligibility rule or approval hierarchy configured as system-enforced",
+    "action_or_input": "Submit a leave request that would breach an external policy; Caretaker decides it",
+    "expected_result": "HM accepts and routes the request without applying external eligibility, hierarchy or document rules",
+    "test_type": "scope"
+  },
+  {
+    "test_id": "TC-035",
+    "source_id": "AFR-HM-035",
+    "purpose": "Verify Student can submit a hostel-related complaint",
+    "preconditions": "Student logged in",
+    "action_or_input": "Submit a complaint about a hostel facility",
+    "expected_result": "The complaint is submitted and appears with a status for the Student",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-036",
+    "source_id": "AFR-HM-036",
+    "purpose": "Verify complaint category and description are captured and optional attachment is supported where provided",
+    "preconditions": "Complaint form includes an attachment field",
+    "action_or_input": "Submit one complaint with category, description and attachment; submit another without attachment",
+    "expected_result": "Category and description are stored in both; the attachment is stored in the first and omission is accepted in the second",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-037",
+    "source_id": "AFR-HM-037",
+    "purpose": "Verify Caretaker can review complaints, record action, update status and escalate",
+    "preconditions": "Caretaker of H1 logged in; open complaint from H1; escalation supported by the workflow",
+    "action_or_input": "Record action taken, update status, then escalate the complaint to the Warden",
+    "expected_result": "Action and status are saved and the complaint appears as escalated to the Warden",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-038",
+    "source_id": "AFR-HM-038",
+    "purpose": "Verify Warden can monitor unresolved, delayed or escalated complaints",
+    "preconditions": "Warden of H1 logged in; unresolved, delayed and escalated complaints exist",
+    "action_or_input": "Open the complaint monitoring view",
+    "expected_result": "Unresolved, delayed and escalated complaints for H1 are listed",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-039",
+    "source_id": "AFR-HM-039",
+    "purpose": "Verify complaint history and resolution status are tracked",
+    "preconditions": "A complaint went through update and resolution",
+    "action_or_input": "View the complaint’s history",
+    "expected_result": "History shows each update and the final resolution status",
+    "test_type": "retention"
+  },
+  {
+    "test_id": "TC-040",
+    "source_id": "AFR-HM-040",
+    "purpose": "Verify only hostel-related complaints are covered",
+    "preconditions": "Student logged in",
+    "action_or_input": "Look for a way to submit a non-hostel complaint (e.g., academic)",
+    "expected_result": "HM provides only hostel-related complaint submission and does not handle non-hostel complaint types",
+    "test_type": "scope"
+  },
+  {
+    "test_id": "TC-041",
+    "source_id": "AFR-HM-041",
+    "purpose": "Verify central complaint interaction occurs only within explicitly defined integration scope",
+    "preconditions": "A central Complaint Management module exists; no integration scope is defined",
+    "action_or_input": "Submit a hostel complaint",
+    "expected_result": "HM handles it as a hostel-local complaint and does not record or escalate it to the central module",
+    "test_type": "scope"
+  },
+  {
+    "test_id": "TC-042",
+    "source_id": "AFR-HM-042",
+    "purpose": "Verify non-hostel complaints are outside HM",
+    "preconditions": "Complaint categories configured in HM",
+    "action_or_input": "Review the available complaint categories and handling functions",
+    "expected_result": "No category or function for non-hostel complaints exists in HM",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-043",
+    "source_id": "AFR-HM-043",
+    "purpose": "Verify Student can submit a guest-room booking request",
+    "preconditions": "Student logged in",
+    "action_or_input": "Submit a guest-room booking request with valid details",
+    "expected_result": "The request is submitted and shown with a pending status",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-044",
+    "source_id": "AFR-HM-044",
+    "purpose": "Verify booking requests are recorded and availability information is provided for decisions",
+    "preconditions": "Pending guest-room booking request; Caretaker logged in",
+    "action_or_input": "Open the request with its availability information",
+    "expected_result": "The stored request details and guest-room availability for the requested dates are shown",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-045",
+    "source_id": "AFR-HM-045",
+    "purpose": "Verify Caretaker can verify availability and approve or reject booking requests",
+    "preconditions": "Caretaker logged in; two pending booking requests",
+    "action_or_input": "Approve one request and reject the other",
+    "expected_result": "Both decisions are recorded and statuses update accordingly",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-046",
+    "source_id": "AFR-HM-046",
+    "purpose": "Verify guest-room booking history is maintained",
+    "preconditions": "Past booking requests and decisions exist",
+    "action_or_input": "Open booking history",
+    "expected_result": "Past requests and decisions are retained and viewable for audit, planning and security review",
+    "test_type": "retention"
+  },
+  {
+    "test_id": "TC-047",
+    "source_id": "AFR-HM-047",
+    "purpose": "Verify guest-room management is limited to request handling and status tracking",
+    "preconditions": "Guest-room module accessible by Caretaker",
+    "action_or_input": "Review the available guest-room functions",
+    "expected_result": "Only booking-request handling and booking-status tracking are available",
+    "test_type": "scope"
+  },
+  {
+    "test_id": "TC-048",
+    "source_id": "AFR-HM-048",
+    "purpose": "Verify check-in, check-out, inspection, charge collection and settlement are absent",
+    "preconditions": "Approved guest-room booking exists; no integration configured",
+    "action_or_input": "Look for check-in, check-out, inspection, charge collection and settlement functions",
+    "expected_result": "None of these functions are provided in HM",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-049",
+    "source_id": "AFR-HM-049",
+    "purpose": "Verify Student can submit an extended-stay request",
+    "preconditions": "Student logged in; vacation or semester break period",
+    "action_or_input": "Submit an extended-stay request for a period",
+    "expected_result": "The request is submitted successfully",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-050",
+    "source_id": "AFR-HM-050",
+    "purpose": "Verify extended-stay request, period and decision status are recorded",
+    "preconditions": "Extended-stay request submitted",
+    "action_or_input": "Open the stored request",
+    "expected_result": "Request, requested period and decision status are stored and shown",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-051",
+    "source_id": "AFR-HM-051",
+    "purpose": "Verify extended-stay charge/fee amount is recorded where applicable and represented in HM",
+    "preconditions": "A charge applies to the extended-stay request and its data is provided to HM",
+    "action_or_input": "Provide the charge amount for the request and open the request",
+    "expected_result": "The charge amount is stored and shown with the request",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-052",
+    "source_id": "AFR-HM-052",
+    "purpose": "Verify payment deadline and compliance status are recorded where maintained in HM",
+    "preconditions": "Extended-stay request with deadline and compliance information provided",
+    "action_or_input": "Provide the deadline and compliance status, then open the request",
+    "expected_result": "Payment deadline and compliance status are stored and shown with the request",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-053",
+    "source_id": "AFR-HM-053",
+    "purpose": "Verify Warden can record approval or rejection of extended-stay requests",
+    "preconditions": "Warden logged in; two pending extended-stay requests",
+    "action_or_input": "Approve one request and reject the other",
+    "expected_result": "Both decisions are recorded and statuses update",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-054",
+    "source_id": "AFR-HM-054",
+    "purpose": "Verify Warden can see request details, compliance information and decision status",
+    "preconditions": "Extended-stay request with configured compliance information exists",
+    "action_or_input": "Warden opens the request",
+    "expected_result": "Request details, compliance information and decision status are visible",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-055",
+    "source_id": "AFR-HM-055",
+    "purpose": "Verify application-window enforcement is not applied unless configured",
+    "preconditions": "No application window configured",
+    "action_or_input": "Submit an extended-stay request on an arbitrary date",
+    "expected_result": "The request is accepted without any application-window check",
+    "test_type": "scope"
+  },
+  {
+    "test_id": "TC-056",
+    "source_id": "AFR-HM-056",
+    "purpose": "Verify payment collection, receipts, settlement and reconciliation are absent from HM",
+    "preconditions": "Extended-stay request with charge exists; no accounting integration",
+    "action_or_input": "Look for payment collection, receipt, settlement or reconciliation functions",
+    "expected_result": "None are available in HM; only recorded charge/deadline/compliance information is present",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-057",
+    "source_id": "AFR-HM-057",
+    "purpose": "Verify appeal and expedited handling are absent for extended-stay requests",
+    "preconditions": "Extended-stay request rejected",
+    "action_or_input": "Look for appeal or expedited handling options",
+    "expected_result": "No appeal or expedited handling function exists",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-058",
+    "source_id": "AFR-HM-058",
+    "purpose": "Verify Caretaker can record fines",
+    "preconditions": "Caretaker of H1 logged in; student S1 in H1",
+    "action_or_input": "Record a fine for S1 for damage",
+    "expected_result": "The fine record is saved for S1",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-059",
+    "source_id": "AFR-HM-059",
+    "purpose": "Verify fine records contain reason, amount, date and student reference",
+    "preconditions": "Fine being recorded",
+    "action_or_input": "Record a fine with all four data elements; then try omitting each mandatory element",
+    "expected_result": "Complete fine is saved with reason, amount, date and student reference; a fine missing any of these is not captured as complete",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-060",
+    "source_id": "AFR-HM-060",
+    "purpose": "Verify Student can view imposed fines and history",
+    "preconditions": "S1 has fines recorded",
+    "action_or_input": "S1 opens fine records",
+    "expected_result": "S1 sees own fines and fine history only",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-061",
+    "source_id": "AFR-HM-061",
+    "purpose": "Verify Warden can review fine summaries and disciplinary patterns",
+    "preconditions": "Warden of H1 logged in; fines exist for H1",
+    "action_or_input": "Open fine summaries and disciplinary patterns",
+    "expected_result": "Summaries and patterns for H1 are displayed",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-062",
+    "source_id": "AFR-HM-062",
+    "purpose": "Verify fine payment, waiver, settlement and appeal are absent",
+    "preconditions": "Fine recorded for S1",
+    "action_or_input": "Look for pay, waive, settle or appeal functions on the fine",
+    "expected_result": "No such functions are available in HM",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-063",
+    "source_id": "AFR-HM-063",
+    "purpose": "Verify fine-reason policy validation is not enforced",
+    "preconditions": "No fine-reason policy configured as system-enforced",
+    "action_or_input": "Record a fine with an arbitrary reason",
+    "expected_result": "The fine is saved without policy validation of the reason",
+    "test_type": "scope"
+  },
+  {
+    "test_id": "TC-064",
+    "source_id": "AFR-HM-064",
+    "purpose": "Verify Caretaker can maintain hostel-operational inventory records",
+    "preconditions": "Caretaker of H1 logged in",
+    "action_or_input": "Add, update and view an inventory item record",
+    "expected_result": "The inventory record is saved and updated",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-065",
+    "source_id": "AFR-HM-065",
+    "purpose": "Verify authorized hostel roles can view or maintain staff coordination information",
+    "preconditions": "Authorized hostel role logged in",
+    "action_or_input": "Add and view staff assignment, duty/shift and contact information",
+    "expected_result": "Staff coordination information is saved and viewable",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-066",
+    "source_id": "AFR-HM-066",
+    "purpose": "Verify Warden and Super Admin can review staff assignments or shift information",
+    "preconditions": "Staff coordination records exist for H1",
+    "action_or_input": "Warden and Super Admin each open staff assignment and shift information",
+    "expected_result": "Both roles can view the information",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-067",
+    "source_id": "AFR-HM-067",
+    "purpose": "Verify inventory updates and usage changes are logged",
+    "preconditions": "Inventory item exists",
+    "action_or_input": "Update an inventory quantity, then open the log",
+    "expected_result": "The log records the change with details for accountability",
+    "test_type": "retention"
+  },
+  {
+    "test_id": "TC-068",
+    "source_id": "AFR-HM-068",
+    "purpose": "Verify inventory and staff coordination are limited to operational records, visibility and logs",
+    "preconditions": "Inventory and staff coordination screens accessible",
+    "action_or_input": "Review available functions",
+    "expected_result": "Only hostel-operational records, visibility and accountability logs are provided",
+    "test_type": "scope"
+  },
+  {
+    "test_id": "TC-069",
+    "source_id": "AFR-HM-069",
+    "purpose": "Verify procurement, payroll, HR records and employee service administration are absent",
+    "preconditions": "No integration configured",
+    "action_or_input": "Look for procurement, stock purchase, payroll, HR record and service administration functions",
+    "expected_result": "None are available in HM",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-070",
+    "source_id": "AFR-HM-070",
+    "purpose": "Verify Warden can maintain, update and review guard shift schedules",
+    "preconditions": "Warden of H1 logged in",
+    "action_or_input": "Create a guard shift schedule, update it, then view it",
+    "expected_result": "The schedule is saved, updated and displayed",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-071",
+    "source_id": "AFR-HM-071",
+    "purpose": "Verify maintained security schedules and records are available for monitoring and review",
+    "preconditions": "Guard shift schedule exists",
+    "action_or_input": "Open security schedules and records for monitoring",
+    "expected_result": "Maintained schedules and records are available for review",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-072",
+    "source_id": "AFR-HM-072",
+    "purpose": "Verify incident investigation, security staff employment, payroll and non-hostel security administration are absent",
+    "preconditions": "No explicit specification or integration",
+    "action_or_input": "Look for these functions in the security section",
+    "expected_result": "None are provided in HM",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-073",
+    "source_id": "AFR-HM-073",
+    "purpose": "Verify Caretakers and Wardens can publish notices for assigned hostels",
+    "preconditions": "Caretaker and Warden of H1 logged in separately",
+    "action_or_input": "Each publishes a notice for H1",
+    "expected_result": "Both notices are published for H1",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-074",
+    "source_id": "AFR-HM-074",
+    "purpose": "Verify Students receive visibility or notification of relevant notices",
+    "preconditions": "Student S1 in H1; notice published for H1",
+    "action_or_input": "S1 checks notices",
+    "expected_result": "S1 can see the H1 notice or receives a notification for it",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-075",
+    "source_id": "AFR-HM-075",
+    "purpose": "Verify notice history is maintained",
+    "preconditions": "Several past notices exist",
+    "action_or_input": "Open notice history",
+    "expected_result": "Past notices are retained and viewable",
+    "test_type": "retention"
+  },
+  {
+    "test_id": "TC-076",
+    "source_id": "AFR-HM-076",
+    "purpose": "Verify hostel notice board displays relevant notices to authorized users",
+    "preconditions": "Notices published for H1",
+    "action_or_input": "Authorized H1 user opens the notice board",
+    "expected_result": "Relevant notices are displayed on the notice board",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-077",
+    "source_id": "AFR-HM-077",
+    "purpose": "Verify predefined reports and summaries derived from HM records are supported",
+    "preconditions": "HM data exists; authorized user logged in",
+    "action_or_input": "Open the list of predefined reports and run one",
+    "expected_result": "Predefined reports are listed and the selected one is generated from HM records",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-078",
+    "source_id": "AFR-HM-078",
+    "purpose": "Verify occupancy and room-utilization reports are provided",
+    "preconditions": "Room occupancy data exists",
+    "action_or_input": "Generate the occupancy and room-utilization report",
+    "expected_result": "Report is generated and matches recorded occupancy data",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-079",
+    "source_id": "AFR-HM-079",
+    "purpose": "Verify attendance and leave summaries are provided",
+    "preconditions": "Attendance and leave data exist",
+    "action_or_input": "Generate attendance and leave summaries",
+    "expected_result": "Summaries are generated and match recorded data",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-080",
+    "source_id": "AFR-HM-080",
+    "purpose": "Verify fine and disciplinary summaries are provided",
+    "preconditions": "Fine data exists",
+    "action_or_input": "Generate fine and disciplinary summaries",
+    "expected_result": "Summaries are generated and match recorded fines",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-081",
+    "source_id": "AFR-HM-081",
+    "purpose": "Verify complaint and resolution statistics are provided",
+    "preconditions": "Complaints with various statuses exist",
+    "action_or_input": "Generate complaint and resolution statistics",
+    "expected_result": "Statistics match recorded complaint and resolution data",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-082",
+    "source_id": "AFR-HM-082",
+    "purpose": "Verify extended-stay summaries are provided",
+    "preconditions": "Extended-stay requests exist",
+    "action_or_input": "Generate extended-stay summaries",
+    "expected_result": "Summary matches recorded extended-stay requests and decisions",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-083",
+    "source_id": "AFR-HM-083",
+    "purpose": "Verify hostel-level operational reports for Caretakers",
+    "preconditions": "Caretaker of H1 logged in",
+    "action_or_input": "Generate a hostel-level operational report",
+    "expected_result": "Report for H1 is generated and available to the Caretaker",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-084",
+    "source_id": "AFR-HM-084",
+    "purpose": "Verify supervisory reports for Wardens",
+    "preconditions": "Warden of H1 logged in",
+    "action_or_input": "Generate a supervisory report",
+    "expected_result": "Supervisory report for H1 is generated and available to the Warden",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-085",
+    "source_id": "AFR-HM-085",
+    "purpose": "Verify institution-level or cross-hostel monitoring reports for Super Admin",
+    "preconditions": "Super Admin logged in; data in multiple hostels",
+    "action_or_input": "Generate a cross-hostel monitoring report",
+    "expected_result": "Report covers multiple hostels at institution level",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-086",
+    "source_id": "AFR-HM-086",
+    "purpose": "Verify advanced analytics are not provided",
+    "preconditions": "Reports module accessible",
+    "action_or_input": "Look for advanced analytics, predictive analysis or external data analysis features",
+    "expected_result": "None are provided by HM",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-087",
+    "source_id": "AFR-HM-087",
+    "purpose": "Verify notifications are issued for supported events through the notification mechanism",
+    "preconditions": "Fusion notification infrastructure or configured mechanism available",
+    "action_or_input": "Trigger a supported event (e.g., leave decision)",
+    "expected_result": "The relevant user receives a notification or status update via the notification mechanism",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-088",
+    "source_id": "AFR-HM-088",
+    "purpose": "Verify notification on room allotment and allocation changes",
+    "preconditions": "Student S1 has no pending changes",
+    "action_or_input": "Allot S1 to a room, then re-allot to another room",
+    "expected_result": "S1 is notified of the allotment and of the allocation change",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-089",
+    "source_id": "AFR-HM-089",
+    "purpose": "Verify notification on leave submission and leave decisions",
+    "preconditions": "Student S1 logged in",
+    "action_or_input": "Submit a leave request; Caretaker records a decision",
+    "expected_result": "Notifications are issued for the submission and for the decision to the relevant users",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-090",
+    "source_id": "AFR-HM-090",
+    "purpose": "Verify notification on complaint submission, update and resolution",
+    "preconditions": "Student S1 logged in",
+    "action_or_input": "Submit a complaint; Caretaker updates it; Caretaker resolves it",
+    "expected_result": "Notifications are issued for submission, update and resolution to the relevant users",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-091",
+    "source_id": "AFR-HM-091",
+    "purpose": "Verify notification on guest-room booking status",
+    "preconditions": "Pending guest-room booking request from S1",
+    "action_or_input": "Caretaker approves the request",
+    "expected_result": "S1 receives a booking status notification",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-092",
+    "source_id": "AFR-HM-092",
+    "purpose": "Verify notification on extended-stay request status",
+    "preconditions": "Pending extended-stay request from S1",
+    "action_or_input": "Warden approves the request",
+    "expected_result": "S1 receives an extended-stay status notification",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-093",
+    "source_id": "AFR-HM-093",
+    "purpose": "Verify payment/deadline alerts where such information is maintained in HM",
+    "preconditions": "Extended-stay record with deadline information maintained in HM",
+    "action_or_input": "Trigger the payment/deadline alert event",
+    "expected_result": "The relevant user receives a payment/deadline alert",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-094",
+    "source_id": "AFR-HM-094",
+    "purpose": "Verify notification on fine imposition",
+    "preconditions": "Student S1 in H1",
+    "action_or_input": "Caretaker records a fine for S1",
+    "expected_result": "S1 is notified of the fine",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-095",
+    "source_id": "AFR-HM-095",
+    "purpose": "Verify notification on notices and announcements",
+    "preconditions": "Student S1 in H1",
+    "action_or_input": "Publish a notice for H1",
+    "expected_result": "S1 receives a notification for the notice",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-096",
+    "source_id": "AFR-HM-096",
+    "purpose": "Verify Caretaker operations are restricted to the assigned hostel and shift context",
+    "preconditions": "Caretaker C1 assigned to H1; H2 data exists",
+    "action_or_input": "C1 performs an operation on H1, then attempts the same on H2",
+    "expected_result": "The operation on H1 succeeds and the attempt on H2 is denied or hidden",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-097",
+    "source_id": "AFR-HM-097",
+    "purpose": "Verify hostel-specific Warden and Caretaker role assignments are maintained",
+    "preconditions": "Warden W1 assigned to H1 and Caretaker C1 assigned to H2",
+    "action_or_input": "W1 accesses H1 and H2 functions; C1 accesses H2 and H1 functions",
+    "expected_result": "Each has access only to the hostel of their assignment",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-098",
+    "source_id": "AFR-HM-098",
+    "purpose": "Verify Student access is limited by hostel association",
+    "preconditions": "Student S1 allocated to H1; notices and information exist for H1 and H2",
+    "action_or_input": "S1 attempts to view information of H1 and of H2",
+    "expected_result": "S1 can access H1 information and is denied or not shown H2 information",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-099",
+    "source_id": "AFR-HM-099",
+    "purpose": "Verify Super Admin has institution-level access",
+    "preconditions": "No restriction configured; hostels H1 and H2 exist",
+    "action_or_input": "Super Admin opens data and functions for H1 and H2",
+    "expected_result": "Super Admin can access both hostels",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-100",
+    "source_id": "AFR-HM-100",
+    "purpose": "Verify role activation and deactivation status is recorded and affects access",
+    "preconditions": "Caretaker C1 bound to H1",
+    "action_or_input": "Super Admin deactivates C1’s binding; C1 attempts a Caretaker action on H1",
+    "expected_result": "Deactivated status is recorded and C1’s access is denied",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-101",
+    "source_id": "AFR-HM-101",
+    "purpose": "Verify time-bound role validity is enforced only if start and end dates are configured",
+    "preconditions": "Case A: binding without dates; Case B: binding with an end date in the past, configured in HM",
+    "action_or_input": "Holder in each case attempts a role action",
+    "expected_result": "Case A: access is not time-limited; Case B: access is denied after the end date",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-102",
+    "source_id": "AFR-HM-102",
+    "purpose": "Verify role changes take effect when recorded by Super Admin",
+    "preconditions": "Warden W1 bound to H1; W2 unbound",
+    "action_or_input": "Super Admin reassigns H1 from W1 to W2; W1 and W2 then attempt Warden actions on H1",
+    "expected_result": "Immediately after recording, W2 has access and W1 does not",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-103",
+    "source_id": "AFR-HM-103",
+    "purpose": "Verify new role holder can view pending HM records after reassignment",
+    "preconditions": "Pending leave and complaint records exist for H1",
+    "action_or_input": "Super Admin reassigns Caretaker of H1 to C2; C2 opens pending records",
+    "expected_result": "C2 can view pending records for H1, subject to RBAC",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-104",
+    "source_id": "AFR-HM-104",
+    "purpose": "Verify operational handover outside system-visible records is not handled by HM",
+    "preconditions": "Role reassigned for H1",
+    "action_or_input": "Look for handover workflow functions beyond system-visible responsibility records",
+    "expected_result": "HM provides no handover process beyond viewing system-visible records",
+    "test_type": "scope"
+  },
+  {
+    "test_id": "TC-105",
+    "source_id": "AFR-HM-105",
+    "purpose": "Verify users access only hostel data and functions permitted by role and hostel assignment",
+    "preconditions": "Users of each role with different hostel assignments",
+    "action_or_input": "Each user attempts permitted and non-permitted functions and hostel data",
+    "expected_result": "Permitted access succeeds; non-permitted access is denied or hidden",
+    "test_type": "authorization"
+  }
+]

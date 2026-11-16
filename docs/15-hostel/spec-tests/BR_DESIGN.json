@@ -1,0 +1,236 @@
+[
+  {
+    "test_id": "TC-001",
+    "source_id": "BR-HM-001",
+    "purpose": "Verify hostel-specific Warden and Caretaker role binding is maintained and the change is recorded",
+    "preconditions": "Super Admin logged in; Hostel H1 exists; user U1 exists",
+    "action_or_input": "Super Admin assigns U1 as Warden of H1, then reassigns the Warden role of H1 to user U2",
+    "expected_result": "Role binding is stored per hostel (H1), and each role change made by the Super Admin is recorded",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-002",
+    "source_id": "BR-HM-002",
+    "purpose": "Verify student can access hostel-specific data only for the hostel they are allocated to",
+    "preconditions": "Student S1 allocated to hostel H1; hostel H2 has no association with S1",
+    "action_or_input": "S1 requests hostel-specific data of H1, then of H2",
+    "expected_result": "Access to H1 data is granted; access to H2 data is denied",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-003",
+    "source_id": "BR-HM-003",
+    "purpose": "Verify Super Admin has institution-level access across hostels without restricting configuration",
+    "preconditions": "Super Admin logged in; hostels H1 and H2 exist; no HM configuration restricts Super Admin",
+    "action_or_input": "Super Admin accesses data and functions of H1 and H2",
+    "expected_result": "Access is permitted for both hostels",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-004",
+    "source_id": "BR-HM-004",
+    "purpose": "Verify time-bound role validity is enforced when start and end dates are configured",
+    "preconditions": "Warden role for U1 in H1 configured with start date D1 and end date D2",
+    "action_or_input": "U1 attempts Warden functions within D1–D2 and again after D2",
+    "expected_result": "Access is permitted within the validity period and denied after the end date",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-005",
+    "source_id": "BR-HM-005",
+    "purpose": "Verify RBAC restricts users to data and functions permitted by role and hostel assignment",
+    "preconditions": "Warden W1 assigned to H1 only; H2 exists",
+    "action_or_input": "W1 attempts a permitted function on H1 and the same function on H2",
+    "expected_result": "Function on H1 succeeds; function on H2 is denied",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-006",
+    "source_id": "BR-HM-006",
+    "purpose": "Verify newly assigned role holder can view pending HM records of the assigned hostel",
+    "preconditions": "H1 has pending HM records; Caretaker C1 currently assigned to H1",
+    "action_or_input": "Super Admin reassigns H1 Caretaker role to C2; C2 opens pending records for H1",
+    "expected_result": "C2 can view the pending HM records for H1, subject to RBAC",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-007",
+    "source_id": "BR-HM-008",
+    "purpose": "Verify allotment decision is recorded and room assignment information is updated",
+    "preconditions": "Student S1 awaiting allotment; room R1 in H1 has free capacity",
+    "action_or_input": "Authorized user records allotment of S1 to R1",
+    "expected_result": "Allotment decision is recorded and room assignment for S1/R1 is updated",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-008",
+    "source_id": "BR-HM-009",
+    "purpose": "Verify room assignment history is maintained",
+    "preconditions": "S1 assigned to R1; R2 has free capacity",
+    "action_or_input": "Authorized user changes S1 assignment from R1 to R2, then views assignment history",
+    "expected_result": "History shows both the R1 assignment and the change to R2 with traceable details",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-009",
+    "source_id": "BR-HM-010",
+    "purpose": "Verify occupancy cannot exceed defined room capacity",
+    "preconditions": "Room R1 capacity = 2 and currently has 2 occupants; student S3 unassigned",
+    "action_or_input": "Attempt to assign S3 to R1",
+    "expected_result": "Assignment is rejected; occupancy remains 2",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-010",
+    "source_id": "BR-HM-011",
+    "purpose": "Verify attendance records are retained and available for review",
+    "preconditions": "Attendance recorded for H1 on date D1",
+    "action_or_input": "Authorized user retrieves attendance records for D1 at a later time",
+    "expected_result": "The attendance records for D1 are retained and retrievable",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-011",
+    "source_id": "BR-HM-013",
+    "purpose": "Verify leave history is retained",
+    "preconditions": "Student S1 has submitted and had a leave request processed",
+    "action_or_input": "Authorized user views leave history for S1",
+    "expected_result": "The leave request and its status history are retained and displayed",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-012",
+    "source_id": "BR-HM-015",
+    "purpose": "Verify complaint captures category and description, with optional attachment",
+    "preconditions": "Student S1 logged in; complaint form available",
+    "action_or_input": "Submit a complaint with category and description and no attachment; submit another with an attachment (where the form provides the field)",
+    "expected_result": "Both complaints are saved with category and description; the attachment is captured when provided",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-013",
+    "source_id": "BR-HM-016",
+    "purpose": "Verify HM covers hostel-related complaints only",
+    "preconditions": "Student S1 logged in",
+    "action_or_input": "Submit a hostel-related complaint, then attempt to submit a non-hostel complaint",
+    "expected_result": "Hostel-related complaint is accepted; non-hostel complaint is not handled by HM",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-014",
+    "source_id": "BR-HM-018",
+    "purpose": "Verify guest-room booking history is maintained",
+    "preconditions": "Guest-room booking request B1 submitted and status updated",
+    "action_or_input": "Authorized user views guest-room booking history",
+    "expected_result": "B1 and its status changes are retained and viewable",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-015",
+    "source_id": "BR-HM-019",
+    "purpose": "Verify guest-room management is limited to booking-request handling and status tracking",
+    "preconditions": "Booking request B1 exists",
+    "action_or_input": "Review available guest-room functions in HM",
+    "expected_result": "Booking-request handling and status tracking are available; check-in, check-out, inspection, charge collection and settlement are not provided",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-016",
+    "source_id": "BR-HM-020",
+    "purpose": "Verify applicable extended-stay charge amount is recorded",
+    "preconditions": "Extended-stay request exists; charges are applicable and represented in HM",
+    "action_or_input": "Event supplies extended-stay charge amount for the request",
+    "expected_result": "The charge/fee amount is recorded against the extended-stay request",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-017",
+    "source_id": "BR-HM-021",
+    "purpose": "Verify payment deadline and compliance status are recorded for extended-stay decisions",
+    "preconditions": "Extended-stay request exists; deadline/compliance information is maintained in HM",
+    "action_or_input": "Event supplies payment deadline and compliance status",
+    "expected_result": "Deadline and payment/deadline compliance status are recorded and available for the extended-stay decision",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-018",
+    "source_id": "BR-HM-022",
+    "purpose": "Verify application window is enforced only when configured",
+    "preconditions": "Extended-stay application window configured and enforced; date outside window",
+    "action_or_input": "Student submits extended-stay request outside the configured window",
+    "expected_result": "Request is rejected per the configured window",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-019",
+    "source_id": "BR-HM-025",
+    "purpose": "Verify fine record requires reason, amount, date and affected student reference",
+    "preconditions": "Authorized user on fine creation function",
+    "action_or_input": "Submit fine with all four fields; then submit fines each omitting one of reason, amount, date, student reference",
+    "expected_result": "Complete fine is saved; each incomplete fine is rejected with a validation error",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-020",
+    "source_id": "BR-HM-027",
+    "purpose": "Verify inventory and staff coordination records and accountability logs are maintained",
+    "preconditions": "Caretaker C1 logged in for assigned hostel H1",
+    "action_or_input": "Update a hostel inventory record and a staff coordination record",
+    "expected_result": "Updates are saved and an accountability log entry is created for each",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-021",
+    "source_id": "BR-HM-029",
+    "purpose": "Verify Warden/Caretaker can publish notices only for assigned hostels",
+    "preconditions": "Warden W1 assigned to H1 only",
+    "action_or_input": "W1 publishes a notice for H1, then attempts to publish a notice for H2",
+    "expected_result": "Notice for H1 is published; notice for H2 is denied",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-022",
+    "source_id": "BR-HM-030",
+    "purpose": "Verify notice history is maintained",
+    "preconditions": "Notice N1 published in H1",
+    "action_or_input": "Authorized user views notice history for H1",
+    "expected_result": "N1 appears in the retained notice history",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-023",
+    "source_id": "BR-HM-031",
+    "purpose": "Verify notice board displays relevant notices to authorized users",
+    "preconditions": "Notice N1 published for H1; S1 allocated to H1; unauthorized user U9",
+    "action_or_input": "S1 opens the H1 notice board; U9 attempts to open it",
+    "expected_result": "S1 sees N1; U9 is denied access",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-024",
+    "source_id": "BR-HM-032",
+    "purpose": "Verify predefined reports and operational summaries are produced from HM records",
+    "preconditions": "HM records exist; authorized user logged in",
+    "action_or_input": "Run a predefined HM report",
+    "expected_result": "Report/operational summary is generated from HM records",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-025",
+    "source_id": "BR-HM-034",
+    "purpose": "Verify notification issued for a supported HM event",
+    "preconditions": "Notification mechanism configured; S1 allocated to R1",
+    "action_or_input": "Change S1 room allocation",
+    "expected_result": "A notification/status update is issued to the relevant users via the Fusion notification infrastructure or configured mechanism",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-026",
+    "source_id": "BR-HM-035",
+    "purpose": "Verify Caretaker operations are supported within assigned hostel and shift context",
+    "preconditions": "Caretaker C1 assigned to H1 with shift context configured",
+    "action_or_input": "C1 performs a caretaker operation for H1, then for H2",
+    "expected_result": "Operation on H1 is supported; operation on H2 is not",
+    "test_type": "authorization"
+  }
+]

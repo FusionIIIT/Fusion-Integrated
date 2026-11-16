@@ -13,6 +13,31 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `hostel`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `hostel.room.view` | View hostel and room information | `Super Admin`, `caretaker`, `student`, `warden` |
+| `hostel.room.manage` | Manage hostels and rooms | `Super Admin`, `caretaker` |
+| `hostel.accommodation.view` | View accommodation requests | `Super Admin`, `caretaker`, `student`, `warden` |
+| `hostel.accommodation.create` | Submit accommodation request | `student` |
+| `hostel.allotment.manage` | Manage batch and room allotments | `Super Admin` |
+| `hostel.leave.view` | View leave requests | `Super Admin`, `caretaker`, `student`, `warden` |
+| `hostel.leave.create` | Submit leave request | `student` |
+| `hostel.leave.review` | Review and approve/reject leave requests | `Super Admin`, `caretaker` |
+| `hostel.complaint.view` | View hostel complaints | `Super Admin`, `caretaker`, `student`, `warden` |
+| `hostel.complaint.create` | Submit hostel complaint | `student` |
+| `hostel.complaint.review` | Review, escalate, or resolve complaints | `Super Admin`, `caretaker`, `warden` |
+| `hostel.attendance.view` | View student attendance | `Super Admin`, `caretaker`, `student`, `warden` |
+| `hostel.attendance.create` | Record student attendance | `Super Admin`, `caretaker` |
+| `hostel.fine.view` | View hostel fine records | `Super Admin`, `caretaker`, `student`, `warden` |
+| `hostel.fine.create` | Impose hostel fines | `Super Admin`, `caretaker`, `warden` |
+| `hostel.notice.view` | View hostel notices | `Super Admin`, `caretaker`, `student`, `warden` |
+| `hostel.notice.publish` | Publish hostel notices | `Super Admin`, `caretaker`, `warden` |
+| `hostel.inventory.manage` | Manage hostel inventory | `Super Admin`, `caretaker` |
+| `hostel.security.manage` | Manage security shifts | `Super Admin`, `warden` |
+| `hostel.report.view` | View operational reports | `Super Admin`, `warden` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

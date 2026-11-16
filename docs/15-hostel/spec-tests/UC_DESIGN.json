@@ -1,0 +1,407 @@
+[
+  {
+    "test_id": "TC-001",
+    "source_id": "HM-UC-001",
+    "purpose": "Verify Super Admin can create a hostel record",
+    "preconditions": "Super Admin authenticated; hostel record does not already exist",
+    "action_or_input": "Open create-hostel function, enter hostel identification and master data, submit",
+    "expected_result": "New hostel record is created and stored in HM",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-002",
+    "source_id": "HM-UC-002",
+    "purpose": "Verify Super Admin can activate or deactivate a hostel record",
+    "preconditions": "Super Admin authenticated; hostel record exists",
+    "action_or_input": "Open hostel record, select Deactivate, then select Activate",
+    "expected_result": "Activation status is recorded as inactive, then as active, and is available to HM functions using hostel records",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-003",
+    "source_id": "HM-UC-003",
+    "purpose": "Verify Super Admin can assign, reassign, activate or deactivate a Warden role binding",
+    "preconditions": "Super Admin authenticated; hostel exists",
+    "action_or_input": "Select hostel, assign Warden binding, then reassign it and toggle status",
+    "expected_result": "Binding and status are recorded for the hostel; hostel-specific access visibility is applied; new holder can view pending HM records for the hostel",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-004",
+    "source_id": "HM-UC-004",
+    "purpose": "Verify Super Admin can assign, reassign, activate or deactivate a Caretaker role binding",
+    "preconditions": "Super Admin authenticated; hostel exists",
+    "action_or_input": "Select hostel, assign Caretaker binding, then reassign it and toggle status",
+    "expected_result": "Binding and status are recorded for the hostel; hostel-specific access visibility is applied; new holder can view pending HM records for the hostel",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-005",
+    "source_id": "HM-UC-005",
+    "purpose": "Verify Student can submit a hostel accommodation request",
+    "preconditions": "Student authenticated",
+    "action_or_input": "Open accommodation request form, enter details, submit",
+    "expected_result": "Request details and an initial request status are recorded for allotment processing",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-006",
+    "source_id": "HM-UC-006",
+    "purpose": "Verify Super Admin can record hostel and room allotment decisions",
+    "preconditions": "Super Admin authenticated; accommodation records and rooms with available capacity exist",
+    "action_or_input": "Open allotment decision function, record hostel and room allotment for a student",
+    "expected_result": "Allotment decision, room assignment, occupancy and room-assignment history are recorded; allocation status notification is issued",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-007",
+    "source_id": "HM-UC-006",
+    "purpose": "Verify allotment exceeding room capacity is rejected",
+    "preconditions": "Super Admin authenticated; target room is at defined capacity",
+    "action_or_input": "Record an allotment into the full room",
+    "expected_result": "Update is rejected and prior occupancy state is preserved",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-008",
+    "source_id": "HM-UC-007",
+    "purpose": "Verify central re-allotment and formal room-vacation can be recorded",
+    "preconditions": "Super Admin authenticated; student has a current room assignment; target room has capacity",
+    "action_or_input": "Record a central re-allotment; then record a formal room-vacation for another assignment",
+    "expected_result": "Re-allotment creates a new assignment; vacation removes the current assignment/occupancy; room history is updated; notification is issued",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-009",
+    "source_id": "HM-UC-007",
+    "purpose": "Verify re-allotment exceeding room capacity is rejected",
+    "preconditions": "Super Admin authenticated; target room is at defined capacity",
+    "action_or_input": "Record a central re-allotment into the full room",
+    "expected_result": "Update is rejected and prior occupancy state is preserved",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-010",
+    "source_id": "HM-UC-008",
+    "purpose": "Verify Student can view current and historical room allocation",
+    "preconditions": "Student authenticated; student has current and past allocations",
+    "action_or_input": "Open room allocation view",
+    "expected_result": "Current room allocation and historical allocation information are displayed for that student only",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-011",
+    "source_id": "HM-UC-009",
+    "purpose": "Verify Caretaker can maintain room availability and occupancy",
+    "preconditions": "Caretaker authenticated; within assigned hostel and shift",
+    "action_or_input": "Open room availability/occupancy function, update room status and an occupancy value within capacity",
+    "expected_result": "Updated availability/occupancy information is stored",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-012",
+    "source_id": "HM-UC-009",
+    "purpose": "Verify occupancy update exceeding capacity is rejected",
+    "preconditions": "Caretaker authenticated; room at defined capacity",
+    "action_or_input": "Record an occupancy update exceeding capacity",
+    "expected_result": "Update is rejected; existing occupancy unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-013",
+    "source_id": "HM-UC-010",
+    "purpose": "Verify Caretaker can record an individual room exchange",
+    "preconditions": "Caretaker authenticated; within assigned hostel and shift; exchange keeps rooms within capacity",
+    "action_or_input": "Select student and room assignment, record the exchange",
+    "expected_result": "Affected assignments, occupancy, room status and history are updated; room-allocation-change notification is issued",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-014",
+    "source_id": "HM-UC-010",
+    "purpose": "Verify exchange exceeding capacity is not recorded",
+    "preconditions": "Caretaker authenticated; exchange would exceed a room’s capacity",
+    "action_or_input": "Record the exchange",
+    "expected_result": "Exchange is not recorded; existing records unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-015",
+    "source_id": "HM-UC-011",
+    "purpose": "Verify Warden can review room assignments and occupancy",
+    "preconditions": "Warden authenticated; hostel within active role binding",
+    "action_or_input": "Open room assignment/occupancy review",
+    "expected_result": "Room assignment, utilization, occupancy and room-change information for the hostel is displayed",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-016",
+    "source_id": "HM-UC-012",
+    "purpose": "Verify Caretaker can record and monitor attendance",
+    "preconditions": "Caretaker authenticated; within assigned hostel and shift",
+    "action_or_input": "Open attendance function, record attendance for students",
+    "expected_result": "Attendance records are stored and available for authorized review/reporting",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-017",
+    "source_id": "HM-UC-013",
+    "purpose": "Verify Student can view own attendance information",
+    "preconditions": "Student authenticated; attendance data exists",
+    "action_or_input": "Open attendance-status view",
+    "expected_result": "Student’s own attendance information is displayed; no state change",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-018",
+    "source_id": "HM-UC-014",
+    "purpose": "Verify Student can submit a leave request",
+    "preconditions": "Student authenticated",
+    "action_or_input": "Open leave form, enter details and any configured supporting information, submit",
+    "expected_result": "Leave request is recorded with status, retained in leave history, available for Caretaker review; submission notification is issued",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-019",
+    "source_id": "HM-UC-015",
+    "purpose": "Verify Caretaker can approve or reject a leave request",
+    "preconditions": "Caretaker authenticated; within assigned hostel and shift; pending leave request exists",
+    "action_or_input": "Open request, record Approval for one request and Rejection for another",
+    "expected_result": "Request states become Approved and Rejected respectively; leave history retained; decision notification issued",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-020",
+    "source_id": "HM-UC-016",
+    "purpose": "Verify Student can view own leave status and history",
+    "preconditions": "Student authenticated; leave records exist",
+    "action_or_input": "Open leave status/history view",
+    "expected_result": "Student’s own leave status and history are displayed; no state change",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-021",
+    "source_id": "HM-UC-017",
+    "purpose": "Verify Student can submit a hostel-related complaint",
+    "preconditions": "Student authenticated",
+    "action_or_input": "Open complaint form, enter category and description (optional attachment), submit",
+    "expected_result": "Complaint and initial status are recorded for Caretaker handling; submission notification is issued",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-022",
+    "source_id": "HM-UC-017",
+    "purpose": "Verify out-of-scope matter is not treated as an HM hostel complaint",
+    "preconditions": "Student authenticated",
+    "action_or_input": "Submit a matter outside hostel-related complaint scope",
+    "expected_result": "HM does not treat it as a hostel complaint and no central complaint routing occurs",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-023",
+    "source_id": "HM-UC-018",
+    "purpose": "Verify Caretaker can review, update, resolve and escalate a complaint",
+    "preconditions": "Caretaker authenticated; within assigned hostel and shift; submitted complaint exists",
+    "action_or_input": "Open complaint, record action and status (resolved); on another complaint record unresolved update; on another record escalation to Warden",
+    "expected_result": "Action and status are stored; resolved status stored; unresolved remains unresolved; escalation recorded where supported; update/resolution notification issued",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-024",
+    "source_id": "HM-UC-019",
+    "purpose": "Verify Warden can monitor complaint status and history",
+    "preconditions": "Warden authenticated; hostel within active role binding; complaints exist",
+    "action_or_input": "Open complaint monitoring view",
+    "expected_result": "Unresolved, delayed, escalated and historical complaint information within permitted scope is displayed",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-025",
+    "source_id": "HM-UC-020",
+    "purpose": "Verify Student can submit a guest-room booking request",
+    "preconditions": "Student authenticated",
+    "action_or_input": "Open booking form, enter details, submit",
+    "expected_result": "Request with initial booking status is recorded and retained in booking history; booking status notification is issued",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-026",
+    "source_id": "HM-UC-021",
+    "purpose": "Verify Caretaker can approve or reject a guest-room booking request",
+    "preconditions": "Caretaker authenticated; within assigned hostel and shift; pending booking request exists",
+    "action_or_input": "Open pending request, view availability, record approval for one and rejection for another",
+    "expected_result": "Booking status is updated and booking history maintained",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-027",
+    "source_id": "HM-UC-022",
+    "purpose": "Verify Student can view own guest-room booking status",
+    "preconditions": "Student authenticated; booking request exists",
+    "action_or_input": "Open guest-room booking status",
+    "expected_result": "Student’s own booking requests and status are displayed; no state change",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-028",
+    "source_id": "HM-UC-023",
+    "purpose": "Verify Student can submit an extended-stay request",
+    "preconditions": "Student authenticated",
+    "action_or_input": "Open extended-stay form, enter requested period and details, submit",
+    "expected_result": "Requested period and decision status are recorded for Warden review",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-029",
+    "source_id": "HM-UC-024",
+    "purpose": "Verify Warden can approve or reject an extended-stay request",
+    "preconditions": "Warden authenticated; hostel within active role binding; submitted extended-stay request exists",
+    "action_or_input": "Open request, review details and any charge/deadline/compliance info, record approval for one and rejection for another",
+    "expected_result": "Decision status, actor and timestamp are recorded (Approved/Rejected); status notification is issued",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-030",
+    "source_id": "HM-UC-025",
+    "purpose": "Verify supplied charge/deadline/compliance information is recorded against an extended-stay request",
+    "preconditions": "Extended-stay request exists; configured source supplies charge/deadline/compliance data",
+    "action_or_input": "Configured source supplies charge, payment deadline and compliance information for the request",
+    "expected_result": "HM associates and records the information with the request and makes it available for Warden review",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-031",
+    "source_id": "HM-UC-025",
+    "purpose": "Verify HM does not invent values when source supplies no usable information",
+    "preconditions": "Extended-stay request exists; source supplies no usable information",
+    "action_or_input": "Source provides no usable charge/deadline/compliance data",
+    "expected_result": "No unsupported value is created or inferred",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-032",
+    "source_id": "HM-UC-026",
+    "purpose": "Verify Caretaker can record a hostel fine",
+    "preconditions": "Caretaker authenticated; within assigned hostel and shift",
+    "action_or_input": "Open fine function, enter affected student, reason, amount, date, submit",
+    "expected_result": "Fine record is stored and visible for permitted review; fine-imposition notification issued where applicable",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-033",
+    "source_id": "HM-UC-027",
+    "purpose": "Verify Student can view own fine records and history",
+    "preconditions": "Student authenticated; fine records exist",
+    "action_or_input": "Open fine records/history view",
+    "expected_result": "Student’s own imposed fines and history are displayed; no state change",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-034",
+    "source_id": "HM-UC-028",
+    "purpose": "Verify Caretaker can maintain hostel inventory records",
+    "preconditions": "Caretaker authenticated; within assigned hostel and shift",
+    "action_or_input": "Open inventory records, record an inventory update or usage change",
+    "expected_result": "Inventory records (and accountability logs where maintained) are stored",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-035",
+    "source_id": "HM-UC-029",
+    "purpose": "Verify authorized role can maintain and view staff coordination information",
+    "preconditions": "Authorized hostel role authenticated, with maintenance permission for one actor and view-only for another",
+    "action_or_input": "Maintenance actor updates a staff-coordination record; view-only actor opens the same records",
+    "expected_result": "Permitted update is stored; view-only action leaves records unchanged",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-036",
+    "source_id": "HM-UC-030",
+    "purpose": "Verify Warden can maintain security guard shift schedule",
+    "preconditions": "Warden authenticated; hostel within active role binding",
+    "action_or_input": "Open guard shift schedule function, record or update a shift schedule",
+    "expected_result": "Updated schedule is stored and available for monitoring/review",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-037",
+    "source_id": "HM-UC-031",
+    "purpose": "Verify Caretaker or Warden can publish a notice for an assigned hostel",
+    "preconditions": "Caretaker or Warden authenticated; target hostel is assigned to the actor",
+    "action_or_input": "Open notice function, enter content, publish",
+    "expected_result": "Notice is displayed on the hostel notice board and recorded in notice history",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-038",
+    "source_id": "HM-UC-032",
+    "purpose": "Verify authorized users can view hostel notices",
+    "preconditions": "Authorized user authenticated; published notices exist",
+    "action_or_input": "Open hostel notice board",
+    "expected_result": "Notices visible to the user within hostel/access scope are displayed with history/reference where maintained",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-039",
+    "source_id": "HM-UC-033",
+    "purpose": "Verify role-scoped report generation",
+    "preconditions": "Caretaker, Warden and Super Admin each authenticated; HM records exist",
+    "action_or_input": "Each actor opens the reports function and generates a predefined report",
+    "expected_result": "Caretaker sees hostel-level options, Warden supervisory options, Super Admin institution-level/cross-hostel options; selected report is generated from HM records",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-040",
+    "source_id": "HM-UC-034",
+    "purpose": "Verify notification/status update is issued on a supported HM event",
+    "preconditions": "Configured notification mechanism available",
+    "action_or_input": "Trigger a supported event (e.g., leave decision recorded)",
+    "expected_result": "Notification/status update is issued to relevant recipients through the configured mechanism",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-041",
+    "source_id": "HM-UC-034",
+    "purpose": "Verify failed notification is not represented as issued",
+    "preconditions": "Configured notification mechanism cannot accept the notification",
+    "action_or_input": "Trigger a supported event",
+    "expected_result": "System does not represent the notification as successfully issued",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-042",
+    "source_id": "HM-UC-036",
+    "purpose": "Verify Warden can review attendance summaries, trends and exceptions",
+    "preconditions": "Warden authenticated; hostel within active role binding; attendance data exists",
+    "action_or_input": "Open attendance oversight view",
+    "expected_result": "Attendance summaries, trends and exceptions for permitted scope are displayed; no records changed",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-043",
+    "source_id": "HM-UC-037",
+    "purpose": "Verify Warden can review leave information and summaries",
+    "preconditions": "Warden authenticated; hostel within active role binding; leave data exists",
+    "action_or_input": "Open leave oversight view",
+    "expected_result": "Leave information and summaries for permitted scope are displayed; no request or decision state changed",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-044",
+    "source_id": "HM-UC-038",
+    "purpose": "Verify Warden can review fine summaries and disciplinary patterns",
+    "preconditions": "Warden authenticated; hostel within active role binding; fine data exists",
+    "action_or_input": "Open fine/disciplinary summary view",
+    "expected_result": "Fine summaries and disciplinary patterns for permitted scope are displayed; no fine record changed",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-045",
+    "source_id": "HM-UC-039",
+    "purpose": "Verify Warden and Super Admin scoped review of staff assignments/shift information",
+    "preconditions": "Warden (with hostel binding) and Super Admin authenticated; staff assignment data exists for multiple hostels",
+    "action_or_input": "Each actor opens the staff-assignment/shift review view",
+    "expected_result": "Warden sees only permitted hostel scope; Super Admin sees institution-level scope; no records changed",
+    "test_type": "authorization"
+  }
+]

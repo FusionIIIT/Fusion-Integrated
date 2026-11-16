@@ -1,0 +1,119 @@
+[
+  {
+    "test_id": "TC-HM-001",
+    "source_id": "BW-HM-01",
+    "purpose": "Verify an accommodation request progresses from submission to a recorded initial room allotment without exceeding capacity.",
+    "preconditions": "Student has no active accommodation request. Super Admin is authenticated. An allotment round exists with at least one room having available capacity.",
+    "action_or_input": "1) Student submits an accommodation request (HM-UC-005). 2) Super Admin records a hostel and room allotment decision for that request/student (HM-UC-006).",
+    "expected_result": "After step 1 the request is recorded with state 'Accommodation Request Submitted'. After step 2 the state is 'Room Allotted' and the resulting room occupancy does not exceed the defined capacity.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-HM-002",
+    "source_id": "BW-HM-02",
+    "purpose": "Verify a submitted leave request reaches the 'Leave Approved' outcome.",
+    "preconditions": "Student has no active leave request. Hostel Caretaker is authenticated.",
+    "action_or_input": "1) Student submits a leave request (HM-UC-014). 2) Hostel Caretaker reviews the request and records approval (HM-UC-015).",
+    "expected_result": "After step 1 the request is recorded, available for review, and in state 'Leave Request Submitted'. After step 2 the state is 'Leave Approved'.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-HM-003",
+    "source_id": "BW-HM-03",
+    "purpose": "Verify a submitted leave request reaches the 'Leave Rejected' outcome.",
+    "preconditions": "Student has no active leave request. Hostel Caretaker is authenticated.",
+    "action_or_input": "1) Student submits a leave request (HM-UC-014). 2) Hostel Caretaker reviews the request and records rejection (HM-UC-015).",
+    "expected_result": "After step 1 the state is 'Leave Request Submitted'. After step 2 the state is 'Leave Rejected'.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-HM-004",
+    "source_id": "CW-HM-01",
+    "purpose": "Verify the composite leave workflow supports both approval and rejection outcomes from the 'Leave Request Submitted' state.",
+    "preconditions": "Two students (A and B) each have no active leave request. Hostel Caretaker is authenticated.",
+    "action_or_input": "1) Student A and Student B each submit a leave request (HM-UC-014). 2) Hostel Caretaker records approval for Student A's request and rejection for Student B's request (HM-UC-015).",
+    "expected_result": "Both requests are in 'Leave Request Submitted' after step 1. After step 2 Student A's request is 'Leave Approved' and Student B's request is 'Leave Rejected'.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-HM-005",
+    "source_id": "BW-HM-04",
+    "purpose": "Verify a submitted hostel complaint reaches the 'Complaint Resolved' outcome.",
+    "preconditions": "Student has no recorded hostel complaint. Hostel Caretaker is authenticated. The complaint is within HM hostel-related scope.",
+    "action_or_input": "1) Student submits a hostel-related complaint (HM-UC-017). 2) Hostel Caretaker records action/status with outcome Resolved (HM-UC-018).",
+    "expected_result": "After step 1 the state is 'Complaint Submitted'. After step 2 the state is 'Complaint Resolved'.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-HM-006",
+    "source_id": "BW-HM-05",
+    "purpose": "Verify a submitted hostel complaint reaches the 'Complaint Escalated to Warden' outcome.",
+    "preconditions": "Student has no recorded hostel complaint. Hostel Caretaker is authenticated. The complaint is unresolved or supervisory, and escalation is supported by HM/integration scope.",
+    "action_or_input": "1) Student submits a hostel-related complaint (HM-UC-017). 2) Hostel Caretaker records escalation (HM-UC-018).",
+    "expected_result": "After step 1 the state is 'Complaint Submitted'. After step 2 the state is 'Complaint Escalated to Warden'.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-HM-007",
+    "source_id": "CW-HM-02",
+    "purpose": "Verify the composite complaint workflow's non-final update path: submitted, updated-unresolved, then resolved.",
+    "preconditions": "Student has no recorded hostel complaint. Hostel Caretaker is authenticated. The complaint is within HM hostel-related scope.",
+    "action_or_input": "1) Student submits a hostel-related complaint (HM-UC-017). 2) Hostel Caretaker records one non-final update without resolution or escalation (HM-UC-018). 3) Hostel Caretaker records outcome Resolved (HM-UC-018).",
+    "expected_result": "State is 'Complaint Submitted' after step 1, 'Complaint Updated — Unresolved' after step 2, and 'Complaint Resolved' after step 3.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-HM-008",
+    "source_id": "BW-HM-06",
+    "purpose": "Verify a guest-room booking request reaches the 'Guest-Room Booking Approved' outcome.",
+    "preconditions": "Student has no active guest-room booking request. Hostel Caretaker is authenticated. Availability information is available for review.",
+    "action_or_input": "1) Student submits a guest-room booking request (HM-UC-020). 2) Hostel Caretaker reviews availability information and records approval (HM-UC-021).",
+    "expected_result": "After step 1 the request/status are recorded in state 'Guest-Room Booking Request Submitted'. After step 2 the state is 'Guest-Room Booking Approved'.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-HM-009",
+    "source_id": "BW-HM-07",
+    "purpose": "Verify a guest-room booking request reaches the 'Guest-Room Booking Rejected' outcome.",
+    "preconditions": "Student has no active guest-room booking request. Hostel Caretaker is authenticated. Availability information is available for review.",
+    "action_or_input": "1) Student submits a guest-room booking request (HM-UC-020). 2) Hostel Caretaker reviews availability information and records rejection (HM-UC-021).",
+    "expected_result": "After step 1 the state is 'Guest-Room Booking Request Submitted'. After step 2 the state is 'Guest-Room Booking Rejected'.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-HM-010",
+    "source_id": "CW-HM-03",
+    "purpose": "Verify the composite guest-room booking workflow supports both approval and rejection outcomes from the submitted state.",
+    "preconditions": "Two students (A and B) each have no active guest-room booking request. Hostel Caretaker is authenticated. Availability information is available for review.",
+    "action_or_input": "1) Student A and Student B each submit a guest-room booking request (HM-UC-020). 2) Hostel Caretaker records approval for Student A's request and rejection for Student B's request after availability review (HM-UC-021).",
+    "expected_result": "Both requests are in 'Guest-Room Booking Request Submitted' after step 1. After step 2 Student A's request is 'Guest-Room Booking Approved' and Student B's request is 'Guest-Room Booking Rejected'.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-HM-011",
+    "source_id": "BW-HM-08",
+    "purpose": "Verify an extended-stay request reaches the 'Extended-Stay Approved' outcome.",
+    "preconditions": "Student has no active extended-stay request. Hostel Warden is authenticated.",
+    "action_or_input": "1) Student submits an extended-stay request for vacation/semester break with a requested period (HM-UC-023). 2) Hostel Warden reviews the request and records approval (HM-UC-024).",
+    "expected_result": "After step 1 the requested period/status are recorded in state 'Extended-Stay Request Submitted'. After step 2 the state is 'Extended-Stay Approved'.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-HM-012",
+    "source_id": "BW-HM-09",
+    "purpose": "Verify an extended-stay request reaches the 'Extended-Stay Rejected' outcome.",
+    "preconditions": "Student has no active extended-stay request. Hostel Warden is authenticated.",
+    "action_or_input": "1) Student submits an extended-stay request for vacation/semester break with a requested period (HM-UC-023). 2) Hostel Warden reviews the request and records rejection (HM-UC-024).",
+    "expected_result": "After step 1 the state is 'Extended-Stay Request Submitted'. After step 2 the state is 'Extended-Stay Rejected'.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-HM-013",
+    "source_id": "CW-HM-04",
+    "purpose": "Verify the composite extended-stay workflow supports both approval and rejection outcomes from the submitted state.",
+    "preconditions": "Two students (A and B) each have no active extended-stay request. Hostel Warden is authenticated.",
+    "action_or_input": "1) Student A and Student B each submit an extended-stay request (HM-UC-023). 2) Hostel Warden records approval for Student A's request and rejection for Student B's request (HM-UC-024).",
+    "expected_result": "Both requests are in 'Extended-Stay Request Submitted' after step 1. After step 2 Student A's request is 'Extended-Stay Approved' and Student B's request is 'Extended-Stay Rejected'.",
+    "test_type": "functional"
+  }
+]
