@@ -123,6 +123,5 @@ ROLE_GRANTS = {
         "badms.restoration.approve_sensitive",
         "badms.restoration.execute",
         "badms.audit.view_operational",
-        "badms.security.administer",
     ],
 }

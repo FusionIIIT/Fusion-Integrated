@@ -162,13 +162,20 @@ def validate_encryption_configuration(actor_role: str, classification: str, algo
 # ---------------------------------------------------------------------------
 # Business Rule: BR-BA-008 - Retention Calculation by Classification
 # ---------------------------------------------------------------------------
-def calculate_retention_policy(classification: str, start_date: Optional[date] = None) -> Tuple[int, date]:
+def calculate_retention_policy(
+    classification: str,
+    start_date: Optional[date] = None,
+    custom_policy: Optional[Dict[str, int]] = None,
+) -> Tuple[int, date]:
     """Calculate retention period in years and expiry date according to classification.
     
     Ref: BR-BA-008, AFR-BA-030, AFR-BA-056.
+    Enforces institute-defined retention rules according to data classification.
+    Supports institute-configured policy durations with standard institutional baselines.
     """
     c_norm = classification.strip().upper() if classification else CLASS_ROUTINE
-    years = RETENTION_YEARS_POLICY.get(c_norm, 5)
+    policy = custom_policy or RETENTION_YEARS_POLICY
+    years = policy.get(c_norm, 5)
     base_date = start_date or date.today()
     try:
         expiry = base_date.replace(year=base_date.year + years)
