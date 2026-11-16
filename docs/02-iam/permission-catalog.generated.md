@@ -13,6 +13,26 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `hreis`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `hreis.record.view_self` | View own service record | `Employee`, `HR Administrator` |
+| `hreis.record.manage` | Maintain service records | `HR Administrator` |
+| `hreis.leave.apply` | Apply for leave and track applications | `Employee`, `HR Administrator` |
+| `hreis.leave.review` | Decide routed leave requests | `Director`, `HOD`, `HR Administrator`, `Registrar` |
+| `hreis.appraisal.submit` | Submit annual appraisals | `Employee`, `HR Administrator` |
+| `hreis.appraisal.assign` | Assign appraisal reviewers | `HR Administrator` |
+| `hreis.appraisal.review` | Review and finalize assigned appraisals | `Director`, `HOD`, `Registrar` |
+| `hreis.claim.submit` | Submit LTC and CPDA claims | `Employee`, `HR Administrator` |
+| `hreis.claim.verify` | Verify claims and eligibility | `HR Administrator` |
+| `hreis.claim.review` | Decide routed claims | `Director`, `HOD`, `Registrar` |
+| `hreis.claim.process` | Record approved claim settlement status | `Accountant` |
+| `hreis.workflow.configure` | Configure HR workflows and appraisal windows | `HR Administrator` |
+| `hreis.audit.view` | Review immutable HR audit records | `HR Administrator` |
+| `hreis.notification.view` | View own HR notifications | `Employee`, `HR Administrator` |
+| `hreis.notification.manage` | Create policy and deadline notifications | `HR Administrator` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
