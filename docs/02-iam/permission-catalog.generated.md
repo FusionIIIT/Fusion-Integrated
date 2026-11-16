@@ -38,3 +38,24 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `spacs`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `spacs.scheme.view` | Browse scholarship and award catalogue schemes | `accounts_admin`, `award_evaluation_committee`, `spacs_assistant`, `spacs_convener`, `student` |
+| `spacs.scheme.create` | Create scholarship and award catalogue schemes | `spacs_convener` |
+| `spacs.scheme.update` | Update scholarship and award catalogue schemes | `spacs_convener` |
+| `spacs.cycle.view` | View award cycle details and deadlines | `award_evaluation_committee`, `spacs_assistant`, `spacs_convener`, `student` |
+| `spacs.cycle.create` | Create and announce award cycles | `spacs_convener` |
+| `spacs.cycle.publish` | Publish award cycle announcements and outcomes | `spacs_convener` |
+| `spacs.application.create` | Submit scholarship or renewal applications | `student` |
+| `spacs.application.view` | View visible scholarship applications | `award_evaluation_committee`, `spacs_assistant`, `spacs_convener`, `student` |
+| `spacs.application.update` | Amend or withdraw pending applications | `student` |
+| `spacs.application.review` | Verify and evaluate scholarship applications | `award_evaluation_committee`, `spacs_assistant`, `spacs_convener` |
+| `spacs.application.approve` | Sanction or reject scholarship applications | `spacs_convener` |
+| `spacs.award.view` | View convocation and scholarship awards | `accounts_admin`, `award_evaluation_committee`, `spacs_convener`, `student` |
+| `spacs.award.create` | Create award disbursement and ledger records | `accounts_admin`, `spacs_convener` |
+| `spacs.award.publish` | Publish approved convocation award lists | `spacs_convener` |
+| `spacs.award.export` | Export awards and financial disbursement data | `accounts_admin`, `spacs_convener` |
+| `spacs.audit.view` | View SPACS module audit trail | `spacs_auditor`, `spacs_convener` |

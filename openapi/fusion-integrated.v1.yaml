@@ -1674,6 +1674,511 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/spacs/applications:
+    get:
+      operationId: v1_spacs_applications_list
+      description: List applications or submit a new application.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SpacsApplication'
+          description: ''
+    post:
+      operationId: v1_spacs_applications_create
+      description: List applications or submit a new application.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ApplicationCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ApplicationCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpacsApplication'
+          description: ''
+  /api/v1/spacs/applications/{id}:
+    get:
+      operationId: v1_spacs_applications_retrieve
+      description: View application details with scoping.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpacsApplication'
+          description: ''
+    patch:
+      operationId: v1_spacs_applications_partial_update
+      description: View application details with scoping.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedApplicationAmend'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedApplicationAmend'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedApplicationAmend'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpacsApplication'
+          description: ''
+  /api/v1/spacs/applications/{id}/withdraw:
+    post:
+      operationId: v1_spacs_applications_withdraw_create
+      description: Withdraw a pending application.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpacsApplication'
+          description: ''
+  /api/v1/spacs/audit:
+    get:
+      operationId: v1_spacs_audit_list
+      description: List audit logs for authorized auditor.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditLog'
+          description: ''
+  /api/v1/spacs/awards:
+    get:
+      operationId: v1_spacs_awards_list
+      description: List awards and create award candidates.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AwardCandidate'
+          description: ''
+    post:
+      operationId: v1_spacs_awards_create
+      description: List awards and create award candidates.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AwardCandidate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AwardCandidate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AwardCandidate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AwardCandidate'
+          description: ''
+  /api/v1/spacs/awards/export:
+    get:
+      operationId: v1_spacs_awards_export_list
+      description: Export awards and financial disbursement data.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AwardCandidate'
+          description: ''
+  /api/v1/spacs/awards/publish:
+    post:
+      operationId: v1_spacs_awards_publish_create
+      description: Publish convocation award lists.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AwardCandidate'
+          description: ''
+  /api/v1/spacs/cycles:
+    get:
+      operationId: v1_spacs_cycles_list
+      description: List or announce award cycles.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cycle'
+          description: ''
+    post:
+      operationId: v1_spacs_cycles_create
+      description: List or announce award cycles.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CycleCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CycleCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CycleCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cycle'
+          description: ''
+  /api/v1/spacs/cycles/{id}/publish:
+    post:
+      operationId: v1_spacs_cycles_publish_create
+      description: Publish award cycle outcomes.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cycle'
+          description: ''
+  /api/v1/spacs/decisions/action:
+    post:
+      operationId: v1_spacs_decisions_action_create
+      description: Convener approval or rejection decision.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecisionAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DecisionAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DecisionAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpacsApplication'
+          description: ''
+  /api/v1/spacs/renewals:
+    get:
+      operationId: v1_spacs_renewals_list
+      description: List or submit renewal applications.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SpacsApplication'
+          description: ''
+    post:
+      operationId: v1_spacs_renewals_create
+      description: List or submit renewal applications.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenewalCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RenewalCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RenewalCreate'
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpacsApplication'
+          description: ''
+  /api/v1/spacs/schemes:
+    get:
+      operationId: v1_spacs_schemes_list
+      description: List or create schemes.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Scheme'
+          description: ''
+    post:
+      operationId: v1_spacs_schemes_create
+      description: List or create schemes.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SchemeCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SchemeCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SchemeCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scheme'
+          description: ''
+  /api/v1/spacs/schemes/{id}:
+    get:
+      operationId: v1_spacs_schemes_retrieve
+      description: Retrieve or update scheme details.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scheme'
+          description: ''
+    patch:
+      operationId: v1_spacs_schemes_partial_update
+      description: Retrieve or update scheme details.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedScheme'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedScheme'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedScheme'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scheme'
+          description: ''
+  /api/v1/spacs/tasks:
+    get:
+      operationId: v1_spacs_tasks_list
+      description: List pending tasks for assistants.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+          description: ''
+  /api/v1/spacs/verifications:
+    get:
+      operationId: v1_spacs_verifications_list
+      description: List pending verification items for staff.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SpacsApplication'
+          description: ''
+  /api/v1/spacs/verifications/{id}/action:
+    post:
+      operationId: v1_spacs_verifications_action_create
+      description: 'Perform verification check: verify or mark defect.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificationAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerificationAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerificationAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpacsApplication'
+          description: ''
 components:
   schemas:
     AcademicDirectory:
@@ -1763,6 +2268,14 @@ components:
       - semester
       - semester_type
       - user_id
+    ActionEnum:
+      enum:
+      - verify
+      - defect
+      type: string
+      description: |-
+        * `verify` - verify
+        * `defect` - defect
     AddCandidates:
       type: object
       properties:
@@ -1898,6 +2411,34 @@ components:
       - status
       - user_id
       - withdrawn_reason
+    ApplicationCreate:
+      type: object
+      description: Input serializer for submitting an application.
+      properties:
+        scheme_code:
+          type: string
+          maxLength: 64
+        academic_cycle:
+          type: string
+          maxLength: 32
+        cpi:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,2})?$
+        family_income:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          nullable: true
+        documents:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - academic_cycle
+      - cpi
+      - scheme_code
     ApplicationStatusEnum:
       enum:
       - draft
@@ -1993,6 +2534,74 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    AuditLog:
+      type: object
+      description: Serializer for audit logs.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        event_type:
+          type: string
+          maxLength: 64
+        entity_type:
+          type: string
+          maxLength: 64
+        entity_id:
+          type: string
+          maxLength: 64
+        actor_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        details: {}
+        timestamp:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actor_user_id
+      - entity_id
+      - entity_type
+      - event_type
+      - id
+      - timestamp
+    AwardCandidate:
+      type: object
+      description: Serializer for award candidates.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        award_cycle:
+          type: integer
+        student_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        cpi:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,2})?$
+        academic_standing:
+          type: string
+          maxLength: 64
+        shortlisted:
+          type: boolean
+        evaluation_score:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          nullable: true
+        committee_recommendation:
+          type: string
+          maxLength: 64
+        remarks:
+          type: string
+      required:
+      - award_cycle
+      - id
+      - student_user_id
     BulkOutcome:
       type: object
       properties:
@@ -2315,6 +2924,100 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    Cycle:
+      type: object
+      description: Serializer for award cycle instances.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        catalogue_entry_id:
+          type: integer
+          readOnly: true
+        academic_cycle:
+          type: string
+          maxLength: 32
+        state:
+          $ref: '#/components/schemas/CycleStateEnum'
+        criteria_version:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        approval_evidence:
+          type: string
+          maxLength: 255
+        published_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - academic_cycle
+      - catalogue_entry_id
+      - created_at
+      - id
+      - updated_at
+    CycleCreate:
+      type: object
+      description: Input serializer for opening an award cycle.
+      properties:
+        scheme_code:
+          type: string
+          maxLength: 64
+        academic_cycle:
+          type: string
+          maxLength: 32
+      required:
+      - academic_cycle
+      - scheme_code
+    CycleStateEnum:
+      enum:
+      - open
+      - pool_prepared
+      - under_committee_evaluation
+      - committee_result_recorded
+      - awaiting_approval
+      - ready_for_publication
+      - published
+      type: string
+      description: |-
+        * `open` - Award Cycle Open
+        * `pool_prepared` - Candidate Pool Prepared
+        * `under_committee_evaluation` - Under Committee Evaluation
+        * `committee_result_recorded` - Committee Result Recorded
+        * `awaiting_approval` - Awaiting Institutional Approval
+        * `ready_for_publication` - Ready for Publication
+        * `published` - Published
+    DecisionAction:
+      type: object
+      description: Input serializer for convener decision.
+      properties:
+        application_id:
+          type: string
+          maxLength: 64
+        outcome:
+          $ref: '#/components/schemas/DecisionActionOutcomeEnum'
+        reason:
+          type: string
+          default: ''
+      required:
+      - application_id
+      - outcome
+    DecisionActionOutcomeEnum:
+      enum:
+      - approved
+      - rejected
+      type: string
+      description: |-
+        * `approved` - approved
+        * `rejected` - rejected
     Detail:
       type: object
       properties:
@@ -3000,6 +3703,24 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PatchedApplicationAmend:
+      type: object
+      description: Input serializer for amending a pending application.
+      properties:
+        cpi:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,2})?$
+        family_income:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          nullable: true
+        documents:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
     PatchedJobPosting:
       type: object
       properties:
@@ -3085,6 +3806,49 @@ components:
       properties:
         active_role:
           type: string
+    PatchedScheme:
+      type: object
+      description: Serializer for award/scholarship scheme catalogue.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        scheme_code:
+          type: string
+          maxLength: 64
+        name:
+          type: string
+          maxLength: 255
+        scheme_type:
+          $ref: '#/components/schemas/SchemeTypeEnum'
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/SchemeStatusEnum'
+        min_cpi:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,2})?$
+        max_family_income:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          nullable: true
+        academic_cycle:
+          type: string
+          maxLength: 32
+        version:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
     PlacementRecordDetail:
       type: object
       description: A student's own record, with what rules 22 and 24 still want from
@@ -3466,6 +4230,30 @@ components:
       - message
       - reason
       - route
+    RenewalCreate:
+      type: object
+      description: Input serializer for submitting renewal.
+      properties:
+        previous_application_id:
+          type: string
+          maxLength: 64
+        parent_application_id:
+          type: string
+          maxLength: 64
+        academic_cycle:
+          type: string
+          default: 2026-27
+          maxLength: 32
+        cpi:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,2})?$
+          default: '8.00'
+        family_income:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          nullable: true
     RoundOutcome:
       type: object
       properties:
@@ -3558,6 +4346,106 @@ components:
           type: integer
       required:
       - scheduled
+    Scheme:
+      type: object
+      description: Serializer for award/scholarship scheme catalogue.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        scheme_code:
+          type: string
+          maxLength: 64
+        name:
+          type: string
+          maxLength: 255
+        scheme_type:
+          $ref: '#/components/schemas/SchemeTypeEnum'
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/SchemeStatusEnum'
+        min_cpi:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,2})?$
+        max_family_income:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          nullable: true
+        academic_cycle:
+          type: string
+          maxLength: 32
+        version:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - name
+      - scheme_code
+      - updated_at
+    SchemeCreate:
+      type: object
+      description: Input serializer for scheme creation.
+      properties:
+        scheme_code:
+          type: string
+          maxLength: 64
+        name:
+          type: string
+          maxLength: 255
+        scheme_type:
+          $ref: '#/components/schemas/SchemeTypeEnum'
+        description:
+          type: string
+          default: ''
+        min_cpi:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,2})?$
+          default: '0.00'
+        max_family_income:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          nullable: true
+        academic_cycle:
+          type: string
+          default: 2026-27
+          maxLength: 32
+      required:
+      - name
+      - scheme_code
+      - scheme_type
+    SchemeStatusEnum:
+      enum:
+      - draft
+      - published
+      - retired
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `published` - Published
+        * `retired` - Retired
+    SchemeTypeEnum:
+      enum:
+      - scholarship
+      - award
+      type: string
+      description: |-
+        * `scholarship` - Scholarship
+        * `award` - Award
     Season:
       type: object
       description: Just enough to populate a season picker.
@@ -3663,6 +4551,114 @@ components:
       description: |-
         * `campus` - Through the Placement Cell
         * `off_campus` - Off campus (rules 5 and 24)
+    SpacsApplication:
+      type: object
+      description: Serializer for student applications.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        application_id:
+          type: string
+          readOnly: true
+        catalogue_entry_id:
+          type: integer
+          readOnly: true
+        applicant_user_id:
+          type: integer
+          readOnly: true
+        academic_cycle:
+          type: string
+          maxLength: 32
+        is_renewal:
+          type: boolean
+        state:
+          allOf:
+          - $ref: '#/components/schemas/SpacsApplicationStateEnum'
+          readOnly: true
+        cpi:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,2})?$
+          nullable: true
+        family_income:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          nullable: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        verification_findings:
+          type: string
+        correction_reason:
+          type: string
+        decision_reason:
+          type: string
+        decision_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - academic_cycle
+      - applicant_user_id
+      - application_id
+      - catalogue_entry_id
+      - created_at
+      - decision_at
+      - id
+      - state
+      - submitted_at
+      - updated_at
+    SpacsApplicationStateEnum:
+      enum:
+      - draft
+      - submitted
+      - under_verification
+      - correction_required
+      - resubmitted
+      - verified
+      - verification_concern
+      - under_convener_review
+      - approved
+      - rejected
+      - withdrawn
+      - renewal_submitted
+      - renewal_under_verification
+      - renewal_verified
+      - renewal_under_decision
+      - renewed
+      - renewal_rejected
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `submitted` - Submitted
+        * `under_verification` - Under Verification
+        * `correction_required` - Correction Required
+        * `resubmitted` - Resubmitted
+        * `verified` - Verified / Routed for Decision
+        * `verification_concern` - Verification Concern
+        * `under_convener_review` - Under Convener Review
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `withdrawn` - Withdrawn
+        * `renewal_submitted` - Renewal Submitted
+        * `renewal_under_verification` - Renewal Under Verification
+        * `renewal_verified` - Renewal Verified / Routed
+        * `renewal_under_decision` - Renewal Under Decision
+        * `renewed` - Renewed / Approved
+        * `renewal_rejected` - Renewal Rejected
     StaffStats:
       type: object
       description: PC-UC-011/012. Operational figures, staff only.
@@ -3698,6 +4694,48 @@ components:
           type: integer
       required:
       - document_id
+    Task:
+      type: object
+      description: Serializer for workflow and SLA tasks.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        task_type:
+          type: string
+          maxLength: 64
+        entity_type:
+          type: string
+          maxLength: 64
+        entity_id:
+          type: string
+          maxLength: 64
+        assigned_role:
+          type: string
+          maxLength: 64
+        assigned_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        status:
+          type: string
+          maxLength: 32
+        due_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - assigned_role
+      - created_at
+      - entity_id
+      - entity_type
+      - id
+      - task_type
     TopicEnum:
       enum:
       - drive
@@ -3814,6 +4852,17 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    VerificationAction:
+      type: object
+      description: Input serializer for verification decision.
+      properties:
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+        notes:
+          type: string
+          default: ''
+      required:
+      - action
     WaiveIncident:
       type: object
       properties:
