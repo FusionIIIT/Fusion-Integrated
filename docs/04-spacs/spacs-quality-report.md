@@ -83,7 +83,13 @@ Vite build: all chunks < 2.0 kB gzip (well below 150 kB budget)
 
 ---
 
-## 4. Approvals and Formal Sign-Offs
+## 4. Defect Log & Triage Resolutions
+
+- **DEF-SPACS-001**: Baseline spec test `TEST-FR-026` caught that `"sla_reminder"` was omitted from `SIGNIFICANT_EVENTS` in `modules/spacs/domain/rules.py`. Resolved by adding `"sla_reminder"` to the whitelist of notify-able event types. Re-tested and verified with 100% pass across all 4 spec test suites.
+
+---
+
+## 5. Approvals and Formal Sign-Offs
 
 - **Blueprint Approval**: Approved in writing by Kasu Karunya Reddy (`24BCS116`) on 2026-11-16 (recorded in `docs/04-spacs/spacs-blueprint.md`).
 - **Known Gaps / Waivers**: None. All functional and non-functional requirements from the specifications are implemented.

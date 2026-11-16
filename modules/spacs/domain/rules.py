@@ -148,6 +148,7 @@ SIGNIFICANT_EVENTS = {
     "withdrawn",
     "renewal_reminder",
     "award_published",
+    "sla_reminder",
 }
 
 
