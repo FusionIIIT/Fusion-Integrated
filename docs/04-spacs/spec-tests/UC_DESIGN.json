@@ -1,0 +1,371 @@
+[
+  {
+    "test_id": "TEST-UC-001-MF",
+    "source_id": "UC-SPACS-001 Main Flow",
+    "purpose": "Student successfully applies for an open scholarship",
+    "preconditions": "Published scholarship with open window exists",
+    "action_or_input": "Submit application with meeting CPI and documents",
+    "expected_result": "State is submitted, task created for assistant",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-001-A1",
+    "source_id": "UC-SPACS-001 Alternative A1",
+    "purpose": "Student saves application draft before submitting",
+    "preconditions": "Published scholarship exists",
+    "action_or_input": "Create draft and save partial data",
+    "expected_result": "State remains draft, inputs preserved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-001-A2",
+    "source_id": "UC-SPACS-001 Alternative A2",
+    "purpose": "Prevent duplicate submission for same scholarship cycle",
+    "preconditions": "Student has an active submitted application",
+    "action_or_input": "Attempt to create another application for same scheme and cycle",
+    "expected_result": "DuplicateApplicationError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-001-E1",
+    "source_id": "UC-SPACS-001 Exception E1",
+    "purpose": "Reject submission when student does not satisfy minimum CPI",
+    "preconditions": "Scheme requires CPI >= 7.5",
+    "action_or_input": "Submit with CPI 6.8",
+    "expected_result": "EligibilityError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-001-E2",
+    "source_id": "UC-SPACS-001 Exception E2",
+    "purpose": "Reject submission when required document is missing",
+    "preconditions": "Scheme requires income certificate",
+    "action_or_input": "Submit without uploading income certificate",
+    "expected_result": "CompletenessError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-002-MF",
+    "source_id": "UC-SPACS-002 Main Flow",
+    "purpose": "Assistant verifies application completeness and marks verified",
+    "preconditions": "Application in submitted state",
+    "action_or_input": "Open verification, record findings, mark verified",
+    "expected_result": "State transitions to verified, decision task created for convener",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-002-A1",
+    "source_id": "UC-SPACS-002 Alternative A1",
+    "purpose": "Assistant requests correction for missing or defective data",
+    "preconditions": "Application in under_verification state",
+    "action_or_input": "Request correction with specific reason",
+    "expected_result": "State transitions to correction_required, student notified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-002-A2",
+    "source_id": "UC-SPACS-002 Alternative A2",
+    "purpose": "Assistant records verification concern and routes to convener",
+    "preconditions": "Application in under_verification state",
+    "action_or_input": "Record concern notes and route",
+    "expected_result": "State transitions to verification_concern, task created for convener",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-003-MF",
+    "source_id": "UC-SPACS-003 Main Flow",
+    "purpose": "Student modifies and resubmits application in Correction Required state",
+    "preconditions": "Application in correction_required state",
+    "action_or_input": "Update data and resubmit",
+    "expected_result": "State transitions to resubmitted, prior verification findings cleared",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-003-E1",
+    "source_id": "UC-SPACS-003 Exception E1",
+    "purpose": "Reject student modification when application is not in editable state",
+    "preconditions": "Application in submitted state",
+    "action_or_input": "Attempt modify_application_in_correction",
+    "expected_result": "UnauthorizedActionError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-004-MF",
+    "source_id": "UC-SPACS-004 Main Flow",
+    "purpose": "Student withdraws application before final decision",
+    "preconditions": "Application in submitted or under_verification state",
+    "action_or_input": "Execute withdraw action",
+    "expected_result": "State transitions to withdrawn, pending tasks closed",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-004-E1",
+    "source_id": "UC-SPACS-004 Exception E1",
+    "purpose": "Reject withdrawal when application has reached approved terminal state",
+    "preconditions": "Application is approved",
+    "action_or_input": "Attempt withdraw action",
+    "expected_result": "UnauthorizedActionError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-006-MF",
+    "source_id": "UC-SPACS-006 Main Flow",
+    "purpose": "Convener approves verified scholarship application",
+    "preconditions": "Application in verified state",
+    "action_or_input": "Open review and approve with reason",
+    "expected_result": "State transitions to approved, student notified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-006-A1",
+    "source_id": "UC-SPACS-006 Alternative A1",
+    "purpose": "Convener rejects scholarship application",
+    "preconditions": "Application in verified or verification_concern state",
+    "action_or_input": "Open review and reject with reason",
+    "expected_result": "State transitions to rejected, student notified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-006-A2",
+    "source_id": "UC-SPACS-006 Alternative A2",
+    "purpose": "Convener returns application for correction",
+    "preconditions": "Application under convener review",
+    "action_or_input": "Return for correction with reason",
+    "expected_result": "State transitions to correction_required",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-007-MF",
+    "source_id": "UC-SPACS-007 Main Flow",
+    "purpose": "Student downloads/prints own submitted application",
+    "preconditions": "Application exists for student",
+    "action_or_input": "Export application as owner",
+    "expected_result": "Application details returned successfully",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-007-A1",
+    "source_id": "UC-SPACS-007 Alternative A1",
+    "purpose": "Staff exports application with authorized role",
+    "preconditions": "Application exists in system",
+    "action_or_input": "Staff user with spacs_assistant role exports application",
+    "expected_result": "Application details returned successfully",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-007-E1",
+    "source_id": "UC-SPACS-007 Exception E1",
+    "purpose": "Reject download attempt by another unauthorized student",
+    "preconditions": "Application belongs to student A",
+    "action_or_input": "Student B attempts export without staff role",
+    "expected_result": "UnauthorizedActionError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-008-MF",
+    "source_id": "UC-SPACS-008 Main Flow",
+    "purpose": "Student checks status and history of own applications",
+    "preconditions": "Student has multiple applications across cycles",
+    "action_or_input": "Query visible applications for student",
+    "expected_result": "Returns list of student applications ordered by date",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-010-MF",
+    "source_id": "UC-SPACS-010 Main Flow",
+    "purpose": "Convener creates a new draft catalogue entry",
+    "preconditions": "User is SPACS Convener",
+    "action_or_input": "Create catalogue entry",
+    "expected_result": "Catalogue entry created with status draft",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-011-MF",
+    "source_id": "UC-SPACS-011 Main Flow",
+    "purpose": "Convener updates draft catalogue entry",
+    "preconditions": "Draft catalogue entry exists",
+    "action_or_input": "Update criteria fields",
+    "expected_result": "Fields updated in place without version bump",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-011-A1",
+    "source_id": "UC-SPACS-011 Alternative A1",
+    "purpose": "Modifying published catalogue entry creates new version and sets draft",
+    "preconditions": "Published catalogue entry exists",
+    "action_or_input": "Update criteria fields on published entry",
+    "expected_result": "Version increments from 1 to 2 and status becomes draft",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-012-MF",
+    "source_id": "UC-SPACS-012 Main Flow",
+    "purpose": "Convener retires catalogue entry prospectively",
+    "preconditions": "Catalogue entry exists",
+    "action_or_input": "Retire catalogue entry",
+    "expected_result": "Status changes to retired",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-014-MF",
+    "source_id": "UC-SPACS-014 Main Flow",
+    "purpose": "Authenticated user browses published catalogue entries",
+    "preconditions": "Catalogue contains draft, published, and retired entries",
+    "action_or_input": "Call visible_catalogue selector",
+    "expected_result": "Only published entries returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-015-MF",
+    "source_id": "UC-SPACS-015 Main Flow",
+    "purpose": "Student initiates and submits scholarship renewal",
+    "preconditions": "Approved application exists for renewal-permitted scheme",
+    "action_or_input": "Initiate renewal and submit with updated CPI and doc",
+    "expected_result": "State is renewal_submitted, task created for assistant",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-015-E1",
+    "source_id": "UC-SPACS-015 Exception E1",
+    "purpose": "Reject renewal when scheme does not allow renewals",
+    "preconditions": "Approved application exists but scheme has renewal_allowed=False",
+    "action_or_input": "Attempt initiate_renewal",
+    "expected_result": "RenewalEligibilityError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-015-E2",
+    "source_id": "UC-SPACS-015 Exception E2",
+    "purpose": "Reject renewal when prior application is not in approved state",
+    "preconditions": "Prior application is in rejected or withdrawn state",
+    "action_or_input": "Attempt initiate_renewal",
+    "expected_result": "RenewalEligibilityError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-017-MF",
+    "source_id": "UC-SPACS-017 Main Flow",
+    "purpose": "Convener prepares candidate pool for open award cycle",
+    "preconditions": "Award cycle is open",
+    "action_or_input": "Prepare candidate pool with student list",
+    "expected_result": "Candidates saved, cycle state transitions to pool_prepared",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-018-MF",
+    "source_id": "UC-SPACS-018 Main Flow",
+    "purpose": "Award Committee evaluates and shortlists candidates",
+    "preconditions": "Cycle in pool_prepared state",
+    "action_or_input": "Begin evaluation and record scores and recommendations",
+    "expected_result": "State transitions to committee_result_recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-019-MF",
+    "source_id": "UC-SPACS-019 Main Flow",
+    "purpose": "Convener records award outcome when approval evidence is available",
+    "preconditions": "Cycle in committee_result_recorded state",
+    "action_or_input": "Record approved outcome with Senate reference",
+    "expected_result": "State transitions to ready_for_publication",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-019-A1",
+    "source_id": "UC-SPACS-019 Alternative A1",
+    "purpose": "Convener records outcome when institutional approval is still pending",
+    "preconditions": "Cycle in committee_result_recorded state",
+    "action_or_input": "Record outcome without approval evidence",
+    "expected_result": "State transitions to awaiting_approval",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-019-A2",
+    "source_id": "UC-SPACS-019 Alternative A2",
+    "purpose": "Convener records institutional approval received after pending state",
+    "preconditions": "Cycle in awaiting_approval state",
+    "action_or_input": "Record approval received with reference",
+    "expected_result": "State transitions to ready_for_publication",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-020-MF",
+    "source_id": "UC-SPACS-020 Main Flow",
+    "purpose": "Convener publishes award results after approval confirmed",
+    "preconditions": "Cycle in ready_for_publication state with approval reference",
+    "action_or_input": "Publish award results",
+    "expected_result": "State transitions to published, winner notified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-020-E1",
+    "source_id": "UC-SPACS-020 Exception E1",
+    "purpose": "Reject award publication before institutional approval is recorded",
+    "preconditions": "Cycle in awaiting_approval state",
+    "action_or_input": "Attempt publish_award_results",
+    "expected_result": "AwardPolicyError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-021-MF",
+    "source_id": "UC-SPACS-021 Main Flow",
+    "purpose": "Authorized auditor views SPACS audit trail",
+    "preconditions": "User holds spacs_auditor role",
+    "action_or_input": "Call get_audit_trail_for_auditor",
+    "expected_result": "Audit log query set returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-021-E1",
+    "source_id": "UC-SPACS-021 Exception E1",
+    "purpose": "Reject unauthorized access to audit trail",
+    "preconditions": "User holds only student role",
+    "action_or_input": "Attempt get_audit_trail_for_auditor",
+    "expected_result": "PermissionError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-023-MF",
+    "source_id": "UC-SPACS-023 Main Flow",
+    "purpose": "Convener publishes catalogue version with policy reference and effective dates",
+    "preconditions": "Draft catalogue entry exists",
+    "action_or_input": "Publish catalogue version",
+    "expected_result": "Status is published and version snapshot created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-023-E1",
+    "source_id": "UC-SPACS-023 Exception E1",
+    "purpose": "Reject publication if policy approval reference is missing",
+    "preconditions": "Draft catalogue entry exists",
+    "action_or_input": "Attempt publish with empty policy reference",
+    "expected_result": "AwardPolicyError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-024-MF",
+    "source_id": "UC-SPACS-024 Main Flow",
+    "purpose": "System issues SLA escalation for pending tasks exceeding threshold",
+    "preconditions": "Pending verification task older than SLA hours",
+    "action_or_input": "Run check_and_escalate_sla_tasks",
+    "expected_result": "Escalated task returned and notification emitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-025-MF",
+    "source_id": "UC-SPACS-025 Main Flow",
+    "purpose": "System sends renewal reminders to eligible students",
+    "preconditions": "Approved scholarship holders exist for renewal-eligible scheme",
+    "action_or_input": "Execute send_renewal_reminders",
+    "expected_result": "Eligible students receive reminder notification",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-026-MF",
+    "source_id": "UC-SPACS-026 Main Flow",
+    "purpose": "System reassigns pending tasks when role holder changes",
+    "preconditions": "Pending tasks assigned to old assistant",
+    "action_or_input": "Execute reassign_role_tasks",
+    "expected_result": "Tasks assigned to new assistant, audit log created",
+    "test_type": "positive"
+  }
+]

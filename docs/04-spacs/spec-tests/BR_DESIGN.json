@@ -1,0 +1,362 @@
+[
+  {
+    "test_id": "TEST-BR-001-PASS",
+    "source_id": "BR-SPACS-001 permitted outcome",
+    "purpose": "Eligibility validated when CPI and family income satisfy criteria",
+    "preconditions": "Min CPI 7.0, Max income 500000",
+    "action_or_input": "Student has CPI 7.5 and income 400000",
+    "expected_result": "Validation passes without exception",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-001-FAIL-CPI",
+    "source_id": "BR-SPACS-001 threshold-side CPI failure",
+    "purpose": "Eligibility rejected when student CPI is below threshold",
+    "preconditions": "Min CPI 7.0",
+    "action_or_input": "Student has CPI 6.9",
+    "expected_result": "EligibilityError raised",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-BR-001-FAIL-INC",
+    "source_id": "BR-SPACS-001 threshold-side income failure",
+    "purpose": "Eligibility rejected when student family income exceeds maximum",
+    "preconditions": "Max income 500000",
+    "action_or_input": "Student family income 500001",
+    "expected_result": "EligibilityError raised",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-BR-002-PASS",
+    "source_id": "BR-SPACS-002 permitted outcome",
+    "purpose": "Single application per student per scholarship cycle is permitted",
+    "preconditions": "No active application exists for student in cycle",
+    "action_or_input": "Check duplicate with empty existing states",
+    "expected_result": "Validation passes",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-002-FAIL",
+    "source_id": "BR-SPACS-002 prohibited outcome",
+    "purpose": "Duplicate application in active/submitted state is blocked",
+    "preconditions": "Student already has submitted application in cycle",
+    "action_or_input": "Check duplicate with existing state submitted",
+    "expected_result": "DuplicateApplicationError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-003-PASS",
+    "source_id": "BR-SPACS-003 permitted outcome",
+    "purpose": "Reuse of prior uploaded document permitted when valid and matching",
+    "preconditions": "Document belongs to student, matches required type, future expiry",
+    "action_or_input": "Validate document reuse",
+    "expected_result": "Reuse permitted without exception",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-003-FAIL-EXPIRED",
+    "source_id": "BR-SPACS-003 prohibited outcome expired",
+    "purpose": "Reuse blocked when document has passed validity period",
+    "preconditions": "Document expiry date is yesterday",
+    "action_or_input": "Validate document reuse",
+    "expected_result": "DocumentReuseError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-003-FAIL-USER",
+    "source_id": "BR-SPACS-003 prohibited outcome non-owner",
+    "purpose": "Reuse blocked when document belongs to another user",
+    "preconditions": "Document user_id does not match applicant user_id",
+    "action_or_input": "Validate document reuse",
+    "expected_result": "DocumentReuseError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-004-PASS",
+    "source_id": "BR-SPACS-004 permitted outcome",
+    "purpose": "Application completeness passes when all mandatory fields and docs exist",
+    "preconditions": "All required fields and documents present",
+    "action_or_input": "Validate completeness",
+    "expected_result": "Validation passes",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-004-FAIL",
+    "source_id": "BR-SPACS-004 prohibited outcome",
+    "purpose": "Application completeness fails when a mandatory field is missing",
+    "preconditions": "Mandatory field bank_account is missing",
+    "action_or_input": "Validate completeness",
+    "expected_result": "CompletenessError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-005-PASS",
+    "source_id": "BR-SPACS-005 permitted outcome",
+    "purpose": "Application review access granted to authorized SPACS roles",
+    "preconditions": "User holds spacs_assistant or spacs_convener role",
+    "action_or_input": "Check application review access",
+    "expected_result": "Access granted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-005-FAIL",
+    "source_id": "BR-SPACS-005 prohibited outcome",
+    "purpose": "Application review access blocked for unauthorized roles",
+    "preconditions": "User holds only student role",
+    "action_or_input": "Check application review access",
+    "expected_result": "UnauthorizedActionError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-006-PASS",
+    "source_id": "BR-SPACS-006 permitted outcome",
+    "purpose": "Assistant permitted to verify, request correction, or record concern",
+    "action_or_input": "Assert assistant actions mark_verified, request_correction",
+    "expected_result": "Action permitted",
+    "preconditions": "Assistant reviews application",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-006-FAIL",
+    "source_id": "BR-SPACS-006 prohibited outcome",
+    "purpose": "Assistant prohibited from final approval/rejection decision",
+    "action_or_input": "Assert assistant action approve or reject",
+    "expected_result": "UnauthorizedActionError raised",
+    "preconditions": "Assistant attempts decision",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-007-PASS",
+    "source_id": "BR-SPACS-007 draft preservation",
+    "purpose": "Draft preservation merges partial input without losing prior entries",
+    "preconditions": "Existing draft has field A",
+    "action_or_input": "Preserve draft with field B",
+    "expected_result": "Both fields A and B are preserved in payload",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-008-PASS",
+    "source_id": "BR-SPACS-008 notification trigger",
+    "purpose": "Significant lifecycle events emit notifications",
+    "preconditions": "Event is submitted, verified, approved, or rejected",
+    "action_or_input": "Check should_notify_event",
+    "expected_result": "Returns True for all significant events",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-009-PASS",
+    "source_id": "BR-SPACS-009 permitted outcome",
+    "purpose": "Withdrawal permitted in withdrawable states before final decision",
+    "preconditions": "Application is in submitted state",
+    "action_or_input": "Validate can withdraw",
+    "expected_result": "Withdrawal permitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-009-FAIL",
+    "source_id": "BR-SPACS-009 prohibited outcome",
+    "purpose": "Withdrawal prohibited once final decision has been rendered",
+    "preconditions": "Application is in approved state",
+    "action_or_input": "Validate can withdraw",
+    "expected_result": "UnauthorizedActionError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-010-PASS",
+    "source_id": "BR-SPACS-010 permitted outcome",
+    "purpose": "Owner permitted to modify or withdraw application",
+    "preconditions": "Acting user ID equals applicant user ID",
+    "action_or_input": "Assert ownership",
+    "expected_result": "Ownership confirmed",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-010-FAIL",
+    "source_id": "BR-SPACS-010 prohibited outcome",
+    "purpose": "Non-owner prohibited from modifying or withdrawing application",
+    "preconditions": "Acting user ID does not match applicant user ID",
+    "action_or_input": "Assert ownership",
+    "expected_result": "UnauthorizedActionError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-011-PASS",
+    "source_id": "BR-SPACS-011 permitted outcome",
+    "purpose": "Modification permitted in correction_required state",
+    "preconditions": "Application state is correction_required",
+    "action_or_input": "Validate can modify",
+    "expected_result": "Modification permitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-011-FAIL",
+    "source_id": "BR-SPACS-011 prohibited outcome",
+    "purpose": "Modification prohibited in non-editable state",
+    "preconditions": "Application state is under_verification",
+    "action_or_input": "Validate can modify",
+    "expected_result": "UnauthorizedActionError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-012-PASS",
+    "source_id": "BR-SPACS-012 permitted outcome",
+    "purpose": "Student permitted to export own application",
+    "preconditions": "Acting user ID equals applicant user ID",
+    "action_or_input": "Validate download access",
+    "expected_result": "Access granted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-012-FAIL",
+    "source_id": "BR-SPACS-012 prohibited outcome",
+    "purpose": "Student prohibited from exporting application of other students",
+    "preconditions": "Acting user ID differs and has no staff role",
+    "action_or_input": "Validate download access",
+    "expected_result": "UnauthorizedActionError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-013-PASS",
+    "source_id": "BR-SPACS-013 permitted outcome",
+    "purpose": "Pending task exceeding SLA triggers escalation",
+    "preconditions": "Task age > SLA threshold",
+    "action_or_input": "Check is_sla_breached",
+    "expected_result": "Returns True",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-014-PASS",
+    "source_id": "BR-SPACS-014 permitted outcome",
+    "purpose": "Application accepted when scheme is published and window open",
+    "preconditions": "Status published, reference date inside window",
+    "action_or_input": "Validate catalogue published and open",
+    "expected_result": "Validation passes",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-014-FAIL",
+    "source_id": "BR-SPACS-014 prohibited outcome",
+    "purpose": "Application rejected when scheme is in draft status",
+    "preconditions": "Status draft",
+    "action_or_input": "Validate catalogue published and open",
+    "expected_result": "EligibilityError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-015-PASS",
+    "source_id": "BR-SPACS-015 permitted outcome",
+    "purpose": "Catalogue publishing requires approved policy reference and effective start date",
+    "preconditions": "Policy approval reference and start date provided",
+    "action_or_input": "Validate catalogue publication prerequisites",
+    "expected_result": "Validation passes",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-015-FAIL",
+    "source_id": "BR-SPACS-015 prohibited outcome",
+    "purpose": "Catalogue publishing rejected when policy approval reference is empty",
+    "preconditions": "Policy approval reference empty",
+    "action_or_input": "Validate catalogue publication prerequisites",
+    "expected_result": "AwardPolicyError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-016-PASS",
+    "source_id": "BR-SPACS-016 permitted outcome",
+    "purpose": "Document verification requires recorded findings",
+    "preconditions": "Findings text provided",
+    "action_or_input": "Validate document verification recording",
+    "expected_result": "Validation passes",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-017-PASS",
+    "source_id": "BR-SPACS-017 permitted outcome",
+    "purpose": "Renewal permitted when scheme allows renewal, parent application was approved, and window open",
+    "preconditions": "Parent state approved, renewal_allowed True, within window",
+    "action_or_input": "Validate renewal conditions",
+    "expected_result": "Validation passes",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-017-FAIL",
+    "source_id": "BR-SPACS-017 prohibited outcome",
+    "purpose": "Renewal rejected when parent application was rejected",
+    "preconditions": "Parent state rejected",
+    "action_or_input": "Validate renewal conditions",
+    "expected_result": "RenewalEligibilityError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-018-PASS",
+    "source_id": "BR-SPACS-018 permitted outcome",
+    "purpose": "Convener permitted to render final scholarship decision",
+    "preconditions": "User holds spacs_convener role",
+    "action_or_input": "Assert decision authority",
+    "expected_result": "Authority confirmed",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-018-FAIL",
+    "source_id": "BR-SPACS-018 prohibited outcome",
+    "purpose": "Non-convener prohibited from rendering final decision",
+    "preconditions": "User holds only spacs_assistant role",
+    "action_or_input": "Assert decision authority",
+    "expected_result": "UnauthorizedActionError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-019-PASS",
+    "source_id": "BR-SPACS-019 permitted outcome",
+    "purpose": "Award publication permitted when ready and approval evidence exists",
+    "preconditions": "State ready_for_publication and approval evidence non-empty",
+    "action_or_input": "Validate award publication allowed",
+    "expected_result": "Publication permitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-019-FAIL",
+    "source_id": "BR-SPACS-019 prohibited outcome",
+    "purpose": "Award publication prohibited when approval evidence is missing",
+    "preconditions": "State ready_for_publication but approval evidence empty",
+    "action_or_input": "Validate award publication allowed",
+    "expected_result": "AwardPolicyError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-020-PASS",
+    "source_id": "BR-SPACS-020 permitted outcome",
+    "purpose": "Award evaluation uses criteria version effective for that cycle",
+    "preconditions": "Expected criteria version matches candidate version",
+    "action_or_input": "Validate award criteria version",
+    "expected_result": "Validation passes",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-021-FAIL",
+    "source_id": "BR-SPACS-021 prohibited outcome",
+    "purpose": "Modification or deletion of audit records is strictly prohibited",
+    "preconditions": "Audit record exists",
+    "action_or_input": "Assert audit modification prohibited",
+    "expected_result": "AuditProtectionError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-022-PASS",
+    "source_id": "BR-SPACS-022 permitted outcome",
+    "purpose": "Role reassignment filters only pending tasks for reassignment",
+    "preconditions": "Set of pending and completed tasks",
+    "action_or_input": "Filter reassignable tasks",
+    "expected_result": "Only pending tasks returned for reassignment",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-023-PASS",
+    "source_id": "BR-SPACS-023 permitted outcome",
+    "purpose": "Candidate pool filtered by scheme candidate source method",
+    "preconditions": "Source method system_pool with min CPI 8.0",
+    "action_or_input": "Filter eligible candidates",
+    "expected_result": "Only students with CPI >= 8.0 returned",
+    "test_type": "positive"
+  }
+]
