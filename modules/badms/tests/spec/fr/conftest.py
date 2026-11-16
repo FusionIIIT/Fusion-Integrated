@@ -1,16 +1,13 @@
 import copy
 import os
+import tempfile
+import uuid
 import pytest
 from django.conf import settings
 from django.db import connections, connection
 import django.apps
 
-db_path = r"C:\Users\DELL\.gemini\antigravity\scratch\test_badms_fr.sqlite3"
-if os.path.exists(db_path):
-    try:
-        os.remove(db_path)
-    except Exception:
-        pass
+db_path = os.path.join(tempfile.gettempdir(), f"badms_fr_{uuid.uuid4().hex}.sqlite3")
 
 d = copy.deepcopy(connections["default"].settings_dict)
 d["ENGINE"] = "django.db.backends.sqlite3"

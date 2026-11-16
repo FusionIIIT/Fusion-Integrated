@@ -18,3 +18,17 @@ Student 1's 10/10 commit the baseline ran on (hash): 95856b3
 | Test id | Source id | Strategies | Category | Evidence | Outcome (fixing commit, covering test, or agreed reading with the spec sentence) | Open? |
 |:---|:---|:---|:---|:---|:---|:---:|
 | TC-BADMS-008 | AFR-08 | FR | Environment / setup problem | External background daemon execution requires separate system process | Handled via Celery beat scheduler in platform configuration | No |
+
+## Student 2 follow-up verification (2026-11-16)
+
+The checked-in baseline above is historical evidence from the baseline commit; it is not a result from this verification attempt. On the current `module/badms` checkout (`be4c043`), all four strategy suites were attempted individually but could not be executed because this checkout had no usable pytest installation. The repository has no pre-existing `.venv`; `uv` could create the environment but could not complete dependency synchronization in this session. No current pass, fail, or coverage counts are claimed.
+
+| Test id | Source id | Strategies | Category | Evidence | Outcome | Open? |
+|:---|:---|:---|:---|:---|:---|:---:|
+| FR suite | AFR-BA-001–AFR-BA-074 | FR | Environment / setup problem | `pytest` is absent from `.venv`; dependency installation did not complete, so the suite could not be collected or run. | Requires an environment with project dev dependencies installed; no test result inferred. | Yes |
+| UC suite | BA-UC-001–BA-UC-023 | UC | Environment / setup problem | `pytest` is absent from `.venv`; dependency installation did not complete, so the suite could not be collected or run. | Requires an environment with project dev dependencies installed; no test result inferred. | Yes |
+| BR suite | BR-BA-001–BR-BA-021 | BR | Environment / setup problem | `pytest` is absent from `.venv`; dependency installation did not complete, so the suite could not be collected or run. | Requires an environment with project dev dependencies installed; no test result inferred. | Yes |
+| WF suite | CW-BA-01–CW-BA-03 | WF | Environment / setup problem | `pytest` is absent from `.venv`; dependency installation did not complete, so the suite could not be collected or run. | Requires an environment with project dev dependencies installed; no test result inferred. | Yes |
+| TC-BADMS-008 | AFR-BA-006 | FR | Unimplemented / skipped test | The test body calls `pytest.skip`; the historical entry above marks this handled by platform Celery configuration, but no executed test verifies scheduled BADMS backup execution. | Still skipped; Step 9's no-skip requirement is not met. | Yes |
+
+The spec-test database fixtures were also changed to use per-run unique files in the system temporary directory. Previously they attempted to delete fixed files beneath `C:\Users\DELL\.gemini\antigravity\scratch`, outside the authorized workspace. The suites must be rerun after installing dependencies to establish executable results.
