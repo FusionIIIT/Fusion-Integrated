@@ -13,6 +13,24 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.leave_request.view` | View own leave requests | `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Leave Administrator`, `Registrar`, `SectionHead_HR`, `SectionHead_IWD`, `SectionHead_PS`, `SectionHead_RSPC`, `faculty`, `staff` |
+| `elm.leave_request.view_all` | View all employee leave requests | `Director`, `Leave Administrator`, `Registrar` |
+| `elm.leave_request.create` | Submit leave requests and extensions | `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Leave Administrator`, `Registrar`, `SectionHead_HR`, `SectionHead_IWD`, `SectionHead_PS`, `SectionHead_RSPC`, `faculty`, `staff` |
+| `elm.leave_request.delete` | Withdraw pending leave requests | `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Leave Administrator`, `Registrar`, `SectionHead_HR`, `SectionHead_IWD`, `SectionHead_PS`, `SectionHead_RSPC`, `faculty`, `staff` |
+| `elm.leave_request.update` | Request cancellation, substitute changes, and resumption | `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Leave Administrator`, `Registrar`, `SectionHead_HR`, `SectionHead_IWD`, `SectionHead_PS`, `SectionHead_RSPC`, `faculty`, `staff` |
+| `elm.leave_request.review` | Review and recommend on assigned leave requests | `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Leave Administrator`, `Registrar`, `SectionHead_HR`, `SectionHead_IWD`, `SectionHead_PS`, `SectionHead_RSPC` |
+| `elm.leave_request.approve` | Approve or reject assigned leave requests | `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Leave Administrator`, `Registrar`, `SectionHead_HR`, `SectionHead_IWD`, `SectionHead_PS`, `SectionHead_RSPC` |
+| `elm.substitution.review` | Respond to substitute requests | `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Leave Administrator`, `Registrar`, `SectionHead_HR`, `SectionHead_IWD`, `SectionHead_PS`, `SectionHead_RSPC`, `faculty`, `staff` |
+| `elm.resumption.review` | Verify employee resumption records | `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Leave Administrator`, `Registrar`, `SectionHead_HR`, `SectionHead_IWD`, `SectionHead_PS`, `SectionHead_RSPC` |
+| `elm.leave_balance.view` | View own leave balances and history | `Deputy Registrar`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Leave Administrator`, `Registrar`, `SectionHead_HR`, `SectionHead_IWD`, `SectionHead_PS`, `SectionHead_RSPC`, `faculty`, `staff` |
+| `elm.policy.manage` | Maintain current leave policy and hierarchy configuration | `Director`, `Leave Administrator`, `Registrar` |
+| `elm.calendar.publish` | Maintain and publish holiday/RH/vacation calendars | `Director`, `Leave Administrator`, `Registrar` |
+| `elm.offline_record.create` | Record already-sanctioned offline leave | `Director`, `Leave Administrator`, `Registrar` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
@@ -38,3 +56,23 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `visitor_hostel`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `visitor_hostel.booking.create` | Submit booking request | `Hostel Caretaker`, `Hostel Incharge`, `faculty`, `staff`, `student` |
+| `visitor_hostel.booking.view_self` | View own bookings | `Hostel Caretaker`, `Hostel Incharge`, `faculty`, `staff`, `student` |
+| `visitor_hostel.booking.cancel` | Cancel own booking | `Hostel Caretaker`, `Hostel Incharge`, `faculty`, `staff`, `student` |
+| `visitor_hostel.booking.review` | Review and route bookings | `Hostel Caretaker`, `Hostel Incharge` |
+| `visitor_hostel.booking.allot` | Allot rooms | `Hostel Caretaker`, `Hostel Incharge` |
+| `visitor_hostel.booking.checkin` | Record check-in | `Hostel Caretaker`, `Hostel Incharge` |
+| `visitor_hostel.booking.checkout` | Record check-out | `Hostel Caretaker`, `Hostel Incharge` |
+| `visitor_hostel.booking.approve` | Approve forwarded bookings | `Hostel Incharge` |
+| `visitor_hostel.tariff.manage` | Manage tariffs | `Hostel Incharge` |
+| `visitor_hostel.meal.manage` | Manage meal bookings | `Hostel Caretaker`, `Hostel Incharge` |
+| `visitor_hostel.billing.manage` | Manage bills and settlements | `Hostel Caretaker`, `Hostel Incharge` |
+| `visitor_hostel.inventory.manage` | Manage inventory | `Hostel Caretaker`, `Hostel Incharge` |
+| `visitor_hostel.inventory.approve` | Approve replenishment | `Hostel Incharge` |
+| `visitor_hostel.report.view` | View reports | `Hostel Caretaker`, `Hostel Incharge` |
+| `visitor_hostel.role.reassign` | Reassign operational roles | _service only_ |
