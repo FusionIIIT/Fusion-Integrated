@@ -1674,6 +1674,234 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/psm/{resource}:
+    get:
+      operationId: v1_psm_retrieve
+      summary: List authorized PSM records
+      parameters:
+      - in: path
+        name: resource
+        schema:
+          type: string
+        required: true
+      tags:
+      - psm
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    post:
+      operationId: v1_psm_create
+      parameters:
+      - in: path
+        name: resource
+        schema:
+          type: string
+        required: true
+      tags:
+      - psm
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonCommand'
+            examples:
+              NewIndent:
+                value:
+                  data:
+                    item: Lab chairs
+                    quantity: '6'
+                    estimated_cost: '12000'
+                    justification: Teaching lab
+                summary: New indent
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/JsonCommand'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/JsonCommand'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                NewIndent:
+                  value:
+                    data:
+                      item: Lab chairs
+                      quantity: '6'
+                      estimated_cost: '12000'
+                      justification: Teaching lab
+                  summary: New indent
+          description: ''
+  /api/v1/psm/{resource}/{id}/actions:
+    post:
+      operationId: v1_psm_actions_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: resource
+        schema:
+          type: string
+        required: true
+      tags:
+      - psm
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Command'
+            examples:
+              SubmitDraft:
+                value:
+                  action: submit
+                  data: {}
+                summary: Submit draft
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Command'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Command'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                SubmitDraft:
+                  value:
+                    action: submit
+                    data: {}
+                  summary: Submit draft
+          description: ''
+  /api/v1/psm/attachments/{id}/download:
+    get:
+      operationId: v1_psm_attachments_download_retrieve
+      summary: Download an authorized private PSM document
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - psm
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/v1/psm/attachments/upload:
+    post:
+      operationId: v1_psm_attachments_upload_create
+      summary: Retain a private supporting document
+      tags:
+      - psm
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Upload'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Upload'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/psm/report:
+    post:
+      operationId: v1_psm_report_create
+      tags:
+      - psm
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonCommand'
+            examples:
+              StockReport:
+                value:
+                  data:
+                    report: stock
+                    filters: {}
+                summary: Stock report
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/JsonCommand'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/JsonCommand'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                StockReport:
+                  value:
+                    data:
+                      report: stock
+                      filters: {}
+                  summary: Stock report
+          description: ''
+  /api/v1/psm/workspace:
+    get:
+      operationId: v1_psm_workspace_retrieve
+      summary: Scoped purchase and stores workspace
+      tags:
+      - psm
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
 components:
   schemas:
     AcademicDirectory:
@@ -2101,6 +2329,17 @@ components:
       - cleared
       - message
       - user_id
+    Command:
+      type: object
+      properties:
+        action:
+          type: string
+          maxLength: 60
+        data:
+          type: object
+          additionalProperties: {}
+      required:
+      - action
     Company:
       type: object
       properties:
@@ -2407,6 +2646,16 @@ components:
       - season_decision
       - semester
       - standing
+    EntityEnum:
+      enum:
+      - indent
+      - case
+      - vendor
+      type: string
+      description: |-
+        * `indent` - indent
+        * `case` - case
+        * `vendor` - vendor
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2637,6 +2886,14 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    JsonCommand:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: {}
+      required:
+      - data
     LiftSanction:
       type: object
       properties:
@@ -3769,6 +4026,21 @@ components:
       - application_id
       - redacted
       - results
+    Upload:
+      type: object
+      properties:
+        entity:
+          $ref: '#/components/schemas/EntityEnum'
+        object_id:
+          type: string
+          format: uuid
+        file:
+          type: string
+          format: uri
+      required:
+      - entity
+      - file
+      - object_id
     UserRef:
       type: object
       properties:

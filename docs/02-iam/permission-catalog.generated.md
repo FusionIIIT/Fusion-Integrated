@@ -38,3 +38,21 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `psm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `psm.workspace.view` | Open the scoped purchase and stores workspace | `psm_accounts`, `psm_auditor`, `psm_committee`, `psm_department_admin`, `psm_department_head`, `psm_employee`, `psm_final_authority`, `psm_ps_admin`, `psm_vendor` |
+| `psm.workflow.manage` | Act within the assigned PSM role and department | `psm_accounts`, `psm_auditor`, `psm_committee`, `psm_department_admin`, `psm_department_head`, `psm_employee`, `psm_final_authority`, `psm_ps_admin`, `psm_vendor` |
+| `psm.report.view` | Generate reports within assigned PSM scope | `psm_accounts`, `psm_auditor`, `psm_committee`, `psm_department_admin`, `psm_department_head`, `psm_employee`, `psm_final_authority`, `psm_ps_admin`, `psm_vendor` |
+| `psm.report.schedule` | Schedule authorized purchase and stores reports | `psm_accounts`, `psm_auditor`, `psm_committee`, `psm_department_admin`, `psm_department_head`, `psm_employee`, `psm_final_authority`, `psm_ps_admin`, `psm_vendor` |
+| `psm.employee.manage` | Act within the employee PSM role | `psm_employee` |
+| `psm.department_admin.manage` | Act within the department_admin PSM role | `psm_department_admin` |
+| `psm.department_head.manage` | Act within the department_head PSM role | `psm_department_head` |
+| `psm.ps_admin.manage` | Act within the ps_admin PSM role | `psm_ps_admin` |
+| `psm.accounts.manage` | Act within the accounts PSM role | `psm_accounts` |
+| `psm.final_authority.manage` | Act within the final_authority PSM role | `psm_final_authority` |
+| `psm.committee.manage` | Act within the committee PSM role | `psm_committee` |
+| `psm.vendor.manage` | Act within the vendor PSM role | `psm_vendor` |
+| `psm.auditor.manage` | Act within the auditor PSM role | `psm_auditor` |

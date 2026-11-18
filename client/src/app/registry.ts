@@ -12,6 +12,7 @@ export interface ModuleManifest {
 }
 
 export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
+  psm: { code: "psm", basePath: "/psm", load: () => import("../modules/psm/routes") },
   placement_cell: {
     code: "placement_cell",
     basePath: "/placement",
