@@ -13,6 +13,37 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `iaa`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `iaa.request.view` | View requests within authorized scope | `Auditor`, `Dean`, `Director`, `Finance Staff`, `HoD` |
+| `iaa.request.view_self` | View own requests and their history | `Basic User` |
+| `iaa.request.create` | Create and submit expense or voucher requests | `Basic User` |
+| `iaa.request.update` | Update drafts or respond to a finance query | `Basic User`, `Finance Staff` |
+| `iaa.request.review` | Review requests for finance validation | `Finance Staff` |
+| `iaa.request.approve` | Approve or reject assigned requests | `Dean`, `Director`, `Finance Staff`, `HoD` |
+| `iaa.ta_claim.view` | View TA claims within authorized scope | `Auditor`, `Dean`, `Director`, `Finance Staff`, `HoD` |
+| `iaa.ta_claim.view_self` | View own TA claims and their history | `Basic User` |
+| `iaa.ta_claim.create` | Submit a TA claim | `Basic User` |
+| `iaa.ta_claim.update` | Respond to a TA clarification query | `Basic User`, `Finance Staff` |
+| `iaa.ta_claim.review` | Verify TA claims for policy and budget compliance | `Finance Staff` |
+| `iaa.ta_claim.approve` | Approve or reject assigned high-value TA claims | `Dean`, `Director`, `Finance Staff`, `HoD` |
+| `iaa.anomaly.view` | View anomalies within authorized scope | `Auditor`, `Dean`, `Director`, `Finance Staff`, `HoD` |
+| `iaa.anomaly.create` | Flag a material anomaly | `Auditor`, `Finance Staff` |
+| `iaa.anomaly.update` | Resolve or escalate an assigned anomaly | `Auditor`, `Dean`, `Director`, `Finance Staff`, `HoD` |
+| `iaa.audit_record.view` | Review financial records for audit | `Auditor`, `Dean`, `Director`, `Finance Staff`, `HoD` |
+| `iaa.audit_observation.view` | View observations within authorized scope | `Auditor`, `Basic User`, `Finance Staff` |
+| `iaa.audit_observation.create` | Raise an audit observation | `Auditor` |
+| `iaa.audit_observation.update` | Respond to or verify an audit observation | `Auditor`, `Basic User` |
+| `iaa.report.view` | View role-scoped IAA reports | `Auditor`, `Dean`, `Director`, `Finance Staff`, `HoD` |
+| `iaa.report.export` | Export a read-only IAA report | `Auditor`, `Finance Staff` |
+| `iaa.notification.view` | View assigned IAA notifications and pending actions | `Auditor`, `Basic User`, `Dean`, `Director`, `Finance Staff`, `HoD` |
+| `iaa.role.view` | View IAA role assignments | `Auditor`, `Basic User`, `Dean`, `Director`, `Finance Staff`, `HoD`, `System Admin` |
+| `iaa.role.update` | Select the active IAA actor role | `Auditor`, `Basic User`, `Dean`, `Director`, `Finance Staff`, `HoD`, `System Admin` |
+| `iaa.role.assign` | Manage IAA role assignments | `System Admin` |
+| `iaa.configuration.manage` | Configure IAA approval, budget, year, and policy rules | `System Admin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
