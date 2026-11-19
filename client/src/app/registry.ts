@@ -17,4 +17,9 @@ export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
     basePath: "/placement",
     load: () => import("../modules/placement/routes"),
   },
+  iaa: {
+    code: "iaa",
+    basePath: "/iaa",
+    load: () => import("../modules/iaa/routes"),
+  },
 };
