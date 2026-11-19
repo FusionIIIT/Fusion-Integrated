@@ -285,7 +285,11 @@
           document.getElementById('quotaUsed').textContent = used + ' MB';
           document.getElementById('quotaAllocated').textContent = allocated + ' MB';
           document.getElementById('quotaBar').style.width = pct + '%';
-          document.getElementById('quotaPercent').innerHTML = '<strong>' + pct + '%</strong>';
+          const quotaPctElem = document.getElementById('quotaPercent');
+          quotaPctElem.textContent = '';
+          const strongPct = document.createElement('strong');
+          strongPct.textContent = pct + '%';
+          quotaPctElem.appendChild(strongPct);
           if (pct >= 80) {
             document.getElementById('quotaBar').style.backgroundColor = 'var(--danger)';
           }
@@ -298,18 +302,52 @@
           const records = await arcRes.json();
           if (records && records.length > 0) {
             const tbody = document.getElementById('archivalTableBody');
-            tbody.innerHTML = records.map(r => `
-              <tr>
-                <td><strong>${r.request_number || (r.id ? r.id.substring(0, 8) : 'REQ')}</strong></td>
-                <td>${r.file_name}</td>
-                <td>${r.file_size_mb} MB</td>
-                <td>${r.department_id}</td>
-                <td>${r.initial_classification}</td>
-                <td><span class="badge ${r.authoritative_classification === 'SENSITIVE' ? 'badge-warning' : ''}">${r.authoritative_classification || 'PENDING'}</span></td>
-                <td><span class="badge badge-success">${r.status}</span></td>
-                <td>${r.retention_years ? r.retention_years + ' Years' : 'Standard'}</td>
-              </tr>
-            `).join('');
+            tbody.textContent = '';
+            records.forEach(r => {
+              const tr = document.createElement('tr');
+
+              const tdReq = document.createElement('td');
+              const strongReq = document.createElement('strong');
+              strongReq.textContent = r.request_number || (r.id ? r.id.substring(0, 8) : 'REQ');
+              tdReq.appendChild(strongReq);
+              tr.appendChild(tdReq);
+
+              const tdName = document.createElement('td');
+              tdName.textContent = r.file_name || '';
+              tr.appendChild(tdName);
+
+              const tdSize = document.createElement('td');
+              tdSize.textContent = (r.file_size_mb != null ? r.file_size_mb : 0) + ' MB';
+              tr.appendChild(tdSize);
+
+              const tdDept = document.createElement('td');
+              tdDept.textContent = r.department_id || '';
+              tr.appendChild(tdDept);
+
+              const tdInitClass = document.createElement('td');
+              tdInitClass.textContent = r.initial_classification || '';
+              tr.appendChild(tdInitClass);
+
+              const tdAuthClass = document.createElement('td');
+              const authBadge = document.createElement('span');
+              authBadge.className = 'badge' + (r.authoritative_classification === 'SENSITIVE' ? ' badge-warning' : '');
+              authBadge.textContent = r.authoritative_classification || 'PENDING';
+              tdAuthClass.appendChild(authBadge);
+              tr.appendChild(tdAuthClass);
+
+              const tdStatus = document.createElement('td');
+              const statusBadge = document.createElement('span');
+              statusBadge.className = 'badge badge-success';
+              statusBadge.textContent = r.status || '';
+              tdStatus.appendChild(statusBadge);
+              tr.appendChild(tdStatus);
+
+              const tdRet = document.createElement('td');
+              tdRet.textContent = r.retention_years ? (r.retention_years + ' Years') : 'Standard';
+              tr.appendChild(tdRet);
+
+              tbody.appendChild(tr);
+            });
           }
         }
       } catch (e) {}
