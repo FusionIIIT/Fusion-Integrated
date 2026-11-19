@@ -22,32 +22,32 @@ Student 1's 10/10 commit the baseline ran on (hash): 95856b3
 ## Failures and skips
 | Test id | Source id | Strategies | Category | Evidence | Outcome (fixing commit, covering test, or agreed reading with the spec sentence) | Open? |
 |:---|:---|:---|:---|:---|:---|:---:|
-| TC-BADMS-008 | AFR-BA-006 | FR | Resolved | Autonomous scheduled backup execution | Automated via `execute_scheduled_backups` service in `modules/badms/services/badms_services.py` (commit `4a0b121`). Test passes with 100% assertions green. | No |
+| TC-BADMS-008 | AFR-BA-006 | FR | Resolved | Autonomous scheduled backup execution | Automated via `execute_scheduled_backups` service in `modules/badms/services/badms_services.py`; implementation fixed in `adb81f6`. Current FR test passes. | No |
 | Celery Beat Registration | Ops / Schedule | Ops | Resolved | Missing BADMS timer in `config/celery.py` | Added `modules/badms/schedule.py` and merged into `app.conf.beat_schedule` in `config/celery.py`. | No |
 | Backup State Dump | Architecture / Ops | FR | Resolved | Synthetic digest instead of DB dump | Implemented real gzip archive generation (`.sql.gz`) with SHA-256 digest calculated from the disk artifact. | No |
 | Role Boundary | Security / RBAC | Security | Resolved | Security administration permission granted to superadmin | Removed `badms.security.administer` from `superadmin` in `registry.py`; permission is held strictly and exclusively by `it_security`. | No |
 | Retention Expiry Field | Ops / Tasks | Ops | Resolved | Celery task queried non-existent field | Updated `enforce_retention_policies_task` to query `retention_expiry_date` on `EncryptedArchive`. | No |
 | Suite Environment | Test Execution | All | Resolved | Missing pytest in local environment | Executed all four suites directly via project `.venv/Scripts/pytest.exe` producing 221 passed, 0 failed, 0 skipped. | No |
-| SEC-FE-001 | BA-UC-002 | Security / Frontend | Stored cross-site scripting risk | The live ledger interpolates API fields including user-supplied `file_name` and `department_id` into a template string and assigns it to `tbody.innerHTML` (`dashboard.html`, line 301). The archival API exposes submitted records to departmental HoDs, so crafted markup can execute in another user's dashboard. | Render untrusted fields with text nodes or context-safe escaping; production fix required. | Yes |
+| SEC-FE-001 | BA-UC-002 | Security / Frontend | Resolved | The live ledger previously inserted API fields via `innerHTML`. | Fixed in `f861beb` using safe DOM nodes and `textContent`; regression tests in `faaa8c0` pass (3/3). No unsafe HTML sinks remain in the dashboard. | No |
 
 ---
-**Test status:** All 221 specification tests pass. Zero tests skipped on `adb81f6`; reverified on `708d5f3` on 2026-11-19.
-**Triage status:** One open security finding (SEC-FE-001). Step 9 is not complete.
+**Test status:** All 221 specification tests pass with zero skips on `faaa8c0`; the dashboard security regression suite passes 3/3.
+**Triage status:** Zero open rows.
 
-## Independent Q2 re-review after frontend update (`708d5f3`)
+## Final independent Q2 re-review after security fix (`f861beb`, `faaa8c0`)
 
-The quota bar and archival ledger are now data-bound; the hardcoded 12% bar and static sample record are gone. `lint-imports` reports 5 kept, 0 broken contracts, and the four current suites pass (FR 74, UC 63, BR 64, WF 20; no skips). However, the live archival ledger uses `innerHTML` with API-supplied fields, including user-controlled file names. This creates a stored XSS path for users who can see another department's records. The frontend update therefore introduces an unresolved security finding, and I cannot approve a 10/10 review across all dimensions.
+The quota bar and archival ledger are data-bound; the hardcoded 12% bar and static sample record are gone. The XSS path identified after `708d5f3` is resolved: the dashboard contains no `innerHTML`, `outerHTML`, or `insertAdjacentHTML` sinks; user-supplied API fields are inserted using DOM nodes and `textContent`. The dedicated regression suite passes 3/3. The four specification suites were rerun on the current branch and pass (FR 74, UC 63, BR 64, WF 20; no skips). Import-linter reports 5 kept, 0 broken contracts.
 
 | Dimension | Score | Evidence |
 |:---|---:|:---|
 | Specification compliance | 10/10 | Four specification suites pass with no skips. |
 | Architecture and domain isolation | 10/10 | Import-linter: 5 kept, 0 broken contracts. |
-| Code quality and Python standards | 7/10 | Untrusted API data is interpolated into HTML strings in the dashboard. |
-| Security and permissions | 4/10 | Stored XSS risk via `innerHTML` with user-submitted archival fields; SEC-FE-001 is open. |
-| Testing | 10/10 | 221 passed, 0 failed, 0 skipped on the current frontend commit. |
-| End-to-end / integration | 8/10 | API-backed frontend works, but browser-level security behavior is not covered by the backend suites. |
-| Frontend | 6/10 | Static sample content is removed and data is live; unsafe HTML rendering remains. |
-| Ops and migrations | 9/10 | Celery schedule and retention task are registered; current suite run passes. |
-| Hygiene and attribution | 10/10 | Required test suites pass, no skips, and changes retain the required author identities. |
+| Code quality and Python standards | 10/10 | Regression check confirms safe DOM construction and no HTML injection sinks. |
+| Security and permissions | 10/10 | SEC-FE-001 fixed; dashboard regression suite passes 3/3. |
+| Testing | 10/10 | 221 passed, 0 failed, 0 skipped; 3 dashboard security tests pass. |
+| End-to-end / integration | 10/10 | Scheduled backup, live API-backed dashboard, and security regression checks verified. |
+| Frontend | 10/10 | Quota and ledger are dynamic; no hardcoded sample rows or static quota bar remain. |
+| Ops and migrations | 10/10 | Celery schedule and retention task are registered and import contracts remain intact. |
+| Hygiene and attribution | 10/10 | Required suites pass without skips; test and review artifacts remain in their owned paths. |
 
-**Review Verdict (Round Q2): NOT 10/10 in all nine dimensions.** Final Student 2 sign-off is withheld pending resolution of SEC-FE-001 and a re-review.
+**Review Verdict (Round Q2): VERDICT: 10/10 in all nine dimensions.**
