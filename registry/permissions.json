@@ -278,6 +278,218 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "rspc": {
+      "grants": {
+        "dean_rspc": [
+          "rspc.audit.view",
+          "rspc.closure.approve",
+          "rspc.consultancy.approve_dean",
+          "rspc.consultancy.view",
+          "rspc.financial.approve_dean",
+          "rspc.financial.verify",
+          "rspc.procurement.approve",
+          "rspc.procurement.request",
+          "rspc.proposal.approve_dean",
+          "rspc.proposal.verify_admin",
+          "rspc.proposal.view",
+          "rspc.report.submit",
+          "rspc.staff.manage"
+        ],
+        "director": [
+          "rspc.audit.view",
+          "rspc.closure.approve",
+          "rspc.consultancy.approve_dean",
+          "rspc.consultancy.view",
+          "rspc.financial.approve_dean",
+          "rspc.financial.authorize_director",
+          "rspc.financial.verify",
+          "rspc.procurement.approve",
+          "rspc.procurement.request",
+          "rspc.proposal.approve_dean",
+          "rspc.proposal.authorize_director",
+          "rspc.proposal.verify_admin",
+          "rspc.proposal.view",
+          "rspc.report.submit",
+          "rspc.staff.manage"
+        ],
+        "faculty": [
+          "rspc.closure.submit",
+          "rspc.consultancy.register",
+          "rspc.consultancy.view",
+          "rspc.financial.request",
+          "rspc.procurement.request",
+          "rspc.proposal.submit",
+          "rspc.proposal.view",
+          "rspc.report.submit",
+          "rspc.staff.request"
+        ],
+        "hod": [
+          "rspc.closure.submit",
+          "rspc.consultancy.recommend_hod",
+          "rspc.consultancy.register",
+          "rspc.consultancy.view",
+          "rspc.financial.request",
+          "rspc.procurement.request",
+          "rspc.proposal.recommend_hod",
+          "rspc.proposal.submit",
+          "rspc.proposal.view",
+          "rspc.report.submit",
+          "rspc.staff.request"
+        ],
+        "rspc_admin": [
+          "rspc.audit.view",
+          "rspc.closure.approve",
+          "rspc.consultancy.view",
+          "rspc.financial.verify",
+          "rspc.procurement.request",
+          "rspc.proposal.verify_admin",
+          "rspc.proposal.view",
+          "rspc.report.submit",
+          "rspc.staff.manage"
+        ]
+      },
+      "module_grants": [
+        "dean_rspc",
+        "director",
+        "faculty",
+        "hod",
+        "rspc_admin"
+      ],
+      "nav": {
+        "base_path": "/rspc",
+        "icon": "FolderSimpleLock",
+        "items": [
+          {
+            "code": "rspc.proposals",
+            "icon": "FolderSimpleLock",
+            "label": "Research Proposals",
+            "required_permission": "rspc.proposal.view",
+            "sort_order": 10,
+            "to": "/rspc/proposals"
+          },
+          {
+            "code": "rspc.consultancy",
+            "icon": "Briefcase",
+            "label": "Consultancy Projects",
+            "required_permission": "rspc.consultancy.view",
+            "sort_order": 20,
+            "to": "/rspc/consultancy"
+          },
+          {
+            "code": "rspc.financial",
+            "icon": "Coins",
+            "label": "Fund Requests",
+            "required_permission": "rspc.financial.request",
+            "sort_order": 30,
+            "to": "/rspc/financial"
+          },
+          {
+            "code": "rspc.reports",
+            "icon": "ChartBar",
+            "label": "Progress & Closure Reports",
+            "required_permission": "rspc.report.submit",
+            "sort_order": 40,
+            "to": "/rspc/reports"
+          }
+        ],
+        "label": "Research, Sponsored Projects & Consultancy",
+        "nav_section": "Research",
+        "sort_order": 30,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "rspc.proposal.view",
+          "label": "View research proposals"
+        },
+        {
+          "code": "rspc.proposal.submit",
+          "label": "Submit research proposals"
+        },
+        {
+          "code": "rspc.proposal.recommend_hod",
+          "label": "HoD review and recommend research proposals"
+        },
+        {
+          "code": "rspc.proposal.verify_admin",
+          "label": "RSPC Admin verify research proposals"
+        },
+        {
+          "code": "rspc.proposal.approve_dean",
+          "label": "Dean RSPC approve research proposals"
+        },
+        {
+          "code": "rspc.proposal.authorize_director",
+          "label": "Director authorize high-value proposals"
+        },
+        {
+          "code": "rspc.consultancy.view",
+          "label": "View consultancy projects"
+        },
+        {
+          "code": "rspc.consultancy.register",
+          "label": "Register consultancy projects"
+        },
+        {
+          "code": "rspc.consultancy.recommend_hod",
+          "label": "HoD recommend consultancy projects"
+        },
+        {
+          "code": "rspc.consultancy.approve_dean",
+          "label": "Dean RSPC approve consultancy projects"
+        },
+        {
+          "code": "rspc.staff.request",
+          "label": "Request project staff appointment"
+        },
+        {
+          "code": "rspc.staff.manage",
+          "label": "Manage and verify project staff appointments"
+        },
+        {
+          "code": "rspc.financial.request",
+          "label": "Submit fund utilization and expenditure request"
+        },
+        {
+          "code": "rspc.financial.verify",
+          "label": "Verify financial requests"
+        },
+        {
+          "code": "rspc.financial.approve_dean",
+          "label": "Approve financial requests within delegated powers"
+        },
+        {
+          "code": "rspc.financial.authorize_director",
+          "label": "Authorize high-value expenditure requests"
+        },
+        {
+          "code": "rspc.procurement.request",
+          "label": "Request project equipment or consumable procurement"
+        },
+        {
+          "code": "rspc.procurement.approve",
+          "label": "Approve project procurement requests"
+        },
+        {
+          "code": "rspc.report.submit",
+          "label": "Submit periodic progress and utilization reports"
+        },
+        {
+          "code": "rspc.closure.submit",
+          "label": "Submit project closure request"
+        },
+        {
+          "code": "rspc.closure.approve",
+          "label": "Approve project closure and archival"
+        },
+        {
+          "code": "rspc.audit.view",
+          "label": "View RSPC audit trails and compliance records"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
     }
   },
   "publisher": "integrated",
