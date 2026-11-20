@@ -525,6 +525,44 @@ def test_dec_3_modified_decision_has_no_invented_downstream_state():
     assert get_transitions(PatentApplicationStatus.DECISION_MODIFIED) == []
 
 
+@pytest.mark.parametrize(
+    "target_status",
+    [
+        PatentApplicationStatus.BUDGET_APPROVED,
+        PatentApplicationStatus.BUDGET_REJECTED,
+        PatentApplicationStatus.ESCALATED,
+    ],
+)
+def test_budget_decisions_are_only_allowed_from_approved(target_status):
+    """BW-PMS-08..10 / BR-PMS-052: decisions start only at Approved."""
+    with pytest.raises(InvalidTransitionError):
+        validate_transition(
+            PatentApplicationStatus.ATTORNEY_ASSIGNED,
+            target_status,
+            actor_role="Director",
+        )
+
+
+def test_filing_requires_pre_filing_satisfied_transition():
+    """BW-PMS-11: the approved filing path passes through pre-filing readiness."""
+    with pytest.raises(InvalidTransitionError):
+        validate_transition(
+            PatentApplicationStatus.BUDGET_APPROVED,
+            PatentApplicationStatus.FILED,
+            actor_role="Attorney",
+        )
+
+    pre_filing = validate_transition(
+        PatentApplicationStatus.BUDGET_APPROVED,
+        PatentApplicationStatus.PRE_FILING_SATISFIED,
+        actor_role="Attorney",
+    )
+    assert pre_filing.to_status == PatentApplicationStatus.PRE_FILING_SATISFIED
+    assert validate_transition(
+        pre_filing.to_status, PatentApplicationStatus.FILED, actor_role="Attorney"
+    ).to_status == PatentApplicationStatus.FILED
+
+
 def test_state_graph_is_reachable_and_consistent():
     """Guards the table itself: a state nobody can reach, or a state that dead-ends
     without being declared terminal, is a modelling bug rather than a rule."""

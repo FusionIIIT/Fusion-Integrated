@@ -274,14 +274,6 @@ TRANSITIONS: tuple[Transition, ...] = (
         guard_description="Decision = Approve, within threshold limit and available",
     ),
     Transition(
-        PatentApplicationStatus.ATTORNEY_ASSIGNED,
-        PatentApplicationStatus.BUDGET_APPROVED,
-        actor_role="Director",
-        uc_id="UC-PMS-009",
-        permission="pms.budget.review",
-        guard_description="Decision = Approve, within threshold limit and available",
-    ),
-    Transition(
         PatentApplicationStatus.APPROVED,
         PatentApplicationStatus.BUDGET_REJECTED,
         actor_role="Director",
@@ -290,23 +282,7 @@ TRANSITIONS: tuple[Transition, ...] = (
         guard_description="Decision = Reject",
     ),
     Transition(
-        PatentApplicationStatus.ATTORNEY_ASSIGNED,
-        PatentApplicationStatus.BUDGET_REJECTED,
-        actor_role="Director",
-        uc_id="UC-PMS-009",
-        permission="pms.budget.review",
-        guard_description="Decision = Reject",
-    ),
-    Transition(
         PatentApplicationStatus.APPROVED,
-        PatentApplicationStatus.ESCALATED,
-        actor_role="Director",
-        uc_id="UC-PMS-009",
-        permission="pms.budget.review",
-        guard_description="Total cost exceeds threshold limit",
-    ),
-    Transition(
-        PatentApplicationStatus.ATTORNEY_ASSIGNED,
         PatentApplicationStatus.ESCALATED,
         actor_role="Director",
         uc_id="UC-PMS-009",
@@ -349,14 +325,6 @@ TRANSITIONS: tuple[Transition, ...] = (
         uc_id="UC-PMS-013",
         permission="pms.filing.record",
         guard_description="Filing reference and confirmation recorded",
-    ),
-    Transition(
-        PatentApplicationStatus.BUDGET_APPROVED,
-        PatentApplicationStatus.FILED,
-        actor_role="Attorney",
-        uc_id="UC-PMS-013",
-        permission="pms.filing.record",
-        guard_description="Direct filing when preconditions satisfied",
     ),
     # BW-PMS-12, 13, CW-PMS-03: Office Action Responses
     Transition(

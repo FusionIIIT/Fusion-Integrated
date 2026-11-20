@@ -50,8 +50,30 @@ def record_external_filing(
             international_justification=international_justification,
         )
 
-        validate_transition(app.status, PatentApplicationStatus.FILED, actor_role="Attorney")
         prev_status = app.status
+
+        if app.status == PatentApplicationStatus.PRE_FILING_SATISFIED.value:
+            validate_transition(app.status, PatentApplicationStatus.FILED, actor_role="Attorney")
+        else:
+            validate_transition(
+                app.status, PatentApplicationStatus.PRE_FILING_SATISFIED, actor_role="Attorney"
+            )
+            validate_transition(
+                PatentApplicationStatus.PRE_FILING_SATISFIED,
+                PatentApplicationStatus.FILED,
+                actor_role="Attorney",
+            )
+            app.status = PatentApplicationStatus.PRE_FILING_SATISFIED.value
+            app.save(update_fields=["status", "updated_at"])
+            log_audit(
+                application=app,
+                actor_user_id=attorney_user_id,
+                action_type="pre_filing_preconditions_satisfied",
+                from_state=prev_status,
+                to_state=app.status,
+            )
+
+        filing_start_status = app.status
 
         app.external_filing_id = external_filing_id.strip()
         app.external_filing_date = external_filing_date
@@ -67,7 +89,7 @@ def record_external_filing(
             application=app,
             actor_user_id=attorney_user_id,
             action_type="external_patent_filed",
-            from_state=prev_status,
+            from_state=filing_start_status,
             to_state=app.status,
             details={
                 "external_filing_id": external_filing_id,
