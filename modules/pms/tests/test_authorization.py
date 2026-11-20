@@ -13,6 +13,7 @@ from rest_framework.test import APIClient
 
 from conftest import make_session
 from modules.pms.domain.state_machine import PatentApplicationStatus
+from modules.pms.models import AttorneyAssignment, PmsRoleAssignment
 from modules.pms.services import submit_application
 
 pytestmark = pytest.mark.django_db
@@ -111,6 +112,122 @@ def test_coinventor_can_view_application(stub_iam):
     res = client_coinv.get(f"/api/v1/pms/applications/{app.id}/")
     assert res.status_code == 200
     assert res.json()["title"] == "Shared Patent"
+
+
+def test_director_scope_is_domain_or_assignment_only(stub_iam):
+    assigned = submit_application(
+        applicant_user_id=1001,
+        title="Assigned",
+        abstract="A",
+        detailed_description="D",
+        claims="C",
+        domain="Physics",
+    )
+    assigned.assigned_director_user_id = 2001
+    assigned.save(update_fields=["assigned_director_user_id", "updated_at"])
+    in_domain = submit_application(
+        applicant_user_id=1002,
+        title="In domain",
+        abstract="A",
+        detailed_description="D",
+        claims="C",
+        domain="Physics",
+    )
+    out_of_scope = submit_application(
+        applicant_user_id=1003,
+        title="Outside scope",
+        abstract="A",
+        detailed_description="D",
+        claims="C",
+        domain="Chemistry",
+    )
+    PmsRoleAssignment.objects.create(user_id=2001, role="Director", domain="Physics")
+
+    client = _auth_client(
+        stub_iam,
+        user_id=2001,
+        roles=("director",),
+        permissions=("pms.application.view", "pms.application.review"),
+    )
+    response = client.get("/api/v1/pms/applications/")
+    assert response.status_code == 200
+    ids = {row["id"] for row in response.json()}
+    assert {assigned.id, in_domain.id} <= ids
+    assert out_of_scope.id not in ids
+
+
+def test_attorney_scope_excludes_declined_inactive_assignment(stub_iam):
+    assigned = submit_application(
+        applicant_user_id=1001,
+        title="Active assignment",
+        abstract="A",
+        detailed_description="D",
+        claims="C",
+        domain="Physics",
+    )
+    declined = submit_application(
+        applicant_user_id=1002,
+        title="Declined assignment",
+        abstract="A",
+        detailed_description="D",
+        claims="C",
+        domain="Physics",
+    )
+    AttorneyAssignment.objects.create(
+        application=assigned,
+        attorney_user_id=5001,
+        assigned_by_user_id=9001,
+        status="accepted",
+        is_active=True,
+    )
+    AttorneyAssignment.objects.create(
+        application=declined,
+        attorney_user_id=5001,
+        assigned_by_user_id=9001,
+        status="declined",
+        is_active=True,
+    )
+
+    client = _auth_client(
+        stub_iam,
+        user_id=5001,
+        roles=("attorney",),
+        permissions=("pms.application.view", "pms.patentability.assess"),
+    )
+    response = client.get("/api/v1/pms/applications/")
+    assert response.status_code == 200
+    ids = {row["id"] for row in response.json()}
+    assert assigned.id in ids
+    assert declined.id not in ids
+
+
+def test_nested_endpoint_hides_foreign_application_records(stub_iam):
+    app = submit_application(
+        applicant_user_id=2001,
+        title="Private patent",
+        abstract="A",
+        detailed_description="D",
+        claims="C",
+        domain="Tech",
+    )
+    coinventor = app.coinventors.create(
+        user_id=2002,
+        name="Co-inventor",
+        email="co@example.test",
+        ownership_percentage="100.00",
+    )
+    client = _auth_client(
+        stub_iam,
+        user_id=1001,
+        permissions=("pms.coinventor.manage",),
+    )
+    response = client.post(
+        f"/api/v1/pms/coinventors/{coinventor.id}/consent/",
+        {"consent_given": True, "agreement_signed": True},
+    )
+    assert response.status_code == 404
+    coinventor.refresh_from_db()
+    assert not coinventor.agreement_signed
 
 
 def test_applicant_cannot_revise_another_applicants_application(stub_iam):

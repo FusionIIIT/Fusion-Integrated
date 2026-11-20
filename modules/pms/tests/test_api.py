@@ -222,6 +222,7 @@ def test_api_budget_management(stub_iam):
         domain="Tech",
     )
     app.status = PatentApplicationStatus.APPROVED.value
+    app.assigned_director_user_id = 2001
     app.save()
 
     c_dir = _client(
@@ -629,6 +630,8 @@ def test_api_licensing_lifecycle(stub_iam):
         claims="C",
         domain="Tech",
     )
+    app.assigned_director_user_id = 2001
+    app.save(update_fields=["assigned_director_user_id", "updated_at"])
     c_app = _client(
         stub_iam, user_id=1001, permissions=("pms.licensing.submit", "pms.application.view_self")
     )

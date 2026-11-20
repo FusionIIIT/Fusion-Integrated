@@ -5,7 +5,7 @@ Implements all PMS endpoints with strict authorization and domain service delega
 
 from __future__ import annotations
 
-from django.db.models import Count
+from django.db.models import Count, Q
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.response import Response
@@ -16,11 +16,15 @@ from modules.pms.api import permissions as p
 from modules.pms.api import serializers as s
 from modules.pms.api.errors import PmsAPIView, PmsListCreateView
 from modules.pms.models import (
+    AttorneyAssignment,
     AttorneyPanel,
+    CoInventor,
     LicensingRequest,
     OfficeAction,
+    PatentAppeal,
     PatentLegalAdvice,
     PmsAuditTrail,
+    PostGrantMaintenance,
 )
 from modules.pms.selectors.applications import visible_applications
 from modules.pms.services import (
@@ -57,6 +61,19 @@ from modules.pms.services import (
 )
 
 
+def _visible_application(request, application_id: int):
+    """Resolve an application only within the authenticated actor's PMS scope."""
+    app = visible_applications(request.principal).filter(pk=application_id).first()
+    if app is None:
+        raise NotFoundError(f"Patent application {application_id} not found or inaccessible.")
+    return app
+
+
+def _require_visible_parent(request, application_id: int) -> None:
+    """Apply application scope to records reached through nested resource IDs."""
+    _visible_application(request, application_id)
+
+
 class PatentApplicationListCreateView(PmsAPIView):
     """List applications visible to caller or submit a new application
     (UC-PMS-001, CFR-PMS-001, CFR-PMS-005)."""
@@ -65,6 +82,8 @@ class PatentApplicationListCreateView(PmsAPIView):
 
     @extend_schema(responses=s.PatentApplicationReadSerializer(many=True))
     def get(self, request):
+        if not request.principal.has_any_permission(p.P_VIEW_SELF, p.P_VIEW):
+            raise PermissionDeniedError("You do not have permission to view patent applications.")
         qs = visible_applications(request.principal)
         domain = request.query_params.get("domain")
         status_filter = request.query_params.get("status")
@@ -110,10 +129,9 @@ class PatentApplicationDetailView(PmsAPIView):
 
     @extend_schema(responses=s.PatentApplicationReadSerializer)
     def get(self, request, pk: int):
-        qs = visible_applications(request.principal)
-        app = qs.filter(pk=pk).first()
-        if not app:
-            raise NotFoundError(f"Patent application {pk} not found or inaccessible.")
+        if not request.principal.has_any_permission(p.P_VIEW_SELF, p.P_VIEW):
+            raise PermissionDeniedError("You do not have permission to view patent applications.")
+        app = _visible_application(request, pk)
         return Response(s.PatentApplicationReadSerializer(app).data)
 
 
@@ -126,6 +144,7 @@ class PatentApplicationReviseView(PmsAPIView):
         request=s.ReviseApplicationSerializer, responses=s.PatentApplicationReadSerializer
     )
     def post(self, request, pk: int):
+        _visible_application(request, pk)
         serializer = s.ReviseApplicationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         d = serializer.validated_data
@@ -152,6 +171,7 @@ class PatentApplicationWithdrawView(PmsAPIView):
         request=s.WithdrawApplicationSerializer, responses=s.PatentApplicationReadSerializer
     )
     def post(self, request, pk: int):
+        _visible_application(request, pk)
         serializer = s.WithdrawApplicationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         reason = serializer.validated_data["reason"]
@@ -171,6 +191,7 @@ class PatentApplicationAssignDirectorView(PmsAPIView):
 
     @extend_schema(request=s.AssignDirectorSerializer, responses=s.PatentApplicationReadSerializer)
     def post(self, request, pk: int):
+        _visible_application(request, pk)
         serializer = s.AssignDirectorSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         director_id = serializer.validated_data["director_user_id"]
@@ -190,6 +211,7 @@ class PatentApplicationReviewView(PmsAPIView):
 
     @extend_schema(request=s.SubmitReviewSerializer, responses=s.DirectorReviewSerializer)
     def post(self, request, pk: int):
+        _visible_application(request, pk)
         serializer = s.SubmitReviewSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         d = serializer.validated_data
@@ -211,6 +233,7 @@ class PatentApplicationAppealView(PmsAPIView):
 
     @extend_schema(request=s.FileAppealSerializer, responses=s.PatentAppealSerializer)
     def post(self, request, pk: int):
+        _visible_application(request, pk)
         serializer = s.FileAppealSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         d = serializer.validated_data
@@ -231,6 +254,10 @@ class PatentAppealReviewView(PmsAPIView):
 
     @extend_schema(request=s.ReviewAppealSerializer, responses=s.PatentAppealSerializer)
     def post(self, request, appeal_id: int):
+        appeal = PatentAppeal.objects.filter(pk=appeal_id).only("application_id").first()
+        if appeal is None:
+            raise NotFoundError(f"Appeal {appeal_id} not found or inaccessible.")
+        _require_visible_parent(request, appeal.application_id)
         serializer = s.ReviewAppealSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         d = serializer.validated_data
@@ -251,6 +278,9 @@ class PatentBudgetView(PmsAPIView):
 
     @extend_schema(request=s.BudgetLineItemsSerializer, responses=s.PatentBudgetSerializer)
     def put(self, request, pk: int):
+        if not request.principal.has_permission(p.P_BUDGET_REVIEW):
+            raise PermissionDeniedError("You do not have permission to review or decide budgets.")
+        _visible_application(request, pk)
         serializer = s.BudgetLineItemsSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         d = serializer.validated_data
@@ -269,6 +299,7 @@ class PatentBudgetView(PmsAPIView):
     def post(self, request, pk: int):
         if not request.principal.has_permission(p.P_BUDGET_REVIEW):
             raise PermissionDeniedError("You do not have permission to review or decide budgets.")
+        _visible_application(request, pk)
 
         serializer = s.DecideBudgetSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -290,6 +321,7 @@ class PatentApplicationAssignAttorneyView(PmsAPIView):
 
     @extend_schema(request=s.AssignAttorneySerializer, responses=s.AttorneyAssignmentSerializer)
     def post(self, request, pk: int):
+        _visible_application(request, pk)
         serializer = s.AssignAttorneySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         d = serializer.validated_data
@@ -314,6 +346,12 @@ class AttorneyAssignmentRespondView(PmsAPIView):
         request=s.RespondAttorneyAssignmentSerializer, responses=s.AttorneyAssignmentSerializer
     )
     def post(self, request, assignment_id: int):
+        assignment = AttorneyAssignment.objects.filter(pk=assignment_id).only(
+            "application_id"
+        ).first()
+        if assignment is None:
+            raise NotFoundError(f"Attorney assignment {assignment_id} not found or inaccessible.")
+        _require_visible_parent(request, assignment.application_id)
         serializer = s.RespondAttorneyAssignmentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         d = serializer.validated_data
@@ -337,6 +375,7 @@ class PatentabilityAssessmentView(PmsAPIView):
         responses=s.PatentabilityAssessmentSerializer,
     )
     def post(self, request, pk: int):
+        _visible_application(request, pk)
         serializer = s.PatentabilityAssessmentCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         d = serializer.validated_data
@@ -362,6 +401,7 @@ class PatentFilingView(PmsAPIView):
 
     @extend_schema(request=s.RecordFilingSerializer, responses=s.PatentApplicationReadSerializer)
     def post(self, request, pk: int):
+        _visible_application(request, pk)
         serializer = s.RecordFilingSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         d = serializer.validated_data
@@ -385,6 +425,7 @@ class PatentGrantView(PmsAPIView):
 
     @extend_schema(request=s.RecordGrantSerializer, responses=s.PatentApplicationReadSerializer)
     def post(self, request, pk: int):
+        _visible_application(request, pk)
         serializer = s.RecordGrantSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         d = serializer.validated_data
@@ -405,6 +446,9 @@ class OfficeActionListCreateView(PmsAPIView):
 
     @extend_schema(responses=s.OfficeActionSerializer(many=True))
     def get(self, request, pk: int):
+        if not request.principal.has_any_permission(p.P_VIEW_SELF, p.P_VIEW):
+            raise PermissionDeniedError("You do not have permission to view patent applications.")
+        _visible_application(request, pk)
         oas = OfficeAction.objects.filter(application_id=pk).order_by("-issue_date")
         return Response(s.OfficeActionSerializer(oas, many=True).data)
 
@@ -412,6 +456,7 @@ class OfficeActionListCreateView(PmsAPIView):
     def post(self, request, pk: int):
         if not request.principal.has_permission(p.P_OA_RECORD):
             raise PermissionDeniedError("Permission denied to record office actions.")
+        _visible_application(request, pk)
 
         serializer = s.RecordOfficeActionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -438,6 +483,10 @@ class OfficeActionDraftResponseView(PmsAPIView):
         request=s.DraftOfficeActionResponseSerializer, responses=s.OfficeActionSerializer
     )
     def post(self, request, oa_id: int):
+        oa = OfficeAction.objects.filter(pk=oa_id).only("application_id").first()
+        if oa is None:
+            raise NotFoundError(f"Office action {oa_id} not found or inaccessible.")
+        _require_visible_parent(request, oa.application_id)
         serializer = s.DraftOfficeActionResponseSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -456,6 +505,10 @@ class OfficeActionApproveResponseView(PmsAPIView):
 
     @extend_schema(request=None, responses=s.OfficeActionSerializer)
     def post(self, request, oa_id: int):
+        oa = OfficeAction.objects.filter(pk=oa_id).only("application_id").first()
+        if oa is None:
+            raise NotFoundError(f"Office action {oa_id} not found or inaccessible.")
+        _require_visible_parent(request, oa.application_id)
         oa = approve_office_action_response(
             office_action_id=oa_id,
             applicant_user_id=request.principal.user_id,
@@ -472,6 +525,10 @@ class OfficeActionSubmitResponseView(PmsAPIView):
         request=s.SubmitOfficeActionResponseSerializer, responses=s.OfficeActionSerializer
     )
     def post(self, request, oa_id: int):
+        oa = OfficeAction.objects.filter(pk=oa_id).only("application_id").first()
+        if oa is None:
+            raise NotFoundError(f"Office action {oa_id} not found or inaccessible.")
+        _require_visible_parent(request, oa.application_id)
         serializer = s.SubmitOfficeActionResponseSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -490,6 +547,10 @@ class OfficeActionExtensionView(PmsAPIView):
 
     @extend_schema(request=s.OfficeActionExtensionSerializer, responses=s.OfficeActionSerializer)
     def post(self, request, oa_id: int):
+        oa = OfficeAction.objects.filter(pk=oa_id).only("application_id").first()
+        if oa is None:
+            raise NotFoundError(f"Office action {oa_id} not found or inaccessible.")
+        _require_visible_parent(request, oa.application_id)
         serializer = s.OfficeActionExtensionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         oa = request_office_action_extension(
@@ -507,6 +568,12 @@ class MaintenanceRequestRenewalView(PmsAPIView):
 
     @extend_schema(request=None, responses=s.PostGrantMaintenanceSerializer)
     def post(self, request, maintenance_id: int):
+        maint = PostGrantMaintenance.objects.filter(pk=maintenance_id).only(
+            "application_id"
+        ).first()
+        if maint is None:
+            raise NotFoundError(f"Maintenance record {maintenance_id} not found or inaccessible.")
+        _require_visible_parent(request, maint.application_id)
         maint = request_renewal_decision(
             maintenance_id=maintenance_id,
             attorney_user_id=request.principal.user_id,
@@ -521,6 +588,12 @@ class MaintenanceDecideRenewalView(PmsAPIView):
 
     @extend_schema(request=s.DecideRenewalSerializer, responses=s.PostGrantMaintenanceSerializer)
     def post(self, request, maintenance_id: int):
+        maint = PostGrantMaintenance.objects.filter(pk=maintenance_id).only(
+            "application_id"
+        ).first()
+        if maint is None:
+            raise NotFoundError(f"Maintenance record {maintenance_id} not found or inaccessible.")
+        _require_visible_parent(request, maint.application_id)
         serializer = s.DecideRenewalSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -541,6 +614,12 @@ class MaintenanceRecordActionView(PmsAPIView):
         request=s.RecordMaintenanceActionSerializer, responses=s.PostGrantMaintenanceSerializer
     )
     def post(self, request, maintenance_id: int):
+        maint = PostGrantMaintenance.objects.filter(pk=maintenance_id).only(
+            "application_id"
+        ).first()
+        if maint is None:
+            raise NotFoundError(f"Maintenance record {maintenance_id} not found or inaccessible.")
+        _require_visible_parent(request, maint.application_id)
         serializer = s.RecordMaintenanceActionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -576,6 +655,7 @@ class PriorArtAttachView(PmsAPIView):
 
     @extend_schema(request=s.AttachPriorArtSerializer, responses=s.PriorArtReferenceSerializer)
     def post(self, request, pk: int):
+        _visible_application(request, pk)
         serializer = s.AttachPriorArtSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         d = serializer.validated_data
@@ -600,6 +680,7 @@ class DocumentUploadView(PmsAPIView):
 
     @extend_schema(request=s.UploadDocumentSerializer, responses=s.ApplicationDocumentSerializer)
     def post(self, request, pk: int):
+        _visible_application(request, pk)
         serializer = s.UploadDocumentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         d = serializer.validated_data
@@ -626,6 +707,9 @@ class LicensingRequestListCreateView(PmsAPIView):
 
     @extend_schema(responses=s.LicensingRequestSerializer(many=True))
     def get(self, request, pk: int):
+        if not request.principal.has_any_permission(p.P_VIEW_SELF, p.P_VIEW):
+            raise PermissionDeniedError("You do not have permission to view patent applications.")
+        _visible_application(request, pk)
         reqs = LicensingRequest.objects.filter(application_id=pk)
         return Response(s.LicensingRequestSerializer(reqs, many=True).data)
 
@@ -635,6 +719,7 @@ class LicensingRequestListCreateView(PmsAPIView):
     def post(self, request, pk: int):
         if not request.principal.has_permission(p.P_LICENSING_SUBMIT):
             raise PermissionDeniedError("Permission denied to submit licensing requests.")
+        _visible_application(request, pk)
 
         serializer = s.LicensingRequestCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -657,6 +742,10 @@ class LicensingRequestReviewView(PmsAPIView):
 
     @extend_schema(request=s.LicensingReviewSerializer, responses=s.LicensingRequestSerializer)
     def post(self, request, request_id: int):
+        req = LicensingRequest.objects.filter(pk=request_id).only("application_id").first()
+        if req is None:
+            raise NotFoundError(f"Licensing request {request_id} not found or inaccessible.")
+        _require_visible_parent(request, req.application_id)
         serializer = s.LicensingReviewSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         d = serializer.validated_data
@@ -674,10 +763,14 @@ class LicensingRequestReviewView(PmsAPIView):
 class CoInventorConsentView(PmsAPIView):
     """Record inventor agreement and signature (UC-PMS-003, CFR-PMS-016)."""
 
-    permission_classes = [p.MODULE]
+    permission_classes = [p.MODULE, HasPermission(p.P_COINVENTOR_MANAGE)]
 
     @extend_schema(request=s.CoInventorConsentWriteSerializer, responses=s.CoInventorSerializer)
     def post(self, request, coinventor_id: int):
+        coinventor = CoInventor.objects.filter(pk=coinventor_id).only("application_id").first()
+        if coinventor is None:
+            raise NotFoundError(f"Co-inventor {coinventor_id} not found or inaccessible.")
+        _require_visible_parent(request, coinventor.application_id)
         serializer = s.CoInventorConsentWriteSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
@@ -695,13 +788,17 @@ class CoInventorConsentView(PmsAPIView):
 class CoInventorWithdrawalConsentView(PmsAPIView):
     """Record co-inventor consent for withdrawal (UC-PMS-003, BR-PMS-070)."""
 
-    permission_classes = [p.MODULE]
+    permission_classes = [p.MODULE, HasPermission(p.P_COINVENTOR_MANAGE)]
 
     @extend_schema(
         request=s.CoInventorWithdrawalConsentWriteSerializer,
         responses=s.CoInventorSerializer,
     )
     def post(self, request, coinventor_id: int):
+        coinventor = CoInventor.objects.filter(pk=coinventor_id).only("application_id").first()
+        if coinventor is None:
+            raise NotFoundError(f"Co-inventor {coinventor_id} not found or inaccessible.")
+        _require_visible_parent(request, coinventor.application_id)
         serializer = s.CoInventorWithdrawalConsentWriteSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         coinv = record_withdrawal_consent(
@@ -719,6 +816,9 @@ class LegalAdviceListCreateView(PmsAPIView):
 
     @extend_schema(responses=s.PatentLegalAdviceSerializer(many=True))
     def get(self, request, pk: int):
+        if not request.principal.has_permission(p.P_ADVICE_RECORD):
+            raise PermissionDeniedError("Permission denied to view legal advice.")
+        _visible_application(request, pk)
         advices = PatentLegalAdvice.objects.filter(application_id=pk)
         return Response(s.PatentLegalAdviceSerializer(advices, many=True).data)
 
@@ -726,6 +826,7 @@ class LegalAdviceListCreateView(PmsAPIView):
     def post(self, request, pk: int):
         if not request.principal.has_permission(p.P_ADVICE_RECORD):
             raise PermissionDeniedError("Permission denied to record legal advice.")
+        _visible_application(request, pk)
 
         serializer = s.LegalAdviceCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -750,6 +851,11 @@ class AuditTrailListView(PmsAPIView):
         qs = PmsAuditTrail.objects.all().order_by("-timestamp")
         app_id = request.query_params.get("application_id")
         action_type = request.query_params.get("action_type")
+        if not request.principal.has_any_permission(p.P_WORKFLOW_MONITOR, p.P_CONFIG_MANAGE):
+            qs = qs.filter(
+                Q(application__in=visible_applications(request.principal).values("id"))
+                | Q(application__isnull=True, actor_user_id=request.principal.user_id)
+            )
         if app_id:
             qs = qs.filter(application_id=app_id)
         if action_type:
@@ -765,6 +871,8 @@ class ReportsView(PmsAPIView):
     @extend_schema(request=None, responses=s.PmsReportResponseSerializer)
     def get(self, request):
         p_obj = request.principal
+        if not p_obj.has_any_permission(p.P_REPORT_SELF, p.P_REPORT_VIEW):
+            raise PermissionDeniedError("You do not have permission to view PMS reports.")
         # Log report access (CFR-PMS-022)
         PmsAuditTrail.objects.create(
             actor_user_id=p_obj.user_id,
@@ -792,6 +900,14 @@ class ReportsView(PmsAPIView):
 class AttorneyPanelListView(PmsListCreateView):
     """Attorney panel maintenance and expertise mappings (UC-PMS-026, CFR-PMS-003)."""
 
-    permission_classes = [p.MODULE, HasPermission(p.P_PANEL_MANAGE, p.P_ASSIGN_ATTORNEY)]
+    permission_classes = [p.MODULE]
     queryset = AttorneyPanel.objects.all().order_by("name")
     serializer_class = s.AttorneyPanelSerializer
+
+    def get_permissions(self):
+        allowed = (
+            HasPermission(p.P_PANEL_MANAGE, p.P_ASSIGN_ATTORNEY)
+            if self.request.method == "GET"
+            else HasPermission(p.P_PANEL_MANAGE)
+        )
+        return [p.MODULE(), allowed()]
