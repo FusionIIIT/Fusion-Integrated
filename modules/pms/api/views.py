@@ -14,7 +14,7 @@ from core.api.exceptions import NotFoundError, PermissionDeniedError
 from fusion_auth.permissions import HasPermission
 from modules.pms.api import permissions as p
 from modules.pms.api import serializers as s
-from modules.pms.api.errors import PmsAPIView, PmsListCreateView
+from modules.pms.api.errors import PmsAPIView
 from modules.pms.models import (
     AttorneyAssignment,
     AttorneyPanel,
@@ -947,12 +947,10 @@ class PmsConfigurationDeleteView(PmsAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class AttorneyPanelListView(PmsListCreateView):
+class AttorneyPanelListView(PmsAPIView):
     """Attorney panel maintenance and expertise mappings (UC-PMS-026, CFR-PMS-003)."""
 
     permission_classes = [p.MODULE]
-    queryset = AttorneyPanel.objects.all().order_by("name")
-    serializer_class = s.AttorneyPanelSerializer
 
     def get_permissions(self):
         allowed = (
@@ -961,3 +959,76 @@ class AttorneyPanelListView(PmsListCreateView):
             else HasPermission(p.P_PANEL_MANAGE)
         )
         return [p.MODULE(), allowed()]
+
+    @extend_schema(responses=s.AttorneyPanelSerializer(many=True))
+    def get(self, request):
+        entries = AttorneyPanel.objects.all().order_by("name")
+        return Response(s.AttorneyPanelSerializer(entries, many=True).data)
+
+    @extend_schema(request=s.AttorneyPanelWriteSerializer, responses=s.AttorneyPanelSerializer)
+    def post(self, request):
+        serializer = s.AttorneyPanelWriteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        panel = serializer.save()
+        PmsAuditTrail.objects.create(
+            actor_user_id=request.principal.user_id,
+            action_type="attorney_panel_added",
+            details={"panel_id": panel.pk, "attorney_user_id": panel.attorney_user_id},
+        )
+        return Response(s.AttorneyPanelSerializer(panel).data, status=status.HTTP_201_CREATED)
+
+
+class AttorneyPanelDetailView(PmsAPIView):
+    """Update or remove an attorney panel entry (UC-PMS-026)."""
+
+    permission_classes = [p.MODULE]
+
+    def get_permissions(self):
+        allowed = (
+            HasPermission(p.P_PANEL_MANAGE, p.P_ASSIGN_ATTORNEY)
+            if self.request.method == "GET"
+            else HasPermission(p.P_PANEL_MANAGE)
+        )
+        return [p.MODULE(), allowed()]
+
+    def _get_panel(self, pk: int) -> AttorneyPanel:
+        panel = AttorneyPanel.objects.filter(pk=pk).first()
+        if panel is None:
+            raise NotFoundError(f"Attorney panel entry {pk} not found.")
+        return panel
+
+    @extend_schema(responses=s.AttorneyPanelSerializer)
+    def get(self, request, pk: int):
+        return Response(s.AttorneyPanelSerializer(self._get_panel(pk)).data)
+
+    @extend_schema(request=s.AttorneyPanelWriteSerializer, responses=s.AttorneyPanelSerializer)
+    def put(self, request, pk: int):
+        return self._update(request, pk, partial=False)
+
+    @extend_schema(request=s.AttorneyPanelWriteSerializer, responses=s.AttorneyPanelSerializer)
+    def patch(self, request, pk: int):
+        return self._update(request, pk, partial=True)
+
+    def _update(self, request, pk: int, *, partial: bool):
+        panel = self._get_panel(pk)
+        serializer = s.AttorneyPanelWriteSerializer(panel, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        panel = serializer.save()
+        PmsAuditTrail.objects.create(
+            actor_user_id=request.principal.user_id,
+            action_type="attorney_panel_updated",
+            details={"panel_id": panel.pk, "attorney_user_id": panel.attorney_user_id},
+        )
+        return Response(s.AttorneyPanelSerializer(panel).data)
+
+    @extend_schema(request=None, responses={"204": None})
+    def delete(self, request, pk: int):
+        panel = self._get_panel(pk)
+        panel_id, attorney_user_id = panel.pk, panel.attorney_user_id
+        panel.delete()
+        PmsAuditTrail.objects.create(
+            actor_user_id=request.principal.user_id,
+            action_type="attorney_panel_removed",
+            details={"panel_id": panel_id, "attorney_user_id": attorney_user_id},
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)

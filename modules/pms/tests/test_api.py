@@ -778,6 +778,50 @@ def test_api_configuration_requires_config_permission(stub_iam):
     assert response.status_code == 403
 
 
+def test_api_manage_attorney_panel_membership(stub_iam):
+    """UC-PMS-026: PCC_ADMIN can add, update and remove panel entries."""
+    client = _client(
+        stub_iam,
+        user_id=9001,
+        roles=("pcc_admin",),
+        permissions=("pms.panel.manage",),
+    )
+    created = client.post(
+        "/api/v1/pms/attorney-panel/",
+        {
+            "attorney_user_id": 3001,
+            "name": "Panel Attorney",
+            "email": "panel@example.test",
+            "expertise_domains": ["Physics"],
+        },
+        format="json",
+    )
+    assert created.status_code == 201
+    panel_id = created.json()["id"]
+
+    updated = client.patch(
+        f"/api/v1/pms/attorney-panel/{panel_id}/",
+        {"expertise_domains": ["Physics", "Materials"]},
+        format="json",
+    )
+    assert updated.status_code == 200
+    assert updated.json()["expertise_domains"] == ["Physics", "Materials"]
+
+    removed = client.delete(f"/api/v1/pms/attorney-panel/{panel_id}/")
+    assert removed.status_code == 204
+
+
+def test_attorney_panel_assignment_permission_is_read_only(stub_iam):
+    client = _client(
+        stub_iam,
+        user_id=2001,
+        roles=("director",),
+        permissions=("pms.attorney.assign",),
+    )
+    assert client.get("/api/v1/pms/attorney-panel/").status_code == 200
+    assert client.post("/api/v1/pms/attorney-panel/", {}, format="json").status_code == 403
+
+
 def test_api_licensing_request_records_the_requesting_applicant(stub_iam):
     """UC-PMS-020, CFR-PMS-019: the view must pass the applicant id through to
     submit_licensing_request. Regression for a keyword mismatch

@@ -118,6 +118,23 @@ class AttorneyPanelSerializer(serializers.ModelSerializer):
             "current_workload",
             "max_workload",
         ]
+        read_only_fields = ["id", "current_workload"]
+
+
+class AttorneyPanelWriteSerializer(serializers.ModelSerializer):
+    expertise_domains = serializers.ListField(child=serializers.CharField(), required=False)
+
+    class Meta:
+        model = AttorneyPanel
+        fields = [
+            "attorney_user_id",
+            "name",
+            "firm_name",
+            "email",
+            "is_approved",
+            "expertise_domains",
+            "max_workload",
+        ]
 
 
 class PatentabilityAssessmentSerializer(serializers.ModelSerializer):
