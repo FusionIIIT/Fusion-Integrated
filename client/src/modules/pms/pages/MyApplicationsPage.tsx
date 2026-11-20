@@ -103,7 +103,7 @@ export default function MyApplicationsPage() {
                       { name: "doc_type", label: "Document type", required: true },
                       { name: "title", label: "Document title", required: true },
                       { name: "filename", label: "Filename", required: true },
-                      { name: "file_size_bytes", label: "File size in bytes", type: "number", required: true },
+                      { name: "file_size_bytes", label: "File size in bytes (under 50 MB)", type: "number", min: 0, max: 52_428_799, required: true },
                       { name: "sensitivity", label: "Sensitivity classification", initialValue: "confidential" },
                       { name: "file_url", label: "Existing storage URL" },
                     ]}

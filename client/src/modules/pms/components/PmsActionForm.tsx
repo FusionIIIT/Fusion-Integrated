@@ -17,6 +17,8 @@ export interface PmsField {
   description?: string;
   options?: Array<{ value: string; label: string }>;
   initialValue?: string | boolean;
+  min?: number;
+  max?: number;
 }
 
 export function PmsActionForm({
@@ -110,6 +112,7 @@ export function PmsActionForm({
                   <TextInput
                     key={field.name} type={field.type ?? "text"}
                     label={field.label} required={field.required}
+                    min={field.min} max={field.max}
                     description={field.description}
                     value={String(value ?? "")}
                     onChange={(event) => update(field.name, event.currentTarget.value)}
