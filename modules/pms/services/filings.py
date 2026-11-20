@@ -12,10 +12,12 @@ from django.db import transaction
 from modules.pms.domain.entities import validate_filing_preconditions
 from modules.pms.domain.errors import PreconditionNotMetError
 from modules.pms.domain.state_machine import (
+    FilingWorkflowState,
     PatentApplicationStatus,
     validate_transition,
 )
 from modules.pms.models import (
+    AttorneyAssignment,
     PatentApplication,
 )
 from modules.pms.services.audit import log_audit
@@ -42,6 +44,18 @@ def record_external_filing(
         budget_status = budget.status if budget else "draft"
         all_agreements = not app.coinventors.filter(agreement_signed=False).exists()
 
+        assigned_attorney = AttorneyAssignment.objects.filter(
+            application=app,
+            attorney_user_id=attorney_user_id,
+            is_active=True,
+            status="accepted",
+        ).exists()
+        if app.assigned_attorney_user_id != attorney_user_id or not assigned_attorney:
+            raise PreconditionNotMetError(
+                "Filing requires the accepted assignment of the filing Attorney "
+                "(UC-PMS-010, UC-PMS-013)."
+            )
+
         validate_filing_preconditions(
             status=app.status,
             budget_status=budget_status,
@@ -50,29 +64,13 @@ def record_external_filing(
             international_justification=international_justification,
         )
 
-        prev_status = app.status
-
-        if app.status == PatentApplicationStatus.PRE_FILING_SATISFIED.value:
-            validate_transition(app.status, PatentApplicationStatus.FILED, actor_role="Attorney")
-        else:
-            validate_transition(
-                app.status, PatentApplicationStatus.PRE_FILING_SATISFIED, actor_role="Attorney"
-            )
-            validate_transition(
-                PatentApplicationStatus.PRE_FILING_SATISFIED,
-                PatentApplicationStatus.FILED,
-                actor_role="Attorney",
-            )
-            app.status = PatentApplicationStatus.PRE_FILING_SATISFIED.value
-            app.save(update_fields=["status", "updated_at"])
-            log_audit(
-                application=app,
-                actor_user_id=attorney_user_id,
-                action_type="pre_filing_preconditions_satisfied",
-                from_state=prev_status,
-                to_state=app.status,
-            )
-
+        # The derived ready state is represented separately from the single
+        # application lifecycle status (BW-PMS-11, CW-PMS-02).
+        validate_transition(
+            FilingWorkflowState.PRE_FILING_SATISFIED,
+            PatentApplicationStatus.FILED,
+            actor_role="Attorney",
+        )
         filing_start_status = app.status
 
         app.external_filing_id = external_filing_id.strip()
@@ -95,6 +93,7 @@ def record_external_filing(
                 "external_filing_id": external_filing_id,
                 "external_filing_date": str(external_filing_date),
                 "is_international": is_international,
+                "pre_filing_ready": True,
             },
         )
 

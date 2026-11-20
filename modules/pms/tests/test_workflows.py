@@ -225,7 +225,7 @@ def test_bw_pms_05_appeal_modified_decision_path():
 
 
 def test_bw_pms_06_attorney_assignment_acceptance():
-    """BW-PMS-06: Approved -> Assignment Offered -> Attorney Assigned."""
+    """BW-PMS-06: Assignment offer and acceptance are tracked beside Approved."""
     AttorneyPanel.objects.create(
         attorney_user_id=5001,
         name="Atty 1",
@@ -253,15 +253,17 @@ def test_bw_pms_06_attorney_assignment_acceptance():
         application_id=app.id, attorney_user_id=5001, assigned_by_user_id=9001
     )
     app.refresh_from_db()
-    assert app.status == PatentApplicationStatus.ASSIGNMENT_OFFERED.value
+    assert app.status == PatentApplicationStatus.APPROVED.value
+    assert assignment.status == "offered"
 
     respond_to_attorney_assignment(assignment_id=assignment.id, attorney_user_id=5001, accept=True)
     app.refresh_from_db()
-    assert app.status == PatentApplicationStatus.ATTORNEY_ASSIGNED.value
+    assert app.status == PatentApplicationStatus.APPROVED.value
+    assert assignment.status == "accepted"
 
 
 def test_bw_pms_07_attorney_decline_and_reassignment():
-    """BW-PMS-07: Approved -> Assignment Offered -> Pending Review -> Assignment Offered -> Attorney Assigned."""
+    """BW-PMS-07: Decline/reassignment is recorded without changing application status."""
     AttorneyPanel.objects.create(
         attorney_user_id=5001,
         name="Atty 1",
@@ -304,21 +306,23 @@ def test_bw_pms_07_attorney_decline_and_reassignment():
         assignment_id=a1.id, attorney_user_id=5001, accept=False, decline_reason="Schedule full"
     )
     app.refresh_from_db()
-    assert app.status == PatentApplicationStatus.PENDING_REVIEW.value
+    assert app.status == PatentApplicationStatus.APPROVED.value
+    assert a1.status == "declined"
 
     # 3. Re-assignment to Atty 2
     a2 = assign_attorney(application_id=app.id, attorney_user_id=5002, assigned_by_user_id=9001)
     app.refresh_from_db()
-    assert app.status == PatentApplicationStatus.ASSIGNMENT_OFFERED.value
+    assert app.status == PatentApplicationStatus.APPROVED.value
 
     # 4. Accept
     respond_to_attorney_assignment(assignment_id=a2.id, attorney_user_id=5002, accept=True)
     app.refresh_from_db()
-    assert app.status == PatentApplicationStatus.ATTORNEY_ASSIGNED.value
+    assert app.status == PatentApplicationStatus.APPROVED.value
+    assert a2.status == "accepted"
 
 
 def test_bw_pms_08_budget_approval_path():
-    """BW-PMS-08: Approved -> Budget Approved."""
+    """BW-PMS-08: Budget approval is tracked independently of application status."""
     app = submit_application(
         applicant_user_id=1001,
         title="Sensor",
@@ -345,11 +349,12 @@ def test_bw_pms_08_budget_approval_path():
         application_id=app.id, director_user_id=2001, decision="Approve", justification="Approved"
     )
     app.refresh_from_db()
-    assert app.status == PatentApplicationStatus.BUDGET_APPROVED.value
+    assert app.status == PatentApplicationStatus.APPROVED.value
+    assert app.budget.status == "approved"
 
 
 def test_bw_pms_09_budget_rejection_path():
-    """BW-PMS-09: Approved -> Budget Rejected."""
+    """BW-PMS-09: Budget rejection is tracked independently of application status."""
     app = submit_application(
         applicant_user_id=1001,
         title="Sensor",
@@ -379,7 +384,8 @@ def test_bw_pms_09_budget_rejection_path():
         justification="Costs too high",
     )
     app.refresh_from_db()
-    assert app.status == PatentApplicationStatus.BUDGET_REJECTED.value
+    assert app.status == PatentApplicationStatus.APPROVED.value
+    assert app.budget.status == "rejected"
 
 
 def test_bw_pms_11_external_filing_path():
@@ -408,6 +414,18 @@ def test_bw_pms_11_external_filing_path():
         decision="Approve",
         justification="Technical novelty and claims are acceptable for filing.",
     )
+    AttorneyPanel.objects.create(
+        attorney_user_id=5001,
+        name="Filing Attorney",
+        email="filing@atty.com",
+        is_approved=True,
+        current_workload=0,
+        max_workload=5,
+    )
+    assignment = assign_attorney(
+        application_id=app.id, attorney_user_id=5001, assigned_by_user_id=9001
+    )
+    respond_to_attorney_assignment(assignment_id=assignment.id, attorney_user_id=5001, accept=True)
     submit_or_update_budget(
         application_id=app.id,
         filing_fees=Decimal("10000.00"),
@@ -417,6 +435,7 @@ def test_bw_pms_11_external_filing_path():
     )
     decide_budget(application_id=app.id, director_user_id=2001, decision="Approve")
     app.refresh_from_db()
+    assert app.status == PatentApplicationStatus.APPROVED.value
 
     record_external_filing(
         application_id=app.id,

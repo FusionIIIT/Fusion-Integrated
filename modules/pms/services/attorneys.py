@@ -15,7 +15,6 @@ from modules.pms.domain.errors import (
 )
 from modules.pms.domain.state_machine import (
     PatentApplicationStatus,
-    validate_transition,
 )
 from modules.pms.models import (
     AttorneyAssignment,
@@ -39,16 +38,12 @@ def assign_attorney(
     with transaction.atomic():
         app = PatentApplication.objects.select_for_update().get(pk=application_id)
 
-        # Sequential check: Attorney assignment must not occur before Director approval (BR-PMS-127)
-        allowed_assign_statuses = (
-            PatentApplicationStatus.APPROVED.value,
-            PatentApplicationStatus.PENDING_REVIEW.value,
-            PatentApplicationStatus.BUDGET_APPROVED.value,
-        )
-        if app.status not in allowed_assign_statuses:
+        # Assignment is an independent subworkflow; the application remains
+        # Approved while the AttorneyAssignment row tracks offer/response.
+        if app.status != PatentApplicationStatus.APPROVED.value:
             raise PreconditionNotMetError(
                 f"Application status '{app.status}' cannot receive attorney assignment. "
-                "Must be Approved or Pending Review (BR-PMS-040, BR-PMS-127)."
+                "Must be Approved (BR-PMS-040, BR-PMS-127)."
             )
 
         # Approved panel verification (BR-PMS-041)
@@ -75,14 +70,8 @@ def assign_attorney(
                 "an inventor (BR-PMS-044)."
             )
 
-        validate_transition(
-            app.status, PatentApplicationStatus.ASSIGNMENT_OFFERED, actor_role="PCC_ADMIN"
-        )
-        prev_status = app.status
-
         app.assigned_attorney_user_id = attorney_user_id
-        app.status = PatentApplicationStatus.ASSIGNMENT_OFFERED.value
-        app.save()
+        app.save(update_fields=["assigned_attorney_user_id", "updated_at"])
 
         # Mark any previous assignments inactive
         AttorneyAssignment.objects.filter(application=app).update(is_active=False)
@@ -99,9 +88,11 @@ def assign_attorney(
             application=app,
             actor_user_id=assigned_by_user_id,
             action_type="attorney_assignment_offered",
-            from_state=prev_status,
-            to_state=app.status,
-            details={"attorney_user_id": attorney_user_id, "assignment_id": assignment.id},
+            details={
+                "attorney_user_id": attorney_user_id,
+                "assignment_id": assignment.id,
+                "assignment_status": assignment.status,
+            },
         )
 
         enqueue_notification(
@@ -138,24 +129,15 @@ def respond_to_attorney_assignment(
                 f"Assignment is not in 'offered' status (current: {assignment.status})."
             )
 
-        target_status = (
-            PatentApplicationStatus.ATTORNEY_ASSIGNED
-            if accept
-            else PatentApplicationStatus.PENDING_REVIEW
-        )
-        validate_transition(app.status, target_status, actor_role="Attorney")
-        prev_status = app.status
-
         now = timezone.now()
         assignment.status = "accepted" if accept else "declined"
         assignment.decline_reason = decline_reason.strip() if not accept else ""
         assignment.decided_at = now
         assignment.save()
 
-        app.status = target_status.value
         if not accept:
             app.assigned_attorney_user_id = None
-        app.save()
+        app.save(update_fields=["assigned_attorney_user_id", "updated_at"])
 
         # Update panel workload if accepted
         if accept:
@@ -168,9 +150,12 @@ def respond_to_attorney_assignment(
             application=app,
             actor_user_id=attorney_user_id,
             action_type="attorney_assignment_responded",
-            from_state=prev_status,
-            to_state=app.status,
-            details={"accepted": accept, "reason": decline_reason},
+            details={
+                "accepted": accept,
+                "reason": decline_reason,
+                "assignment_id": assignment.id,
+                "assignment_status": assignment.status,
+            },
         )
 
         enqueue_notification(

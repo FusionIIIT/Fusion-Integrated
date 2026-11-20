@@ -35,9 +35,11 @@ from modules.pms.domain.errors import (
     WithdrawalNotAllowedError,
 )
 from modules.pms.domain.state_machine import (
+    FILING_TRANSITIONS,
     TERMINAL_STATES,
     TRANSITIONS,
     WITHDRAWAL_ELIGIBLE_STATES,
+    FilingWorkflowState,
     PatentApplicationStatus,
     get_transitions,
     validate_transition,
@@ -119,50 +121,21 @@ def test_appeal_workflow_transitions():
     )
 
 
-def test_attorney_assignment_workflow():
-    """BW-PMS-06, 07: Attorney assignment offer, accept, decline."""
-    validate_transition(
-        PatentApplicationStatus.APPROVED,
-        PatentApplicationStatus.ASSIGNMENT_OFFERED,
-        actor_role="PCC_ADMIN",
-    )
-    validate_transition(
-        PatentApplicationStatus.ASSIGNMENT_OFFERED,
-        PatentApplicationStatus.ATTORNEY_ASSIGNED,
+def test_pre_filing_substates_are_not_application_transitions():
+    """CW-PMS-02: independent budget/assignment outcomes do not replace Approved."""
+    assert all(edge.uc_id not in {"UC-PMS-009", "UC-PMS-010", "UC-PMS-011"} for edge in TRANSITIONS)
+    with pytest.raises(InvalidTransitionError):
+        validate_transition(
+            PatentApplicationStatus.APPROVED,
+            PatentApplicationStatus.FILED,
+            actor_role="Attorney",
+        )
+    assert len(FILING_TRANSITIONS) == 1
+    assert validate_transition(
+        FilingWorkflowState.PRE_FILING_SATISFIED,
+        PatentApplicationStatus.FILED,
         actor_role="Attorney",
-    )
-    validate_transition(
-        PatentApplicationStatus.ASSIGNMENT_OFFERED,
-        PatentApplicationStatus.PENDING_REVIEW,
-        actor_role="Attorney",
-    )
-    validate_transition(
-        PatentApplicationStatus.PENDING_REVIEW,
-        PatentApplicationStatus.ASSIGNMENT_OFFERED,
-        actor_role="PCC_ADMIN",
-    )
-
-
-def test_budget_transitions():
-    """BW-PMS-08, 09, 10: Budget approval, rejection, and escalation."""
-    validate_transition(
-        PatentApplicationStatus.APPROVED,
-        PatentApplicationStatus.BUDGET_APPROVED,
-        actor_role="Director",
-    )
-    validate_transition(
-        PatentApplicationStatus.APPROVED,
-        PatentApplicationStatus.BUDGET_REJECTED,
-        actor_role="Director",
-    )
-    validate_transition(
-        PatentApplicationStatus.APPROVED, PatentApplicationStatus.ESCALATED, actor_role="Director"
-    )
-    validate_transition(
-        PatentApplicationStatus.ESCALATED,
-        PatentApplicationStatus.ESCALATION_TRACKED,
-        actor_role="PCC_ADMIN",
-    )
+    ) == FILING_TRANSITIONS[0]
 
 
 def test_office_action_transitions():
@@ -429,7 +402,7 @@ def test_external_filing_preconditions():
     """BR-PMS-020, 056, 128: Preconditions for external patent filing."""
     # Valid domestic filing
     validate_filing_preconditions(
-        status="budget_approved",
+        status="approved",
         budget_status="approved",
         all_agreements_complete=True,
         is_international=False,
@@ -438,7 +411,7 @@ def test_external_filing_preconditions():
     # Budget not approved
     with pytest.raises(PreconditionNotMetError, match="Budget must be approved"):
         validate_filing_preconditions(
-            status="budget_approved",
+            status="approved",
             budget_status="pending_approval",
             all_agreements_complete=True,
         )
@@ -446,7 +419,7 @@ def test_external_filing_preconditions():
     # Agreements incomplete
     with pytest.raises(PreconditionNotMetError, match="agreements and consents must be complete"):
         validate_filing_preconditions(
-            status="budget_approved",
+            status="approved",
             budget_status="approved",
             all_agreements_complete=False,
         )
@@ -456,7 +429,7 @@ def test_external_filing_preconditions():
         PreconditionNotMetError, match="International filings require additional justification"
     ):
         validate_filing_preconditions(
-            status="budget_approved",
+            status="approved",
             budget_status="approved",
             all_agreements_complete=True,
             is_international=True,
@@ -506,12 +479,7 @@ def test_dec_2_escalation_has_no_internal_approval_edge():
     """DEC-2 / BR-PMS-051: BW-PMS-10 says the higher authority is external and
     "not invented as a PMS actor or transition", so PMS must never approve a
     budget on that authority's behalf."""
-    with pytest.raises(InvalidTransitionError):
-        validate_transition(
-            PatentApplicationStatus.ESCALATION_TRACKED,
-            PatentApplicationStatus.BUDGET_APPROVED,
-            actor_role="PCC_ADMIN",
-        )
+    assert all(edge.uc_id != "UC-PMS-009" for edge in TRANSITIONS)
 
 
 def test_dec_3_modified_decision_has_no_invented_downstream_state():
@@ -525,41 +493,19 @@ def test_dec_3_modified_decision_has_no_invented_downstream_state():
     assert get_transitions(PatentApplicationStatus.DECISION_MODIFIED) == []
 
 
-@pytest.mark.parametrize(
-    "target_status",
-    [
-        PatentApplicationStatus.BUDGET_APPROVED,
-        PatentApplicationStatus.BUDGET_REJECTED,
-        PatentApplicationStatus.ESCALATED,
-    ],
-)
-def test_budget_decisions_are_only_allowed_from_approved(target_status):
-    """BW-PMS-08..10 / BR-PMS-052: decisions start only at Approved."""
-    with pytest.raises(InvalidTransitionError):
-        validate_transition(
-            PatentApplicationStatus.ATTORNEY_ASSIGNED,
-            target_status,
-            actor_role="Director",
-        )
-
-
 def test_filing_requires_pre_filing_satisfied_transition():
-    """BW-PMS-11: the approved filing path passes through pre-filing readiness."""
+    """BW-PMS-11: filing starts from derived readiness, not an application substatus."""
     with pytest.raises(InvalidTransitionError):
         validate_transition(
-            PatentApplicationStatus.BUDGET_APPROVED,
+            PatentApplicationStatus.APPROVED,
             PatentApplicationStatus.FILED,
             actor_role="Attorney",
         )
 
-    pre_filing = validate_transition(
-        PatentApplicationStatus.BUDGET_APPROVED,
-        PatentApplicationStatus.PRE_FILING_SATISFIED,
-        actor_role="Attorney",
-    )
-    assert pre_filing.to_status == PatentApplicationStatus.PRE_FILING_SATISFIED
     assert validate_transition(
-        pre_filing.to_status, PatentApplicationStatus.FILED, actor_role="Attorney"
+        FilingWorkflowState.PRE_FILING_SATISFIED,
+        PatentApplicationStatus.FILED,
+        actor_role="Attorney",
     ).to_status == PatentApplicationStatus.FILED
 
 
@@ -575,10 +521,24 @@ def test_state_graph_is_reachable_and_consistent():
             if edge.from_status in seen and edge.to_status not in seen:
                 seen.add(edge.to_status)
                 changed = True
-    assert states - seen == set()
+    pre_filing_application_states = states - {
+        PatentApplicationStatus.FILED,
+        PatentApplicationStatus.OFFICE_ACTION_RECORDED,
+        PatentApplicationStatus.AWAITING_APPLICANT_APPROVAL,
+        PatentApplicationStatus.APPLICANT_APPROVED,
+        PatentApplicationStatus.RESPONSE_READY,
+        PatentApplicationStatus.RESPONSE_SUBMITTED,
+        PatentApplicationStatus.GRANTED,
+        PatentApplicationStatus.RENEWAL_DECISION_REQUESTED,
+        PatentApplicationStatus.RENEWAL_APPROVED,
+        PatentApplicationStatus.DO_NOT_RENEW,
+        PatentApplicationStatus.RENEWED,
+    }
+    assert pre_filing_application_states - seen == set()
 
     triples = [(edge.from_status, edge.to_status, edge.actor_role) for edge in TRANSITIONS]
     assert len(triples) == len(set(triples))
 
     no_outbound = {state for state in states if not get_transitions(state)}
     assert no_outbound <= set(TERMINAL_STATES)
+    assert FILING_TRANSITIONS[0].from_status == FilingWorkflowState.PRE_FILING_SATISFIED

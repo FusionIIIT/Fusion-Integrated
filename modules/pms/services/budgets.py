@@ -16,7 +16,6 @@ from modules.pms.domain.errors import (
 )
 from modules.pms.domain.state_machine import (
     PatentApplicationStatus,
-    validate_transition,
 )
 from modules.pms.models import PatentApplication, PatentBudget
 from modules.pms.services.audit import log_audit
@@ -39,15 +38,9 @@ def submit_or_update_budget(
     with transaction.atomic():
         app = PatentApplication.objects.select_for_update().get(pk=application_id)
 
-        # Precondition check: application must be in an approved status (BR-PMS-052)
-        valid_statuses = (
-            PatentApplicationStatus.APPROVED.value,
-            PatentApplicationStatus.ATTORNEY_ASSIGNED.value,
-            PatentApplicationStatus.BUDGET_APPROVED.value,
-            PatentApplicationStatus.BUDGET_REJECTED.value,
-            PatentApplicationStatus.ESCALATED.value,
-        )
-        if app.status not in valid_statuses:
+        # Budget is its own workflow record; its decision is permitted only
+        # while the application itself remains Approved (BR-PMS-052).
+        if app.status != PatentApplicationStatus.APPROVED.value:
             raise PreconditionNotMetError(
                 f"Budget submission is only permitted for Approved applications, "
                 f"not '{app.status}' (BR-PMS-052)."
@@ -96,6 +89,16 @@ def decide_budget(
         app = PatentApplication.objects.select_for_update().get(pk=application_id)
         budget = app.budget
 
+        if app.status != PatentApplicationStatus.APPROVED.value:
+            raise PreconditionNotMetError(
+                "Budget decisions are only permitted while the application is Approved "
+                "(BR-PMS-052)."
+            )
+        if budget.status != "pending_approval":
+            raise PreconditionNotMetError(
+                "A budget decision requires a budget pending approval."
+            )
+
         # Budget availability check (BR-PMS-053)
         if not budget.availability_verified and decision == "Approve":
             raise PreconditionNotMetError("Budget availability could not be verified (BR-PMS-053).")
@@ -114,21 +117,15 @@ def decide_budget(
             decision = "Escalate"
 
         if decision == "Approve":
-            target_status = PatentApplicationStatus.BUDGET_APPROVED
             budget_status = "approved"
         elif decision == "Reject":
-            target_status = PatentApplicationStatus.BUDGET_REJECTED
             budget_status = "rejected"
         elif decision == "Escalate":
-            target_status = PatentApplicationStatus.ESCALATED
             budget_status = "escalated"
         else:
             raise PreconditionNotMetError(
                 f"Invalid budget decision '{decision}'. Must be Approve, Reject, or Escalate."
             )
-
-        validate_transition(app.status, target_status, actor_role="Director")
-        prev_status = app.status
 
         budget.status = budget_status
         budget.decided_by_user_id = director_user_id
@@ -136,17 +133,13 @@ def decide_budget(
         budget.justification = justification.strip()
         budget.save()
 
-        app.status = target_status.value
-        app.save(update_fields=["status", "updated_at"])
-
         log_audit(
             application=app,
             actor_user_id=director_user_id,
             action_type=f"budget_{budget_status}",
-            from_state=prev_status,
-            to_state=app.status,
             details={
                 "decision": decision,
+                "budget_status": budget_status,
                 "total_cost": str(budget.total_cost),
                 "threshold": str(threshold) if threshold is not None else "not configured",
                 "justification": justification,

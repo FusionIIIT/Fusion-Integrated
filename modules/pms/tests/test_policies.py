@@ -249,7 +249,8 @@ def test_budget_without_a_configured_threshold_does_not_escalate():
     )
     assert budget.status == "approved"
     app.refresh_from_db()
-    assert app.status == PatentApplicationStatus.BUDGET_APPROVED.value
+    assert app.status == PatentApplicationStatus.APPROVED.value
+    assert app.budget.status == "approved"
 
     audit = app.audit_logs.filter(action_type="budget_approved").first()
     assert audit.details["threshold"] == "not configured"
@@ -270,4 +271,4 @@ def test_budget_with_a_configured_threshold_escalates():
     )
     assert budget.status == "escalated"
     app.refresh_from_db()
-    assert app.status == PatentApplicationStatus.ESCALATED.value
+    assert app.status == PatentApplicationStatus.APPROVED.value

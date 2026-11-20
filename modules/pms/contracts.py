@@ -109,10 +109,7 @@ def get_attorney_active_workload(attorney_user_ids: Sequence[int]) -> dict[int, 
     if not attorney_user_ids:
         return {}
     active_statuses = [
-        PatentApplicationStatus.ATTORNEY_ASSIGNED.value,
-        PatentApplicationStatus.ASSIGNMENT_OFFERED.value,
-        PatentApplicationStatus.BUDGET_APPROVED.value,
-        PatentApplicationStatus.PRE_FILING_SATISFIED.value,
+        PatentApplicationStatus.APPROVED.value,
         PatentApplicationStatus.OFFICE_ACTION_RECORDED.value,
         PatentApplicationStatus.AWAITING_APPLICANT_APPROVAL.value,
     ]

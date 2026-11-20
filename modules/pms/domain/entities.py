@@ -163,11 +163,10 @@ def validate_filing_preconditions(
 ) -> None:
     """Validate all preconditions before external filing is permitted
     (BR-PMS-020, 056, 078, 128)."""
-    allowed_statuses = {"budget_approved", "attorney_assigned", "approved", "pre_filing_satisfied"}
-    if status not in allowed_statuses:
+    if status != "approved":
         raise PreconditionNotMetError(
             f"Application status '{status}' cannot be filed externally. "
-            f"Must be approved/budget approved (BR-PMS-128)."
+            "The application must be Approved and satisfy pre-filing requirements (BR-PMS-128)."
         )
 
     if budget_status != "approved":

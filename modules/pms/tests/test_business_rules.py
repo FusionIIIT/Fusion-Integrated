@@ -355,7 +355,8 @@ def test_br_pms_041_043_044_attorney_panel_and_workload():
     # Attorney accepts assignment
     respond_to_attorney_assignment(assignment_id=assignment.id, attorney_user_id=5002, accept=True)
     app.refresh_from_db()
-    assert app.status == PatentApplicationStatus.ATTORNEY_ASSIGNED.value
+    assert app.status == PatentApplicationStatus.APPROVED.value
+    assert app.assigned_attorney_user_id == 5002
     panel_avail.refresh_from_db()
     assert panel_avail.current_workload == 2
 
@@ -403,7 +404,7 @@ def test_br_pms_051_budget_escalation_above_threshold():
     )
     assert budget.status == "escalated"
     app.refresh_from_db()
-    assert app.status == PatentApplicationStatus.ESCALATED.value
+    assert app.status == PatentApplicationStatus.APPROVED.value
 
 
 # --- BR-PMS-020, 056, 078, 128: Pre-Filing Prerequisites and International Filing ---

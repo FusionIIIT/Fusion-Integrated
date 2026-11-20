@@ -28,17 +28,7 @@ class PatentApplicationStatus(StrEnum):
     REMANDED_FOR_AMENDMENT = "remanded_for_amendment"
     DECISION_MODIFIED = "decision_modified"
 
-    # Attorney & Budget
-    ASSIGNMENT_OFFERED = "assignment_offered"
-    ATTORNEY_ASSIGNED = "attorney_assigned"
-    PENDING_REVIEW = "pending_review"
-    BUDGET_APPROVED = "budget_approved"
-    BUDGET_REJECTED = "budget_rejected"
-    ESCALATED = "escalated"
-    ESCALATION_TRACKED = "escalation_tracked"
-
     # Filing & Office Actions
-    PRE_FILING_SATISFIED = "pre_filing_satisfied"
     FILED = "filed"
     OFFICE_ACTION_RECORDED = "office_action_recorded"
     AWAITING_APPLICANT_APPROVAL = "awaiting_applicant_approval"
@@ -57,7 +47,13 @@ class PatentApplicationStatus(StrEnum):
     WITHDRAWN = "withdrawn"
 
 
-#: Pre-filing states eligible for withdrawal (BR-PMS-067, BR-PMS-068, CW-PMS-05)
+class FilingWorkflowState(StrEnum):
+    """Derived filing stage; it is not persisted as PatentApplication.status."""
+
+    PRE_FILING_SATISFIED = "pre_filing_satisfied"
+
+
+#: Pre-filing application statuses eligible for withdrawal (BR-PMS-067, 068).
 WITHDRAWAL_ELIGIBLE_STATES: frozenset[PatentApplicationStatus] = frozenset(
     {
         PatentApplicationStatus.SUBMITTED,
@@ -66,14 +62,6 @@ WITHDRAWAL_ELIGIBLE_STATES: frozenset[PatentApplicationStatus] = frozenset(
         PatentApplicationStatus.RESUBMITTED,
         PatentApplicationStatus.REJECTED,
         PatentApplicationStatus.APPROVED,
-        PatentApplicationStatus.ASSIGNMENT_OFFERED,
-        PatentApplicationStatus.ATTORNEY_ASSIGNED,
-        PatentApplicationStatus.PENDING_REVIEW,
-        PatentApplicationStatus.BUDGET_APPROVED,
-        PatentApplicationStatus.BUDGET_REJECTED,
-        PatentApplicationStatus.ESCALATED,
-        PatentApplicationStatus.ESCALATION_TRACKED,
-        PatentApplicationStatus.PRE_FILING_SATISFIED,
     }
 )
 
@@ -92,7 +80,7 @@ TERMINAL_STATES: frozenset[PatentApplicationStatus] = frozenset(
 
 @dataclass(frozen=True)
 class Transition:
-    from_status: PatentApplicationStatus
+    from_status: PatentApplicationStatus | FilingWorkflowState
     to_status: PatentApplicationStatus
     actor_role: str
     uc_id: str
@@ -231,101 +219,6 @@ TRANSITIONS: tuple[Transition, ...] = (
     # DEC-3: UC-PMS-023 note — "the exact downstream state after 'Modify
     # Decision' is not specified by the PS; the workflow therefore ends at the
     # recorded outcome". No downstream transition is invented.
-    # BW-PMS-06, 07: Attorney Assignment Paths
-    Transition(
-        PatentApplicationStatus.APPROVED,
-        PatentApplicationStatus.ASSIGNMENT_OFFERED,
-        actor_role="PCC_ADMIN",
-        uc_id="UC-PMS-010",
-        permission="pms.attorney.assign",
-        guard_description="Assigned from approved panel with expertise and workload balance",
-    ),
-    Transition(
-        PatentApplicationStatus.ASSIGNMENT_OFFERED,
-        PatentApplicationStatus.ATTORNEY_ASSIGNED,
-        actor_role="Attorney",
-        uc_id="UC-PMS-011",
-        permission="pms.attorney.respond_assignment",
-        guard_description="Outcome = Accept",
-    ),
-    Transition(
-        PatentApplicationStatus.ASSIGNMENT_OFFERED,
-        PatentApplicationStatus.PENDING_REVIEW,
-        actor_role="Attorney",
-        uc_id="UC-PMS-011",
-        permission="pms.attorney.respond_assignment",
-        guard_description="Outcome = Decline",
-    ),
-    Transition(
-        PatentApplicationStatus.PENDING_REVIEW,
-        PatentApplicationStatus.ASSIGNMENT_OFFERED,
-        actor_role="PCC_ADMIN",
-        uc_id="UC-PMS-010",
-        permission="pms.attorney.assign",
-        guard_description="Reassignment to another approved panel attorney",
-    ),
-    # BW-PMS-08, 09, 10: Budget Paths
-    Transition(
-        PatentApplicationStatus.APPROVED,
-        PatentApplicationStatus.BUDGET_APPROVED,
-        actor_role="Director",
-        uc_id="UC-PMS-009",
-        permission="pms.budget.review",
-        guard_description="Decision = Approve, within threshold limit and available",
-    ),
-    Transition(
-        PatentApplicationStatus.APPROVED,
-        PatentApplicationStatus.BUDGET_REJECTED,
-        actor_role="Director",
-        uc_id="UC-PMS-009",
-        permission="pms.budget.review",
-        guard_description="Decision = Reject",
-    ),
-    Transition(
-        PatentApplicationStatus.APPROVED,
-        PatentApplicationStatus.ESCALATED,
-        actor_role="Director",
-        uc_id="UC-PMS-009",
-        permission="pms.budget.review",
-        guard_description="Total cost exceeds threshold limit",
-    ),
-    Transition(
-        PatentApplicationStatus.ESCALATED,
-        PatentApplicationStatus.ESCALATION_TRACKED,
-        actor_role="PCC_ADMIN",
-        uc_id="UC-PMS-027",
-        permission="pms.workflow.monitor",
-        guard_description="PCC_ADMIN logs and routes escalation to higher authority",
-    ),
-    # DEC-2: escalation is resolved by the external/configured authority, which
-    # BW-PMS-10 says is "not invented as a PMS actor or transition". There is
-    # deliberately no ESCALATION_TRACKED -> BUDGET_APPROVED edge: PMS tracks the
-    # escalation and never approves on that authority's behalf.
-    # Pre-filing satisfied & BW-PMS-11 External Filing
-    Transition(
-        PatentApplicationStatus.BUDGET_APPROVED,
-        PatentApplicationStatus.PRE_FILING_SATISFIED,
-        actor_role="Attorney",
-        uc_id="UC-PMS-013",
-        permission="pms.filing.record",
-        guard_description="Approvals, budget, inventor agreements and format validation complete",
-    ),
-    Transition(
-        PatentApplicationStatus.ATTORNEY_ASSIGNED,
-        PatentApplicationStatus.PRE_FILING_SATISFIED,
-        actor_role="Attorney",
-        uc_id="UC-PMS-013",
-        permission="pms.filing.record",
-        guard_description="Approvals, budget, inventor agreements and format validation complete",
-    ),
-    Transition(
-        PatentApplicationStatus.PRE_FILING_SATISFIED,
-        PatentApplicationStatus.FILED,
-        actor_role="Attorney",
-        uc_id="UC-PMS-013",
-        permission="pms.filing.record",
-        guard_description="Filing reference and confirmation recorded",
-    ),
     # BW-PMS-12, 13, CW-PMS-03: Office Action Responses
     Transition(
         PatentApplicationStatus.FILED,
@@ -459,13 +352,27 @@ TRANSITIONS: tuple[Transition, ...] = (
 )
 
 
+# CW-PMS-02 leaves the order of pre-filing activities open. The Attorney reaches
+# this derived state only after filing guards validate independent records.
+FILING_TRANSITIONS: tuple[Transition, ...] = (
+    Transition(
+        FilingWorkflowState.PRE_FILING_SATISFIED,
+        PatentApplicationStatus.FILED,
+        actor_role="Attorney",
+        uc_id="UC-PMS-013",
+        permission="pms.filing.record",
+        guard_description="Explicit filing prerequisites are satisfied",
+    ),
+)
+
+
 def get_transitions(from_status: PatentApplicationStatus) -> list[Transition]:
     """Return all valid outgoing transitions from a given status."""
     return [t for t in TRANSITIONS if t.from_status == from_status]
 
 
 def validate_transition(
-    current_status: PatentApplicationStatus | str,
+    current_status: PatentApplicationStatus | FilingWorkflowState | str,
     target_status: PatentApplicationStatus | str,
     actor_role: str | None = None,
     *,
@@ -477,13 +384,18 @@ def validate_transition(
     Raises InvalidTransitionError or WithdrawalNotAllowedError if disallowed.
     """
     try:
-        curr = PatentApplicationStatus(current_status)
+        if str(current_status) == FilingWorkflowState.PRE_FILING_SATISFIED.value:
+            curr: PatentApplicationStatus | FilingWorkflowState = (
+                FilingWorkflowState.PRE_FILING_SATISFIED
+            )
+        else:
+            curr = PatentApplicationStatus(current_status)
         target = PatentApplicationStatus(target_status)
     except ValueError as exc:
         raise InvalidTransitionError(f"Invalid status value: {exc}") from exc
 
     if target == PatentApplicationStatus.WITHDRAWN:
-        if curr not in WITHDRAWAL_ELIGIBLE_STATES:
+        if not isinstance(curr, PatentApplicationStatus) or curr not in WITHDRAWAL_ELIGIBLE_STATES:
             raise WithdrawalNotAllowedError(
                 f"Withdrawal is not permitted from status '{curr.value}' "
                 f"(only allowed before filing)."
@@ -493,7 +405,11 @@ def validate_transition(
         if not has_coinventor_consent:
             raise WithdrawalNotAllowedError("All co-inventors must consent to withdrawal.")
 
-    matching = [t for t in TRANSITIONS if t.from_status == curr and t.to_status == target]
+    matching = [
+        t
+        for t in TRANSITIONS + FILING_TRANSITIONS
+        if t.from_status == curr and t.to_status == target
+    ]
 
     if not matching:
         raise InvalidTransitionError(

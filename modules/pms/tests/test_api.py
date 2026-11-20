@@ -11,6 +11,7 @@ from rest_framework.test import APIClient
 from conftest import make_session
 from modules.pms.domain.state_machine import PatentApplicationStatus
 from modules.pms.models import (
+    AttorneyAssignment,
     AttorneyPanel,
     LicensingRequest,
     PostGrantMaintenance,
@@ -353,8 +354,16 @@ def test_api_filing_and_grant(stub_iam):
             }
         ],
     )
-    app.status = PatentApplicationStatus.BUDGET_APPROVED.value
-    app.save()
+    app.status = PatentApplicationStatus.APPROVED.value
+    app.assigned_attorney_user_id = 5001
+    app.save(update_fields=["status", "assigned_attorney_user_id", "updated_at"])
+    AttorneyAssignment.objects.create(
+        application=app,
+        attorney_user_id=5001,
+        assigned_by_user_id=9001,
+        status="accepted",
+        is_active=True,
+    )
     budget = app.budget
     budget.status = "approved"
     budget.save()
