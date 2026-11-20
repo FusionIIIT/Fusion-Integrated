@@ -2408,19 +2408,6 @@ paths:
       operationId: v1_pms_attorney_panel_list
       description: Attorney panel maintenance and expertise mappings (UC-PMS-026,
         CFR-PMS-003).
-      parameters:
-      - name: cursor
-        required: false
-        in: query
-        description: The pagination cursor value.
-        schema:
-          type: string
-      - name: limit
-        required: false
-        in: query
-        description: Number of results to return per page.
-        schema:
-          type: integer
       tags:
       - v1
       security:
@@ -2430,7 +2417,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedAttorneyPanelList'
+                type: array
+                items:
+                  $ref: '#/components/schemas/AttorneyPanel'
           description: ''
     post:
       operationId: v1_pms_attorney_panel_create
@@ -2442,23 +2431,123 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AttorneyPanel'
+              $ref: '#/components/schemas/AttorneyPanelWrite'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/AttorneyPanel'
+              $ref: '#/components/schemas/AttorneyPanelWrite'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/AttorneyPanel'
+              $ref: '#/components/schemas/AttorneyPanelWrite'
         required: true
       security:
       - iamSession: []
       responses:
-        '201':
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AttorneyPanel'
           description: ''
+  /api/v1/pms/attorney-panel/{id}/:
+    get:
+      operationId: v1_pms_attorney_panel_retrieve
+      description: Update or remove an attorney panel entry (UC-PMS-026).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttorneyPanel'
+          description: ''
+    put:
+      operationId: v1_pms_attorney_panel_update
+      description: Update or remove an attorney panel entry (UC-PMS-026).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttorneyPanelWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AttorneyPanelWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AttorneyPanelWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttorneyPanel'
+          description: ''
+    patch:
+      operationId: v1_pms_attorney_panel_partial_update
+      description: Update or remove an attorney panel entry (UC-PMS-026).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAttorneyPanelWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAttorneyPanelWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAttorneyPanelWrite'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttorneyPanel'
+          description: ''
+    delete:
+      operationId: v1_pms_attorney_panel_destroy
+      description: Update or remove an attorney panel entry (UC-PMS-026).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
   /api/v1/pms/audit-trail/:
     get:
       operationId: v1_pms_audit_trail_list
@@ -2540,6 +2629,66 @@ paths:
               schema:
                 $ref: '#/components/schemas/CoInventor'
           description: ''
+  /api/v1/pms/configuration/:
+    get:
+      operationId: v1_pms_configuration_list
+      description: Manage module-scoped PMS policy values (UC-PMS-025, DEC-7).
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsConfigurationRead'
+          description: ''
+    put:
+      operationId: v1_pms_configuration_update
+      description: Manage module-scoped PMS policy values (UC-PMS-025, DEC-7).
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsConfiguration'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsConfiguration'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsConfiguration'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsConfigurationRead'
+          description: ''
+  /api/v1/pms/configuration/{key}/:
+    delete:
+      operationId: v1_pms_configuration_destroy
+      description: Remove an explicitly configured PMS policy value (UC-PMS-025, DEC-7).
+      parameters:
+      - in: path
+        name: key
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
   /api/v1/pms/licensing/{request_id}/review/:
     post:
       operationId: v1_pms_licensing_review_create
@@ -2809,6 +2958,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PmsReportResponse'
+          description: ''
+  /api/v1/pms/workflow-oversight/:
+    get:
+      operationId: v1_pms_workflow_oversight_list
+      description: Return lifecycle and related workflow states within actor scope
+        (UC-027, 032).
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkflowOversight'
           description: ''
 components:
   schemas:
@@ -3271,8 +3438,40 @@ components:
         expertise_domains: {}
         current_workload:
           type: integer
+          readOnly: true
+        max_workload:
+          type: integer
           maximum: 2147483647
           minimum: -2147483648
+      required:
+      - attorney_user_id
+      - current_workload
+      - email
+      - id
+      - name
+    AttorneyPanelWrite:
+      type: object
+      properties:
+        attorney_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        name:
+          type: string
+          maxLength: 150
+        firm_name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        is_approved:
+          type: boolean
+        expertise_domains:
+          type: array
+          items:
+            type: string
         max_workload:
           type: integer
           maximum: 2147483647
@@ -3280,7 +3479,6 @@ components:
       required:
       - attorney_user_id
       - email
-      - id
       - name
     AudienceEnum:
       enum:
@@ -4529,25 +4727,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Application'
-    PaginatedAttorneyPanelList:
-      type: object
-      required:
-      - results
-      properties:
-        next:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
-        previous:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/AttorneyPanel'
     PaginatedCompanyList:
       type: object
       required:
@@ -4624,6 +4803,33 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PatchedAttorneyPanelWrite:
+      type: object
+      properties:
+        attorney_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        name:
+          type: string
+          maxLength: 150
+        firm_name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        is_approved:
+          type: boolean
+        expertise_domains:
+          type: array
+          items:
+            type: string
+        max_workload:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
     PatchedJobPosting:
       type: object
       properties:
@@ -4906,14 +5112,6 @@ components:
       - rejection_upheld
       - remanded_for_amendment
       - decision_modified
-      - assignment_offered
-      - attorney_assigned
-      - pending_review
-      - budget_approved
-      - budget_rejected
-      - escalated
-      - escalation_tracked
-      - pre_filing_satisfied
       - filed
       - office_action_recorded
       - awaiting_applicant_approval
@@ -4940,14 +5138,6 @@ components:
         * `rejection_upheld` - REJECTION_UPHELD
         * `remanded_for_amendment` - REMANDED_FOR_AMENDMENT
         * `decision_modified` - DECISION_MODIFIED
-        * `assignment_offered` - ASSIGNMENT_OFFERED
-        * `attorney_assigned` - ATTORNEY_ASSIGNED
-        * `pending_review` - PENDING_REVIEW
-        * `budget_approved` - BUDGET_APPROVED
-        * `budget_rejected` - BUDGET_REJECTED
-        * `escalated` - ESCALATED
-        * `escalation_tracked` - ESCALATION_TRACKED
-        * `pre_filing_satisfied` - PRE_FILING_SATISFIED
         * `filed` - FILED
         * `office_action_recorded` - OFFICE_ACTION_RECORDED
         * `awaiting_applicant_approval` - AWAITING_APPLICANT_APPROVAL
@@ -5190,6 +5380,31 @@ components:
       - application_id
       - id
       - timestamp
+    PmsConfiguration:
+      type: object
+      properties:
+        key:
+          type: string
+          maxLength: 100
+        value: {}
+        description:
+          type: string
+          maxLength: 255
+      required:
+      - key
+      - value
+    PmsConfigurationRead:
+      type: object
+      properties:
+        key:
+          type: string
+        value: {}
+        description:
+          type: string
+      required:
+      - description
+      - key
+      - value
     PmsReportResponse:
       type: object
       properties:
@@ -6202,6 +6417,99 @@ components:
           type: string
       required:
       - reason
+    WorkflowMaintenance:
+      type: object
+      properties:
+        id:
+          type: integer
+        cycle_number:
+          type: integer
+        fee_due_date:
+          type: string
+          format: date
+        maintenance_status:
+          type: string
+        director_decision:
+          type: string
+      required:
+      - cycle_number
+      - director_decision
+      - fee_due_date
+      - id
+      - maintenance_status
+    WorkflowOfficeAction:
+      type: object
+      properties:
+        id:
+          type: integer
+        due_date:
+          type: string
+          format: date
+        status:
+          type: string
+        requires_applicant_review:
+          type: boolean
+        applicant_approved:
+          type: boolean
+      required:
+      - applicant_approved
+      - due_date
+      - id
+      - requires_applicant_review
+      - status
+    WorkflowOversight:
+      type: object
+      properties:
+        application_id:
+          type: integer
+        application_no:
+          type: string
+        domain:
+          type: string
+        status:
+          type: string
+        assigned_director_user_id:
+          type: integer
+          nullable: true
+        assigned_attorney_user_id:
+          type: integer
+          nullable: true
+        review_deadline:
+          type: string
+          format: date-time
+          nullable: true
+        revision_deadline:
+          type: string
+          format: date-time
+          nullable: true
+        budget_status:
+          type: string
+          nullable: true
+        attorney_assignment_statuses:
+          type: array
+          items:
+            type: string
+        office_actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowOfficeAction'
+        maintenance:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowMaintenance'
+      required:
+      - application_id
+      - application_no
+      - assigned_attorney_user_id
+      - assigned_director_user_id
+      - attorney_assignment_statuses
+      - budget_status
+      - domain
+      - maintenance
+      - office_actions
+      - review_deadline
+      - revision_deadline
+      - status
   securitySchemes:
     iamSession:
       type: apiKey
