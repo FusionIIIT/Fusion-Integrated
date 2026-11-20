@@ -89,7 +89,7 @@ def publish(*, posting_id: int, principal) -> JobPosting:
         p = (JobPosting.objects.select_for_update()
              .select_related("company", "placement_year").get(pk=posting_id))
         resolve_transition(p.status, PostingStatus.PUBLISHED)
-        require_permission(principal, "placement_cell.job_posting.publish")
+        require_permission(principal, "placement.job_posting.publish")
         run_guards((rule_valid, has_window, company_active, year_active), posting=p)
 
         p.status = PostingStatus.PUBLISHED
@@ -135,7 +135,7 @@ warns.
 
 ```python
 def cancel(*, posting_id: int, reason: str, principal) -> JobPosting:
-    require_permission(principal, "placement_cell.job_posting.delete")
+    require_permission(principal, "placement.job_posting.delete")
     if not reason.strip():
         raise GuardFailed("has_reason")
     with transaction.atomic():

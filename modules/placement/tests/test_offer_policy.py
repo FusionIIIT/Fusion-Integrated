@@ -1,9 +1,4 @@
-"""Placement Policy 2026-27, rule by rule.
-
-Each class names the clause it covers, so a revision to the signed document
-can be diffed against this file. The recurring theme: an unenforceable or
-unmapped situation denies — a rule nobody configured is not an open door.
-"""
+"""Placement Policy 2026-27, rule by rule."""
 from decimal import Decimal as D
 
 from django.test import SimpleTestCase
@@ -52,8 +47,7 @@ class GroupMappingTests(SimpleTestCase):
         self.assertEqual(group_for(" cse "), CSE_ECE)
 
     def test_an_unmapped_discipline_is_none_not_a_guess(self):
-        """Inventing a group would apply CSE's switch limits to someone the
-        policy says nothing about."""
+        """Inventing a group would apply CSE's switch limits to an unmapped student."""
         self.assertIsNone(group_for("PHD"))
         self.assertIsNone(group_for(None))
 
@@ -86,6 +80,7 @@ class FirstOfferTests(SimpleTestCase):
     """Rule 2.A: the category is chosen once, based on the companies."""
 
     def test_a_first_offer_is_always_allowed(self):
+        # PC-BR-015, PC-AFR-014, PC-CFR-005
         d = can_accept(policy(), student(), offer(ctc_lpa=D("8")))
         self.assertTrue(d.allowed)
         self.assertEqual(d.rule, "first_offer")
@@ -108,6 +103,7 @@ class CseEceSwitchTests(SimpleTestCase):
     """Rule 2.A — Cat 1 switches at 1.5x, Cat 2 at 2x, one switch then out."""
 
     def test_cat1_needs_one_and_a_half_times(self):
+        # PC-BR-015, PC-AFR-014, PC-UC-005 E2
         s = student(category_number=1, accepted_offer_count=1,
                     held_ctc_lpa=D("8"), held_offer_id=7)
         self.assertFalse(can_accept(policy(), s, offer(ctc_lpa=D("11"))).allowed)

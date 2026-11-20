@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  Alert, Badge, Button, Card, Container, Grid, NumberInput, Select, Stack,
+  Alert, Badge, Button, Card, Container, Grid, Group, NumberInput, Select, Stack,
   TagsInput, Text, Textarea, TextInput,
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
@@ -15,13 +15,15 @@ import { PageHeader } from "../../ui/components/PageHeader";
 import { StatusBadge } from "../../ui/components/StatusBadge";
 import { useRecruiterAuth } from "../RecruiterAuth";
 import {
-  useCreateMyPosting, useMyPostings, usePublishMyPosting, type Posting,
+  useCreateMyPosting, useMyPostings, usePublishMyPosting, useSubmitMyPosting,
+  type Posting,
 } from "../api";
 
 export default function RecruiterPostingsPage() {
   const { session } = useRecruiterAuth();
   const { data, isPending, error } = useMyPostings();
   const publish = usePublishMyPosting();
+  const submit = useSubmitMyPosting();
   const [creating, setCreating] = useState(false);
 
   const approved = session?.company.approval_status === "approved";
@@ -48,7 +50,7 @@ export default function RecruiterPostingsPage() {
           rows={data?.results ?? []}
           loading={isPending}
           rowKey={(r) => r.id}
-          minWidth={900}
+          minWidth={860}
           columns={[
             {
               key: "title", header: "Role",
@@ -80,21 +82,40 @@ export default function RecruiterPostingsPage() {
             {
               key: "actions", header: "", align: "right",
               render: (r) => r.status === "draft" ? (
-                <Button
-                  size="xs" variant="light" loading={publish.isPending}
-                  onClick={() => publish.mutate(r.id, {
-                    onSuccess: () => notifications.show({
-                      color: "green", title: "Published",
-                      message: "Students can now see and apply to this role.",
-                    }),
-                    onError: (e) => notifications.show({
-                      color: "red", title: "Could not publish",
-                      message: errorMessage(e),
-                    }),
-                  })}
-                >
-                  Publish
-                </Button>
+                <Group gap="xs" justify="flex-end">
+                  <Button
+                    size="xs" variant="default" loading={submit.isPending}
+                    onClick={() => submit.mutate(r.id, {
+                      onSuccess: () => notifications.show({
+                        color: "green", title: "Sent to the placement office",
+                        message: "The office publishes it; students see it then.",
+                      }),
+                      onError: (e) => notifications.show({
+                        color: "red", title: "Could not submit",
+                        message: errorMessage(e),
+                      }),
+                    })}
+                  >
+                    Submit to office
+                  </Button>
+                  <Button
+                    size="xs" variant="light" loading={publish.isPending}
+                    onClick={() => publish.mutate(r.id, {
+                      onSuccess: () => notifications.show({
+                        color: "green", title: "Published",
+                        message: "Students can now see and apply to this role.",
+                      }),
+                      onError: (e) => notifications.show({
+                        color: "red", title: "Could not publish",
+                        message: errorMessage(e),
+                      }),
+                    })}
+                  >
+                    Publish
+                  </Button>
+                </Group>
+              ) : r.status === "pending_approval" ? (
+                <Text size="xs" c="dimmed">With the placement office</Text>
               ) : <Text size="xs" c="dimmed">—</Text>,
             },
           ]}
@@ -128,7 +149,6 @@ function NewPostingModal({ opened, onClose }: {
   const [minCpi, setMinCpi] = useState<number | string>("");
   const [disciplines, setDisciplines] = useState<string[]>([]);
   const [maxBacklogs, setMaxBacklogs] = useState<number | string>("");
-  const [skills, setSkills] = useState<string[]>([]);
 
   function buildRule(): Record<string, unknown> {
     const clauses: Record<string, unknown>[] = [];
@@ -137,7 +157,6 @@ function NewPostingModal({ opened, onClose }: {
     if (maxBacklogs !== "") {
       clauses.push({ lte: ["active_backlogs", Number(maxBacklogs)] });
     }
-    if (skills.length) clauses.push({ has_all: ["skills", skills] });
     if (!clauses.length) return {};
     if (clauses.length === 1) return clauses[0]!;
     return { all: clauses };
@@ -215,6 +234,7 @@ function NewPostingModal({ opened, onClose }: {
           <Grid.Col span={{ base: 12, sm: 8 }}>
             <DateTimePicker
               label="Applications close" value={closesAt} onChange={setClosesAt}
+              minDate={new Date()}
               description="Required before publishing"
             />
           </Grid.Col>
@@ -252,11 +272,6 @@ function NewPostingModal({ opened, onClose }: {
             <TagsInput
               label="Disciplines" value={disciplines} onChange={setDisciplines}
               placeholder="CSE, ECE — leave empty for all"
-            />
-          </Grid.Col>
-          <Grid.Col span={12}>
-            <TagsInput
-              label="Required skills" value={skills} onChange={setSkills}
             />
           </Grid.Col>
         </Grid>

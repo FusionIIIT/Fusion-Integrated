@@ -1,8 +1,4 @@
-"""Profile documents — attach, replace, remove (PC-UC-001).
-
-A document is a Drive link. Nothing is stored here, so the byte-level checks
-are gone; the authorisation model around reaching one is unchanged.
-"""
+"""Profile documents — attach, replace, remove (PC-UC-001)."""
 from __future__ import annotations
 
 import logging
@@ -68,8 +64,7 @@ def _default_title(kind: str) -> str:
 
 @transaction.atomic
 def remove(*, document_id: int, user_id: int) -> None:
-    """Deactivate. The row stays — a student must not be able to blank out
-    evidence a recruiter already reviewed."""
+    """Deactivate."""
     document = ProfileDocument.objects.filter(
         pk=document_id, user_id=user_id, is_active=True).first()
     if document is None:

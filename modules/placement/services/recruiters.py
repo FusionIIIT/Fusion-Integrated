@@ -1,10 +1,4 @@
-"""Recruiter accounts: invitation, acceptance, sign-in (PC-UC-014, PC-BR-007).
-
-The module's externally-reachable surface, so: invitation only with no
-self-service signup; one identical failure message and comparable work on
-every path, so nothing can be enumerated; progressive lockout per address; and
-invitation tokens hashed at rest.
-"""
+"""Recruiter accounts: invitation, acceptance, sign-in (PC-UC-014, PC-BR-007)."""
 from __future__ import annotations
 
 import secrets
@@ -48,8 +42,7 @@ class Locked(Exception):
 @transaction.atomic
 def invite(*, company_id: int, email: str, full_name: str = "",
            invited_by_user_id: int) -> tuple[RecruiterAccount, str]:
-    """Returns (account, raw_token). The token is shown once; only its digest
-    is stored."""
+    """Returns (account, raw_token)."""
     email = email.strip().lower()
     company = Company.objects.filter(pk=company_id).first()
     if company is None:
@@ -119,55 +112,47 @@ def accept_invite(*, token: str, password: str) -> RecruiterAccount:
 
 
 # -- Sign-in -------------------------------------------------------------------
-def _recent_failures(email: str) -> int:
+def _failures(email: str, ip: str | None):
+    # Keyed on the address too, or a stranger who knows the email keeps the account locked.
+    return (RecruiterLoginAttempt.objects.filter(email=email, ip=ip)
+            .exclude(outcome="success"))
+
+
+def check_lockout(email: str, ip: str | None = None) -> None:
     since = timezone.now() - timedelta(minutes=LOCKOUT_WINDOW_MINUTES)
-    return (RecruiterLoginAttempt.objects
-            .filter(email=email, at__gte=since)
-            .exclude(outcome="success").count())
-
-
-def check_lockout(email: str) -> None:
-    fails = _recent_failures(email)
+    fails = _failures(email, ip).filter(at__gte=since).count()
     for threshold, minutes in LOCKOUT_TIERS:
         if fails >= threshold:
             if minutes is None:
                 raise Locked(None)
-            last = (RecruiterLoginAttempt.objects.filter(email=email)
-                    .exclude(outcome="success").order_by("-at").first())
+            last = _failures(email, ip).order_by("-at").first()
             if last and timezone.now() < last.at + timedelta(minutes=minutes):
                 raise Locked(minutes)
             return
     return
 
 
-def sign_in(*, email: str, password: str, ip: str | None = None) -> RecruiterSession:
-    """Verify credentials and open a session.
-
-    Raises PermissionDeniedError with one identical message for every failure.
-    """
-    email = (email or "").strip().lower()
-    check_lockout(email)
-
-    account = (RecruiterAccount.objects.select_related("company")
-               .filter(email=email).first())
-
-    def _fail(outcome: str):
-        RecruiterLoginAttempt.objects.create(email=email, ip=ip, outcome=outcome)
-        raise PermissionDeniedError(GENERIC_FAILURE, code="invalid_credentials")
-
-    if account is None:
+def _outcome(account: RecruiterAccount | None, password: str) -> str:
+    if account is None or not account.can_sign_in or not account.company.can_operate:
         check_password(password, _DUMMY_HASH)       # equalise response time
-        _fail("unknown_account")
-    if not account.can_sign_in:
-        check_password(password, _DUMMY_HASH)
-        _fail("inactive")
-    if not account.company.can_operate:
-        check_password(password, _DUMMY_HASH)
-        _fail("company_not_approved")
-    if not check_password(password or "", account.password_hash):
-        _fail("bad_password")
+        if account is None:
+            return "unknown_account"
+        return "inactive" if not account.can_sign_in else "company_not_approved"
+    return "success" if check_password(password or "", account.password_hash) else "bad_password"
 
-    RecruiterLoginAttempt.objects.create(email=email, ip=ip, outcome="success")
+
+def sign_in(*, email: str, password: str, ip: str | None = None) -> RecruiterSession:
+    """Verify credentials and open a session."""
+    email = (email or "").strip().lower()
+    with transaction.atomic():
+        # One attempt per account at a time, so a burst cannot outrun the failure count.
+        account = (RecruiterAccount.objects.select_for_update(of=("self",))
+                   .select_related("company").filter(email=email).first())
+        check_lockout(email, ip)
+        outcome = _outcome(account, password)
+        RecruiterLoginAttempt.objects.create(email=email, ip=ip, outcome=outcome)
+    if outcome != "success":
+        raise PermissionDeniedError(GENERIC_FAILURE, code="invalid_credentials")
 
     # Only the digest is stored, so a dump of this table yields no live session.
     raw = make_session_key()

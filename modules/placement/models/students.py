@@ -1,9 +1,4 @@
-"""Placement domain tables.
-
-Institute people are referenced by plain `user_id` integers, never foreign
-keys — there is no user table in this database. Recruiters are the exception:
-they are local rows, scoped to one company.
-"""
+"""Placement domain tables."""
 
 from django.db import models
 
@@ -12,15 +7,7 @@ from core.db.mixins import TimeStampedModel, UserScopedModel
 # -- Student placement profile (PC-UC-001, PC-BR-001) --------------------------
 
 class ProfileDocument(TimeStampedModel, UserScopedModel):
-    """A document a student has submitted to the placement office.
-
-    Offer letters and clearance paperwork. Not resumes: those are maintained
-    once on the ERP portal and reach here through the directory projection.
-
-    New rows are Drive links; rows written before the switch hold uploaded
-    bytes. The CHECK constraint allows exactly one, so the download view
-    always knows which it is holding.
-    """
+    """A document a student has submitted to the placement office."""
 
     KIND = [("certificate", "Certificate"),
             ("offer_letter", "Offer letter"), ("other", "Other")]
@@ -66,8 +53,7 @@ class ProfileDocument(TimeStampedModel, UserScopedModel):
 
 
 class PlacementRegistration(TimeStampedModel, UserScopedModel):
-    """A student opting into a season. Carries the counters the offer policy
-    reads."""
+    """A student opting into a season."""
 
     STATUS = [("registered", "Registered"), ("debarred", "Debarred"),
               ("opted_out", "Opted out")]

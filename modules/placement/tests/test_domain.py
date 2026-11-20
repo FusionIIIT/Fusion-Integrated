@@ -61,8 +61,7 @@ def test_missing_fact_denies_rather_than_defaulting():
 
 
 def test_no_declared_standing_is_not_cpi_zero():
-    """A student with no declared result must be INELIGIBLE, not treated as 0.0
-    — which would silently pass a `lte` rule."""
+    """A student with no declared result must be INELIGIBLE, not treated as 0.0."""
     assert evaluate({"lte": ["cpi", 5.0]}, {}).is_eligible is False
 
 

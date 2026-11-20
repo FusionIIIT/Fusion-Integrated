@@ -1,8 +1,4 @@
-"""Serializers. Thin, and every write serializer is an explicit allow-list.
-
-`fields = "__all__"` is never used here — it is exactly how `user_id`,
-`status` or `cpi_at_apply` ends up writable by whoever posts the right JSON.
-"""
+"""Serializers."""
 from rest_framework import serializers
 
 from modules.placement.models import (
@@ -16,6 +12,7 @@ from modules.placement.models import (
     Offer,
     PlacementPolicy,
     PlacementRecord,
+    PlacementRecordRevision,
     PlacementRegistration,
     ProfileDocument,
     RoundParticipation,
@@ -101,11 +98,13 @@ class JobPostingWriteSerializer(serializers.Serializer):
     location = serializers.CharField(max_length=120, required=False,
                                      allow_blank=True, default="")
     ctc_lpa = serializers.DecimalField(max_digits=8, decimal_places=2,
-                                       required=False, allow_null=True)
+                                       required=False, allow_null=True, min_value=0)
     stipend_pm = serializers.DecimalField(max_digits=10, decimal_places=2,
-                                          required=False, allow_null=True)
-    bond_months = serializers.IntegerField(required=False, allow_null=True)
-    seats = serializers.IntegerField(required=False, allow_null=True)
+                                          required=False, allow_null=True, min_value=0)
+    bond_months = serializers.IntegerField(required=False, allow_null=True,
+                                           min_value=0, max_value=120)
+    seats = serializers.IntegerField(required=False, allow_null=True,
+                                     min_value=0, max_value=32767)
     eligibility_rule = serializers.JSONField(required=False, default=dict)
     opens_at = serializers.DateTimeField(required=False, allow_null=True)
     closes_at = serializers.DateTimeField(required=False, allow_null=True)
@@ -120,15 +119,14 @@ class DocumentLinkSerializer(serializers.Serializer):
     """A Drive link. Validated in core.files.drive."""
 
     kind = serializers.ChoiceField(
-        choices=["resume", "certificate", "offer_letter", "other"])
+        choices=["certificate", "offer_letter", "other"])
     url = serializers.CharField(max_length=500)
     title = serializers.CharField(max_length=160, required=False,
                                   allow_blank=True, default="")
 
 
 class ProfileDocumentSerializer(serializers.ModelSerializer):
-    """Deliberately no `drive_url` — whoever holds it opens the file, with no
-    further check. `download_url` re-authorises on every use."""
+    """Deliberately no `drive_url` — whoever holds it opens the file, with no further check."""
 
     is_link = serializers.BooleanField(read_only=True)
     download_url = serializers.SerializerMethodField()
@@ -164,8 +162,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
         return sm.allowed_targets(obj.status, actor_kind(actor) if actor else None)
 
     def get_candidate(self, obj) -> dict | None:
-        """Populated only when the view batch-loaded the directory, i.e. when
-        the reader is staff. A student's own list needs no directory call."""
+        """Populated only when the view batch-loaded the directory."""
         person = (self.context.get("people") or {}).get(obj.user_id)
         if person is None:
             return None
@@ -179,12 +176,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
 
 class ApplicantSerializer(serializers.ModelSerializer):
-    """The recruiter-facing view of an application.
-
-    Narrower than ApplicationSerializer on purpose: enough to make a hiring
-    decision and nothing more. No eligibility snapshot (it records why other
-    people failed), no withdrawal reasons, no audit trail.
-    """
+    """The recruiter-facing view of an application."""
 
     candidate = serializers.SerializerMethodField()
 
@@ -218,14 +210,15 @@ class ApplySerializer(serializers.Serializer):
     posting_id = serializers.IntegerField()
     cover_note = serializers.CharField(max_length=4000, required=False,
                                        allow_blank=True, default="")
-    resume_id = serializers.IntegerField(required=False, allow_null=True)
 
 
 # -- Interviews ----------------------------------------------------------------
 class InterviewRoundSerializer(serializers.ModelSerializer):
+    posting_title = serializers.CharField(source="posting.title", read_only=True)
+
     class Meta:
         model = InterviewRound
-        fields = ("id", "posting", "seq", "kind", "mode", "starts_at",
+        fields = ("id", "posting", "posting_title", "seq", "kind", "mode", "starts_at",
                   "ends_at", "venue", "meeting_url", "capacity", "instructions",
                   "created_at")
         read_only_fields = fields
@@ -241,7 +234,8 @@ class InterviewRoundWriteSerializer(serializers.Serializer):
                                   allow_blank=True, default="")
     meeting_url = serializers.URLField(required=False, allow_blank=True,
                                        default="")
-    capacity = serializers.IntegerField(required=False, allow_null=True)
+    capacity = serializers.IntegerField(required=False, allow_null=True,
+                                        min_value=1, max_value=32767)
     instructions = serializers.CharField(required=False, allow_blank=True,
                                          default="")
 
@@ -280,10 +274,18 @@ class OfferSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+class CompanyOfferSerializer(OfferSerializer):
+    """What a recruiter sees: the decision records the student's other offers (PC-BR-009)."""
+
+    class Meta(OfferSerializer.Meta):
+        fields = tuple(f for f in OfferSerializer.Meta.fields if f != "policy_decision")
+        read_only_fields = fields
+
+
 class OfferIssueSerializer(serializers.Serializer):
     application_id = serializers.IntegerField()
     ctc_lpa = serializers.DecimalField(max_digits=8, decimal_places=2,
-                                       required=False, allow_null=True)
+                                       required=False, allow_null=True, min_value=0)
     tier_rank = serializers.IntegerField(required=False, allow_null=True)
     respond_by = serializers.DateTimeField(required=False, allow_null=True)
 
@@ -461,8 +463,18 @@ class StaffStatsSerializer(serializers.Serializer):
     median_ctc = serializers.CharField(required=False, allow_null=True)
     mean_ctc = serializers.CharField(required=False, allow_null=True)
     max_ctc = serializers.CharField(required=False, allow_null=True)
+    placement_rate = serializers.FloatField(required=False, allow_null=True)
+    salary_distribution = serializers.JSONField(required=False)
     by_company = serializers.JSONField(required=False)
     applications_by_status = serializers.JSONField(required=False)
+
+
+class SeasonTrendSerializer(serializers.Serializer):
+    season = serializers.CharField()
+    registered = serializers.IntegerField()
+    placed = serializers.IntegerField()
+    placement_rate = serializers.FloatField(allow_null=True)
+    companies_participated = serializers.IntegerField()
 
 
 class RecruiterInviteResultSerializer(serializers.Serializer):
@@ -495,8 +507,7 @@ class RecruiterMeSerializer(serializers.Serializer):
 
 
 class AcademicStandingRowSerializer(serializers.Serializer):
-    """One row of the CPI directory. `cpi` is null when nothing is declared —
-    never zero."""
+    """One row of the CPI directory."""
 
     user_id = serializers.IntegerField()
     roll_no = serializers.CharField()
@@ -544,8 +555,7 @@ class RecordIncidentSerializer(serializers.Serializer):
 
 
 class RecommendationSerializer(serializers.Serializer):
-    """What the policy points to. `automatic` is always false — rules 19 and 21
-    leave the decision to a human."""
+    """What the policy points to."""
 
     sanction = serializers.CharField()
     rule = serializers.CharField()
@@ -654,7 +664,7 @@ class OffCampusRecordSerializer(serializers.Serializer):
     user_id = serializers.IntegerField()
     company_id = serializers.IntegerField()
     ctc_lpa = serializers.DecimalField(max_digits=8, decimal_places=2,
-                                       required=False, allow_null=True)
+                                       required=False, allow_null=True, min_value=0)
     kind = serializers.ChoiceField(choices=["fte", "internship", "ppo"],
                                    default="fte")
 
@@ -676,18 +686,16 @@ class BulkOutcomeSerializer(serializers.Serializer):
 
 
 class BulkResultSerializer(serializers.Serializer):
-    """Counts first, then the per-item detail — a partial run must never read
-    as a complete one."""
+    """Counts first, then the per-item detail — a partial run must never read as a complete one."""
 
     moved = serializers.IntegerField()
     refused = serializers.IntegerField()
     results = BulkOutcomeSerializer(many=True)
 
 
-# -- Audit trail (PC-BR-008) ---------------------------------------------------
+# -- Audit trail (PC-AFR-009) ---------------------------------------------------
 class TransitionEntrySerializer(serializers.Serializer):
-    """`reason` and the actor ids are absent for a non-staff reader — see
-    api/audit.py for why."""
+    """`reason` and the actor ids are absent for a non-staff reader — see api/audit.py for why."""
 
     from_status = serializers.CharField()
     to_status = serializers.CharField()
@@ -706,10 +714,45 @@ class TransitionHistorySerializer(serializers.Serializer):
 
 
 class StudentConductIncidentSerializer(serializers.ModelSerializer):
-    """A student's own record. Shows the note and waiver — both contestable —
-    but not who recorded it."""
+    """A student's own record."""
 
     class Meta:
         model = ConductIncident
         fields = ("id", "kind", "note", "waived", "waived_reason", "created_at")
         read_only_fields = fields
+
+
+# -- TPO record maintenance (PC-UC-010) ----------------------------------------
+class OfficeRecordSerializer(serializers.ModelSerializer):
+    company = CompanyBriefSerializer(read_only=True)
+    season = serializers.CharField(source="policy.season", read_only=True)
+
+    class Meta:
+        model = PlacementRecord
+        fields = ("id", "user_id", "company", "season", "source", "kind",
+                  "ctc_lpa", "is_active", "created_at", "updated_at")
+        read_only_fields = fields
+
+
+class RecordCorrectionSerializer(serializers.Serializer):
+    reason = serializers.CharField(max_length=300)
+    ctc_lpa = serializers.DecimalField(max_digits=8, decimal_places=2,
+                                       required=False, allow_null=True,
+                                       min_value=0)
+    kind = serializers.ChoiceField(choices=JobPosting.KIND,
+                                   required=False)
+    is_active = serializers.BooleanField(required=False)
+
+
+class RecordRevisionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlacementRecordRevision
+        fields = ("id", "by_user_id", "reason", "before", "after", "created_at")
+        read_only_fields = fields
+
+
+class CompanySelfRegisterSerializer(CompanyRegisterSerializer):
+    """A company's own request; the contact is how the office answers it (PC-UC-014)."""
+
+    contact_name = serializers.CharField(max_length=120)
+    contact_email = serializers.EmailField()

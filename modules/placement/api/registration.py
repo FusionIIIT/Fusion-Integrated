@@ -1,13 +1,4 @@
-"""Registering for a season (rules 1, 20, 21).
-
-A student registers themselves and can always ask what route is open to them.
-The two routes that turn on a payment — rule 20's late fee and rule 21's
-re-registration — are staff endpoints, because both require the office to have
-seen a challan.
-
-`user_id` is never read from the body on the self-service paths; it comes from
-the credential, or a student could register or withdraw somebody else.
-"""
+"""Registering for a season (rules 1, 20, 21)."""
 from __future__ import annotations
 
 from drf_spectacular.utils import extend_schema
@@ -20,9 +11,9 @@ from modules.placement.api import serializers as s
 from modules.placement.models import PlacementRegistration
 from modules.placement.services import registration as service
 
-MODULE = HasModuleGrant("placement_cell")
-P_SELF = "placement_cell.registration.self"
-P_MANAGE = "placement_cell.registration.manage"
+MODULE = HasModuleGrant("placement")
+P_SELF = "placement.registration.create"
+P_MANAGE = "placement.registration.manage"
 
 
 def _actor(request):
@@ -55,6 +46,7 @@ class MyRegistrationsView(APIView):
     """The caller's own registrations. Scoped by the credential, not a filter."""
 
     permission_classes = [MODULE, HasPermission(P_SELF)]
+    throttle_scope = "placement_write"
 
     def get(self, request):
         rows = (PlacementRegistration.objects
@@ -76,10 +68,10 @@ class MyRegistrationsView(APIView):
 
 @extend_schema(request=s.OptOutSerializer, responses=s.RegistrationSerializer)
 class MyOptOutView(APIView):
-    """Withdrawing. Rule 21 makes coming back cost a fee and allows it once,
-    so the client should say so before confirming."""
+    """Withdrawing."""
 
     permission_classes = [MODULE, HasPermission(P_SELF)]
+    throttle_scope = "placement_write"
 
     def post(self, request):
         payload = s.OptOutSerializer(data=request.data)
@@ -95,6 +87,7 @@ class LateRegistrationView(APIView):
     """Rule 20 — the office approves a late registration against a challan."""
 
     permission_classes = [MODULE, HasPermission(P_MANAGE)]
+    throttle_scope = "placement_write"
 
     def post(self, request):
         payload = s.FeeApprovalSerializer(data=request.data)
@@ -110,6 +103,7 @@ class ReRegistrationView(APIView):
     """Rule 21 — once only, at the Chairperson's discretion."""
 
     permission_classes = [MODULE, HasPermission(P_MANAGE)]
+    throttle_scope = "placement_write"
 
     def post(self, request):
         payload = s.FeeApprovalSerializer(data=request.data)

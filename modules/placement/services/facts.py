@@ -1,13 +1,4 @@
-"""The facts an eligibility rule is evaluated against.
-
-Each has one owner: academic facts from the IAM's declared-CPI projection,
-identity from its directory, placement state from this module, skills from the
-the ERP portal's profile.
-
-Gathered in a fixed number of queries however many students are asked about,
-and fail-closed — a student with no declared result has no academic facts, and
-the engine denies on a missing fact rather than reading absence as zero.
-"""
+"""The facts an eligibility rule is evaluated against."""
 from __future__ import annotations
 
 import logging
@@ -31,8 +22,7 @@ def _dec(v):
 
 
 def academic_facts(user_ids: Sequence[int]) -> dict[int, dict]:
-    """Declared CPI and friends from the IAM, batched. Absence is propagated,
-    never filled in."""
+    """Declared CPI and friends from the IAM, batched."""
     ids = sorted({int(i) for i in user_ids if i is not None})
     if not ids:
         return {}

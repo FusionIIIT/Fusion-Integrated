@@ -1,11 +1,4 @@
-"""Post-offer obligations (policy rules 22 and 24).
-
-Rule 24 lets placement hold up a no-dues certificate, which is the only place
-this module can block a student's graduation paperwork. So the tests care about
-two things: that it blocks exactly the right people, and that a refusal says
-which company still owes a letter — an unexplained hold at the end of a degree
-is what ends up in the Dean's office.
-"""
+"""Post-offer obligations (policy rules 22 and 24)."""
 from datetime import date, timedelta
 
 import pytest
@@ -36,16 +29,16 @@ OTHER = 2002
 LINK = "https://drive.google.com/file/d/1A2b3C4d5E6f7G8h9I0jKlMnOpQrStUv/view"
 
 
-def _actor(uid=9, perms=("placement_cell.record.manage",)):
+def _actor(uid=9, perms=("placement.record.manage",)):
     from fusion_auth.principal import Principal
     return Principal.from_session(
         make_session(user_id=uid, kind="staff", permissions=perms,
-                     modules=("placement_cell",)))
+                     modules=("placement",)))
 
 
-def _client(stub_iam, perms=("placement_cell.application.view_self",),
+def _client(stub_iam, perms=("placement.own_application.view",),
             uid=STUDENT):
-    stub_iam(make_session(user_id=uid, modules=("placement_cell",),
+    stub_iam(make_session(user_id=uid, modules=("placement",),
                           permissions=perms))
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
@@ -109,8 +102,7 @@ class TestClearanceRules:
         assert "rule 24" in verdict.message.lower()
 
     def test_declaring_not_joining_does_not_release_the_letter(self):
-        """The acceptance happened and the record stands, so rule 24 still
-        wants the signed copy."""
+        """The acceptance happened and the record stands, so rule 24 still wants the signed copy."""
         verdict = rules.no_dues_clearance((
             rules.RecordState("Acme", has_signed_offer_letter=False,
                               declared_not_joining=True),))
@@ -126,8 +118,7 @@ class TestNonJoiningRules:
         assert v.accepted and not v.is_late
 
     def test_after_the_cut_off_is_late_but_still_accepted(self):
-        """Refusing it would leave the Placement Cell less informed, which is
-        the opposite of what rule 22 wants."""
+        """Refusing it would leave the Placement Cell less informed."""
         v = rules.assess_non_joining(declared_on=date(2027, 4, 16),
                                      deadline=date(2027, 4, 15))
         assert v.accepted and v.is_late
@@ -217,7 +208,7 @@ class TestNotJoining:
                                         reason="again")
         assert exc.value.code == "already_declared"
 
-    def test_the_placement_cell_is_told(self, stub_iam, policy):
+    def test_the_placement_is_told(self, stub_iam, policy):
         from modules.placement.models import NotificationOutbox
         stub_iam()
         record = campus_record(policy, make_company())
@@ -230,9 +221,7 @@ class TestNotJoining:
 class TestOffCampus:
 
     def test_an_off_campus_placement_also_blocks_no_dues(self, stub_iam, policy):
-        """Rule 24 says "placed (on/off campus)". Without a record for these,
-        the gate would miss the students least likely to have submitted
-        anything."""
+        """Rule 24 says "placed (on/off campus)"."""
         stub_iam()
         service.record_off_campus(season=SEASON, user_id=STUDENT,
                                   company_id=make_company("Globex", "globex").pk,
@@ -246,7 +235,7 @@ class TestOffCampus:
         with pytest.raises(PermissionDeniedError):
             service.record_off_campus(
                 season=SEASON, user_id=STUDENT, company_id=make_company().pk,
-                actor=_actor(perms=("placement_cell.report.view",)))
+                actor=_actor(perms=("placement.report.view",)))
 
     def test_a_second_active_placement_is_refused(self, stub_iam, policy):
         stub_iam()
@@ -258,8 +247,7 @@ class TestOffCampus:
         assert exc.value.code == "already_placed"
 
     def test_the_database_refuses_a_campus_record_with_no_offer(self, policy):
-        """The source field would otherwise be able to lie about where a
-        placement came from."""
+        """The source field would otherwise be able to lie about where a placement came from."""
         company = make_company()
         with pytest.raises(IntegrityError), transaction.atomic():
             PlacementRecord.objects.create(
@@ -325,10 +313,9 @@ class TestClearanceApi:
 
     def test_a_reports_reader_can_read_the_office_worklist(self, stub_iam,
                                                            policy):
-        """The worklist is a report; gating it on record.manage locked out every
-        coordinator and rendered as "every student has filed one"."""
+        """The worklist is a report; gating it on record.manage locked out every coordinator."""
         campus_record(policy, make_company())
-        client = _client(stub_iam, perms=("placement_cell.report.view",), uid=9)
+        client = _client(stub_iam, perms=("placement.report.view",), uid=9)
         assert client.get(
             "/api/v1/placement/records/outstanding").status_code == 200
 
@@ -342,8 +329,7 @@ class TestClearanceApi:
 
 
 def test_a_student_can_release_the_hold_over_http(stub_iam, policy):
-    """The whole point of the UI work: rule 24 blocks, and the student has a
-    reachable way to clear it. A hold with no remedy is worse than no hold."""
+    """The whole point of the UI work: rule 24 blocks."""
     record = campus_record(policy, make_company())
     client = _client(stub_iam)
 

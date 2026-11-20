@@ -1,13 +1,4 @@
-"""The debarment ladder (policy rules 18, 19, 21).
-
-The load-bearing property is restraint: the policy says a student "may be"
-debarred and leaves the call to the Chairperson, so recording an incident must
-never impose a sanction by itself. A system stricter than the signed document
-is as wrong as one that is laxer, and here it costs a student a placement.
-
-Rule 19's first tier is also narrower than it looks — the next TWO drives, not
-the season — so a season-wide flag would over-punish.
-"""
+"""The debarment ladder (policy rules 18, 19, 21)."""
 from datetime import timedelta
 
 import pytest
@@ -34,19 +25,19 @@ INCIDENTS = "/api/v1/placement/conduct/incidents"
 SANCTIONS = "/api/v1/placement/conduct/sanctions"
 
 
-def _staff(stub_iam, perms=("placement_cell.registration.debar",), uid=9):
+def _staff(stub_iam, perms=("placement.sanction.manage",), uid=9):
     stub_iam(make_session(user_id=uid, kind="staff",
-                          modules=("placement_cell",), permissions=perms))
+                          modules=("placement",), permissions=perms))
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
     return c
 
 
-def _actor(uid=9, perms=("placement_cell.registration.debar",)):
+def _actor(uid=9, perms=("placement.sanction.manage",)):
     from fusion_auth.principal import Principal
     return Principal.from_session(
         make_session(user_id=uid, kind="staff", permissions=perms,
-                     modules=("placement_cell",)))
+                     modules=("placement",)))
 
 
 @pytest.fixture
@@ -69,8 +60,7 @@ def make_posting(company, published_offset_days):
 class TestLadder:
 
     def test_a_first_consent_failure_bars_two_drives_not_the_season(self):
-        """Rule 19 says "the next two campus placement processes". Barring the
-        season would be a heavier sanction than the policy authorises."""
+        """Rule 19 says "the next two campus placement processes"."""
         r = conduct.recommend(conduct.IncidentKind.CONSENT_FAILURE,
                               prior_incidents=0)
         assert r.sanction is conduct.Sanction.BAR_NEXT_TWO
@@ -149,8 +139,7 @@ class TestRecording:
         assert rec.sanction is conduct.Sanction.BAR_NEXT_TWO
 
     def test_a_waived_incident_stops_counting(self, registration):
-        """Rule 19: "in any unavoidable circumstances, the student may inform
-        the placement cell in writing"."""
+        """Rule 19: "in any unavoidable circumstances, the student may inform the placement cell in writing"."""
         incident, _ = service.record(season=SEASON, user_id=STUDENT,
                                      kind="consent_failure", note="ill",
                                      actor=_actor())
@@ -182,7 +171,7 @@ class TestRecording:
         with pytest.raises(PermissionDeniedError):
             service.record(season=SEASON, user_id=STUDENT,
                            kind="consent_failure", note="x",
-                           actor=_actor(perms=("placement_cell.report.view",)))
+                           actor=_actor(perms=("placement.report.view",)))
 
 
 # -- Imposing and lifting --------------------------------------------------------
@@ -242,8 +231,7 @@ class TestDriveScopedBar:
 
     def test_the_next_two_drives_are_barred_and_the_third_is_not(
             self, registration, company):
-        """Rule 19's first tier, counted against drives rather than days — a
-        quiet fortnight should not discharge the sanction."""
+        """Rule 19's first tier, counted against drives rather than days."""
         service.apply_sanction(season=SEASON, user_id=STUDENT,
                                sanction="bar_next_two", rule="19",
                                reason="No-show", actor=_actor())
@@ -293,7 +281,7 @@ class TestConductApi:
     def test_a_student_cannot_record_an_incident_against_anyone(
             self, stub_iam, registration):
         client = _staff(stub_iam,
-                        perms=("placement_cell.application.view_self",),
+                        perms=("placement.own_application.view",),
                         uid=STUDENT)
         assert client.post(INCIDENTS, {
             "season": SEASON, "user_id": 2002, "kind": "consent_failure",
@@ -306,7 +294,7 @@ class TestConductApi:
                                sanction="bar_season", rule="19",
                                reason="No-show", actor=_actor())
         client = _staff(stub_iam,
-                        perms=("placement_cell.application.view_self",),
+                        perms=("placement.own_application.view",),
                         uid=STUDENT)
         response = client.post("/api/v1/placement/conduct/sanctions/lift", {
             "season": SEASON, "user_id": STUDENT, "reason": "please",
@@ -318,9 +306,8 @@ class TestConductApi:
 
     def test_report_view_alone_does_not_grant_debarment(self, stub_iam,
                                                         registration):
-        """`report.view` makes someone staff for scoping; sanctioning a student
-        is a different authority."""
-        client = _staff(stub_iam, perms=("placement_cell.report.view",))
+        """`report.view` makes someone staff for scoping."""
+        client = _staff(stub_iam, perms=("placement.report.view",))
         assert client.post(SANCTIONS, {
             "season": SEASON, "user_id": STUDENT, "sanction": "bar_season",
             "rule": "19", "reason": "x",

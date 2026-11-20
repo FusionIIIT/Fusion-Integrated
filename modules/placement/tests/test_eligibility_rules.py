@@ -1,9 +1,4 @@
-"""Eligibility (PC-BR-002, PC-BR-004).
-
-Two load-bearing properties: nothing reaches "eligible" by accident (the facts
-come from a projection that can legitimately be empty), and every denial names
-the actual value and the required one.
-"""
+"""Eligibility (PC-BR-002, PC-BR-004)."""
 from decimal import Decimal
 
 from django.test import SimpleTestCase
@@ -29,8 +24,7 @@ class FailClosedTests(SimpleTestCase):
         self.assertTrue(evaluate(None, facts()).is_eligible)
 
     def test_a_missing_fact_denies(self):
-        """A student with no declared result has no CPI. That must deny, not
-        be skipped and not be read as zero."""
+        """A student with no declared result has no CPI."""
         out = evaluate({"gte": ["cpi", 7.0]}, facts(cpi=None))
         self.assertFalse(out.is_eligible)
         self.assertEqual(out.outcomes[0].reason, "missing_fact")
@@ -171,7 +165,7 @@ class AuthoringValidationTests(SimpleTestCase):
         ({"in": ["discipline", []]}, "type_mismatch"),
         ({"in": ["semester", [7, "eight"]]}, "type_mismatch"),
         ({"gte": ["discipline", "CSE"]}, "operator_not_valid_for_field"),
-        ({"has_all": ["discipline", ["CSE"]]}, "operator_not_valid_for_field"),
+        ({"has_all": ["discipline", ["CSE"]]}, "unknown_operator"),
         ({"gte": ["cpi"]}, "malformed_rule"),
         ({"gte": [7, "cpi"]}, "malformed_rule"),
         ({"gte": ["cpi", 7], "lte": ["cpi", 9]}, "malformed_rule"),
@@ -207,6 +201,6 @@ class AuthoringValidationTests(SimpleTestCase):
         self.assertEqual([p.reason for p in validate(rule)], ["rule_too_complex"])
 
     def test_every_field_has_exactly_one_type(self):
-        typed = [elig.NUMERIC_FIELDS, elig.TEXT_FIELDS, elig.FLAG_FIELDS, elig.LIST_FIELDS]
+        typed = [elig.NUMERIC_FIELDS, elig.TEXT_FIELDS, elig.FLAG_FIELDS]
         self.assertEqual(set().union(*typed), elig.FIELDS)
         self.assertEqual(sum(len(s) for s in typed), len(elig.FIELDS))

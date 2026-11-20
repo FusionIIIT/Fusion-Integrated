@@ -54,7 +54,6 @@ BACKEND_NOTES = {
     "selectors": "ALL reads. Every queryset a view uses is built here.",
     "selectors/scoping.py":
         "Who may see what. Narrowing means a foreign row is 404, not 403.",
-    "selectors/applications.py": "Read helpers for the application list.",
     "management/commands/send_notifications.py": "Drain or inspect the outbox by hand.",
 
     "services": "ALL writes. Transaction boundaries live here.",

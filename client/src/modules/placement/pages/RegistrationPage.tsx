@@ -17,8 +17,7 @@ import {
 } from "../api/hooks";
 import type { RegistrationTerms } from "../api/hooks";
 
-/** Rule 1 makes this the gate on everything else, so the page leads with where
- *  the student stands and what, if anything, they can do about it. */
+/** Rule 1 makes this the gate on everything else, so the page leads with where the student stands. */
 export default function RegistrationPage() {
   const seasons = useSeasons();
   const active = seasons.data?.find((s) => s.is_active)?.season;
@@ -178,9 +177,7 @@ const INCIDENT_LABELS: Record<string, string> = {
   misrepresentation: "False resume or unfair means (rule 18)",
 };
 
-/** A student's own conduct record. Shown because rule 19 allows a waiver and
- *  rule 21 leaves a sanction to the Chairperson — neither is contestable if the
- *  student cannot read what is on file. */
+/** A student's own conduct record. */
 function ConductRecord() {
   const { data } = useMyConductRecord();
   const rows = data?.results ?? [];
@@ -226,9 +223,7 @@ function StatusBadge({ status }: { status: string }) {
   return <Badge color={tone} variant="light">{status.replace("_", " ")}</Badge>;
 }
 
-/** The four routes the server can return. `late` and `reregister` are not
- *  refusals — they are real paths that go through the Placement Cell, so the
- *  copy says what to do rather than just saying no. */
+/** The four routes the server can return. */
 function TermsCard({ terms, season, onRegister, busy }: {
   terms: RegistrationTerms;
   season: string;

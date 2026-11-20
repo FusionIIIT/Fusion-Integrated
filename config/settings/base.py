@@ -216,6 +216,9 @@ REST_FRAMEWORK = {
         "export": "5/hour",
         "upload": "20/hour",
         "directory_search": "120/hour",
+        "placement_record_write": "60/hour",
+        "placement_write": "600/hour",
+        "company_register": "5/hour",
     },
 }
 
@@ -230,6 +233,9 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "JobPostingKindEnum": "modules.placement.models.postings.JobPosting.KIND",
+    },
 }
 
 CORS_ALLOW_ALL_ORIGINS = False

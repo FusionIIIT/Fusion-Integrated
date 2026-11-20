@@ -1,7 +1,8 @@
-"""Interview scheduling and tracking (PC-UC-009, PC-WF-006, PC-BR-011/012)."""
+"""Interview scheduling and tracking (PC-UC-009, BW-PC-05, BW-PC-06, PC-BR-011/012)."""
 from __future__ import annotations
 
 from django.db import transaction
+from django.utils import timezone
 
 from core.api.exceptions import ConflictError, NotFoundError
 from modules.placement.domain import state_machine as sm
@@ -10,8 +11,8 @@ from modules.placement.services import applications as app_service
 from modules.placement.services import notifications
 from modules.placement.services.authz import require
 
-P_SCHEDULE = "placement_cell.interview.schedule"
-P_REVIEW = "placement_cell.application.review"
+P_SCHEDULE = "placement.interview.create"
+P_REVIEW = "placement.application.review"
 
 
 @transaction.atomic
@@ -34,6 +35,10 @@ def schedule_round(*, posting_id: int, actor, mode: str, starts_at,
     if mode == "offline" and not venue:
         raise ConflictError("An offline round needs a venue.",
                             code="venue_required")
+    if starts_at <= timezone.now():
+        raise ConflictError("A round must start in the future.", code="starts_in_past")
+    if ends_at is not None and ends_at <= starts_at:
+        raise ConflictError("A round must end after it starts.", code="ends_before_start")
 
     if seq is None:
         seq = (InterviewRound.objects.filter(posting=posting).count() or 0) + 1
@@ -51,11 +56,7 @@ def schedule_round(*, posting_id: int, actor, mode: str, starts_at,
 @transaction.atomic
 def add_candidates(*, round_id: int, application_ids: list[int], actor,
                    scope=None) -> int:
-    """Put shortlisted candidates into a round and notify them (PC-BR-012).
-
-    `scope` stops a recruiter reaching a candidate who never applied to them;
-    a student's own application is in their scope, hence the permission gate.
-    """
+    """Put shortlisted candidates into a round and notify them (PC-BR-012)."""
     require(actor, P_SCHEDULE, allow_recruiter=True)
     round_ = (InterviewRound.objects.select_related("posting", "posting__company")
               .filter(pk=round_id).first())

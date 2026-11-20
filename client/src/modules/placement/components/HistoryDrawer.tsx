@@ -8,11 +8,7 @@ const LANE_COLOUR: Record<string, string> = {
   staff: "blue", recruiter: "grape", student: "teal", system: "gray",
 };
 
-/** Every state change an application has been through (PC-BR-008).
- *
- *  The server decides what this reader may see, so there is nothing to hide
- *  here — `redacted` only tells the user that reasons were withheld, rather
- *  than letting them think the trail is thin. */
+/** Every state change an application has been through (PC-AFR-009). */
 export function HistoryDrawer({ applicationId, onClose }: {
   applicationId: number | null;
   onClose: () => void;

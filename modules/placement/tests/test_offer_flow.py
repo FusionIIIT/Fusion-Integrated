@@ -1,10 +1,4 @@
-"""The offer lifecycle end to end, under Placement Policy 2026-27.
-
-Where test_offer_policy.py checks the rules in isolation, this checks that the
-service actually wires them up: the right counters move, the category locks,
-switches are counted, and the database backstop still holds when everything
-else is bypassed.
-"""
+"""The offer lifecycle end to end, under Placement Policy 2026-27."""
 from datetime import timedelta
 from decimal import Decimal as D
 
@@ -38,13 +32,7 @@ _SET_DISCIPLINE = {"fn": None}
 
 @pytest.fixture(autouse=True)
 def directory(stub_iam):
-    """The policy is per discipline group, so the directory must answer for
-    know the student's.
-
-    Going through the IAM stub rather than writing a UserRef directly keeps the
-    module boundary intact — placement may only reach directory through its
-    contract, and the import-linter contract enforces that even in tests.
-    """
+    """The policy is per discipline group, so the directory must answer for know the student's."""
     def install(discipline="CSE"):
         stub_iam(make_session(user_id=STUDENT), users={
             STUDENT: UserRef(user_id=STUDENT, username="21BCS001",
@@ -56,8 +44,7 @@ def directory(stub_iam):
 
 
 def make_world(discipline="CSE"):
-    """The signed 2026-27 categories, plus one registered student whose
-    discipline the policy can map."""
+    """The signed 2026-27 categories, plus one registered student whose discipline the policy maps."""
     policy = PlacementPolicy.objects.create(
         season="2026-27", discipline_groups=dict(pol.DEFAULT_GROUP_MAP))
     for c in pol.default_categories():
@@ -90,19 +77,18 @@ def make_offer(name, ctc, *, marquee=False, sector="it", dream=False,
     app = Application.objects.create(posting=posting, user_id=STUDENT,
                                      status=status)
     staff = make_principal(user_id=9, kind="staff",
-                           permissions=("placement_cell.offer.issue",
-                                        "placement_cell.application.review"))
+                           permissions=("placement.offer.create",
+                                        "placement.application.review"))
     return offer_service.issue(application_id=app.pk, actor=staff)
 
 
 def student_principal():
     return make_principal(user_id=STUDENT, kind="student",
-                          permissions=("placement_cell.offer.respond",))
+                          permissions=("placement.offer_response.create",))
 
 
 def reopen(offer):
-    """Re-open an offer that the auto-withdraw sweep closed, so a later test
-    can exercise the POLICY rather than the state machine."""
+    """Re-open an offer that the auto-withdraw sweep closed."""
     Offer.objects.filter(pk=offer.pk).update(status="issued")
     Application.objects.filter(pk=offer.application_id).update(
         status="offer_issued")
@@ -241,9 +227,7 @@ class TestSwitching:
 class TestAutoWithdraw:
 
     def test_applications_close_only_when_the_student_is_out(self):
-        """A Marquee placement ends the season (rule 8), so everything else
-        closes. Being merely placed does NOT — rule 9 keeps parallel processes
-        open while a switch allowance remains."""
+        """A Marquee placement ends the season (rule 8), so everything else closes."""
         make_world()
         offer = make_offer("Marquee Co", 8, marquee=True)
         other = make_offer("Borg", 40).application
@@ -253,9 +237,7 @@ class TestAutoWithdraw:
         assert other.status == "auto_withdrawn"
 
     def test_a_reachable_application_is_left_alone(self):
-        """The sweep is not a blanket close. Rule 9 allows parallel processes,
-        and a student with a switch left is still in the running — closing
-        their applications would be the platform overriding the policy."""
+        """The sweep is not a blanket close."""
         make_world()
         offer = make_offer("Acme", 8)
         reachable = make_offer("Borg", 20).application
@@ -363,7 +345,7 @@ class TestOwnership:
         make_world()
         offer = make_offer("Acme", 8)
         intruder = make_principal(user_id=9999, kind="student",
-                                  permissions=("placement_cell.offer.respond",))
+                                  permissions=("placement.offer_response.create",))
         with pytest.raises(NotFoundError):
             offer_service.respond(offer_id=offer.pk, accept=True, actor=intruder)
 

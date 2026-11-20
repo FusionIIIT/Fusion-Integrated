@@ -1,9 +1,4 @@
-"""Placement domain tables.
-
-Institute people are referenced by plain `user_id` integers, never foreign
-keys — there is no user table in this database. Recruiters are the exception:
-they are local rows, scoped to one company.
-"""
+"""Placement domain tables."""
 
 from django.db import models
 from django.db.models import Q
@@ -13,8 +8,7 @@ from core.db.mixins import TimeStampedModel
 
 # -- Postings ------------------------------------------------------------------
 class JobPosting(TimeStampedModel):
-    """An opportunity. PC-BR-003 requires a description, criteria and a
-    deadline before publishing, enforced by a database constraint."""
+    """An opportunity."""
 
     STATUS = [("draft", "Draft"), ("pending_approval", "Pending TPO approval"),
               ("published", "Published"), ("closed", "Applications closed"),

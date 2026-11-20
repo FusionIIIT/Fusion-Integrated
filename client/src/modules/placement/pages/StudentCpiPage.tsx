@@ -12,13 +12,7 @@ import { useCpiDirectory, useCpiFilters, type CpiRow } from "../api/hooks";
 
 const PAGE_SIZE = 50;
 
-/**
- * Every student's latest DECLARED CPI, searchable by discipline and batch.
- *
- * Two care points: an undeclared result reads "not declared", never 0.00, or a
- * missing result becomes a very weak one; and the semester is always on
- * screen, because placement legitimately trails the exam portal.
- */
+/** Every student's latest DECLARED CPI, searchable by discipline and batch. */
 export default function StudentCpiPage() {
   const [search, setSearch] = useState("");
   const [debounced] = useDebouncedValue(search, 300);
@@ -98,7 +92,7 @@ export default function StudentCpiPage() {
           rows={data?.results ?? []}
           loading={isPending && !data}
           rowKey={(r) => r.user_id}
-          minWidth={980}
+          minWidth={860}
           columns={[
             { key: "roll_no", header: "Roll no.",
               render: (r) => <Text fw={600} ff="monospace">{r.roll_no}</Text> },

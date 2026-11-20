@@ -8,11 +8,7 @@ import { CONFIG, RECRUITER_SURFACE_TAG } from "../pages/Login/constants";
 import { BRAND } from "../ui/theme/theme";
 import { useRecruiterLogin } from "./api";
 
-/**
- * The recruiter portal login: the same composition as the institute door, told
- * apart by the header tag and a footer note pointing institute users
- * elsewhere.
- */
+/** The recruiter portal login: the same composition as the institute door. */
 export default function RecruiterLoginPage() {
   const navigate = useNavigate();
   const login = useRecruiterLogin();
@@ -50,8 +46,11 @@ export default function RecruiterLoginPage() {
       footer={
         <>
           <Text size="xs" c="dimmed" mt="xs">
-            Recruiter access is by invitation from the placement office — there
-            is no self-registration.
+            New to campus recruitment?{" "}
+            <Text component="a" href="/recruiter/register" size="xs" c={BRAND.primary}>
+              Register your company
+            </Text>
+            . Sign-in follows an invitation once the institute approves it.
           </Text>
           <Text size="xs" c="dimmed">
             Students and staff sign in at{" "}

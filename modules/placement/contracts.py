@@ -32,11 +32,7 @@ def get_placement_status(user_ids: Sequence[int],
 
 @dataclass(frozen=True)
 class NoDuesClearanceDTO:
-    """Rule 24, for whoever issues the certificate.
-
-    `blocking` names each company still owing a signed offer letter, so the
-    academic office can tell a student what to do instead of just refusing.
-    """
+    """Rule 24, for whoever issues the certificate."""
 
     user_id: int
     cleared: bool
@@ -46,11 +42,7 @@ class NoDuesClearanceDTO:
 
 def get_no_dues_clearances(user_ids: Sequence[int]
                            ) -> dict[int, NoDuesClearanceDTO]:
-    """Whether placement blocks a no-dues certificate (rule 24).
-
-    Plural because the academic office checks a graduating batch, not a person.
-    A student with no placement is cleared — the rule only bites on the placed.
-    """
+    """Whether placement blocks a no-dues certificate (rule 24)."""
     from modules.placement.services import clearance
 
     ids = {int(i) for i in user_ids if i is not None}

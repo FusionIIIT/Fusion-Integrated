@@ -5,12 +5,7 @@ import { FaExclamationTriangle } from "react-icons/fa";
 import { AppShellLayout, type NavGroup } from "../ui/layout/AppShellLayout";
 import { useRecruiterAuth } from "./RecruiterAuth";
 
-/** The portal's navigation is STATIC, unlike the institute shell's.
- *
- *  There is nothing to filter: a recruiter's reach is fixed by construction —
- *  their own company's postings, their own applicants, their own rounds. They
- *  hold no permissions at all, so there is no server-driven sidebar to build.
- */
+/** The portal's navigation is STATIC, unlike the institute shell's. */
 const NAV: NavGroup[] = [
   {
     section: "Recruitment",

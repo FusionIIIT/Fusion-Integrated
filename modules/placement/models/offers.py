@@ -1,10 +1,6 @@
-"""Placement domain tables.
+"""Placement domain tables."""
 
-Institute people are referenced by plain `user_id` integers, never foreign
-keys — there is no user table in this database. Recruiters are the exception:
-they are local rows, scoped to one company.
-"""
-
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import Q
 
@@ -30,7 +26,7 @@ class Offer(TimeStampedModel, UserScopedModel):
     responded_at = models.DateTimeField(null=True, blank=True)
 
     # Machine-readable justification, so an appeal has a reason.
-    policy_decision = models.JSONField(default=dict, blank=True)
+    policy_decision = models.JSONField(default=dict, blank=True, encoder=DjangoJSONEncoder)
 
     issued_by_user_id = models.IntegerField(null=True, blank=True)
     issued_by_recruiter = models.ForeignKey(
@@ -52,11 +48,7 @@ class Offer(TimeStampedModel, UserScopedModel):
 
 
 class PlacementRecord(TimeStampedModel, UserScopedModel):
-    """Written when an offer is accepted (PC-BR-014).
-
-    The partial unique index is the backstop: even bypassing the service, a
-    student cannot hold two active placements in one season.
-    """
+    """Written when an offer is accepted (PC-BR-014)."""
 
     SOURCE = [("campus", "Through the Placement Cell"),
               ("off_campus", "Off campus (rules 5 and 24)")]
@@ -111,3 +103,23 @@ class PlacementRecord(TimeStampedModel, UserScopedModel):
 
     def __str__(self) -> str:
         return f"placed u{self.user_id} @{self.company_id}"
+
+
+class PlacementRecordRevision(TimeStampedModel):
+    """Append-only history of a TPO correction to a placement record (PC-UC-010, PC-BR-029)."""
+
+    record = models.ForeignKey(PlacementRecord, on_delete=models.PROTECT,
+                               related_name="revisions")
+    by_user_id = models.IntegerField()
+    reason = models.CharField(max_length=300)
+    before = models.JSONField()
+    after = models.JSONField()
+
+    class Meta:
+        db_table = "placement_record_revision"
+        indexes = [
+            models.Index(fields=["record", "-created_at"], name="record_revision_idx"),
+        ]
+
+    def __str__(self) -> str:
+        return f"revision#{self.pk} of record#{self.record_id}"

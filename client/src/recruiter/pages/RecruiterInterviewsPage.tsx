@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
-  Badge, Button, Card, Checkbox, Container, Group, NumberInput, Select, Stack,
-  Text, Textarea, TextInput,
+  Badge, Button, Card, Checkbox, Container, Group, NumberInput, Select, Stack, Text, TextInput, Textarea,
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { notifications } from "@mantine/notifications";
@@ -50,10 +49,17 @@ export default function RecruiterInterviewsPage() {
           rows={data?.results ?? []}
           loading={isPending}
           rowKey={(r) => r.id}
-          minWidth={940}
+          minWidth={860}
           columns={[
-            { key: "seq", header: "Round", align: "right",
-              render: (r) => `#${r.seq}` },
+            {
+              key: "role", header: "Role",
+              render: (r) => (
+                <Stack gap={0}>
+                  <Text fw={600}>{r.posting_title}</Text>
+                  <Text size="xs" c="dimmed">Round {r.seq}</Text>
+                </Stack>
+              ),
+            },
             {
               key: "kind", header: "Type",
               render: (r) => (
@@ -174,6 +180,7 @@ function ScheduleModal({ opened, onClose }: {
         </Group>
         <DateTimePicker
           label="Starts at" required value={startsAt} onChange={setStartsAt}
+          minDate={new Date()}
         />
         {mode === "online" ? (
           <TextInput

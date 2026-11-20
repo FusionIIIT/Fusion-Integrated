@@ -249,7 +249,7 @@ withdrawn. The coordinator is told this explicitly in the confirmation dialog.
 ## Expiry
 
 `respond_by = issued_at + policy.offer_response_days`, extendable by
-`placement_cell.offer.update` (not dangerous — extending a deadline only ever helps the student).
+`placement.offer.update` (not dangerous — extending a deadline only ever helps the student).
 
 `expire_offers` runs every 15 minutes over the partial index `offer_pending_expiry_idx`, so the sweep never
 scans historical offers. Idempotent.

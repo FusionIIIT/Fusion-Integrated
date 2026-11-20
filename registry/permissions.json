@@ -8,22 +8,18 @@
         "acadadmin": [
           "directory.user.search"
         ],
-        "placement_chairman": [
+        "placement chairman": [
           "directory.user.search"
         ],
-        "placement_coordinator": [
-          "directory.user.search"
-        ],
-        "placement_officer": [
+        "placement officer": [
           "directory.user.search"
         ]
       },
       "module_grants": [
         "Dean Academic",
         "acadadmin",
-        "placement_chairman",
-        "placement_coordinator",
-        "placement_officer"
+        "placement chairman",
+        "placement officer"
       ],
       "permissions": [
         {
@@ -34,59 +30,50 @@
       "scope_permissions": [],
       "system_permissions": []
     },
-    "placement_cell": {
+    "placement": {
       "grants": {
-        "Dean Academic": [
-          "placement_cell.academic_directory.view",
-          "placement_cell.announcement.publish",
-          "placement_cell.application.view",
-          "placement_cell.job_posting.view",
-          "placement_cell.report.view"
+        "alumini": [
+          "placement.statistic.view"
         ],
-        "placement_chairman": [
-          "placement_cell.academic_directory.view",
-          "placement_cell.announcement.publish",
-          "placement_cell.application.view",
-          "placement_cell.job_posting.view",
-          "placement_cell.report.view"
+        "placement chairman": [
+          "placement.academic_directory.view",
+          "placement.announcement.publish",
+          "placement.application.view",
+          "placement.job_posting.view",
+          "placement.report.view",
+          "placement.statistic.view"
         ],
-        "placement_coordinator": [
-          "placement_cell.academic_directory.view",
-          "placement_cell.application.review",
-          "placement_cell.application.view",
-          "placement_cell.job_posting.view",
-          "placement_cell.report.view"
-        ],
-        "placement_officer": [
-          "placement_cell.academic_directory.view",
-          "placement_cell.announcement.publish",
-          "placement_cell.application.review",
-          "placement_cell.application.view",
-          "placement_cell.company.manage",
-          "placement_cell.interview.schedule",
-          "placement_cell.job_posting.manage",
-          "placement_cell.job_posting.view",
-          "placement_cell.offer.issue",
-          "placement_cell.offer.revoke",
-          "placement_cell.record.manage",
-          "placement_cell.registration.debar",
-          "placement_cell.registration.manage",
-          "placement_cell.report.view"
+        "placement officer": [
+          "placement.academic_directory.view",
+          "placement.announcement.publish",
+          "placement.application.review",
+          "placement.application.view",
+          "placement.company.manage",
+          "placement.interview.create",
+          "placement.job_posting.manage",
+          "placement.job_posting.view",
+          "placement.offer.create",
+          "placement.offer.revoke",
+          "placement.record.manage",
+          "placement.registration.manage",
+          "placement.report.view",
+          "placement.sanction.manage",
+          "placement.statistic.view"
         ],
         "student": [
-          "placement_cell.application.create",
-          "placement_cell.application.delete",
-          "placement_cell.application.view_self",
-          "placement_cell.job_posting.view",
-          "placement_cell.offer.respond",
-          "placement_cell.registration.self"
+          "placement.application.create",
+          "placement.application.delete",
+          "placement.job_posting.view",
+          "placement.offer_response.create",
+          "placement.own_application.view",
+          "placement.registration.create",
+          "placement.statistic.view"
         ]
       },
       "module_grants": [
-        "Dean Academic",
-        "placement_chairman",
-        "placement_coordinator",
-        "placement_officer",
+        "alumini",
+        "placement chairman",
+        "placement officer",
         "student"
       ],
       "nav": {
@@ -97,15 +84,23 @@
             "code": "placement.registration",
             "icon": "Checks",
             "label": "Season Registration",
-            "required_permission": "placement_cell.registration.self",
+            "required_permission": "placement.registration.create",
             "sort_order": 5,
             "to": "/placement/registration"
+          },
+          {
+            "code": "placement.profile",
+            "icon": "IdentificationCard",
+            "label": "My Profile",
+            "required_permission": "placement.own_application.view",
+            "sort_order": 7,
+            "to": "/placement/profile"
           },
           {
             "code": "placement.postings",
             "icon": "ClipboardText",
             "label": "Opportunities",
-            "required_permission": "placement_cell.job_posting.view",
+            "required_permission": "placement.job_posting.view",
             "sort_order": 10,
             "to": "/placement/postings"
           },
@@ -113,7 +108,7 @@
             "code": "placement.mine",
             "icon": "UserCheck",
             "label": "My Applications",
-            "required_permission": "placement_cell.application.view_self",
+            "required_permission": "placement.own_application.view",
             "sort_order": 20,
             "to": "/placement/mine"
           },
@@ -121,7 +116,7 @@
             "code": "placement.offers",
             "icon": "Signature",
             "label": "My Offers",
-            "required_permission": "placement_cell.offer.respond",
+            "required_permission": "placement.offer_response.create",
             "sort_order": 30,
             "to": "/placement/offers"
           },
@@ -129,7 +124,7 @@
             "code": "placement.applications",
             "icon": "Users",
             "label": "Applications",
-            "required_permission": "placement_cell.application.view",
+            "required_permission": "placement.application.view",
             "sort_order": 50,
             "to": "/placement/applications"
           },
@@ -137,7 +132,7 @@
             "code": "placement.registrations",
             "icon": "Checks",
             "label": "Registrations",
-            "required_permission": "placement_cell.registration.manage",
+            "required_permission": "placement.registration.manage",
             "sort_order": 55,
             "to": "/placement/registration-approvals"
           },
@@ -145,7 +140,7 @@
             "code": "placement.companies",
             "icon": "Buildings",
             "label": "Companies",
-            "required_permission": "placement_cell.company.manage",
+            "required_permission": "placement.company.manage",
             "sort_order": 60,
             "to": "/placement/companies"
           },
@@ -153,7 +148,7 @@
             "code": "placement.interviews",
             "icon": "CalendarBlank",
             "label": "Interviews",
-            "required_permission": "placement_cell.interview.schedule",
+            "required_permission": "placement.interview.create",
             "sort_order": 70,
             "to": "/placement/interviews"
           },
@@ -161,7 +156,7 @@
             "code": "placement.announcements",
             "icon": "Megaphone",
             "label": "Announcements",
-            "required_permission": "placement_cell.announcement.publish",
+            "required_permission": "placement.announcement.publish",
             "sort_order": 80,
             "to": "/placement/announcements"
           },
@@ -169,15 +164,23 @@
             "code": "placement.cpi",
             "icon": "GraduationCap",
             "label": "Student CPI",
-            "required_permission": "placement_cell.academic_directory.view",
+            "required_permission": "placement.academic_directory.view",
             "sort_order": 85,
             "to": "/placement/students-cpi"
+          },
+          {
+            "code": "placement.records",
+            "icon": "Notebook",
+            "label": "Placement Records",
+            "required_permission": "placement.record.manage",
+            "sort_order": 88,
+            "to": "/placement/records"
           },
           {
             "code": "placement.reports",
             "icon": "ChartBar",
             "label": "Reports",
-            "required_permission": "placement_cell.report.view",
+            "required_permission": "placement.statistic.view",
             "sort_order": 90,
             "to": "/placement/reports"
           }
@@ -189,94 +192,98 @@
       },
       "permissions": [
         {
-          "code": "placement_cell.job_posting.view",
+          "code": "placement.job_posting.view",
           "label": "See job postings"
         },
         {
-          "code": "placement_cell.job_posting.manage",
+          "code": "placement.job_posting.manage",
           "label": "Create and publish postings"
         },
         {
-          "code": "placement_cell.application.view",
+          "code": "placement.application.view",
           "label": "See all applications"
         },
         {
-          "code": "placement_cell.application.view_self",
+          "code": "placement.own_application.view",
           "label": "See one's own applications"
         },
         {
-          "code": "placement_cell.application.create",
+          "code": "placement.application.create",
           "label": "Apply to a posting"
         },
         {
-          "code": "placement_cell.application.review",
+          "code": "placement.application.review",
           "label": "Shortlist and reject applications"
         },
         {
-          "code": "placement_cell.application.delete",
+          "code": "placement.application.delete",
           "label": "Withdraw an application"
         },
         {
-          "code": "placement_cell.application.auto_withdraw",
+          "code": "placement.application.revoke",
           "label": "System auto-withdrawal"
         },
         {
-          "code": "placement_cell.interview.schedule",
+          "code": "placement.interview.create",
           "label": "Schedule interview rounds"
         },
         {
-          "code": "placement_cell.offer.issue",
+          "code": "placement.offer.create",
           "label": "Extend an offer"
         },
         {
-          "code": "placement_cell.offer.respond",
+          "code": "placement.offer_response.create",
           "label": "Accept or decline an offer"
         },
         {
-          "code": "placement_cell.offer.revoke",
+          "code": "placement.offer.revoke",
           "label": "Revoke an issued offer"
         },
         {
-          "code": "placement_cell.offer.expire",
+          "code": "placement.offer_expiry.create",
           "label": "System offer expiry"
         },
         {
-          "code": "placement_cell.company.manage",
+          "code": "placement.company.manage",
           "label": "Register and approve companies"
         },
         {
-          "code": "placement_cell.announcement.publish",
+          "code": "placement.announcement.publish",
           "label": "Publish announcements"
         },
         {
-          "code": "placement_cell.report.view",
+          "code": "placement.report.view",
           "label": "See operational reports"
         },
         {
-          "code": "placement_cell.registration.debar",
+          "code": "placement.statistic.view",
+          "label": "See anonymised placement statistics"
+        },
+        {
+          "code": "placement.sanction.manage",
           "label": "Record conduct incidents and impose placement sanctions"
         },
         {
-          "code": "placement_cell.registration.manage",
+          "code": "placement.registration.manage",
           "label": "Approve late registrations and re-registrations"
         },
         {
-          "code": "placement_cell.registration.self",
+          "code": "placement.registration.create",
           "label": "Register yourself for a placement season"
         },
         {
-          "code": "placement_cell.record.manage",
+          "code": "placement.record.manage",
           "label": "Record off-campus placements and chase offer letters"
         },
         {
-          "code": "placement_cell.academic_directory.view",
+          "code": "placement.academic_directory.view",
           "label": "Browse every student's declared CPI"
         }
       ],
       "scope_permissions": [],
       "system_permissions": [
-        "placement_cell.application.auto_withdraw",
-        "placement_cell.offer.expire"
+        "placement.application.revoke",
+        "placement.offer_expiry.create"
       ]
     }
   },

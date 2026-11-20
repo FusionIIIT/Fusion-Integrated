@@ -1,11 +1,4 @@
-"""Recruiter authentication — the only credential check this service performs.
-
-Institute users authenticate at the IAM; this service never sees their
-password. Recruiters have no ERP identity, so their credential lives here, in
-a separate lane: its own header scheme, and a principal carrying a company but
-no permissions, since everything a recruiter may do is decided by scoped
-querysets.
-"""
+"""Recruiter authentication — the only credential check this service performs."""
 from __future__ import annotations
 
 import hashlib
@@ -38,11 +31,7 @@ def hash_token(raw: str) -> str:
 
 @dataclass(frozen=True)
 class RecruiterPrincipal:
-    """An external recruiter: a company, not an institute identity.
-
-    The absence of `user_id` is load-bearing — code that reaches for it to
-    scope institute data fails loudly rather than silently.
-    """
+    """An external recruiter: a company, not an institute identity."""
 
     account_id: int
     company_id: int
@@ -58,7 +47,7 @@ class RecruiterPrincipal:
     permissions: frozenset[str] = field(default_factory=frozenset)
 
     # Hard-coded, not granted, so no data change can widen a recruiter's reach.
-    modules: tuple[str, ...] = ("placement_cell",)
+    modules: tuple[str, ...] = ("placement",)
 
     def has_permission(self, code: str) -> bool:
         """Always false — reach is defined by scoped querysets, never a grant."""
@@ -68,7 +57,7 @@ class RecruiterPrincipal:
         return False
 
     def has_module(self, code: str) -> bool:
-        return code == "placement_cell"
+        return code == "placement"
 
     def __str__(self) -> str:
         return f"recruiter:{self.email}@{self.company_id}"

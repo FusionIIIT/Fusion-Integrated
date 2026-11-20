@@ -59,6 +59,7 @@ export function IssueOfferModal({ application, onClose }: {
         />
         <DateTimePicker
           label="Respond by" value={respondBy} onChange={setRespondBy}
+          minDate={new Date()}
           description="Leave blank to use the season's default window"
         />
         <Alert variant="light" color="blue" icon={<FaInfoCircle />}>

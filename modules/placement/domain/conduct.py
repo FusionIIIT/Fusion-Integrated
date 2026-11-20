@@ -1,21 +1,4 @@
-"""The debarment ladder (policy rules 18, 19 and 21). Pure functions.
-
-The policy is deliberately discretionary — rule 19 says a student "may be
-debarred" and rule 21 vests the decision in the Chairperson. So nothing here
-debars anyone. It reads the incidents on record and returns the sanction the
-policy *recommends*; applying it stays a human act, recorded as one.
-
-The ladders, quoted:
-
-  19  consent given then failed to appear — "may be debarred from the next two
-      campus placement processes. A repeat of such an incident will debar them
-      from entire campus placement processes." Waivable: "in any unavoidable
-      circumstances, the student may inform the placement cell in writing".
-  21  code of conduct — de-registered, re-registration on a fee "acceptable
-      only once", after which "debarred from Placement activities in future".
-  18  unfair means or a false resume — debarred outright, and rule 18 removes
-      the re-registration route that rule 21 would otherwise offer.
-"""
+"""The debarment ladder (policy rules 18, 19 and 21)."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -50,11 +33,7 @@ class Recommendation:
 
 
 def recommend(kind: IncidentKind, *, prior_incidents: int) -> Recommendation:
-    """The sanction the policy points to, given what is already on record.
-
-    `prior_incidents` counts earlier incidents of the SAME kind that were not
-    waived — the ladders in 19 and 21 escalate independently of each other.
-    """
+    """The sanction the policy points to, given what is already on record."""
     if kind is IncidentKind.MISREPRESENTATION:
         return Recommendation(
             Sanction.BAR_SEASON, "18",
@@ -85,11 +64,7 @@ def recommend(kind: IncidentKind, *, prior_incidents: int) -> Recommendation:
 
 
 def bars_this_drive(*, sanction: Sanction, drives_since_sanction: int) -> bool:
-    """Whether a sanction still blocks the drive now being considered.
-
-    Rule 19's first tier expires by being served: two drives pass and the
-    student is back in. Season and permanent bars never expire this way.
-    """
+    """Whether a sanction still blocks the drive now being considered."""
     if sanction in (Sanction.BAR_SEASON, Sanction.BAR_PERMANENT):
         return True
     if sanction is Sanction.BAR_NEXT_TWO:

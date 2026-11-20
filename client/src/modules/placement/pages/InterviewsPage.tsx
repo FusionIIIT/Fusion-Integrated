@@ -1,19 +1,21 @@
 import { useState } from "react";
 import {
-  Badge, Button, Card, Container, Group, NumberInput, Select, Stack, Text,
-  Textarea, TextInput,
+  Badge, Button, Card, Checkbox, Container, Group, NumberInput, Select, Stack, Text, TextInput, Textarea,
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { notifications } from "@mantine/notifications";
-import { FaCalendarAlt, FaPlus } from "react-icons/fa";
+import { FaCalendarAlt, FaPlus, FaUserPlus } from "react-icons/fa";
 
 import { errorMessage } from "../../../lib/http";
 import { DataTable } from "../../../ui/components/DataTable";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
-import { usePostings, useRounds, useScheduleRound } from "../api/hooks";
+import {
+  useAddCandidates, useApplications, usePostings, useRounds, useScheduleRound,
+} from "../api/hooks";
 import type { InterviewRound } from "../api/types";
+import { LoadMore } from "../components/LoadMore";
 
 const KINDS = [
   { value: "test", label: "Written / online test" },
@@ -24,8 +26,10 @@ const KINDS = [
 ];
 
 export default function InterviewsPage() {
-  const { data, isPending, error } = useRounds();
+  const list = useRounds();
+  const { data, isPending, error } = list;
   const [scheduling, setScheduling] = useState(false);
+  const [adding, setAdding] = useState<InterviewRound | null>(null);
 
   if (error) return <Container size="xl"><ErrorState error={error} /></Container>;
 
@@ -47,10 +51,17 @@ export default function InterviewsPage() {
           rows={data?.results ?? []}
           loading={isPending}
           rowKey={(r) => r.id}
-          minWidth={900}
+          minWidth={860}
           columns={[
-            { key: "seq", header: "Round", align: "right",
-              render: (r) => `#${r.seq}` },
+            {
+              key: "role", header: "Role",
+              render: (r) => (
+                <Stack gap={0}>
+                  <Text fw={600}>{r.posting_title}</Text>
+                  <Text size="xs" c="dimmed">Round {r.seq}</Text>
+                </Stack>
+              ),
+            },
             {
               key: "kind", header: "Type",
               render: (r) => (
@@ -80,6 +91,18 @@ export default function InterviewsPage() {
             },
             { key: "capacity", header: "Capacity", align: "right",
               render: (r) => r.capacity?.toString() ?? "—" },
+            {
+              key: "actions", header: "", align: "right",
+              render: (r) => (
+                <Button
+                  size="xs" variant="light"
+                  leftSection={<FaUserPlus size={10} />}
+                  onClick={() => setAdding(r)}
+                >
+                  Add candidates
+                </Button>
+              ),
+            },
           ]}
           empty={{
             icon: FaCalendarAlt,
@@ -90,6 +113,8 @@ export default function InterviewsPage() {
       </Card>
 
       <ScheduleModal opened={scheduling} onClose={() => setScheduling(false)} />
+      <AddCandidatesModal round={adding} onClose={() => setAdding(null)} />
+      <LoadMore list={list} />
     </Container>
   );
 }
@@ -161,6 +186,7 @@ function ScheduleModal({ opened, onClose }: {
         </Group>
         <DateTimePicker
           label="Starts at" required value={startsAt} onChange={setStartsAt}
+          minDate={new Date()}
         />
         {mode === "online" ? (
           <TextInput
@@ -184,6 +210,73 @@ function ScheduleModal({ opened, onClose }: {
           onChange={(e) => setInstructions(e.currentTarget.value)}
         />
       </Stack>
+    </FormModal>
+  );
+}
+
+/** PC-UC-009 steps 2-4: put shortlisted candidates into a round, which notifies them. */
+function AddCandidatesModal({ round, onClose }: {
+  round: InterviewRound | null; onClose: () => void;
+}) {
+  const add = useAddCandidates();
+  const { data } = useApplications(
+    round ? { posting: round.posting, status: "shortlisted" } : undefined);
+  const [picked, setPicked] = useState<number[]>([]);
+  const rows = round ? data?.results ?? [] : [];
+
+  function toggle(id: number) {
+    setPicked((p) => p.includes(id) ? p.filter((x) => x !== id) : [...p, id]);
+  }
+
+  return (
+    <FormModal
+      opened={round != null}
+      onClose={() => { setPicked([]); onClose(); }}
+      title={`Add candidates to round #${round?.seq ?? ""}`}
+      subtitle="Everyone you add is emailed the date, time and mode"
+      onSubmit={() => round && add.mutate(
+        { roundId: round.id, applicationIds: picked },
+        {
+          onSuccess: (d) => {
+            notifications.show({
+              color: "green", title: "Candidates scheduled",
+              message: `${d.scheduled} candidate(s) notified.`,
+            });
+            setPicked([]);
+            onClose();
+          },
+          onError: (e) => notifications.show({
+            color: "red", title: "Could not schedule", message: errorMessage(e),
+          }),
+        },
+      )}
+      submitLabel={`Add ${picked.length || ""}`.trim()}
+      submitting={add.isPending} error={add.error} disabled={!picked.length}
+    >
+      {rows.length === 0 ? (
+        <Text size="sm" c="dimmed">
+          No shortlisted candidates for this posting yet.
+        </Text>
+      ) : (
+        <Stack gap="xs">
+          {rows.map((a) => (
+            <Checkbox
+              key={a.id}
+              checked={picked.includes(a.id)}
+              onChange={() => toggle(a.id)}
+              label={
+                <Stack gap={0}>
+                  <Text size="sm" fw={500}>{a.candidate?.name ?? `#${a.user_id}`}</Text>
+                  <Text size="xs" c="dimmed">
+                    {a.candidate?.roll_no}
+                    {a.cpi_at_apply ? ` · CPI ${a.cpi_at_apply}` : ""}
+                  </Text>
+                </Stack>
+              }
+            />
+          ))}
+        </Stack>
+      )}
     </FormModal>
   );
 }

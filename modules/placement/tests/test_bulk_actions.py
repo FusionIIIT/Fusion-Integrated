@@ -1,13 +1,4 @@
-"""Bulk shortlisting and rejection (PC-UC-008).
-
-A bulk endpoint is the natural place for an authorisation check to go missing,
-because it is tempting to write a fast path that updates rows directly. These
-tests pin the opposite: every item goes through the same service as a single
-transition, so scope, permission, state machine and guards all still apply.
-
-The other property is honesty about partial success — a run that moved 38 of 40
-must not report as done.
-"""
+"""Bulk shortlisting and rejection (PC-UC-008)."""
 from datetime import timedelta
 
 import pytest
@@ -31,8 +22,8 @@ SEASON = "2026-27"
 BULK = "/api/v1/placement/applications/bulk-transition"
 
 STAFF_PERMS = (
-    "placement_cell.application.view",
-    "placement_cell.application.review",
+    "placement.application.view",
+    "placement.application.review",
 )
 
 
@@ -40,11 +31,11 @@ def _actor(uid=9, perms=STAFF_PERMS, kind="staff"):
     from fusion_auth.principal import Principal
     return Principal.from_session(
         make_session(user_id=uid, kind=kind, permissions=perms,
-                     modules=("placement_cell",)))
+                     modules=("placement",)))
 
 
 def _client(stub_iam, perms=STAFF_PERMS, uid=9, kind="staff"):
-    stub_iam(make_session(user_id=uid, kind=kind, modules=("placement_cell",),
+    stub_iam(make_session(user_id=uid, kind=kind, modules=("placement",),
                           permissions=perms))
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
@@ -118,8 +109,7 @@ class TestBulkMove:
 class TestPartialSuccess:
 
     def test_one_refusal_does_not_block_the_rest(self, stub_iam, world):
-        """A TPO shortlisting forty candidates should not be stopped because
-        one withdrew an hour ago."""
+        """A TPO shortlisting forty candidates should not be stopped by one withdrawal."""
         stub_iam()
         _, posting = world
         good = submitted(posting, 2)
@@ -189,8 +179,7 @@ class TestLimits:
 class TestBulkGrantsNoShortcut:
 
     def test_a_reason_is_still_required_for_rejection(self, stub_iam, world):
-        """The has_reason guard applies per item, so a bulk reject cannot skip
-        the reason a single reject demands."""
+        """The has_reason guard applies per item, so a bulk reject cannot skip the reason."""
         stub_iam()
         _, posting = world
         apps = submitted(posting, 2)
@@ -219,9 +208,7 @@ class TestBulkGrantsNoShortcut:
 
     def test_a_student_cannot_bulk_move_their_own_applications(self, stub_iam,
                                                               world):
-        """`applications_for` returns a student their own rows, so scope alone
-        would let this through — the per-item permission check is what stops
-        it."""
+        """`applications_for` returns a student their own rows."""
         stub_iam()
         _, posting = world
         mine = Application.objects.create(posting=posting, user_id=1001,
@@ -230,7 +217,7 @@ class TestBulkGrantsNoShortcut:
         outcomes = service.bulk_transition(
             application_ids=[mine.pk], to_status="shortlisted",
             actor=_actor(uid=1001, kind="student",
-                         perms=("placement_cell.application.view_self",)),
+                         perms=("placement.own_application.view",)),
             scope=Application.objects.filter(user_id=1001))
 
         assert outcomes[0].moved is False
@@ -245,7 +232,7 @@ class TestBulkGrantsNoShortcut:
 
         outcomes = service.bulk_transition(
             application_ids=[a.pk for a in apps], to_status="under_review",
-            actor=_actor(perms=("placement_cell.report.view",)),
+            actor=_actor(perms=("placement.report.view",)),
             scope=Application.objects.all())
 
         assert not any(o.moved for o in outcomes)
@@ -275,14 +262,14 @@ class TestBulkApi:
         _, posting = world
         app = Application.objects.create(posting=posting, user_id=1001,
                                         status="submitted")
-        client = _client(stub_iam, perms=("placement_cell.application.view_self",),
+        client = _client(stub_iam, perms=("placement.own_application.view",),
                          uid=1001, kind="student")
 
-        body = client.post(BULK, {
+        response = client.post(BULK, {
             "application_ids": [app.pk], "to_status": "shortlisted",
-        }, format="json").json()
+        }, format="json")
 
-        assert body["moved"] == 0
+        assert response.status_code == 403
         app.refresh_from_db()
         assert app.status == "submitted"
 

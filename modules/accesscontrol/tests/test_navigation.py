@@ -9,7 +9,7 @@ from modules.accesscontrol.models import Module, NavItem
 pytestmark = pytest.mark.django_db
 
 
-def _module(code="placement_cell", status="active", **kw):
+def _module(code="placement", status="active", **kw):
     return Module.objects.create(
         code=code, label=code.title(), base_path=f"/{code}",
         nav_section=kw.pop("section", "Placement"), status=status, **kw)
@@ -24,10 +24,10 @@ def test_granted_module_appears():
     m = _module()
     NavItem.objects.create(module=m, code="p.list", label="Postings",
                            to="/placement/postings")
-    nav = contracts.build_navigation(granted_module_codes=["placement_cell"],
+    nav = contracts.build_navigation(granted_module_codes=["placement"],
                                      permissions=[])
     assert nav[0]["section"] == "Placement"
-    assert nav[0]["items"][0]["code"] == "placement_cell"
+    assert nav[0]["items"][0]["code"] == "placement"
 
 
 def test_links_filtered_by_permission():
@@ -36,12 +36,12 @@ def test_links_filtered_by_permission():
                            to="/placement/postings")
     NavItem.objects.create(module=m, code="p.admin", label="Admin",
                            to="/placement/admin",
-                           required_permission="placement_cell.offer.issue")
-    nav = contracts.build_navigation(granted_module_codes=["placement_cell"],
-                                     permissions=["placement_cell.offer.issue"])
+                           required_permission="placement.offer.create")
+    nav = contracts.build_navigation(granted_module_codes=["placement"],
+                                     permissions=["placement.offer.create"])
     assert len(nav[0]["items"][0]["links"]) == 2
 
-    nav = contracts.build_navigation(granted_module_codes=["placement_cell"],
+    nav = contracts.build_navigation(granted_module_codes=["placement"],
                                      permissions=[])
     assert len(nav[0]["items"][0]["links"]) == 1
 
@@ -51,8 +51,8 @@ def test_module_whose_every_link_is_filtered_away_is_omitted():
     m = _module()
     NavItem.objects.create(module=m, code="p.admin", label="Admin",
                            to="/placement/admin",
-                           required_permission="placement_cell.offer.issue")
-    assert contracts.build_navigation(granted_module_codes=["placement_cell"],
+                           required_permission="placement.offer.create")
+    assert contracts.build_navigation(granted_module_codes=["placement"],
                                       permissions=[]) == []
 
 

@@ -12,7 +12,7 @@ from modules.placement.services import postings
 
 pytestmark = pytest.mark.django_db
 
-MANAGE = "placement_cell.job_posting.manage"
+MANAGE = "placement.job_posting.manage"
 BROKEN_RULE = {"approx": ["cpi", 7]}
 
 
@@ -158,7 +158,7 @@ def test_informational_fields_stay_editable_after_publish(company, staff):
 @pytest.fixture
 def api(stub_iam):
     stub_iam(make_session(user_id=9, kind="staff", roles=("tpo",), active_role="tpo",
-                          modules=("placement_cell",), permissions=(MANAGE,)))
+                          modules=("placement",), permissions=(MANAGE,)))
     client = APIClient()
     client.credentials(HTTP_AUTHORIZATION="Token abc")
     return client

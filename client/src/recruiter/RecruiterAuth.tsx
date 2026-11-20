@@ -15,10 +15,10 @@ interface Value {
 
 const Ctx = createContext<Value | null>(null);
 
-/** Auth for the recruiter portal. Deliberately separate from the institute
- *  AuthProvider: different credential, different login page, different 401
- *  destination. Sharing one context is how a signed-out recruiter ends up on
- *  the institute login screen. */
+/** Reachable with no session: signing in, accepting an invitation, registering. */
+const PUBLIC_PATHS = new Set(["/recruiter/login", "/recruiter/accept", "/recruiter/register"]);
+
+/** Auth for the recruiter portal. */
 export function RecruiterAuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { data, isPending, isError } = useRecruiterSession();
@@ -30,8 +30,11 @@ export function RecruiterAuthProvider({ children }: { children: React.ReactNode 
   }, [data?.csrf_token]);
 
   useEffect(() => {
-    setRecruiterUnauthorizedHandler(() => navigate("/recruiter/login",
-      { replace: true }));
+    setRecruiterUnauthorizedHandler(() => {
+      if (!PUBLIC_PATHS.has(window.location.pathname)) {
+        navigate("/recruiter/login", { replace: true });
+      }
+    });
     return () => setRecruiterUnauthorizedHandler(() => {});
   }, [navigate]);
 

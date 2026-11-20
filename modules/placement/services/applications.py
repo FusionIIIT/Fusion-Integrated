@@ -1,13 +1,4 @@
-"""All writes to an application (PC-WF-004, PC-WF-005).
-
-Raises domain errors, never DRF exceptions, so it stays callable from a task
-or a management command. Three checks must all pass:
-
-    state machine   which kind of actor may drive this edge
-    permission      whether this institute user holds the right
-    scope           whether they may touch THIS application, supplied by the
-                    caller as a queryset so a foreign one is a 404
-"""
+"""All writes to an application (CW-PC-01, CW-PC-02)."""
 from __future__ import annotations
 
 import logging
@@ -37,13 +28,7 @@ log = logging.getLogger("fusion.placement.applications")
 
 
 def actor_kind(actor, application=None) -> str:
-    """Which lane of the state machine this caller is in.
-
-    Follows what they were granted, not `principal.kind` — a student placement
-    coordinator is a real role and would otherwise be locked out of the job
-    they were appointed to do. Acting on their OWN application drops them back
-    to the student lane, which is the self-approval guard.
-    """
+    """Which lane of the state machine this caller is in."""
     if actor is None:
         return sm.SYSTEM
     if getattr(actor, "kind", None) == "recruiter":
@@ -56,8 +41,7 @@ def actor_kind(actor, application=None) -> str:
 
 
 def _guard_conduct_sanction(application) -> None:
-    """Rule 19's first tier bars the next two drives, not the season, so the
-    season-wide debarred flag cannot express it."""
+    """Rule 19's first tier bars the next two drives, not the season."""
     from modules.placement.services import conduct as conduct_service
 
     registration = PlacementRegistration.objects.filter(
@@ -73,8 +57,7 @@ def _guard_conduct_sanction(application) -> None:
 
 
 def resolve_or_raise(frm: str, to: str, kind: str):
-    """`sm.resolve` with its errors translated. Every path into the state
-    machine must use this, or an illegal move surfaces as a 500."""
+    """`sm.resolve` with its errors translated."""
     try:
         return sm.resolve(frm, to, kind)
     except sm.InvalidTransition as exc:
@@ -207,13 +190,8 @@ def _notify_transition(app: Application, to_status: str) -> None:
 
 # -- Creating an application ---------------------------------------------------
 @transaction.atomic
-def apply_to(*, posting_id: int, actor, cover_note: str = "",
-             resume_id: int | None = None) -> Application:
-    """Create and submit in one step (PC-UC-003).
-
-    Eligibility is frozen onto the row, so the decision stays reproducible
-    after a CPI or rule change. That snapshot is what an appeal is judged on.
-    """
+def apply_to(*, posting_id: int, actor, cover_note: str = "") -> Application:
+    """Create and submit in one step (PC-UC-003)."""
     posting = (JobPosting.objects.select_related("company")
                .filter(pk=posting_id).first())
     if posting is None:
@@ -233,7 +211,7 @@ def apply_to(*, posting_id: int, actor, cover_note: str = "",
 
     app = Application.objects.create(
         posting=posting, user_id=actor.user_id, status=sm.DRAFT,
-        cover_note=cover_note, resume_id=resume_id,
+        cover_note=cover_note,
         cpi_at_apply=snapshot.get("cpi"),
         semester_at_apply=snapshot.get("semester"),
         standing_declared_seq_at_apply=snapshot.get("declared_seq"),
@@ -302,17 +280,7 @@ class BulkOutcome:
 
 def bulk_transition(*, application_ids: Sequence[int], to_status: str, actor,
                     reason: str = "", scope=None) -> list[BulkOutcome]:
-    """Move several applications, reporting each one's fate.
-
-    Each item goes through `transition` — the same scope, permission, state
-    machine and guards. A separate bulk path is precisely where one of those
-    checks gets forgotten, so there isn't one.
-
-    Deliberately NOT all-or-nothing: a TPO shortlisting forty candidates should
-    not be blocked because one of them withdrew an hour ago. Each item commits
-    on its own and the caller is told exactly which did not, so a partial run
-    can never read as a complete one.
-    """
+    """Move several applications, reporting each one's fate."""
     ids = list(dict.fromkeys(int(i) for i in application_ids))
     if not ids:
         raise ConflictError("Select at least one application.",

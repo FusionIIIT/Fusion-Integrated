@@ -1,17 +1,4 @@
-"""Role scope, decided in one place (PC-UC-018).
-
-Every list and detail view starts from a queryset built here. Ownership is
-enforced by narrowing the queryset, never by fetching a row and then checking
-it — so a row you may not see is a 404, not a 403. A 403 would confirm it
-exists, which for placement data is itself a disclosure.
-
-    PC-BR-009  a company sees only applications to its own postings
-    PC-BR-010  the TPO sees everything in the module
-    PC-BR-016  students get anonymised aggregates, not raw records
-    PC-BR-019  alumni get a narrow read-only slice
-    PC-BR-020  alumni are excluded from active workflow objects
-    PC-BR-023  sensitive data is restricted to authorised readers
-"""
+"""Role scope, decided in one place (PC-BR-022)."""
 from __future__ import annotations
 
 from django.db.models import QuerySet
@@ -27,25 +14,26 @@ from modules.placement.models import (
 )
 
 # Permission codes. Held by TPO / placement chairman via the IAM.
-P_VIEW_ALL = "placement_cell.application.view"
-P_MANAGE_POSTINGS = "placement_cell.job_posting.manage"
-P_VIEW_REPORTS = "placement_cell.report.view"
+P_VIEW_ALL = "placement.application.view"
+P_MANAGE_POSTINGS = "placement.job_posting.manage"
+P_VIEW_REPORTS = "placement.report.view"
 
 # Any of these makes someone staff; view_self is the student grant and absent.
 STAFF_SCOPE_PERMISSIONS = (
     P_VIEW_ALL,
-    "placement_cell.application.review",
-    "placement_cell.job_posting.manage",
-    "placement_cell.interview.schedule",
-    "placement_cell.offer.issue",
-    "placement_cell.offer.revoke",
-    "placement_cell.company.manage",
-    "placement_cell.report.view",
-    "placement_cell.announcement.publish",
-    "placement_cell.academic_directory.view",
+    "placement.application.review",
+    "placement.job_posting.manage",
+    "placement.interview.create",
+    "placement.offer.create",
+    "placement.offer.revoke",
+    "placement.company.manage",
+    "placement.report.view",
+    "placement.announcement.publish",
+    "placement.academic_directory.view",
 )
 
-ALUMNI_ROLE = "alumni"
+#: The ERP spells the designation "alumini"; both spellings mean the same role.
+ALUMNI_ROLES = frozenset({"alumni", "alumini"})
 
 
 def _is_recruiter(actor) -> bool:
@@ -53,15 +41,13 @@ def _is_recruiter(actor) -> bool:
 
 
 def _own_id(actor) -> int | None:
-    """None means no identity to scope by, which resolves to an empty
-    queryset. Deny is the only safe reading of "who is asking?" being
-    unanswerable."""
+    """None means no identity to scope by, which resolves to an empty queryset."""
     return getattr(actor, "user_id", None)
 
 
 def _is_alumni(actor) -> bool:
     """Alumni are an IAM role, not a separate pool."""
-    return ALUMNI_ROLE in {r.lower() for r in getattr(actor, "roles", ())}
+    return bool(ALUMNI_ROLES & {r.lower() for r in getattr(actor, "roles", ())})
 
 
 def _has(actor, *codes: str) -> bool:
@@ -70,8 +56,7 @@ def _has(actor, *codes: str) -> bool:
 
 
 def is_staff(actor) -> bool:
-    """Sees the whole module. Never a recruiter or alumnus, whatever
-    permissions they might somehow carry."""
+    """Sees the whole module."""
     return (not _is_recruiter(actor)
             and not _is_alumni(actor)
             and _has(actor, *STAFF_SCOPE_PERMISSIONS))
@@ -146,11 +131,7 @@ def interview_rounds_for(actor) -> QuerySet[InterviewRound]:
 
 # -- Candidates ----------------------------------------------------------------
 def may_read_candidate(actor, user_id: int) -> bool:
-    """Whether this actor may open that person's candidate record.
-
-    A predicate rather than a queryset: the record is assembled from the
-    directory projection now, and placement holds no table to narrow.
-    """
+    """Whether this actor may open that person's candidate record."""
     if _is_alumni(actor):
         return False
     if _sees_everything(actor):
@@ -190,8 +171,7 @@ def placement_records_for(actor) -> QuerySet[PlacementRecord]:
 
 # -- Announcements -------------------------------------------------------------
 def announcements_for(actor) -> QuerySet[Announcement]:
-    """History is kept (PC-BR-018), but a withdrawn notice is staff-only so
-    nobody acts on a retracted one."""
+    """PC-AFR-043 keeps history; a withdrawn notice is staff-only."""
     base = Announcement.objects.all()
 
     if _is_recruiter(actor):

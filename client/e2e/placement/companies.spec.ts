@@ -1,6 +1,7 @@
 import {
-  actAs, expect, openModuleNav, sidebar, signedInAs, test, uniqueName,
+  actAs, expect, signedInAs, test, uniqueName,
 } from "../support/test";
+import { openScreen } from "./setup";
 
 test.describe("placement: companies", () => {
   test.use(signedInAs("placementOfficer"));
@@ -10,9 +11,12 @@ test.describe("placement: companies", () => {
 
     await page.goto("/");
     await actAs(page, "placementOfficer");
-    await openModuleNav(page, "Placement Cell");
-    await sidebar(page).getByRole("link", { name: "Companies" }).click();
+    // A save during the list's first load would be read by that load, not refetched.
+    const listed = page.waitForResponse((r) =>
+      r.url().includes("/api/v1/placement/companies") && r.request().method() === "GET");
+    await openScreen(page, "Companies");
     await expect(page.getByRole("heading", { name: "Companies", level: 2 })).toBeVisible();
+    await listed;
 
     await page.getByRole("button", { name: "Register company" }).click();
     const dialog = page.getByRole("dialog");

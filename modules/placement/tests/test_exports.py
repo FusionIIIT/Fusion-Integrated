@@ -1,10 +1,4 @@
-"""CSV export.
-
-Two properties. The escaping one is the reason this file exists: a spreadsheet
-evaluates a cell that begins `=`, and the values in these columns are supplied
-by students. The access one is the usual — an export is the largest single
-egress of personal data in the module, so the gate matches the CPI directory's.
-"""
+"""CSV export."""
 from datetime import timedelta
 
 import pytest
@@ -31,7 +25,7 @@ PASSWORD = "a-long-enough-password"
 
 
 def _client(stub_iam, perms, users=None, kind="staff", uid=9):
-    stub_iam(make_session(user_id=uid, kind=kind, modules=("placement_cell",),
+    stub_iam(make_session(user_id=uid, kind=kind, modules=("placement",),
                           permissions=perms), users=users or {})
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
@@ -79,13 +73,12 @@ class TestCellEscaping:
 
     def test_a_hostile_name_reaches_the_file_inert(self, stub_iam, world,
                                                    user_ref):
-        """End to end: the value comes from the directory, so quoting at the
-        writer is not enough — it has to be prefixed."""
+        """End to end: the value comes from the directory."""
         _, posting = world
         Application.objects.create(posting=posting, user_id=1001,
                                    status="submitted")
         evil = user_ref(1001, name="=HYPERLINK(\"http://evil.test\")")
-        client = _client(stub_iam, ("placement_cell.report.view",),
+        client = _client(stub_iam, ("placement.report.view",),
                          users={1001: evil})
 
         body = _body(client.get(APPLICATIONS))
@@ -99,28 +92,26 @@ class TestCellEscaping:
 class TestExportAccess:
 
     def test_staff_with_report_view_may_export(self, stub_iam, world):
-        client = _client(stub_iam, ("placement_cell.report.view",))
+        client = _client(stub_iam, ("placement.report.view",))
         response = client.get(APPLICATIONS)
         assert response.status_code == 200
         assert response["Content-Type"].startswith("text/csv")
 
     def test_the_file_is_an_attachment_and_not_sniffable(self, stub_iam, world):
-        client = _client(stub_iam, ("placement_cell.report.view",))
+        client = _client(stub_iam, ("placement.report.view",))
         response = client.get(APPLICATIONS)
         assert response["Content-Disposition"].startswith("attachment;")
         assert response["X-Content-Type-Options"] == "nosniff"
         assert response["Cache-Control"] == "private, no-store"
 
     def test_a_student_cannot_export(self, stub_iam, world):
-        client = _client(stub_iam, ("placement_cell.application.view_self",),
+        client = _client(stub_iam, ("placement.own_application.view",),
                          kind="student", uid=1001)
         assert client.get(APPLICATIONS).status_code == 403
         assert client.get(PLACEMENTS).status_code == 403
 
     def test_a_recruiter_cannot_export(self, stub_iam, world):
-        """401, not 403: these endpoints do not list RecruiterAuthentication at
-        all, so a recruiter credential is not even recognised here. A stronger
-        boundary than accepting it and then refusing."""
+        """401, not 403: these endpoints do not list RecruiterAuthentication at all."""
         company, _ = world
         _, raw = recruiters.invite(company_id=company.pk, email="r@acme.test",
                                    invited_by_user_id=9)
@@ -144,7 +135,7 @@ class TestExportContents:
         _, posting = world
         Application.objects.create(posting=posting, user_id=1001,
                                    status="submitted", cpi_at_apply="8.10")
-        client = _client(stub_iam, ("placement_cell.report.view",),
+        client = _client(stub_iam, ("placement.report.view",),
                          users={1001: user_ref(1001)})
 
         body = _body(client.get(APPLICATIONS))
@@ -156,8 +147,7 @@ class TestExportContents:
 
     def test_placements_export_only_active_records(self, stub_iam, world,
                                                    user_ref):
-        """A superseded record is history, not an outcome — counting it would
-        double-count a student who upgraded."""
+        """A superseded record is history, not an outcome."""
         company, posting = world
         policy = PlacementPolicy.objects.get(season="2026-27")
         app = Application.objects.create(posting=posting, user_id=1001,
@@ -170,7 +160,7 @@ class TestExportContents:
             policy=policy, offer=offer, company=company, posting=posting,
             user_id=1001, ctc_lpa="18.00", kind="fte", is_active=True,
             recorded_by_user_id=1001)
-        client = _client(stub_iam, ("placement_cell.report.view",),
+        client = _client(stub_iam, ("placement.report.view",),
                          users={1001: user_ref(1001)})
 
         body = _body(client.get(PLACEMENTS))
@@ -179,9 +169,8 @@ class TestExportContents:
         assert body.count("Asha Verma") == 1
 
     def test_an_empty_export_is_still_a_valid_file(self, stub_iam, world):
-        """A header-only CSV, not a 204 — the TPO opened a spreadsheet and
-        should see the columns."""
-        client = _client(stub_iam, ("placement_cell.report.view",))
+        """A header-only CSV, not a 204 — the TPO opened a spreadsheet and should see the columns."""
+        client = _client(stub_iam, ("placement.report.view",))
         body = _body(client.get(APPLICATIONS))
         header = ("Roll no,Name,Discipline,Programme,Company,Role,Season,"
                   "Status,CPI at apply,Semester at apply,Applied at")

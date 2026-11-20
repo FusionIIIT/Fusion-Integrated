@@ -1,12 +1,4 @@
-"""What this module needs run on a timer.
-
-Tasks are named by string, not imported, so config assembles the schedule
-without importing anything out of the module.
-
-Nothing scheduled these before, which meant `expire_overdue_offers` never ran:
-an offer nobody answered stayed `issued` forever and kept its student blocked
-from the pool, with no way out but a manual database edit.
-"""
+"""What this module needs run on a timer."""
 from celery.schedules import crontab
 
 #: Which worker pool each task lands on; without it everything queues on default.

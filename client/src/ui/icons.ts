@@ -3,7 +3,7 @@
  *
  *  Named imports ONLY. `import * as Fa` defeats tree-shaking and ships ~1 MB. */
 import {
-  FaBriefcase, FaBuilding, FaBullhorn, FaCalendarAlt, FaChartBar,
+  FaBook, FaBriefcase, FaBuilding, FaBullhorn, FaCalendarAlt, FaChartBar,
   FaCheckDouble, FaCircle, FaClipboardCheck, FaClipboardList, FaCog,
   FaExternalLinkAlt,
   FaFileSignature, FaGraduationCap, FaIdBadge, FaIdCard, FaLayerGroup,
@@ -21,6 +21,15 @@ export const ICONS = {
 
 export type IconKey = keyof typeof ICONS;
 
+// Module registries name Phosphor icons for Fusion-client; this client draws the nearest twin.
+const PHOSPHOR: Record<string, IconType> = {
+  Briefcase: FaBriefcase, Buildings: FaBuilding, CalendarBlank: FaCalendarAlt,
+  ChartBar: FaChartBar, Checks: FaCheckDouble, ClipboardText: FaClipboardList,
+  GraduationCap: FaGraduationCap, IdentificationCard: FaIdCard, Megaphone: FaBullhorn,
+  Notebook: FaBook, Signature: FaFileSignature, UserCheck: FaUserCheck, Users: FaUsers,
+};
+
 export function resolveIcon(key: string | undefined): IconType {
-  return (key && (ICONS as Record<string, IconType>)[key]) || FaCircle;
+  if (!key) return FaCircle;
+  return (ICONS as Record<string, IconType>)[key] ?? PHOSPHOR[key] ?? FaCircle;
 }

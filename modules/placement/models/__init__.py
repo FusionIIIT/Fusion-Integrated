@@ -23,6 +23,7 @@ from modules.placement.models.interviews import (
 from modules.placement.models.offers import (
     Offer,
     PlacementRecord,
+    PlacementRecordRevision,
 )
 from modules.placement.models.policy import (
     PlacementPolicy,
@@ -49,6 +50,7 @@ __all__ = [
     "Offer",
     "PlacementPolicy",
     "PlacementRecord",
+    "PlacementRecordRevision",
     "PlacementRegistration",
     "PlacementStatsSnapshot",
     "PolicyCategory",

@@ -17,6 +17,7 @@ import {
   useApply, useEligibility, usePostings, usePublishPosting,
 } from "../api/hooks";
 import type { Posting } from "../api/types";
+import { LoadMore } from "../components/LoadMore";
 
 function deadline(p: Posting): string {
   if (!p.closes_at) return "—";
@@ -27,12 +28,13 @@ function deadline(p: Posting): string {
 }
 
 export default function PostingsPage() {
-  const { data, isPending, error } = usePostings();
+  const list = usePostings();
+  const { data, isPending, error } = list;
   const { can } = useAuth();
   const [selected, setSelected] = useState<Posting | null>(null);
   const [creating, setCreating] = useState(false);
 
-  const canManage = can("placement_cell.job_posting.manage");
+  const canManage = can("placement.job_posting.manage");
 
   if (error) return <Container size="xl"><ErrorState error={error} /></Container>;
 
@@ -55,7 +57,7 @@ export default function PostingsPage() {
           rows={data?.results ?? []}
           loading={isPending}
           rowKey={(r) => r.id}
-          minWidth={900}
+          minWidth={860}
           columns={[
             {
               key: "title", header: "Role",
@@ -105,6 +107,7 @@ export default function PostingsPage() {
         posting={selected} onClose={() => setSelected(null)} canManage={canManage}
       />
       <NewPostingModal opened={creating} onClose={() => setCreating(false)} />
+      <LoadMore list={list} />
     </Container>
   );
 }
@@ -120,7 +123,7 @@ function PostingDrawer({ posting, onClose, canManage }: {
   const apply = useApply();
   const publish = usePublishPosting();
 
-  const canApply = can("placement_cell.application.create");
+  const canApply = can("placement.application.create");
   // The server decides and re-checks on submit; the button only follows.
   const isEligible = eligibility.data?.is_eligible === true;
 
@@ -199,7 +202,7 @@ function PostingDrawer({ posting, onClose, canManage }: {
             </>
           )}
 
-          {canManage && posting.status === "draft" && (
+          {canManage && (posting.status === "draft" || posting.status === "pending_approval") && (
             <Button
               variant="light"
               loading={publish.isPending}

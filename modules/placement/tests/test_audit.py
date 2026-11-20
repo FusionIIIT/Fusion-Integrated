@@ -1,11 +1,4 @@
-"""Reading the audit trail (PC-BR-008).
-
-The interesting property is not that the trail exists — services already write
-it — but that each reader sees the right slice of it. A student is owed their own
-timeline; they are not owed the TPO's internal note or the name of the person who
-rejected them. Their own conduct record is the opposite: shown in full, because
-rule 19's waiver and rule 21's sanction are both contestable.
-"""
+"""Reading the audit trail (PC-AFR-009)."""
 from datetime import timedelta
 
 import pytest
@@ -35,7 +28,7 @@ REASON = "Weak on data structures — do not shortlist again"
 
 
 def _client(stub_iam, perms, uid=STUDENT, kind="student"):
-    stub_iam(make_session(user_id=uid, kind=kind, modules=("placement_cell",),
+    stub_iam(make_session(user_id=uid, kind=kind, modules=("placement",),
                           permissions=perms))
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
@@ -45,9 +38,9 @@ def _client(stub_iam, perms, uid=STUDENT, kind="student"):
 def _staff_actor(uid=9):
     from fusion_auth.principal import Principal
     return Principal.from_session(make_session(
-        user_id=uid, kind="staff", modules=("placement_cell",),
-        permissions=("placement_cell.application.view",
-                     "placement_cell.application.review")))
+        user_id=uid, kind="staff", modules=("placement",),
+        permissions=("placement.application.view",
+                     "placement.application.review")))
 
 
 @pytest.fixture
@@ -76,7 +69,7 @@ class TestApplicationHistory:
 
     def test_staff_see_the_reason_and_the_actor(self, stub_iam,
                                                 rejected_application):
-        client = _client(stub_iam, ("placement_cell.application.view",),
+        client = _client(stub_iam, ("placement.application.view",),
                          uid=9, kind="staff")
         body = client.get(
             f"/api/v1/placement/applications/{rejected_application.pk}/history"
@@ -89,9 +82,8 @@ class TestApplicationHistory:
 
     def test_a_student_sees_the_timeline_without_the_internal_note(
             self, stub_iam, rejected_application):
-        """The note was written on the understanding it was internal — the
-        notification only ever told the student the status changed."""
-        client = _client(stub_iam, ("placement_cell.application.view_self",))
+        """The note was written on the understanding it was internal."""
+        client = _client(stub_iam, ("placement.own_application.view",))
         body = client.get(
             f"/api/v1/placement/applications/{rejected_application.pk}/history"
         ).json()
@@ -104,9 +96,8 @@ class TestApplicationHistory:
 
     def test_a_student_is_not_told_who_acted(self, stub_iam,
                                              rejected_application):
-        """Naming the TPO who rejected someone invites pressure on them. The
-        lane — staff, student, system — is still shown."""
-        client = _client(stub_iam, ("placement_cell.application.view_self",))
+        """Naming the TPO who rejected someone invites pressure on them."""
+        client = _client(stub_iam, ("placement.own_application.view",))
         entry = client.get(
             f"/api/v1/placement/applications/{rejected_application.pk}/history"
         ).json()["results"][-1]
@@ -116,7 +107,7 @@ class TestApplicationHistory:
 
     def test_the_timeline_is_ordered_oldest_first(self, stub_iam,
                                                   rejected_application):
-        client = _client(stub_iam, ("placement_cell.application.view_self",))
+        client = _client(stub_iam, ("placement.own_application.view",))
         rows = client.get(
             f"/api/v1/placement/applications/{rejected_application.pk}/history"
         ).json()["results"]
@@ -130,7 +121,7 @@ class TestHistoryScope:
     def test_another_students_history_is_a_404(self, stub_iam,
                                                rejected_application):
         """Scoped like every other read, so it is absent rather than forbidden."""
-        client = _client(stub_iam, ("placement_cell.application.view_self",),
+        client = _client(stub_iam, ("placement.own_application.view",),
                          uid=OTHER)
         assert client.get(
             f"/api/v1/placement/applications/{rejected_application.pk}/history"
@@ -143,8 +134,7 @@ class TestHistoryScope:
 
     def test_a_recruiter_reads_their_own_applicants_redacted(
             self, stub_iam, rejected_application):
-        """PC-BR-009 gets them the timeline; the institute's note is not theirs
-        to read."""
+        """PC-BR-009 gets them the timeline; the institute's note is not theirs to read."""
         stub_iam()
         company = rejected_application.posting.company
         _, raw = recruiters.invite(company_id=company.pk, email="r@acme.test",
@@ -194,9 +184,8 @@ class TestMyConductRecord:
             recorded_by_user_id=9)
 
     def test_a_student_sees_their_own_incident_in_full(self, stub_iam, incident):
-        """Rule 21 leaves a sanction to the Chairperson and rule 19 allows a
-        waiver. Neither is contestable if the student cannot read the record."""
-        client = _client(stub_iam, ("placement_cell.application.view_self",))
+        """Rule 21 leaves a sanction to the Chairperson and rule 19 allows a waiver."""
+        client = _client(stub_iam, ("placement.own_application.view",))
         rows = client.get("/api/v1/placement/conduct/mine").json()["results"]
 
         assert len(rows) == 1
@@ -208,25 +197,24 @@ class TestMyConductRecord:
         from fusion_auth.principal import Principal
         from modules.placement.services import conduct
         officer = Principal.from_session(make_session(
-            user_id=9, kind="staff", modules=("placement_cell",),
-            permissions=("placement_cell.registration.debar",)))
+            user_id=9, kind="staff", modules=("placement",),
+            permissions=("placement.sanction.manage",)))
         conduct.waive(incident_id=incident.pk, reason="Wrote in advance; ill",
                       actor=officer)
-        client = _client(stub_iam, ("placement_cell.application.view_self",))
+        client = _client(stub_iam, ("placement.own_application.view",))
         row = client.get("/api/v1/placement/conduct/mine").json()["results"][0]
 
         assert row["waived"] is True
         assert row["waived_reason"] == "Wrote in advance; ill"
 
     def test_who_recorded_it_is_not_shown(self, stub_iam, incident):
-        client = _client(stub_iam, ("placement_cell.application.view_self",))
+        client = _client(stub_iam, ("placement.own_application.view",))
         row = client.get("/api/v1/placement/conduct/mine").json()["results"][0]
         assert "recorded_by_user_id" not in row
 
     def test_a_student_sees_only_their_own(self, stub_iam, incident):
-        """Scoped by the credential — there is no user parameter to point
-        elsewhere."""
-        client = _client(stub_iam, ("placement_cell.application.view_self",),
+        """Scoped by the credential — there is no user parameter to point elsewhere."""
+        client = _client(stub_iam, ("placement.own_application.view",),
                          uid=OTHER)
         assert client.get(
             "/api/v1/placement/conduct/mine").json()["results"] == []

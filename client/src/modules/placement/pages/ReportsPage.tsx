@@ -1,5 +1,6 @@
+import { useState } from "react";
 import {
-  Alert, Badge, Button, Card, Container, Grid, Group, Progress, SimpleGrid,
+  Alert, Badge, Button, Card, Container, Grid, Group, Progress, Select, SimpleGrid,
   Stack, Table, Text,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
@@ -10,8 +11,87 @@ import { errorMessage } from "../../../lib/http";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import {
-  useCsvExport, useOutstandingLetters, useStats, type ExportKind,
+  useCsvExport, useOutstandingLetters, useSeasons, useStats, useStatsTrends,
+  type ExportKind,
 } from "../api/hooks";
+
+function SeasonPicker({ value, onChange }: {
+  value: string | undefined; onChange: (season: string) => void;
+}) {
+  const { data } = useSeasons();
+  return (
+    <Select
+      label="Season" size="xs" w={140} allowDeselect={false}
+      data={(data ?? []).map((s) => ({ value: s.season, label: s.season }))}
+      value={value ?? null}
+      onChange={(v) => v && onChange(v)}
+    />
+  );
+}
+
+function SalaryBands({ bands }: { bands: { band: string; placed: number }[] }) {
+  const most = Math.max(1, ...bands.map((b) => b.placed));
+  return (
+    <Card padding="lg" mt="md">
+      <Text fw={600} mb="sm">Salary package distribution</Text>
+      <Stack gap={8}>
+        {bands.map((b) => (
+          <div key={b.band}>
+            <Group justify="space-between">
+              <Text size="sm">{b.band}</Text>
+              <Text size="sm" fw={600}>{b.placed}</Text>
+            </Group>
+            <Progress value={(b.placed * 100) / most} size="sm" color="indigo"
+              aria-label={`${b.band}: ${b.placed} placed`} />
+          </div>
+        ))}
+      </Stack>
+    </Card>
+  );
+}
+
+function Trends() {
+  const { data, isPending, error } = useStatsTrends(true);
+  return (
+    <Card padding="lg" mt="md">
+      <Text fw={600}>Trends across seasons</Text>
+      <Text size="xs" c="dimmed" mb="sm">
+        Company participation and employment, season by season.
+      </Text>
+      {isPending && <Text size="sm" c="dimmed">Loading…</Text>}
+      {error && <Text size="sm" c="red">Trends could not be loaded. {errorMessage(error)}</Text>}
+      {data && data.length === 0 && (
+        <Text size="sm" c="dimmed">No season has been configured yet.</Text>
+      )}
+      {data && data.length > 0 && (
+        <Table>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>Season</Table.Th>
+              <Table.Th ta="right">Registered</Table.Th>
+              <Table.Th ta="right">Placed</Table.Th>
+              <Table.Th ta="right">Placement rate</Table.Th>
+              <Table.Th ta="right">Companies</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {data.map((t) => (
+              <Table.Tr key={t.season}>
+                <Table.Td>{t.season}</Table.Td>
+                <Table.Td ta="right">{t.registered}</Table.Td>
+                <Table.Td ta="right">{t.placed}</Table.Td>
+                <Table.Td ta="right">
+                  {t.placement_rate === null ? "—" : `${t.placement_rate}%`}
+                </Table.Td>
+                <Table.Td ta="right">{t.companies_participated}</Table.Td>
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      )}
+    </Card>
+  );
+}
 
 /** Staff only, matching the server. Hiding it is UX; the endpoint enforces. */
 function ExportActions() {
@@ -48,8 +128,7 @@ function ExportActions() {
   );
 }
 
-/** Rule 24's worklist. The office chases these before convocation, so it is a
- *  report rather than a screen of its own. */
+/** Rule 24's worklist. */
 function OutstandingLetters() {
   const { data, isPending, error } = useOutstandingLetters();
   const rows = data?.results ?? [];
@@ -125,9 +204,15 @@ function Metric({ label, value, hint }: {
 }
 
 export default function ReportsPage() {
-  const { data, isPending, error } = useStats();
+  const [season, setSeason] = useState<string | undefined>(undefined);
+  const { data, isPending, error } = useStats(season);
   const { can } = useAuth();
-  const isStaff = can("placement_cell.report.view");
+  const isStaff = can("placement.report.view");
+  const companyRows = isStaff
+    ? (data?.by_company ?? []).map((c) => ({
+        name: c.company__name, placed: c.placed, top: c.top }))
+    : (data?.companies ?? []).map((c) => ({ name: c.company, placed: c.placed, top: null }));
+  const picker = <SeasonPicker value={season ?? data?.season} onChange={setSeason} />;
 
   if (error) return <Container size="lg"><ErrorState error={error} /></Container>;
   if (isPending) return <Container size="lg"><Text c="dimmed">Loading…</Text></Container>;
@@ -136,7 +221,7 @@ export default function ReportsPage() {
   if (data && data.available === false) {
     return (
       <Container size="lg">
-        <PageHeader title="Placement Statistics" subtitle={data.season} />
+        <PageHeader title="Placement Statistics" subtitle={data.season} action={picker} />
         <Alert variant="light" color="blue" icon={<FaInfoCircle />}
           title="Statistics are not published yet">
           <Text size="sm">
@@ -155,7 +240,7 @@ export default function ReportsPage() {
         subtitle={isStaff
           ? `Operational figures for ${data?.season}`
           : `Anonymised figures for ${data?.season}`}
-        action={isStaff ? <ExportActions /> : undefined}
+        action={<Group align="end">{picker}{isStaff && <ExportActions />}</Group>}
       />
 
       <SimpleGrid cols={{ base: 2, sm: 4 }} mb="md">
@@ -188,8 +273,7 @@ export default function ReportsPage() {
               <FaChartBar size={13} />
               <Text fw={600}>By company</Text>
             </Group>
-            {/* Small cells are suppressed server-side: a per-company count of
-                one or two identifies the individual. */}
+            {/* The server hides small cells, because a count of one or two identifies a person. */}
             <Table>
               <Table.Thead>
                 <Table.Tr>
@@ -199,12 +283,14 @@ export default function ReportsPage() {
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {(isStaff
-                  ? (data?.by_company ?? []).map((c) => ({
-                      name: c.company__name, placed: c.placed, top: c.top }))
-                  : (data?.companies ?? []).map((c) => ({
-                      name: c.company, placed: c.placed, top: null }))
-                ).map((c) => (
+                {companyRows.length === 0 && (
+                  <Table.Tr>
+                    <Table.Td colSpan={isStaff ? 3 : 2} ta="center" c="dimmed">
+                      No placements recorded for this season yet.
+                    </Table.Td>
+                  </Table.Tr>
+                )}
+                {companyRows.map((c) => (
                   <Table.Tr key={c.name}>
                     <Table.Td>{c.name}</Table.Td>
                     <Table.Td ta="right">{c.placed}</Table.Td>
@@ -244,6 +330,10 @@ export default function ReportsPage() {
         )}
       </Grid>
 
+      {isStaff && data?.salary_distribution && (
+        <SalaryBands bands={data.salary_distribution} />
+      )}
+      {isStaff && <Trends />}
       {isStaff && <OutstandingLetters />}
     </Container>
   );

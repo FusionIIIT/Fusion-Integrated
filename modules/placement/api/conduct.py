@@ -1,10 +1,4 @@
-"""Conduct incidents and placement sanctions (rules 18, 19, 21).
-
-Recording an incident and imposing a sanction are separate endpoints, because
-they are separate decisions in the policy: rule 19 says a student "may be"
-debarred and rule 21 vests it in the Chairperson. POSTing an incident returns
-the recommendation and changes nothing else.
-"""
+"""Conduct incidents and placement sanctions (rules 18, 19, 21)."""
 from __future__ import annotations
 
 from drf_spectacular.utils import extend_schema
@@ -12,13 +6,14 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from core.api.exceptions import BadRequestError
 from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.placement.api import serializers as s
 from modules.placement.models import ConductIncident
 from modules.placement.services import conduct as conduct_service
 
-MODULE = HasModuleGrant("placement_cell")
-P_DEBAR = "placement_cell.registration.debar"
+MODULE = HasModuleGrant("placement")
+P_DEBAR = "placement.sanction.manage"
 
 
 def _actor(request):
@@ -29,13 +24,16 @@ class IncidentListView(APIView):
     """GET  the incidents on record   POST a new one."""
 
     permission_classes = [MODULE, HasPermission(P_DEBAR)]
+    throttle_scope = "placement_write"
 
     @extend_schema(responses=s.ConductIncidentSerializer(many=True))
     def get(self, request):
         rows = ConductIncident.objects.select_related("posting")
         user_id = request.query_params.get("user_id")
         if user_id:
-            rows = rows.filter(user_id=user_id)
+            if not user_id.isdigit():
+                raise BadRequestError("user_id must be a number.", code="invalid_filter")
+            rows = rows.filter(user_id=int(user_id))
         rows = rows.order_by("-created_at")[:200]
         return Response({
             "results": s.ConductIncidentSerializer(rows, many=True).data})
@@ -66,6 +64,7 @@ class IncidentWaiveView(APIView):
     """Rule 19's written-notice exception."""
 
     permission_classes = [MODULE, HasPermission(P_DEBAR)]
+    throttle_scope = "placement_write"
 
     def post(self, request, pk):
         payload = s.WaiveIncidentSerializer(data=request.data)
@@ -82,6 +81,7 @@ class SanctionView(APIView):
     """Impose the sanction. The human decision the policy calls for."""
 
     permission_classes = [MODULE, HasPermission(P_DEBAR)]
+    throttle_scope = "placement_write"
 
     def post(self, request):
         payload = s.ApplySanctionSerializer(data=request.data)
@@ -97,6 +97,7 @@ class SanctionLiftView(APIView):
     """Anything a human can impose, a human can undo."""
 
     permission_classes = [MODULE, HasPermission(P_DEBAR)]
+    throttle_scope = "placement_write"
 
     def post(self, request):
         payload = s.LiftSanctionSerializer(data=request.data)

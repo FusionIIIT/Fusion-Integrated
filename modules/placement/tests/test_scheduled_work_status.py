@@ -1,7 +1,4 @@
-"""The command that makes "beat is not running" visible.
-
-Nothing errors when beat stops; work just stops. These are the two symptoms.
-"""
+"""The command that makes "beat is not running" visible."""
 from datetime import timedelta
 from io import StringIO
 
@@ -49,8 +46,7 @@ def test_a_quiet_system_is_healthy():
 
 
 def test_an_offer_past_its_deadline_is_reported(posting):
-    """It still blocks the student's pool until the sweep retires it, which is
-    what makes a stopped beat cost someone their place."""
+    """It still blocks the student's pool until the sweep retires it."""
     application = Application.objects.create(
         posting=posting, user_id=1001, status="selected", cpi_at_apply="8.00")
     Offer.objects.create(posting=posting, application=application,
@@ -72,7 +68,6 @@ def test_outbox_lag_beyond_the_threshold_is_reported():
     assert code == 1
     assert "outbox lag" in out
 
-    # Without a threshold it reports but does not fail: a backlog is only a
-    # problem relative to how long it has been there.
+    # Without a threshold it reports but does not fail.
     _, code = _run()
     assert code == 0

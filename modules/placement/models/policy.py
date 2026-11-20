@@ -1,9 +1,4 @@
-"""Placement domain tables.
-
-Institute people are referenced by plain `user_id` integers, never foreign
-keys — there is no user table in this database. Recruiters are the exception:
-they are local rows, scoped to one company.
-"""
+"""Placement domain tables."""
 from decimal import Decimal
 
 from django.db import models
@@ -14,8 +9,7 @@ from core.db.mixins import TimeStampedModel
 
 # -- Season and policy ---------------------------------------------------------
 class PlacementPolicy(TimeStampedModel):
-    """One season of the signed Placement Policy. Switching rules live in
-    PolicyCategory, which is per discipline group."""
+    """One season of the signed Placement Policy."""
 
     season = models.CharField(max_length=12, unique=True)     # "2026-27"
     label = models.CharField(max_length=60, blank=True)
@@ -55,14 +49,7 @@ class PlacementPolicy(TimeStampedModel):
 
 
 class PolicyCategory(TimeStampedModel):
-    """One category within a discipline group (policy rule 2).
-
-        CSE/ECE  Cat 1  <=10 LPA      1.5x, one switch then out
-                 Cat 2  10-16.5 LPA   2x,   one switch then out
-        Core     Cat 1  6.5-11.5 LPA  1.5x and must exceed 11.5
-        Design   Cat 1  <=7.5 LPA     1.5x, out once above 12
-                 Cat 2  7.5-12 LPA    1.5x, out once above 12
-    """
+    """One category within a discipline group (policy rule 2)."""
 
     GROUPS = [("cse_ece", "CSE & ECE"), ("core", "ME, SM and Core"),
               ("design", "Design")]

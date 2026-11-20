@@ -1,16 +1,16 @@
-"""Job postings (PC-UC-006, PC-UC-015, PC-WF-003, PC-BR-003/004/005/006)."""
+"""Job postings (PC-UC-006, PC-UC-015, CW-PC-01, PC-BR-003/004/005/006)."""
 from __future__ import annotations
 
 from django.db import transaction
 from django.utils import timezone
 
-from core.api.exceptions import ConflictError, NotFoundError
+from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from modules.placement.domain import eligibility as elig
 from modules.placement.models import Company, JobPosting
 from modules.placement.services import notifications
 from modules.placement.services.authz import require
 
-P_MANAGE = "placement_cell.job_posting.manage"
+P_MANAGE = "placement.job_posting.manage"
 
 EDITABLE = ("title", "kind", "description", "location", "ctc_lpa", "stipend_pm",
             "bond_months", "seats", "opens_at", "closes_at", "eligibility_rule",
@@ -18,13 +18,20 @@ EDITABLE = ("title", "kind", "description", "location", "ctc_lpa", "stipend_pm",
             "is_dream_slot", "dream_slot_note")
 
 
-def validate_rule(rule: dict | None) -> None:
-    """Reject, at authoring time, a rule that could not be evaluated as written.
+def _refuse_company_dream_slot(actor, fields: dict, current: JobPosting | None = None) -> None:
+    """Rule 7: the Placement Cell declares a Dream Slot; a company can neither set nor clear one."""
+    if getattr(actor, "kind", None) != "recruiter":
+        return
+    for name in ("is_dream_slot", "dream_slot_note"):
+        held = getattr(current, name) if current is not None else JobPosting._meta.get_field(
+            name).get_default()
+        if name in fields and fields[name] != held:
+            raise PermissionDeniedError("Only the placement office declares a Dream Slot.",
+                                        code="dream_slot_office_only")
 
-    An unknown operator or a literal of the wrong type would otherwise publish
-    a rule that denies every student. Catching it here makes a broken rule the
-    author's problem, not a queue of confused students on deadline day.
-    """
+
+def validate_rule(rule: dict | None) -> None:
+    """Reject, at authoring time, a rule that could not be evaluated as written."""
     problems = elig.validate(rule)
     if problems:
         first = problems[0]
@@ -64,6 +71,7 @@ def create(*, company_id: int, placement_year: str, actor, **fields) -> JobPosti
                             code="company_not_approved")
 
     data = {k: v for k, v in fields.items() if k in EDITABLE}
+    _refuse_company_dream_slot(actor, data)
     validate_rule(data.get("eligibility_rule"))
 
     is_recruiter = getattr(actor, "kind", None) == "recruiter"
@@ -82,6 +90,7 @@ def update(*, posting_id: int, actor, scope=None, **fields) -> JobPosting:
     posting = qs.select_for_update().filter(pk=posting_id).first()
     if posting is None:
         raise NotFoundError("No such posting.")
+    _refuse_company_dream_slot(actor, fields, posting)
 
     if posting.eligibility_rule_locked_at and "eligibility_rule" in fields:
         # PC-BR-002: criteria cannot move under people who already applied.
@@ -118,6 +127,52 @@ def publish(*, posting_id: int, actor, scope=None) -> JobPosting:
     if posting.status not in ("draft", "pending_approval"):
         raise ConflictError(f"A {posting.status} posting cannot be published.",
                             code="not_publishable")
+    if posting.status == "pending_approval" and getattr(actor, "kind", None) == "recruiter":
+        # BW-PC-03: a submitted opportunity is published by the TPO.
+        raise ConflictError(
+            "This posting was submitted to the placement office, which publishes it.",
+            code="awaiting_tpo")
+    _require_publishable(posting)
+    # A rule stored before authoring checks existed must not go live either.
+    validate_rule(posting.eligibility_rule)
+
+    posting.status = "published"
+    posting.published_at = timezone.now()
+    posting.eligibility_rule_locked_at = timezone.now()
+    posting.save(update_fields=["status", "published_at",
+                                "eligibility_rule_locked_at", "updated_at"])
+
+    notifications.enqueue(
+        topic="posting.published", dedupe_key=f"posting.published:{posting.pk}",
+        recipient_email="placement-broadcast@invalid",
+        subject=f"New opportunity: {posting.title} at {posting.company.name}",
+        body=f"Applications close {posting.closes_at:%d %b %Y %H:%M}.",
+        payload={"posting_id": posting.pk, "broadcast": True})
+    return posting
+
+
+@transaction.atomic
+def submit(*, posting_id: int, actor, scope=None) -> JobPosting:
+    """A company hands a complete draft to the TPO to publish (BW-PC-03, PC-AFR-018)."""
+    require(actor, P_MANAGE, allow_recruiter=True)
+    qs = scope if scope is not None else JobPosting.objects.all()
+    posting = (qs.select_for_update().select_related("company")
+               .filter(pk=posting_id).first())
+    if posting is None:
+        raise NotFoundError("No such posting.")
+    if posting.status == "pending_approval":
+        return posting
+    if posting.status != "draft":
+        raise ConflictError(f"A {posting.status} posting cannot be submitted.",
+                            code="not_submittable")
+    _require_publishable(posting)
+    validate_rule(posting.eligibility_rule)
+    posting.status = "pending_approval"
+    posting.save(update_fields=["status", "updated_at"])
+    return posting
+
+
+def _require_publishable(posting: JobPosting) -> None:
     if not posting.company.can_operate:
         raise ConflictError("This company is not approved for recruitment yet.",
                             code="company_not_approved")
@@ -139,22 +194,6 @@ def publish(*, posting_id: int, actor, scope=None) -> JobPosting:
     if posting.closes_at <= timezone.now():
         raise ConflictError("The application deadline is already past.",
                             code="deadline_in_past")
-    # A rule stored before authoring checks existed must not go live either.
-    validate_rule(posting.eligibility_rule)
-
-    posting.status = "published"
-    posting.published_at = timezone.now()
-    posting.eligibility_rule_locked_at = timezone.now()
-    posting.save(update_fields=["status", "published_at",
-                                "eligibility_rule_locked_at", "updated_at"])
-
-    notifications.enqueue(
-        topic="posting.published", dedupe_key=f"posting.published:{posting.pk}",
-        recipient_email="placement-broadcast@invalid",
-        subject=f"New opportunity: {posting.title} at {posting.company.name}",
-        body=f"Applications close {posting.closes_at:%d %b %Y %H:%M}.",
-        payload={"posting_id": posting.pk, "broadcast": True})
-    return posting
 
 
 @transaction.atomic

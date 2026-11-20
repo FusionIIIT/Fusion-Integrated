@@ -1,11 +1,4 @@
-"""Post-offer obligations: the signed offer letter and non-joining (rules 22, 24).
-
-Rule 24 makes this module the gate on a no-dues certificate, which is the one
-place placement can block a student's graduation paperwork. So the answer names
-the company still owing a letter rather than returning a bare "blocked", and
-`contracts.get_no_dues_clearances` exposes it to the rest of the platform
-without anyone reaching into these tables.
-"""
+"""Post-offer obligations: the signed offer letter and non-joining (rules 22, 24)."""
 from __future__ import annotations
 
 import logging
@@ -26,7 +19,7 @@ from modules.placement.services.authz import require
 
 log = logging.getLogger("fusion.placement.clearance")
 
-P_MANAGE = "placement_cell.record.manage"
+P_MANAGE = "placement.record.manage"
 
 
 def _states(records) -> tuple[rules.RecordState, ...]:
@@ -47,8 +40,7 @@ def no_dues_clearance(*, user_id: int) -> rules.Clearance:
 
 
 def no_dues_clearances(user_ids) -> dict[int, rules.Clearance]:
-    """Batched, for the contract. One query however many students are asked
-    about — the academic office checks a whole graduating batch."""
+    """Batched, for the contract."""
     ids = {int(i) for i in user_ids if i is not None}
     if not ids:
         return {}
@@ -64,11 +56,7 @@ def no_dues_clearances(user_ids) -> dict[int, rules.Clearance]:
 @transaction.atomic
 def submit_offer_letter(*, record_id: int, document_id: int,
                         user_id: int) -> PlacementRecord:
-    """Attach the signed copy (rule 24).
-
-    Scoped to the caller's own record and their own document, so neither id can
-    be used to reach someone else's.
-    """
+    """Attach the signed copy (rule 24)."""
     record = PlacementRecord.objects.select_for_update().filter(
         pk=record_id, user_id=user_id, is_active=True).first()
     if record is None:
@@ -95,12 +83,7 @@ def submit_offer_letter(*, record_id: int, document_id: int,
 @transaction.atomic
 def declare_not_joining(*, record_id: int, user_id: int, reason: str
                         ) -> tuple[PlacementRecord, rules.NonJoiningVerdict]:
-    """Rule 22 — the student says they will not join.
-
-    Always accepted, late or not. Refusing a late declaration would leave the
-    Placement Cell less informed, which is the opposite of the rule's purpose;
-    lateness is recorded because that is what rule 22 attaches consequences to.
-    """
+    """Rule 22 — the student says they will not join."""
     if not (reason or "").strip():
         raise ConflictError(
             "Rule 22 asks for the reason — higher studies, or another genuine "
@@ -144,11 +127,7 @@ def declare_not_joining(*, record_id: int, user_id: int, reason: str
 def record_off_campus(*, season: str, user_id: int, company_id: int,
                       ctc_lpa=None, kind: str = "fte", actor
                       ) -> PlacementRecord:
-    """Rules 5 and 24 — an off-campus placement the Cell was told about.
-
-    Rule 24 covers "placed (on/off campus)", so without this the no-dues gate
-    would miss the students least likely to have submitted anything.
-    """
+    """Rules 5 and 24 — an off-campus placement the Cell was told about."""
     require(actor, P_MANAGE)
     policy = PlacementPolicy.objects.filter(season=season).first()
     if policy is None:

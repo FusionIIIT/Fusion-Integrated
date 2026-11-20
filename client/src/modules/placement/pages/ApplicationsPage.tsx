@@ -21,17 +21,16 @@ import { useApplications, useBulkTransition, useTransition } from "../api/hooks"
 import type { BulkResult } from "../api/hooks";
 import type { Application } from "../api/types";
 import type { RowKey } from "../../../ui/components/DataTable";
+import { LoadMore } from "../components/LoadMore";
 
-/** Bulk targets a TPO actually reaches for. Anything else stays a per-row
- *  decision, because it needs looking at the individual candidate. */
+/** Bulk targets a TPO actually reaches for. */
 const BULK_MOVES = [
   { value: "under_review", label: "Move to review" },
   { value: "shortlisted", label: "Shortlist" },
   { value: "rejected", label: "Reject" },
 ];
 
-/** Transitions that must carry a reason. The server enforces this too — the
- *  prompt here just avoids a round trip that would only produce an error. */
+/** Transitions that must carry a reason. */
 const NEEDS_REASON = new Set(["rejected"]);
 
 const LABELS: Record<string, string> = {
@@ -45,8 +44,9 @@ const LABELS: Record<string, string> = {
 
 export default function ApplicationsPage() {
   const [status, setStatus] = useState<string | null>(null);
-  const { data, isPending, error } = useApplications(
+  const list = useApplications(
     status ? { status } : undefined);
+  const { data, isPending, error } = list;
   const [pending, setPending] = useState<
     { app: Application; to: string } | null>(null);
   const [offerFor, setOfferFor] = useState<Application | null>(null);
@@ -147,8 +147,7 @@ export default function ApplicationsPage() {
         }
       />
 
-      {/* Appears only with a selection, so it never competes with the table for
-          attention when there is nothing to act on. */}
+      {/* Shown only with a selection, so it never competes with the table. */}
       {selected.size > 0 && (
         <Paper
           withBorder p="sm" mb="md" radius="md"
@@ -181,8 +180,7 @@ export default function ApplicationsPage() {
             </Group>
           </Group>
 
-          {/* Rejection needs a reason per item; the server refuses without one,
-              so asking here avoids a round trip that only returns errors. */}
+          {/* The server refuses a rejection without a reason, so ask for it here. */}
           {bulkTo === "rejected" && (
             <Textarea
               mt="sm" label="Reason" required autosize minRows={2}
@@ -216,7 +214,7 @@ export default function ApplicationsPage() {
           rows={rows}
           loading={isPending}
           rowKey={(r) => r.id}
-          minWidth={1000}
+          minWidth={860}
           selection={{ selected, onChange: setSelected, isSelectable }}
           columns={[
             {
@@ -328,6 +326,7 @@ export default function ApplicationsPage() {
       <HistoryDrawer
         applicationId={historyFor} onClose={() => setHistoryFor(null)}
       />
+      <LoadMore list={list} />
     </Container>
   );
 }

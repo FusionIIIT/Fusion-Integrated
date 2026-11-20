@@ -21,7 +21,7 @@ def test_no_credentials_is_401():
 
 
 def test_valid_token_resolves_a_principal(stub_iam):
-    stub_iam(make_session(user_id=42, modules=("placement_cell",)))
+    stub_iam(make_session(user_id=42, modules=("placement",)))
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
     r = c.get("/api/v1/me")
@@ -60,7 +60,7 @@ def test_error_envelope_carries_a_request_id():
 
 def test_module_grant_gates_the_endpoint(stub_iam):
     """A module the caller was not granted is refused even with the permission."""
-    stub_iam(make_session(permissions=("placement_cell.job_posting.view",),
+    stub_iam(make_session(permissions=("placement.job_posting.view",),
                           modules=()))                      # no module grant
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
@@ -68,8 +68,8 @@ def test_module_grant_gates_the_endpoint(stub_iam):
 
 
 def test_module_grant_plus_permission_passes(stub_iam):
-    stub_iam(make_session(permissions=("placement_cell.job_posting.view",),
-                          modules=("placement_cell",)))
+    stub_iam(make_session(permissions=("placement.job_posting.view",),
+                          modules=("placement",)))
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
     assert c.get("/api/v1/placement/postings").status_code == 200

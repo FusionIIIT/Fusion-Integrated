@@ -99,8 +99,8 @@ Two gates, both server-side, on **every** request:
 
 ```python
 permission_classes = [
-    HasModuleGrant("placement_cell"),               # is this module yours at all?
-    HasPermission("placement_cell.application.view"),  # may you do this?
+    HasModuleGrant("placement"),               # is this module yours at all?
+    HasPermission("placement.application.view"),  # may you do this?
 ]
 ```
 

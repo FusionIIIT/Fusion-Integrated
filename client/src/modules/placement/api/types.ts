@@ -1,10 +1,4 @@
-/** Wire types for the placement API. Two shapes carry meaning:
- *
- *  * `AcademicStanding` is null when there is no DECLARED result — never a
- *    zero CPI, and the UI must not render it as one.
- *  * Money and CPI arrive as STRINGS, as Django serialises Decimal. Parsing
- *    them into JS numbers puts float arithmetic on a salary figure.
- */
+/** Wire types for the placement API. */
 
 export interface Page<T> {
   results: T[];
@@ -88,8 +82,7 @@ export interface Candidate {
   batch_year: number | null;
 }
 
-/** Why a student is (not) eligible. Every failure carries a rendered message
- *  so the UI never has to compose one from a code. */
+/** Why a student is (not) eligible. */
 export interface EligibilityFailure {
   field: string;
   reason: string;
@@ -135,8 +128,7 @@ export interface Application {
   created_at: string;
 }
 
-/** What a recruiter sees. Narrower on purpose — no eligibility snapshot, no
- *  withdrawal reasons, no audit trail. */
+/** What a recruiter sees. */
 export interface Applicant {
   id: number;
   status: ApplicationStatus;
@@ -168,6 +160,7 @@ export interface Offer {
 export interface InterviewRound {
   id: number;
   posting: number;
+  posting_title: string;
   seq: number;
   kind: "test" | "gd" | "tech" | "hr" | "other";
   mode: "online" | "offline";
@@ -195,11 +188,10 @@ export interface Announcement {
   created_at: string;
 }
 
-/** A document submitted to the placement office. Not a resume: that is
- *  maintained once on the ERP portal. */
+/** A document submitted to the placement office. */
 export interface ProfileDocument {
   id: number;
-  kind: "resume" | "certificate" | "offer_letter" | "other";
+  kind: "certificate" | "offer_letter" | "other";
   title: string;
   original_filename: string;
   /** True for a Drive link, false for a row from the old upload path. */
@@ -218,8 +210,7 @@ export interface MissingField {
 }
 
 
-/** Anonymised figures a student may see. `available: false` when there are too
- *  few placements to publish without identifying people. */
+/** Anonymised figures a student may see. */
 export interface StudentStats {
   season: string;
   available: boolean;
@@ -243,6 +234,63 @@ export interface StaffStats {
   median_ctc?: string | null;
   mean_ctc?: string | null;
   max_ctc?: string | null;
-  by_company?: { company__name: string; placed: number; top: string | null }[];
+  placement_rate?: number | null;
+  salary_distribution?: { band: string; placed: number }[];
+  by_company?: { company__name: string; placed: number; top: number | string | null }[];
   applications_by_status?: Record<string, number>;
+}
+
+export interface SeasonTrend {
+  season: string;
+  registered: number;
+  placed: number;
+  placement_rate: number | null;
+  companies_participated: number;
+}
+
+export interface OfficeRecord {
+  id: number;
+  user_id: number;
+  company: { id: number; name: string } | null;
+  season: string;
+  source: "campus" | "off_campus";
+  kind: "fte" | "internship" | "ppo";
+  ctc_lpa: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RecordRevision {
+  id: number;
+  by_user_id: number;
+  reason: string;
+  before: { ctc_lpa: string | null; kind: string; is_active: boolean };
+  after: { ctc_lpa: string | null; kind: string; is_active: boolean };
+  created_at: string;
+}
+
+export interface RecordCorrection {
+  reason: string;
+  ctc_lpa?: string | null;
+  kind?: OfficeRecord["kind"];
+  is_active?: boolean;
+}
+
+/** A person as the ERP portal and the IAM describe them (PC-UC-001, PC-UC-023). */
+export interface CandidateRecord {
+  user_id: number;
+  name: string;
+  roll_no: string;
+  email: string;
+  programme: string;
+  discipline: string;
+  batch_year: number | null;
+  resume_link: string;
+  profile_completed: boolean;
+  academic: {
+    semester?: number | null; semester_type?: string | null;
+    declared_seq?: number | null; synced_at?: string | null; computed_by?: string | null;
+    cpi?: string | null;
+  } | null;
 }

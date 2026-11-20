@@ -27,8 +27,8 @@ def test_student_sees_only_their_own_applications(stub_iam, posting, user_ref):
     Application.objects.create(posting=posting, user_id=1001, status="submitted")
     Application.objects.create(posting=posting, user_id=2002, status="submitted")
 
-    stub_iam(make_session(user_id=1001, modules=("placement_cell",),
-                          permissions=("placement_cell.application.view_self",)),
+    stub_iam(make_session(user_id=1001, modules=("placement",),
+                          permissions=("placement.own_application.view",)),
              users={1001: user_ref(1001)})
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
@@ -41,8 +41,8 @@ def test_coordinator_sees_everyone(stub_iam, posting, user_ref):
     Application.objects.create(posting=posting, user_id=1001, status="submitted")
     Application.objects.create(posting=posting, user_id=2002, status="submitted")
 
-    stub_iam(make_session(user_id=9, kind="staff", modules=("placement_cell",),
-                          permissions=("placement_cell.application.view",)),
+    stub_iam(make_session(user_id=9, kind="staff", modules=("placement",),
+                          permissions=("placement.application.view",)),
              users={1001: user_ref(1001), 2002: user_ref(2002, "Bo Li")})
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
@@ -55,8 +55,8 @@ def test_applicant_names_cost_one_batched_directory_call(stub_iam, posting, user
     for uid in range(3001, 3011):
         Application.objects.create(posting=posting, user_id=uid, status="submitted")
     fake = stub_iam(
-        make_session(user_id=9, modules=("placement_cell",),
-                     permissions=("placement_cell.application.view",)),
+        make_session(user_id=9, modules=("placement",),
+                     permissions=("placement.application.view",)),
         users={uid: user_ref(uid) for uid in range(3001, 3011)})
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
@@ -67,12 +67,11 @@ def test_applicant_names_cost_one_batched_directory_call(stub_iam, posting, user
 
 
 def test_illegal_transition_is_409_not_500(stub_iam, posting):
-    """Regression: InvalidTransition is a pure-domain exception. If the service
-    does not translate it, it escapes the DRF handler as a 500."""
+    """Regression: InvalidTransition is a pure-domain exception."""
     app = Application.objects.create(posting=posting, user_id=1001,
                                      status="submitted")
-    c = _client(stub_iam, user_id=9, modules=("placement_cell",),
-                permissions=("placement_cell.application.review",))
+    c = _client(stub_iam, user_id=9, modules=("placement",),
+                permissions=("placement.application.review",))
     r = c.post(f"/api/v1/placement/applications/{app.id}/transition",
                {"to_status": "offer_accepted"}, format="json")
     assert r.status_code == 409
@@ -84,8 +83,8 @@ def test_illegal_transition_is_409_not_500(stub_iam, posting):
 def test_reject_without_a_reason_is_refused(stub_iam, posting):
     app = Application.objects.create(posting=posting, user_id=1001,
                                      status="submitted")
-    c = _client(stub_iam, user_id=9, modules=("placement_cell",),
-                permissions=("placement_cell.application.review",))
+    c = _client(stub_iam, user_id=9, modules=("placement",),
+                permissions=("placement.application.review",))
     r = c.post(f"/api/v1/placement/applications/{app.id}/transition",
                {"to_status": "rejected"}, format="json")
     assert r.status_code == 409
@@ -93,13 +92,11 @@ def test_reject_without_a_reason_is_refused(stub_iam, posting):
 
 
 def test_someone_elses_application_is_404_not_403(stub_iam, posting):
-    """The distinction this module cares about. A 403 would confirm that
-    application 17 exists — for placement data that is itself a disclosure, so
-    a foreign row must be indistinguishable from a nonexistent one."""
+    """The distinction this module cares about."""
     app = Application.objects.create(posting=posting, user_id=1001,
                                      status="submitted")
-    c = _client(stub_iam, user_id=9, modules=("placement_cell",),
-                permissions=("placement_cell.application.view_self",))
+    c = _client(stub_iam, user_id=9, modules=("placement",),
+                permissions=("placement.own_application.view",))
     r = c.post(f"/api/v1/placement/applications/{app.id}/transition",
                {"to_status": "under_review"}, format="json")
     assert r.status_code == 404
@@ -115,8 +112,8 @@ def test_a_student_cannot_drive_a_staff_transition_on_their_own_application(
     """In scope, so it resolves — and is then refused on the actor lane."""
     app = Application.objects.create(posting=posting, user_id=1001,
                                      status="submitted")
-    c = _client(stub_iam, user_id=1001, modules=("placement_cell",),
-                permissions=("placement_cell.application.view_self",))
+    c = _client(stub_iam, user_id=1001, modules=("placement",),
+                permissions=("placement.own_application.view",))
     r = c.post(f"/api/v1/placement/applications/{app.id}/transition",
                {"to_status": "under_review"}, format="json")
     assert r.status_code == 403
@@ -125,16 +122,14 @@ def test_a_student_cannot_drive_a_staff_transition_on_their_own_application(
 
 def test_a_student_coordinator_cannot_shortlist_their_own_application(
         stub_iam, posting):
-    """Conflict of interest. A student placement coordinator legitimately
-    reviews other people's applications, but must not self-approve — acting on
-    their own row drops them back into the student lane."""
+    """Conflict of interest."""
     own = Application.objects.create(posting=posting, user_id=77,
                                      status="submitted")
     other = Application.objects.create(posting=posting, user_id=1001,
                                        status="submitted")
     c = _client(stub_iam, user_id=77, kind="student",
-                modules=("placement_cell",),
-                permissions=("placement_cell.application.review",))
+                modules=("placement",),
+                permissions=("placement.application.review",))
 
     mine = c.post(f"/api/v1/placement/applications/{own.id}/transition",
                   {"to_status": "under_review"}, format="json")
@@ -150,8 +145,8 @@ def test_every_transition_is_audited(stub_iam, posting):
     from modules.placement.models import ApplicationTransition
     app = Application.objects.create(posting=posting, user_id=1001,
                                      status="submitted")
-    c = _client(stub_iam, user_id=9, modules=("placement_cell",),
-                permissions=("placement_cell.application.review",))
+    c = _client(stub_iam, user_id=9, modules=("placement",),
+                permissions=("placement.application.review",))
     c.post(f"/api/v1/placement/applications/{app.id}/transition",
            {"to_status": "under_review"}, format="json")
     t = ApplicationTransition.objects.get(application=app)
@@ -160,13 +155,13 @@ def test_every_transition_is_audited(stub_iam, posting):
 
 
 def test_seasons_are_a_closed_list(stub_iam):
-    """Free text let a typo create a posting whose season has no policy — it
-    looked fine until a student applied and hit `policy_missing`."""
+    """Free text let a typo create a posting whose season has no policy."""
     from modules.placement.models import PlacementPolicy
 
     PlacementPolicy.objects.create(season="2025-26", is_active=False)
     PlacementPolicy.objects.create(season="2026-27", is_active=True)
-    client = _client(stub_iam, modules=("placement_cell",))
+    client = _client(stub_iam, modules=("placement",),
+                     permissions=("placement.job_posting.view",))
 
     rows = client.get("/api/v1/placement/seasons").json()
 

@@ -1,10 +1,6 @@
-"""Placement domain tables.
+"""Placement domain tables."""
 
-Institute people are referenced by plain `user_id` integers, never foreign
-keys — there is no user table in this database. Recruiters are the exception:
-they are local rows, scoped to one company.
-"""
-
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
 from core.db.mixins import TimeStampedModel, UserScopedModel
@@ -32,7 +28,7 @@ class Application(TimeStampedModel, UserScopedModel):
                                        null=True, blank=True)
     semester_at_apply = models.PositiveSmallIntegerField(null=True, blank=True)
     standing_declared_seq_at_apply = models.IntegerField(null=True, blank=True)
-    eligibility_snapshot = models.JSONField(default=dict, blank=True)
+    eligibility_snapshot = models.JSONField(default=dict, blank=True, encoder=DjangoJSONEncoder)
     cover_note = models.TextField(blank=True)
     applied_at = models.DateTimeField(null=True, blank=True)
     withdrawn_reason = models.CharField(max_length=300, blank=True)
@@ -53,7 +49,7 @@ class Application(TimeStampedModel, UserScopedModel):
 
 
 class ApplicationTransition(models.Model):
-    """Append-only audit of every status change (PC-BR-008)."""
+    """Append-only audit of every status change (PC-AFR-009)."""
 
     application = models.ForeignKey(Application, on_delete=models.CASCADE,
                                     related_name="transitions")

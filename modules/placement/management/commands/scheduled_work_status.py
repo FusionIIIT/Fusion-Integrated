@@ -1,12 +1,4 @@
-"""Is the scheduled work actually happening?
-
-    manage.py scheduled_work_status
-    manage.py scheduled_work_status --max-lag 600     non-zero exit past that
-
-Beat not running is silent by nature: nothing errors, work simply stops. The
-symptoms show up as an outbox that only grows and offers that never expire, so
-those are what this reports. Suitable for a cron or a monitoring check.
-"""
+"""Is the scheduled work actually happening?"""
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
@@ -35,8 +27,7 @@ class Command(BaseCommand):
             problems.append(f"outbox lag {lag}s exceeds {opts['max_lag']}s — is "
                             f"the notifications worker draining?")
 
-        # The one that costs a student their place: an issued offer past its
-        # deadline still blocks their pool until the sweep retires it.
+        # An issued offer past its deadline blocks the student from the pool.
         overdue = Offer.objects.filter(status="issued", respond_by__lt=now).count()
         self.stdout.write(f"  offers overdue    {overdue}")
         if overdue:

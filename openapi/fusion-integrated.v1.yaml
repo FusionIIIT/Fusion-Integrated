@@ -108,8 +108,7 @@ paths:
   /api/v1/placement/announcements:
     get:
       operationId: v1_placement_announcements_list
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       parameters:
       - name: cursor
@@ -138,8 +137,7 @@ paths:
           description: ''
     post:
       operationId: v1_placement_announcements_create
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       tags:
       - v1
@@ -167,8 +165,7 @@ paths:
   /api/v1/placement/announcements/{id}/withdraw:
     post:
       operationId: v1_placement_announcements_withdraw_create
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       parameters:
       - in: path
@@ -203,8 +200,7 @@ paths:
   /api/v1/placement/applications:
     get:
       operationId: v1_placement_applications_list
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       parameters:
       - name: cursor
@@ -256,8 +252,7 @@ paths:
   /api/v1/placement/applications/{id}/transition:
     post:
       operationId: v1_placement_applications_transition_create
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       parameters:
       - in: path
@@ -292,8 +287,7 @@ paths:
   /api/v1/placement/applications/apply:
     post:
       operationId: v1_placement_applications_apply_create
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       tags:
       - v1
@@ -322,12 +316,7 @@ paths:
   /api/v1/placement/applications/bulk-transition:
     post:
       operationId: v1_placement_applications_bulk_transition_create
-      description: |-
-        Move several applications at once (PC-UC-008).
-
-        Every item goes through the same service as a single transition, so the
-        scope, permission, state machine and guards are identical. Partial success
-        is reported rather than hidden.
+      description: Move several applications at once (PC-UC-008).
       tags:
       - v1
       requestBody:
@@ -355,8 +344,7 @@ paths:
   /api/v1/placement/companies:
     get:
       operationId: v1_placement_companies_list
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       parameters:
       - name: cursor
@@ -385,8 +373,7 @@ paths:
           description: ''
     post:
       operationId: v1_placement_companies_create
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       tags:
       - v1
@@ -414,8 +401,7 @@ paths:
   /api/v1/placement/companies/{id}/{action}:
     post:
       operationId: placement_company_decide
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       parameters:
       - in: path
@@ -450,6 +436,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Company'
+          description: ''
+  /api/v1/placement/companies/register:
+    post:
+      operationId: placement_company_self_register
+      description: A company asks to take part; it gains no access until approved
+        (PC-UC-014, PC-BR-007).
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanySelfRegister'
+            examples:
+              ARegistrationRequest:
+                value:
+                  name: Acme Robotics
+                  sector: Robotics
+                  website: https://acme.example
+                  hq_city: Pune
+                  contact_name: R. Mehta
+                  contact_email: hiring@acme.example
+                summary: A registration request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CompanySelfRegister'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CompanySelfRegister'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Detail'
+              examples:
+                Recorded:
+                  value:
+                    detail: Registration received. The placement office will contact
+                      you after institute approval.
           description: ''
   /api/v1/placement/conduct/incidents:
     get:
@@ -530,13 +557,7 @@ paths:
   /api/v1/placement/conduct/mine:
     get:
       operationId: v1_placement_conduct_mine_list
-      description: |-
-        A student's own conduct record, in full.
-
-        Rule 19 allows a waiver and rule 21 leaves a sanction to the Chairperson's
-        discretion. Both are contestable, and nobody can contest what they cannot
-        see — so the note and any waiver reason are shown, unlike an application's
-        internal review note.
+      description: A student's own conduct record, in full.
       tags:
       - v1
       security:
@@ -607,9 +628,8 @@ paths:
   /api/v1/placement/documents:
     get:
       operationId: v1_placement_documents_list
-      description: |-
-        GET  /placement/documents   my documents
-        POST /placement/documents   attach a Drive link
+      description: GET /placement/documents my documents POST /placement/documents
+        attach a Drive link
       tags:
       - v1
       security:
@@ -626,9 +646,8 @@ paths:
           description: ''
     post:
       operationId: v1_placement_documents_create
-      description: |-
-        GET  /placement/documents   my documents
-        POST /placement/documents   attach a Drive link
+      description: GET /placement/documents my documents POST /placement/documents
+        attach a Drive link
       tags:
       - v1
       requestBody:
@@ -672,9 +691,8 @@ paths:
   /api/v1/placement/documents/{id}/download:
     get:
       operationId: v1_placement_documents_download_retrieve
-      description: |-
-        Readable by the owner, by staff, and by a recruiter the owner has a
-        live application with — the same scope that governs the profile.
+      description: Readable by the owner, staff, and a recruiter the owner has a live
+        application with.
       parameters:
       - in: path
         name: id
@@ -737,8 +755,7 @@ paths:
   /api/v1/placement/interviews/rounds:
     get:
       operationId: v1_placement_interviews_rounds_list
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       parameters:
       - name: cursor
@@ -767,8 +784,7 @@ paths:
           description: ''
     post:
       operationId: v1_placement_interviews_rounds_create
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       tags:
       - v1
@@ -796,8 +812,7 @@ paths:
   /api/v1/placement/interviews/rounds/{id}/candidates:
     post:
       operationId: v1_placement_interviews_rounds_candidates_create
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       parameters:
       - in: path
@@ -832,8 +847,7 @@ paths:
   /api/v1/placement/interviews/rounds/{id}/outcome:
     post:
       operationId: v1_placement_interviews_rounds_outcome_create
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       parameters:
       - in: path
@@ -868,8 +882,7 @@ paths:
   /api/v1/placement/offers:
     get:
       operationId: v1_placement_offers_list
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       parameters:
       - name: cursor
@@ -899,8 +912,7 @@ paths:
   /api/v1/placement/offers/{id}/respond:
     post:
       operationId: v1_placement_offers_respond_create
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       parameters:
       - in: path
@@ -935,8 +947,7 @@ paths:
   /api/v1/placement/offers/issue:
     post:
       operationId: v1_placement_offers_issue_create
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       tags:
       - v1
@@ -965,8 +976,7 @@ paths:
   /api/v1/placement/postings:
     get:
       operationId: v1_placement_postings_list
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       parameters:
       - name: cursor
@@ -995,8 +1005,7 @@ paths:
           description: ''
     post:
       operationId: v1_placement_postings_create
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       tags:
       - v1
@@ -1024,8 +1033,7 @@ paths:
   /api/v1/placement/postings/{id}:
     get:
       operationId: v1_placement_postings_retrieve
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       parameters:
       - in: path
@@ -1047,8 +1055,7 @@ paths:
           description: ''
     put:
       operationId: v1_placement_postings_update
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       parameters:
       - in: path
@@ -1081,8 +1088,7 @@ paths:
           description: ''
     patch:
       operationId: v1_placement_postings_partial_update
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       parameters:
       - in: path
@@ -1138,9 +1144,30 @@ paths:
   /api/v1/placement/postings/{id}/publish:
     post:
       operationId: v1_placement_postings_publish_create
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - recruiterSession: []
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPosting'
+          description: ''
+  /api/v1/placement/postings/{id}/submit:
+    post:
+      operationId: v1_placement_postings_submit_create
+      description: A company submits a draft for the TPO to publish (BW-PC-03).
       parameters:
       - in: path
         name: id
@@ -1162,8 +1189,7 @@ paths:
   /api/v1/placement/profile/resume:
     get:
       operationId: v1_placement_profile_resume_retrieve
-      description: |-
-        The student's own candidate record, including the resume they maintain
+      description: The student's own candidate record, including the resume they maintain
         on the ERP portal.
       tags:
       - v1
@@ -1180,11 +1206,7 @@ paths:
   /api/v1/placement/profiles/{user_id}:
     get:
       operationId: v1_placement_profiles_retrieve
-      description: |-
-        A recruiter or the TPO reading a candidate.
-
-        A recruiter reaches only their own live applicants — anyone else is a 404,
-        not a 403, because a 403 confirms the person exists.
+      description: A recruiter or the TPO reading a candidate.
       parameters:
       - in: path
         name: user_id
@@ -1219,6 +1241,59 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PlacementRecordDetail'
+          description: ''
+  /api/v1/placement/records/{id}:
+    patch:
+      operationId: v1_placement_records_partial_update
+      description: A TPO correction to one record; the record's history is kept (PC-BR-029).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRecordCorrection'
+            examples:
+              CorrectThePackage:
+                value:
+                  reason: The company revised the offer letter.
+                  ctc_lpa: '14.50'
+                summary: Correct the package
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRecordCorrection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRecordCorrection'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfficeRecord'
+              examples:
+                Corrected:
+                  value:
+                    id: 7
+                    user_id: 4021
+                    company:
+                      id: 3
+                      name: Acme
+                    season: 2026-27
+                    source: campus
+                    kind: fte
+                    ctc_lpa: '14.50'
+                    is_active: true
+                    created_at: '2026-11-02T10:00:00Z'
+                    updated_at: '2026-11-09T09:30:00Z'
           description: ''
   /api/v1/placement/records/{id}/not-joining:
     post:
@@ -1286,6 +1361,46 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlacementRecordDetail'
           description: ''
+  /api/v1/placement/records/{id}/revisions:
+    get:
+      operationId: v1_placement_records_revisions_list
+      description: What a record said before each correction (PC-UC-010 step 4).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecordRevision'
+              examples:
+                OneCorrection:
+                  value:
+                  - results:
+                    - id: 1
+                      by_user_id: 62
+                      reason: The company revised the offer letter.
+                      before:
+                        ctc_lpa: '12.00'
+                        kind: fte
+                        is_active: true
+                      after:
+                        ctc_lpa: '14.50'
+                        kind: fte
+                        is_active: true
+                      created_at: '2026-11-09T09:30:00Z'
+                  summary: One correction
+          description: ''
   /api/v1/placement/records/clearance:
     get:
       operationId: v1_placement_records_clearance_retrieve
@@ -1304,11 +1419,7 @@ paths:
   /api/v1/placement/records/off-campus:
     post:
       operationId: v1_placement_records_off_campus_create
-      description: |-
-        Rules 5 and 24 — an off-campus placement the Cell was told about.
-
-        Without this the no-dues gate would miss off-campus students entirely,
-        which is the group rule 24 names explicitly.
+      description: Rules 5 and 24 — an off-campus placement the Cell was told about.
       tags:
       - v1
       requestBody:
@@ -1331,6 +1442,63 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlacementRecordDetail'
+          description: ''
+  /api/v1/placement/records/office:
+    get:
+      operationId: v1_placement_records_office_list
+      description: Every placement record the office may maintain (PC-UC-010, PC-AFR-030).
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: season
+        schema:
+          type: string
+        description: Placement season, for example 2026-27.
+      - in: query
+        name: user_id
+        schema:
+          type: integer
+        description: One person's records.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOfficeRecordList'
+              examples:
+                OneRecord:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 7
+                      user_id: 4021
+                      company:
+                        id: 3
+                        name: Acme
+                      season: 2026-27
+                      source: campus
+                      kind: fte
+                      ctc_lpa: '12.00'
+                      is_active: true
+                      created_at: '2026-11-02T10:00:00Z'
+                      updated_at: '2026-11-02T10:00:00Z'
+                  summary: One record
           description: ''
   /api/v1/placement/records/outstanding:
     get:
@@ -1376,8 +1544,7 @@ paths:
   /api/v1/placement/recruiters/invite:
     post:
       operationId: v1_placement_recruiters_invite_create
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       tags:
       - v1
@@ -1430,8 +1597,7 @@ paths:
   /api/v1/placement/recruiters/logout:
     post:
       operationId: v1_placement_recruiters_logout_create
-      description: |-
-        Recruiters authenticate on a separate scheme; both pools land on
+      description: Recruiters authenticate on a separate scheme; both pools land on
         `request.principal`.
       tags:
       - v1
@@ -1536,9 +1702,7 @@ paths:
   /api/v1/placement/registrations/opt-out:
     post:
       operationId: v1_placement_registrations_opt_out_create
-      description: |-
-        Withdrawing. Rule 21 makes coming back cost a fee and allows it once,
-        so the client should say so before confirming.
+      description: Withdrawing.
       tags:
       - v1
       requestBody:
@@ -1607,12 +1771,7 @@ paths:
   /api/v1/placement/seasons:
     get:
       operationId: v1_placement_seasons_list
-      description: |-
-        The seasons a posting may belong to.
-
-        Free text here was a trap: a typo produced a posting whose season has no
-        PlacementPolicy, so it looked fine until a student applied and hit an
-        opaque `policy_missing`. A closed list moves that failure to authoring time.
+      description: The seasons a posting may belong to.
       tags:
       - v1
       security:
@@ -1643,6 +1802,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StaffStats'
+          description: ''
+  /api/v1/placement/stats/trends:
+    get:
+      operationId: v1_placement_stats_trends_list
+      description: Season-on-season figures for the TPO and chairman (PC-AFR-034,
+        PC-AFR-036).
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SeasonTrend'
+              examples:
+                TwoSeasons:
+                  value:
+                  - results:
+                    - season: 2025-26
+                      registered: 310
+                      placed: 262
+                      placement_rate: 84.5
+                      companies_participated: 41
+                    - season: 2026-27
+                      registered: 322
+                      placed: 118
+                      placement_rate: 36.6
+                      companies_participated: 19
+                  summary: Two seasons
           description: ''
   /api/v1/placement/students/cpi:
     get:
@@ -1715,9 +1907,7 @@ components:
       - programmes
     AcademicStandingRow:
       type: object
-      description: |-
-        One row of the CPI directory. `cpi` is null when nothing is declared —
-        never zero.
+      description: One row of the CPI directory.
       properties:
         user_id:
           type: integer
@@ -1876,9 +2066,7 @@ components:
           type: object
           additionalProperties: {}
           nullable: true
-          description: |-
-            Populated only when the view batch-loaded the directory, i.e. when
-            the reader is staff. A student's own list needs no directory call.
+          description: Populated only when the view batch-loaded the directory.
           readOnly: true
         created_at:
           type: string
@@ -1937,9 +2125,6 @@ components:
           type: string
           default: ''
           maxLength: 4000
-        resume_id:
-          type: integer
-          nullable: true
       required:
       - posting_id
     ApplySanction:
@@ -2011,9 +2196,8 @@ components:
       - moved
     BulkResult:
       type: object
-      description: |-
-        Counts first, then the per-item detail — a partial run must never read
-        as a complete one.
+      description: Counts first, then the per-item detail — a partial run must never
+        read as a complete one.
       properties:
         moved:
           type: integer
@@ -2252,6 +2436,39 @@ components:
       - email
       - id
       - name
+    CompanySelfRegister:
+      type: object
+      description: A company's own request; the contact is how the office answers
+        it (PC-UC-014).
+      properties:
+        name:
+          type: string
+          maxLength: 160
+        sector:
+          type: string
+          maxLength: 60
+        website:
+          oneOf:
+          - type: string
+            format: uri
+          - type: string
+            maxLength: 0
+        hq_city:
+          type: string
+          maxLength: 80
+        contact_name:
+          type: string
+          maxLength: 120
+        contact_email:
+          type: string
+          format: email
+        contact_phone:
+          type: string
+          maxLength: 32
+      required:
+      - contact_email
+      - contact_name
+      - name
     CompanyStatusEnum:
       enum:
       - prospect
@@ -2340,13 +2557,11 @@ components:
       - url
     DocumentLinkKindEnum:
       enum:
-      - resume
       - certificate
       - offer_letter
       - other
       type: string
       description: |-
-        * `resume` - resume
         * `certificate` - certificate
         * `offer_letter` - offer_letter
         * `other` - other
@@ -2442,6 +2657,9 @@ components:
         posting:
           type: integer
           readOnly: true
+        posting_title:
+          type: string
+          readOnly: true
         seq:
           type: integer
           readOnly: true
@@ -2491,6 +2709,7 @@ components:
       - meeting_url
       - mode
       - posting
+      - posting_title
       - seq
       - starts_at
       - venue
@@ -2864,6 +3083,57 @@ components:
         * `revoked` - Revoked
         * `superseded` - Superseded
         * `expired` - Expired
+    OfficeRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        company:
+          allOf:
+          - $ref: '#/components/schemas/CompanyBrief'
+          readOnly: true
+        season:
+          type: string
+          readOnly: true
+        source:
+          allOf:
+          - $ref: '#/components/schemas/SourceEnum'
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        ctc_lpa:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        is_active:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - company
+      - created_at
+      - ctc_lpa
+      - id
+      - is_active
+      - kind
+      - season
+      - source
+      - updated_at
+      - user_id
     Ok:
       type: object
       properties:
@@ -3000,6 +3270,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PaginatedOfficeRecordList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/OfficeRecord'
     PatchedJobPosting:
       type: object
       properties:
@@ -3080,6 +3369,21 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PatchedRecordCorrection:
+      type: object
+      properties:
+        reason:
+          type: string
+          maxLength: 300
+        ctc_lpa:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          nullable: true
+        kind:
+          $ref: '#/components/schemas/JobPostingKindEnum'
+        is_active:
+          type: boolean
     PatchedRole:
       type: object
       properties:
@@ -3147,9 +3451,8 @@ components:
       - source
     ProfileDocument:
       type: object
-      description: |-
-        Deliberately no `drive_url` — whoever holds it opens the file, with no
-        further check. `download_url` re-authorises on every use.
+      description: Deliberately no `drive_url` — whoever holds it opens the file,
+        with no further check.
       properties:
         id:
           type: integer
@@ -3203,9 +3506,7 @@ components:
         * `other` - Other
     Recommendation:
       type: object
-      description: |-
-        What the policy points to. `automatic` is always false — rules 19 and 21
-        leave the decision to a human.
+      description: What the policy points to.
       properties:
         sanction:
           type: string
@@ -3251,6 +3552,33 @@ components:
         * `consent_failure` - consent_failure
         * `code_of_conduct` - code_of_conduct
         * `misrepresentation` - misrepresentation
+    RecordRevision:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        by_user_id:
+          type: integer
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        before:
+          readOnly: true
+        after:
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - after
+      - before
+      - by_user_id
+      - created_at
+      - id
+      - reason
     RecruiterAccept:
       type: object
       properties:
@@ -3588,6 +3916,27 @@ components:
       - allowed
       - message
       - rule
+    SeasonTrend:
+      type: object
+      properties:
+        season:
+          type: string
+        registered:
+          type: integer
+        placed:
+          type: integer
+        placement_rate:
+          type: number
+          format: double
+          nullable: true
+        companies_participated:
+          type: integer
+      required:
+      - companies_participated
+      - placed
+      - placement_rate
+      - registered
+      - season
     SectorKindEnum:
       enum:
       - it
@@ -3686,6 +4035,11 @@ components:
         max_ctc:
           type: string
           nullable: true
+        placement_rate:
+          type: number
+          format: double
+          nullable: true
+        salary_distribution: {}
         by_company: {}
         applications_by_status: {}
       required:
@@ -3728,9 +4082,8 @@ components:
       - to_status
     TransitionEntry:
       type: object
-      description: |-
-        `reason` and the actor ids are absent for a non-staff reader — see
-        api/audit.py for why.
+      description: '`reason` and the actor ids are absent for a non-staff reader —
+        see api/audit.py for why.'
       properties:
         from_status:
           type: string

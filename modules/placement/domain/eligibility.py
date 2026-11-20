@@ -1,11 +1,4 @@
-"""Eligibility rules — a tiny JSON AST, evaluated fail-closed.
-
-    {"all": [{"gte": ["cpi", 7.0]}, {"in": ["discipline", ["CSE","ECE"]]}]}
-
-Fail-closed means an unknown field, a missing fact, or any error yields
-INELIGIBLE with an explicit reason — never eligible-by-default. Students see
-"CPI 6.80 — 7.00 required", not "not eligible".
-"""
+"""Eligibility rules — a tiny JSON AST, evaluated fail-closed. {"all": [{"gte"."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -20,10 +13,6 @@ FIELDS = {
     "profile_complete",                                       # the ERP portal
 }
 
-# List-valued facts, comparable only with the set operators. None today.
-LIST_FIELDS: set[str] = set()
-LIST_OPS = {"has_all", "has_any", "has_none"}
-
 # Each scalar field's literal type, so a rule is checked when it is written.
 NUMERIC_FIELDS = {"cpi", "earned_credits", "active_backlogs", "semester",
                   "batch_year", "offer_count"}
@@ -33,7 +22,7 @@ FLAG_FIELDS = {"is_placed", "is_registered", "profile_complete"}
 EQUALITY_OPS = {"eq", "ne"}
 MEMBERSHIP_OPS = {"in", "not_in"}
 ORDER_OPS = {"gt", "gte", "lt", "lte"}
-OPERATORS = EQUALITY_OPS | MEMBERSHIP_OPS | ORDER_OPS | LIST_OPS
+OPERATORS = EQUALITY_OPS | MEMBERSHIP_OPS | ORDER_OPS
 
 MAX_DEPTH = 5
 
@@ -62,32 +51,6 @@ def _num(v):
         return None
 
 
-def _norm_set(v) -> set[str] | None:
-    """Case-insensitive, whitespace-trimmed. 'Python' matches 'python '."""
-    if isinstance(v, str):
-        v = [v]
-    if not isinstance(v, (list, tuple, set)):
-        return None
-    return {str(x).strip().lower() for x in v if str(x).strip()}
-
-
-def _compare_list(op: str, field: str, expected, actual) -> RuleOutcome:
-    have, want = _norm_set(actual), _norm_set(expected)
-    if have is None or want is None:
-        return RuleOutcome(field, op, expected, actual, False, "type_mismatch")
-    if op == "has_all":
-        missing = sorted(want - have)
-        return RuleOutcome(field, op, sorted(want), sorted(have), not missing,
-                           "" if not missing else f"{field}_missing:{','.join(missing)}")
-    if op == "has_any":
-        ok = bool(want & have)
-        return RuleOutcome(field, op, sorted(want), sorted(have), ok,
-                           "" if ok else f"{field}_none_of_required")
-    overlap = sorted(want & have)          # has_none
-    return RuleOutcome(field, op, sorted(want), sorted(have), not overlap,
-                       "" if not overlap else f"{field}_disallowed:{','.join(overlap)}")
-
-
 def _same(field: str, actual, expected) -> bool | None:
     """Equality by value for numbers: a CPI stored as Decimal("8.10") equals 8.1."""
     if field not in NUMERIC_FIELDS:
@@ -97,12 +60,6 @@ def _same(field: str, actual, expected) -> bool | None:
 
 
 def _compare(op: str, field: str, expected, actual) -> RuleOutcome:
-    # A rule-authoring mistake still denies: guessing is how someone slips through.
-    if (field in LIST_FIELDS) != (op in LIST_OPS):
-        return RuleOutcome(field, op, expected, actual, False, "operator_not_valid_for_field")
-    if op in LIST_OPS:
-        return _compare_list(op, field, expected, actual or [])
-
     if actual is None:
         return RuleOutcome(field, op, expected, None, False, "missing_fact")
 
@@ -275,10 +232,6 @@ def _comparison_problem(op: str, field: str, expected) -> str:
         return "unknown_operator"
     if field not in FIELDS:
         return "unknown_field"
-    if (field in LIST_FIELDS) != (op in LIST_OPS):
-        return "operator_not_valid_for_field"
-    if op in LIST_OPS:
-        return "" if _norm_set(expected) else "type_mismatch"
     if op in ORDER_OPS and field not in NUMERIC_FIELDS:
         return "operator_not_valid_for_field"
     if op in MEMBERSHIP_OPS:

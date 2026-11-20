@@ -1,9 +1,4 @@
-"""Placement domain tables.
-
-Institute people are referenced by plain `user_id` integers, never foreign
-keys — there is no user table in this database. Recruiters are the exception:
-they are local rows, scoped to one company.
-"""
+"""Placement domain tables."""
 
 from django.db import models
 from django.db.models import Q

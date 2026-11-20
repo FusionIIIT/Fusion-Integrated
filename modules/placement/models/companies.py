@@ -1,23 +1,15 @@
-"""Placement domain tables.
-
-Institute people are referenced by plain `user_id` integers, never foreign
-keys — there is no user table in this database. Recruiters are the exception:
-they are local rows, scoped to one company.
-"""
+"""Placement domain tables."""
 
 from django.db import models
 from django.db.models import Q
+from django.db.models.functions import Lower
 
 from core.db.mixins import TimeStampedModel
 
 
 # -- Companies and their people ------------------------------------------------
 class Company(TimeStampedModel):
-    """A recruiting organisation.
-
-    `approval_status` is the PC-BR-007 gate; `status` is the ongoing
-    relationship. An approved company can still be blacklisted later.
-    """
+    """A recruiting organisation."""
 
     STATUS = [("prospect", "Prospect"), ("active", "Active"),
               ("blacklisted", "Blacklisted")]
@@ -58,6 +50,8 @@ class Company(TimeStampedModel):
             models.Index(fields=["approval_status"], name="company_approval_idx"),
         ]
         constraints = [
+            # Two rows for one company would split its approvals, postings and history.
+            models.UniqueConstraint(Lower("name"), name="company_name_unique_ci"),
             # An approval records who made it even if the service layer is bypassed.
             models.CheckConstraint(
                 condition=~Q(approval_status="approved")
@@ -94,12 +88,7 @@ class CompanyContact(TimeStampedModel):
 
 
 class RecruiterAccount(TimeStampedModel):
-    """A recruiter's login. PCMS-owned, deliberately not an IAM identity, so
-    an auth bug here cannot expose the institute directory.
-
-    `company` is the isolation boundary: every recruiter query filters on it.
-    Invitation only — there is no self-service signup.
-    """
+    """A recruiter's login."""
 
     company = models.ForeignKey(Company, on_delete=models.CASCADE,
                                 related_name="recruiters")
@@ -131,8 +120,7 @@ class RecruiterAccount(TimeStampedModel):
 
 
 class RecruiterLoginAttempt(models.Model):
-    """Every attempt, including unknown addresses — that is the stuffing
-    signal."""
+    """Every attempt, including unknown addresses — that is the stuffing signal."""
 
     email = models.CharField(max_length=254, db_index=True)
     ip = models.GenericIPAddressField(null=True, blank=True)
@@ -149,8 +137,7 @@ class RecruiterLoginAttempt(models.Model):
 
 
 class RecruiterSession(models.Model):
-    """A signed-in recruiter's session. `key` is the SHA-256 of the bearer
-    token, so a dump of this table yields no usable session."""
+    """A signed-in recruiter's session."""
 
     key = models.CharField(max_length=64, primary_key=True)
     account = models.ForeignKey(RecruiterAccount, on_delete=models.CASCADE,

@@ -1,19 +1,4 @@
-"""Placement Policy 2026-27, encoded as rules (PC-BR-015).
-
-A student belongs to a discipline group (CSE/ECE, Core, Design); within it are
-one or two categories defined by CTC bands. Accepting an offer locks the
-category; switching needs the new offer to clear a multiple of the held one,
-and each category caps how many switches are allowed.
-
-Four overrides sit on top:
-
-    marquee     once placed, no switching at all              (rule 8)
-    dream slot  a placed student may still appear             (rule 7)
-    core -> IT  a Core-placed student may never move to IT    (rule 2B)
-    IT -> core  a non-CSE student holding IT may sit for Core (rule 10)
-
-Pure Python, so the whole truth table is testable without a database.
-"""
+"""Placement Policy 2026-27, encoded as rules (PC-BR-015)."""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -38,11 +23,7 @@ OTHER = "other"
 
 
 def group_for(discipline: str | None, mapping: dict[str, str] | None = None) -> str | None:
-    """The policy group for a discipline code, or None if unmapped.
-
-    None rather than a guess — inventing a group would apply CSE's switch
-    limits to someone the policy says nothing about.
-    """
+    """The policy group for a discipline code, or None if unmapped."""
     if not discipline:
         return None
     table = mapping or DEFAULT_GROUP_MAP
@@ -51,8 +32,7 @@ def group_for(discipline: str | None, mapping: dict[str, str] | None = None) -> 
 
 @dataclass(frozen=True)
 class CategorySpec:
-    """One category within a discipline group (rule 2). The CTC band decides
-    which category an offer belongs to."""
+    """One category within a discipline group (rule 2)."""
 
     group: str
     number: int
@@ -152,8 +132,7 @@ class Decision:
     facts: dict = field(default_factory=dict)
 
     def as_json(self) -> dict:
-        """Persisted onto Offer.policy_decision, so an appeal gets the rule
-        name and the numbers it compared."""
+        """Persisted onto Offer.policy_decision, so an appeal gets the rule and its numbers."""
         return {
             "allowed": self.allowed, "rule": self.rule, "message": self.message,
             "supersedes_offer_id": self.supersedes_offer_id, "facts": self.facts,
@@ -168,11 +147,7 @@ def _d(v) -> Decimal | None:
 
 
 def money(v) -> str:
-    """Trim a CTC for display: 12.0000 -> 12, 12.50 -> 12.5.
-
-    Figures computed from DecimalFields otherwise reach students as
-    "12.0000 LPA", which reads as a bug.
-    """
+    """Trim a CTC for display: 12.0000 -> 12, 12.50 -> 12.5."""
     d = _d(v)
     if d is None:
         return "—"
@@ -202,10 +177,7 @@ def _facts(policy, student, offer, group, category) -> dict:
 # -- Acceptance ----------------------------------------------------------------
 def can_accept(policy: PolicySpec, student: StudentState,
                offer: OfferSpec) -> Decision:
-    """May this student accept this offer?
-
-    Hardest bar first, so the recorded reason is the most fundamental one.
-    """
+    """May this student accept this offer?"""
     group = group_for(student.discipline, policy.group_map)
     held_category = policy.category(group, student.category_number)
     facts = _facts(policy, student, offer, group, held_category)
@@ -332,12 +304,7 @@ def _below_multiple(category, held, new, required, facts) -> Decision:
 # -- Applying ------------------------------------------------------------------
 def can_apply(policy: PolicySpec, student: StudentState,
               offer: OfferSpec | None = None) -> Decision:
-    """May this student appear for this posting?
-
-    Season-level, and deliberately more permissive than `can_accept`: rule 9
-    allows parallel processes, so whether the resulting offer may be accepted
-    is decided later with the real numbers.
-    """
+    """May this student appear for this posting?"""
     offer = offer or OfferSpec()
     group = group_for(student.discipline, policy.group_map)
     category = policy.category(group, student.category_number)
@@ -419,10 +386,7 @@ def can_apply(policy: PolicySpec, student: StudentState,
 # -- Rule 6 — mandatory participation from September ---------------------------
 def participation_is_mandatory(policy: PolicySpec, student: StudentState,
                                today) -> bool:
-    """Whether an eligible unplaced student must appear (rule 6).
-
-    Advisory only — rule 19's consequences follow a human decision.
-    """
+    """Whether an eligible unplaced student must appear (rule 6)."""
     if policy.mandatory_from is None or student.is_debarred:
         return False
     if not student.is_registered or student.accepted_offer_count > 0:

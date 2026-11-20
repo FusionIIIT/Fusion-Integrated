@@ -1,5 +1,4 @@
-/** Companies is an office page: who reaches it is the route's guard (routes.tsx);
- *  this pins that an officer who does gets every control. */
+/** Companies is an office page: who reaches it is the route's guard (routes.tsx). */
 import { MantineProvider } from "@mantine/core";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -39,5 +38,23 @@ describe("CompaniesPage", () => {
     expect(screen.getByRole("button", { name: /register company/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /invite recruiter/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Approve" })).toBeInTheDocument();
+  });
+});
+
+describe("CompaniesPage paging", () => {
+  beforeEach(() => {
+    const idle = { mutate: vi.fn(), isPending: false };
+    hooks.useCompanyDecision.mockReturnValue(idle);
+    hooks.useInviteRecruiter.mockReturnValue(idle);
+    hooks.useRegisterCompany.mockReturnValue(idle);
+  });
+
+  it("offers the next page when the server has more rows", () => {
+    const fetchNextPage = vi.fn();
+    hooks.useCompanies.mockReturnValue({ data: { results: [approved] }, isPending: false,
+      error: null, hasNextPage: true, fetchNextPage, isFetchingNextPage: false });
+    render(<MantineProvider><CompaniesPage /></MantineProvider>);
+    screen.getByRole("button", { name: "Load more" }).click();
+    expect(fetchNextPage).toHaveBeenCalled();
   });
 });

@@ -1,10 +1,4 @@
-"""Registering for a season (rules 1, 20, 21).
-
-Nothing created a PlacementRegistration before this, so `can_apply` refused
-every student with `not_registered` and the application flow was closed in
-production. The last test in this file is the one that matters: a student who
-registers can then actually apply.
-"""
+"""Registering for a season (rules 1, 20, 21)."""
 from datetime import date, timedelta
 from decimal import Decimal
 
@@ -52,8 +46,7 @@ class TestRules:
         assert t.allowed
 
     def test_a_missing_declared_result_refuses_rather_than_passes(self):
-        """Same fail-closed rule as the eligibility engine: absence is not a
-        pass."""
+        """Same fail-closed rule as the eligibility engine: absence is not a pass."""
         t = rules.assess(terms(min_cpi=Decimal("6.0")),
                          rules.Applicant(cpi=None), today=TODAY)
         assert t.route is rules.Route.REFUSED
@@ -108,11 +101,11 @@ def policy():
         registration_closes_on=timezone.localdate() + timedelta(days=30))
 
 
-def _staff(perms=("placement_cell.registration.manage",), uid=9):
+def _staff(perms=("placement.registration.manage",), uid=9):
     from fusion_auth.principal import Principal
     return Principal.from_session(
         make_session(user_id=uid, kind="staff", permissions=perms,
-                     modules=("placement_cell",)))
+                     modules=("placement",)))
 
 
 class TestRegistering:
@@ -131,8 +124,7 @@ class TestRegistering:
         assert PlacementRegistration.objects.count() == 1
 
     def test_late_registration_needs_a_fee_reference(self, stub_iam, policy):
-        """Rule 20 — "a copy of the payment challan/receipt shall be
-        submitted"."""
+        """Rule 20 — "a copy of the payment challan/receipt shall be submitted"."""
         stub_iam()
         policy.registration_closes_on = timezone.localdate() - timedelta(days=1)
         policy.save()
@@ -157,7 +149,7 @@ class TestRegistering:
         with pytest.raises(PermissionDeniedError):
             service.approve_late(
                 season=SEASON, user_id=STUDENT, fee_reference="X",
-                actor=_staff(perms=("placement_cell.report.view",)))
+                actor=_staff(perms=("placement.report.view",)))
 
     def test_reregistration_is_allowed_once(self, stub_iam, policy):
         stub_iam()
@@ -187,9 +179,9 @@ class TestRegistering:
 # -- HTTP ---------------------------------------------------------------------------
 class TestRegistrationApi:
 
-    def _client(self, stub_iam, perms=("placement_cell.registration.self",),
+    def _client(self, stub_iam, perms=("placement.registration.create",),
                 uid=STUDENT):
-        stub_iam(make_session(user_id=uid, modules=("placement_cell",),
+        stub_iam(make_session(user_id=uid, modules=("placement",),
                               permissions=perms))
         c = APIClient()
         c.credentials(HTTP_AUTHORIZATION="Token abc")
@@ -226,12 +218,11 @@ class TestRegistrationApi:
 
 # -- The point of all of it ----------------------------------------------------------
 def test_a_registered_student_can_actually_apply(stub_iam, policy, user_ref):
-    """Before this, `can_apply` refused everyone with `not_registered` because
-    no registration could exist. This is the regression guard."""
+    """Before this, `can_apply` refused everyone with `not_registered` because no registration could exist."""
     from modules.placement.services import applications
 
-    stub_iam(make_session(user_id=STUDENT, modules=("placement_cell",),
-                          permissions=("placement_cell.application.create",)),
+    stub_iam(make_session(user_id=STUDENT, modules=("placement",),
+                          permissions=("placement.application.create",)),
              users={STUDENT: user_ref(STUDENT)})
     company = Company.objects.create(
         name="Acme", slug="acme", status="active",

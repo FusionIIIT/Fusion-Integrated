@@ -1,10 +1,4 @@
-"""Drain the notification outbox.
-
-Exists as a management command as well as a Celery task so the system works
-before a broker does — a cron entry calling this is a perfectly good production
-setup for a few hundred emails a day, and it is how the queue gets drained
-during an incident when the workers are down.
-"""
+"""Drain the notification outbox."""
 from django.core.management.base import BaseCommand
 
 from modules.placement.models import NotificationOutbox
