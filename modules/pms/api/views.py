@@ -22,6 +22,7 @@ from modules.pms.models import (
     LicensingRequest,
     OfficeAction,
     PatentAppeal,
+    PatentBudget,
     PatentLegalAdvice,
     PmsAuditTrail,
     PmsConfiguration,
@@ -901,6 +902,68 @@ class ReportsView(PmsAPIView):
                 "domain_distribution": domain_counts,
             }
         )
+
+
+class WorkflowOversightView(PmsAPIView):
+    """Return lifecycle and related workflow states within actor scope (UC-027, 032)."""
+
+    permission_classes = [p.MODULE]
+
+    @extend_schema(responses=s.WorkflowOversightSerializer(many=True))
+    def get(self, request):
+        principal = request.principal
+        if not principal.has_any_permission(p.P_WORKFLOW_MONITOR, p.P_WORKFLOW_OVERSIGHT):
+            raise PermissionDeniedError("You do not have permission to view workflow oversight.")
+
+        applications = list(
+            visible_applications(principal).prefetch_related(
+                "attorney_assignments", "office_actions", "maintenance_records"
+            )
+        )
+        application_ids = [app.pk for app in applications]
+        budget_statuses = dict(
+            PatentBudget.objects.filter(application_id__in=application_ids).values_list(
+                "application_id", "status"
+            )
+        )
+        data = [
+            {
+                "application_id": app.pk,
+                "application_no": app.application_no,
+                "domain": app.domain,
+                "status": app.status,
+                "assigned_director_user_id": app.assigned_director_user_id,
+                "assigned_attorney_user_id": app.assigned_attorney_user_id,
+                "review_deadline": app.review_deadline,
+                "revision_deadline": app.revision_deadline,
+                "budget_status": budget_statuses.get(app.pk),
+                "attorney_assignment_statuses": list(
+                    app.attorney_assignments.order_by("created_at").values_list(
+                        "status", flat=True
+                    )
+                ),
+                "office_actions": list(
+                    app.office_actions.order_by("due_date").values(
+                        "id",
+                        "due_date",
+                        "status",
+                        "requires_applicant_review",
+                        "applicant_approved",
+                    )
+                ),
+                "maintenance": list(
+                    app.maintenance_records.order_by("fee_due_date").values(
+                        "id",
+                        "cycle_number",
+                        "fee_due_date",
+                        "maintenance_status",
+                        "director_decision",
+                    )
+                ),
+            }
+            for app in applications
+        ]
+        return Response(s.WorkflowOversightSerializer(data, many=True).data)
 
 
 class PmsConfigurationView(PmsAPIView):

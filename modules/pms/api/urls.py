@@ -173,4 +173,9 @@ urlpatterns = [
     ),
     path("audit-trail/", views.AuditTrailListView.as_view(), name="pms-audit-trail"),
     path("reports/", views.ReportsView.as_view(), name="pms-reports"),
+    path(
+        "workflow-oversight/",
+        views.WorkflowOversightView.as_view(),
+        name="pms-workflow-oversight",
+    ),
 ]

@@ -505,3 +505,34 @@ class PmsConfigurationReadSerializer(serializers.Serializer):
     key = serializers.CharField()
     value = serializers.JSONField()
     description = serializers.CharField(allow_blank=True)
+
+
+class WorkflowOfficeActionSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    due_date = serializers.DateField()
+    status = serializers.CharField()
+    requires_applicant_review = serializers.BooleanField()
+    applicant_approved = serializers.BooleanField()
+
+
+class WorkflowMaintenanceSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    cycle_number = serializers.IntegerField()
+    fee_due_date = serializers.DateField()
+    maintenance_status = serializers.CharField()
+    director_decision = serializers.CharField(allow_blank=True)
+
+
+class WorkflowOversightSerializer(serializers.Serializer):
+    application_id = serializers.IntegerField()
+    application_no = serializers.CharField()
+    domain = serializers.CharField()
+    status = serializers.CharField()
+    assigned_director_user_id = serializers.IntegerField(allow_null=True)
+    assigned_attorney_user_id = serializers.IntegerField(allow_null=True)
+    review_deadline = serializers.DateTimeField(allow_null=True)
+    revision_deadline = serializers.DateTimeField(allow_null=True)
+    budget_status = serializers.CharField(allow_null=True)
+    attorney_assignment_statuses = serializers.ListField(child=serializers.CharField())
+    office_actions = WorkflowOfficeActionSerializer(many=True)
+    maintenance = WorkflowMaintenanceSerializer(many=True)

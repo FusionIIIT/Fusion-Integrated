@@ -822,6 +822,12 @@ def test_attorney_panel_assignment_permission_is_read_only(stub_iam):
     assert client.post("/api/v1/pms/attorney-panel/", {}, format="json").status_code == 403
 
 
+def test_api_workflow_oversight_requires_workflow_permission(stub_iam):
+    client = _client(stub_iam, permissions=("pms.application.view_self",))
+    response = client.get("/api/v1/pms/workflow-oversight/")
+    assert response.status_code == 403
+
+
 def test_api_licensing_request_records_the_requesting_applicant(stub_iam):
     """UC-PMS-020, CFR-PMS-019: the view must pass the applicant id through to
     submit_licensing_request. Regression for a keyword mismatch
