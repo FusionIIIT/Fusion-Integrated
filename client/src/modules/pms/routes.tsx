@@ -14,6 +14,10 @@ const FilingsPage = lazy(() => import("./pages/FilingsPage"));
 const OfficeActionsPage = lazy(() => import("./pages/OfficeActionsPage"));
 const MaintenancePage = lazy(() => import("./pages/MaintenancePage"));
 const LicensingPage = lazy(() => import("./pages/LicensingPage"));
+const WorkflowPage = lazy(() => import("./pages/WorkflowPage"));
+const ReportsPage = lazy(() => import("./pages/ReportsPage"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
+const AuditPage = lazy(() => import("./pages/AuditPage"));
 
 function AnyPermission({ permissions, children }: { permissions: string[]; children: ReactNode }) {
   const { can } = useAuth();
@@ -36,4 +40,9 @@ export const routes: RouteObject[] = [
   { path: "office-actions", element: any(["pms.office_action.record", "pms.office_action.respond", "pms.office_action.review"], <OfficeActionsPage />) },
   { path: "maintenance", element: any(["pms.maintenance.manage", "pms.maintenance.decide"], <MaintenancePage />) },
   { path: "licensing", element: any(["pms.licensing.submit", "pms.licensing.review"], <LicensingPage />) },
+  { path: "oversight", element: any(["pms.workflow.monitor", "pms.workflow.oversight"], <WorkflowPage />) },
+  { path: "reports", element: <RequirePermission permission="pms.report.view"><ReportsPage /></RequirePermission> },
+  { path: "my-reports", element: <RequirePermission permission="pms.report.view_self"><ReportsPage personal /></RequirePermission> },
+  { path: "admin", element: any(["pms.config.manage", "pms.panel.manage"], <AdminPage />) },
+  { path: "audit", element: <RequirePermission permission="pms.audit.view"><AuditPage /></RequirePermission> },
 ];

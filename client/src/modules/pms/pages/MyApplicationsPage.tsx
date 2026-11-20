@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Alert, Button, Card, Container, Grid, Group, SimpleGrid, Stack, Text } from "@mantine/core";
 import { FaArrowRight, FaEye } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 import { useAuth } from "../../../auth/AuthProvider";
 import { DataTable, type Column } from "../../../ui/components/DataTable";
@@ -90,6 +91,11 @@ export default function MyApplicationsPage() {
                     {doc.title} · v{doc.version}{doc.is_current ? " · current" : ""}
                   </Text>
                 ))}
+              </Group>
+              <Group gap="md">
+                <Link to="../office-actions">Open office actions</Link>
+                <Link to="../licensing">Open licensing requests</Link>
+                <Link to="../maintenance">Open maintenance</Link>
               </Group>
               {can("pms.document.manage") && (
                 <>
