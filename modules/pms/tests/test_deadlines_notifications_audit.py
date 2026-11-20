@@ -17,6 +17,7 @@ from modules.pms.domain.errors import NotificationRecipientError
 from modules.pms.domain.state_machine import PatentApplicationStatus
 from modules.pms.models import (
     PmsNotificationOutbox,
+    PostGrantMaintenance,
 )
 from modules.pms.services import (
     add_business_days,
@@ -30,7 +31,7 @@ from modules.pms.services import (
     send_pending_notifications,
     submit_application,
 )
-from modules.pms.tests.support import configure_maintenance_schedule
+from modules.pms.tests.support import configure, configure_maintenance_schedule
 
 pytestmark = pytest.mark.django_db
 
@@ -125,6 +126,69 @@ def test_missed_review_deadline_triggers_escalation():
     ).first()
     assert esc_notif is not None
     assert "Escalation" in esc_notif.subject
+
+
+def test_configured_alert_offsets_cover_maintenance_cycles_and_dedupe():
+    configure(alert_offsets=[10])
+    app = submit_application(
+        applicant_user_id=1001,
+        title="Maintenance reminder",
+        abstract="A",
+        detailed_description="D",
+        claims="C",
+        domain="Tech",
+    )
+    app.status = PatentApplicationStatus.GRANTED.value
+    app.assigned_attorney_user_id = 5001
+    app.save()
+    cycle = PostGrantMaintenance.objects.create(
+        application=app,
+        cycle_number=1,
+        fee_due_date=timezone.now().date() + timedelta(days=10),
+        maintenance_status="scheduled",
+    )
+
+    monitor_and_process_deadlines()
+    monitor_and_process_deadlines()
+
+    assert PmsNotificationOutbox.objects.filter(
+        topic="deadline.alert_10",
+        dedupe_key__startswith=f"pms:maintenance:alert:{cycle.id}:10:",
+        recipient_user_id=5001,
+    ).count() == 1
+
+
+def test_overdue_maintenance_escalates_without_application_transition():
+    app = submit_application(
+        applicant_user_id=1001,
+        title="Overdue maintenance",
+        abstract="A",
+        detailed_description="D",
+        claims="C",
+        domain="Tech",
+    )
+    app.status = PatentApplicationStatus.RENEWAL_DECISION_REQUESTED.value
+    app.assigned_director_user_id = 2001
+    app.assigned_attorney_user_id = 5001
+    app.save()
+    cycle = PostGrantMaintenance.objects.create(
+        application=app,
+        cycle_number=1,
+        fee_due_date=timezone.now().date() - timedelta(days=1),
+        decision_requested=True,
+        maintenance_status="decision_requested",
+    )
+
+    monitor_and_process_deadlines()
+    monitor_and_process_deadlines()
+
+    app.refresh_from_db()
+    assert app.status == PatentApplicationStatus.RENEWAL_DECISION_REQUESTED.value
+    assert PmsNotificationOutbox.objects.filter(
+        topic="deadline.escalated",
+        dedupe_key__startswith=f"pms:maintenance:escalated:{cycle.id}:",
+        recipient_user_id=2001,
+    ).count() == 1
 
 
 # --- 3. Notification Outbox & Sending (CFR-PMS-023, BR-PMS-116) ---

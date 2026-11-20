@@ -5,10 +5,11 @@ from __future__ import annotations
 import datetime
 from datetime import timedelta
 
+from django.db import transaction
 from django.utils import timezone
 
 from modules.pms.domain.state_machine import PatentApplicationStatus
-from modules.pms.models import OfficeAction, PatentApplication
+from modules.pms.models import OfficeAction, PatentApplication, PostGrantMaintenance
 from modules.pms.services.audit import log_audit
 from modules.pms.services.configuration import load_policy
 from modules.pms.services.notifications import enqueue_notification
@@ -53,7 +54,8 @@ def monitor_and_process_deadlines(now: datetime.datetime | None = None) -> dict[
     now = now or timezone.now()
     today = now.date()
     stats = {"alerts_sent": 0, "revisions_expired": 0, "escalations": 0}
-    alert_offsets = load_policy().alert_offsets
+    policy = load_policy()
+    alert_offsets = policy.alert_offsets
 
     # 1. Overdue revisions -> Expired (BR-PMS-038)
     overdue_revisions = PatentApplication.objects.filter(
@@ -65,27 +67,36 @@ def monitor_and_process_deadlines(now: datetime.datetime | None = None) -> dict[
     )
     for app in overdue_revisions:
         prev_status = app.status
-        app.status = PatentApplicationStatus.EXPIRED.value
-        app.save(update_fields=["status", "updated_at"])
+        with transaction.atomic():
+            updated = PatentApplication.objects.filter(
+                pk=app.pk,
+                status=prev_status,
+                revision_deadline__lt=now,
+            ).update(status=PatentApplicationStatus.EXPIRED.value, updated_at=now)
+            if not updated:
+                continue
+            app.status = PatentApplicationStatus.EXPIRED.value
+            log_audit(
+                application=app,
+                action_type="revision_expired",
+                from_state=prev_status,
+                to_state=app.status,
+                details={
+                    "reason": "Revision deadline exceeded.",
+                    "configured_revision_days": policy.revision_days,
+                },
+            )
+            enqueue_notification(
+                topic="application.expired",
+                dedupe_key=f"pms:app:expired:{app.id}",
+                subject=f"PMS: Patent Application {app.application_no} has expired",
+                body=(
+                    f"Your patent application '{app.title}' has expired due to "
+                    "overdue revision resubmission."
+                ),
+                recipient_user_id=app.applicant_user_id,
+            )
         stats["revisions_expired"] += 1
-
-        log_audit(
-            application=app,
-            action_type="revision_expired",
-            from_state=prev_status,
-            to_state=app.status,
-            details={"reason": "Revision deadline of 60 days exceeded."},
-        )
-        enqueue_notification(
-            topic="application.expired",
-            dedupe_key=f"pms:app:expired:{app.id}",
-            subject=f"PMS: Patent Application {app.application_no} has expired",
-            body=(
-                f"Your patent application '{app.title}' has expired due to "
-                f"overdue revision resubmission."
-            ),
-            recipient_user_id=app.applicant_user_id,
-        )
 
     # 2. Overdue Director Reviews -> Escalate (BR-PMS-104)
     overdue_reviews = PatentApplication.objects.filter(
@@ -100,7 +111,7 @@ def monitor_and_process_deadlines(now: datetime.datetime | None = None) -> dict[
             subject=f"PMS Escalation: Director Review Overdue for {app.application_no}",
             body=(
                 f"Review deadline ({app.review_deadline}) for application "
-                f"'{app.title}' has expired. Escalating to PCC_ADMIN."
+                f"'{app.title}' has expired. This item has been flagged for escalation handling."
             ),
             recipient_user_id=app.assigned_director_user_id,
         )
@@ -176,6 +187,49 @@ def monitor_and_process_deadlines(now: datetime.datetime | None = None) -> dict[
                 ),
                 recipient_user_id=oa.application.assigned_attorney_user_id
                 or oa.application.applicant_user_id,
+            )
+
+    # 5. Maintenance deadlines only exist where a configured jurisdictional
+    # schedule created a cycle (BR-PMS-060, 061, 100).
+    active_maintenance = PostGrantMaintenance.objects.filter(
+        maintenance_status__in=("scheduled", "decision_requested", "renewal_approved")
+    ).select_related("application")
+    for cycle in active_maintenance:
+        app = cycle.application
+        days_remaining = (cycle.fee_due_date - today).days
+        recipient = (
+            app.assigned_director_user_id
+            if cycle.maintenance_status == "decision_requested"
+            else app.assigned_attorney_user_id
+        )
+        if days_remaining < 0:
+            stats["escalations"] += 1
+            enqueue_notification(
+                topic="deadline.escalated",
+                dedupe_key=f"pms:maintenance:escalated:{cycle.id}:{today}",
+                subject=f"PMS Escalation: Maintenance Deadline Overdue ({app.application_no})",
+                body=(
+                    f"Maintenance deadline ({cycle.fee_due_date}) has passed for "
+                    f"'{app.title}'. This item has been flagged for escalation handling."
+                ),
+                recipient_user_id=recipient,
+            )
+        elif days_remaining in alert_offsets:
+            stats["alerts_sent"] += 1
+            enqueue_notification(
+                topic=f"deadline.alert_{days_remaining}",
+                dedupe_key=(
+                    f"pms:maintenance:alert:{cycle.id}:{days_remaining}:{today}"
+                ),
+                subject=(
+                    f"PMS Alert: {days_remaining} days until Maintenance Deadline "
+                    f"({app.application_no})"
+                ),
+                body=(
+                    f"Maintenance cycle {cycle.cycle_number} for '{app.title}' is due "
+                    f"on {cycle.fee_due_date} in {days_remaining} days."
+                ),
+                recipient_user_id=recipient,
             )
 
     return stats
