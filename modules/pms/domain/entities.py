@@ -48,7 +48,7 @@ def validate_document(
             f"Unsupported document format '{ext}'. Only PDF documents are accepted (BR-PMS-014)."
         )
 
-    if file_size_bytes > MAX_DOCUMENT_SIZE_BYTES:
+    if file_size_bytes >= MAX_DOCUMENT_SIZE_BYTES:
         raise InvalidDocumentError(
             f"Document size ({file_size_bytes} bytes) exceeds the 50 MB limit (BR-PMS-015)."
         )

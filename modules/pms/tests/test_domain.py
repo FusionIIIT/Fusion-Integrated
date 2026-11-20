@@ -327,6 +327,9 @@ def test_document_size_limit():
     validate_document("valid.pdf", MAX_DOCUMENT_SIZE_BYTES - 1, is_malware_clean=True)
 
     with pytest.raises(InvalidDocumentError, match="exceeds the 50 MB limit"):
+        validate_document("at_limit.pdf", MAX_DOCUMENT_SIZE_BYTES, is_malware_clean=True)
+
+    with pytest.raises(InvalidDocumentError, match="exceeds the 50 MB limit"):
         validate_document("large.pdf", MAX_DOCUMENT_SIZE_BYTES + 1, is_malware_clean=True)
 
 
