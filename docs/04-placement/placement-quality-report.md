@@ -8,7 +8,7 @@ All accounts named here are synthetic accounts from `fusion-dev.dump`.
 ## 1. Gates
 
 `make check` exit 0.
-It runs `manage.py check`, the migration check, `ruff`, `lint-imports`, the three `ops/checks/` scripts, `permission_manifest --check`, `schema-check` and 594 backend tests.
+It runs `manage.py check`, the migration check, `ruff`, `lint-imports`, the three `ops/checks/` scripts, `permission_manifest --check`, `schema-check` and 595 backend tests.
 Last lines:
 
 ```text
@@ -918,7 +918,8 @@ Shared-file changes outside the module's own folders:
 | `client/src/ui/theme/theme.ts` | Names for the date picker's month arrows and confirm button. |
 | `client/e2e/accounts.ts`, `client/e2e/auth.spec.ts` | Three test accounts; the sign-in test waits out the IAM's login limit, and the student's sidebar list includes the new links. |
 | `ops/docs/module_structure.py`, `ops/docs/placement_reference.py` | The structure reference drops a deleted file; a new generator writes `placement-reference.md`. |
-| `.github/workflows/e2e.yml` | Creates `examination_student_grades` as a view of the dump's `online_cms_student_grades`, so the latest IAM can sync. Added after Student 2's approval; waits for Student 2's approval. |
+| `.github/workflows/e2e.yml` | Creates `examination_student_grades` as a view of the dump's `online_cms_student_grades`, so the latest IAM can sync, and opens season 2026-27 with `open_placement_season`. Added after Student 2's approval; waits for Student 2's approval. |
+| `fusion_auth/views.py`, `fusion_auth/tests/test_auth.py`, `conftest.py` | A role switch answered with the role from before the switch, so the shell kept showing the old role. It now answers with the session as it is after the switch. Added after Student 2's approval; waits for Student 2's approval. |
 | `openapi/fusion-integrated.v1.yaml`, `registry/permissions.json`, `docs/02-iam/permission-catalog.generated.md`, `docs/_diagrams/application-state-machine.mmd` | Regenerated. |
 
 ## 12. Review rounds

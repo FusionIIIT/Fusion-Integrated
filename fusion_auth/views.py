@@ -18,6 +18,7 @@ from core.api.exceptions import AuthenticationFailedError as AuthFailed
 from core.api.exceptions import DomainError
 from core.observability.middleware import get_request_id
 from fusion_auth.client import IamThrottled, IamUnavailable, get_client
+from fusion_auth.principal import Principal
 from fusion_auth.serializers import LoginSerializer, OkSerializer, RoleSerializer, SessionSerializer
 from modules.accesscontrol import contracts as accesscontrol
 
@@ -128,6 +129,8 @@ class MeView(APIView):
         role = (request.data.get("active_role") or "").strip()
         try:
             get_client().set_active_role(request.auth or "", role)
+            # The principal was read before the switch; answer with the session as it is now.
+            session = get_client().resolve_session(auth_token=request.auth or "")
         except ValueError as exc:
             raise DomainError(str(exc), code="unknown_role") from exc
         except IamUnavailable as exc:
@@ -136,4 +139,7 @@ class MeView(APIView):
                            "message": f"Identity service unavailable: {exc}",
                            "details": [], "request_id": ""}},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        if session is None:
+            raise AuthFailed("Invalid or expired credentials.")
+        request.principal = Principal.from_session(session)
         return self.get(request)

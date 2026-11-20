@@ -198,3 +198,12 @@ def test_cookie_session_is_forwarded_as_a_header_not_a_replayed_cookie(stub_iam)
     r = c.get("/api/v1/me")
     assert r.status_code == 200
     assert ("resolve_session", "tok-from-cookie") in fake.calls
+
+
+def test_switching_role_answers_with_the_new_role(stub_iam):
+    stub_iam(make_session(roles=("faculty", "placement chairman"), active_role="faculty"))
+    c = APIClient()
+    c.credentials(HTTP_AUTHORIZATION="Token abc")
+    r = c.patch("/api/v1/me", {"active_role": "placement chairman"}, format="json")
+    assert r.status_code == 200
+    assert r.json()["active_role"] == "placement chairman"

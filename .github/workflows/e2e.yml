@@ -111,6 +111,7 @@ jobs:
           uv pip install --python .venv/bin/python -e ".[dev]"
           .venv/bin/python manage.py migrate
           .venv/bin/python manage.py seed_modules
+          .venv/bin/python manage.py open_placement_season --season 2026-27
           .venv/bin/python manage.py permission_manifest
           # This step's settings module and DB_* would override the IAM's own .env.
           (cd iam/Backend/backend && env -u DJANGO_SETTINGS_MODULE -u DB_NAME -u DB_USER \
