@@ -476,3 +476,15 @@ class PmsReportResponseSerializer(serializers.Serializer):
     total_applications = serializers.IntegerField()
     status_distribution = serializers.DictField(child=serializers.IntegerField())
     domain_distribution = serializers.DictField(child=serializers.IntegerField())
+
+
+class PmsConfigurationSerializer(serializers.Serializer):
+    key = serializers.CharField(max_length=100)
+    value = serializers.JSONField()
+    description = serializers.CharField(max_length=255, required=False, allow_blank=True)
+
+
+class PmsConfigurationReadSerializer(serializers.Serializer):
+    key = serializers.CharField()
+    value = serializers.JSONField()
+    description = serializers.CharField(allow_blank=True)

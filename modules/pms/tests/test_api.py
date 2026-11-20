@@ -745,6 +745,39 @@ def test_api_audit_and_reports(stub_iam):
     assert "status_distribution" in res_rep.json()
 
 
+def test_api_manage_pms_configuration(stub_iam):
+    """UC-PMS-025: Configuration changes are admin-only, validated and audited."""
+    client = _client(
+        stub_iam,
+        user_id=9001,
+        roles=("pcc_admin",),
+        permissions=("pms.config.manage",),
+    )
+    response = client.put(
+        "/api/v1/pms/configuration/",
+        {"key": "revision_days", "value": 45, "description": "Review period"},
+        format="json",
+    )
+    assert response.status_code == 200
+    assert response.json()["value"] == 45
+
+    invalid = client.put(
+        "/api/v1/pms/configuration/",
+        {"key": "revision_days", "value": 0},
+        format="json",
+    )
+    assert invalid.status_code == 409
+
+    removed = client.delete("/api/v1/pms/configuration/revision_days/")
+    assert removed.status_code == 204
+
+
+def test_api_configuration_requires_config_permission(stub_iam):
+    client = _client(stub_iam, permissions=("pms.application.view_self",))
+    response = client.get("/api/v1/pms/configuration/")
+    assert response.status_code == 403
+
+
 def test_api_licensing_request_records_the_requesting_applicant(stub_iam):
     """UC-PMS-020, CFR-PMS-019: the view must pass the applicant id through to
     submit_licensing_request. Regression for a keyword mismatch

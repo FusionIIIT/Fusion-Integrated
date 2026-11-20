@@ -24,6 +24,7 @@ from modules.pms.models import (
     PatentAppeal,
     PatentLegalAdvice,
     PmsAuditTrail,
+    PmsConfiguration,
     PostGrantMaintenance,
 )
 from modules.pms.selectors.applications import (
@@ -53,12 +54,14 @@ from modules.pms.services import (
     review_licensing_request,
     revise_and_resubmit_application,
     search_prior_art,
+    set_policy_value,
     submit_application,
     submit_director_review,
     submit_licensing_request,
     submit_office_action_response,
     submit_or_update_budget,
     submit_patentability_assessment,
+    unset_policy_value,
     upload_document_version,
     withdraw_application,
 )
@@ -898,6 +901,50 @@ class ReportsView(PmsAPIView):
                 "domain_distribution": domain_counts,
             }
         )
+
+
+class PmsConfigurationView(PmsAPIView):
+    """Manage module-scoped PMS policy values (UC-PMS-025, DEC-7)."""
+
+    permission_classes = [p.MODULE, HasPermission(p.P_CONFIG_MANAGE)]
+
+    @extend_schema(responses=s.PmsConfigurationReadSerializer(many=True))
+    def get(self, request):
+        rows = PmsConfiguration.objects.order_by("key")
+        return Response(s.PmsConfigurationReadSerializer(rows, many=True).data)
+
+    @extend_schema(request=s.PmsConfigurationSerializer, responses=s.PmsConfigurationReadSerializer)
+    def put(self, request):
+        serializer = s.PmsConfigurationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        row = set_policy_value(
+            data["key"], data["value"], description=data.get("description", "")
+        )
+        PmsAuditTrail.objects.create(
+            actor_user_id=request.principal.user_id,
+            action_type="configuration_updated",
+            details={"key": row.key},
+        )
+        return Response(s.PmsConfigurationReadSerializer(row).data)
+
+
+class PmsConfigurationDeleteView(PmsAPIView):
+    """Remove an explicitly configured PMS policy value (UC-PMS-025, DEC-7)."""
+
+    permission_classes = [p.MODULE, HasPermission(p.P_CONFIG_MANAGE)]
+
+    @extend_schema(request=None, responses={"204": None})
+    def delete(self, request, key: str):
+        deleted = unset_policy_value(key)
+        if not deleted:
+            raise NotFoundError(f"PMS configuration key '{key}' not found.")
+        PmsAuditTrail.objects.create(
+            actor_user_id=request.principal.user_id,
+            action_type="configuration_removed",
+            details={"key": key},
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class AttorneyPanelListView(PmsListCreateView):

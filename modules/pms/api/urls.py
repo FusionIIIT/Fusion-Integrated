@@ -160,6 +160,12 @@ urlpatterns = [
     ),
     # Oversight, panel, audit & reports
     path("attorney-panel/", views.AttorneyPanelListView.as_view(), name="pms-attorney-panel"),
+    path("configuration/", views.PmsConfigurationView.as_view(), name="pms-configuration"),
+    path(
+        "configuration/<str:key>/",
+        views.PmsConfigurationDeleteView.as_view(),
+        name="pms-configuration-delete",
+    ),
     path("audit-trail/", views.AuditTrailListView.as_view(), name="pms-audit-trail"),
     path("reports/", views.ReportsView.as_view(), name="pms-reports"),
 ]
