@@ -918,6 +918,7 @@ Shared-file changes outside the module's own folders:
 | `client/src/ui/theme/theme.ts` | Names for the date picker's month arrows and confirm button. |
 | `client/e2e/accounts.ts`, `client/e2e/auth.spec.ts` | Three test accounts; the sign-in test waits out the IAM's login limit, and the student's sidebar list includes the new links. |
 | `ops/docs/module_structure.py`, `ops/docs/placement_reference.py` | The structure reference drops a deleted file; a new generator writes `placement-reference.md`. |
+| `.github/workflows/e2e.yml` | Creates `examination_student_grades` as a view of the dump's `online_cms_student_grades`, so the latest IAM can sync. Added after Student 2's approval; waits for Student 2's approval. |
 | `openapi/fusion-integrated.v1.yaml`, `registry/permissions.json`, `docs/02-iam/permission-catalog.generated.md`, `docs/_diagrams/application-state-machine.mmd` | Regenerated. |
 
 ## 12. Review rounds
