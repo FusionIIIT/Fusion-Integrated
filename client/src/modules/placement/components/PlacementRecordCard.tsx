@@ -15,11 +15,7 @@ import {
 } from "../api/hooks";
 import type { PlacementRecordRow } from "../api/hooks";
 
-/** What rules 22 and 24 ask of a student once they have accepted an offer.
- *
- *  Rule 24 withholds the no-dues certificate until the signed letter is in, so
- *  the hold and the way to release it have to sit together — a block with no
- *  visible remedy is worse than no block at all. */
+/** What rules 22 and 24 ask of a student once they have accepted an offer. */
 export function PlacementRecordCard() {
   const records = useMyRecords();
   const clearance = useMyClearance();

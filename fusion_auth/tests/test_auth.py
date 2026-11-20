@@ -21,7 +21,7 @@ def test_no_credentials_is_401():
 
 
 def test_valid_token_resolves_a_principal(stub_iam):
-    stub_iam(make_session(user_id=42, modules=("placement_cell",)))
+    stub_iam(make_session(user_id=42, modules=("placement",)))
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
     r = c.get("/api/v1/me")
@@ -60,7 +60,7 @@ def test_error_envelope_carries_a_request_id():
 
 def test_module_grant_gates_the_endpoint(stub_iam):
     """A module the caller was not granted is refused even with the permission."""
-    stub_iam(make_session(permissions=("placement_cell.job_posting.view",),
+    stub_iam(make_session(permissions=("placement.job_posting.view",),
                           modules=()))                      # no module grant
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
@@ -68,8 +68,8 @@ def test_module_grant_gates_the_endpoint(stub_iam):
 
 
 def test_module_grant_plus_permission_passes(stub_iam):
-    stub_iam(make_session(permissions=("placement_cell.job_posting.view",),
-                          modules=("placement_cell",)))
+    stub_iam(make_session(permissions=("placement.job_posting.view",),
+                          modules=("placement",)))
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
     assert c.get("/api/v1/placement/postings").status_code == 200
@@ -198,3 +198,12 @@ def test_cookie_session_is_forwarded_as_a_header_not_a_replayed_cookie(stub_iam)
     r = c.get("/api/v1/me")
     assert r.status_code == 200
     assert ("resolve_session", "tok-from-cookie") in fake.calls
+
+
+def test_switching_role_answers_with_the_new_role(stub_iam):
+    stub_iam(make_session(roles=("faculty", "placement chairman"), active_role="faculty"))
+    c = APIClient()
+    c.credentials(HTTP_AUTHORIZATION="Token abc")
+    r = c.patch("/api/v1/me", {"active_role": "placement chairman"}, format="json")
+    assert r.status_code == 200
+    assert r.json()["active_role"] == "placement chairman"

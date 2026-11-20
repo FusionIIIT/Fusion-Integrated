@@ -1,8 +1,4 @@
-"""The CPI directory: every student's latest declared result (PC-BR-023).
-
-The whole cohort, so the largest disclosure in the module — staff only, never
-a recruiter. Read-only: policy rule 23 puts results with the Academic office.
-"""
+"""The CPI directory: every student's latest declared result (PC-BR-023)."""
 from __future__ import annotations
 
 from drf_spectacular.utils import extend_schema
@@ -15,8 +11,8 @@ from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.placement.api import serializers as s
 from modules.placement.selectors import scoping
 
-MODULE = HasModuleGrant("placement_cell")
-P_VIEW_DIRECTORY = "placement_cell.academic_directory.view"
+MODULE = HasModuleGrant("placement")
+P_VIEW_DIRECTORY = "placement.academic_directory.view"
 
 MAX_PAGE = 200
 

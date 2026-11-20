@@ -1,18 +1,14 @@
-/** Data access for the placement module.
- *
- *  Every mutation invalidates the keys it can affect; no manual cache surgery.
- *  Getting that subtly wrong shows up as an enabled "Apply" button on a
- *  posting the student already applied to.
- */
+/** Data access for the placement module. */
 import {
-  useMutation, useQuery, useQueryClient, type UseMutationOptions,
+  useInfiniteQuery, useMutation, useQuery, useQueryClient, type UseMutationOptions,
 } from "@tanstack/react-query";
 
 import { filenameFromDisposition, saveBlob } from "../../../lib/download";
 import { http, readBlobError } from "../../../lib/http";
 import type {
   Announcement, Applicant, Application, Company, EligibilityVerdict,
-  InterviewRound, Offer, Page, Posting, ProfileDocument, StaffStats,
+  CandidateRecord, InterviewRound, Offer, OfficeRecord, Page, Posting, ProfileDocument, RecordCorrection,
+  RecordRevision, SeasonTrend, StaffStats,
   StudentStats,
 } from "./types";
 
@@ -29,6 +25,9 @@ export const keys = {
   rounds: (postingId?: number) => [KEY, "rounds", postingId] as const,
   announcements: () => [KEY, "announcements"] as const,
   stats: (season?: string) => [KEY, "stats", season] as const,
+  trends: () => [KEY, "trends"] as const,
+  officeRecords: (season?: string) => [KEY, "office-records", season] as const,
+  revisions: (id: number) => [KEY, "revisions", id] as const,
   seasons: () => [KEY, "seasons"] as const,
   registrations: () => [KEY, "registrations"] as const,
   records: () => [KEY, "records"] as const,
@@ -40,21 +39,33 @@ export const keys = {
     [KEY, "registration-terms", season] as const,
 };
 
-/** Coarse on purpose — these pages are small, and correctness beats shaving
- *  a refetch. */
+/** Coarse on purpose — these pages are small, and correctness beats shaving a refetch. */
 function invalidateAll(qc: ReturnType<typeof useQueryClient>) {
   qc.invalidateQueries({ queryKey: [KEY] });
 }
 
+/** A cursor-paginated list, flattened, that can load its next page. */
+function useCursorList<T>(queryKey: readonly unknown[], path: string,
+  params?: Record<string, unknown>, staleTime = 30_000) {
+  const q = useInfiniteQuery({
+    queryKey,
+    initialPageParam: "",
+    queryFn: async ({ pageParam }) => (await http.get<Page<T>>(path,
+      { params: pageParam ? { ...params, cursor: pageParam } : params })).data,
+    getNextPageParam: (last) =>
+      (last.next ? new URL(last.next, window.location.origin).searchParams.get("cursor") : null)
+      ?? undefined,
+    staleTime,
+  });
+  const data: Page<T> | undefined = q.data
+    ? { results: q.data.pages.flatMap((page) => page.results), next: null, previous: null }
+    : undefined;
+  return { ...q, data };
+}
+
 // -- Postings ------------------------------------------------------------------
 export function usePostings(filters?: { placement_year?: string; kind?: string }) {
-  return useQuery({
-    queryKey: keys.postings(filters),
-    queryFn: async () =>
-      (await http.get<Page<Posting>>("/placement/postings", { params: filters }))
-        .data,
-    staleTime: 30_000,
-  });
+  return useCursorList<Posting>(keys.postings(filters), "/placement/postings", filters);
 }
 
 export function usePosting(id: number | undefined) {
@@ -66,10 +77,7 @@ export function usePosting(id: number | undefined) {
   });
 }
 
-/** The "why can't I apply?" call, fetched when a posting is opened.
- *
- *  Deliberately not folded into the list query — it reaches the IAM for a
- *  declared CPI, so per-row would be fifty round trips nobody asked for. */
+/** The "why can't I apply?" call, fetched when a posting is opened. */
 export function useEligibility(postingId: number | undefined) {
   return useQuery({
     queryKey: keys.eligibility(postingId!),
@@ -102,13 +110,8 @@ export function usePublishPosting() {
 
 // -- Applications --------------------------------------------------------------
 export function useApplications(filters?: { status?: string; posting?: number }) {
-  return useQuery({
-    queryKey: keys.applications(filters),
-    queryFn: async () =>
-      (await http.get<Page<Application & Applicant>>(
-        "/placement/applications", { params: filters })).data,
-    staleTime: 15_000,
-  });
+  return useCursorList<Application & Applicant>(
+    keys.applications(filters), "/placement/applications", filters, 15_000);
 }
 
 export function useApply() {
@@ -171,12 +174,7 @@ export function useRespondToOffer() {
 
 // -- Companies -----------------------------------------------------------------
 export function useCompanies() {
-  return useQuery({
-    queryKey: keys.companies(),
-    queryFn: async () =>
-      (await http.get<Page<Company>>("/placement/companies")).data,
-    staleTime: 30_000,
-  });
+  return useCursorList<Company>(keys.companies(), "/placement/companies");
 }
 
 export function useRegisterCompany() {
@@ -214,13 +212,8 @@ export function useInviteRecruiter() {
 
 // -- Interviews ----------------------------------------------------------------
 export function useRounds(postingId?: number) {
-  return useQuery({
-    queryKey: keys.rounds(postingId),
-    queryFn: async () =>
-      (await http.get<Page<InterviewRound>>("/placement/interviews/rounds",
-        { params: postingId ? { posting: postingId } : undefined })).data,
-    staleTime: 30_000,
-  });
+  return useCursorList<InterviewRound>(keys.rounds(postingId), "/placement/interviews/rounds",
+    postingId ? { posting: postingId } : undefined);
 }
 
 export function useScheduleRound() {
@@ -246,12 +239,7 @@ export function useAddCandidates() {
 
 // -- Announcements -------------------------------------------------------------
 export function useAnnouncements() {
-  return useQuery({
-    queryKey: keys.announcements(),
-    queryFn: async () =>
-      (await http.get<Page<Announcement>>("/placement/announcements")).data,
-    staleTime: 30_000,
-  });
+  return useCursorList<Announcement>(keys.announcements(), "/placement/announcements");
 }
 
 export function usePublishAnnouncement() {
@@ -281,6 +269,25 @@ export function useStats(season?: string) {
       (await http.get<StudentStats & StaffStats>("/placement/stats",
         { params: season ? { season } : undefined })).data,
     staleTime: 60_000,
+  });
+}
+
+/** Season-on-season figures; office roles only (PC-AFR-034, PC-AFR-036). */
+export function useStatsTrends(enabled: boolean) {
+  return useQuery({
+    queryKey: keys.trends(),
+    queryFn: async () =>
+      (await http.get<{ results: SeasonTrend[] }>("/placement/stats/trends")).data.results,
+    enabled,
+    staleTime: 60_000,
+  });
+}
+
+// -- Profile ---------------------------------------------------------------------
+export function useMyProfile() {
+  return useQuery({
+    queryKey: keys.resume(),
+    queryFn: async () => (await http.get<CandidateRecord>("/placement/profile/resume")).data,
   });
 }
 
@@ -323,9 +330,7 @@ const EXPORT_PATHS: Record<ExportKind, string> = {
   placements: "/placement/exports/placements.csv",
 };
 
-/** Exports are fetched, not navigated to. A link would leave the SPA, so a
- *  refused or throttled export lands the officer on a raw server error page;
- *  buffering a capped file is the cost of reporting it as a toast instead. */
+/** Exports are fetched, not navigated to. */
 export function useCsvExport() {
   return useMutation({
     mutationFn: async (kind: ExportKind) => {
@@ -343,7 +348,7 @@ export function useCsvExport() {
   });
 }
 
-// -- Audit trail (PC-BR-008) ---------------------------------------------------
+// -- Audit trail (PC-AFR-009) ---------------------------------------------------
 export interface TransitionEntry {
   from_status: string;
   to_status: string;
@@ -357,8 +362,7 @@ export interface TransitionEntry {
 
 export interface TransitionHistory {
   application_id: number;
-  /** True when reasons and actor identities were withheld, so the UI can say
-   *  so rather than implying the trail is empty. */
+  /** True when reasons and actor identities were withheld. */
   redacted: boolean;
   results: TransitionEntry[];
 }
@@ -381,8 +385,7 @@ export interface MyConductIncident {
   created_at: string;
 }
 
-/** A student's own conduct record, shown in full — rule 19's waiver and rule
- *  21's sanction are both contestable. */
+/** A student's own conduct record, shown in full — rule 19's waiver and rule 21's sanction are contestable. */
 export function useMyConductRecord() {
   return useQuery({
     queryKey: keys.myConduct(),
@@ -391,8 +394,7 @@ export function useMyConductRecord() {
   });
 }
 
-/** Move several applications at once. Each item is authorised individually on
- *  the server, so a refusal for one does not stop the rest. */
+/** Move several applications at once. */
 export interface BulkOutcome {
   application_id: number;
   moved: boolean;
@@ -506,8 +508,7 @@ export interface Registration {
 }
 
 export interface RegistrationTerms {
-  /** open | late | reregister | refused — `late` and `reregister` are real
-   *  routes that go through the Placement Cell, not refusals. */
+  /** open | late | reregister | refused — `late` and `reregister` are real routes, not refusals. */
   route: "open" | "late" | "reregister" | "refused";
   reason: string;
   message: string;
@@ -583,8 +584,7 @@ export interface Season {
   is_active: boolean;
 }
 
-/** The seasons a posting may belong to. A closed list, because a season with
- *  no PlacementPolicy behind it fails only when a student tries to apply. */
+/** The seasons a posting may belong to. */
 export function useSeasons() {
   return useQuery({
     queryKey: keys.seasons(),
@@ -639,5 +639,30 @@ export function useCpiFilters() {
         disciplines: string[]; batch_years: number[]; programmes: string[];
       }>("/placement/students/cpi/filters")).data,
     staleTime: 600_000,
+  });
+}
+
+// -- Placement records, office side (PC-UC-010) ---------------------------------
+export function useOfficeRecords(season?: string) {
+  return useCursorList<OfficeRecord>(keys.officeRecords(season), "/placement/records/office",
+    season ? { season } : undefined);
+}
+
+export function useRecordRevisions(id: number | undefined) {
+  return useQuery({
+    queryKey: keys.revisions(id ?? 0),
+    queryFn: async () =>
+      (await http.get<{ results: RecordRevision[] }>(
+        `/placement/records/${id}/revisions`)).data.results,
+    enabled: id !== undefined,
+  });
+}
+
+export function useCorrectRecord() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...body }: RecordCorrection & { id: number }) =>
+      (await http.patch<OfficeRecord>(`/placement/records/${id}`, body)).data,
+    onSuccess: () => invalidateAll(qc),
   });
 }

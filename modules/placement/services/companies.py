@@ -1,4 +1,4 @@
-"""Company registration and authorization (PC-UC-014, PC-WF-002, PC-BR-007)."""
+"""Company registration and authorization (PC-UC-014, PC-AFR-044, PC-BR-007)."""
 from __future__ import annotations
 
 from django.db import IntegrityError, transaction
@@ -10,7 +10,7 @@ from modules.placement.models import Company, CompanyContact, RecruiterSession
 from modules.placement.services import notifications
 from modules.placement.services.authz import require
 
-P_MANAGE = "placement_cell.company.manage"
+P_MANAGE = "placement.company.manage"
 SLUG_ATTEMPTS = 5
 
 
@@ -23,9 +23,17 @@ def _unique_slug(name: str) -> str:
     return slug
 
 
+def _constraint(exc: IntegrityError) -> str | None:
+    return getattr(getattr(exc.__cause__, "diag", None), "constraint_name", None)
+
+
 def _is_slug_clash(exc: IntegrityError) -> bool:
-    diag = getattr(exc.__cause__, "diag", None)
-    return getattr(diag, "constraint_name", None) == f"{Company._meta.db_table}_slug_key"
+    return _constraint(exc) == f"{Company._meta.db_table}_slug_key"
+
+
+def _already_registered(name: str) -> ConflictError:
+    return ConflictError(f"{name} is already registered with the placement office.",
+                         code="company_exists")
 
 
 def _create_with_unique_slug(**fields) -> Company:
@@ -35,6 +43,8 @@ def _create_with_unique_slug(**fields) -> Company:
             with transaction.atomic():
                 return Company.objects.create(slug=_unique_slug(fields["name"]), **fields)
         except IntegrityError as exc:
+            if _constraint(exc) == "company_name_unique_ci":
+                raise _already_registered(fields["name"]) from exc
             if not _is_slug_clash(exc):
                 raise
     raise ConflictError(
@@ -46,13 +56,14 @@ def _create_with_unique_slug(**fields) -> Company:
 def register(*, name: str, sector: str = "", website: str = "",
              hq_city: str = "", contact: dict | None = None,
              registered_by_user_id: int | None = None, actor=None) -> Company:
-    """Record a registration request. It grants nothing until approved, but
-    is still gated — otherwise any student can fill the table."""
+    """Record a registration request."""
     if actor is not None:
         require(actor, P_MANAGE)
     name = (name or "").strip()
     if not name:
         raise ConflictError("A company name is required.", code="name_required")
+    if Company.objects.filter(name__iexact=name).exists():
+        raise _already_registered(name)
 
     company = _create_with_unique_slug(
         name=name, sector=sector, website=website,
@@ -126,13 +137,7 @@ def blacklist(*, company_id: int, actor, note: str) -> Company:
 
 
 def _cut_off_sessions(company: Company) -> int:
-    """Withdrawing authorization must take effect now, not when the recruiter's
-    eight-hour session happens to end.
-
-    Note the authentication class ALSO re-checks `can_operate` per request, so
-    this is belt and braces — revoking here just avoids leaving live rows
-    around that would otherwise be honoured if that check were ever relaxed.
-    """
+    """Withdrawing authorization must take effect now."""
     return (RecruiterSession.objects
             .filter(account__company=company, revoked_at__isnull=True)
             .update(revoked_at=timezone.now()))

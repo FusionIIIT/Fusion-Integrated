@@ -1,14 +1,4 @@
-"""Registering for a season (rules 1, 20, 21).
-
-Nothing created a PlacementRegistration before this, which meant `can_apply`
-refused everyone with `not_registered` — the whole application flow was closed
-in production.
-
-A student registers themselves. The two routes that need money — rule 20's
-late fee and rule 21's re-registration — are staff actions, because both
-require the office to have seen a challan and, for rule 21, the Chairperson's
-approval. PCMS records the reference; it never takes payment.
-"""
+"""Registering for a season (rules 1, 20, 21)."""
 from __future__ import annotations
 
 import logging
@@ -26,7 +16,7 @@ from modules.placement.services.authz import require
 
 log = logging.getLogger("fusion.placement.registration")
 
-P_MANAGE = "placement_cell.registration.manage"
+P_MANAGE = "placement.registration.manage"
 
 
 def _policy(season: str) -> PlacementPolicy:
@@ -180,11 +170,7 @@ def reregister(*, season: str, user_id: int, fee_reference: str,
 
 @transaction.atomic
 def opt_out(*, season: str, user_id: int, reason: str = "") -> PlacementRegistration:
-    """A student withdrawing from the season.
-
-    Note the asymmetry with rule 21: coming back costs the re-registration fee
-    and is available once, so the caller should say so before confirming.
-    """
+    """A student withdrawing from the season."""
     policy = _policy(season)
     registration = PlacementRegistration.objects.select_for_update().filter(
         policy=policy, user_id=user_id).first()

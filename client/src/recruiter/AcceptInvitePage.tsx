@@ -12,8 +12,7 @@ import { useAcceptInvite } from "./api";
 
 const MIN_LENGTH = 12;
 
-/** Client-side guidance only. The server enforces the minimum length, and this
- *  meter exists so a recruiter is not told "too short" after submitting. */
+/** Client-side guidance only. */
 function strength(pw: string): { score: number; hints: string[] } {
   const hints: string[] = [];
   if (pw.length < MIN_LENGTH) hints.push(`At least ${MIN_LENGTH} characters`);

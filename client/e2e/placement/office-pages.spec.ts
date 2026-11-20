@@ -1,7 +1,7 @@
 import { expect, signedInAs, test } from "../support/test";
 
 // The office's pages, opened directly by someone the sidebar never offered them to.
-const OFFICE_PAGES = ["companies", "interviews", "registration-approvals", "students-cpi"];
+const OFFICE_PAGES = ["companies", "interviews", "records", "registration-approvals", "students-cpi"];
 
 test.describe("placement: office pages", () => {
   test.use(signedInAs("student"));

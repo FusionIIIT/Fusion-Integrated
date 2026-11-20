@@ -17,13 +17,7 @@ const KINDS = [
   { value: "ppo", label: "Pre-placement offer" },
 ];
 
-/** Creating a posting.
- *
- *  The eligibility rule is built from a few named controls rather than a raw
- *  JSON box. Two reasons: the server's rule vocabulary is a closed set and an
- *  unknown field DENIES everyone, and a free-text JSON field on a screen that
- *  decides who may apply is a footgun aimed at students.
- */
+/** Creating a posting. */
 export function NewPostingModal({ opened, onClose }: {
   opened: boolean;
   onClose: () => void;
@@ -47,7 +41,6 @@ export function NewPostingModal({ opened, onClose }: {
   const [minCpi, setMinCpi] = useState<number | string>("");
   const [disciplines, setDisciplines] = useState<string[]>([]);
   const [maxBacklogs, setMaxBacklogs] = useState<number | string>("");
-  const [skills, setSkills] = useState<string[]>([]);
 
   // PC-BR-006: only approved companies, so the picker cannot offer a refusal.
   const companyOptions = useMemo(
@@ -76,7 +69,6 @@ export function NewPostingModal({ opened, onClose }: {
     if (maxBacklogs !== "") {
       clauses.push({ lte: ["active_backlogs", Number(maxBacklogs)] });
     }
-    if (skills.length) clauses.push({ has_all: ["skills", skills] });
     if (!clauses.length) return {};          // no rule = no restriction
     if (clauses.length === 1) return clauses[0]!;
     return { all: clauses };
@@ -245,12 +237,6 @@ export function NewPostingModal({ opened, onClose }: {
                   label="Disciplines" value={disciplines}
                   onChange={setDisciplines}
                   placeholder="Type a code and press Enter — empty means all"
-                />
-              </Field>
-              <Field span={12}>
-                <TagsInput
-                  label="Required skills" value={skills} onChange={setSkills}
-                  placeholder="Matched against the student's profile"
                 />
               </Field>
             </FormRow>

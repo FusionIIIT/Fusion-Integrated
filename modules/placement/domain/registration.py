@@ -1,16 +1,4 @@
-"""Who may register for a season, and on what terms (rules 1, 20, 21).
-
-Pure functions over plain data.
-
-    1   only registered students participate
-    20  register by the stipulated deadline; afterwards a late fee and the
-        Placement Cell's approval
-    21  a de-registered student may re-register once, on a fee, and never again
-
-Fails closed on a missing academic fact, for the same reason the eligibility
-engine does: a student with no declared result cannot be assessed, and absence
-must not read as a pass.
-"""
+"""Who may register for a season, and on what terms (rules 1, 20, 21)."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -43,8 +31,7 @@ class Terms:
 
 @dataclass(frozen=True)
 class Applicant:
-    """What the decision reads. `cpi` and `active_backlogs` are None when no
-    result has been declared."""
+    """What the decision reads."""
 
     cpi: Decimal | None = None
     active_backlogs: int | None = None

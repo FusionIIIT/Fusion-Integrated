@@ -1,9 +1,4 @@
-"""What a recruiter or the TPO may read about a person.
-
-Assembled, never stored: identity and the resume come from the ERP portal via
-the directory projection, academic figures from the IAM. Placement holding its
-own copy is what made a student maintain two profiles.
-"""
+"""What a recruiter or the TPO may read about a person."""
 from __future__ import annotations
 
 from core.api.exceptions import NotFoundError

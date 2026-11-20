@@ -1,22 +1,4 @@
-"""Reading the audit trail (PC-BR-008).
-
-Two records: every application state change, and every conduct incident.
-
-What each caller sees differs, and the difference is deliberate.
-
-  * **Staff** see everything, including who acted and the free-text reason.
-  * **A student** sees their own timeline — what happened and when — but not the
-    reason and not who acted. The reason field has never been shown to students
-    (the notification says only that the status changed), so surfacing it now
-    would expose notes written on the understanding they were internal. Naming
-    the TPO who rejected someone also invites pressure on that person.
-  * **A recruiter** sees the timeline for applications to their own postings,
-    with institute actors unnamed for the same reason.
-
-A student DOES see their own conduct record in full, reason included: rule 21
-puts a sanction at the Chairperson's discretion and rule 19 allows a waiver, and
-nobody can contest what they cannot read.
-"""
+"""Reading the audit trail (PC-AFR-009)."""
 from __future__ import annotations
 
 from drf_spectacular.utils import extend_schema
@@ -26,12 +8,13 @@ from rest_framework.views import APIView
 from core.api.exceptions import NotFoundError
 from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.placement.api import serializers as s
+from modules.placement.api.permissions import ScopedCollection
 from modules.placement.authentication import RecruiterAuthentication
 from modules.placement.models import ApplicationTransition, ConductIncident
 from modules.placement.selectors import scoping
 
-MODULE = HasModuleGrant("placement_cell")
-P_VIEW_SELF = "placement_cell.application.view_self"
+MODULE = HasModuleGrant("placement")
+P_VIEW_SELF = "placement.own_application.view"
 
 
 def _actor(request):
@@ -44,7 +27,8 @@ class ApplicationHistoryView(APIView):
 
     authentication_classes = [RecruiterAuthentication,
                               *APIView.authentication_classes]
-    permission_classes = [MODULE]
+    permission_classes = [MODULE, ScopedCollection(
+            "placement.application.view", "placement.own_application.view")]
 
     def get(self, request, pk):
         actor = _actor(request)
@@ -80,13 +64,7 @@ def _entry(row: ApplicationTransition, *, full: bool) -> dict:
 
 @extend_schema(responses=s.ConductIncidentSerializer(many=True))
 class MyConductRecordView(APIView):
-    """A student's own conduct record, in full.
-
-    Rule 19 allows a waiver and rule 21 leaves a sanction to the Chairperson's
-    discretion. Both are contestable, and nobody can contest what they cannot
-    see — so the note and any waiver reason are shown, unlike an application's
-    internal review note.
-    """
+    """A student's own conduct record, in full."""
 
     permission_classes = [MODULE, HasPermission(P_VIEW_SELF)]
 

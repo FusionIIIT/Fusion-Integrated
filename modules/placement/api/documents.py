@@ -1,9 +1,4 @@
-"""Attaching a Drive link, and reaching one.
-
-Reaching is the sensitive half: the link is a capability, so it is disclosed
-only here and only after the scope check, which narrows the queryset before
-the row is fetched — someone else's document is a 404, not a 403.
-"""
+"""Attaching a Drive link, and reaching one."""
 from __future__ import annotations
 
 from urllib.parse import quote
@@ -17,14 +12,16 @@ from rest_framework.views import APIView
 from core.api.exceptions import NotFoundError
 from core.files import storage
 from fusion_auth.permissions import HasModuleGrant, HasPermission
+from modules.placement.api.permissions import ScopedCollection
 from modules.placement.api.serializers import DocumentLinkSerializer, ProfileDocumentSerializer
+from modules.placement.api.throttling import WriteThrottle
 from modules.placement.authentication import RecruiterAuthentication
 from modules.placement.models import Application, ProfileDocument
 from modules.placement.selectors import scoping
 from modules.placement.services import documents as document_service
 
-MODULE = HasModuleGrant("placement_cell")
-P_VIEW_SELF = "placement_cell.application.view_self"
+MODULE = HasModuleGrant("placement")
+P_VIEW_SELF = "placement.own_application.view"
 
 
 def _actor(request):
@@ -33,14 +30,13 @@ def _actor(request):
 
 @extend_schema(responses=ProfileDocumentSerializer(many=True))
 class MyDocumentsView(APIView):
-    """GET  /placement/documents   my documents
-        POST /placement/documents   attach a Drive link
-    """
+    """GET /placement/documents my documents POST /placement/documents attach a Drive link"""
 
     authentication_classes = [RecruiterAuthentication,
                               *APIView.authentication_classes]
     permission_classes = [MODULE, HasPermission(P_VIEW_SELF)]
     throttle_scope = "upload"
+    throttle_classes = [WriteThrottle]
 
     def get(self, request):
         rows = ProfileDocument.objects.filter(
@@ -61,6 +57,7 @@ class MyDocumentsView(APIView):
 @extend_schema(responses={204: None})
 class MyDocumentDetailView(APIView):
     permission_classes = [MODULE, HasPermission(P_VIEW_SELF)]
+    throttle_scope = "placement_write"
 
     def delete(self, request, pk):
         document_service.remove(document_id=pk, user_id=_actor(request).user_id)
@@ -75,12 +72,12 @@ class MyDocumentDetailView(APIView):
                                      "the two are deliberately the same answer."),
 })
 class DocumentDownloadView(APIView):
-    """Readable by the owner, by staff, and by a recruiter the owner has a
-    live application with — the same scope that governs the profile."""
+    """Readable by the owner, staff, and a recruiter the owner has a live application with."""
 
     authentication_classes = [RecruiterAuthentication,
                               *APIView.authentication_classes]
-    permission_classes = [MODULE]
+    permission_classes = [MODULE, ScopedCollection(
+            "placement.own_application.view", "placement.application.view")]
 
     def get(self, request, pk):
         actor = _actor(request)
@@ -97,7 +94,7 @@ class DocumentDownloadView(APIView):
                 posting__company_id=actor.company_id,
                 user_id=document.user_id,
             ).exclude(status__in=("draft", "withdrawn", "auto_withdrawn")).exists()
-            if not attached or document.kind not in ("resume", "certificate"):
+            if not attached or document.kind != "certificate":
                 raise NotFoundError("No such document.")
 
         return _serve(document)

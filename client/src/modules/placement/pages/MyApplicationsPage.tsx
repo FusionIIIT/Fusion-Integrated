@@ -14,9 +14,11 @@ import { CpiBadge } from "../components/CpiBadge";
 import { HistoryDrawer } from "../components/HistoryDrawer";
 import { useApplications, useTransition } from "../api/hooks";
 import type { Application } from "../api/types";
+import { LoadMore } from "../components/LoadMore";
 
 export default function MyApplicationsPage() {
-  const { data, isPending, error } = useApplications();
+  const list = useApplications();
+  const { data, isPending, error } = list;
   const transition = useTransition();
   const [historyFor, setHistoryFor] = useState<number | null>(null);
 
@@ -48,7 +50,7 @@ export default function MyApplicationsPage() {
           rows={(data?.results ?? []) as Application[]}
           loading={isPending}
           rowKey={(r) => r.id}
-          minWidth={900}
+          minWidth={860}
           columns={[
             {
               key: "posting", header: "Role",
@@ -113,6 +115,7 @@ export default function MyApplicationsPage() {
       <HistoryDrawer
         applicationId={historyFor} onClose={() => setHistoryFor(null)}
       />
+      <LoadMore list={list} />
     </Container>
   );
 }

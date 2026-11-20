@@ -2,6 +2,8 @@ import { Center, Checkbox, Loader, Table, Text, ThemeIcon } from "@mantine/core"
 import type { IconType } from "react-icons";
 import { FaInbox } from "react-icons/fa";
 
+import classes from "./DataTable.module.css";
+
 export interface Column<T> {
   key: string;
   header: string;
@@ -83,7 +85,7 @@ export function DataTable<T>({
 
   return (
     <Table.ScrollContainer minWidth={minWidth}>
-      <Table>
+      <Table className={classes.table}>
         <Table.Thead>
           <Table.Tr>
             {selection && (

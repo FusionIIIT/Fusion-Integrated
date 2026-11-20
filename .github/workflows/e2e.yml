@@ -50,6 +50,14 @@ jobs:
           users=$(psql -d fusionlab -tAc "select count(*) from auth_user")
           echo "restored $users accounts"
           test "$users" -gt 0
+          # The IAM reads examination_student_grades; the August dump still names it online_cms_student_grades.
+          psql -d fusionlab -v ON_ERROR_STOP=1 <<'SQL'
+          DO $$ BEGIN
+            IF to_regclass('examination_student_grades') IS NULL THEN
+              CREATE VIEW examination_student_grades AS SELECT * FROM online_cms_student_grades;
+            END IF;
+          END $$;
+          SQL
 
       - name: IAM
         working-directory: iam
@@ -103,6 +111,7 @@ jobs:
           uv pip install --python .venv/bin/python -e ".[dev]"
           .venv/bin/python manage.py migrate
           .venv/bin/python manage.py seed_modules
+          .venv/bin/python manage.py open_placement_season --season 2026-27
           .venv/bin/python manage.py permission_manifest
           # This step's settings module and DB_* would override the IAM's own .env.
           (cd iam/Backend/backend && env -u DJANGO_SETTINGS_MODULE -u DB_NAME -u DB_USER \

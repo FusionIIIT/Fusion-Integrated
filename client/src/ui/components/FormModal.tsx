@@ -38,7 +38,8 @@ export function FormModal({
           color: "#fff",
         }}
       >
-        <Text fw={700} size="lg">{title}</Text>
+        {/* Modal.Title, not Text: only it gives the dialog its accessible name. */}
+        <Modal.Title fw={700} fz="lg" lh="var(--mantine-line-height-lg)">{title}</Modal.Title>
         {subtitle && (
           <Text size="sm" c="rgba(255,255,255,.62)" mt={2}>{subtitle}</Text>
         )}

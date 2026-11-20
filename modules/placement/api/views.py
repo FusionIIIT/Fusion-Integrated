@@ -1,14 +1,9 @@
-"""HTTP layer: parse, scope, delegate, serialise.
-
-Every view takes its queryset from `selectors.scoping`, so authorisation is
-never re-derived per endpoint. Anything out of scope is simply absent, which
-is why detail views 404 rather than 403.
-"""
+"""HTTP layer: parse, scope, delegate, serialise."""
 from __future__ import annotations
 
 from django.conf import settings
 from django.utils import timezone
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -20,6 +15,7 @@ from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.directory import contracts as directory
 from modules.placement.api import serializers as s
 from modules.placement.api.permissions import ScopedCollection
+from modules.placement.api.throttling import WriteThrottle
 from modules.placement.authentication import (
     COOKIE_NAME as RECRUITER_COOKIE,
 )
@@ -44,18 +40,24 @@ from modules.placement.services import postings as posting_service
 from modules.placement.services import recruiters as recruiter_service
 from modules.placement.services import stats as stats_service
 
-MODULE = HasModuleGrant("placement_cell")
+MODULE = HasModuleGrant("placement")
 
-P_VIEW_POSTINGS = "placement_cell.job_posting.view"
-P_MANAGE_POSTINGS = "placement_cell.job_posting.manage"
-P_VIEW_APPS = "placement_cell.application.view"
-P_VIEW_SELF = "placement_cell.application.view_self"
-P_MANAGE_COMPANIES = "placement_cell.company.manage"
-P_VIEW_REPORTS = "placement_cell.report.view"
+P_VIEW_POSTINGS = "placement.job_posting.view"
+P_MANAGE_POSTINGS = "placement.job_posting.manage"
+P_VIEW_APPS = "placement.application.view"
+P_VIEW_SELF = "placement.own_application.view"
+P_MANAGE_COMPANIES = "placement.company.manage"
+P_VIEW_REPORTS = "placement.report.view"
+P_VIEW_STATS = "placement.statistic.view"
 
 
 def _actor(request):
     return getattr(request, "principal", None)
+
+
+def _offer_serializer(actor):
+    return (s.CompanyOfferSerializer if getattr(actor, "kind", None) == "recruiter"
+            else s.OfferSerializer)
 
 
 def _int_param(params, name):
@@ -84,8 +86,7 @@ def _client_ip(request):
 
 
 class _Scoped(generics.GenericAPIView):
-    """Recruiters authenticate on a separate scheme; both pools land on
-    `request.principal`."""
+    """Recruiters authenticate on a separate scheme; both pools land on `request.principal`."""
 
     authentication_classes = [RecruiterAuthentication,
                               *generics.GenericAPIView.authentication_classes]
@@ -99,7 +100,9 @@ class _Scoped(generics.GenericAPIView):
 # -- Postings ------------------------------------------------------------------
 class PostingListView(_Scoped, generics.ListCreateAPIView):
     serializer_class = s.JobPostingSerializer
-    permission_classes = [MODULE]
+    permission_classes = [MODULE, ScopedCollection(P_VIEW_POSTINGS, P_MANAGE_POSTINGS)]
+    throttle_scope = "placement_write"
+    throttle_classes = [WriteThrottle]
 
     def get_queryset(self):
         qs = scoping.postings_for(_actor(self.request))
@@ -136,7 +139,9 @@ class PostingListView(_Scoped, generics.ListCreateAPIView):
 
 class PostingDetailView(_Scoped, generics.RetrieveUpdateAPIView):
     serializer_class = s.JobPostingSerializer
-    permission_classes = [MODULE]
+    permission_classes = [MODULE, ScopedCollection(P_VIEW_POSTINGS, P_MANAGE_POSTINGS)]
+    throttle_scope = "placement_write"
+    throttle_classes = [WriteThrottle]
 
     def get_queryset(self):
         return scoping.postings_for(_actor(self.request))
@@ -156,10 +161,25 @@ class PostingDetailView(_Scoped, generics.RetrieveUpdateAPIView):
 
 @extend_schema(request=None, responses=s.JobPostingSerializer)
 class PostingPublishView(_Scoped, APIView):
-    permission_classes = [MODULE]
+    permission_classes = [MODULE, ScopedCollection(P_MANAGE_POSTINGS)]
+    throttle_scope = "placement_write"
 
     def post(self, request, pk):
         posting = posting_service.publish(
+            posting_id=pk, actor=_actor(request),
+            scope=scoping.postings_for(_actor(request)))
+        return Response(s.JobPostingSerializer(posting).data)
+
+
+@extend_schema(request=None, responses=s.JobPostingSerializer)
+class PostingSubmitView(_Scoped, APIView):
+    """A company submits a draft for the TPO to publish (BW-PC-03)."""
+
+    permission_classes = [MODULE, ScopedCollection(P_MANAGE_POSTINGS)]
+    throttle_scope = "placement_write"
+
+    def post(self, request, pk):
+        posting = posting_service.submit(
             posting_id=pk, actor=_actor(request),
             scope=scoping.postings_for(_actor(request)))
         return Response(s.JobPostingSerializer(posting).data)
@@ -235,14 +255,9 @@ class ApplicationListView(_Scoped, generics.ListAPIView):
 @extend_schema(request=s.BulkTransitionSerializer,
                responses=s.BulkResultSerializer)
 class ApplicationBulkTransitionView(_Scoped, APIView):
-    """Move several applications at once (PC-UC-008).
+    """Move several applications at once (PC-UC-008)."""
 
-    Every item goes through the same service as a single transition, so the
-    scope, permission, state machine and guards are identical. Partial success
-    is reported rather than hidden.
-    """
-
-    permission_classes = [MODULE]
+    permission_classes = [MODULE, ScopedCollection("placement.application.review")]
     throttle_scope = "apply"
 
     def post(self, request):
@@ -265,7 +280,8 @@ class ApplicationBulkTransitionView(_Scoped, APIView):
 
 @extend_schema(request=s.TransitionSerializer, responses=s.ApplicationSerializer)
 class ApplicationTransitionView(_Scoped, APIView):
-    permission_classes = [MODULE]
+    permission_classes = [MODULE, ScopedCollection("placement.application.review", P_VIEW_SELF)]
+    throttle_scope = "placement_write"
 
     def post(self, request, pk):
         payload = s.TransitionSerializer(data=request.data)
@@ -281,7 +297,7 @@ class ApplicationTransitionView(_Scoped, APIView):
 
 @extend_schema(request=s.ApplySerializer, responses=s.ApplicationSerializer)
 class ApplyView(_Scoped, APIView):
-    permission_classes = [MODULE, HasPermission("placement_cell.application.create")]
+    permission_classes = [MODULE, HasPermission("placement.application.create")]
     throttle_scope = "apply"
 
     def post(self, request):
@@ -304,8 +320,7 @@ class ApplyView(_Scoped, APIView):
 # -- Profile -------------------------------------------------------------------
 @extend_schema(responses=s.CandidateSerializer)
 class MyResumeView(_Scoped, APIView):
-    """The student's own candidate record, including the resume they maintain
-    on the ERP portal."""
+    """The student's own candidate record, including the resume they maintain on the ERP portal."""
 
     permission_classes = [MODULE, HasPermission(P_VIEW_SELF)]
 
@@ -316,13 +331,9 @@ class MyResumeView(_Scoped, APIView):
 
 @extend_schema(responses=s.CandidateSerializer)
 class ProfileDetailView(_Scoped, APIView):
-    """A recruiter or the TPO reading a candidate.
+    """A recruiter or the TPO reading a candidate."""
 
-    A recruiter reaches only their own live applicants — anyone else is a 404,
-    not a 403, because a 403 confirms the person exists.
-    """
-
-    permission_classes = [MODULE]
+    permission_classes = [MODULE, ScopedCollection(P_VIEW_APPS)]
 
     def get(self, request, user_id: int):
         actor = _actor(request)
@@ -336,8 +347,10 @@ def _candidate(user_id: int) -> dict:
     standing = None
     try:
         from modules.placement.services import facts
-        standing = (facts.academic_facts([user_id])
-                    .get(user_id, {}).get("_standing"))
+        declared = facts.academic_facts([user_id]).get(user_id)
+        if declared:
+            cpi = declared.get("cpi")
+            standing = {**declared["_standing"], "cpi": None if cpi is None else str(cpi)}
     except IamUnavailable:
         standing = None              # the record still renders, minus the CPI
     return candidates.candidate_record(user_id=user_id, standing=standing)
@@ -346,10 +359,12 @@ def _candidate(user_id: int) -> dict:
 # -- Companies -----------------------------------------------------------------
 class CompanyListView(_Scoped, generics.ListCreateAPIView):
     serializer_class = s.CompanySerializer
-    permission_classes = [MODULE]
+    permission_classes = [MODULE, ScopedCollection(P_MANAGE_COMPANIES, P_VIEW_POSTINGS)]
+    throttle_scope = "placement_write"
+    throttle_classes = [WriteThrottle]
 
     def get_queryset(self):
-        return scoping.companies_for(_actor(self.request)).order_by("name")
+        return scoping.companies_for(_actor(self.request)).order_by("-created_at", "-id")
 
     def create(self, request, *args, **kwargs):
         payload = s.CompanyRegisterSerializer(data=request.data)
@@ -368,8 +383,42 @@ class CompanyListView(_Scoped, generics.ListCreateAPIView):
                         status=status.HTTP_201_CREATED)
 
 
+class CompanySelfRegisterView(APIView):
+    """A company asks to take part; it gains no access until approved (PC-UC-014, PC-BR-007)."""
+
+    authentication_classes: list = []
+    permission_classes: list = []
+    throttle_scope = "company_register"
+
+    @extend_schema(
+        operation_id="placement_company_self_register",
+        request=s.CompanySelfRegisterSerializer, responses={201: s.DetailSerializer},
+        examples=[
+            OpenApiExample("A registration request", request_only=True, value={
+                "name": "Acme Robotics", "sector": "Robotics",
+                "website": "https://acme.example", "hq_city": "Pune",
+                "contact_name": "R. Mehta", "contact_email": "hiring@acme.example"}),
+            OpenApiExample("Recorded", response_only=True, value={
+                "detail": "Registration received. The placement office will "
+                          "contact you after institute approval."})])
+    def post(self, request):
+        payload = s.CompanySelfRegisterSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        d = payload.validated_data
+        company_service.register(
+            name=d["name"], sector=d.get("sector", ""), website=d.get("website", ""),
+            hq_city=d.get("hq_city", ""),
+            contact={"name": d["contact_name"], "email": d["contact_email"],
+                     "phone": d.get("contact_phone", "")})
+        return Response(
+            {"detail": "Registration received. The placement office will "
+                       "contact you after institute approval."},
+            status=status.HTTP_201_CREATED)
+
+
 class CompanyApprovalView(_Scoped, APIView):
     permission_classes = [MODULE, HasPermission(P_MANAGE_COMPANIES)]
+    throttle_scope = "placement_write"
 
     @extend_schema(
         # Distinct from the company-create POST, which collides on operationId.
@@ -397,14 +446,17 @@ class CompanyApprovalView(_Scoped, APIView):
 # -- Interviews ----------------------------------------------------------------
 class InterviewRoundListView(_Scoped, generics.ListCreateAPIView):
     serializer_class = s.InterviewRoundSerializer
-    permission_classes = [MODULE]
+    permission_classes = [MODULE, ScopedCollection(
+            "placement.interview.create", "placement.application.review", P_VIEW_SELF)]
+    throttle_scope = "placement_write"
+    throttle_classes = [WriteThrottle]
 
     def get_queryset(self):
         qs = scoping.interview_rounds_for(_actor(self.request))
         posting_id = _int_param(self.request.query_params, "posting")
         if posting_id:
             qs = qs.filter(posting_id=posting_id)
-        return qs.order_by("posting_id", "seq")
+        return qs.select_related("posting").order_by("posting_id", "seq")
 
     def create(self, request, *args, **kwargs):
         payload = s.InterviewRoundWriteSerializer(data=request.data)
@@ -420,7 +472,8 @@ class InterviewRoundListView(_Scoped, generics.ListCreateAPIView):
 @extend_schema(request=s.AddCandidatesSerializer,
                responses=s.ScheduledCountSerializer)
 class RoundCandidatesView(_Scoped, APIView):
-    permission_classes = [MODULE]
+    permission_classes = [MODULE, ScopedCollection("placement.interview.create")]
+    throttle_scope = "placement_write"
 
     def post(self, request, pk):
         payload = s.AddCandidatesSerializer(data=request.data)
@@ -435,7 +488,9 @@ class RoundCandidatesView(_Scoped, APIView):
 @extend_schema(request=s.RoundOutcomeSerializer,
                responses=s.RoundParticipationSerializer)
 class RoundOutcomeView(_Scoped, APIView):
-    permission_classes = [MODULE]
+    permission_classes = [MODULE, ScopedCollection(
+            "placement.interview.create", "placement.application.review")]
+    throttle_scope = "placement_write"
 
     def post(self, request, pk):
         payload = s.RoundOutcomeSerializer(data=request.data)
@@ -450,15 +505,20 @@ class RoundOutcomeView(_Scoped, APIView):
 # -- Offers --------------------------------------------------------------------
 class OfferListView(_Scoped, generics.ListAPIView):
     serializer_class = s.OfferSerializer
-    permission_classes = [MODULE]
+    permission_classes = [MODULE, ScopedCollection(
+            "placement.offer.create", "placement.offer_response.create", P_VIEW_APPS)]
 
     def get_queryset(self):
         return scoping.offers_for(_actor(self.request)).order_by("-created_at")
 
+    def get_serializer_class(self):
+        return _offer_serializer(_actor(self.request))
+
 
 @extend_schema(request=s.OfferIssueSerializer, responses=s.OfferSerializer)
 class OfferIssueView(_Scoped, APIView):
-    permission_classes = [MODULE]
+    permission_classes = [MODULE, ScopedCollection("placement.offer.create")]
+    throttle_scope = "placement_write"
 
     def post(self, request):
         payload = s.OfferIssueSerializer(data=request.data)
@@ -467,13 +527,14 @@ class OfferIssueView(_Scoped, APIView):
         offer = offer_service.issue(actor=actor,
                                     scope=scoping.applications_for(actor),
                                     **payload.validated_data)
-        return Response(s.OfferSerializer(offer).data,
+        return Response(_offer_serializer(actor)(offer).data,
                         status=status.HTTP_201_CREATED)
 
 
 @extend_schema(request=s.OfferRespondSerializer, responses=s.OfferSerializer)
 class OfferRespondView(_Scoped, APIView):
-    permission_classes = [MODULE, HasPermission("placement_cell.offer.respond")]
+    permission_classes = [MODULE, HasPermission("placement.offer_response.create")]
+    throttle_scope = "placement_write"
 
     def post(self, request, pk):
         payload = s.OfferRespondSerializer(data=request.data)
@@ -487,7 +548,10 @@ class OfferRespondView(_Scoped, APIView):
 # -- Announcements -------------------------------------------------------------
 class AnnouncementListView(_Scoped, generics.ListCreateAPIView):
     serializer_class = s.AnnouncementSerializer
-    permission_classes = [MODULE]
+    permission_classes = [MODULE, ScopedCollection(
+            "placement.announcement.publish", P_VIEW_POSTINGS, P_VIEW_STATS)]
+    throttle_scope = "placement_write"
+    throttle_classes = [WriteThrottle]
 
     def get_queryset(self):
         return scoping.announcements_for(_actor(self.request)).order_by(
@@ -505,7 +569,8 @@ class AnnouncementListView(_Scoped, generics.ListCreateAPIView):
 @extend_schema(request=s.WithdrawSerializer, responses=s.AnnouncementSerializer)
 class AnnouncementWithdrawView(_Scoped, APIView):
     permission_classes = [MODULE,
-                          HasPermission("placement_cell.announcement.publish")]
+                          HasPermission("placement.announcement.publish")]
+    throttle_scope = "placement_write"
 
     def post(self, request, pk):
         payload = s.WithdrawSerializer(data=request.data)
@@ -517,15 +582,12 @@ class AnnouncementWithdrawView(_Scoped, APIView):
 
 
 class SeasonListView(_Scoped, generics.ListAPIView):
-    """The seasons a posting may belong to.
-
-    Free text here was a trap: a typo produced a posting whose season has no
-    PlacementPolicy, so it looked fine until a student applied and hit an
-    opaque `policy_missing`. A closed list moves that failure to authoring time.
-    """
+    """The seasons a posting may belong to."""
 
     serializer_class = s.SeasonSerializer
-    permission_classes = [MODULE]
+    permission_classes = [MODULE, ScopedCollection(
+            P_VIEW_POSTINGS, P_VIEW_REPORTS, P_VIEW_STATS, "placement.registration.create",
+            "placement.registration.manage")]
     pagination_class = None          # a handful of rows; never paginated
 
     def get_queryset(self):
@@ -537,10 +599,9 @@ class SeasonListView(_Scoped, generics.ListAPIView):
                description="Staff receive StaffStats; everyone else receives "
                            "the anonymised StudentStats shape (PC-BR-016).")
 class StatsView(_Scoped, APIView):
-    """Anonymised aggregates for a student (PC-BR-016), operational figures
-    for staff (PC-UC-011/012)."""
+    """Anonymised aggregates for a student (PC-BR-016)."""
 
-    permission_classes = [MODULE]
+    permission_classes = [MODULE, HasPermission(P_VIEW_STATS, P_VIEW_REPORTS)]
 
     def get(self, request):
         actor = _actor(request)
@@ -549,6 +610,23 @@ class StatsView(_Scoped, APIView):
                 actor.has_permission(P_VIEW_REPORTS):
             return Response(stats_service.staff_view(season=season))
         return Response(stats_service.student_view(season=season))
+
+
+@extend_schema(
+    responses=s.SeasonTrendSerializer(many=True),
+    examples=[OpenApiExample("Two seasons", response_only=True, value={
+        "results": [
+            {"season": "2025-26", "registered": 310, "placed": 262,
+             "placement_rate": 84.5, "companies_participated": 41},
+            {"season": "2026-27", "registered": 322, "placed": 118,
+             "placement_rate": 36.6, "companies_participated": 19}]})])
+class StatsTrendView(APIView):
+    """Season-on-season figures for the TPO and chairman (PC-AFR-034, PC-AFR-036)."""
+
+    permission_classes = [MODULE, HasPermission(P_VIEW_REPORTS)]
+
+    def get(self, request):
+        return Response({"results": stats_service.trends()})
 
 
 def _current_season() -> str:
@@ -562,6 +640,7 @@ def _current_season() -> str:
                responses=s.RecruiterInviteResultSerializer)
 class RecruiterInviteView(_Scoped, APIView):
     permission_classes = [MODULE, HasPermission(P_MANAGE_COMPANIES)]
+    throttle_scope = "placement_write"
 
     def post(self, request):
         payload = s.RecruiterInviteSerializer(data=request.data)
@@ -627,6 +706,7 @@ class RecruiterLoginView(APIView):
 @extend_schema(request=None, responses=s.DetailSerializer)
 class RecruiterLogoutView(_Scoped, APIView):
     permission_classes = [MODULE]
+    throttle_scope = "placement_write"
 
     def post(self, request):
         auth = request.META.get("HTTP_AUTHORIZATION", "")

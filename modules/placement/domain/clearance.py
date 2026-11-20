@@ -1,18 +1,4 @@
-"""Post-offer obligations (policy rules 22 and 24). Pure functions.
-
-    22  after accepting, a student who will not join must tell the Placement
-        Cell "on or before April 15". Silence makes them "liable for any
-        further consequences, including referral to the institute for
-        disciplinary actions" — a referral this system records but does not
-        make.
-    24  "No dues certificate ... will not be issued to the placed (on/off
-        campus) students unless the signed copy of the offer letter is
-        submitted to the Placement Cell."
-
-Rule 24 is the institute's lever, so the answer has to be precise about WHY a
-student is blocked: an unexplained hold on a no-dues certificate at the end of a
-degree is the kind of thing that ends up in the Dean's office.
-"""
+"""Post-offer obligations (policy rules 22 and 24)."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -46,10 +32,7 @@ class Clearance:
 
 
 def no_dues_clearance(records: tuple[RecordState, ...]) -> Clearance:
-    """Whether rule 24 permits a no-dues certificate.
-
-    A student with no placement is cleared — the rule only bites on the placed.
-    """
+    """Whether rule 24 permits a no-dues certificate."""
     blocking = tuple(r.company for r in records if not r.has_signed_offer_letter)
     return Clearance(cleared=not blocking, blocking=blocking)
 
@@ -63,12 +46,7 @@ class NonJoiningVerdict:
 
 def assess_non_joining(*, declared_on: date, deadline: date | None
                        ) -> NonJoiningVerdict:
-    """Rule 22's deadline.
-
-    The declaration is always accepted — refusing it would leave the Placement
-    Cell less informed, which is the opposite of what the rule wants. Lateness
-    is recorded instead, because that is what rule 22 attaches consequences to.
-    """
+    """Rule 22's deadline."""
     if deadline is None:
         return NonJoiningVerdict(
             True, False,

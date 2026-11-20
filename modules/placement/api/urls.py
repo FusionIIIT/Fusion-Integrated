@@ -16,6 +16,8 @@ urlpatterns = [
          name="placement-posting"),
     path("postings/<int:pk>/publish", v.PostingPublishView.as_view(),
          name="placement-posting-publish"),
+    path("postings/<int:pk>/submit", v.PostingSubmitView.as_view(),
+         name="placement-posting-submit"),
     path("postings/<int:pk>/eligibility", v.PostingEligibilityView.as_view(),
          name="placement-posting-eligibility"),
 
@@ -45,6 +47,8 @@ urlpatterns = [
 
     # companies
     path("companies", v.CompanyListView.as_view(), name="placement-companies"),
+    path("companies/register", v.CompanySelfRegisterView.as_view(),
+         name="placement-company-self-register"),
     path("companies/<int:pk>/<str:action>", v.CompanyApprovalView.as_view(),
          name="placement-company-approval"),
 
@@ -98,6 +102,12 @@ urlpatterns = [
          name="placement-outstanding-letters"),
     path("records/off-campus", cl.OffCampusRecordView.as_view(),
          name="placement-off-campus-record"),
+    path("records/office", cl.OfficeRecordsView.as_view(),
+         name="placement-office-records"),
+    path("records/<int:pk>", cl.RecordCorrectionView.as_view(),
+         name="placement-record-correction"),
+    path("records/<int:pk>/revisions", cl.RecordRevisionsView.as_view(),
+         name="placement-record-revisions"),
 
     # conduct and sanctions (rules 18, 19, 21)
     path("conduct/incidents", c.IncidentListView.as_view(),
@@ -121,6 +131,7 @@ urlpatterns = [
     # seasons and statistics
     path("seasons", v.SeasonListView.as_view(), name="placement-seasons"),
     path("stats", v.StatsView.as_view(), name="placement-stats"),
+    path("stats/trends", v.StatsTrendView.as_view(), name="placement-stats-trends"),
 
     # recruiter portal
     path("recruiters/invite", v.RecruiterInviteView.as_view(),

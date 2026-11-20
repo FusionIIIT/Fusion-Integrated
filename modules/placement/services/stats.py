@@ -1,17 +1,12 @@
-"""Reports and statistics (PC-UC-011, PC-UC-012, PC-BR-016).
-
-Staff get operational figures from the live tables; students get anonymised
-aggregates from materialised snapshots, so a viral share of the stats page
-cannot slow an application deadline. An aggregate over a group of one is not
-anonymous, hence the small-cell suppression below.
-"""
+"""Reports and statistics (PC-UC-011, PC-UC-012, PC-BR-016)."""
 from __future__ import annotations
 
 from decimal import Decimal
 
 from django.db import transaction
-from django.db.models import Avg, Count, Max
+from django.db.models import Avg, Count, Exists, Max, OuterRef
 
+from modules.placement.domain import reports
 from modules.placement.models import (
     Application,
     PlacementPolicy,
@@ -35,8 +30,7 @@ def _median(values: list[Decimal]) -> Decimal | None:
 
 
 def _counted_records(policy: PlacementPolicy):
-    """Active placements of registered students: a debarred or opted-out student
-    leaves the numerator as well as the denominator."""
+    """Active placements of registered students; a debarred student leaves both sides."""
     registered = PlacementRegistration.objects.filter(
         policy=policy, status="registered").values("user_id")
     return PlacementRecord.objects.filter(policy=policy, is_active=True,
@@ -99,10 +93,7 @@ def _by_company(policy, records) -> list[PlacementStatsSnapshot]:
 
 
 def student_view(*, season: str) -> dict:
-    """The anonymised figures a student may see (PC-BR-016).
-
-    No names, no per-student rows, and any cell below MIN_CELL suppressed.
-    """
+    """The anonymised figures a student may see (PC-BR-016)."""
     policy = PlacementPolicy.objects.filter(season=season).first()
     if policy is None:
         return {"season": season, "available": False}
@@ -125,8 +116,7 @@ def student_view(*, season: str) -> dict:
         "available": True,
         "registered": overall.registered,
         "placed": overall.placed,
-        "placement_rate": (round(overall.placed * 100 / overall.registered, 1)
-                           if overall.registered else None),
+        "placement_rate": reports.placement_rate(overall.placed, overall.registered),
         "companies_participated": overall.companies_participated,
         "median_ctc": str(overall.median_ctc) if overall.median_ctc else None,
         "max_ctc": str(overall.max_ctc) if overall.max_ctc else None,
@@ -165,6 +155,31 @@ def staff_view(*, season: str) -> dict:
         "median_ctc": str(_median(ctcs)) if ctcs else None,
         "mean_ctc": str(round(agg["mean"], 2)) if agg["mean"] else None,
         "max_ctc": str(agg["top"]) if agg["top"] else None,
+        "placement_rate": reports.placement_rate(
+            agg["n"] or 0, PlacementRegistration.objects.filter(
+                policy=policy, status="registered").count()),
+        "salary_distribution": reports.salary_distribution(ctcs),
         "by_company": by_company,
         "applications_by_status": by_status,
     }
+
+
+def trends() -> list[dict]:
+    """Company participation and employment across seasons (PC-AFR-034, PC-AFR-036)."""
+    seasons = list(PlacementPolicy.objects.values_list("season", flat=True))
+    registered = dict(
+        PlacementRegistration.objects.filter(status="registered")
+        .values_list("policy__season").annotate(n=Count("id")))
+    is_registered = PlacementRegistration.objects.filter(
+        policy=OuterRef("policy"), user_id=OuterRef("user_id"), status="registered")
+    rows = (PlacementRecord.objects.filter(is_active=True).filter(Exists(is_registered))
+            .values("policy__season")
+            .annotate(placed=Count("id"), companies=Count("company", distinct=True)))
+    placed = {r["policy__season"]: r["placed"] for r in rows}
+    companies = {r["policy__season"]: r["companies"] for r in rows}
+    return [
+        {"season": t.season, "registered": t.registered, "placed": t.placed,
+         "placement_rate": t.placement_rate,
+         "companies_participated": t.companies_participated}
+        for t in reports.season_trends(seasons, registered, placed, companies)
+    ]

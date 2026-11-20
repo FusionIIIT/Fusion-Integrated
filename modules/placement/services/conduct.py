@@ -1,13 +1,4 @@
-"""Recording conduct incidents and applying the sanctions they point to.
-
-Two steps on purpose. `record` writes what happened and returns what the
-policy recommends; `apply_sanction` is the separate act of imposing it. Rule 19
-says a student "may be debarred" and rule 21 leaves it to the Chairperson, so a
-system that debarred on its own would be stricter than the signed policy.
-
-The ladder is counted from the incidents on record rather than a stored tally,
-which cannot drift out of step with them.
-"""
+"""Recording conduct incidents and applying the sanctions they point to."""
 from __future__ import annotations
 
 import logging
@@ -27,7 +18,7 @@ from modules.placement.services.authz import require
 
 log = logging.getLogger("fusion.placement.conduct")
 
-P_DEBAR = "placement_cell.registration.debar"
+P_DEBAR = "placement.sanction.manage"
 
 VALID_KINDS = {k.value for k in conduct.IncidentKind}
 
@@ -50,11 +41,7 @@ def prior_count(registration: PlacementRegistration, kind: str) -> int:
 def record(*, season: str, user_id: int, kind: str, note: str, actor,
            posting_id: int | None = None) -> tuple[ConductIncident,
                                                    conduct.Recommendation]:
-    """Log an incident and report the sanction the policy points to.
-
-    Deliberately does not impose it. The caller sees the recommendation and
-    decides, which is what rules 19 and 21 require.
-    """
+    """Log an incident and report the sanction the policy points to."""
     require(actor, P_DEBAR)
     if kind not in VALID_KINDS:
         raise ConflictError(f"Unknown incident kind {kind!r}.", code="bad_kind")
@@ -86,11 +73,7 @@ def record(*, season: str, user_id: int, kind: str, note: str, actor,
 
 @transaction.atomic
 def waive(*, incident_id: int, reason: str, actor) -> ConductIncident:
-    """Rule 19's escape hatch — the student gave written notice in advance.
-
-    The row stays and stops counting toward the ladder, so the history remains
-    readable and the decision is attributable.
-    """
+    """Rule 19's escape hatch — the student gave written notice in advance."""
     require(actor, P_DEBAR)
     if not (reason or "").strip():
         raise ConflictError("A waiver needs a reason.", code="reason_required")
@@ -187,12 +170,7 @@ def lift(*, season: str, user_id: int, reason: str, actor) -> PlacementRegistrat
 
 def bars_posting(registration: PlacementRegistration,
                  posting: JobPosting) -> bool:
-    """Whether the sanction in force blocks this particular drive.
-
-    Rule 19's first tier is served by sitting out two drives, so it is counted
-    against the postings published since the sanction rather than against a
-    date — a quiet fortnight should not discharge it.
-    """
+    """Whether the sanction in force blocks this particular drive."""
     if not registration.sanction or registration.sanctioned_at is None:
         return False
 

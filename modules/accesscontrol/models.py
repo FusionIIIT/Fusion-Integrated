@@ -14,7 +14,7 @@ class Module(TimeStampedModel):
     STATUS = [("planned", "Planned"), ("active", "Active"),
               ("deprecated", "Deprecated")]
 
-    code = models.CharField(max_length=48, unique=True)      # placement_cell
+    code = models.CharField(max_length=48, unique=True)      # placement
     label = models.CharField(max_length=80)                  # "Placement Cell"
     icon = models.CharField(max_length=48, default="FaCircle")
     base_path = models.CharField(max_length=80)              # /placement

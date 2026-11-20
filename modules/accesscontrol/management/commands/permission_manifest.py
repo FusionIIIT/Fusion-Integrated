@@ -160,7 +160,7 @@ def _module_paths() -> dict[str, Path]:
     """Module code -> the directory its code lives in.
 
     Resolved through the app registry, not by joining the code onto a path: the
-    placement module's code is `placement_cell` while its package is
+    placement module's code is `placement` while its package is
     `modules.placement`, and guessing the directory found nothing and reported
     every one of its 21 permissions as unenforced.
     """

@@ -1,8 +1,4 @@
-"""Scheduled work.
-
-Ids only in arguments, never ORM objects. Everything is idempotent, because
-`acks_late` means a task can run twice if a worker dies mid-flight.
-"""
+"""Scheduled work."""
 from __future__ import annotations
 
 import logging
@@ -18,11 +14,7 @@ log = logging.getLogger("fusion.placement.tasks")
     soft_time_limit=270, time_limit=300,
 )
 def deliver_notifications(limit: int | None = None) -> str:
-    """Drain the notification outbox (PC-BR-021).
-
-    No autoretry — the rows carry their own attempts and backoff, so a failed
-    pass is picked up by the next beat rather than re-sending the batch.
-    """
+    """Drain the notification outbox (PC-BR-021)."""
     from modules.placement.services import notifications
 
     report = notifications.deliver_pending(limit=limit)
@@ -36,8 +28,7 @@ def deliver_notifications(limit: int | None = None) -> str:
     soft_time_limit=270, time_limit=300,
 )
 def expire_overdue_offers() -> int:
-    """Close offers past their deadline (PC-BR-013), or a student who never
-    answers stays blocked from the pool forever."""
+    """Close offers past their deadline (PC-BR-013), or the student stays blocked from the pool."""
     from modules.placement.services import offers
 
     n = offers.expire_overdue()
@@ -56,11 +47,7 @@ def rebuild_stats(season: str) -> int:
 
 @shared_task(name="placement.rebuild_active_stats", acks_late=True)
 def rebuild_active_stats() -> int:
-    """Rebuild every active season. The beat entry point.
-
-    A static schedule cannot name a season, and hard-coding one would silently
-    stop refreshing the day the season rolls over.
-    """
+    """Rebuild every active season."""
     from modules.placement.models import PlacementPolicy
 
     seasons = list(PlacementPolicy.objects

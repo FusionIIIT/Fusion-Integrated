@@ -1,9 +1,4 @@
-"""Placement domain tables.
-
-Institute people are referenced by plain `user_id` integers, never foreign
-keys — there is no user table in this database. Recruiters are the exception:
-they are local rows, scoped to one company.
-"""
+"""Placement domain tables."""
 
 from django.db import models
 from django.db.models import Q
@@ -11,10 +6,9 @@ from django.db.models import Q
 from core.db.mixins import TimeStampedModel, UserScopedModel
 
 
-# -- Announcements and notifications (PC-UC-013/020, PC-BR-017/018/021) --------
+# -- Announcements and notifications (PC-UC-013/020, PC-BR-017, PC-AFR-043/021) --------
 class Announcement(TimeStampedModel):
-    """PC-BR-017 bounds the topics. PC-BR-018 keeps history, so withdrawal
-    sets a flag rather than deleting."""
+    """PC-BR-017 bounds the topics."""
 
     TOPIC = [("drive", "Placement drive"), ("company_visit", "Company visit"),
              ("training", "Training session"), ("workshop", "Workshop"),
@@ -49,12 +43,7 @@ class Announcement(TimeStampedModel):
 
 
 class NotificationOutbox(TimeStampedModel):
-    """A notification PCMS decided to send (PC-BR-021).
-
-    Written in the same transaction as the event that caused it and drained by
-    a separate worker, so an offer and its email commit together or not at all.
-    `dedupe_key` makes redelivery idempotent.
-    """
+    """A notification PCMS decided to send (PC-BR-021)."""
 
     STATUS = [("pending", "Pending"), ("sending", "Sending"), ("sent", "Sent"),
               ("failed", "Failed"), ("suppressed", "Suppressed")]
@@ -89,11 +78,7 @@ class NotificationOutbox(TimeStampedModel):
 
 
 class PlacementStatsSnapshot(TimeStampedModel):
-    """Materialised aggregate for the statistics screens (PC-UC-011/012).
-
-    Reports read snapshots, never transactional tables, so a busy stats page
-    cannot slow down an application deadline.
-    """
+    """Materialised aggregate for the statistics screens (PC-UC-011/012)."""
 
     policy = models.ForeignKey("PlacementPolicy", on_delete=models.CASCADE,
                                related_name="snapshots")
@@ -124,13 +109,7 @@ class PlacementStatsSnapshot(TimeStampedModel):
 
 
 class ConductIncident(TimeStampedModel, UserScopedModel):
-    """One recorded breach of the code of conduct (rules 18, 19, 21).
-
-    The ladder is derived by counting these, never by a stored tally that could
-    drift. A waived incident stays on the record and stops counting, because
-    rule 19's escape hatch — "the student may inform the placement cell in
-    writing" — is a decision someone made and should remain visible.
-    """
+    """One recorded breach of the code of conduct (rules 18, 19, 21)."""
 
     KIND = [("consent_failure", "Did not appear after consenting (r19)"),
             ("code_of_conduct", "Code of conduct (r21)"),

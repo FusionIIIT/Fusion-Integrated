@@ -1,10 +1,4 @@
-"""Notification decisions and delivery (PC-BR-021).
-
-Every notification is written to the outbox in the same transaction as the
-event that caused it, so an offer and its email commit together and a broken
-mail server can never fail a student's application. `dedupe_key` makes
-redelivery idempotent.
-"""
+"""Notification decisions and delivery (PC-BR-021)."""
 from __future__ import annotations
 
 import logging
@@ -35,8 +29,7 @@ TOPICS = {
 def enqueue(*, topic: str, dedupe_key: str, subject: str, body: str,
             recipient_user_id: int | None = None, recipient_email: str = "",
             payload: dict | None = None) -> NotificationOutbox | None:
-    """Queue one notification, inside the caller's transaction. None if it was
-    already queued."""
+    """Queue one notification, inside the caller's transaction."""
     if topic not in TOPICS:
         raise ValueError(f"Unknown notification topic {topic!r}.")
     if recipient_user_id is None and not recipient_email:
@@ -106,13 +99,7 @@ def _reclaim_stranded(now) -> int:
 
 
 def _claim(row) -> bool:
-    """Take exclusive ownership of a row, or report that someone else has it.
-
-    A single conditional UPDATE: the database decides the winner, so of two
-    workers holding the same `pending` row exactly one proceeds to send. Doing
-    this after send_mail — which is where the mark used to be — meant both
-    would deliver and the recipient got the notification twice.
-    """
+    """Take exclusive ownership of a row, or report that someone else has it."""
     return NotificationOutbox.objects.filter(
         pk=row.pk, status="pending",
     ).update(status="sending", claimed_at=timezone.now()) == 1
@@ -224,11 +211,7 @@ def _resolve_addresses(rows: list[NotificationOutbox]) -> dict[int, str]:
 
 
 def _expand_broadcast(row: NotificationOutbox) -> int:
-    """One broadcast decision into per-recipient rows.
-
-    Resolved at send time so a student who registers after the announcement
-    still receives it, and publishing stays one fast transaction.
-    """
+    """One broadcast decision into per-recipient rows."""
     audience = (row.payload or {}).get("audience", "students")
     season = (row.payload or {}).get("placement_year", "")
 
@@ -253,10 +236,7 @@ def _expand_broadcast(row: NotificationOutbox) -> int:
 
 
 def _audience_ids(audience: str, season: str) -> list[int]:
-    """Who a broadcast reaches — only people already known to this module.
-
-    There is deliberately no "email every student in the institute" path.
-    """
+    """Who a broadcast reaches — only people already known to this module."""
     from modules.placement.models import PlacementRegistration
 
     if audience in ("registered", "students", "all"):

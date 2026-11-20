@@ -44,6 +44,19 @@ export const theme: MantineThemeOverride = createTheme({
       defaultProps: { radius: "lg", centered: true, overlayProps: { blur: 2 } },
     },
     ...INPUT_DEFAULTS,
+    // Its month arrows and confirm button are icon-only, and Mantine leaves them unnamed.
+    DateTimePicker: {
+      defaultProps: {
+        ...INPUT_DEFAULTS.DateTimePicker?.defaultProps,
+        ariaLabels: {
+          previousMonth: "Previous month", nextMonth: "Next month",
+          previousYear: "Previous year", nextYear: "Next year",
+          previousDecade: "Previous decade", nextDecade: "Next decade",
+          monthLevelControl: "Choose a month", yearLevelControl: "Choose a year",
+        },
+        submitButtonProps: { "aria-label": "Confirm date and time" },
+      },
+    },
   },
 });
 

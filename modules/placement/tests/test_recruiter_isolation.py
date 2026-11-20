@@ -1,10 +1,4 @@
-"""The recruiter boundary.
-
-This is the module's externally-reachable surface, so it gets the harshest
-tests. The property under examination throughout: **a recruiter at company A
-cannot observe anything belonging to company B, and cannot tell whether it
-exists.**
-"""
+"""The recruiter boundary."""
 from datetime import timedelta
 
 import pytest
@@ -106,8 +100,7 @@ class TestCrossCompanyIsolation:
         assert r.status_code == 404
 
     def test_company_id_in_the_body_cannot_reassign_a_posting(self, two_companies):
-        """The credential decides the company, never the payload. Otherwise
-        `company_id` is a one-field privilege escalation."""
+        """The credential decides the company, never the payload."""
         c = recruiter_client(two_companies["ra"])
         r = c.post("/api/v1/placement/postings",
                    {"company_id": two_companies["b"].pk, "title": "Injected",
@@ -166,20 +159,19 @@ class TestRecruiterCredential:
 
     def test_an_institute_session_is_rejected_under_the_recruiter_scheme(
             self, stub_iam, two_companies):
-        stub_iam(make_session(user_id=9, modules=("placement_cell",)))
+        stub_iam(make_session(user_id=9, modules=("placement",)))
         c = APIClient()
         c.credentials(HTTP_AUTHORIZATION="Recruiter abc")
         assert c.get("/api/v1/placement/postings").status_code == 401
 
     def test_a_recruiter_holds_no_permissions_at_all(self, two_companies):
-        """Their reach is the scoped queryset, never a permission grant — so a
-        misconfigured role cannot widen it."""
+        """Their reach is the scoped queryset, never a permission grant."""
         from modules.placement.authentication import RecruiterPrincipal
         p = RecruiterPrincipal(account_id=1, company_id=1, email="x@y.z",
                                display_name="X")
-        assert p.has_permission("placement_cell.application.view") is False
+        assert p.has_permission("placement.application.view") is False
         assert p.has_any_permission("anything", "at", "all") is False
-        assert p.has_module("placement_cell") is True
+        assert p.has_module("placement") is True
         assert p.has_module("hr") is False
 
     def test_a_recruiter_cannot_reach_the_iam_directory_or_me(self, two_companies):
@@ -214,8 +206,7 @@ class TestRecruiterCredential:
         assert c.get("/api/v1/placement/postings").status_code == 401
 
     def test_un_approving_the_company_cuts_off_a_live_session(self, two_companies):
-        """Checked per request, not merely at login — otherwise a blacklisted
-        company keeps working until their eight-hour session lapses."""
+        """Checked per request, not merely at login — a blacklisted company must stop working at once."""
         c = recruiter_client(two_companies["ra"])
         assert c.get("/api/v1/placement/postings").status_code == 200
 
@@ -327,8 +318,7 @@ class TestInvitation:
                               invited_by_user_id=9)
 
     def test_the_password_is_argon2(self, settings):
-        """Test settings swap in MD5 for speed, so this restores the real
-        hashers — otherwise it asserts whatever the runner happens to set."""
+        """Test settings swap in MD5 for speed, so this restores the real hashers."""
         settings.PASSWORD_HASHERS = [
             "django.contrib.auth.hashers.Argon2PasswordHasher",
             "django.contrib.auth.hashers.PBKDF2PasswordHasher",
@@ -342,8 +332,7 @@ class TestInvitation:
 
 # -- The session cookie --------------------------------------------------------
 class TestRecruiterCookie:
-    """The portal SPA authenticates by cookie, so the token never lives in
-    JS-readable storage. Both transports must behave identically."""
+    """The portal SPA authenticates by cookie, so the token never lives in JS-readable storage."""
 
     def test_login_sets_an_httponly_cookie_and_does_not_return_the_token(
             self, two_companies):
@@ -391,8 +380,7 @@ class TestRecruiterCookie:
 
     def test_an_institute_header_does_not_fall_back_to_the_recruiter_cookie(
             self, two_companies):
-        """A request must not authenticate as two different principals
-        depending on which class runs first."""
+        """A request must not authenticate as two different principals depending on class order."""
         c = APIClient()
         c.post("/api/v1/placement/recruiters/login",
                {"email": "hire@acme.test", "password": PASSWORD}, format="json")

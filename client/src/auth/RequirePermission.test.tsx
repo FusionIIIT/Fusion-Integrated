@@ -13,7 +13,7 @@ function renderHolding(permissions: string[]) {
   const Page = vi.fn(() => <button type="button">Schedule a round</button>);
   render(
     <MantineProvider>
-      <RequirePermission permission="placement_cell.interview.schedule"><Page /></RequirePermission>
+      <RequirePermission permission="placement.interview.create"><Page /></RequirePermission>
     </MantineProvider>,
   );
   return Page;
@@ -21,7 +21,7 @@ function renderHolding(permissions: string[]) {
 
 describe("RequirePermission", () => {
   it("refuses a role without the permission, and never mounts the page", () => {
-    const page = renderHolding(["placement_cell.job_posting.view"]);
+    const page = renderHolding(["placement.job_posting.view"]);
 
     expect(screen.getByText("Not available to your role")).toBeInTheDocument();
     expect(screen.queryByRole("button")).toBeNull();
@@ -29,7 +29,7 @@ describe("RequirePermission", () => {
   });
 
   it("renders the page for a role that holds it", () => {
-    renderHolding(["placement_cell.interview.schedule"]);
+    renderHolding(["placement.interview.create"]);
 
     expect(screen.getByRole("button", { name: "Schedule a round" })).toBeInTheDocument();
     expect(screen.queryByText("Not available to your role")).toBeNull();

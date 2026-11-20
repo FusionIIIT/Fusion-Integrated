@@ -16,8 +16,7 @@ const ROUTES = [
   { value: "reregister", label: "Re-registration (rule 21)" },
 ];
 
-/** Rules 20 and 21 both require the office to have seen a challan, which is why
- *  these are staff actions rather than something a student can self-serve. */
+/** Rules 20 and 21 both require the office to have seen a challan. */
 export default function RegistrationApprovalsPage() {
   const seasons = useSeasons();
   const approveLate = useApproveLate();

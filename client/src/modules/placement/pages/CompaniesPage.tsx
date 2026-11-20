@@ -14,13 +14,15 @@ import {
   useCompanies, useCompanyDecision, useInviteRecruiter, useRegisterCompany,
 } from "../api/hooks";
 import type { Company } from "../api/types";
+import { LoadMore } from "../components/LoadMore";
 
 const APPROVAL_COLOR: Record<string, string> = {
   pending: "yellow", approved: "green", rejected: "red",
 };
 
 export default function CompaniesPage() {
-  const { data, isPending, error } = useCompanies();
+  const list = useCompanies();
+  const { data, isPending, error } = list;
   const decide = useCompanyDecision();
   const [registering, setRegistering] = useState(false);
   const [rejecting, setRejecting] = useState<Company | null>(null);
@@ -59,7 +61,7 @@ export default function CompaniesPage() {
           rows={data?.results ?? []}
           loading={isPending}
           rowKey={(r) => r.id}
-          minWidth={980}
+          minWidth={860}
           columns={[
             {
               key: "name", header: "Company",
@@ -167,6 +169,7 @@ export default function CompaniesPage() {
       </FormModal>
 
       <InviteModal company={inviting} onClose={() => setInviting(null)} />
+      <LoadMore list={list} />
     </Container>
   );
 }

@@ -15,6 +15,7 @@ import {
   useAnnouncements, usePublishAnnouncement, useWithdrawAnnouncement,
 } from "../api/hooks";
 import type { Announcement } from "../api/types";
+import { LoadMore } from "../components/LoadMore";
 
 const TOPICS = [
   { value: "drive", label: "Placement drive" },
@@ -33,14 +34,15 @@ const AUDIENCES = [
 ];
 
 export default function AnnouncementsPage() {
-  const { data, isPending, error } = useAnnouncements();
+  const list = useAnnouncements();
+  const { data, isPending, error } = list;
   const { can } = useAuth();
   const [writing, setWriting] = useState(false);
   const [withdrawing, setWithdrawing] = useState<Announcement | null>(null);
   const [reason, setReason] = useState("");
   const withdraw = useWithdrawAnnouncement();
 
-  const canPublish = can("placement_cell.announcement.publish");
+  const canPublish = can("placement.announcement.publish");
 
   if (error) return <Container size="md"><ErrorState error={error} /></Container>;
 
@@ -134,6 +136,7 @@ export default function AnnouncementsPage() {
           onChange={(e) => setReason(e.currentTarget.value)} maxLength={300}
         />
       </FormModal>
+      <LoadMore list={list} />
     </Container>
   );
 }

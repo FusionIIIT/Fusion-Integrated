@@ -11,30 +11,31 @@ For the intended taxonomy of modules not yet built, see
 
 | Code | What it allows | Held by |
 |---|---|---|
-| `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+| `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement chairman`, `placement officer` |
 
-## `placement_cell`
+## `placement`
 
 | Code | What it allows | Held by |
 |---|---|---|
-| `placement_cell.job_posting.view` | See job postings | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer`, `student` |
-| `placement_cell.job_posting.manage` | Create and publish postings | `placement_officer` |
-| `placement_cell.application.view` | See all applications | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
-| `placement_cell.application.view_self` | See one's own applications | `student` |
-| `placement_cell.application.create` | Apply to a posting | `student` |
-| `placement_cell.application.review` | Shortlist and reject applications | `placement_coordinator`, `placement_officer` |
-| `placement_cell.application.delete` | Withdraw an application | `student` |
-| `placement_cell.application.auto_withdraw` | System auto-withdrawal | _service only_ |
-| `placement_cell.interview.schedule` | Schedule interview rounds | `placement_officer` |
-| `placement_cell.offer.issue` | Extend an offer | `placement_officer` |
-| `placement_cell.offer.respond` | Accept or decline an offer | `student` |
-| `placement_cell.offer.revoke` | Revoke an issued offer | `placement_officer` |
-| `placement_cell.offer.expire` | System offer expiry | _service only_ |
-| `placement_cell.company.manage` | Register and approve companies | `placement_officer` |
-| `placement_cell.announcement.publish` | Publish announcements | `Dean Academic`, `placement_chairman`, `placement_officer` |
-| `placement_cell.report.view` | See operational reports | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
-| `placement_cell.registration.debar` | Record conduct incidents and impose placement sanctions | `placement_officer` |
-| `placement_cell.registration.manage` | Approve late registrations and re-registrations | `placement_officer` |
-| `placement_cell.registration.self` | Register yourself for a placement season | `student` |
-| `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
-| `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+| `placement.job_posting.view` | See job postings | `placement chairman`, `placement officer`, `student` |
+| `placement.job_posting.manage` | Create and publish postings | `placement officer` |
+| `placement.application.view` | See all applications | `placement chairman`, `placement officer` |
+| `placement.own_application.view` | See one's own applications | `student` |
+| `placement.application.create` | Apply to a posting | `student` |
+| `placement.application.review` | Shortlist and reject applications | `placement officer` |
+| `placement.application.delete` | Withdraw an application | `student` |
+| `placement.application.revoke` | System auto-withdrawal | _service only_ |
+| `placement.interview.create` | Schedule interview rounds | `placement officer` |
+| `placement.offer.create` | Extend an offer | `placement officer` |
+| `placement.offer_response.create` | Accept or decline an offer | `student` |
+| `placement.offer.revoke` | Revoke an issued offer | `placement officer` |
+| `placement.offer_expiry.create` | System offer expiry | _service only_ |
+| `placement.company.manage` | Register and approve companies | `placement officer` |
+| `placement.announcement.publish` | Publish announcements | `placement chairman`, `placement officer` |
+| `placement.report.view` | See operational reports | `placement chairman`, `placement officer` |
+| `placement.statistic.view` | See anonymised placement statistics | `alumini`, `placement chairman`, `placement officer`, `student` |
+| `placement.sanction.manage` | Record conduct incidents and impose placement sanctions | `placement officer` |
+| `placement.registration.manage` | Approve late registrations and re-registrations | `placement officer` |
+| `placement.registration.create` | Register yourself for a placement season | `student` |
+| `placement.record.manage` | Record off-campus placements and chase offer letters | `placement officer` |
+| `placement.academic_directory.view` | Browse every student's declared CPI | `placement chairman`, `placement officer` |

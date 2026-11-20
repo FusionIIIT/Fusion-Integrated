@@ -14,8 +14,19 @@ test.describe("sign-in", () => {
     await page.getByRole("textbox", { name: /username/i })
       .fill(uniqueName("e2e-nobody").replace(/\s/g, "-"));
     await page.getByRole("textbox", { name: /password/i }).fill(`${PASSWORD}-wrong`);
-    await page.getByRole("button", { name: "Sign in" }).click();
-
+    // Global setup's logins can use up the IAM's budget, so a 429 is waited out first.
+    for (let attempt = 1; ; attempt++) {
+      const [res] = await Promise.all([
+        page.waitForResponse((r) => r.url().endsWith("/api/v1/auth/login")),
+        page.getByRole("button", { name: "Sign in" }).click(),
+      ]);
+      if (res.status() !== 429 || attempt === 3) {
+        expect(res.status()).toBe(401);
+        break;
+      }
+      await expect(page.getByRole("alert")).toContainText("Too many sign-in attempts");
+      await page.waitForTimeout((Number(res.headers()["retry-after"]) + 1) * 1000);
+    }
     await expect(page.getByRole("alert")).toContainText("Incorrect username or password");
     await expect(page).toHaveURL(/\/login/);
   });
@@ -26,7 +37,8 @@ test.describe("sign-in", () => {
 
     const links = sidebar(page).getByRole("link");
     await expect(links).toHaveText(
-      ["Season Registration", "Opportunities", "My Applications", "My Offers"]);
+      ["Season Registration", "My Profile", "Opportunities", "My Applications", "My Offers",
+        "Reports"]);
 
     await links.filter({ hasText: "Opportunities" }).click();
     await expect(page.getByRole("heading", { name: "Opportunities", level: 2 })).toBeVisible();

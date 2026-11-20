@@ -1,8 +1,4 @@
-"""The CPI directory's access boundary.
-
-The largest disclosure in the module — every student's academic standing — so
-the test is mostly about who is refused.
-"""
+"""The CPI directory's access boundary."""
 import pytest
 from rest_framework.test import APIClient
 
@@ -13,11 +9,11 @@ from modules.placement.services import recruiters
 pytestmark = pytest.mark.django_db
 
 URL = "/api/v1/placement/students/cpi"
-STAFF_PERM = "placement_cell.academic_directory.view"
+STAFF_PERM = "placement.academic_directory.view"
 
 
 def client_for(stub_iam, **kw):
-    stub_iam(make_session(modules=("placement_cell",), **kw))
+    stub_iam(make_session(modules=("placement",), **kw))
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
     return c
@@ -27,18 +23,18 @@ class TestWhoMayEnumerate:
 
     def test_staff_with_the_permission_may(self, stub_iam):
         c = client_for(stub_iam, user_id=9, kind="staff",
-                       permissions=(STAFF_PERM, "placement_cell.report.view"))
+                       permissions=(STAFF_PERM, "placement.report.view"))
         assert c.get(URL).status_code == 200
 
     def test_a_student_may_not(self, stub_iam):
         """Their own CPI arrives on /me. Enumerating their peers' does not."""
         c = client_for(stub_iam, user_id=1001, kind="student",
-                       permissions=("placement_cell.application.view_self",))
+                       permissions=("placement.own_application.view",))
         assert c.get(URL).status_code == 403
 
     def test_staff_without_the_permission_may_not(self, stub_iam):
         c = client_for(stub_iam, user_id=9, kind="staff",
-                       permissions=("placement_cell.application.review",))
+                       permissions=("placement.application.review",))
         assert c.get(URL).status_code == 403
 
     def test_an_alumnus_may_not(self, stub_iam):
@@ -47,9 +43,7 @@ class TestWhoMayEnumerate:
         assert c.get(URL).status_code == 403
 
     def test_a_recruiter_may_not(self, stub_iam):
-        """The case that matters most. A recruiter with the whole institute's
-        CPI list is precisely what the company-scoping rules exist to stop —
-        and they hold no permissions at all, so this is refused twice over."""
+        """The case that matters most."""
         company = Company.objects.create(
             name="Acme", slug="acme", status="active",
             approval_status="approved", approved_by_user_id=9)
@@ -69,11 +63,9 @@ class TestWhoMayEnumerate:
 class TestBehaviour:
 
     def test_the_student_token_is_never_forwarded_to_the_iam(self, stub_iam):
-        """The service credential is used, after this service has decided the
-        caller is staff. Forwarding a user's token would make IAM authorisation
-        the only thing between a student and every peer's CPI."""
+        """The service credential is used, after this service has decided the caller is staff."""
         fake = stub_iam(make_session(user_id=9, kind="staff",
-                                     modules=("placement_cell",),
+                                     modules=("placement",),
                                      permissions=(STAFF_PERM,)))
         c = APIClient()
         c.credentials(HTTP_AUTHORIZATION="Token abc")
@@ -90,7 +82,7 @@ class TestBehaviour:
         """An empty directory reads as "no students", which is a lie."""
         from fusion_auth.client import IamUnavailable
         fake = stub_iam(make_session(user_id=9, kind="staff",
-                                     modules=("placement_cell",),
+                                     modules=("placement",),
                                      permissions=(STAFF_PERM,)))
         fake.directory_error = IamUnavailable("connection refused")
         c = APIClient()

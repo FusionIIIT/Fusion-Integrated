@@ -5,12 +5,7 @@ import type { AxiosError } from "axios";
 import { CpiBadge } from "./CpiBadge";
 import type { EligibilityVerdict } from "../api/types";
 
-/** Why a student can or cannot apply.
- *
- *  The whole point is the per-rule reason list. "Not eligible" produces a
- *  support ticket; "CPI 6.80 — this posting needs at least 7.00" does not. The
- *  server composes each message, so nothing here has to interpret a rule code.
- */
+/** Why a student can or cannot apply. */
 export function EligibilityPanel({ verdict, isPending, error }: {
   verdict?: EligibilityVerdict;
   isPending: boolean;

@@ -1,9 +1,4 @@
-/** The CSV export path: fetched, not navigated to.
- *
- *  A plain link left the SPA, so a refusal replaced the app with the server's
- *  own error page. These pin the two halves of the fix — the download, and the
- *  error being readable at all.
- */
+/** The CSV export path: fetched, not navigated to. */
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
@@ -56,8 +51,7 @@ describe("useCsvExport", () => {
   });
 
   it("reads the error envelope back out of the blob body", async () => {
-    // responseType "blob" delivers the *error* body as a Blob too, which hides
-    // the envelope. Without readBlobError the toast says nothing useful.
+    // responseType "blob" delivers the *error* body as a Blob too, which hides the envelope.
     const envelope = {
       error: { code: "permission_denied", message: "Not available.", details: [] },
     };

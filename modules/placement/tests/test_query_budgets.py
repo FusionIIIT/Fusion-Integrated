@@ -1,9 +1,4 @@
-"""Query counts for the list endpoints, so an N+1 fails a build.
-
-The budget is per request, not per row: each test adds several rows and asserts
-the count does not move with them. A forgotten select_related shows up as a
-failure here rather than as a slow page during a drive.
-"""
+"""Query counts for the list endpoints, so an N+1 fails a build."""
 from datetime import timedelta
 
 import pytest
@@ -21,14 +16,14 @@ from modules.placement.models import (
 
 pytestmark = pytest.mark.django_db
 
-STAFF = ("placement_cell.job_posting.view", "placement_cell.application.view",
-         "placement_cell.company.manage", "placement_cell.offer.issue",
-         "placement_cell.announcement.publish")
+STAFF = ("placement.job_posting.view", "placement.application.view",
+         "placement.company.manage", "placement.offer.create",
+         "placement.announcement.publish")
 
 
 def _client(stub_iam, permissions=STAFF, uid=9, kind="staff"):
     stub_iam(make_session(user_id=uid, kind=kind, permissions=permissions,
-                          modules=("placement_cell",)))
+                          modules=("placement",)))
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
     return c
@@ -51,8 +46,7 @@ def _posting(company, n):
 
 @pytest.fixture
 def cohort():
-    """Five postings across five companies, each with an application and offer —
-    every relation a serializer might follow per row."""
+    """Five postings across five companies, each with an application and offer."""
     out = []
     for n in range(5):
         company = _company(n)

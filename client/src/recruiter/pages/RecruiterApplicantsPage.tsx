@@ -19,8 +19,7 @@ import {
   type Applicant,
 } from "../api";
 
-/** Only the moves a recruiter is allowed to drive. The server's state machine
- *  is the authority; this map is what turns its vocabulary into buttons. */
+/** Only the moves a recruiter is allowed to drive. */
 const LABELS: Record<string, string> = {
   under_review: "Move to review",
   shortlisted: "Shortlist",
@@ -29,16 +28,13 @@ const LABELS: Record<string, string> = {
   offer_issued: "Issue offer",
 };
 
-/** The recruiter payload is narrower than the staff one and carries no
- *  `allowed_transitions`, so the next legal moves are derived from the status.
- *  An illegal choice is still refused server-side — this only decides which
- *  buttons are worth offering. */
+/** The recruiter payload is narrower than the staff one and carries no `allowed_transitions`. */
 function movesFor(status: string): string[] {
   switch (status) {
-    case "submitted": return ["under_review", "rejected"];
+    case "submitted": return ["shortlisted", "under_review", "rejected"];
     case "under_review": return ["shortlisted", "rejected"];
     case "shortlisted": return ["offer_issued", "rejected"];
-    case "interview_scheduled": return ["selected", "rejected"];
+    case "interview_scheduled": return ["offer_issued", "selected", "rejected"];
     case "selected": return ["offer_issued"];
     default: return [];
   }
@@ -113,7 +109,7 @@ export default function RecruiterApplicantsPage() {
           rows={data?.results ?? []}
           loading={isPending}
           rowKey={(r) => r.id}
-          minWidth={960}
+          minWidth={860}
           columns={[
             {
               key: "candidate", header: "Candidate",
@@ -259,6 +255,7 @@ function IssueOfferModal({ applicant, onClose }: {
         />
         <DateTimePicker
           label="Respond by" value={respondBy} onChange={setRespondBy}
+          minDate={new Date()}
           description="Leave blank to use the institute's default window"
         />
         <Alert variant="light" color="blue" icon={<FaInfoCircle />}>

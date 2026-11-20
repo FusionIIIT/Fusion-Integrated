@@ -45,7 +45,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setUnauthorizedHandler(() => {
       qc.setQueryData(["session"], null);
-      if (!window.location.pathname.startsWith("/login")) navigate("/login");
+      // The recruiter portal has its own session; an institute 401 says nothing about it.
+      const path = window.location.pathname;
+      if (!path.startsWith("/login") && !path.startsWith("/recruiter")) navigate("/login");
     });
   }, [navigate, qc]);
 

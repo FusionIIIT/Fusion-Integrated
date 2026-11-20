@@ -90,7 +90,8 @@ export default function OffersPage() {
         {live.map((o) => {
           const left = remaining(o.respond_by);
           return (
-            <Card key={o.id} padding="lg" withBorder>
+            <Card key={o.id} component="article" aria-label={o.posting?.title}
+              padding="lg" withBorder>
               <Group justify="space-between" align="flex-start" wrap="wrap">
                 <Stack gap={4}>
                   <Group gap="xs">

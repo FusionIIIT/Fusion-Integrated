@@ -1,9 +1,4 @@
-"""Notification delivery (PC-BR-021).
-
-The properties that matter: a broken mail server never fails a business write,
-nothing is sent twice however often the worker runs, a permanently-bad address
-stops being retried, and a broadcast is one row that fans out at send time.
-"""
+"""Notification delivery (PC-BR-021)."""
 from datetime import timedelta
 from unittest.mock import patch
 
@@ -35,6 +30,7 @@ def queue(**over):
 class TestDelivery:
 
     def test_a_pending_row_is_sent_once(self):
+        # PC-UC-007, PC-BR-021, PC-AFR-057, PC-CFR-017
         queue()
         assert notifications.deliver_pending().sent == 1
         assert len(mail.outbox) == 1
@@ -64,6 +60,7 @@ class TestDelivery:
                                   recipient_email="a@b.test")
 
     def test_a_notification_needs_a_recipient(self):
+        # PC-UC-007 E1
         with pytest.raises(ValueError):
             notifications.enqueue(topic="offer.issued", dedupe_key="x",
                                   subject="s", body="b")
@@ -153,6 +150,7 @@ class TestAddressResolution:
 class TestBroadcast:
 
     def test_a_broadcast_expands_to_the_audience(self):
+        # PC-UC-007, PC-AFR-050, PC-AFR-056
         policy = PlacementPolicy.objects.create(season="2026-27")
         for uid in (11, 22, 33):
             PlacementRegistration.objects.create(
@@ -217,16 +215,10 @@ class TestVolumeGuards:
 
 
 class TestConcurrentDrains:
-    """Two workers draining at once must not send the same row twice.
-
-    Latent until the beat schedule existed: nothing ran the task, so the drains
-    never overlapped. A 60-second beat with a 270-second time limit makes
-    overlap the normal case.
-    """
+    """Two workers draining at once must not send the same row twice."""
 
     def test_a_row_is_claimed_before_it_is_sent(self):
-        """The claim is a conditional UPDATE, so the loser sees zero rows
-        affected and skips — rather than both sending and both marking sent."""
+        """The claim is a conditional UPDATE, so the loser sees zero rows affected and skips."""
         row = notifications.enqueue(
             topic="offer.issued", dedupe_key="race:1",
             recipient_email="a@test.invalid", subject="s", body="b")
@@ -250,8 +242,7 @@ class TestConcurrentDrains:
         assert len(mailoutbox) == 0
 
     def test_a_row_stranded_by_a_dead_worker_is_reclaimed(self, mailoutbox):
-        """A worker that dies between claiming and sending must not park the
-        notification forever."""
+        """A worker that dies between claiming and sending must not park the notification forever."""
         notifications.enqueue(
             topic="offer.issued", dedupe_key="race:3",
             recipient_email="c@test.invalid", subject="s", body="b")
@@ -264,8 +255,7 @@ class TestConcurrentDrains:
         assert NotificationOutbox.objects.get().status == "sent"
 
     def test_a_retryable_failure_returns_the_row_to_the_queue(self, settings):
-        """Not left in `sending`, or every transient bounce would wait out the
-        reclaim window before being retried."""
+        """Not left in `sending`, or every transient bounce would wait out the reclaim window."""
         settings.NOTIFY_MAX_ATTEMPTS = 3
         notifications.enqueue(
             topic="offer.issued", dedupe_key="race:4",

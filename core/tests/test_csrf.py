@@ -16,12 +16,12 @@ COOKIE = settings.IAM_AUTH_COOKIE_NAME
 
 pytestmark = pytest.mark.django_db
 
-PERMS = ("placement_cell.application.view_self",
-         "placement_cell.application.create")
+PERMS = ("placement.own_application.view",
+         "placement.application.create")
 
 
 def _cookie_client(stub_iam, token="tok-123"):
-    stub_iam(make_session(modules=("placement_cell",), permissions=PERMS))
+    stub_iam(make_session(modules=("placement",), permissions=PERMS))
     client = APIClient()
     client.cookies[COOKIE] = token
     return client
@@ -47,7 +47,7 @@ def test_a_cookie_read_needs_no_token(stub_iam):
 
 def test_a_header_credential_needs_no_token(stub_iam):
     """No ambient credential, so nothing to forge."""
-    stub_iam(make_session(modules=("placement_cell",), permissions=PERMS))
+    stub_iam(make_session(modules=("placement",), permissions=PERMS))
     client = APIClient()
     client.credentials(HTTP_AUTHORIZATION="Token tok-123")
     assert client.post("/api/v1/auth/logout").status_code == 200
@@ -65,7 +65,7 @@ def test_the_token_is_handed_over_on_login_and_on_me(stub_iam):
     """A reloaded tab has to recover it without a second round trip."""
     fake = _cookie_client(stub_iam)
     fake.cookies.clear()
-    stub_iam(make_session(modules=("placement_cell",), permissions=PERMS))
+    stub_iam(make_session(modules=("placement",), permissions=PERMS))
 
     login = APIClient().post("/api/v1/auth/login",
                              {"username": "u", "password": "p"}, format="json")

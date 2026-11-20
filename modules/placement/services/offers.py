@@ -1,10 +1,4 @@
-"""Offers and placement records (PC-WF-007, PC-BR-013/014/015).
-
-Two tabs accepting two offers at once is stopped three times over: a
-`select_for_update` mutex on the registration row, the policy re-evaluated
-inside that lock, and a partial unique index on PlacementRecord that holds
-even if this service is bypassed entirely.
-"""
+"""Offers and placement records (CW-PC-03, PC-BR-013/014/015)."""
 from __future__ import annotations
 
 from datetime import timedelta
@@ -26,15 +20,11 @@ from modules.placement.models import (
 from modules.placement.services import notifications
 from modules.placement.services.authz import require
 
-P_ISSUE = "placement_cell.offer.issue"
+P_ISSUE = "placement.offer.create"
 
 
 def policy_spec(policy: PlacementPolicy) -> pol.PolicySpec:
-    """The stored policy as the pure spec the rules operate on.
-
-    A season with no categories falls back to the signed defaults, so a
-    half-configured season still enforces something.
-    """
+    """The stored policy as the pure spec the rules operate on."""
     rows = list(policy.categories.all())
     categories = tuple(
         pol.CategorySpec(
@@ -99,10 +89,7 @@ _student_state = student_state
 @transaction.atomic
 def issue(*, application_id: int, actor, ctc_lpa=None, tier_rank=None,
           respond_by=None, letter_id: int | None = None, scope=None) -> Offer:
-    """Extend an offer (PC-UC-016). Always carries a response deadline.
-
-    Both gates: `require` is the authority, `scope` is the reach.
-    """
+    """Extend an offer (PC-UC-022)."""
     require(actor, P_ISSUE, allow_recruiter=True)
     qs = scope if scope is not None else Application.objects.all()
     app = (qs.select_for_update()
@@ -157,12 +144,7 @@ def issue(*, application_id: int, actor, ctc_lpa=None, tier_rank=None,
 
 
 def respond(*, offer_id: int, accept: bool, actor) -> Offer:
-    """A student accepts or declines (PC-UC-005).
-
-    A policy refusal leaves the atomic block normally and raises afterwards:
-    the reason is persisted for an appeal, and raising inside the transaction
-    would roll back the very record the appeal needs.
-    """
+    """A student accepts or declines (PC-UC-005)."""
     denial = _decide_and_apply(offer_id=offer_id, accept=accept, actor=actor)
     if denial is None:
         return (Offer.objects.select_related("posting", "posting__company")
@@ -177,11 +159,7 @@ def respond(*, offer_id: int, accept: bool, actor) -> Offer:
 
 @transaction.atomic
 def _decide_and_apply(*, offer_id: int, accept: bool, actor):
-    """None when applied, or (offer_pk, Decision) when policy refused.
-
-    The registration row is locked for the whole block: every acceptance for a
-    student contends on the same row, so two tabs cannot both read "0 held".
-    """
+    """None when applied, or (offer_pk, Decision) when policy refused."""
     # Scoped by user_id, so another's offer is not found rather than refused.
     offer = (Offer.objects.select_for_update()
              .select_related("application", "posting", "posting__company")
@@ -247,13 +225,7 @@ def _decide_and_apply(*, offer_id: int, accept: bool, actor):
 
 
 def _record_acceptance(registration, offer, decision, spec, state) -> None:
-    """Update the counters the policy reads on the next decision.
-
-    `category_number` locks on the first acceptance (rule 2.A) and never
-    changes — moving up ends the season under rule 3 instead. `switches_used`
-    counts only acceptances that REPLACED a held offer; counting a first offer
-    would halve everyone's allowance.
-    """
+    """Update the counters the policy reads on the next decision."""
     company = offer.posting.company
     fields = ["offer_count", "best_accepted_ctc_lpa", "best_accepted_tier_rank",
               "held_is_marquee", "held_sector_kind", "updated_at"]
@@ -289,14 +261,7 @@ def _supersede(offer_id: int) -> None:
 
 def _auto_withdraw_others(*, user_id: int, policy: PlacementPolicy, spec, state,
                           keep_application_id: int) -> int:
-    """Close only the applications this student may no longer pursue.
-
-    Not a blanket sweep: a dream slot stays open to placed students (rule 7),
-    a non-CSE student holding IT may still sit for Core (rule 10), and an
-    unspent switch allowance keeps everything open (rule 2). Each application
-    is asked the same question the student would be, and the reason is
-    recorded per application.
-    """
+    """Close only the applications this student may no longer pursue."""
     # State AFTER the acceptance — the pre-acceptance state would close nothing.
     registration = PlacementRegistration.objects.filter(
         policy=policy, user_id=user_id).first()
@@ -377,8 +342,7 @@ def _policy_for(season: str) -> PlacementPolicy:
 
 
 def _move(app: Application, to_status: str, actor, *, reason: str) -> None:
-    """The application-side transition, via the same state machine everything
-    else obeys."""
+    """The application-side transition, via the same state machine everything else obeys."""
     from modules.placement.services.applications import resolve_or_raise
 
     actor_kind = _actor_kind(actor, app)

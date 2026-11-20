@@ -1,10 +1,4 @@
-"""Permission classes for this module.
-
-Institute users are authorised by permission codes; recruiters hold none, and
-their authority is the company-scoped queryset instead. `ScopedCollection` is
-the gate for an endpoint both may reach: it lets a recruiter through to the
-selector and still demands a code from everyone else.
-"""
+"""Permission classes for this module."""
 from rest_framework.permissions import BasePermission
 
 

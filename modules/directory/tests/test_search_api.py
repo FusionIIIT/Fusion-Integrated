@@ -10,7 +10,7 @@ pytestmark = pytest.mark.django_db
 
 def _client(stub_iam, permissions=(), kind="student", uid=1001):
     stub_iam(make_session(user_id=uid, kind=kind, permissions=permissions,
-                          modules=("placement_cell",)))
+                          modules=("placement",)))
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
     return c

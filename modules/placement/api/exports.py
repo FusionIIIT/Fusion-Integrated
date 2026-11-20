@@ -1,12 +1,4 @@
-"""CSV exports for the placement office.
-
-The largest deliberate egress in the module: one request leaves with the whole
-cohort's applications, names and CPIs attached. So the gate matches the CPI
-directory's — staff only, never a recruiter — the `export` throttle applies,
-and every download is logged with who took it and how many rows.
-
-Cell escaping lives in core.api.csv, so an export added later cannot forget it.
-"""
+"""CSV exports for the placement office."""
 from __future__ import annotations
 
 import logging
@@ -24,8 +16,8 @@ from modules.placement.selectors import scoping
 
 log = logging.getLogger("fusion.placement.export")
 
-MODULE = HasModuleGrant("placement_cell")
-P_VIEW_REPORTS = "placement_cell.report.view"
+MODULE = HasModuleGrant("placement")
+P_VIEW_REPORTS = "placement.report.view"
 
 #: Beyond this an export is almost certainly a scrape rather than a report.
 MAX_ROWS = 20_000

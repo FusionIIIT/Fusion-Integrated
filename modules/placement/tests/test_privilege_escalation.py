@@ -1,8 +1,4 @@
-"""Write authority is a permission, not read scope.
-
-A student can SEE a published posting and their own application, which is
-exactly why the write paths must ask for a code as well.
-"""
+"""Write authority is a permission, not read scope."""
 from datetime import timedelta
 
 import pytest
@@ -27,9 +23,9 @@ pytestmark = pytest.mark.django_db
 PASSWORD = "a-long-enough-password"
 
 STUDENT_PERMS = (
-    "placement_cell.application.view_self",
-    "placement_cell.application.create",
-    "placement_cell.job_posting.view",
+    "placement.own_application.view",
+    "placement.application.create",
+    "placement.job_posting.view",
 )
 
 
@@ -51,7 +47,7 @@ def world():
 
 
 def _as(stub_iam, uid, perms, kind="student"):
-    stub_iam(make_session(user_id=uid, kind=kind, modules=("placement_cell",),
+    stub_iam(make_session(user_id=uid, kind=kind, modules=("placement",),
                           permissions=perms))
     client = APIClient()
     client.credentials(HTTP_AUTHORIZATION="Token abc")
@@ -72,6 +68,7 @@ def recruiter_client():
 
 
 def test_student_cannot_edit_a_published_posting(stub_iam, world):
+    # PC-BR-022, PC-AFR-061, PC-CFR-019
     """Readable to every student, hence the separate check."""
     _, posting = world
     client = _as(stub_iam, 1001, STUDENT_PERMS)
@@ -166,11 +163,12 @@ def test_student_issuing_themselves_an_offer_is_refused_cleanly(stub_iam, world)
 
 
 def test_read_only_reporting_staff_cannot_issue_offers(stub_iam, world):
+    # PC-BR-026, PC-AFR-064
     """`report.view` makes them staff for scoping, not for issuing."""
     _, posting = world
     app = Application.objects.create(posting=posting, user_id=1001,
                                      status="selected")
-    client = _as(stub_iam, 77, ("placement_cell.report.view",), kind="staff")
+    client = _as(stub_iam, 77, ("placement.report.view",), kind="staff")
 
     response = client.post("/api/v1/placement/offers/issue",
                            {"application_id": app.pk, "ctc_lpa": "99.00"},
@@ -182,7 +180,7 @@ def test_read_only_reporting_staff_cannot_issue_offers(stub_iam, world):
 
 def test_read_only_reporting_staff_cannot_edit_postings(stub_iam, world):
     _, posting = world
-    client = _as(stub_iam, 77, ("placement_cell.report.view",), kind="staff")
+    client = _as(stub_iam, 77, ("placement.report.view",), kind="staff")
 
     response = client.patch(f"/api/v1/placement/postings/{posting.pk}",
                             {"seats": 999}, format="json")
@@ -193,15 +191,16 @@ def test_read_only_reporting_staff_cannot_edit_postings(stub_iam, world):
 
 
 def test_tpo_can_still_do_all_of_it(stub_iam, world):
+    # PC-BR-022, PC-AFR-061
     """The checks must not lock out the role they exist for."""
     _, posting = world
     app = Application.objects.create(posting=posting, user_id=1001,
                                      status="selected")
     client = _as(stub_iam, 9, (
-        "placement_cell.job_posting.manage",
-        "placement_cell.interview.schedule",
-        "placement_cell.offer.issue",
-        "placement_cell.application.review",
+        "placement.job_posting.manage",
+        "placement.interview.create",
+        "placement.offer.create",
+        "placement.application.review",
     ), kind="staff")
 
     assert client.patch(f"/api/v1/placement/postings/{posting.pk}",
