@@ -103,3 +103,21 @@ escalates without changing status, while revision expiry stays the
 specification-mandated rule of BR-PMS-038.
 
 See `docs/11-PMS/CONFIGURATION.md` for the key reference.
+
+## M2 — State-machine corrections (implemented)
+
+Two transitions that the specifications do not authorise were removed, and the
+grant path was documented as the one deliberate extension:
+
+- **DEC-2** — dropped `ESCALATION_TRACKED → BUDGET_APPROVED`. BW-PMS-10 states the
+  higher authority "is not invented as a PMS actor or transition", so PMS now
+  tracks an escalation and never approves on that authority's behalf.
+- **DEC-3** — dropped `DECISION_MODIFIED → APPROVED`. `review_appeal` records the
+  outcome and stops there; `DECISION_MODIFIED` is declared terminal, matching the
+  UC-PMS-023 note that the workflow "ends at the recorded outcome".
+- **DEC-1** — the `Filed|Response Submitted → Granted` edges are annotated as a
+  beyond-spec extension: the Attorney records an official grant, PMS never decides
+  one, and CFR-PMS-029 keeps patent-office decisions external.
+
+A state-graph integrity test now fails if any state becomes unreachable, if an
+edge is duplicated, or if a dead-end state is not declared terminal.

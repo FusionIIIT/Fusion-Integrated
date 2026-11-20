@@ -272,11 +272,9 @@ def review_appeal(
         appeal.status = outcome.lower().replace(" ", "_")
         appeal.save()
 
-        # If decision modified, transition to Approved
-        if target_status == PatentApplicationStatus.DECISION_MODIFIED:
-            app.status = PatentApplicationStatus.APPROVED.value
-        else:
-            app.status = target_status.value
+        # The outcome itself is the final state; UC-PMS-023 does not define a
+        # downstream state for "Modify Decision" (DEC-3).
+        app.status = target_status.value
         app.save()
 
         log_audit(

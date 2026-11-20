@@ -84,6 +84,8 @@ TERMINAL_STATES: frozenset[PatentApplicationStatus] = frozenset(
         PatentApplicationStatus.EXPIRED,
         PatentApplicationStatus.REJECTION_UPHELD,
         PatentApplicationStatus.DO_NOT_RENEW,
+        # UC-PMS-023 ends at the recorded appeal outcome (DEC-3).
+        PatentApplicationStatus.DECISION_MODIFIED,
     }
 )
 
@@ -226,14 +228,9 @@ TRANSITIONS: tuple[Transition, ...] = (
         permission="pms.application.review_appeal",
         guard_description="Outcome = Modify Decision",
     ),
-    Transition(
-        PatentApplicationStatus.DECISION_MODIFIED,
-        PatentApplicationStatus.APPROVED,
-        actor_role="Director",
-        uc_id="UC-PMS-023",
-        permission="pms.application.review_appeal",
-        guard_description="Modified to Approved",
-    ),
+    # DEC-3: UC-PMS-023 note — "the exact downstream state after 'Modify
+    # Decision' is not specified by the PS; the workflow therefore ends at the
+    # recorded outcome". No downstream transition is invented.
     # BW-PMS-06, 07: Attorney Assignment Paths
     Transition(
         PatentApplicationStatus.APPROVED,
@@ -324,14 +321,10 @@ TRANSITIONS: tuple[Transition, ...] = (
         permission="pms.workflow.monitor",
         guard_description="PCC_ADMIN logs and routes escalation to higher authority",
     ),
-    Transition(
-        PatentApplicationStatus.ESCALATION_TRACKED,
-        PatentApplicationStatus.BUDGET_APPROVED,
-        actor_role="PCC_ADMIN",
-        uc_id="UC-PMS-027",
-        permission="pms.workflow.monitor",
-        guard_description="Higher authority approval recorded",
-    ),
+    # DEC-2: escalation is resolved by the external/configured authority, which
+    # BW-PMS-10 says is "not invented as a PMS actor or transition". There is
+    # deliberately no ESCALATION_TRACKED -> BUDGET_APPROVED edge: PMS tracks the
+    # escalation and never approves on that authority's behalf.
     # Pre-filing satisfied & BW-PMS-11 External Filing
     Transition(
         PatentApplicationStatus.BUDGET_APPROVED,
@@ -423,6 +416,10 @@ TRANSITIONS: tuple[Transition, ...] = (
         guard_description="Returns to active post-filing tracking",
     ),
     # Grant & BW-PMS-14, 15, CW-PMS-04: Maintenance Cycles
+    # DEC-1 (beyond-spec extension): no requirement defines how a patent becomes
+    # Granted, yet BR-PMS-059 gates post-grant tracking on it. The Attorney only
+    # *records* the official grant (PMS-AFR-104/106); PMS never decides it, and
+    # CFR-PMS-029 keeps patent-office decisions external.
     Transition(
         PatentApplicationStatus.FILED,
         PatentApplicationStatus.GRANTED,

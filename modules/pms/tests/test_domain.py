@@ -36,6 +36,7 @@ from modules.pms.domain.errors import (
 )
 from modules.pms.domain.state_machine import (
     TERMINAL_STATES,
+    TRANSITIONS,
     WITHDRAWAL_ELIGIBLE_STATES,
     PatentApplicationStatus,
     get_transitions,
@@ -496,3 +497,47 @@ def test_patentability_opinion_validation():
 
     with pytest.raises(PreconditionNotMetError, match="Invalid recommendation"):
         validate_patentability_opinion("Maybe File", "Details...")
+
+
+def test_dec_2_escalation_has_no_internal_approval_edge():
+    """DEC-2 / BR-PMS-051: BW-PMS-10 says the higher authority is external and
+    "not invented as a PMS actor or transition", so PMS must never approve a
+    budget on that authority's behalf."""
+    with pytest.raises(InvalidTransitionError):
+        validate_transition(
+            PatentApplicationStatus.ESCALATION_TRACKED,
+            PatentApplicationStatus.BUDGET_APPROVED,
+            actor_role="PCC_ADMIN",
+        )
+
+
+def test_dec_3_modified_decision_has_no_invented_downstream_state():
+    """DEC-3 / UC-PMS-023: the workflow ends at the recorded outcome."""
+    with pytest.raises(InvalidTransitionError):
+        validate_transition(
+            PatentApplicationStatus.DECISION_MODIFIED,
+            PatentApplicationStatus.APPROVED,
+            actor_role="Director",
+        )
+    assert get_transitions(PatentApplicationStatus.DECISION_MODIFIED) == []
+
+
+def test_state_graph_is_reachable_and_consistent():
+    """Guards the table itself: a state nobody can reach, or a state that dead-ends
+    without being declared terminal, is a modelling bug rather than a rule."""
+    states = set(PatentApplicationStatus)
+    seen = {PatentApplicationStatus.DRAFT}
+    changed = True
+    while changed:
+        changed = False
+        for edge in TRANSITIONS:
+            if edge.from_status in seen and edge.to_status not in seen:
+                seen.add(edge.to_status)
+                changed = True
+    assert states - seen == set()
+
+    triples = [(edge.from_status, edge.to_status, edge.actor_role) for edge in TRANSITIONS]
+    assert len(triples) == len(set(triples))
+
+    no_outbound = {state for state in states if not get_transitions(state)}
+    assert no_outbound <= set(TERMINAL_STATES)

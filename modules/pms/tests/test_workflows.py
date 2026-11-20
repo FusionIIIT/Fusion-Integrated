@@ -188,7 +188,11 @@ def test_bw_pms_04_appeal_rejection_upheld_path():
 
 
 def test_bw_pms_05_appeal_modified_decision_path():
-    """BW-PMS-05: Under Review -> Rejected -> Appeal Submitted -> Decision Modified -> Approved."""
+    """BW-PMS-05: Under Review -> Rejected -> Appeal Submitted -> Decision Modified.
+
+    UC-PMS-023 does not define a downstream state after "Modify Decision", so
+    the workflow ends at the recorded outcome (DEC-3).
+    """
     app = submit_application(
         applicant_user_id=1001,
         title="Battery Electrolyte",
@@ -217,7 +221,7 @@ def test_bw_pms_05_appeal_modified_decision_path():
         outcome_justification="The high temperature verified test results resolve thermal stability concern completely.",
     )
     app.refresh_from_db()
-    assert app.status == PatentApplicationStatus.APPROVED.value
+    assert app.status == PatentApplicationStatus.DECISION_MODIFIED.value
 
 
 def test_bw_pms_06_attorney_assignment_acceptance():
