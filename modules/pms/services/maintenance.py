@@ -18,6 +18,10 @@ from modules.pms.domain.state_machine import (
 )
 from modules.pms.models import PostGrantMaintenance
 from modules.pms.services.audit import log_audit
+from modules.pms.services.authorization import (
+    require_assigned_attorney,
+    require_director_scope,
+)
 from modules.pms.services.configuration import load_policy
 from modules.pms.services.notifications import enqueue_notification
 
@@ -54,6 +58,7 @@ def request_renewal_decision(
     with transaction.atomic():
         maint = PostGrantMaintenance.objects.select_for_update().get(pk=maintenance_id)
         app = maint.application
+        require_assigned_attorney(app, attorney_user_id)
 
         if app.status not in (
             PatentApplicationStatus.GRANTED.value,
@@ -116,6 +121,7 @@ def decide_renewal(
     with transaction.atomic():
         maint = PostGrantMaintenance.objects.select_for_update().get(pk=maintenance_id)
         app = maint.application
+        require_director_scope(app, director_user_id)
 
         target_status = (
             PatentApplicationStatus.RENEWAL_APPROVED
@@ -169,6 +175,7 @@ def record_maintenance_action(
     with transaction.atomic():
         maint = PostGrantMaintenance.objects.select_for_update().get(pk=maintenance_id)
         app = maint.application
+        require_assigned_attorney(app, attorney_user_id)
 
         if app.status != PatentApplicationStatus.RENEWAL_APPROVED.value:
             raise PreconditionNotMetError(

@@ -29,6 +29,7 @@ from modules.pms.models import (
     PatentApplication,
 )
 from modules.pms.services.audit import log_audit
+from modules.pms.services.authorization import require_director_scope
 from modules.pms.services.deadlines import (
     calculate_review_deadline,
     calculate_revision_deadline,
@@ -254,6 +255,7 @@ def review_appeal(
     with transaction.atomic():
         appeal = PatentAppeal.objects.select_for_update().get(pk=appeal_id)
         app = appeal.application
+        require_director_scope(app, director_user_id)
 
         target_status_map = {
             "Remand for Amendment": PatentApplicationStatus.REMANDED_FOR_AMENDMENT,

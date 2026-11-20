@@ -8,7 +8,7 @@ from __future__ import annotations
 from django.db import transaction
 
 from modules.pms.domain.entities import validate_document
-from modules.pms.domain.errors import PreconditionNotMetError
+from modules.pms.domain.errors import NotPermittedError, PreconditionNotMetError
 from modules.pms.domain.state_machine import PatentApplicationStatus
 from modules.pms.models import ApplicationDocument, PatentApplication
 from modules.pms.services.audit import log_audit
@@ -36,13 +36,13 @@ def upload_document_version(
     with transaction.atomic():
         app = PatentApplication.objects.select_for_update().get(pk=application_id)
 
-        # Applicant edit constraint: Applicants can edit documents only while status
-        # is Needs Revision (BR-PMS-087)
-        if user_role == "Applicant" and app.status not in (
-            PatentApplicationStatus.NEEDS_REVISION.value,
-            PatentApplicationStatus.DRAFT.value,
-            PatentApplicationStatus.SUBMITTED.value,
-        ):
+        is_primary_applicant = app.applicant_user_id == user_id
+        if user_role == "Applicant" and not is_primary_applicant:
+            raise NotPermittedError("Only the primary applicant may edit application documents.")
+
+        # Applicant document edits are allowed only during the specified
+        # revision stage (BR-PMS-087).
+        if is_primary_applicant and app.status != PatentApplicationStatus.NEEDS_REVISION.value:
             raise PreconditionNotMetError(
                 f"Applicants may edit application documents only while status is "
                 f"Needs Revision, not '{app.status}' (BR-PMS-087)."

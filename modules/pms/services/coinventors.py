@@ -27,6 +27,8 @@ def update_coinventors(
     """Update co-inventors and ownership percentages (BR-PMS-073, BR-PMS-074)."""
     with transaction.atomic():
         app = PatentApplication.objects.select_for_update().get(pk=application_id)
+        if app.applicant_user_id != actor_user_id:
+            raise NotPermittedError("Only the primary applicant may update co-inventor records.")
 
         # Pre-filing check: cannot edit co-inventors after filing
         if app.status in ("filed", "granted", "withdrawn", "expired"):
@@ -81,7 +83,12 @@ def record_consent_and_agreement(
     """Record inventor agreement and electronic signature (BR-PMS-075, 076, 077, 078)."""
     with transaction.atomic():
         coinv = CoInventor.objects.select_for_update().get(pk=coinventor_id)
-        if coinv.user_id and coinv.user_id != user_id:
+        if coinv.user_id is None:
+            if coinv.application.applicant_user_id != user_id:
+                raise NotPermittedError(
+                    "You are not authorized to record this co-inventor's agreement."
+                )
+        elif coinv.user_id != user_id:
             raise NotPermittedError("You are not authorized to sign for this co-inventor.")
 
         coinv.consent_given = consent_given
@@ -114,7 +121,12 @@ def record_withdrawal_consent(
     """Record co-inventor consent for withdrawal (BR-PMS-070)."""
     with transaction.atomic():
         coinv = CoInventor.objects.select_for_update().get(pk=coinventor_id)
-        if coinv.user_id and coinv.user_id != user_id:
+        if coinv.user_id is None:
+            if coinv.application.applicant_user_id != user_id:
+                raise NotPermittedError(
+                    "You are not authorized to record this co-inventor's consent."
+                )
+        elif coinv.user_id != user_id:
             raise NotPermittedError("You are not authorized to consent for this co-inventor.")
 
         coinv.withdrawal_consent_given = consent_given

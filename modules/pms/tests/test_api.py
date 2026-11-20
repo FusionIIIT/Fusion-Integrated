@@ -313,6 +313,16 @@ def test_api_patentability_assessment(stub_iam):
         claims="C",
         domain="Tech",
     )
+    app.status = PatentApplicationStatus.APPROVED.value
+    app.assigned_attorney_user_id = 5001
+    app.save(update_fields=["status", "assigned_attorney_user_id", "updated_at"])
+    AttorneyAssignment.objects.create(
+        application=app,
+        attorney_user_id=5001,
+        assigned_by_user_id=9001,
+        status="accepted",
+        is_active=True,
+    )
     c_atty = _client(
         stub_iam,
         user_id=5001,
@@ -671,7 +681,8 @@ def test_api_appeal_lifecycle(stub_iam):
         domain="Tech",
     )
     app.status = PatentApplicationStatus.REJECTED.value
-    app.save()
+    app.assigned_director_user_id = 2001
+    app.save(update_fields=["status", "assigned_director_user_id", "updated_at"])
 
     c_app = _client(
         stub_iam, user_id=1001, permissions=("pms.application.appeal", "pms.application.view_self")

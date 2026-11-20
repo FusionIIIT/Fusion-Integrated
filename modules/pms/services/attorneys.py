@@ -11,6 +11,7 @@ from django.utils import timezone
 from modules.pms.domain.entities import validate_patentability_opinion
 from modules.pms.domain.errors import (
     ConflictOfInterestError,
+    NotPermittedError,
     PreconditionNotMetError,
 )
 from modules.pms.domain.state_machine import (
@@ -24,6 +25,7 @@ from modules.pms.models import (
     PatentLegalAdvice,
 )
 from modules.pms.services.audit import log_audit
+from modules.pms.services.authorization import require_assigned_attorney
 from modules.pms.services.notifications import enqueue_notification
 
 
@@ -122,8 +124,10 @@ def respond_to_attorney_assignment(
         app = assignment.application
 
         if assignment.attorney_user_id != attorney_user_id:
-            raise PreconditionNotMetError("You are not authorized to respond to this assignment.")
+            raise NotPermittedError("You are not authorized to respond to this assignment.")
 
+        if not assignment.is_active or app.assigned_attorney_user_id != attorney_user_id:
+            raise NotPermittedError("This assignment is no longer active for this Attorney.")
         if assignment.status != "offered":
             raise PreconditionNotMetError(
                 f"Assignment is not in 'offered' status (current: {assignment.status})."
@@ -190,6 +194,7 @@ def submit_patentability_assessment(
 
     with transaction.atomic():
         app = PatentApplication.objects.select_for_update().get(pk=application_id)
+        require_assigned_attorney(app, attorney_user_id, require_accepted_assignment=True)
 
         assessment = PatentabilityAssessment.objects.create(
             application=app,
@@ -230,6 +235,7 @@ def record_legal_advice(
 
     with transaction.atomic():
         app = PatentApplication.objects.get(pk=application_id)
+        require_assigned_attorney(app, attorney_user_id, require_accepted_assignment=True)
         advice = PatentLegalAdvice.objects.create(
             application=app,
             attorney_user_id=attorney_user_id,

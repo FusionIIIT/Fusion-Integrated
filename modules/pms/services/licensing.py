@@ -7,9 +7,10 @@ from __future__ import annotations
 
 from django.db import transaction
 
-from modules.pms.domain.errors import PreconditionNotMetError
+from modules.pms.domain.errors import NotPermittedError, PreconditionNotMetError
 from modules.pms.models import LicensingRequest, PatentApplication
 from modules.pms.services.audit import log_audit
+from modules.pms.services.authorization import require_director_scope
 
 
 def submit_licensing_request(
@@ -28,6 +29,10 @@ def submit_licensing_request(
 
     with transaction.atomic():
         app = PatentApplication.objects.get(pk=application_id)
+        if app.applicant_user_id != applicant_user_id:
+            raise NotPermittedError(
+                "Only the primary applicant may submit a licensing request."
+            )
         req = LicensingRequest.objects.create(
             application=app,
             requested_by_user_id=applicant_user_id,
@@ -69,6 +74,7 @@ def review_licensing_request(
 
     with transaction.atomic():
         req = LicensingRequest.objects.select_for_update().get(pk=request_id)
+        require_director_scope(req.application, director_user_id)
         req.status = status
         if negotiation_notes:
             req.negotiation_notes = negotiation_notes.strip()

@@ -508,6 +508,7 @@ def test_bw_pms_13_office_action_without_applicant_review():
         domain="Tech",
     )
     app.status = PatentApplicationStatus.FILED.value
+    app.assigned_attorney_user_id = 5001
     app.save()
 
     oa = record_office_action(

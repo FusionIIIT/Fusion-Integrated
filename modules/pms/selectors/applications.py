@@ -10,6 +10,17 @@ from django.db.models import Q, QuerySet
 from modules.pms.models import PatentApplication, PmsRoleAssignment
 
 
+def has_global_application_scope(principal) -> bool:
+    """Whether IAM grants institution-wide PMS application visibility."""
+    return principal is not None and principal.has_any_permission(
+        "pms.workflow.monitor",
+        "pms.config.manage",
+        "pms.application.assign_director",
+        "pms.attorney.assign",
+        "pms.panel.manage",
+    )
+
+
 def visible_applications(principal) -> QuerySet[PatentApplication]:
     """Return applications visible to the caller based on their role and permissions.
 
@@ -27,15 +38,19 @@ def visible_applications(principal) -> QuerySet[PatentApplication]:
     if principal is None:
         return qs.none()
 
-    # PCC_ADMIN oversight
-    if principal.has_permission("pms.workflow.monitor") or principal.has_permission(
-        "pms.config.manage"
-    ):
+    # PCC_ADMIN and panel/assignment administrators have institution-wide scope.
+    if has_global_application_scope(principal):
         return qs
 
     # Director domain / assignment scope
-    if principal.has_permission("pms.application.review") or principal.has_permission(
-        "pms.workflow.oversight"
+    if principal.has_any_permission(
+        "pms.application.review",
+        "pms.application.review_appeal",
+        "pms.budget.review",
+        "pms.maintenance.decide",
+        "pms.licensing.review",
+        "pms.workflow.oversight",
+        "pms.report.view",
     ):
         domains = PmsRoleAssignment.objects.filter(
             user_id=principal.user_id,
@@ -48,8 +63,14 @@ def visible_applications(principal) -> QuerySet[PatentApplication]:
         return qs.filter(director_scope).distinct()
 
     # Attorney scope
-    if principal.has_permission("pms.filing.record") or principal.has_permission(
-        "pms.patentability.assess"
+    if principal.has_any_permission(
+        "pms.attorney.respond_assignment",
+        "pms.patentability.assess",
+        "pms.filing.record",
+        "pms.office_action.record",
+        "pms.office_action.respond",
+        "pms.maintenance.manage",
+        "pms.advice.record",
     ):
         return qs.filter(
             attorney_assignments__attorney_user_id=principal.user_id,

@@ -450,6 +450,19 @@ def test_br_pms_020_056_128_external_filing_rules():
     decide_budget(application_id=app.id, director_user_id=3001, decision="Approve")
     app.refresh_from_db()
 
+    AttorneyPanel.objects.create(
+        attorney_user_id=5001,
+        name="Filing Attorney",
+        email="filing@example.test",
+        is_approved=True,
+        current_workload=0,
+        max_workload=5,
+    )
+    assignment = assign_attorney(
+        application_id=app.id, attorney_user_id=5001, assigned_by_user_id=9001
+    )
+    respond_to_attorney_assignment(assignment_id=assignment.id, attorney_user_id=5001, accept=True)
+
     # Co-inventor has not signed agreement (BR-PMS-020, 078)
     with pytest.raises(PreconditionNotMetError, match="agreements and consents must be complete"):
         record_external_filing(
@@ -523,6 +536,7 @@ def test_br_pms_059_060_061_post_grant_maintenance():
     # Fast forward to Filed, with the Director who will be asked to decide
     # the renewal (UC-PMS-017 addresses that request to the Director).
     app.status = PatentApplicationStatus.FILED.value
+    app.assigned_attorney_user_id = 5001
     app.assigned_director_user_id = 3001
     app.save()
 

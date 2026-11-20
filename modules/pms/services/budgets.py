@@ -19,6 +19,7 @@ from modules.pms.domain.state_machine import (
 )
 from modules.pms.models import PatentApplication, PatentBudget
 from modules.pms.services.audit import log_audit
+from modules.pms.services.authorization import require_director_scope
 from modules.pms.services.configuration import load_policy
 from modules.pms.services.notifications import enqueue_notification
 
@@ -45,6 +46,7 @@ def submit_or_update_budget(
                 f"Budget submission is only permitted for Approved applications, "
                 f"not '{app.status}' (BR-PMS-052)."
             )
+        require_director_scope(app, actor_user_id)
 
         budget, _ = PatentBudget.objects.get_or_create(application=app)
         budget.filing_fees = filing_fees
@@ -94,6 +96,7 @@ def decide_budget(
                 "Budget decisions are only permitted while the application is Approved "
                 "(BR-PMS-052)."
             )
+        require_director_scope(app, director_user_id)
         if budget.status != "pending_approval":
             raise PreconditionNotMetError(
                 "A budget decision requires a budget pending approval."

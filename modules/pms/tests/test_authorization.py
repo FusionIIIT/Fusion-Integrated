@@ -12,9 +12,15 @@ import pytest
 from rest_framework.test import APIClient
 
 from conftest import make_session
+from modules.pms.domain.errors import NotPermittedError
 from modules.pms.domain.state_machine import PatentApplicationStatus
-from modules.pms.models import AttorneyAssignment, PmsRoleAssignment
-from modules.pms.services import submit_application
+from modules.pms.models import AttorneyAssignment, PatentBudget, PmsRoleAssignment
+from modules.pms.services import (
+    decide_budget,
+    record_legal_advice,
+    submit_application,
+    submit_licensing_request,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -228,6 +234,47 @@ def test_nested_endpoint_hides_foreign_application_records(stub_iam):
     assert response.status_code == 404
     coinventor.refresh_from_db()
     assert not coinventor.agreement_signed
+
+
+def test_services_bind_director_and_attorney_actions_to_application_scope():
+    app = submit_application(
+        applicant_user_id=2001,
+        title="Scoped patent",
+        abstract="A",
+        detailed_description="D",
+        claims="C",
+        domain="Tech",
+    )
+    with pytest.raises(NotPermittedError):
+        record_legal_advice(
+            application_id=app.id,
+            attorney_user_id=5001,
+            stage="review",
+            advice_text="This legal advice is detailed and sufficiently complete.",
+        )
+    with pytest.raises(NotPermittedError):
+        submit_licensing_request(
+            application_id=app.id,
+            applicant_user_id=1001,
+            licensee_name="Licensee",
+            request_type="exclusive",
+            commercial_terms="Terms",
+        )
+
+    app.status = PatentApplicationStatus.APPROVED.value
+    app.save(update_fields=["status", "updated_at"])
+    budget = PatentBudget.objects.get(application=app)
+    budget.status = "pending_approval"
+    budget.save(update_fields=["status", "updated_at"])
+    with pytest.raises(NotPermittedError):
+        decide_budget(
+            application_id=app.id,
+            director_user_id=3001,
+            decision="Approve",
+            justification="Within the usual cost allowance.",
+        )
+    budget.refresh_from_db()
+    assert budget.status == "pending_approval"
 
 
 def test_applicant_cannot_revise_another_applicants_application(stub_iam):

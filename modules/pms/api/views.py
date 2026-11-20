@@ -26,7 +26,10 @@ from modules.pms.models import (
     PmsAuditTrail,
     PostGrantMaintenance,
 )
-from modules.pms.selectors.applications import visible_applications
+from modules.pms.selectors.applications import (
+    has_global_application_scope,
+    visible_applications,
+)
 from modules.pms.services import (
     approve_office_action_response,
     assign_attorney,
@@ -851,7 +854,7 @@ class AuditTrailListView(PmsAPIView):
         qs = PmsAuditTrail.objects.all().order_by("-timestamp")
         app_id = request.query_params.get("application_id")
         action_type = request.query_params.get("action_type")
-        if not request.principal.has_any_permission(p.P_WORKFLOW_MONITOR, p.P_CONFIG_MANAGE):
+        if not has_global_application_scope(request.principal):
             qs = qs.filter(
                 Q(application__in=visible_applications(request.principal).values("id"))
                 | Q(application__isnull=True, actor_user_id=request.principal.user_id)

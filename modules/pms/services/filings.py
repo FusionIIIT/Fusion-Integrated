@@ -16,11 +16,9 @@ from modules.pms.domain.state_machine import (
     PatentApplicationStatus,
     validate_transition,
 )
-from modules.pms.models import (
-    AttorneyAssignment,
-    PatentApplication,
-)
+from modules.pms.models import PatentApplication
 from modules.pms.services.audit import log_audit
+from modules.pms.services.authorization import require_assigned_attorney
 from modules.pms.services.maintenance import SCHEDULE_NOT_CONFIGURED, schedule_cycle
 from modules.pms.services.notifications import enqueue_notification
 
@@ -44,17 +42,7 @@ def record_external_filing(
         budget_status = budget.status if budget else "draft"
         all_agreements = not app.coinventors.filter(agreement_signed=False).exists()
 
-        assigned_attorney = AttorneyAssignment.objects.filter(
-            application=app,
-            attorney_user_id=attorney_user_id,
-            is_active=True,
-            status="accepted",
-        ).exists()
-        if app.assigned_attorney_user_id != attorney_user_id or not assigned_attorney:
-            raise PreconditionNotMetError(
-                "Filing requires the accepted assignment of the filing Attorney "
-                "(UC-PMS-010, UC-PMS-013)."
-            )
+        require_assigned_attorney(app, attorney_user_id, require_accepted_assignment=True)
 
         validate_filing_preconditions(
             status=app.status,
@@ -131,6 +119,8 @@ def record_patent_grant(
                 f"Cannot grant patent for application in status '{app.status}'. "
                 f"Must be Filed or Response Submitted."
             )
+
+        require_assigned_attorney(app, attorney_user_id)
 
         validate_transition(app.status, PatentApplicationStatus.GRANTED, actor_role="Attorney")
         prev_status = app.status

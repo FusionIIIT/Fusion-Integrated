@@ -12,6 +12,7 @@ from django.db import transaction
 from modules.pms.domain.errors import PreconditionNotMetError
 from modules.pms.models import PatentApplication, PriorArtReference
 from modules.pms.services.audit import log_audit
+from modules.pms.services.authorization import require_assigned_attorney
 
 
 def search_prior_art(
@@ -68,6 +69,8 @@ def attach_prior_art(
 
     with transaction.atomic():
         app = PatentApplication.objects.get(pk=application_id)
+        if app.applicant_user_id != user_id:
+            require_assigned_attorney(app, user_id, require_accepted_assignment=True)
         ref = PriorArtReference.objects.create(
             application=app,
             source=source.strip(),

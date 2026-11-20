@@ -21,6 +21,7 @@ from modules.pms.domain.state_machine import (
 )
 from modules.pms.models import OfficeAction, PatentApplication
 from modules.pms.services.audit import log_audit
+from modules.pms.services.authorization import require_assigned_attorney
 from modules.pms.services.notifications import enqueue_notification
 
 
@@ -38,6 +39,7 @@ def record_office_action(
     (UC-PMS-014, CFR-PMS-014)."""
     with transaction.atomic():
         app = PatentApplication.objects.select_for_update().get(pk=application_id)
+        require_assigned_attorney(app, attorney_user_id)
 
         allowed_statuses = (
             PatentApplicationStatus.FILED.value,
@@ -102,6 +104,7 @@ def draft_office_action_response(
     with transaction.atomic():
         oa = OfficeAction.objects.select_for_update().get(pk=office_action_id)
         app = oa.application
+        require_assigned_attorney(app, attorney_user_id)
 
         target_status = (
             PatentApplicationStatus.AWAITING_APPLICANT_APPROVAL
@@ -207,6 +210,7 @@ def submit_office_action_response(
     with transaction.atomic():
         oa = OfficeAction.objects.select_for_update().get(pk=office_action_id)
         app = oa.application
+        require_assigned_attorney(app, attorney_user_id)
 
         allowed_statuses = (
             PatentApplicationStatus.APPLICANT_APPROVED.value,
@@ -261,6 +265,7 @@ def request_office_action_extension(
     """File extension request for additional time to respond (UC-PMS-015)."""
     with transaction.atomic():
         oa = OfficeAction.objects.select_for_update().get(pk=office_action_id)
+        require_assigned_attorney(oa.application, attorney_user_id)
         oa.extension_months += extension_months
         oa.due_date = oa.due_date + timedelta(days=30 * extension_months)
         oa.save(update_fields=["extension_months", "due_date", "updated_at"])
