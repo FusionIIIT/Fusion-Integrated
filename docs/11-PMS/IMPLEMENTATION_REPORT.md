@@ -1,123 +1,104 @@
-# Patent Management System Implementation Report
+# Patent Management System — Implementation and Verification Record
 
-**Branch:** `11-PMS`
-**Specification set:** Assignment 7, PMS v1.2/v1.3
-**Status:** Backend lifecycle implementation present; final verification is blocked by the local PostgreSQL service and Ruff issues. The client pages remain placeholders.
+**Current branch:** `assignment9_PMS`
+**Specification baseline:** PMS Problem Statement v1.2; Requirement Registry, Use Cases, Business Rules, Workflows, and Traceability Matrix v1.3
+**Code snapshot:** M6 commits through `9026735`
+**M7 purpose:** describe repository evidence; this report does not change or supersede requirements.
 
-## Architecture and design
+## Specification set reviewed
 
-PMS is a Django domain module under `modules.pms`, registered in `DOMAIN_MODULES` and mounted at `/api/v1/pms/`. It follows the module layering contracts for API, services, selectors, models, and domain logic. Cross-module references use integer IAM user IDs; `contracts.py` exposes plural-ID lookups to other modules. The domain state machine owns status transitions, services enforce lifecycle rules and write audit/notification records, selectors scope application reads, and DRF serializers/views form the API boundary.
+The source documents reviewed for this report are the six supplied files in the original `11-PMS` folder:
 
-## Features present in the code
+1. `01_PMS_Problem_Statement_v1.2_SYNCHRONIZED.docx`
+2. `02_PMS_Requirement_Registry_CFR_AFR_v1.3_DIRECT_FINAL.docx`
+3. `03_PMS_Use_Case_Specifications_v1.3_DIRECT_FINAL.docx`
+4. `04_PMS_Business_Rule_Specifications_v1.3_DIRECT_FINAL.docx`
+5. `05_PMS_Workflow_Specifications_v1.3_DIRECT_FINAL.docx`
+6. `06_PMS_Traceability_Matrix_v1.3_DIRECT_FINAL.xlsx`
 
-- Application submission, unique application numbers, review assignment and decisions, revision/resubmission, withdrawal, and appeals.
-- Inventor ownership shares, consent/agreement records, and withdrawal consent.
-- PDF size/malware validation metadata and document version tracking.
-- Budget decisions and escalations, attorney panel/assignment/response, patentability assessments, and legal advice.
-- Prior-art search/attachment, external filing/grant tracking, office actions and responses, and maintenance decisions/actions.
-- Licensing requests, audit trail, report aggregates, notification outbox, and deadline monitoring services.
-- PMS-specific role/permission declarations and navigation manifest entries.
+The first five files and the original workbook remain unchanged. The derived M7 workbook is [PMS_Traceability_Matrix_M7.xlsx](PMS_Traceability_Matrix_M7.xlsx).
 
-The integration currently records external filing and notification state in PMS; it does not perform legal decisions, actual payments, or patent-office submission. Search is a PMS-supported adapter/stub rather than a live patent database integration.
+## Product and architecture
 
-## Models and relationships
+PMS manages institutional patent applications from submission through internal review, assignment, budgeting, external filing records, office-action response tracking, licensing records, appeals, and post-grant maintenance. PMS records institutional workflow and externally supplied outcomes; it does not make patent-office, financial, or legal decisions.
 
-The migration creates `PatentApplication` and related records: `CoInventor`, `ApplicationDocument`, `DirectorReview`, `PatentBudget`, `AttorneyAssignment`, `AttorneyPanel`, `PatentabilityAssessment`, `PriorArtReference`, `OfficeAction`, `PostGrantMaintenance`, `LicensingRequest`, `PatentAppeal`, `PatentLegalAdvice`, `PmsAuditTrail`, `PmsNotificationOutbox`, `PmsConfiguration`, and `PmsRoleAssignment`. Applications own lifecycle records; budgets are one-to-one; actor references are scalar IAM IDs. `0001_initial.py` is the only PMS migration currently present.
+The backend is a Django module registered as `pms`, mounted at `/api/v1/pms/`. Important directories:
 
-## Workflows and business rules
+- `modules/pms/models.py`, `migrations/` — 17 PMS models and three migrations.
+- `modules/pms/domain/` — state machine, policy configuration, validation, and domain errors.
+- `modules/pms/services/` — application, review, budget, attorney, filing, office-action, maintenance, document, licensing, audit, deadline, and notification logic.
+- `modules/pms/selectors/` — application visibility scoping.
+- `modules/pms/api/` — 37 URL patterns in `urls.py`, serializers, permissions, and views. Some patterns support multiple HTTP methods.
+- `modules/pms/tasks.py`, `schedule.py` — Celery deadline and notification tasks and Beat schedule.
+- `modules/pms/tests/` — domain, workflow, business-rule, API, authorization, policy, scheduling, notification, model, and audit tests.
+- `client/src/modules/pms/` — API hooks/types, shared action form and application selector, routes, and functional pages.
+- `modules/pms/registry.py`, `permissions.py` — server-driven navigation and IAM permission declarations.
 
-Services and state transitions cover the documented submission/review/revision/appeal paths, attorney assignment, budget decisions, filing, office-action response (with and without applicant review), maintenance, and pre-filing withdrawal. Rule validation includes required fields, document constraints, reviewer justification, deadlines, assignment conflicts, ownership shares, and inventor consent. The test suite names and maps cases to CFR/BR/UC/BW identifiers, though coverage is selective rather than exhaustive.
+`PatentApplication` owns dependent records through Django foreign keys. Actor references are integer IAM user IDs; there are no cross-module IAM foreign keys. Pre-filing budget and attorney assignment progress is stored in workflow records so the application’s main status is not used to represent parallel stages.
 
-## Authorization and integrations
+## Milestones and Git evidence
 
-The registry declares PMS roles and permissions for applicant, Director/Dean Research, PCC admin, and attorney workflows. API endpoints use module grants and permission gates; application list/detail reads use the `visible_applications` selector. During continuation, `revise_and_resubmit_application` was corrected to check primary-applicant ownership at the service boundary, and an authorization regression test was added (CFR-PMS-008). Missing OpenAPI annotations were added for prior-art search, consent, reporting, renewal, and office-action actions. Office-action extension input now uses a bounded serializer instead of an unchecked integer conversion. The generated OpenAPI schema and permission manifest were refreshed.
+The branch history contains the following implementation stages:
 
-Known authorization limitation: several nested resource endpoints retrieve records by ID in their services/views and do not consistently apply the application selector first. Director selector scope is also broader than assigned-only because domain membership is not currently modeled. These require security review before production use.
+- **M0 baseline:** `4e02b49` added PMS domain/models/services/API; `0dcbb8d` added backend tests; `8f57d9b` added placeholder client routes; `4a0a761` registered the module and permissions; `4e16d1e` added the initial report.
+- **M0a–M0c:** the current branch has no distinct commits bearing these milestone labels. Their completion cannot be independently attributed to a labeled commit from this history.
+- **M1:** `1367421` introduced configurable policies and deadlines. Only specified defaults (15 business days, 60 calendar days, 30/15/5 alert offsets) are seeded.
+- **M2:** `a359762` records DEC-1–3 state-machine corrections; `f6296b4` applies the exact 50 MB rejection boundary; `282f0b6` aligns budget/filing transitions; `e565b9f` separates pre-filing substates from application status.
+- **M3:** `24089fc` scopes API data to visible applications; `dadd5f6` adds service-layer actor ownership checks.
+- **M4:** `c8361cb` adds configuration API; `01a5e87` completes attorney-panel API; `d0d249e` adds scoped workflow oversight.
+- **M5:** `e45ebd4` makes outbox delivery retry-safe; `9c252a7` automates configured maintenance deadline alerts; `2a05039` schedules PMS deadline and notification tasks.
+- **M6:** `f19537f` adds submission/tracking; `9d2c18c` adds review and attorney workflows; `9026735` adds administration, workflow oversight, audit, and reporting screens.
 
-## Files created and modified
+The initial implementation report’s check results are historical and predate M3–M6. M7 did not rerun the backend suite or frontend build. A previous M6 build attempt could not start because this checkout did not have TypeScript installed (`tsc: not found`). No PMS-specific frontend test files exist under `client/src/modules/pms/`.
 
-- Added `modules/pms/` (domain, models, migration, services, selectors, API, and tests).
-- Added `client/src/modules/pms/` routes and a placeholder page.
-- Modified `.importlinter`, `config/settings/base.py`, and `config/urls.py` to register the module and API.
-- Modified `registry/permissions.json` and generated `docs/02-iam/permission-catalog.generated.md` with PMS permissions/navigation.
-- Added this report.
-- Added one regression test in `modules/pms/tests/test_authorization.py` for cross-applicant revision denial.
+### Decisions and constraints visible in the repository
 
-No unrelated module implementation files were changed. Ruff formatting and safe autofixes were applied to the new PMS package after the project check reported lint issues.
+- **DEC-1:** grant is recorded as an external official outcome by an Attorney; PMS does not decide grant.
+- **DEC-2:** budget escalation does not invent a higher-authority PMS actor or approval transition.
+- **DEC-3:** “Modify Decision” ends at the recorded appeal outcome; no unspecified downstream state is created.
+- **DEC-4:** documents at or above 50 MiB are rejected; exactly 50 MiB is rejected.
+- **DEC-7:** unspecified thresholds and policy values have no seeded defaults.
+- **DEC-8:** maintenance cycles are created only from an explicitly configured jurisdiction schedule.
+- **DEC-9:** missed review/office-action deadlines escalate without changing application status; ordinary business-day counting is Monday–Friday unless a holiday calendar is configured.
 
-## Requirement coverage
+No DEC-5 or DEC-6 decision record was found in the current repository documentation or code comments. Their approved wording should be recovered from the historical decision log if they remain governing decisions.
 
-**Implemented in backend code:** core application lifecycle; document and inventor records; review, budget, assignment, filing, office action, maintenance, licensing, appeal, prior-art, audit, and notification flows. The existing tests reference all major workflow families (UC-PMS-001 through UC-PMS-033), a selected subset of the 30 CFRs and 84 BRs, and the 16 basis/5 composite workflows.
+## Backend, data, and automation
 
-**Partially implemented:**
+The three migrations are `0001_initial.py` (domain schema), `0002_seed_pms_configuration.py` (specified default values), and `0003_separate_prefiling_workflow_states.py` (normalizes legacy application statuses and keeps substates in workflow records).
 
-- Report UC-PMS-024/030/031/032: current API returns basic status/domain aggregates; full dashboards, workload analytics, and workflow oversight are not present.
-- UC-PMS-025: configuration and role-assignment models exist, but complete configuration/role administration endpoints are absent.
-- UC-PMS-026: attorney panel listing/creation exists; full edit/deactivation and expertise lifecycle are incomplete.
-- UC-PMS-016: deadline monitoring service exists but no scheduled-job registration/operation is supplied in this module.
-- UC-PMS-002: status/history is represented by application state and audit rows, but there is no dedicated history endpoint.
-- UI: all PMS routes currently render `Placeholder`; no applicant, reviewer, attorney, or admin workflow screens are implemented.
-- External prior-art search and notification delivery depend on integration/deployment adapters; this repository does not provide a live external search connector.
+The API covers application CRUD/lifecycle actions, review, budget, attorney assignment/response, patentability/legal advice, external filing/grant records, office actions and responses, maintenance, prior art, document metadata/versioning, licensing, inventor consent, attorney panel, configuration, audit, reports, and workflow oversight. There are 37 URL patterns in the current `urls.py`; M4 instructions referred to 39 routes. Whether that count included individual method operations is undocumented, so the count convention remains unverified.
 
-**Not implemented or not verified:** complete requirement-by-requirement acceptance evidence; fully functional PMS client pages; scheduled task wiring; production-grade malware scanning and binary document storage; full configuration, exceptional-case, and analytics workflows. Because database-dependent tests could not initialize, these requirements are not considered successfully tested.
+`visible_applications()` scopes Applicant, Director, Attorney, and PCC_ADMIN reads. Nested views resolve the parent application through the same selector. Services enforce assigned-Director and assigned-Attorney rules on workflow writes. `test_authorization.py` includes role, cross-application, Director-scope, and service-ownership checks. This is implementation evidence, not a claim that every permission combination or object path has been tested.
 
-## Tests and checks
+Celery Beat schedules a daily deadline scan and a notification drain every 60 seconds. Deadline offsets and maintenance dates come from configuration; dedupe keys make repeated alert/outbox creation idempotent. Mail delivery still depends on the Directory service returning email addresses and on the deployment’s configured mail backend. A missing escalation chain remains unset by design.
 
-Existing PMS tests were inspected before adding a single regression case. Test modules cover domain transitions, business rules, models, workflows, authorization, deadlines/notifications/audit, and API behavior.
+## Frontend pages and API use
 
-Commands executed:
+`routes.tsx` registers permission-gated PMS routes and lazy-loads these pages:
 
-- `make check` — **failed** at `.venv/bin/ruff check .`. Django `manage.py check` passed; `makemigrations --check --dry-run` reported no changes (with a warning that the PostgreSQL connection was unavailable). Ruff initially reported 227 PMS lint findings; after safe formatting/autofixes, 69 remained, primarily E501 long lines plus unused test variables and two regex warnings. Later checks in the Make target did not execute.
-- `./.venv/bin/pytest -q modules/pms/tests` — **26 passed, 73 errors**. Errors occurred while creating/connecting to the test database because PostgreSQL at `127.0.0.1:5432` was unavailable. There were no assertion failures reported; database-backed tests, including the new regression test, remain unverified.
-- `client` checks were not run: `client/node_modules` is absent.
-- `lint-imports`, `no_cross_module_fk.py`, `contracts_are_plural.py`, and `nav_matches_routes.py` — **passed**.
-- `manage.py permission_manifest --check` — **passed** after restoring the PMS `PERMISSIONS` export expected by the manifest generator.
-- `make schema` / `manage.py spectacular --fail-on-warn` — **passed** after adding the missing PMS endpoint schemas.
+- My Applications and Submit Application
+- Application Queue and Reviews (including budget decisions)
+- Attorney workspace / Filings
+- Office Actions, Maintenance, and Licensing
+- Workflow Oversight, Reports / My Reports, Administration, and Audit Trail
 
-## Setup and rerun instructions
+Pages use the shared HTTP/CSRF client and React Query hooks. UI role checks control visibility only; API and service authorization remain authoritative. Application selectors are populated from the scoped applications API. The shared forms display validation, loading, success, and server error feedback. The client has no PMS-specific automated tests, and M6’s build/type check remains unverified because the local `tsc` executable was absent.
 
-1. Start the project PostgreSQL service and configure `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, and `DB_PORT` for the local environment.
-2. From `Fusion-Integrated`, run `make migrate` to apply migrations.
-3. Run the backend checks with `make check` and the PMS tests with `./.venv/bin/pytest -q modules/pms/tests`.
-4. Install the client dependencies according to the repository lockfile, then run `cd client && npm run typecheck && npm test && npm run build`.
+## Current implementation gaps and dependencies
 
-## Readiness
+- **Document files:** APIs and UI record document metadata, versions, and an optional storage URL; they do not accept or store binary files. Malware status is a caller-supplied boolean that defaults clean; no scanner or fail-closed scanning integration exists. The M6 document size input is capped at 52,428,799 bytes, while the server remains authoritative.
+- **Prior art:** `services/prior_art.py` returns deterministic sample records. No external patent/publication query connector, keyword optimization, or classification mapping is present. The frontend deliberately does not present those sample records as real search results. Attaching a reference and logging a search are separate implemented capabilities.
+- **Appeals:** an Applicant can submit an appeal, and the API can decide a known appeal ID. There is no appeal-list endpoint and application detail does not return appeal IDs, so a Director cannot discover appeals through a review queue.
+- **Application history:** current details and audit rows are available; there is no dedicated complete application history endpoint/timeline.
+- **Reports:** the API and UI provide visible-application counts and status/domain aggregates. Scheduled reports, filtering/customization, export, workload/financial/deadline dashboards, and historical/trend analysis are absent.
+- **Administration/exceptions:** PMS configuration and attorney-panel CRUD are present. PMS role grants are platform-IAM-owned; no PMS role-assignment endpoint is exposed. Workflow oversight is read-only and does not resolve conflict or exception cases.
+- **External systems:** patent-office filing/grant decisions, financial/payment execution, DMS binary storage, external prior-art queries, and email transport are recorded or delegated at the boundary rather than integrated as live systems.
+- **Conditional policy:** appeal period, escalation chain, budget threshold, and maintenance schedule remain unset unless an operator configures them. `PatentBudget.threshold_limit` still has a legacy model default of 100000; current escalation logic reads `PmsConfiguration.budget_threshold` and does not consult that legacy value when policy is unset. This schema/API field can therefore appear misleading and should be reconciled in a later implementation decision.
+- **Traceability source quality:** all 203 AFR rows in the supplied RTM have blank UC mapping, UC locations, BR mapping, workflow mapping, minimum-representation, and coverage cells. The registry’s AFR-to-UC/BR/WF columns and each UC’s CFR/AFR links are also blank. The source Summary says coverage is full, which is unsupported by its own blank evidence cells. M7 leaves those source sheets intact; its separate implementation map labels associations as direct or derived.
 
-The module is not ready to push as a completed assignment: database-backed tests have not run successfully, project lint still fails, and the client and several administration/reporting requirements remain partial. The schema and permission checks were rerun after the first `make check`; the full test suite was not rerun after the final schema/validation edits, so those edits also remain unverified by execution. The report records observed code and execution results rather than treating declared features as verified behavior.
+The M7 workbook includes 371 traceability rows (203 AFR, 30 CFR, 33 use cases, 84 business rules, 21 workflows). Its status is an evidence classification based on current code references, feature-level associations, and test-file presence. “Covered by tests” means a related test source exists; it does not mean the test was run in M7 or that it asserts every mapped requirement clause. Frontend behavior has no PMS-specific automated tests.
 
-## M1 — Policy and configuration (implemented)
+## Verification boundary
 
-`PmsConfiguration` is now the single source of operator policy, read through
-`domain/policies.py` + `services/configuration.py`. `0002_seed_pms_configuration`
-seeds only the three specification-stated values (15 business days, 60 days,
-30/15/5 alerts); thresholds, appeal periods, escalation chains, holiday
-calendars and maintenance schedules are left absent by design (PS §2.4).
-
-Fabricated maintenance values are gone: `record_patent_grant` and
-`record_maintenance_action` create a cycle only from a configured
-`maintenance_schedule`, and otherwise record `schedule not configured`. Budget
-escalation compares against the configured `budget_threshold` only, so an
-unconfigured threshold no longer silently escalates against an invented
-100,000 limit. Deadline alerts use the configured offsets; a missed deadline
-escalates without changing status, while revision expiry stays the
-specification-mandated rule of BR-PMS-038.
-
-See `docs/11-PMS/CONFIGURATION.md` for the key reference.
-
-## M2 — State-machine corrections (implemented)
-
-Two transitions that the specifications do not authorise were removed, and the
-grant path was documented as the one deliberate extension:
-
-- **DEC-2** — dropped `ESCALATION_TRACKED → BUDGET_APPROVED`. BW-PMS-10 states the
-  higher authority "is not invented as a PMS actor or transition", so PMS now
-  tracks an escalation and never approves on that authority's behalf.
-- **DEC-3** — dropped `DECISION_MODIFIED → APPROVED`. `review_appeal` records the
-  outcome and stops there; `DECISION_MODIFIED` is declared terminal, matching the
-  UC-PMS-023 note that the workflow "ends at the recorded outcome".
-- **DEC-1** — the `Filed|Response Submitted → Granted` edges are annotated as a
-  beyond-spec extension: the Attorney records an official grant, PMS never decides
-  one, and CFR-PMS-029 keeps patent-office decisions external.
-
-A state-graph integrity test now fails if any state becomes unreachable, if an
-edge is duplicated, or if a dead-end state is not declared terminal.
+M7 performed static source and test-file inspection to update the report and RTM. It did not run extensive tests, alter implementation code, or modify the six original specifications. Before M8 or production use, Student 2 should execute backend and frontend suites in the configured environment and review every partial, unimplemented, and externally dependent RTM row.

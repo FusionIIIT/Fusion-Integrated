@@ -1,7 +1,8 @@
 # PMS Configuration (M1, DEC-7 / DEC-8 / DEC-9)
 
-Operator policy lives in `PmsConfiguration` (`key`, JSON `value`). Nothing else
-in PMS hard-codes a threshold, a period or a fee.
+Operator policy is read from `PmsConfiguration` (`key`, JSON `value`). The
+decision services use this configuration rather than inventing an escalation
+threshold, appeal period, or maintenance schedule.
 
 ## What is seeded
 
@@ -21,7 +22,7 @@ until an operator sets them. An absent value is never guessed:
 
 | Key | Effect while unset |
 |---|---|
-| `budget_threshold` | No escalation comparison; the Director's decision stands and the audit records `threshold: "not configured"` (BR-PMS-051). |
+| `budget_threshold` | No escalation comparison; the Director's decision stands and the audit records `threshold: "not configured"` (BR-PMS-051). `PatentBudget.threshold_limit` retains a legacy model default of 100000, but current `decide_budget` does not consult it when policy is unset. The legacy field is therefore not the authoritative policy. |
 | `appeal_period_days` | No appeal window is enforced (BR-PMS-093). |
 | `escalation_chain` | Missed deadlines raise the escalation notification only; no chain is invented (BR-PMS-104). |
 | `maintenance_schedule` | No renewal cycle is created; grant and renewal audits record `schedule not configured` (BR-PMS-060). |
@@ -46,6 +47,11 @@ set_policy_value("maintenance_schedule", {
 invalid value is rejected at write time instead of surfacing later as a wrong
 deadline. Unknown keys are rejected — a typo must not look like a configured
 policy.
+
+The API still accepts and persists an optional `threshold_limit` on budget
+submission for compatibility. When `budget_threshold` is configured, policy
+configuration controls escalation. When it is unset, no comparison is made;
+the stored legacy field value does not imply an active escalation threshold.
 
 ## How the services use it
 
