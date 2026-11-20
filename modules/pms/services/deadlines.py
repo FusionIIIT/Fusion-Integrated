@@ -10,28 +10,41 @@ from django.utils import timezone
 from modules.pms.domain.state_machine import PatentApplicationStatus
 from modules.pms.models import OfficeAction, PatentApplication
 from modules.pms.services.audit import log_audit
+from modules.pms.services.configuration import load_policy
 from modules.pms.services.notifications import enqueue_notification
 
 
-def add_business_days(start_date: datetime.datetime, days: int) -> datetime.datetime:
-    """Add a specified number of business days (Mon-Fri) to a timestamp."""
+def add_business_days(
+    start_date: datetime.datetime,
+    days: int,
+    holidays: frozenset[datetime.date] = frozenset(),
+) -> datetime.datetime:
+    """Add business days (Mon-Fri, minus configured holidays) to a timestamp.
+
+    The holiday calendar is optional; when no operator has configured one the
+    calculation is the plain Mon-Fri rule the specification states.
+    """
     current = start_date
     added = 0
     while added < days:
         current += timedelta(days=1)
-        if current.weekday() < 5:  # Monday to Friday
+        if current.weekday() < 5 and current.date() not in holidays:
             added += 1
     return current
 
 
-def calculate_review_deadline(assigned_at: datetime.datetime) -> datetime.datetime:
-    """Director review must be completed within 15 business days of assignment (BR-PMS-031)."""
-    return add_business_days(assigned_at, 15)
+def calculate_review_deadline(
+    assigned_at: datetime.datetime, policy=None
+) -> datetime.datetime:
+    """Director review deadline: 15 business days by default (BR-PMS-031)."""
+    policy = policy or load_policy()
+    return add_business_days(assigned_at, policy.review_business_days, policy.holidays)
 
 
-def calculate_revision_deadline(decision_date: datetime.datetime) -> datetime.datetime:
-    """A revised application must be resubmitted within 60 calendar days (BR-PMS-035)."""
-    return decision_date + timedelta(days=60)
+def calculate_revision_deadline(decision_date: datetime.datetime, policy=None) -> datetime.datetime:
+    """Resubmission deadline: 60 calendar days by default (BR-PMS-035)."""
+    policy = policy or load_policy()
+    return decision_date + timedelta(days=policy.revision_days)
 
 
 def monitor_and_process_deadlines(now: datetime.datetime | None = None) -> dict[str, int]:
@@ -40,6 +53,7 @@ def monitor_and_process_deadlines(now: datetime.datetime | None = None) -> dict[
     now = now or timezone.now()
     today = now.date()
     stats = {"alerts_sent": 0, "revisions_expired": 0, "escalations": 0}
+    alert_offsets = load_policy().alert_offsets
 
     # 1. Overdue revisions -> Expired (BR-PMS-038)
     overdue_revisions = PatentApplication.objects.filter(
@@ -108,7 +122,7 @@ def monitor_and_process_deadlines(now: datetime.datetime | None = None) -> dict[
             continue
 
         days_remaining = (target_dl.date() - today).days
-        for alert_days in (30, 15, 5):
+        for alert_days in alert_offsets:
             if days_remaining == alert_days:
                 stats["alerts_sent"] += 1
                 topic = f"deadline.alert_{alert_days}"
@@ -150,7 +164,7 @@ def monitor_and_process_deadlines(now: datetime.datetime | None = None) -> dict[
                 recipient_user_id=oa.application.assigned_attorney_user_id
                 or oa.application.applicant_user_id,
             )
-        elif days_remaining in (30, 15, 5):
+        elif days_remaining in alert_offsets:
             stats["alerts_sent"] += 1
             enqueue_notification(
                 topic=f"deadline.alert_{days_remaining}",

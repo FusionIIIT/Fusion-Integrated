@@ -10,11 +10,7 @@ from decimal import Decimal
 from django.db import transaction
 from django.utils import timezone
 
-from modules.pms.domain.entities import (
-    DEFAULT_BUDGET_THRESHOLD,
-    check_budget_escalation,
-    validate_budget_components,
-)
+from modules.pms.domain.entities import check_budget_escalation, validate_budget_components
 from modules.pms.domain.errors import (
     PreconditionNotMetError,
 )
@@ -24,6 +20,7 @@ from modules.pms.domain.state_machine import (
 )
 from modules.pms.models import PatentApplication, PatentBudget
 from modules.pms.services.audit import log_audit
+from modules.pms.services.configuration import load_policy
 from modules.pms.services.notifications import enqueue_notification
 
 
@@ -34,7 +31,7 @@ def submit_or_update_budget(
     attorney_fees: Decimal,
     administrative_costs: Decimal,
     actor_user_id: int,
-    threshold_limit: Decimal = DEFAULT_BUDGET_THRESHOLD,
+    threshold_limit: Decimal | None = None,
 ) -> PatentBudget:
     """Submit or update budget line items for an approved patent (UC-PMS-009, CFR-PMS-011)."""
     total = validate_budget_components(filing_fees, attorney_fees, administrative_costs)
@@ -61,7 +58,14 @@ def submit_or_update_budget(
         budget.attorney_fees = attorney_fees
         budget.administrative_costs = administrative_costs
         budget.total_cost = total
-        budget.threshold_limit = threshold_limit
+        # The escalation threshold is operator policy (DEC-7). When none is
+        # configured the column keeps its legacy value and is not consulted by
+        # decide_budget — no invented default is applied here.
+        policy_threshold = load_policy().budget_threshold
+        if policy_threshold is not None:
+            budget.threshold_limit = policy_threshold
+        elif threshold_limit is not None:
+            budget.threshold_limit = threshold_limit
         budget.status = "pending_approval"
         budget.save()
 
@@ -98,10 +102,15 @@ def decide_budget(
 
         now = timezone.now()
 
-        # Check threshold limit escalation (BR-PMS-051)
-        is_exceeded = check_budget_escalation(budget.total_cost, budget.threshold_limit)
-        if is_exceeded and decision == "Approve":
-            # Must escalate rather than approve directly
+        # Escalation is driven by configured policy only (BR-PMS-051, DEC-7).
+        # With no threshold configured there is nothing to compare, so the
+        # decision stands as recorded — PMS does not invent a limit.
+        threshold = load_policy().budget_threshold
+        if (
+            threshold is not None
+            and decision == "Approve"
+            and check_budget_escalation(budget.total_cost, threshold)
+        ):
             decision = "Escalate"
 
         if decision == "Approve":
@@ -139,7 +148,7 @@ def decide_budget(
             details={
                 "decision": decision,
                 "total_cost": str(budget.total_cost),
-                "threshold": str(budget.threshold_limit),
+                "threshold": str(threshold) if threshold is not None else "not configured",
                 "justification": justification,
             },
         )

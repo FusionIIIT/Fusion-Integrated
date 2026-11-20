@@ -30,6 +30,7 @@ from modules.pms.services import (
     send_pending_notifications,
     submit_application,
 )
+from modules.pms.tests.support import configure_maintenance_schedule
 
 pytestmark = pytest.mark.django_db
 
@@ -235,6 +236,7 @@ def test_renewal_request_notifies_the_assigned_director():
     app.assigned_director_user_id = 2001
     app.save()
 
+    configure_maintenance_schedule()
     record_patent_grant(
         application_id=app.id,
         attorney_user_id=5001,

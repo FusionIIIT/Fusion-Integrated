@@ -35,8 +35,6 @@ ALLOWED_PATENTABILITY_RECOMMENDATIONS = (
 )  # (BR-PMS-046)
 ALLOWED_RENEWAL_DECISIONS = ("Renew", "Do Not Renew")  # (BR-PMS-061)
 
-DEFAULT_BUDGET_THRESHOLD = Decimal("100000.00")  # Configurable threshold
-
 
 def validate_document(
     filename: str,
@@ -122,10 +120,7 @@ def validate_budget_components(
     return filing_fees + attorney_fees + administrative_costs
 
 
-def check_budget_escalation(
-    total_cost: Decimal,
-    threshold: Decimal = DEFAULT_BUDGET_THRESHOLD,
-) -> bool:
+def check_budget_escalation(total_cost: Decimal, threshold: Decimal) -> bool:
     """Check if total budget exceeds the configured threshold limit (BR-PMS-051)."""
     return total_cost > threshold
 

@@ -84,3 +84,22 @@ Commands executed:
 ## Readiness
 
 The module is not ready to push as a completed assignment: database-backed tests have not run successfully, project lint still fails, and the client and several administration/reporting requirements remain partial. The schema and permission checks were rerun after the first `make check`; the full test suite was not rerun after the final schema/validation edits, so those edits also remain unverified by execution. The report records observed code and execution results rather than treating declared features as verified behavior.
+
+## M1 — Policy and configuration (implemented)
+
+`PmsConfiguration` is now the single source of operator policy, read through
+`domain/policies.py` + `services/configuration.py`. `0002_seed_pms_configuration`
+seeds only the three specification-stated values (15 business days, 60 days,
+30/15/5 alerts); thresholds, appeal periods, escalation chains, holiday
+calendars and maintenance schedules are left absent by design (PS §2.4).
+
+Fabricated maintenance values are gone: `record_patent_grant` and
+`record_maintenance_action` create a cycle only from a configured
+`maintenance_schedule`, and otherwise record `schedule not configured`. Budget
+escalation compares against the configured `budget_threshold` only, so an
+unconfigured threshold no longer silently escalates against an invented
+100,000 limit. Deadline alerts use the configured offsets; a missed deadline
+escalates without changing status, while revision expiry stays the
+specification-mandated rule of BR-PMS-038.
+
+See `docs/11-PMS/CONFIGURATION.md` for the key reference.

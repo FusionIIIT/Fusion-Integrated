@@ -17,6 +17,12 @@ from .coinventors import (
     record_withdrawal_consent,
     update_coinventors,
 )
+from .configuration import (
+    configured_keys,
+    load_policy,
+    set_policy_value,
+    unset_policy_value,
+)
 from .deadlines import (
     add_business_days,
     calculate_review_deadline,
@@ -27,9 +33,11 @@ from .documents import upload_document_version
 from .filings import record_external_filing, record_patent_grant
 from .licensing import review_licensing_request, submit_licensing_request
 from .maintenance import (
+    SCHEDULE_NOT_CONFIGURED,
     decide_renewal,
     record_maintenance_action,
     request_renewal_decision,
+    schedule_cycle,
 )
 from .notifications import enqueue_notification, send_pending_notifications
 from .office_actions import (
@@ -48,6 +56,7 @@ from .reviews import (
 )
 
 __all__ = [
+    "SCHEDULE_NOT_CONFIGURED",
     "add_business_days",
     "approve_office_action_response",
     "assign_attorney",
@@ -55,12 +64,14 @@ __all__ = [
     "attach_prior_art",
     "calculate_review_deadline",
     "calculate_revision_deadline",
+    "configured_keys",
     "decide_budget",
     "decide_renewal",
     "draft_office_action_response",
     "enqueue_notification",
     "file_appeal",
     "generate_application_no",
+    "load_policy",
     "log_audit",
     "monitor_and_process_deadlines",
     "record_consent_and_agreement",
@@ -76,14 +87,17 @@ __all__ = [
     "review_appeal",
     "review_licensing_request",
     "revise_and_resubmit_application",
+    "schedule_cycle",
     "search_prior_art",
     "send_pending_notifications",
+    "set_policy_value",
     "submit_application",
     "submit_director_review",
     "submit_licensing_request",
     "submit_office_action_response",
     "submit_or_update_budget",
     "submit_patentability_assessment",
+    "unset_policy_value",
     "update_coinventors",
     "upload_document_version",
     "withdraw_application",

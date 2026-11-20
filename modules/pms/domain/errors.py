@@ -61,6 +61,17 @@ class UnauthorizedRoleError(PmsDomainError):
     message = "The active role is not authorized for this patent action."
 
 
+class PolicyConfigurationError(PmsDomainError):
+    """A stored policy value is unknown or malformed.
+
+    Raised at read time so a broken configuration fails where it is used,
+    never as a silently wrong deadline or threshold (DEC-7, PS §2.4).
+    """
+
+    code = "policy_configuration_invalid"
+    message = "The PMS configuration is missing or invalid for this action."
+
+
 class NotificationRecipientError(PmsDomainError):
     """A workflow event has no recorded recipient.
 

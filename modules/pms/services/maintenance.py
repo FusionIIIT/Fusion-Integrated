@@ -6,7 +6,6 @@ Enforces business rules BR-PMS-059, 060, 061, and Workflows BW-PMS-14, 15, CW-PM
 from __future__ import annotations
 
 from datetime import timedelta
-from decimal import Decimal
 
 from django.db import transaction
 from django.utils import timezone
@@ -19,7 +18,30 @@ from modules.pms.domain.state_machine import (
 )
 from modules.pms.models import PostGrantMaintenance
 from modules.pms.services.audit import log_audit
+from modules.pms.services.configuration import load_policy
 from modules.pms.services.notifications import enqueue_notification
+
+#: Reported wherever a renewal cycle cannot be scheduled.
+SCHEDULE_NOT_CONFIGURED = "schedule not configured"
+
+
+def schedule_cycle(application, cycle_number: int) -> PostGrantMaintenance | None:
+    """Create the configured renewal cycle, or None when none is configured.
+
+    BR-PMS-060 fixes the schedule only "where applicable schedule rules are
+    available". With no configured schedule there is nothing to compute, so
+    PMS records nothing rather than inventing a date or an amount.
+    """
+    entry = load_policy().maintenance_cycle(application.jurisdiction, cycle_number)
+    if entry is None or application.grant_date is None:
+        return None
+    return PostGrantMaintenance.objects.create(
+        application=application,
+        cycle_number=entry.cycle,
+        fee_due_date=application.grant_date + timedelta(days=entry.due_after_days),
+        fee_amount=entry.fee_amount,
+        maintenance_status="scheduled",
+    )
 
 
 def request_renewal_decision(
@@ -165,15 +187,8 @@ def record_maintenance_action(
         app.status = PatentApplicationStatus.RENEWED.value
         app.save(update_fields=["status", "updated_at"])
 
-        # Schedule next maintenance cycle (next year)
-        next_due = maint.fee_due_date + timedelta(days=365)
-        PostGrantMaintenance.objects.create(
-            application=app,
-            cycle_number=maint.cycle_number + 1,
-            fee_due_date=next_due,
-            fee_amount=maint.fee_amount + Decimal("1000.00"),
-            maintenance_status="scheduled",
-        )
+        # The next cycle exists only when the jurisdiction's schedule is configured.
+        next_cycle = schedule_cycle(app, maint.cycle_number + 1)
 
         log_audit(
             application=app,
@@ -184,7 +199,9 @@ def record_maintenance_action(
             details={
                 "cycle": maint.cycle_number,
                 "transaction_ref": transaction_reference,
-                "next_due": str(next_due),
+                "next_cycle": (
+                    str(next_cycle.fee_due_date) if next_cycle else SCHEDULE_NOT_CONFIGURED
+                ),
             },
         )
 
@@ -194,7 +211,8 @@ def record_maintenance_action(
             subject=f"PMS: Patent Renewal Completed ({app.application_no})",
             body=(
                 f"Maintenance fee renewal completed for '{app.title}'. "
-                f"Next cycle due: {next_due}."
+                f"Next cycle: "
+                f"{next_cycle.fee_due_date if next_cycle else SCHEDULE_NOT_CONFIGURED}."
             ),
             recipient_user_id=app.applicant_user_id,
         )

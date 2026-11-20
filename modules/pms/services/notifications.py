@@ -7,6 +7,7 @@ Deduplication key prevents duplicate deliveries.
 from __future__ import annotations
 
 import logging
+import re
 from typing import Any
 
 from django.core.mail import send_mail
@@ -17,6 +18,10 @@ from modules.pms.domain.errors import NotificationRecipientError
 from modules.pms.models import PmsNotificationOutbox
 
 log = logging.getLogger("fusion.pms.notify")
+
+#: Configured alert offsets may differ from the seeded 30/15/5, so a
+#: numeric suffix is accepted alongside the fixed topic list.
+_DEADLINE_ALERT = re.compile(r"deadline\.alert_\d+$")
 
 TOPICS = {
     "application.submitted",
@@ -61,7 +66,7 @@ def enqueue_notification(
     payload: dict[str, Any] | None = None,
 ) -> PmsNotificationOutbox | None:
     """Enqueue a notification inside caller's transaction."""
-    if topic not in TOPICS:
+    if topic not in TOPICS and not _DEADLINE_ALERT.match(topic):
         raise ValueError(f"Unknown notification topic '{topic}'.")
     if recipient_user_id is None and not recipient_email:
         # No silent drop and no invented fallback: the workflow's addressee is

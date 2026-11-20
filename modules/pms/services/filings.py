@@ -6,8 +6,6 @@ Enforces business rules BR-PMS-020, 055, 056, 059, 060, 078, 128, 138, 142.
 from __future__ import annotations
 
 import datetime
-from datetime import timedelta
-from decimal import Decimal
 
 from django.db import transaction
 
@@ -19,9 +17,9 @@ from modules.pms.domain.state_machine import (
 )
 from modules.pms.models import (
     PatentApplication,
-    PostGrantMaintenance,
 )
 from modules.pms.services.audit import log_audit
+from modules.pms.services.maintenance import SCHEDULE_NOT_CONFIGURED, schedule_cycle
 from modules.pms.services.notifications import enqueue_notification
 
 
@@ -121,15 +119,8 @@ def record_patent_grant(
         app.status = PatentApplicationStatus.GRANTED.value
         app.save()
 
-        # Schedule first maintenance cycle (BR-PMS-060: 3rd year from grant/filing)
-        first_fee_due = grant_date + timedelta(days=365 * 3)
-        PostGrantMaintenance.objects.create(
-            application=app,
-            cycle_number=1,
-            fee_due_date=first_fee_due,
-            fee_amount=Decimal("5000.00"),
-            maintenance_status="scheduled",
-        )
+        # First cycle only when the jurisdiction's schedule is configured (BR-PMS-060).
+        first_cycle = schedule_cycle(app, 1)
 
         log_audit(
             application=app,
@@ -140,7 +131,9 @@ def record_patent_grant(
             details={
                 "patent_number": patent_number,
                 "grant_date": str(grant_date),
-                "first_maintenance_due": str(first_fee_due),
+                "first_maintenance_due": (
+                    str(first_cycle.fee_due_date) if first_cycle else SCHEDULE_NOT_CONFIGURED
+                ),
             },
         )
 

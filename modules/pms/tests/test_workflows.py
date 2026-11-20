@@ -34,6 +34,7 @@ from modules.pms.services import (
     submit_or_update_budget,
     withdraw_application,
 )
+from modules.pms.tests.support import configure_maintenance_schedule
 
 pytestmark = pytest.mark.django_db
 
@@ -510,6 +511,7 @@ def test_bw_pms_13_office_action_without_applicant_review():
 
 def test_bw_pms_14_and_15_maintenance_renewal_and_non_renewal():
     """BW-PMS-14 (Renew) and BW-PMS-15 (Do Not Renew)."""
+    configure_maintenance_schedule()
     # Renewal path (BW-PMS-14)
     app1 = submit_application(
         applicant_user_id=1001,

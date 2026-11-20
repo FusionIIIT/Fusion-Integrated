@@ -5,8 +5,6 @@ Implements all PMS endpoints with strict authorization and domain service delega
 
 from __future__ import annotations
 
-from decimal import Decimal
-
 from django.db.models import Count
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
@@ -262,7 +260,7 @@ class PatentBudgetView(PmsAPIView):
             filing_fees=d["filing_fees"],
             attorney_fees=d["attorney_fees"],
             administrative_costs=d["administrative_costs"],
-            threshold_limit=d.get("threshold_limit", Decimal("100000.00")),
+            threshold_limit=d.get("threshold_limit"),
             actor_user_id=request.principal.user_id,
         )
         return Response(s.PatentBudgetSerializer(budget).data)

@@ -42,6 +42,7 @@ from modules.pms.services import (
     upload_document_version,
     withdraw_application,
 )
+from modules.pms.tests.support import configure, configure_maintenance_schedule
 
 pytestmark = pytest.mark.django_db
 
@@ -381,14 +382,16 @@ def test_br_pms_051_budget_escalation_above_threshold():
     )
     app.refresh_from_db()
 
-    # Budget total 150,000 > threshold 100,000
+    # Escalation compares against configured policy (BR-PMS-051, DEC-7).
+    configure(budget_threshold="100000.00")
+
+    # Budget total 150,000 > configured threshold 100,000
     submit_or_update_budget(
         application_id=app.id,
         filing_fees=Decimal("50000.00"),
         attorney_fees=Decimal("80000.00"),
         administrative_costs=Decimal("20000.00"),
         actor_user_id=3001,
-        threshold_limit=Decimal("100000.00"),
     )
 
     # Director tries to approve -> automatically escalates due to threshold (BR-PMS-051)
@@ -511,6 +514,10 @@ def test_br_pms_059_060_061_post_grant_maintenance():
             patent_number="IN99999",
             grant_date=date(2026, 11, 1),
         )
+
+    # BR-PMS-060 is conditional: the jurisdiction's schedule must be configured
+    # before PMS has any cycle to create.
+    configure_maintenance_schedule()
 
     # Fast forward to Filed, with the Director who will be asked to decide
     # the renewal (UC-PMS-017 addresses that request to the Director).
