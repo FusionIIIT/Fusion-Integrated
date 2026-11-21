@@ -403,7 +403,14 @@ def test_uc_pms_014_015_029_br_pms_065_http_office_action_review_journey(stub_ia
     assert decided.status_code == 200, decided.content
     assert decided.json()["status"] == "approved"
 
-    attorney = _client(stub_iam, 5001, "attorney", "pms.filing.record")
+    attorney = _client(
+        stub_iam,
+        5001,
+        "attorney",
+        "pms.filing.record",
+        "pms.office_action.record",
+        "pms.office_action.respond",
+    )
     filing = attorney.post(
         f"{API}/applications/{application['id']}/filing/",
         {
