@@ -1,5 +1,5 @@
 import { MantineProvider } from "@mantine/core";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -30,13 +30,16 @@ const sampleDraft: FileListItem = {
 };
 
 describe("DraftsPage", () => {
+  const mockDiscardMutate = vi.fn();
+
   beforeEach(() => {
+    mockDiscardMutate.mockReset();
     hooks.useDraftFiles.mockReturnValue({
       data: [sampleDraft],
       isPending: false,
       error: null,
     });
-    hooks.useDiscardDraft.mockReturnValue({ mutate: vi.fn(), isPending: false });
+    hooks.useDiscardDraft.mockReturnValue({ mutate: mockDiscardMutate, isPending: false });
     hooks.useForwardFile.mockReturnValue({ mutate: vi.fn(), isPending: false });
   });
 
@@ -55,6 +58,40 @@ describe("DraftsPage", () => {
     expect(screen.getByRole("button", { name: /circulate/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /discard/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /new file/i })).toBeInTheDocument();
+  });
+
+  it("triggers discard mutation when discard button is clicked and confirmed", () => {
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+
+    render(
+      <MantineProvider>
+        <MemoryRouter>
+          <DraftsPage />
+        </MemoryRouter>
+      </MantineProvider>,
+    );
+
+    const discardBtn = screen.getByRole("button", { name: /discard/i });
+    fireEvent.click(discardBtn);
+    expect(mockDiscardMutate).toHaveBeenCalledWith(3, expect.any(Object));
+  });
+
+  it("renders error state when hook fails", () => {
+    hooks.useDraftFiles.mockReturnValue({
+      data: null,
+      isPending: false,
+      error: new Error("Failed to load drafts"),
+    });
+
+    render(
+      <MantineProvider>
+        <MemoryRouter>
+          <DraftsPage />
+        </MemoryRouter>
+      </MantineProvider>,
+    );
+
+    expect(screen.getByText("Could not load this")).toBeInTheDocument();
   });
 
   it("renders empty state when no drafts exist", () => {

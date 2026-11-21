@@ -28,12 +28,14 @@ def transition_state(current_state: str | None, action: str) -> str:
     """Computes the target file status from the current status and requested action."""
     if current_state == STATE_ARCHIVED:
         raise ArchivedFileModificationProhibitedError(
-            "Archived files are permanently closed and cannot be modified or transitioned."
+            "Archived files are permanently closed and cannot be modified or transitioned. "
+            "Create a new file if further action is required."
         )
 
     if current_state == STATE_DISCARDED:
         raise InvalidStateTransitionError(
-            "Discarded drafts are terminal and cannot be modified or transitioned."
+            "Discarded drafts are terminal and cannot be modified or transitioned. "
+            "Create a new draft if you wish to restart this file."
         )
 
     if current_state is None:
@@ -41,7 +43,9 @@ def transition_state(current_state: str | None, action: str) -> str:
             return STATE_DRAFT
         if action == ACTION_CREATE_AND_CIRCULATE:
             return STATE_CIRCULATED
-        raise InvalidStateTransitionError(f"Cannot perform {action} on non-existent file.")
+        raise InvalidStateTransitionError(
+            f"Cannot perform {action} on non-existent file. Create the file first."
+        )
 
     if current_state == STATE_DRAFT:
         if action == ACTION_EDIT_DRAFT:
@@ -50,17 +54,26 @@ def transition_state(current_state: str | None, action: str) -> str:
             return STATE_DISCARDED
         if action == ACTION_SEND_INITIAL:
             return STATE_CIRCULATED
-        raise InvalidStateTransitionError(f"Action {action} is not valid on a DRAFT file.")
+        raise InvalidStateTransitionError(
+            f"Action {action} is not valid on a DRAFT file. "
+            "Choose either to edit, discard, or circulate the draft."
+        )
 
     if current_state == STATE_CIRCULATED:
         if action == ACTION_DISCARD_DRAFT:
             raise CirculatedFileDeletionProhibitedError(
-                "A file cannot be discarded or deleted once submitted and circulated."
+                "A file cannot be discarded or deleted once submitted and circulated. "
+                "Forward or return the file to the appropriate handler instead."
             )
         if action in (ACTION_FORWARD, ACTION_RETURN):
             return STATE_CIRCULATED
         if action == ACTION_ARCHIVE:
             return STATE_ARCHIVED
-        raise InvalidStateTransitionError(f"Action {action} is not valid on a CIRCULATED file.")
+        raise InvalidStateTransitionError(
+            f"Action {action} is not valid on a CIRCULATED file. "
+            "Forward, return, or archive the file as permitted."
+        )
 
-    raise InvalidStateTransitionError(f"Unknown current file state: {current_state}")
+    raise InvalidStateTransitionError(
+        f"Unknown current file state: {current_state}. Verify the file state before proceeding."
+    )

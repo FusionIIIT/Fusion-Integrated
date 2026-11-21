@@ -1,5 +1,5 @@
 import { MantineProvider } from "@mantine/core";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -36,7 +36,10 @@ const sampleFile: FileListItem = {
 };
 
 describe("InboxPage", () => {
+  const mockArchiveMutate = vi.fn();
+
   beforeEach(() => {
+    mockArchiveMutate.mockReset();
     useAuth.mockReturnValue({
       session: { user: { id: 20, username: "registrar_office" } },
       can: vi.fn().mockReturnValue(true),
@@ -46,7 +49,7 @@ describe("InboxPage", () => {
       isPending: false,
       error: null,
     });
-    hooks.useArchiveFile.mockReturnValue({ mutate: vi.fn(), isPending: false });
+    hooks.useArchiveFile.mockReturnValue({ mutate: mockArchiveMutate, isPending: false });
     hooks.useFileDetail.mockReturnValue({ data: null, isPending: false, error: null });
     hooks.useFileHistory.mockReturnValue({ data: [], isPending: false, error: null });
     hooks.useForwardFile.mockReturnValue({ mutate: vi.fn(), isPending: false });
@@ -67,6 +70,47 @@ describe("InboxPage", () => {
     expect(screen.getByText("Lab Budget Approval")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /forward/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /return/i })).toBeInTheDocument();
+    // Non-owner should not see archive button
+    expect(screen.queryByRole("button", { name: /archive/i })).not.toBeInTheDocument();
+  });
+
+  it("shows archive button when current user is file owner and calls mutate on confirmation", () => {
+    useAuth.mockReturnValue({
+      session: { user: { id: 10, username: "prof_smith" } },
+      can: vi.fn().mockReturnValue(true),
+    });
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+
+    render(
+      <MantineProvider>
+        <MemoryRouter>
+          <InboxPage />
+        </MemoryRouter>
+      </MantineProvider>,
+    );
+
+    const archiveBtn = screen.getByRole("button", { name: /archive/i });
+    expect(archiveBtn).toBeInTheDocument();
+    fireEvent.click(archiveBtn);
+    expect(mockArchiveMutate).toHaveBeenCalledWith(1);
+  });
+
+  it("renders error state when hook fails", () => {
+    hooks.useInboxFiles.mockReturnValue({
+      data: null,
+      isPending: false,
+      error: new Error("Network error loading inbox"),
+    });
+
+    render(
+      <MantineProvider>
+        <MemoryRouter>
+          <InboxPage />
+        </MemoryRouter>
+      </MantineProvider>,
+    );
+
+    expect(screen.getByText("Could not load this")).toBeInTheDocument();
   });
 
   it("renders empty state when no files exist", () => {

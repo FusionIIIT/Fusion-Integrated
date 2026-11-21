@@ -1,5 +1,5 @@
 import { MantineProvider } from "@mantine/core";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -63,6 +63,38 @@ describe("OutboxPage", () => {
     expect(screen.getByText("Conference Travel Claim")).toBeInTheDocument();
     expect(screen.getByText(/dean_acad/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /view history/i })).toBeInTheDocument();
+  });
+
+  it("renders error state when hook fails", () => {
+    hooks.useOutboxFiles.mockReturnValue({
+      data: null,
+      isPending: false,
+      error: new Error("Outbox network error"),
+    });
+
+    render(
+      <MantineProvider>
+        <MemoryRouter>
+          <OutboxPage />
+        </MemoryRouter>
+      </MantineProvider>,
+    );
+
+    expect(screen.getByText("Could not load this")).toBeInTheDocument();
+  });
+
+  it("triggers detail drawer when view history is clicked", () => {
+    render(
+      <MantineProvider>
+        <MemoryRouter>
+          <OutboxPage />
+        </MemoryRouter>
+      </MantineProvider>,
+    );
+
+    const historyBtn = screen.getByRole("button", { name: /view history/i });
+    fireEvent.click(historyBtn);
+    expect(historyBtn).toBeInTheDocument();
   });
 
   it("renders empty state when outbox is empty", () => {

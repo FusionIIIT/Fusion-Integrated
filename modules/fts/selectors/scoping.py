@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from django.db.models import Q
 
-from core.api.exceptions import NotFoundError, PermissionDeniedError
+from core.api.exceptions import NotFoundError
 from modules.fts.models.files import File
 from modules.fts.models.movements import FileMovement
 
@@ -21,7 +21,7 @@ def get_file_for_user(file_id: int, user_id: int, *, is_admin: bool = False) -> 
     if is_user_associated(file_obj, user_id):
         return file_obj
 
-    raise PermissionDeniedError("You are not associated with this file and cannot access it.")
+    raise NotFoundError(f"File #{file_id} was not found.")
 
 
 def is_user_associated(file_obj: File, user_id: int) -> bool:

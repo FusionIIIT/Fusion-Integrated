@@ -63,4 +63,41 @@ describe("GovernancePage", () => {
     expect(screen.getByText("FILE_FORWARDED")).toBeInTheDocument();
     expect(screen.getByText(/prof_smith/i)).toBeInTheDocument();
   });
+
+  it("renders error state when metrics hook fails", () => {
+    hooks.useGovernanceUsage.mockReturnValue({
+      data: null,
+      isPending: false,
+      error: new Error("Governance metrics unavailable"),
+    });
+
+    render(
+      <MantineProvider>
+        <MemoryRouter>
+          <GovernancePage />
+        </MemoryRouter>
+      </MantineProvider>,
+    );
+
+    expect(screen.getByText("Could not load this")).toBeInTheDocument();
+  });
+
+  it("shows placeholder when metrics are loading", () => {
+    hooks.useGovernanceUsage.mockReturnValue({
+      data: null,
+      isPending: true,
+      error: null,
+    });
+
+    render(
+      <MantineProvider>
+        <MemoryRouter>
+          <GovernancePage />
+        </MemoryRouter>
+      </MantineProvider>,
+    );
+
+    const placeholders = screen.getAllByText("…");
+    expect(placeholders.length).toBeGreaterThan(0);
+  });
 });

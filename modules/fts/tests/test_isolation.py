@@ -8,6 +8,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_unassociated_employee_cannot_view_file_or_history(fts_client):
+    """BR-FTS-009, FTS-UC-007, BW-FTS-05: Non-associated employee cannot view file or tracking history."""
     c_unrelated = fts_client(user_id=999, kind="faculty", active_role="Associate Professor")
 
     file_obj = create_file(
@@ -22,13 +23,13 @@ def test_unassociated_employee_cannot_view_file_or_history(fts_client):
         recipient_role="HOD (ECE)",
     )
 
-    # Unassociated user cannot view file details
+    # Unassociated user cannot view file details - answers 404 to avoid leaking existence
     detail_res = c_unrelated.get(f"/api/v1/fts/files/{file_obj.id}/")
-    assert detail_res.status_code == status.HTTP_403_FORBIDDEN
+    assert detail_res.status_code == status.HTTP_404_NOT_FOUND
 
-    # Unassociated user cannot view tracking history
+    # Unassociated user cannot view tracking history - answers 404
     history_res = c_unrelated.get(f"/api/v1/fts/files/{file_obj.id}/history/")
-    assert history_res.status_code == status.HTTP_403_FORBIDDEN
+    assert history_res.status_code == status.HTTP_404_NOT_FOUND
 
     # File does not leak into unassociated user's inbox or outbox
     inbox = c_unrelated.get("/api/v1/fts/inbox/").json()

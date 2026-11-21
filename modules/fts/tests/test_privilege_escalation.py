@@ -10,6 +10,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_student_cannot_access_fts(stub_iam):
+    """BR-FTS-001: Students cannot access FTS operational endpoints."""
     stub_iam(
         make_session(
             user_id=5001,
@@ -28,6 +29,7 @@ def test_student_cannot_access_fts(stub_iam):
 
 
 def test_admin_cannot_perform_operational_file_actions(admin_client):
+    """BR-FTS-001, BR-FTS-010: System administrators cannot perform operational file actions."""
     admin = admin_client()
 
     # Admin cannot create operational file
@@ -40,12 +42,14 @@ def test_admin_cannot_perform_operational_file_actions(admin_client):
 
 
 def test_employee_without_governance_permission_cannot_view_audit_logs(fts_client):
+    """BR-FTS-010, BR-FTS-011: Audit log access requires explicit governance permission."""
     employee = fts_client(user_id=101, permissions=("fts.file.view", "fts.file.create"))
     res = employee.get("/api/v1/fts/governance/audit-logs/")
     assert res.status_code == status.HTTP_403_FORBIDDEN
 
 
 def test_non_owner_cannot_archive_file(fts_client):
+    """BR-FTS-010, BR-FTS-012: Only file owner can archive a circulated file."""
     file_obj = create_file(
         subject="Confidential Project",
         comment_text="Owner file.",

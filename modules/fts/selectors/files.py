@@ -13,10 +13,7 @@ from modules.fts.models.movements import FileMovement
 
 
 def get_inbox_files(user_id: int) -> QuerySet[File]:
-    """Returns active circulated files held by the specified user.
-
-    Excludes DRAFT, ARCHIVED, and DISCARDED records.
-    """
+    """Returns active circulated files held by user, excluding inactive files."""
     return File.objects.filter(
         current_holder_user_id=user_id,
         status=STATE_CIRCULATED,
@@ -24,10 +21,7 @@ def get_inbox_files(user_id: int) -> QuerySet[File]:
 
 
 def get_outbox_files(user_id: int) -> QuerySet[File]:
-    """Returns circulated or archived files sent by the specified user.
-
-    Excludes DRAFT and DISCARDED records.
-    """
+    """Returns circulated or archived files sent by user, excluding drafts."""
     sent_file_ids = (
         FileMovement.objects.filter(from_user_id=user_id)
         .values_list("file_id", flat=True)
@@ -40,10 +34,7 @@ def get_outbox_files(user_id: int) -> QuerySet[File]:
 
 
 def get_draft_files(user_id: int) -> QuerySet[File]:
-    """Returns draft files owned by the specified user.
-
-    Excludes DISCARDED files, ensuring discarded drafts never appear in drafts.
-    """
+    """Returns draft files owned by user, excluding discarded records."""
     return File.objects.filter(
         owner_user_id=user_id,
         status=STATE_DRAFT,

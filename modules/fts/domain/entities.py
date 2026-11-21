@@ -45,30 +45,41 @@ class MovementRecordDTO:
 def validate_mandatory_comment(comment_text: str | None) -> str:
     """Enforces non-empty mandatory comments at file creation and movement."""
     if not comment_text or not comment_text.strip():
-        raise MandatoryCommentMissingError("A non-empty comment is required for this file action.")
+        raise MandatoryCommentMissingError(
+            "A non-empty comment is required for this file action. "
+            "Please provide a clear remark or instruction before proceeding."
+        )
     return comment_text.strip()
 
 
 def validate_recipient(to_user_id: int | None) -> int:
     """Enforces a valid positive recipient user ID."""
     if to_user_id is None or to_user_id <= 0:
-        raise InvalidRecipientError("A valid recipient Institute Employee must be selected.")
+        raise InvalidRecipientError(
+            "A valid recipient Institute Employee must be selected. "
+            "Choose an active employee from the directory."
+        )
     return to_user_id
 
 
 def validate_owner_archival(owner_user_id: int, actor_user_id: int) -> None:
     """Enforces that only the file owner may archive a circulated file."""
     if owner_user_id != actor_user_id:
-        raise OnlyOwnerMayArchiveError("Only the file owner may archive a completed file.")
+        raise OnlyOwnerMayArchiveError(
+            "Only the file owner may archive a completed file. "
+            "Contact the file creator to request archival."
+        )
 
 
 def validate_employee_operational_actor(actor_kind: str | None, is_admin_actor: bool) -> None:
     """Enforces that operational file actions are performed by employees, not admin."""
     if is_admin_actor:
         raise SystemAdminOperationalActionProhibitedError(
-            "System Admin cannot perform operational file workflows."
+            "System Admin cannot perform operational file workflows. "
+            "Please switch to an Institute Employee role to act on files."
         )
     if actor_kind not in ("faculty", "staff"):
         raise SystemAdminOperationalActionProhibitedError(
-            "Only faculty and staff Institute Employees may perform operational file actions."
+            "Only faculty and staff Institute Employees may perform operational file actions. "
+            "Log in as an employee to continue."
         )

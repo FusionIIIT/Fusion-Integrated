@@ -40,6 +40,7 @@ from modules.fts.services.movements import forward_file, return_file
 
 class FileListCreateView(APIView):
     permission_classes = [RequireFtsModule, RequireFileCreate, IsInstituteEmployee]
+    throttle_scope = "fts_file_create"
 
     @extend_schema(
         summary="Create a new file or draft",
@@ -142,6 +143,7 @@ class FileDetailView(APIView):
 
 class FileDiscardView(APIView):
     permission_classes = [RequireFtsModule, RequireFileCreate, IsInstituteEmployee]
+    throttle_scope = "fts_file_create"
 
     @extend_schema(
         summary="Discard an uncirculated draft",
@@ -161,6 +163,7 @@ class FileDiscardView(APIView):
 
 class FileForwardView(APIView):
     permission_classes = [RequireFtsModule, RequireFileForward, IsInstituteEmployee]
+    throttle_scope = "fts_file_forward"
 
     @extend_schema(
         summary="Forward file onward",
@@ -191,6 +194,7 @@ class FileForwardView(APIView):
 
 class FileReturnView(APIView):
     permission_classes = [RequireFtsModule, RequireFileReturn, IsInstituteEmployee]
+    throttle_scope = "fts_file_forward"
 
     @extend_schema(
         summary="Return received file to sender",
@@ -218,6 +222,7 @@ class FileReturnView(APIView):
 
 class FileArchiveView(APIView):
     permission_classes = [RequireFtsModule, RequireFileArchive, IsInstituteEmployee]
+    throttle_scope = "fts_file_forward"
 
     @extend_schema(
         summary="Archive completed circulated file (owner only)",
