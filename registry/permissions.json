@@ -1,5 +1,153 @@
 {
   "modules": {
+    "department": {
+      "grants": {
+        "department_admin": [
+          "department.announcement.publish",
+          "department.detail.propose",
+          "department.detail.update",
+          "department.feedback.submit",
+          "department.inventory.manage",
+          "department.profile.view",
+          "department.resource.view",
+          "department.timetable.manage"
+        ],
+        "department_head": [
+          "department.announcement.publish",
+          "department.detail.propose",
+          "department.detail.update",
+          "department.feedback.submit",
+          "department.profile.view",
+          "department.resource.view",
+          "department.stock_request.create",
+          "department.timetable.manage"
+        ],
+        "faculty": [
+          "department.announcement.publish",
+          "department.feedback.submit",
+          "department.profile.view",
+          "department.resource.view",
+          "department.stock_request.create"
+        ],
+        "student": [
+          "department.feedback.submit",
+          "department.profile.view",
+          "department.resource.view"
+        ]
+      },
+      "module_grants": [
+        "department_admin",
+        "department_head",
+        "faculty",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/department",
+        "icon": "FaBuilding",
+        "items": [
+          {
+            "code": "department.overview",
+            "icon": "FaBuilding",
+            "label": "Department Info",
+            "required_permission": "department.profile.view",
+            "sort_order": 10,
+            "to": "/department/overview"
+          },
+          {
+            "code": "department.announcements",
+            "icon": "FaBullhorn",
+            "label": "Announcements",
+            "required_permission": "department.profile.view",
+            "sort_order": 20,
+            "to": "/department/announcements"
+          },
+          {
+            "code": "department.inventory",
+            "icon": "FaClipboardList",
+            "label": "Inventory & Stock",
+            "required_permission": "department.stock_request.create",
+            "sort_order": 30,
+            "to": "/department/inventory"
+          },
+          {
+            "code": "department.feedback",
+            "icon": "FaClipboardCheck",
+            "label": "Feedback",
+            "required_permission": "department.feedback.submit",
+            "sort_order": 40,
+            "to": "/department/feedback"
+          },
+          {
+            "code": "department.timetable",
+            "icon": "FaCalendarAlt",
+            "label": "Timetable",
+            "required_permission": "department.profile.view",
+            "sort_order": 50,
+            "to": "/department/timetable"
+          },
+          {
+            "code": "department.faculty_staff",
+            "icon": "FaUsers",
+            "label": "Faculty & Staff",
+            "required_permission": "department.profile.view",
+            "sort_order": 60,
+            "to": "/department/faculty-staff"
+          },
+          {
+            "code": "department.resources",
+            "icon": "FaThLarge",
+            "label": "Lab Resources",
+            "required_permission": "department.resource.view",
+            "sort_order": 70,
+            "to": "/department/resources"
+          }
+        ],
+        "label": "Department",
+        "nav_section": "Department",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "department.announcement.publish",
+          "label": "Publish announcements"
+        },
+        {
+          "code": "department.inventory.manage",
+          "label": "Insert and track inventory"
+        },
+        {
+          "code": "department.stock_request.create",
+          "label": "Submit stock requests"
+        },
+        {
+          "code": "department.feedback.submit",
+          "label": "Submit confidential feedback"
+        },
+        {
+          "code": "department.profile.view",
+          "label": "View department profiles"
+        },
+        {
+          "code": "department.timetable.manage",
+          "label": "Upload and modify timetables"
+        },
+        {
+          "code": "department.resource.view",
+          "label": "View lab resource profiles"
+        },
+        {
+          "code": "department.detail.update",
+          "label": "Update general department information"
+        },
+        {
+          "code": "department.detail.propose",
+          "label": "Propose official department-detail changes"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "directory": {
       "grants": {
         "Dean Academic": [
