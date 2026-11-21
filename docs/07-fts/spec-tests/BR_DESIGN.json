@@ -1,0 +1,416 @@
+[
+  {
+    "test_id": "BR-001",
+    "source_id": "BR-FTS-001 permitted-operational-action",
+    "purpose": "Verify that authorized Institute Employee (Faculty/Staff) can perform operational file actions.",
+    "preconditions": "Authenticated Institute Employee with assigned role.",
+    "action_or_input": "Employee performs file creation and movement operations.",
+    "expected_result": "Operational file actions proceed successfully.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-002",
+    "source_id": "BR-FTS-001 prohibited-sysadmin-operational-action",
+    "purpose": "Verify that System Admin is prohibited from performing routine operational file actions.",
+    "preconditions": "Authenticated System Admin.",
+    "action_or_input": "System Admin attempts to create or forward an operational file.",
+    "expected_result": "FTS denies the action; operational processing is blocked for System Admin.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-003",
+    "source_id": "BR-FTS-001 sysadmin-governance-permitted",
+    "purpose": "Verify that System Admin is permitted to perform governance actions within administrative scope.",
+    "preconditions": "Authenticated System Admin.",
+    "action_or_input": "System Admin performs role assignment or accesses audit logs.",
+    "expected_result": "Governance actions succeed within administrative boundary.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-004",
+    "source_id": "BR-FTS-002 role-switch-context-update",
+    "purpose": "Verify that role switching updates active authorization context for subsequent operations.",
+    "preconditions": "Institute Employee with multiple assigned roles (e.g. Faculty and Warden).",
+    "action_or_input": "Employee switches active role context from Faculty to Warden.",
+    "expected_result": "Active role permissions are updated and applied to subsequent operations.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-005",
+    "source_id": "BR-FTS-002 role-switch-preserves-ownership",
+    "purpose": "Verify that switching assigned role context does not change ownership of previously created files.",
+    "preconditions": "Employee created a file under role A; employee also holds role B.",
+    "action_or_input": "Employee switches role context to role B.",
+    "expected_result": "Previously created file retains original owner identity; ownership is not altered or transferred.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-006",
+    "source_id": "BR-FTS-002 role-switch-preserves-audit-history",
+    "purpose": "Verify that switching role context does not alter previously recorded audit history records.",
+    "preconditions": "File with recorded audit history entries under role A.",
+    "action_or_input": "User switches active role context to role B.",
+    "expected_result": "Historical audit records remain unchanged with original actor and role identities preserved.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-007",
+    "source_id": "BR-FTS-003 composite-file-structure",
+    "purpose": "Verify that an FTS file is maintained as a persistent composite object with mandatory comments and optional attachments.",
+    "preconditions": "Authenticated Institute Employee.",
+    "action_or_input": "Create file with mandatory comment and optional attachment.",
+    "expected_result": "File object is stored containing both mandatory comment and attachment reference.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-008",
+    "source_id": "BR-FTS-003 retain-circulated-contents-no-deletion",
+    "purpose": "Verify that circulated file contents and movement records are retained and cannot be deleted.",
+    "preconditions": "Circulated file with accumulated comments and attachments.",
+    "action_or_input": "Attempt to delete or purge comments or attachments from the circulated file.",
+    "expected_result": "Deletion is prevented; all accumulated contents and movement history remain intact.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-009",
+    "source_id": "BR-FTS-003 draft-discard-exception",
+    "purpose": "Verify stated exception that pre-submission drafts may be discarded before circulation.",
+    "preconditions": "Pre-circulation draft file owned by employee.",
+    "action_or_input": "Employee initiates Discard on the pre-submission draft.",
+    "expected_result": "Draft file is discarded and removed from active files.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-010",
+    "source_id": "BR-FTS-004 initial-comment-permitted",
+    "purpose": "Verify that file creation succeeds when a non-empty initial mandatory comment is supplied.",
+    "preconditions": "Authenticated Institute Employee.",
+    "action_or_input": "Submit file creation request with non-empty comment.",
+    "expected_result": "File creation is accepted and persisted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-011",
+    "source_id": "BR-FTS-004 initial-comment-prohibited-empty",
+    "purpose": "Verify that file creation is blocked when the initial mandatory comment is empty or missing.",
+    "preconditions": "Authenticated Institute Employee.",
+    "action_or_input": "Attempt to create file with empty or missing comment.",
+    "expected_result": "Creation is blocked with validation error; no file is persisted.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "BR-012",
+    "source_id": "BR-FTS-005 pre-circulation-draft-permitted",
+    "purpose": "Verify that draft save, edit, and discard operations are permitted in pre-circulation state.",
+    "preconditions": "Authenticated Institute Employee.",
+    "action_or_input": "Create draft, edit draft fields, and save updated draft.",
+    "expected_result": "Draft operations succeed in pre-circulation state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-013",
+    "source_id": "BR-FTS-005 post-circulation-discard-prohibited",
+    "purpose": "Verify that once submitted and circulated, a file cannot be discarded or deleted as a draft.",
+    "preconditions": "File has been submitted and circulated to another employee.",
+    "action_or_input": "Attempt to invoke draft discard on the circulated file.",
+    "expected_result": "Action is rejected; circulated files cannot be deleted.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-014",
+    "source_id": "BR-FTS-005 draft-submission-transition",
+    "purpose": "Verify that submitting a draft transitions it to circulated workflow state.",
+    "preconditions": "Pre-circulation draft file.",
+    "action_or_input": "Submit file to recipient with mandatory movement comment.",
+    "expected_result": "File transitions from draft to circulated state; file appears in recipient inbox.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-015",
+    "source_id": "BR-FTS-006 forward-comment-permitted",
+    "purpose": "Verify that forward action succeeds when mandatory movement comment is supplied.",
+    "preconditions": "Active file held by sender; valid recipient exists.",
+    "action_or_input": "Sender executes Forward with non-empty movement comment.",
+    "expected_result": "Forward succeeds; movement comment is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-016",
+    "source_id": "BR-FTS-006 forward-comment-prohibited-empty",
+    "purpose": "Verify that forward action is blocked when mandatory movement comment is missing or empty.",
+    "preconditions": "Active file held by sender; valid recipient exists.",
+    "action_or_input": "Sender attempts to forward file without providing movement comment.",
+    "expected_result": "Forward is blocked with validation error; file holder is unchanged.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "BR-017",
+    "source_id": "BR-FTS-006 return-comment-permitted",
+    "purpose": "Verify that return action succeeds when mandatory movement comment is supplied.",
+    "preconditions": "Active file held by recipient; previous sender known.",
+    "action_or_input": "Recipient executes Return with non-empty movement comment.",
+    "expected_result": "Return succeeds; movement comment is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-018",
+    "source_id": "BR-FTS-006 return-comment-prohibited-empty",
+    "purpose": "Verify that return action is blocked when mandatory movement comment is missing or empty.",
+    "preconditions": "Active file held by recipient; previous sender known.",
+    "action_or_input": "Recipient attempts Return without providing movement comment.",
+    "expected_result": "Return is blocked with validation error; file holder is unchanged.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "BR-019",
+    "source_id": "BR-FTS-007 recipient-cross-role-permitted",
+    "purpose": "Verify that a file can be sent to any valid Institute Employee regardless of receiver role.",
+    "preconditions": "Active file held by sender; target recipient is an employee with any valid role.",
+    "action_or_input": "Forward file to recipient employee.",
+    "expected_result": "Forwarding succeeds regardless of receiver administrative or academic role.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-020",
+    "source_id": "BR-FTS-007 recipient-invalid-prohibited",
+    "purpose": "Verify that forwarding to an invalid or non-existent recipient is rejected.",
+    "preconditions": "Active file held by sender.",
+    "action_or_input": "Attempt to forward file to non-existent user identifier.",
+    "expected_result": "Forwarding is rejected with validation error; file remains with sender.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "BR-021",
+    "source_id": "BR-FTS-007 return-to-previous-sender-permitted",
+    "purpose": "Verify that return routes strictly to the sender of the received movement.",
+    "preconditions": "Active file held by recipient B, received from sender A.",
+    "action_or_input": "Recipient B initiates Return.",
+    "expected_result": "File is routed back to previous sender A.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-022",
+    "source_id": "BR-FTS-007 return-to-arbitrary-user-prohibited",
+    "purpose": "Verify that return cannot be routed to an arbitrary third party who was not the previous sender.",
+    "preconditions": "Active file held by recipient B, received from sender A; third employee C exists.",
+    "action_or_input": "Attempt to return file specifying employee C as target.",
+    "expected_result": "Return action to non-previous sender is rejected or routes strictly to sender A.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-023",
+    "source_id": "BR-FTS-008 movement-record-completeness",
+    "purpose": "Verify that movement records capture sender, receiver, timestamp, comment, and attachments.",
+    "preconditions": "File forwarded with mandatory comment and optional attachment.",
+    "action_or_input": "Inspect recorded movement in history.",
+    "expected_result": "Movement record contains sender, receiver, timestamp, comment, and attachment reference.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-024",
+    "source_id": "BR-FTS-008 movement-chronological-append",
+    "purpose": "Verify that sequential movements append chronologically without overwriting prior records.",
+    "preconditions": "File subjected to multiple forwards and returns.",
+    "action_or_input": "Inspect full movement history sequence.",
+    "expected_result": "All events are ordered chronologically; prior events are preserved intact.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-025",
+    "source_id": "BR-FTS-008 movement-holder-consistency",
+    "purpose": "Verify that current file holder is consistently updated across forward and return actions.",
+    "preconditions": "File forwarded from A to B, then returned from B to A.",
+    "action_or_input": "Verify holder status after forward and after return.",
+    "expected_result": "Holder updates to B after forward, and updates to A after return.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-026",
+    "source_id": "BR-FTS-009 inbox-visibility-permitted",
+    "purpose": "Verify that received files are visible and accessible in recipient Inbox.",
+    "preconditions": "File forwarded to recipient.",
+    "action_or_input": "Recipient queries Inbox.",
+    "expected_result": "File appears in recipient Inbox and can be opened.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-027",
+    "source_id": "BR-FTS-009 outbox-visibility-permitted",
+    "purpose": "Verify that sent files are visible and accessible in sender Outbox.",
+    "preconditions": "File forwarded by sender.",
+    "action_or_input": "Sender queries Outbox.",
+    "expected_result": "File appears in sender Outbox and can be opened.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-028",
+    "source_id": "BR-FTS-009 unassociated-file-access-prohibited",
+    "purpose": "Verify that users not associated with a file cannot view its contents or history.",
+    "preconditions": "File exists where user X has no association (not creator, sender, recipient, or current holder).",
+    "action_or_input": "User X attempts to view file details or history.",
+    "expected_result": "Access is denied; no file content or history is exposed.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-029",
+    "source_id": "BR-FTS-009 archived-file-readable-to-associated",
+    "purpose": "Verify that archived files remain readable to authorized associated users.",
+    "preconditions": "Archived file with prior association to user.",
+    "action_or_input": "Associated user opens archived file.",
+    "expected_result": "File content and history are retrievable in read-only format.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-030",
+    "source_id": "BR-FTS-010 authorized-action-permitted",
+    "purpose": "Verify that an action is permitted when user role, file association, and file state align.",
+    "preconditions": "Employee is authorized current holder of an active file.",
+    "action_or_input": "Employee initiates Forward with valid recipient and comment.",
+    "expected_result": "Action is permitted and executed successfully.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-031",
+    "source_id": "BR-FTS-010 unauthorized-role-prohibited",
+    "purpose": "Verify that action is rejected when user role lacks required permissions.",
+    "preconditions": "User role does not possess file-creation or movement permissions.",
+    "action_or_input": "User attempts the restricted action.",
+    "expected_result": "Action is rejected with authorization failure.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-032",
+    "source_id": "BR-FTS-010 state-mismatch-action-prohibited",
+    "purpose": "Verify that action is rejected when file state does not permit the requested operation.",
+    "preconditions": "File is in archived state.",
+    "action_or_input": "Attempt to perform forward or edit operation on archived file.",
+    "expected_result": "Action is rejected; file state prevents further collaborative movement.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-033",
+    "source_id": "BR-FTS-011 audit-record-generation",
+    "purpose": "Verify that creation, comments, attachments, forward, return, and archival actions append audit records.",
+    "preconditions": "File undergoes creation, movement, comments, attachments, and archival.",
+    "action_or_input": "Inspect audit log for the file.",
+    "expected_result": "Audit entries exist for each action type with actor, timestamp, and action details.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-034",
+    "source_id": "BR-FTS-011 audit-record-immutability",
+    "purpose": "Verify that prior audit records cannot be rewritten or modified.",
+    "preconditions": "Audit records exist for past file actions.",
+    "action_or_input": "Attempt to update, overwrite, or delete existing audit log entries.",
+    "expected_result": "Modification of audit records is rejected; audit history remains append-only.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-035",
+    "source_id": "BR-FTS-011 integration-audit-generation",
+    "purpose": "Verify that auditable actions performed via integration APIs generate audit records.",
+    "preconditions": "Consuming module performs file action via FTS API.",
+    "action_or_input": "Inspect audit log entries.",
+    "expected_result": "Audit record logs action with external module/client attribution.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-036",
+    "source_id": "BR-FTS-012 owner-archival-permitted",
+    "purpose": "Verify that file owner can archive a completed circulated file.",
+    "preconditions": "Circulated file where actor is the file owner.",
+    "action_or_input": "Owner requests file archival.",
+    "expected_result": "File status transitions to Archived / Read-only.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-037",
+    "source_id": "BR-FTS-012 non-owner-archival-prohibited",
+    "purpose": "Verify that non-owners are prohibited from archiving the file.",
+    "preconditions": "Circulated file; actor is a recipient but not the owner.",
+    "action_or_input": "Non-owner attempts to archive the file.",
+    "expected_result": "Archival request is denied; file remains active.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-038",
+    "source_id": "BR-FTS-012 archived-modification-prohibited",
+    "purpose": "Verify that modification of an archived file is prohibited.",
+    "preconditions": "File is in archived status.",
+    "action_or_input": "Attempt to add comments or attachments to archived file.",
+    "expected_result": "Modification request is denied; archived file remains unchanged.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-039",
+    "source_id": "BR-FTS-012 archived-forwarding-prohibited",
+    "purpose": "Verify that forwarding of an archived file is prohibited.",
+    "preconditions": "File is in archived status.",
+    "action_or_input": "Attempt to forward archived file to another user.",
+    "expected_result": "Forwarding request is denied; archived file remains in archived status.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-040",
+    "source_id": "BR-FTS-013 notify-file-received-and-forwarded",
+    "purpose": "Verify that forward action triggers file-received and file-forwarded notification events.",
+    "preconditions": "Active file forwarded from sender to recipient.",
+    "action_or_input": "Observe triggered notification events.",
+    "expected_result": "Notification events for file-forwarded and file-received are generated and dispatched.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-041",
+    "source_id": "BR-FTS-013 notify-file-returned",
+    "purpose": "Verify that return action triggers file-returned notification event.",
+    "preconditions": "Active file returned by recipient to previous sender.",
+    "action_or_input": "Observe triggered notification events.",
+    "expected_result": "Notification event for file-returned is generated and dispatched.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-042",
+    "source_id": "BR-FTS-013 notify-file-archived",
+    "purpose": "Verify that archival action triggers file-archived notification event.",
+    "preconditions": "File owner archives circulated file.",
+    "action_or_input": "Observe triggered notification events.",
+    "expected_result": "Notification event for file-archived is generated and dispatched.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-043",
+    "source_id": "BR-FTS-013 notify-role-reassigned",
+    "purpose": "Verify that FTS-relevant role assignment or reassignment triggers role notification event.",
+    "preconditions": "System Admin assigns or reassigns an FTS role.",
+    "action_or_input": "Observe triggered notification events.",
+    "expected_result": "Notification event for role assignment/reassignment is generated and dispatched.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-044",
+    "source_id": "BR-FTS-014 authorized-api-access-permitted",
+    "purpose": "Verify that authorized consuming module can access FTS tracking and workflow APIs under RBAC and audit.",
+    "preconditions": "Authorized external module with valid credentials.",
+    "action_or_input": "Consuming module invokes FTS workflow or tracking API.",
+    "expected_result": "FTS executes requested service and logs audit record.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-045",
+    "source_id": "BR-FTS-014 unauthorized-api-access-prohibited",
+    "purpose": "Verify that unauthorized external module requests are rejected.",
+    "preconditions": "Unauthenticated or unauthorized external client.",
+    "action_or_input": "Client attempts to call FTS integration API.",
+    "expected_result": "Request is rejected with HTTP 401/403 authorization error.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-046",
+    "source_id": "BR-FTS-014 domain-approval-policy-boundary",
+    "purpose": "Verify that FTS does not assume ownership of consuming module domain-specific approval policy.",
+    "preconditions": "Consuming module sends approval workflow action.",
+    "action_or_input": "Consuming module invokes FTS API for request tracking.",
+    "expected_result": "FTS performs tracking service without evaluating or enforcing external domain approval criteria.",
+    "test_type": "boundary"
+  }
+]
