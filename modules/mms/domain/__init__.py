@@ -1,0 +1,1 @@
+"""MMS Domain package."""

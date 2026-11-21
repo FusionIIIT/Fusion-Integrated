@@ -34,6 +34,110 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "mess_module": {
+      "grants": {
+        "caretaker": [
+          "mess_module.menu.manage",
+          "mess_module.menu.view",
+          "mess_module.rebate.review",
+          "mess_module.registration.review"
+        ],
+        "student": [
+          "mess_module.feedback.submit",
+          "mess_module.menu.view",
+          "mess_module.rebate.submit",
+          "mess_module.registration.submit"
+        ],
+        "warden": [
+          "mess_module.menu.view",
+          "mess_module.rebate.review",
+          "mess_module.role.assign"
+        ]
+      },
+      "module_grants": [
+        "caretaker",
+        "student",
+        "warden"
+      ],
+      "nav": {
+        "base_path": "/mms",
+        "icon": "ForkKnife",
+        "items": [
+          {
+            "code": "mms.dashboard",
+            "icon": "House",
+            "label": "Mess Dashboard",
+            "required_permission": "mess_module.menu.view",
+            "sort_order": 10,
+            "to": "/mms"
+          },
+          {
+            "code": "mms.menu",
+            "icon": "ForkKnife",
+            "label": "Weekly Menu",
+            "required_permission": "mess_module.menu.view",
+            "sort_order": 20,
+            "to": "/mms/menu"
+          },
+          {
+            "code": "mms.registration",
+            "icon": "Checks",
+            "label": "Registration",
+            "required_permission": "mess_module.registration.submit",
+            "sort_order": 30,
+            "to": "/mms/registration"
+          },
+          {
+            "code": "mms.rebates",
+            "icon": "CalendarBlank",
+            "label": "Rebates",
+            "required_permission": "mess_module.rebate.submit",
+            "sort_order": 40,
+            "to": "/mms/rebates"
+          }
+        ],
+        "label": "Mess Management",
+        "nav_section": "Campus Life",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "mess_module.menu.view",
+          "label": "See mess menu schedule"
+        },
+        {
+          "code": "mess_module.menu.manage",
+          "label": "Update mess menu"
+        },
+        {
+          "code": "mess_module.registration.submit",
+          "label": "Submit mess registration"
+        },
+        {
+          "code": "mess_module.registration.review",
+          "label": "Review student registrations"
+        },
+        {
+          "code": "mess_module.rebate.submit",
+          "label": "Submit meal rebate"
+        },
+        {
+          "code": "mess_module.rebate.review",
+          "label": "Approve or reject rebates"
+        },
+        {
+          "code": "mess_module.feedback.submit",
+          "label": "Submit mess feedback"
+        },
+        {
+          "code": "mess_module.role.assign",
+          "label": "Assign caretaker or warden roles"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
