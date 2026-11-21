@@ -13,6 +13,19 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `fts`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `fts.file.create` | Create files and manage pre-circulation drafts | `Assistant Professor`, `Associate Professor`, `Dean Academic`, `Director`, `Junior Assistant`, `Junior Superintendent`, `Professor`, `Registrar`, `faculty`, `staff` |
+| `fts.file.forward` | Forward active files to other employees | `Assistant Professor`, `Associate Professor`, `Dean Academic`, `Director`, `Junior Assistant`, `Junior Superintendent`, `Professor`, `Registrar`, `faculty`, `staff` |
+| `fts.file.return` | Return received active files to sender | `Assistant Professor`, `Associate Professor`, `Dean Academic`, `Director`, `Junior Assistant`, `Junior Superintendent`, `Professor`, `Registrar`, `faculty`, `staff` |
+| `fts.file.archive` | Archive completed circulated files as owner | `Assistant Professor`, `Associate Professor`, `Dean Academic`, `Director`, `Junior Assistant`, `Junior Superintendent`, `Professor`, `Registrar`, `faculty`, `staff` |
+| `fts.file.view` | View associated files in Inbox/Outbox and tracking history | `Assistant Professor`, `Associate Professor`, `Dean Academic`, `Director`, `Junior Assistant`, `Junior Superintendent`, `Professor`, `Registrar`, `faculty`, `staff` |
+| `fts.governance.view` | View FTS system usage, security, and audit logs | `System Administrator`, `admin` |
+| `fts.integration.access` | Invoke FTS workflow-support APIs | _service only_ |
+| `fts.notification.dispatch` | System notification dispatch | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
