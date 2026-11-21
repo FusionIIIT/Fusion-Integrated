@@ -74,3 +74,19 @@ the stored legacy field value does not imply an active escalation threshold.
   cycle row is written and the audit says `schedule not configured`.
 - Budget escalation remains external/configured; M1 adds no internal approval
   transition and no automatic approval (DEC-2).
+
+## Deployment and operator commands
+
+For a new environment, apply migrations, run `seed_pms_configuration`, register
+modules with `seed_modules`, grant permissions through the platform IAM, then
+run `pms_readiness`. The policy command creates only missing fixed defaults and
+does not overwrite operator values. The migration also seeds those defaults,
+so this command is safe to repeat after migration. Readiness exits unsuccessfully
+while the required IAM Director-domain projection, trusted scanner/private
+storage, or external prior-art source is unavailable; it prints each missing
+prerequisite and does not claim that these integrations exist.
+
+The scheduled tasks can be invoked synchronously during operations or incident
+response with `run_pms_deadlines` and `run_pms_notifications --limit 50`. These
+commands call the same task entry points registered in Celery Beat; they do not
+create an alternative workflow or bypass task/service idempotency.

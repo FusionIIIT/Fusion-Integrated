@@ -12,6 +12,21 @@ MODULE = {
     "status": "active",
 }
 
+
+def readiness() -> list[str]:
+    """List unavailable external prerequisites without inventing integrations."""
+    return [
+        (
+            "Provide an IAM-owned Director-domain assignment projection; "
+            "PMS currently relies on its local role-assignment table."
+        ),
+        (
+            "Configure a trusted malware scanner and private binary-storage path "
+            "before accepting documents."
+        ),
+        "Configure a supported external prior-art source before enabling prior-art searches.",
+    ]
+
 NAV_ITEMS = [
     {
         "code": "pms.mine",
