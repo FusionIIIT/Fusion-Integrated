@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="47" time="3.290" timestamp="2026-11-04T16:33:05.183526+05:30" hostname="manvendra-singh-ASUS-TUF-Gaming-F15-FX507ZC4-FX577ZC4"><testcase classname="tests.a8.fr.test_fr" name="test_fr_001" time="2.068" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_002" time="0.009" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_003" time="0.004" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_004" time="0.011" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_005" time="0.006" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_005_neg" time="0.003" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_006" time="0.011" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_007" time="0.008" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_008" time="0.011" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_008_neg" time="0.008" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_009" time="0.018" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_010" time="0.025" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_011" time="0.022" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_012" time="0.020" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_013" time="0.015" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_014" time="0.012" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_015" time="0.016" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_016" time="0.020" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_017" time="0.020" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_018" time="0.063" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_019" time="0.019" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_020" time="0.021" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_021" time="0.022" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_022" time="0.026" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_023" time="0.029" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_024" time="0.022" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_025" time="0.026" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_026" time="0.007"><failure message="AssertionError: assert False&#10; +  where False = exists()&#10; +    where exists = &lt;QuerySet []&gt;.exists&#10; +      where &lt;QuerySet []&gt; = filter(recipient_user_id=25, event_type='sla_reminder')&#10; +        where filter = &lt;django.db.models.manager.Manager object at 0x727625a04830&gt;.filter&#10; +          where &lt;django.db.models.manager.Manager object at 0x727625a04830&gt; = SpacsNotification.objects">db = None
+
+    @pytest.mark.django_db
+    def test_fr_026(db):
+        """TEST-FR-026 | AFR-SPACS-026: SLA reminders and escalations for pending tasks."""
+        past_time = timezone.now() - timedelta(hours=60)
+        task = SpacsTask.objects.create(
+            task_type="verification",
+            entity_type="application",
+            entity_id="SPACS-SLA-TEST",
+            assigned_role="spacs_assistant",
+            assigned_user_id=25,
+            status="pending",
+        )
+        # simulate aged creation
+        SpacsTask.objects.filter(id=task.id).update(created_at=past_time)
+    
+        escalated = task_svc.check_and_escalate_sla_tasks(sla_hours=48)
+        assert any(t.id == task.id for t in escalated)
+&gt;       assert SpacsNotification.objects.filter(recipient_user_id=25, event_type="sla_reminder").exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = &lt;QuerySet []&gt;.exists
+E        +      where &lt;QuerySet []&gt; = filter(recipient_user_id=25, event_type='sla_reminder')
+E        +        where filter = &lt;django.db.models.manager.Manager object at 0x727625a04830&gt;.filter
+E        +          where &lt;django.db.models.manager.Manager object at 0x727625a04830&gt; = SpacsNotification.objects
+
+tests/a8/fr/test_fr.py:440: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr" name="test_fr_027" time="0.024" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_028_and_029" time="0.030" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_030" time="0.031" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_031" time="0.019" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_032" time="0.029" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_033" time="0.031" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_034" time="0.024" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_035" time="0.011" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_036" time="0.014" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_037" time="0.010" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_038_and_040" time="0.019" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_039" time="0.013" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_041" time="0.009" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_042_and_043" time="0.014" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_044_to_047" time="0.024" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_048" time="0.003" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_049_and_050" time="0.003" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_051" time="0.008" /><testcase classname="tests.a8.fr.test_fr" name="test_fr_052" time="0.049" /></testsuite></testsuites>

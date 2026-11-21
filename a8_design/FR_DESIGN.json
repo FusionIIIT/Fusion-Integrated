@@ -1,0 +1,488 @@
+[
+  {
+    "test_id": "TEST-FR-001",
+    "source_id": "AFR-SPACS-001",
+    "purpose": "Verify authenticated users can browse all published catalogue entries",
+    "preconditions": "Published catalogue entries exist in the system",
+    "action_or_input": "Query visible catalogue entries",
+    "expected_result": "All published catalogue entries are returned and draft/retired are excluded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-002",
+    "source_id": "AFR-SPACS-002",
+    "purpose": "Verify catalogue entry displays description, eligibility criteria, required documents, dates, and renewal information",
+    "preconditions": "A published scholarship catalogue entry exists with full criteria",
+    "action_or_input": "Inspect published catalogue entry fields",
+    "expected_result": "Description, min_cpi, max_family_income, required_documents, window dates, and renewal_allowed are present",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-003",
+    "source_id": "AFR-SPACS-003",
+    "purpose": "Verify SPACS Convener can create a new draft catalogue entry",
+    "preconditions": "User is authorized SPACS Convener",
+    "action_or_input": "Create new catalogue entry with scheme code, name, and scholarship type",
+    "expected_result": "Catalogue entry is created with status Draft and version 1",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-004",
+    "source_id": "AFR-SPACS-004",
+    "purpose": "Verify modifying a published catalogue entry increments version and preserves historical version",
+    "preconditions": "A published catalogue entry with version 1 exists",
+    "action_or_input": "Modify catalogue entry criteria (e.g. min_cpi)",
+    "expected_result": "Catalogue entry version is incremented and historical version record is preserved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-005",
+    "source_id": "AFR-SPACS-005",
+    "purpose": "Verify catalogue version can be published only when policy approval ref and effective dates are recorded",
+    "preconditions": "A draft catalogue entry exists",
+    "action_or_input": "Publish with policy approval reference and effective dates",
+    "expected_result": "Status changes to Published and immutable version snapshot is stored",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-005-NEG",
+    "source_id": "AFR-SPACS-005",
+    "purpose": "Verify publishing fails if policy approval reference is missing",
+    "preconditions": "A draft catalogue entry exists",
+    "action_or_input": "Publish with empty policy approval reference",
+    "expected_result": "AwardPolicyError raised; publication prohibited",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-006",
+    "source_id": "AFR-SPACS-006",
+    "purpose": "Verify SPACS Convener can retire a catalogue entry prospectively",
+    "preconditions": "A published catalogue entry exists",
+    "action_or_input": "Retire catalogue entry",
+    "expected_result": "Status changes to Retired while existing applications remain intact",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-007",
+    "source_id": "AFR-SPACS-007",
+    "purpose": "Verify system preserves auditable version history of catalogue criteria and effective periods",
+    "preconditions": "A catalogue entry has been published across multiple versions",
+    "action_or_input": "Query catalogue version history",
+    "expected_result": "All versions, their criteria snapshots, policy refs, and effective periods are retained",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-008",
+    "source_id": "AFR-SPACS-008",
+    "purpose": "Verify student can start an application only for a published scheme within open window",
+    "preconditions": "A published scheme exists with an open application window",
+    "action_or_input": "Student creates draft application",
+    "expected_result": "Draft application is created successfully",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-008-NEG",
+    "source_id": "AFR-SPACS-008",
+    "purpose": "Verify student cannot start an application if the application window is closed",
+    "preconditions": "A published scheme exists whose window has closed",
+    "action_or_input": "Student creates draft application",
+    "expected_result": "EligibilityError raised stating window is closed",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-009",
+    "source_id": "AFR-SPACS-009",
+    "purpose": "Verify system evaluates machine-checkable eligibility at submission and blocks unqualified applicants",
+    "preconditions": "A draft application exists for a scheme requiring CPI >= 7.5",
+    "action_or_input": "Student submits with CPI 6.5",
+    "expected_result": "EligibilityError raised; submission rejected",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-010",
+    "source_id": "AFR-SPACS-010",
+    "purpose": "Verify system prevents duplicate active applications for same student, scholarship and cycle",
+    "preconditions": "Student already has a submitted application for scheme X in cycle 2026-27",
+    "action_or_input": "Student initiates a second application for scheme X in cycle 2026-27",
+    "expected_result": "DuplicateApplicationError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-011",
+    "source_id": "AFR-SPACS-011",
+    "purpose": "Verify student can enter and update application data",
+    "preconditions": "Draft application exists for student",
+    "action_or_input": "Update application data fields",
+    "expected_result": "Application data is updated successfully",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-012",
+    "source_id": "AFR-SPACS-012",
+    "purpose": "Verify student can upload supporting documents",
+    "preconditions": "Draft application exists",
+    "action_or_input": "Upload document of type income_cert",
+    "expected_result": "Document record created and linked to application",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-013",
+    "source_id": "AFR-SPACS-013",
+    "purpose": "Verify system permits reuse of prior valid uploaded documents",
+    "preconditions": "Student has prior valid document with future expiry",
+    "action_or_input": "Reuse document in new application",
+    "expected_result": "Document reused successfully for the new application",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-014",
+    "source_id": "AFR-SPACS-014",
+    "purpose": "Verify explicit draft saving preserves input without requiring mandatory validation",
+    "preconditions": "Draft application exists with partial inputs",
+    "action_or_input": "Save draft updates with incomplete fields",
+    "expected_result": "Draft is saved without completeness error",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-015",
+    "source_id": "AFR-SPACS-015",
+    "purpose": "Verify submission validates all mandatory fields and required documents are present",
+    "preconditions": "Draft application is missing required income certificate",
+    "action_or_input": "Submit application",
+    "expected_result": "CompletenessError raised; submission rejected",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-016",
+    "source_id": "AFR-SPACS-016",
+    "purpose": "Verify submission assigns unique ID, records timestamp and binds to catalogue version",
+    "preconditions": "Complete draft application meets eligibility criteria",
+    "action_or_input": "Submit application",
+    "expected_result": "Application has unique ID, submitted_at timestamp, and catalogue_version bound",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-017",
+    "source_id": "AFR-SPACS-017",
+    "purpose": "Verify submission transitions state to Submitted and creates verification task for assistant",
+    "preconditions": "Application is submitted",
+    "action_or_input": "Check state and tasks",
+    "expected_result": "State is submitted and SpacsTask created for role spacs_assistant",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-018",
+    "source_id": "AFR-SPACS-018",
+    "purpose": "Verify submission emits notifications to student and assistant",
+    "preconditions": "Application submitted successfully",
+    "action_or_input": "Check notifications for student",
+    "expected_result": "Notification with event_type submitted exists for student",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-019",
+    "source_id": "AFR-SPACS-019",
+    "purpose": "Verify authorized SPACS Assistant can open assigned application for verification",
+    "preconditions": "Submitted application exists",
+    "action_or_input": "Assistant opens verification task",
+    "expected_result": "State transitions to under_verification",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-020",
+    "source_id": "AFR-SPACS-020",
+    "purpose": "Verify assistant records findings without possessing final sanction authority",
+    "preconditions": "Application is under verification",
+    "action_or_input": "Assistant records verification findings and attempts approve",
+    "expected_result": "Findings saved; assistant cannot approve directly (UnauthorizedActionError)",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-FR-021",
+    "source_id": "AFR-SPACS-021",
+    "purpose": "Verify assistant can return application to student for correction with recorded reason",
+    "preconditions": "Application is under verification",
+    "action_or_input": "Assistant requests correction with reason",
+    "expected_result": "State transitions to correction_required and correction_reason is recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-022",
+    "source_id": "AFR-SPACS-022",
+    "purpose": "Verify student can modify an application in Correction Required state",
+    "preconditions": "Application is in correction_required state",
+    "action_or_input": "Student modifies application data",
+    "expected_result": "Application data updated successfully",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-023",
+    "source_id": "AFR-SPACS-023",
+    "purpose": "Verify resubmission revalidates application and invalidates prior verification findings",
+    "preconditions": "Application modified in correction_required state",
+    "action_or_input": "Student resubmits application",
+    "expected_result": "State transitions to resubmitted and prior verification findings/authenticity cleared",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-024",
+    "source_id": "AFR-SPACS-024",
+    "purpose": "Verify assistant can mark verified and route to Convener for decision",
+    "preconditions": "Application verification is satisfied",
+    "action_or_input": "Assistant marks verified",
+    "expected_result": "State transitions to verified and decision task routed to spacs_convener",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-025",
+    "source_id": "AFR-SPACS-025",
+    "purpose": "Verify assistant can record unresolved verification concern and route to Convener",
+    "preconditions": "Application is under verification with potential concern",
+    "action_or_input": "Assistant records concern notes",
+    "expected_result": "State transitions to verification_concern and task routed to convener",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-026",
+    "source_id": "AFR-SPACS-026",
+    "purpose": "Verify system issues reminders and escalations when tasks exceed configured SLA threshold",
+    "preconditions": "A pending verification task was created > 48 hours ago",
+    "action_or_input": "Run check_and_escalate_sla_tasks",
+    "expected_result": "Task is flagged and escalated notification is generated",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-027",
+    "source_id": "AFR-SPACS-027",
+    "purpose": "Verify authorized Convener can review applications routed for decision",
+    "preconditions": "Application is in verified state",
+    "action_or_input": "Convener opens decision review",
+    "expected_result": "State transitions to under_convener_review",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-028",
+    "source_id": "AFR-SPACS-028",
+    "purpose": "Verify Convener can approve, reject, or return application for correction",
+    "preconditions": "Application is under convener review",
+    "action_or_input": "Convener executes decision action (approve)",
+    "expected_result": "Decision is executed and state updated to approved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-029",
+    "source_id": "AFR-SPACS-029",
+    "purpose": "Verify system records decision outcome, decision actor, timestamp and reason",
+    "preconditions": "Application is approved by Convener",
+    "action_or_input": "Inspect decision record fields on application",
+    "expected_result": "decision_actor_user_id, decision_at, and decision_reason are populated",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-030",
+    "source_id": "AFR-SPACS-030",
+    "purpose": "Verify system updates state and notifies student of decision outcome",
+    "preconditions": "Application decision is recorded",
+    "action_or_input": "Check notifications for applicant",
+    "expected_result": "Decision notification exists with event_type approved or rejected",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-031",
+    "source_id": "AFR-SPACS-031",
+    "purpose": "Verify student can modify application only while in editable states",
+    "preconditions": "Application is in submitted state",
+    "action_or_input": "Student attempts to modify application data while submitted",
+    "expected_result": "UnauthorizedActionError raised; modification rejected",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-032",
+    "source_id": "AFR-SPACS-032",
+    "purpose": "Verify permitted modification in correction_required revalidates and resets verification",
+    "preconditions": "Application in correction_required modified by student",
+    "action_or_input": "Student resubmits with updated CPI",
+    "expected_result": "Application revalidated and routed back to verification queue",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-033",
+    "source_id": "AFR-SPACS-033",
+    "purpose": "Verify student can withdraw application only while in withdrawable state before final decision",
+    "preconditions": "Application is in approved state",
+    "action_or_input": "Student attempts to withdraw approved application",
+    "expected_result": "UnauthorizedActionError raised; withdrawal rejected after final decision",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-034",
+    "source_id": "AFR-SPACS-034",
+    "purpose": "Verify on withdrawal state is Withdrawn, pending tasks are closed, audit logged and student notified",
+    "preconditions": "Application is in submitted state with pending assistant task",
+    "action_or_input": "Student withdraws application",
+    "expected_result": "State is withdrawn, pending tasks marked completed, audit log and notification created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-035",
+    "source_id": "AFR-SPACS-035",
+    "purpose": "Verify student can view own application status history",
+    "preconditions": "Student has applications in system",
+    "action_or_input": "Query visible applications for student",
+    "expected_result": "Returns only applications belonging to the student",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-036",
+    "source_id": "AFR-SPACS-036",
+    "purpose": "Verify download/export restricted to owner or authorized staff",
+    "preconditions": "Application belongs to student A",
+    "action_or_input": "Student B attempts to export application of student A",
+    "expected_result": "UnauthorizedActionError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-037",
+    "source_id": "AFR-SPACS-037",
+    "purpose": "Verify system identifies awarded scholarship as renewal-eligible only when scheme permits and window is open",
+    "preconditions": "Scheme does not allow renewals",
+    "action_or_input": "Student attempts to initiate renewal",
+    "expected_result": "RenewalEligibilityError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-038",
+    "source_id": "AFR-SPACS-038",
+    "purpose": "Verify renewal application prefills reusable prior data while linking to parent application",
+    "preconditions": "Student has an approved application for a renewal-eligible scheme",
+    "action_or_input": "Student initiates renewal application",
+    "expected_result": "Renewal application created with is_renewal=True, parent_application linked, and data prefilled",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-039",
+    "source_id": "AFR-SPACS-039",
+    "purpose": "Verify renewal validates updated eligibility and refreshed evidence",
+    "preconditions": "Student submits renewal with current CPI below required threshold",
+    "action_or_input": "Submit renewal application",
+    "expected_result": "EligibilityError raised; renewal rejected",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-040",
+    "source_id": "AFR-SPACS-040",
+    "purpose": "Verify submitted renewal routes through verification and fresh convener decision",
+    "preconditions": "Renewal application is submitted",
+    "action_or_input": "Inspect renewal state and tasks",
+    "expected_result": "State is renewal_submitted; task created for assistant; not auto-approved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-041",
+    "source_id": "AFR-SPACS-041",
+    "purpose": "Verify system sends renewal reminders to eligible students before deadline",
+    "preconditions": "Students with approved scholarships exist for a renewal-eligible scheme",
+    "action_or_input": "Trigger renewal reminders",
+    "expected_result": "Renewal reminder notifications created for eligible students",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-042",
+    "source_id": "AFR-SPACS-042",
+    "purpose": "Verify system supports configured candidate-source methods for awards",
+    "preconditions": "Award scheme configured with candidate_source_method system_pool",
+    "action_or_input": "Open award cycle",
+    "expected_result": "Award cycle created in state open with criteria version bound",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-043",
+    "source_id": "AFR-SPACS-043",
+    "purpose": "Verify Convener can prepare and finalize candidate pool for award cycle",
+    "preconditions": "Award cycle is open",
+    "action_or_input": "Convener prepares candidate pool with candidate records",
+    "expected_result": "Candidate records created and cycle state transitions to pool_prepared",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-044",
+    "source_id": "AFR-SPACS-044",
+    "purpose": "Verify Award Evaluation Committee can record shortlist, scores and recommendations",
+    "preconditions": "Candidate pool prepared",
+    "action_or_input": "Committee begins evaluation and records scores/recommendation",
+    "expected_result": "Candidate evaluation scores saved and state transitions to committee_result_recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-045",
+    "source_id": "AFR-SPACS-045",
+    "purpose": "Verify Convener records final award approval reference",
+    "preconditions": "Committee results recorded",
+    "action_or_input": "Convener records approved outcome with Senate reference",
+    "expected_result": "State transitions to ready_for_publication and approval evidence saved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-046",
+    "source_id": "AFR-SPACS-046",
+    "purpose": "Verify award results can be published only after final approval outcome is recorded",
+    "preconditions": "Award cycle is in committee_result_recorded state without approval",
+    "action_or_input": "Attempt to publish award results",
+    "expected_result": "AwardPolicyError raised; publication prohibited until approval recorded",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-047",
+    "source_id": "AFR-SPACS-047",
+    "purpose": "Verify award publication preserves candidates, evaluations, recommendations and approval references",
+    "preconditions": "Award cycle is in ready_for_publication state",
+    "action_or_input": "Publish award results",
+    "expected_result": "State transitions to published, published_at is set, and winner notified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-048",
+    "source_id": "AFR-SPACS-048",
+    "purpose": "Verify system creates notifications for significant lifecycle events",
+    "preconditions": "Application lifecycle events occur",
+    "action_or_input": "Emit notifications across lifecycle",
+    "expected_result": "Notifications created and persisted in SpacsNotification table",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-049",
+    "source_id": "AFR-SPACS-049",
+    "purpose": "Verify system creates time-stamped audit records for significant actions",
+    "preconditions": "Catalogue and application operations performed",
+    "action_or_input": "Inspect SpacsAuditLog entries",
+    "expected_result": "Timestamp, event_type, entity_id, and actor_user_id recorded accurately",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-050",
+    "source_id": "AFR-SPACS-050",
+    "purpose": "Verify audit records are immutable and protected from alteration or deletion",
+    "preconditions": "An audit log record exists",
+    "action_or_input": "Attempt delete or modify audit log",
+    "expected_result": "AuditProtectionError raised; modification blocked",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-051",
+    "source_id": "AFR-SPACS-051",
+    "purpose": "Verify system enforces role- and ownership-based access control across all operations",
+    "preconditions": "Student attempts to perform staff verification or convener approval",
+    "action_or_input": "Call verification or decision service with student role",
+    "expected_result": "UnauthorizedActionError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-052",
+    "source_id": "AFR-SPACS-052",
+    "purpose": "Verify role reassignment routes pending tasks to new holder while preserving history of completed actions",
+    "preconditions": "Pending verification tasks assigned to assistant A",
+    "action_or_input": "Reassign role tasks to assistant B",
+    "expected_result": "Pending tasks updated to assistant B; historical audit records preserve assistant A",
+    "test_type": "positive"
+  }
+]

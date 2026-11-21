@@ -1,0 +1,50 @@
+================================================================================
+SESSION: STRATEGY BR
+MODEL: Gemini 3.8 Flash (High) / Antigravity Coding Agent
+MODULE: 4 - Awards and Scholarships (SPACS)
+DATE: 2026-11-04
+================================================================================
+
+--- PROMPT A: TEST DESIGN GENERATION ---
+You are designing automated specification-based tests for the Awards and Scholarships (SPACS) Fusion ERP module.
+Source of truth: Use ONLY the supplied Problem Statement and Business Rules specifications (04_SPACS_Business_Rule_Specifications_v1.1_FINAL.docx).
+Do NOT inspect implementation code.
+Do NOT infer behavior from implementation.
+Do NOT introduce behavior unsupported by the supplied specification.
+Generate the minimum non-redundant set of test cases needed to satisfy the strategy-specific adequacy rule in Section 7. Do not stop at an arbitrary number, do not omit an explicit test obligation to reduce the test count, and do not invent unsupported behavior. Prefer observable behavior that can subsequently be automated using pytest/pytest-django.
+For every test case output exactly these fields:
+- test_id
+- source_id
+- purpose
+- preconditions
+- action_or_input
+- expected_result
+- test_type
+- source_id must identify the exact obligation covered.
+Output ONLY a valid JSON array. Do not provide explanation or additional prose.
+
+Strategy-specific instruction:
+Cover every Business Rule with at least one test. Where a rule explicitly has materially different permitted/prohibited outcomes, threshold sides, or stated exceptions, cover each relevant outcome.
+
+--- RESULT A ---
+Saved unchanged as a8_design/BR_DESIGN.json and frozen.
+
+--- PROMPT B: TEST IMPLEMENTATION ---
+You are given:
+1. the frozen A8_BASE Fusion implementation, and
+2. the frozen a8_design/BR_DESIGN.json.
+Convert these test designs into executable automated backend tests using pytest/pytest-django.
+Rules:
+- Implement exactly the supplied test cases.
+- Do not add, remove, merge or reinterpret test cases.
+- Preserve each specified expected result.
+- Do not modify production code.
+- Use the Django isolated test database.
+- Reuse existing Fusion test infrastructure where appropriate.
+- Do not mock the behavior being tested; mocks may be used only for unavailable external dependencies.
+- Do not use xfail to hide failures.
+- Every test must contain its test_id and source_id in its name or docstring.
+- Store generated tests only under tests/a8/br/.
+
+--- PROMPT C: TEST CODE / SETUP REPAIR (IF NEEDED) ---
+None. All tests executable without repair.
