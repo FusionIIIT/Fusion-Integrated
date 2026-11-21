@@ -1,0 +1,67 @@
+================================================================================
+AI INTERACTION LOG: STRATEGY FR (Functional Requirements)
+================================================================================
+Model: Gemini 3.8 Flash (High)
+Agent: Google Antigravity
+Strategy: Functional Requirements (CFR + AFR)
+Source Specification: 01_BA_Problem_Statement_v1.2_SYNCHRONIZED_DRAFT.docx, 02_BA_Requirement_Registry_v1.1_FINAL.docx
+
+--------------------------------------------------------------------------------
+PROMPT A: GENERATE FROZEN TEST DESIGN
+--------------------------------------------------------------------------------
+You are designing automated specification-based tests for the BADMS Fusion ERP module.
+Source of truth: Use ONLY the supplied Problem Statement and Functional Requirements (CFR + AFR).
+Do NOT inspect implementation code.
+Do NOT infer behavior from implementation.
+Do NOT introduce behavior unsupported by the supplied specification.
+Generate the minimum non-redundant set of test cases needed to satisfy the strategy-specific adequacy rule in Section 7. Do not stop at an arbitrary number, do not omit an explicit test obligation to reduce the test count, and do not invent unsupported behavior. Prefer observable behavior that can subsequently be automated using pytest/pytest-django.
+For every test case output exactly these fields:
+- test_id
+- source_id
+- purpose
+- preconditions
+- action_or_input
+- expected_result
+- test_type
+source_id must identify the exact obligation covered.
+Output ONLY a valid JSON array. Do not provide explanation or additional prose.
+[Strategy-specific instruction]: Cover every testable CFR/AFR with at least one test. Add a separate negative/boundary/validation/authorization case only where the requirement explicitly defines such a condition or outcome.
+
+Output saved to: a8_design/FR_DESIGN.json (40 test cases frozen)
+
+--------------------------------------------------------------------------------
+PROMPT B: CONVERT FROZEN DESIGN INTO EXECUTABLE TESTS
+--------------------------------------------------------------------------------
+You are given:
+1. the frozen A8_BASE Fusion implementation, and
+2. the frozen FR_DESIGN.json.
+Convert these test designs into executable automated backend tests using pytest/pytest-django.
+Rules:
+- Implement exactly the supplied test cases.
+- Do not add, remove, merge or reinterpret test cases.
+- Preserve each specified expected result.
+- Do not modify production code.
+- Use the Django isolated test database.
+- Reuse existing Fusion test infrastructure where appropriate.
+- Do not mock the behavior being tested; mocks may be used only for unavailable external dependencies.
+- Do not use xfail to hide failures.
+- Every test must contain its test_id and source_id in its name or docstring.
+- Store generated tests only under tests/a8/fr/.
+
+Tests generated at: tests/a8/fr/test_fr.py
+
+--------------------------------------------------------------------------------
+PROMPT C: PERMITTED REPAIR PROMPT (Repair 1 of 2 used)
+--------------------------------------------------------------------------------
+The generated test suite encountered a setup error:
+PermissionDeniedError: SysAdmin classification authority required
+Cause: Test helper passed permission string 'badms.classification.assign' instead of the model permission 'badms.archival.classify_authoritative'.
+Repair applied: Updated tests/a8/helpers.py sysadmin_actor permissions to include 'badms.archival.classify_authoritative'. No production code modified.
+
+--------------------------------------------------------------------------------
+FINAL EXECUTION RESULT
+--------------------------------------------------------------------------------
+pytest tests/a8/fr --junitxml=a8_results/fr/junit.xml --cov=modules.badms --cov-branch --cov-report=xml:a8_results/fr/coverage.xml
+Total: 40 tests | Passed: 34 | Failed: 5 | Skipped: 1
+Statement Coverage: 85.20% | Branch Coverage: 58.33%
+Confirmed Implementation Defects Found: 4 (DEF-01, DEF-02, DEF-03, DEF-04)

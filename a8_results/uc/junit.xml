@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="6" skipped="2" tests="64" time="5.016" timestamp="2026-11-10T22:45:41.938213+05:30" hostname="black"><testcase classname="tests.a8.uc.test_uc" name="test_uc_001_main_flow" time="3.223" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_002_alt_a1" time="0.004" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_003_exc_e1" time="0.004" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_004_main_flow" time="0.008" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_005_alt_a1" time="0.005" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_006_exc_e1" time="0.005" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_007_main_flow" time="0.008" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_008_alt_a1" time="0.008" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_009_alt_a2" time="0.008" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_010_exc_e1" time="0.009"><failure message="Failed: DID NOT RAISE PermissionDeniedError">def test_uc_010_exc_e1():
+        """TEST-UC-010 | BA-UC-003 Exc E1: Request outside HoD's department -&gt; deny decision action."""
+        user = regular_user_actor(user_id=12, dept="ECE")
+        ece_req = ops.submit_archival_request(actor=user, department="ECE", file_name="ece.csv", file_type="csv", file_size_bytes=200, reason="ECE")
+        cse_hod = hod_actor(user_id=20, dept="CSE")
+&gt;       with pytest.raises(PermissionDeniedError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PermissionDeniedError
+
+tests\a8\uc\test_uc.py:124: Failed</failure></testcase><testcase classname="tests.a8.uc.test_uc" name="test_uc_011_main_flow" time="0.011" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_012_alt_a1" time="0.012" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_013_alt_a2" time="0.011" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_014_exc_e1" time="0.008" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_015_main_flow" time="0.014" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_016_exc_e1" time="0.013"><failure message="Failed: DID NOT RAISE any of (BadRequestError, ValueError)">def test_uc_016_exc_e1():
+        """TEST-UC-016 | BA-UC-005 Exc E1: Non-AES encryption algorithm rejected."""
+        user = regular_user_actor(user_id=14, dept="CSE")
+        cse_hod = hod_actor(user_id=20, dept="CSE")
+        admin = sysadmin_actor(user_id=1)
+        sec = it_security_actor(user_id=30)
+        req = ops.submit_archival_request(actor=user, department="CSE", file_name="keys.txt", file_type="txt", file_size_bytes=100, reason="Keys")
+        ops.hod_review_archival(actor=cse_hod, request_id=req.pk, action="approve")
+        ops.sysadmin_classify_archival(actor=admin, request_id=req.pk, authoritative_classification="sensitive")
+&gt;       with pytest.raises((BadRequestError, ValueError)):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE any of (BadRequestError, ValueError)
+
+tests\a8\uc\test_uc.py:200: Failed</failure></testcase><testcase classname="tests.a8.uc.test_uc" name="test_uc_017_main_flow" time="0.009" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_018_alt_a1" time="0.003" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_019_alt_a2" time="0.003" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_020_exc_e1" time="0.004"><skipped type="pytest.skip" message="NOT_AUTOMATED: External repository network daemon probe is not automated in unit tests">C:\Fusion-Integrated\tests\a8\uc\test_uc.py:230: NOT_AUTOMATED: External repository network daemon probe is not automated in unit tests</skipped></testcase><testcase classname="tests.a8.uc.test_uc" name="test_uc_021_main_flow" time="0.010" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_022_exc_e1" time="0.007" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_023_main_flow" time="0.007" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_024_alt_a1" time="0.012" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_025_alt_a2" time="0.011" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_026_exc_e1" time="0.011"><failure message="Failed: DID NOT RAISE PermissionDeniedError">def test_uc_026_exc_e1():
+        """TEST-UC-026 | BA-UC-008 Exc E1: Request outside departmental scope -&gt; deny decision."""
+        user = regular_user_actor(user_id=24, dept="ECE")
+        cse_hod = hod_actor(user_id=20, dept="CSE")
+        StorageQuota.objects.create(user_id=24, allocated_mb=5120, used_mb=5120)
+        ext = ops.submit_storage_extension(actor=user, department="ECE", requested_additional_mb=1024, reason="ECE expansion")
+&gt;       with pytest.raises(PermissionDeniedError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PermissionDeniedError
+
+tests\a8\uc\test_uc.py:292: Failed</failure></testcase><testcase classname="tests.a8.uc.test_uc" name="test_uc_027_main_flow" time="0.008" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_028_alt_a1" time="0.006" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_029_alt_a2" time="0.010" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_030_exc_e1" time="0.007"><failure message="Failed: DID NOT RAISE any of (BadRequestError, ValueError)">def test_uc_030_exc_e1():
+        """TEST-UC-030 | BA-UC-009 Exc E1: Invalid/conflicting parameters rejected."""
+        admin = sysadmin_actor(user_id=1)
+&gt;       with pytest.raises((BadRequestError, ValueError)):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE any of (BadRequestError, ValueError)
+
+tests\a8\uc\test_uc.py:324: Failed</failure></testcase><testcase classname="tests.a8.uc.test_uc" name="test_uc_031_main_flow" time="0.004"><failure message="AssertionError: special_archival_operation service missing from operations.py&#10;assert False&#10; +  where False = hasattr(ops, 'special_archival_operation')">def test_uc_031_main_flow():
+        """TEST-UC-031 | BA-UC-010 Main Flow: Super Admin performs special archival operation."""
+        superadmin = superadmin_actor(user_id=102)
+&gt;       assert hasattr(ops, "special_archival_operation"), "special_archival_operation service missing from operations.py"
+E       AssertionError: special_archival_operation service missing from operations.py
+E       assert False
+E        +  where False = hasattr(ops, 'special_archival_operation')
+
+tests\a8\uc\test_uc.py:333: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc" name="test_uc_032_exc_e1" time="0.005"><failure message="AssertionError: special_archival_operation service missing from operations.py&#10;assert False&#10; +  where False = hasattr(ops, 'special_archival_operation')">def test_uc_032_exc_e1():
+        """TEST-UC-032 | BA-UC-010 Exc E1: Non-Super Admin denied special archival."""
+        user = regular_user_actor(user_id=25)
+&gt;       assert hasattr(ops, "special_archival_operation"), "special_archival_operation service missing from operations.py"
+E       AssertionError: special_archival_operation service missing from operations.py
+E       assert False
+E        +  where False = hasattr(ops, 'special_archival_operation')
+
+tests\a8\uc\test_uc.py:344: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc" name="test_uc_033_main_flow" time="0.007" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_034_exc_e1" time="0.004" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_035_main_flow" time="0.006" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_036_exc_e1" time="0.003" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_037_main_flow" time="0.003" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_038_exc_e1" time="0.003" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_039_main_flow" time="0.006" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_040_exc_e1" time="0.003" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_041_main_flow" time="0.006" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_042_exc_e1" time="0.006" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_043_main_flow" time="0.009" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_044_alt_a1" time="0.008" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_045_alt_a2" time="0.007" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_046_exc_e1" time="0.006" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_047_main_flow" time="0.008" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_048_alt_a1" time="0.010" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_049_alt_a2" time="0.011" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_050_exc_e1" time="0.008" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_051_main_flow" time="0.011" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_052_exc_e1" time="0.003"><skipped type="pytest.skip" message="NOT_AUTOMATED: External raw disk restoration failure simulation is outside unit test scope">C:\Fusion-Integrated\tests\a8\uc\test_uc.py:534: NOT_AUTOMATED: External raw disk restoration failure simulation is outside unit test scope</skipped></testcase><testcase classname="tests.a8.uc.test_uc" name="test_uc_053_main_flow" time="0.003" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_054_exc_e1" time="0.003" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_055_main_flow" time="0.003" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_056_exc_e1" time="0.003" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_057_main_flow" time="0.006" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_058_exc_e1" time="0.008" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_059_main_flow" time="0.004" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_060_alt_a1" time="0.005" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_061_exc_e1" time="0.004" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_062_main_flow" time="0.006" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_063_alt_a1" time="0.005" /><testcase classname="tests.a8.uc.test_uc" name="test_uc_064_exc_e1" time="0.541" /></testsuite></testsuites>

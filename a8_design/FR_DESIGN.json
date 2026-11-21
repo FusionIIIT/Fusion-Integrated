@@ -1,0 +1,362 @@
+[
+  {
+    "test_id": "TEST-FR-001",
+    "source_id": "AFR-BA-001",
+    "purpose": "Verify SysAdmin or Super Admin can trigger manual backup",
+    "preconditions": "Actor is authenticated with SysAdmin backup.trigger permission.",
+    "action_or_input": "Call trigger_manual_backup(actor, dataset_code='cse_db')",
+    "expected_result": "BackupOperation is created with status='success', trigger_type='manual', dataset_code='cse_db'.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-002",
+    "source_id": "AFR-BA-001-AUTH-FAIL",
+    "purpose": "Verify unauthorized user cannot trigger manual backup",
+    "preconditions": "Actor is authenticated as regular student/faculty without backup.trigger permission.",
+    "action_or_input": "Call trigger_manual_backup(actor, dataset_code='cse_db')",
+    "expected_result": "PermissionDeniedError is raised and no backup operation is created.",
+    "test_type": "authorization-negative"
+  },
+  {
+    "test_id": "TEST-FR-003",
+    "source_id": "AFR-BA-002",
+    "purpose": "Verify manual backup captures current timestamp and required backup artifacts",
+    "preconditions": "Actor has SysAdmin permission.",
+    "action_or_input": "Call trigger_manual_backup(actor, dataset_code='all')",
+    "expected_result": "BackupOperation record contains valid started_at and completed_at timestamps, and dump_location.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-004",
+    "source_id": "AFR-BA-003",
+    "purpose": "Verify manual backup saves dump and records integrity verification",
+    "preconditions": "Actor has SysAdmin permission.",
+    "action_or_input": "Call trigger_manual_backup(actor, dataset_code='students')",
+    "expected_result": "BackupOperation has integrity_verified=True and file_size_bytes > 0.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-005",
+    "source_id": "AFR-BA-004",
+    "purpose": "Verify system records backup outcome as Success",
+    "preconditions": "Actor triggers a successful backup.",
+    "action_or_input": "Inspect created BackupOperation record.",
+    "expected_result": "Status field is 'success'.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-006",
+    "source_id": "AFR-BA-005",
+    "purpose": "Verify failed backup records Failure outcome and error details",
+    "preconditions": "Backup creation process fails.",
+    "action_or_input": "Create BackupOperation with status='failed' and error_message='Disk full'.",
+    "expected_result": "BackupOperation has status='failed' and error_message is preserved.",
+    "test_type": "functional-negative"
+  },
+  {
+    "test_id": "TEST-FR-007",
+    "source_id": "AFR-BA-006",
+    "purpose": "Verify automatic backup schedule representation and properties",
+    "preconditions": "Backup schedule configured for automatic execution.",
+    "action_or_input": "Query active BackupSchedule instances.",
+    "expected_result": "Schedule has valid cron_expression and retention_days.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-008",
+    "source_id": "AFR-BA-011",
+    "purpose": "Verify repository reachability requirement for scheduled backup",
+    "preconditions": "Scheduled backup repository is unreachable.",
+    "action_or_input": "Evaluate repository reachability check.",
+    "expected_result": "Scheduled automatic backup is not executed and failure is recorded.",
+    "test_type": "functional-negative"
+  },
+  {
+    "test_id": "TEST-FR-009",
+    "source_id": "AFR-BA-012",
+    "purpose": "Verify SysAdmin can view backup schedules",
+    "preconditions": "BackupSchedule records exist in database.",
+    "action_or_input": "Query BackupSchedule.objects.all() by SysAdmin.",
+    "expected_result": "Returns list of configured backup schedules.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-010",
+    "source_id": "AFR-BA-013",
+    "purpose": "Verify SysAdmin can configure local dataset backup schedule",
+    "preconditions": "Actor has badms.schedule.manage_local permission.",
+    "action_or_input": "Call configure_schedule(actor, scope='local', dataset_code='library', cron_expression='0 2 * * *', retention_days=30)",
+    "expected_result": "BackupSchedule created with scope='local', dataset_code='library', is_active=True.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-011",
+    "source_id": "AFR-BA-014",
+    "purpose": "Verify validation rejects conflicting or invalid schedule parameters",
+    "preconditions": "Actor supplies invalid cron expression or negative retention days.",
+    "action_or_input": "Call configure_schedule with invalid schedule parameters.",
+    "expected_result": "Validation error is raised and invalid schedule is not applied.",
+    "test_type": "validation-negative"
+  },
+  {
+    "test_id": "TEST-FR-012",
+    "source_id": "AFR-BA-016",
+    "purpose": "Verify schedule configuration changes are logged in audit log",
+    "preconditions": "Schedule is configured by authorized actor.",
+    "action_or_input": "Execute configure_schedule and inspect BadmsAuditLog.",
+    "expected_result": "BadmsAuditLog entry exists with entity_type='backup_schedule' and action containing 'schedule_configured'.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-013",
+    "source_id": "AFR-BA-017",
+    "purpose": "Verify system maintains current status and history of backup operations",
+    "preconditions": "Multiple BackupOperation records exist.",
+    "action_or_input": "Query BackupOperation ordering and history.",
+    "expected_result": "Records are retrievable ordered chronologically by created_at.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-014",
+    "source_id": "AFR-BA-019",
+    "purpose": "Verify authenticated user can initiate a secure archival request",
+    "preconditions": "Actor is an authenticated user.",
+    "action_or_input": "Call submit_archival_request(actor, department='CSE', file_name='grades.csv', file_type='csv', file_size_bytes=2048, reason='End of term', initial_classification='routine')",
+    "expected_result": "SecureArchivalRequest created with status='submitted', department='CSE', file_name='grades.csv'.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-015",
+    "source_id": "AFR-BA-020",
+    "purpose": "Verify archival request captures file name, type, size, reason and owner",
+    "preconditions": "Archival request submitted.",
+    "action_or_input": "Inspect fields of created SecureArchivalRequest.",
+    "expected_result": "file_name, file_type, file_size_bytes, reason, and user_id are populated.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-016",
+    "source_id": "AFR-BA-021",
+    "purpose": "Verify archival request parameters validation before acceptance",
+    "preconditions": "User submits invalid or empty archival parameters.",
+    "action_or_input": "Call submit_archival_request with invalid parameters.",
+    "expected_result": "Request is validated or rejected if corrupt/empty.",
+    "test_type": "validation-negative"
+  },
+  {
+    "test_id": "TEST-FR-017",
+    "source_id": "AFR-BA-022",
+    "purpose": "Verify initial status of submitted archival request is 'submitted'",
+    "preconditions": "Archival request successfully submitted.",
+    "action_or_input": "Check request status.",
+    "expected_result": "Status is 'submitted'.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-018",
+    "source_id": "AFR-BA-024",
+    "purpose": "Verify routed HoD can review archival request details",
+    "preconditions": "SecureArchivalRequest in 'submitted' status for department CSE.",
+    "action_or_input": "HoD queries visible archival requests for CSE.",
+    "expected_result": "CSE archival request is visible to CSE HoD.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-019",
+    "source_id": "AFR-BA-025",
+    "purpose": "Verify HoD can approve or reject a secure archival request",
+    "preconditions": "Request in 'submitted' status; actor has HoD permission for department.",
+    "action_or_input": "Call hod_review_archival(actor, request_id, action='approve') and action='reject'",
+    "expected_result": "'approve' sets status to 'hod_approved'; 'reject' sets status to 'hod_rejected'.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-020",
+    "source_id": "AFR-BA-026",
+    "purpose": "Verify only the HoD of requester's department can approve/reject archival request",
+    "preconditions": "Request department is 'ECE'; actor is HoD of 'CSE'.",
+    "action_or_input": "Call hod_review_archival(actor, request_id, action='approve')",
+    "expected_result": "PermissionDeniedError is raised because HoD is outside requester department.",
+    "test_type": "authorization-negative"
+  },
+  {
+    "test_id": "TEST-FR-021",
+    "source_id": "AFR-BA-028",
+    "purpose": "Verify SysAdmin classifies approved archival request",
+    "preconditions": "Request is in 'hod_approved' status; actor has classification.assign permission.",
+    "action_or_input": "Call sysadmin_classify_archival(actor, request_id, authoritative_classification='routine')",
+    "expected_result": "authoritative_classification is set to 'routine' and status becomes 'completed'.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-022",
+    "source_id": "AFR-BA-029",
+    "purpose": "Verify default initial classification is 'routine' if omitted or invalid",
+    "preconditions": "User submits archival request without valid classification.",
+    "action_or_input": "Call submit_archival_request with initial_classification='unknown'",
+    "expected_result": "initial_classification defaults to 'routine'.",
+    "test_type": "boundary-positive"
+  },
+  {
+    "test_id": "TEST-FR-023",
+    "source_id": "AFR-BA-031",
+    "purpose": "Verify Sensitive classification routes request for encryption",
+    "preconditions": "Request in 'hod_approved' status; SysAdmin classifies as 'sensitive'.",
+    "action_or_input": "Call sysadmin_classify_archival(actor, request_id, authoritative_classification='sensitive')",
+    "expected_result": "status becomes 'classified' (pending encryption configuration).",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-024",
+    "source_id": "AFR-BA-032",
+    "purpose": "Verify IT Security Team configures encryption for Sensitive data",
+    "preconditions": "Request in 'classified' status with authoritative_classification='sensitive'; actor has security.manage permission.",
+    "action_or_input": "Call it_security_configure_encryption(actor, request_id, algorithm='AES-256')",
+    "expected_result": "is_encrypted=True, encryption_algorithm='AES-256', status='completed'.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-025",
+    "source_id": "AFR-BA-034",
+    "purpose": "Verify AES-256 encryption algorithm is strictly enforced for Sensitive data",
+    "preconditions": "Request in 'classified' status; actor attempts weak algorithm like 'DES'.",
+    "action_or_input": "Call it_security_configure_encryption(actor, request_id, algorithm='DES')",
+    "expected_result": "ValidationError or rejection because only AES-256 is permitted for Sensitive data.",
+    "test_type": "validation-negative"
+  },
+  {
+    "test_id": "TEST-FR-026",
+    "source_id": "AFR-BA-035",
+    "purpose": "Verify user can track status and history of own secure archival request",
+    "preconditions": "User submitted archival request.",
+    "action_or_input": "Call visible_archival_requests(user_actor)",
+    "expected_result": "Returns the user's submitted requests and excludes other users' requests.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-027",
+    "source_id": "AFR-BA-037",
+    "purpose": "Verify Super Admin can perform special archival operation",
+    "preconditions": "Actor is Super Admin with special_archival authority.",
+    "action_or_input": "Execute special archival operation for high-priority institution dataset.",
+    "expected_result": "SecureArchivalRequest created with is_special=True and status='special_executed'.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-028",
+    "source_id": "AFR-BA-038",
+    "purpose": "Verify non-Super Admin is denied from performing special archival operation",
+    "preconditions": "Actor is regular user or SysAdmin without Super Admin special authority.",
+    "action_or_input": "Attempt special archival operation.",
+    "expected_result": "Operation is denied with PermissionDeniedError.",
+    "test_type": "authorization-negative"
+  },
+  {
+    "test_id": "TEST-FR-029",
+    "source_id": "AFR-BA-040",
+    "purpose": "Verify user can request restoration of archived data",
+    "preconditions": "Completed archival request exists.",
+    "action_or_input": "Call submit_restoration_request(actor, archival_request_id=req.id, reason='Audit audit')",
+    "expected_result": "DataRestorationRequest created referencing the archival request.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-030",
+    "source_id": "AFR-BA-041",
+    "purpose": "Verify restoration of Sensitive data requires SysAdmin approval",
+    "preconditions": "Archival request has authoritative_classification='sensitive'.",
+    "action_or_input": "Call submit_restoration_request(actor, archival_request_id=req.id, reason='Sensitive restore')",
+    "expected_result": "DataRestorationRequest status is 'submitted' (pending SysAdmin review), not completed.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-031",
+    "source_id": "AFR-BA-042",
+    "purpose": "Verify non-Sensitive restoration proceeds through standard path to completion",
+    "preconditions": "Archival request has authoritative_classification='routine'.",
+    "action_or_input": "Call submit_restoration_request(actor, archival_request_id=req.id, reason='Routine restore')",
+    "expected_result": "DataRestorationRequest status is 'completed' with restored_at populated.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-032",
+    "source_id": "AFR-BA-045",
+    "purpose": "Verify user can submit storage extension request when quota is full",
+    "preconditions": "User StorageQuota has used_mb >= allocated_mb.",
+    "action_or_input": "Call submit_storage_extension(actor, department='CSE', requested_additional_mb=1024, reason='Research data')",
+    "expected_result": "StorageExtensionRequest created with status='submitted'.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-033",
+    "source_id": "AFR-BA-046",
+    "purpose": "Verify storage extension request is rejected if user quota is not reached",
+    "preconditions": "User StorageQuota has used_mb < allocated_mb (e.g. 1000MB used of 5120MB).",
+    "action_or_input": "Call submit_storage_extension(actor, department='CSE', requested_additional_mb=1024, reason='Early request')",
+    "expected_result": "RuleViolation or ValidationError is raised and request is not submitted.",
+    "test_type": "boundary-negative"
+  },
+  {
+    "test_id": "TEST-FR-034",
+    "source_id": "AFR-BA-049",
+    "purpose": "Verify HoD approval of storage extension allocates additional storage",
+    "preconditions": "StorageExtensionRequest in 'submitted' status for 1024MB; actor is HoD.",
+    "action_or_input": "Call hod_review_storage_extension(actor, request_id, action='approve')",
+    "expected_result": "Request status becomes 'approved' and user's StorageQuota.allocated_mb is increased by 1024MB.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-035",
+    "source_id": "AFR-BA-051",
+    "purpose": "Verify storage threshold monitoring and quota calculation",
+    "preconditions": "StorageQuota records exist for multiple users.",
+    "action_or_input": "Call get_user_storage_quotas([user1, user2])",
+    "expected_result": "Returns UserStorageDTO with calculated is_quota_full flag.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-036",
+    "source_id": "AFR-BA-053",
+    "purpose": "Verify Super Admin can define global backup schedule",
+    "preconditions": "Actor has badms.schedule.manage_global permission.",
+    "action_or_input": "Call configure_schedule(actor, scope='global', dataset_code='', cron_expression='0 0 * * *', retention_days=60)",
+    "expected_result": "BackupSchedule created with scope='global' and dataset_code=''.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-037",
+    "source_id": "AFR-BA-055",
+    "purpose": "Verify local backup schedule overrides global backup schedule",
+    "preconditions": "Global schedule and local schedule for 'exam_db' exist.",
+    "action_or_input": "Call calculate_effective_schedule('exam_db', local_schedules, global_schedule)",
+    "expected_result": "Returns the local schedule.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-038",
+    "source_id": "AFR-BA-056",
+    "purpose": "Verify retention rules by classification tier",
+    "preconditions": "Classification tiers defined.",
+    "action_or_input": "Inspect state_machine.RETENTION_YEARS for routine, archival, sensitive, critical.",
+    "expected_result": "routine=1, archival=5, sensitive=7, critical=10.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-039",
+    "source_id": "AFR-BA-058",
+    "purpose": "Verify escalation to Director of IT on 3 consecutive backup failures",
+    "preconditions": "Consecutive backup failure counter tracked.",
+    "action_or_input": "Call check_repeated_failure_escalation(consecutive_failures=3)",
+    "expected_result": "Returns True, indicating escalation required.",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "TEST-FR-040",
+    "source_id": "AFR-BA-061",
+    "purpose": "Verify audit log recording for operations",
+    "preconditions": "Operation performed.",
+    "action_or_input": "Query BadmsAuditLog.",
+    "expected_result": "Log records actor_user_id, action, entity_type, and details.",
+    "test_type": "functional-positive"
+  }
+]
