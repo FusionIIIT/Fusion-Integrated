@@ -686,9 +686,18 @@ def test_br_pms_092_095_appeal_rules():
             justification="Full justification...",
         )
 
-    # Set to Rejected
-    app.status = PatentApplicationStatus.REJECTED.value
-    app.save()
+    # Follow the authorized review workflow so Director 3001 is assigned before
+    # testing the appeal review guard and outcome.
+    assign_director(application_id=app.id, director_user_id=3001, assigned_by_user_id=9001)
+    submit_director_review(
+        application_id=app.id,
+        director_user_id=3001,
+        decision="Reject",
+        justification=(
+            "The submitted claims do not establish a technical distinction over "
+            "the cited prior art references."
+        ),
+    )
 
     appeal = file_appeal(
         application_id=app.id,

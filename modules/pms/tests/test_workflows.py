@@ -258,6 +258,7 @@ def test_bw_pms_06_attorney_assignment_acceptance():
 
     respond_to_attorney_assignment(assignment_id=assignment.id, attorney_user_id=5001, accept=True)
     app.refresh_from_db()
+    assignment.refresh_from_db()
     assert app.status == PatentApplicationStatus.APPROVED.value
     assert assignment.status == "accepted"
 
@@ -306,6 +307,7 @@ def test_bw_pms_07_attorney_decline_and_reassignment():
         assignment_id=a1.id, attorney_user_id=5001, accept=False, decline_reason="Schedule full"
     )
     app.refresh_from_db()
+    a1.refresh_from_db()
     assert app.status == PatentApplicationStatus.APPROVED.value
     assert a1.status == "declined"
 
@@ -317,6 +319,7 @@ def test_bw_pms_07_attorney_decline_and_reassignment():
     # 4. Accept
     respond_to_attorney_assignment(assignment_id=a2.id, attorney_user_id=5002, accept=True)
     app.refresh_from_db()
+    a2.refresh_from_db()
     assert app.status == PatentApplicationStatus.APPROVED.value
     assert a2.status == "accepted"
 

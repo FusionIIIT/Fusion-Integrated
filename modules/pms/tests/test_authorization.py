@@ -278,7 +278,7 @@ def test_services_bind_director_and_attorney_actions_to_application_scope():
 
 
 def test_applicant_cannot_revise_another_applicants_application(stub_iam):
-    """CFR-PMS-008: revise permission does not bypass application ownership."""
+    """CFR-PMS-008: co-inventor visibility does not grant primary-applicant actions."""
     app = submit_application(
         applicant_user_id=2001,
         title="Private Patent",
@@ -286,6 +286,20 @@ def test_applicant_cannot_revise_another_applicants_application(stub_iam):
         detailed_description="D",
         claims="C",
         domain="Tech",
+        coinventors_data=[
+            {
+                "user_id": 2001,
+                "name": "Primary Applicant",
+                "email": "primary@example.test",
+                "ownership_percentage": "60.00",
+            },
+            {
+                "user_id": 1001,
+                "name": "Co-inventor",
+                "email": "coinventor@example.test",
+                "ownership_percentage": "40.00",
+            },
+        ],
     )
     app.status = PatentApplicationStatus.NEEDS_REVISION.value
     app.save(update_fields=["status", "updated_at"])
@@ -300,10 +314,9 @@ def test_applicant_cannot_revise_another_applicants_application(stub_iam):
         {"feedback_response": "Updated the requested technical details."},
     )
 
-    # 403, not 400: the caller holds pms.application.revise but is not this
-    # application's applicant — an authorization refusal. That matches the
-    # platform convention (PermissionDeniedError = 403) and the placement
-    # precedent that maps actor-not-allowed to 403 (CFR-PMS-008, BR-PMS-126).
+    # Co-inventor scope makes the application visible, so the service's
+    # primary-applicant ownership guard returns 403 without disclosing a
+    # foreign application's existence.
     assert response.status_code == 403
     app.refresh_from_db()
     assert app.status == PatentApplicationStatus.NEEDS_REVISION.value
@@ -375,9 +388,7 @@ def test_pcc_admin_exclusive_assign_attorney_permission(stub_iam):
 
 
 def test_non_owner_withdraw_is_403(stub_iam):
-    """CFR-PMS-015, BR-PMS-126: an ownership refusal on another lifecycle action
-    is also an authorization refusal, so the domain-to-HTTP mapping is general
-    and not special-cased for revise."""
+    """CFR-PMS-015, BR-PMS-126: a visible co-inventor cannot withdraw as owner."""
     app = submit_application(
         applicant_user_id=2001,
         title="Not yours",
@@ -385,6 +396,20 @@ def test_non_owner_withdraw_is_403(stub_iam):
         detailed_description="D",
         claims="C",
         domain="Tech",
+        coinventors_data=[
+            {
+                "user_id": 2001,
+                "name": "Primary Applicant",
+                "email": "primary@example.test",
+                "ownership_percentage": "60.00",
+            },
+            {
+                "user_id": 1001,
+                "name": "Co-inventor",
+                "email": "coinventor@example.test",
+                "ownership_percentage": "40.00",
+            },
+        ],
     )
     client = _auth_client(
         stub_iam, user_id=1001, permissions=("pms.application.withdraw",)

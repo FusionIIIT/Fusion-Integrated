@@ -3,6 +3,7 @@
 Maps to all 33 use cases UC-PMS-001 through UC-PMS-033 and CFR-PMS-001..030.
 """
 
+from datetime import date
 from decimal import Decimal
 
 import pytest
@@ -33,6 +34,18 @@ def _client(stub_iam, user_id=1001, roles=("student",), permissions=()):
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token mock-token")
     return c
+
+
+def _accepted_attorney_assignment(app, attorney_user_id, assigned_by_user_id=9001):
+    app.assigned_attorney_user_id = attorney_user_id
+    app.save(update_fields=["assigned_attorney_user_id", "updated_at"])
+    return AttorneyAssignment.objects.create(
+        application=app,
+        attorney_user_id=attorney_user_id,
+        assigned_by_user_id=assigned_by_user_id,
+        status="accepted",
+        is_active=True,
+    )
 
 
 # --- UC-PMS-001: Submit Patent Application ---
@@ -423,8 +436,8 @@ def test_api_office_action_workflow(stub_iam):
     # A Filed application carries its assigned Attorney (BW-PMS-06 -> 11);
     # the response-approval notification is addressed to that Attorney.
     app.status = PatentApplicationStatus.FILED.value
-    app.assigned_attorney_user_id = 5001
     app.save()
+    _accepted_attorney_assignment(app, attorney_user_id=5001)
 
     c_atty = _client(
         stub_iam,
@@ -501,12 +514,22 @@ def test_api_maintenance_workflow(stub_iam):
         claims="C",
         domain="Tech",
     )
-    # Granted follows filing and attorney assignment (BW-PMS-11 -> 15); the
-    # renewal-request notification goes to the assigned Director (UC-PMS-017).
+    # Granted follows filing and accepted attorney assignment (BW-PMS-11 -> 15);
+    # renewal requests go to the assigned Director (UC-PMS-017).
     app.status = PatentApplicationStatus.GRANTED.value
-    app.assigned_attorney_user_id = 5001
     app.assigned_director_user_id = 2001
-    app.save()
+    app.grant_date = date(2026, 11, 1)
+    app.patent_number = "IN-API-2026-1"
+    app.save(
+        update_fields=[
+            "status",
+            "assigned_director_user_id",
+            "grant_date",
+            "patent_number",
+            "updated_at",
+        ]
+    )
+    _accepted_attorney_assignment(app, attorney_user_id=5001)
 
     maint = PostGrantMaintenance.objects.create(
         application=app, cycle_number=1, fee_due_date="2029-11-01", fee_amount=Decimal("5000.00")
@@ -730,7 +753,12 @@ def test_api_audit_and_reports(stub_iam):
         stub_iam,
         user_id=9001,
         roles=("pcc_admin",),
-        permissions=("pms.audit.view", "pms.report.view", "pms.application.view"),
+        permissions=(
+            "pms.audit.view",
+            "pms.report.view",
+            "pms.application.view",
+            "pms.workflow.monitor",
+        ),
     )
 
     # Audit trail
@@ -867,9 +895,9 @@ def test_api_maintenance_request_requires_manage_permission(stub_iam):
         domain="Tech",
     )
     app.status = PatentApplicationStatus.GRANTED.value
-    app.assigned_attorney_user_id = 5001
     app.assigned_director_user_id = 2001
     app.save()
+    _accepted_attorney_assignment(app, attorney_user_id=5001)
     maint = PostGrantMaintenance.objects.create(
         application=app, cycle_number=1, fee_due_date="2029-11-01", fee_amount=Decimal("5000.00")
     )
