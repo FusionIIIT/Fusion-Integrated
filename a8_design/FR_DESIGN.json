@@ -1,0 +1,1082 @@
+[
+{
+"test_id": "TC-SA-001-01",
+"source_id": "AFR-SA-001",
+"purpose": "Verify Super Admin can successfully create a basic user account of type Student, Faculty, or Staff.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Submit valid user creation request with user_type='Student', name='John Doe', email='john@iiitdmj.ac.in', institute_id='2026001', department='CSE'.",
+"expected_result": "Basic user account is created successfully.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-002-01",
+"source_id": "AFR-SA-002",
+"purpose": "Verify system captures all required profile fields upon user creation.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Create user providing user_type, name, institute_email, contact_number, institute_id, department, date_of_joining, and expected_completion_date.",
+"expected_result": "All provided profile fields are captured and saved accurately.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-003A-01",
+"source_id": "AFR-SA-003A",
+"purpose": "Verify positive unique Institute ID validation during user creation.",
+"preconditions": "Authenticated Super Admin session active. Institute ID '2026002' does not exist.",
+"action_or_input": "Submit user creation request with institute_id='2026002'.",
+"expected_result": "Account creation succeeds.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-003A-02",
+"source_id": "AFR-SA-003A",
+"purpose": "Verify rejection of user creation when Institute ID is non-unique.",
+"preconditions": "Authenticated Super Admin session active. User with Institute ID '2026001' already exists.",
+"action_or_input": "Submit user creation request with institute_id='2026001'.",
+"expected_result": "Account creation is rejected with a uniqueness violation error.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-SA-003B-01",
+"source_id": "AFR-SA-003B",
+"purpose": "Verify Institute ID cannot be changed after account creation.",
+"preconditions": "Authenticated Super Admin session active. User account exists with institute_id='2026001'.",
+"action_or_input": "Submit profile update request attempting to change institute_id from '2026001' to '2026099'.",
+"expected_result": "Update request is rejected or institute_id remains unchanged ('2026001').",
+"test_type": "validation"
+},
+{
+"test_id": "TC-SA-004-01",
+"source_id": "AFR-SA-004",
+"purpose": "Verify positive acceptance of valid institute email address.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Submit user creation request with email='user@iiitdmj.ac.in'.",
+"expected_result": "Email address is accepted and account creation succeeds.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-004-02",
+"source_id": "AFR-SA-004",
+"purpose": "Verify rejection of non-institute email address.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Submit user creation request with email='user@gmail.com'.",
+"expected_result": "Account creation is rejected due to invalid institute email address.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-SA-005-01",
+"source_id": "AFR-SA-005",
+"purpose": "Verify duplicate user creation prevention via identity data validation.",
+"preconditions": "Authenticated Super Admin session active. Existing user with identical identity details.",
+"action_or_input": "Submit creation request matching existing user identity data.",
+"expected_result": "System detects duplicate identity data and rejects user creation.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-SA-006-01",
+"source_id": "AFR-SA-006",
+"purpose": "Verify unique internal user ID generation upon creation.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Create a new basic user account.",
+"expected_result": "System automatically generates a unique internal user ID for the created account.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-007-01",
+"source_id": "AFR-SA-007",
+"purpose": "Verify initial login credentials generation upon creation.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Create a new basic user account.",
+"expected_result": "Initial login credentials are securely generated for the user.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-008-01",
+"source_id": "AFR-SA-008",
+"purpose": "Verify basic-user dashboard access is enabled upon account creation.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Create a basic user account and attempt basic dashboard authentication/access.",
+"expected_result": "Newly created user is provisioned with baseline dashboard access.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-009-01",
+"source_id": "AFR-SA-009",
+"purpose": "Verify sending of welcome message with credential information and first-login guidance.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Create a basic user account.",
+"expected_result": "Welcome message containing initial credentials, first-login instructions, profile update link, and password change link is sent to user email.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-010-01",
+"source_id": "AFR-SA-010",
+"purpose": "Verify Super Admin can view complete permitted basic user profile.",
+"preconditions": "Authenticated Super Admin session active; basic user exists.",
+"action_or_input": "Request basic user profile view for targeted user ID.",
+"expected_result": "Permitted complete basic user profile data is displayed.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-011-01",
+"source_id": "AFR-SA-011",
+"purpose": "Verify Super Admin can update editable basic user profile information.",
+"preconditions": "Authenticated Super Admin session active; basic user exists.",
+"action_or_input": "Update user contact number and department while preserving Institute ID.",
+"expected_result": "Editable profile fields are updated successfully.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-012-01",
+"source_id": "AFR-SA-012",
+"purpose": "Verify Super Admin can deactivate an active user account.",
+"preconditions": "Authenticated Super Admin session active; active user account exists.",
+"action_or_input": "Execute account deactivation on targeted user.",
+"expected_result": "User account status transitions to deactivated.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-013-01",
+"source_id": "AFR-SA-013",
+"purpose": "Verify Super Admin can reactivate a deactivated user account when policy permits.",
+"preconditions": "Authenticated Super Admin session active; deactivated user account exists within policy limits.",
+"action_or_input": "Execute account reactivation on deactivated user.",
+"expected_result": "User account status transitions back to active.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-014-01",
+"source_id": "AFR-SA-014",
+"purpose": "Verify maintenance of audit trail for user profile and status changes.",
+"preconditions": "Authenticated Super Admin session active; user profile/status updated.",
+"action_or_input": "Perform profile update or deactivation on a user.",
+"expected_result": "Audit entry recording timestamp, reason/context, and status history is recorded.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-015-01",
+"source_id": "AFR-SA-015",
+"purpose": "Verify bulk user batch creation from valid predefined CSV template.",
+"preconditions": "Authenticated Super Admin session active; valid CSV file prepared.",
+"action_or_input": "Upload predefined CSV file containing valid user creation records.",
+"expected_result": "All users in CSV batch are created successfully.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-016-01",
+"source_id": "AFR-SA-016",
+"purpose": "Verify bulk deactivation of multiple users in one operation.",
+"preconditions": "Authenticated Super Admin session active; multiple active users exist.",
+"action_or_input": "Submit bulk deactivation request with list of target user IDs.",
+"expected_result": "Targeted user accounts are deactivated in bulk.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-017-01",
+"source_id": "AFR-SA-017",
+"purpose": "Verify permitted bulk status updates on multiple users.",
+"preconditions": "Authenticated Super Admin session active; target users exist.",
+"action_or_input": "Submit bulk status update request for multiple users.",
+"expected_result": "Permitted status updates are applied across targeted users.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-018A-01",
+"source_id": "AFR-SA-018A",
+"purpose": "Verify pre-validation of bulk template structure and operation-size constraints.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Upload bulk operation CSV file with invalid header structure.",
+"expected_result": "System rejects processing before execution and flags structural template error.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-SA-018B-01",
+"source_id": "AFR-SA-018B",
+"purpose": "Verify pre-validation of individual records in bulk upload identifying invalid entries.",
+"preconditions": "Authenticated Super Admin session active; CSV template contains 1 valid and 1 invalid record.",
+"action_or_input": "Submit CSV file with mixed valid and invalid records.",
+"expected_result": "System identifies invalid record and isolates error prior to final commit.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-SA-019A-01",
+"source_id": "AFR-SA-019A",
+"purpose": "Verify production of accurate success/failure summary for bulk user operation.",
+"preconditions": "Authenticated Super Admin session active; bulk operation executed.",
+"action_or_input": "Execute bulk user operation with mixed record outcomes.",
+"expected_result": "System generates an accurate summary reporting count of succeeded and failed records.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-019B-01",
+"source_id": "AFR-SA-019B",
+"purpose": "Verify production of detailed processing log with per-record outcomes.",
+"preconditions": "Authenticated Super Admin session active; bulk operation completed.",
+"action_or_input": "Request processing log for executed bulk operation.",
+"expected_result": "Detailed processing log listing itemized outcome per record is generated.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-020-01",
+"source_id": "AFR-SA-020",
+"purpose": "Verify Super Admin notification upon bulk user operation completion.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Complete bulk user operation.",
+"expected_result": "Notification is delivered to Super Admin indicating bulk operation completion.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-021-01",
+"source_id": "AFR-SA-021",
+"purpose": "Verify read-only inspection of role definitions and metadata.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "View role definitions details page.",
+"expected_result": "Role name, description, module/department association, eligibility, singularity, default validity, permissions, and compatibility rules are presented read-only.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-022-01",
+"source_id": "AFR-SA-022",
+"purpose": "Verify assignment of additional role specifying required parameters.",
+"preconditions": "Authenticated Super Admin session active; eligible basic user exists.",
+"action_or_input": "Assign role specifying target_user, role_id, start_date, end_date, scope, and reason.",
+"expected_result": "Additional role is assigned to the target user with specified parameters.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-023-01",
+"source_id": "AFR-SA-023",
+"purpose": "Verify support for holding multiple non-conflicting roles simultaneously.",
+"preconditions": "Authenticated Super Admin session active; user already holds Role A.",
+"action_or_input": "Assign additional compatible Role B to the same user.",
+"expected_result": "Role B is assigned; user successfully holds both Role A and Role B simultaneously.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-024-01",
+"source_id": "AFR-SA-024",
+"purpose": "Verify positive assignment of a singular role when no active holder exists.",
+"preconditions": "Authenticated Super Admin session active; singular role currently vacant.",
+"action_or_input": "Assign singular role to User 1.",
+"expected_result": "Singular role assignment succeeds.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-024-02",
+"source_id": "AFR-SA-024",
+"purpose": "Verify prevention of assigning a singular role when an active holder already exists.",
+"preconditions": "Authenticated Super Admin session active; User 1 currently holds active singular role for scope.",
+"action_or_input": "Attempt to assign same singular role to User 2 for same scope and time.",
+"expected_result": "Assignment is rejected due to singularity constraint violation.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-SA-025-01",
+"source_id": "AFR-SA-025",
+"purpose": "Verify validation of role compatibility with target user's basic user type.",
+"preconditions": "Authenticated Super Admin session active; target user is of type 'Student'; role requires 'Faculty'.",
+"action_or_input": "Assign Faculty-only role to Student user.",
+"expected_result": "System rejects assignment due to user-type eligibility mismatch.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-SA-026-01",
+"source_id": "AFR-SA-026",
+"purpose": "Verify check of configured role conflicts prior to assignment.",
+"preconditions": "Authenticated Super Admin session active; target user holds Role A; Role B conflicts with Role A.",
+"action_or_input": "Attempt to assign Role B to target user.",
+"expected_result": "System detects role conflict and rejects assignment.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-SA-027-01",
+"source_id": "AFR-SA-027",
+"purpose": "Verify automatic activation of future-dated role assignment on start date.",
+"preconditions": "Future-dated role assignment exists for user; system clock reaches start date.",
+"action_or_input": "Trigger automated scheduled task on role start date.",
+"expected_result": "Role assignment automatically transitions from pending to active.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-028-01",
+"source_id": "AFR-SA-028",
+"purpose": "Verify automatic inactivation of time-bound role on end date.",
+"preconditions": "Time-bound active role reaches its configured end date.",
+"action_or_input": "Trigger automated end-date scheduled task.",
+"expected_result": "Role status transitions to inactive automatically.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-029-01",
+"source_id": "AFR-SA-029",
+"purpose": "Verify affected user notification upon role assignment.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Assign role to basic user.",
+"expected_result": "Notification is delivered to affected user regarding role assignment.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-030-01",
+"source_id": "AFR-SA-030",
+"purpose": "Verify exposure of assigned roles on user dashboard for role selection.",
+"preconditions": "User possesses multiple active assigned roles.",
+"action_or_input": "User logs into system dashboard.",
+"expected_result": "All valid assigned roles are displayed on user dashboard interface.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-031-01",
+"source_id": "AFR-SA-031",
+"purpose": "Verify audit trail and history recording of role assignment.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Assign role to basic user.",
+"expected_result": "Role assignment is logged in audit trail and recorded in role assignment history.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-032-01",
+"source_id": "AFR-SA-032",
+"purpose": "Verify Super Admin can reassign an existing role to a new user.",
+"preconditions": "Authenticated Super Admin session active; active role holder exists; eligible replacement user exists.",
+"action_or_input": "Submit role reassignment with new_user, effective_date, and reason.",
+"expected_result": "Role reassignment request is accepted and scheduled/processed.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-033-01",
+"source_id": "AFR-SA-033",
+"purpose": "Verify handover of access on effective date of role reassignment.",
+"preconditions": "Reassignment effective date is reached.",
+"action_or_input": "Execute reassignment effective-date transition.",
+"expected_result": "Role access is revoked from previous holder and granted to new holder.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-034-01",
+"source_id": "AFR-SA-034",
+"purpose": "Verify transfer of pending tasks to new holder on reassignment without exposing content to Super Admin.",
+"preconditions": "Previous holder has pending role-specific tasks.",
+"action_or_input": "Process role reassignment.",
+"expected_result": "Pending tasks transfer to new holder via system services without exposing task operational details to Super Admin.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-035A-01",
+"source_id": "AFR-SA-035A",
+"purpose": "Verify notification to previous and new role holders on role reassignment.",
+"preconditions": "Role reassignment executed.",
+"action_or_input": "Trigger role reassignment processing.",
+"expected_result": "Notifications are delivered to both previous and new role holders.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-035B-01",
+"source_id": "AFR-SA-035B",
+"purpose": "Verify retention of complete role-reassignment history.",
+"preconditions": "Role reassignment completed.",
+"action_or_input": "Inspect system role history logs.",
+"expected_result": "Complete reassignment trace including dates, reason, old holder, and new holder is preserved.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-036-01",
+"source_id": "AFR-SA-036",
+"purpose": "Verify previous holder read-only access to prior actions during audit period.",
+"preconditions": "Role reassigned; current time within configured audit access period.",
+"action_or_input": "Previous holder attempts to view historical actions performed during prior role tenure.",
+"expected_result": "Read-only access to prior actions is granted to previous holder.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-036-02",
+"source_id": "AFR-SA-036",
+"purpose": "Verify previous holder audit access expires after audit period.",
+"preconditions": "Role reassigned; configured audit access period has expired.",
+"action_or_input": "Previous holder attempts to access prior role action records.",
+"expected_result": "Read-only access is denied.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-SA-037-01",
+"source_id": "AFR-SA-037",
+"purpose": "Verify emergency reassignment with immediate effect.",
+"preconditions": "Authenticated Super Admin session active; active role holder exists.",
+"action_or_input": "Execute emergency reassignment with immediate effective timestamp.",
+"expected_result": "Role access transfers to new holder immediately without notice delay.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-038-01",
+"source_id": "AFR-SA-038",
+"purpose": "Verify early role revocation specifying mandatory reason and task disposition.",
+"preconditions": "Authenticated Super Admin session active; active user role exists.",
+"action_or_input": "Submit role revocation with revocation_date, mandatory reason, and pending task disposition ('transfer').",
+"expected_result": "Role revocation is submitted successfully.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-038-02",
+"source_id": "AFR-SA-038",
+"purpose": "Verify rejection of role revocation without mandatory reason.",
+"preconditions": "Authenticated Super Admin session active; active user role exists.",
+"action_or_input": "Submit role revocation omitting mandatory reason.",
+"expected_result": "Revocation request is rejected with validation error.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-SA-039A-01",
+"source_id": "AFR-SA-039A",
+"purpose": "Verify removal of role access on effective revocation date.",
+"preconditions": "Effective revocation date reached.",
+"action_or_input": "Process effective revocation state transition.",
+"expected_result": "Target user's role access is completely removed.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-039B-01",
+"source_id": "AFR-SA-039B",
+"purpose": "Verify pending tasks handled according to specified transfer-or-close disposition upon revocation.",
+"preconditions": "Revoked role holder has pending tasks; disposition set to 'close'.",
+"action_or_input": "Execute role revocation.",
+"expected_result": "Pending tasks associated with revoked role are closed as per specified disposition.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-039C-01",
+"source_id": "AFR-SA-039C",
+"purpose": "Verify notification to affected user and relevant module administrators upon revocation.",
+"preconditions": "Role revocation executed.",
+"action_or_input": "Trigger role revocation process.",
+"expected_result": "Notifications sent to affected user and module administrators.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-039D-01",
+"source_id": "AFR-SA-039D",
+"purpose": "Verify revocation is recorded in audit trail.",
+"preconditions": "Role revocation executed.",
+"action_or_input": "Inspect system audit logs.",
+"expected_result": "Audit trail contains complete entry for role revocation event.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-040A-01",
+"source_id": "AFR-SA-040A",
+"purpose": "Verify automatic role inactivation when scheduled end date is reached.",
+"preconditions": "Role end date reached.",
+"action_or_input": "Trigger scheduled expiry system check.",
+"expected_result": "Time-bound role is automatically revoked/inactivated.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-040B-01",
+"source_id": "AFR-SA-040B",
+"purpose": "Verify automatic revocation of assigned roles when user account is deactivated.",
+"preconditions": "Active user holds assigned roles; Super Admin deactivates user account.",
+"action_or_input": "Deactivate basic user account.",
+"expected_result": "All assigned roles belonging to user are automatically revoked/inactivated.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-041-01",
+"source_id": "AFR-SA-041",
+"purpose": "Verify tracking of role validity periods and identification of roles approaching expiration.",
+"preconditions": "Role validity date within configured lead time window.",
+"action_or_input": "Run role validity tracking check.",
+"expected_result": "Roles approaching expiration are identified accurately.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-042-01",
+"source_id": "AFR-SA-042",
+"purpose": "Verify role-expiry reminders sent at configured lead time.",
+"preconditions": "Role expiry date matches lead time trigger.",
+"action_or_input": "Execute notification reminder job.",
+"expected_result": "Role-expiry reminders delivered to Super Admin and affected user.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-043-01",
+"source_id": "AFR-SA-043",
+"purpose": "Verify extension of time-bound role validity prior to expiration.",
+"preconditions": "Authenticated Super Admin session active; unexpired time-bound role exists.",
+"action_or_input": "Submit role extension with new end date and reason.",
+"expected_result": "Role end date is updated and validity extended.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-044A-01",
+"source_id": "AFR-SA-044A",
+"purpose": "Verify affected user notification upon role validity extension.",
+"preconditions": "Super Admin extends role validity.",
+"action_or_input": "Execute role extension.",
+"expected_result": "Notification delivered to affected user confirming role extension.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-044B-01",
+"source_id": "AFR-SA-044B",
+"purpose": "Verify affected user notification when time-bound role expires.",
+"preconditions": "Time-bound role reaches end date and expires.",
+"action_or_input": "Trigger role expiration system task.",
+"expected_result": "Notification delivered to affected user announcing role expiration.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-045-01",
+"source_id": "AFR-SA-045",
+"purpose": "Verify multi-role user can view assigned roles and switch active role for session.",
+"preconditions": "Logged-in user holds Role A and Role B.",
+"action_or_input": "User selects Role B as active role for session.",
+"expected_result": "Session active role updates to Role B.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-046-01",
+"source_id": "AFR-SA-046",
+"purpose": "Verify module access granted according to active role permissions.",
+"preconditions": "User switched active role to Role B (has Module X access, no Module Y access).",
+"action_or_input": "Attempt access to Module X.",
+"expected_result": "Access to Module X is granted.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-SA-046-02",
+"source_id": "AFR-SA-046",
+"purpose": "Verify module access denied when active role lacks required permissions.",
+"preconditions": "User active role is Role B (lacks Module Y access).",
+"action_or_input": "Attempt access to Module Y.",
+"expected_result": "Access to Module Y is denied.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-SA-047-01",
+"source_id": "AFR-SA-047",
+"purpose": "Verify Super Admin can archive an eligible inactive user.",
+"preconditions": "Authenticated Super Admin session active; eligible deactivated user exists.",
+"action_or_input": "Submit archival request with archival_date, reason, and retention option.",
+"expected_result": "User archival process initiates successfully.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-048-01",
+"source_id": "AFR-SA-048",
+"purpose": "Verify user archival allowed after minimum deactivation interval and pending constraint satisfaction.",
+"preconditions": "Authenticated Super Admin session active; user deactivated > minimum interval, no pending transactions.",
+"action_or_input": "Archive eligible user account.",
+"expected_result": "Archival request is accepted.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-048-02",
+"source_id": "AFR-SA-048",
+"purpose": "Verify rejection of user archival before minimum deactivation interval.",
+"preconditions": "Authenticated Super Admin session active; user deactivated < minimum required interval.",
+"action_or_input": "Attempt to archive user account.",
+"expected_result": "Archival request rejected due to policy interval non-compliance.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-SA-049A-01",
+"source_id": "AFR-SA-049A",
+"purpose": "Verify user credentials/access disabled and roles revoked upon archival.",
+"preconditions": "User account archival executed.",
+"action_or_input": "Attempt login or role access with archived user credentials.",
+"expected_result": "Credentials disabled, all system access denied, assigned roles revoked.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-049B-01",
+"source_id": "AFR-SA-049B",
+"purpose": "Verify record moved to archive and listed under Archived Users upon user archival.",
+"preconditions": "User account archival executed.",
+"action_or_input": "Inspect active users list and Archived Users list.",
+"expected_result": "User record is removed from active list and appears under Archived Users list.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-050-01",
+"source_id": "AFR-SA-050",
+"purpose": "Verify archived record retains profile, role history, module participation, and audit trail.",
+"preconditions": "User account archived.",
+"action_or_input": "Retrieve archived record data structure.",
+"expected_result": "Required profile data, role history, permitted module participation records, and activity audit trail are preserved.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-051A-01",
+"source_id": "AFR-SA-051A",
+"purpose": "Verify restoration of archived user during reversible period with authorization.",
+"preconditions": "Authenticated Super Admin session active; user within reversible period; required authorization present.",
+"action_or_input": "Submit user restore request.",
+"expected_result": "Archived user account is restored to deactivated/active state.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-051A-02",
+"source_id": "AFR-SA-051A",
+"purpose": "Verify rejection of restoration attempt when required authorization is missing.",
+"preconditions": "Super Admin session active; user within reversible period; required authorization missing.",
+"action_or_input": "Submit user restore request.",
+"expected_result": "Restoration request rejected due to missing authorization.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-SA-051B-01",
+"source_id": "AFR-SA-051B",
+"purpose": "Verify archived account becomes permanently non-restorable after reversible period expires.",
+"preconditions": "User account archived; reversible window expired (ISS-SA-004).",
+"action_or_input": "Attempt to restore archived user account.",
+"expected_result": "Restoration request is rejected; account remains permanently archived.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-SA-052-01",
+"source_id": "AFR-SA-052",
+"purpose": "Verify Super Admin can initiate historical system data archival by category and date range.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Select data category 'AuditLogs' and date range, then click initiate archival.",
+"expected_result": "Historical data archival initiation accepted.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-053-01",
+"source_id": "AFR-SA-053",
+"purpose": "Verify pre-archival verification of retention-age, completion status, and dependencies.",
+"preconditions": "Historical data selected contains incomplete/dependent records.",
+"action_or_input": "Initiate archival on selected dataset.",
+"expected_result": "System checks flag dependent/incomplete data and halts non-compliant archival.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-SA-054A-01",
+"source_id": "AFR-SA-054A",
+"purpose": "Verify historical data archival requires authenticated confirmation immediately before execution.",
+"preconditions": "Historical data validated for archival.",
+"action_or_input": "Submit final archival execution request without reauthentication credentials.",
+"expected_result": "Execution blocked until reauthentication confirmation is provided.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-054B-01",
+"source_id": "AFR-SA-054B",
+"purpose": "Verify backup creation prior to moving historical data to archive database.",
+"preconditions": "Authenticated confirmation completed.",
+"action_or_input": "Execute historical data archival process.",
+"expected_result": "Data backup is created before data is moved to archive storage.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-055A-01",
+"source_id": "AFR-SA-055A",
+"purpose": "Verify moving eligible historical data to archive database after successful archival.",
+"preconditions": "Backup created successfully.",
+"action_or_input": "Complete archival data move operation.",
+"expected_result": "Eligible data records are migrated to archive database.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-055B-01",
+"source_id": "AFR-SA-055B",
+"purpose": "Verify generation of archival summary report after historical data archival.",
+"preconditions": "Historical data migration completed.",
+"action_or_input": "Finalize archival job.",
+"expected_result": "Archival summary report detailing processed counts and metrics is generated.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-056-01",
+"source_id": "AFR-SA-056",
+"purpose": "Verify read-only searchable access to permitted archived records subject to data isolation.",
+"preconditions": "Authenticated Super Admin session active; archived records exist.",
+"action_or_input": "Search and view permitted archived records.",
+"expected_result": "Records are presented in read-only mode without exposing prohibited operational content.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-SA-057-01",
+"source_id": "AFR-SA-057",
+"purpose": "Verify restoration of archived historical data when required approval exists.",
+"preconditions": "Authenticated Super Admin session active; approved restoration request exists.",
+"action_or_input": "Execute historical data restoration for target archival batch.",
+"expected_result": "Archived data is restored to active system.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-057-02",
+"source_id": "AFR-SA-057",
+"purpose": "Verify rejection of historical data restoration without required approval.",
+"preconditions": "Authenticated Super Admin session active; restoration approval absent.",
+"action_or_input": "Attempt historical data restoration.",
+"expected_result": "Restoration attempt rejected due to missing approval.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-SA-058-01",
+"source_id": "AFR-SA-058",
+"purpose": "Verify search and filter options for archived users and records.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Filter archived users by user ID, user type='Faculty', department='ECE', and date range.",
+"expected_result": "Filtered list matching exact criteria is returned.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-059A-01",
+"source_id": "AFR-SA-059A",
+"purpose": "Verify generation of archive reports from permitted archived data.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Generate archive report for specified date range.",
+"expected_result": "Archive report generated successfully.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-059B-01",
+"source_id": "AFR-SA-059B",
+"purpose": "Verify export of archive search or report results to CSV or PDF.",
+"preconditions": "Archive report generated.",
+"action_or_input": "Export results to PDF and CSV formats.",
+"expected_result": "Valid CSV and PDF files containing report results are produced.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-060-01",
+"source_id": "AFR-SA-060",
+"purpose": "Verify export of archived data packages for external storage.",
+"preconditions": "Authenticated Super Admin session active; retention policy allows export.",
+"action_or_input": "Request export of authorized archive package.",
+"expected_result": "Authorized archive package exported successfully.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-061A-01",
+"source_id": "AFR-SA-061A",
+"purpose": "Verify permanent-purge request permitted only after retention period has elapsed.",
+"preconditions": "Archived dataset past configured retention expiry period.",
+"action_or_input": "Submit purge request for expired dataset.",
+"expected_result": "Purge eligibility check passes.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-061A-02",
+"source_id": "AFR-SA-061A",
+"purpose": "Verify permanent-purge request rejected prior to retention period expiration.",
+"preconditions": "Archived dataset retention period active (unexpired).",
+"action_or_input": "Attempt permanent purge on unexpired dataset.",
+"expected_result": "Purge request rejected due to retention policy constraint.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-SA-061B-01",
+"source_id": "AFR-SA-061B",
+"purpose": "Verify permanent purge executes only after dual authorization by Super Admin and IT Head.",
+"preconditions": "Dataset eligible for purge; Super Admin authorized.",
+"action_or_input": "IT Head provides second authorization and confirms purge.",
+"expected_result": "Permanent purge is executed successfully.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-SA-061B-02",
+"source_id": "AFR-SA-061B",
+"purpose": "Verify permanent purge blocked when IT Head dual authorization is missing.",
+"preconditions": "Dataset eligible for purge; Super Admin authorized; IT Head authorization missing.",
+"action_or_input": "Attempt to execute permanent purge.",
+"expected_result": "Permanent purge is blocked pending dual authorization.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-SA-062-01",
+"source_id": "AFR-SA-062",
+"purpose": "Verify system logs user creation, role changes, authentication, archival, and config operations.",
+"preconditions": "Various administrative operations performed.",
+"action_or_input": "Trigger administrative actions across user, role, auth, archive, and config scopes.",
+"expected_result": "System logs entries for all performed administrative actions.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-063-01",
+"source_id": "AFR-SA-063",
+"purpose": "Verify activity log entry contains timestamp, actor, action, target, IP address, result, and reason.",
+"preconditions": "Super Admin action executed.",
+"action_or_input": "Inspect generated log entry.",
+"expected_result": "Log entry accurately includes timestamp, actor ID, action name, target entity, IP address, result status, and context/reason.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-064-01",
+"source_id": "AFR-SA-064",
+"purpose": "Verify Super Admin can view and filter audit logs in read-only mode without modifying them.",
+"preconditions": "Authenticated Super Admin session active; audit logs exist.",
+"action_or_input": "View and filter audit logs, and attempt to edit/delete log entry via UI/API.",
+"expected_result": "Logs displayed read-only; modification attempts rejected.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-065A-01",
+"source_id": "AFR-SA-065A",
+"purpose": "Verify generating audit reports with selectable parameters, sorting, and filtering.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Select date range and action type parameters, generate report, and sort tabular results.",
+"expected_result": "Audit report is generated with correct tabular sorting and filtering.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-065B-01",
+"source_id": "AFR-SA-065B",
+"purpose": "Verify provision of graphical views for supported audit reports.",
+"preconditions": "Audit report generated.",
+"action_or_input": "Switch to graphical report view.",
+"expected_result": "Graphical chart presentation of audit data is displayed.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-065C-01",
+"source_id": "AFR-SA-065C",
+"purpose": "Verify export of audit reports to PDF or Excel formats.",
+"preconditions": "Audit report generated.",
+"action_or_input": "Export report to PDF and Excel.",
+"expected_result": "Valid PDF and Excel report files are generated.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-066-01",
+"source_id": "AFR-SA-066",
+"purpose": "Verify Super Admin dashboard displays required statistics.",
+"preconditions": "Authenticated Super Admin session active; monitoring data available.",
+"action_or_input": "Load Super Admin dashboard page.",
+"expected_result": "User counts, role counts/expiries, recent operations, archive volume, system health, active users, role holders, and failed logins statistics are displayed.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-067-01",
+"source_id": "AFR-SA-067",
+"purpose": "Verify Super Admin can view role availability status, search vacant roles, and view role holders.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Search vacant roles and inspect current/past role holders for selected role.",
+"expected_result": "Role availability, vacant roles list, and historical holder details are displayed.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-068-01",
+"source_id": "AFR-SA-068",
+"purpose": "Verify notifications sent to basic users for account lifecycle and role events.",
+"preconditions": "Account creation, role assignment, deactivation, or archival event occurs.",
+"action_or_input": "Trigger basic user lifecycle event.",
+"expected_result": "Applicable notification delivered to target basic user.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-069-01",
+"source_id": "AFR-SA-069",
+"purpose": "Verify Super Admin notifications for bulk completion, role expiries, failed creations, security alerts, and archival completion.",
+"preconditions": "Target event (e.g., bulk completion or security alert) occurs.",
+"action_or_input": "Trigger event requiring Super Admin notification.",
+"expected_result": "Notification delivered to Super Admin.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-070-01",
+"source_id": "AFR-SA-070",
+"purpose": "Verify notifications to module administrators when roles in their module change.",
+"preconditions": "Role associated with Module X is assigned, reassigned, or revoked.",
+"action_or_input": "Execute role assignment for Module X role.",
+"expected_result": "Module X administrator receives notification regarding role change.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-071A-01",
+"source_id": "AFR-SA-071A",
+"purpose": "Verify notification subsystem delivers system-generated email and in-system notifications.",
+"preconditions": "Standard notification event triggered.",
+"action_or_input": "Trigger user role notification.",
+"expected_result": "Notification delivered via email and in-system channel.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-071B-01",
+"source_id": "AFR-SA-071B",
+"purpose": "Verify optional SMS channel delivery for critical security alerts.",
+"preconditions": "SMS channel configured; critical security alert triggered.",
+"action_or_input": "Trigger critical security alert.",
+"expected_result": "SMS notification delivered to designated recipient.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-072-01",
+"source_id": "AFR-SA-072",
+"purpose": "Verify data-isolation boundary prevents Super Admin access to module operational content.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Attempt to access operational endpoints/content (academic records, financial transactions, medical complaints).",
+"expected_result": "Access to operational content is denied with authorization error.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-SA-073A-01",
+"source_id": "AFR-SA-073A",
+"purpose": "Verify enforcement of strong-password policy during Super Admin login/change.",
+"preconditions": "Super Admin password change or authentication attempt.",
+"action_or_input": "Attempt to set/login with weak password '12345'.",
+"expected_result": "System rejects weak password failing strong-password policy.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-073B-01",
+"source_id": "AFR-SA-073B",
+"purpose": "Verify mandatory two-factor authentication requirement for Super Admin login.",
+"preconditions": "Super Admin enters valid primary username and password.",
+"action_or_input": "Omit secondary 2FA code submission.",
+"expected_result": "Login incomplete; access denied until valid 2FA token provided.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-073C-01",
+"source_id": "AFR-SA-073C",
+"purpose": "Verify optional IP-whitelist enforcement when enabled.",
+"preconditions": "IP-whitelist enforcement enabled; Super Admin connects from non-whitelisted IP.",
+"action_or_input": "Attempt Super Admin login from unauthorized IP address.",
+"expected_result": "Login attempt rejected due to IP whitelist mismatch.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-074A-01",
+"source_id": "AFR-SA-074A",
+"purpose": "Verify only one active Super Admin session permitted at a time.",
+"preconditions": "Super Admin Session 1 active on Machine A.",
+"action_or_input": "Authenticate Super Admin Session 2 on Machine B.",
+"expected_result": "Session 1 is invalidated/terminated or Session 2 rejected to maintain single active session.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-074B-01",
+"source_id": "AFR-SA-074B",
+"purpose": "Verify enforcement of configured Super Admin inactivity timeout.",
+"preconditions": "Super Admin session active; no user activity for duration exceeding inactivity timeout.",
+"action_or_input": "Submit request after inactivity timeout period elapses.",
+"expected_result": "Session expired; user redirected to login page.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-074C-01",
+"source_id": "AFR-SA-074C",
+"purpose": "Verify system maintains auditable Super Admin session logs.",
+"preconditions": "Super Admin logs in and logs out.",
+"action_or_input": "Inspect session logs.",
+"expected_result": "Login, logout, IP, and session duration are accurately recorded in session logs.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-075-01",
+"source_id": "AFR-SA-075",
+"purpose": "Verify prevention of Super Admin self-assigning or modifying own Super Admin status.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Attempt to modify self user account to alter Super Admin role/status.",
+"expected_result": "Modification attempt is rejected with explicit permission denial.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-076-01",
+"source_id": "AFR-SA-076",
+"purpose": "Verify Super Admin can configure permitted system-wide parameters.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Update permitted parameters: session timeout, password policy, archival retention period, notification preferences, bulk limit.",
+"expected_result": "System configuration updates successfully.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-077-01",
+"source_id": "AFR-SA-077",
+"purpose": "Verify prevention of Super Admin modifying excluded operational configurations.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Attempt to edit academic calendar, financial rules, or module operational workflows.",
+"expected_result": "Modification request is rejected.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-SA-078-01",
+"source_id": "AFR-SA-078",
+"purpose": "Verify bulk operation accepts batch size up to upper limit of 1000 records.",
+"preconditions": "Authenticated Super Admin session active; CSV file contains exactly 1000 records.",
+"action_or_input": "Submit bulk user operation with 1000 records.",
+"expected_result": "Bulk operation file is accepted for processing.",
+"test_type": "boundary"
+},
+{
+"test_id": "TC-SA-078-02",
+"source_id": "AFR-SA-078",
+"purpose": "Verify bulk operation rejects batch size exceeding limit of 1000 records.",
+"preconditions": "Authenticated Super Admin session active; CSV file contains 1001 records.",
+"action_or_input": "Submit bulk user operation with 1001 records.",
+"expected_result": "Bulk operation rejected due to exceeding 1000-record size limit.",
+"test_type": "boundary"
+},
+{
+"test_id": "TC-SA-079-01",
+"source_id": "AFR-SA-079",
+"purpose": "Verify critical operations require confirmation with authentication.",
+"preconditions": "Authenticated Super Admin session active; initiate critical operation (e.g., historical data archival).",
+"action_or_input": "Prompt for re-authentication password appears; submit incorrect password.",
+"expected_result": "Critical operation is blocked due to failed re-authentication.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-080A-01",
+"source_id": "AFR-SA-080A",
+"purpose": "Verify logging of failed Super Admin login attempts.",
+"preconditions": "Super Admin login page.",
+"action_or_input": "Submit failed login attempt with incorrect credentials.",
+"expected_result": "Failed login attempt is logged with IP address and timestamp.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-080B-01",
+"source_id": "AFR-SA-080B",
+"purpose": "Verify security alert trigger after 5 consecutive failed login attempts.",
+"preconditions": "4 consecutive failed Super Admin login attempts recorded.",
+"action_or_input": "Submit 5th consecutive failed login attempt.",
+"expected_result": "System triggers security alert notification.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-081A-01",
+"source_id": "AFR-SA-081A",
+"purpose": "Verify all Super Admin actions are logged.",
+"preconditions": "Authenticated Super Admin session active.",
+"action_or_input": "Perform an administrative action.",
+"expected_result": "Corresponding audit log entry is generated immediately.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-081B-01",
+"source_id": "AFR-SA-081B",
+"purpose": "Verify Super Admin audit logs are immutable and cannot be modified or deleted.",
+"preconditions": "Audit log entries exist in database.",
+"action_or_input": "Attempt update or delete operation on audit log records via API/database query.",
+"expected_result": "Modification or deletion of audit log records is denied.",
+"test_type": "security"
+},
+{
+"test_id": "TC-SA-081C-01",
+"source_id": "AFR-SA-081C",
+"purpose": "Verify permanent retention of Super Admin audit logs.",
+"preconditions": "Audit logs created.",
+"action_or_input": "Check retention settings and automated cleanup routines for audit logs.",
+"expected_result": "Audit log tables are excluded from automated purge or routine deletion.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-081D-01",
+"source_id": "AFR-SA-081D",
+"purpose": "Verify role-assignment history is retained after role expiry.",
+"preconditions": "Assigned role reaches end date and expires.",
+"action_or_input": "Query role assignment history after role expiry date.",
+"expected_result": "Expired role assignment history remains fully intact and queryable.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-SA-082-01",
+"source_id": "AFR-SA-082",
+"purpose": "Verify password change enforcement at configured password-rotation interval.",
+"preconditions": "Super Admin password age exceeds configured password-rotation interval.",
+"action_or_input": "Attempt login with current password.",
+"expected_result": "Login requires mandatory password update before access is granted.",
+"test_type": "security"
+}
+]
