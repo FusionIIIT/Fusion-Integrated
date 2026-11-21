@@ -18,6 +18,7 @@ sys.path.insert(0, str(ROOT))
 # Routes that exist deliberately without a nav entry.
 EXEMPT_ROUTES = {
     "",           # the index redirect
+    "files/:id",  # detail page reached via row click, not sidebar nav
 }
 
 
