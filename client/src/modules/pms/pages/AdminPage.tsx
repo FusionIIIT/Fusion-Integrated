@@ -12,7 +12,7 @@ import { PmsActionForm } from "../components/PmsActionForm";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { DataTable, type Column } from "../../../ui/components/DataTable";
-import type { AttorneyPanelEntry, PmsConfiguration } from "../api/types";
+import type { AttorneyPanelEntry } from "../api/types";
 
 const CONFIG_KEYS = [
   "review_business_days", "revision_days", "alert_offsets", "holiday_calendar",

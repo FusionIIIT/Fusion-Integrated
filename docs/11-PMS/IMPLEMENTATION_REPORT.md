@@ -2,7 +2,7 @@
 
 **Current branch:** `assignment9_PMS`
 **Specification baseline:** PMS Problem Statement v1.2; Requirement Registry, Use Cases, Business Rules, Workflows, and Traceability Matrix v1.3
-**Code snapshot:** M6 commits through `9026735`
+**Code snapshot:** branch HEAD `496538f` (M8 test corrections); local frontend compile fixes are uncommitted
 **M7 purpose:** describe repository evidence; this report does not change or supersede requirements.
 
 ## Specification set reviewed
@@ -49,7 +49,7 @@ The branch history contains the following implementation stages:
 - **M5:** `e45ebd4` makes outbox delivery retry-safe; `9c252a7` automates configured maintenance deadline alerts; `2a05039` schedules PMS deadline and notification tasks.
 - **M6:** `f19537f` adds submission/tracking; `9d2c18c` adds review and attorney workflows; `9026735` adds administration, workflow oversight, audit, and reporting screens.
 
-The initial implementation report’s check results are historical and predate M3–M6. M7 did not rerun the backend suite or frontend build. A previous M6 build attempt could not start because this checkout did not have TypeScript installed (`tsc: not found`). No PMS-specific frontend test files exist under `client/src/modules/pms/`.
+The initial implementation report’s check results are historical and predate M3–M6. M7 did not rerun the backend suite or frontend build. No PMS-specific frontend test files exist under `client/src/modules/pms/`.
 
 ### Decisions and constraints visible in the repository
 
@@ -83,7 +83,7 @@ Celery Beat schedules a daily deadline scan and a notification drain every 60 se
 - Office Actions, Maintenance, and Licensing
 - Workflow Oversight, Reports / My Reports, Administration, and Audit Trail
 
-Pages use the shared HTTP/CSRF client and React Query hooks. UI role checks control visibility only; API and service authorization remain authoritative. Application selectors are populated from the scoped applications API. The shared forms display validation, loading, success, and server error feedback. The client has no PMS-specific automated tests, and M6’s build/type check remains unverified because the local `tsc` executable was absent.
+Pages use the shared HTTP/CSRF client and React Query hooks. UI role checks control visibility only; API and service authorization remain authoritative. Application selectors are populated from the scoped applications API. The shared forms display validation, loading, success, and server error feedback. The client has no PMS-specific automated tests. The latest client typecheck, shared client tests, and production build passed (see latest verification below).
 
 ## Current implementation gaps and dependencies
 
@@ -99,6 +99,12 @@ Pages use the shared HTTP/CSRF client and React Query hooks. UI role checks cont
 
 The M7 workbook includes 371 traceability rows (203 AFR, 30 CFR, 33 use cases, 84 business rules, 21 workflows). Its status is an evidence classification based on current code references, feature-level associations, and test-file presence. “Covered by tests” means a related test source exists; it does not mean the test was run in M7 or that it asserts every mapped requirement clause. Frontend behavior has no PMS-specific automated tests.
 
-## Verification boundary
+## Latest verification — 2026-11-21
 
-M7 performed static source and test-file inspection to update the report and RTM. It did not run extensive tests, alter implementation code, or modify the six original specifications. Before M8 or production use, Student 2 should execute backend and frontend suites in the configured environment and review every partial, unimplemented, and externally dependent RTM row.
+- `make check` — **passed** against the configured local PostgreSQL database. Django system checks, migration consistency, Ruff, import contracts, repository contract checks, navigation/route matching, permission manifest, OpenAPI schema, and the full backend pytest suite all completed successfully. Pytest emitted Django email-setting deprecation warnings and two naive-datetime warnings in policy tests; these did not fail the check.
+- `make check-client` — **passed** after installing the exact `client/package-lock.json` dependencies. TypeScript checks (application and E2E), all 38 shared client tests across six files, and the production Vite build passed. The build reported a chunk-size advisory; npm install reported nine dependency advisories. Neither was investigated as part of this check.
+- The first client check attempt could not start because TypeScript was absent. Once dependencies were installed, it exposed two unused-import TypeScript errors; the local fixes remove those imports from `client/src/modules/pms/pages/AdminPage.tsx` and `client/src/modules/pms/pages/Placeholder.tsx`.
+- The prior nine backend test failures were corrected as test fixture/assertion issues in HEAD `496538f`, not production defects. Fixtures now create accepted AttorneyAssignment records and a granted maintenance context required by the relevant workflows; the audit caller has the workflow-monitor permission it uses; ownership tests make the co-inventor visible while still asserting primary-applicant-only actions are refused; the appeal test follows Director assignment and review; and workflow tests refresh ORM instances before asserting persisted assignment status. These align with UC-PMS-006/010/011/017/018/023/028, BW-PMS-06/07/14/15, and BR-PMS-040/061/067/070/092/095/126. The test suite passed in `make check`.
+- No original specification or Student 2 spec-test files were modified. No new milestone work was started. Full independent review scorecard/output was not present in the repository or searched Downloads; the prior nine-test report was used as requested.
+
+The M7 review and traceability updates did not run backend/frontend suites at the time; the results above supersede that verification gap. Student 2 should still perform comprehensive QA, including PMS-specific frontend workflow coverage, and review every partial, unimplemented, and externally dependent RTM row. This is not full QA certification.
