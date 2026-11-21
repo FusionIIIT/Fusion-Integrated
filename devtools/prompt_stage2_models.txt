@@ -1,0 +1,59 @@
+You are Qwen2.5-Coder 7B running locally in the Fusion ERP repository.
+Define the Django ORM models for the Employee Leave Management (`elm`) module in `modules/elm/models.py`.
+
+Repository conventions:
+- Institute employees are referenced by plain `user_id` integer (`models.IntegerField` or `UserScopedModel`), NEVER foreign keys to user table (there is no user table in this database; Fusion uses IAM/directory).
+- Import `TimeStampedModel, UserScopedModel` from `core.db.mixins`.
+- Use explicit `db_table` names with `elm_` prefix (e.g., `elm_leave_balance`, `elm_leave_request`, `elm_substitute_assignment`, `elm_leave_action_history`).
+
+Required models:
+1. `LeaveBalance(TimeStampedModel, UserScopedModel)`:
+   - Fields: `user_id` (from UserScopedModel), `category` (CharField max_length=10: 'CL', 'RH', 'SCL', 'EL', 'VL', 'COL'), `year` (IntegerField), `credited` (DecimalField 5,2), `availed` (DecimalField 5,2, default=0), `balance` (DecimalField 5,2).
+   - Constraints: UniqueConstraint on `user_id, category, year`.
+   - Table: `elm_leave_balance`.
+
+2. `LeaveRequest(TimeStampedModel, UserScopedModel)`:
+   - Status choices:
+     - `submitted` ("Submitted")
+     - `awaiting_substitute` ("Awaiting substitute consent")
+     - `under_review` ("Under Unit Head review")
+     - `recommended` ("Recommended to Sanctioning Authority")
+     - `sanctioned` ("Sanctioned")
+     - `rejected` ("Rejected")
+     - `withdrawn` ("Withdrawn")
+     - `cancelled` ("Cancelled")
+   - Fields:
+     - `user_id` (from UserScopedModel)
+     - `category` (CharField max_length=10)
+     - `start_date` (DateField)
+     - `end_date` (DateField)
+     - `half_day` (CharField max_length=10, blank=True, null=True choices: [('first', 'First Half'), ('second', 'Second Half')])
+     - `leave_days` (DecimalField 5,2)
+     - `purpose` (TextField)
+     - `status` (CharField max_length=24, default='submitted')
+     - `is_station_leave` (BooleanField default=False)
+     - `destination` (CharField max_length=200, blank=True)
+     - `emergency_contact` (CharField max_length=50, blank=True)
+     - `substitute_id` (IntegerField null=True, blank=True)
+     - `current_reviewer_id` (IntegerField null=True, blank=True)
+     - `rejection_reason` (TextField blank=True)
+   - Table: `elm_leave_request`.
+
+3. `SubstituteAssignment(TimeStampedModel)`:
+   - Fields:
+     - `leave_request` (ForeignKey to LeaveRequest, on_delete=CASCADE, related_name='substitute_assignments')
+     - `substitute_id` (IntegerField)
+     - `status` (CharField max_length=20 choices: [('pending', 'Pending'), ('accepted', 'Accepted'), ('declined', 'Declined')], default='pending')
+     - `remarks` (TextField blank=True)
+     - `responded_at` (DateTimeField null=True, blank=True)
+   - Table: `elm_substitute_assignment`.
+
+4. `LeaveActionHistory(TimeStampedModel)`:
+   - Fields:
+     - `leave_request` (ForeignKey to LeaveRequest, on_delete=CASCADE, related_name='actions')
+     - `actor_id` (IntegerField)
+     - `action` (CharField max_length=30)
+     - `comments` (TextField blank=True)
+   - Table: `elm_leave_action_history`.
+
+Output ONLY the complete Python code in ```python fences.

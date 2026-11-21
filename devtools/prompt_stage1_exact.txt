@@ -1,0 +1,29 @@
+You are Qwen2.5-Coder 7B running locally.
+Here is the exact official specification for BR-EL-007, BR-EL-008, and BR-EL-012 from Fusion ERP ELM Specifications v1.4:
+
+1. BR-EL-007 & BR-EL-008:
+"At year end, all unused faculty VL shall convert to EL at 2 VL : 1 EL including fractional conversion, and VL itself shall not carry forward. EL created by VL conversion shall be credited to the faculty member's EL balance, may carry forward, and may subsequently be availed."
+So:
+- `el_credited = unutilized_vl / Decimal('2')`
+- `new_el = current_el + el_credited`
+- If an EL accumulation cap applies (e.g. `max_el_cap = Decimal('300')`), credited EL is capped at `min(el_credited, max(Decimal('0'), max_el_cap - current_el))` and excess converted EL or uncredited VL is forfeited.
+- The return value of `calculate_vl_to_el_conversion(unutilized_vl: Decimal, current_el: Decimal, max_el_cap: Decimal = Decimal('300'))` must be:
+  `(credited_el, forfeited_vl, new_el_balance)` where `forfeited_vl = unutilized_vl - (credited_el * Decimal('2'))`.
+
+2. BR-EL-012:
+"Applicant non-overlap with half-day CL exception: A leave period cannot overlap with another leave request for the same applicant, except when both requests are for the exact same date, one request is for 'first' half CL, and the other is for 'second' half CL."
+So `intervals_overlap(a_start: date, a_end: date, a_half: str | None, b_start: date, b_end: date, b_half: str | None) -> bool`:
+- If dates do not overlap (`a_end < b_start` or `b_end < a_start`), return False.
+- If they do intersect: if `a_start == a_end == b_start == b_end` and `((a_half == 'first' and b_half == 'second') or (a_half == 'second' and b_half == 'first'))`: return False.
+- Otherwise, return True.
+
+3. Complete `modules/elm/domain/rules.py`:
+Implement:
+- `ENTITLEMENTS = {'CL': Decimal('8'), 'RH': Decimal('2'), 'SCL': Decimal('15'), 'EL': Decimal('30'), 'VL': Decimal('60'), 'COL': Decimal('20')}`
+- `count_leave_days(category: str, start: date, end: date, half_day: str | None = None, closed_dates: set[date] | None = None) -> Decimal`
+- `intervals_overlap(a_start: date, a_end: date, a_half: str | None, b_start: date, b_end: date, b_half: str | None) -> bool`
+- `calculate_vl_to_el_conversion(unutilized_vl: Decimal, current_el: Decimal, max_el_cap: Decimal = Decimal('300')) -> tuple[Decimal, Decimal, Decimal]`
+- `validate_station_leave(is_station_leave: bool, destination: str | None, emergency_contact: str | None) -> bool`
+- `can_substitute(applicant_id: int, substitute_id: int) -> bool`
+
+Write the COMPLETE, PRODUCTION-READY `modules/elm/domain/rules.py` in valid Python. Return ONLY code inside ```python fences.
