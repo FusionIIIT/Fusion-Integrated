@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.mms",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -173,6 +174,12 @@ EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", False)
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL",
                          "Placement Cell <placement@iiitdmj.ac.in>")
+
+# The frozen MMS specification leaves the special-food decision period
+# institution-defined (12 hours is only an intended value), so no default is
+# silently imposed here.
+MMS_SPECIAL_FOOD_DECISION_HOURS = env_int(
+    "MMS_SPECIAL_FOOD_DECISION_HOURS", None)
 
 #: Ceiling per worker pass, so a runaway loop cannot mail the institute.
 NOTIFY_MAX_PER_RUN = env_int("NOTIFY_MAX_PER_RUN", 500)

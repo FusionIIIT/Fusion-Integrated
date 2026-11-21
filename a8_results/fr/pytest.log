@@ -1,0 +1,832 @@
+FFF..F.FFF..................................s..s...F.................... [ 61%]
+.........F..F....s.ss...ssssss.......Fs.ss...                            [100%]
+=================================== FAILURES ===================================
+________________________ test_frozen_fr_case[TC-FR-001] ________________________
+
+case_id = 'TC-FR-001'
+stub_iam = <function stub_iam.<locals>._install at 0x721dc5814680>
+user_ref = <function user_ref.<locals>._make at 0x721dc5815800>
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+>       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/a8/fr/test_fr_cases.py:1080: in <lambda>
+    HANDLERS["TC-FR-001"] = lambda h, _case_id: _run_status(h)
+                                                ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = <test_fr_cases.Harness object at 0x721dc5920c50>
+
+    def _run_status(h):
+        h.enrollment(1001)
+        response = h.client(1001).get("/api/v1/mms/student-status")
+        assert response.status_code == 200
+        assert response.json()["registered"] is True
+>       assert response.json().get("cycle") == "Semester-Autumn-2026"
+E       assert None == 'Semester-Autumn-2026'
+E        +  where None = <built-in method get of dict object at 0x721dc593bdc0>('cycle')
+E        +    where <built-in method get of dict object at 0x721dc593bdc0> = {'registered': True, 'registered_at': '2026-10-11T02:40:23.249730Z', 'deregistered_at': None}.get
+E        +      where {'registered': True, 'registered_at': '2026-10-11T02:40:23.249730Z', 'deregistered_at': None} = functools.partial(<bound method ClientMixin._parse_json of <rest_framework.test.APIClient object at 0x721dc59221e0>>, <Response status_code=200, "application/json">)()
+E        +        where functools.partial(<bound method ClientMixin._parse_json of <rest_framework.test.APIClient object at 0x721dc59221e0>>, <Response status_code=200, "application/json">) = <Response status_code=200, "application/json">.json
+
+tests/a8/fr/test_fr_cases.py:213: AssertionError
+________________________ test_frozen_fr_case[TC-FR-002] ________________________
+
+case_id = 'TC-FR-002'
+stub_iam = <function stub_iam.<locals>._install at 0x721dc536c900>
+user_ref = <function user_ref.<locals>._make at 0x721dc536d4e0>
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+>       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = <test_fr_cases.Harness object at 0x721dc6533800>, case_id = 'TC-FR-002'
+
+    def _run_role(h, case_id):
+        role = "caretaker" if case_id not in {"TC-FR-003", "TC-FR-007", "TC-FR-008",
+                                              "TC-FR-010"} else "warden"
+        if case_id in {"TC-FR-002", "TC-FR-003", "TC-FR-009", "TC-FR-010",
+                       "TC-FR-013"}:
+            employee_id = 1001 if role == "caretaker" else 1002
+            h.employee(employee_id)
+            with freeze_time("2026-08-02T12:00:00Z"):
+                payload = {
+                    "role": role,
+                    "user_id": employee_id,
+                    "ends_at": (
+                        "2026-12-31T18:29:00Z"
+                        if case_id != "TC-FR-013"
+                        else (timezone.now() + timedelta(days=30)).isoformat()
+                    ),
+                }
+                if case_id != "TC-FR-013":
+                    payload["starts_at"] = "2026-08-01T00:00:00Z"
+                response = h.client(9000, "admin").post(
+                    "/api/v1/mms/roles",
+                    payload,
+                    format="json",
+                )
+            assert response.status_code == 201
+            assert response.json()["user_id"] == employee_id
+            if case_id != "TC-FR-013":
+>               assert response.json()["starts_at"].startswith("2026-08-01")
+E               AssertionError: assert False
+E                +  where False = <built-in method startswith of str object at 0x721dc512eec0>('2026-08-01')
+E                +    where <built-in method startswith of str object at 0x721dc512eec0> = '2026-08-02T17:30:00+05:30'.startswith
+
+tests/a8/fr/test_fr_cases.py:243: AssertionError
+________________________ test_frozen_fr_case[TC-FR-003] ________________________
+
+case_id = 'TC-FR-003'
+stub_iam = <function stub_iam.<locals>._install at 0x721dc536c5e0>
+user_ref = <function user_ref.<locals>._make at 0x721dc512a8e0>
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+>       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = <test_fr_cases.Harness object at 0x721dc5920c80>, case_id = 'TC-FR-003'
+
+    def _run_role(h, case_id):
+        role = "caretaker" if case_id not in {"TC-FR-003", "TC-FR-007", "TC-FR-008",
+                                              "TC-FR-010"} else "warden"
+        if case_id in {"TC-FR-002", "TC-FR-003", "TC-FR-009", "TC-FR-010",
+                       "TC-FR-013"}:
+            employee_id = 1001 if role == "caretaker" else 1002
+            h.employee(employee_id)
+            with freeze_time("2026-08-02T12:00:00Z"):
+                payload = {
+                    "role": role,
+                    "user_id": employee_id,
+                    "ends_at": (
+                        "2026-12-31T18:29:00Z"
+                        if case_id != "TC-FR-013"
+                        else (timezone.now() + timedelta(days=30)).isoformat()
+                    ),
+                }
+                if case_id != "TC-FR-013":
+                    payload["starts_at"] = "2026-08-01T00:00:00Z"
+                response = h.client(9000, "admin").post(
+                    "/api/v1/mms/roles",
+                    payload,
+                    format="json",
+                )
+            assert response.status_code == 201
+            assert response.json()["user_id"] == employee_id
+            if case_id != "TC-FR-013":
+>               assert response.json()["starts_at"].startswith("2026-08-01")
+E               AssertionError: assert False
+E                +  where False = <built-in method startswith of str object at 0x721dc5155340>('2026-08-01')
+E                +    where <built-in method startswith of str object at 0x721dc5155340> = '2026-08-02T17:30:00+05:30'.startswith
+
+tests/a8/fr/test_fr_cases.py:243: AssertionError
+________________________ test_frozen_fr_case[TC-FR-006] ________________________
+
+case_id = 'TC-FR-006'
+stub_iam = <function stub_iam.<locals>._install at 0x721dc512b240>
+user_ref = <function user_ref.<locals>._make at 0x721dc536c720>
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+>       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = <test_fr_cases.Harness object at 0x721dc5137380>, case_id = 'TC-FR-006'
+
+    def _run_role(h, case_id):
+        role = "caretaker" if case_id not in {"TC-FR-003", "TC-FR-007", "TC-FR-008",
+                                              "TC-FR-010"} else "warden"
+        if case_id in {"TC-FR-002", "TC-FR-003", "TC-FR-009", "TC-FR-010",
+                       "TC-FR-013"}:
+            employee_id = 1001 if role == "caretaker" else 1002
+            h.employee(employee_id)
+            with freeze_time("2026-08-02T12:00:00Z"):
+                payload = {
+                    "role": role,
+                    "user_id": employee_id,
+                    "ends_at": (
+                        "2026-12-31T18:29:00Z"
+                        if case_id != "TC-FR-013"
+                        else (timezone.now() + timedelta(days=30)).isoformat()
+                    ),
+                }
+                if case_id != "TC-FR-013":
+                    payload["starts_at"] = "2026-08-01T00:00:00Z"
+                response = h.client(9000, "admin").post(
+                    "/api/v1/mms/roles",
+                    payload,
+                    format="json",
+                )
+            assert response.status_code == 201
+            assert response.json()["user_id"] == employee_id
+            if case_id != "TC-FR-013":
+                assert response.json()["starts_at"].startswith("2026-08-01")
+                assert response.json()["ends_at"].startswith("2026-12-31")
+            assert DirectoryUserRef.objects.filter(user_id=employee_id).count() == 1
+            return
+    
+        if case_id in {"TC-FR-004", "TC-FR-011"}:
+            h.employee(1003)
+            h.employee(1004)
+            h.active_role(1003, "caretaker")
+            response = h.client(9000, "admin").post(
+                "/api/v1/mms/roles",
+                {
+                    "role": "caretaker",
+                    "user_id": 1004,
+                    "ends_at": (timezone.now() + timedelta(days=30)).isoformat(),
+                },
+                format="json",
+            )
+            assert response.status_code == 201
+            assert not RoleAssignment.objects.get(user_id=1003).is_current
+            assert RoleAssignment.objects.get(user_id=1004).is_current
+            return
+    
+        current_user = 1001 if role == "caretaker" else 1002
+        other_user = 1004 if role == "caretaker" else 1005
+        h.employee(current_user)
+        h.employee(other_user)
+        h.active_role(current_user, role)
+        if case_id in {"TC-FR-005", "TC-FR-007"}:
+            response = h.client(9000, "admin").get("/api/v1/mms/roles")
+            assert response.status_code == 200
+            current = [row for row in response.json()["current"] if row["role"] == role]
+            assert [row["user_id"] for row in current] == [current_user]
+        elif case_id in {"TC-FR-006", "TC-FR-008"}:
+            response = h.client(9000, "admin").post(
+                "/api/v1/mms/roles",
+                {
+                    "role": role,
+                    "user_id": other_user,
+                    "ends_at": (timezone.now() + timedelta(days=30)).isoformat(),
+                },
+                format="json",
+            )
+>           assert response.status_code == 409
+E           assert 201 == 409
+E            +  where 201 = <Response status_code=201, "application/json">.status_code
+
+tests/a8/fr/test_fr_cases.py:286: AssertionError
+________________________ test_frozen_fr_case[TC-FR-008] ________________________
+
+case_id = 'TC-FR-008'
+stub_iam = <function stub_iam.<locals>._install at 0x721dc512a020>
+user_ref = <function user_ref.<locals>._make at 0x721dc51ccea0>
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+>       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = <test_fr_cases.Harness object at 0x721dc5137c20>, case_id = 'TC-FR-008'
+
+    def _run_role(h, case_id):
+        role = "caretaker" if case_id not in {"TC-FR-003", "TC-FR-007", "TC-FR-008",
+                                              "TC-FR-010"} else "warden"
+        if case_id in {"TC-FR-002", "TC-FR-003", "TC-FR-009", "TC-FR-010",
+                       "TC-FR-013"}:
+            employee_id = 1001 if role == "caretaker" else 1002
+            h.employee(employee_id)
+            with freeze_time("2026-08-02T12:00:00Z"):
+                payload = {
+                    "role": role,
+                    "user_id": employee_id,
+                    "ends_at": (
+                        "2026-12-31T18:29:00Z"
+                        if case_id != "TC-FR-013"
+                        else (timezone.now() + timedelta(days=30)).isoformat()
+                    ),
+                }
+                if case_id != "TC-FR-013":
+                    payload["starts_at"] = "2026-08-01T00:00:00Z"
+                response = h.client(9000, "admin").post(
+                    "/api/v1/mms/roles",
+                    payload,
+                    format="json",
+                )
+            assert response.status_code == 201
+            assert response.json()["user_id"] == employee_id
+            if case_id != "TC-FR-013":
+                assert response.json()["starts_at"].startswith("2026-08-01")
+                assert response.json()["ends_at"].startswith("2026-12-31")
+            assert DirectoryUserRef.objects.filter(user_id=employee_id).count() == 1
+            return
+    
+        if case_id in {"TC-FR-004", "TC-FR-011"}:
+            h.employee(1003)
+            h.employee(1004)
+            h.active_role(1003, "caretaker")
+            response = h.client(9000, "admin").post(
+                "/api/v1/mms/roles",
+                {
+                    "role": "caretaker",
+                    "user_id": 1004,
+                    "ends_at": (timezone.now() + timedelta(days=30)).isoformat(),
+                },
+                format="json",
+            )
+            assert response.status_code == 201
+            assert not RoleAssignment.objects.get(user_id=1003).is_current
+            assert RoleAssignment.objects.get(user_id=1004).is_current
+            return
+    
+        current_user = 1001 if role == "caretaker" else 1002
+        other_user = 1004 if role == "caretaker" else 1005
+        h.employee(current_user)
+        h.employee(other_user)
+        h.active_role(current_user, role)
+        if case_id in {"TC-FR-005", "TC-FR-007"}:
+            response = h.client(9000, "admin").get("/api/v1/mms/roles")
+            assert response.status_code == 200
+            current = [row for row in response.json()["current"] if row["role"] == role]
+            assert [row["user_id"] for row in current] == [current_user]
+        elif case_id in {"TC-FR-006", "TC-FR-008"}:
+            response = h.client(9000, "admin").post(
+                "/api/v1/mms/roles",
+                {
+                    "role": role,
+                    "user_id": other_user,
+                    "ends_at": (timezone.now() + timedelta(days=30)).isoformat(),
+                },
+                format="json",
+            )
+>           assert response.status_code == 409
+E           assert 201 == 409
+E            +  where 201 = <Response status_code=201, "application/json">.status_code
+
+tests/a8/fr/test_fr_cases.py:286: AssertionError
+________________________ test_frozen_fr_case[TC-FR-009] ________________________
+
+case_id = 'TC-FR-009'
+stub_iam = <function stub_iam.<locals>._install at 0x721dc51ccd60>
+user_ref = <function user_ref.<locals>._make at 0x721dc51cd9e0>
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+>       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = <test_fr_cases.Harness object at 0x721dc5134cb0>, case_id = 'TC-FR-009'
+
+    def _run_role(h, case_id):
+        role = "caretaker" if case_id not in {"TC-FR-003", "TC-FR-007", "TC-FR-008",
+                                              "TC-FR-010"} else "warden"
+        if case_id in {"TC-FR-002", "TC-FR-003", "TC-FR-009", "TC-FR-010",
+                       "TC-FR-013"}:
+            employee_id = 1001 if role == "caretaker" else 1002
+            h.employee(employee_id)
+            with freeze_time("2026-08-02T12:00:00Z"):
+                payload = {
+                    "role": role,
+                    "user_id": employee_id,
+                    "ends_at": (
+                        "2026-12-31T18:29:00Z"
+                        if case_id != "TC-FR-013"
+                        else (timezone.now() + timedelta(days=30)).isoformat()
+                    ),
+                }
+                if case_id != "TC-FR-013":
+                    payload["starts_at"] = "2026-08-01T00:00:00Z"
+                response = h.client(9000, "admin").post(
+                    "/api/v1/mms/roles",
+                    payload,
+                    format="json",
+                )
+            assert response.status_code == 201
+            assert response.json()["user_id"] == employee_id
+            if case_id != "TC-FR-013":
+>               assert response.json()["starts_at"].startswith("2026-08-01")
+E               AssertionError: assert False
+E                +  where False = <built-in method startswith of str object at 0x721dc515fc80>('2026-08-01')
+E                +    where <built-in method startswith of str object at 0x721dc515fc80> = '2026-08-02T17:30:00+05:30'.startswith
+
+tests/a8/fr/test_fr_cases.py:243: AssertionError
+________________________ test_frozen_fr_case[TC-FR-010] ________________________
+
+case_id = 'TC-FR-010'
+stub_iam = <function stub_iam.<locals>._install at 0x721dc51cc9a0>
+user_ref = <function user_ref.<locals>._make at 0x721dc51cec00>
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+>       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = <test_fr_cases.Harness object at 0x721dc51377a0>, case_id = 'TC-FR-010'
+
+    def _run_role(h, case_id):
+        role = "caretaker" if case_id not in {"TC-FR-003", "TC-FR-007", "TC-FR-008",
+                                              "TC-FR-010"} else "warden"
+        if case_id in {"TC-FR-002", "TC-FR-003", "TC-FR-009", "TC-FR-010",
+                       "TC-FR-013"}:
+            employee_id = 1001 if role == "caretaker" else 1002
+            h.employee(employee_id)
+            with freeze_time("2026-08-02T12:00:00Z"):
+                payload = {
+                    "role": role,
+                    "user_id": employee_id,
+                    "ends_at": (
+                        "2026-12-31T18:29:00Z"
+                        if case_id != "TC-FR-013"
+                        else (timezone.now() + timedelta(days=30)).isoformat()
+                    ),
+                }
+                if case_id != "TC-FR-013":
+                    payload["starts_at"] = "2026-08-01T00:00:00Z"
+                response = h.client(9000, "admin").post(
+                    "/api/v1/mms/roles",
+                    payload,
+                    format="json",
+                )
+            assert response.status_code == 201
+            assert response.json()["user_id"] == employee_id
+            if case_id != "TC-FR-013":
+>               assert response.json()["starts_at"].startswith("2026-08-01")
+E               AssertionError: assert False
+E                +  where False = <built-in method startswith of str object at 0x721dc51bc800>('2026-08-01')
+E                +    where <built-in method startswith of str object at 0x721dc51bc800> = '2026-08-02T17:30:00+05:30'.startswith
+
+tests/a8/fr/test_fr_cases.py:243: AssertionError
+________________________ test_frozen_fr_case[TC-FR-052] ________________________
+
+case_id = 'TC-FR-052'
+stub_iam = <function stub_iam.<locals>._install at 0x721dc5208a40>
+user_ref = <function user_ref.<locals>._make at 0x721dc5209440>
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+>       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = <test_fr_cases.Harness object at 0x721dc528a900>, case_id = 'TC-FR-052'
+
+    def _run_billing(h, case_id):
+        if case_id == "TC-FR-042":
+            _create_bill(1001)
+            _create_bill(2002, total="500.00")
+            response = h.client(1001).get("/api/v1/mms/bills")
+            assert response.status_code == 200
+            assert [row["user_id"] for row in response.json()["results"]] == [1001]
+            return
+        if case_id == "TC-FR-043":
+            bill = _generate_bill(h)
+            assert bill.user_id == 1001
+            assert bill.year == 2026 and bill.month == 9
+            return
+        if case_id == "TC-FR-044":
+            from modules.mms.domain.rules import calculate_bill
+    
+            assert calculate_bill(
+                daily_rate=Decimal("100"), served_days=25,
+                special_food_charges=Decimal("0"),
+                rebate_deduction=Decimal("0"),
+            ) == Decimal("2500.00")
+            return
+        if case_id in {"TC-FR-046", "TC-FR-047", "TC-FR-072", "TC-FR-095"}:
+            if case_id in {"TC-FR-046", "TC-FR-072"}:
+                RebateRequest.objects.create(
+                    user_id=1001,
+                    reason="medical",
+                    starts_on=date(2026, 9, 10),
+                    ends_on=date(2026, 9, 14) if case_id == "TC-FR-046" else date(2026, 9, 13),
+                    status="approved",
+                )
+            if case_id in {"TC-FR-047", "TC-FR-095"}:
+                SpecialFoodRequest.objects.create(
+                    user_id=1001,
+                    reason="illness",
+                    requested_for=date(2026, 9, 10),
+                    status="approved",
+                    charge_amount=Decimal("150.00"),
+                )
+            bill = _generate_bill(h, days=30)
+            if case_id == "TC-FR-046":
+                assert bill.rebate_deduction == Decimal("500.00")
+                assert bill.total == Decimal("2500.00")
+            elif case_id == "TC-FR-072":
+                assert bill.rebate_deduction == Decimal("400.00")
+            else:
+                assert bill.special_food_charges == Decimal("150.00")
+            return
+        if case_id in {"TC-FR-049", "TC-FR-050"}:
+            h.active_role(3001, "caretaker")
+            bill = _create_bill(1001, status="generated")
+            client = h.client(3001, "caretaker")
+            finalized = client.post(
+                f"/api/v1/mms/bills/{bill.id}/finalize", {}, format="json")
+            assert finalized.status_code == 200
+            published = client.post(
+                f"/api/v1/mms/bills/{bill.id}/publish", {}, format="json")
+            assert published.status_code == 200
+            assert published.json()["status"] == "published"
+            if case_id == "TC-FR-049":
+                assert h.client(1001).get("/api/v1/mms/bills").json()["results"]
+            if case_id == "TC-FR-050":
+                assert NotificationOutbox.objects.filter(
+                    topic="bill.published", recipient_user_id=1001).exists()
+            return
+        if case_id == "TC-FR-051":
+            _create_bill(1001)
+            response = h.client(1001).get("/api/v1/mms/bills")
+            assert response.status_code == 200
+            assert Decimal(str(response.json()["balance"])) == Decimal("1200.00")
+            return
+        if case_id == "TC-FR-052":
+            h.active_role(3002, "warden")
+            _create_bill(1001)
+            response = h.client(3002, "warden").get("/api/v1/mms/bills")
+>           assert response.status_code == 200
+E           assert 403 == 200
+E            +  where 403 = <Response status_code=403, "application/json">.status_code
+
+tests/a8/fr/test_fr_cases.py:625: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-10 08:10:24 WARNING django.request Forbidden: /api/v1/mms/bills
+------------------------------ Captured log call -------------------------------
+WARNING  django.request:log.py:253 Forbidden: /api/v1/mms/bills
+________________________ test_frozen_fr_case[TC-FR-082] ________________________
+
+case_id = 'TC-FR-082'
+stub_iam = <function stub_iam.<locals>._install at 0x721dc519f560>
+user_ref = <function user_ref.<locals>._make at 0x721dc519f740>
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+>       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = <test_fr_cases.Harness object at 0x721dc5288aa0>, case_id = 'TC-FR-082'
+
+    def _run_vacation(h, case_id):
+        if case_id in {"TC-FR-076", "TC-FR-079", "TC-FR-080"}:
+            h.active_role(3001, "caretaker")
+            h.enrollment(1001)
+            response = h.client(3001, "caretaker").post(
+                "/api/v1/mms/vacation-surveys",
+                {
+                    "title": "December food survey",
+                    "vacation_starts_on": "2026-12-10",
+                    "vacation_ends_on": "2026-12-20",
+                    "deadline": "2026-12-05T18:29:00Z",
+                },
+                format="json",
+            )
+            assert response.status_code == 201
+            if case_id == "TC-FR-079":
+                assert response.json()["deadline"].startswith("2026-12-05")
+            if case_id == "TC-FR-080":
+                assert NotificationOutbox.objects.filter(
+                    topic="vacation.created", recipient_user_id=1001).exists()
+            return
+    
+        survey = _create_survey()
+        if case_id in {"TC-FR-077", "TC-FR-078"}:
+            if case_id == "TC-FR-077":
+                h.enrollment(1001)
+                response = h.client(1001).get("/api/v1/mms/vacation-surveys")
+                assert response.status_code == 200
+                assert survey.id in [row["id"] for row in response.json()["results"]]
+            else:
+                response = h.client(1099).get("/api/v1/mms/vacation-surveys")
+                assert response.status_code == 200
+                assert survey.id not in [row["id"] for row in response.json()["results"]]
+            return
+        if case_id == "TC-FR-081":
+            h.active_role(3001, "caretaker")
+            h.enrollment(1002)
+            response = h.client(3001, "caretaker").post(
+                f"/api/v1/mms/vacation-surveys/{survey.id}/remind",
+                {},
+                format="json",
+            )
+            assert response.status_code == 200
+            assert NotificationOutbox.objects.filter(
+                topic="vacation.reminder", recipient_user_id=1002).exists()
+            return
+        if case_id in {"TC-FR-082", "TC-FR-083"}:
+            h.enrollment(1001)
+            response = h.client(1001).post(
+                f"/api/v1/mms/vacation-surveys/{survey.id}/responses",
+                {"response": "Yes" if case_id == "TC-FR-082" else "Maybe"},
+                format="json",
+            )
+            if case_id == "TC-FR-083":
+                assert response.status_code == 409
+            else:
+>               assert response.status_code == 201
+E               assert 409 == 201
+E                +  where 409 = <Response status_code=409, "application/json">.status_code
+
+tests/a8/fr/test_fr_cases.py:821: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-10 08:10:25 WARNING django.request Conflict: /api/v1/mms/vacation-surveys/7/responses
+------------------------------ Captured log call -------------------------------
+WARNING  django.request:log.py:253 Conflict: /api/v1/mms/vacation-surveys/7/responses
+________________________ test_frozen_fr_case[TC-FR-085] ________________________
+
+case_id = 'TC-FR-085'
+stub_iam = <function stub_iam.<locals>._install at 0x721dc512ab60>
+user_ref = <function user_ref.<locals>._make at 0x721dc51cf740>
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+>       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = <test_fr_cases.Harness object at 0x721dc5936ea0>, case_id = 'TC-FR-085'
+
+    def _run_vacation(h, case_id):
+        if case_id in {"TC-FR-076", "TC-FR-079", "TC-FR-080"}:
+            h.active_role(3001, "caretaker")
+            h.enrollment(1001)
+            response = h.client(3001, "caretaker").post(
+                "/api/v1/mms/vacation-surveys",
+                {
+                    "title": "December food survey",
+                    "vacation_starts_on": "2026-12-10",
+                    "vacation_ends_on": "2026-12-20",
+                    "deadline": "2026-12-05T18:29:00Z",
+                },
+                format="json",
+            )
+            assert response.status_code == 201
+            if case_id == "TC-FR-079":
+                assert response.json()["deadline"].startswith("2026-12-05")
+            if case_id == "TC-FR-080":
+                assert NotificationOutbox.objects.filter(
+                    topic="vacation.created", recipient_user_id=1001).exists()
+            return
+    
+        survey = _create_survey()
+        if case_id in {"TC-FR-077", "TC-FR-078"}:
+            if case_id == "TC-FR-077":
+                h.enrollment(1001)
+                response = h.client(1001).get("/api/v1/mms/vacation-surveys")
+                assert response.status_code == 200
+                assert survey.id in [row["id"] for row in response.json()["results"]]
+            else:
+                response = h.client(1099).get("/api/v1/mms/vacation-surveys")
+                assert response.status_code == 200
+                assert survey.id not in [row["id"] for row in response.json()["results"]]
+            return
+        if case_id == "TC-FR-081":
+            h.active_role(3001, "caretaker")
+            h.enrollment(1002)
+            response = h.client(3001, "caretaker").post(
+                f"/api/v1/mms/vacation-surveys/{survey.id}/remind",
+                {},
+                format="json",
+            )
+            assert response.status_code == 200
+            assert NotificationOutbox.objects.filter(
+                topic="vacation.reminder", recipient_user_id=1002).exists()
+            return
+        if case_id in {"TC-FR-082", "TC-FR-083"}:
+            h.enrollment(1001)
+            response = h.client(1001).post(
+                f"/api/v1/mms/vacation-surveys/{survey.id}/responses",
+                {"response": "Yes" if case_id == "TC-FR-082" else "Maybe"},
+                format="json",
+            )
+            if case_id == "TC-FR-083":
+                assert response.status_code == 409
+            else:
+                assert response.status_code == 201
+                assert response.json()["response"].lower() == "yes"
+            return
+        if case_id == "TC-FR-084":
+            from modules.mms.services.operations import default_vacation_responses
+    
+            h.enrollment(1003)
+            assert default_vacation_responses(now=survey.deadline + timedelta(seconds=1)) == 1
+            row = VacationResponse.objects.get(survey=survey, user_id=1003)
+            assert row.response == "no" and row.is_default
+            return
+        if case_id == "TC-FR-085":
+            h.active_role(3001, "caretaker")
+            h.active_role(3002, "warden")
+            for index in range(25):
+                user_id = 4000 + index
+                h.enrollment(user_id)
+                VacationResponse.objects.create(
+                    survey=survey,
+                    user_id=user_id,
+                    response="yes" if index < 10 else "no",
+                )
+            for role, uid in (("caretaker", 3001), ("warden", 3002)):
+                response = h.client(uid, role).get(
+                    "/api/v1/mms/reports?type=vacation")
+>               assert response.status_code == 200
+E               assert 403 == 200
+E                +  where 403 = <Response status_code=403, "application/json">.status_code
+
+tests/a8/fr/test_fr_cases.py:846: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-10 08:10:25 WARNING django.request Forbidden: /api/v1/mms/reports
+------------------------------ Captured log call -------------------------------
+WARNING  django.request:log.py:253 Forbidden: /api/v1/mms/reports
+________________________ test_frozen_fr_case[TC-FR-110] ________________________
+
+case_id = 'TC-FR-110'
+stub_iam = <function stub_iam.<locals>._install at 0x721dc51cc040>
+user_ref = <function user_ref.<locals>._make at 0x721dc51cd6c0>
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+>       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = <test_fr_cases.Harness object at 0x721dc590b1a0>, case_id = 'TC-FR-110'
+
+    def _run_reports(h, case_id):
+        if case_id == "TC-FR-109":
+            h.active_role(3002, "warden")
+            h.enrollment(1001)
+            response = h.client(3002, "warden").get("/api/v1/mms/overview")
+            assert response.status_code == 200
+            assert response.json()["enrollment_count"] == 1
+            assert "requests" in response.json()
+        elif case_id == "TC-FR-110":
+            h.active_role(3002, "warden")
+            _create_bill(1001)
+            response = h.client(3002, "warden").get(
+                "/api/v1/mms/reports?type=billing_summary")
+>           assert response.status_code == 200
+E           assert 403 == 200
+E            +  where 403 = <Response status_code=403, "application/json">.status_code
+
+tests/a8/fr/test_fr_cases.py:954: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-10 08:10:25 WARNING django.request Forbidden: /api/v1/mms/reports
+------------------------------ Captured log call -------------------------------
+WARNING  django.request:log.py:253 Forbidden: /api/v1/mms/reports
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.16-final-0 _______________
+
+Coverage XML written to file a8_results/fr/coverage.xml
+=========================== short test summary info ============================
+FAILED tests/a8/fr/test_fr_cases.py::test_frozen_fr_case[TC-FR-001] - assert ...
+FAILED tests/a8/fr/test_fr_cases.py::test_frozen_fr_case[TC-FR-002] - Asserti...
+FAILED tests/a8/fr/test_fr_cases.py::test_frozen_fr_case[TC-FR-003] - Asserti...
+FAILED tests/a8/fr/test_fr_cases.py::test_frozen_fr_case[TC-FR-006] - assert ...
+FAILED tests/a8/fr/test_fr_cases.py::test_frozen_fr_case[TC-FR-008] - assert ...
+FAILED tests/a8/fr/test_fr_cases.py::test_frozen_fr_case[TC-FR-009] - Asserti...
+FAILED tests/a8/fr/test_fr_cases.py::test_frozen_fr_case[TC-FR-010] - Asserti...
+FAILED tests/a8/fr/test_fr_cases.py::test_frozen_fr_case[TC-FR-052] - assert ...
+FAILED tests/a8/fr/test_fr_cases.py::test_frozen_fr_case[TC-FR-082] - assert ...
+FAILED tests/a8/fr/test_fr_cases.py::test_frozen_fr_case[TC-FR-085] - assert ...
+FAILED tests/a8/fr/test_fr_cases.py::test_frozen_fr_case[TC-FR-110] - assert ...

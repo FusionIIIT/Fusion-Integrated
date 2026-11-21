@@ -1,0 +1,765 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="11" skipped="14" tests="117" time="6.118" timestamp="2026-11-10T08:10:20.236552+05:30" hostname="Aspire"><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-001]" time="2.878"><failure message="assert None == 'Semester-Autumn-2026'&#10; +  where None = &lt;built-in method get of dict object at 0x721dc593bdc0&gt;('cycle')&#10; +    where &lt;built-in method get of dict object at 0x721dc593bdc0&gt; = {'registered': True, 'registered_at': '2026-10-11T02:40:23.249730Z', 'deregistered_at': None}.get&#10;[+2 more lines; full report in element text]">case_id = 'TC-FR-001'
+stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x721dc5814680&gt;
+user_ref = &lt;function user_ref.&lt;locals&gt;._make at 0x721dc5815800&gt;
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+&gt;       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/a8/fr/test_fr_cases.py:1080: in &lt;lambda&gt;
+    HANDLERS["TC-FR-001"] = lambda h, _case_id: _run_status(h)
+                                                ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = &lt;test_fr_cases.Harness object at 0x721dc5920c50&gt;
+
+    def _run_status(h):
+        h.enrollment(1001)
+        response = h.client(1001).get("/api/v1/mms/student-status")
+        assert response.status_code == 200
+        assert response.json()["registered"] is True
+&gt;       assert response.json().get("cycle") == "Semester-Autumn-2026"
+E       assert None == 'Semester-Autumn-2026'
+E        +  where None = &lt;built-in method get of dict object at 0x721dc593bdc0&gt;('cycle')
+E        +    where &lt;built-in method get of dict object at 0x721dc593bdc0&gt; = {'registered': True, 'registered_at': '2026-10-11T02:40:23.249730Z', 'deregistered_at': None}.get
+E        +      where {'registered': True, 'registered_at': '2026-10-11T02:40:23.249730Z', 'deregistered_at': None} = functools.partial(&lt;bound method ClientMixin._parse_json of &lt;rest_framework.test.APIClient object at 0x721dc59221e0&gt;&gt;, &lt;Response status_code=200, "application/json"&gt;)()
+E        +        where functools.partial(&lt;bound method ClientMixin._parse_json of &lt;rest_framework.test.APIClient object at 0x721dc59221e0&gt;&gt;, &lt;Response status_code=200, "application/json"&gt;) = &lt;Response status_code=200, "application/json"&gt;.json
+
+tests/a8/fr/test_fr_cases.py:213: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-002]" time="0.057"><failure message="AssertionError: assert False&#10; +  where False = &lt;built-in method startswith of str object at 0x721dc512eec0&gt;('2026-08-01')&#10; +    where &lt;built-in method startswith of str object at 0x721dc512eec0&gt; = '2026-08-02T17:30:00+05:30'.startswith">case_id = 'TC-FR-002'
+stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x721dc536c900&gt;
+user_ref = &lt;function user_ref.&lt;locals&gt;._make at 0x721dc536d4e0&gt;
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+&gt;       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = &lt;test_fr_cases.Harness object at 0x721dc6533800&gt;, case_id = 'TC-FR-002'
+
+    def _run_role(h, case_id):
+        role = "caretaker" if case_id not in {"TC-FR-003", "TC-FR-007", "TC-FR-008",
+                                              "TC-FR-010"} else "warden"
+        if case_id in {"TC-FR-002", "TC-FR-003", "TC-FR-009", "TC-FR-010",
+                       "TC-FR-013"}:
+            employee_id = 1001 if role == "caretaker" else 1002
+            h.employee(employee_id)
+            with freeze_time("2026-08-02T12:00:00Z"):
+                payload = {
+                    "role": role,
+                    "user_id": employee_id,
+                    "ends_at": (
+                        "2026-12-31T18:29:00Z"
+                        if case_id != "TC-FR-013"
+                        else (timezone.now() + timedelta(days=30)).isoformat()
+                    ),
+                }
+                if case_id != "TC-FR-013":
+                    payload["starts_at"] = "2026-08-01T00:00:00Z"
+                response = h.client(9000, "admin").post(
+                    "/api/v1/mms/roles",
+                    payload,
+                    format="json",
+                )
+            assert response.status_code == 201
+            assert response.json()["user_id"] == employee_id
+            if case_id != "TC-FR-013":
+&gt;               assert response.json()["starts_at"].startswith("2026-08-01")
+E               AssertionError: assert False
+E                +  where False = &lt;built-in method startswith of str object at 0x721dc512eec0&gt;('2026-08-01')
+E                +    where &lt;built-in method startswith of str object at 0x721dc512eec0&gt; = '2026-08-02T17:30:00+05:30'.startswith
+
+tests/a8/fr/test_fr_cases.py:243: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-003]" time="0.028"><failure message="AssertionError: assert False&#10; +  where False = &lt;built-in method startswith of str object at 0x721dc5155340&gt;('2026-08-01')&#10; +    where &lt;built-in method startswith of str object at 0x721dc5155340&gt; = '2026-08-02T17:30:00+05:30'.startswith">case_id = 'TC-FR-003'
+stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x721dc536c5e0&gt;
+user_ref = &lt;function user_ref.&lt;locals&gt;._make at 0x721dc512a8e0&gt;
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+&gt;       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = &lt;test_fr_cases.Harness object at 0x721dc5920c80&gt;, case_id = 'TC-FR-003'
+
+    def _run_role(h, case_id):
+        role = "caretaker" if case_id not in {"TC-FR-003", "TC-FR-007", "TC-FR-008",
+                                              "TC-FR-010"} else "warden"
+        if case_id in {"TC-FR-002", "TC-FR-003", "TC-FR-009", "TC-FR-010",
+                       "TC-FR-013"}:
+            employee_id = 1001 if role == "caretaker" else 1002
+            h.employee(employee_id)
+            with freeze_time("2026-08-02T12:00:00Z"):
+                payload = {
+                    "role": role,
+                    "user_id": employee_id,
+                    "ends_at": (
+                        "2026-12-31T18:29:00Z"
+                        if case_id != "TC-FR-013"
+                        else (timezone.now() + timedelta(days=30)).isoformat()
+                    ),
+                }
+                if case_id != "TC-FR-013":
+                    payload["starts_at"] = "2026-08-01T00:00:00Z"
+                response = h.client(9000, "admin").post(
+                    "/api/v1/mms/roles",
+                    payload,
+                    format="json",
+                )
+            assert response.status_code == 201
+            assert response.json()["user_id"] == employee_id
+            if case_id != "TC-FR-013":
+&gt;               assert response.json()["starts_at"].startswith("2026-08-01")
+E               AssertionError: assert False
+E                +  where False = &lt;built-in method startswith of str object at 0x721dc5155340&gt;('2026-08-01')
+E                +    where &lt;built-in method startswith of str object at 0x721dc5155340&gt; = '2026-08-02T17:30:00+05:30'.startswith
+
+tests/a8/fr/test_fr_cases.py:243: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-004]" time="0.018" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-005]" time="0.022" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-006]" time="0.027"><failure message="assert 201 == 409&#10; +  where 201 = &lt;Response status_code=201, &quot;application/json&quot;&gt;.status_code">case_id = 'TC-FR-006'
+stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x721dc512b240&gt;
+user_ref = &lt;function user_ref.&lt;locals&gt;._make at 0x721dc536c720&gt;
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+&gt;       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = &lt;test_fr_cases.Harness object at 0x721dc5137380&gt;, case_id = 'TC-FR-006'
+
+    def _run_role(h, case_id):
+        role = "caretaker" if case_id not in {"TC-FR-003", "TC-FR-007", "TC-FR-008",
+                                              "TC-FR-010"} else "warden"
+        if case_id in {"TC-FR-002", "TC-FR-003", "TC-FR-009", "TC-FR-010",
+                       "TC-FR-013"}:
+            employee_id = 1001 if role == "caretaker" else 1002
+            h.employee(employee_id)
+            with freeze_time("2026-08-02T12:00:00Z"):
+                payload = {
+                    "role": role,
+                    "user_id": employee_id,
+                    "ends_at": (
+                        "2026-12-31T18:29:00Z"
+                        if case_id != "TC-FR-013"
+                        else (timezone.now() + timedelta(days=30)).isoformat()
+                    ),
+                }
+                if case_id != "TC-FR-013":
+                    payload["starts_at"] = "2026-08-01T00:00:00Z"
+                response = h.client(9000, "admin").post(
+                    "/api/v1/mms/roles",
+                    payload,
+                    format="json",
+                )
+            assert response.status_code == 201
+            assert response.json()["user_id"] == employee_id
+            if case_id != "TC-FR-013":
+                assert response.json()["starts_at"].startswith("2026-08-01")
+                assert response.json()["ends_at"].startswith("2026-12-31")
+            assert DirectoryUserRef.objects.filter(user_id=employee_id).count() == 1
+            return
+    
+        if case_id in {"TC-FR-004", "TC-FR-011"}:
+            h.employee(1003)
+            h.employee(1004)
+            h.active_role(1003, "caretaker")
+            response = h.client(9000, "admin").post(
+                "/api/v1/mms/roles",
+                {
+                    "role": "caretaker",
+                    "user_id": 1004,
+                    "ends_at": (timezone.now() + timedelta(days=30)).isoformat(),
+                },
+                format="json",
+            )
+            assert response.status_code == 201
+            assert not RoleAssignment.objects.get(user_id=1003).is_current
+            assert RoleAssignment.objects.get(user_id=1004).is_current
+            return
+    
+        current_user = 1001 if role == "caretaker" else 1002
+        other_user = 1004 if role == "caretaker" else 1005
+        h.employee(current_user)
+        h.employee(other_user)
+        h.active_role(current_user, role)
+        if case_id in {"TC-FR-005", "TC-FR-007"}:
+            response = h.client(9000, "admin").get("/api/v1/mms/roles")
+            assert response.status_code == 200
+            current = [row for row in response.json()["current"] if row["role"] == role]
+            assert [row["user_id"] for row in current] == [current_user]
+        elif case_id in {"TC-FR-006", "TC-FR-008"}:
+            response = h.client(9000, "admin").post(
+                "/api/v1/mms/roles",
+                {
+                    "role": role,
+                    "user_id": other_user,
+                    "ends_at": (timezone.now() + timedelta(days=30)).isoformat(),
+                },
+                format="json",
+            )
+&gt;           assert response.status_code == 409
+E           assert 201 == 409
+E            +  where 201 = &lt;Response status_code=201, "application/json"&gt;.status_code
+
+tests/a8/fr/test_fr_cases.py:286: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-007]" time="0.024" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-008]" time="0.026"><failure message="assert 201 == 409&#10; +  where 201 = &lt;Response status_code=201, &quot;application/json&quot;&gt;.status_code">case_id = 'TC-FR-008'
+stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x721dc512a020&gt;
+user_ref = &lt;function user_ref.&lt;locals&gt;._make at 0x721dc51ccea0&gt;
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+&gt;       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = &lt;test_fr_cases.Harness object at 0x721dc5137c20&gt;, case_id = 'TC-FR-008'
+
+    def _run_role(h, case_id):
+        role = "caretaker" if case_id not in {"TC-FR-003", "TC-FR-007", "TC-FR-008",
+                                              "TC-FR-010"} else "warden"
+        if case_id in {"TC-FR-002", "TC-FR-003", "TC-FR-009", "TC-FR-010",
+                       "TC-FR-013"}:
+            employee_id = 1001 if role == "caretaker" else 1002
+            h.employee(employee_id)
+            with freeze_time("2026-08-02T12:00:00Z"):
+                payload = {
+                    "role": role,
+                    "user_id": employee_id,
+                    "ends_at": (
+                        "2026-12-31T18:29:00Z"
+                        if case_id != "TC-FR-013"
+                        else (timezone.now() + timedelta(days=30)).isoformat()
+                    ),
+                }
+                if case_id != "TC-FR-013":
+                    payload["starts_at"] = "2026-08-01T00:00:00Z"
+                response = h.client(9000, "admin").post(
+                    "/api/v1/mms/roles",
+                    payload,
+                    format="json",
+                )
+            assert response.status_code == 201
+            assert response.json()["user_id"] == employee_id
+            if case_id != "TC-FR-013":
+                assert response.json()["starts_at"].startswith("2026-08-01")
+                assert response.json()["ends_at"].startswith("2026-12-31")
+            assert DirectoryUserRef.objects.filter(user_id=employee_id).count() == 1
+            return
+    
+        if case_id in {"TC-FR-004", "TC-FR-011"}:
+            h.employee(1003)
+            h.employee(1004)
+            h.active_role(1003, "caretaker")
+            response = h.client(9000, "admin").post(
+                "/api/v1/mms/roles",
+                {
+                    "role": "caretaker",
+                    "user_id": 1004,
+                    "ends_at": (timezone.now() + timedelta(days=30)).isoformat(),
+                },
+                format="json",
+            )
+            assert response.status_code == 201
+            assert not RoleAssignment.objects.get(user_id=1003).is_current
+            assert RoleAssignment.objects.get(user_id=1004).is_current
+            return
+    
+        current_user = 1001 if role == "caretaker" else 1002
+        other_user = 1004 if role == "caretaker" else 1005
+        h.employee(current_user)
+        h.employee(other_user)
+        h.active_role(current_user, role)
+        if case_id in {"TC-FR-005", "TC-FR-007"}:
+            response = h.client(9000, "admin").get("/api/v1/mms/roles")
+            assert response.status_code == 200
+            current = [row for row in response.json()["current"] if row["role"] == role]
+            assert [row["user_id"] for row in current] == [current_user]
+        elif case_id in {"TC-FR-006", "TC-FR-008"}:
+            response = h.client(9000, "admin").post(
+                "/api/v1/mms/roles",
+                {
+                    "role": role,
+                    "user_id": other_user,
+                    "ends_at": (timezone.now() + timedelta(days=30)).isoformat(),
+                },
+                format="json",
+            )
+&gt;           assert response.status_code == 409
+E           assert 201 == 409
+E            +  where 201 = &lt;Response status_code=201, "application/json"&gt;.status_code
+
+tests/a8/fr/test_fr_cases.py:286: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-009]" time="0.033"><failure message="AssertionError: assert False&#10; +  where False = &lt;built-in method startswith of str object at 0x721dc515fc80&gt;('2026-08-01')&#10; +    where &lt;built-in method startswith of str object at 0x721dc515fc80&gt; = '2026-08-02T17:30:00+05:30'.startswith">case_id = 'TC-FR-009'
+stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x721dc51ccd60&gt;
+user_ref = &lt;function user_ref.&lt;locals&gt;._make at 0x721dc51cd9e0&gt;
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+&gt;       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = &lt;test_fr_cases.Harness object at 0x721dc5134cb0&gt;, case_id = 'TC-FR-009'
+
+    def _run_role(h, case_id):
+        role = "caretaker" if case_id not in {"TC-FR-003", "TC-FR-007", "TC-FR-008",
+                                              "TC-FR-010"} else "warden"
+        if case_id in {"TC-FR-002", "TC-FR-003", "TC-FR-009", "TC-FR-010",
+                       "TC-FR-013"}:
+            employee_id = 1001 if role == "caretaker" else 1002
+            h.employee(employee_id)
+            with freeze_time("2026-08-02T12:00:00Z"):
+                payload = {
+                    "role": role,
+                    "user_id": employee_id,
+                    "ends_at": (
+                        "2026-12-31T18:29:00Z"
+                        if case_id != "TC-FR-013"
+                        else (timezone.now() + timedelta(days=30)).isoformat()
+                    ),
+                }
+                if case_id != "TC-FR-013":
+                    payload["starts_at"] = "2026-08-01T00:00:00Z"
+                response = h.client(9000, "admin").post(
+                    "/api/v1/mms/roles",
+                    payload,
+                    format="json",
+                )
+            assert response.status_code == 201
+            assert response.json()["user_id"] == employee_id
+            if case_id != "TC-FR-013":
+&gt;               assert response.json()["starts_at"].startswith("2026-08-01")
+E               AssertionError: assert False
+E                +  where False = &lt;built-in method startswith of str object at 0x721dc515fc80&gt;('2026-08-01')
+E                +    where &lt;built-in method startswith of str object at 0x721dc515fc80&gt; = '2026-08-02T17:30:00+05:30'.startswith
+
+tests/a8/fr/test_fr_cases.py:243: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-010]" time="0.029"><failure message="AssertionError: assert False&#10; +  where False = &lt;built-in method startswith of str object at 0x721dc51bc800&gt;('2026-08-01')&#10; +    where &lt;built-in method startswith of str object at 0x721dc51bc800&gt; = '2026-08-02T17:30:00+05:30'.startswith">case_id = 'TC-FR-010'
+stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x721dc51cc9a0&gt;
+user_ref = &lt;function user_ref.&lt;locals&gt;._make at 0x721dc51cec00&gt;
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+&gt;       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = &lt;test_fr_cases.Harness object at 0x721dc51377a0&gt;, case_id = 'TC-FR-010'
+
+    def _run_role(h, case_id):
+        role = "caretaker" if case_id not in {"TC-FR-003", "TC-FR-007", "TC-FR-008",
+                                              "TC-FR-010"} else "warden"
+        if case_id in {"TC-FR-002", "TC-FR-003", "TC-FR-009", "TC-FR-010",
+                       "TC-FR-013"}:
+            employee_id = 1001 if role == "caretaker" else 1002
+            h.employee(employee_id)
+            with freeze_time("2026-08-02T12:00:00Z"):
+                payload = {
+                    "role": role,
+                    "user_id": employee_id,
+                    "ends_at": (
+                        "2026-12-31T18:29:00Z"
+                        if case_id != "TC-FR-013"
+                        else (timezone.now() + timedelta(days=30)).isoformat()
+                    ),
+                }
+                if case_id != "TC-FR-013":
+                    payload["starts_at"] = "2026-08-01T00:00:00Z"
+                response = h.client(9000, "admin").post(
+                    "/api/v1/mms/roles",
+                    payload,
+                    format="json",
+                )
+            assert response.status_code == 201
+            assert response.json()["user_id"] == employee_id
+            if case_id != "TC-FR-013":
+&gt;               assert response.json()["starts_at"].startswith("2026-08-01")
+E               AssertionError: assert False
+E                +  where False = &lt;built-in method startswith of str object at 0x721dc51bc800&gt;('2026-08-01')
+E                +    where &lt;built-in method startswith of str object at 0x721dc51bc800&gt; = '2026-08-02T17:30:00+05:30'.startswith
+
+tests/a8/fr/test_fr_cases.py:243: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-011]" time="0.029" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-012]" time="0.095" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-013]" time="0.031" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-014]" time="0.014" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-015]" time="0.023" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-016]" time="0.029" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-017]" time="0.023" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-018]" time="0.028" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-019]" time="0.021" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-020]" time="0.018" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-021]" time="0.036" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-022]" time="0.033" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-023]" time="0.045" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-024]" time="0.019" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-025]" time="0.014" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-026]" time="0.020" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-027]" time="0.030" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-028]" time="0.039" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-029]" time="0.020" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-030]" time="0.026" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-031]" time="0.032" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-032]" time="0.018" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-033]" time="0.015" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-034]" time="0.013" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-035]" time="0.008" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-036]" time="0.021" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-037]" time="0.024" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-038]" time="0.010" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-039]" time="0.029" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-040]" time="0.024" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-041]" time="0.024" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-042]" time="0.021" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-043]" time="0.017" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-044]" time="0.005" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-045]" time="0.005"><skipped type="pytest.skip" message="No fixed-charge configuration or bill field is defined by the current MMS implementation.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/fr/test_fr_cases.py:1090: No fixed-charge configuration or bill field is defined by the current MMS implementation.</skipped></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-046]" time="0.019" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-047]" time="0.016" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-048]" time="0.005"><skipped type="pytest.skip" message="No prior outstanding-balance input/roll-forward model or rule is defined by the current MMS implementation.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/fr/test_fr_cases.py:1090: No prior outstanding-balance input/roll-forward model or rule is defined by the current MMS implementation.</skipped></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-049]" time="0.039" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-050]" time="0.026" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-051]" time="0.015" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-052]" time="0.010"><failure message="assert 403 == 200&#10; +  where 403 = &lt;Response status_code=403, &quot;application/json&quot;&gt;.status_code">case_id = 'TC-FR-052'
+stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x721dc5208a40&gt;
+user_ref = &lt;function user_ref.&lt;locals&gt;._make at 0x721dc5209440&gt;
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+&gt;       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = &lt;test_fr_cases.Harness object at 0x721dc528a900&gt;, case_id = 'TC-FR-052'
+
+    def _run_billing(h, case_id):
+        if case_id == "TC-FR-042":
+            _create_bill(1001)
+            _create_bill(2002, total="500.00")
+            response = h.client(1001).get("/api/v1/mms/bills")
+            assert response.status_code == 200
+            assert [row["user_id"] for row in response.json()["results"]] == [1001]
+            return
+        if case_id == "TC-FR-043":
+            bill = _generate_bill(h)
+            assert bill.user_id == 1001
+            assert bill.year == 2026 and bill.month == 9
+            return
+        if case_id == "TC-FR-044":
+            from modules.mms.domain.rules import calculate_bill
+    
+            assert calculate_bill(
+                daily_rate=Decimal("100"), served_days=25,
+                special_food_charges=Decimal("0"),
+                rebate_deduction=Decimal("0"),
+            ) == Decimal("2500.00")
+            return
+        if case_id in {"TC-FR-046", "TC-FR-047", "TC-FR-072", "TC-FR-095"}:
+            if case_id in {"TC-FR-046", "TC-FR-072"}:
+                RebateRequest.objects.create(
+                    user_id=1001,
+                    reason="medical",
+                    starts_on=date(2026, 9, 10),
+                    ends_on=date(2026, 9, 14) if case_id == "TC-FR-046" else date(2026, 9, 13),
+                    status="approved",
+                )
+            if case_id in {"TC-FR-047", "TC-FR-095"}:
+                SpecialFoodRequest.objects.create(
+                    user_id=1001,
+                    reason="illness",
+                    requested_for=date(2026, 9, 10),
+                    status="approved",
+                    charge_amount=Decimal("150.00"),
+                )
+            bill = _generate_bill(h, days=30)
+            if case_id == "TC-FR-046":
+                assert bill.rebate_deduction == Decimal("500.00")
+                assert bill.total == Decimal("2500.00")
+            elif case_id == "TC-FR-072":
+                assert bill.rebate_deduction == Decimal("400.00")
+            else:
+                assert bill.special_food_charges == Decimal("150.00")
+            return
+        if case_id in {"TC-FR-049", "TC-FR-050"}:
+            h.active_role(3001, "caretaker")
+            bill = _create_bill(1001, status="generated")
+            client = h.client(3001, "caretaker")
+            finalized = client.post(
+                f"/api/v1/mms/bills/{bill.id}/finalize", {}, format="json")
+            assert finalized.status_code == 200
+            published = client.post(
+                f"/api/v1/mms/bills/{bill.id}/publish", {}, format="json")
+            assert published.status_code == 200
+            assert published.json()["status"] == "published"
+            if case_id == "TC-FR-049":
+                assert h.client(1001).get("/api/v1/mms/bills").json()["results"]
+            if case_id == "TC-FR-050":
+                assert NotificationOutbox.objects.filter(
+                    topic="bill.published", recipient_user_id=1001).exists()
+            return
+        if case_id == "TC-FR-051":
+            _create_bill(1001)
+            response = h.client(1001).get("/api/v1/mms/bills")
+            assert response.status_code == 200
+            assert Decimal(str(response.json()["balance"])) == Decimal("1200.00")
+            return
+        if case_id == "TC-FR-052":
+            h.active_role(3002, "warden")
+            _create_bill(1001)
+            response = h.client(3002, "warden").get("/api/v1/mms/bills")
+&gt;           assert response.status_code == 200
+E           assert 403 == 200
+E            +  where 403 = &lt;Response status_code=403, "application/json"&gt;.status_code
+
+tests/a8/fr/test_fr_cases.py:625: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-053]" time="0.008" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-054]" time="0.014" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-055]" time="0.011" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-056]" time="0.007" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-057]" time="0.030" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-058]" time="0.025" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-059]" time="0.026" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-060]" time="0.030" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-061]" time="0.026" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-062]" time="0.032" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-063]" time="0.031" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-064]" time="0.020" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-065]" time="0.022" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-066]" time="0.021" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-067]" time="0.029" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-068]" time="0.022" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-069]" time="0.025" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-070]" time="0.021" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-071]" time="0.019" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-072]" time="0.003" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-073]" time="0.010" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-074]" time="0.020" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-075]" time="0.013" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-076]" time="0.068" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-077]" time="0.009" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-078]" time="0.008" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-079]" time="0.011" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-080]" time="0.013" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-081]" time="0.017" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-082]" time="0.015"><failure message="assert 409 == 201&#10; +  where 409 = &lt;Response status_code=409, &quot;application/json&quot;&gt;.status_code">case_id = 'TC-FR-082'
+stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x721dc519f560&gt;
+user_ref = &lt;function user_ref.&lt;locals&gt;._make at 0x721dc519f740&gt;
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+&gt;       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = &lt;test_fr_cases.Harness object at 0x721dc5288aa0&gt;, case_id = 'TC-FR-082'
+
+    def _run_vacation(h, case_id):
+        if case_id in {"TC-FR-076", "TC-FR-079", "TC-FR-080"}:
+            h.active_role(3001, "caretaker")
+            h.enrollment(1001)
+            response = h.client(3001, "caretaker").post(
+                "/api/v1/mms/vacation-surveys",
+                {
+                    "title": "December food survey",
+                    "vacation_starts_on": "2026-12-10",
+                    "vacation_ends_on": "2026-12-20",
+                    "deadline": "2026-12-05T18:29:00Z",
+                },
+                format="json",
+            )
+            assert response.status_code == 201
+            if case_id == "TC-FR-079":
+                assert response.json()["deadline"].startswith("2026-12-05")
+            if case_id == "TC-FR-080":
+                assert NotificationOutbox.objects.filter(
+                    topic="vacation.created", recipient_user_id=1001).exists()
+            return
+    
+        survey = _create_survey()
+        if case_id in {"TC-FR-077", "TC-FR-078"}:
+            if case_id == "TC-FR-077":
+                h.enrollment(1001)
+                response = h.client(1001).get("/api/v1/mms/vacation-surveys")
+                assert response.status_code == 200
+                assert survey.id in [row["id"] for row in response.json()["results"]]
+            else:
+                response = h.client(1099).get("/api/v1/mms/vacation-surveys")
+                assert response.status_code == 200
+                assert survey.id not in [row["id"] for row in response.json()["results"]]
+            return
+        if case_id == "TC-FR-081":
+            h.active_role(3001, "caretaker")
+            h.enrollment(1002)
+            response = h.client(3001, "caretaker").post(
+                f"/api/v1/mms/vacation-surveys/{survey.id}/remind",
+                {},
+                format="json",
+            )
+            assert response.status_code == 200
+            assert NotificationOutbox.objects.filter(
+                topic="vacation.reminder", recipient_user_id=1002).exists()
+            return
+        if case_id in {"TC-FR-082", "TC-FR-083"}:
+            h.enrollment(1001)
+            response = h.client(1001).post(
+                f"/api/v1/mms/vacation-surveys/{survey.id}/responses",
+                {"response": "Yes" if case_id == "TC-FR-082" else "Maybe"},
+                format="json",
+            )
+            if case_id == "TC-FR-083":
+                assert response.status_code == 409
+            else:
+&gt;               assert response.status_code == 201
+E               assert 409 == 201
+E                +  where 409 = &lt;Response status_code=409, "application/json"&gt;.status_code
+
+tests/a8/fr/test_fr_cases.py:821: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-083]" time="0.013" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-084]" time="0.014" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-085]" time="0.032"><failure message="assert 403 == 200&#10; +  where 403 = &lt;Response status_code=403, &quot;application/json&quot;&gt;.status_code">case_id = 'TC-FR-085'
+stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x721dc512ab60&gt;
+user_ref = &lt;function user_ref.&lt;locals&gt;._make at 0x721dc51cf740&gt;
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+&gt;       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = &lt;test_fr_cases.Harness object at 0x721dc5936ea0&gt;, case_id = 'TC-FR-085'
+
+    def _run_vacation(h, case_id):
+        if case_id in {"TC-FR-076", "TC-FR-079", "TC-FR-080"}:
+            h.active_role(3001, "caretaker")
+            h.enrollment(1001)
+            response = h.client(3001, "caretaker").post(
+                "/api/v1/mms/vacation-surveys",
+                {
+                    "title": "December food survey",
+                    "vacation_starts_on": "2026-12-10",
+                    "vacation_ends_on": "2026-12-20",
+                    "deadline": "2026-12-05T18:29:00Z",
+                },
+                format="json",
+            )
+            assert response.status_code == 201
+            if case_id == "TC-FR-079":
+                assert response.json()["deadline"].startswith("2026-12-05")
+            if case_id == "TC-FR-080":
+                assert NotificationOutbox.objects.filter(
+                    topic="vacation.created", recipient_user_id=1001).exists()
+            return
+    
+        survey = _create_survey()
+        if case_id in {"TC-FR-077", "TC-FR-078"}:
+            if case_id == "TC-FR-077":
+                h.enrollment(1001)
+                response = h.client(1001).get("/api/v1/mms/vacation-surveys")
+                assert response.status_code == 200
+                assert survey.id in [row["id"] for row in response.json()["results"]]
+            else:
+                response = h.client(1099).get("/api/v1/mms/vacation-surveys")
+                assert response.status_code == 200
+                assert survey.id not in [row["id"] for row in response.json()["results"]]
+            return
+        if case_id == "TC-FR-081":
+            h.active_role(3001, "caretaker")
+            h.enrollment(1002)
+            response = h.client(3001, "caretaker").post(
+                f"/api/v1/mms/vacation-surveys/{survey.id}/remind",
+                {},
+                format="json",
+            )
+            assert response.status_code == 200
+            assert NotificationOutbox.objects.filter(
+                topic="vacation.reminder", recipient_user_id=1002).exists()
+            return
+        if case_id in {"TC-FR-082", "TC-FR-083"}:
+            h.enrollment(1001)
+            response = h.client(1001).post(
+                f"/api/v1/mms/vacation-surveys/{survey.id}/responses",
+                {"response": "Yes" if case_id == "TC-FR-082" else "Maybe"},
+                format="json",
+            )
+            if case_id == "TC-FR-083":
+                assert response.status_code == 409
+            else:
+                assert response.status_code == 201
+                assert response.json()["response"].lower() == "yes"
+            return
+        if case_id == "TC-FR-084":
+            from modules.mms.services.operations import default_vacation_responses
+    
+            h.enrollment(1003)
+            assert default_vacation_responses(now=survey.deadline + timedelta(seconds=1)) == 1
+            row = VacationResponse.objects.get(survey=survey, user_id=1003)
+            assert row.response == "no" and row.is_default
+            return
+        if case_id == "TC-FR-085":
+            h.active_role(3001, "caretaker")
+            h.active_role(3002, "warden")
+            for index in range(25):
+                user_id = 4000 + index
+                h.enrollment(user_id)
+                VacationResponse.objects.create(
+                    survey=survey,
+                    user_id=user_id,
+                    response="yes" if index &lt; 10 else "no",
+                )
+            for role, uid in (("caretaker", 3001), ("warden", 3002)):
+                response = h.client(uid, role).get(
+                    "/api/v1/mms/reports?type=vacation")
+&gt;               assert response.status_code == 200
+E               assert 403 == 200
+E                +  where 403 = &lt;Response status_code=403, "application/json"&gt;.status_code
+
+tests/a8/fr/test_fr_cases.py:846: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-086]" time="0.016" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-087]" time="0.024" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-088]" time="0.018" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-089]" time="0.018" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-090]" time="0.006"><skipped type="pytest.skip" message="Approval requires a policy-provided special-food charge, but the frozen case provides no amount or policy value.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/fr/test_fr_cases.py:1090: Approval requires a policy-provided special-food charge, but the frozen case provides no amount or policy value.</skipped></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-091]" time="0.021" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-092]" time="0.005"><skipped type="pytest.skip" message="The frozen case does not specify the institution-defined decision period; test settings may leave it unset.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/fr/test_fr_cases.py:1090: The frozen case does not specify the institution-defined decision period; test settings may leave it unset.</skipped></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-093]" time="0.004"><skipped type="pytest.skip" message="Approval and its notification require a policy-provided special-food charge, but the frozen case provides no amount or policy value.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/fr/test_fr_cases.py:1090: Approval and its notification require a policy-provided special-food charge, but the frozen case provides no amount or policy value.</skipped></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-094]" time="0.015" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-095]" time="0.005" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-096]" time="0.015" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-097]" time="0.004"><skipped type="pytest.skip" message="The frozen case does not specify the fulfillment actor; the implementation marks that actor policy unresolved.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/fr/test_fr_cases.py:1090: The frozen case does not specify the fulfillment actor; the implementation marks that actor policy unresolved.</skipped></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-098]" time="0.005"><skipped type="pytest.skip" message="The frozen case does not specify the fulfillment actor; the implementation marks that actor policy unresolved.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/fr/test_fr_cases.py:1090: The frozen case does not specify the fulfillment actor; the implementation marks that actor policy unresolved.</skipped></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-099]" time="0.010"><skipped type="pytest.skip" message="The frozen case does not specify the fulfillment actor; the implementation marks that actor policy unresolved.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/fr/test_fr_cases.py:1090: The frozen case does not specify the fulfillment actor; the implementation marks that actor policy unresolved.</skipped></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-100]" time="0.008"><skipped type="pytest.skip" message="The frozen case does not specify the fulfillment actor; the implementation marks that actor policy unresolved.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/fr/test_fr_cases.py:1090: The frozen case does not specify the fulfillment actor; the implementation marks that actor policy unresolved.</skipped></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-101]" time="0.009"><skipped type="pytest.skip" message="The frozen case does not specify the fulfillment actor; the implementation marks that actor policy unresolved.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/fr/test_fr_cases.py:1090: The frozen case does not specify the fulfillment actor; the implementation marks that actor policy unresolved.</skipped></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-102]" time="0.009"><skipped type="pytest.skip" message="The frozen case does not specify the fulfillment actor; the implementation marks that actor policy unresolved.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/fr/test_fr_cases.py:1090: The frozen case does not specify the fulfillment actor; the implementation marks that actor policy unresolved.</skipped></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-103]" time="0.019" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-104]" time="0.022" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-105]" time="0.027" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-106]" time="0.019" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-107]" time="0.008" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-108]" time="0.008" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-109]" time="0.020" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-110]" time="0.010"><failure message="assert 403 == 200&#10; +  where 403 = &lt;Response status_code=403, &quot;application/json&quot;&gt;.status_code">case_id = 'TC-FR-110'
+stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x721dc51cc040&gt;
+user_ref = &lt;function user_ref.&lt;locals&gt;._make at 0x721dc51cd6c0&gt;
+
+    @pytest.mark.parametrize(
+        "case_id",
+        [f"TC-FR-{number:03}" for number in range(1, 118)],
+        ids=[f"TC-FR-{number:03}" for number in range(1, 118)],
+    )
+    def test_frozen_fr_case(case_id, stub_iam, user_ref):
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+        handler = HANDLERS.get(case_id)
+        assert handler is not None, f"{case_id} has no automated test handler"
+&gt;       handler(Harness(stub_iam, user_ref), case_id)
+
+tests/a8/fr/test_fr_cases.py:1093: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = &lt;test_fr_cases.Harness object at 0x721dc590b1a0&gt;, case_id = 'TC-FR-110'
+
+    def _run_reports(h, case_id):
+        if case_id == "TC-FR-109":
+            h.active_role(3002, "warden")
+            h.enrollment(1001)
+            response = h.client(3002, "warden").get("/api/v1/mms/overview")
+            assert response.status_code == 200
+            assert response.json()["enrollment_count"] == 1
+            assert "requests" in response.json()
+        elif case_id == "TC-FR-110":
+            h.active_role(3002, "warden")
+            _create_bill(1001)
+            response = h.client(3002, "warden").get(
+                "/api/v1/mms/reports?type=billing_summary")
+&gt;           assert response.status_code == 200
+E           assert 403 == 200
+E            +  where 403 = &lt;Response status_code=403, "application/json"&gt;.status_code
+
+tests/a8/fr/test_fr_cases.py:954: AssertionError</failure></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-111]" time="0.004"><skipped type="pytest.skip" message="No Warden feedback/trend report type or aggregation contract is exposed by the current MMS API.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/fr/test_fr_cases.py:1090: No Warden feedback/trend report type or aggregation contract is exposed by the current MMS API.</skipped></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-112]" time="0.014" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-113]" time="0.006"><skipped type="pytest.skip" message="No rebate-consumption report type or aggregation contract is exposed by the current MMS API.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/fr/test_fr_cases.py:1090: No rebate-consumption report type or aggregation contract is exposed by the current MMS API.</skipped></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-114]" time="0.006"><skipped type="pytest.skip" message="The feedback endpoint exposes raw entries, but no operational feedback summary contract is specified.">/home/proginator/Documents/Fusion/Fusion-Integrated/tests/a8/fr/test_fr_cases.py:1090: The feedback endpoint exposes raw entries, but no operational feedback summary contract is specified.</skipped></testcase><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-115]" time="0.013" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-116]" time="0.018" /><testcase classname="tests.a8.fr.test_fr_cases" name="test_frozen_fr_case[TC-FR-117]" time="0.052" /></testsuite></testsuites>

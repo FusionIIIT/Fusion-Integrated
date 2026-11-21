@@ -1,0 +1,1026 @@
+{
+  "design_summary": {
+    "title": "Assignment 8 - Workflow (WF) Strategy Test Design",
+    "status": "FROZEN DESIGN ONLY - no implementation inspection and no pytest generation or execution",
+    "source_documents": [
+      "docs/mms-specs/01_MMS_Problem_Statement_v1.0_SYNCHRONIZED.md",
+      "docs/mms-specs/05_MMS_Workflow_Specifications_v1.4_FINAL.md"
+    ],
+    "method": "Independently derived from the Problem Statement and authoritative workflow state-transition tables. Basis workflows and composites share test IDs when they describe the same path.",
+    "workflows_identified": 21,
+    "basis_workflows": 16,
+    "composite_workflows": 5,
+    "distinct_end_to_end_paths": 16,
+    "distinct_state_transitions": 24,
+    "test_cases_designed": 24,
+    "blocked_cases": [
+      "TC-WF-003",
+      "TC-WF-007",
+      "TC-WF-009",
+      "TC-WF-010",
+      "TC-WF-011",
+      "TC-WF-012",
+      "TC-WF-016",
+      "TC-WF-018",
+      "TC-WF-022",
+      "TC-WF-024"
+    ],
+    "ambiguities": [
+      "The Problem Statement prohibits registration requests outside an open window but does not state the resulting error, status, or record behavior.",
+      "Rebate date modification is conditional on institution policy; the permitted modification rules are not specified.",
+      "Rebate validation guards are stated, but the result of submissions violating minimum duration, lead time, overlap, or the required explanation is unspecified.",
+      "The vacation workflow specifies explicit responses before the deadline and a default at the deadline, but does not define the result of an explicit response submitted exactly at the deadline.",
+      "The special-food decision period is institution-defined; the Problem Statement notes 12 hours as intended, not authoritative. The exact timeout and behavior of too-late submissions are not defined.",
+      "Monthly billing inputs are listed, but no concrete rates, charge values, rebate calculation details, or rounding rules are supplied for asserting a numeric bill."
+    ],
+    "scope_notes": [
+      "Role assignment, menu publication, announcement publication, feedback, and reporting are explicitly outside the connected workflows in the Workflow Specifications; they are not added as workflows.",
+      "Email expectations are limited to MMS triggering system-generated notifications described in the Problem Statement; external delivery is out of scope.",
+      "Payment collection, accounting settlement, payroll, procurement, inventory, and email infrastructure are outside MMS scope."
+    ]
+  },
+  "test_cases": [
+    {
+      "test_id": "TC-WF-001",
+      "workflow_id_name": "BW-MMS-01 Registration — Approved; CW-MMS-01 Registration Request Lifecycle",
+      "workflow_path_transition": "Registration Window Not Open -> Registration Window Open -> Registration Request Pending -> Registration Request Approved / Student Registered",
+      "test_objective": "Verify the valid registration path and approval outcome.",
+      "preconditions": [
+        "A student is eligible to submit a registration request.",
+        "No registration window is currently open."
+      ],
+      "test_data": {
+        "window_information": "Sufficient information to open the window, as required by the specification.",
+        "registration_submission": "Valid student registration data."
+      },
+      "steps_or_api_action": [
+        "Mess Caretaker opens the registration window.",
+        "Student submits a valid request while the window is open.",
+        "Mess Caretaker approves the pending request."
+      ],
+      "expected_result": [
+        "The window becomes open, the request becomes Pending, and approval results in Approved / Student Registered.",
+        "MMS records request history and triggers the student email notifications for submission and decision."
+      ],
+      "classification": "positive",
+      "status": "TESTABLE",
+      "specification_reference": [
+        "Problem Statement §3.3.1 Registration Management",
+        "Workflow Specifications BW-MMS-01 STT rows 1-3; CW-MMS-01 STT rows 1-3"
+      ]
+    },
+    {
+      "test_id": "TC-WF-002",
+      "workflow_id_name": "BW-MMS-02 Registration — Rejected; CW-MMS-01 Registration Request Lifecycle",
+      "workflow_path_transition": "Registration Window Not Open -> Registration Window Open -> Registration Request Pending -> Registration Request Rejected",
+      "test_objective": "Verify the valid registration path when the Caretaker rejects the pending request.",
+      "preconditions": [
+        "A registration window is open.",
+        "A valid student registration request can be submitted."
+      ],
+      "test_data": {
+        "registration_submission": "Valid student registration data."
+      },
+      "steps_or_api_action": [
+        "Student submits a valid request while the registration window is open.",
+        "Mess Caretaker rejects the pending request."
+      ],
+      "expected_result": [
+        "The request progresses to Pending and then Rejected; the student is not registered by this outcome.",
+        "MMS records request history and triggers the student email notifications for submission and decision."
+      ],
+      "classification": "positive",
+      "status": "TESTABLE",
+      "specification_reference": [
+        "Problem Statement §3.3.1 Registration Management",
+        "Workflow Specifications BW-MMS-02 STT rows 1-3; CW-MMS-01 STT row 4"
+      ]
+    },
+    {
+      "test_id": "TC-WF-003",
+      "workflow_id_name": "Registration Management — closed-window guard (Problem Statement)",
+      "workflow_path_transition": "Attempt registration submission while Registration Window is Not Open",
+      "test_objective": "Determine the result of a registration submission outside an open window.",
+      "preconditions": [
+        "No registration window is open."
+      ],
+      "test_data": {
+        "registration_submission": "Otherwise valid student registration data."
+      },
+      "steps_or_api_action": [
+        "Student attempts to submit a registration request."
+      ],
+      "expected_result": "BLOCKED: the Problem Statement says submissions are allowed only while the window is open but does not define the validation response, request status, or record behavior for this attempt.",
+      "classification": "negative",
+      "status": "BLOCKED",
+      "blocked_reason": "The guard is specified, but the expected system outcome on violation is not.",
+      "specification_reference": [
+        "Problem Statement §3.3.1 Registration Management",
+        "Workflow Specifications BW-MMS-01 and BW-MMS-02 (valid open-window submission path)"
+      ]
+    },
+    {
+      "test_id": "TC-WF-004",
+      "workflow_id_name": "BW-MMS-03 Deregistration — Approved; CW-MMS-02 Deregistration Request Lifecycle",
+      "workflow_path_transition": "Student Registered -> Deregistration Request Pending -> Deregistration Approved — Awaiting Effective Date -> Student Deregistered / Mess Service Inactive at the next calendar day",
+      "test_objective": "Verify that approval is recorded immediately and service deregistration takes effect only when the next calendar day begins.",
+      "preconditions": [
+        "The student is registered and active in mess service."
+      ],
+      "test_data": {
+        "approval_time": "A known calendar date and time.",
+        "activation_check": "Check after approval on the same calendar day and again when the next calendar day begins."
+      },
+      "steps_or_api_action": [
+        "Student submits a valid deregistration request.",
+        "Mess Caretaker approves it.",
+        "Check the student's service state before the next calendar day begins.",
+        "Allow the next calendar day to begin and check the service state again."
+      ],
+      "expected_result": [
+        "The request becomes Pending and then Approved — Awaiting Effective Date.",
+        "The student remains registered until the next calendar day begins after approval.",
+        "At that trigger, the student becomes Deregistered and mess service becomes Inactive.",
+        "MMS triggers the student email notifications for request submission and decision."
+      ],
+      "classification": "boundary",
+      "status": "TESTABLE",
+      "specification_reference": [
+        "Problem Statement §3.3.1 Registration Management",
+        "Workflow Specifications BW-MMS-03 STT rows 1-3; CW-MMS-02 STT rows 1-3"
+      ]
+    },
+    {
+      "test_id": "TC-WF-005",
+      "workflow_id_name": "BW-MMS-04 Deregistration — Rejected; CW-MMS-02 Deregistration Request Lifecycle",
+      "workflow_path_transition": "Student Registered -> Deregistration Request Pending -> Deregistration Request Rejected / Student remains Registered",
+      "test_objective": "Verify that rejecting a valid deregistration request leaves mess service active.",
+      "preconditions": [
+        "The student is registered and active in mess service."
+      ],
+      "test_data": {
+        "deregistration_submission": "Valid deregistration request."
+      },
+      "steps_or_api_action": [
+        "Student submits a deregistration request.",
+        "Mess Caretaker rejects the pending request."
+      ],
+      "expected_result": [
+        "The request becomes Rejected and the student remains Registered.",
+        "MMS triggers the student email notifications for request submission and decision."
+      ],
+      "classification": "positive",
+      "status": "TESTABLE",
+      "specification_reference": [
+        "Problem Statement §3.3.1 Registration Management",
+        "Workflow Specifications BW-MMS-04 STT rows 1-2; CW-MMS-02 STT row 4"
+      ]
+    },
+    {
+      "test_id": "TC-WF-006",
+      "workflow_id_name": "BW-MMS-05 Rebate — Approved as Submitted; CW-MMS-03 Rebate Request Lifecycle",
+      "workflow_path_transition": "No Current Rebate Request -> Rebate Request Pending -> Rebate Approved without date modification",
+      "test_objective": "Verify valid rebate requests for all named reason categories and the minimum-duration and lead-time boundaries when approved without date changes.",
+      "preconditions": [
+        "The student has no overlapping rebate request.",
+        "The caretaker can review the submitted request."
+      ],
+      "test_data": {
+        "reason_scenarios": [
+          "medical",
+          "institute leave",
+          "family function",
+          "other with a non-empty explanation"
+        ],
+        "duration": "Exactly 3 calendar days in each scenario.",
+        "lead_time": "Request submitted one calendar day before the start date.",
+        "dates": "Non-overlapping dates with complete reason/date data."
+      },
+      "steps_or_api_action": [
+        "Submit each valid rebate scenario.",
+        "For each resulting Pending request, have the Mess Caretaker approve without changing dates."
+      ],
+      "expected_result": [
+        "Each valid submission becomes Pending.",
+        "Each approved request becomes Approved with submitted dates unchanged, and those approved dates are used for monthly billing adjustment.",
+        "MMS triggers student email notifications for each submission and decision."
+      ],
+      "classification": "boundary",
+      "status": "TESTABLE",
+      "specification_reference": [
+        "Problem Statement §3.3.5 Rebate Management",
+        "Workflow Specifications BW-MMS-05 STT rows 1-2; CW-MMS-03 STT rows 1-2"
+      ]
+    },
+    {
+      "test_id": "TC-WF-007",
+      "workflow_id_name": "BW-MMS-06 Rebate — Dates Modified then Approved; CW-MMS-03 Rebate Request Lifecycle",
+      "workflow_path_transition": "Rebate Request Pending -> Caretaker modifies dates under permitted policy -> Rebate Approved with Modified Dates",
+      "test_objective": "Verify the date-modification-and-approval path and that the modified approved dates drive billing adjustment.",
+      "preconditions": [
+        "A valid rebate request is Pending."
+      ],
+      "test_data": {
+        "modified_dates": "Not specifiable until the institution's policy-permitted modification rules are supplied."
+      },
+      "steps_or_api_action": [
+        "Have Mess Caretaker modify the pending request dates and approve it, using a modification permitted by institution policy."
+      ],
+      "expected_result": "BLOCKED: the specification does not define which date modifications are permitted, so a valid modified-date test input and its expected billing dates cannot be reliably determined.",
+      "classification": "positive",
+      "status": "BLOCKED",
+      "blocked_reason": "The workflow is conditional on external policy, whose permitted date changes are not specified.",
+      "specification_reference": [
+        "Problem Statement §3.3.5 Rebate Management",
+        "Workflow Specifications BW-MMS-06 STT row 2; CW-MMS-03 STT row 3"
+      ]
+    },
+    {
+      "test_id": "TC-WF-008",
+      "workflow_id_name": "BW-MMS-07 Rebate — Rejected; CW-MMS-03 Rebate Request Lifecycle",
+      "workflow_path_transition": "No Current Rebate Request -> Rebate Request Pending -> Rebate Rejected",
+      "test_objective": "Verify rejection of a valid rebate request.",
+      "preconditions": [
+        "The student has no overlapping rebate request."
+      ],
+      "test_data": {
+        "reason": "medical",
+        "duration": "3 calendar days",
+        "lead_time": "At least one calendar day",
+        "dates": "Complete and non-overlapping."
+      },
+      "steps_or_api_action": [
+        "Student submits the valid rebate request.",
+        "Mess Caretaker rejects it."
+      ],
+      "expected_result": [
+        "The request progresses to Pending and then Rejected.",
+        "No approval-based billing adjustment is applied for this rejected request.",
+        "MMS triggers student email notifications for submission and decision."
+      ],
+      "classification": "positive",
+      "status": "TESTABLE",
+      "specification_reference": [
+        "Problem Statement §3.3.5 Rebate Management",
+        "Workflow Specifications BW-MMS-07 STT rows 1-2; CW-MMS-03 STT row 4"
+      ]
+    },
+    {
+      "test_id": "TC-WF-009",
+      "workflow_id_name": "Rebate Management — minimum-duration guard (Problem Statement)",
+      "workflow_path_transition": "Attempt rebate submission with duration below 3 days",
+      "test_objective": "Determine the outcome when a rebate request violates the minimum duration.",
+      "preconditions": [
+        "The student has no overlapping rebate request."
+      ],
+      "test_data": {
+        "duration": "2 calendar days",
+        "other_fields": "Complete, with at least one calendar day of lead time."
+      },
+      "steps_or_api_action": [
+        "Student submits the rebate request."
+      ],
+      "expected_result": "BLOCKED: the 3-day minimum is specified, but the system response or resulting request state for a shorter request is not.",
+      "classification": "negative",
+      "status": "BLOCKED",
+      "blocked_reason": "Violation behavior is unspecified; asserting a rejection, error, or absence of record would invent behavior.",
+      "specification_reference": [
+        "Problem Statement §3.3.5 Rebate Management",
+        "Workflow Specifications BW-MMS-05 through BW-MMS-07 submission guards"
+      ]
+    },
+    {
+      "test_id": "TC-WF-010",
+      "workflow_id_name": "Rebate Management — lead-time guard (Problem Statement)",
+      "workflow_path_transition": "Attempt rebate submission less than one calendar day before its start date",
+      "test_objective": "Determine the outcome when a rebate request fails the stated submission lead time.",
+      "preconditions": [
+        "The student has no overlapping rebate request."
+      ],
+      "test_data": {
+        "submission_date": "Same calendar date as the rebate start date.",
+        "duration": "At least 3 calendar days."
+      },
+      "steps_or_api_action": [
+        "Student submits the rebate request."
+      ],
+      "expected_result": "BLOCKED: the one-calendar-day lead-time requirement is stated, but the result of violating it is unspecified.",
+      "classification": "negative",
+      "status": "BLOCKED",
+      "blocked_reason": "The specification provides no validation response or request-state behavior for an insufficient lead time.",
+      "specification_reference": [
+        "Problem Statement §3.3.5 Rebate Management",
+        "Workflow Specifications BW-MMS-05 through BW-MMS-07 submission guards"
+      ]
+    },
+    {
+      "test_id": "TC-WF-011",
+      "workflow_id_name": "Rebate Management — overlapping-request guard (Problem Statement)",
+      "workflow_path_transition": "Attempt a rebate submission whose dates overlap another request for the same student",
+      "test_objective": "Determine the outcome when a rebate request overlaps an existing request.",
+      "preconditions": [
+        "The student has an existing rebate request with known dates."
+      ],
+      "test_data": {
+        "new_request_dates": "Dates overlapping the existing request."
+      },
+      "steps_or_api_action": [
+        "Student submits the overlapping rebate request."
+      ],
+      "expected_result": "BLOCKED: overlapping requests are prohibited, but the specification does not state the system response or resulting record behavior.",
+      "classification": "negative",
+      "status": "BLOCKED",
+      "blocked_reason": "The guard is known; the expected violation outcome is not.",
+      "specification_reference": [
+        "Problem Statement §3.3.5 Rebate Management",
+        "Workflow Specifications BW-MMS-05 through BW-MMS-07 submission guards"
+      ]
+    },
+    {
+      "test_id": "TC-WF-012",
+      "workflow_id_name": "Rebate Management — mandatory explanation for other (Problem Statement)",
+      "workflow_path_transition": "Attempt a rebate submission with reason other and no explanation",
+      "test_objective": "Determine the outcome when the mandatory explanation for reason other is omitted.",
+      "preconditions": [
+        "The student has no overlapping rebate request."
+      ],
+      "test_data": {
+        "reason": "other",
+        "explanation": "Missing",
+        "duration": "At least 3 calendar days",
+        "lead_time": "At least one calendar day"
+      },
+      "steps_or_api_action": [
+        "Student submits the rebate request."
+      ],
+      "expected_result": "BLOCKED: an explanation is mandatory for reason other, but the handling of a missing explanation is not specified.",
+      "classification": "negative",
+      "status": "BLOCKED",
+      "blocked_reason": "The required field is stated without an expected validation result.",
+      "specification_reference": [
+        "Problem Statement §3.3.5 Rebate Management",
+        "Workflow Specifications BW-MMS-05 through BW-MMS-07 submission guards"
+      ]
+    },
+    {
+      "test_id": "TC-WF-013",
+      "workflow_id_name": "BW-MMS-08 Vacation Survey — Yes Response; CW-MMS-04 Vacation Food Continuity Response Lifecycle",
+      "workflow_path_transition": "Vacation Survey Not Created -> Vacation Survey Open -> Vacation Response = Yes",
+      "test_objective": "Verify survey creation, registered-student inclusion, and an explicit Yes response before the deadline.",
+      "preconditions": [
+        "At least one student is currently registered and one student is not currently registered.",
+        "An upcoming institute vacation is identified."
+      ],
+      "test_data": {
+        "response_deadline": "A future deadline set by the Mess Caretaker.",
+        "registered_student_response": "Yes before the deadline."
+      },
+      "steps_or_api_action": [
+        "Mess Caretaker creates the vacation food continuity survey with a response deadline.",
+        "Inspect the survey recipient set.",
+        "The registered student responds Yes before the deadline."
+      ],
+      "expected_result": [
+        "The survey opens and includes currently registered students only; the unregistered student is not included.",
+        "The registered student's response is recorded as Yes.",
+        "MMS triggers the vacation survey creation email notification."
+      ],
+      "classification": "positive",
+      "status": "TESTABLE",
+      "specification_reference": [
+        "Problem Statement §3.3.6 Vacation Food Continuity Management and §3.3.10 Notifications",
+        "Workflow Specifications BW-MMS-08 STT rows 1-2; CW-MMS-04 STT rows 1-2"
+      ]
+    },
+    {
+      "test_id": "TC-WF-014",
+      "workflow_id_name": "BW-MMS-09 Vacation Survey — No Response; CW-MMS-04 Vacation Food Continuity Response Lifecycle",
+      "workflow_path_transition": "Vacation Survey Not Created -> Vacation Survey Open -> Vacation Response = No",
+      "test_objective": "Verify that an explicit No response before the deadline is recorded as No.",
+      "preconditions": [
+        "A vacation survey is open for a currently registered student."
+      ],
+      "test_data": {
+        "response_deadline": "A future deadline.",
+        "student_response": "No before the deadline."
+      },
+      "steps_or_api_action": [
+        "Student submits No before the response deadline."
+      ],
+      "expected_result": "The student's vacation response is recorded as No; it is not the system's default-No outcome.",
+      "classification": "positive",
+      "status": "TESTABLE",
+      "specification_reference": [
+        "Problem Statement §3.3.6 Vacation Food Continuity Management",
+        "Workflow Specifications BW-MMS-09 STT row 2; CW-MMS-04 STT row 3"
+      ]
+    },
+    {
+      "test_id": "TC-WF-015",
+      "workflow_id_name": "BW-MMS-10 Vacation Survey — Default No; CW-MMS-04 Vacation Food Continuity Response Lifecycle",
+      "workflow_path_transition": "Vacation Survey Open -> response deadline reached without response -> Vacation Response = Default No",
+      "test_objective": "Verify the system applies the specified default No for a non-responding student when the response deadline is reached.",
+      "preconditions": [
+        "A vacation survey is open for a currently registered student.",
+        "The student has no recorded response."
+      ],
+      "test_data": {
+        "response_deadline": "A specific deadline configured by the Caretaker."
+      },
+      "steps_or_api_action": [
+        "Allow the configured response deadline to be reached without a student response.",
+        "Inspect the student's recorded response."
+      ],
+      "expected_result": "The system records Vacation Response = Default No.",
+      "classification": "boundary",
+      "status": "TESTABLE",
+      "specification_reference": [
+        "Problem Statement §3.3.6 Vacation Food Continuity Management",
+        "Workflow Specifications BW-MMS-10 STT row 2; CW-MMS-04 STT row 4"
+      ]
+    },
+    {
+      "test_id": "TC-WF-016",
+      "workflow_id_name": "Vacation Survey — response exactly at deadline",
+      "workflow_path_transition": "Attempt explicit Yes or No at the exact response deadline",
+      "test_objective": "Determine whether an explicit response at the deadline is accepted or defaulted.",
+      "preconditions": [
+        "A vacation survey is open and a registered student has not yet responded."
+      ],
+      "test_data": {
+        "response_time": "Exactly the configured response deadline."
+      },
+      "steps_or_api_action": [
+        "Submit an explicit Yes or No at the exact response deadline and inspect the resulting response."
+      ],
+      "expected_result": "BLOCKED: explicit responses are specified as occurring before the deadline, while the system applies Default No when the deadline is reached; ordering/acceptance at the exact instant is not defined.",
+      "classification": "boundary",
+      "status": "BLOCKED",
+      "blocked_reason": "The exact-deadline precedence between user response and system default is unspecified.",
+      "specification_reference": [
+        "Problem Statement §3.3.6 Vacation Food Continuity Management",
+        "Workflow Specifications BW-MMS-08 through BW-MMS-10; CW-MMS-04 STT rows 2-4"
+      ]
+    },
+    {
+      "test_id": "TC-WF-017",
+      "workflow_id_name": "BW-MMS-11 Special Food — Rejected by Caretaker; CW-MMS-05 Special Food Request Lifecycle",
+      "workflow_path_transition": "No Special Food Request -> Requested -> Rejected by Caretaker within the stipulated decision period",
+      "test_objective": "Verify an explicit Caretaker rejection of a valid special-food request.",
+      "preconditions": [
+        "The student is eligible to submit a special-food request.",
+        "The pending request remains Requested and has not reached its stipulated decision-period expiry."
+      ],
+      "test_data": {
+        "requested_date": "At least one calendar day after submission.",
+        "decision": "Caretaker rejects while the request is still within the stipulated decision period."
+      },
+      "steps_or_api_action": [
+        "Student submits the valid special-food request.",
+        "Mess Caretaker rejects it before the decision period expires."
+      ],
+      "expected_result": [
+        "The request progresses to Requested and then Rejected.",
+        "MMS triggers email notifications to the student for submission and decision."
+      ],
+      "classification": "positive",
+      "status": "TESTABLE",
+      "specification_reference": [
+        "Problem Statement §3.3.7 Special Food Arrangement and §3.3.10 Notifications",
+        "Workflow Specifications BW-MMS-11 STT rows 1-2; CW-MMS-05 STT row 2"
+      ]
+    },
+    {
+      "test_id": "TC-WF-018",
+      "workflow_id_name": "BW-MMS-12 Special Food — Default Rejected; CW-MMS-05 Special Food Request Lifecycle",
+      "workflow_path_transition": "Requested -> institution-defined decision period expires undecided -> Rejected (Default)",
+      "test_objective": "Verify that an undecided request becomes Rejected by default when its stipulated decision period expires.",
+      "preconditions": [
+        "A valid special-food request remains Requested without a Caretaker decision."
+      ],
+      "test_data": {
+        "stipulated_decision_period": "Exact value unavailable; Problem Statement identifies 12 hours as intended but says the policy value is institution-defined."
+      },
+      "steps_or_api_action": [
+        "Allow the stipulated decision period to expire without a decision.",
+        "Inspect the request status and student notification."
+      ],
+      "expected_result": "BLOCKED: default rejection is specified, but the institution-defined decision-period value is not supplied, preventing a reliable timeout test setup.",
+      "classification": "boundary",
+      "status": "BLOCKED",
+      "blocked_reason": "The exact configured decision period is necessary to set a deterministic test deadline; 12 hours is expressly only the intended value.",
+      "specification_reference": [
+        "Problem Statement §3.3.7 Special Food Arrangement and §3.3.10 Notifications",
+        "Workflow Specifications BW-MMS-12 STT row 2; CW-MMS-05 STT row 3"
+      ]
+    },
+    {
+      "test_id": "TC-WF-019",
+      "workflow_id_name": "BW-MMS-13 Special Food — Approved, Awaiting Fulfillment; CW-MMS-05 Special Food Request Lifecycle",
+      "workflow_path_transition": "No Special Food Request -> Requested -> Approved",
+      "test_objective": "Verify approval of a valid special-food request and its Awaiting Fulfillment outcome.",
+      "preconditions": [
+        "The student is eligible to submit a special-food request.",
+        "The request remains Requested and has not reached its stipulated decision-period expiry."
+      ],
+      "test_data": {
+        "requested_date": "Exactly one calendar day after submission.",
+        "decision": "Caretaker approves while the request remains within the stipulated period."
+      },
+      "steps_or_api_action": [
+        "Student submits the valid request at the one-calendar-day lead-time boundary.",
+        "Mess Caretaker approves it while it is still within the stipulated decision period."
+      ],
+      "expected_result": [
+        "The request progresses to Requested and then Approved, awaiting fulfillment.",
+        "The approved request is chargeable and is added to the student's monthly bill.",
+        "MMS triggers email notifications for submission and decision."
+      ],
+      "classification": "boundary",
+      "status": "TESTABLE",
+      "specification_reference": [
+        "Problem Statement §3.3.7 Special Food Arrangement and §3.3.10 Notifications",
+        "Workflow Specifications BW-MMS-13 STT rows 1-2; CW-MMS-05 STT row 4"
+      ]
+    },
+    {
+      "test_id": "TC-WF-020",
+      "workflow_id_name": "BW-MMS-14 Special Food — Served; CW-MMS-05 Special Food Request Lifecycle",
+      "workflow_path_transition": "Requested -> Approved -> Served",
+      "test_objective": "Verify the post-approval fulfillment transition to Served.",
+      "preconditions": [
+        "A valid special-food request has been approved."
+      ],
+      "test_data": {
+        "fulfillment_outcome": "Served."
+      },
+      "steps_or_api_action": [
+        "Mess Caretaker updates the approved request fulfillment status to Served."
+      ],
+      "expected_result": [
+        "The request status becomes Served.",
+        "MMS triggers the applicable fulfillment-related student email notification."
+      ],
+      "classification": "positive",
+      "status": "TESTABLE",
+      "specification_reference": [
+        "Problem Statement §3.3.7 Special Food Arrangement and §3.3.10 Notifications",
+        "Workflow Specifications BW-MMS-14 STT row 3; CW-MMS-05 STT row 5"
+      ]
+    },
+    {
+      "test_id": "TC-WF-021",
+      "workflow_id_name": "BW-MMS-15 Special Food — Cancelled; CW-MMS-05 Special Food Request Lifecycle",
+      "workflow_path_transition": "Requested -> Approved -> Cancelled",
+      "test_objective": "Verify the post-approval fulfillment transition to Cancelled.",
+      "preconditions": [
+        "A valid special-food request has been approved."
+      ],
+      "test_data": {
+        "fulfillment_outcome": "Cancelled."
+      },
+      "steps_or_api_action": [
+        "Mess Caretaker updates the approved request fulfillment status to Cancelled."
+      ],
+      "expected_result": [
+        "The request status becomes Cancelled; the transition is only exercised after approval.",
+        "MMS triggers the applicable fulfillment-related student email notification."
+      ],
+      "classification": "positive",
+      "status": "TESTABLE",
+      "specification_reference": [
+        "Problem Statement §3.3.7 Special Food Arrangement",
+        "Workflow Specifications BW-MMS-15 STT row 3; CW-MMS-05 STT row 6"
+      ]
+    },
+    {
+      "test_id": "TC-WF-022",
+      "workflow_id_name": "Special Food Arrangement — one-calendar-day lead-time guard (Problem Statement)",
+      "workflow_path_transition": "Attempt special-food request less than one calendar day before requested date",
+      "test_objective": "Determine the outcome when a special-food request violates the stated one-calendar-day advance-submission requirement.",
+      "preconditions": [
+        "The student can access special-food request submission."
+      ],
+      "test_data": {
+        "submission_date": "Same calendar date as requested date."
+      },
+      "steps_or_api_action": [
+        "Student attempts to submit the special-food request."
+      ],
+      "expected_result": "BLOCKED: the minimum lead time is stated, but the validation response and resulting request state for an early/late violation are unspecified.",
+      "classification": "negative",
+      "status": "BLOCKED",
+      "blocked_reason": "The invalid-submission behavior is not described.",
+      "specification_reference": [
+        "Problem Statement §3.3.7 Special Food Arrangement",
+        "Workflow Specifications BW-MMS-11 through BW-MMS-15 submission guard"
+      ]
+    },
+    {
+      "test_id": "TC-WF-023",
+      "workflow_id_name": "BW-MMS-16 Monthly Billing — Generated to Published",
+      "workflow_path_transition": "Monthly Bill Not Generated -> Monthly Bill Generated -> Monthly Bill Published",
+      "test_objective": "Verify calendar-month bill generation followed by Caretaker review, finalization, and publication; verify a student can view the published bill.",
+      "preconditions": [
+        "The calendar-month billing event is due.",
+        "Required billing inputs are available.",
+        "A student has a bill for the month."
+      ],
+      "test_data": {
+        "billing_inputs": "Available served-day, approved special-meal/add-on, approved rebate, and daily-rate inputs.",
+        "bill_review": "Caretaker reviews and finalizes generated bills before publication."
+      },
+      "steps_or_api_action": [
+        "Allow the calendar-month billing event to generate bills.",
+        "Mess Caretaker reviews, finalizes, and publishes the generated bill.",
+        "Student views the published monthly bill and outstanding balance."
+      ],
+      "expected_result": [
+        "A monthly bill is generated and then published only after Caretaker review and finalization.",
+        "The student can view the published bill and outstanding balance.",
+        "MMS triggers the monthly bill publication email notification."
+      ],
+      "classification": "positive",
+      "status": "TESTABLE",
+      "specification_reference": [
+        "Problem Statement §3.3.3 Billing Management and §3.3.10 Notifications",
+        "Workflow Specifications BW-MMS-16 STT rows 1-2"
+      ]
+    },
+    {
+      "test_id": "TC-WF-024",
+      "workflow_id_name": "Monthly Billing — numeric bill calculation (Problem Statement)",
+      "workflow_path_transition": "Generate bill from served-day charges, approved special-meal/add-on charges, and approved rebate deductions",
+      "test_objective": "Assert the exact numeric amount generated for a bill containing the specified charge and deduction types.",
+      "preconditions": [
+        "A bill is generated for a calendar month."
+      ],
+      "test_data": {
+        "rates_and_amounts": "No numeric rate or charge schedule is supplied.",
+        "rounding_and_adjustment_rules": "Not specified."
+      },
+      "steps_or_api_action": [
+        "Generate a bill with served days, approved special meals/add-ons, and an approved rebate."
+      ],
+      "expected_result": "BLOCKED: the charge components are named, but the specific rates, calculation rules, and rounding behavior needed for an exact numeric oracle are not provided.",
+      "classification": "boundary",
+      "status": "BLOCKED",
+      "blocked_reason": "A numeric expected total cannot be derived without inventing policy values or calculation rules.",
+      "specification_reference": [
+        "Problem Statement §3.3.3 Billing Management",
+        "Workflow Specifications BW-MMS-16 STT row 1"
+      ]
+    }
+  ],
+  "workflow_coverage_matrix": [
+    {
+      "workflow_id": "BW-MMS-01",
+      "workflow_name": "Registration — Approved",
+      "type": "Basis",
+      "paths_or_transitions": [
+        {
+          "path": "Open window -> valid student submission -> Caretaker approves",
+          "test_ids": ["TC-WF-001"],
+          "coverage_status": "TESTABLE"
+        }
+      ]
+    },
+    {
+      "workflow_id": "BW-MMS-02",
+      "workflow_name": "Registration — Rejected",
+      "type": "Basis",
+      "paths_or_transitions": [
+        {
+          "path": "Open window -> valid student submission -> Caretaker rejects",
+          "test_ids": ["TC-WF-002"],
+          "coverage_status": "TESTABLE"
+        }
+      ]
+    },
+    {
+      "workflow_id": "CW-MMS-01",
+      "workflow_name": "Registration Request Lifecycle",
+      "type": "Composite",
+      "paths_or_transitions": [
+        {
+          "path": "Common window-opening and submission prefix -> approval",
+          "test_ids": ["TC-WF-001"],
+          "coverage_status": "TESTABLE"
+        },
+        {
+          "path": "Common window-opening and submission prefix -> rejection",
+          "test_ids": ["TC-WF-002"],
+          "coverage_status": "TESTABLE"
+        }
+      ]
+    },
+    {
+      "workflow_id": "BW-MMS-03",
+      "workflow_name": "Deregistration — Approved",
+      "type": "Basis",
+      "paths_or_transitions": [
+        {
+          "path": "Valid submission -> approval awaiting effective date -> activation at next calendar day",
+          "test_ids": ["TC-WF-004"],
+          "coverage_status": "TESTABLE"
+        }
+      ]
+    },
+    {
+      "workflow_id": "BW-MMS-04",
+      "workflow_name": "Deregistration — Rejected",
+      "type": "Basis",
+      "paths_or_transitions": [
+        {
+          "path": "Valid submission -> rejection; student remains registered",
+          "test_ids": ["TC-WF-005"],
+          "coverage_status": "TESTABLE"
+        }
+      ]
+    },
+    {
+      "workflow_id": "CW-MMS-02",
+      "workflow_name": "Deregistration Request Lifecycle",
+      "type": "Composite",
+      "paths_or_transitions": [
+        {
+          "path": "Valid submission -> approval -> next-calendar-day activation",
+          "test_ids": ["TC-WF-004"],
+          "coverage_status": "TESTABLE"
+        },
+        {
+          "path": "Valid submission -> rejection; student remains registered",
+          "test_ids": ["TC-WF-005"],
+          "coverage_status": "TESTABLE"
+        }
+      ]
+    },
+    {
+      "workflow_id": "BW-MMS-05",
+      "workflow_name": "Rebate — Approved as Submitted",
+      "type": "Basis",
+      "paths_or_transitions": [
+        {
+          "path": "Valid request -> approval without date modification",
+          "test_ids": ["TC-WF-006"],
+          "coverage_status": "TESTABLE"
+        }
+      ]
+    },
+    {
+      "workflow_id": "BW-MMS-06",
+      "workflow_name": "Rebate — Dates Modified then Approved",
+      "type": "Basis",
+      "paths_or_transitions": [
+        {
+          "path": "Pending request -> policy-permitted date modification -> approval using modified dates",
+          "test_ids": ["TC-WF-007"],
+          "coverage_status": "BLOCKED"
+        }
+      ]
+    },
+    {
+      "workflow_id": "BW-MMS-07",
+      "workflow_name": "Rebate — Rejected",
+      "type": "Basis",
+      "paths_or_transitions": [
+        {
+          "path": "Valid request -> rejection",
+          "test_ids": ["TC-WF-008"],
+          "coverage_status": "TESTABLE"
+        }
+      ]
+    },
+    {
+      "workflow_id": "CW-MMS-03",
+      "workflow_name": "Rebate Request Lifecycle",
+      "type": "Composite",
+      "paths_or_transitions": [
+        {
+          "path": "Valid request -> approval without modification",
+          "test_ids": ["TC-WF-006"],
+          "coverage_status": "TESTABLE"
+        },
+        {
+          "path": "Pending request -> policy-permitted date modification -> approval",
+          "test_ids": ["TC-WF-007"],
+          "coverage_status": "BLOCKED"
+        },
+        {
+          "path": "Valid request -> rejection",
+          "test_ids": ["TC-WF-008"],
+          "coverage_status": "TESTABLE"
+        }
+      ]
+    },
+    {
+      "workflow_id": "BW-MMS-08",
+      "workflow_name": "Vacation Survey — Yes Response",
+      "type": "Basis",
+      "paths_or_transitions": [
+        {
+          "path": "Create survey for currently registered students -> explicit Yes before deadline",
+          "test_ids": ["TC-WF-013"],
+          "coverage_status": "TESTABLE"
+        }
+      ]
+    },
+    {
+      "workflow_id": "BW-MMS-09",
+      "workflow_name": "Vacation Survey — No Response",
+      "type": "Basis",
+      "paths_or_transitions": [
+        {
+          "path": "Create survey -> explicit No before deadline",
+          "test_ids": ["TC-WF-014"],
+          "coverage_status": "TESTABLE"
+        }
+      ]
+    },
+    {
+      "workflow_id": "BW-MMS-10",
+      "workflow_name": "Vacation Survey — Default No",
+      "type": "Basis",
+      "paths_or_transitions": [
+        {
+          "path": "Create survey -> deadline reached with no response -> system Default No",
+          "test_ids": ["TC-WF-015"],
+          "coverage_status": "TESTABLE"
+        }
+      ]
+    },
+    {
+      "workflow_id": "CW-MMS-04",
+      "workflow_name": "Vacation Food Continuity Response Lifecycle",
+      "type": "Composite",
+      "paths_or_transitions": [
+        {
+          "path": "Survey creation -> explicit Yes before deadline",
+          "test_ids": ["TC-WF-013"],
+          "coverage_status": "TESTABLE"
+        },
+        {
+          "path": "Survey creation -> explicit No before deadline",
+          "test_ids": ["TC-WF-014"],
+          "coverage_status": "TESTABLE"
+        },
+        {
+          "path": "Survey creation -> no response at deadline -> system Default No",
+          "test_ids": ["TC-WF-015"],
+          "coverage_status": "TESTABLE"
+        }
+      ]
+    },
+    {
+      "workflow_id": "BW-MMS-11",
+      "workflow_name": "Special Food — Rejected by Caretaker",
+      "type": "Basis",
+      "paths_or_transitions": [
+        {
+          "path": "Valid request -> Caretaker rejects within stipulated period",
+          "test_ids": ["TC-WF-017"],
+          "coverage_status": "TESTABLE"
+        }
+      ]
+    },
+    {
+      "workflow_id": "BW-MMS-12",
+      "workflow_name": "Special Food — Default Rejected",
+      "type": "Basis",
+      "paths_or_transitions": [
+        {
+          "path": "Valid request -> stipulated period expires without decision -> system default rejection",
+          "test_ids": ["TC-WF-018"],
+          "coverage_status": "BLOCKED"
+        }
+      ]
+    },
+    {
+      "workflow_id": "BW-MMS-13",
+      "workflow_name": "Special Food — Approved, Awaiting Fulfillment",
+      "type": "Basis",
+      "paths_or_transitions": [
+        {
+          "path": "Valid request -> Caretaker approval",
+          "test_ids": ["TC-WF-019"],
+          "coverage_status": "TESTABLE"
+        }
+      ]
+    },
+    {
+      "workflow_id": "BW-MMS-14",
+      "workflow_name": "Special Food — Served",
+      "type": "Basis",
+      "paths_or_transitions": [
+        {
+          "path": "Valid request -> approval -> Served",
+          "test_ids": ["TC-WF-020"],
+          "coverage_status": "TESTABLE"
+        }
+      ]
+    },
+    {
+      "workflow_id": "BW-MMS-15",
+      "workflow_name": "Special Food — Cancelled",
+      "type": "Basis",
+      "paths_or_transitions": [
+        {
+          "path": "Valid request -> approval -> Cancelled",
+          "test_ids": ["TC-WF-021"],
+          "coverage_status": "TESTABLE"
+        }
+      ]
+    },
+    {
+      "workflow_id": "CW-MMS-05",
+      "workflow_name": "Special Food Request Lifecycle",
+      "type": "Composite",
+      "paths_or_transitions": [
+        {
+          "path": "Valid request -> explicit Caretaker rejection",
+          "test_ids": ["TC-WF-017"],
+          "coverage_status": "TESTABLE"
+        },
+        {
+          "path": "Valid request -> no decision by deadline -> default rejection",
+          "test_ids": ["TC-WF-018"],
+          "coverage_status": "BLOCKED"
+        },
+        {
+          "path": "Valid request -> approval",
+          "test_ids": ["TC-WF-019"],
+          "coverage_status": "TESTABLE"
+        },
+        {
+          "path": "Approval -> Served",
+          "test_ids": ["TC-WF-020"],
+          "coverage_status": "TESTABLE"
+        },
+        {
+          "path": "Approval -> Cancelled",
+          "test_ids": ["TC-WF-021"],
+          "coverage_status": "TESTABLE"
+        }
+      ]
+    },
+    {
+      "workflow_id": "BW-MMS-16",
+      "workflow_name": "Monthly Billing — Generated to Published",
+      "type": "Basis",
+      "paths_or_transitions": [
+        {
+          "path": "Calendar-month event -> bill generated -> Caretaker reviews/finalizes -> bill published",
+          "test_ids": ["TC-WF-023"],
+          "coverage_status": "TESTABLE"
+        },
+        {
+          "path": "Supplemental numeric-calculation assertion (not a distinct state transition)",
+          "test_ids": ["TC-WF-024"],
+          "coverage_status": "BLOCKED"
+        }
+      ]
+    }
+  ],
+  "blocked_cases": [
+    {
+      "test_id": "TC-WF-003",
+      "reason": "Registration outside an open window is prohibited, but violation response and record behavior are unspecified."
+    },
+    {
+      "test_id": "TC-WF-007",
+      "reason": "Permitted rebate date modifications depend on external policy not defined in the specifications."
+    },
+    {
+      "test_id": "TC-WF-009",
+      "reason": "The below-minimum rebate duration is prohibited, but the validation outcome is unspecified."
+    },
+    {
+      "test_id": "TC-WF-010",
+      "reason": "The insufficient rebate lead-time validation outcome is unspecified."
+    },
+    {
+      "test_id": "TC-WF-011",
+      "reason": "Overlapping rebate requests are prohibited, but the system response and record behavior are unspecified."
+    },
+    {
+      "test_id": "TC-WF-012",
+      "reason": "The explanation is mandatory for rebate reason other, but the missing-explanation outcome is unspecified."
+    },
+    {
+      "test_id": "TC-WF-016",
+      "reason": "Precedence between an explicit vacation response and the system default at the exact deadline is unspecified."
+    },
+    {
+      "test_id": "TC-WF-018",
+      "reason": "The special-food decision period is institution-defined; the stated 12 hours is intended, not a confirmed test value."
+    },
+    {
+      "test_id": "TC-WF-022",
+      "reason": "Special-food submissions with less than one calendar day of lead time have no specified validation outcome."
+    },
+    {
+      "test_id": "TC-WF-024",
+      "reason": "Rates, component amounts, detailed calculation rules, and rounding behavior are absent, so no exact numeric expected total can be derived."
+    }
+  ]
+}

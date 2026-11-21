@@ -1,0 +1,217 @@
+..F.......s....................ss............F...........s....s.FF...... [ 56%]
+s....F..s....ss......ss.......................s.....ss..                 [100%]
+=================================== FAILURES ===================================
+________________________ test_frozen_uc_case[TC-UC-003] ________________________
+
+test_case = {'id': 'TC-UC-003', 'source_use_case': 'MMS-UC-001', 'flow': 'Alternative Flow A1: conflicting role assignment', 'obje... MMS prevents a role assignment that would violate exactly-one-active-role cardinality for its effective period.', ...}
+stub_iam = <function stub_iam.<locals>._install at 0x7f628d6645e0>
+user_ref = <function user_ref.<locals>._make at 0x7f628d664ae0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f628d6543b0>
+
+    @pytest.mark.parametrize(
+        "test_case",
+        [pytest.param(case, id=case["id"]) for case in _TEST_CASES],
+    )
+    def test_frozen_uc_case(test_case, stub_iam, user_ref, monkeypatch):
+        case_id = test_case["id"]
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+>       _dispatch(case_id, UCHarness(stub_iam, user_ref), monkeypatch)
+
+tests/a8/uc/test_uc_cases.py:1522: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/a8/uc/test_uc_cases.py:1470: in _dispatch
+    return runner(h)
+           ^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = <test_uc_cases.UCHarness object at 0x7f628dda8890>
+
+    def _case_003(h):
+        h.employee(4101)
+        h.employee(4102)
+        incumbent = h.active_role(4101, "caretaker")
+        response = h.client(9000, "admin").post(
+            "/api/v1/mms/roles",
+            {"role": "caretaker", "user_id": 4102,
+             "ends_at": (timezone.now() + timedelta(days=30)).isoformat()},
+            format="json",
+        )
+>       assert response.status_code == 409
+E       assert 201 == 409
+E        +  where 201 = <Response status_code=201, "application/json">.status_code
+
+tests/a8/uc/test_uc_cases.py:304: AssertionError
+________________________ test_frozen_uc_case[TC-UC-046] ________________________
+
+test_case = {'id': 'TC-UC-046', 'source_use_case': 'MMS-UC-013', 'flow': 'Exception Flow: unauthorized feedback view', 'objective': 'Verify an actor without the stated feedback-view role cannot view feedback entries.', ...}
+stub_iam = <function stub_iam.<locals>._install at 0x7f628de9f380>
+user_ref = <function user_ref.<locals>._make at 0x7f628e94be20>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f628e5ccb90>
+
+    @pytest.mark.parametrize(
+        "test_case",
+        [pytest.param(case, id=case["id"]) for case in _TEST_CASES],
+    )
+    def test_frozen_uc_case(test_case, stub_iam, user_ref, monkeypatch):
+        case_id = test_case["id"]
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+>       _dispatch(case_id, UCHarness(stub_iam, user_ref), monkeypatch)
+
+tests/a8/uc/test_uc_cases.py:1522: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/a8/uc/test_uc_cases.py:1470: in _dispatch
+    return runner(h)
+           ^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = <test_uc_cases.UCHarness object at 0x7f628e5cd610>
+
+    def _case_046(h):
+        Feedback.objects.create(user_id=1001, message="Private feedback")
+        response = h.client(2002).get("/api/v1/mms/feedback")
+>       assert response.status_code == 403
+E       assert 200 == 403
+E        +  where 200 = <Response status_code=200, "application/json">.status_code
+
+tests/a8/uc/test_uc_cases.py:728: AssertionError
+________________________ test_frozen_uc_case[TC-UC-065] ________________________
+
+test_case = {'id': 'TC-UC-065', 'source_use_case': 'MMS-UC-017', 'flow': 'Main Success Scenario, steps 1-5: explicit Yes response'...Verify a currently registered Student submits and MMS records an explicit Yes response while the survey is open.', ...}
+stub_iam = <function stub_iam.<locals>._install at 0x7f628de9eac0>
+user_ref = <function user_ref.<locals>._make at 0x7f628de9e700>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f628e5ed160>
+
+    @pytest.mark.parametrize(
+        "test_case",
+        [pytest.param(case, id=case["id"]) for case in _TEST_CASES],
+    )
+    def test_frozen_uc_case(test_case, stub_iam, user_ref, monkeypatch):
+        case_id = test_case["id"]
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+>       _dispatch(case_id, UCHarness(stub_iam, user_ref), monkeypatch)
+
+tests/a8/uc/test_uc_cases.py:1522: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/a8/uc/test_uc_cases.py:1447: in _dispatch
+    return _case_065_068_069_070(h, case_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = <test_uc_cases.UCHarness object at 0x7f628e020830>, case_id = 'TC-UC-065'
+
+    def _case_065_068_069_070(h, case_id):
+        survey = _create_survey()
+        if case_id in {"TC-UC-065", "TC-UC-066"}:
+            h.enrollment(1001)
+            response = h.client(1001).post(
+                f"/api/v1/mms/vacation-surveys/{survey.pk}/responses",
+                {"response": "Yes" if case_id == "TC-UC-065" else "No"},
+                format="json",
+            )
+>           assert response.status_code == 200
+E           assert 409 == 200
+E            +  where 409 = <Response status_code=409, "application/json">.status_code
+
+tests/a8/uc/test_uc_cases.py:890: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-10 08:32:20 WARNING django.request Conflict: /api/v1/mms/vacation-surveys/2/responses
+------------------------------ Captured log call -------------------------------
+WARNING  django.request:log.py:253 Conflict: /api/v1/mms/vacation-surveys/2/responses
+________________________ test_frozen_uc_case[TC-UC-066] ________________________
+
+test_case = {'id': 'TC-UC-066', 'source_use_case': 'MMS-UC-017', 'flow': 'Main Success Scenario, steps 1-5: explicit No response',...'Verify a currently registered Student submits and MMS records an explicit No response while the survey is open.', ...}
+stub_iam = <function stub_iam.<locals>._install at 0x7f628de9e8e0>
+user_ref = <function user_ref.<locals>._make at 0x7f628de9d3a0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f628e5cdf70>
+
+    @pytest.mark.parametrize(
+        "test_case",
+        [pytest.param(case, id=case["id"]) for case in _TEST_CASES],
+    )
+    def test_frozen_uc_case(test_case, stub_iam, user_ref, monkeypatch):
+        case_id = test_case["id"]
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+>       _dispatch(case_id, UCHarness(stub_iam, user_ref), monkeypatch)
+
+tests/a8/uc/test_uc_cases.py:1522: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/a8/uc/test_uc_cases.py:1447: in _dispatch
+    return _case_065_068_069_070(h, case_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = <test_uc_cases.UCHarness object at 0x7f628e5ed400>, case_id = 'TC-UC-066'
+
+    def _case_065_068_069_070(h, case_id):
+        survey = _create_survey()
+        if case_id in {"TC-UC-065", "TC-UC-066"}:
+            h.enrollment(1001)
+            response = h.client(1001).post(
+                f"/api/v1/mms/vacation-surveys/{survey.pk}/responses",
+                {"response": "Yes" if case_id == "TC-UC-065" else "No"},
+                format="json",
+            )
+>           assert response.status_code == 200
+E           assert 409 == 200
+E            +  where 409 = <Response status_code=409, "application/json">.status_code
+
+tests/a8/uc/test_uc_cases.py:890: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-10 08:32:20 WARNING django.request Conflict: /api/v1/mms/vacation-surveys/3/responses
+------------------------------ Captured log call -------------------------------
+WARNING  django.request:log.py:253 Conflict: /api/v1/mms/vacation-surveys/3/responses
+________________________ test_frozen_uc_case[TC-UC-078] ________________________
+
+test_case = {'id': 'TC-UC-078', 'source_use_case': 'MMS-UC-020', 'flow': 'Main Success Scenario, steps 1-4: approve within stipula... special-food request within the applicable institution-defined period and the outcome is recorded and notified.', ...}
+stub_iam = <function stub_iam.<locals>._install at 0x7f628df17740>
+user_ref = <function user_ref.<locals>._make at 0x7f628d510f40>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f628e5ef6e0>
+
+    @pytest.mark.parametrize(
+        "test_case",
+        [pytest.param(case, id=case["id"]) for case in _TEST_CASES],
+    )
+    def test_frozen_uc_case(test_case, stub_iam, user_ref, monkeypatch):
+        case_id = test_case["id"]
+        if case_id in BLOCKED:
+            pytest.skip(BLOCKED[case_id])
+>       _dispatch(case_id, UCHarness(stub_iam, user_ref), monkeypatch)
+
+tests/a8/uc/test_uc_cases.py:1522: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/a8/uc/test_uc_cases.py:1470: in _dispatch
+    return runner(h)
+           ^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+h = <test_uc_cases.UCHarness object at 0x7f628e9ce360>
+
+    def _case_078(h):
+        h.active_role(3001, "caretaker")
+        request = SpecialFoodRequest.objects.create(
+            user_id=1001, reason="illness", requested_for=date(2026, 12, 1))
+        response = _decide_special(h.client(3001, "caretaker"), request, True)
+>       assert response.status_code == 200
+E       assert 409 == 200
+E        +  where 409 = <Response status_code=409, "application/json">.status_code
+
+tests/a8/uc/test_uc_cases.py:973: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-10 08:32:20 WARNING django.request Conflict: /api/v1/mms/special-food/3/decision
+------------------------------ Captured log call -------------------------------
+WARNING  django.request:log.py:253 Conflict: /api/v1/mms/special-food/3/decision
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.16-final-0 _______________
+
+Coverage XML written to file a8_results/uc/coverage.xml
+=========================== short test summary info ============================
+FAILED tests/a8/uc/test_uc_cases.py::test_frozen_uc_case[TC-UC-003] - assert ...
+FAILED tests/a8/uc/test_uc_cases.py::test_frozen_uc_case[TC-UC-046] - assert ...
+FAILED tests/a8/uc/test_uc_cases.py::test_frozen_uc_case[TC-UC-065] - assert ...
+FAILED tests/a8/uc/test_uc_cases.py::test_frozen_uc_case[TC-UC-066] - assert ...
+FAILED tests/a8/uc/test_uc_cases.py::test_frozen_uc_case[TC-UC-078] - assert ...
+5 failed, 109 passed, 14 skipped in 7.77s
