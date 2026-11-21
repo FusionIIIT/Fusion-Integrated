@@ -8,6 +8,7 @@ import pytest
 from rest_framework.test import APIClient
 
 from conftest import make_session
+from modules.pms.models import PmsAuditTrail
 
 pytestmark = pytest.mark.django_db
 
@@ -74,7 +75,7 @@ def _assign_and_review(
 
 
 def test_uc_pms_003_http_journey_records_coinventor_consent_and_tracks_application(stub_iam):
-    """UC-PMS-003 and UC-PMS-002: applicant records inventors; each inventor signs as self."""
+    """UC-PMS-003 and UC-PMS-002: each inventor signs as self and the applicant tracks status."""
     applicant = _client(
         stub_iam, 1001, "student", "pms.application.create", "pms.application.view_self"
     )
@@ -118,7 +119,7 @@ def test_uc_pms_003_http_journey_records_coinventor_consent_and_tracks_applicati
 
 
 def test_uc_pms_005_007_008_http_journey_resubmits_and_reaches_approval(stub_iam):
-    """UC-PMS-005/007/008: Needs Revision alternate path returns through review."""
+    """UC-PMS-005, UC-PMS-007, UC-PMS-008: revision returns through review."""
     applicant = _client(stub_iam, 1001, "student", "pms.application.create")
     submitted = _submit(applicant, "Revision and reapproval journey")
     _assign_and_review(
@@ -165,8 +166,42 @@ def test_uc_pms_005_007_008_http_journey_resubmits_and_reaches_approval(stub_iam
     assert tracked.json()["status"] == "approved"
 
 
+def test_uc_pms_005_br_pms_034_rejected_application_revision_alternate(stub_iam):
+    """UC-PMS-005 and BR-PMS-034: an Applicant can revise a rejected application."""
+    submitted = _submit(
+        _client(stub_iam, 1001, "student", "pms.application.create"),
+        "Rejected revision alternate journey",
+    )
+    _assign_and_review(stub_iam, submitted["id"], "Reject")
+
+    applicant = _client(
+        stub_iam,
+        1001,
+        "student",
+        "pms.application.revise",
+        "pms.application.view_self",
+    )
+    revised = applicant.post(
+        f"{API}/applications/{submitted['id']}/revise/",
+        {
+            "feedback_response": "The revised claims respond to the rejection grounds with specific evidence.",
+            "claims": "A sensor system with a calibrated feedback controller.",
+        },
+        format="json",
+    )
+    assert revised.status_code == 200, revised.content
+    assert revised.json()["status"] == "resubmitted"
+    assert revised.json()["claims"].startswith("A sensor system")
+    assert PmsAuditTrail.objects.filter(
+        application_id=submitted["id"],
+        action_type="application_resubmitted",
+        from_state="rejected",
+        to_state="resubmitted",
+    ).exists()
+
+
 def test_uc_pms_010_011_http_journey_declines_and_reassigns_attorney(stub_iam):
-    """UC-PMS-010/011 alternate flow: decline is recorded, then a new offer is accepted."""
+    """UC-PMS-010, UC-PMS-011: decline is recorded, then a new offer is accepted."""
     application = _submit(
         _client(stub_iam, 1001, "student", "pms.application.create"),
         "Attorney reassignment journey",
@@ -217,8 +252,8 @@ def test_uc_pms_010_011_http_journey_declines_and_reassigns_attorney(stub_iam):
     assert accepted.json()["status"] == "accepted"
 
 
-def test_uc_pms_016_027_032_http_journey_reads_scoped_workflow_oversight(stub_iam):
-    """UC-PMS-016/027/032: authorized actors see workflow/deadline state in scope."""
+def test_uc_pms_032_http_journey_reads_scoped_workflow_oversight(stub_iam):
+    """UC-PMS-032: a Director reads workflow oversight only within authorization scope."""
     application = _submit(
         _client(stub_iam, 1001, "student", "pms.application.create"),
         "Workflow oversight journey",
@@ -244,7 +279,7 @@ def test_uc_pms_016_027_032_http_journey_reads_scoped_workflow_oversight(stub_ia
 
 
 def test_uc_pms_030_031_http_journey_keeps_reports_in_actor_scope(stub_iam):
-    """UC-PMS-030/031: Applicant and Director report requests return only visible rows."""
+    """UC-PMS-030, UC-PMS-031: Applicant and Director reports return only visible rows."""
     applicant = _submit(
         _client(stub_iam, 1001, "student", "pms.application.create"),
         "Applicant personal report",
@@ -318,3 +353,106 @@ def test_uc_pms_033_http_journey_records_advice_for_assigned_attorney(stub_iam):
     assert advice.status_code == 201, advice.content
     assert advice.json()["stage"] == "review"
     assert advice.json()["advice_text"].startswith("Claims should emphasize")
+
+
+def test_uc_pms_014_015_029_br_pms_065_http_office_action_review_journey(stub_iam):
+    """UC-PMS-014, UC-PMS-015, UC-PMS-029, BR-PMS-065 cover response submission."""
+    application = _submit(
+        _client(stub_iam, 1001, "student", "pms.application.create"),
+        "Office action applicant review journey",
+    )
+    _assign_and_review(stub_iam, application["id"], "Approve")
+
+    admin = _client(stub_iam, 9001, "pcc_admin", "pms.panel.manage", "pms.attorney.assign")
+    panel = admin.post(
+        f"{API}/attorney-panel/",
+        {
+            "attorney_user_id": 5001,
+            "name": "Office Action Counsel",
+            "email": "office-action-counsel@example.test",
+            "expertise_domains": ["Energy Systems"],
+        },
+        format="json",
+    )
+    assert panel.status_code == 201, panel.content
+    offer = admin.post(
+        f"{API}/applications/{application['id']}/assign-attorney/",
+        {"attorney_user_id": 5001},
+        format="json",
+    )
+    assert offer.status_code == 201, offer.content
+    accepted = _client(stub_iam, 5001, "attorney", "pms.attorney.respond_assignment").post(
+        f"{API}/attorney-assignments/{offer.json()['id']}/respond/",
+        {"accept": True},
+        format="json",
+    )
+    assert accepted.status_code == 200, accepted.content
+
+    budget_actor = _client(stub_iam, 2001, "director", "pms.budget.review")
+    proposed = budget_actor.put(
+        f"{API}/applications/{application['id']}/budget/",
+        {"filing_fees": "12000.00", "attorney_fees": "25000.00", "administrative_costs": "3000.00"},
+        format="json",
+    )
+    assert proposed.status_code == 200, proposed.content
+    decided = budget_actor.post(
+        f"{API}/applications/{application['id']}/budget/",
+        {"decision": "Approve", "justification": "The listed costs are supported and approved."},
+        format="json",
+    )
+    assert decided.status_code == 200, decided.content
+    assert decided.json()["status"] == "approved"
+
+    attorney = _client(stub_iam, 5001, "attorney", "pms.filing.record")
+    filing = attorney.post(
+        f"{API}/applications/{application['id']}/filing/",
+        {
+            "external_filing_id": "TEST-PMS-OA-001",
+            "external_filing_date": "2026-11-21",
+            "filing_confirmation": "Filing acknowledgement recorded by the Attorney.",
+        },
+        format="json",
+    )
+    assert filing.status_code == 200, filing.content
+    assert filing.json()["status"] == "filed"
+
+    recorded = attorney.post(
+        f"{API}/applications/{application['id']}/office-actions/",
+        {
+            "action_type": "Examination Report",
+            "issue_date": "2026-11-22",
+            "due_date": "2027-02-22",
+            "details": "The examiner requests clarification of claim scope.",
+            "requires_applicant_review": True,
+        },
+        format="json",
+    )
+    assert recorded.status_code == 201, recorded.content
+    office_action_id = recorded.json()["id"]
+    drafted = attorney.post(
+        f"{API}/office-actions/{office_action_id}/draft-response/",
+        {"draft_response": "The amended claim clarifies the sensor calibration boundary."},
+        format="json",
+    )
+    assert drafted.status_code == 200, drafted.content
+    assert drafted.json()["status"] == "awaiting_applicant_approval"
+
+    applicant = _client(stub_iam, 1001, "student", "pms.office_action.review")
+    approved = applicant.post(f"{API}/office-actions/{office_action_id}/approve-response/")
+    assert approved.status_code == 200, approved.content
+    assert approved.json()["applicant_approved"] is True
+
+    attorney = _client(stub_iam, 5001, "attorney", "pms.office_action.respond")
+    response = attorney.post(
+        f"{API}/office-actions/{office_action_id}/submit-response/",
+        {"submission_details": "The Attorney recorded external response submission."},
+        format="json",
+    )
+    assert response.status_code == 200, response.content
+    assert response.json()["status"] == "response_submitted"
+    assert PmsAuditTrail.objects.filter(
+        application_id=application["id"], action_type="office_action_applicant_approved"
+    ).exists()
+    assert PmsAuditTrail.objects.filter(
+        application_id=application["id"], action_type="office_action_response_submitted"
+    ).exists()
