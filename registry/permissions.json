@@ -34,6 +34,106 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "fts": {
+      "grants": {
+        "admin": [
+          "fts.audit.view"
+        ],
+        "faculty": [
+          "fts.file.create",
+          "fts.file.delete",
+          "fts.file.manage",
+          "fts.file.update",
+          "fts.file.view"
+        ],
+        "staff": [
+          "fts.file.create",
+          "fts.file.delete",
+          "fts.file.manage",
+          "fts.file.update",
+          "fts.file.view"
+        ],
+        "system_admin": [
+          "fts.audit.view"
+        ]
+      },
+      "module_grants": [
+        "admin",
+        "faculty",
+        "staff",
+        "system_admin"
+      ],
+      "nav": {
+        "base_path": "/fts",
+        "icon": "FolderSimple",
+        "items": [
+          {
+            "code": "fts.inbox",
+            "icon": "Tray",
+            "label": "Inbox",
+            "required_permission": "fts.file.view",
+            "sort_order": 10,
+            "to": "/fts/inbox"
+          },
+          {
+            "code": "fts.outbox",
+            "icon": "PaperPlaneTilt",
+            "label": "Outbox",
+            "required_permission": "fts.file.view",
+            "sort_order": 20,
+            "to": "/fts/outbox"
+          },
+          {
+            "code": "fts.drafts",
+            "icon": "FileDotted",
+            "label": "Drafts",
+            "required_permission": "fts.file.view",
+            "sort_order": 30,
+            "to": "/fts/drafts"
+          },
+          {
+            "code": "fts.create",
+            "icon": "PlusCircle",
+            "label": "Create File",
+            "required_permission": "fts.file.create",
+            "sort_order": 40,
+            "to": "/fts/create"
+          }
+        ],
+        "label": "File Tracking",
+        "nav_section": "Workflow",
+        "sort_order": 25,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "fts.file.view",
+          "label": "View accessible files, inbox, outbox, and tracking history"
+        },
+        {
+          "code": "fts.file.create",
+          "label": "Create new files and save drafts"
+        },
+        {
+          "code": "fts.file.update",
+          "label": "Forward, return, edit drafts, and add notes to files"
+        },
+        {
+          "code": "fts.file.delete",
+          "label": "Discard uncirculated draft files"
+        },
+        {
+          "code": "fts.file.manage",
+          "label": "Archive completed files and manage file configurations"
+        },
+        {
+          "code": "fts.audit.view",
+          "label": "View FTS system usage and security audit logs"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

@@ -13,6 +13,17 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `fts`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `fts.file.view` | View accessible files, inbox, outbox, and tracking history | `faculty`, `staff` |
+| `fts.file.create` | Create new files and save drafts | `faculty`, `staff` |
+| `fts.file.update` | Forward, return, edit drafts, and add notes to files | `faculty`, `staff` |
+| `fts.file.delete` | Discard uncirculated draft files | `faculty`, `staff` |
+| `fts.file.manage` | Archive completed files and manage file configurations | `faculty`, `staff` |
+| `fts.audit.view` | View FTS system usage and security audit logs | `admin`, `system_admin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

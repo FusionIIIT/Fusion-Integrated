@@ -17,4 +17,9 @@ export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
     basePath: "/placement",
     load: () => import("../modules/placement/routes"),
   },
+  fts: {
+    code: "fts",
+    basePath: "/fts",
+    load: () => import("../modules/fts/routes"),
+  },
 };
