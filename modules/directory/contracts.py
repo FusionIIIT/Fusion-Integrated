@@ -3,6 +3,7 @@
 Plural by signature on purpose: there is no get_user(id), because a singular
 lookup is what gets called inside a loop.
 """
+
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -27,14 +28,23 @@ class UserDTO:
     #: Maintained on the ERP portal's profile page, read here.
     resume_link: str = ""
     profile_completed: bool = False
+    is_active: bool = True
 
 
 def _to_dto(r: UserRef) -> UserDTO:
     return UserDTO(
-        user_id=r.user_id, username=r.username, display_name=r.display_name,
-        kind=r.kind, email=r.email, department=r.department,
-        programme=r.programme, discipline=r.discipline, batch_year=r.batch_year,
-        resume_link=r.resume_link, profile_completed=r.profile_completed,
+        user_id=r.user_id,
+        username=r.username,
+        display_name=r.display_name,
+        kind=r.kind,
+        email=r.email,
+        department=r.department,
+        programme=r.programme,
+        discipline=r.discipline,
+        batch_year=r.batch_year,
+        resume_link=r.resume_link,
+        profile_completed=r.profile_completed,
+        is_active=r.is_active,
     )
 
 
@@ -50,8 +60,9 @@ def get_users(user_ids: Sequence[int]) -> dict[int, UserDTO]:
 
 def user_ids_in_discipline(discipline: str) -> list[int]:
     return list(
-        UserRef.objects.filter(discipline=discipline, kind="student", is_active=True)
-        .values_list("user_id", flat=True)
+        UserRef.objects.filter(discipline=discipline, kind="student", is_active=True).values_list(
+            "user_id", flat=True
+        )
     )
 
 
@@ -59,17 +70,17 @@ def get_employees() -> list[UserDTO]:
     """Everyone on the payroll: faculty and staff, not students."""
     return [
         _to_dto(r)
-        for r in UserRef.objects.filter(
-            kind__in=("faculty", "staff"), is_active=True
-        ).order_by("user_id")
+        for r in UserRef.objects.filter(kind__in=("faculty", "staff"), is_active=True).order_by(
+            "user_id"
+        )
     ]
 
 
 def held_employee_ids() -> set[int]:
     return set(
-        UserRef.objects.filter(
-            kind__in=("faculty", "staff"), is_active=True
-        ).values_list("user_id", flat=True)
+        UserRef.objects.filter(kind__in=("faculty", "staff"), is_active=True).values_list(
+            "user_id", flat=True
+        )
     )
 
 
