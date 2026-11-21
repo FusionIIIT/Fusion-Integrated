@@ -73,6 +73,29 @@ def _render_file_links(paths: list[str]) -> str:
     return "<br>".join(links)
 
 
+def _current_source_mentions(specification_id: str, *, tests: bool) -> list[str]:
+    if tests:
+        roots = [ROOT / "modules/pms/tests", ROOT / "client/src/modules/pms"]
+        patterns = ("test_*.py", "*.test.ts", "*.test.tsx")
+    else:
+        roots = [ROOT / "modules/pms", ROOT / "client/src/modules/pms"]
+        patterns = ("*.py", "*.ts", "*.tsx")
+
+    matches: set[str] = set()
+    for root in roots:
+        for pattern in patterns:
+            for path in root.rglob(pattern):
+                relative = path.relative_to(ROOT).as_posix()
+                if tests and "tests/" not in relative and ".test." not in path.name:
+                    continue
+                if not tests and ("/tests/" in relative or ".test." in path.name):
+                    continue
+                identifier = rf"(?<![A-Z0-9-]){re.escape(specification_id)}(?![A-Z0-9-])"
+                if re.search(identifier, path.read_text()):
+                    matches.add(relative)
+    return sorted(matches)
+
+
 def render_reference() -> tuple[str, int, list[str]]:
     with ZipFile(WORKBOOK) as archive:
         shared_strings: list[str] = []
@@ -107,8 +130,9 @@ def render_reference() -> tuple[str, int, list[str]]:
             "sheet in `PMS_Traceability_Matrix_M7.xlsx`."
         ),
         (
-            "This file indexes the M7 map's recorded code and test file associations. "
-            "It does not assert full implementation, test adequacy, or passing tests. "
+            "This file combines the M7 map's associations with current source/test files "
+            "that cite the exact identifier. A citation is a navigation aid, not proof "
+            "of enforcement, test adequacy, or passing tests. "
             "The six original PMS specifications remain authoritative."
         ),
         "",
@@ -138,8 +162,14 @@ def render_reference() -> tuple[str, int, list[str]]:
             invalid.append(specification_id)
             continue
         id_count += 1
-        implementation = _linked_paths(values.get(impl_col, ""))
-        tests = _linked_paths(values.get(tests_col, ""))
+        implementation = sorted(
+            set(_linked_paths(values.get(impl_col, "")))
+            | set(_current_source_mentions(specification_id, tests=False))
+        )
+        tests = sorted(
+            set(_linked_paths(values.get(tests_col, "")))
+            | set(_current_source_mentions(specification_id, tests=True))
+        )
         output.append(
             f"| `{specification_id}` | {values.get(type_col, '').strip()} | "
             f"{_render_file_links(implementation)} | {_render_file_links(tests)} |"

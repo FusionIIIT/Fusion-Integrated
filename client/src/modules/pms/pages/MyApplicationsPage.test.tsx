@@ -64,7 +64,7 @@ function renderPage() {
   );
 }
 
-describe("MyApplicationsPage", () => {
+describe("MyApplicationsPage (UC-PMS-002)", () => {
   beforeEach(() => {
     auth.can.mockReturnValue(false);
     hooks.usePmsApplications.mockReturnValue({

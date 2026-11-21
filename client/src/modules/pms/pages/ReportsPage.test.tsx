@@ -7,7 +7,7 @@ import ReportsPage from "./ReportsPage";
 const hooks = vi.hoisted(() => ({ usePmsReports: vi.fn() }));
 vi.mock("../api/hooks", () => hooks);
 
-describe("ReportsPage", () => {
+describe("ReportsPage (UC-PMS-024, UC-PMS-030, UC-PMS-031)", () => {
   beforeEach(() => {
     hooks.usePmsReports.mockReturnValue({
       data: { total_applications: 0, status_distribution: {}, domain_distribution: {} },
