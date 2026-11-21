@@ -1,10 +1,7 @@
 import { lazy, type ReactNode } from "react";
-import { Container } from "@mantine/core";
 import { Navigate, type RouteObject } from "react-router-dom";
 
-import { useAuth } from "../../auth/AuthProvider";
 import { RequirePermission } from "../../auth/RequirePermission";
-import { NotPermitted } from "../../ui/components/NotPermitted";
 
 const MyApplicationsPage = lazy(() => import("./pages/MyApplicationsPage"));
 const SubmitApplicationPage = lazy(() => import("./pages/SubmitApplicationPage"));
@@ -19,15 +16,8 @@ const ReportsPage = lazy(() => import("./pages/ReportsPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const AuditPage = lazy(() => import("./pages/AuditPage"));
 
-function AnyPermission({ permissions, children }: { permissions: string[]; children: ReactNode }) {
-  const { can } = useAuth();
-  return permissions.some(can)
-    ? <>{children}</>
-    : <Container size="xl" pt="md"><NotPermitted /></Container>;
-}
-
-function any(permissions: string[], page: ReactNode) {
-  return <AnyPermission permissions={permissions}>{page}</AnyPermission>;
+function office(permission: string, page: ReactNode) {
+  return <RequirePermission permission={permission}>{page}</RequirePermission>;
 }
 
 export const routes: RouteObject[] = [
@@ -35,14 +25,14 @@ export const routes: RouteObject[] = [
   { path: "mine", element: <RequirePermission permission="pms.application.view_self"><MyApplicationsPage /></RequirePermission> },
   { path: "submit", element: <RequirePermission permission="pms.application.create"><SubmitApplicationPage /></RequirePermission> },
   { path: "queue", element: <RequirePermission permission="pms.application.view"><ApplicationQueuePage /></RequirePermission> },
-  { path: "reviews", element: any(["pms.application.review", "pms.budget.review", "pms.application.review_appeal", "pms.licensing.review"], <ReviewsPage />) },
-  { path: "filings", element: any(["pms.attorney.respond_assignment", "pms.patentability.assess", "pms.advice.record", "pms.filing.record"], <FilingsPage />) },
-  { path: "office-actions", element: any(["pms.office_action.record", "pms.office_action.respond", "pms.office_action.review"], <OfficeActionsPage />) },
-  { path: "maintenance", element: any(["pms.maintenance.manage", "pms.maintenance.decide"], <MaintenancePage />) },
-  { path: "licensing", element: any(["pms.licensing.submit", "pms.licensing.review"], <LicensingPage />) },
-  { path: "oversight", element: any(["pms.workflow.monitor", "pms.workflow.oversight"], <WorkflowPage />) },
+  { path: "reviews", element: office("pms.application.review", <ReviewsPage />) },
+  { path: "filings", element: office("pms.filing.record", <FilingsPage />) },
+  { path: "office-actions", element: office("pms.office_action.record", <OfficeActionsPage />) },
+  { path: "maintenance", element: office("pms.maintenance.manage", <MaintenancePage />) },
+  { path: "licensing", element: office("pms.licensing.submit", <LicensingPage />) },
+  { path: "oversight", element: office("pms.workflow.monitor", <WorkflowPage />) },
   { path: "reports", element: <RequirePermission permission="pms.report.view"><ReportsPage /></RequirePermission> },
   { path: "my-reports", element: <RequirePermission permission="pms.report.view_self"><ReportsPage personal /></RequirePermission> },
-  { path: "admin", element: any(["pms.config.manage", "pms.panel.manage"], <AdminPage />) },
+  { path: "admin", element: office("pms.config.manage", <AdminPage />) },
   { path: "audit", element: <RequirePermission permission="pms.audit.view"><AuditPage /></RequirePermission> },
 ];

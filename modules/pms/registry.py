@@ -56,7 +56,7 @@ NAV_ITEMS = [
     {
         "code": "pms.office_actions",
         "label": "Office Actions",
-        "icon": "FaClipboardCheck",
+        "icon": "ClipboardText",
         "to": "/pms/office-actions",
         "required_permission": "pms.office_action.record",
         "sort_order": 45,
@@ -72,7 +72,7 @@ NAV_ITEMS = [
     {
         "code": "pms.licensing",
         "label": "Licensing",
-        "icon": "FaFileSignature",
+        "icon": "FileSignature",
         "to": "/pms/licensing",
         "required_permission": "pms.licensing.submit",
         "sort_order": 55,
@@ -80,7 +80,7 @@ NAV_ITEMS = [
     {
         "code": "pms.oversight",
         "label": "Workflow Oversight",
-        "icon": "FaLayerGroup",
+        "icon": "SquaresFour",
         "to": "/pms/oversight",
         "required_permission": "pms.workflow.monitor",
         "sort_order": 58,
