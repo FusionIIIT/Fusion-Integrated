@@ -10,6 +10,7 @@ from modules.placement.schedule import BEAT_SCHEDULE
 
 
 def test_every_scheduled_task_is_registered():
+    app.autodiscover_tasks(force=True)
     missing = [entry["task"] for entry in BEAT_SCHEDULE.values()
                if entry["task"] not in app.tasks]
     assert not missing, f"scheduled but not registered: {missing}"
