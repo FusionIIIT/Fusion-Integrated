@@ -13,6 +13,37 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `oap`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `oap.leave.submit` | Submit a leave application | `student` |
+| `oap.leave.view_self` | See one's own leave applications | `student` |
+| `oap.leave.decide` | Approve or reject student leave | `HOD` |
+| `oap.bonafide.submit` | Request a bonafide certificate | `student` |
+| `oap.bonafide.view_self` | See one's own bonafide requests | `student` |
+| `oap.bonafide.decide` | Approve or reject bonafide requests | `Academic Admin` |
+| `oap.seminar.request` | Request a PG seminar | `student` |
+| `oap.seminar.schedule` | Schedule PG seminars | `Department Admin` |
+| `oap.seminar.view` | See the seminar schedule | `HOD`, `faculty`, `student` |
+| `oap.assignment.manage` | Record supervisor and TA assignments | `Department Admin` |
+| `oap.nodues.submit` | Start a no-dues clearance | `student` |
+| `oap.nodues.view_self` | See one's own no-dues clearance | `student` |
+| `oap.nodues.finalize` | Finalize no-dues clearances | `Academic Admin` |
+| `oap.nodues.verify_library` | Record the library no-dues result | `Librarian` |
+| `oap.nodues.verify_hostel` | Record the hostel no-dues result | `Hostel Warden` |
+| `oap.nodues.verify_mess` | Record the mess no-dues result | `Mess In-charge` |
+| `oap.nodues.verify_department` | Record the department no-dues result | `Department Verifier` |
+| `oap.nodues.verify_lab` | Record the lab no-dues result | `Lab Supervisor` |
+| `oap.nodues.verify_academic_section` | Record the academic section no-dues result | `Academic Section Verifier` |
+| `oap.nodues.verify_student_section` | Record the student section no-dues result | `Student Section Verifier` |
+| `oap.assistantship.submit` | Submit an assistantship claim | `student` |
+| `oap.assistantship.view_self` | See one's own assistantship claims | `student` |
+| `oap.assistantship.verify` | Verify a supervised student's claim | `HOD`, `faculty` |
+| `oap.assistantship.review` | Review and forward department claims | `Department Admin` |
+| `oap.assistantship.decide` | Approve or reject assistantship claims | `HOD` |
+| `oap.assistantship.process_stipend` | Process approved stipends | `Academic Admin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

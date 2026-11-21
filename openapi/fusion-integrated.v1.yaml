@@ -105,6 +105,1056 @@ paths:
               schema:
                 $ref: '#/components/schemas/Session'
           description: ''
+  /api/v1/oap/assistantship/:
+    get:
+      operationId: v1_oap_assistantship_list
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAssistantshipList'
+          description: ''
+    post:
+      operationId: v1_oap_assistantship_create
+      description: Module grant plus one permission code per HTTP method.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClaimSubmit'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ClaimSubmit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ClaimSubmit'
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assistantship'
+          description: ''
+  /api/v1/oap/assistantship/{id}/:
+    get:
+      operationId: v1_oap_assistantship_retrieve
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssistantshipDetail'
+          description: ''
+  /api/v1/oap/assistantship/{id}/decision/:
+    post:
+      operationId: v1_oap_assistantship_decision_create
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Decision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Decision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Decision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assistantship'
+          description: ''
+  /api/v1/oap/assistantship/{id}/forward/:
+    post:
+      operationId: v1_oap_assistantship_forward_create
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Remark'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Remark'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Remark'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assistantship'
+          description: ''
+  /api/v1/oap/assistantship/{id}/stipend/:
+    post:
+      operationId: v1_oap_assistantship_stipend_create
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Remark'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Remark'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Remark'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assistantship'
+          description: ''
+  /api/v1/oap/assistantship/{id}/verify/:
+    post:
+      operationId: v1_oap_assistantship_verify_create
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClaimVerify'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ClaimVerify'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ClaimVerify'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assistantship'
+          description: ''
+  /api/v1/oap/assistantship/decision-queue/:
+    get:
+      operationId: v1_oap_assistantship_decision_queue_list
+      description: Claims in one state, limited to the caller's department.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAssistantshipList'
+          description: ''
+  /api/v1/oap/assistantship/review-queue/:
+    get:
+      operationId: v1_oap_assistantship_review_queue_list
+      description: Claims in one state, limited to the caller's department.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAssistantshipList'
+          description: ''
+  /api/v1/oap/assistantship/stipend-queue/:
+    get:
+      operationId: v1_oap_assistantship_stipend_queue_list
+      description: 'The Academic Administrator is institute-wide: no department filter.'
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAssistantshipList'
+          description: ''
+  /api/v1/oap/assistantship/to-verify/:
+    get:
+      operationId: v1_oap_assistantship_to_verify_list
+      description: Claims waiting on the caller as thesis or TA supervisor.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAssistantshipList'
+          description: ''
+  /api/v1/oap/bonafide/:
+    get:
+      operationId: v1_oap_bonafide_list
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBonafideList'
+          description: ''
+    post:
+      operationId: v1_oap_bonafide_create
+      description: Module grant plus one permission code per HTTP method.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BonafideSubmit'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BonafideSubmit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BonafideSubmit'
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bonafide'
+          description: ''
+  /api/v1/oap/bonafide/{id}/:
+    get:
+      operationId: v1_oap_bonafide_retrieve
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BonafideDetail'
+          description: ''
+  /api/v1/oap/bonafide/{id}/certificate/:
+    get:
+      operationId: v1_oap_bonafide_certificate_retrieve
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BonafideCertificate'
+          description: ''
+  /api/v1/oap/bonafide/{id}/decision/:
+    post:
+      operationId: v1_oap_bonafide_decision_create
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Decision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Decision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Decision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bonafide'
+          description: ''
+  /api/v1/oap/bonafide/pending/:
+    get:
+      operationId: v1_oap_bonafide_pending_list
+      description: The Academic Administrator sees every department (OA-BR-21).
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBonafideList'
+          description: ''
+  /api/v1/oap/leave/:
+    get:
+      operationId: v1_oap_leave_list
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveList'
+          description: ''
+    post:
+      operationId: v1_oap_leave_create
+      description: Module grant plus one permission code per HTTP method.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveSubmit'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveSubmit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveSubmit'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Leave'
+          description: ''
+  /api/v1/oap/leave/{id}/:
+    get:
+      operationId: v1_oap_leave_retrieve
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveDetail'
+          description: ''
+  /api/v1/oap/leave/{id}/decision/:
+    post:
+      operationId: v1_oap_leave_decision_create
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Decision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Decision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Decision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Leave'
+          description: ''
+  /api/v1/oap/leave/pending/:
+    get:
+      operationId: v1_oap_leave_pending_list
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveList'
+          description: ''
+  /api/v1/oap/nodues/:
+    get:
+      operationId: v1_oap_nodues_list
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNoDuesList'
+          description: ''
+    post:
+      operationId: v1_oap_nodues_create
+      description: Module grant plus one permission code per HTTP method.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoDues'
+          description: ''
+  /api/v1/oap/nodues/{id}/:
+    get:
+      operationId: v1_oap_nodues_retrieve
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoDuesDetail'
+          description: ''
+  /api/v1/oap/nodues/{id}/certificate/:
+    get:
+      operationId: v1_oap_nodues_certificate_retrieve
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoDuesCertificate'
+          description: ''
+  /api/v1/oap/nodues/{id}/clearance/{domain_code}/:
+    post:
+      operationId: v1_oap_nodues_clearance_create
+      parameters:
+      - in: path
+        name: domain_code
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoDuesClearanceInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NoDuesClearanceInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NoDuesClearanceInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoDuesWithClearances'
+          description: ''
+  /api/v1/oap/nodues/{id}/finalize/:
+    post:
+      operationId: v1_oap_nodues_finalize_create
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoDuesWithClearances'
+          description: ''
+  /api/v1/oap/nodues/completed/:
+    get:
+      operationId: v1_oap_nodues_completed_list
+      description: Verified requests awaiting the Academic Administrator (AFR-OAP-029).
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNoDuesWithClearancesList'
+          description: ''
+  /api/v1/oap/nodues/pending/{domain_code}/:
+    get:
+      operationId: v1_oap_nodues_pending_list
+      description: Requests still waiting on one authority's domain.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - in: path
+        name: domain_code
+        schema:
+          type: string
+        required: true
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNoDuesList'
+          description: ''
+  /api/v1/oap/records/supervisor/:
+    get:
+      operationId: v1_oap_records_supervisor_list
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSupervisorAssignmentList'
+          description: ''
+    post:
+      operationId: v1_oap_records_supervisor_create
+      description: Module grant plus one permission code per HTTP method.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupervisorAssignmentWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SupervisorAssignmentWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SupervisorAssignmentWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupervisorAssignment'
+          description: ''
+  /api/v1/oap/records/ta/:
+    get:
+      operationId: v1_oap_records_ta_list
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTAAssignmentList'
+          description: ''
+    post:
+      operationId: v1_oap_records_ta_create
+      description: Module grant plus one permission code per HTTP method.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TAAssignmentWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TAAssignmentWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TAAssignmentWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TAAssignment'
+          description: ''
+  /api/v1/oap/seminar/:
+    get:
+      operationId: v1_oap_seminar_list
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSeminarList'
+          description: ''
+    post:
+      operationId: v1_oap_seminar_create
+      description: Module grant plus one permission code per HTTP method.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Seminar'
+          description: ''
+  /api/v1/oap/seminar/{id}/schedule/:
+    post:
+      operationId: v1_oap_seminar_schedule_create
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeminarSchedule'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SeminarSchedule'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SeminarSchedule'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Seminar'
+          description: ''
+  /api/v1/oap/seminar/pending/:
+    get:
+      operationId: v1_oap_seminar_pending_list
+      description: Module grant plus one permission code per HTTP method.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSeminarList'
+          description: ''
+  /api/v1/oap/seminar/schedule/:
+    get:
+      operationId: v1_oap_seminar_schedule_list
+      description: Visible to PG students and faculty (OA-BR-63).
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSeminarList'
+          description: ''
   /api/v1/placement/announcements:
     get:
       operationId: v1_placement_announcements_list
@@ -1763,6 +2813,14 @@ components:
       - semester
       - semester_type
       - user_id
+    ActionEnum:
+      enum:
+      - approve
+      - reject
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
     AddCandidates:
       type: object
       properties:
@@ -1981,6 +3039,152 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    Assistantship:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        claim_period:
+          type: string
+          readOnly: true
+        thesis_supervisor_id:
+          type: integer
+          readOnly: true
+        ta_supervisor_id:
+          type: integer
+          readOnly: true
+        department_reviewed_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decided_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        stipend_processed_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decision_remark:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - claim_period
+      - created_at
+      - decided_at
+      - decided_by_id
+      - decision_remark
+      - department
+      - department_reviewed_by_id
+      - id
+      - status
+      - stipend_processed_by_id
+      - student_id
+      - ta_supervisor_id
+      - thesis_supervisor_id
+      - updated_at
+    AssistantshipDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        claim_period:
+          type: string
+          readOnly: true
+        thesis_supervisor_id:
+          type: integer
+          readOnly: true
+        ta_supervisor_id:
+          type: integer
+          readOnly: true
+        department_reviewed_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decided_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        stipend_processed_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decision_remark:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        verifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/SupervisorVerification'
+          readOnly: true
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/CaseEvent'
+          readOnly: true
+      required:
+      - claim_period
+      - created_at
+      - decided_at
+      - decided_by_id
+      - decision_remark
+      - department
+      - department_reviewed_by_id
+      - history
+      - id
+      - status
+      - stipend_processed_by_id
+      - student_id
+      - ta_supervisor_id
+      - thesis_supervisor_id
+      - updated_at
+      - verifications
     AudienceEnum:
       enum:
       - students
@@ -1993,6 +3197,143 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    Bonafide:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        purpose:
+          type: string
+          readOnly: true
+        decided_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decision_remark:
+          type: string
+          readOnly: true
+        certificate_number:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - certificate_number
+      - created_at
+      - decided_at
+      - decided_by_id
+      - decision_remark
+      - department
+      - id
+      - purpose
+      - status
+      - student_id
+      - updated_at
+    BonafideCertificate:
+      type: object
+      properties:
+        certificate_number:
+          type: string
+        student_id:
+          type: integer
+        purpose:
+          type: string
+        issued_on:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - certificate_number
+      - issued_on
+      - purpose
+      - student_id
+    BonafideDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        purpose:
+          type: string
+          readOnly: true
+        decided_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decision_remark:
+          type: string
+          readOnly: true
+        certificate_number:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/CaseEvent'
+          readOnly: true
+      required:
+      - certificate_number
+      - created_at
+      - decided_at
+      - decided_by_id
+      - decision_remark
+      - department
+      - history
+      - id
+      - purpose
+      - status
+      - student_id
+      - updated_at
+    BonafideSubmit:
+      type: object
+      properties:
+        purpose:
+          type: string
+          default: ''
+          maxLength: 200
     BulkOutcome:
       type: object
       properties:
@@ -2082,6 +3423,52 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CaseEvent:
+      type: object
+      properties:
+        from_state:
+          type: string
+          readOnly: true
+        to_state:
+          type: string
+          readOnly: true
+        action:
+          type: string
+          readOnly: true
+        actor_id:
+          type: integer
+          readOnly: true
+        remark:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - actor_id
+      - created_at
+      - from_state
+      - remark
+      - to_state
+    ClaimSubmit:
+      type: object
+      properties:
+        claim_period:
+          type: string
+          default: ''
+          maxLength: 20
+    ClaimVerify:
+      type: object
+      properties:
+        role:
+          type: string
+        remark:
+          type: string
+          default: ''
+      required:
+      - role
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2315,6 +3702,16 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    Decision:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+        remark:
+          type: string
+          default: ''
+      required:
+      - action
     Detail:
       type: object
       properties:
@@ -2637,6 +4034,161 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    Leave:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+          readOnly: true
+        end_date:
+          type: string
+          format: date
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        supporting_document:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+        decided_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decision_remark:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - decided_at
+      - decided_by_id
+      - decision_remark
+      - department
+      - end_date
+      - id
+      - reason
+      - start_date
+      - status
+      - student_id
+      - supporting_document
+      - updated_at
+    LeaveDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+          readOnly: true
+        end_date:
+          type: string
+          format: date
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        supporting_document:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+        decided_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decision_remark:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/CaseEvent'
+          readOnly: true
+      required:
+      - created_at
+      - decided_at
+      - decided_by_id
+      - decision_remark
+      - department
+      - end_date
+      - history
+      - id
+      - reason
+      - start_date
+      - status
+      - student_id
+      - supporting_document
+      - updated_at
+    LeaveSubmit:
+      type: object
+      properties:
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        reason:
+          type: string
+        supporting_document:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - end_date
+      - reason
+      - start_date
     LiftSanction:
       type: object
       properties:
@@ -2708,6 +4260,206 @@ components:
       - icon
       - label
       - to
+    NoDues:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        finalized_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        finalized_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        certificate_number:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - certificate_number
+      - created_at
+      - department
+      - finalized_at
+      - finalized_by_id
+      - id
+      - status
+      - student_id
+      - updated_at
+    NoDuesCertificate:
+      type: object
+      properties:
+        certificate_number:
+          type: string
+        student_id:
+          type: integer
+        issued_on:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - certificate_number
+      - issued_on
+      - student_id
+    NoDuesClearance:
+      type: object
+      properties:
+        domain_code:
+          type: string
+          readOnly: true
+        result:
+          type: string
+          readOnly: true
+        remark:
+          type: string
+          readOnly: true
+        recorded_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - domain_code
+      - recorded_at
+      - remark
+      - result
+    NoDuesClearanceInput:
+      type: object
+      properties:
+        result:
+          type: string
+        remark:
+          type: string
+          default: ''
+      required:
+      - result
+    NoDuesDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        finalized_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        finalized_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        certificate_number:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        clearances:
+          type: array
+          items:
+            $ref: '#/components/schemas/NoDuesClearance'
+          readOnly: true
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/CaseEvent'
+          readOnly: true
+      required:
+      - certificate_number
+      - clearances
+      - created_at
+      - department
+      - finalized_at
+      - finalized_by_id
+      - history
+      - id
+      - status
+      - student_id
+      - updated_at
+    NoDuesWithClearances:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        finalized_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        finalized_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        certificate_number:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        clearances:
+          type: array
+          items:
+            $ref: '#/components/schemas/NoDuesClearance'
+          readOnly: true
+      required:
+      - certificate_number
+      - clearances
+      - created_at
+      - department
+      - finalized_at
+      - finalized_by_id
+      - id
+      - status
+      - student_id
+      - updated_at
     NotJoining:
       type: object
       properties:
@@ -2924,6 +4676,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Application'
+    PaginatedAssistantshipList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Assistantship'
+    PaginatedBonafideList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Bonafide'
     PaginatedCompanyList:
       type: object
       required:
@@ -2981,6 +4771,63 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedLeaveList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Leave'
+    PaginatedNoDuesList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/NoDues'
+    PaginatedNoDuesWithClearancesList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/NoDuesWithClearances'
     PaginatedOfferList:
       type: object
       required:
@@ -3000,6 +4847,63 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PaginatedSeminarList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Seminar'
+    PaginatedSupervisorAssignmentList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SupervisorAssignment'
+    PaginatedTAAssignmentList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/TAAssignment'
     PatchedJobPosting:
       type: object
       properties:
@@ -3466,6 +5370,12 @@ components:
       - message
       - reason
       - route
+    Remark:
+      type: object
+      properties:
+        remark:
+          type: string
+          default: ''
     RoundOutcome:
       type: object
       properties:
@@ -3598,6 +5508,63 @@ components:
         * `it` - IT / software
         * `core` - Core engineering
         * `other` - Other
+    Seminar:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        scheduled_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        venue:
+          type: string
+          readOnly: true
+        scheduled_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - department
+      - id
+      - scheduled_at
+      - scheduled_by_id
+      - status
+      - student_id
+      - updated_at
+      - venue
+    SeminarSchedule:
+      type: object
+      properties:
+        scheduled_at:
+          type: string
+          format: date-time
+        venue:
+          type: string
+          default: ''
+          maxLength: 200
+      required:
+      - scheduled_at
     Session:
       type: object
       properties:
@@ -3698,6 +5665,115 @@ components:
           type: integer
       required:
       - document_id
+    SupervisorAssignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: integer
+          readOnly: true
+        faculty_id:
+          type: integer
+          readOnly: true
+        assigned_by_id:
+          type: integer
+          readOnly: true
+        decision_reference:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - assigned_by_id
+      - created_at
+      - decision_reference
+      - faculty_id
+      - id
+      - student_id
+      - updated_at
+    SupervisorAssignmentWrite:
+      type: object
+      properties:
+        student_id:
+          type: integer
+        faculty_id:
+          type: integer
+        decision_reference:
+          type: string
+          default: ''
+          maxLength: 200
+      required:
+      - faculty_id
+      - student_id
+    SupervisorVerification:
+      type: object
+      properties:
+        role:
+          type: string
+          readOnly: true
+        verified_by_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - role
+      - verified_by_id
+    TAAssignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: integer
+          readOnly: true
+        course_code:
+          type: string
+          readOnly: true
+        faculty_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        assigned_by_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - assigned_by_id
+      - course_code
+      - created_at
+      - faculty_id
+      - id
+      - student_id
+    TAAssignmentWrite:
+      type: object
+      properties:
+        student_id:
+          type: integer
+        course_code:
+          type: string
+          default: ''
+          maxLength: 20
+        faculty_id:
+          type: integer
+          nullable: true
+      required:
+      - student_id
     TopicEnum:
       enum:
       - drive
