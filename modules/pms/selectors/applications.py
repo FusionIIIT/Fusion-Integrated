@@ -32,7 +32,13 @@ def visible_applications(principal) -> QuerySet[PatentApplication]:
       co-inventor (BR-PMS-003).
     """
     qs = PatentApplication.objects.prefetch_related(
-        "coinventors", "documents", "director_reviews", "budget", "attorney_assignments"
+        "coinventors",
+        "documents",
+        "director_reviews",
+        "budget",
+        "attorney_assignments",
+        "office_actions",
+        "maintenance_records",
     )
 
     if principal is None:
