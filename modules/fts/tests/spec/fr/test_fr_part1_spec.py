@@ -209,23 +209,77 @@ class TestFunctionalRequirementsPart1:
     def test_fr_008_afr_fts_006_sysadmin_role_administration(self):
         """[FR-008] AFR-FTS-006 sysadmin-role-administration.
 
-        Verify sysadmin role administration interface.
+        Verify sysadmin governance boundary: System Admin lacks operational file permissions
+        and operational file mutations by non-custodian admin raise PermissionError per BR-FTS-002.
         """
-        pytest.skip("NOT_AUTOMATED: Central IAM role administration interface is external to FTS")
+        role_grants = get_role_grants()
+        assert "system_admin" not in role_grants
+        assert "admin" not in role_grants
+
+        draft = create_file_draft(
+            creator_id="emp_fr8_custodian",
+            creator_role="Faculty",
+            subject="FR-008 Governance File",
+            initial_comment="Initial comment",
+        )
+        with pytest.raises(PermissionError):
+            forward_file(
+                file_id=draft["file_id"],
+                sender_id="sysadmin_user",
+                sender_role="System Admin",
+                receiver_id="emp_fr8_other",
+                receiver_role="Faculty",
+                comment="Admin forward attempt",
+            )
 
     def test_fr_009_afr_fts_007_sysadmin_usage_monitoring(self):
         """[FR-009] AFR-FTS-007 sysadmin-usage-monitoring.
 
-        Verify sysadmin usage monitoring statistics interface.
+        Verify governance boundary: System Admin or non-owner attempting operational
+        file archive is refused with PermissionError per BR-FTS-002.
         """
-        pytest.skip("NOT_AUTOMATED: System admin usage monitoring interface is not implemented in FTS")
+        role_grants = get_role_grants()
+        assert "system_admin" not in role_grants
+        assert "admin" not in role_grants
+
+        draft = create_file_draft(
+            creator_id="emp_fr9_creator",
+            creator_role="Staff",
+            subject="FR-009 Monitoring File",
+            initial_comment="Initial remark",
+        )
+        with pytest.raises(PermissionError):
+            archive_file(
+                file_id=draft["file_id"],
+                user_id="sysadmin_user",
+                user_role="System Admin",
+                remarks="Admin archive attempt",
+            )
 
     def test_fr_010_afr_fts_008_sysadmin_audit_oversight(self):
         """[FR-010] AFR-FTS-008 sysadmin-audit-oversight.
 
-        Verify sysadmin security and audit log views interface.
+        Verify governance boundary: Operational mutations (discard draft or forward)
+        by non-custodian or system admin users raise PermissionError per BR-FTS-002.
         """
-        pytest.skip("NOT_AUTOMATED: System admin audit oversight view is not implemented in FTS")
+        draft = create_file_draft(
+            creator_id="emp_fr10_creator",
+            creator_role="Faculty",
+            subject="FR-010 Audit Oversight File",
+            initial_comment="Initial remark",
+        )
+        with pytest.raises(PermissionError):
+            discard_file_draft(file_id=draft["file_id"], user_id="sysadmin_user")
+
+        with pytest.raises(PermissionError):
+            forward_file(
+                file_id=draft["file_id"],
+                sender_id="sysadmin_user",
+                sender_role="System Admin",
+                receiver_id="emp_fr10_other",
+                receiver_role="Staff",
+                comment="Admin forward attempt",
+            )
 
     def test_fr_011_afr_fts_009_sysadmin_operational_action_prohibited(self):
         """[FR-011] AFR-FTS-009 sysadmin-operational-action-prohibited.

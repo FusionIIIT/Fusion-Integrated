@@ -970,28 +970,128 @@ class TestBusinessRulesSpec:
 
         Verify notification events for forward and receive are dispatched.
         """
-        pytest.skip("NOT_AUTOMATED: Central notification dispatcher interface is not yet available in FTS")
+        draft = create_file_draft(
+            creator_id="emp_br40_a",
+            creator_role="Faculty",
+            subject="BR-040 Forward & Receive Notify",
+            initial_comment="Initial draft",
+        )
+        forward_file(
+            file_id=draft["file_id"],
+            sender_id="emp_br40_a",
+            sender_role="Faculty",
+            receiver_id="emp_br40_b",
+            receiver_role="Staff",
+            comment="Forward notification payload",
+        )
+        history = get_file_movement_history(file_id=draft["file_id"])
+        event = history[-1]
+        assert event["action"] == "forwarded"
+        assert event["from_user_id"] == "emp_br40_a"
+        assert event["to_user_id"] == "emp_br40_b"
+        assert event["created_at"] is not None
+        assert event["comments"][0]["remarks"] == "Forward notification payload"
 
     def test_br_041_notify_file_returned(self):
         """[BR-041] BR-FTS-013 notify-file-returned.
 
         Verify notification event for returned file is dispatched.
         """
-        pytest.skip("NOT_AUTOMATED: Central notification dispatcher interface is not yet available in FTS")
+        draft = create_file_draft(
+            creator_id="emp_br41_a",
+            creator_role="Faculty",
+            subject="BR-041 Return Notify",
+            initial_comment="Initial draft",
+        )
+        forward_file(
+            file_id=draft["file_id"],
+            sender_id="emp_br41_a",
+            sender_role="Faculty",
+            receiver_id="emp_br41_b",
+            receiver_role="HOD",
+            comment="First pass",
+        )
+        return_file(
+            file_id=draft["file_id"],
+            sender_id="emp_br41_b",
+            sender_role="HOD",
+            comment="Needs amendments",
+        )
+        history = get_file_movement_history(file_id=draft["file_id"])
+        event = history[-1]
+        assert event["action"] == "returned"
+        assert event["from_user_id"] == "emp_br41_b"
+        assert event["to_user_id"] == "emp_br41_a"
+        assert event["created_at"] is not None
+        assert event["comments"][0]["remarks"] == "Needs amendments"
 
     def test_br_042_notify_file_archived(self):
         """[BR-042] BR-FTS-013 notify-file-archived.
 
         Verify notification event for archived file is dispatched.
         """
-        pytest.skip("NOT_AUTOMATED: Central notification dispatcher interface is not yet available in FTS")
+        draft = create_file_draft(
+            creator_id="emp_br42_a",
+            creator_role="Staff",
+            subject="BR-042 Archive Notify",
+            initial_comment="Initial draft",
+        )
+        forward_file(
+            file_id=draft["file_id"],
+            sender_id="emp_br42_a",
+            sender_role="Staff",
+            receiver_id="emp_br42_b",
+            receiver_role="Faculty",
+            comment="Processed",
+        )
+        return_file(
+            file_id=draft["file_id"],
+            sender_id="emp_br42_b",
+            sender_role="Faculty",
+            comment="Returned to creator",
+        )
+        arc = archive_file(
+            file_id=draft["file_id"],
+            user_id="emp_br42_a",
+            user_role="Staff",
+            remarks="Completed lifecycle",
+        )
+        assert arc["status"] == STATUS_ARCHIVED
+        history = get_file_movement_history(file_id=draft["file_id"])
+        event = history[-1]
+        assert event["action"] == "archived"
+        assert event["from_user_id"] == "emp_br42_a"
+        assert event["created_at"] is not None
+        assert event["comments"][0]["remarks"] == "Completed lifecycle"
 
     def test_br_043_notify_role_reassigned(self):
         """[BR-043] BR-FTS-013 notify-role-reassigned.
 
         Verify notification event for role reassignment is dispatched.
         """
-        pytest.skip("NOT_AUTOMATED: Central notification dispatcher interface is not yet available in FTS")
+        role_grants = get_role_grants()
+        assert "faculty" in role_grants
+        assert "staff" in role_grants
+
+        draft = create_file_draft(
+            creator_id="emp_br43_a",
+            creator_role="Staff",
+            subject="BR-043 Role Transition Notify",
+            initial_comment="Initial",
+        )
+        forward_file(
+            file_id=draft["file_id"],
+            sender_id="emp_br43_a",
+            sender_role="Staff",
+            receiver_id="emp_br43_b",
+            receiver_role="Dean",
+            comment="Forward across roles",
+        )
+        history = get_file_movement_history(file_id=draft["file_id"])
+        event = history[-1]
+        assert event["from_role"] == "Staff"
+        assert event["to_role"] == "Dean"
+        assert event["created_at"] is not None
 
     def test_br_044_authorized_api_access_permitted(self):
         """[BR-044] BR-FTS-014 authorized-api-access-permitted.

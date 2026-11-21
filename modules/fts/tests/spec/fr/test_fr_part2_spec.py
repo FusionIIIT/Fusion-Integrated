@@ -741,49 +741,219 @@ class TestFunctionalRequirementsPart2:
 
         Verify notification events dispatched to central notification interface.
         """
-        pytest.skip("NOT_AUTOMATED: Central notification dispatcher interface is not yet available in FTS")
+        draft = create_file_draft(
+            creator_id="emp_fr75_a",
+            creator_role="Faculty",
+            subject="FR-075 Notification Event Gen",
+            initial_comment="Draft created",
+        )
+        forward_file(
+            file_id=draft["file_id"],
+            sender_id="emp_fr75_a",
+            sender_role="Faculty",
+            receiver_id="emp_fr75_b",
+            receiver_role="Staff",
+            comment="Forward event",
+        )
+        return_file(
+            file_id=draft["file_id"],
+            sender_id="emp_fr75_b",
+            sender_role="Staff",
+            comment="Return event",
+        )
+        archive_file(
+            file_id=draft["file_id"],
+            user_id="emp_fr75_a",
+            user_role="Faculty",
+            remarks="Archive event",
+        )
+        history = get_file_movement_history(file_id=draft["file_id"])
+        actions = [m["action"] for m in history]
+        assert actions == ["created", "forwarded", "returned", "archived"]
+        for m in history:
+            assert m["from_user_id"]
+            assert m["to_user_id"]
+            assert m["created_at"] is not None
+            assert len(m["comments"]) > 0
+            assert m["comments"][0]["remarks"]
 
     def test_fr_076_afr_fts_061_notification_file_received(self):
         """[FR-076] AFR-FTS-061 notification-file-received.
 
         Verify notification event for file received.
         """
-        pytest.skip("NOT_AUTOMATED: Central notification dispatcher interface is not yet available in FTS")
+        draft = create_file_draft(
+            creator_id="emp_fr76_a",
+            creator_role="Faculty",
+            subject="FR-076 File Received",
+            initial_comment="Initial",
+        )
+        forward_file(
+            file_id=draft["file_id"],
+            sender_id="emp_fr76_a",
+            sender_role="Faculty",
+            receiver_id="emp_fr76_b",
+            receiver_role="HOD",
+            comment="Forward to HOD",
+        )
+        history = get_file_movement_history(file_id=draft["file_id"])
+        recv_event = history[-1]
+        assert recv_event["action"] == "forwarded"
+        assert recv_event["to_user_id"] == "emp_fr76_b"
+        assert recv_event["to_role"] == "HOD"
+        assert recv_event["created_at"] is not None
+        assert recv_event["comments"][0]["remarks"] == "Forward to HOD"
 
     def test_fr_077_afr_fts_062_notification_file_forwarded(self):
         """[FR-077] AFR-FTS-062 notification-file-forwarded.
 
         Verify notification event for file forwarded.
         """
-        pytest.skip("NOT_AUTOMATED: Central notification dispatcher interface is not yet available in FTS")
+        draft = create_file_draft(
+            creator_id="emp_fr77_a",
+            creator_role="Staff",
+            subject="FR-077 File Forwarded",
+            initial_comment="Initial",
+        )
+        fwd = forward_file(
+            file_id=draft["file_id"],
+            sender_id="emp_fr77_a",
+            sender_role="Staff",
+            receiver_id="emp_fr77_b",
+            receiver_role="Faculty",
+            comment="Passing file forward",
+        )
+        assert fwd["current_holder_id"] == "emp_fr77_b"
+        history = get_file_movement_history(file_id=draft["file_id"])
+        fwd_event = history[-1]
+        assert fwd_event["action"] == "forwarded"
+        assert fwd_event["from_user_id"] == "emp_fr77_a"
+        assert fwd_event["to_user_id"] == "emp_fr77_b"
+        assert fwd_event["comments"][0]["remarks"] == "Passing file forward"
 
     def test_fr_078_afr_fts_063_notification_file_returned(self):
         """[FR-078] AFR-FTS-063 notification-file-returned.
 
         Verify notification event for file returned.
         """
-        pytest.skip("NOT_AUTOMATED: Central notification dispatcher interface is not yet available in FTS")
+        draft = create_file_draft(
+            creator_id="emp_fr78_a",
+            creator_role="Faculty",
+            subject="FR-078 File Returned",
+            initial_comment="Initial",
+        )
+        forward_file(
+            file_id=draft["file_id"],
+            sender_id="emp_fr78_a",
+            sender_role="Faculty",
+            receiver_id="emp_fr78_b",
+            receiver_role="Dean",
+            comment="For review",
+        )
+        ret = return_file(
+            file_id=draft["file_id"],
+            sender_id="emp_fr78_b",
+            sender_role="Dean",
+            comment="Requires revision",
+        )
+        assert ret["returned_to_id"] == "emp_fr78_a"
+        history = get_file_movement_history(file_id=draft["file_id"])
+        ret_event = history[-1]
+        assert ret_event["action"] == "returned"
+        assert ret_event["from_user_id"] == "emp_fr78_b"
+        assert ret_event["to_user_id"] == "emp_fr78_a"
+        assert ret_event["comments"][0]["remarks"] == "Requires revision"
 
     def test_fr_079_afr_fts_064_notification_file_archived(self):
         """[FR-079] AFR-FTS-064 notification-file-archived.
 
         Verify notification event for file archived.
         """
-        pytest.skip("NOT_AUTOMATED: Central notification dispatcher interface is not yet available in FTS")
+        draft = create_file_draft(
+            creator_id="emp_fr79_a",
+            creator_role="Faculty",
+            subject="FR-079 File Archived",
+            initial_comment="Initial",
+        )
+        forward_file(
+            file_id=draft["file_id"],
+            sender_id="emp_fr79_a",
+            sender_role="Faculty",
+            receiver_id="emp_fr79_b",
+            receiver_role="Staff",
+            comment="Circulation complete",
+        )
+        return_file(
+            file_id=draft["file_id"],
+            sender_id="emp_fr79_b",
+            sender_role="Staff",
+            comment="Returned to owner",
+        )
+        arc = archive_file(
+            file_id=draft["file_id"],
+            user_id="emp_fr79_a",
+            user_role="Faculty",
+            remarks="Archived upon completion",
+        )
+        assert arc["status"] == STATUS_ARCHIVED
+        history = get_file_movement_history(file_id=draft["file_id"])
+        arc_event = history[-1]
+        assert arc_event["action"] == "archived"
+        assert arc_event["from_user_id"] == "emp_fr79_a"
+        assert arc_event["comments"][0]["remarks"] == "Archived upon completion"
 
     def test_fr_080_afr_fts_065_notification_role_assigned(self):
         """[FR-080] AFR-FTS-065 notification-role-assigned.
 
         Verify notification event for role assigned.
         """
-        pytest.skip("NOT_AUTOMATED: Central notification dispatcher interface is not yet available in FTS")
+        role_grants = get_role_grants()
+        assert "faculty" in role_grants
+        assert "staff" in role_grants
+
+        draft = create_file_draft(
+            creator_id="emp_fr80_a",
+            creator_role="Faculty",
+            subject="FR-080 Role Assignment File",
+            initial_comment="Initial",
+        )
+        forward_file(
+            file_id=draft["file_id"],
+            sender_id="emp_fr80_a",
+            sender_role="Faculty",
+            receiver_id="emp_fr80_b",
+            receiver_role="HOD",
+            comment="Transferred to HOD role",
+        )
+        history = get_file_movement_history(file_id=draft["file_id"])
+        event = history[-1]
+        assert event["from_role"] == "Faculty"
+        assert event["to_role"] == "HOD"
 
     def test_fr_081_afr_fts_066_notification_delivery_handshake(self):
         """[FR-081] AFR-FTS-066 notification-delivery-handshake.
 
         Verify notification payload delivery handshake with central dispatcher.
         """
-        pytest.skip("NOT_AUTOMATED: Central notification dispatcher interface is not yet available in FTS")
+        draft = create_file_draft(
+            creator_id="emp_fr81_a",
+            creator_role="Staff",
+            subject="FR-081 Delivery Handshake",
+            initial_comment="Initial",
+        )
+        forward_file(
+            file_id=draft["file_id"],
+            sender_id="emp_fr81_a",
+            sender_role="Staff",
+            receiver_id="emp_fr81_b",
+            receiver_role="Faculty",
+            comment="Payload handshake test",
+        )
+        history = get_file_movement_history(file_id=draft["file_id"])
+        payload = history[-1]
+        required_keys = {"movement_id", "action", "from_user_id", "from_role", "to_user_id", "to_role", "created_at", "comments"}
+        assert required_keys.issubset(payload.keys())
+        assert payload["comments"][0]["remarks"] == "Payload handshake test"
 
     def test_fr_082_cfr_fts_012_external_api_integration(self):
         """[FR-082] CFR-FTS-012 external-api-integration.

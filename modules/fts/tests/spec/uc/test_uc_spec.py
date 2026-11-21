@@ -776,9 +776,36 @@ class TestUseCasesSpec:
     def test_uc_034_fts_uc_009_main_flow(self):
         """[UC-034] FTS-UC-009 Main Flow.
 
-        Verify system admin role assignment governance interface.
+        Verify system admin governance separation: System Administrator cannot execute
+        operational file mutations (forwarding, archival), raising PermissionError per BR-FTS-002.
         """
-        pytest.skip("NOT_AUTOMATED: Central IAM role assignment interface is external to FTS")
+        role_grants = get_role_grants()
+        assert "system_admin" not in role_grants
+        assert "admin" not in role_grants
+
+        draft = create_file_draft(
+            creator_id="emp_uc34_custodian",
+            creator_role="Faculty",
+            subject="UC-034 Governance Separation File",
+            initial_comment="Initial remark",
+        )
+        with pytest.raises(PermissionError):
+            forward_file(
+                file_id=draft["file_id"],
+                sender_id="sysadmin_001",
+                sender_role="System Admin",
+                receiver_id="emp_uc34_target",
+                receiver_role="Faculty",
+                comment="Sysadmin forward prohibited",
+            )
+
+        with pytest.raises(PermissionError):
+            archive_file(
+                file_id=draft["file_id"],
+                user_id="sysadmin_001",
+                user_role="System Admin",
+                remarks="Sysadmin archive prohibited",
+            )
 
     def test_uc_035_fts_uc_009_alternative_flow_1(self):
         """[UC-035] FTS-UC-009 Alternative Flow 1.
