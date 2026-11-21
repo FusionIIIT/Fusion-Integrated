@@ -140,14 +140,20 @@ class BillSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         # BR-VH-037: Maintain immutable billing records for audit
-        if self.instance and self.instance.is_finalized:
-            # Check if any financial or status fields are being altered
-            restricted_fields = ["room_charges", "meal_charges", "cancellation_charges", "total_amount", "is_finalized"]
-            for f in restricted_fields:
-                if f in attrs and attrs[f] != getattr(self.instance, f):
-                    raise serializers.ValidationError(
-                        f"Cannot modify '{f}' on a finalized bill; bills are immutable for audit per BR-VH-037."
-                    )
+        restricted_fields = ["room_charges", "meal_charges", "cancellation_charges", "total_amount", "is_finalized"]
+        if self.instance:
+            if self.instance.is_finalized:
+                for f in restricted_fields:
+                    if f in attrs and attrs[f] != getattr(self.instance, f):
+                        raise serializers.ValidationError(
+                            f"Cannot modify '{f}' on a finalized bill; bills are immutable for audit per BR-VH-037."
+                        )
+            else:
+                for f in ["room_charges", "meal_charges", "cancellation_charges", "total_amount"]:
+                    if f in attrs and attrs[f] != getattr(self.instance, f):
+                        raise serializers.ValidationError(
+                            f"Field '{f}' is system-computed; arbitrary manual rate/discount modifications are prohibited."
+                        )
         return attrs
 
 
@@ -220,12 +226,16 @@ class BookingSerializer(serializers.ModelSerializer):
             "visit_purpose",
             "check_in_date",
             "check_out_date",
+            "expected_check_in_time",
+            "expected_check_out_time",
             "number_of_rooms",
             "number_of_occupants",
             "billing_responsibility",
             "status",
             "assigned_caretaker_id",
             "assigned_incharge_id",
+            "reviewed_at",
+            "approved_at",
             "caretaker_remarks",
             "incharge_remarks",
             "cancellation_reason",
@@ -242,6 +252,8 @@ class BookingSerializer(serializers.ModelSerializer):
             "status",
             "assigned_caretaker_id",
             "assigned_incharge_id",
+            "reviewed_at",
+            "approved_at",
             "calculated_cancellation_charge",
             "created_at",
             "updated_at",
@@ -298,6 +310,14 @@ class InventoryReplenishmentSerializer(serializers.ModelSerializer):
             "requested_by_user_id",
             "status",
             "remarks",
+            "reviewed_by_user_id",
+            "decision_timestamp",
+            "created_at",
+        ]
+        read_only_fields = [
+            "id",
+            "reviewed_by_user_id",
+            "decision_timestamp",
             "created_at",
         ]
 

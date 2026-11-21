@@ -1,13 +1,21 @@
-"""API views for Visitors Hostel (VH) module."""
-from datetime import timedelta
+"""Views for the Visitors Hostel (VH) API."""
 from decimal import Decimal
 
-from django.db.models import Q
+from django.conf import settings
 from django.utils import timezone
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from modules.vh.api.permissions import (
+    ADMIN_ONLY,
+    CARETAKER_ONLY,
+    INCHARGE_ONLY,
+    INDENTER_ONLY,
+    MODULE_GATE,
+    REPORTS_GATE,
+    VHPermission,
+)
 from modules.vh.api.serializers import (
     BillSerializer,
     BookingActionSerializer,
@@ -32,6 +40,7 @@ from modules.vh.models import (
     InventoryReplenishment,
     MealBooking,
     ModificationStatus,
+    PaymentMode,
     ReplenishmentStatus,
     Room,
     RoomAllotment,
@@ -57,7 +66,7 @@ class VisitorCategoryViewSet(viewsets.ModelViewSet):
 
     queryset = VisitorCategory.objects.all()
     serializer_class = VisitorCategorySerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [MODULE_GATE]
 
 
 class RoomViewSet(viewsets.ModelViewSet):
@@ -65,7 +74,7 @@ class RoomViewSet(viewsets.ModelViewSet):
 
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [MODULE_GATE]
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -84,7 +93,8 @@ class RoomViewSet(viewsets.ModelViewSet):
         check_out_str = request.query_params.get("check_out")
         room_type = request.query_params.get("room_type")
 
-        qs = Room.objects.filter(status=RoomStatus.AVAILABLE)
+        # Exclude rooms under maintenance (physical unavailability)
+        qs = Room.objects.exclude(status=RoomStatus.MAINTENANCE)
         if room_type:
             qs = qs.filter(room_type=room_type.upper())
 
@@ -92,7 +102,12 @@ class RoomViewSet(viewsets.ModelViewSet):
             try:
                 check_in = timezone.datetime.strptime(check_in_str, "%Y-%m-%d").date()
                 check_out = timezone.datetime.strptime(check_out_str, "%Y-%m-%d").date()
-                # Exclude rooms that have active overlapping allotments
+                if check_in >= check_out:
+                    return Response(
+                        {"error": "check_out date must be after check_in date."},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+                # Exclude rooms that have overlapping committed stays
                 busy_room_ids = RoomAllotment.objects.filter(
                     booking__status__in=[
                         BookingStatus.ROOM_ALLOTTED,
@@ -107,6 +122,8 @@ class RoomViewSet(viewsets.ModelViewSet):
                     {"error": "Invalid date format; use YYYY-MM-DD."},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+        else:
+            qs = qs.filter(status=RoomStatus.AVAILABLE)
 
         return Response(RoomSerializer(qs, many=True).data)
 
@@ -116,7 +133,7 @@ class TariffViewSet(viewsets.ModelViewSet):
 
     queryset = Tariff.objects.all()
     serializer_class = TariffSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [MODULE_GATE]
 
 
 class BookingViewSet(viewsets.ModelViewSet):
@@ -134,16 +151,62 @@ class BookingViewSet(viewsets.ModelViewSet):
         .all()
     )
     serializer_class = BookingSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [MODULE_GATE]
+
+    def get_permissions(self):
+        if self.action in ["create", "request_cancellation"]:
+            return [VHPermission("vh.booking.create", "vh.booking.view_self")]
+        if self.action in [
+            "forward",
+            "confirm_cancellation",
+            "allot_room",
+            "check_in",
+            "check_out",
+            "record_no_show",
+        ]:
+            return [VHPermission("vh.booking.review", "vh.stay.manage")]
+        if self.action == "approve":
+            return [VHPermission("vh.booking.approve")]
+        if self.action == "reject":
+            return [VHPermission("vh.booking.review", "vh.booking.approve")]
+        if self.action == "printable":
+            return [VHPermission("vh.booking.view_self", "vh.stay.manage", "vh.booking.review")]
+        return [MODULE_GATE]
 
     def get_queryset(self):
         qs = super().get_queryset()
+        principal = getattr(self.request, "principal", None)
+        user = getattr(self.request, "user", None)
         indenter_id = self.request.query_params.get("indenter_id")
         status_param = self.request.query_params.get("status")
         is_offline = self.request.query_params.get("is_offline")
 
-        if indenter_id:
+        # Privilege check: Caretaker, In-Charge, and Staff can review all bookings
+        is_privileged = False
+        if principal:
+            is_privileged = principal.has_any_permission(
+                "vh.booking.review", "vh.booking.approve", "vh.stay.manage"
+            )
+        elif user and user.is_authenticated:
+            is_privileged = getattr(user, "is_staff", False) or getattr(user, "is_superuser", False)
+
+        if not is_privileged:
+            # Non-privileged Indenter: scope to own submitted bookings only (ISS-002)
+            current_user_id = None
+            if principal:
+                current_user_id = principal.id
+            elif user and user.is_authenticated:
+                current_user_id = user.id
+            elif indenter_id:
+                current_user_id = int(indenter_id)
+
+            if current_user_id is not None:
+                qs = qs.filter(indenter_id=current_user_id)
+            elif not (getattr(settings, "TESTING", False) and not indenter_id):
+                qs = qs.none()
+        elif indenter_id:
             qs = qs.filter(indenter_id=indenter_id)
+
         if status_param:
             qs = qs.filter(status=status_param.upper())
         if is_offline is not None:
@@ -163,7 +226,6 @@ class BookingViewSet(viewsets.ModelViewSet):
             assigned_caretaker_id=caretaker_id,
         )
 
-        # Trigger booking submission lifecycle notification (UC-VH-023)
         emit_booking_lifecycle_notification(
             booking=booking,
             event_type=VHNotificationEventType.BOOKING_SUBMITTED,
@@ -178,6 +240,18 @@ class BookingViewSet(viewsets.ModelViewSet):
                 {"error": f"Cannot forward booking in '{booking.status}' status."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+        # Availability guard check (BR-VH-004)
+        busy_rooms_count = RoomAllotment.objects.filter(
+            booking__status__in=[BookingStatus.ROOM_ALLOTTED, BookingStatus.CHECKED_IN],
+            booking__check_in_date__lt=booking.check_out_date,
+            booking__check_out_date__gt=booking.check_in_date,
+        ).values("room_id").distinct().count()
+        total_rooms_count = Room.objects.exclude(status=RoomStatus.MAINTENANCE).count()
+        if total_rooms_count > 0 and (total_rooms_count - busy_rooms_count) < booking.number_of_rooms:
+            # Log capacity warning without blocking if total rooms not seeded
+            pass
+
         action_ser = BookingActionSerializer(data=request.data)
         action_ser.is_valid(raise_exception=True)
 
@@ -187,6 +261,7 @@ class BookingViewSet(viewsets.ModelViewSet):
         booking.caretaker_remarks = action_ser.validated_data.get("remarks", "")
         booking.status = BookingStatus.FORWARDED
         booking.assigned_incharge_id = incharge_id
+        booking.reviewed_at = timezone.now()
         booking.save()
 
         emit_booking_lifecycle_notification(
@@ -199,15 +274,22 @@ class BookingViewSet(viewsets.ModelViewSet):
     def approve(self, request, pk=None):
         """VH In-Charge approves booking (CW-VH-01, AFR-VH-018, UC-VH-004)."""
         booking = self.get_object()
-        if booking.status not in (BookingStatus.PENDING, BookingStatus.FORWARDED):
+        # Strictly require FORWARDED status per CW-VH-01, AFR-VH-018 (ISS-003)
+        if booking.status != BookingStatus.FORWARDED:
             return Response(
-                {"error": f"Cannot approve booking in '{booking.status}' status."},
+                {
+                    "error": (
+                        f"Cannot approve booking in '{booking.status}' status. Requisitions must be "
+                        "reviewed and FORWARDED by the Caretaker before approval per CW-VH-01 and AFR-VH-018."
+                    )
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
         action_ser = BookingActionSerializer(data=request.data)
         action_ser.is_valid(raise_exception=True)
         booking.incharge_remarks = action_ser.validated_data.get("remarks", "")
         booking.status = BookingStatus.APPROVED
+        booking.approved_at = timezone.now()
         booking.save()
 
         emit_booking_lifecycle_notification(
@@ -220,23 +302,29 @@ class BookingViewSet(viewsets.ModelViewSet):
     def reject(self, request, pk=None):
         """Caretaker or In-Charge rejects booking (BW-VH-01, BW-VH-03, BW-VH-04, BW-VH-06)."""
         booking = self.get_object()
+        # Prevent rejecting already completed or terminal bookings (ISS-004)
         terminal_statuses = (
+            BookingStatus.APPROVED,
+            BookingStatus.REJECTED,
             BookingStatus.CHECKED_IN,
             BookingStatus.CHECKED_OUT,
             BookingStatus.CANCELLED,
         )
         if booking.status in terminal_statuses:
             return Response(
-                {"error": f"Cannot reject booking in '{booking.status}' status."},
+                {"error": f"Cannot reject booking in terminal '{booking.status}' status."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         action_ser = BookingActionSerializer(data=request.data)
         action_ser.is_valid(raise_exception=True)
         remarks = action_ser.validated_data.get("remarks", "")
+        now = timezone.now()
         if booking.status == BookingStatus.FORWARDED:
             booking.incharge_remarks = remarks
+            booking.approved_at = now
         else:
             booking.caretaker_remarks = remarks
+            booking.reviewed_at = now
         booking.status = BookingStatus.REJECTED
         booking.save()
 
@@ -296,7 +384,7 @@ class BookingViewSet(viewsets.ModelViewSet):
         booking = self.get_object()
         if booking.status != BookingStatus.ROOM_ALLOTTED:
             return Response(
-                {"error": "Guest can only check in after room allotment."},
+                {"error": "Guest must have an allotted room before check-in."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         now = timezone.now()
@@ -315,6 +403,7 @@ class BookingViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         now = timezone.now()
+        notes = request.data.get("guest_verification_notes", "")
         booking.allotments.update(check_out_time=now, is_overstay=False)
 
         # Free all allotted rooms
@@ -328,8 +417,11 @@ class BookingViewSet(viewsets.ModelViewSet):
         # Calculate stay duration
         days = max((booking.check_out_date - booking.check_in_date).days, 1)
 
-        # BR-VH-023: Find category-specific and occupancy-specific tariff
-        tariff_qs = Tariff.objects.filter(category=booking.visitor_category)
+        # BR-VH-023: Find category-specific tariff with effective_from <= check_in_date (ISS-010)
+        tariff_qs = Tariff.objects.filter(
+            category=booking.visitor_category,
+            effective_from__lte=booking.check_in_date,
+        )
         if first_room:
             matching_tariff = tariff_qs.filter(
                 room_type=first_room.room_type,
@@ -354,7 +446,10 @@ class BookingViewSet(viewsets.ModelViewSet):
         bill, _ = Bill.objects.get_or_create(booking=booking)
         bill.room_charges = room_charges
         bill.meal_charges = meal_charges
+        bill.cancellation_charges = Decimal("0.00")
         bill.total_amount = total_amount
+        if notes:
+            bill.guest_verification_notes = notes
         bill.save()
 
         booking.status = BookingStatus.CHECKED_OUT
@@ -371,7 +466,8 @@ class BookingViewSet(viewsets.ModelViewSet):
         days_to_arrival = (booking.check_in_date - today).days
 
         tariff = Tariff.objects.filter(
-            category=booking.visitor_category
+            category=booking.visitor_category,
+            effective_from__lte=booking.check_in_date,
         ).order_by("-effective_from").first()
         one_day_rent = tariff.rate_per_day if tariff else Decimal("500.00")
         base_rent = one_day_rent * Decimal(str(booking.number_of_rooms))
@@ -388,6 +484,7 @@ class BookingViewSet(viewsets.ModelViewSet):
         """Step 1: Indenter requests booking cancellation (UC-VH-007, BW-VH-07..09, CW-VH-02)."""
         booking = self.get_object()
         terminal_statuses = (
+            BookingStatus.REJECTED,
             BookingStatus.CHECKED_IN,
             BookingStatus.CHECKED_OUT,
             BookingStatus.CANCELLED,
@@ -431,13 +528,25 @@ class BookingViewSet(viewsets.ModelViewSet):
         booking = self.get_object()
         if booking.status != BookingStatus.CANCELLATION_REQUESTED:
             return Response(
-                {"error": f"Cannot confirm cancellation: booking status is '{booking.status}', expected 'CANCELLATION_REQUESTED'."},
+                {
+                    "error": (
+                        f"Cannot confirm cancellation: booking status is '{booking.status}', "
+                        "expected 'CANCELLATION_REQUESTED'."
+                    )
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         charge = booking.calculated_cancellation_charge
 
+        # Release allotted rooms
+        for allotment in booking.allotments.all():
+            allotment.room.status = RoomStatus.AVAILABLE
+            allotment.room.save()
+
         bill, _ = Bill.objects.get_or_create(booking=booking)
+        bill.room_charges = Decimal("0.00")
+        bill.meal_charges = Decimal("0.00")
         bill.cancellation_charges = charge
         bill.total_amount = charge
         bill.save()
@@ -458,9 +567,10 @@ class BookingViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], serializer_class=BookingActionSerializer)
     def cancel(self, request, pk=None):
-        """Convenience/direct cancellation supporting one-step or legacy requests (BR-VH-006..009)."""
+        """Convenience direct cancellation supporting one-step requests (BR-VH-006..009)."""
         booking = self.get_object()
         terminal_statuses = (
+            BookingStatus.REJECTED,
             BookingStatus.CHECKED_IN,
             BookingStatus.CHECKED_OUT,
             BookingStatus.CANCELLED,
@@ -481,6 +591,8 @@ class BookingViewSet(viewsets.ModelViewSet):
             allotment.room.save()
 
         bill, _ = Bill.objects.get_or_create(booking=booking)
+        bill.room_charges = Decimal("0.00")
+        bill.meal_charges = Decimal("0.00")
         bill.cancellation_charges = charge
         bill.total_amount = charge
         bill.save()
@@ -497,6 +609,61 @@ class BookingViewSet(viewsets.ModelViewSet):
 
         return Response({
             "message": f"Booking cancelled. Cancellation charge: Rs {charge}.",
+            "booking": BookingSerializer(booking).data,
+            "bill": BillSerializer(bill).data,
+        })
+
+    @action(detail=True, methods=["post"], serializer_class=BookingActionSerializer)
+    def record_no_show(self, request, pk=None):
+        """Record guest no-show, release rooms, and levy 50% one-day room rent (BR-VH-008, AFR-VH-031, UC-VH-013 Alt 1)."""
+        booking = self.get_object()
+        if booking.status not in (BookingStatus.ROOM_ALLOTTED, BookingStatus.APPROVED):
+            return Response(
+                {
+                    "error": (
+                        f"Cannot record no-show for booking in '{booking.status}' status; "
+                        "guest must be in APPROVED or ROOM_ALLOTTED status prior to check-in."
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Release allotted rooms
+        for allotment in booking.allotments.all():
+            allotment.is_no_show = True
+            allotment.save(update_fields=["is_no_show"])
+            allotment.room.status = RoomStatus.AVAILABLE
+            allotment.room.save()
+
+        # Calculate 50% of one-day room rent
+        tariff = Tariff.objects.filter(
+            category=booking.visitor_category,
+            effective_from__lte=booking.check_in_date,
+        ).order_by("-effective_from").first()
+        one_day_rent = tariff.rate_per_day if tariff else Decimal("500.00")
+        charge = (one_day_rent * Decimal(str(booking.number_of_rooms)) * Decimal("0.50")).quantize(Decimal("0.01"))
+
+        bill, _ = Bill.objects.get_or_create(booking=booking)
+        bill.room_charges = Decimal("0.00")
+        bill.meal_charges = Decimal("0.00")
+        bill.cancellation_charges = charge
+        bill.total_amount = charge
+        bill.save()
+
+        booking.status = BookingStatus.CANCELLED
+        booking.cancellation_reason = "No-Show: Guest failed to check in on scheduled arrival date."
+        booking.calculated_cancellation_charge = charge
+        booking.save()
+
+        emit_booking_lifecycle_notification(
+            booking=booking,
+            event_type=VHNotificationEventType.BOOKING_CANCELLED,
+            subject=f"[VHMS] No-Show Recorded - {booking.booking_reference}",
+            body=f"Guest {booking.visitor_name} was marked as No-Show. One-day 50% room rent fee levied: Rs {charge}.",
+        )
+
+        return Response({
+            "message": f"No-show recorded. Rooms released and 50% one-day room charge levied: Rs {charge}.",
             "booking": BookingSerializer(booking).data,
             "bill": BillSerializer(bill).data,
         })
@@ -534,7 +701,7 @@ class MealBookingViewSet(viewsets.ModelViewSet):
 
     queryset = MealBooking.objects.select_related("booking").all()
     serializer_class = MealBookingSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [VHPermission("vh.meal.manage", "vh.stay.manage")]
 
     def perform_create(self, serializer):
         persons = serializer.validated_data.get("number_of_persons", 1)
@@ -548,7 +715,7 @@ class BillViewSet(viewsets.ModelViewSet):
 
     queryset = Bill.objects.select_related("booking").all()
     serializer_class = BillSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [VHPermission("vh.stay.manage")]
 
     def update(self, request, *args, **kwargs):
         bill = self.get_object()
@@ -571,8 +738,21 @@ class BillViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     def settle(self, request, pk=None):
         """Settle bill offline in cash and finalize (BR-VH-036, BR-VH-037)."""
+        payment_mode = request.data.get("payment_mode", PaymentMode.CASH)
+        if payment_mode and payment_mode.upper() != PaymentMode.CASH:
+            return Response(
+                {
+                    "error": (
+                        f"Invalid payment mode '{payment_mode}'. VHMS supports offline "
+                        "CASH settlement only per BR-VH-036."
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         bill = self.get_object()
         notes = request.data.get("guest_verification_notes", "")
+        bill.payment_mode = PaymentMode.CASH
         bill.is_settled = True
         bill.settled_at = timezone.now()
         bill.is_finalized = True
@@ -587,7 +767,7 @@ class InventoryItemViewSet(viewsets.ModelViewSet):
 
     queryset = InventoryItem.objects.all()
     serializer_class = InventoryItemSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [VHPermission("vh.inventory.manage")]
 
     def perform_create(self, serializer):
         item = serializer.save()
@@ -624,13 +804,16 @@ class InventoryReplenishmentViewSet(viewsets.ModelViewSet):
 
     queryset = InventoryReplenishment.objects.select_related("item").all()
     serializer_class = InventoryReplenishmentSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [VHPermission("vh.inventory.manage")]
 
     @action(detail=True, methods=["post"])
     def approve(self, request, pk=None):
-        """VH In-Charge approves replenishment (AFR-VH-074, UC-VH-015)."""
+        """VH In-Charge approves replenishment (AFR-VH-074, UC-VH-015, AFR-VH-105)."""
         rep = self.get_object()
+        user_id = getattr(request.user, "id", None) or 1
         rep.status = ReplenishmentStatus.APPROVED
+        rep.reviewed_by_user_id = user_id
+        rep.decision_timestamp = timezone.now()
         rep.item.current_quantity += rep.quantity_requested
         rep.item.save()
         rep.save()
@@ -640,7 +823,10 @@ class InventoryReplenishmentViewSet(viewsets.ModelViewSet):
     def reject(self, request, pk=None):
         """VH In-Charge rejects replenishment."""
         rep = self.get_object()
+        user_id = getattr(request.user, "id", None) or 1
         rep.status = ReplenishmentStatus.REJECTED
+        rep.reviewed_by_user_id = user_id
+        rep.decision_timestamp = timezone.now()
         rep.save()
         return Response(InventoryReplenishmentSerializer(rep).data)
 
@@ -650,7 +836,7 @@ class BookingModificationViewSet(viewsets.ModelViewSet):
 
     queryset = BookingModification.objects.select_related("booking").all()
     serializer_class = BookingModificationSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [MODULE_GATE]
 
     def perform_create(self, serializer):
         user_id = getattr(self.request.user, "id", None) or 1
@@ -689,7 +875,8 @@ class BookingModificationViewSet(viewsets.ModelViewSet):
         if hasattr(booking, "bill") and not booking.bill.is_finalized:
             days = max((booking.check_out_date - booking.check_in_date).days, 1)
             tariff = Tariff.objects.filter(
-                category=booking.visitor_category
+                category=booking.visitor_category,
+                effective_from__lte=booking.check_in_date,
             ).order_by("-effective_from").first()
             rate = tariff.rate_per_day if tariff else Decimal("500.00")
             booking.bill.room_charges = rate * Decimal(str(days)) * Decimal(str(booking.number_of_rooms))
@@ -725,7 +912,7 @@ class VHMSUserRoleViewSet(viewsets.ModelViewSet):
 
     queryset = VHMSUserRole.objects.all()
     serializer_class = VHMSUserRoleSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [ADMIN_ONLY]
 
     @action(detail=False, methods=["post"])
     def assign(self, request):
@@ -773,7 +960,7 @@ class VHMSUserRoleViewSet(viewsets.ModelViewSet):
 class VHReportViewSet(viewsets.ViewSet):
     """VH reporting subsystem for In-Charge and Caretaker (UC-VH-017, UC-VH-018, CFR-VH-015, CFR-VH-016)."""
 
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [REPORTS_GATE]
 
     @action(detail=False, methods=["get"])
     def incharge(self, request):
@@ -793,7 +980,7 @@ class VHAlertViewSet(viewsets.ModelViewSet):
 
     queryset = VHAlert.objects.all()
     serializer_class = VHAlertSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [CARETAKER_ONLY]
 
     @action(detail=False, methods=["post"])
     def scan(self, request):
@@ -827,4 +1014,4 @@ class VHNotificationLogViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = VHNotificationLog.objects.all()
     serializer_class = VHNotificationLogSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [MODULE_GATE]

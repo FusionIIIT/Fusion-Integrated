@@ -4,8 +4,9 @@ Per ops/checks/contracts_are_plural.py, cross-module getters must accept
 a sequence of IDs rather than singular IDs to prevent N+1 queries.
 """
 from collections.abc import Sequence
+from django.db.models import Count
 
-from .models import Bill, Booking, Room, VHMSUserRole
+from .models import Bill, Booking, BookingStatus, Room, VHMSUserRole
 
 
 def get_bookings_for_users(user_ids: Sequence[int]) -> list[dict]:
@@ -72,9 +73,11 @@ def get_active_operational_roles(role_types: Sequence[str]) -> list[dict]:
 
 
 def get_pending_booking_counts_for_users(user_ids: Sequence[int]) -> list[dict]:
-    """Retrieve counts of pending bookings for given indenter IDs."""
-    results = []
-    for uid in user_ids:
-        cnt = Booking.objects.filter(indenter_id=uid, status="PENDING").count()
-        results.append({"user_id": uid, "pending_count": cnt})
-    return results
+    """Retrieve counts of pending bookings for given indenter IDs without N+1 queries."""
+    counts = dict(
+        Booking.objects.filter(indenter_id__in=user_ids, status="PENDING")
+        .values("indenter_id")
+        .annotate(cnt=Count("id"))
+        .values_list("indenter_id", "cnt")
+    )
+    return [{"user_id": uid, "pending_count": counts.get(uid, 0)} for uid in user_ids]

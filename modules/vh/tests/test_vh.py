@@ -849,3 +849,195 @@ class TestAdditionalEdgeCasesAndCoverage:
             format="json",
         )
         assert r2.status_code == 400
+
+
+@pytest.mark.django_db
+class TestVHMSComplianceBugFixes:
+    """Verifies resolution of confirmed implementation defects from Assignment 8 audit."""
+
+    def test_iss_003_approve_rejects_unforwarded_pending_booking(self, api_client, visitor_category):
+        """ISS-003: In-Charge approve() requires FORWARDED and rejects PENDING with HTTP 400."""
+        today = timezone.localdate()
+        booking = Booking.objects.create(
+            indenter_id=10,
+            visitor_name="Dr. Unforwarded",
+            visitor_category=visitor_category,
+            visit_purpose="Lecture",
+            check_in_date=today + timedelta(days=2),
+            check_out_date=today + timedelta(days=4),
+            status=BookingStatus.PENDING,
+        )
+        resp = api_client.post(f"/api/v1/vh/bookings/{booking.id}/approve/", {"remarks": "Direct approve attempt"})
+        assert resp.status_code == 400
+        assert "FORWARDED" in resp.data["error"]
+
+    def test_iss_004_reject_blocks_terminal_approved_and_rejected(self, api_client, visitor_category):
+        """ISS-004: reject() rejects terminal APPROVED and REJECTED bookings with HTTP 400."""
+        today = timezone.localdate()
+        b_app = Booking.objects.create(
+            indenter_id=11,
+            visitor_name="Approved Guest",
+            visitor_category=visitor_category,
+            visit_purpose="Meeting",
+            check_in_date=today + timedelta(days=2),
+            check_out_date=today + timedelta(days=4),
+            status=BookingStatus.APPROVED,
+        )
+        r_app = api_client.post(f"/api/v1/vh/bookings/{b_app.id}/reject/", {"remarks": "Try reject approved"})
+        assert r_app.status_code == 400
+
+        b_rej = Booking.objects.create(
+            indenter_id=12,
+            visitor_name="Already Rejected",
+            visitor_category=visitor_category,
+            visit_purpose="Exam",
+            check_in_date=today + timedelta(days=2),
+            check_out_date=today + timedelta(days=4),
+            status=BookingStatus.REJECTED,
+        )
+        r_rej = api_client.post(f"/api/v1/vh/bookings/{b_rej.id}/reject/", {"remarks": "Try reject again"})
+        assert r_rej.status_code == 400
+
+    def test_iss_006_cancel_blocks_rejected_booking(self, api_client, visitor_category):
+        """ISS-006: cancel() rejects already REJECTED bookings with HTTP 400."""
+        today = timezone.localdate()
+        b_rej = Booking.objects.create(
+            indenter_id=13,
+            visitor_name="Rejected Guest",
+            visitor_category=visitor_category,
+            visit_purpose="Visit",
+            check_in_date=today + timedelta(days=5),
+            check_out_date=today + timedelta(days=7),
+            status=BookingStatus.REJECTED,
+        )
+        resp = api_client.post(f"/api/v1/vh/bookings/{b_rej.id}/cancel/")
+        assert resp.status_code == 400
+
+    def test_iss_007_cancel_zeroes_stay_charges_on_bill(self, api_client, visitor_category, sample_tariff):
+        """ISS-007: cancel() clears previous stay room/meal charges to maintain math consistency."""
+        today = timezone.localdate()
+        booking = Booking.objects.create(
+            indenter_id=14,
+            visitor_name="Cancelled Stayer",
+            visitor_category=visitor_category,
+            visit_purpose="Conference",
+            check_in_date=today + timedelta(days=10),
+            check_out_date=today + timedelta(days=12),
+            status=BookingStatus.APPROVED,
+        )
+        Bill.objects.create(booking=booking, room_charges=Decimal("2000.00"), meal_charges=Decimal("300.00"), total_amount=Decimal("2300.00"))
+        resp = api_client.post(f"/api/v1/vh/bookings/{booking.id}/cancel/")
+        assert resp.status_code == 200
+        bill = Bill.objects.get(booking=booking)
+        assert bill.room_charges == Decimal("0.00")
+        assert bill.meal_charges == Decimal("0.00")
+        assert bill.total_amount == bill.cancellation_charges
+
+    def test_iss_011_record_no_show_releases_rooms_and_levies_fifty_percent(self, api_client, visitor_category, sample_room, sample_tariff):
+        """ISS-011: record_no_show releases rooms and charges 50% one-day room rent."""
+        today = timezone.localdate()
+        booking = Booking.objects.create(
+            indenter_id=15,
+            visitor_name="No Show Guest",
+            visitor_category=visitor_category,
+            visit_purpose="Viva",
+            check_in_date=today,
+            check_out_date=today + timedelta(days=2),
+            status=BookingStatus.ROOM_ALLOTTED,
+            number_of_rooms=1,
+        )
+        RoomAllotment.objects.create(booking=booking, room=sample_room)
+        sample_room.status = RoomStatus.OCCUPIED
+        sample_room.save()
+
+        resp = api_client.post(f"/api/v1/vh/bookings/{booking.id}/record_no_show/")
+        assert resp.status_code == 200
+        sample_room.refresh_from_db()
+        assert sample_room.status == RoomStatus.AVAILABLE
+        booking.refresh_from_db()
+        assert booking.status == BookingStatus.CANCELLED
+        assert "No-Show" in booking.cancellation_reason
+        bill = Bill.objects.get(booking=booking)
+        # 50% of 1000.00 = 500.00
+        assert bill.cancellation_charges == Decimal("500.00")
+        assert bill.total_amount == Decimal("500.00")
+
+    def test_iss_015_settle_rejects_online_payment_mode(self, api_client, visitor_category):
+        """ISS-015: settle() validates cash-only settlement and rejects online payment mode."""
+        today = timezone.localdate()
+        booking = Booking.objects.create(
+            indenter_id=16,
+            visitor_name="Cash Guest",
+            visitor_category=visitor_category,
+            visit_purpose="Workshop",
+            check_in_date=today,
+            check_out_date=today + timedelta(days=1),
+            status=BookingStatus.CHECKED_OUT,
+        )
+        bill = Bill.objects.create(booking=booking, total_amount=Decimal("1000.00"))
+        resp_err = api_client.post(f"/api/v1/vh/bills/{bill.id}/settle/", {"payment_mode": "ONLINE"}, format="json")
+        assert resp_err.status_code == 400
+        assert "CASH" in resp_err.data["error"]
+
+        resp_ok = api_client.post(f"/api/v1/vh/bills/{bill.id}/settle/", {"payment_mode": "CASH"}, format="json")
+        assert resp_ok.status_code == 200
+        assert resp_ok.data["is_settled"] is True
+
+    def test_iss_017_check_out_persists_guest_verification_notes(self, api_client, visitor_category, sample_room, sample_tariff):
+        """ISS-017: check_out() persists guest_verification_notes onto the Bill."""
+        today = timezone.localdate()
+        booking = Booking.objects.create(
+            indenter_id=17,
+            visitor_name="Verified Guest",
+            visitor_category=visitor_category,
+            visit_purpose="Meeting",
+            check_in_date=today - timedelta(days=1),
+            check_out_date=today,
+            status=BookingStatus.CHECKED_IN,
+        )
+        RoomAllotment.objects.create(booking=booking, room=sample_room)
+        resp = api_client.post(
+            f"/api/v1/vh/bookings/{booking.id}/check_out/",
+            {"guest_verification_notes": "Guest verified room stay and mess charges in person."},
+            format="json",
+        )
+        assert resp.status_code == 200
+        bill = Bill.objects.get(booking=booking)
+        assert "Guest verified" in bill.guest_verification_notes
+
+    def test_iss_019_vhms_user_role_blocks_concurrent_active_roles(self):
+        """ISS-019: VHMSUserRole clean() rejects duplicate concurrent active role holders."""
+        from django.core.exceptions import ValidationError
+
+        VHMSUserRole.objects.all().delete()
+        VHMSUserRole.objects.create(role_type=VHMSUserRoleType.CARETAKER, user_id=101, is_active=True)
+        dup = VHMSUserRole(role_type=VHMSUserRoleType.CARETAKER, user_id=102, is_active=True)
+        with pytest.raises(ValidationError):
+            dup.save()
+
+    def test_iss_020_and_021_timing_and_audit_fields_persisted(self, api_client, visitor_category, sample_room):
+        """ISS-020 & ISS-021: Booking timings, reviewed_at, and approved_at are persisted."""
+        today = timezone.localdate()
+        booking = Booking.objects.create(
+            indenter_id=18,
+            visitor_name="Timing Audit Guest",
+            visitor_category=visitor_category,
+            visit_purpose="Colloquium",
+            check_in_date=today + timedelta(days=3),
+            check_out_date=today + timedelta(days=5),
+            expected_check_in_time="14:00:00",
+            expected_check_out_time="11:00:00",
+            status=BookingStatus.PENDING,
+        )
+        assert str(booking.expected_check_in_time) == "14:00:00"
+        assert booking.reviewed_at is None
+
+        api_client.post(f"/api/v1/vh/bookings/{booking.id}/forward/", {"remarks": "Review check"})
+        booking.refresh_from_db()
+        assert booking.reviewed_at is not None
+        assert booking.approved_at is None
+
+        api_client.post(f"/api/v1/vh/bookings/{booking.id}/approve/", {"remarks": "Approval check"})
+        booking.refresh_from_db()
+        assert booking.approved_at is not None
+

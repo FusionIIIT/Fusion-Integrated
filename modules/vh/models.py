@@ -169,6 +169,8 @@ class Booking(TimeStampedModel):
 
     check_in_date = models.DateField()
     check_out_date = models.DateField()
+    expected_check_in_time = models.TimeField(null=True, blank=True, help_text="Expected arrival time (AFR-VH-009)")
+    expected_check_out_time = models.TimeField(null=True, blank=True, help_text="Expected departure time (AFR-VH-009)")
     number_of_rooms = models.PositiveSmallIntegerField(default=1)
     number_of_occupants = models.PositiveSmallIntegerField(default=1)
 
@@ -186,6 +188,8 @@ class Booking(TimeStampedModel):
 
     assigned_caretaker_id = models.IntegerField(null=True, blank=True, db_index=True)
     assigned_incharge_id = models.IntegerField(null=True, blank=True, db_index=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True, help_text="Caretaker review timestamp (AFR-VH-101)")
+    approved_at = models.DateTimeField(null=True, blank=True, help_text="In-Charge approval/rejection timestamp (AFR-VH-101)")
 
     caretaker_remarks = models.TextField(blank=True)
     incharge_remarks = models.TextField(blank=True)
@@ -390,6 +394,8 @@ class InventoryReplenishment(TimeStampedModel):
         default=ReplenishmentStatus.PENDING,
     )
     remarks = models.TextField(blank=True)
+    reviewed_by_user_id = models.IntegerField(null=True, blank=True, help_text="In-Charge approver ID (AFR-VH-105)")
+    decision_timestamp = models.DateTimeField(null=True, blank=True, help_text="Replenishment approval timestamp (AFR-VH-105)")
 
     class Meta:
         db_table = "vh_inventory_replenishment"
@@ -416,6 +422,34 @@ class VHMSUserRole(TimeStampedModel):
     class Meta:
         db_table = "vh_user_role"
         ordering = ["-start_date"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["role_type"],
+                condition=models.Q(is_active=True),
+                name="unique_active_role_per_type",
+            )
+        ]
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+
+        if self.end_date and self.start_date and self.start_date > self.end_date:
+            raise ValidationError({"end_date": "End date cannot be earlier than start date."})
+        if self.is_active:
+            existing = VHMSUserRole.objects.filter(
+                role_type=self.role_type,
+                is_active=True,
+            )
+            if self.pk:
+                existing = existing.exclude(pk=self.pk)
+            if existing.exists():
+                raise ValidationError(
+                    f"An active {self.get_role_type_display()} role already exists (User {existing.first().user_id}). Deactivate or reassign before creating a new active role."
+                )
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"{self.get_role_type_display()} - User {self.user_id} (active={self.is_active})"
