@@ -12,7 +12,8 @@ surfaces as HTTP 500 instead of its intended 4xx (BR-PMS-126, CFR-PMS-027).
 
 from __future__ import annotations
 
-from rest_framework import generics
+from rest_framework import generics, status
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.api.exceptions import (
@@ -22,11 +23,13 @@ from core.api.exceptions import (
     PermissionDeniedError,
 )
 from core.api.exceptions import exception_handler as platform_exception_handler
+from core.observability.middleware import get_request_id
 from modules.pms.domain.errors import (
     AppealNotAllowedError,
     BudgetThresholdExceededError,
     ConflictOfInterestError,
     DeadlineExceededError,
+    ExternalServiceUnavailableError,
     IncompleteInventorsError,
     InsufficientJustificationError,
     InvalidDocumentError,
@@ -73,6 +76,18 @@ class PmsErrorMappingMixin:
     """Answer a PMS domain refusal with its HTTP meaning instead of a 500."""
 
     def handle_exception(self, exc):
+        if isinstance(exc, ExternalServiceUnavailableError):
+            return Response(
+                {
+                    "error": {
+                        "code": exc.code,
+                        "message": exc.message,
+                        "details": exc.details,
+                        "request_id": get_request_id(),
+                    }
+                },
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
         if isinstance(exc, PmsDomainError):
             return platform_exception_handler(
                 to_platform_error(exc), {"request": self.request, "view": self}

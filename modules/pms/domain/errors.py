@@ -56,6 +56,13 @@ class InvalidDocumentError(PmsDomainError):
     message = "Document must be a malware-free PDF under 50 MB."
 
 
+class ExternalServiceUnavailableError(PmsDomainError):
+    """A required external integration is not configured or reachable."""
+
+    code = "external_service_unavailable"
+    message = "A required external validation or search service is unavailable."
+
+
 class UnauthorizedRoleError(PmsDomainError):
     code = "unauthorized_role"
     message = "The active role is not authorized for this patent action."

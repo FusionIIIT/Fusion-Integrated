@@ -26,13 +26,9 @@ def upload_document_version(
     file_size_bytes: int,
     sensitivity: str = "confidential",
     file_url: str = "",
-    is_malware_clean: bool = True,
 ) -> ApplicationDocument:
     """Upload a new document version with validation and automatic versioning
     (UC-PMS-019, CFR-PMS-018)."""
-    # Document validation (BR-PMS-014, 015, 016)
-    validate_document(filename, file_size_bytes, is_malware_clean)
-
     with transaction.atomic():
         app = PatentApplication.objects.select_for_update().get(pk=application_id)
 
@@ -47,6 +43,9 @@ def upload_document_version(
                 f"Applicants may edit application documents only while status is "
                 f"Needs Revision, not '{app.status}' (BR-PMS-087)."
             )
+
+        # No caller assertion can replace the configured trusted malware scan.
+        validate_document(filename, file_size_bytes, is_malware_clean=None)
 
         # Version assignment: find latest version for this doc_type (BR-PMS-082)
         latest_doc = (
@@ -67,8 +66,6 @@ def upload_document_version(
             title=title.strip(),
             file_format="pdf",
             file_size_bytes=file_size_bytes,
-            malware_scanned=True,
-            is_clean=True,
             sensitivity=sensitivity,
             version=new_version,
             is_current=True,

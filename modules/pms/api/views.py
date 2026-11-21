@@ -6,7 +6,7 @@ Implements all PMS endpoints with strict authorization and domain service delega
 from __future__ import annotations
 
 from django.db.models import Count, Q
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -102,7 +102,11 @@ class PatentApplicationListCreateView(PmsAPIView):
         return Response(serializer.data)
 
     @extend_schema(
-        request=s.SubmitApplicationWriteSerializer, responses=s.PatentApplicationReadSerializer
+        request=s.SubmitApplicationWriteSerializer,
+        responses={
+            201: s.PatentApplicationReadSerializer,
+            503: OpenApiResponse(description="Required malware-scanning service unavailable."),
+        },
     )
     def post(self, request):
         if not request.principal.has_permission(p.P_CREATE):
@@ -148,7 +152,11 @@ class PatentApplicationReviseView(PmsAPIView):
     permission_classes = [p.MODULE, HasPermission(p.P_REVISE)]
 
     @extend_schema(
-        request=s.ReviseApplicationSerializer, responses=s.PatentApplicationReadSerializer
+        request=s.ReviseApplicationSerializer,
+        responses={
+            200: s.PatentApplicationReadSerializer,
+            503: OpenApiResponse(description="Required malware-scanning service unavailable."),
+        },
     )
     def post(self, request, pk: int):
         _visible_application(request, pk)
@@ -643,7 +651,13 @@ class PriorArtSearchView(PmsAPIView):
 
     permission_classes = [p.MODULE, HasPermission(p.P_PRIOR_ART)]
 
-    @extend_schema(request=None, responses=s.PriorArtSearchResponseSerializer)
+    @extend_schema(
+        request=None,
+        responses={
+            200: s.PriorArtSearchResponseSerializer,
+            503: OpenApiResponse(description="No external prior-art source is configured."),
+        },
+    )
     def get(self, request):
         query = request.query_params.get("q", "")
         domain = request.query_params.get("domain", "")
@@ -685,7 +699,13 @@ class DocumentUploadView(PmsAPIView):
 
     permission_classes = [p.MODULE, HasPermission(p.P_DOC_MANAGE)]
 
-    @extend_schema(request=s.UploadDocumentSerializer, responses=s.ApplicationDocumentSerializer)
+    @extend_schema(
+        request=s.UploadDocumentSerializer,
+        responses={
+            201: s.ApplicationDocumentSerializer,
+            503: OpenApiResponse(description="Required malware-scanning service unavailable."),
+        },
+    )
     def post(self, request, pk: int):
         _visible_application(request, pk)
         serializer = s.UploadDocumentSerializer(data=request.data)

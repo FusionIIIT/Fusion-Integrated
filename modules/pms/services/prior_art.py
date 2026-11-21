@@ -5,11 +5,9 @@ Enforces CFR-PMS-017, BR-PMS-141, and UC-PMS-004.
 
 from __future__ import annotations
 
-from typing import Any
-
 from django.db import transaction
 
-from modules.pms.domain.errors import PreconditionNotMetError
+from modules.pms.domain.errors import ExternalServiceUnavailableError, PreconditionNotMetError
 from modules.pms.models import PatentApplication, PriorArtReference
 from modules.pms.services.audit import log_audit
 from modules.pms.services.authorization import require_assigned_attorney
@@ -20,34 +18,18 @@ def search_prior_art(
     query: str,
     domain: str = "",
     actor_user_id: int | None = None,
-) -> list[dict[str, Any]]:
-    """Simulated external prior-art search across patent databases (BR-PMS-141)."""
-    # Logs search session for audit trail (CFR-PMS-017)
+) -> None:
+    """Refuse searches until a supported external source is configured (UC-PMS-004)."""
+    del query, domain
+    # No search session is logged as successful when no source was queried.
     log_audit(
         actor_user_id=actor_user_id,
-        action_type="prior_art_search_executed",
-        details={"query": query, "domain": domain},
+        action_type="prior_art_search_unavailable",
+        details={"result": "not_queried"},
     )
-
-    # Return search results with relevance ranking
-    return [
-        {
-            "reference_id": f"PAT-REF-{abs(hash(query)) % 10000:04d}",
-            "source": "Indian Patent Database",
-            "title": f"Novel methods in {query}",
-            "authors": "A. Kumar et al.",
-            "relevance": "high",
-            "url": "https://ipindia.gov.in/patents",
-        },
-        {
-            "reference_id": f"PUB-REF-{(abs(hash(query)) + 1) % 10000:04d}",
-            "source": "IEEE Xplore",
-            "title": f"Recent advances in {domain or query}",
-            "authors": "R. Sharma et al.",
-            "relevance": "medium",
-            "url": "https://ieeexplore.ieee.org",
-        },
-    ]
+    raise ExternalServiceUnavailableError(
+        "Prior-art search is unavailable because no external search source is configured."
+    )
 
 
 def attach_prior_art(

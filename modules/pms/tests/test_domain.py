@@ -27,6 +27,7 @@ from modules.pms.domain.entities import (
 )
 from modules.pms.domain.errors import (
     ConflictOfInterestError,
+    ExternalServiceUnavailableError,
     IncompleteInventorsError,
     InsufficientJustificationError,
     InvalidDocumentError,
@@ -310,6 +311,11 @@ def test_document_malware_validation():
     """BR-PMS-016: A submitted document must pass malware validation."""
     with pytest.raises(InvalidDocumentError, match="failed security / malware validation"):
         validate_document("infected.pdf", 1024, is_malware_clean=False)
+
+
+def test_document_without_trusted_scan_is_rejected():
+    with pytest.raises(ExternalServiceUnavailableError, match="malware scanning is unavailable"):
+        validate_document("unscanned.pdf", 1024)
 
 
 # --- 4. Review Decisions & Justifications (BR-PMS-029, 030) ---

@@ -15,6 +15,7 @@ from modules.pms.models import (
     AttorneyAssignment,
     AttorneyPanel,
     LicensingRequest,
+    PatentApplication,
     PostGrantMaintenance,
 )
 from modules.pms.services import submit_application
@@ -77,14 +78,7 @@ def test_api_submit_application(stub_iam):
                 "ownership_percentage": "60.00",
             },
         ],
-        "documents": [
-            {
-                "title": "Claims Doc",
-                "filename": "claims.pdf",
-                "file_size_bytes": 4096,
-                "doc_type": "claims",
-            }
-        ],
+        "documents": [],
     }
 
     res = c.post("/api/v1/pms/applications/", payload, format="json")
@@ -93,7 +87,35 @@ def test_api_submit_application(stub_iam):
     assert data["status"] == "submitted"
     assert "PMS-" in data["application_no"]
     assert len(data["coinventors"]) == 2
-    assert len(data["documents"]) == 1
+    assert len(data["documents"]) == 0
+
+
+def test_api_submission_rejects_caller_asserted_malware_status(stub_iam):
+    c = _client(stub_iam, user_id=1001, permissions=("pms.application.create",))
+    before = PatentApplication.objects.count()
+    response = c.post(
+        "/api/v1/pms/applications/",
+        {
+            "title": "Unscanned document",
+            "abstract": "A",
+            "detailed_description": "D",
+            "claims": "C",
+            "domain": "Tech",
+            "documents": [
+                {
+                    "title": "Claims",
+                    "filename": "claims.pdf",
+                    "file_size_bytes": 4096,
+                    "is_clean": True,
+                }
+            ],
+        },
+        format="json",
+    )
+
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "external_service_unavailable"
+    assert PatentApplication.objects.count() == before
 
 
 # --- UC-PMS-002: Track Application Status and History ---
@@ -604,10 +626,11 @@ def test_api_prior_art_search_and_attach(stub_iam):
         stub_iam, user_id=1001, permissions=("pms.prior_art.search", "pms.application.view_self")
     )
 
-    # Search
+    # Search fails truthfully until an external source is configured; it must
+    # never expose simulated search hits as retrieved references.
     res_search = c.get("/api/v1/pms/prior-art/search/?q=quantum")
-    assert res_search.status_code == 200
-    assert len(res_search.json()["results"]) >= 1
+    assert res_search.status_code == 503
+    assert res_search.json()["error"]["code"] == "external_service_unavailable"
 
     # Attach
     res_attach = c.post(
@@ -646,8 +669,8 @@ def test_api_document_upload(stub_iam):
             "file_size_bytes": 1024,
         },
     )
-    assert res.status_code == 201
-    assert res.json()["version"] == 1
+    assert res.status_code == 503
+    assert res.json()["error"]["code"] == "external_service_unavailable"
 
 
 # --- UC-PMS-020 & UC-PMS-021: Licensing ---

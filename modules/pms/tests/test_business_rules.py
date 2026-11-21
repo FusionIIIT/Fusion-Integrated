@@ -11,6 +11,7 @@ from django.utils import timezone
 
 from modules.pms.domain.errors import (
     ConflictOfInterestError,
+    ExternalServiceUnavailableError,
     InsufficientJustificationError,
     InvalidDocumentError,
     PreconditionNotMetError,
@@ -109,8 +110,9 @@ def test_br_pms_014_015_016_document_validations_during_submission():
             ],
         )
 
-    # Malware infected
-    with pytest.raises(InvalidDocumentError, match="failed security / malware validation"):
+    # An applicant-provided clean flag is not a trusted scan result; until a
+    # scanner is configured, documents fail closed before application creation.
+    with pytest.raises(ExternalServiceUnavailableError, match="malware scanning is unavailable"):
         submit_application(
             applicant_user_id=1001,
             title="T",
@@ -119,9 +121,41 @@ def test_br_pms_014_015_016_document_validations_during_submission():
             claims="C",
             domain="Tech",
             documents_data=[
-                {"title": "Doc", "filename": "doc.pdf", "file_size_bytes": 100, "is_clean": False}
+                {"title": "Doc", "filename": "doc.pdf", "file_size_bytes": 100, "is_clean": True}
             ],
         )
+
+
+def test_revision_does_not_trust_caller_malware_status():
+    app = submit_application(
+        applicant_user_id=1001,
+        title="Revision needs trusted scan",
+        abstract="A",
+        detailed_description="D",
+        claims="C",
+        domain="Tech",
+    )
+    app.status = PatentApplicationStatus.NEEDS_REVISION.value
+    app.save(update_fields=["status", "updated_at"])
+
+    with pytest.raises(ExternalServiceUnavailableError, match="malware scanning is unavailable"):
+        revise_and_resubmit_application(
+            application_id=app.id,
+            applicant_user_id=1001,
+            feedback_response="The revision addresses the review feedback in full.",
+            new_documents_data=[
+                {
+                    "title": "Claims",
+                    "filename": "claims.pdf",
+                    "file_size_bytes": 100,
+                    "is_clean": True,
+                }
+            ],
+        )
+
+    app.refresh_from_db()
+    assert app.status == PatentApplicationStatus.NEEDS_REVISION.value
+    assert not app.documents.exists()
 
 
 # --- BR-PMS-025, 026, 027: Director Assignment & Conflict of Interest ---
@@ -646,20 +680,20 @@ def test_br_pms_087_applicant_document_edit_rule():
             file_size_bytes=1000,
         )
 
-    # In Needs Revision status -> Allowed
+    # In Needs Revision status, the state permits upload, but no document is
+    # stored until a trusted malware scanner is available.
     app.status = PatentApplicationStatus.NEEDS_REVISION.value
     app.save()
-    new_doc = upload_document_version(
-        application_id=app.id,
-        user_id=1001,
-        user_role="Applicant",
-        doc_type="claims",
-        title="Revised Claims",
-        filename="claims.pdf",
-        file_size_bytes=1000,
-    )
-    assert new_doc.version == 1
-    assert new_doc.is_current is True
+    with pytest.raises(ExternalServiceUnavailableError, match="malware scanning is unavailable"):
+        upload_document_version(
+            application_id=app.id,
+            user_id=1001,
+            user_role="Applicant",
+            doc_type="claims",
+            title="Revised Claims",
+            filename="claims.pdf",
+            file_size_bytes=1000,
+        )
 
 
 # --- BR-PMS-092..095: Appeal Rules ---

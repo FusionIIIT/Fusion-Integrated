@@ -10,6 +10,7 @@ from decimal import Decimal
 
 from .errors import (
     ConflictOfInterestError,
+    ExternalServiceUnavailableError,
     IncompleteInventorsError,
     InsufficientJustificationError,
     InvalidDocumentError,
@@ -39,7 +40,7 @@ ALLOWED_RENEWAL_DECISIONS = ("Renew", "Do Not Renew")  # (BR-PMS-061)
 def validate_document(
     filename: str,
     file_size_bytes: int,
-    is_malware_clean: bool = True,
+    is_malware_clean: bool | None = None,
 ) -> None:
     """Validate document format, size, and malware status (BR-PMS-014, 015, 016)."""
     ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
@@ -53,6 +54,10 @@ def validate_document(
             f"Document size ({file_size_bytes} bytes) exceeds the 50 MB limit (BR-PMS-015)."
         )
 
+    if is_malware_clean is None:
+        raise ExternalServiceUnavailableError(
+            "Document malware scanning is unavailable; the document was not accepted."
+        )
     if not is_malware_clean:
         raise InvalidDocumentError("Document failed security / malware validation (BR-PMS-016).")
 

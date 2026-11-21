@@ -77,7 +77,7 @@ def submit_application(
             validate_document(
                 filename=doc.get("filename", doc.get("title", "document.pdf")),
                 file_size_bytes=doc.get("file_size_bytes", 0),
-                is_malware_clean=doc.get("is_clean", True),
+                is_malware_clean=None,
             )
 
     # Validate inventor ownership shares (BR-PMS-074)
@@ -136,8 +136,6 @@ def submit_application(
                     title=doc.get("title", "Document"),
                     file_format=doc.get("file_format", "pdf"),
                     file_size_bytes=doc.get("file_size_bytes", 0),
-                    malware_scanned=True,
-                    is_clean=True,
                     sensitivity=doc.get("sensitivity", "confidential"),
                     version=1,
                     is_current=True,
@@ -234,7 +232,7 @@ def revise_and_resubmit_application(
                 validate_document(
                     filename=doc.get("filename", doc.get("title", "document.pdf")),
                     file_size_bytes=doc.get("file_size_bytes", 0),
-                    is_malware_clean=doc.get("is_clean", True),
+                    is_malware_clean=None,
                 )
                 doc_type = doc.get("doc_type", "specification")
                 # find latest version for this doc_type
@@ -256,8 +254,6 @@ def revise_and_resubmit_application(
                     title=doc.get("title", f"{doc_type} v{new_ver}"),
                     file_format=doc.get("file_format", "pdf"),
                     file_size_bytes=doc.get("file_size_bytes", 0),
-                    malware_scanned=True,
-                    is_clean=True,
                     sensitivity=doc.get("sensitivity", "confidential"),
                     version=new_ver,
                     is_current=True,
