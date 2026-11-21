@@ -1,0 +1,29 @@
+# PMS business rules for budget, attorney, assessment, filing, office actions, maintenance (read-only spec)
+
+- BR-PMS-040 (Attorney assignment; applies to PCC_ADMIN): Only PCC_ADMIN may assign an Attorney to an Approved application.
+- BR-PMS-041 (Attorney panel rule; applies to PCC_ADMIN): An assigned Attorney must be selected from the approved panel unless an institutional exception is recorded or allowed. Exception: unless an institutional exception is recorded or allowed
+- BR-PMS-042 (Assignment criterion; applies to PCC_ADMIN): Attorney expertise matching the application domain is an assignment criterion.
+- BR-PMS-043 (Assignment criterion; applies to PCC_ADMIN): Attorney current workload is an assignment criterion.
+- BR-PMS-044 (Conflict of interest; applies to PCC_ADMIN / Attorney): PMS must perform a conflict-of-interest check before Attorney assignment.
+- BR-PMS-045 (Preference rule; applies to Applicant / PCC_ADMIN): Applicant Attorney preference may be considered only when the preferred Attorney is in the approved panel. Exception: Outside the stated condition, the rule does not authorize the action.
+- BR-PMS-046 (Opinion validation; applies to Attorney): A finalized Attorney patentability opinion must contain exactly one recommendation: File Patent, Do Not File, or Needs Amendment.
+- BR-PMS-048 (Budget data; applies to Director): Budget information must include filing fees.
+- BR-PMS-049 (Budget data; applies to Director): Budget information must include attorney fees.
+- BR-PMS-050 (Budget data; applies to Director): Budget information must include administrative costs.
+- BR-PMS-051 (Budget escalation; applies to Director / PCC_ADMIN): When total patent cost exceeds the configured threshold, PMS must route/escalate the case to the applicable higher authority.
+- BR-PMS-052 (Budget approval rule; applies to Director): Budget approval is permitted only when the application status is Approved. Exception: Outside the stated condition, the rule does not authorize the action.
+- BR-PMS-053 (Budget validation; applies to Director): Where budget-availability information is available to PMS, budget availability must be validated before approval. Exception: Applies only under the stated availability/configuration/legal condition.
+- BR-PMS-055 (Format validation; applies to Attorney): Where corresponding validation rules are available, the filing package must satisfy the applicable patent-office format standards before PMS records compliant readiness. Exception: Applies only under the stated availability/configuration/legal condition.
+- BR-PMS-056 (International filing rule; applies to Attorney): An international filing must include additional justification recorded in PMS.
+- BR-PMS-059 (Post-grant rule; applies to Attorney / Director): Post-grant tracking is activated only when patent status is Granted. Exception: Outside the stated condition, the rule does not authorize the action.
+- BR-PMS-060 (Maintenance schedule; applies to Attorney / Director): Where applicable schedule rules are available, the maintenance-fee schedule is determined from grant date and jurisdiction. Exception: Applies only under the stated availability/configuration/legal condition.
+- BR-PMS-061 (Renewal decision rule; applies to Director): An explicit Renew or Do Not Renew decision is required before each maintenance deadline.
+- BR-PMS-065 (Response submission; applies to Attorney): An office-action response must be recorded as submitted within the applicable deadline unless a permitted extension applies. Exception: unless a permitted extension applies
+- BR-PMS-066 (Deadline tracking; applies to Attorney / Applicant): Office-action response deadline tracking is automated only where applicable deadline data/rules are available to PMS. Exception: Applies only under the stated availability/configuration/legal condition. Outside the stated condition, the rule does not authorize the action.
+- BR-PMS-100 (Deadline tracking; applies to Attorney / Director): PMS calculates/monitors maintenance-fee deadlines only where applicable jurisdictional schedule rules/data are available. Exception: Applies only under the stated availability/configuration/legal condition. Outside the stated condition, the rule does not authorize the action.
+- BR-PMS-127 (Sequential workflow rule; applies to PCC_ADMIN / Attorney): Attorney assignment must not occur before Director approval is recorded.
+- BR-PMS-128 (Sequential workflow rule; applies to Attorney / Director): External filing must not occur until required approvals and budget allocation are complete.
+- BR-PMS-138 (Scope boundary; applies to Patent office systems): Patent-office systems are external; PMS may validate, record, track, notify, log, or report based on filing/status/communication data but does not control patent-office processing or decisions.
+- BR-PMS-141 (Scope boundary; applies to Prior-art databases): External prior-art databases are query sources and are not PMS-owned repositories.
+- BR-PMS-142 (Scope boundary; applies to Attorney / patent office systems): PMS must not treat external patent-office filing success as internally controlled beyond recording submitted filing details and confirmations.
+- BR-PMS-146 (Applicant office-action response approval condition; applies to Office-action response handling): Applicant review and approval of an office-action response is required only when the applicable process requires Applicant review. Exception: Outside the stated condition, the rule does not authorize the action.
