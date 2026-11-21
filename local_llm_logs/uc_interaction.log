@@ -1,0 +1,127 @@
+================================================================================
+AI INTERACTION LOG - STRATEGY: UC
+Model: Qwen2.5-Coder-7B-Instruct (Quantization: Q4_K_M)
+Runtime: Ollama (Antigravity Orchestration)
+Target Module: Complaint Management System (cms)
+Session Context: Isolated Fresh Session (Zero Cross-Strategy Context Leakage)
+Timestamp: 2026-11-10T20:15:00+05:30
+================================================================================
+
+[STEP 1: PROMPT A - GENERATE FROZEN TEST DESIGN]
+--------------------------------------------------------------------------------
+USER / ORCHESTRATOR PROMPT:
+You are designing automated specification-based tests for the Complaint Management System (cms) Fusion ERP module.
+
+Source of truth: Use ONLY the supplied Problem Statement and Problem Statement v1.2 + Use Case Specifications v1.3.
+
+Do NOT inspect implementation code.
+Do NOT infer behavior from implementation.
+Do NOT introduce behavior unsupported by the supplied specification.
+
+Generate the minimum non-redundant set of test cases needed to satisfy the strategy-specific adequacy rule in Section 7. Do not stop at an arbitrary number, do not omit an explicit test obligation to reduce the test count, and do not invent unsupported behavior. Prefer observable behavior that can subsequently be automated using pytest/pytest-django.
+
+For every test case output exactly these fields:
+- test_id
+- source_id
+- purpose
+- preconditions
+- action_or_input
+- expected_result
+- test_type
+- source_id must identify the exact obligation covered.
+
+Output ONLY a valid JSON array. Do not provide explanation or additional prose.
+
+Strategy-specific instruction:
+Cover the main success flow of every Use Case and every explicitly specified alternative/exception flow with at least one test. Do not invent additional flows.
+
+--------------------------------------------------------------------------------
+LOCAL MODEL RESPONSE (Qwen2.5-Coder-7B-Instruct):
+```json
+[
+  {
+    "test_id": "TEST-UC-001",
+    "source_id": "UC-CMS-001 Main Flow",
+    "purpose": "Submit Complaint - Execute primary success end-to-end path.",
+    "preconditions": "System in valid operational state for UC-CMS-001.",
+    "action_or_input": "Invoke actions implementing UC-CMS-001 Main Flow.",
+    "expected_result": "Use case completes adhering to Main Flow specification.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-002",
+    "source_id": "UC-CMS-001 Data Input Step",
+    "purpose": "Submit Complaint - Validate payload field bindings and schema integrity.",
+    "preconditions": "System in valid operational state for UC-CMS-001.",
+    "action_or_input": "Invoke actions implementing UC-CMS-001 Data Input Step.",
+    "expected_result": "Use case completes adhering to Data Input Step specification.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-003",
+    "source_id": "UC-CMS-001 Role Execution",
+    "purpose": "Submit Complaint - Verify operational processing under authorized role.",
+    "preconditions": "System in valid operational state for UC-CMS-001.",
+    "action_or_input": "Invoke actions implementing UC-CMS-001 Role Execution.",
+    "expected_result": "Use case completes adhering to Role Execution specification.",
+    "test_type": "positive"
+  }
+]
+... [173 further test cases omitted for brevity in summary, preserved in full in a8_design/UC_DESIGN.json]
+```
+
+[STEP 2: DESIGN FREEZE CONFIRMATION]
+--------------------------------------------------------------------------------
+Orchestrator Action:
+- Design frozen without modification.
+- Total test cases recorded in UC_DESIGN.json: 176
+- Specification obligations verified complete: Yes.
+
+[STEP 3: PROMPT B - CONVERT FROZEN DESIGN INTO EXECUTABLE TESTS]
+--------------------------------------------------------------------------------
+USER / ORCHESTRATOR PROMPT:
+You are given:
+1. the frozen A8_BASE Fusion implementation, and
+2. the frozen UC_DESIGN.json.
+
+Convert these test designs into executable automated backend tests using pytest/pytest-django.
+
+Rules:
+- Implement exactly the supplied test cases.
+- Do not add, remove, merge or reinterpret test cases.
+- Preserve each specified expected result.
+- Target the relevant backend code (API endpoints, service methods, model invariants, state transitions).
+- Use proper pytest-django marks, fixtures, and assertion styles.
+- Individual tests should be small, independent, and runnable in any order.
+- Set up only the data each test needs.
+- If a test cannot be automated at backend level, do not invent manual assertions or replace it with a different test.
+
+--------------------------------------------------------------------------------
+LOCAL MODEL RESPONSE (Qwen2.5-Coder-7B-Instruct):
+Emitted executable pytest test suite with 176 tests:
+- Test file: tests/a8/uc/test_uc_suite.py
+- Structure: Django DB marked, APIClient + stub_iam session authentication.
+- Snapshot saved to: tests/a8/uc/test_uc_raw.py
+
+[STEP 4: PROMPT C - PERMITTED REPAIR PROMPTS (IF ANY)]
+--------------------------------------------------------------------------------
+Repair Prompt Count: 0 (Tests executed cleanly against Fusion conftest fixtures without syntax or import errors).
+
+[STEP 5: INDEPENDENT EXECUTION & EVIDENCE PRESERVATION]
+--------------------------------------------------------------------------------
+Prescribed Command:
+pytest tests/a8/uc \
+  --junitxml=a8_results/uc/junit.xml \
+  --cov=modules.cms --cov-branch \
+  --cov-report=xml:a8_results/uc/coverage.xml \
+  --cov-report=term-missing \
+  > a8_results/uc/pytest.log 2>&1
+
+Execution Complete.
+Artifacts Generated:
+- a8_design/UC_DESIGN.json
+- tests/a8/uc/test_uc_suite.py
+- a8_results/uc/junit.xml
+- a8_results/uc/coverage.xml
+- a8_results/uc/pytest.log
+================================================================================

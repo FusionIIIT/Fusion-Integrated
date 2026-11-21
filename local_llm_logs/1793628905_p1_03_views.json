@@ -1,0 +1,16 @@
+{
+  "task": "p1_03_views",
+  "model": "Qwen2.5-Coder-7B-Instruct",
+  "model_family": "Qwen",
+  "parameter_size": "7B",
+  "quantization": "Q4_K_M",
+  "runtime": "Ollama",
+  "system_prompt": "You are an expert Python Django and React TypeScript software engineer working on Fusion ERP. Generate strictly valid, complete, syntactically clean code blocks without conversational filler.",
+  "prompt": "Write Django REST Framework ViewSets in `modules/cms/api/views.py` for CMS.\nImplement ComplaintViewSet(viewsets.ModelViewSet) with standard CRUD, plus stub actions for assign, resolve, reject, escalate.\nImport models from ..models and serializers from .serializers.\nReturn ONLY the valid Python code in ```python ... ```.",
+  "response": "```python\nfrom rest_framework import viewsets\nfrom rest_framework.decorators import action\nfrom rest_framework.response import Response\nfrom rest_framework import status\nfrom ..models import Complaint\nfrom .serializers import ComplaintSerializer\n\nclass ComplaintViewSet(viewsets.ModelViewSet):\n    queryset = Complaint.objects.all()\n    serializer_class = ComplaintSerializer\n\n    @action(detail=True, methods=['post'])\n    def assign(self, request, pk=None):\n        complaint = self.get_object()\n        complaint.status = 'assigned'\n        complaint.assigned_to = request.data.get('assigned_to')\n        complaint.save()\n        return Response({'status': 'assigned'})\n\n    @action(detail=True, methods=['post'])\n    def resolve(self, request, pk=None):\n        complaint = self.get_object()\n        complaint.status = 'resolved'\n        complaint.save()\n        return Response({'status': 'resolved'})\n\n    @action(detail=True, methods=['post'])\n    def reject(self, request, pk=None):\n        complaint = self.get_object()\n        complaint.status = 'rejected'\n        complaint.save()\n        return Response({'status': 'rejected'})\n\n    @action(detail=True, methods=['post'])\n    def escalate(self, request, pk=None):\n        complaint = self.get_object()\n        complaint.status = 'escalated'\n        complaint.save()\n        return Response({'status': 'escalated'})\n```\n",
+  "stats": {
+    "elapsed_seconds": 62.945876598358154,
+    "total_tokens": 385,
+    "tokens_per_second": 6.116365690743945
+  }
+}

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="7" skipped="0" tests="176" time="12.883" timestamp="2026-11-10T22:16:31.193068+05:30" hostname="Shl0k"><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_001_uc_cms_001_main_flow" time="7.189" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_002_uc_cms_001_data_input_step" time="0.026" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_003_uc_cms_001_role_execution" time="0.027" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_004_uc_cms_001_state_transition" time="0.026" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_005_uc_cms_001_alternative_a1" time="0.023" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_006_uc_cms_001_alternative_a2" time="0.022" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_007_uc_cms_001_exception_e1" time="0.023" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_008_uc_cms_001_exception_e2" time="0.023" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_009_uc_cms_002_main_flow" time="0.024" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_010_uc_cms_002_data_input_step" time="0.038" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_011_uc_cms_002_role_execution" time="0.029" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_012_uc_cms_002_state_transition" time="0.025" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_013_uc_cms_002_alternative_a1" time="0.024" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_014_uc_cms_002_alternative_a2" time="0.025" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_015_uc_cms_002_exception_e1" time="0.026" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_016_uc_cms_002_exception_e2" time="0.027" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_017_uc_cms_003_main_flow" time="0.028" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_018_uc_cms_003_data_input_step" time="0.030" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_019_uc_cms_003_role_execution" time="0.026" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_020_uc_cms_003_state_transition" time="0.026" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_021_uc_cms_003_alternative_a1" time="0.023" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_022_uc_cms_003_alternative_a2" time="0.026" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_023_uc_cms_003_exception_e1" time="0.023" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_024_uc_cms_003_exception_e2" time="0.023" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_025_uc_cms_004_main_flow" time="0.023" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_026_uc_cms_004_data_input_step" time="0.024" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_027_uc_cms_004_role_execution" time="0.023" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_028_uc_cms_004_state_transition" time="0.024" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_029_uc_cms_004_alternative_a1" time="0.024" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_030_uc_cms_004_alternative_a2" time="0.041"><failure message="AssertionError: Expected default priority 'Medium' on re-categorization to network, got 'Low'&#10;assert 'Low' == 'Medium'&#10;  &#10;  - Medium&#10;  + Low">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x0000022451779C60&gt;
+
+    def test_uc_030_uc_cms_004_alternative_a2(stub_iam):
+        """TEST-UC-030: UC-CMS-004 Alternative A2 - Re-categorization resets default priority (Defect 13)."""
+        client = auth_client(stub_iam, user_id=5000 + 30, kind="staff", roles=("complaint_handler",))
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-UC0030",
+            complainant_user_id=4000 + 30,
+            category="hostel",
+            description="Water leak.",
+            status="Submitted",
+            priority="Low"
+        )
+        # Handler reassigns to network category where institutional policy mandates default Medium priority
+        res = client.post(f"/api/v1/cms/complaints/{c.id}/assign/", data={"assigned_handler_id": 5000 + 30, "category": "network"}, format="json")
+        assert res.status_code == 200
+        c.refresh_from_db()
+        # Expected re-categorization to enforce category-specific baseline priority
+&gt;       assert c.priority == "Medium", f"Expected default priority 'Medium' on re-categorization to network, got '{c.priority}'"
+E       AssertionError: Expected default priority 'Medium' on re-categorization to network, got 'Low'
+E       assert 'Low' == 'Medium'
+E         
+E         - Medium
+E         + Low
+
+tests\a8\uc\test_uc_suite.py:519: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_031_uc_cms_004_exception_e1" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_032_uc_cms_004_exception_e2" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_033_uc_cms_005_main_flow" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_034_uc_cms_005_data_input_step" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_035_uc_cms_005_role_execution" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_036_uc_cms_005_state_transition" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_037_uc_cms_005_alternative_a1" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_038_uc_cms_005_alternative_a2" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_039_uc_cms_005_exception_e1" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_040_uc_cms_005_exception_e2" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_041_uc_cms_006_main_flow" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_042_uc_cms_006_data_input_step" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_043_uc_cms_006_role_execution" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_044_uc_cms_006_state_transition" time="0.009" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_045_uc_cms_006_alternative_a1" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_046_uc_cms_006_alternative_a2" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_047_uc_cms_006_exception_e1" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_048_uc_cms_006_exception_e2" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_049_uc_cms_007_main_flow" time="0.014" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_050_uc_cms_007_data_input_step" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_051_uc_cms_007_role_execution" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_052_uc_cms_007_state_transition" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_053_uc_cms_007_alternative_a1" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_054_uc_cms_007_alternative_a2" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_055_uc_cms_007_exception_e1" time="0.024"><failure message="AssertionError: Complainant closure verification accepted without supervisor authority (got 200)&#10;assert 200 in [400, 403]&#10; +  where 200 = &lt;Response status_code=200, &quot;application/json&quot;&gt;.status_code">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x0000022451779300&gt;
+
+    def test_uc_055_uc_cms_007_exception_e1(stub_iam):
+        """TEST-UC-055: UC-CMS-007 Exception E1 - Complainant cannot verify closure on supervisor-mandated complaint (Defect 8)."""
+        client = auth_client(stub_iam, user_id=4000 + 55, kind="student", roles=("student",))
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-UC0055",
+            complainant_user_id=4000 + 55,
+            category="academic",
+            description="Laboratory equipment damage requiring supervisor sign-off.",
+            status="Resolved",
+            requires_supervisor_verification=True
+        )
+        # Complainant attempts to call verify_closure on ticket requiring supervisor sign-off
+        res = client.post(f"/api/v1/cms/complaints/{c.id}/verify_closure/", data={"notes": "Complainant signing off."}, format="json")
+&gt;       assert res.status_code in [400, 403], f"Complainant closure verification accepted without supervisor authority (got {res.status_code})"
+E       AssertionError: Complainant closure verification accepted without supervisor authority (got 200)
+E       assert 200 in [400, 403]
+E        +  where 200 = &lt;Response status_code=200, "application/json"&gt;.status_code
+
+tests\a8\uc\test_uc_suite.py:919: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_056_uc_cms_007_exception_e2" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_057_uc_cms_008_main_flow" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_058_uc_cms_008_data_input_step" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_059_uc_cms_008_role_execution" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_060_uc_cms_008_state_transition" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_061_uc_cms_008_alternative_a1" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_062_uc_cms_008_alternative_a2" time="0.012"><failure message="AssertionError: Duplicate pending reopening request allowed&#10;assert 201 == 400&#10; +  where 201 = &lt;Response status_code=201, &quot;application/json&quot;&gt;.status_code">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x00000224517C2840&gt;
+
+    def test_uc_062_uc_cms_008_alternative_a2(stub_iam):
+        """TEST-UC-062: UC-CMS-008 Alternative A2 - Duplicate pending reopening prevention (Defect 2)."""
+        client = auth_client(stub_iam, user_id=4000 + 62)
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-UC0062",
+            complainant_user_id=4000 + 62,
+            category="maintenance",
+            description="Reopening defect verification.",
+            status="Closed"
+        )
+        # First reopening request
+        r1 = client.post(f"/api/v1/cms/complaints/{c.id}/request_reopen/", data={"dissatisfaction_reason": "Still not working."}, format="json")
+        assert r1.status_code in [200, 201]
+        # Second reopening request while first is pending must be rejected with 400
+        r2 = client.post(f"/api/v1/cms/complaints/{c.id}/request_reopen/", data={"dissatisfaction_reason": "Submitting duplicate request."}, format="json")
+&gt;       assert r2.status_code == 400, "Duplicate pending reopening request allowed"
+E       AssertionError: Duplicate pending reopening request allowed
+E       assert 201 == 400
+E        +  where 201 = &lt;Response status_code=201, "application/json"&gt;.status_code
+
+tests\a8\uc\test_uc_suite.py:1033: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_063_uc_cms_008_exception_e1" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_064_uc_cms_008_exception_e2" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_065_uc_cms_009_main_flow" time="0.015" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_066_uc_cms_009_data_input_step" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_067_uc_cms_009_role_execution" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_068_uc_cms_009_state_transition" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_069_uc_cms_009_alternative_a1" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_070_uc_cms_009_alternative_a2" time="0.013"><failure message="AssertionError: Allowed duplicate feedback for single complaint&#10;assert 201 == 400&#10; +  where 201 = &lt;Response status_code=201, &quot;application/json&quot;&gt;.status_code">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x000002245182C720&gt;
+
+    def test_uc_070_uc_cms_009_alternative_a2(stub_iam):
+        """TEST-UC-070: UC-CMS-009 Alternative A2 - Duplicate feedback rejection (Defect 5)."""
+        client = auth_client(stub_iam, user_id=4000 + 70)
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-UC0070",
+            complainant_user_id=4000 + 70,
+            category="hostel",
+            description="Duplicate feedback testing.",
+            status="Closed"
+        )
+        r1 = client.post("/api/v1/cms/feedback/", data={"complaint": c.id, "rating": 5, "comments": "Good service."}, format="json")
+        assert r1.status_code == 201
+        r2 = client.post("/api/v1/cms/feedback/", data={"complaint": c.id, "rating": 2, "comments": "Downgrading rating."}, format="json")
+&gt;       assert r2.status_code == 400, "Allowed duplicate feedback for single complaint"
+E       AssertionError: Allowed duplicate feedback for single complaint
+E       assert 201 == 400
+E        +  where 201 = &lt;Response status_code=201, "application/json"&gt;.status_code
+
+tests\a8\uc\test_uc_suite.py:1161: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_071_uc_cms_009_exception_e1" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_072_uc_cms_009_exception_e2" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_073_uc_cms_010_main_flow" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_074_uc_cms_010_data_input_step" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_075_uc_cms_010_role_execution" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_076_uc_cms_010_state_transition" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_077_uc_cms_010_alternative_a1" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_078_uc_cms_010_alternative_a2" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_079_uc_cms_010_exception_e1" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_080_uc_cms_010_exception_e2" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_081_uc_cms_011_main_flow" time="0.015"><failure message="AssertionError: Audit role recorded as complaint_handler, expected 'complainant'&#10;assert 'complaint_handler' == 'complainant'&#10;  &#10;  - complainant&#10;  + complaint_handler">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x00000224517C3920&gt;
+
+    def test_uc_081_uc_cms_011_main_flow(stub_iam):
+        """TEST-UC-081: UC-CMS-011 Main Flow - Manual escalation audit actor role (Defect 9)."""
+        client = auth_client(stub_iam, user_id=4000 + 81, kind="student", roles=("student",))
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-UC0081",
+            complainant_user_id=4000 + 81,
+            category="network",
+            description="Network switch failure.",
+            status="In Progress"
+        )
+        res = client.post(f"/api/v1/cms/complaints/{c.id}/escalate/", data={"escalation_remarks": "Urgent exam."}, format="json")
+        assert res.status_code == 200
+        p = c.progress_history.filter(action="escalated_manual").last()
+        assert p is not None
+&gt;       assert p.actor_role == "complainant", f"Audit role recorded as {p.actor_role}, expected 'complainant'"
+E       AssertionError: Audit role recorded as complaint_handler, expected 'complainant'
+E       assert 'complaint_handler' == 'complainant'
+E         
+E         - complainant
+E         + complaint_handler
+
+tests\a8\uc\test_uc_suite.py:1338: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_082_uc_cms_011_data_input_step" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_083_uc_cms_011_role_execution" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_084_uc_cms_011_state_transition" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_085_uc_cms_011_alternative_a1" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_086_uc_cms_011_alternative_a2" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_087_uc_cms_011_exception_e1" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_088_uc_cms_011_exception_e2" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_089_uc_cms_012_main_flow" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_090_uc_cms_012_data_input_step" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_091_uc_cms_012_role_execution" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_092_uc_cms_012_state_transition" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_093_uc_cms_012_alternative_a1" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_094_uc_cms_012_alternative_a2" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_095_uc_cms_012_exception_e1" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_096_uc_cms_012_exception_e2" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_097_uc_cms_013_main_flow" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_098_uc_cms_013_data_input_step" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_099_uc_cms_013_role_execution" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_100_uc_cms_013_state_transition" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_101_uc_cms_013_alternative_a1" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_102_uc_cms_013_alternative_a2" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_103_uc_cms_013_exception_e1" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_104_uc_cms_013_exception_e2" time="0.016" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_105_uc_cms_014_main_flow" time="0.016" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_106_uc_cms_014_data_input_step" time="0.018" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_107_uc_cms_014_role_execution" time="0.014" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_108_uc_cms_014_state_transition" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_109_uc_cms_014_alternative_a1" time="0.014" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_110_uc_cms_014_alternative_a2" time="0.029" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_111_uc_cms_014_exception_e1" time="0.031" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_112_uc_cms_014_exception_e2" time="0.021" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_113_uc_cms_015_main_flow" time="0.019" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_114_uc_cms_015_data_input_step" time="0.029" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_115_uc_cms_015_role_execution" time="0.027" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_116_uc_cms_015_state_transition" time="0.020" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_117_uc_cms_015_alternative_a1" time="0.024" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_118_uc_cms_015_alternative_a2" time="0.014" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_119_uc_cms_015_exception_e1" time="0.015" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_120_uc_cms_015_exception_e2" time="0.017" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_121_uc_cms_016_main_flow" time="0.023" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_122_uc_cms_016_data_input_step" time="0.028" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_123_uc_cms_016_role_execution" time="0.028" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_124_uc_cms_016_state_transition" time="0.027" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_125_uc_cms_016_alternative_a1" time="0.030" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_126_uc_cms_016_alternative_a2" time="0.025" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_127_uc_cms_016_exception_e1" time="0.026" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_128_uc_cms_016_exception_e2" time="0.099" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_129_uc_cms_017_main_flow" time="0.029" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_130_uc_cms_017_data_input_step" time="0.028" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_131_uc_cms_017_role_execution" time="0.030" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_132_uc_cms_017_state_transition" time="0.025" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_133_uc_cms_017_alternative_a1" time="0.024" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_134_uc_cms_017_alternative_a2" time="0.016" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_135_uc_cms_017_exception_e1" time="0.018" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_136_uc_cms_017_exception_e2" time="0.015" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_137_uc_cms_018_main_flow" time="0.015" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_138_uc_cms_018_data_input_step" time="0.013" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_139_uc_cms_018_role_execution" time="0.017" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_140_uc_cms_018_state_transition" time="0.019" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_141_uc_cms_018_alternative_a1" time="0.017" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_142_uc_cms_018_alternative_a2" time="0.019"><failure message="AssertionError: Overlapping active role assignment for same user accepted without conflict validation&#10;assert 201 == 400&#10; +  where 201 = &lt;Response status_code=201, &quot;application/json&quot;&gt;.status_code">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x00000224517789A0&gt;
+
+    def test_uc_142_uc_cms_018_alternative_a2(stub_iam):
+        """TEST-UC-142: UC-CMS-018 Alternative A2 - Overlapping active role dates rejection (Defect 14)."""
+        client = auth_client(stub_iam, user_id=9999, kind="staff", roles=("complaint_supervisor",))
+        r1 = CmsRoleAssignment.objects.create(
+            user_id=8142,
+            role_type="complaint_handler",
+            start_date=date(2026, 1, 1),
+            end_date=date(2026, 6, 30),
+            is_active=True,
+            assigned_by_id=9999
+        )
+        # Assign same user an overlapping active role period
+        res = client.post("/api/v1/cms/roles/", data={
+            "user_id": 8142,
+            "role_type": "complaint_handler",
+            "start_date": "2026-03-01",
+            "end_date": "2026-09-30",
+            "is_active": True
+        }, format="json")
+&gt;       assert res.status_code == 400, "Overlapping active role assignment for same user accepted without conflict validation"
+E       AssertionError: Overlapping active role assignment for same user accepted without conflict validation
+E       assert 201 == 400
+E        +  where 201 = &lt;Response status_code=201, "application/json"&gt;.status_code
+
+tests\a8\uc\test_uc_suite.py:2320: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_143_uc_cms_018_exception_e1" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_144_uc_cms_018_exception_e2" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_145_uc_cms_019_main_flow" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_146_uc_cms_019_data_input_step" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_147_uc_cms_019_role_execution" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_148_uc_cms_019_state_transition" time="0.010" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_149_uc_cms_019_alternative_a1" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_150_uc_cms_019_alternative_a2" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_151_uc_cms_019_exception_e1" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_152_uc_cms_019_exception_e2" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_153_uc_cms_020_main_flow" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_154_uc_cms_020_data_input_step" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_155_uc_cms_020_role_execution" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_156_uc_cms_020_state_transition" time="0.016" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_157_uc_cms_020_alternative_a1" time="0.016" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_158_uc_cms_020_alternative_a2" time="0.015" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_159_uc_cms_020_exception_e1" time="0.013" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_160_uc_cms_020_exception_e2" time="0.013" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_161_uc_cms_021_main_flow" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_162_uc_cms_021_data_input_step" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_163_uc_cms_021_role_execution" time="0.013" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_164_uc_cms_021_state_transition" time="0.014" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_165_uc_cms_021_alternative_a1" time="0.014" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_166_uc_cms_021_alternative_a2" time="0.011"><failure message="AssertionError: Pre-breach reminder triggered immediately with 23h remaining on 24h SLA&#10;assert True is False&#10; +  where True = &lt;Complaint: CMS-2026-UC0166 (In Progress)&gt;.sla_reminder_sent">stub_iam = &lt;function stub_iam.&lt;locals&gt;._install at 0x0000022451779620&gt;
+
+    def test_uc_166_uc_cms_021_alternative_a2(stub_iam):
+        """TEST-UC-166: UC-CMS-021 Alternative A2 - Pre-breach reminder window for High priority (Defect 10)."""
+        client = auth_client(stub_iam, user_id=4000 + 166)
+        # High priority complaint created just now, due in 23 hours (SLA = 24h)
+        c = Complaint.objects.create(
+            complaint_id="CMS-2026-UC0166",
+            complainant_user_id=4000 + 166,
+            category="mess",
+            description="Mess freezer breakdown.",
+            status="In Progress",
+            priority="High",
+            sla_due_date=timezone.now() + timedelta(hours=23),
+            sla_reminder_sent=False
+        )
+        # SLA sweep should NOT send pre-breach reminder when full SLA is 24h and 23h remains (threshold is 12h)
+        res = client.post("/api/v1/cms/complaints/check_sla/", format="json")
+        assert res.status_code == 200
+        c.refresh_from_db()
+&gt;       assert c.sla_reminder_sent is False, "Pre-breach reminder triggered immediately with 23h remaining on 24h SLA"
+E       AssertionError: Pre-breach reminder triggered immediately with 23h remaining on 24h SLA
+E       assert True is False
+E        +  where True = &lt;Complaint: CMS-2026-UC0166 (In Progress)&gt;.sla_reminder_sent
+
+tests\a8\uc\test_uc_suite.py:2709: AssertionError</failure></testcase><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_167_uc_cms_021_exception_e1" time="0.013" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_168_uc_cms_021_exception_e2" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_169_uc_cms_022_main_flow" time="0.013" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_170_uc_cms_022_data_input_step" time="0.012" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_171_uc_cms_022_role_execution" time="0.011" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_172_uc_cms_022_state_transition" time="0.013" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_173_uc_cms_022_alternative_a1" time="0.015" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_174_uc_cms_022_alternative_a2" time="0.013" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_175_uc_cms_022_exception_e1" time="0.014" /><testcase classname="tests.a8.uc.test_uc_suite" name="test_uc_176_uc_cms_022_exception_e2" time="0.013" /></testsuite></testsuites>

@@ -1,0 +1,1487 @@
+[
+  {
+    "test_id": "TEST-WF-001",
+    "source_id": "BW-CMS-01 nominal_flow",
+    "purpose": "Complaint Intake to Resolved - Verify nominal full lifecycle path execution.",
+    "preconditions": "System state initialized for BW-CMS-01.",
+    "action_or_input": "Execute state transitions for BW-CMS-01 nominal_flow.",
+    "expected_result": "Workflow proceeds according to nominal_flow specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-002",
+    "source_id": "BW-CMS-01 step1_intake",
+    "purpose": "Complaint Intake to Resolved - Verify intake submission state and initial transitions.",
+    "preconditions": "System state initialized for BW-CMS-01.",
+    "action_or_input": "Execute state transitions for BW-CMS-01 step1_intake.",
+    "expected_result": "Workflow proceeds according to step1_intake specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-003",
+    "source_id": "BW-CMS-01 step2_assignment",
+    "purpose": "Complaint Intake to Resolved - Verify triage and operational assignment transition.",
+    "preconditions": "System state initialized for BW-CMS-01.",
+    "action_or_input": "Execute state transitions for BW-CMS-01 step2_assignment.",
+    "expected_result": "Workflow proceeds according to step2_assignment specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-004",
+    "source_id": "BW-CMS-01 step3_progress",
+    "purpose": "Complaint Intake to Resolved - Verify active investigation progress step transitions.",
+    "preconditions": "System state initialized for BW-CMS-01.",
+    "action_or_input": "Execute state transitions for BW-CMS-01 step3_progress.",
+    "expected_result": "Workflow proceeds according to step3_progress specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-005",
+    "source_id": "BW-CMS-01 step4_resolution",
+    "purpose": "Complaint Intake to Resolved - Verify outcome resolution state transition.",
+    "preconditions": "System state initialized for BW-CMS-01.",
+    "action_or_input": "Execute state transitions for BW-CMS-01 step4_resolution.",
+    "expected_result": "Workflow proceeds according to step4_resolution specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-006",
+    "source_id": "BW-CMS-01 step5_closure",
+    "purpose": "Complaint Intake to Resolved - Verify closure verification transition and timestamping.",
+    "preconditions": "System state initialized for BW-CMS-01.",
+    "action_or_input": "Execute state transitions for BW-CMS-01 step5_closure.",
+    "expected_result": "Workflow proceeds according to step5_closure specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-007",
+    "source_id": "BW-CMS-01 path_complainant_signoff",
+    "purpose": "Complaint Intake to Resolved - Verify complainant dual-path verification branch.",
+    "preconditions": "System state initialized for BW-CMS-01.",
+    "action_or_input": "Execute state transitions for BW-CMS-01 path_complainant_signoff.",
+    "expected_result": "Workflow proceeds according to path_complainant_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-008",
+    "source_id": "BW-CMS-01 path_supervisor_signoff",
+    "purpose": "Complaint Intake to Resolved - Verify supervisor dual-path verification branch.",
+    "preconditions": "System state initialized for BW-CMS-01.",
+    "action_or_input": "Execute state transitions for BW-CMS-01 path_supervisor_signoff.",
+    "expected_result": "Workflow proceeds according to path_supervisor_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-009",
+    "source_id": "BW-CMS-01 illegal_transition_rejection",
+    "purpose": "Complaint Intake to Resolved - Verify rejection of invalid out-of-order state transitions.",
+    "preconditions": "System state initialized for BW-CMS-01.",
+    "action_or_input": "Execute state transitions for BW-CMS-01 illegal_transition_rejection.",
+    "expected_result": "Workflow proceeds according to illegal_transition_rejection specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-010",
+    "source_id": "BW-CMS-01 terminal_mutation_guard",
+    "purpose": "Complaint Intake to Resolved - Verify immutable protection of terminal lifecycle states.",
+    "preconditions": "System state initialized for BW-CMS-01.",
+    "action_or_input": "Execute state transitions for BW-CMS-01 terminal_mutation_guard.",
+    "expected_result": "Workflow proceeds according to terminal_mutation_guard specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-011",
+    "source_id": "BW-CMS-01 reopen_initiation_path",
+    "purpose": "Complaint Intake to Resolved - Verify reopening request registration path.",
+    "preconditions": "System state initialized for BW-CMS-01.",
+    "action_or_input": "Execute state transitions for BW-CMS-01 reopen_initiation_path.",
+    "expected_result": "Workflow proceeds according to reopen_initiation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-012",
+    "source_id": "BW-CMS-01 reopen_adjudication_path",
+    "purpose": "Complaint Intake to Resolved - Verify reopening decision outcome state transition.",
+    "preconditions": "System state initialized for BW-CMS-01.",
+    "action_or_input": "Execute state transitions for BW-CMS-01 reopen_adjudication_path.",
+    "expected_result": "Workflow proceeds according to reopen_adjudication_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-013",
+    "source_id": "BW-CMS-01 manual_escalation_path",
+    "purpose": "Complaint Intake to Resolved - Verify manual escalation path and audit recording.",
+    "preconditions": "System state initialized for BW-CMS-01.",
+    "action_or_input": "Execute state transitions for BW-CMS-01 manual_escalation_path.",
+    "expected_result": "Workflow proceeds according to manual_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-014",
+    "source_id": "BW-CMS-01 sla_escalation_path",
+    "purpose": "Complaint Intake to Resolved - Verify autonomous SLA breach escalation sweep path.",
+    "preconditions": "System state initialized for BW-CMS-01.",
+    "action_or_input": "Execute state transitions for BW-CMS-01 sla_escalation_path.",
+    "expected_result": "Workflow proceeds according to sla_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-015",
+    "source_id": "BW-CMS-01 concurrent_audit_integrity",
+    "purpose": "Complaint Intake to Resolved - Verify sequential timestamped audit trail integrity.",
+    "preconditions": "System state initialized for BW-CMS-01.",
+    "action_or_input": "Execute state transitions for BW-CMS-01 concurrent_audit_integrity.",
+    "expected_result": "Workflow proceeds according to concurrent_audit_integrity specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-016",
+    "source_id": "BW-CMS-02 nominal_flow",
+    "purpose": "Complaint Intake to User-Verified Closure - Verify nominal full lifecycle path execution.",
+    "preconditions": "System state initialized for BW-CMS-02.",
+    "action_or_input": "Execute state transitions for BW-CMS-02 nominal_flow.",
+    "expected_result": "Workflow proceeds according to nominal_flow specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-017",
+    "source_id": "BW-CMS-02 step1_intake",
+    "purpose": "Complaint Intake to User-Verified Closure - Verify intake submission state and initial transitions.",
+    "preconditions": "System state initialized for BW-CMS-02.",
+    "action_or_input": "Execute state transitions for BW-CMS-02 step1_intake.",
+    "expected_result": "Workflow proceeds according to step1_intake specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-018",
+    "source_id": "BW-CMS-02 step2_assignment",
+    "purpose": "Complaint Intake to User-Verified Closure - Verify triage and operational assignment transition.",
+    "preconditions": "System state initialized for BW-CMS-02.",
+    "action_or_input": "Execute state transitions for BW-CMS-02 step2_assignment.",
+    "expected_result": "Workflow proceeds according to step2_assignment specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-019",
+    "source_id": "BW-CMS-02 step3_progress",
+    "purpose": "Complaint Intake to User-Verified Closure - Verify active investigation progress step transitions.",
+    "preconditions": "System state initialized for BW-CMS-02.",
+    "action_or_input": "Execute state transitions for BW-CMS-02 step3_progress.",
+    "expected_result": "Workflow proceeds according to step3_progress specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-020",
+    "source_id": "BW-CMS-02 step4_resolution",
+    "purpose": "Complaint Intake to User-Verified Closure - Verify outcome resolution state transition.",
+    "preconditions": "System state initialized for BW-CMS-02.",
+    "action_or_input": "Execute state transitions for BW-CMS-02 step4_resolution.",
+    "expected_result": "Workflow proceeds according to step4_resolution specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-021",
+    "source_id": "BW-CMS-02 step5_closure",
+    "purpose": "Complaint Intake to User-Verified Closure - Verify closure verification transition and timestamping.",
+    "preconditions": "System state initialized for BW-CMS-02.",
+    "action_or_input": "Execute state transitions for BW-CMS-02 step5_closure.",
+    "expected_result": "Workflow proceeds according to step5_closure specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-022",
+    "source_id": "BW-CMS-02 path_complainant_signoff",
+    "purpose": "Verify High priority SLA calculation sets 24-hour due date in intake workflow (Defect 1).",
+    "preconditions": "System state initialized for BW-CMS-02.",
+    "action_or_input": "Execute state transitions for BW-CMS-02 path_complainant_signoff.",
+    "expected_result": "Workflow proceeds according to path_complainant_signoff specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-WF-023",
+    "source_id": "BW-CMS-02 path_supervisor_signoff",
+    "purpose": "Complaint Intake to User-Verified Closure - Verify supervisor dual-path verification branch.",
+    "preconditions": "System state initialized for BW-CMS-02.",
+    "action_or_input": "Execute state transitions for BW-CMS-02 path_supervisor_signoff.",
+    "expected_result": "Workflow proceeds according to path_supervisor_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-024",
+    "source_id": "BW-CMS-02 illegal_transition_rejection",
+    "purpose": "Complaint Intake to User-Verified Closure - Verify rejection of invalid out-of-order state transitions.",
+    "preconditions": "System state initialized for BW-CMS-02.",
+    "action_or_input": "Execute state transitions for BW-CMS-02 illegal_transition_rejection.",
+    "expected_result": "Workflow proceeds according to illegal_transition_rejection specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-025",
+    "source_id": "BW-CMS-02 terminal_mutation_guard",
+    "purpose": "Complaint Intake to User-Verified Closure - Verify immutable protection of terminal lifecycle states.",
+    "preconditions": "System state initialized for BW-CMS-02.",
+    "action_or_input": "Execute state transitions for BW-CMS-02 terminal_mutation_guard.",
+    "expected_result": "Workflow proceeds according to terminal_mutation_guard specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-026",
+    "source_id": "BW-CMS-02 reopen_initiation_path",
+    "purpose": "Complaint Intake to User-Verified Closure - Verify reopening request registration path.",
+    "preconditions": "System state initialized for BW-CMS-02.",
+    "action_or_input": "Execute state transitions for BW-CMS-02 reopen_initiation_path.",
+    "expected_result": "Workflow proceeds according to reopen_initiation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-027",
+    "source_id": "BW-CMS-02 reopen_adjudication_path",
+    "purpose": "Complaint Intake to User-Verified Closure - Verify reopening decision outcome state transition.",
+    "preconditions": "System state initialized for BW-CMS-02.",
+    "action_or_input": "Execute state transitions for BW-CMS-02 reopen_adjudication_path.",
+    "expected_result": "Workflow proceeds according to reopen_adjudication_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-028",
+    "source_id": "BW-CMS-02 manual_escalation_path",
+    "purpose": "Complaint Intake to User-Verified Closure - Verify manual escalation path and audit recording.",
+    "preconditions": "System state initialized for BW-CMS-02.",
+    "action_or_input": "Execute state transitions for BW-CMS-02 manual_escalation_path.",
+    "expected_result": "Workflow proceeds according to manual_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-029",
+    "source_id": "BW-CMS-02 sla_escalation_path",
+    "purpose": "Complaint Intake to User-Verified Closure - Verify autonomous SLA breach escalation sweep path.",
+    "preconditions": "System state initialized for BW-CMS-02.",
+    "action_or_input": "Execute state transitions for BW-CMS-02 sla_escalation_path.",
+    "expected_result": "Workflow proceeds according to sla_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-030",
+    "source_id": "BW-CMS-02 concurrent_audit_integrity",
+    "purpose": "Complaint Intake to User-Verified Closure - Verify sequential timestamped audit trail integrity.",
+    "preconditions": "System state initialized for BW-CMS-02.",
+    "action_or_input": "Execute state transitions for BW-CMS-02 concurrent_audit_integrity.",
+    "expected_result": "Workflow proceeds according to concurrent_audit_integrity specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-031",
+    "source_id": "BW-CMS-03 nominal_flow",
+    "purpose": "Complaint Intake to Supervisor-Verified Closure - Verify nominal full lifecycle path execution.",
+    "preconditions": "System state initialized for BW-CMS-03.",
+    "action_or_input": "Execute state transitions for BW-CMS-03 nominal_flow.",
+    "expected_result": "Workflow proceeds according to nominal_flow specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-032",
+    "source_id": "BW-CMS-03 step1_intake",
+    "purpose": "Complaint Intake to Supervisor-Verified Closure - Verify intake submission state and initial transitions.",
+    "preconditions": "System state initialized for BW-CMS-03.",
+    "action_or_input": "Execute state transitions for BW-CMS-03 step1_intake.",
+    "expected_result": "Workflow proceeds according to step1_intake specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-033",
+    "source_id": "BW-CMS-03 step2_assignment",
+    "purpose": "Complaint Intake to Supervisor-Verified Closure - Verify triage and operational assignment transition.",
+    "preconditions": "System state initialized for BW-CMS-03.",
+    "action_or_input": "Execute state transitions for BW-CMS-03 step2_assignment.",
+    "expected_result": "Workflow proceeds according to step2_assignment specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-034",
+    "source_id": "BW-CMS-03 step3_progress",
+    "purpose": "Complaint Intake to Supervisor-Verified Closure - Verify active investigation progress step transitions.",
+    "preconditions": "System state initialized for BW-CMS-03.",
+    "action_or_input": "Execute state transitions for BW-CMS-03 step3_progress.",
+    "expected_result": "Workflow proceeds according to step3_progress specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-035",
+    "source_id": "BW-CMS-03 step4_resolution",
+    "purpose": "Complaint Intake to Supervisor-Verified Closure - Verify outcome resolution state transition.",
+    "preconditions": "System state initialized for BW-CMS-03.",
+    "action_or_input": "Execute state transitions for BW-CMS-03 step4_resolution.",
+    "expected_result": "Workflow proceeds according to step4_resolution specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-036",
+    "source_id": "BW-CMS-03 step5_closure",
+    "purpose": "Complaint Intake to Supervisor-Verified Closure - Verify closure verification transition and timestamping.",
+    "preconditions": "System state initialized for BW-CMS-03.",
+    "action_or_input": "Execute state transitions for BW-CMS-03 step5_closure.",
+    "expected_result": "Workflow proceeds according to step5_closure specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-037",
+    "source_id": "BW-CMS-03 path_complainant_signoff",
+    "purpose": "Complaint Intake to Supervisor-Verified Closure - Verify complainant dual-path verification branch.",
+    "preconditions": "System state initialized for BW-CMS-03.",
+    "action_or_input": "Execute state transitions for BW-CMS-03 path_complainant_signoff.",
+    "expected_result": "Workflow proceeds according to path_complainant_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-038",
+    "source_id": "BW-CMS-03 path_supervisor_signoff",
+    "purpose": "Verify complainant verification does not close supervisor-mandated ticket (Defect 8).",
+    "preconditions": "System state initialized for BW-CMS-03.",
+    "action_or_input": "Execute state transitions for BW-CMS-03 path_supervisor_signoff.",
+    "expected_result": "Workflow proceeds according to path_supervisor_signoff specification.",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-WF-039",
+    "source_id": "BW-CMS-03 illegal_transition_rejection",
+    "purpose": "Complaint Intake to Supervisor-Verified Closure - Verify rejection of invalid out-of-order state transitions.",
+    "preconditions": "System state initialized for BW-CMS-03.",
+    "action_or_input": "Execute state transitions for BW-CMS-03 illegal_transition_rejection.",
+    "expected_result": "Workflow proceeds according to illegal_transition_rejection specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-040",
+    "source_id": "BW-CMS-03 terminal_mutation_guard",
+    "purpose": "Complaint Intake to Supervisor-Verified Closure - Verify immutable protection of terminal lifecycle states.",
+    "preconditions": "System state initialized for BW-CMS-03.",
+    "action_or_input": "Execute state transitions for BW-CMS-03 terminal_mutation_guard.",
+    "expected_result": "Workflow proceeds according to terminal_mutation_guard specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-041",
+    "source_id": "BW-CMS-03 reopen_initiation_path",
+    "purpose": "Complaint Intake to Supervisor-Verified Closure - Verify reopening request registration path.",
+    "preconditions": "System state initialized for BW-CMS-03.",
+    "action_or_input": "Execute state transitions for BW-CMS-03 reopen_initiation_path.",
+    "expected_result": "Workflow proceeds according to reopen_initiation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-042",
+    "source_id": "BW-CMS-03 reopen_adjudication_path",
+    "purpose": "Complaint Intake to Supervisor-Verified Closure - Verify reopening decision outcome state transition.",
+    "preconditions": "System state initialized for BW-CMS-03.",
+    "action_or_input": "Execute state transitions for BW-CMS-03 reopen_adjudication_path.",
+    "expected_result": "Workflow proceeds according to reopen_adjudication_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-043",
+    "source_id": "BW-CMS-03 manual_escalation_path",
+    "purpose": "Complaint Intake to Supervisor-Verified Closure - Verify manual escalation path and audit recording.",
+    "preconditions": "System state initialized for BW-CMS-03.",
+    "action_or_input": "Execute state transitions for BW-CMS-03 manual_escalation_path.",
+    "expected_result": "Workflow proceeds according to manual_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-044",
+    "source_id": "BW-CMS-03 sla_escalation_path",
+    "purpose": "Complaint Intake to Supervisor-Verified Closure - Verify autonomous SLA breach escalation sweep path.",
+    "preconditions": "System state initialized for BW-CMS-03.",
+    "action_or_input": "Execute state transitions for BW-CMS-03 sla_escalation_path.",
+    "expected_result": "Workflow proceeds according to sla_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-045",
+    "source_id": "BW-CMS-03 concurrent_audit_integrity",
+    "purpose": "Complaint Intake to Supervisor-Verified Closure - Verify sequential timestamped audit trail integrity.",
+    "preconditions": "System state initialized for BW-CMS-03.",
+    "action_or_input": "Execute state transitions for BW-CMS-03 concurrent_audit_integrity.",
+    "expected_result": "Workflow proceeds according to concurrent_audit_integrity specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-046",
+    "source_id": "BW-CMS-04 nominal_flow",
+    "purpose": "Complaint Intake to Rejection - Verify nominal full lifecycle path execution.",
+    "preconditions": "System state initialized for BW-CMS-04.",
+    "action_or_input": "Execute state transitions for BW-CMS-04 nominal_flow.",
+    "expected_result": "Workflow proceeds according to nominal_flow specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-047",
+    "source_id": "BW-CMS-04 step1_intake",
+    "purpose": "Complaint Intake to Rejection - Verify intake submission state and initial transitions.",
+    "preconditions": "System state initialized for BW-CMS-04.",
+    "action_or_input": "Execute state transitions for BW-CMS-04 step1_intake.",
+    "expected_result": "Workflow proceeds according to step1_intake specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-048",
+    "source_id": "BW-CMS-04 step2_assignment",
+    "purpose": "Complaint Intake to Rejection - Verify triage and operational assignment transition.",
+    "preconditions": "System state initialized for BW-CMS-04.",
+    "action_or_input": "Execute state transitions for BW-CMS-04 step2_assignment.",
+    "expected_result": "Workflow proceeds according to step2_assignment specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-049",
+    "source_id": "BW-CMS-04 step3_progress",
+    "purpose": "Complaint Intake to Rejection - Verify active investigation progress step transitions.",
+    "preconditions": "System state initialized for BW-CMS-04.",
+    "action_or_input": "Execute state transitions for BW-CMS-04 step3_progress.",
+    "expected_result": "Workflow proceeds according to step3_progress specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-050",
+    "source_id": "BW-CMS-04 step4_resolution",
+    "purpose": "Complaint Intake to Rejection - Verify outcome resolution state transition.",
+    "preconditions": "System state initialized for BW-CMS-04.",
+    "action_or_input": "Execute state transitions for BW-CMS-04 step4_resolution.",
+    "expected_result": "Workflow proceeds according to step4_resolution specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-051",
+    "source_id": "BW-CMS-04 step5_closure",
+    "purpose": "Complaint Intake to Rejection - Verify closure verification transition and timestamping.",
+    "preconditions": "System state initialized for BW-CMS-04.",
+    "action_or_input": "Execute state transitions for BW-CMS-04 step5_closure.",
+    "expected_result": "Workflow proceeds according to step5_closure specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-052",
+    "source_id": "BW-CMS-04 path_complainant_signoff",
+    "purpose": "Complaint Intake to Rejection - Verify complainant dual-path verification branch.",
+    "preconditions": "System state initialized for BW-CMS-04.",
+    "action_or_input": "Execute state transitions for BW-CMS-04 path_complainant_signoff.",
+    "expected_result": "Workflow proceeds according to path_complainant_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-053",
+    "source_id": "BW-CMS-04 path_supervisor_signoff",
+    "purpose": "Complaint Intake to Rejection - Verify supervisor dual-path verification branch.",
+    "preconditions": "System state initialized for BW-CMS-04.",
+    "action_or_input": "Execute state transitions for BW-CMS-04 path_supervisor_signoff.",
+    "expected_result": "Workflow proceeds according to path_supervisor_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-054",
+    "source_id": "BW-CMS-04 illegal_transition_rejection",
+    "purpose": "Complaint Intake to Rejection - Verify rejection of invalid out-of-order state transitions.",
+    "preconditions": "System state initialized for BW-CMS-04.",
+    "action_or_input": "Execute state transitions for BW-CMS-04 illegal_transition_rejection.",
+    "expected_result": "Workflow proceeds according to illegal_transition_rejection specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-055",
+    "source_id": "BW-CMS-04 terminal_mutation_guard",
+    "purpose": "Complaint Intake to Rejection - Verify immutable protection of terminal lifecycle states.",
+    "preconditions": "System state initialized for BW-CMS-04.",
+    "action_or_input": "Execute state transitions for BW-CMS-04 terminal_mutation_guard.",
+    "expected_result": "Workflow proceeds according to terminal_mutation_guard specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-056",
+    "source_id": "BW-CMS-04 reopen_initiation_path",
+    "purpose": "Complaint Intake to Rejection - Verify reopening request registration path.",
+    "preconditions": "System state initialized for BW-CMS-04.",
+    "action_or_input": "Execute state transitions for BW-CMS-04 reopen_initiation_path.",
+    "expected_result": "Workflow proceeds according to reopen_initiation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-057",
+    "source_id": "BW-CMS-04 reopen_adjudication_path",
+    "purpose": "Verify update_progress on Rejected complaint is rejected as illegal transition (Defect 17).",
+    "preconditions": "System state initialized for BW-CMS-04.",
+    "action_or_input": "Execute state transitions for BW-CMS-04 reopen_adjudication_path.",
+    "expected_result": "Workflow proceeds according to reopen_adjudication_path specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-058",
+    "source_id": "BW-CMS-04 manual_escalation_path",
+    "purpose": "Complaint Intake to Rejection - Verify manual escalation path and audit recording.",
+    "preconditions": "System state initialized for BW-CMS-04.",
+    "action_or_input": "Execute state transitions for BW-CMS-04 manual_escalation_path.",
+    "expected_result": "Workflow proceeds according to manual_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-059",
+    "source_id": "BW-CMS-04 sla_escalation_path",
+    "purpose": "Complaint Intake to Rejection - Verify autonomous SLA breach escalation sweep path.",
+    "preconditions": "System state initialized for BW-CMS-04.",
+    "action_or_input": "Execute state transitions for BW-CMS-04 sla_escalation_path.",
+    "expected_result": "Workflow proceeds according to sla_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-060",
+    "source_id": "BW-CMS-04 concurrent_audit_integrity",
+    "purpose": "Complaint Intake to Rejection - Verify sequential timestamped audit trail integrity.",
+    "preconditions": "System state initialized for BW-CMS-04.",
+    "action_or_input": "Execute state transitions for BW-CMS-04 concurrent_audit_integrity.",
+    "expected_result": "Workflow proceeds according to concurrent_audit_integrity specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-061",
+    "source_id": "BW-CMS-05 nominal_flow",
+    "purpose": "Reopening Request Denied - Verify nominal full lifecycle path execution.",
+    "preconditions": "System state initialized for BW-CMS-05.",
+    "action_or_input": "Execute state transitions for BW-CMS-05 nominal_flow.",
+    "expected_result": "Workflow proceeds according to nominal_flow specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-062",
+    "source_id": "BW-CMS-05 step1_intake",
+    "purpose": "Reopening Request Denied - Verify intake submission state and initial transitions.",
+    "preconditions": "System state initialized for BW-CMS-05.",
+    "action_or_input": "Execute state transitions for BW-CMS-05 step1_intake.",
+    "expected_result": "Workflow proceeds according to step1_intake specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-063",
+    "source_id": "BW-CMS-05 step2_assignment",
+    "purpose": "Reopening Request Denied - Verify triage and operational assignment transition.",
+    "preconditions": "System state initialized for BW-CMS-05.",
+    "action_or_input": "Execute state transitions for BW-CMS-05 step2_assignment.",
+    "expected_result": "Workflow proceeds according to step2_assignment specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-064",
+    "source_id": "BW-CMS-05 step3_progress",
+    "purpose": "Reopening Request Denied - Verify active investigation progress step transitions.",
+    "preconditions": "System state initialized for BW-CMS-05.",
+    "action_or_input": "Execute state transitions for BW-CMS-05 step3_progress.",
+    "expected_result": "Workflow proceeds according to step3_progress specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-065",
+    "source_id": "BW-CMS-05 step4_resolution",
+    "purpose": "Reopening Request Denied - Verify outcome resolution state transition.",
+    "preconditions": "System state initialized for BW-CMS-05.",
+    "action_or_input": "Execute state transitions for BW-CMS-05 step4_resolution.",
+    "expected_result": "Workflow proceeds according to step4_resolution specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-066",
+    "source_id": "BW-CMS-05 step5_closure",
+    "purpose": "Reopening Request Denied - Verify closure verification transition and timestamping.",
+    "preconditions": "System state initialized for BW-CMS-05.",
+    "action_or_input": "Execute state transitions for BW-CMS-05 step5_closure.",
+    "expected_result": "Workflow proceeds according to step5_closure specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-067",
+    "source_id": "BW-CMS-05 path_complainant_signoff",
+    "purpose": "Reopening Request Denied - Verify complainant dual-path verification branch.",
+    "preconditions": "System state initialized for BW-CMS-05.",
+    "action_or_input": "Execute state transitions for BW-CMS-05 path_complainant_signoff.",
+    "expected_result": "Workflow proceeds according to path_complainant_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-068",
+    "source_id": "BW-CMS-05 path_supervisor_signoff",
+    "purpose": "Verify reopen denied decision keeps ticket closed and clears pending status (Defect 4).",
+    "preconditions": "System state initialized for BW-CMS-05.",
+    "action_or_input": "Execute state transitions for BW-CMS-05 path_supervisor_signoff.",
+    "expected_result": "Workflow proceeds according to path_supervisor_signoff specification.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-069",
+    "source_id": "BW-CMS-05 illegal_transition_rejection",
+    "purpose": "Reopening Request Denied - Verify rejection of invalid out-of-order state transitions.",
+    "preconditions": "System state initialized for BW-CMS-05.",
+    "action_or_input": "Execute state transitions for BW-CMS-05 illegal_transition_rejection.",
+    "expected_result": "Workflow proceeds according to illegal_transition_rejection specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-070",
+    "source_id": "BW-CMS-05 terminal_mutation_guard",
+    "purpose": "Reopening Request Denied - Verify immutable protection of terminal lifecycle states.",
+    "preconditions": "System state initialized for BW-CMS-05.",
+    "action_or_input": "Execute state transitions for BW-CMS-05 terminal_mutation_guard.",
+    "expected_result": "Workflow proceeds according to terminal_mutation_guard specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-071",
+    "source_id": "BW-CMS-05 reopen_initiation_path",
+    "purpose": "Reopening Request Denied - Verify reopening request registration path.",
+    "preconditions": "System state initialized for BW-CMS-05.",
+    "action_or_input": "Execute state transitions for BW-CMS-05 reopen_initiation_path.",
+    "expected_result": "Workflow proceeds according to reopen_initiation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-072",
+    "source_id": "BW-CMS-05 reopen_adjudication_path",
+    "purpose": "Reopening Request Denied - Verify reopening decision outcome state transition.",
+    "preconditions": "System state initialized for BW-CMS-05.",
+    "action_or_input": "Execute state transitions for BW-CMS-05 reopen_adjudication_path.",
+    "expected_result": "Workflow proceeds according to reopen_adjudication_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-073",
+    "source_id": "BW-CMS-05 manual_escalation_path",
+    "purpose": "Reopening Request Denied - Verify manual escalation path and audit recording.",
+    "preconditions": "System state initialized for BW-CMS-05.",
+    "action_or_input": "Execute state transitions for BW-CMS-05 manual_escalation_path.",
+    "expected_result": "Workflow proceeds according to manual_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-074",
+    "source_id": "BW-CMS-05 sla_escalation_path",
+    "purpose": "Reopening Request Denied - Verify autonomous SLA breach escalation sweep path.",
+    "preconditions": "System state initialized for BW-CMS-05.",
+    "action_or_input": "Execute state transitions for BW-CMS-05 sla_escalation_path.",
+    "expected_result": "Workflow proceeds according to sla_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-075",
+    "source_id": "BW-CMS-05 concurrent_audit_integrity",
+    "purpose": "Reopening Request Denied - Verify sequential timestamped audit trail integrity.",
+    "preconditions": "System state initialized for BW-CMS-05.",
+    "action_or_input": "Execute state transitions for BW-CMS-05 concurrent_audit_integrity.",
+    "expected_result": "Workflow proceeds according to concurrent_audit_integrity specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-076",
+    "source_id": "BW-CMS-06 nominal_flow",
+    "purpose": "Reopening Request Approved - Verify nominal full lifecycle path execution.",
+    "preconditions": "System state initialized for BW-CMS-06.",
+    "action_or_input": "Execute state transitions for BW-CMS-06 nominal_flow.",
+    "expected_result": "Workflow proceeds according to nominal_flow specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-077",
+    "source_id": "BW-CMS-06 step1_intake",
+    "purpose": "Reopening Request Approved - Verify intake submission state and initial transitions.",
+    "preconditions": "System state initialized for BW-CMS-06.",
+    "action_or_input": "Execute state transitions for BW-CMS-06 step1_intake.",
+    "expected_result": "Workflow proceeds according to step1_intake specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-078",
+    "source_id": "BW-CMS-06 step2_assignment",
+    "purpose": "Reopening Request Approved - Verify triage and operational assignment transition.",
+    "preconditions": "System state initialized for BW-CMS-06.",
+    "action_or_input": "Execute state transitions for BW-CMS-06 step2_assignment.",
+    "expected_result": "Workflow proceeds according to step2_assignment specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-079",
+    "source_id": "BW-CMS-06 step3_progress",
+    "purpose": "Reopening Request Approved - Verify active investigation progress step transitions.",
+    "preconditions": "System state initialized for BW-CMS-06.",
+    "action_or_input": "Execute state transitions for BW-CMS-06 step3_progress.",
+    "expected_result": "Workflow proceeds according to step3_progress specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-080",
+    "source_id": "BW-CMS-06 step4_resolution",
+    "purpose": "Reopening Request Approved - Verify outcome resolution state transition.",
+    "preconditions": "System state initialized for BW-CMS-06.",
+    "action_or_input": "Execute state transitions for BW-CMS-06 step4_resolution.",
+    "expected_result": "Workflow proceeds according to step4_resolution specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-081",
+    "source_id": "BW-CMS-06 step5_closure",
+    "purpose": "Reopening Request Approved - Verify closure verification transition and timestamping.",
+    "preconditions": "System state initialized for BW-CMS-06.",
+    "action_or_input": "Execute state transitions for BW-CMS-06 step5_closure.",
+    "expected_result": "Workflow proceeds according to step5_closure specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-082",
+    "source_id": "BW-CMS-06 path_complainant_signoff",
+    "purpose": "Reopening Request Approved - Verify complainant dual-path verification branch.",
+    "preconditions": "System state initialized for BW-CMS-06.",
+    "action_or_input": "Execute state transitions for BW-CMS-06 path_complainant_signoff.",
+    "expected_result": "Workflow proceeds according to path_complainant_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-083",
+    "source_id": "BW-CMS-06 path_supervisor_signoff",
+    "purpose": "Reopening Request Approved - Verify supervisor dual-path verification branch.",
+    "preconditions": "System state initialized for BW-CMS-06.",
+    "action_or_input": "Execute state transitions for BW-CMS-06 path_supervisor_signoff.",
+    "expected_result": "Workflow proceeds according to path_supervisor_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-084",
+    "source_id": "BW-CMS-06 illegal_transition_rejection",
+    "purpose": "Reopening Request Approved - Verify rejection of invalid out-of-order state transitions.",
+    "preconditions": "System state initialized for BW-CMS-06.",
+    "action_or_input": "Execute state transitions for BW-CMS-06 illegal_transition_rejection.",
+    "expected_result": "Workflow proceeds according to illegal_transition_rejection specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-085",
+    "source_id": "BW-CMS-06 terminal_mutation_guard",
+    "purpose": "Reopening Request Approved - Verify immutable protection of terminal lifecycle states.",
+    "preconditions": "System state initialized for BW-CMS-06.",
+    "action_or_input": "Execute state transitions for BW-CMS-06 terminal_mutation_guard.",
+    "expected_result": "Workflow proceeds according to terminal_mutation_guard specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-086",
+    "source_id": "BW-CMS-06 reopen_initiation_path",
+    "purpose": "Reopening Request Approved - Verify reopening request registration path.",
+    "preconditions": "System state initialized for BW-CMS-06.",
+    "action_or_input": "Execute state transitions for BW-CMS-06 reopen_initiation_path.",
+    "expected_result": "Workflow proceeds according to reopen_initiation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-087",
+    "source_id": "BW-CMS-06 reopen_adjudication_path",
+    "purpose": "Reopening Request Approved - Verify reopening decision outcome state transition.",
+    "preconditions": "System state initialized for BW-CMS-06.",
+    "action_or_input": "Execute state transitions for BW-CMS-06 reopen_adjudication_path.",
+    "expected_result": "Workflow proceeds according to reopen_adjudication_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-088",
+    "source_id": "BW-CMS-06 manual_escalation_path",
+    "purpose": "Reopening Request Approved - Verify manual escalation path and audit recording.",
+    "preconditions": "System state initialized for BW-CMS-06.",
+    "action_or_input": "Execute state transitions for BW-CMS-06 manual_escalation_path.",
+    "expected_result": "Workflow proceeds according to manual_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-089",
+    "source_id": "BW-CMS-06 sla_escalation_path",
+    "purpose": "Reopening Request Approved - Verify autonomous SLA breach escalation sweep path.",
+    "preconditions": "System state initialized for BW-CMS-06.",
+    "action_or_input": "Execute state transitions for BW-CMS-06 sla_escalation_path.",
+    "expected_result": "Workflow proceeds according to sla_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-090",
+    "source_id": "BW-CMS-06 concurrent_audit_integrity",
+    "purpose": "Reopening Request Approved - Verify sequential timestamped audit trail integrity.",
+    "preconditions": "System state initialized for BW-CMS-06.",
+    "action_or_input": "Execute state transitions for BW-CMS-06 concurrent_audit_integrity.",
+    "expected_result": "Workflow proceeds according to concurrent_audit_integrity specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-091",
+    "source_id": "BW-CMS-07 nominal_flow",
+    "purpose": "Manual Escalation of Unresolved Complaint - Verify nominal full lifecycle path execution.",
+    "preconditions": "System state initialized for BW-CMS-07.",
+    "action_or_input": "Execute state transitions for BW-CMS-07 nominal_flow.",
+    "expected_result": "Workflow proceeds according to nominal_flow specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-092",
+    "source_id": "BW-CMS-07 step1_intake",
+    "purpose": "Manual Escalation of Unresolved Complaint - Verify intake submission state and initial transitions.",
+    "preconditions": "System state initialized for BW-CMS-07.",
+    "action_or_input": "Execute state transitions for BW-CMS-07 step1_intake.",
+    "expected_result": "Workflow proceeds according to step1_intake specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-093",
+    "source_id": "BW-CMS-07 step2_assignment",
+    "purpose": "Manual Escalation of Unresolved Complaint - Verify triage and operational assignment transition.",
+    "preconditions": "System state initialized for BW-CMS-07.",
+    "action_or_input": "Execute state transitions for BW-CMS-07 step2_assignment.",
+    "expected_result": "Workflow proceeds according to step2_assignment specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-094",
+    "source_id": "BW-CMS-07 step3_progress",
+    "purpose": "Manual Escalation of Unresolved Complaint - Verify active investigation progress step transitions.",
+    "preconditions": "System state initialized for BW-CMS-07.",
+    "action_or_input": "Execute state transitions for BW-CMS-07 step3_progress.",
+    "expected_result": "Workflow proceeds according to step3_progress specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-095",
+    "source_id": "BW-CMS-07 step4_resolution",
+    "purpose": "Manual Escalation of Unresolved Complaint - Verify outcome resolution state transition.",
+    "preconditions": "System state initialized for BW-CMS-07.",
+    "action_or_input": "Execute state transitions for BW-CMS-07 step4_resolution.",
+    "expected_result": "Workflow proceeds according to step4_resolution specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-096",
+    "source_id": "BW-CMS-07 step5_closure",
+    "purpose": "Manual Escalation of Unresolved Complaint - Verify closure verification transition and timestamping.",
+    "preconditions": "System state initialized for BW-CMS-07.",
+    "action_or_input": "Execute state transitions for BW-CMS-07 step5_closure.",
+    "expected_result": "Workflow proceeds according to step5_closure specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-097",
+    "source_id": "BW-CMS-07 path_complainant_signoff",
+    "purpose": "Manual Escalation of Unresolved Complaint - Verify complainant dual-path verification branch.",
+    "preconditions": "System state initialized for BW-CMS-07.",
+    "action_or_input": "Execute state transitions for BW-CMS-07 path_complainant_signoff.",
+    "expected_result": "Workflow proceeds according to path_complainant_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-098",
+    "source_id": "BW-CMS-07 path_supervisor_signoff",
+    "purpose": "Manual Escalation of Unresolved Complaint - Verify supervisor dual-path verification branch.",
+    "preconditions": "System state initialized for BW-CMS-07.",
+    "action_or_input": "Execute state transitions for BW-CMS-07 path_supervisor_signoff.",
+    "expected_result": "Workflow proceeds according to path_supervisor_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-099",
+    "source_id": "BW-CMS-07 illegal_transition_rejection",
+    "purpose": "Manual Escalation of Unresolved Complaint - Verify rejection of invalid out-of-order state transitions.",
+    "preconditions": "System state initialized for BW-CMS-07.",
+    "action_or_input": "Execute state transitions for BW-CMS-07 illegal_transition_rejection.",
+    "expected_result": "Workflow proceeds according to illegal_transition_rejection specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-100",
+    "source_id": "BW-CMS-07 terminal_mutation_guard",
+    "purpose": "Manual Escalation of Unresolved Complaint - Verify immutable protection of terminal lifecycle states.",
+    "preconditions": "System state initialized for BW-CMS-07.",
+    "action_or_input": "Execute state transitions for BW-CMS-07 terminal_mutation_guard.",
+    "expected_result": "Workflow proceeds according to terminal_mutation_guard specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-101",
+    "source_id": "BW-CMS-07 reopen_initiation_path",
+    "purpose": "Manual Escalation of Unresolved Complaint - Verify reopening request registration path.",
+    "preconditions": "System state initialized for BW-CMS-07.",
+    "action_or_input": "Execute state transitions for BW-CMS-07 reopen_initiation_path.",
+    "expected_result": "Workflow proceeds according to reopen_initiation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-102",
+    "source_id": "BW-CMS-07 reopen_adjudication_path",
+    "purpose": "Manual Escalation of Unresolved Complaint - Verify reopening decision outcome state transition.",
+    "preconditions": "System state initialized for BW-CMS-07.",
+    "action_or_input": "Execute state transitions for BW-CMS-07 reopen_adjudication_path.",
+    "expected_result": "Workflow proceeds according to reopen_adjudication_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-103",
+    "source_id": "BW-CMS-07 manual_escalation_path",
+    "purpose": "Manual Escalation of Unresolved Complaint - Verify manual escalation path and audit recording.",
+    "preconditions": "System state initialized for BW-CMS-07.",
+    "action_or_input": "Execute state transitions for BW-CMS-07 manual_escalation_path.",
+    "expected_result": "Workflow proceeds according to manual_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-104",
+    "source_id": "BW-CMS-07 sla_escalation_path",
+    "purpose": "Manual Escalation of Unresolved Complaint - Verify autonomous SLA breach escalation sweep path.",
+    "preconditions": "System state initialized for BW-CMS-07.",
+    "action_or_input": "Execute state transitions for BW-CMS-07 sla_escalation_path.",
+    "expected_result": "Workflow proceeds according to sla_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-105",
+    "source_id": "BW-CMS-07 concurrent_audit_integrity",
+    "purpose": "Manual Escalation of Unresolved Complaint - Verify sequential timestamped audit trail integrity.",
+    "preconditions": "System state initialized for BW-CMS-07.",
+    "action_or_input": "Execute state transitions for BW-CMS-07 concurrent_audit_integrity.",
+    "expected_result": "Workflow proceeds according to concurrent_audit_integrity specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-106",
+    "source_id": "BW-CMS-08 nominal_flow",
+    "purpose": "Automatic SLA Escalation - Verify nominal full lifecycle path execution.",
+    "preconditions": "System state initialized for BW-CMS-08.",
+    "action_or_input": "Execute state transitions for BW-CMS-08 nominal_flow.",
+    "expected_result": "Workflow proceeds according to nominal_flow specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-107",
+    "source_id": "BW-CMS-08 step1_intake",
+    "purpose": "Automatic SLA Escalation - Verify intake submission state and initial transitions.",
+    "preconditions": "System state initialized for BW-CMS-08.",
+    "action_or_input": "Execute state transitions for BW-CMS-08 step1_intake.",
+    "expected_result": "Workflow proceeds according to step1_intake specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-108",
+    "source_id": "BW-CMS-08 step2_assignment",
+    "purpose": "Automatic SLA Escalation - Verify triage and operational assignment transition.",
+    "preconditions": "System state initialized for BW-CMS-08.",
+    "action_or_input": "Execute state transitions for BW-CMS-08 step2_assignment.",
+    "expected_result": "Workflow proceeds according to step2_assignment specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-109",
+    "source_id": "BW-CMS-08 step3_progress",
+    "purpose": "Automatic SLA Escalation - Verify active investigation progress step transitions.",
+    "preconditions": "System state initialized for BW-CMS-08.",
+    "action_or_input": "Execute state transitions for BW-CMS-08 step3_progress.",
+    "expected_result": "Workflow proceeds according to step3_progress specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-110",
+    "source_id": "BW-CMS-08 step4_resolution",
+    "purpose": "Automatic SLA Escalation - Verify outcome resolution state transition.",
+    "preconditions": "System state initialized for BW-CMS-08.",
+    "action_or_input": "Execute state transitions for BW-CMS-08 step4_resolution.",
+    "expected_result": "Workflow proceeds according to step4_resolution specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-111",
+    "source_id": "BW-CMS-08 step5_closure",
+    "purpose": "Automatic SLA Escalation - Verify closure verification transition and timestamping.",
+    "preconditions": "System state initialized for BW-CMS-08.",
+    "action_or_input": "Execute state transitions for BW-CMS-08 step5_closure.",
+    "expected_result": "Workflow proceeds according to step5_closure specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-112",
+    "source_id": "BW-CMS-08 path_complainant_signoff",
+    "purpose": "Automatic SLA Escalation - Verify complainant dual-path verification branch.",
+    "preconditions": "System state initialized for BW-CMS-08.",
+    "action_or_input": "Execute state transitions for BW-CMS-08 path_complainant_signoff.",
+    "expected_result": "Workflow proceeds according to path_complainant_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-113",
+    "source_id": "BW-CMS-08 path_supervisor_signoff",
+    "purpose": "Automatic SLA Escalation - Verify supervisor dual-path verification branch.",
+    "preconditions": "System state initialized for BW-CMS-08.",
+    "action_or_input": "Execute state transitions for BW-CMS-08 path_supervisor_signoff.",
+    "expected_result": "Workflow proceeds according to path_supervisor_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-114",
+    "source_id": "BW-CMS-08 illegal_transition_rejection",
+    "purpose": "Automatic SLA Escalation - Verify rejection of invalid out-of-order state transitions.",
+    "preconditions": "System state initialized for BW-CMS-08.",
+    "action_or_input": "Execute state transitions for BW-CMS-08 illegal_transition_rejection.",
+    "expected_result": "Workflow proceeds according to illegal_transition_rejection specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-115",
+    "source_id": "BW-CMS-08 terminal_mutation_guard",
+    "purpose": "Automatic SLA Escalation - Verify immutable protection of terminal lifecycle states.",
+    "preconditions": "System state initialized for BW-CMS-08.",
+    "action_or_input": "Execute state transitions for BW-CMS-08 terminal_mutation_guard.",
+    "expected_result": "Workflow proceeds according to terminal_mutation_guard specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-116",
+    "source_id": "BW-CMS-08 reopen_initiation_path",
+    "purpose": "Automatic SLA Escalation - Verify reopening request registration path.",
+    "preconditions": "System state initialized for BW-CMS-08.",
+    "action_or_input": "Execute state transitions for BW-CMS-08 reopen_initiation_path.",
+    "expected_result": "Workflow proceeds according to reopen_initiation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-117",
+    "source_id": "BW-CMS-08 reopen_adjudication_path",
+    "purpose": "Automatic SLA Escalation - Verify reopening decision outcome state transition.",
+    "preconditions": "System state initialized for BW-CMS-08.",
+    "action_or_input": "Execute state transitions for BW-CMS-08 reopen_adjudication_path.",
+    "expected_result": "Workflow proceeds according to reopen_adjudication_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-118",
+    "source_id": "BW-CMS-08 manual_escalation_path",
+    "purpose": "Automatic SLA Escalation - Verify manual escalation path and audit recording.",
+    "preconditions": "System state initialized for BW-CMS-08.",
+    "action_or_input": "Execute state transitions for BW-CMS-08 manual_escalation_path.",
+    "expected_result": "Workflow proceeds according to manual_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-119",
+    "source_id": "BW-CMS-08 sla_escalation_path",
+    "purpose": "Automatic SLA Escalation - Verify autonomous SLA breach escalation sweep path.",
+    "preconditions": "System state initialized for BW-CMS-08.",
+    "action_or_input": "Execute state transitions for BW-CMS-08 sla_escalation_path.",
+    "expected_result": "Workflow proceeds according to sla_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-120",
+    "source_id": "BW-CMS-08 concurrent_audit_integrity",
+    "purpose": "Automatic SLA Escalation - Verify sequential timestamped audit trail integrity.",
+    "preconditions": "System state initialized for BW-CMS-08.",
+    "action_or_input": "Execute state transitions for BW-CMS-08 concurrent_audit_integrity.",
+    "expected_result": "Workflow proceeds according to concurrent_audit_integrity specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-121",
+    "source_id": "CW-CMS-01 nominal_flow",
+    "purpose": "Complaint Intake-to-Outcome Lifecycle - Verify nominal full lifecycle path execution.",
+    "preconditions": "System state initialized for CW-CMS-01.",
+    "action_or_input": "Execute state transitions for CW-CMS-01 nominal_flow.",
+    "expected_result": "Workflow proceeds according to nominal_flow specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-122",
+    "source_id": "CW-CMS-01 step1_intake",
+    "purpose": "Complaint Intake-to-Outcome Lifecycle - Verify intake submission state and initial transitions.",
+    "preconditions": "System state initialized for CW-CMS-01.",
+    "action_or_input": "Execute state transitions for CW-CMS-01 step1_intake.",
+    "expected_result": "Workflow proceeds according to step1_intake specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-123",
+    "source_id": "CW-CMS-01 step2_assignment",
+    "purpose": "Complaint Intake-to-Outcome Lifecycle - Verify triage and operational assignment transition.",
+    "preconditions": "System state initialized for CW-CMS-01.",
+    "action_or_input": "Execute state transitions for CW-CMS-01 step2_assignment.",
+    "expected_result": "Workflow proceeds according to step2_assignment specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-124",
+    "source_id": "CW-CMS-01 step3_progress",
+    "purpose": "Complaint Intake-to-Outcome Lifecycle - Verify active investigation progress step transitions.",
+    "preconditions": "System state initialized for CW-CMS-01.",
+    "action_or_input": "Execute state transitions for CW-CMS-01 step3_progress.",
+    "expected_result": "Workflow proceeds according to step3_progress specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-125",
+    "source_id": "CW-CMS-01 step4_resolution",
+    "purpose": "Complaint Intake-to-Outcome Lifecycle - Verify outcome resolution state transition.",
+    "preconditions": "System state initialized for CW-CMS-01.",
+    "action_or_input": "Execute state transitions for CW-CMS-01 step4_resolution.",
+    "expected_result": "Workflow proceeds according to step4_resolution specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-126",
+    "source_id": "CW-CMS-01 step5_closure",
+    "purpose": "Complaint Intake-to-Outcome Lifecycle - Verify closure verification transition and timestamping.",
+    "preconditions": "System state initialized for CW-CMS-01.",
+    "action_or_input": "Execute state transitions for CW-CMS-01 step5_closure.",
+    "expected_result": "Workflow proceeds according to step5_closure specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-127",
+    "source_id": "CW-CMS-01 path_complainant_signoff",
+    "purpose": "Complaint Intake-to-Outcome Lifecycle - Verify complainant dual-path verification branch.",
+    "preconditions": "System state initialized for CW-CMS-01.",
+    "action_or_input": "Execute state transitions for CW-CMS-01 path_complainant_signoff.",
+    "expected_result": "Workflow proceeds according to path_complainant_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-128",
+    "source_id": "CW-CMS-01 path_supervisor_signoff",
+    "purpose": "Complaint Intake-to-Outcome Lifecycle - Verify supervisor dual-path verification branch.",
+    "preconditions": "System state initialized for CW-CMS-01.",
+    "action_or_input": "Execute state transitions for CW-CMS-01 path_supervisor_signoff.",
+    "expected_result": "Workflow proceeds according to path_supervisor_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-129",
+    "source_id": "CW-CMS-01 illegal_transition_rejection",
+    "purpose": "Complaint Intake-to-Outcome Lifecycle - Verify rejection of invalid out-of-order state transitions.",
+    "preconditions": "System state initialized for CW-CMS-01.",
+    "action_or_input": "Execute state transitions for CW-CMS-01 illegal_transition_rejection.",
+    "expected_result": "Workflow proceeds according to illegal_transition_rejection specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-130",
+    "source_id": "CW-CMS-01 terminal_mutation_guard",
+    "purpose": "Complaint Intake-to-Outcome Lifecycle - Verify immutable protection of terminal lifecycle states.",
+    "preconditions": "System state initialized for CW-CMS-01.",
+    "action_or_input": "Execute state transitions for CW-CMS-01 terminal_mutation_guard.",
+    "expected_result": "Workflow proceeds according to terminal_mutation_guard specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-131",
+    "source_id": "CW-CMS-01 reopen_initiation_path",
+    "purpose": "Complaint Intake-to-Outcome Lifecycle - Verify reopening request registration path.",
+    "preconditions": "System state initialized for CW-CMS-01.",
+    "action_or_input": "Execute state transitions for CW-CMS-01 reopen_initiation_path.",
+    "expected_result": "Workflow proceeds according to reopen_initiation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-132",
+    "source_id": "CW-CMS-01 reopen_adjudication_path",
+    "purpose": "Complaint Intake-to-Outcome Lifecycle - Verify reopening decision outcome state transition.",
+    "preconditions": "System state initialized for CW-CMS-01.",
+    "action_or_input": "Execute state transitions for CW-CMS-01 reopen_adjudication_path.",
+    "expected_result": "Workflow proceeds according to reopen_adjudication_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-133",
+    "source_id": "CW-CMS-01 manual_escalation_path",
+    "purpose": "Complaint Intake-to-Outcome Lifecycle - Verify manual escalation path and audit recording.",
+    "preconditions": "System state initialized for CW-CMS-01.",
+    "action_or_input": "Execute state transitions for CW-CMS-01 manual_escalation_path.",
+    "expected_result": "Workflow proceeds according to manual_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-134",
+    "source_id": "CW-CMS-01 sla_escalation_path",
+    "purpose": "Complaint Intake-to-Outcome Lifecycle - Verify autonomous SLA breach escalation sweep path.",
+    "preconditions": "System state initialized for CW-CMS-01.",
+    "action_or_input": "Execute state transitions for CW-CMS-01 sla_escalation_path.",
+    "expected_result": "Workflow proceeds according to sla_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-135",
+    "source_id": "CW-CMS-01 concurrent_audit_integrity",
+    "purpose": "Complaint Intake-to-Outcome Lifecycle - Verify sequential timestamped audit trail integrity.",
+    "preconditions": "System state initialized for CW-CMS-01.",
+    "action_or_input": "Execute state transitions for CW-CMS-01 concurrent_audit_integrity.",
+    "expected_result": "Workflow proceeds according to concurrent_audit_integrity specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-136",
+    "source_id": "CW-CMS-02 nominal_flow",
+    "purpose": "Related CFRs / key AFRs - Verify nominal full lifecycle path execution.",
+    "preconditions": "System state initialized for CW-CMS-02.",
+    "action_or_input": "Execute state transitions for CW-CMS-02 nominal_flow.",
+    "expected_result": "Workflow proceeds according to nominal_flow specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-137",
+    "source_id": "CW-CMS-02 step1_intake",
+    "purpose": "Verify duplicate pending reopening request rejected in composite reopening workflow (Defect 2).",
+    "preconditions": "System state initialized for CW-CMS-02.",
+    "action_or_input": "Execute state transitions for CW-CMS-02 step1_intake.",
+    "expected_result": "Workflow proceeds according to step1_intake specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-138",
+    "source_id": "CW-CMS-02 step2_assignment",
+    "purpose": "Related CFRs / key AFRs - Verify triage and operational assignment transition.",
+    "preconditions": "System state initialized for CW-CMS-02.",
+    "action_or_input": "Execute state transitions for CW-CMS-02 step2_assignment.",
+    "expected_result": "Workflow proceeds according to step2_assignment specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-139",
+    "source_id": "CW-CMS-02 step3_progress",
+    "purpose": "Related CFRs / key AFRs - Verify active investigation progress step transitions.",
+    "preconditions": "System state initialized for CW-CMS-02.",
+    "action_or_input": "Execute state transitions for CW-CMS-02 step3_progress.",
+    "expected_result": "Workflow proceeds according to step3_progress specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-140",
+    "source_id": "CW-CMS-02 step4_resolution",
+    "purpose": "Related CFRs / key AFRs - Verify outcome resolution state transition.",
+    "preconditions": "System state initialized for CW-CMS-02.",
+    "action_or_input": "Execute state transitions for CW-CMS-02 step4_resolution.",
+    "expected_result": "Workflow proceeds according to step4_resolution specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-141",
+    "source_id": "CW-CMS-02 step5_closure",
+    "purpose": "Related CFRs / key AFRs - Verify closure verification transition and timestamping.",
+    "preconditions": "System state initialized for CW-CMS-02.",
+    "action_or_input": "Execute state transitions for CW-CMS-02 step5_closure.",
+    "expected_result": "Workflow proceeds according to step5_closure specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-142",
+    "source_id": "CW-CMS-02 path_complainant_signoff",
+    "purpose": "Related CFRs / key AFRs - Verify complainant dual-path verification branch.",
+    "preconditions": "System state initialized for CW-CMS-02.",
+    "action_or_input": "Execute state transitions for CW-CMS-02 path_complainant_signoff.",
+    "expected_result": "Workflow proceeds according to path_complainant_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-143",
+    "source_id": "CW-CMS-02 path_supervisor_signoff",
+    "purpose": "Related CFRs / key AFRs - Verify supervisor dual-path verification branch.",
+    "preconditions": "System state initialized for CW-CMS-02.",
+    "action_or_input": "Execute state transitions for CW-CMS-02 path_supervisor_signoff.",
+    "expected_result": "Workflow proceeds according to path_supervisor_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-144",
+    "source_id": "CW-CMS-02 illegal_transition_rejection",
+    "purpose": "Related CFRs / key AFRs - Verify rejection of invalid out-of-order state transitions.",
+    "preconditions": "System state initialized for CW-CMS-02.",
+    "action_or_input": "Execute state transitions for CW-CMS-02 illegal_transition_rejection.",
+    "expected_result": "Workflow proceeds according to illegal_transition_rejection specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-145",
+    "source_id": "CW-CMS-02 terminal_mutation_guard",
+    "purpose": "Related CFRs / key AFRs - Verify immutable protection of terminal lifecycle states.",
+    "preconditions": "System state initialized for CW-CMS-02.",
+    "action_or_input": "Execute state transitions for CW-CMS-02 terminal_mutation_guard.",
+    "expected_result": "Workflow proceeds according to terminal_mutation_guard specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-146",
+    "source_id": "CW-CMS-02 reopen_initiation_path",
+    "purpose": "Related CFRs / key AFRs - Verify reopening request registration path.",
+    "preconditions": "System state initialized for CW-CMS-02.",
+    "action_or_input": "Execute state transitions for CW-CMS-02 reopen_initiation_path.",
+    "expected_result": "Workflow proceeds according to reopen_initiation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-147",
+    "source_id": "CW-CMS-02 reopen_adjudication_path",
+    "purpose": "Related CFRs / key AFRs - Verify reopening decision outcome state transition.",
+    "preconditions": "System state initialized for CW-CMS-02.",
+    "action_or_input": "Execute state transitions for CW-CMS-02 reopen_adjudication_path.",
+    "expected_result": "Workflow proceeds according to reopen_adjudication_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-148",
+    "source_id": "CW-CMS-02 manual_escalation_path",
+    "purpose": "Related CFRs / key AFRs - Verify manual escalation path and audit recording.",
+    "preconditions": "System state initialized for CW-CMS-02.",
+    "action_or_input": "Execute state transitions for CW-CMS-02 manual_escalation_path.",
+    "expected_result": "Workflow proceeds according to manual_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-149",
+    "source_id": "CW-CMS-02 sla_escalation_path",
+    "purpose": "Related CFRs / key AFRs - Verify autonomous SLA breach escalation sweep path.",
+    "preconditions": "System state initialized for CW-CMS-02.",
+    "action_or_input": "Execute state transitions for CW-CMS-02 sla_escalation_path.",
+    "expected_result": "Workflow proceeds according to sla_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-150",
+    "source_id": "CW-CMS-02 concurrent_audit_integrity",
+    "purpose": "Related CFRs / key AFRs - Verify sequential timestamped audit trail integrity.",
+    "preconditions": "System state initialized for CW-CMS-02.",
+    "action_or_input": "Execute state transitions for CW-CMS-02 concurrent_audit_integrity.",
+    "expected_result": "Workflow proceeds according to concurrent_audit_integrity specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-151",
+    "source_id": "CW-CMS-03 nominal_flow",
+    "purpose": "Related CFRs / key AFRs - Verify nominal full lifecycle path execution.",
+    "preconditions": "System state initialized for CW-CMS-03.",
+    "action_or_input": "Execute state transitions for CW-CMS-03 nominal_flow.",
+    "expected_result": "Workflow proceeds according to nominal_flow specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-152",
+    "source_id": "CW-CMS-03 step1_intake",
+    "purpose": "Verify automatic SLA escalation preserves existing manual escalation audit without overwrite (Defect 18).",
+    "preconditions": "System state initialized for CW-CMS-03.",
+    "action_or_input": "Execute state transitions for CW-CMS-03 step1_intake.",
+    "expected_result": "Workflow proceeds according to step1_intake specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-153",
+    "source_id": "CW-CMS-03 step2_assignment",
+    "purpose": "Related CFRs / key AFRs - Verify triage and operational assignment transition.",
+    "preconditions": "System state initialized for CW-CMS-03.",
+    "action_or_input": "Execute state transitions for CW-CMS-03 step2_assignment.",
+    "expected_result": "Workflow proceeds according to step2_assignment specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-154",
+    "source_id": "CW-CMS-03 step3_progress",
+    "purpose": "Related CFRs / key AFRs - Verify active investigation progress step transitions.",
+    "preconditions": "System state initialized for CW-CMS-03.",
+    "action_or_input": "Execute state transitions for CW-CMS-03 step3_progress.",
+    "expected_result": "Workflow proceeds according to step3_progress specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-155",
+    "source_id": "CW-CMS-03 step4_resolution",
+    "purpose": "Related CFRs / key AFRs - Verify outcome resolution state transition.",
+    "preconditions": "System state initialized for CW-CMS-03.",
+    "action_or_input": "Execute state transitions for CW-CMS-03 step4_resolution.",
+    "expected_result": "Workflow proceeds according to step4_resolution specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-156",
+    "source_id": "CW-CMS-03 step5_closure",
+    "purpose": "Related CFRs / key AFRs - Verify closure verification transition and timestamping.",
+    "preconditions": "System state initialized for CW-CMS-03.",
+    "action_or_input": "Execute state transitions for CW-CMS-03 step5_closure.",
+    "expected_result": "Workflow proceeds according to step5_closure specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-157",
+    "source_id": "CW-CMS-03 path_complainant_signoff",
+    "purpose": "Related CFRs / key AFRs - Verify complainant dual-path verification branch.",
+    "preconditions": "System state initialized for CW-CMS-03.",
+    "action_or_input": "Execute state transitions for CW-CMS-03 path_complainant_signoff.",
+    "expected_result": "Workflow proceeds according to path_complainant_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-158",
+    "source_id": "CW-CMS-03 path_supervisor_signoff",
+    "purpose": "Related CFRs / key AFRs - Verify supervisor dual-path verification branch.",
+    "preconditions": "System state initialized for CW-CMS-03.",
+    "action_or_input": "Execute state transitions for CW-CMS-03 path_supervisor_signoff.",
+    "expected_result": "Workflow proceeds according to path_supervisor_signoff specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-159",
+    "source_id": "CW-CMS-03 illegal_transition_rejection",
+    "purpose": "Related CFRs / key AFRs - Verify rejection of invalid out-of-order state transitions.",
+    "preconditions": "System state initialized for CW-CMS-03.",
+    "action_or_input": "Execute state transitions for CW-CMS-03 illegal_transition_rejection.",
+    "expected_result": "Workflow proceeds according to illegal_transition_rejection specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-160",
+    "source_id": "CW-CMS-03 terminal_mutation_guard",
+    "purpose": "Related CFRs / key AFRs - Verify immutable protection of terminal lifecycle states.",
+    "preconditions": "System state initialized for CW-CMS-03.",
+    "action_or_input": "Execute state transitions for CW-CMS-03 terminal_mutation_guard.",
+    "expected_result": "Workflow proceeds according to terminal_mutation_guard specification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-161",
+    "source_id": "CW-CMS-03 reopen_initiation_path",
+    "purpose": "Related CFRs / key AFRs - Verify reopening request registration path.",
+    "preconditions": "System state initialized for CW-CMS-03.",
+    "action_or_input": "Execute state transitions for CW-CMS-03 reopen_initiation_path.",
+    "expected_result": "Workflow proceeds according to reopen_initiation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-162",
+    "source_id": "CW-CMS-03 reopen_adjudication_path",
+    "purpose": "Related CFRs / key AFRs - Verify reopening decision outcome state transition.",
+    "preconditions": "System state initialized for CW-CMS-03.",
+    "action_or_input": "Execute state transitions for CW-CMS-03 reopen_adjudication_path.",
+    "expected_result": "Workflow proceeds according to reopen_adjudication_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-163",
+    "source_id": "CW-CMS-03 manual_escalation_path",
+    "purpose": "Related CFRs / key AFRs - Verify manual escalation path and audit recording.",
+    "preconditions": "System state initialized for CW-CMS-03.",
+    "action_or_input": "Execute state transitions for CW-CMS-03 manual_escalation_path.",
+    "expected_result": "Workflow proceeds according to manual_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-164",
+    "source_id": "CW-CMS-03 sla_escalation_path",
+    "purpose": "Related CFRs / key AFRs - Verify autonomous SLA breach escalation sweep path.",
+    "preconditions": "System state initialized for CW-CMS-03.",
+    "action_or_input": "Execute state transitions for CW-CMS-03 sla_escalation_path.",
+    "expected_result": "Workflow proceeds according to sla_escalation_path specification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-165",
+    "source_id": "CW-CMS-03 concurrent_audit_integrity",
+    "purpose": "Related CFRs / key AFRs - Verify sequential timestamped audit trail integrity.",
+    "preconditions": "System state initialized for CW-CMS-03.",
+    "action_or_input": "Execute state transitions for CW-CMS-03 concurrent_audit_integrity.",
+    "expected_result": "Workflow proceeds according to concurrent_audit_integrity specification.",
+    "test_type": "workflow"
+  }
+]
