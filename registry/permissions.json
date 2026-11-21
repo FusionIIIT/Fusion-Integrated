@@ -34,6 +34,131 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "leave_management": {
+      "grants": {
+        "Leave Administrator": [
+          "leave_management.calendar.publish",
+          "leave_management.leave_record.import",
+          "leave_management.leave_record.update",
+          "leave_management.leave_request.view",
+          "leave_management.policy.manage"
+        ],
+        "faculty": [
+          "leave_management.leave_request.create",
+          "leave_management.leave_request.export",
+          "leave_management.leave_request.review",
+          "leave_management.leave_request.view"
+        ],
+        "staff": [
+          "leave_management.leave_request.create",
+          "leave_management.leave_request.export",
+          "leave_management.leave_request.review",
+          "leave_management.leave_request.view"
+        ]
+      },
+      "module_grants": [
+        "Leave Administrator",
+        "faculty",
+        "staff"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "CalendarCheck",
+        "items": [
+          {
+            "code": "leave.mine",
+            "icon": "CalendarCheck",
+            "label": "My Leave",
+            "required_permission": "leave_management.leave_request.create",
+            "sort_order": 10,
+            "to": "/leave/mine"
+          },
+          {
+            "code": "leave.tasks",
+            "icon": "ListChecks",
+            "label": "Leave Tasks",
+            "required_permission": "leave_management.leave_request.review",
+            "sort_order": 20,
+            "to": "/leave/tasks"
+          },
+          {
+            "code": "leave.settings",
+            "icon": "Gear",
+            "label": "Leave Settings",
+            "required_permission": "leave_management.policy.manage",
+            "sort_order": 30,
+            "to": "/leave/settings"
+          },
+          {
+            "code": "leave.calendar",
+            "icon": "CalendarBlank",
+            "label": "Holiday Calendar",
+            "required_permission": "leave_management.calendar.publish",
+            "sort_order": 40,
+            "to": "/leave/calendar"
+          },
+          {
+            "code": "leave.records",
+            "icon": "Notebook",
+            "label": "Leave Records",
+            "required_permission": "leave_management.leave_record.update",
+            "sort_order": 50,
+            "to": "/leave/records"
+          }
+        ],
+        "label": "Leave",
+        "nav_section": "Leave",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "leave_management.leave_request.create",
+          "label": "Apply, withdraw, cancel, extend and resume one's own leave"
+        },
+        {
+          "code": "leave_management.leave_request.view",
+          "label": "See leave requests within one's scope"
+        },
+        {
+          "code": "leave_management.leave_request.review",
+          "label": "Act on leave tasks assigned by the hierarchy"
+        },
+        {
+          "code": "leave_management.leave_request.export",
+          "label": "Print one's own leave application"
+        },
+        {
+          "code": "leave_management.policy.manage",
+          "label": "Maintain leave policy, hierarchy and SLA"
+        },
+        {
+          "code": "leave_management.calendar.publish",
+          "label": "Create and publish the holiday/RH calendar"
+        },
+        {
+          "code": "leave_management.leave_record.import",
+          "label": "Record offline-sanctioned leave"
+        },
+        {
+          "code": "leave_management.leave_record.update",
+          "label": "Correct leave balances and see all records"
+        },
+        {
+          "code": "leave_management.leave_account.update",
+          "label": "Year-end leave processing"
+        },
+        {
+          "code": "leave_management.leave_request.assign",
+          "label": "SLA reminder and escalation"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "leave_management.leave_account.update",
+        "leave_management.leave_request.assign"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

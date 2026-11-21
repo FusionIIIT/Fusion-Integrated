@@ -63,6 +63,834 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/leave/calendar:
+    get:
+      operationId: v1_leave_calendar_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calendar'
+          description: ''
+  /api/v1/leave/calendars:
+    get:
+      operationId: v1_leave_calendars_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calendar'
+          description: ''
+    post:
+      operationId: v1_leave_calendars_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalendarWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CalendarWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CalendarWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calendar'
+          description: ''
+  /api/v1/leave/calendars/{id}/publish:
+    post:
+      operationId: v1_leave_calendars_publish_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calendar'
+          description: ''
+  /api/v1/leave/employees:
+    get:
+      operationId: v1_leave_employees_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/leave/me/balances:
+    get:
+      operationId: v1_leave_me_balances_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/leave/notifications:
+    get:
+      operationId: v1_leave_notifications_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/leave/records/{user_id}/balances:
+    get:
+      operationId: v1_leave_records_balances_retrieve
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/leave/records/corrections:
+    post:
+      operationId: v1_leave_records_corrections_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Correction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Correction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Correction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/leave/records/offline:
+    post:
+      operationId: v1_leave_records_offline_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfflineRecord'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OfflineRecord'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OfflineRecord'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests:
+    get:
+      operationId: v1_leave_requests_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveRequestList'
+          description: ''
+  /api/v1/leave/requests/{id}:
+    get:
+      operationId: v1_leave_requests_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequestDetail'
+          description: ''
+  /api/v1/leave/requests/{id}/cancel:
+    post:
+      operationId: v1_leave_requests_cancel_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Note'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Note'
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/decide:
+    post:
+      operationId: v1_leave_requests_decide_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FinalDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FinalDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/extend:
+    post:
+      operationId: v1_leave_requests_extend_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Extension'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Extension'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Extension'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/print:
+    get:
+      operationId: v1_leave_requests_print_retrieve
+      description: 'EL-UC-013: a printable page of one''s own application.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            text/html:
+              schema:
+                type: string
+          description: ''
+  /api/v1/leave/requests/{id}/renominate:
+    post:
+      operationId: v1_leave_requests_renominate_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Renominate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Renominate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Renominate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/resumption:
+    post:
+      operationId: v1_leave_requests_resumption_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResumptionSubmit'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResumptionSubmit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResumptionSubmit'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resumption'
+          description: ''
+  /api/v1/leave/requests/{id}/review:
+    post:
+      operationId: v1_leave_requests_review_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Review'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Review'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/route:
+    post:
+      operationId: v1_leave_requests_route_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Note'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Note'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/substitute:
+    post:
+      operationId: v1_leave_requests_substitute_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/withdraw:
+    post:
+      operationId: v1_leave_requests_withdraw_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Note'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Note'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/apply:
+    post:
+      operationId: v1_leave_requests_apply_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveApply'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveApply'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveApply'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/resumptions/{id}/review:
+    post:
+      operationId: v1_leave_resumptions_review_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resumption'
+          description: ''
+  /api/v1/leave/settings/authority-rules:
+    get:
+      operationId: v1_leave_settings_authority_rules_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorityRule'
+          description: ''
+    post:
+      operationId: v1_leave_settings_authority_rules_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorityRuleWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthorityRuleWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuthorityRuleWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorityRule'
+          description: ''
+  /api/v1/leave/settings/director:
+    put:
+      operationId: v1_leave_settings_director_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Director'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Director'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Director'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/leave/settings/policies:
+    get:
+      operationId: v1_leave_settings_policies_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+          description: ''
+    put:
+      operationId: v1_leave_settings_policies_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Policy'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Policy'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Policy'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+          description: ''
+  /api/v1/leave/settings/sla:
+    get:
+      operationId: v1_leave_settings_sla_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sla'
+          description: ''
+    put:
+      operationId: v1_leave_settings_sla_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sla'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Sla'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Sla'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sla'
+          description: ''
+  /api/v1/leave/settings/units:
+    get:
+      operationId: v1_leave_settings_units_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unit'
+          description: ''
+    post:
+      operationId: v1_leave_settings_units_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnitWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UnitWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UnitWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unit'
+          description: ''
+  /api/v1/leave/tasks:
+    get:
+      operationId: v1_leave_tasks_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/leave/vacations:
+    get:
+      operationId: v1_leave_vacations_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vacation'
+          description: ''
+    post:
+      operationId: v1_leave_vacations_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vacation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Vacation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Vacation'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vacation'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1827,6 +2655,12 @@ components:
       - title
       - topic
       - withdrawn_reason
+    ApplicantKindEnum:
+      enum:
+      - faculty
+      - staff
+      type: string
+      description: "* `` - \n* `faculty` - faculty\n* `staff` - staff"
     Application:
       type: object
       properties:
@@ -1993,6 +2827,59 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    AuthorityRule:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        unit_name:
+          type: string
+          readOnly: true
+          default: ''
+        applicant_kind:
+          type: string
+          maxLength: 10
+        sanctioning_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        establishment_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+      required:
+      - category
+      - id
+      - sanctioning_user_id
+      - unit_name
+    AuthorityRuleWrite:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        unit_name:
+          type: string
+          default: ''
+        applicant_kind:
+          default: ''
+          oneOf:
+          - $ref: '#/components/schemas/ApplicantKindEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        sanctioning_user_id:
+          type: integer
+        establishment_user_id:
+          type: integer
+          nullable: true
+      required:
+      - category
+      - sanctioning_user_id
+    BlankEnum:
+      enum:
+      - ''
     BulkOutcome:
       type: object
       properties:
@@ -2045,6 +2932,65 @@ components:
       required:
       - application_ids
       - to_status
+    Calendar:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        title:
+          type: string
+          maxLength: 120
+        status:
+          allOf:
+          - $ref: '#/components/schemas/CalendarStatusEnum'
+          default: draft
+        published_at:
+          type: string
+          format: date-time
+          nullable: true
+        holidays:
+          type: array
+          items:
+            $ref: '#/components/schemas/Holiday'
+          readOnly: true
+      required:
+      - holidays
+      - id
+      - title
+      - year
+    CalendarStatusEnum:
+      enum:
+      - draft
+      - published
+      - superseded
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `published` - Published
+        * `superseded` - Superseded
+    CalendarWrite:
+      type: object
+      properties:
+        year:
+          type: integer
+          maximum: 2100
+          minimum: 2000
+        title:
+          type: string
+          maxLength: 120
+        holidays:
+          type: array
+          items:
+            $ref: '#/components/schemas/Holiday'
+      required:
+      - holidays
+      - title
+      - year
     Candidate:
       type: object
       description: A person as the ERP portal and the IAM describe them. Read-only
@@ -2082,6 +3028,22 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CategoryEnum:
+      enum:
+      - CL
+      - RH
+      - SCL
+      - EL
+      - COL
+      - VL
+      type: string
+      description: |-
+        * `CL` - CL
+        * `RH` - RH
+        * `SCL` - SCL
+        * `EL` - EL
+        * `COL` - COL
+        * `VL` - VL
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2315,6 +3277,42 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    Correction:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        year:
+          type: integer
+          maximum: 2100
+          minimum: 2000
+        days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        note:
+          type: string
+          maxLength: 255
+      required:
+      - category
+      - days
+      - note
+      - user_id
+      - year
+    DecisionEnum:
+      enum:
+      - approve
+      - reject
+      - recommended
+      - not_recommended
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
+        * `recommended` - recommended
+        * `not_recommended` - not_recommended
     Detail:
       type: object
       properties:
@@ -2322,6 +3320,13 @@ components:
           type: string
       required:
       - detail
+    Director:
+      type: object
+      properties:
+        user_id:
+          type: integer
+      required:
+      - user_id
     DocumentLink:
       type: object
       description: A Drive link. Validated in core.files.drive.
@@ -2407,6 +3412,21 @@ components:
       - season_decision
       - semester
       - standing
+    Extension:
+      type: object
+      properties:
+        new_end_date:
+          type: string
+          format: date
+        purpose:
+          type: string
+          maxLength: 2000
+        substitute_user_id:
+          type: integer
+          nullable: true
+      required:
+      - new_end_date
+      - purpose
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2423,6 +3443,50 @@ components:
       - fee_reference
       - season
       - user_id
+    FinalDecision:
+      type: object
+      properties:
+        note:
+          type: string
+          default: ''
+          maxLength: 2000
+        approve:
+          type: boolean
+      required:
+      - approve
+    HalfEnum:
+      enum:
+      - full
+      - first
+      - second
+      type: string
+      description: |-
+        * `full` - full
+        * `first` - first
+        * `second` - second
+    Holiday:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        name:
+          type: string
+          maxLength: 120
+        kind:
+          $ref: '#/components/schemas/HolidayKindEnum'
+      required:
+      - date
+      - kind
+      - name
+    HolidayKindEnum:
+      enum:
+      - closed
+      - restricted
+      type: string
+      description: |-
+        * `closed` - closed
+        * `restricted` - restricted
     IncidentRecorded:
       type: object
       properties:
@@ -2637,6 +3701,290 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveApply:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        half:
+          allOf:
+          - $ref: '#/components/schemas/HalfEnum'
+          default: full
+        purpose:
+          type: string
+          maxLength: 2000
+        substitute_user_id:
+          type: integer
+          nullable: true
+        station_leave:
+          type: boolean
+          default: false
+        station_address:
+          type: string
+          default: ''
+          maxLength: 255
+        medical_evidence_ref:
+          type: string
+          default: ''
+          maxLength: 255
+      required:
+      - category
+      - end_date
+      - purpose
+      - start_date
+    LeaveRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        applicant_name:
+          type: string
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        parent:
+          type: integer
+          nullable: true
+        category:
+          type: string
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        half:
+          type: string
+          readOnly: true
+        days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        purpose:
+          type: string
+        station_leave:
+          type: boolean
+        station_address:
+          type: string
+          maxLength: 255
+        medical_evidence_ref:
+          type: string
+          maxLength: 255
+        status:
+          type: string
+          readOnly: true
+        substitute_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        unit_head_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        establishment_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        sanctioning_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        unit_head_final:
+          type: boolean
+        director_self:
+          type: boolean
+        recommendation:
+          type: string
+          maxLength: 16
+        source:
+          type: string
+          readOnly: true
+        offline_reference:
+          type: string
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          nullable: true
+        resumption_status:
+          type: string
+          readOnly: true
+      required:
+      - applicant_name
+      - category
+      - created_at
+      - days
+      - end_date
+      - half
+      - id
+      - kind
+      - purpose
+      - resumption_status
+      - source
+      - start_date
+      - status
+      - user_id
+    LeaveRequestDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        applicant_name:
+          type: string
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        parent:
+          type: integer
+          nullable: true
+        category:
+          type: string
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        half:
+          type: string
+          readOnly: true
+        days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        purpose:
+          type: string
+        station_leave:
+          type: boolean
+        station_address:
+          type: string
+          maxLength: 255
+        medical_evidence_ref:
+          type: string
+          maxLength: 255
+        status:
+          type: string
+          readOnly: true
+        substitute_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        unit_head_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        establishment_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        sanctioning_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        unit_head_final:
+          type: boolean
+        director_self:
+          type: boolean
+        recommendation:
+          type: string
+          maxLength: 16
+        source:
+          type: string
+          readOnly: true
+        offline_reference:
+          type: string
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          nullable: true
+        resumption_status:
+          type: string
+          readOnly: true
+        transitions:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveTransition'
+          readOnly: true
+      required:
+      - applicant_name
+      - category
+      - created_at
+      - days
+      - end_date
+      - half
+      - id
+      - kind
+      - purpose
+      - resumption_status
+      - source
+      - start_date
+      - status
+      - transitions
+      - user_id
+    LeaveTransition:
+      type: object
+      properties:
+        from_status:
+          type: string
+          maxLength: 32
+        to_status:
+          type: string
+          maxLength: 32
+        event:
+          type: string
+          maxLength: 32
+        actor_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        note:
+          type: string
+        at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - at
+      - event
+      - to_status
     LiftSanction:
       type: object
       properties:
@@ -2732,6 +4080,13 @@ components:
       - is_late
       - message
       - record
+    Note:
+      type: object
+      properties:
+        note:
+          type: string
+          default: ''
+          maxLength: 2000
     OffCampusRecord:
       type: object
       properties:
@@ -2864,6 +4219,36 @@ components:
         * `revoked` - Revoked
         * `superseded` - Superseded
         * `expired` - Expired
+    OfflineRecord:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        half:
+          allOf:
+          - $ref: '#/components/schemas/HalfEnum'
+          default: full
+        purpose:
+          type: string
+          default: ''
+          maxLength: 2000
+        reference:
+          type: string
+          maxLength: 255
+      required:
+      - category
+      - end_date
+      - reference
+      - start_date
+      - user_id
     Ok:
       type: object
       properties:
@@ -2981,6 +4366,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedLeaveRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveRequest'
     PaginatedOfferList:
       type: object
       required:
@@ -3145,6 +4549,25 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    Policy:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        annual_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        requires_substitute:
+          type: boolean
+        max_days_per_request:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          nullable: true
+      required:
+      - annual_days
+      - category
     ProfileDocument:
       type: object
       description: |-
@@ -3466,6 +4889,88 @@ components:
       - message
       - reason
       - route
+    Renominate:
+      type: object
+      properties:
+        substitute_user_id:
+          type: integer
+      required:
+      - substitute_user_id
+    Resumption:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        leave:
+          allOf:
+          - $ref: '#/components/schemas/LeaveRequest'
+          readOnly: true
+        actual_date:
+          type: string
+          format: date
+        remarks:
+          type: string
+        status:
+          $ref: '#/components/schemas/ResumptionStatusEnum'
+        outcome:
+          oneOf:
+          - $ref: '#/components/schemas/ResumptionOutcomeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        adjustment_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          nullable: true
+        reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - actual_date
+      - id
+      - leave
+    ResumptionOutcomeEnum:
+      enum:
+      - normal
+      - early
+      - late
+      type: string
+      description: |-
+        * `normal` - normal
+        * `early` - early
+        * `late` - late
+    ResumptionStatusEnum:
+      enum:
+      - pending
+      - reviewed
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `reviewed` - Reviewed
+    ResumptionSubmit:
+      type: object
+      properties:
+        actual_date:
+          type: string
+          format: date
+        remarks:
+          type: string
+          default: ''
+          maxLength: 2000
+      required:
+      - actual_date
+    Review:
+      type: object
+      properties:
+        note:
+          type: string
+          default: ''
+          maxLength: 2000
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+      required:
+      - decision
     RoundOutcome:
       type: object
       properties:
@@ -3655,6 +5160,28 @@ components:
       - id
       - kind
       - username
+    Sla:
+      type: object
+      properties:
+        state:
+          $ref: '#/components/schemas/StateEnum'
+        reminder_hours:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        escalation_hours:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        escalate_to_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+      required:
+      - escalation_hours
+      - reminder_hours
+      - state
     SourceEnum:
       enum:
       - campus
@@ -3691,6 +5218,20 @@ components:
       required:
       - available
       - season
+    StateEnum:
+      enum:
+      - applicant_action_required
+      - awaiting_establishment
+      - awaiting_final_decision
+      - awaiting_substitute
+      - awaiting_unit_head
+      type: string
+      description: |-
+        * `applicant_action_required` - applicant_action_required
+        * `awaiting_establishment` - awaiting_establishment
+        * `awaiting_final_decision` - awaiting_final_decision
+        * `awaiting_substitute` - awaiting_substitute
+        * `awaiting_unit_head` - awaiting_unit_head
     SubmitOfferLetter:
       type: object
       properties:
@@ -3698,6 +5239,17 @@ components:
           type: integer
       required:
       - document_id
+    SubstituteResponse:
+      type: object
+      properties:
+        note:
+          type: string
+          default: ''
+          maxLength: 2000
+        accept:
+          type: boolean
+      required:
+      - accept
     TopicEnum:
       enum:
       - drive
@@ -3769,6 +5321,44 @@ components:
       - application_id
       - redacted
       - results
+    Unit:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 80
+        head_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        parent_name:
+          type: string
+          readOnly: true
+          default: ''
+      required:
+      - id
+      - name
+      - parent_name
+    UnitWrite:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 80
+        head_user_id:
+          type: integer
+          nullable: true
+        parent_name:
+          type: string
+          default: ''
+          maxLength: 80
+      required:
+      - head_user_id
+      - name
     UserRef:
       type: object
       properties:
@@ -3814,6 +5404,26 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    Vacation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 120
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+      required:
+      - end_date
+      - id
+      - name
+      - start_date
     WaiveIncident:
       type: object
       properties:
