@@ -2,8 +2,8 @@
 
 **Module**: File Tracking System (`fts`)  
 **Assessment Date**: 2026-11-22  
-**Role**: Student 1 (Builder) — Varun Jalagam (Roll: `24BCS100`, GitHub: `VarunJalagam`, Email: `varun.j@fusion.ac.in`)  
-**Reviewer**: Student 2 (Reviewer) — Nava Samith Reddy (Roll: `24BCS113`, GitHub: `navasamith9`, Email: `samith.r@fusion.ac.in`)  
+**Role**: Student 1 (Builder) — `@VarunJalagam`  
+**Reviewer**: Student 2 (Reviewer) — `@navasamith9`  
 **Branch**: `module/fts-system`  
 
 ---
@@ -133,73 +133,126 @@ Full keyboard accessibility was verified per WCAG 2.1 AA requirements:
 
 ## 6. Fusion-Client Sidebar Integration Snippet
 
-The following sidebar entry snippet is configured in `client/src/modules/fts/registry.py` and rendered with Phosphor icon `FolderNotch`:
+The following sidebar entry is written out ready to paste into `Fusion-client` sidebar definitions, utilizing the Phosphor icon `FolderNotch`:
 
 ```json
 {
-  "name": "File Tracking",
+  "id": "fts",
+  "label": "File Tracking",
   "icon": "FolderNotch",
-  "path": "/fts",
-  "module": "fts",
-  "roles": ["faculty", "staff", "admin"],
-  "children": [
-    {
-      "name": "Inbox",
-      "path": "/fts/inbox",
-      "permission": "fts.file.view"
-    },
-    {
-      "name": "Outbox",
-      "path": "/fts/outbox",
-      "permission": "fts.file.view"
-    },
-    {
-      "name": "Drafts",
-      "path": "/fts/drafts",
-      "permission": "fts.file.view"
-    },
-    {
-      "name": "Create File",
-      "path": "/fts/create",
-      "permission": "fts.file.create"
-    },
-    {
-      "name": "Governance",
-      "path": "/fts/governance",
-      "permission": "fts.governance.view"
-    }
-  ]
+  "to": "/fts/inbox",
+  "section": "Administrative Services"
 }
+```
+
+The individual section sub-items ready to paste:
+
+```json
+[
+  {
+    "id": "fts-inbox",
+    "label": "Inbox",
+    "icon": "FolderNotch",
+    "to": "/fts/inbox",
+    "section": "File Tracking"
+  },
+  {
+    "id": "fts-outbox",
+    "label": "Outbox",
+    "icon": "Tray",
+    "to": "/fts/outbox",
+    "section": "File Tracking"
+  },
+  {
+    "id": "fts-drafts",
+    "label": "Drafts",
+    "icon": "FileText",
+    "to": "/fts/drafts",
+    "section": "File Tracking"
+  },
+  {
+    "id": "fts-create",
+    "label": "Create File",
+    "icon": "PlusCircle",
+    "to": "/fts/create",
+    "section": "File Tracking"
+  },
+  {
+    "id": "fts-governance",
+    "label": "Governance",
+    "icon": "ShieldCheck",
+    "to": "/fts/governance",
+    "section": "File Tracking"
+  }
+]
 ```
 
 ---
 
-## 7. Fresh-Install Proof Execution Log
+## 7. Fresh-Install Proof Execution Log (Step 7.8)
 
-The following command transcript demonstrates successful execution from a clean installation:
+The following verbatim command transcript executes the throwaway database test on `fusion_integrated_fresh`:
 
 ```bash
-$ python manage.py migrate modules_fts
+$ docker compose exec -T db dropdb -U fusion_admin --if-exists fusion_integrated_fresh && \
+  docker compose exec -T db createdb -U fusion_admin fusion_integrated_fresh && \
+  DB_NAME=fusion_integrated_fresh make migrate && \
+  DB_NAME=fusion_integrated_fresh .venv/bin/python manage.py migrate fts zero && \
+  DB_NAME=fusion_integrated_fresh make migrate && \
+  DB_NAME=fusion_integrated_fresh .venv/bin/python manage.py seed_modules && \
+  DB_NAME=fusion_integrated_fresh .venv/bin/python manage.py fts_scheduled_work_status
+
+.venv/bin/python manage.py migrate
 Operations to perform:
-  Apply all migrations: modules_fts
+  Apply all migrations: accesscontrol, auth, contenttypes, directory, fts, placement
 Running migrations:
-  Applying modules_fts.0001_initial... OK
-
-$ python manage.py seed_fts_demo
-Seeding FTS demonstration data...
-Created draft file: FTS-2026-0001
-Created circulated file: FTS-2026-0002 with 3 movement steps
-Created archived file: FTS-2026-0003
-FTS demo data seeded successfully.
-
-$ python manage.py fts_scheduled_work_status
+  Applying accesscontrol.0001_initial... OK
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying directory.0001_initial... OK
+  Applying directory.0002_userref_profile_completed_userref_resume_link... OK
+  Applying fts.0001_initial... OK
+  Applying placement.0001_initial... OK
+  Applying placement.0002_announcement_companycontact_interviewround_and_more... OK
+  Applying placement.0003_remove_placementpolicy_dream_threshold_lpa_and_more... OK
+  Applying placement.0004_document_drive_link... OK
+  Applying placement.0005_outbox_claim... OK
+  Applying placement.0006_conduct_incidents... OK
+  Applying placement.0007_registration_flow... OK
+  Applying placement.0008_post_offer_obligations... OK
+  Applying placement.0009_remove_profiledocument_profile_and_more... OK
+  Applying placement.0010_retire_resume_documents... OK
+Operations to perform:
+  Unapply all migrations: fts
+Running migrations:
+  Rendering model states... DONE
+  Unapplying fts.0001_initial... OK
+.venv/bin/python manage.py migrate
+Operations to perform:
+  Apply all migrations: accesscontrol, auth, contenttypes, directory, fts, placement
+Running migrations:
+  Applying fts.0001_initial... OK
+  registered placement_cell (active)
+  registered fts (active)
+2 module(s) registered
   notifications pending: 0
   oldest pending lag:    0s
   audit integrity valid: True
   FTS scheduled work looks healthy
 
-$ python ops/docs/fts_reference.py
-Successfully verified 57 spec links and updated docs/09-fts/fts-reference.md
+$ docker compose exec -T db dropdb -U fusion_admin --if-exists fusion_integrated_fresh
 ```
 
 ---

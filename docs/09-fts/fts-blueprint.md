@@ -1,8 +1,8 @@
 # File Tracking System (FTS) — Module Blueprint
 **Document Version:** 1.1  
 **Status:** Approved by Student 2 (with minor polish refinements incorporated)  
-**Authors:** Student 1 (Builder: Varun Jalagam - 24BCS100)  
-**Approver:** Student 2 (Nava Samith Reddy - 24BCS113)  
+**Authors:** Student 1 (Builder: `@VarunJalagam`)  
+**Approver:** Student 2 (Reviewer: `@navasamith9`)  
 **Approval Date:** 2026-11-21  
 
 ---

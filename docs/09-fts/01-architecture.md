@@ -5,7 +5,7 @@
 **Base Path**: `/fts`  
 **API Path**: `/api/v1/fts/`  
 **Spec Prefix**: `FTS-`  
-**Authors**: Varun Jalagam (Student 1 - Builder), Nava Samith Reddy (Student 2 - Reviewer)
+**Authors**: `@VarunJalagam` (Student 1 - Builder), `@navasamith9` (Student 2 - Reviewer)
 
 ---
 
