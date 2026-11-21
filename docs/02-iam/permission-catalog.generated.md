@@ -13,6 +13,43 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `hostel`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `hostel.master.manage` | Create, activate, and deactivate hostel records | `Super Admin`, `System Administrator`, `admin` |
+| `hostel.role_binding.manage` | Assign, reassign, activate, and deactivate hostel role bindings | `Super Admin`, `System Administrator`, `admin` |
+| `hostel.accommodation.apply` | Submit hostel accommodation requests | `Super Admin`, `System Administrator`, `admin`, `student` |
+| `hostel.accommodation.view` | View accommodation requests and status | `Hostel Caretaker`, `Hostel Warden`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `faculty`, `staff`, `student`, `warden` |
+| `hostel.allotment.manage` | Record batch allotments, re-allotments, and room vacations | `Super Admin`, `System Administrator`, `admin` |
+| `hostel.room.manage` | Maintain room availability, occupancy, and individual exchanges | `Hostel Caretaker`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `staff` |
+| `hostel.room.view` | View room allocation and occupancy details | `Hostel Caretaker`, `Hostel Warden`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `faculty`, `staff`, `student`, `warden` |
+| `hostel.attendance.record` | Record and monitor student attendance | `Hostel Caretaker`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `staff` |
+| `hostel.attendance.view` | View student attendance status and summaries | `Hostel Caretaker`, `Hostel Warden`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `faculty`, `staff`, `student`, `warden` |
+| `hostel.leave.apply` | Submit leave requests with supporting details | `Super Admin`, `System Administrator`, `admin`, `student` |
+| `hostel.leave.review` | Review and record approval or rejection on leave requests | `Hostel Caretaker`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `staff` |
+| `hostel.leave.view` | View leave requests, status, and history | `Hostel Caretaker`, `Hostel Warden`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `faculty`, `staff`, `student`, `warden` |
+| `hostel.complaint.submit` | Submit hostel-related complaints | `Super Admin`, `System Administrator`, `admin`, `student` |
+| `hostel.complaint.resolve` | Review, update, resolve, and escalate hostel complaints | `Hostel Caretaker`, `Hostel Warden`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `faculty`, `staff`, `warden` |
+| `hostel.complaint.view` | View hostel complaints and resolution history | `Hostel Caretaker`, `Hostel Warden`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `faculty`, `staff`, `student`, `warden` |
+| `hostel.guest_room.request` | Submit guest room booking requests | `Super Admin`, `System Administrator`, `admin`, `student` |
+| `hostel.guest_room.review` | Review and record decisions on guest room bookings | `Hostel Caretaker`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `staff` |
+| `hostel.guest_room.view` | View guest room booking status and history | `Hostel Caretaker`, `Hostel Warden`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `faculty`, `staff`, `student`, `warden` |
+| `hostel.extended_stay.apply` | Submit extended-stay requests for vacations or breaks | `Super Admin`, `System Administrator`, `admin`, `student` |
+| `hostel.extended_stay.review` | Review and record decisions on extended-stay requests | `Hostel Warden`, `Super Admin`, `System Administrator`, `admin`, `faculty`, `warden` |
+| `hostel.extended_stay.view` | View extended-stay requests and compliance status | `Hostel Caretaker`, `Hostel Warden`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `faculty`, `staff`, `student`, `warden` |
+| `hostel.fine.record` | Record fines imposed for damages or rule violations | `Hostel Caretaker`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `staff` |
+| `hostel.fine.view` | View fine records, history, and disciplinary summaries | `Hostel Caretaker`, `Hostel Warden`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `faculty`, `staff`, `student`, `warden` |
+| `hostel.inventory.manage` | Maintain hostel operational inventory and audit logs | `Hostel Caretaker`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `staff` |
+| `hostel.inventory.view` | View hostel inventory and change logs | `Hostel Caretaker`, `Hostel Warden`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `faculty`, `staff`, `warden` |
+| `hostel.staff.manage` | Maintain hostel staff assignments and duty shifts | `Hostel Caretaker`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `staff` |
+| `hostel.staff.view` | View hostel staff assignments and shift info | `Hostel Caretaker`, `Hostel Warden`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `faculty`, `staff`, `warden` |
+| `hostel.security.manage` | Maintain security guard shift schedules and posts | `Hostel Warden`, `Super Admin`, `System Administrator`, `admin`, `faculty`, `warden` |
+| `hostel.security.view` | View security guard shift schedules | `Hostel Warden`, `Super Admin`, `System Administrator`, `admin`, `faculty`, `warden` |
+| `hostel.notice.publish` | Publish hostel notices and announcements | `Hostel Caretaker`, `Hostel Warden`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `faculty`, `staff`, `warden` |
+| `hostel.notice.view` | View hostel notice board and announcements | `Hostel Caretaker`, `Hostel Warden`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `faculty`, `staff`, `student`, `warden` |
+| `hostel.report.view` | Generate and view hostel operational reports and summaries | `Hostel Caretaker`, `Hostel Warden`, `Super Admin`, `System Administrator`, `admin`, `caretaker`, `faculty`, `staff`, `warden` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
