@@ -99,5 +99,11 @@ class PmsAPIView(PmsErrorMappingMixin, APIView):
     """Base for every PMS endpoint."""
 
 
+class PmsWriteAPIView(PmsAPIView):
+    """Base for PMS endpoints that accept state-changing requests."""
+
+    throttle_scope = "pms_write"
+
+
 class PmsListCreateView(PmsErrorMappingMixin, generics.ListCreateAPIView):
     """Same contract for generic list/create endpoints."""

@@ -14,7 +14,7 @@ from core.api.exceptions import NotFoundError, PermissionDeniedError
 from fusion_auth.permissions import HasPermission
 from modules.pms.api import permissions as p
 from modules.pms.api import serializers as s
-from modules.pms.api.errors import PmsAPIView
+from modules.pms.api.errors import PmsAPIView, PmsWriteAPIView
 from modules.pms.models import (
     AttorneyAssignment,
     AttorneyPanel,
@@ -81,7 +81,7 @@ def _require_visible_parent(request, application_id: int) -> None:
     _visible_application(request, application_id)
 
 
-class PatentApplicationListCreateView(PmsAPIView):
+class PatentApplicationListCreateView(PmsWriteAPIView):
     """List applications visible to caller or submit a new application
     (UC-PMS-001, CFR-PMS-001, CFR-PMS-005)."""
 
@@ -146,7 +146,7 @@ class PatentApplicationDetailView(PmsAPIView):
         return Response(s.PatentApplicationReadSerializer(app).data)
 
 
-class PatentApplicationReviseView(PmsAPIView):
+class PatentApplicationReviseView(PmsWriteAPIView):
     """Revise and resubmit an application (UC-PMS-005, CFR-PMS-008)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_REVISE)]
@@ -177,7 +177,7 @@ class PatentApplicationReviseView(PmsAPIView):
         return Response(s.PatentApplicationReadSerializer(app).data)
 
 
-class PatentApplicationWithdrawView(PmsAPIView):
+class PatentApplicationWithdrawView(PmsWriteAPIView):
     """Withdraw an application before filing (UC-PMS-006, CFR-PMS-015)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_WITHDRAW)]
@@ -199,7 +199,7 @@ class PatentApplicationWithdrawView(PmsAPIView):
         return Response(s.PatentApplicationReadSerializer(app).data)
 
 
-class PatentApplicationAssignDirectorView(PmsAPIView):
+class PatentApplicationAssignDirectorView(PmsWriteAPIView):
     """Assign an application to a Director for review (UC-PMS-007, CFR-PMS-006)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_ASSIGN_DIRECTOR)]
@@ -219,7 +219,7 @@ class PatentApplicationAssignDirectorView(PmsAPIView):
         return Response(s.PatentApplicationReadSerializer(app).data)
 
 
-class PatentApplicationReviewView(PmsAPIView):
+class PatentApplicationReviewView(PmsWriteAPIView):
     """Submit a Director technical review decision (UC-PMS-008, CFR-PMS-007)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_REVIEW)]
@@ -241,7 +241,7 @@ class PatentApplicationReviewView(PmsAPIView):
         return Response(s.DirectorReviewSerializer(review).data, status=status.HTTP_201_CREATED)
 
 
-class PatentApplicationAppealView(PmsAPIView):
+class PatentApplicationAppealView(PmsWriteAPIView):
     """File an appeal against application rejection (UC-PMS-022, CFR-PMS-020)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_APPEAL)]
@@ -262,7 +262,7 @@ class PatentApplicationAppealView(PmsAPIView):
         return Response(s.PatentAppealSerializer(appeal).data, status=status.HTTP_201_CREATED)
 
 
-class PatentAppealReviewView(PmsAPIView):
+class PatentAppealReviewView(PmsWriteAPIView):
     """Review and decide an appeal (UC-PMS-023, CFR-PMS-020)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_REVIEW_APPEAL)]
@@ -286,7 +286,7 @@ class PatentAppealReviewView(PmsAPIView):
         return Response(s.PatentAppealSerializer(appeal).data)
 
 
-class PatentBudgetView(PmsAPIView):
+class PatentBudgetView(PmsWriteAPIView):
     """Submit budget line items or decide budget (UC-PMS-009, CFR-PMS-011)."""
 
     permission_classes = [p.MODULE]
@@ -329,7 +329,7 @@ class PatentBudgetView(PmsAPIView):
         return Response(s.PatentBudgetSerializer(budget).data)
 
 
-class PatentApplicationAssignAttorneyView(PmsAPIView):
+class PatentApplicationAssignAttorneyView(PmsWriteAPIView):
     """PCC_ADMIN assigns an Attorney to an approved application (UC-PMS-010, CFR-PMS-009)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_ASSIGN_ATTORNEY)]
@@ -352,7 +352,7 @@ class PatentApplicationAssignAttorneyView(PmsAPIView):
         )
 
 
-class AttorneyAssignmentRespondView(PmsAPIView):
+class AttorneyAssignmentRespondView(PmsWriteAPIView):
     """Attorney accepts or declines assignment (UC-PMS-011, CFR-PMS-009)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_RESPOND_ASSIGNMENT)]
@@ -380,7 +380,7 @@ class AttorneyAssignmentRespondView(PmsAPIView):
         return Response(s.AttorneyAssignmentSerializer(assignment).data)
 
 
-class PatentabilityAssessmentView(PmsAPIView):
+class PatentabilityAssessmentView(PmsWriteAPIView):
     """Conduct patentability assessment (UC-PMS-012, CFR-PMS-010)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_PATENTABILITY_ASSESS)]
@@ -409,7 +409,7 @@ class PatentabilityAssessmentView(PmsAPIView):
         )
 
 
-class PatentFilingView(PmsAPIView):
+class PatentFilingView(PmsWriteAPIView):
     """Prepare and record external patent filing (UC-PMS-013, CFR-PMS-012)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_FILING_RECORD)]
@@ -433,7 +433,7 @@ class PatentFilingView(PmsAPIView):
         return Response(s.PatentApplicationReadSerializer(app).data)
 
 
-class PatentGrantView(PmsAPIView):
+class PatentGrantView(PmsWriteAPIView):
     """Record patent grant and initialize maintenance tracking (UC-PMS-014, CFR-PMS-013)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_FILING_RECORD)]
@@ -454,7 +454,7 @@ class PatentGrantView(PmsAPIView):
         return Response(s.PatentApplicationReadSerializer(app).data)
 
 
-class OfficeActionListCreateView(PmsAPIView):
+class OfficeActionListCreateView(PmsWriteAPIView):
     """List or record office actions (UC-PMS-014, CFR-PMS-014)."""
 
     permission_classes = [p.MODULE]
@@ -489,7 +489,7 @@ class OfficeActionListCreateView(PmsAPIView):
         return Response(s.OfficeActionSerializer(oa).data, status=status.HTTP_201_CREATED)
 
 
-class OfficeActionDraftResponseView(PmsAPIView):
+class OfficeActionDraftResponseView(PmsWriteAPIView):
     """Attorney drafts response to office action (UC-PMS-015, CFR-PMS-014)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_OA_RESPOND)]
@@ -513,7 +513,7 @@ class OfficeActionDraftResponseView(PmsAPIView):
         return Response(s.OfficeActionSerializer(oa).data)
 
 
-class OfficeActionApproveResponseView(PmsAPIView):
+class OfficeActionApproveResponseView(PmsWriteAPIView):
     """Applicant approves draft response (UC-PMS-029, BR-PMS-146)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_OA_REVIEW)]
@@ -531,7 +531,7 @@ class OfficeActionApproveResponseView(PmsAPIView):
         return Response(s.OfficeActionSerializer(oa).data)
 
 
-class OfficeActionSubmitResponseView(PmsAPIView):
+class OfficeActionSubmitResponseView(PmsWriteAPIView):
     """Attorney submits finalized response (UC-PMS-015, BR-PMS-065)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_OA_RESPOND)]
@@ -555,7 +555,7 @@ class OfficeActionSubmitResponseView(PmsAPIView):
         return Response(s.OfficeActionSerializer(oa).data)
 
 
-class OfficeActionExtensionView(PmsAPIView):
+class OfficeActionExtensionView(PmsWriteAPIView):
     """Attorney files extension request (UC-PMS-015)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_OA_RESPOND)]
@@ -576,7 +576,7 @@ class OfficeActionExtensionView(PmsAPIView):
         return Response(s.OfficeActionSerializer(oa).data)
 
 
-class MaintenanceRequestRenewalView(PmsAPIView):
+class MaintenanceRequestRenewalView(PmsWriteAPIView):
     """Attorney initiates renewal decision request (UC-PMS-017, BR-PMS-061)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_MAINTENANCE_MANAGE)]
@@ -596,7 +596,7 @@ class MaintenanceRequestRenewalView(PmsAPIView):
         return Response(s.PostGrantMaintenanceSerializer(maint).data)
 
 
-class MaintenanceDecideRenewalView(PmsAPIView):
+class MaintenanceDecideRenewalView(PmsWriteAPIView):
     """Director decides renewal: Renew or Do Not Renew (UC-PMS-018, BR-PMS-061)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_MAINTENANCE_DECIDE)]
@@ -620,7 +620,7 @@ class MaintenanceDecideRenewalView(PmsAPIView):
         return Response(s.PostGrantMaintenanceSerializer(maint).data)
 
 
-class MaintenanceRecordActionView(PmsAPIView):
+class MaintenanceRecordActionView(PmsWriteAPIView):
     """Attorney records completed renewal action (UC-PMS-017, BW-PMS-14)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_MAINTENANCE_MANAGE)]
@@ -669,7 +669,7 @@ class PriorArtSearchView(PmsAPIView):
         return Response({"results": results})
 
 
-class PriorArtAttachView(PmsAPIView):
+class PriorArtAttachView(PmsWriteAPIView):
     """Attach prior-art reference to an application (UC-PMS-004, CFR-PMS-017)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_PRIOR_ART)]
@@ -694,7 +694,7 @@ class PriorArtAttachView(PmsAPIView):
         return Response(s.PriorArtReferenceSerializer(ref).data, status=status.HTTP_201_CREATED)
 
 
-class DocumentUploadView(PmsAPIView):
+class DocumentUploadView(PmsWriteAPIView):
     """Upload a new document version (UC-PMS-019, CFR-PMS-018)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_DOC_MANAGE)]
@@ -727,7 +727,7 @@ class DocumentUploadView(PmsAPIView):
         return Response(s.ApplicationDocumentSerializer(doc).data, status=status.HTTP_201_CREATED)
 
 
-class LicensingRequestListCreateView(PmsAPIView):
+class LicensingRequestListCreateView(PmsWriteAPIView):
     """Submit or list licensing requests (UC-PMS-020, CFR-PMS-019)."""
 
     permission_classes = [p.MODULE]
@@ -762,7 +762,7 @@ class LicensingRequestListCreateView(PmsAPIView):
         return Response(s.LicensingRequestSerializer(req).data, status=status.HTTP_201_CREATED)
 
 
-class LicensingRequestReviewView(PmsAPIView):
+class LicensingRequestReviewView(PmsWriteAPIView):
     """Review licensing request (UC-PMS-021, CFR-PMS-019)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_LICENSING_REVIEW)]
@@ -787,7 +787,7 @@ class LicensingRequestReviewView(PmsAPIView):
         return Response(s.LicensingRequestSerializer(req).data)
 
 
-class CoInventorConsentView(PmsAPIView):
+class CoInventorConsentView(PmsWriteAPIView):
     """Record inventor agreement and signature (UC-PMS-003, CFR-PMS-016)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_COINVENTOR_MANAGE)]
@@ -812,7 +812,7 @@ class CoInventorConsentView(PmsAPIView):
         return Response(s.CoInventorSerializer(coinv).data)
 
 
-class CoInventorWithdrawalConsentView(PmsAPIView):
+class CoInventorWithdrawalConsentView(PmsWriteAPIView):
     """Record co-inventor consent for withdrawal (UC-PMS-003, BR-PMS-070)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_COINVENTOR_MANAGE)]
@@ -836,7 +836,7 @@ class CoInventorWithdrawalConsentView(PmsAPIView):
         return Response(s.CoInventorSerializer(coinv).data)
 
 
-class LegalAdviceListCreateView(PmsAPIView):
+class LegalAdviceListCreateView(PmsWriteAPIView):
     """Record or view patent legal advice (UC-PMS-033, CFR-PMS-004)."""
 
     permission_classes = [p.MODULE]
@@ -986,7 +986,7 @@ class WorkflowOversightView(PmsAPIView):
         return Response(s.WorkflowOversightSerializer(data, many=True).data)
 
 
-class PmsConfigurationView(PmsAPIView):
+class PmsConfigurationView(PmsWriteAPIView):
     """Manage module-scoped PMS policy values (UC-PMS-025, DEC-7)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_CONFIG_MANAGE)]
@@ -1012,7 +1012,7 @@ class PmsConfigurationView(PmsAPIView):
         return Response(s.PmsConfigurationReadSerializer(row).data)
 
 
-class PmsConfigurationDeleteView(PmsAPIView):
+class PmsConfigurationDeleteView(PmsWriteAPIView):
     """Remove an explicitly configured PMS policy value (UC-PMS-025, DEC-7)."""
 
     permission_classes = [p.MODULE, HasPermission(p.P_CONFIG_MANAGE)]
@@ -1030,7 +1030,7 @@ class PmsConfigurationDeleteView(PmsAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class AttorneyPanelListView(PmsAPIView):
+class AttorneyPanelListView(PmsWriteAPIView):
     """Attorney panel maintenance and expertise mappings (UC-PMS-026, CFR-PMS-003)."""
 
     permission_classes = [p.MODULE]
@@ -1061,7 +1061,7 @@ class AttorneyPanelListView(PmsAPIView):
         return Response(s.AttorneyPanelSerializer(panel).data, status=status.HTTP_201_CREATED)
 
 
-class AttorneyPanelDetailView(PmsAPIView):
+class AttorneyPanelDetailView(PmsWriteAPIView):
     """Update or remove an attorney panel entry (UC-PMS-026)."""
 
     permission_classes = [p.MODULE]
