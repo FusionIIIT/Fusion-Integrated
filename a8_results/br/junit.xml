@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="3" failures="0" skipped="0" tests="3" time="3.013" timestamp="2026-11-10T21:25:05.069432+05:30" hostname="Tirth"><testcase classname="tests.a8.br.test_br_design" name="test_br_tc_001" time="0.486"><error message="failed on setup with &quot;RuntimeError: Database access not allowed, use the &quot;django_db&quot; mark, or the &quot;db&quot; or &quot;transactional_db&quot; fixtures to enable it.&quot;">@pytest.fixture
+    def user():
+&gt;       return User.objects.create_user(username='testuser', password='testpassword')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\a8\br\test_br_design.py:7: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\models.py:175: in create_user
+    return self._create_user(username, email, password, **extra_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\models.py:163: in _create_user
+    user.save(using=self._db)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\base_user.py:65: in save
+    super().save(*args, **kwargs)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\base.py:902: in save
+    self.save_base(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\base.py:1008: in save_base
+    updated = self._save_table(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\base.py:1169: in _save_table
+    results = self._do_insert(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\base.py:1210: in _do_insert
+    return manager._insert(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\query.py:1873: in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\sql\compiler.py:1880: in execute_sql
+    with self.connection.cursor() as cursor:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;, name = None
+
+    def _cursor(self, name=None):
+        self.close_if_health_check_failed()
+&gt;       self.ensure_connection()
+E       RuntimeError: Database access not allowed, use the "django_db" mark, or the "db" or "transactional_db" fixtures to enable it.
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: RuntimeError</error></testcase><testcase classname="tests.a8.br.test_br_design" name="test_br_tc_002" time="0.005"><error message="failed on setup with &quot;RuntimeError: Database access not allowed, use the &quot;django_db&quot; mark, or the &quot;db&quot; or &quot;transactional_db&quot; fixtures to enable it.&quot;">@pytest.fixture
+    def user():
+&gt;       return User.objects.create_user(username='testuser', password='testpassword')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\a8\br\test_br_design.py:7: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\models.py:175: in create_user
+    return self._create_user(username, email, password, **extra_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\models.py:163: in _create_user
+    user.save(using=self._db)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\base_user.py:65: in save
+    super().save(*args, **kwargs)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\base.py:902: in save
+    self.save_base(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\base.py:1008: in save_base
+    updated = self._save_table(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\base.py:1169: in _save_table
+    results = self._do_insert(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\base.py:1210: in _do_insert
+    return manager._insert(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\query.py:1873: in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\sql\compiler.py:1880: in execute_sql
+    with self.connection.cursor() as cursor:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;, name = None
+
+    def _cursor(self, name=None):
+        self.close_if_health_check_failed()
+&gt;       self.ensure_connection()
+E       RuntimeError: Database access not allowed, use the "django_db" mark, or the "db" or "transactional_db" fixtures to enable it.
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: RuntimeError</error></testcase><testcase classname="tests.a8.br.test_br_design" name="test_br_tc_003" time="0.005"><error message="failed on setup with &quot;RuntimeError: Database access not allowed, use the &quot;django_db&quot; mark, or the &quot;db&quot; or &quot;transactional_db&quot; fixtures to enable it.&quot;">@pytest.fixture
+    def user():
+&gt;       return User.objects.create_user(username='testuser', password='testpassword')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\a8\br\test_br_design.py:7: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\models.py:175: in create_user
+    return self._create_user(username, email, password, **extra_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\models.py:163: in _create_user
+    user.save(using=self._db)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\base_user.py:65: in save
+    super().save(*args, **kwargs)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\base.py:902: in save
+    self.save_base(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\base.py:1008: in save_base
+    updated = self._save_table(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\base.py:1169: in _save_table
+    results = self._do_insert(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\base.py:1210: in _do_insert
+    return manager._insert(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\query.py:1873: in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\sql\compiler.py:1880: in execute_sql
+    with self.connection.cursor() as cursor:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;, name = None
+
+    def _cursor(self, name=None):
+        self.close_if_health_check_failed()
+&gt;       self.ensure_connection()
+E       RuntimeError: Database access not allowed, use the "django_db" mark, or the "db" or "transactional_db" fixtures to enable it.
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: RuntimeError</error></testcase></testsuite></testsuites>
