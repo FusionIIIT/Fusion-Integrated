@@ -163,8 +163,10 @@ def staff_view(*, season: str) -> dict:
             policy=policy, status="debarred").count(),
         "placed": agg["n"] or 0,
         "median_ctc": str(_median(ctcs)) if ctcs else None,
-        "mean_ctc": str(round(agg["mean"], 2)) if agg["mean"] else None,
-        "max_ctc": str(agg["top"]) if agg["top"] else None,
+        "mean_ctc": (
+            f"{Decimal(str(round(agg['mean'], 2))):.2f}" if agg["mean"] is not None else None
+        ),
+        "max_ctc": f"{Decimal(str(agg['top'])):.2f}" if agg["top"] is not None else None,
         "by_company": by_company,
         "applications_by_status": by_status,
     }

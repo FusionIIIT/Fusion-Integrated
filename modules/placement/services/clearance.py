@@ -173,6 +173,28 @@ def record_off_campus(*, season: str, user_id: int, company_id: int,
     return record
 
 
+@transaction.atomic
+def update_record(*, record_id: int, actor, **fields) -> PlacementRecord:
+    """PC-BR-029: TPO may update placement records for Students and Alumni.
+
+    Exceptions / Exclusions: Does not grant Alumni write access.
+    """
+    require(actor, P_MANAGE)
+    record = PlacementRecord.objects.select_for_update().filter(pk=record_id).first()
+    if record is None:
+        raise NotFoundError("No such placement record.")
+
+    allowed = {"ctc_lpa", "kind", "is_active"}
+    touched = []
+    for key, val in fields.items():
+        if key in allowed:
+            setattr(record, key, val)
+            touched.append(key)
+    if touched:
+        record.save(update_fields=[*touched, "updated_at"])
+    return record
+
+
 def outstanding(*, season: str | None = None) -> list[PlacementRecord]:
     """Placed students who still owe a signed letter. The office's worklist."""
     rows = (PlacementRecord.objects

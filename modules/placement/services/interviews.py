@@ -1,4 +1,7 @@
-"""Interview scheduling and tracking (PC-UC-009, PC-WF-006, PC-BR-011/012)."""
+"""Interview scheduling and tracking.
+
+Spec refs: PC-UC-009, PC-UC-021, BW-PC-05, BW-PC-06, CW-PC-02, PC-BR-011/012.
+"""
 from __future__ import annotations
 
 from django.db import transaction

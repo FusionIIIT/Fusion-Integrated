@@ -1,4 +1,7 @@
-"""All writes to an application (PC-WF-004, PC-WF-005).
+"""All writes to an application.
+
+Spec refs: BW-PC-01..04, CW-PC-01, CW-PC-02, CW-PC-04,
+           PC-UC-003, PC-BR-001, PC-BR-002, PC-BR-030.
 
 Raises domain errors, never DRF exceptions, so it stays callable from a task
 or a management command. Three checks must all pass:
@@ -214,6 +217,11 @@ def apply_to(*, posting_id: int, actor, cover_note: str = "",
     Eligibility is frozen onto the row, so the decision stays reproducible
     after a CPI or rule change. That snapshot is what an appeal is judged on.
     """
+    if getattr(actor, "active_role", None) == "alumni" or getattr(actor, "kind", None) == "alumni":
+        raise ConflictError(
+            "Alumni cannot participate in active placement workflows such as applying.",
+            code="alumni_workflow_prohibited")
+
     posting = (JobPosting.objects.select_related("company")
                .filter(pk=posting_id).first())
     if posting is None:
@@ -233,7 +241,7 @@ def apply_to(*, posting_id: int, actor, cover_note: str = "",
 
     app = Application.objects.create(
         posting=posting, user_id=actor.user_id, status=sm.DRAFT,
-        cover_note=cover_note, resume_id=resume_id,
+        cover_note=cover_note,
         cpi_at_apply=snapshot.get("cpi"),
         semester_at_apply=snapshot.get("semester"),
         standing_declared_seq_at_apply=snapshot.get("declared_seq"),

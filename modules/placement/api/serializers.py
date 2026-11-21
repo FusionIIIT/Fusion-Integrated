@@ -684,7 +684,7 @@ class BulkResultSerializer(serializers.Serializer):
     results = BulkOutcomeSerializer(many=True)
 
 
-# -- Audit trail (PC-BR-008) ---------------------------------------------------
+# -- Audit trail (PC-AFR-009, PC-UC-004) ---------------------------------------
 class TransitionEntrySerializer(serializers.Serializer):
     """`reason` and the actor ids are absent for a non-staff reader — see
     api/audit.py for why."""
