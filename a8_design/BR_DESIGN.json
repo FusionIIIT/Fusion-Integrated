@@ -1,0 +1,551 @@
+[
+  {
+    "test_id": "BR-TC-001",
+    "source_id": "OA-BR-01 permitted",
+    "purpose": "Authorized role can use a function it is authorized for.",
+    "preconditions": "A Student user (UG or PG) exists and is authenticated.",
+    "action_or_input": "Student requests a function/record in their own role scope (e.g., view own leave status).",
+    "expected_result": "Access is permitted and the student's own data is returned.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-002",
+    "source_id": "OA-BR-01 prohibited-function",
+    "purpose": "A role is denied a function it is not authorized for.",
+    "preconditions": "A Student user is authenticated.",
+    "action_or_input": "Student attempts an HoD-only function (e.g., approve a leave application).",
+    "expected_result": "Access is denied; no state change occurs.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-003",
+    "source_id": "OA-BR-01 prohibited-record",
+    "purpose": "A user cannot access a record outside their data scope.",
+    "preconditions": "Student A and Student B each have a leave application; Student A is authenticated.",
+    "action_or_input": "Student A requests Student B's leave application record.",
+    "expected_result": "Access is denied; Student B's data is not returned.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-004",
+    "source_id": "OA-BR-03 channel",
+    "purpose": "A triggered notification obligation is sent via both system alert and email.",
+    "preconditions": "A student exists with a valid email address.",
+    "action_or_input": "Student submits a leave application (a request-submission notification obligation).",
+    "expected_result": "A system-generated alert and an email notification are both generated for the student.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-005",
+    "source_id": "OA-BR-11 HoD-approve",
+    "purpose": "HoD can approve a leave application.",
+    "preconditions": "A submitted leave application exists; HoD is authenticated.",
+    "action_or_input": "HoD approves the leave application.",
+    "expected_result": "Leave decision is recorded as approved by the HoD.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-006",
+    "source_id": "OA-BR-11 HoD-reject",
+    "purpose": "HoD can reject a leave application.",
+    "preconditions": "A submitted leave application exists; HoD is authenticated.",
+    "action_or_input": "HoD rejects the leave application.",
+    "expected_result": "Leave decision is recorded as rejected by the HoD.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-007",
+    "source_id": "OA-BR-11 non-HoD",
+    "purpose": "A non-HoD role cannot approve/reject a leave application.",
+    "preconditions": "A submitted leave application exists; Academic Administrator is authenticated.",
+    "action_or_input": "Academic Administrator attempts to approve the leave application.",
+    "expected_result": "Action is denied; leave application remains undecided.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-008",
+    "source_id": "OA-BR-21 approve",
+    "purpose": "Academic Administrator verifies and approves a bonafide request.",
+    "preconditions": "A submitted bonafide request exists; Academic Administrator is authenticated.",
+    "action_or_input": "Academic Administrator verifies and approves the request.",
+    "expected_result": "Request is recorded as approved by the Academic Administrator.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-009",
+    "source_id": "OA-BR-21 reject",
+    "purpose": "Academic Administrator verifies and rejects a bonafide request.",
+    "preconditions": "A submitted bonafide request exists; Academic Administrator is authenticated.",
+    "action_or_input": "Academic Administrator verifies and rejects the request.",
+    "expected_result": "Request is recorded as rejected by the Academic Administrator.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-010",
+    "source_id": "OA-BR-21 non-AcadAdmin",
+    "purpose": "A role other than Academic Administrator cannot verify/decide a bonafide request.",
+    "preconditions": "A submitted bonafide request exists; HoD is authenticated.",
+    "action_or_input": "HoD attempts to approve the bonafide request.",
+    "expected_result": "Action is denied; request status is unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-011",
+    "source_id": "OA-BR-22 approved",
+    "purpose": "Download is permitted for an approved bonafide request.",
+    "preconditions": "A bonafide request approved by the Academic Administrator exists; the requesting student is authenticated.",
+    "action_or_input": "Student requests download of the bonafide certificate.",
+    "expected_result": "Download is permitted and the certificate is delivered.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-012",
+    "source_id": "OA-BR-22 pending",
+    "purpose": "Download is refused while the bonafide request is not yet approved.",
+    "preconditions": "A submitted, not-yet-decided bonafide request exists; the requesting student is authenticated.",
+    "action_or_input": "Student requests download of the bonafide certificate.",
+    "expected_result": "Download is refused; no certificate is delivered.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-013",
+    "source_id": "OA-BR-22 rejected",
+    "purpose": "Download is refused for a rejected bonafide request.",
+    "preconditions": "A bonafide request rejected by the Academic Administrator exists; the requesting student is authenticated.",
+    "action_or_input": "Student requests download of the bonafide certificate.",
+    "expected_result": "Download is refused; no certificate is delivered.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-014",
+    "source_id": "OA-BR-31 Library",
+    "purpose": "Librarian can record clearance for the Library domain.",
+    "preconditions": "A no-dues request exists routed to all seven domains; Librarian is authenticated.",
+    "action_or_input": "Librarian opens the request and records a clearance result for the Library domain.",
+    "expected_result": "The Library clearance result is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-015",
+    "source_id": "OA-BR-31 Hostel",
+    "purpose": "Hostel Warden can record clearance for the Hostel domain.",
+    "preconditions": "A no-dues request exists routed to all seven domains; Hostel Warden is authenticated.",
+    "action_or_input": "Hostel Warden opens the request and records a clearance result for the Hostel domain.",
+    "expected_result": "The Hostel clearance result is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-016",
+    "source_id": "OA-BR-31 Mess",
+    "purpose": "Mess In-charge can record clearance for the Mess domain.",
+    "preconditions": "A no-dues request exists routed to all seven domains; Mess In-charge is authenticated.",
+    "action_or_input": "Mess In-charge opens the request and records a clearance result for the Mess domain.",
+    "expected_result": "The Mess clearance result is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-017",
+    "source_id": "OA-BR-31 respective Department",
+    "purpose": "authorized Department verifier of the student's department can record clearance for the respective Department domain.",
+    "preconditions": "A no-dues request exists routed to all seven domains; authorized Department verifier of the student's department is authenticated.",
+    "action_or_input": "authorized Department verifier of the student's department opens the request and records a clearance result for the respective Department domain.",
+    "expected_result": "The respective Department clearance result is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-018",
+    "source_id": "OA-BR-31 Lab",
+    "purpose": "Lab Supervisor can record clearance for the Lab domain.",
+    "preconditions": "A no-dues request exists routed to all seven domains; Lab Supervisor is authenticated.",
+    "action_or_input": "Lab Supervisor opens the request and records a clearance result for the Lab domain.",
+    "expected_result": "The Lab clearance result is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-019",
+    "source_id": "OA-BR-31 Academic Section",
+    "purpose": "authorized Academic Section verifier can record clearance for the Academic Section domain.",
+    "preconditions": "A no-dues request exists routed to all seven domains; authorized Academic Section verifier is authenticated.",
+    "action_or_input": "authorized Academic Section verifier opens the request and records a clearance result for the Academic Section domain.",
+    "expected_result": "The Academic Section clearance result is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-020",
+    "source_id": "OA-BR-31 Student Section",
+    "purpose": "authorized Student Section verifier can record clearance for the Student Section domain.",
+    "preconditions": "A no-dues request exists routed to all seven domains; authorized Student Section verifier is authenticated.",
+    "action_or_input": "authorized Student Section verifier opens the request and records a clearance result for the Student Section domain.",
+    "expected_result": "The Student Section clearance result is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-021",
+    "source_id": "OA-BR-31 cross-domain",
+    "purpose": "An authority cannot record clearance for another authority's domain.",
+    "preconditions": "A no-dues request exists; Librarian is authenticated.",
+    "action_or_input": "Librarian attempts to record a clearance result for the Hostel domain.",
+    "expected_result": "Action is denied; Hostel status is unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-022",
+    "source_id": "OA-BR-31 respective-department",
+    "purpose": "A verifier of a different department cannot record the student's Department clearance.",
+    "preconditions": "A no-dues request exists for a student of Department X; an authorized Department verifier of Department Y is authenticated.",
+    "action_or_input": "Department Y verifier attempts to record the Department clearance for the student.",
+    "expected_result": "Action is denied; the student's Department status is unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-023",
+    "source_id": "OA-BR-32 independence",
+    "purpose": "Recording one authority's result updates only that domain and leaves the other six unchanged.",
+    "preconditions": "A no-dues request exists with all seven statuses pending.",
+    "action_or_input": "Librarian records 'clear' for Library; then Mess In-charge records 'not clear' for Mess.",
+    "expected_result": "After the first action only Library is clear and the other six are unchanged; after the second action Mess is not clear, Library remains clear, and the other five are unchanged.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-024",
+    "source_id": "OA-BR-33 all-clear",
+    "purpose": "Finalization is allowed when all seven authorities have submitted and all are clear.",
+    "preconditions": "A no-dues request exists with all seven authority results recorded as clear; Academic Administrator is authenticated.",
+    "action_or_input": "Academic Administrator attempts to finalize no-dues clearance.",
+    "expected_result": "Finalization is allowed and the request is recorded as finalized.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-025",
+    "source_id": "OA-BR-33 incomplete",
+    "purpose": "Finalization is refused when not all seven authorities have submitted verification.",
+    "preconditions": "A no-dues request exists where six authorities recorded 'clear' and one (e.g., Lab) has not submitted; Academic Administrator is authenticated.",
+    "action_or_input": "Academic Administrator attempts to finalize no-dues clearance.",
+    "expected_result": "Finalization is refused; the request is not finalized.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-026",
+    "source_id": "OA-BR-33 not-clear",
+    "purpose": "Finalization is refused when all seven have submitted but at least one result is not clear.",
+    "preconditions": "A no-dues request exists where all seven authorities submitted and six are 'clear' but one (e.g., Hostel) is 'not clear'; Academic Administrator is authenticated.",
+    "action_or_input": "Academic Administrator attempts to finalize no-dues clearance.",
+    "expected_result": "Finalization is refused; the request is not finalized.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-027",
+    "source_id": "OA-BR-34 before-finalization",
+    "purpose": "No-dues certificate download is refused before finalization.",
+    "preconditions": "A no-dues request exists that has not been finalized; the student is authenticated.",
+    "action_or_input": "Student requests the no-dues certificate download.",
+    "expected_result": "Download is refused; no certificate is delivered.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-028",
+    "source_id": "OA-BR-34 after-finalization",
+    "purpose": "No-dues certificate download is permitted after finalization.",
+    "preconditions": "A no-dues request finalized by the Academic Administrator exists; the student is authenticated.",
+    "action_or_input": "Student requests the no-dues certificate download.",
+    "expected_result": "Download is permitted and the certificate is delivered.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-029",
+    "source_id": "OA-BR-41 PG",
+    "purpose": "A PG student can submit an assistantship claim.",
+    "preconditions": "A PG student is authenticated.",
+    "action_or_input": "PG student submits an assistantship claim.",
+    "expected_result": "Claim submission is accepted and the claim is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-030",
+    "source_id": "OA-BR-41 non-PG",
+    "purpose": "A non-PG (UG) student cannot submit an assistantship claim.",
+    "preconditions": "A UG student is authenticated.",
+    "action_or_input": "UG student attempts to submit an assistantship claim.",
+    "expected_result": "Submission is refused; no claim is recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-031",
+    "source_id": "OA-BR-42 thesis-then-TA",
+    "purpose": "Both role-verifications are recorded when different faculty verify in Thesis-then-TA order.",
+    "preconditions": "A submitted claim exists; Faculty F1 is the assigned Thesis Supervisor and Faculty F2 is the assigned TA Supervisor.",
+    "action_or_input": "F1 verifies as Thesis Supervisor, then F2 verifies as TA Supervisor.",
+    "expected_result": "Both the Thesis Supervisor verification and the TA Supervisor verification are recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-032",
+    "source_id": "OA-BR-42 TA-then-thesis",
+    "purpose": "No order is prescribed: both verifications are recorded in TA-then-Thesis order.",
+    "preconditions": "A submitted claim exists; Faculty F1 is the assigned Thesis Supervisor and Faculty F2 is the assigned TA Supervisor.",
+    "action_or_input": "F2 verifies as TA Supervisor, then F1 verifies as Thesis Supervisor.",
+    "expected_result": "Both role-verifications are recorded; the reverse order is accepted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-033",
+    "source_id": "OA-BR-42 same-faculty",
+    "purpose": "The same faculty member holding both roles can record both role-verifications.",
+    "preconditions": "A submitted claim exists; Faculty F1 is both the assigned Thesis Supervisor and the assigned TA Supervisor.",
+    "action_or_input": "F1 verifies the claim as Thesis Supervisor and also verifies it as TA Supervisor.",
+    "expected_result": "Both role-verifications are recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-034",
+    "source_id": "OA-BR-42 thesis-only",
+    "purpose": "Thesis Supervisor verification alone does not replace the TA Supervisor verification.",
+    "preconditions": "A submitted claim exists; F1 is the assigned Thesis Supervisor and F2 is the assigned TA Supervisor.",
+    "action_or_input": "Only F1 verifies as Thesis Supervisor.",
+    "expected_result": "Thesis Supervisor verification is recorded; the TA Supervisor verification remains outstanding and the claim is not treated as fully verified.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-035",
+    "source_id": "OA-BR-42 TA-only",
+    "purpose": "TA Supervisor verification alone does not replace the Thesis Supervisor verification.",
+    "preconditions": "A submitted claim exists; F1 is the assigned Thesis Supervisor and F2 is the assigned TA Supervisor.",
+    "action_or_input": "Only F2 verifies as TA Supervisor.",
+    "expected_result": "TA Supervisor verification is recorded; the Thesis Supervisor verification remains outstanding and the claim is not treated as fully verified.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-036",
+    "source_id": "OA-BR-43 none-verified",
+    "purpose": "Department Administrator review is blocked when no supervisor verification exists.",
+    "preconditions": "A submitted claim exists with no supervisor-role verification; Department Administrator is authenticated.",
+    "action_or_input": "Department Administrator attempts to review/forward the claim.",
+    "expected_result": "Action is refused; the claim does not enter department review.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-037",
+    "source_id": "OA-BR-43 one-verified",
+    "purpose": "Department Administrator review is blocked when only one supervisor role is verified.",
+    "preconditions": "A submitted claim exists with only the Thesis Supervisor role verified; Department Administrator is authenticated.",
+    "action_or_input": "Department Administrator attempts to review/forward the claim.",
+    "expected_result": "Action is refused; the claim does not enter department review.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-038",
+    "source_id": "OA-BR-43 both-verified",
+    "purpose": "Department Administrator review is allowed once both supervisor roles are verified.",
+    "preconditions": "A claim exists with both Thesis Supervisor and TA Supervisor role-verifications recorded; Department Administrator is authenticated.",
+    "action_or_input": "Department Administrator reviews and forwards the claim to HoD.",
+    "expected_result": "Review is allowed and the claim is forwarded to HoD.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-039",
+    "source_id": "OA-BR-44 approve",
+    "purpose": "HoD can approve an assistantship claim after review.",
+    "preconditions": "A claim forwarded by the Department Administrator exists; HoD is authenticated.",
+    "action_or_input": "HoD approves the claim.",
+    "expected_result": "Claim is recorded as approved by the HoD.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-040",
+    "source_id": "OA-BR-44 reject",
+    "purpose": "HoD can reject an assistantship claim after review.",
+    "preconditions": "A claim forwarded by the Department Administrator exists; HoD is authenticated.",
+    "action_or_input": "HoD rejects the claim.",
+    "expected_result": "Claim is recorded as rejected by the HoD.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-041",
+    "source_id": "OA-BR-44 non-HoD",
+    "purpose": "A non-HoD role cannot approve/reject an assistantship claim.",
+    "preconditions": "A claim forwarded by the Department Administrator exists; Academic Administrator is authenticated.",
+    "action_or_input": "Academic Administrator attempts to approve the claim as the departmental decision.",
+    "expected_result": "Action is denied; the claim remains undecided.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-042",
+    "source_id": "OA-BR-45 approved",
+    "purpose": "Stipend processing is permitted for an HoD-approved claim.",
+    "preconditions": "An HoD-approved claim exists; Academic Administrator is authenticated.",
+    "action_or_input": "Academic Administrator opens the claim for stipend processing and processes it.",
+    "expected_result": "Processing is permitted and recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-043",
+    "source_id": "OA-BR-45 rejected",
+    "purpose": "Stipend processing is refused for an HoD-rejected claim.",
+    "preconditions": "An HoD-rejected claim exists; Academic Administrator is authenticated.",
+    "action_or_input": "Academic Administrator attempts stipend processing on the claim.",
+    "expected_result": "Processing is refused; no stipend processing is recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-044",
+    "source_id": "OA-BR-45 undecided",
+    "purpose": "Stipend processing is refused for a claim without an HoD approval.",
+    "preconditions": "A claim forwarded to HoD and awaiting HoD decision exists; Academic Administrator is authenticated.",
+    "action_or_input": "Academic Administrator attempts stipend processing on the claim.",
+    "expected_result": "Processing is refused; no stipend processing is recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-045",
+    "source_id": "OA-BR-46 full-sequence",
+    "purpose": "The accepted assistantship progression is followed end to end.",
+    "preconditions": "A PG student's submitted claim exists with assigned Thesis and TA Supervisors, Department Administrator, HoD and Academic Administrator available.",
+    "action_or_input": "Thesis Supervisor and TA Supervisor verify (either order); Department Administrator reviews/forwards; HoD approves; Academic Administrator processes the stipend.",
+    "expected_result": "Each step is accepted in this sequence and the claim ends as stipend-processed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-046",
+    "source_id": "OA-BR-46 bypass-dept-review",
+    "purpose": "HoD decision cannot bypass Department Administrator review.",
+    "preconditions": "A claim with both supervisor verifications recorded but not yet reviewed/forwarded by the Department Administrator exists; HoD is authenticated.",
+    "action_or_input": "HoD attempts to approve the claim.",
+    "expected_result": "Action is refused; the claim is not approved.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-047",
+    "source_id": "OA-BR-46 bypass-supervisors",
+    "purpose": "HoD decision cannot bypass the required supervisor verifications.",
+    "preconditions": "A submitted claim with no supervisor-role verification exists; HoD is authenticated.",
+    "action_or_input": "HoD attempts to approve the claim.",
+    "expected_result": "Action is refused; the claim is not approved.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-048",
+    "source_id": "OA-BR-51 thesis-assignment",
+    "purpose": "Department Administrator records a thesis-supervisor assignment.",
+    "preconditions": "A PG student and a faculty member exist; a departmental decision is available; Department Administrator is authenticated.",
+    "action_or_input": "Department Administrator records the thesis-supervisor assignment of the faculty member to the student.",
+    "expected_result": "The thesis-supervisor assignment is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-049",
+    "source_id": "OA-BR-51 TA-course-only",
+    "purpose": "TA assignment is recorded with a course/subject only.",
+    "preconditions": "A PG student and a course exist; a departmental decision specifies the course only; Department Administrator is authenticated.",
+    "action_or_input": "Department Administrator records the TA assignment with the course/subject only.",
+    "expected_result": "The TA assignment is recorded with the course/subject and no faculty target.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-050",
+    "source_id": "OA-BR-51 TA-faculty-only",
+    "purpose": "TA assignment is recorded with a faculty member only.",
+    "preconditions": "A PG student and a faculty member exist; a departmental decision specifies the faculty member only; Department Administrator is authenticated.",
+    "action_or_input": "Department Administrator records the TA assignment with the faculty member only.",
+    "expected_result": "The TA assignment is recorded with the faculty target and no course/subject.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-051",
+    "source_id": "OA-BR-51 TA-both",
+    "purpose": "TA assignment is recorded with both course/subject and faculty member.",
+    "preconditions": "A PG student, a course and a faculty member exist; a departmental decision specifies both; Department Administrator is authenticated.",
+    "action_or_input": "Department Administrator records the TA assignment with both the course/subject and the faculty member.",
+    "expected_result": "The TA assignment is recorded with both the course/subject and the faculty target.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-052",
+    "source_id": "OA-BR-51 non-DeptAdmin",
+    "purpose": "A role other than Department Administrator cannot record assignments.",
+    "preconditions": "A PG student and a faculty member exist; a Student user is authenticated.",
+    "action_or_input": "The student attempts to record a thesis-supervisor assignment.",
+    "expected_result": "Action is denied; no assignment is recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-053",
+    "source_id": "OA-BR-52 roles-resolved",
+    "purpose": "Both roles are resolved for the claimant and both verifications are required when one faculty member holds both roles.",
+    "preconditions": "A submitted claim exists for a PG student whose Thesis Supervisor and TA Supervisor are the same faculty member F1.",
+    "action_or_input": "F1 views the claim for verification.",
+    "expected_result": "Both the Thesis Supervisor role and the TA Supervisor role are resolved for F1 for this claim, as two distinct required verifications.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-054",
+    "source_id": "OA-BR-52 single-verification",
+    "purpose": "A single verification by a dual-role faculty member does not satisfy both roles.",
+    "preconditions": "A submitted claim exists whose Thesis Supervisor and TA Supervisor are the same faculty member F1; Department Administrator is available.",
+    "action_or_input": "F1 verifies only in the Thesis Supervisor role; then Department Administrator attempts to review/forward the claim.",
+    "expected_result": "TA Supervisor role-verification remains outstanding and Department Administrator review is refused.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-055",
+    "source_id": "OA-BR-61 PG",
+    "purpose": "A PG student can initiate a graduate seminar scheduling request.",
+    "preconditions": "A PG student is authenticated.",
+    "action_or_input": "PG student submits a seminar scheduling request.",
+    "expected_result": "The request is accepted and recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-056",
+    "source_id": "OA-BR-61 non-PG",
+    "purpose": "A non-PG (UG) student cannot initiate a seminar scheduling request.",
+    "preconditions": "A UG student is authenticated.",
+    "action_or_input": "UG student attempts to submit a seminar scheduling request.",
+    "expected_result": "Request is refused; none is recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-057",
+    "source_id": "OA-BR-62 schedule",
+    "purpose": "Department Administrator schedules and logs a seminar with no separate approval stage.",
+    "preconditions": "A PG seminar request awaiting scheduling exists; Department Administrator is authenticated.",
+    "action_or_input": "Department Administrator schedules the seminar.",
+    "expected_result": "Seminar is scheduled and logged directly, with no approval step required.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-058",
+    "source_id": "OA-BR-62 non-DeptAdmin",
+    "purpose": "A non-Department Administrator cannot schedule a seminar.",
+    "preconditions": "A PG seminar request awaiting scheduling exists; the requesting PG student is authenticated.",
+    "action_or_input": "The PG student attempts to schedule the seminar.",
+    "expected_result": "Action is denied; the seminar remains unscheduled.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TC-059",
+    "source_id": "OA-BR-63 PG-view",
+    "purpose": "A PG student can view seminar schedules.",
+    "preconditions": "A scheduled seminar exists; a PG student is authenticated.",
+    "action_or_input": "PG student requests to view the seminar schedule.",
+    "expected_result": "Viewing is permitted and the schedule is shown.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-060",
+    "source_id": "OA-BR-63 faculty-view",
+    "purpose": "A faculty member can view seminar schedules.",
+    "preconditions": "A scheduled seminar exists; a faculty member is authenticated.",
+    "action_or_input": "Faculty member requests to view the seminar schedule.",
+    "expected_result": "Viewing is permitted and the schedule is shown.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-TC-061",
+    "source_id": "OA-BR-63 other-role",
+    "purpose": "A role that is neither PG student nor faculty cannot view seminar schedules.",
+    "preconditions": "A scheduled seminar exists; a UG student is authenticated.",
+    "action_or_input": "UG student requests to view the seminar schedule.",
+    "expected_result": "Viewing is denied.",
+    "test_type": "negative"
+  }
+]

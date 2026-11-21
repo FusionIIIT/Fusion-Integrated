@@ -1,0 +1,83 @@
+[
+  {
+    "test_id": "WF-TC-01",
+    "source_id": "BW-OAP-01 leave-approved path (transitions 1-2; also covers CW-OAP-01 transitions 1-2)",
+    "purpose": "Verify the leave workflow from student submission through HoD approval.",
+    "preconditions": "A student has no submitted leave application. The student's appropriate HoD exists and is able to review leave applications.",
+    "action_or_input": "1) Student submits a leave application (OA-UC-01). 2) HoD reviews the submitted application and decides Outcome = Approved (OA-UC-03).",
+    "expected_result": "After step 1 the application state is 'Submitted – Awaiting HoD Decision'. After step 2 the application state is 'Approved'.",
+    "test_type": "workflow_path_positive"
+  },
+  {
+    "test_id": "WF-TC-02",
+    "source_id": "BW-OAP-02 leave-rejected path (transitions 1-2; also covers CW-OAP-01 transitions 1 and 3)",
+    "purpose": "Verify the leave workflow from student submission through HoD rejection.",
+    "preconditions": "A student has no submitted leave application. The student's appropriate HoD exists and is able to review leave applications.",
+    "action_or_input": "1) Student submits a leave application (OA-UC-01). 2) HoD reviews the submitted application and decides Outcome = Rejected (OA-UC-03).",
+    "expected_result": "After step 1 the application state is 'Submitted – Awaiting HoD Decision'. After step 2 the application state is 'Rejected'.",
+    "test_type": "workflow_path_negative_outcome"
+  },
+  {
+    "test_id": "WF-TC-03",
+    "source_id": "BW-OAP-03 bonafide-approved path (transitions 1-2; also covers CW-OAP-02 transitions 1-2)",
+    "purpose": "Verify the bonafide workflow from student request through Academic Administrator approval and certificate availability.",
+    "preconditions": "A student has no submitted bonafide request. An Academic Administrator exists and is able to verify and decide bonafide requests.",
+    "action_or_input": "1) Student submits a bonafide certificate request (OA-UC-11). 2) Academic Administrator verifies the request and decides Outcome = Approved (OA-UC-12).",
+    "expected_result": "After step 1 the request state is 'Submitted – Awaiting Academic Administrator'. After step 2 the request state is 'Approved – Certificate Available'.",
+    "test_type": "workflow_path_positive"
+  },
+  {
+    "test_id": "WF-TC-04",
+    "source_id": "BW-OAP-04 bonafide-rejected path (transitions 1-2; also covers CW-OAP-02 transitions 1 and 3)",
+    "purpose": "Verify the bonafide workflow from student request through Academic Administrator rejection.",
+    "preconditions": "A student has no submitted bonafide request. An Academic Administrator exists and is able to verify and decide bonafide requests.",
+    "action_or_input": "1) Student submits a bonafide certificate request (OA-UC-11). 2) Academic Administrator verifies the request and decides Outcome = Rejected (OA-UC-12).",
+    "expected_result": "After step 1 the request state is 'Submitted – Awaiting Academic Administrator'. After step 2 the request state is 'Rejected'.",
+    "test_type": "workflow_path_negative_outcome"
+  },
+  {
+    "test_id": "WF-TC-05",
+    "source_id": "BW-OAP-05 no-dues cleared path (transitions 1-4; also covers CW-OAP-03 transitions 1, 2, 3 and 5)",
+    "purpose": "Verify the no-dues workflow from initiation, through parallel verification by all seven mandatory authorities with all results Clear, to Academic Administrator finalization.",
+    "preconditions": "A student has no active clearance case. The seven mandatory clearance authorities (Library, Hostel, Mess, the student's respective Department, Lab, Academic Section, Student Section) and an Academic Administrator exist and are able to act.",
+    "action_or_input": "1) Student initiates no-dues clearance (OA-UC-21). 2) One of the seven authorities records its result as Clear while the other six verifications remain outstanding (OA-UC-22). 3) The remaining authorities record their results as Clear, the last remaining authority recording the seventh result (OA-UC-22). 4) Academic Administrator finalizes the no-dues clearance (OA-UC-23).",
+    "expected_result": "After step 1 the request is routed to all seven mandatory authorities and the state is 'Verification In Progress'. After step 2 the state remains 'Verification In Progress'. After the last authority records Clear in step 3 (all seven verifications complete and all seven Clear) the state is 'Verification Complete – All Clear'. After step 4 the state is 'Finalized – Certificate Available'.",
+    "test_type": "workflow_path_positive"
+  },
+  {
+    "test_id": "WF-TC-06",
+    "source_id": "BW-OAP-06 no-dues dues-outstanding path (transitions 1-3; also covers CW-OAP-03 transitions 1, 2 and 4)",
+    "purpose": "Verify the no-dues workflow in which all seven verifications complete but at least one authority records Dues Outstanding.",
+    "preconditions": "A student has no active clearance case. The seven mandatory clearance authorities exist and are able to act.",
+    "action_or_input": "1) Student initiates no-dues clearance (OA-UC-21). 2) One of the seven authorities records its result while other required verifications remain (OA-UC-22). 3) The remaining authorities record their results, with at least one authority's result = Dues Outstanding, the last remaining authority recording the seventh result (OA-UC-22).",
+    "expected_result": "After step 1 the request is routed to all seven mandatory authorities and the state is 'Verification In Progress'. After step 2 the state remains 'Verification In Progress'. After the last authority records its result in step 3 (all seven verifications complete and at least one result = Dues Outstanding) the state is 'Verification Complete – Dues Outstanding'.",
+    "test_type": "workflow_path_negative_outcome"
+  },
+  {
+    "test_id": "WF-TC-07",
+    "source_id": "BW-OAP-07 assistantship approved-and-processed path (transitions 1-6; also covers CW-OAP-04 transitions 1-5 and 7)",
+    "purpose": "Verify the assistantship workflow from PG submission, through dual supervisor verification (Thesis Supervisor first, then TA Supervisor), Department Administrator review, and HoD approval, to stipend processing.",
+    "preconditions": "A PG student has no submitted claim. The student has an assigned Thesis Supervisor and an assigned TA Supervisor (both roles resolvable). A Department Administrator, an HoD and an Academic Administrator exist and are able to act.",
+    "action_or_input": "1) PG student submits an assistantship claim (OA-UC-31). 2) Thesis Supervisor verifies the claim (OA-UC-33). 3) TA Supervisor verifies the claim (OA-UC-33). 4) Department Administrator reviews and forwards the claim (OA-UC-34). 5) HoD decides Outcome = Approved (OA-UC-35). 6) Academic Administrator processes stipend disbursement (OA-UC-36).",
+    "expected_result": "After step 1 the claim state is 'Awaiting Dual Supervisor Verification'. After step 2 the state is 'Awaiting Other Supervisor Verification'. After step 3 (both role-verifications complete) the state is 'Awaiting Department Review'. After step 4 the state is 'Awaiting HoD Decision'. After step 5 the state is 'Approved – Awaiting Stipend Processing'. After step 6 the state is 'Stipend Processed'.",
+    "test_type": "workflow_path_positive"
+  },
+  {
+    "test_id": "WF-TC-08",
+    "source_id": "BW-OAP-08 assistantship rejected-by-HoD path (transitions 1-5; also covers CW-OAP-04 transitions 1-4 and 6)",
+    "purpose": "Verify the assistantship workflow ending in HoD rejection, with the TA Supervisor verifying first and the Thesis Supervisor second.",
+    "preconditions": "A PG student has no submitted claim. The student has an assigned Thesis Supervisor and an assigned TA Supervisor (both roles resolvable). A Department Administrator and an HoD exist and are able to act.",
+    "action_or_input": "1) PG student submits an assistantship claim (OA-UC-31). 2) TA Supervisor verifies the claim (OA-UC-33). 3) Thesis Supervisor verifies the claim (OA-UC-33). 4) Department Administrator reviews and forwards the claim (OA-UC-34). 5) HoD decides Outcome = Rejected (OA-UC-35).",
+    "expected_result": "After step 1 the claim state is 'Awaiting Dual Supervisor Verification'. After step 2 the state is 'Awaiting Other Supervisor Verification'. After step 3 (both role-verifications complete) the state is 'Awaiting Department Review'. After step 4 the state is 'Awaiting HoD Decision'. After step 5 the state is 'Rejected'.",
+    "test_type": "workflow_path_negative_outcome"
+  },
+  {
+    "test_id": "WF-TC-09",
+    "source_id": "BW-OAP-09 graduate seminar scheduling path (transitions 1-2)",
+    "purpose": "Verify the graduate seminar workflow from PG student request through Department Administrator scheduling.",
+    "preconditions": "A PG student has no submitted seminar request. A Department Administrator exists and is able to schedule graduate seminars.",
+    "action_or_input": "1) PG student submits a graduate seminar scheduling request (OA-UC-51). 2) Department Administrator schedules the graduate seminar (OA-UC-53).",
+    "expected_result": "After step 1 the request state is 'Awaiting Scheduling'. After step 2 the request state is 'Scheduled'.",
+    "test_type": "workflow_path_positive"
+  }
+]

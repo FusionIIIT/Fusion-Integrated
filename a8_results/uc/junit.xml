@@ -1,0 +1,3538 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="9" failures="0" skipped="0" tests="9" time="269.299" timestamp="2026-11-10T17:58:12.978850+05:30" hostname="Tirth"><testcase classname="tests.a8.uc.test_oap_application" name="test_create_oap_application" time="260.270"><error message="failed on setup with &quot;django.db.utils.OperationalError: connection timeout expired&quot;">self = &lt;DatabaseWrapper vendor='postgresql' alias='__no_db__'&gt;
+
+    @async_unsafe
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
+        if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
+            with self.wrap_database_errors:
+&gt;               self.connect()
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=postgres client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1', autocommit = False
+prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'postgres', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               psycopg.errors.ConnectionTimeout: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: ConnectionTimeout
+
+The above exception was the direct cause of the following exception:
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+
+    @contextmanager
+    def _nodb_cursor(self):
+        cursor = None
+        try:
+&gt;           with super()._nodb_cursor() as cursor:
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:712: in _nodb_cursor
+    with conn.cursor() as cursor:
+         ^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: in _cursor
+    self.ensure_connection()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:278: in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: in ensure_connection
+    self.connect()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=postgres client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1', autocommit = False
+prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'postgres', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               django.db.utils.OperationalError: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: OperationalError
+
+During handling of the above exception, another exception occurred:
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+
+    @async_unsafe
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
+        if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
+            with self.wrap_database_errors:
+&gt;               self.connect()
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=fusion_integrated client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1'
+autocommit = False, prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'fusion_integrated', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               psycopg.errors.ConnectionTimeout: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: ConnectionTimeout
+
+The above exception was the direct cause of the following exception:
+
+request = &lt;SubRequest '_django_db_marker' for &lt;Function test_create_oap_application&gt;&gt;
+
+    @pytest.fixture(autouse=True)
+    def _django_db_marker(request: pytest.FixtureRequest) -&gt; None:
+        """Implement the django_db marker, internal to pytest-django."""
+        marker = request.node.get_closest_marker("django_db")
+        if marker:
+&gt;           request.getfixturevalue("_django_db_helper")
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_django\plugin.py:593: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_django\fixtures.py:186: in django_db_setup
+    db_cfg = setup_databases(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\test\utils.py:204: in setup_databases
+    connection.creation.create_test_db(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\creation.py:62: in create_test_db
+    self._create_test_db(verbosity, autoclobber, keepdb)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\creation.py:202: in _create_test_db
+    with self._nodb_cursor() as cursor:
+         ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:533: in _nodb_cursor
+    with conn.cursor() as cursor:
+         ^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: in _cursor
+    self.ensure_connection()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:278: in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: in ensure_connection
+    self.connect()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=fusion_integrated client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1'
+autocommit = False, prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'fusion_integrated', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               django.db.utils.OperationalError: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: OperationalError</error></testcase><testcase classname="tests.a8.uc.test_oap_application" name="test_update_oap_application" time="0.008"><error message="failed on setup with &quot;django.db.utils.OperationalError: connection timeout expired&quot;">self = &lt;DatabaseWrapper vendor='postgresql' alias='__no_db__'&gt;
+
+    @async_unsafe
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
+        if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
+            with self.wrap_database_errors:
+&gt;               self.connect()
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=postgres client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1', autocommit = False
+prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'postgres', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               psycopg.errors.ConnectionTimeout: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: ConnectionTimeout
+
+The above exception was the direct cause of the following exception:
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+
+    @contextmanager
+    def _nodb_cursor(self):
+        cursor = None
+        try:
+&gt;           with super()._nodb_cursor() as cursor:
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:712: in _nodb_cursor
+    with conn.cursor() as cursor:
+         ^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: in _cursor
+    self.ensure_connection()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:278: in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: in ensure_connection
+    self.connect()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=postgres client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1', autocommit = False
+prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'postgres', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               django.db.utils.OperationalError: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: OperationalError
+
+During handling of the above exception, another exception occurred:
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+
+    @async_unsafe
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
+        if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
+            with self.wrap_database_errors:
+&gt;               self.connect()
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=fusion_integrated client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1'
+autocommit = False, prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'fusion_integrated', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               psycopg.errors.ConnectionTimeout: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: ConnectionTimeout
+
+The above exception was the direct cause of the following exception:
+
+request = &lt;SubRequest '_django_db_marker' for &lt;Function test_update_oap_application&gt;&gt;
+
+    @pytest.fixture(autouse=True)
+    def _django_db_marker(request: pytest.FixtureRequest) -&gt; None:
+        """Implement the django_db marker, internal to pytest-django."""
+        marker = request.node.get_closest_marker("django_db")
+        if marker:
+&gt;           request.getfixturevalue("_django_db_helper")
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_django\plugin.py:593: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_django\fixtures.py:186: in django_db_setup
+    db_cfg = setup_databases(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\test\utils.py:204: in setup_databases
+    connection.creation.create_test_db(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\creation.py:62: in create_test_db
+    self._create_test_db(verbosity, autoclobber, keepdb)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\creation.py:202: in _create_test_db
+    with self._nodb_cursor() as cursor:
+         ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:533: in _nodb_cursor
+    with conn.cursor() as cursor:
+         ^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: in _cursor
+    self.ensure_connection()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:278: in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: in ensure_connection
+    self.connect()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=fusion_integrated client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1'
+autocommit = False, prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'fusion_integrated', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               django.db.utils.OperationalError: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: OperationalError</error></testcase><testcase classname="tests.a8.uc.test_oap_application" name="test_delete_oap_application" time="0.005"><error message="failed on setup with &quot;django.db.utils.OperationalError: connection timeout expired&quot;">self = &lt;DatabaseWrapper vendor='postgresql' alias='__no_db__'&gt;
+
+    @async_unsafe
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
+        if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
+            with self.wrap_database_errors:
+&gt;               self.connect()
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=postgres client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1', autocommit = False
+prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'postgres', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               psycopg.errors.ConnectionTimeout: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: ConnectionTimeout
+
+The above exception was the direct cause of the following exception:
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+
+    @contextmanager
+    def _nodb_cursor(self):
+        cursor = None
+        try:
+&gt;           with super()._nodb_cursor() as cursor:
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:712: in _nodb_cursor
+    with conn.cursor() as cursor:
+         ^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: in _cursor
+    self.ensure_connection()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:278: in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: in ensure_connection
+    self.connect()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=postgres client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1', autocommit = False
+prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'postgres', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               django.db.utils.OperationalError: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: OperationalError
+
+During handling of the above exception, another exception occurred:
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+
+    @async_unsafe
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
+        if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
+            with self.wrap_database_errors:
+&gt;               self.connect()
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=fusion_integrated client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1'
+autocommit = False, prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'fusion_integrated', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               psycopg.errors.ConnectionTimeout: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: ConnectionTimeout
+
+The above exception was the direct cause of the following exception:
+
+request = &lt;SubRequest '_django_db_marker' for &lt;Function test_delete_oap_application&gt;&gt;
+
+    @pytest.fixture(autouse=True)
+    def _django_db_marker(request: pytest.FixtureRequest) -&gt; None:
+        """Implement the django_db marker, internal to pytest-django."""
+        marker = request.node.get_closest_marker("django_db")
+        if marker:
+&gt;           request.getfixturevalue("_django_db_helper")
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_django\plugin.py:593: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_django\fixtures.py:186: in django_db_setup
+    db_cfg = setup_databases(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\test\utils.py:204: in setup_databases
+    connection.creation.create_test_db(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\creation.py:62: in create_test_db
+    self._create_test_db(verbosity, autoclobber, keepdb)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\creation.py:202: in _create_test_db
+    with self._nodb_cursor() as cursor:
+         ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:533: in _nodb_cursor
+    with conn.cursor() as cursor:
+         ^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: in _cursor
+    self.ensure_connection()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:278: in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: in ensure_connection
+    self.connect()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=fusion_integrated client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1'
+autocommit = False, prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'fusion_integrated', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               django.db.utils.OperationalError: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: OperationalError</error></testcase><testcase classname="tests.a8.uc.test_oap_service_outcome" name="test_create_oap_service_outcome" time="0.005"><error message="failed on setup with &quot;django.db.utils.OperationalError: connection timeout expired&quot;">self = &lt;DatabaseWrapper vendor='postgresql' alias='__no_db__'&gt;
+
+    @async_unsafe
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
+        if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
+            with self.wrap_database_errors:
+&gt;               self.connect()
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=postgres client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1', autocommit = False
+prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'postgres', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               psycopg.errors.ConnectionTimeout: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: ConnectionTimeout
+
+The above exception was the direct cause of the following exception:
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+
+    @contextmanager
+    def _nodb_cursor(self):
+        cursor = None
+        try:
+&gt;           with super()._nodb_cursor() as cursor:
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:712: in _nodb_cursor
+    with conn.cursor() as cursor:
+         ^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: in _cursor
+    self.ensure_connection()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:278: in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: in ensure_connection
+    self.connect()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=postgres client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1', autocommit = False
+prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'postgres', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               django.db.utils.OperationalError: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: OperationalError
+
+During handling of the above exception, another exception occurred:
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+
+    @async_unsafe
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
+        if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
+            with self.wrap_database_errors:
+&gt;               self.connect()
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=fusion_integrated client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1'
+autocommit = False, prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'fusion_integrated', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               psycopg.errors.ConnectionTimeout: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: ConnectionTimeout
+
+The above exception was the direct cause of the following exception:
+
+request = &lt;SubRequest '_django_db_marker' for &lt;Function test_create_oap_service_outcome&gt;&gt;
+
+    @pytest.fixture(autouse=True)
+    def _django_db_marker(request: pytest.FixtureRequest) -&gt; None:
+        """Implement the django_db marker, internal to pytest-django."""
+        marker = request.node.get_closest_marker("django_db")
+        if marker:
+&gt;           request.getfixturevalue("_django_db_helper")
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_django\plugin.py:593: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_django\fixtures.py:186: in django_db_setup
+    db_cfg = setup_databases(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\test\utils.py:204: in setup_databases
+    connection.creation.create_test_db(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\creation.py:62: in create_test_db
+    self._create_test_db(verbosity, autoclobber, keepdb)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\creation.py:202: in _create_test_db
+    with self._nodb_cursor() as cursor:
+         ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:533: in _nodb_cursor
+    with conn.cursor() as cursor:
+         ^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: in _cursor
+    self.ensure_connection()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:278: in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: in ensure_connection
+    self.connect()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=fusion_integrated client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1'
+autocommit = False, prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'fusion_integrated', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               django.db.utils.OperationalError: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: OperationalError</error></testcase><testcase classname="tests.a8.uc.test_oap_service_outcome" name="test_update_oap_service_outcome" time="0.004"><error message="failed on setup with &quot;django.db.utils.OperationalError: connection timeout expired&quot;">self = &lt;DatabaseWrapper vendor='postgresql' alias='__no_db__'&gt;
+
+    @async_unsafe
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
+        if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
+            with self.wrap_database_errors:
+&gt;               self.connect()
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=postgres client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1', autocommit = False
+prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'postgres', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               psycopg.errors.ConnectionTimeout: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: ConnectionTimeout
+
+The above exception was the direct cause of the following exception:
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+
+    @contextmanager
+    def _nodb_cursor(self):
+        cursor = None
+        try:
+&gt;           with super()._nodb_cursor() as cursor:
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:712: in _nodb_cursor
+    with conn.cursor() as cursor:
+         ^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: in _cursor
+    self.ensure_connection()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:278: in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: in ensure_connection
+    self.connect()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=postgres client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1', autocommit = False
+prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'postgres', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               django.db.utils.OperationalError: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: OperationalError
+
+During handling of the above exception, another exception occurred:
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+
+    @async_unsafe
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
+        if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
+            with self.wrap_database_errors:
+&gt;               self.connect()
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=fusion_integrated client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1'
+autocommit = False, prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'fusion_integrated', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               psycopg.errors.ConnectionTimeout: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: ConnectionTimeout
+
+The above exception was the direct cause of the following exception:
+
+request = &lt;SubRequest '_django_db_marker' for &lt;Function test_update_oap_service_outcome&gt;&gt;
+
+    @pytest.fixture(autouse=True)
+    def _django_db_marker(request: pytest.FixtureRequest) -&gt; None:
+        """Implement the django_db marker, internal to pytest-django."""
+        marker = request.node.get_closest_marker("django_db")
+        if marker:
+&gt;           request.getfixturevalue("_django_db_helper")
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_django\plugin.py:593: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_django\fixtures.py:186: in django_db_setup
+    db_cfg = setup_databases(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\test\utils.py:204: in setup_databases
+    connection.creation.create_test_db(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\creation.py:62: in create_test_db
+    self._create_test_db(verbosity, autoclobber, keepdb)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\creation.py:202: in _create_test_db
+    with self._nodb_cursor() as cursor:
+         ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:533: in _nodb_cursor
+    with conn.cursor() as cursor:
+         ^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: in _cursor
+    self.ensure_connection()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:278: in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: in ensure_connection
+    self.connect()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=fusion_integrated client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1'
+autocommit = False, prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'fusion_integrated', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               django.db.utils.OperationalError: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: OperationalError</error></testcase><testcase classname="tests.a8.uc.test_oap_service_outcome" name="test_delete_oap_service_outcome" time="0.007"><error message="failed on setup with &quot;django.db.utils.OperationalError: connection timeout expired&quot;">self = &lt;DatabaseWrapper vendor='postgresql' alias='__no_db__'&gt;
+
+    @async_unsafe
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
+        if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
+            with self.wrap_database_errors:
+&gt;               self.connect()
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=postgres client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1', autocommit = False
+prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'postgres', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               psycopg.errors.ConnectionTimeout: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: ConnectionTimeout
+
+The above exception was the direct cause of the following exception:
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+
+    @contextmanager
+    def _nodb_cursor(self):
+        cursor = None
+        try:
+&gt;           with super()._nodb_cursor() as cursor:
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:712: in _nodb_cursor
+    with conn.cursor() as cursor:
+         ^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: in _cursor
+    self.ensure_connection()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:278: in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: in ensure_connection
+    self.connect()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=postgres client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1', autocommit = False
+prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'postgres', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               django.db.utils.OperationalError: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: OperationalError
+
+During handling of the above exception, another exception occurred:
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+
+    @async_unsafe
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
+        if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
+            with self.wrap_database_errors:
+&gt;               self.connect()
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=fusion_integrated client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1'
+autocommit = False, prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'fusion_integrated', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               psycopg.errors.ConnectionTimeout: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: ConnectionTimeout
+
+The above exception was the direct cause of the following exception:
+
+request = &lt;SubRequest '_django_db_marker' for &lt;Function test_delete_oap_service_outcome&gt;&gt;
+
+    @pytest.fixture(autouse=True)
+    def _django_db_marker(request: pytest.FixtureRequest) -&gt; None:
+        """Implement the django_db marker, internal to pytest-django."""
+        marker = request.node.get_closest_marker("django_db")
+        if marker:
+&gt;           request.getfixturevalue("_django_db_helper")
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_django\plugin.py:593: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_django\fixtures.py:186: in django_db_setup
+    db_cfg = setup_databases(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\test\utils.py:204: in setup_databases
+    connection.creation.create_test_db(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\creation.py:62: in create_test_db
+    self._create_test_db(verbosity, autoclobber, keepdb)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\creation.py:202: in _create_test_db
+    with self._nodb_cursor() as cursor:
+         ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:533: in _nodb_cursor
+    with conn.cursor() as cursor:
+         ^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: in _cursor
+    self.ensure_connection()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:278: in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: in ensure_connection
+    self.connect()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=fusion_integrated client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1'
+autocommit = False, prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'fusion_integrated', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               django.db.utils.OperationalError: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: OperationalError</error></testcase><testcase classname="tests.a8.uc.test_oap_service_request" name="test_create_oap_service_request" time="0.013"><error message="failed on setup with &quot;django.db.utils.OperationalError: connection timeout expired&quot;">self = &lt;DatabaseWrapper vendor='postgresql' alias='__no_db__'&gt;
+
+    @async_unsafe
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
+        if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
+            with self.wrap_database_errors:
+&gt;               self.connect()
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=postgres client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1', autocommit = False
+prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'postgres', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               psycopg.errors.ConnectionTimeout: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: ConnectionTimeout
+
+The above exception was the direct cause of the following exception:
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+
+    @contextmanager
+    def _nodb_cursor(self):
+        cursor = None
+        try:
+&gt;           with super()._nodb_cursor() as cursor:
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:712: in _nodb_cursor
+    with conn.cursor() as cursor:
+         ^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: in _cursor
+    self.ensure_connection()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:278: in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: in ensure_connection
+    self.connect()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=postgres client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1', autocommit = False
+prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'postgres', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               django.db.utils.OperationalError: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: OperationalError
+
+During handling of the above exception, another exception occurred:
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+
+    @async_unsafe
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
+        if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
+            with self.wrap_database_errors:
+&gt;               self.connect()
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=fusion_integrated client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1'
+autocommit = False, prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'fusion_integrated', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               psycopg.errors.ConnectionTimeout: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: ConnectionTimeout
+
+The above exception was the direct cause of the following exception:
+
+request = &lt;SubRequest '_django_db_marker' for &lt;Function test_create_oap_service_request&gt;&gt;
+
+    @pytest.fixture(autouse=True)
+    def _django_db_marker(request: pytest.FixtureRequest) -&gt; None:
+        """Implement the django_db marker, internal to pytest-django."""
+        marker = request.node.get_closest_marker("django_db")
+        if marker:
+&gt;           request.getfixturevalue("_django_db_helper")
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_django\plugin.py:593: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_django\fixtures.py:186: in django_db_setup
+    db_cfg = setup_databases(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\test\utils.py:204: in setup_databases
+    connection.creation.create_test_db(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\creation.py:62: in create_test_db
+    self._create_test_db(verbosity, autoclobber, keepdb)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\creation.py:202: in _create_test_db
+    with self._nodb_cursor() as cursor:
+         ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:533: in _nodb_cursor
+    with conn.cursor() as cursor:
+         ^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: in _cursor
+    self.ensure_connection()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:278: in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: in ensure_connection
+    self.connect()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=fusion_integrated client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1'
+autocommit = False, prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'fusion_integrated', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               django.db.utils.OperationalError: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: OperationalError</error></testcase><testcase classname="tests.a8.uc.test_oap_service_request" name="test_update_oap_service_request" time="0.007"><error message="failed on setup with &quot;django.db.utils.OperationalError: connection timeout expired&quot;">self = &lt;DatabaseWrapper vendor='postgresql' alias='__no_db__'&gt;
+
+    @async_unsafe
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
+        if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
+            with self.wrap_database_errors:
+&gt;               self.connect()
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=postgres client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1', autocommit = False
+prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'postgres', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               psycopg.errors.ConnectionTimeout: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: ConnectionTimeout
+
+The above exception was the direct cause of the following exception:
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+
+    @contextmanager
+    def _nodb_cursor(self):
+        cursor = None
+        try:
+&gt;           with super()._nodb_cursor() as cursor:
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:712: in _nodb_cursor
+    with conn.cursor() as cursor:
+         ^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: in _cursor
+    self.ensure_connection()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:278: in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: in ensure_connection
+    self.connect()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=postgres client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1', autocommit = False
+prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'postgres', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               django.db.utils.OperationalError: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: OperationalError
+
+During handling of the above exception, another exception occurred:
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+
+    @async_unsafe
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
+        if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
+            with self.wrap_database_errors:
+&gt;               self.connect()
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=fusion_integrated client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1'
+autocommit = False, prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'fusion_integrated', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               psycopg.errors.ConnectionTimeout: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: ConnectionTimeout
+
+The above exception was the direct cause of the following exception:
+
+request = &lt;SubRequest '_django_db_marker' for &lt;Function test_update_oap_service_request&gt;&gt;
+
+    @pytest.fixture(autouse=True)
+    def _django_db_marker(request: pytest.FixtureRequest) -&gt; None:
+        """Implement the django_db marker, internal to pytest-django."""
+        marker = request.node.get_closest_marker("django_db")
+        if marker:
+&gt;           request.getfixturevalue("_django_db_helper")
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_django\plugin.py:593: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_django\fixtures.py:186: in django_db_setup
+    db_cfg = setup_databases(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\test\utils.py:204: in setup_databases
+    connection.creation.create_test_db(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\creation.py:62: in create_test_db
+    self._create_test_db(verbosity, autoclobber, keepdb)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\creation.py:202: in _create_test_db
+    with self._nodb_cursor() as cursor:
+         ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:533: in _nodb_cursor
+    with conn.cursor() as cursor:
+         ^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: in _cursor
+    self.ensure_connection()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:278: in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: in ensure_connection
+    self.connect()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=fusion_integrated client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1'
+autocommit = False, prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'fusion_integrated', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               django.db.utils.OperationalError: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: OperationalError</error></testcase><testcase classname="tests.a8.uc.test_oap_service_request" name="test_delete_oap_service_request" time="0.102"><error message="failed on setup with &quot;django.db.utils.OperationalError: connection timeout expired&quot;">self = &lt;DatabaseWrapper vendor='postgresql' alias='__no_db__'&gt;
+
+    @async_unsafe
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
+        if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
+            with self.wrap_database_errors:
+&gt;               self.connect()
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=postgres client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1', autocommit = False
+prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'postgres', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               psycopg.errors.ConnectionTimeout: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: ConnectionTimeout
+
+The above exception was the direct cause of the following exception:
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+
+    @contextmanager
+    def _nodb_cursor(self):
+        cursor = None
+        try:
+&gt;           with super()._nodb_cursor() as cursor:
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:712: in _nodb_cursor
+    with conn.cursor() as cursor:
+         ^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: in _cursor
+    self.ensure_connection()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:278: in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: in ensure_connection
+    self.connect()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=postgres client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1', autocommit = False
+prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'postgres', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               django.db.utils.OperationalError: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: OperationalError
+
+During handling of the above exception, another exception occurred:
+
+self = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+
+    @async_unsafe
+    def ensure_connection(self):
+        """Guarantee that a connection to the database is established."""
+        if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
+            with self.wrap_database_errors:
+&gt;               self.connect()
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=fusion_integrated client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1'
+autocommit = False, prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'fusion_integrated', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               psycopg.errors.ConnectionTimeout: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: ConnectionTimeout
+
+The above exception was the direct cause of the following exception:
+
+request = &lt;SubRequest '_django_db_marker' for &lt;Function test_delete_oap_service_request&gt;&gt;
+
+    @pytest.fixture(autouse=True)
+    def _django_db_marker(request: pytest.FixtureRequest) -&gt; None:
+        """Implement the django_db marker, internal to pytest-django."""
+        marker = request.node.get_closest_marker("django_db")
+        if marker:
+&gt;           request.getfixturevalue("_django_db_helper")
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_django\plugin.py:593: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\pytest_django\fixtures.py:186: in django_db_setup
+    db_cfg = setup_databases(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\test\utils.py:204: in setup_databases
+    connection.creation.create_test_db(
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\creation.py:62: in create_test_db
+    self._create_test_db(verbosity, autoclobber, keepdb)
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\creation.py:202: in _create_test_db
+    with self._nodb_cursor() as cursor:
+         ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:533: in _nodb_cursor
+    with conn.cursor() as cursor:
+         ^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:320: in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:296: in _cursor
+    self.ensure_connection()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:278: in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:279: in ensure_connection
+    self.connect()
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\base\base.py:256: in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\utils\asyncio.py:26: in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\backends\postgresql\base.py:332: in get_new_connection
+    connection = self.Database.connect(**conn_params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'psycopg.Connection'&gt;
+conninfo = 'dbname=fusion_integrated client_encoding=UTF8 user=fusion_admin host=127.0.0.1 port=5432 hostaddr=127.0.0.1'
+autocommit = False, prepare_threshold = None, context = &lt;psycopg.adapt.AdaptersMap object at 0x000001FB79E8F9D0&gt;, row_factory = None
+cursor_factory = &lt;class 'django.db.backends.postgresql.base.Cursor'&gt;
+kwargs = {'dbname': 'fusion_integrated', 'client_encoding': 'UTF8', 'user': 'fusion_admin', 'host': '127.0.0.1', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -&gt; Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+&gt;               raise last_ex.with_traceback(None)
+E               django.db.utils.OperationalError: connection timeout expired
+
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\psycopg\connection.py:126: OperationalError</error></testcase></testsuite></testsuites>

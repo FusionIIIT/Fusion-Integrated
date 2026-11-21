@@ -1,0 +1,515 @@
+[
+  {
+    "test_id": "UC-TC-01",
+    "source_id": "OA-UC-01 Main Flow",
+    "purpose": "Verify a student can submit a leave application with details and a supporting document and that it is recorded and routed to the HoD.",
+    "preconditions": "An authorized Student exists; the appropriate HoD exists.",
+    "action_or_input": "Student submits a leave application with leave details and one supporting document.",
+    "expected_result": "Application is recorded as submitted and owned by the student; it is available to the appropriate HoD; the required submission notification is triggered.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-02",
+    "source_id": "OA-UC-01 Alternative A1",
+    "purpose": "Verify a leave application without any supporting document is still accepted.",
+    "preconditions": "An authorized Student exists; the appropriate HoD exists.",
+    "action_or_input": "Student submits a leave application with leave details and no supporting document.",
+    "expected_result": "Application is accepted and recorded as submitted; it is available to the HoD; no error is raised for the missing document.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "UC-TC-03",
+    "source_id": "OA-UC-01 Exception E1",
+    "purpose": "Verify a failure to record leave data creates no submitted application and is reported.",
+    "preconditions": "An authorized Student exists; a failure in recording the leave application data is induced.",
+    "action_or_input": "Student submits a leave application.",
+    "expected_result": "The failure is reported to the student; no submitted leave application exists for the student and none is available to the HoD.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-04",
+    "source_id": "OA-UC-03 Main Flow",
+    "purpose": "Verify HoD can approve a submitted leave application.",
+    "preconditions": "A submitted leave application exists; the HoD is authorized for it.",
+    "action_or_input": "HoD opens the application, reviews it (including any supporting information), and records Approve.",
+    "expected_result": "Application details and supplied supporting information are displayed to the HoD; decision is recorded; status becomes Approved; the decision notification to the student is triggered.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-05",
+    "source_id": "OA-UC-03 Alternative A1",
+    "purpose": "Verify HoD rejection results in Rejected rather than Approved status.",
+    "preconditions": "A submitted leave application exists; the HoD is authorized for it.",
+    "action_or_input": "HoD opens the application and records Reject.",
+    "expected_result": "Decision is recorded; status becomes Rejected (not Approved); the decision notification to the student is triggered.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "UC-TC-06",
+    "source_id": "OA-UC-03 Exception E1",
+    "purpose": "Verify a decision that cannot be persisted leaves the prior state intact and is reported.",
+    "preconditions": "A submitted leave application exists; the HoD is authorized; a failure in persisting the decision is induced.",
+    "action_or_input": "HoD records an Approve (or Reject) decision.",
+    "expected_result": "The failure is reported; the application retains its prior Submitted state and data; no decision is recorded.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-07",
+    "source_id": "OA-UC-04 Main Flow",
+    "purpose": "Verify a student can view current status and history of their own leave applications.",
+    "preconditions": "An authorized Student has several leave applications in different statuses (e.g., Submitted, Approved, Rejected).",
+    "action_or_input": "Student opens leave tracking, then opens one individual application.",
+    "expected_result": "The student's leave applications are listed with current status and available history; the individual application shows its recorded details/history; no leave data is changed.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-08",
+    "source_id": "OA-UC-04 Exception E1",
+    "purpose": "Verify an empty history is shown when the student has no leave records.",
+    "preconditions": "An authorized Student has no leave applications.",
+    "action_or_input": "Student opens leave tracking.",
+    "expected_result": "An empty history is displayed without error; no leave data is changed.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-09",
+    "source_id": "OA-UC-11 Main Flow",
+    "purpose": "Verify a student can submit a bonafide request that is recorded and made available to the Academic Administrator.",
+    "preconditions": "An authorized Student exists; an Academic Administrator authorized for bonafide processing exists.",
+    "action_or_input": "Student submits a bonafide certificate request.",
+    "expected_result": "Request is recorded as submitted; it is available to the Academic Administrator; the required submission notification is triggered.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-10",
+    "source_id": "OA-UC-11 Exception E1",
+    "purpose": "Verify a failure to record a bonafide request creates no submitted request and is reported.",
+    "preconditions": "An authorized Student exists; a failure in recording the request is induced.",
+    "action_or_input": "Student submits a bonafide certificate request.",
+    "expected_result": "The failure is reported; no submitted bonafide request exists and none is available to the Academic Administrator.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-11",
+    "source_id": "OA-UC-12 Main Flow",
+    "purpose": "Verify Academic Administrator can approve a bonafide request and the certificate becomes available.",
+    "preconditions": "A submitted bonafide request exists; the Academic Administrator is authorized for bonafide processing.",
+    "action_or_input": "Academic Administrator opens the request, verifies it, and records Approve.",
+    "expected_result": "Request and relevant student information are displayed; status becomes Approved; the certificate is made available for download; the decision notification is triggered.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-12",
+    "source_id": "OA-UC-12 Alternative A1",
+    "purpose": "Verify rejection yields no downloadable certificate.",
+    "preconditions": "A submitted bonafide request exists; the Academic Administrator is authorized.",
+    "action_or_input": "Academic Administrator records Reject.",
+    "expected_result": "Status becomes Rejected; no approved certificate is downloadable for the request; the decision notification is triggered.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "UC-TC-13",
+    "source_id": "OA-UC-12 Exception E1",
+    "purpose": "Verify a decision that cannot be saved leaves the request in its prior state.",
+    "preconditions": "A submitted bonafide request exists; a failure in saving the decision is induced.",
+    "action_or_input": "Academic Administrator records a decision.",
+    "expected_result": "The failure is reported; the request remains in its prior Submitted state; no certificate is made available.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-14",
+    "source_id": "OA-UC-13 Main Flow",
+    "purpose": "Verify a student can download their approved bonafide certificate.",
+    "preconditions": "The Student owns an approved bonafide request whose certificate is available.",
+    "action_or_input": "Student opens the approved certificate and downloads it.",
+    "expected_result": "Access to the student's own certificate is verified; the certificate is provided for direct download.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-15",
+    "source_id": "OA-UC-13 Exception E1",
+    "purpose": "Verify no certificate is provided when the request is not approved/available.",
+    "preconditions": "The Student owns a bonafide request that is not approved (Submitted or Rejected), so no certificate is available.",
+    "action_or_input": "Student attempts to download the certificate.",
+    "expected_result": "No download is provided and no protected certificate content is disclosed.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-16",
+    "source_id": "OA-UC-14 Main Flow",
+    "purpose": "Verify a student can view the current status of their bonafide requests.",
+    "preconditions": "An authorized Student has bonafide requests in different statuses.",
+    "action_or_input": "Student opens bonafide request tracking.",
+    "expected_result": "The student's bonafide requests are listed with the current status of each; no request state is changed.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-17",
+    "source_id": "OA-UC-14 Exception E1",
+    "purpose": "Verify an empty list is shown when no bonafide requests exist.",
+    "preconditions": "An authorized Student has no bonafide requests.",
+    "action_or_input": "Student opens bonafide request tracking.",
+    "expected_result": "An empty list is displayed without error; no state is changed.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-18",
+    "source_id": "OA-UC-21 Main Flow",
+    "purpose": "Verify initiating no-dues clearance records the request and routes it in parallel to all seven mandatory authorities.",
+    "preconditions": "An authorized Student exists; authorities for Library, Hostel, Mess, the student's respective Department, Lab, Academic Section and Student Section exist.",
+    "action_or_input": "Student initiates a no-dues clearance request.",
+    "expected_result": "The clearance request is recorded; verification requests exist for all seven authorities (Library, Hostel, Mess, respective Department, Lab, Academic Section, Student Section), all pending at the same time; the required submission notification is triggered.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-19",
+    "source_id": "OA-UC-21 Exception E1",
+    "purpose": "Verify a failure to record/route no-dues clearance is reported and no initiation is claimed.",
+    "preconditions": "An authorized Student exists; a failure in recording or routing the clearance request is induced.",
+    "action_or_input": "Student initiates a no-dues clearance request.",
+    "expected_result": "The failure is reported; the system does not claim successful initiation; no successfully initiated clearance case exists.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-20",
+    "source_id": "OA-UC-22 Main Flow",
+    "purpose": "Verify each of the seven authorities can record clearance for its own domain without overwriting the other six, and the consolidated case becomes available only after all seven.",
+    "preconditions": "An initiated no-dues clearance exists with all seven verifications pending; each authority is authorized for its own domain.",
+    "action_or_input": "Each authority in turn (Library, Hostel, Mess, respective Department, Lab, Academic Section, Student Section) opens the pending request and records Clear for its domain.",
+    "expected_result": "Only the recording authority's domain status changes each time; the other six statuses are unchanged; the consolidated case is not available to the Academic Administrator until the seventh verification is recorded, and is available after it; the completion/update notification is triggered when applicable.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-21",
+    "source_id": "OA-UC-22 Alternative A1",
+    "purpose": "Verify recording outstanding dues leaves the domain not clear.",
+    "preconditions": "An initiated no-dues clearance exists with a pending verification for an authority (e.g., Library).",
+    "action_or_input": "The authority records that dues/obligations remain outstanding.",
+    "expected_result": "The authority's domain is not marked clear; the result is stored for that domain only; other authority statuses are unchanged.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "UC-TC-22",
+    "source_id": "OA-UC-22 Exception E1",
+    "purpose": "Verify a verification that cannot be saved leaves the prior domain status unchanged.",
+    "preconditions": "An initiated no-dues clearance exists with a pending verification for an authority; a failure in saving is induced.",
+    "action_or_input": "The authority attempts to record its clearance result.",
+    "expected_result": "The failure is reported; the authority's domain status remains as before (pending); no false clearance state is recorded.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-23",
+    "source_id": "OA-UC-23 Main Flow",
+    "purpose": "Verify Academic Administrator can finalize no-dues when all seven clearances are clear.",
+    "preconditions": "A consolidated case exists with all seven authority statuses recorded as clear; the Academic Administrator is authorized for finalization.",
+    "action_or_input": "Academic Administrator opens the consolidated case and confirms finalization.",
+    "expected_result": "Results of all seven authorities are displayed; the system evaluates all seven as clear; finalized clearance is recorded; the no-dues certificate is made available for download; the completion/certificate-availability notification is triggered.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-24",
+    "source_id": "OA-UC-23 Alternative A1",
+    "purpose": "Verify finalization is not permitted when any mandatory authority reports outstanding dues.",
+    "preconditions": "A consolidated case exists in which six authorities are clear and one (e.g., Mess) reports outstanding dues.",
+    "action_or_input": "Academic Administrator attempts to finalize the clearance.",
+    "expected_result": "Finalization as no-dues is not permitted; the case remains unresolved; no certificate is made available.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "UC-TC-25",
+    "source_id": "OA-UC-23 Exception E1",
+    "purpose": "Verify a finalization that cannot be persisted retains previous statuses and releases no certificate.",
+    "preconditions": "A consolidated case with all seven clear exists; a failure in persisting finalization is induced.",
+    "action_or_input": "Academic Administrator confirms finalization.",
+    "expected_result": "The failure is reported; previous statuses are retained; the clearance is not finalized; no certificate is released.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-26",
+    "source_id": "OA-UC-24 Main Flow",
+    "purpose": "Verify a student sees per-authority status and overall status of their no-dues case.",
+    "preconditions": "An authorized Student has a no-dues case with a mix of authority statuses.",
+    "action_or_input": "Student opens no-dues progress.",
+    "expected_result": "The status reported by each applicable authority and the overall case status are displayed; no clearance data is changed.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-27",
+    "source_id": "OA-UC-24 Exception E1",
+    "purpose": "Verify no active progress is shown when the student has no no-dues case.",
+    "preconditions": "An authorized Student has no no-dues case.",
+    "action_or_input": "Student opens no-dues progress.",
+    "expected_result": "No active progress is displayed, without error; no data is changed.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-28",
+    "source_id": "OA-UC-25 Main Flow",
+    "purpose": "Verify a student can download their finalized no-dues certificate.",
+    "preconditions": "The Student owns a finalized no-dues clearance whose certificate is available.",
+    "action_or_input": "Student opens the finalized certificate and downloads it.",
+    "expected_result": "Access is verified; the certificate is provided for download.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-29",
+    "source_id": "OA-UC-25 Exception E1",
+    "purpose": "Verify no certificate is provided when clearance is not finalized.",
+    "preconditions": "The Student has a no-dues case that is not finalized.",
+    "action_or_input": "Student attempts to download the no-dues certificate.",
+    "expected_result": "No certificate is provided and no unfinalized/protected certificate is disclosed.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-30",
+    "source_id": "OA-UC-31 Main Flow",
+    "purpose": "Verify a PG student can submit an assistantship claim that is routed to both assigned supervisor roles.",
+    "preconditions": "A PG student exists with an assigned Thesis Supervisor and an assigned TA Supervisor.",
+    "action_or_input": "PG student submits an assistantship claim.",
+    "expected_result": "Claim is recorded as submitted; it is routed to both the assigned Thesis Supervisor and the assigned TA Supervisor for role-specific verification; claim awaits both verifications; the submission notification is triggered.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-31",
+    "source_id": "OA-UC-31 Exception E1",
+    "purpose": "Verify a claim is not represented as ready for verification when a required supervisor role cannot be resolved.",
+    "preconditions": "A PG student exists for whom (scenario a) no TA Supervisor, or (scenario b) no Thesis Supervisor, can be resolved.",
+    "action_or_input": "PG student submits an assistantship claim in each scenario.",
+    "expected_result": "Dual-supervisor routing is not completed; the claim is not represented as ready for verification or routed to a supervisor in either scenario; no false routed state is recorded.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-32",
+    "source_id": "OA-UC-33 Main Flow",
+    "purpose": "Verify two different supervisors verify independently and the claim reaches the Department Administrator only after both.",
+    "preconditions": "A submitted claim exists whose Thesis Supervisor and TA Supervisor are different faculty members; both verifications are pending.",
+    "action_or_input": "The Thesis Supervisor opens the claim and records verification; then the TA Supervisor opens the claim and records verification.",
+    "expected_result": "Each view displays the claim and the supervisor role exercised; after the first verification the role-specific verification is stored, the claim remains awaiting the other verification and is not available to the Department Administrator; after the second, both verifications are stored independently and the claim becomes available to the Department Administrator; the relevant notification is triggered.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-33",
+    "source_id": "OA-UC-33 Alternative A1",
+    "purpose": "Verify that one faculty member holding both roles must satisfy both distinct verification obligations.",
+    "preconditions": "A submitted claim exists whose Thesis Supervisor and TA Supervisor are the same faculty member; both role-verifications are pending.",
+    "action_or_input": "The faculty member records verification in one role only, then records verification in the other role.",
+    "expected_result": "After the first role-verification the other remains pending and the claim is not available to the Department Administrator; after both are recorded the claim becomes available to the Department Administrator.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "UC-TC-34",
+    "source_id": "OA-UC-33 Exception E1",
+    "purpose": "Verify that when verification cannot be recorded no verified state is stored.",
+    "preconditions": "A submitted claim exists with a pending supervisor-role verification; a failure in recording the verification is induced.",
+    "action_or_input": "The supervisor attempts to record verification for that role.",
+    "expected_result": "No verified state is recorded for that role; the claim remains not verified and is not available to the Department Administrator.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-35",
+    "source_id": "OA-UC-34 Main Flow",
+    "purpose": "Verify Department Administrator can review a dually verified claim and forward it to the HoD.",
+    "preconditions": "A claim with both Thesis Supervisor and TA Supervisor verifications complete is available to the Department Administrator.",
+    "action_or_input": "Department Administrator opens the claim, reviews it, and forwards it to the HoD.",
+    "expected_result": "Claim and both supervisor-role verifications are displayed; the forwarding state is recorded; the claim awaits HoD decision; the relevant notification is triggered.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-36",
+    "source_id": "OA-UC-34 Exception E1",
+    "purpose": "Verify a claim that cannot be forwarded remains at department review.",
+    "preconditions": "A dually verified claim is at department review; a failure in forwarding is induced.",
+    "action_or_input": "Department Administrator attempts to forward the claim.",
+    "expected_result": "The failure is reported; the claim remains at the department-review stage and is not available to the HoD.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-37",
+    "source_id": "OA-UC-35 Main Flow",
+    "purpose": "Verify HoD approval of a reviewed claim hands it to the Academic Administrator for stipend processing.",
+    "preconditions": "A claim that completed both supervisor verifications and Department Administrator review is forwarded to the HoD.",
+    "action_or_input": "HoD opens the claim and records Approve.",
+    "expected_result": "Claim and prior verification/review information are displayed; decision is recorded; the claim is HoD Approved; it becomes available to the Academic Administrator for stipend processing; the decision notification is triggered.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-38",
+    "source_id": "OA-UC-35 Alternative A1",
+    "purpose": "Verify HoD rejection results in no stipend-processing handoff.",
+    "preconditions": "A reviewed claim is forwarded to the HoD.",
+    "action_or_input": "HoD records Reject.",
+    "expected_result": "Claim is Rejected; it is not made available to the Academic Administrator for stipend processing; the decision notification is triggered.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "UC-TC-39",
+    "source_id": "OA-UC-35 Exception E1",
+    "purpose": "Verify a decision that cannot be persisted retains the prior claim state.",
+    "preconditions": "A reviewed claim is forwarded to the HoD; a failure in persisting the decision is induced.",
+    "action_or_input": "HoD records a decision.",
+    "expected_result": "The failure is reported; the claim retains its prior state (awaiting HoD decision); no decision is recorded and no stipend-processing handoff occurs.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-40",
+    "source_id": "OA-UC-36 Main Flow",
+    "purpose": "Verify Academic Administrator can process stipend disbursement for a HoD-approved claim.",
+    "preconditions": "A HoD-approved assistantship claim exists; the Academic Administrator is authorized.",
+    "action_or_input": "Academic Administrator opens the approved claim and performs the stipend-processing action.",
+    "expected_result": "Approved claim and approval history are displayed; the processing outcome is recorded; the stipend disbursement is recorded as processed; the relevant notification is triggered.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-41",
+    "source_id": "OA-UC-36 Exception E1",
+    "purpose": "Verify a processing failure leaves the claim approved but not processed.",
+    "preconditions": "A HoD-approved claim exists; a failure in completing processing is induced.",
+    "action_or_input": "Academic Administrator performs the stipend-processing action.",
+    "expected_result": "The failure is reported; the claim remains approved but is not marked processed.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-42",
+    "source_id": "OA-UC-37 Main Flow",
+    "purpose": "Verify a PG student can track their claims and view stage history.",
+    "preconditions": "A PG student has assistantship claims at different stages.",
+    "action_or_input": "PG student opens claim tracking and then opens one claim.",
+    "expected_result": "Each of the student's claims is listed with its current stage/status; the opened claim shows its available stage history; no claim state is changed.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-43",
+    "source_id": "OA-UC-37 Exception E1",
+    "purpose": "Verify an empty list is shown when the student has no claims.",
+    "preconditions": "A PG student has no assistantship claims.",
+    "action_or_input": "PG student opens claim tracking.",
+    "expected_result": "An empty list is displayed without error; no state is changed.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-44",
+    "source_id": "OA-UC-41 Main Flow",
+    "purpose": "Verify Department Administrator can record a thesis-supervisor assignment.",
+    "preconditions": "A Department Administrator authorized to record assignments, a PG student and a faculty member exist.",
+    "action_or_input": "Department Administrator records a departmental thesis-supervisor assignment mapping the student to the faculty member.",
+    "expected_result": "Relevant student and eligible faculty data are presented; the student-supervisor mapping is saved and retrievable.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-45",
+    "source_id": "OA-UC-41 Exception E1",
+    "purpose": "Verify a failed save retains previous assignment data.",
+    "preconditions": "A PG student has an existing thesis-supervisor assignment; a failure in saving is induced.",
+    "action_or_input": "Department Administrator attempts to record a different thesis-supervisor assignment for the student.",
+    "expected_result": "The failure is reported; the previous assignment data is retained; no incorrect assignment is recorded.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-46",
+    "source_id": "OA-UC-42 Main Flow",
+    "purpose": "Verify a TA assignment can be recorded to a course/subject, a faculty member, or both, as specified.",
+    "preconditions": "A Department Administrator authorized to record TA assignments, PG students, courses/subjects and faculty members exist.",
+    "action_or_input": "Department Administrator records three TA assignments: (a) PG student to a course/subject only, (b) PG student to a faculty member only, (c) PG student to both a course/subject and a faculty member.",
+    "expected_result": "Each assignment is saved with exactly the specified association; a course-only assignment does not imply any faculty mapping; where a faculty association exists it is recorded.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-47",
+    "source_id": "OA-UC-42 Exception E1",
+    "purpose": "Verify a failed save retains prior TA assignment data.",
+    "preconditions": "A PG student has an existing TA assignment; a failure in saving is induced.",
+    "action_or_input": "Department Administrator attempts to record a new or changed TA assignment.",
+    "expected_result": "The failure is reported; prior data is retained; no incorrect assignment is recorded.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-48",
+    "source_id": "OA-UC-51 Main Flow",
+    "purpose": "Verify a PG student can request graduate seminar scheduling.",
+    "preconditions": "A PG student exists; a Department Administrator exists.",
+    "action_or_input": "PG student submits a seminar scheduling request.",
+    "expected_result": "Request is recorded and available to the Department Administrator; it awaits Department Administrator action; the submission notification is triggered.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-49",
+    "source_id": "OA-UC-51 Exception E1",
+    "purpose": "Verify a failure to record a seminar request creates no submitted request.",
+    "preconditions": "A PG student exists; a failure in recording the request is induced.",
+    "action_or_input": "PG student submits a seminar scheduling request.",
+    "expected_result": "The failure is reported; no submitted scheduling request exists and none is available to the Department Administrator.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-50",
+    "source_id": "OA-UC-53 Main Flow",
+    "purpose": "Verify Department Administrator can schedule and log a requested seminar.",
+    "preconditions": "A pending seminar scheduling request exists; the Department Administrator is authorized to schedule seminars.",
+    "action_or_input": "Department Administrator opens the pending request and records a scheduled seminar.",
+    "expected_result": "The seminar scheduling record/history is updated; the seminar is scheduled and logged; the relevant notifications are triggered; no separate approval step is required.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-51",
+    "source_id": "OA-UC-53 Exception E1",
+    "purpose": "Verify a schedule that cannot be recorded leaves the request awaiting scheduling.",
+    "preconditions": "A pending seminar scheduling request exists; a failure in recording the schedule is induced.",
+    "action_or_input": "Department Administrator attempts to record the scheduled seminar.",
+    "expected_result": "The failure is reported; the request remains awaiting scheduling; no scheduled state is recorded.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-52",
+    "source_id": "OA-UC-54 Main Flow",
+    "purpose": "Verify a PG student and a faculty member can each view the seminar schedule.",
+    "preconditions": "One or more seminars are scheduled; a PG student user and a faculty user exist.",
+    "action_or_input": "Each of the PG student and the faculty member opens the seminar schedule.",
+    "expected_result": "The scheduled seminar information is displayed to each user; no seminar data is changed.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-53",
+    "source_id": "OA-UC-54 Exception E1",
+    "purpose": "Verify an empty schedule is shown when no seminars are scheduled.",
+    "preconditions": "No seminars are scheduled; a PG student user exists.",
+    "action_or_input": "The user opens the seminar schedule.",
+    "expected_result": "An empty schedule is displayed without error; no data is changed.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-54",
+    "source_id": "OA-UC-91 Main Flow",
+    "purpose": "Verify a notification-triggering event produces an alert and an email to the relevant recipient.",
+    "preconditions": "A notification-triggering OAP event occurs (e.g., a leave application is submitted) and recipients can be determined.",
+    "action_or_input": "The triggering event occurs.",
+    "expected_result": "Relevant recipients are determined; a notification is generated and sent as both a system-generated alert and an email.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-55",
+    "source_id": "OA-UC-91 Exception E1",
+    "purpose": "Verify a failed channel delivery is not reported as successful and the business event persists.",
+    "preconditions": "A notification-triggering event occurs; delivery failure on one channel (e.g., email) is induced.",
+    "action_or_input": "The triggering event occurs.",
+    "expected_result": "The failed channel is not reported as successfully delivered; the underlying business event remains recorded.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "UC-TC-56",
+    "source_id": "OA-UC-92 Main Flow",
+    "purpose": "Verify a reminder is sent for a pending action meeting the configured reminder condition.",
+    "preconditions": "An OAP action is pending and the configured reminder condition identifies it as due; the responsible actor is identifiable.",
+    "action_or_input": "The reminder condition is met and the reminder process runs.",
+    "expected_result": "The pending action and responsible actor are identified; a reminder is sent as a system-generated alert and email to the responsible actor.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "UC-TC-57",
+    "source_id": "OA-UC-92 Exception E1",
+    "purpose": "Verify a failed reminder delivery does not change pending business state.",
+    "preconditions": "An OAP action is pending and due for reminder; reminder delivery failure is induced.",
+    "action_or_input": "The reminder process runs.",
+    "expected_result": "Reminder delivery failure is not reported as success; the pending business state is unchanged and the request is not advanced.",
+    "test_type": "exception_flow"
+  }
+]
