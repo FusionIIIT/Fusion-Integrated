@@ -1,0 +1,209 @@
+[
+  {
+    "test_id": "WF-001",
+    "source_id": "BW-FTS-01 single-forward-zero-onward",
+    "purpose": "Verify workflow transition from sender to recipient with zero onward-forward traversal.",
+    "preconditions": "Active circulated file held by Sender; valid Recipient employee exists.",
+    "action_or_input": "Sender executes Forward with mandatory movement comment and optional attachment.",
+    "expected_result": "File transitions to Active/Circulated held by Recipient; movement history and audit are updated; notification is triggered; no further forward occurs.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-002",
+    "source_id": "BW-FTS-02 onward-forwarding-one-loop",
+    "purpose": "Verify onward-forwarding workflow transition representing exactly one loop traversal.",
+    "preconditions": "Active circulated file held by Current Recipient; valid Next Recipient exists.",
+    "action_or_input": "Current Recipient forwards file onward to Next Recipient with mandatory movement comment.",
+    "expected_result": "File transitions to Active/Circulated held by Next Recipient; movement history appends onward forward; notification is triggered.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-003",
+    "source_id": "BW-FTS-03 return-to-previous-sender",
+    "purpose": "Verify workflow return transition from current recipient back to the previous sender.",
+    "preconditions": "Active circulated file held by Current Recipient with known previous sender.",
+    "action_or_input": "Current Recipient initiates Return with mandatory movement comment.",
+    "expected_result": "File transitions to Active/Circulated held by Previous Sender; return movement is recorded chronologically; return notification is triggered.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-004",
+    "source_id": "BW-FTS-04 archive-completed-circulated-file",
+    "purpose": "Verify lifecycle-closing archival transition executed by the file owner.",
+    "preconditions": "Active circulated file where collaborative objective is complete; actor is the file owner.",
+    "action_or_input": "File owner selects Archive.",
+    "expected_result": "File transitions from Active to Archived / Read-only / Permanently retained; subsequent modification and forwarding are locked; archival notification is triggered.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-005",
+    "source_id": "BW-FTS-05 Step 1 draft-creation",
+    "purpose": "Verify initial draft creation step of BW-FTS-05 with zero draft-edit traversal.",
+    "preconditions": "No FTS file record for the intended file; employee has authorized role.",
+    "action_or_input": "Employee creates file with initial mandatory comment and saves as draft.",
+    "expected_result": "File transitions from Non-existent to Draft / Pre-circulation state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-006",
+    "source_id": "BW-FTS-05 Step 2 immediate-circulation",
+    "purpose": "Verify initial circulation step of BW-FTS-05 with zero draft-edit traversal.",
+    "preconditions": "File in Draft / Pre-circulation state; valid recipient exists.",
+    "action_or_input": "Sender submits file to recipient with mandatory movement comment without prior draft editing.",
+    "expected_result": "File transitions from Draft / Pre-circulation to Active / Circulated held by Recipient.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-007",
+    "source_id": "BW-FTS-06 Step 1 draft-creation",
+    "purpose": "Verify draft creation step of BW-FTS-06.",
+    "preconditions": "No FTS file record for intended file; employee has authorized role.",
+    "action_or_input": "Employee creates new file with initial mandatory comment and saves as draft.",
+    "expected_result": "File enters Draft / Pre-circulation state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-008",
+    "source_id": "BW-FTS-06 Step 2 draft-edit-traversal",
+    "purpose": "Verify one draft-edit traversal step of BW-FTS-06.",
+    "preconditions": "File in Draft / Pre-circulation state.",
+    "action_or_input": "Employee edits draft comment and attachments, then saves.",
+    "expected_result": "File transitions to Updated Draft / Pre-circulation state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-009",
+    "source_id": "BW-FTS-06 Step 3 circulate-updated-draft",
+    "purpose": "Verify circulation step of BW-FTS-06 following one draft edit.",
+    "preconditions": "File in Updated Draft / Pre-circulation state; valid recipient exists.",
+    "action_or_input": "Sender submits updated draft to recipient with mandatory movement comment.",
+    "expected_result": "File transitions from Updated Draft to Active / Circulated state held by Recipient.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-010",
+    "source_id": "BW-FTS-07 Step 1 draft-creation",
+    "purpose": "Verify draft creation step of BW-FTS-07.",
+    "preconditions": "No FTS file record; employee has authorized role.",
+    "action_or_input": "Employee creates new file with mandatory comment and saves as draft.",
+    "expected_result": "File enters Draft / Pre-circulation state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-011",
+    "source_id": "BW-FTS-07 Step 2 draft-discard-zero-edit",
+    "purpose": "Verify draft discard step of BW-FTS-07 with zero draft edit.",
+    "preconditions": "File in Draft / Pre-circulation state.",
+    "action_or_input": "Employee chooses Discard before submission or editing.",
+    "expected_result": "File transitions from Draft to Discarded; no active file is retained.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-012",
+    "source_id": "BW-FTS-08 Step 1 draft-creation",
+    "purpose": "Verify draft creation step of BW-FTS-08.",
+    "preconditions": "No FTS file record; employee has authorized role.",
+    "action_or_input": "Employee creates new file with mandatory comment and saves as draft.",
+    "expected_result": "File enters Draft / Pre-circulation state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-013",
+    "source_id": "BW-FTS-08 Step 2 draft-edit-traversal",
+    "purpose": "Verify one draft-edit traversal step of BW-FTS-08.",
+    "preconditions": "File in Draft / Pre-circulation state.",
+    "action_or_input": "Employee edits draft content and saves.",
+    "expected_result": "File transitions to Updated Draft / Pre-circulation state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-014",
+    "source_id": "BW-FTS-08 Step 3 discard-updated-draft",
+    "purpose": "Verify draft discard step of BW-FTS-08 following one draft edit.",
+    "preconditions": "File in Updated Draft / Pre-circulation state.",
+    "action_or_input": "Employee chooses Discard on the updated draft before submission.",
+    "expected_result": "File transitions from Updated Draft to Discarded; no active file is retained.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-015",
+    "source_id": "CW-FTS-01 Path 1 forward-to-completion-archival",
+    "purpose": "Verify compound workflow path 1: forward from sender to recipient followed by owner archival upon completion.",
+    "preconditions": "Circulated file held by Sender (who is owner); valid recipient exists.",
+    "action_or_input": "Owner forwards file to recipient with comment; after collaboration, owner archives the completed file.",
+    "expected_result": "File transitions: Active(Sender) -> Active(Recipient) -> Archived(Owner); complete lifecycle closure.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-016",
+    "source_id": "CW-FTS-01 Path 2 forward-then-return",
+    "purpose": "Verify compound workflow path 2: forward to recipient followed by return to previous sender.",
+    "preconditions": "Active file held by Sender; valid recipient exists.",
+    "action_or_input": "Sender forwards to recipient; recipient returns file to previous sender.",
+    "expected_result": "File transitions: Active(Sender) -> Active(Recipient) -> Active(Previous Sender); movement history records forward and return.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-017",
+    "source_id": "CW-FTS-01 Path 3 forward-onward-then-return",
+    "purpose": "Verify compound workflow path 3: forward to recipient, onward forward to next recipient, then return to prior sender.",
+    "preconditions": "Active file held by Employee A; valid recipients B and C exist.",
+    "action_or_input": "A forwards to B, B forwards onward to C, C returns to B.",
+    "expected_result": "File transitions: Active(A) -> Active(B) -> Active(C) -> Active(B); holder updates consistently.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-018",
+    "source_id": "CW-FTS-01 Path 4 forward-onward-to-completion-archival",
+    "purpose": "Verify compound workflow path 4: forward to recipient, onward forward to next recipient, followed by owner archival.",
+    "preconditions": "Active file created by owner A; valid recipients B and C exist.",
+    "action_or_input": "A forwards to B, B forwards onward to C; collaborative objective completes; owner A archives the file.",
+    "expected_result": "File transitions: Active(A) -> Active(B) -> Active(C) -> Archived; file locked in read-only state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-019",
+    "source_id": "CW-FTS-01 Path 5 forward-return-reforward-archival",
+    "purpose": "Verify compound workflow path 5: forward, return to sender, re-forward, and completion archival.",
+    "preconditions": "Active file created by owner A; valid recipient B exists.",
+    "action_or_input": "A forwards to B, B returns to A, A re-forwards to B, owner A archives upon completion.",
+    "expected_result": "All state transitions succeed and are recorded in full chronological sequence.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-020",
+    "source_id": "CW-FTS-02 Path 1 create-draft-discard-zero-edit",
+    "purpose": "Verify compound workflow path 1: create draft and discard before circulation without edit.",
+    "preconditions": "No file exists; authorized creator.",
+    "action_or_input": "Creator creates draft, then chooses Discard before submission.",
+    "expected_result": "Transitions: None -> Draft -> Discarded; terminal outcome reached before circulation.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-021",
+    "source_id": "CW-FTS-02 Path 2 create-draft-edit-discard",
+    "purpose": "Verify compound workflow path 2: create draft, edit once, and discard before circulation.",
+    "preconditions": "No file exists; authorized creator.",
+    "action_or_input": "Creator creates draft, edits draft once, then chooses Discard.",
+    "expected_result": "Transitions: None -> Draft -> Updated Draft -> Discarded; terminal outcome reached after one edit.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-022",
+    "source_id": "CW-FTS-02 Path 3 create-draft-circulate-zero-edit",
+    "purpose": "Verify compound workflow path 3: create draft and circulate directly to recipient without edit.",
+    "preconditions": "No file exists; authorized creator; valid recipient exists.",
+    "action_or_input": "Creator creates draft, then submits directly to recipient with mandatory comment.",
+    "expected_result": "Transitions: None -> Draft -> Active/Circulated(Recipient); file successfully enters collaborative circulation.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "WF-023",
+    "source_id": "CW-FTS-02 Path 4 create-draft-edit-circulate",
+    "purpose": "Verify compound workflow path 4: create draft, edit once, and circulate to recipient.",
+    "preconditions": "No file exists; authorized creator; valid recipient exists.",
+    "action_or_input": "Creator creates draft, edits draft once, then submits to recipient with mandatory comment.",
+    "expected_result": "Transitions: None -> Draft -> Updated Draft -> Active/Circulated(Recipient); file enters circulation with edited content.",
+    "test_type": "functional"
+  }
+]

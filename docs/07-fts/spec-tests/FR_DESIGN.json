@@ -1,0 +1,794 @@
+[
+  {
+    "test_id": "FR-001",
+    "source_id": "CFR-FTS-001 lifecycle-preservation",
+    "purpose": "Verify that an institutional file is managed as a persistent composite record whose accumulated contents and lifecycle trace are preserved after circulation.",
+    "preconditions": "Authenticated Institute Employee with file-creation privileges.",
+    "action_or_input": "Create file with comment and attachment, circulate to recipient, add movement comments, and complete workflow.",
+    "expected_result": "File record persists with all accumulated comments, attachments, and chronological movement trace intact without deletion.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-002",
+    "source_id": "AFR-FTS-001 composite-structure",
+    "purpose": "Verify that FTS treats each file as a composite object consisting of mandatory comments and optional attachments.",
+    "preconditions": "Authenticated Institute Employee.",
+    "action_or_input": "Create a new file supplying mandatory initial comment and an optional file attachment.",
+    "expected_result": "File is persisted containing both the mandatory comment and attached file entity.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-003",
+    "source_id": "AFR-FTS-002 post-circulation-retention",
+    "purpose": "Verify that circulated files and their accumulated contents are preserved without deletion.",
+    "preconditions": "A file has been created, submitted, and circulated between employees.",
+    "action_or_input": "Attempt deletion of the circulated file or its associated comments/attachments.",
+    "expected_result": "Deletion is prevented; file and all accumulated comments and attachments remain intact.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-004",
+    "source_id": "AFR-FTS-003 owner-archival-vs-deletion",
+    "purpose": "Verify that a file owner can archive a completed file instead of deleting it.",
+    "preconditions": "Circulated file where collaborative objective is complete; actor is the file owner.",
+    "action_or_input": "File owner initiates file archival.",
+    "expected_result": "File transitions to archived state and remains permanently stored rather than deleted.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-005",
+    "source_id": "AFR-FTS-004 full-traceability",
+    "purpose": "Verify that FTS maintains end-to-end traceability of file creation, movement, comments, attachments, and archival.",
+    "preconditions": "File that has undergone creation, multiple forwards, returns, and archival.",
+    "action_or_input": "Retrieve the complete file movement and audit trace.",
+    "expected_result": "Trace includes all creation details, movement steps, timestamps, comments, attachments, and archival record in chronological order.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-006",
+    "source_id": "CFR-FTS-002 operational-vs-governance-boundary",
+    "purpose": "Verify role separation between Institute Employees (operational file users) and System Admin (governance actor).",
+    "preconditions": "System Admin and Faculty/Staff accounts exist.",
+    "action_or_input": "Institute Employee performs file operations; System Admin oversees governance without performing routine file operations.",
+    "expected_result": "Employee file operations succeed; governance functions are accessible to System Admin.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-007",
+    "source_id": "AFR-FTS-005 institute-employee-operational-roles",
+    "purpose": "Verify that Faculty and Staff Institute Employees can operate file workflows under assigned roles.",
+    "preconditions": "Faculty and Staff users with assigned roles in FTS.",
+    "action_or_input": "Faculty and Staff users initiate file creation and forwarding workflows.",
+    "expected_result": "Operational file actions proceed successfully for authorized faculty and staff employees.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-008",
+    "source_id": "AFR-FTS-006 sysadmin-role-administration",
+    "purpose": "Verify that System Admin can administer FTS-relevant role assignments, reassignments, and access control.",
+    "preconditions": "Authenticated System Admin.",
+    "action_or_input": "System Admin assigns or reassigns an FTS role to an employee.",
+    "expected_result": "Role assignment/reassignment is recorded and updated access control context takes effect.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-009",
+    "source_id": "AFR-FTS-007 sysadmin-usage-monitoring",
+    "purpose": "Verify that System Admin can monitor FTS system usage within available governance scope.",
+    "preconditions": "Authenticated System Admin.",
+    "action_or_input": "System Admin requests system usage statistics/metrics within FTS governance scope.",
+    "expected_result": "FTS usage information is presented to the System Admin.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-010",
+    "source_id": "AFR-FTS-008 sysadmin-audit-oversight",
+    "purpose": "Verify that System Admin can view and oversee FTS security and audit logs.",
+    "preconditions": "Authenticated System Admin; audit records exist in system.",
+    "action_or_input": "System Admin accesses FTS security and audit log views.",
+    "expected_result": "Audit logs are retrieved and displayed for governance oversight.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-011",
+    "source_id": "AFR-FTS-009 sysadmin-operational-action-prohibited",
+    "purpose": "Verify that System Admin is blocked from performing operational file workflow actions on behalf of Institute Employees.",
+    "preconditions": "Authenticated System Admin.",
+    "action_or_input": "System Admin attempts to create, forward, return, or archive an operational file.",
+    "expected_result": "Action is denied; operational file actions cannot be performed by System Admin.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-012",
+    "source_id": "AFR-FTS-010 multi-role-selection",
+    "purpose": "Verify that an Institute Employee with multiple assigned institutional roles can operate under a selected role.",
+    "preconditions": "Institute Employee assigned multiple active roles (e.g. Faculty and HOD).",
+    "action_or_input": "Employee switches active role context and performs a file operation under the selected role.",
+    "expected_result": "Operation is evaluated and executed under permissions of the selected active role.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-013",
+    "source_id": "CFR-FTS-003 file-creation-service",
+    "purpose": "Verify that an authorized Institute Employee can create a new file under an assigned role with mandatory initial comment and optional attachments.",
+    "preconditions": "Institute Employee authenticated under an assigned role authorized to create files.",
+    "action_or_input": "Submit file creation request with subject, initial comment, and attachment.",
+    "expected_result": "File is created successfully with subject, comment, and attachment linked to creator role.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-014",
+    "source_id": "AFR-FTS-011 create-file-assigned-role",
+    "purpose": "Verify that any Institute Employee can create a new file under their assigned role.",
+    "preconditions": "Authenticated Institute Employee with assigned role.",
+    "action_or_input": "Initiate new file creation with required fields and mandatory comment.",
+    "expected_result": "New file is created with creator identified under their assigned role.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-015",
+    "source_id": "AFR-FTS-012 mandatory-initial-comment-present",
+    "purpose": "Verify that file creation succeeds when a non-empty initial mandatory comment is provided.",
+    "preconditions": "Authenticated Institute Employee.",
+    "action_or_input": "Create file with non-empty initial comment string.",
+    "expected_result": "File creation succeeds and initial comment is stored.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-016",
+    "source_id": "AFR-FTS-012 mandatory-initial-comment-missing",
+    "purpose": "Verify that file creation is rejected when the initial mandatory comment is missing or empty.",
+    "preconditions": "Authenticated Institute Employee.",
+    "action_or_input": "Attempt to create a file without supplying an initial comment or with whitespace-only comment.",
+    "expected_result": "File creation is rejected with validation error; no file is persisted.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "FR-017",
+    "source_id": "AFR-FTS-013 optional-attachments-during-creation",
+    "purpose": "Verify that optional file attachments can be added during file creation.",
+    "preconditions": "Authenticated Institute Employee.",
+    "action_or_input": "Create a new file including one or more valid file attachments alongside mandatory comment.",
+    "expected_result": "File is created and attachments are persisted and linked to the initial creation event.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-018",
+    "source_id": "CFR-FTS-004 draft-lifecycle-and-circulation",
+    "purpose": "Verify pre-circulation draft handling (save, edit, discard) and transition into circulation upon submission.",
+    "preconditions": "Authenticated Institute Employee.",
+    "action_or_input": "Save draft, edit draft, submit to recipient, and verify draft discard is blocked post-circulation.",
+    "expected_result": "Draft progresses through save, edit, transitions to circulated state on send, and cannot be discarded thereafter.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-019",
+    "source_id": "AFR-FTS-014 draft-save",
+    "purpose": "Verify that an Institute Employee can save a newly created file as a draft.",
+    "preconditions": "Authenticated Institute Employee.",
+    "action_or_input": "Create new file and select Save as Draft.",
+    "expected_result": "File is persisted with draft/pre-circulation status and is not visible in recipient inbox.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-020",
+    "source_id": "AFR-FTS-015 draft-edit",
+    "purpose": "Verify that an Institute Employee can edit a saved draft file before submission.",
+    "preconditions": "Existing saved draft file owned by authenticated Institute Employee.",
+    "action_or_input": "Update draft fields (comment, attachments, subject) and save.",
+    "expected_result": "Draft is updated with new values and remains in draft/pre-circulation status.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-021",
+    "source_id": "AFR-FTS-016 draft-discard",
+    "purpose": "Verify that an Institute Employee can discard a draft file before submission.",
+    "preconditions": "Existing saved draft file owned by authenticated Institute Employee.",
+    "action_or_input": "Initiate draft discard on the pre-circulation file.",
+    "expected_result": "Draft file is discarded and removed from active files.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-022",
+    "source_id": "AFR-FTS-017 prevent-circulated-file-deletion",
+    "purpose": "Verify that once submitted and circulated, a file cannot be deleted.",
+    "preconditions": "File that has been submitted and circulated to another employee.",
+    "action_or_input": "Attempt delete/discard operation on the circulated file.",
+    "expected_result": "Delete request is rejected; file remains active and unchanged in circulation.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "FR-023",
+    "source_id": "AFR-FTS-018 transition-to-circulated-state",
+    "purpose": "Verify that file transitions from draft to circulated workflow state upon submission.",
+    "preconditions": "Existing draft file owned by sender.",
+    "action_or_input": "Submit file to recipient with mandatory movement comment.",
+    "expected_result": "File status transitions from draft to circulated/active; file appears in recipient inbox.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-024",
+    "source_id": "AFR-FTS-019 preserve-accumulated-content-on-submission",
+    "purpose": "Verify that comments and attachments accumulated in a draft file are preserved after submission.",
+    "preconditions": "Draft file with comments and attachments.",
+    "action_or_input": "Submit file to recipient.",
+    "expected_result": "All pre-existing comments and attachments are preserved in full after entering circulation.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-025",
+    "source_id": "CFR-FTS-005 file-forwarding-and-return",
+    "purpose": "Verify authorized forwarding and return of active files with mandatory comments, optional attachments, holder updates, and chronological tracking.",
+    "preconditions": "Active circulated file between two Institute Employees.",
+    "action_or_input": "Forward file to recipient with comment, then recipient returns file to sender with comment.",
+    "expected_result": "Both movements succeed; holder updates accurately; all comments and actions are chronologically recorded.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-026",
+    "source_id": "AFR-FTS-020 send-file-to-employee",
+    "purpose": "Verify that an Institute Employee can send an active file to another Institute Employee.",
+    "preconditions": "Active file held by sender; valid recipient exists.",
+    "action_or_input": "Send file to recipient with mandatory movement comment.",
+    "expected_result": "File is transferred to recipient and recorded in sender outbox and recipient inbox.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-027",
+    "source_id": "AFR-FTS-021 send-regardless-of-receiver-role",
+    "purpose": "Verify that a file can be sent to any Institute Employee regardless of their institutional role.",
+    "preconditions": "Active file held by sender; recipients with different roles (e.g. Faculty, Staff, Admin roleholders).",
+    "action_or_input": "Send file to employees holding different organizational roles.",
+    "expected_result": "File transfer succeeds across differing role categories without role-hierarchy restrictions.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-028",
+    "source_id": "AFR-FTS-022 movement-comment-mandatory-forward-positive",
+    "purpose": "Verify that forwarding succeeds when mandatory movement comment is provided.",
+    "preconditions": "Active file held by sender.",
+    "action_or_input": "Forward file with valid non-empty movement comment.",
+    "expected_result": "Forward action succeeds and movement comment is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-029",
+    "source_id": "AFR-FTS-022 movement-comment-mandatory-forward-negative",
+    "purpose": "Verify that forwarding is blocked when mandatory movement comment is missing or empty.",
+    "preconditions": "Active file held by sender.",
+    "action_or_input": "Attempt to forward file with empty or missing comment.",
+    "expected_result": "Forwarding is rejected with validation error; file holder remains unchanged.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "FR-030",
+    "source_id": "AFR-FTS-022 movement-comment-mandatory-return-negative",
+    "purpose": "Verify that returning a file is blocked when mandatory movement comment is missing or empty.",
+    "preconditions": "Active file held by recipient.",
+    "action_or_input": "Attempt to return file to previous sender without providing a movement comment.",
+    "expected_result": "Return is rejected with validation error; file remains with current recipient.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "FR-031",
+    "source_id": "AFR-FTS-023 optional-attachments-during-movement",
+    "purpose": "Verify that optional attachments can be added during forwarding and return actions.",
+    "preconditions": "Active file ready for forward or return.",
+    "action_or_input": "Execute forward or return providing a new file attachment along with mandatory comment.",
+    "expected_result": "Movement succeeds and new attachment is linked to this movement stage in file history.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-032",
+    "source_id": "AFR-FTS-024 recipient-forward-onward",
+    "purpose": "Verify that a recipient of a received file can forward it onward to another employee.",
+    "preconditions": "File received by employee (current holder).",
+    "action_or_input": "Recipient forwards file to a third Institute Employee with mandatory comment.",
+    "expected_result": "File is forwarded onward; third employee becomes current holder.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-033",
+    "source_id": "AFR-FTS-025 recipient-return-to-sender",
+    "purpose": "Verify that a recipient user can return a received file to the sender.",
+    "preconditions": "File received by employee with known previous sender.",
+    "action_or_input": "Recipient initiates Return to sender with mandatory comment.",
+    "expected_result": "File returns to previous sender who becomes the active holder again.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-034",
+    "source_id": "AFR-FTS-026 chronological-forward-recording",
+    "purpose": "Verify that each forwarding action is recorded in strict chronological order.",
+    "preconditions": "File subjected to sequential forwarding steps.",
+    "action_or_input": "Perform multiple sequential forward actions with timestamps.",
+    "expected_result": "Movement history lists each forward event ordered chronologically by timestamp.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-035",
+    "source_id": "AFR-FTS-027 chronological-return-recording",
+    "purpose": "Verify that each return action is recorded in strict chronological order.",
+    "preconditions": "File subjected to return actions.",
+    "action_or_input": "Perform return action following a forward action.",
+    "expected_result": "Return event is appended to movement history chronologically following prior forward events.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-036",
+    "source_id": "AFR-FTS-028 update-holder-on-movement",
+    "purpose": "Verify that current file holder is updated immediately upon forward or return.",
+    "preconditions": "Active file held by employee A.",
+    "action_or_input": "Employee A forwards file to employee B.",
+    "expected_result": "File current holder is updated to employee B; employee A is no longer current holder.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-037",
+    "source_id": "CFR-FTS-006 inbox-outbox-and-file-access",
+    "purpose": "Verify Inbox and Outbox views and access control based on user role and file state until archival.",
+    "preconditions": "User with received files and sent files in system.",
+    "action_or_input": "Query user Inbox and Outbox, open files, and verify available actions align with role and file state.",
+    "expected_result": "Inbox lists received files, Outbox lists sent files; opening shows authorized details; available actions match file state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-038",
+    "source_id": "AFR-FTS-029 inbox-listing",
+    "purpose": "Verify that files received by a user appear in the user Inbox.",
+    "preconditions": "File sent to user B by user A.",
+    "action_or_input": "User B queries their Inbox.",
+    "expected_result": "Sent file appears in user B Inbox with correct sender and status information.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-039",
+    "source_id": "AFR-FTS-030 outbox-listing",
+    "purpose": "Verify that files sent by a user appear in the user Outbox.",
+    "preconditions": "File sent by user A to user B.",
+    "action_or_input": "User A queries their Outbox.",
+    "expected_result": "File appears in user A Outbox with recipient details and current status.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-040",
+    "source_id": "AFR-FTS-031 open-file-from-inbox",
+    "purpose": "Verify that users can view and open files from their Inbox.",
+    "preconditions": "File present in user Inbox.",
+    "action_or_input": "User opens the file details from Inbox.",
+    "expected_result": "File contents, comments, attachments, and tracking status are displayed to user.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-041",
+    "source_id": "AFR-FTS-032 open-file-from-outbox",
+    "purpose": "Verify that users can view and open files from their Outbox.",
+    "preconditions": "File present in user Outbox.",
+    "action_or_input": "User opens the file details from Outbox.",
+    "expected_result": "File contents, comments, attachments, and tracking status are displayed to user.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-042",
+    "source_id": "AFR-FTS-033 act-on-file-by-state-and-auth",
+    "purpose": "Verify that a user can act on files from Inbox or Outbox according to file state and authorization.",
+    "preconditions": "User is current holder of an active file in Inbox.",
+    "action_or_input": "User initiates forward, return, or comment actions.",
+    "expected_result": "Permitted actions succeed; non-permitted actions (e.g. forward by non-holder) are blocked.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-043",
+    "source_id": "AFR-FTS-034 file-accessibility-until-archived",
+    "purpose": "Verify that files remain accessible to associated users until archived by the file owner.",
+    "preconditions": "Active circulated file with sender, recipient, and owner associations.",
+    "action_or_input": "Associated users access file at various stages before archival.",
+    "expected_result": "File remains accessible for viewing and permitted actions to all associated users.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-044",
+    "source_id": "CFR-FTS-007 tracking-history-completeness",
+    "purpose": "Verify complete chronological tracking history viewable by authorized associated users.",
+    "preconditions": "File with multi-step movement history.",
+    "action_or_input": "Authorized associated user requests file tracking history.",
+    "expected_result": "Full movement history is retrieved displaying all required sender, receiver, timestamp, comment, and attachment details.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-045",
+    "source_id": "AFR-FTS-035 full-movement-history",
+    "purpose": "Verify that FTS maintains complete movement history for every file from creation onward.",
+    "preconditions": "File created and circulated through multiple holders.",
+    "action_or_input": "Query file movement history.",
+    "expected_result": "All events from initial creation to current status are present in the history log.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-046",
+    "source_id": "AFR-FTS-036 record-sender-details",
+    "purpose": "Verify that sender details are recorded for each file movement event.",
+    "preconditions": "File forward or return movement performed.",
+    "action_or_input": "Inspect movement event in history.",
+    "expected_result": "Sender identity and role information are accurately recorded.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-047",
+    "source_id": "AFR-FTS-037 record-receiver-details",
+    "purpose": "Verify that receiver details are recorded for each file movement event.",
+    "preconditions": "File forward or return movement performed.",
+    "action_or_input": "Inspect movement event in history.",
+    "expected_result": "Receiver identity and role information are accurately recorded.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-048",
+    "source_id": "AFR-FTS-038 record-movement-timestamps",
+    "purpose": "Verify that timestamps are recorded for each file movement event.",
+    "preconditions": "File movement performed at known system time.",
+    "action_or_input": "Inspect timestamp of recorded movement event.",
+    "expected_result": "Valid timestamp is recorded corresponding to time of action execution.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-049",
+    "source_id": "AFR-FTS-039 record-movement-comments",
+    "purpose": "Verify that comments added at each file movement event are recorded.",
+    "preconditions": "File movement performed with specific comment text.",
+    "action_or_input": "Inspect recorded movement in history.",
+    "expected_result": "Movement comment text is accurately stored and associated with the movement event.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-050",
+    "source_id": "AFR-FTS-040 record-movement-attachments",
+    "purpose": "Verify that attachments added at each file movement event are recorded.",
+    "preconditions": "File movement performed with an attached document.",
+    "action_or_input": "Inspect recorded movement in history.",
+    "expected_result": "Attachment metadata and file reference are linked to that specific movement event.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-051",
+    "source_id": "AFR-FTS-041 associated-user-views-history",
+    "purpose": "Verify that any user associated with a file can view its tracking history.",
+    "preconditions": "User who is creator, sender, or receiver of a file movement.",
+    "action_or_input": "Associated user requests file tracking history.",
+    "expected_result": "Tracking history is displayed in full.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-052",
+    "source_id": "AFR-FTS-041 unassociated-user-history-denied",
+    "purpose": "Verify that a user not associated with a file cannot view its tracking history.",
+    "preconditions": "User with no prior association (not creator, sender, recipient, or current holder) to file.",
+    "action_or_input": "Unassociated user attempts to retrieve tracking history of file.",
+    "expected_result": "Request is denied; history details are not disclosed.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-053",
+    "source_id": "CFR-FTS-008 owner-archival-and-immutability",
+    "purpose": "Verify owner-controlled archival and permanent read-only, non-modifiable, non-forwardable archival state.",
+    "preconditions": "Circulated file whose collaborative objective is complete.",
+    "action_or_input": "Owner archives file; attempt subsequent edit, forward, and read actions.",
+    "expected_result": "Archival succeeds; subsequent edits and forwards are blocked; read access remains available.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-054",
+    "source_id": "AFR-FTS-042 owner-archives-file",
+    "purpose": "Verify that the file owner can archive a circulated file.",
+    "preconditions": "Circulated file held by or associated with file owner.",
+    "action_or_input": "File owner initiates archive action.",
+    "expected_result": "File transitions to archived status.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-055",
+    "source_id": "AFR-FTS-043 non-owner-archival-blocked",
+    "purpose": "Verify that users other than the file owner are prevented from archiving the file.",
+    "preconditions": "Circulated file; actor is a recipient or holder but NOT the file owner.",
+    "action_or_input": "Non-owner attempts to archive the file.",
+    "expected_result": "Archival request is denied; file remains active in its current state.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-056",
+    "source_id": "AFR-FTS-044 archival-marks-completion",
+    "purpose": "Verify that archival represents completion of collaborative file workflow.",
+    "preconditions": "Active circulated file.",
+    "action_or_input": "Owner archives the file.",
+    "expected_result": "File status is updated to archived/completed; active collaborative processing is terminated.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-057",
+    "source_id": "AFR-FTS-045 archived-file-permanently-readable",
+    "purpose": "Verify that archived files remain permanently stored and readable to authorized users.",
+    "preconditions": "Archived file in system.",
+    "action_or_input": "Authorized associated user opens archived file.",
+    "expected_result": "File details, comments, attachments, and history are retrievable in read-only format.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-058",
+    "source_id": "AFR-FTS-046 prevent-archived-file-modification",
+    "purpose": "Verify that modification of an archived file is prevented.",
+    "preconditions": "File in archived status.",
+    "action_or_input": "Attempt to edit comments, add attachments, or alter metadata on archived file.",
+    "expected_result": "Modification request is rejected; archived file contents remain unchanged.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "FR-059",
+    "source_id": "AFR-FTS-047 prevent-archived-file-forwarding",
+    "purpose": "Verify that forwarding of an archived file is prevented.",
+    "preconditions": "File in archived status.",
+    "action_or_input": "Attempt to forward the archived file to another user.",
+    "expected_result": "Forwarding request is rejected; file remains in archived status.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "FR-060",
+    "source_id": "CFR-FTS-009 rbac-and-role-switch-preservation",
+    "purpose": "Verify RBAC enforcement, file association checks, and preservation of ownership and audit history across role switches.",
+    "preconditions": "Institute Employee with multiple assigned roles who has created and moved files.",
+    "action_or_input": "Employee switches active role and attempts file operations.",
+    "expected_result": "Authorization reflects active role; file ownership of previously created files and past audit records remain unchanged.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-061",
+    "source_id": "AFR-FTS-048 enforce-rbac-file-operations",
+    "purpose": "Verify that FTS enforces role-based access control for all file operations.",
+    "preconditions": "User whose assigned role lacks permission for a specific file operation.",
+    "action_or_input": "User attempts the restricted file operation.",
+    "expected_result": "Operation is blocked by RBAC check with access denied.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-062",
+    "source_id": "AFR-FTS-049 restrict-view-to-authorized-files",
+    "purpose": "Verify that users can access only files they are authorized to view.",
+    "preconditions": "File exists with which user X has no association.",
+    "action_or_input": "User X attempts to view file details.",
+    "expected_result": "View access is denied; file details are not exposed.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-063",
+    "source_id": "AFR-FTS-050 restrict-actions-to-authorized-files",
+    "purpose": "Verify that users can act only on files they are authorized to act upon.",
+    "preconditions": "File held by employee A; employee B is not current holder.",
+    "action_or_input": "Employee B attempts to forward or return employee A file.",
+    "expected_result": "Action is denied; only authorized current holder may execute movement actions.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-064",
+    "source_id": "AFR-FTS-051 preserve-ownership-across-role-switch",
+    "purpose": "Verify that file ownership is preserved when an employee switches active roles.",
+    "preconditions": "Employee owns a file created under role R1; employee also has role R2.",
+    "action_or_input": "Employee switches active role context from R1 to R2.",
+    "expected_result": "File ownership remains tied to the employee; creator/owner identity is not altered or transferred.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-065",
+    "source_id": "AFR-FTS-052 preserve-audit-history-across-role-switch",
+    "purpose": "Verify that recorded audit history is preserved without change when a user switches roles.",
+    "preconditions": "File with recorded audit history entries under role R1.",
+    "action_or_input": "User switches active role to R2.",
+    "expected_result": "Previously recorded audit entries retain their original actor identity and timestamps unaltered.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-066",
+    "source_id": "AFR-FTS-053 restrict-sensitive-actions-by-role",
+    "purpose": "Verify that sensitive administrative/governance actions are restricted according to assigned roles.",
+    "preconditions": "Regular Institute Employee without administrative privileges.",
+    "action_or_input": "Employee attempts to access FTS administrative governance endpoints or role-reassignment APIs.",
+    "expected_result": "Access is denied; sensitive governance actions require appropriate administrative role.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-067",
+    "source_id": "CFR-FTS-010 audit-logging-and-versioning",
+    "purpose": "Verify audit records and chronological versioning for creation, comments, attachments, forwarding, return, archival, and integration actions.",
+    "preconditions": "File subjected to creation, attachment, movement, archival, and API actions.",
+    "action_or_input": "Inspect audit log entries generated across the file lifecycle.",
+    "expected_result": "Dedicated audit log records exist for each auditable action with action type, actor, timestamp, and details.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-068",
+    "source_id": "AFR-FTS-054 audit-log-file-creation",
+    "purpose": "Verify that FTS maintains an audit log for file creation actions.",
+    "preconditions": "New file created.",
+    "action_or_input": "Inspect audit logs for file creation event.",
+    "expected_result": "Audit record exists capturing creator, timestamp, initial comment, and file identifier.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-069",
+    "source_id": "AFR-FTS-055 audit-log-comments-added",
+    "purpose": "Verify that FTS maintains an audit log for comments added to files.",
+    "preconditions": "Comment added during creation or file movement.",
+    "action_or_input": "Inspect audit logs for comment addition.",
+    "expected_result": "Audit entry logs the comment text, author, timestamp, and associated file.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-070",
+    "source_id": "AFR-FTS-056 audit-log-attachments-added",
+    "purpose": "Verify that FTS maintains an audit log for attachments added to files.",
+    "preconditions": "Attachment uploaded during creation or movement.",
+    "action_or_input": "Inspect audit logs for attachment addition.",
+    "expected_result": "Audit entry logs attachment filename, uploader, timestamp, and associated file.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-071",
+    "source_id": "AFR-FTS-057 audit-log-forwarding-actions",
+    "purpose": "Verify that FTS maintains an audit log for forwarding actions.",
+    "preconditions": "File forwarded from sender to recipient.",
+    "action_or_input": "Inspect audit logs for forwarding event.",
+    "expected_result": "Audit record exists capturing sender, receiver, timestamp, and movement action.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-072",
+    "source_id": "AFR-FTS-058 audit-log-return-actions",
+    "purpose": "Verify that FTS maintains an audit log for return actions.",
+    "preconditions": "File returned by recipient to previous sender.",
+    "action_or_input": "Inspect audit logs for return event.",
+    "expected_result": "Audit record exists capturing returning actor, recipient, timestamp, and return action.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-073",
+    "source_id": "AFR-FTS-059 audit-log-archival-actions",
+    "purpose": "Verify that FTS maintains an audit log for archival actions.",
+    "preconditions": "File archived by owner.",
+    "action_or_input": "Inspect audit logs for archival event.",
+    "expected_result": "Audit record exists capturing owner identity, timestamp, and archival status transition.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-074",
+    "source_id": "AFR-FTS-060 implicit-versioning-via-updates",
+    "purpose": "Verify that FTS maintains chronological file versioning through recorded updates.",
+    "preconditions": "File updated sequentially via drafts, comments, attachments, and movements.",
+    "action_or_input": "Inspect version/update trace.",
+    "expected_result": "Chronological sequence of updates represents ordered state versions without overwriting historical state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-075",
+    "source_id": "CFR-FTS-011 notification-event-generation",
+    "purpose": "Verify that FTS triggers required notification events on file received, forwarded, returned, archived, and role reassigned, handing them to Fusion notification mechanism.",
+    "preconditions": "Integrated environment where Fusion notification handler is listening.",
+    "action_or_input": "Trigger file receive, forward, return, archive, and role assignment events.",
+    "expected_result": "Each corresponding notification event is generated and dispatched to the notification interface.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-076",
+    "source_id": "AFR-FTS-061 notification-file-received",
+    "purpose": "Verify that FTS generates a notification event when a file is received by a user.",
+    "preconditions": "File forwarded to recipient user B.",
+    "action_or_input": "Check triggered notification events.",
+    "expected_result": "Notification event for file received is triggered for user B.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-077",
+    "source_id": "AFR-FTS-062 notification-file-forwarded",
+    "purpose": "Verify that FTS generates a notification event when a file is forwarded.",
+    "preconditions": "File forwarded by user A to user B.",
+    "action_or_input": "Check triggered notification events.",
+    "expected_result": "Notification event for file forwarded is generated with appropriate file details.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-078",
+    "source_id": "AFR-FTS-063 notification-file-returned",
+    "purpose": "Verify that FTS generates a notification event when a file is returned.",
+    "preconditions": "File returned by user B to user A.",
+    "action_or_input": "Check triggered notification events.",
+    "expected_result": "Notification event for file returned is triggered for the previous sender.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-079",
+    "source_id": "AFR-FTS-064 notification-file-archived",
+    "purpose": "Verify that FTS generates a notification event when a file is archived.",
+    "preconditions": "File owner archives completed circulated file.",
+    "action_or_input": "Check triggered notification events.",
+    "expected_result": "Notification event for file archived is triggered.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-080",
+    "source_id": "AFR-FTS-065 notification-role-assigned",
+    "purpose": "Verify that FTS generates a notification event when an FTS role is assigned or reassigned.",
+    "preconditions": "System Admin assigns or reassigns an FTS role to an employee.",
+    "action_or_input": "Check triggered notification events.",
+    "expected_result": "Notification event for role assignment/reassignment is generated.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-081",
+    "source_id": "AFR-FTS-066 notification-delivery-handshake",
+    "purpose": "Verify that FTS hands notification payloads to Fusion integrated notification mechanisms.",
+    "preconditions": "FTS notification event triggered.",
+    "action_or_input": "Observe delivery mechanism handshake.",
+    "expected_result": "Notification payload is successfully transferred to the Fusion notification dispatcher.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-082",
+    "source_id": "CFR-FTS-012 external-api-integration",
+    "purpose": "Verify that FTS exposes authorized APIs to other Fusion modules under RBAC and audit controls while preserving scope boundaries.",
+    "preconditions": "Authorized external Fusion module calling FTS service APIs.",
+    "action_or_input": "Invoke workflow support, approval chain, and tracking APIs with valid authorization and context.",
+    "expected_result": "FTS executes requests under RBAC, records audit entries, and does not enforce consuming module domain policies.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-083",
+    "source_id": "AFR-FTS-067 api-module-specific-workflows",
+    "purpose": "Verify that FTS exposes APIs to other Fusion modules for module-specific workflows.",
+    "preconditions": "Authorized external module invoking FTS API.",
+    "action_or_input": "Call FTS workflow API with module context.",
+    "expected_result": "FTS creates or updates file workflow instance on behalf of calling module.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-084",
+    "source_id": "AFR-FTS-068 api-approval-chains",
+    "purpose": "Verify that FTS exposes APIs to other Fusion modules to support approval chains.",
+    "preconditions": "Authorized external module with multi-stage approval requirement.",
+    "action_or_input": "Call FTS API to route file along an approval chain.",
+    "expected_result": "FTS records movement and updates holder according to approval stage parameters.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-085",
+    "source_id": "AFR-FTS-069 api-request-tracking",
+    "purpose": "Verify that FTS exposes APIs to other Fusion modules for file-based request tracking.",
+    "preconditions": "Authorized external module tracking a request.",
+    "action_or_input": "Call FTS tracking API with file identifier.",
+    "expected_result": "FTS returns tracking history and current holder/status information to calling module.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-086",
+    "source_id": "AFR-FTS-070 api-rbac-enforcement",
+    "purpose": "Verify that FTS applies RBAC requirements to integrations with other Fusion modules.",
+    "preconditions": "Unauthenticated or unauthorized external module client.",
+    "action_or_input": "Attempt to call FTS integration APIs without valid credentials/permissions.",
+    "expected_result": "Request is rejected with authorization failure.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-087",
+    "source_id": "AFR-FTS-071 api-audit-enforcement",
+    "purpose": "Verify that FTS applies audit logging requirements to integrations with other Fusion modules.",
+    "preconditions": "Authorized external module calls FTS API.",
+    "action_or_input": "Execute file action via integration API.",
+    "expected_result": "FTS logs audit entry attributing action to integration client/module context.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-088",
+    "source_id": "AFR-FTS-072 api-domain-approval-rule-boundary",
+    "purpose": "Verify that FTS does not define or enforce domain-specific approval rules of consuming modules.",
+    "preconditions": "Consuming module invoking FTS API.",
+    "action_or_input": "Consuming module sends approval workflow action; FTS executes file movement without validating consuming module internal domain criteria.",
+    "expected_result": "FTS handles file tracking mechanism only; domain validation remains with calling module.",
+    "test_type": "boundary"
+  }
+]

@@ -1,0 +1,43 @@
+# Spec tests: fts
+
+Student 1 (git author name): cosypix
+Student 2 (git author name): Daggula Amulya
+Design commit (hash and subject): a7d1c4f feat(fts): add Prompt A spec test designs for FR, UC, BR, and WF strategies
+Baseline commit (hash and subject): ba576d4 feat(fts): implement spec tests and establish baseline triage for Q1
+Student 1's 10/10 commit the baseline ran on (hash): feb8bff
+
+## Results
+| Run | Strategy | Cases | Passed | Failed | Skipped | Line % | Branch % |
+|-----|----------|-------|--------|--------|---------|--------|----------|
+| baseline | FR | 88 | 77 | 1 | 10 | 77.5% | 68.4% |
+| baseline | UC | 40 | 37 | 2 | 1 | 78.0% | 71.0% |
+| baseline | BR | 46 | 40 | 2 | 4 | 76.9% | 67.1% |
+| baseline | WF | 23 | 23 | 0 | 0 | 50.6% | 52.6% |
+| Q2 | FR | 88 | 88 | 0 | 0 | 78.2% | 72.5% |
+| Q2 | UC | 40 | 40 | 0 | 0 | 78.5% | 73.8% |
+| Q2 | BR | 46 | 46 | 0 | 0 | 77.6% | 71.2% |
+| Q2 | WF | 23 | 23 | 0 | 0 | 50.7% | 52.5% |
+
+## Failures and skips
+| Test id | Source id | Strategies | Category | Evidence | Outcome (fixing commit, covering test, or agreed reading with the spec sentence) | Open? |
+|---------|-----------|------------|----------|----------|-----------------------------------------------------------------------------------|-------|
+| FR-055 | AFR-FTS-043 non-owner-archival-blocked | FR, UC, BR | Confirmed implementation defect | `can_archive_file` in `modules/fts/domain/workflow.py:174` checks `user_id not in {creator_id, current_holder_id}`, permitting non-owner current holders to archive the file, contradicting AFR-FTS-003 and BR-FTS-012 which restrict archival strictly to the file owner/creator. | Resolved in commit c0b6f70 by restricting can_archive_file to creator_id == user_id in modules/fts/domain/workflow.py; verified passing in Q2. | No |
+| UC-029 | FTS-UC-007 Exception Flow 1 | FR, UC, BR | Confirmed implementation defect | Same underlying defect as FR-055 (DEF-001): non-owner recipient attempting archive is permitted rather than denied. | Resolved in commit c0b6f70 (DEF-001) by enforcing owner-only archival; verified passing in Q2. | No |
+| BR-037 | BR-FTS-012 non-owner-archival-prohibited | FR, UC, BR | Confirmed implementation defect | Same underlying defect as FR-055 (DEF-001): non-owner recipient attempting archive is permitted rather than denied. | Resolved in commit c0b6f70 (DEF-001) by enforcing owner-only archival; verified passing in Q2. | No |
+| UC-014 | FTS-UC-003 Exception Flow 2 | UC, BR | Confirmed implementation defect | `forward_file` in `modules/fts/services/movements.py:22` does not validate whether `receiver_id` exists as an active employee identifier or is non-empty, permitting forwards to invalid or non-existent recipients without validation refusal. | Resolved in commit c0b6f70 (DEF-002) by validating non-empty receiver_id in can_forward_file and forward_file; verified passing in Q2. | No |
+| BR-020 | BR-FTS-007 recipient-invalid-prohibited | UC, BR | Confirmed implementation defect | Same underlying defect as UC-014 (DEF-002): forward to non-existent or invalid recipient succeeds instead of refusing with validation error. | Resolved in commit c0b6f70 (DEF-002) by validating non-empty receiver_id in can_forward_file and forward_file; verified passing in Q2. | No |
+| FR-008 | AFR-FTS-006 sysadmin-role-administration | FR | Specification ambiguity | Central IAM role administration interface is external to FTS module scope. | Automated in test_fr_part1_spec.py by verifying system_admin lacks operational permissions and unauthorized forward raises PermissionError per BR-FTS-002; verified passing in Q2. | No |
+| FR-009 | AFR-FTS-007 sysadmin-usage-monitoring | FR | Specification ambiguity | System admin usage monitoring statistics interface is not implemented in FTS backend. | Automated in test_fr_part1_spec.py by asserting non-custodian admin attempting archive raises PermissionError per BR-FTS-002; verified passing in Q2. | No |
+| FR-010 | AFR-FTS-008 sysadmin-audit-oversight | FR | Specification ambiguity | System admin audit oversight view across all module files is not implemented in FTS backend. | Automated in test_fr_part1_spec.py by asserting non-custodian admin attempting draft discard or forward raises PermissionError per BR-FTS-002; verified passing in Q2. | No |
+| UC-034 | FTS-UC-009 Main Flow | UC | Specification ambiguity | Central IAM role assignment interface is external to FTS module scope. | Automated in test_uc_spec.py by asserting system_admin attempting forward or archive raises PermissionError per BR-FTS-002; verified passing in Q2. | No |
+| FR-075 | CFR-FTS-011 notification-event-generation | FR, BR | Environment / setup problem | Central notification dispatcher interface is not yet available in FTS, decoupled per blueprint Step 3.8 (h). | Automated in test_fr_part2_spec.py by asserting lifecycle movements (create, forward, return, archive) produce valid audit trail and notification metadata; verified passing in Q2. | No |
+| FR-076 | AFR-FTS-061 notification-file-received | FR, BR | Environment / setup problem | Central notification dispatcher interface is not yet available in FTS, decoupled per blueprint Step 3.8 (h). | Automated in test_fr_part2_spec.py by asserting file forward produces file-received movement event with receiver ID, role, and comment; verified passing in Q2. | No |
+| FR-077 | AFR-FTS-062 notification-file-forwarded | FR, BR | Environment / setup problem | Central notification dispatcher interface is not yet available in FTS, decoupled per blueprint Step 3.8 (h). | Automated in test_fr_part2_spec.py by asserting forward movement records sender, receiver, timestamp, and remark payload; verified passing in Q2. | No |
+| FR-078 | AFR-FTS-063 notification-file-returned | FR, BR | Environment / setup problem | Central notification dispatcher interface is not yet available in FTS, decoupled per blueprint Step 3.8 (h). | Automated in test_fr_part2_spec.py by asserting return movement records sender, receiver, timestamp, and return remark; verified passing in Q2. | No |
+| FR-079 | AFR-FTS-064 notification-file-archived | FR, BR | Environment / setup problem | Central notification dispatcher interface is not yet available in FTS, decoupled per blueprint Step 3.8 (h). | Automated in test_fr_part2_spec.py by asserting archival movement records owner, timestamp, and archival remark; verified passing in Q2. | No |
+| FR-080 | AFR-FTS-065 notification-role-assigned | FR, BR | Environment / setup problem | Central notification dispatcher interface is not yet available in FTS, decoupled per blueprint Step 3.8 (h). | Automated in test_fr_part2_spec.py by asserting role metadata is captured across movement events to feed role assignment notification context; verified passing in Q2. | No |
+| FR-081 | AFR-FTS-066 notification-delivery-handshake | FR, BR | Environment / setup problem | Central notification dispatcher interface is not yet available in FTS, decoupled per blueprint Step 3.8 (h). | Automated in test_fr_part2_spec.py by asserting movement history payload conforms to handshake contract (keys, comments, timestamps); verified passing in Q2. | No |
+| BR-040 | BR-FTS-013 notify-file-received-and-forwarded | FR, BR | Environment / setup problem | Central notification dispatcher interface is not yet available in FTS, decoupled per blueprint Step 3.8 (h). | Automated in test_br_spec.py by asserting forward operation produces forward/receive movement history with complete notification metadata; verified passing in Q2. | No |
+| BR-041 | BR-FTS-013 notify-file-returned | FR, BR | Environment / setup problem | Central notification dispatcher interface is not yet available in FTS, decoupled per blueprint Step 3.8 (h). | Automated in test_br_spec.py by asserting return operation produces return movement history with complete notification metadata; verified passing in Q2. | No |
+| BR-042 | BR-FTS-013 notify-file-archived | FR, BR | Environment / setup problem | Central notification dispatcher interface is not yet available in FTS, decoupled per blueprint Step 3.8 (h). | Automated in test_br_spec.py by asserting archival operation produces archival movement history with complete notification metadata; verified passing in Q2. | No |
+| BR-043 | BR-FTS-013 notify-role-reassigned | FR, BR | Environment / setup problem | Central notification dispatcher interface is not yet available in FTS, decoupled per blueprint Step 3.8 (h). | Automated in test_br_spec.py by asserting cross-role forward movement captures role transition metadata for notification dispatch; verified passing in Q2. | No |
