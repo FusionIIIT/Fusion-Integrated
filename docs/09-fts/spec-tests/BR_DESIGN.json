@@ -1,0 +1,218 @@
+[
+  {
+    "test_id": "T_BR-FTS-001_PERMITTED",
+    "source_id": "BR-FTS-001",
+    "purpose": "Institute Employee Operational Access Rule: verify permitted outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise permitted case: Only Institute Employee users (Faculty/Staff operating under assigned roles) may perform operational file-processing actions in FTS.",
+    "expected_result": "Allow operational processing only for authorized Institute Employees; System Admin remains strictly outside routine operational file processing.",
+    "test_type": "permitted"
+  },
+  {
+    "test_id": "T_BR-FTS-001_PROHIBITED",
+    "source_id": "BR-FTS-001",
+    "purpose": "Institute Employee Operational Access Rule: verify prohibited outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise prohibited case: Only Institute Employee users (Faculty/Staff operating under assigned roles) may perform operational file-processing actions in FTS.",
+    "expected_result": "Allow operational processing only for authorized Institute Employees; System Admin remains strictly outside routine operational file processing.",
+    "test_type": "prohibited"
+  },
+  {
+    "test_id": "T_BR-FTS-002_REQUIRED",
+    "source_id": "BR-FTS-002",
+    "purpose": "Role Switching Preservation Rule: verify required outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise required case: Switching assigned role context shall not change existing file ownership or previously recorded audit history.",
+    "expected_result": "Apply the selected role to authorization while preserving ownership and historical audit identity.",
+    "test_type": "required"
+  },
+  {
+    "test_id": "T_BR-FTS-003_PERMITTED",
+    "source_id": "BR-FTS-003",
+    "purpose": "Persistent Composite File Rule: verify permitted outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise permitted case: An FTS file is a persistent composite object containing mandatory user comments at creation/movement stages and optional attachments; circulated contents and movement records are retained.",
+    "expected_result": "Persist the file and accumulated contents after circulation; do not delete circulated contents through draft-discard behavior.",
+    "test_type": "permitted"
+  },
+  {
+    "test_id": "T_BR-FTS-003_PROHIBITED",
+    "source_id": "BR-FTS-003",
+    "purpose": "Persistent Composite File Rule: verify prohibited outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise prohibited case: An FTS file is a persistent composite object containing mandatory user comments at creation/movement stages and optional attachments; circulated contents and movement records are retained.",
+    "expected_result": "Persist the file and accumulated contents after circulation; do not delete circulated contents through draft-discard behavior.",
+    "test_type": "prohibited"
+  },
+  {
+    "test_id": "T_BR-FTS-004_PERMITTED",
+    "source_id": "BR-FTS-004",
+    "purpose": "Initial Comment Requirement: verify permitted outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise permitted case: A new FTS file requires an initial mandatory user comment.",
+    "expected_result": "Block acceptance of file creation until the initial comment is present.",
+    "test_type": "permitted"
+  },
+  {
+    "test_id": "T_BR-FTS-004_PROHIBITED",
+    "source_id": "BR-FTS-004",
+    "purpose": "Initial Comment Requirement: verify prohibited outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise prohibited case: A new FTS file requires an initial mandatory user comment.",
+    "expected_result": "Block acceptance of file creation until the initial comment is present.",
+    "test_type": "prohibited"
+  },
+  {
+    "test_id": "T_BR-FTS-005_PERMITTED",
+    "source_id": "BR-FTS-005",
+    "purpose": "Draft Boundary Rule: verify permitted outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise permitted case: Draft save/edit/discard behavior is permitted only before submission/circulation; a circulated file is not deleted as a draft.",
+    "expected_result": "Permit draft operations only in pre-circulation state and prevent draft deletion after circulation.",
+    "test_type": "permitted"
+  },
+  {
+    "test_id": "T_BR-FTS-005_PROHIBITED",
+    "source_id": "BR-FTS-005",
+    "purpose": "Draft Boundary Rule: verify prohibited outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise prohibited case: Draft save/edit/discard behavior is permitted only before submission/circulation; a circulated file is not deleted as a draft.",
+    "expected_result": "Permit draft operations only in pre-circulation state and prevent draft deletion after circulation.",
+    "test_type": "prohibited"
+  },
+  {
+    "test_id": "T_BR-FTS-006_PERMITTED",
+    "source_id": "BR-FTS-006",
+    "purpose": "File-Movement Comment Requirement: verify permitted outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise permitted case: Every file-movement action requires a mandatory comment from the acting user.",
+    "expected_result": "Block movement until the mandatory movement comment is supplied.",
+    "test_type": "permitted"
+  },
+  {
+    "test_id": "T_BR-FTS-006_PROHIBITED",
+    "source_id": "BR-FTS-006",
+    "purpose": "File-Movement Comment Requirement: verify prohibited outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise prohibited case: Every file-movement action requires a mandatory comment from the acting user.",
+    "expected_result": "Block movement until the mandatory movement comment is supplied.",
+    "test_type": "prohibited"
+  },
+  {
+    "test_id": "T_BR-FTS-007_PERMITTED",
+    "source_id": "BR-FTS-007",
+    "purpose": "Receiver and Return Eligibility Rule: verify permitted outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise permitted case: A file may be sent to another Institute Employee regardless of the receiver’s role, and a received file may be returned to its sender where the current user is permitted to act.",
+    "expected_result": "Accept only a valid Institute Employee recipient for send/forward; route return to the sender of the received movement, subject to authorization/file-state permissions.",
+    "test_type": "permitted"
+  },
+  {
+    "test_id": "T_BR-FTS-007_PROHIBITED",
+    "source_id": "BR-FTS-007",
+    "purpose": "Receiver and Return Eligibility Rule: verify prohibited outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise prohibited case: A file may be sent to another Institute Employee regardless of the receiver’s role, and a received file may be returned to its sender where the current user is permitted to act.",
+    "expected_result": "Accept only a valid Institute Employee recipient for send/forward; route return to the sender of the received movement, subject to authorization/file-state permissions.",
+    "test_type": "prohibited"
+  },
+  {
+    "test_id": "T_BR-FTS-008_REQUIRED",
+    "source_id": "BR-FTS-008",
+    "purpose": "Chronological Movement Record Rule: verify required outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise required case: FTS shall record forwarding and return events chronologically with sender, receiver, timestamp, movement comment, and movement attachments where present.",
+    "expected_result": "Append movement event and its details to chronological history; update holder/pending-recipient information consistently.",
+    "test_type": "required"
+  },
+  {
+    "test_id": "T_BR-FTS-009_PERMITTED",
+    "source_id": "BR-FTS-009",
+    "purpose": "Associated File Access Rule: verify permitted outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise permitted case: FTS shall expose file contents/history only to users authorized and associated with the file, including Inbox/Outbox access; archived files remain readable to authorized users.",
+    "expected_result": "Show/open only authorized associated files and retain authorized read access after archival.",
+    "test_type": "permitted"
+  },
+  {
+    "test_id": "T_BR-FTS-009_PROHIBITED",
+    "source_id": "BR-FTS-009",
+    "purpose": "Associated File Access Rule: verify prohibited outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise prohibited case: FTS shall expose file contents/history only to users authorized and associated with the file, including Inbox/Outbox access; archived files remain readable to authorized users.",
+    "expected_result": "Show/open only authorized associated files and retain authorized read access after archival.",
+    "test_type": "prohibited"
+  },
+  {
+    "test_id": "T_BR-FTS-010_PERMITTED",
+    "source_id": "BR-FTS-010",
+    "purpose": "Role-Based Access and Sensitive Action Rule: verify permitted outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise permitted case: FTS shall enforce RBAC, assigned-role restrictions, file association, and file-state authorization for FTS actions, including integrations.",
+    "expected_result": "Permit only actions authorized by role/context/file association/file state; reject unauthorized sensitive actions.",
+    "test_type": "permitted"
+  },
+  {
+    "test_id": "T_BR-FTS-010_PROHIBITED",
+    "source_id": "BR-FTS-010",
+    "purpose": "Role-Based Access and Sensitive Action Rule: verify prohibited outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise prohibited case: FTS shall enforce RBAC, assigned-role restrictions, file association, and file-state authorization for FTS actions, including integrations.",
+    "expected_result": "Permit only actions authorized by role/context/file association/file state; reject unauthorized sensitive actions.",
+    "test_type": "prohibited"
+  },
+  {
+    "test_id": "T_BR-FTS-011_REQUIRED",
+    "source_id": "BR-FTS-011",
+    "purpose": "Audit Log and Chronological Versioning Rule: verify required outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise required case: FTS shall maintain audit records for creation, comments, attachments, forwarding, return, archival, and integration actions, and maintain chronological version history through recorded file updates.",
+    "expected_result": "Append applicable audit/version record without rewriting prior chronological history.",
+    "test_type": "required"
+  },
+  {
+    "test_id": "T_BR-FTS-012_PERMITTED",
+    "source_id": "BR-FTS-012",
+    "purpose": "Archival Rule: verify permitted outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise permitted case: Only the file owner may archive a completed circulated file; archived files remain permanently stored/readable to authorized users and are no longer modifiable or forwardable in collaborative processing.",
+    "expected_result": "Allow archival only for the owner after collaborative completion; enforce archived read-only/no-forward state.",
+    "test_type": "permitted"
+  },
+  {
+    "test_id": "T_BR-FTS-012_PROHIBITED",
+    "source_id": "BR-FTS-012",
+    "purpose": "Archival Rule: verify prohibited outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise prohibited case: Only the file owner may archive a completed circulated file; archived files remain permanently stored/readable to authorized users and are no longer modifiable or forwardable in collaborative processing.",
+    "expected_result": "Allow archival only for the owner after collaborative completion; enforce archived read-only/no-forward state.",
+    "test_type": "prohibited"
+  },
+  {
+    "test_id": "T_BR-FTS-013_REQUIRED",
+    "source_id": "BR-FTS-013",
+    "purpose": "Notification Trigger and Delivery Boundary Rule: verify required outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise required case: FTS shall trigger notifications for file received, file forwarded, file returned, file archived, and relevant role assignment/reassignment events; delivery uses Fusion integrated notification mechanisms.",
+    "expected_result": "Create/trigger required notification event and hand it to the Fusion notification mechanism.",
+    "test_type": "required"
+  },
+  {
+    "test_id": "T_BR-FTS-014_PERMITTED",
+    "source_id": "BR-FTS-014",
+    "purpose": "FTS Integration Boundary Rule: verify permitted outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise permitted case: FTS may provide file/workflow tracking APIs, approval-chain support, and file-based request tracking to other Fusion modules, while consuming modules retain ownership of their domain-specific actors, forms, policies, validations, and workflow semantics.",
+    "expected_result": "Provide only authorized FTS capabilities under FTS RBAC/audit rules; do not assume ownership of consuming-module domain policy.",
+    "test_type": "permitted"
+  },
+  {
+    "test_id": "T_BR-FTS-014_PROHIBITED",
+    "source_id": "BR-FTS-014",
+    "purpose": "FTS Integration Boundary Rule: verify prohibited outcome",
+    "preconditions": "Actor, role context, file association, and lifecycle state meet rule conditions.",
+    "action_or_input": "Exercise prohibited case: FTS may provide file/workflow tracking APIs, approval-chain support, and file-based request tracking to other Fusion modules, while consuming modules retain ownership of their domain-specific actors, forms, policies, validations, and workflow semantics.",
+    "expected_result": "Provide only authorized FTS capabilities under FTS RBAC/audit rules; do not assume ownership of consuming-module domain policy.",
+    "test_type": "prohibited"
+  }
+]
