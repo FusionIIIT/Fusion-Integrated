@@ -3,7 +3,7 @@ import {
   Badge, Button, Card, Container, Group, Loader, Modal, Stack, Text, Textarea,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { FaCheck, FaPlay, FaTimes, FaTrash } from "react-icons/fa";
+import { TbCheck, TbPlayerPlay, TbTrash, TbX } from "react-icons/tb";
 
 import { errorMessage } from "../../../lib/http";
 import { DataTable, type Column } from "../../../ui/components/DataTable";
@@ -111,7 +111,7 @@ export default function PurgePage() {
                         size="xs"
                         color="green"
                         variant="light"
-                        leftSection={<FaCheck size={11} />}
+                        leftSection={<TbCheck size={11} />}
                         onClick={() => setDeciding({ req: r, approve: true })}
                       >
                         Approve
@@ -120,7 +120,7 @@ export default function PurgePage() {
                         size="xs"
                         color="red"
                         variant="light"
-                        leftSection={<FaTimes size={11} />}
+                        leftSection={<TbX size={11} />}
                         onClick={() => setDeciding({ req: r, approve: false })}
                       >
                         Reject
@@ -131,7 +131,7 @@ export default function PurgePage() {
                     <Button
                       size="xs"
                       color="red"
-                      leftSection={<FaPlay size={11} />}
+                      leftSection={<TbPlayerPlay size={11} />}
                       onClick={() => setExecuting(r)}
                     >
                       Execute Purge
@@ -143,7 +143,7 @@ export default function PurgePage() {
           ]}
           rowKey={(r) => r.id}
           empty={{
-            icon: FaTrash,
+            icon: TbTrash,
             title: "No purge requests",
             description: "There are currently no purge requests to display.",
           }}

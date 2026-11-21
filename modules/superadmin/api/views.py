@@ -56,6 +56,12 @@ class DashboardView(APIView):
 
 class ArchivedUserListView(APIView):
     permission_classes = [MODULE]
+    throttle_scope = "superadmin_write"
+
+    def get_throttles(self):
+        if getattr(self, "request", None) and self.request.method in ("GET", "HEAD", "OPTIONS"):
+            return []
+        return super().get_throttles()
 
     @extend_schema(responses={200: s.ArchivedUserSerializer(many=True)})
     def get(self, request):
@@ -94,6 +100,7 @@ class ArchivedUserDetailView(APIView):
 
 class ArchivedUserRestoreView(APIView):
     permission_classes = [MODULE, HasPermission("superadmin.archival.change")]
+    throttle_scope = "superadmin_write"
 
     @extend_schema(request=s.RestoreUserSerializer, responses={200: s.ArchivedUserSerializer})
     def post(self, request, user_id: int):
@@ -109,6 +116,12 @@ class ArchivedUserRestoreView(APIView):
 
 class HistoricalArchiveListView(APIView):
     permission_classes = [MODULE]
+    throttle_scope = "superadmin_write"
+
+    def get_throttles(self):
+        if getattr(self, "request", None) and self.request.method in ("GET", "HEAD", "OPTIONS"):
+            return []
+        return super().get_throttles()
 
     @extend_schema(responses={200: s.HistoricalArchiveSerializer(many=True)})
     def get(self, request):
@@ -135,6 +148,7 @@ class HistoricalArchiveListView(APIView):
 
 class HistoricalArchiveRestoreView(APIView):
     permission_classes = [MODULE, HasPermission("superadmin.archival.change")]
+    throttle_scope = "superadmin_write"
 
     @extend_schema(request=None, responses={200: s.HistoricalArchiveSerializer})
     def post(self, request, pk: int):
@@ -144,6 +158,12 @@ class HistoricalArchiveRestoreView(APIView):
 
 class PurgeRequestListView(APIView):
     permission_classes = [MODULE]
+    throttle_scope = "superadmin_write"
+
+    def get_throttles(self):
+        if getattr(self, "request", None) and self.request.method in ("GET", "HEAD", "OPTIONS"):
+            return []
+        return super().get_throttles()
 
     @extend_schema(responses={200: s.PurgeRequestSerializer(many=True)})
     def get(self, request):
@@ -170,6 +190,7 @@ class PurgeRequestListView(APIView):
 
 class PurgeRequestDecisionView(APIView):
     permission_classes = [MODULE, HasPermission("superadmin.purge.change")]
+    throttle_scope = "superadmin_write"
 
     @extend_schema(request=s.PurgeDecisionSerializer, responses={200: s.PurgeRequestSerializer})
     def post(self, request, pk: int):
@@ -186,6 +207,7 @@ class PurgeRequestDecisionView(APIView):
 
 class PurgeRequestExecuteView(APIView):
     permission_classes = [MODULE, HasPermission("superadmin.purge.add")]
+    throttle_scope = "superadmin_purge"
 
     @extend_schema(request=s.PurgeExecuteSerializer, responses={200: s.PurgeRequestSerializer})
     def post(self, request, pk: int):
@@ -199,8 +221,17 @@ class PurgeRequestExecuteView(APIView):
         return Response(s.PurgeRequestSerializer(req).data)
 
 
+PurgeExecuteView = PurgeRequestExecuteView
+
+
 class PolicyParameterListView(APIView):
     permission_classes = [MODULE]
+    throttle_scope = "superadmin_write"
+
+    def get_throttles(self):
+        if getattr(self, "request", None) and self.request.method in ("GET", "HEAD", "OPTIONS"):
+            return []
+        return super().get_throttles()
 
     @extend_schema(responses={200: s.PolicyParameterSerializer(many=True)})
     def get(self, request):

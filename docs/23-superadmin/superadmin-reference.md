@@ -25,7 +25,7 @@ to its enforcing source code location (`file:line`).
 | **BR-SA-028** | Denial of self-modification of admin privileges | [modules/superadmin/domain/validators.py:43](../../modules/superadmin/domain/validators.py#L43) |
 | **BR-SA-029** | Critical purge destructive execution confirmation | [modules/superadmin/services/purge.py:141](../../modules/superadmin/services/purge.py#L141) |
 | **BR-SA-030** | Bulk operations batch size limit check | [modules/superadmin/domain/validators.py:29](../../modules/superadmin/domain/validators.py#L29) |
-| **BR-SA-033** | Audit log export formatting | [modules/superadmin/api/views.py:245](../../modules/superadmin/api/views.py#L245) |
+| **BR-SA-033** | Audit log export formatting | [modules/superadmin/api/views.py:276](../../modules/superadmin/api/views.py#L276) |
 | **BR-SA-035** | System policy parameter key whitelist | [modules/superadmin/domain/validators.py:37](../../modules/superadmin/domain/validators.py#L37) |
 | **ISS-SA-004** | 30-Day Reversible Archival Window Governance | [modules/superadmin/domain/constants.py:51](../../modules/superadmin/domain/constants.py#L51) |
 | **UC-SA-014** | Identify and Filter Eligible Inactive Users | [modules/superadmin/selectors/archival.py:16](../../modules/superadmin/selectors/archival.py#L16) |
@@ -39,7 +39,7 @@ to its enforcing source code location (`file:line`).
 | **UC-SA-022** | Initiate Permanent Data Purge Request | [modules/superadmin/services/purge.py:38](../../modules/superadmin/services/purge.py#L38) |
 | **UC-SA-023** | Authorize or Reject Permanent Data Purge Request | [modules/superadmin/services/purge.py:80](../../modules/superadmin/services/purge.py#L80) |
 | **UC-SA-024** | View Immutable System Audit Log | [modules/superadmin/selectors/audit.py:18](../../modules/superadmin/selectors/audit.py#L18) |
-| **UC-SA-025** | Export System Audit Log to CSV | [modules/superadmin/api/views.py:245](../../modules/superadmin/api/views.py#L245) |
+| **UC-SA-025** | Export System Audit Log to CSV | [modules/superadmin/api/views.py:276](../../modules/superadmin/api/views.py#L276) |
 | **UC-SA-026** | View Admin Dashboard & Operational Metrics | [modules/superadmin/api/views.py:48](../../modules/superadmin/api/views.py#L48) |
 | **UC-SA-027** | Configure System Policy Parameters | [modules/superadmin/services/config.py:19](../../modules/superadmin/services/config.py#L19) |
 | **UC-SA-031** | Finalize User as Permanently Non-Restorable | [modules/superadmin/services/archival.py:164](../../modules/superadmin/services/archival.py#L164) |
@@ -61,7 +61,7 @@ to its enforcing source code location (`file:line`).
 | **CFR-SA-015** | Permanent purge execution and data destruction | [modules/superadmin/services/purge.py:141](../../modules/superadmin/services/purge.py#L141) |
 | **CFR-SA-016** | Purge request expiration sweep | [modules/superadmin/services/purge.py:185](../../modules/superadmin/services/purge.py#L185) |
 | **CFR-SA-017** | Immutable audit log event generation | [modules/superadmin/services/audit.py:8](../../modules/superadmin/services/audit.py#L8) |
-| **CFR-SA-018** | Audit log query and CSV export | [modules/superadmin/api/views.py:245](../../modules/superadmin/api/views.py#L245) |
+| **CFR-SA-018** | Audit log query and CSV export | [modules/superadmin/api/views.py:276](../../modules/superadmin/api/views.py#L276) |
 | **CFR-SA-019** | Administrative dashboard KPI metrics | [modules/superadmin/selectors/audit.py:32](../../modules/superadmin/selectors/audit.py#L32) |
 | **CFR-SA-020** | Effective-dated policy versioning | [modules/superadmin/services/config.py:19](../../modules/superadmin/services/config.py#L19) |
 | **CFR-SA-021** | Administrative permission gates | [modules/superadmin/registry.py:56](../../modules/superadmin/registry.py#L56) |
@@ -95,7 +95,7 @@ to its enforcing source code location (`file:line`).
 | **AFR-SA-050** | Purge request TTL expiration sweep | [modules/superadmin/services/purge.py:185](../../modules/superadmin/services/purge.py#L185) |
 | **AFR-SA-051** | Archival event notification dispatch | [modules/superadmin/services/archival.py:105](../../modules/superadmin/services/archival.py#L105) |
 | **AFR-SA-052** | Audit log query with actor/action filters | [modules/superadmin/selectors/audit.py:18](../../modules/superadmin/selectors/audit.py#L18) |
-| **AFR-SA-053** | Audit log streaming CSV formatting | [modules/superadmin/api/views.py:253](../../modules/superadmin/api/views.py#L253) |
+| **AFR-SA-053** | Audit log streaming CSV formatting | [modules/superadmin/api/views.py:284](../../modules/superadmin/api/views.py#L284) |
 | **AFR-SA-054** | Governance dashboard KPI aggregation | [modules/superadmin/selectors/audit.py:32](../../modules/superadmin/selectors/audit.py#L32) |
 | **AFR-SA-055** | Audit log immutable record creation | [modules/superadmin/services/audit.py:8](../../modules/superadmin/services/audit.py#L8) |
 | **AFR-SA-056** | System policy parameter version supersede | [modules/superadmin/services/config.py:43](../../modules/superadmin/services/config.py#L43) |

@@ -4,7 +4,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { FaCog, FaEdit } from "react-icons/fa";
+import { TbEdit, TbSettings } from "react-icons/tb";
 
 import { errorMessage } from "../../../lib/http";
 import { DataTable, type Column } from "../../../ui/components/DataTable";
@@ -88,7 +88,7 @@ export default function PolicyPage() {
         title="System Policies"
         subtitle="Effective-dated governance parameters (append-only, never edited in place)"
         action={
-          <Button leftSection={<FaEdit size={12} />} onClick={() => setAdding(true)}>
+          <Button leftSection={<TbEdit size={12} />} onClick={() => setAdding(true)}>
             Supersede Parameter
           </Button>
         }
@@ -108,7 +108,7 @@ export default function PolicyPage() {
                   <Button
                     size="xs"
                     variant="light"
-                    leftSection={<FaEdit size={11} />}
+                    leftSection={<TbEdit size={11} />}
                     onClick={() => openEdit(r)}
                   >
                     Supersede
@@ -118,7 +118,7 @@ export default function PolicyPage() {
           ]}
           rowKey={(r) => r.id}
           empty={{
-            icon: FaCog,
+            icon: TbSettings,
             title: "No policy parameters seeded",
             description: "Run seed_superadmin_policy to initialize system governance parameters.",
           }}

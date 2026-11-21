@@ -1,15 +1,15 @@
 import { Badge, Card, Container, Grid, Group, Loader, Stack, Text, Title } from "@mantine/core";
-import { FaArchive, FaClipboardList, FaScroll, FaTrash } from "react-icons/fa";
+import { TbArchive, TbClipboardList, TbFileText, TbTrash } from "react-icons/tb";
 
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { useDashboard } from "../api/hooks";
 
 const STAT_ICONS: Record<string, React.ReactNode> = {
-  "Archived Users": <FaArchive size={20} />,
-  "Reversible Users": <FaArchive size={20} />,
-  "Pending Purges": <FaTrash size={20} />,
-  "Total Audit Events": <FaScroll size={20} />,
+  "Archived Users": <TbArchive size={20} />,
+  "Reversible Users": <TbArchive size={20} />,
+  "Pending Purges": <TbTrash size={20} />,
+  "Total Audit Events": <TbFileText size={20} />,
 };
 
 function StatCard({ label, value }: { label: string; value: number }) {
@@ -17,7 +17,7 @@ function StatCard({ label, value }: { label: string; value: number }) {
     <Card withBorder padding="md" radius="md">
       <Stack gap={4}>
         <Group gap={6}>
-          {STAT_ICONS[label] ?? <FaClipboardList size={20} />}
+          {STAT_ICONS[label] ?? <TbClipboardList size={20} />}
           <Text size="sm" c="dimmed">{label}</Text>
         </Group>
         <Title order={3}>{value}</Title>

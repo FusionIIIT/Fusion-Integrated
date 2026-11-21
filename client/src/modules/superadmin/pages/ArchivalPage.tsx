@@ -3,7 +3,7 @@ import {
   Badge, Button, Card, Container, Group, Loader, Modal, Stack, Text, Textarea,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { FaArchive, FaUndo } from "react-icons/fa";
+import { TbArchive, TbRotateClockwise } from "react-icons/tb";
 
 import { errorMessage } from "../../../lib/http";
 import { DataTable, type Column } from "../../../ui/components/DataTable";
@@ -86,7 +86,7 @@ export default function ArchivalPage() {
                   <Button
                     size="xs"
                     variant="light"
-                    leftSection={<FaUndo size={11} />}
+                    leftSection={<TbRotateClockwise size={11} />}
                     onClick={() => setRestoring(r)}
                   >
                     Restore
@@ -96,7 +96,7 @@ export default function ArchivalPage() {
           ]}
           rowKey={(r) => r.user_id}
           empty={{
-            icon: FaArchive,
+            icon: TbArchive,
             title: "No archived users",
             description: "There are currently no users in archival.",
           }}

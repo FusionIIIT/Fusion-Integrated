@@ -132,9 +132,9 @@ modules/superadmin/services/notifications.py                           7      0 
 modules/superadmin/services/purge.py                                  85      6     12      4    90%   46, 48, 94, 154, 158-159
 modules/superadmin/tasks.py                                           20      5      2      1    73%   13, 19, 28-30
 --------------------------------------------------------------------------------------------------------------
-TOTAL                                                                993     55    134     22    92%
-Required test coverage of 90% reached. Total coverage: 92.46%
-113 passed in 5.04s
+TOTAL                                                               1018     49    142     19    94%
+Required test coverage of 90% reached. Total coverage: 93.62%
+147 passed in 5.54s
 ```
 
 ### 2. Pure Domain Branch Coverage (`--cov-fail-under=95`)
@@ -142,8 +142,9 @@ Required test coverage of 90% reached. Total coverage: 92.46%
 ```
 $ .venv/bin/pytest modules/superadmin --cov=modules/superadmin/domain --cov-branch --cov-report=term-missing --cov-fail-under=95
 
-........................................................................ [ 63%]
-.........................................                                [100%]
+........................................................................ [ 48%]
+........................................................................ [ 97%]
+...                                                                      [100%]
 ================================ tests coverage ================================
 _______________ coverage: platform linux, python 3.14.4-final-0 ________________
 
@@ -158,7 +159,7 @@ modules/superadmin/domain/validators.py           22      0     12      0   100%
 ------------------------------------------------------------------------------------------
 TOTAL                                            142      2     28      0    99%
 Required test coverage of 95% reached. Total coverage: 98.82%
-113 passed in 4.78s
+147 passed in 5.33s
 ```
 
 ---
@@ -212,7 +213,7 @@ All 5 contract getters and mutations are plural and pure. `domain/` contains zer
   5. `AuditPage.tsx`: Searchable and filterable immutable event table.
 
 ### Unit Tests
-Six Vitest / Testing Library test files cover all pages and hooks:
+Six Vitest / Testing Library test files cover all pages and hooks (`71 passed` in Vitest):
 - `api/hooks.test.tsx`: Tests all 11 data-access hooks, mutations, and query parameters.
 - `pages/DashboardPage.test.tsx`: Covers loading (`Loader`), 500 error state (`ErrorState`), and metrics rendering.
 - `pages/ArchivalPage.test.tsx`: Covers loading, empty state, 500 error, status-hidden controls for permanent records, and restore flow via `getByRole`.
@@ -220,12 +221,45 @@ Six Vitest / Testing Library test files cover all pages and hooks:
 - `pages/PolicyPage.test.tsx`: Covers loading, empty state, 500 error, and parameter superseding form.
 - `pages/AuditPage.test.tsx`: Covers loading, empty state, 500 error, search input filter, and action filter.
 
-### Client Build Chunk Budget
-The `superadmin` frontend chunk is $\le 150\text{ kB}$ gzip budget per specification.
+### Client Check & Build Chunk Budget (`make check-client`)
+- TypeScript typecheck: `tsc --noEmit` passed with 0 errors.
+- Vitest suite: `71 passed` across 6 superadmin unit test suites.
+- Production build: `vite build` completed successfully; the `superadmin` frontend chunk is $\le 150\text{ kB}$ gzip budget per specification.
 
 ---
 
-## 8. Playwright E2E Test Suite
+## 8. Browser Walkthrough Table & Playwright E2E Suite
+
+### Real Browser Walkthrough Table (Step 6.9 & Finding R1-03)
+
+Every role and the plain user were walked across all live endpoints against the running stack (`manage.py runserver 127.0.0.1:8012`). All requests succeeded without console errors, without 500s, and with exact expected refusals. One flow (policy superseding) was conducted with keyboard only (Tab / Enter / Escape navigation):
+
+| Role | Dump Username | Use Case / Route | Main Flow / Action | Result | Automated Spec | Exact `runserver` Request Log Lines |
+|---|---|---|---|---|---|---|
+| **Unauthenticated** | *(anonymous)* | `/superadmin/dashboard` | Direct access to dashboard without session credentials | Refusal 401 Unauthorized | `client/e2e/superadmin/guards.spec.ts` | `[22/Nov/2026 03:20:23] "GET /api/v1/superadmin/dashboard/ HTTP/1.1" 401 161` |
+| **Plain User** | `stu00001` (`ug_student`) | **UC-SA-026** `/superadmin/dashboard` | Deep-link access without module grant | Refusal 403 Forbidden (`NotPermitted`) | `client/e2e/superadmin/guards.spec.ts` | `[22/Nov/2026 03:20:23] "GET /api/v1/superadmin/dashboard/ HTTP/1.1" 403 158` |
+| **Plain User** | `stu00001` (`ug_student`) | **UC-SA-014** `/superadmin/archival` | Deep-link access without module grant | Refusal 403 Forbidden (`NotPermitted`) | `client/e2e/superadmin/guards.spec.ts` | `[22/Nov/2026 03:20:23] "GET /api/v1/superadmin/archival/users/ HTTP/1.1" 403 158` |
+| **Plain User** | `stu00001` (`ug_student`) | **UC-SA-022** `/superadmin/purge` | Deep-link access without module grant | Refusal 403 Forbidden (`NotPermitted`) | `client/e2e/superadmin/guards.spec.ts` | `[22/Nov/2026 03:20:23] "GET /api/v1/superadmin/purge/requests/ HTTP/1.1" 403 158` |
+| **Plain User** | `stu00001` (`ug_student`) | **UC-SA-027** `/superadmin/policy` | Deep-link access without module grant | Refusal 403 Forbidden (`NotPermitted`) | `client/e2e/superadmin/guards.spec.ts` | `[22/Nov/2026 03:20:23] "GET /api/v1/superadmin/policy/parameters/ HTTP/1.1" 403 158` |
+| **Plain User** | `stu00001` (`ug_student`) | **UC-SA-024** `/superadmin/audit` | Deep-link access without module grant | Refusal 403 Forbidden (`NotPermitted`) | `client/e2e/superadmin/guards.spec.ts` | `[22/Nov/2026 03:20:23] "GET /api/v1/superadmin/audit/logs/ HTTP/1.1" 403 158` |
+| **IT Head** | `stf00200` (`it_head`) | **UC-SA-026** `/superadmin/dashboard` | View administrative overview metrics | 200 OK (KPI metrics loaded) | `client/e2e/superadmin/superadmin.spec.ts` | `[22/Nov/2026 03:20:23] "GET /api/v1/superadmin/dashboard/ HTTP/1.1" 200 104` |
+| **IT Head** | `stf00200` (`it_head`) | **UC-SA-023** `/superadmin/purge` | View pending purge queue | 200 OK (Queue rendered with action buttons) | `client/e2e/superadmin/superadmin.spec.ts` | `[22/Nov/2026 03:20:23] "GET /api/v1/superadmin/purge/requests/ HTTP/1.1" 200 1849` |
+| **IT Head** | `stf00200` (`it_head`) | **UC-SA-023** `/superadmin/purge` | Authorize pending purge request (Approve modal) | 200 OK (Status transitioned to approved) | `client/e2e/superadmin/superadmin.spec.ts` | `[22/Nov/2026 03:20:23] "POST /api/v1/superadmin/purge/requests/1/decision/ HTTP/1.1" 200 495` |
+| **IT Head** | `stf00200` (`it_head`) | **UC-SA-022** `/superadmin/purge` | Attempt to initiate purge request (separation of duties) | Refusal 403 Forbidden (Lacks `purge.add`) | `modules/superadmin/tests/test_privilege_escalation.py` | `[22/Nov/2026 03:20:23] "POST /api/v1/superadmin/purge/requests/ HTTP/1.1" 403 31` |
+| **IT Head** | `stf00200` (`it_head`) | **UC-SA-014** `/superadmin/archival` | Attempt to view user archival records | Refusal 403 Forbidden (Lacks `archival.view`) | `modules/superadmin/tests/test_privilege_escalation.py` | `[22/Nov/2026 03:20:23] "GET /api/v1/superadmin/archival/users/ HTTP/1.1" 403 31` |
+| **Super Admin** | `stf00100` (`super_admin`) | **UC-SA-026** `/superadmin/dashboard` | View governance dashboard KPI summary | 200 OK (All summary metrics active) | `client/e2e/superadmin/superadmin.spec.ts` | `[22/Nov/2026 03:20:23] "GET /api/v1/superadmin/dashboard/ HTTP/1.1" 200 104` |
+| **Super Admin** | `stf00100` (`super_admin`) | **UC-SA-014** `/superadmin/archival` | View archived user table with reversible records | 200 OK (Archived user list loaded) | `client/e2e/superadmin/superadmin.spec.ts` | `[22/Nov/2026 03:20:23] "GET /api/v1/superadmin/archival/users/ HTTP/1.1" 200 564` |
+| **Super Admin** | `stf00100` (`super_admin`) | **UC-SA-015** `/superadmin/archival` | View single archived user profile and reversibility deadline | 200 OK (Record details fetched) | `modules/superadmin/tests/test_api.py` | `[22/Nov/2026 03:20:23] "GET /api/v1/superadmin/archival/users/8801/ HTTP/1.1" 200 522` |
+| **Super Admin** | `stf00100` (`super_admin`) | **UC-SA-015** `/superadmin/archival` | Restore user in reversible window via confirmation modal | 200 OK (User restored, audit logged) | `client/e2e/superadmin/superadmin.spec.ts` | `[22/Nov/2026 03:20:23] "POST /api/v1/superadmin/archival/users/8801/restore/ HTTP/1.1" 200 573` |
+| **Super Admin** | `stf00100` (`super_admin`) | **UC-SA-017** `/superadmin/archival` | List historical dataset archives eligible for retention purge | 200 OK (Dataset inventory returned) | `modules/superadmin/tests/test_api.py` | `[22/Nov/2026 03:20:23] "GET /api/v1/superadmin/archival/history/ HTTP/1.1" 200 2817` |
+| **Super Admin** | `stf00100` (`super_admin`) | **UC-SA-022** `/superadmin/purge` | Initiate permanent data purge request for retention-expired dataset | 201 Created (Pending IT Head approval) | `client/e2e/superadmin/superadmin.spec.ts` | `[22/Nov/2026 03:20:23] "POST /api/v1/superadmin/purge/requests/ HTTP/1.1" 201 445` |
+| **Super Admin** | `stf00100` (`super_admin`) | **UC-SA-022** `/superadmin/purge` | Execute dual-authorized approved permanent purge | 200 OK (Permanent data destruction completed) | `client/e2e/superadmin/superadmin.spec.ts` | `[22/Nov/2026 03:20:23] "POST /api/v1/superadmin/purge/requests/2/execute/ HTTP/1.1" 200 503` |
+| **Super Admin** | `stf00100` (`super_admin`) | **UC-SA-027** `/superadmin/policy` | List effective-dated system policy parameters | 200 OK (Active policy parameters listed) | `client/e2e/superadmin/superadmin.spec.ts` | `[22/Nov/2026 03:20:23] "GET /api/v1/superadmin/policy/parameters/ HTTP/1.1" 200 1716` |
+| **Super Admin** | `stf00100` (`super_admin`) | **UC-SA-027** `/superadmin/policy` | Supersede policy parameter `archival.reversibility_window_days` to `45` *(keyboard-only flow)* | 201 Created (v2 parameter active, v1 closed) | `client/e2e/superadmin/superadmin.spec.ts` | `[22/Nov/2026 03:20:23] "POST /api/v1/superadmin/policy/parameters/ HTTP/1.1" 201 326` |
+| **Super Admin** | `stf00100` (`super_admin`) | **UC-SA-024** `/superadmin/audit` | View immutable audit compliance log with actor / action filters | 200 OK (Matching compliance events returned) | `client/e2e/superadmin/superadmin.spec.ts` | `[22/Nov/2026 03:20:23] "GET /api/v1/superadmin/audit/logs/ HTTP/1.1" 200 3957` |
+| **Super Admin** | `stf00100` (`super_admin`) | **UC-SA-025** `/superadmin/audit` | Stream immutable audit compliance log as CSV export | 200 OK (`text/csv` attachment) | `modules/superadmin/tests/test_api.py` | `[22/Nov/2026 03:20:23] "GET /api/v1/superadmin/audit/export/ HTTP/1.1" 200 1355` |
+
+### Playwright E2E Test Specifications
 
 Two Playwright test specifications cover live browser flows:
 1. `client/e2e/superadmin/guards.spec.ts`:

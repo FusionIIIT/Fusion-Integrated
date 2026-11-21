@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
   Badge, Card, Container, Group, Loader, Select, Stack, Text, TextInput,
 } from "@mantine/core";
-import { FaScroll, FaSearch } from "react-icons/fa";
+import { TbFileText, TbSearch } from "react-icons/tb";
 
 import { DataTable, type Column } from "../../../ui/components/DataTable";
 import { ErrorState } from "../../../ui/components/ErrorState";
@@ -76,7 +76,7 @@ export default function AuditPage() {
       <Group mb="md" gap="sm">
         <TextInput
           placeholder="Search by actor username…"
-          leftSection={<FaSearch size={14} />}
+          leftSection={<TbSearch size={14} />}
           value={search}
           onChange={(e) => setSearch(e.currentTarget.value)}
           style={{ flex: 1 }}
@@ -101,7 +101,7 @@ export default function AuditPage() {
             columns={COLUMNS}
             rowKey={(r) => r.id}
             empty={{
-              icon: FaScroll,
+              icon: TbFileText,
               title: "No audit events found",
               description: "No audit events match the current filters.",
             }}
