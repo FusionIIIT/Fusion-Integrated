@@ -1674,6 +1674,436 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/superadmin/archival/datasets/:
+    get:
+      operationId: v1_superadmin_archival_datasets_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HistoricalArchive'
+          description: ''
+    post:
+      operationId: v1_superadmin_archival_datasets_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HistoricalArchiveCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HistoricalArchiveCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HistoricalArchiveCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoricalArchive'
+          description: ''
+  /api/v1/superadmin/archival/history/:
+    get:
+      operationId: v1_superadmin_archival_history_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HistoricalArchive'
+          description: ''
+    post:
+      operationId: v1_superadmin_archival_history_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HistoricalArchiveCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HistoricalArchiveCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HistoricalArchiveCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoricalArchive'
+          description: ''
+  /api/v1/superadmin/archival/history/{id}/restore/:
+    post:
+      operationId: v1_superadmin_archival_history_restore_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoricalArchive'
+          description: ''
+  /api/v1/superadmin/archival/users/:
+    get:
+      operationId: v1_superadmin_archival_users_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ArchivedUser'
+          description: ''
+    post:
+      operationId: v1_superadmin_archival_users_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchiveUserCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ArchiveUserCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ArchiveUserCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchivedUser'
+          description: ''
+  /api/v1/superadmin/archival/users/{user_id}/:
+    get:
+      operationId: v1_superadmin_archival_users_retrieve
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchivedUser'
+          description: ''
+  /api/v1/superadmin/archival/users/{user_id}/restore/:
+    post:
+      operationId: v1_superadmin_archival_users_restore_create
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestoreUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RestoreUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RestoreUser'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchivedUser'
+          description: ''
+  /api/v1/superadmin/audit/export/:
+    get:
+      operationId: v1_superadmin_audit_export_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            text/csv:
+              schema:
+                type: string
+          description: ''
+  /api/v1/superadmin/audit/logs/:
+    get:
+      operationId: v1_superadmin_audit_logs_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SuperAdminAuditLog'
+          description: ''
+  /api/v1/superadmin/dashboard/:
+    get:
+      operationId: v1_superadmin_dashboard_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardSummary'
+          description: ''
+  /api/v1/superadmin/policies/:
+    get:
+      operationId: v1_superadmin_policies_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PolicyParameter'
+          description: ''
+    post:
+      operationId: v1_superadmin_policies_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolicySupersede'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PolicySupersede'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PolicySupersede'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyParameter'
+          description: ''
+  /api/v1/superadmin/policy/parameters/:
+    get:
+      operationId: v1_superadmin_policy_parameters_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PolicyParameter'
+          description: ''
+    post:
+      operationId: v1_superadmin_policy_parameters_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolicySupersede'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PolicySupersede'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PolicySupersede'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyParameter'
+          description: ''
+  /api/v1/superadmin/purge/requests/:
+    get:
+      operationId: v1_superadmin_purge_requests_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurgeRequest'
+          description: ''
+    post:
+      operationId: v1_superadmin_purge_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurgeRequestCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PurgeRequestCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PurgeRequestCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurgeRequest'
+          description: ''
+  /api/v1/superadmin/purge/requests/{id}/decision/:
+    post:
+      operationId: v1_superadmin_purge_requests_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurgeDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PurgeDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PurgeDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurgeRequest'
+          description: ''
+  /api/v1/superadmin/purge/requests/{id}/execute/:
+    post:
+      operationId: v1_superadmin_purge_requests_execute_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurgeExecute'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PurgeExecute'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PurgeExecute'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurgeRequest'
+          description: ''
 components:
   schemas:
     AcademicDirectory:
@@ -1981,6 +2411,135 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    ArchiveUserCreate:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        institute_id:
+          type: string
+          maxLength: 32
+        username:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+        user_kind:
+          type: string
+          maxLength: 16
+        is_deactivated:
+          type: boolean
+          default: true
+        deactivated_at:
+          type: string
+          format: date-time
+          nullable: true
+        has_pending_transactions:
+          type: boolean
+          default: false
+        archival_reason:
+          type: string
+        metadata_snapshot: {}
+      required:
+      - archival_reason
+      - email
+      - institute_id
+      - user_id
+      - user_kind
+      - username
+    ArchivedUser:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          readOnly: true
+        institute_id:
+          type: string
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        user_kind:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ArchivedUserStatusEnum'
+          readOnly: true
+        archived_at:
+          type: string
+          format: date-time
+          readOnly: true
+        reversible_until:
+          type: string
+          format: date-time
+          readOnly: true
+        authorized_by:
+          type: integer
+          readOnly: true
+        archival_reason:
+          type: string
+          readOnly: true
+        restored_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        restored_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        restoration_reason:
+          type: string
+          readOnly: true
+        finalized_permanent_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        metadata_snapshot:
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - archival_reason
+      - archived_at
+      - authorized_by
+      - created_at
+      - email
+      - finalized_permanent_at
+      - institute_id
+      - metadata_snapshot
+      - restoration_reason
+      - restored_at
+      - restored_by
+      - reversible_until
+      - status
+      - updated_at
+      - user_id
+      - user_kind
+      - username
+    ArchivedUserStatusEnum:
+      enum:
+      - finalized_permanent
+      - restored
+      - reversible
+      type: string
+      description: |-
+        * `finalized_permanent` - finalized_permanent
+        * `restored` - restored
+        * `reversible` - reversible
     AudienceEnum:
       enum:
       - students
@@ -2315,6 +2874,22 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DashboardSummary:
+      type: object
+      properties:
+        archived_users_reversible:
+          type: integer
+        archived_users_total:
+          type: integer
+        purge_requests_pending:
+          type: integer
+        audit_logs_total:
+          type: integer
+      required:
+      - archived_users_reversible
+      - archived_users_total
+      - audit_logs_total
+      - purge_requests_pending
     Detail:
       type: object
       properties:
@@ -2423,6 +2998,117 @@ components:
       - fee_reference
       - season
       - user_id
+    HistoricalArchive:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        dataset_category:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        date_range_start:
+          type: string
+          format: date
+          readOnly: true
+        date_range_end:
+          type: string
+          format: date
+          readOnly: true
+        record_count:
+          type: integer
+          readOnly: true
+        backup_file_path:
+          type: string
+          readOnly: true
+        backup_checksum:
+          type: string
+          readOnly: true
+        retention_expires_at:
+          type: string
+          format: date
+          readOnly: true
+        is_restored:
+          type: boolean
+          readOnly: true
+        restored_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        is_purged:
+          type: boolean
+          readOnly: true
+        archived_by:
+          type: integer
+          readOnly: true
+        summary_metadata:
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - archived_by
+      - backup_checksum
+      - backup_file_path
+      - created_at
+      - dataset_category
+      - date_range_end
+      - date_range_start
+      - id
+      - is_purged
+      - is_restored
+      - record_count
+      - restored_at
+      - retention_expires_at
+      - summary_metadata
+      - title
+      - updated_at
+    HistoricalArchiveCreate:
+      type: object
+      properties:
+        dataset_category:
+          type: string
+          maxLength: 64
+        title:
+          type: string
+          maxLength: 200
+        date_range_start:
+          type: string
+          format: date
+        date_range_end:
+          type: string
+          format: date
+        record_count:
+          type: integer
+          minimum: 1
+        backup_file_path:
+          type: string
+          maxLength: 255
+        backup_checksum:
+          type: string
+          maxLength: 64
+        retention_expires_at:
+          type: string
+          format: date
+        summary_metadata: {}
+      required:
+      - backup_checksum
+      - backup_file_path
+      - dataset_category
+      - date_range_end
+      - date_range_start
+      - record_count
+      - retention_expires_at
+      - title
     IncidentRecorded:
       type: object
       properties:
@@ -3145,6 +3831,79 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    PolicyParameter:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        key:
+          type: string
+          readOnly: true
+        value:
+          type: string
+          readOnly: true
+        value_type:
+          type: string
+          readOnly: true
+        version:
+          type: integer
+          readOnly: true
+          default: 1
+        effective_from:
+          type: string
+          format: date-time
+          readOnly: true
+        effective_to:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        description:
+          type: string
+          readOnly: true
+        updated_by:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - description
+      - effective_from
+      - effective_to
+      - id
+      - key
+      - updated_at
+      - updated_by
+      - value
+      - value_type
+      - version
+    PolicySupersede:
+      type: object
+      properties:
+        key:
+          type: string
+          maxLength: 64
+        value:
+          type: string
+          maxLength: 255
+        value_type:
+          type: string
+          default: string
+          maxLength: 16
+        description:
+          type: string
+          default: ''
+      required:
+      - key
+      - value
     ProfileDocument:
       type: object
       description: |-
@@ -3201,6 +3960,118 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    PurgeDecision:
+      type: object
+      properties:
+        approve:
+          type: boolean
+        comments:
+          type: string
+          default: ''
+      required:
+      - approve
+    PurgeExecute:
+      type: object
+      properties:
+        reauth_token:
+          type: string
+        execution_summary: {}
+    PurgeRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        archive:
+          type: integer
+          readOnly: true
+        archive_title:
+          type: string
+          readOnly: true
+        dataset_category:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/PurgeRequestStatusEnum'
+          readOnly: true
+        requested_by:
+          type: integer
+          readOnly: true
+        requested_at:
+          type: string
+          format: date-time
+          readOnly: true
+        request_reason:
+          type: string
+          readOnly: true
+        it_head_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        it_head_decision_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        it_head_comments:
+          type: string
+          readOnly: true
+        purged_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        execution_summary:
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - archive
+      - archive_title
+      - created_at
+      - dataset_category
+      - execution_summary
+      - id
+      - it_head_comments
+      - it_head_decision_at
+      - it_head_id
+      - purged_at
+      - request_reason
+      - requested_at
+      - requested_by
+      - status
+      - updated_at
+    PurgeRequestCreate:
+      type: object
+      properties:
+        archive_id:
+          type: integer
+        request_reason:
+          type: string
+      required:
+      - archive_id
+      - request_reason
+    PurgeRequestStatusEnum:
+      enum:
+      - approved
+      - expired
+      - pending_it_head
+      - purged
+      - rejected
+      type: string
+      description: |-
+        * `approved` - approved
+        * `expired` - expired
+        * `pending_it_head` - pending_it_head
+        * `purged` - purged
+        * `rejected` - rejected
     Recommendation:
       type: object
       description: |-
@@ -3466,6 +4337,13 @@ components:
       - message
       - reason
       - route
+    RestoreUser:
+      type: object
+      properties:
+        restoration_reason:
+          type: string
+      required:
+      - restoration_reason
     RoundOutcome:
       type: object
       properties:
@@ -3698,6 +4576,63 @@ components:
           type: integer
       required:
       - document_id
+    SuperAdminAuditLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        timestamp:
+          type: string
+          format: date-time
+          readOnly: true
+        actor_id:
+          type: integer
+          readOnly: true
+        actor_username:
+          type: string
+          readOnly: true
+        actor_role:
+          type: string
+          readOnly: true
+        action:
+          type: string
+          readOnly: true
+        target_id:
+          type: string
+          readOnly: true
+        target_type:
+          type: string
+          readOnly: true
+        result:
+          type: string
+          readOnly: true
+        ip_address:
+          type: string
+          readOnly: true
+          nullable: true
+        user_agent:
+          type: string
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        context_metadata:
+          readOnly: true
+      required:
+      - action
+      - actor_id
+      - actor_role
+      - actor_username
+      - context_metadata
+      - id
+      - ip_address
+      - reason
+      - result
+      - target_id
+      - target_type
+      - timestamp
+      - user_agent
     TopicEnum:
       enum:
       - drive
