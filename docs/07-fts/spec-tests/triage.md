@@ -3,7 +3,7 @@
 Student 1 (git author name): cosypix
 Student 2 (git author name): Daggula Amulya
 Design commit (hash and subject): a7d1c4f feat(fts): add Prompt A spec test designs for FR, UC, BR, and WF strategies
-Baseline commit (hash and subject): 639cc57 feat(fts): implement spec tests and establish baseline triage for Q1
+Baseline commit (hash and subject): ba576d4 feat(fts): implement spec tests and establish baseline triage for Q1
 Student 1's 10/10 commit the baseline ran on (hash): feb8bff
 
 ## Results
