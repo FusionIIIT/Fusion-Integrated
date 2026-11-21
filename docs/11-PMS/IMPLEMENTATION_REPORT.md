@@ -2,7 +2,8 @@
 
 **Current branch:** `assignment9_PMS`
 **Specification baseline:** PMS Problem Statement v1.2; Requirement Registry, Use Cases, Business Rules, Workflows, and Traceability Matrix v1.3
-**Code snapshot:** branch HEAD `496538f` (M8 test corrections); local frontend compile fixes are uncommitted
+**Reviewed base commit:** `73b49fbe0c08ee5153f55e13cb62044a9ea4f194`
+**Verification snapshot:** base commit plus R2 correction commits `c7bae1e`, `d8f1ac5`, and `09c2539` on `assignment9_PMS`, as of 2026-11-22
 **M7 purpose:** describe repository evidence; this report does not change or supersede requirements.
 
 ## Specification set reviewed
@@ -24,7 +25,7 @@ PMS manages institutional patent applications from submission through internal r
 
 The backend is a Django module registered as `pms`, mounted at `/api/v1/pms/`. Important directories:
 
-- `modules/pms/models.py`, `migrations/` — 17 PMS models and three migrations.
+- `modules/pms/models.py`, `migrations/` — 18 PMS models and four migrations, including `PmsRoleAssignment` (whose presence is an unresolved IAM architecture violation).
 - `modules/pms/domain/` — state machine, policy configuration, validation, and domain errors.
 - `modules/pms/services/` — application, review, budget, attorney, filing, office-action, maintenance, document, licensing, audit, deadline, and notification logic.
 - `modules/pms/selectors/` — application visibility scoping.
@@ -65,7 +66,7 @@ No DEC-5 or DEC-6 decision record was found in the current repository documentat
 
 ## Backend, data, and automation
 
-The three migrations are `0001_initial.py` (domain schema), `0002_seed_pms_configuration.py` (specified default values), and `0003_separate_prefiling_workflow_states.py` (normalizes legacy application statuses and keeps substates in workflow records).
+The four migrations are `0001_initial.py` (domain schema), `0002_seed_pms_configuration.py` (specified default values), `0003_separate_prefiling_workflow_states.py` (normalizes legacy application statuses and keeps substates in workflow records), and `0004_fail_closed_document_scan_defaults.py` (marks prior scan claims unverified and changes the defaults to fail closed). `showmigrations pms` against the local development database reported all four unapplied; `make check` applied migrations only to its temporary test database.
 
 The API covers application CRUD/lifecycle actions, review, budget, attorney assignment/response, patentability/legal advice, external filing/grant records, office actions and responses, maintenance, prior art, document metadata/versioning, licensing, inventor consent, attorney panel, configuration, audit, reports, and workflow oversight. There are 37 URL patterns in the current `urls.py`; M4 instructions referred to 39 routes. Whether that count included individual method operations is undocumented, so the count convention remains unverified.
 
@@ -87,24 +88,74 @@ Pages use the shared HTTP/CSRF client and React Query hooks. UI role checks cont
 
 ## Current implementation gaps and dependencies
 
-- **Document files:** APIs and UI record document metadata, versions, and an optional storage URL; they do not accept or store binary files. Malware status is a caller-supplied boolean that defaults clean; no scanner or fail-closed scanning integration exists. The M6 document size input is capped at 52,428,799 bytes, while the server remains authoritative.
-- **Prior art:** `services/prior_art.py` returns deterministic sample records. No external patent/publication query connector, keyword optimization, or classification mapping is present. The frontend deliberately does not present those sample records as real search results. Attaching a reference and logging a search are separate implemented capabilities.
+- **Document files and malware scanning:** APIs accept document metadata and an optional storage URL; they do not accept or store binary files. With no trusted scanner configured, submission, revision, and version upload reject document acceptance with HTTP 503. Caller-supplied `is_clean` values are ignored, model defaults are false, and migration 0004 marks old scan claims unverified. A supported scanner and binary storage flow remain unavailable.
+- **Prior art:** no external patent/publication query connector is configured. Search now returns HTTP 503 and logs an unavailable/not-queried event; no simulated results are exposed. Attaching a reference remains separate. Search becomes available only when a supported external source is provided.
 - **Appeals:** an Applicant can submit an appeal, and the API can decide a known appeal ID. There is no appeal-list endpoint and application detail does not return appeal IDs, so a Director cannot discover appeals through a review queue.
 - **Application history:** current details and audit rows are available; there is no dedicated complete application history endpoint/timeline.
 - **Reports:** the API and UI provide visible-application counts and status/domain aggregates. Scheduled reports, filtering/customization, export, workload/financial/deadline dashboards, and historical/trend analysis are absent.
 - **Administration/exceptions:** PMS configuration and attorney-panel CRUD are present. PMS role grants are platform-IAM-owned; no PMS role-assignment endpoint is exposed. Workflow oversight is read-only and does not resolve conflict or exception cases.
+- **IAM scope data:** the platform session exposes active role, permissions and module grants, but no Director domain assignment projection. PMS still contains `PmsRoleAssignment`, which duplicates IAM-owned designation/access data. Do not remove it until IAM exposes the required domain-scope data and the Director domain authorization can be preserved.
 - **External systems:** patent-office filing/grant decisions, financial/payment execution, DMS binary storage, external prior-art queries, and email transport are recorded or delegated at the boundary rather than integrated as live systems.
 - **Conditional policy:** appeal period, escalation chain, budget threshold, and maintenance schedule remain unset unless an operator configures them. `PatentBudget.threshold_limit` still has a legacy model default of 100000; current escalation logic reads `PmsConfiguration.budget_threshold` and does not consult that legacy value when policy is unset. This schema/API field can therefore appear misleading and should be reconciled in a later implementation decision.
 - **Traceability source quality:** all 203 AFR rows in the supplied RTM have blank UC mapping, UC locations, BR mapping, workflow mapping, minimum-representation, and coverage cells. The registry’s AFR-to-UC/BR/WF columns and each UC’s CFR/AFR links are also blank. The source Summary says coverage is full, which is unsupported by its own blank evidence cells. M7 leaves those source sheets intact; its separate implementation map labels associations as direct or derived.
 
 The M7 workbook includes 371 traceability rows (203 AFR, 30 CFR, 33 use cases, 84 business rules, 21 workflows). Its status is an evidence classification based on current code references, feature-level associations, and test-file presence. “Covered by tests” means a related test source exists; it does not mean the test was run in M7 or that it asserts every mapped requirement clause. Frontend behavior has no PMS-specific automated tests.
 
-## Latest verification — 2026-11-21
+## Latest verification — 2026-11-22
 
-- `make check` — **passed** against the configured local PostgreSQL database. Django system checks, migration consistency, Ruff, import contracts, repository contract checks, navigation/route matching, permission manifest, OpenAPI schema, and the full backend pytest suite all completed successfully. Pytest emitted Django email-setting deprecation warnings and two naive-datetime warnings in policy tests; these did not fail the check.
+- In this commit-preparation session, `.venv/bin/pytest modules/pms/tests/test_client_route_guards.py -q` passed (2 tests); `make check-client` passed TypeScript checks, 38 shared client tests, and production build; `make permissions` completed and the generated manifest had no additional diff. The Vite build emitted its existing large-chunk advisory.
+- In this session, `.venv/bin/ruff check modules/pms`, `make schema-check`, `.venv/bin/python manage.py makemigrations --check --dry-run pms`, and `git diff --cached --check` passed. Migration-drift check emitted a warning that it could not verify database migration history because PostgreSQL was unreachable.
+- In this session, focused backend test attempts for fail-closed document/prior-art behavior and the query-budget test could not initialize their PostgreSQL test database. Docker access to `/var/run/docker.sock` was denied, and PostgreSQL at `127.0.0.1:5432` was unreachable. These attempts are **blocked, not passed**.
+- `DB_NAME=fusion_integrated DB_USER=fusion_admin DB_PASSWORD="$(docker exec fusion-integrated-db-local printenv POSTGRES_PASSWORD)" make check` — **passed** against local PostgreSQL. Django system checks, migration consistency, Ruff, import contracts, repository contract checks, navigation/route matching, permission manifest, OpenAPI schema, and the full backend pytest suite all completed successfully. Pytest emitted Django email-setting deprecation warnings and two naive-datetime warnings in policy tests; these did not fail the check.
 - `make check-client` — **passed** after installing the exact `client/package-lock.json` dependencies. TypeScript checks (application and E2E), all 38 shared client tests across six files, and the production Vite build passed. The build reported a chunk-size advisory; npm install reported nine dependency advisories. Neither was investigated as part of this check.
-- The first client check attempt could not start because TypeScript was absent. Once dependencies were installed, it exposed two unused-import TypeScript errors; the local fixes remove those imports from `client/src/modules/pms/pages/AdminPage.tsx` and `client/src/modules/pms/pages/Placeholder.tsx`.
+- Focused PMS tests covering prior-art unavailability, document fail-closed behavior, migration-independent validation, exact route/nav permissions/icons, and query growth passed (43 passed in the combined focused run; query-budget test separately passed after fixing the N+1).
+- The new query-budget test first measured 10 queries for two applications and 46 for twenty. Adding `office_actions` and `maintenance_records` to `visible_applications()` prefetch reduced growth to a fixed query count; the two-versus-twenty test now passes.
+- `make permissions` regenerated `registry/permissions.json` to match the three corrected Phosphor icon names. `make schema` regenerated the OpenAPI schema for the new 503 responses; `make schema-check` passed in the full gate.
+- `make check-client` previously exposed two unused-import TypeScript errors; the local fixes remove those imports from `client/src/modules/pms/pages/AdminPage.tsx` and `client/src/modules/pms/pages/Placeholder.tsx`.
 - The prior nine backend test failures were corrected as test fixture/assertion issues in HEAD `496538f`, not production defects. Fixtures now create accepted AttorneyAssignment records and a granted maintenance context required by the relevant workflows; the audit caller has the workflow-monitor permission it uses; ownership tests make the co-inventor visible while still asserting primary-applicant-only actions are refused; the appeal test follows Director assignment and review; and workflow tests refresh ORM instances before asserting persisted assignment status. These align with UC-PMS-006/010/011/017/018/023/028, BW-PMS-06/07/14/15, and BR-PMS-040/061/067/070/092/095/126. The test suite passed in `make check`.
-- No original specification or Student 2 spec-test files were modified. No new milestone work was started. Full independent review scorecard/output was not present in the repository or searched Downloads; the prior nine-test report was used as requested.
+- R2-01 and R2-04 are fail-closed, not fully integrated: UC-PMS-004/BR-PMS-141 still needs an approved reachable external search source, and UC-PMS-001/BR-PMS-016 still needs an approved malware scanning/storage integration. No approver acceptance is recorded for those gaps or the other gaps listed above.
+- Browser E2E and author walkthrough evidence were not produced: the current harness accounts include only a student and placement officer, not PMS designations, and the author has not supplied a walkthrough. Do not treat those dimensions as passed.
+- No original specification or Student 2 spec-test files were modified. No milestone work beyond the R2 corrections was started. No R2 acceptance/waiver decision was inferred.
 
-The M7 review and traceability updates did not run backend/frontend suites at the time; the results above supersede that verification gap. Student 2 should still perform comprehensive QA, including PMS-specific frontend workflow coverage, and review every partial, unimplemented, and externally dependent RTM row. This is not full QA certification.
+R2-02 remains open until the approver provides written acceptance for every retained gap or each live requirement is implemented. R2-03 remains open until IAM supplies an approved Director-domain projection/API or a specification-compliant replacement is authorized. R2-06 through R2-09 remain partially/unimplemented: no PMS Playwright suite, complete `test_journeys.py`, author walkthrough record, or PMS page-state test suite exists. R2-12 is partial: domain/state descriptions were added, but no approved blueprint, reference generator, or generated all-ID reference exists. This is not a passing independent review or full QA certification.
+
+### Browser walkthrough status
+
+No result or request-log output is claimed for these rows. Each remains **not run** because no PMS test accounts or live backend/IAM walkthrough were available in the supplied harness. The author should perform the walkthrough and add the real `runserver` request lines.
+
+| Use case | Spec actor | Result |
+| --- | --- | --- |
+| UC-PMS-001 | Applicant | Not run — author walkthrough needed |
+| UC-PMS-002 | Applicant | Not run — author walkthrough needed |
+| UC-PMS-003 | Applicant | Not run — author walkthrough needed |
+| UC-PMS-004 | Applicant or Attorney | Not run — author walkthrough needed |
+| UC-PMS-005 | Applicant | Not run — author walkthrough needed |
+| UC-PMS-006 | Applicant | Not run — author walkthrough needed |
+| UC-PMS-007 | PCC_ADMIN | Not run — author walkthrough needed |
+| UC-PMS-008 | Director | Not run — author walkthrough needed |
+| UC-PMS-009 | Director | Not run — author walkthrough needed |
+| UC-PMS-010 | PCC_ADMIN | Not run — author walkthrough needed |
+| UC-PMS-011 | Attorney | Not run — author walkthrough needed |
+| UC-PMS-012 | Attorney | Not run — author walkthrough needed |
+| UC-PMS-013 | Attorney | Not run — author walkthrough needed |
+| UC-PMS-014 | Attorney | Not run — author walkthrough needed |
+| UC-PMS-015 | Attorney | Not run — author walkthrough needed |
+| UC-PMS-016 | PCC_ADMIN | Not run — author walkthrough needed |
+| UC-PMS-017 | Attorney | Not run — author walkthrough needed |
+| UC-PMS-018 | Director | Not run — author walkthrough needed |
+| UC-PMS-019 | Applicant; other roles when authorized | Not run — author walkthrough needed |
+| UC-PMS-020 | Applicant | Not run — author walkthrough needed |
+| UC-PMS-021 | Director | Not run — author walkthrough needed |
+| UC-PMS-022 | Applicant | Not run — author walkthrough needed |
+| UC-PMS-023 | Director | Not run — author walkthrough needed |
+| UC-PMS-024 | PCC_ADMIN | Not run — author walkthrough needed |
+| UC-PMS-025 | PCC_ADMIN | Not run — author walkthrough needed |
+| UC-PMS-026 | PCC_ADMIN | Not run — author walkthrough needed |
+| UC-PMS-027 | PCC_ADMIN | Not run — author walkthrough needed |
+| UC-PMS-028 | PCC_ADMIN; Director where authorized | Not run — author walkthrough needed |
+| UC-PMS-029 | Applicant | Not run — author walkthrough needed |
+| UC-PMS-030 | Applicant | Not run — author walkthrough needed |
+| UC-PMS-031 | Director | Not run — author walkthrough needed |
+| UC-PMS-032 | Director | Not run — author walkthrough needed |
+| UC-PMS-033 | Attorney | Not run — author walkthrough needed |
+| Plain user | No PMS role | Not run — author walkthrough needed |
