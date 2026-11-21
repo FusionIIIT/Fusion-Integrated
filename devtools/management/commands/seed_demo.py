@@ -58,4 +58,6 @@ class Command(BaseCommand):
 
 
 
+        from django.core.management import call_command
+        call_command("seed_system_admin")
         self.stdout.write(self.style.SUCCESS("demo data loaded"))

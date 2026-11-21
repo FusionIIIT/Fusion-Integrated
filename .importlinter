@@ -15,16 +15,23 @@ source_modules =
     modules.placement
     modules.directory
     modules.accesscontrol
+    modules.system_admin
 forbidden_modules =
     modules.placement.models
     modules.placement.services
     modules.placement.selectors
     modules.placement.api
     modules.placement.domain
+    modules.system_admin.domain
     modules.directory.models
     modules.directory.services
     modules.directory.api
     modules.accesscontrol.models
+    modules.system_admin.models
+    modules.system_admin.services
+    modules.system_admin.selectors
+    modules.system_admin.api
+    modules.system_admin.domain
 # DIRECT imports only. contracts.py legitimately imports its OWN module's
 # models and services, so following the chain transitively would make this
 # contract impossible to satisfy. What we forbid is a module reaching straight
@@ -38,6 +45,7 @@ type = forbidden
 source_modules =
 # Every module's domain, not just the first one written.
     modules.placement.domain
+    modules.system_admin.domain
 forbidden_modules =
     django
     rest_framework
@@ -66,3 +74,14 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+    modules.system_admin.domain
+
+[importlinter:contract:system-admin-layers]
+name = Layering inside system_admin
+type = layers
+layers =
+    modules.system_admin.api
+    modules.system_admin.services
+    modules.system_admin.selectors
+    modules.system_admin.models
+    modules.system_admin.domain

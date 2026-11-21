@@ -3,20 +3,26 @@
  *
  *  Named imports ONLY. `import * as Fa` defeats tree-shaking and ships ~1 MB. */
 import {
+  FaArchive,
   FaBriefcase, FaBuilding, FaBullhorn, FaCalendarAlt, FaChartBar,
-  FaCheckDouble, FaCircle, FaClipboardCheck, FaClipboardList, FaCog,
-  FaExternalLinkAlt,
-  FaFileSignature, FaGraduationCap, FaIdBadge, FaIdCard, FaLayerGroup,
-  FaSignOutAlt, FaThLarge, FaUserCheck, FaUserTie, FaUsers,
+  FaCheckCircle, FaCheckDouble, FaCircle, FaClipboardCheck, FaClipboardList, FaCog,
+  FaCogs, FaDownload, FaExclamationTriangle, FaExchangeAlt,
+  FaExternalLinkAlt, FaFileUpload,
+  FaFileSignature, FaGraduationCap, FaHistory, FaIdBadge, FaIdCard, FaKey, FaLayerGroup,
+  FaSignOutAlt, FaSync, FaTachometerAlt, FaThLarge, FaTimesCircle, FaTrashAlt,
+  FaUserCheck, FaUserLock, FaUserMinus, FaUserPlus, FaUserShield, FaUserTie, FaUsers,
 } from "react-icons/fa";
 import type { IconType } from "react-icons";
 
 export const ICONS = {
+  FaArchive,
   FaBriefcase, FaBuilding, FaBullhorn, FaCalendarAlt, FaChartBar,
-  FaCheckDouble, FaCircle, FaClipboardCheck, FaClipboardList, FaCog,
-  FaExternalLinkAlt,
-  FaFileSignature, FaGraduationCap, FaIdBadge, FaIdCard, FaLayerGroup,
-  FaSignOutAlt, FaThLarge, FaUserCheck, FaUserTie, FaUsers,
+  FaCheckCircle, FaCheckDouble, FaCircle, FaClipboardCheck, FaClipboardList, FaCog,
+  FaCogs, FaDownload, FaExclamationTriangle, FaExchangeAlt,
+  FaExternalLinkAlt, FaFileUpload,
+  FaFileSignature, FaGraduationCap, FaHistory, FaIdBadge, FaIdCard, FaKey, FaLayerGroup,
+  FaSignOutAlt, FaSync, FaTachometerAlt, FaThLarge, FaTimesCircle, FaTrashAlt,
+  FaUserCheck, FaUserLock, FaUserMinus, FaUserPlus, FaUserShield, FaUserTie, FaUsers,
 } as const;
 
 export type IconKey = keyof typeof ICONS;

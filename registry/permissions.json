@@ -278,6 +278,239 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "system_admin": {
+      "grants": {
+        "faculty": [
+          "system_admin.role.switch"
+        ],
+        "it_head": [
+          "system_admin.audit.view",
+          "system_admin.purge.authorize"
+        ],
+        "staff": [
+          "system_admin.role.switch"
+        ],
+        "student": [
+          "system_admin.role.switch"
+        ],
+        "super_admin": [
+          "system_admin.archive.create",
+          "system_admin.archive.export",
+          "system_admin.archive.restore",
+          "system_admin.archive.view",
+          "system_admin.audit.report",
+          "system_admin.audit.view",
+          "system_admin.config.update",
+          "system_admin.config.view",
+          "system_admin.purge.request",
+          "system_admin.role.assign",
+          "system_admin.role.extend",
+          "system_admin.role.reassign",
+          "system_admin.role.revoke",
+          "system_admin.role.view",
+          "system_admin.session.manage",
+          "system_admin.user.bulk_manage",
+          "system_admin.user.create",
+          "system_admin.user.deactivate",
+          "system_admin.user.reactivate",
+          "system_admin.user.update",
+          "system_admin.user.view"
+        ]
+      },
+      "module_grants": [
+        "faculty",
+        "it_head",
+        "staff",
+        "student",
+        "super_admin"
+      ],
+      "nav": {
+        "base_path": "/sysadmin",
+        "icon": "FaUserShield",
+        "items": [
+          {
+            "code": "system_admin.dashboard",
+            "icon": "FaTachometerAlt",
+            "label": "Admin Dashboard",
+            "required_permission": "system_admin.audit.view",
+            "sort_order": 1,
+            "to": "/sysadmin/dashboard"
+          },
+          {
+            "code": "system_admin.users",
+            "icon": "FaUsers",
+            "label": "User Management",
+            "required_permission": "system_admin.user.view",
+            "sort_order": 10,
+            "to": "/sysadmin/users"
+          },
+          {
+            "code": "system_admin.users.bulk",
+            "icon": "FaFileUpload",
+            "label": "Bulk Operations",
+            "required_permission": "system_admin.user.bulk_manage",
+            "sort_order": 20,
+            "to": "/sysadmin/users/bulk"
+          },
+          {
+            "code": "system_admin.roles",
+            "icon": "FaIdBadge",
+            "label": "Role Management",
+            "required_permission": "system_admin.role.view",
+            "sort_order": 30,
+            "to": "/sysadmin/roles"
+          },
+          {
+            "code": "system_admin.archival",
+            "icon": "FaArchive",
+            "label": "Archive Control",
+            "required_permission": "system_admin.archive.view",
+            "sort_order": 40,
+            "to": "/sysadmin/archival"
+          },
+          {
+            "code": "system_admin.purge",
+            "icon": "FaTrashAlt",
+            "label": "Data Purge",
+            "required_permission": "system_admin.purge.request",
+            "sort_order": 50,
+            "to": "/sysadmin/purge"
+          },
+          {
+            "code": "system_admin.audit",
+            "icon": "FaHistory",
+            "label": "Audit Logs",
+            "required_permission": "system_admin.audit.view",
+            "sort_order": 60,
+            "to": "/sysadmin/audit"
+          },
+          {
+            "code": "system_admin.config",
+            "icon": "FaCogs",
+            "label": "System Parameters",
+            "required_permission": "system_admin.config.view",
+            "sort_order": 70,
+            "to": "/sysadmin/config"
+          }
+        ],
+        "label": "System Administrator",
+        "nav_section": "Administration",
+        "sort_order": 1,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "system_admin.user.view",
+          "label": "View basic user accounts"
+        },
+        {
+          "code": "system_admin.user.create",
+          "label": "Create basic user account"
+        },
+        {
+          "code": "system_admin.user.update",
+          "label": "Update user profile details"
+        },
+        {
+          "code": "system_admin.user.deactivate",
+          "label": "Deactivate user account"
+        },
+        {
+          "code": "system_admin.user.reactivate",
+          "label": "Reactivate user account"
+        },
+        {
+          "code": "system_admin.user.bulk_manage",
+          "label": "Perform bulk user operations"
+        },
+        {
+          "code": "system_admin.role.view",
+          "label": "View role metadata and assignments"
+        },
+        {
+          "code": "system_admin.role.assign",
+          "label": "Assign role to user"
+        },
+        {
+          "code": "system_admin.role.reassign",
+          "label": "Reassign role with handover"
+        },
+        {
+          "code": "system_admin.role.revoke",
+          "label": "Revoke user role"
+        },
+        {
+          "code": "system_admin.role.extend",
+          "label": "Extend role validity period"
+        },
+        {
+          "code": "system_admin.role.switch",
+          "label": "Switch active role"
+        },
+        {
+          "code": "system_admin.role.auto_expire",
+          "label": "Automatically expire roles"
+        },
+        {
+          "code": "system_admin.role.auto_activate",
+          "label": "Automatically activate scheduled roles"
+        },
+        {
+          "code": "system_admin.archive.view",
+          "label": "Search and view archived records"
+        },
+        {
+          "code": "system_admin.archive.create",
+          "label": "Archive users and historical data"
+        },
+        {
+          "code": "system_admin.archive.restore",
+          "label": "Restore archived users and data"
+        },
+        {
+          "code": "system_admin.archive.export",
+          "label": "Export archived data"
+        },
+        {
+          "code": "system_admin.archive.auto_finalize",
+          "label": "Finalize non-restorable archived users"
+        },
+        {
+          "code": "system_admin.purge.request",
+          "label": "Request permanent data purge"
+        },
+        {
+          "code": "system_admin.purge.authorize",
+          "label": "Authorize permanent data purge"
+        },
+        {
+          "code": "system_admin.audit.view",
+          "label": "View audit trail and operational metrics"
+        },
+        {
+          "code": "system_admin.audit.report",
+          "label": "Generate audit and archive reports"
+        },
+        {
+          "code": "system_admin.config.view",
+          "label": "View permitted system parameters"
+        },
+        {
+          "code": "system_admin.config.update",
+          "label": "Update permitted system parameters"
+        },
+        {
+          "code": "system_admin.session.manage",
+          "label": "Manage Super Admin session lifecycle"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "system_admin.archive.auto_finalize",
+        "system_admin.role.auto_activate",
+        "system_admin.role.auto_expire"
+      ]
     }
   },
   "publisher": "integrated",

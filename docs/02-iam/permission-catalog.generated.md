@@ -38,3 +38,34 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `system_admin`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `system_admin.user.view` | View basic user accounts | `super_admin` |
+| `system_admin.user.create` | Create basic user account | `super_admin` |
+| `system_admin.user.update` | Update user profile details | `super_admin` |
+| `system_admin.user.deactivate` | Deactivate user account | `super_admin` |
+| `system_admin.user.reactivate` | Reactivate user account | `super_admin` |
+| `system_admin.user.bulk_manage` | Perform bulk user operations | `super_admin` |
+| `system_admin.role.view` | View role metadata and assignments | `super_admin` |
+| `system_admin.role.assign` | Assign role to user | `super_admin` |
+| `system_admin.role.reassign` | Reassign role with handover | `super_admin` |
+| `system_admin.role.revoke` | Revoke user role | `super_admin` |
+| `system_admin.role.extend` | Extend role validity period | `super_admin` |
+| `system_admin.role.switch` | Switch active role | `faculty`, `staff`, `student` |
+| `system_admin.role.auto_expire` | Automatically expire roles | _service only_ |
+| `system_admin.role.auto_activate` | Automatically activate scheduled roles | _service only_ |
+| `system_admin.archive.view` | Search and view archived records | `super_admin` |
+| `system_admin.archive.create` | Archive users and historical data | `super_admin` |
+| `system_admin.archive.restore` | Restore archived users and data | `super_admin` |
+| `system_admin.archive.export` | Export archived data | `super_admin` |
+| `system_admin.archive.auto_finalize` | Finalize non-restorable archived users | _service only_ |
+| `system_admin.purge.request` | Request permanent data purge | `super_admin` |
+| `system_admin.purge.authorize` | Authorize permanent data purge | `it_head` |
+| `system_admin.audit.view` | View audit trail and operational metrics | `it_head`, `super_admin` |
+| `system_admin.audit.report` | Generate audit and archive reports | `super_admin` |
+| `system_admin.config.view` | View permitted system parameters | `super_admin` |
+| `system_admin.config.update` | Update permitted system parameters | `super_admin` |
+| `system_admin.session.manage` | Manage Super Admin session lifecycle | `super_admin` |
