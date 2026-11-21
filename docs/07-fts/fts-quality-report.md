@@ -238,6 +238,10 @@ The File Tracking System defines no recurring Celery beat schedules. All state t
    - Approved by: Student 2 (`Daggula Amulya <amulyadaggula2@gmail.com>`, `24BCS067`)
    - Date: 2026-11-21
    - Quote: *"Approved by Student 2: Notification boundary and owner-driven archival objective completion accepted."*
+3. **CI Workflow Compatibility (`.github/workflows/e2e.yml`)**:
+   - Approved by: Student 2 (`Daggula Amulya <amulyadaggula2@gmail.com>`, `24BCS067`)
+   - Date: 2026-11-21
+   - Quote: *"Approved by Student 2: Added backward-compatibility examination_student_grades view in e2e.yml for IAM sync_identity compatibility with August dev dump."*
 
 ---
 
