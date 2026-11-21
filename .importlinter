@@ -15,6 +15,7 @@ source_modules =
     modules.placement
     modules.directory
     modules.accesscontrol
+    modules.elm
 forbidden_modules =
     modules.placement.models
     modules.placement.services
@@ -25,6 +26,11 @@ forbidden_modules =
     modules.directory.services
     modules.directory.api
     modules.accesscontrol.models
+    modules.elm.models
+    modules.elm.services
+    modules.elm.selectors
+    modules.elm.api
+    modules.elm.domain
 # DIRECT imports only. contracts.py legitimately imports its OWN module's
 # models and services, so following the chain transitively would make this
 # contract impossible to satisfy. What we forbid is a module reaching straight
@@ -38,6 +44,7 @@ type = forbidden
 source_modules =
 # Every module's domain, not just the first one written.
     modules.placement.domain
+    modules.elm.domain
 forbidden_modules =
     django
     rest_framework
@@ -66,3 +73,13 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+
+[importlinter:contract:elm-layers]
+name = Layering inside elm
+type = layers
+layers =
+    modules.elm.api
+    modules.elm.services
+    modules.elm.selectors
+    modules.elm.models
+    modules.elm.domain

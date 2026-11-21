@@ -63,6 +63,547 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/elm/applications:
+    get:
+      operationId: elm_applications_list
+      description: 'GET: your own applications. POST: apply for leave.'
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationList'
+          description: ''
+    post:
+      operationId: v1_elm_applications_create
+      description: 'GET: your own applications. POST: apply for leave.'
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplyInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ApplyInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ApplyInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/applications/{id}:
+    get:
+      operationId: elm_application_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplicationDetail'
+          description: ''
+  /api/v1/elm/applications/{id}/cancel:
+    post:
+      operationId: v1_elm_applications_cancel_create
+      description: Shared shape of an action on one application.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reason'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Reason'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Reason'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/applications/{id}/extend:
+    post:
+      operationId: v1_elm_applications_extend_create
+      description: Shared shape of an action on one application.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtendInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExtendInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExtendInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/applications/{id}/modify:
+    post:
+      operationId: v1_elm_applications_modify_create
+      description: Shared shape of an action on one application.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplyInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ApplyInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ApplyInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/applications/{id}/resume:
+    post:
+      operationId: v1_elm_applications_resume_create
+      description: Shared shape of an action on one application.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Resume'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Resume'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Resume'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/applications/{id}/route:
+    post:
+      operationId: v1_elm_applications_route_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Route'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Route'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Route'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/applications/{id}/sanction:
+    post:
+      operationId: v1_elm_applications_sanction_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sanction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Sanction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Sanction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/applications/{id}/self-sanction:
+    post:
+      operationId: v1_elm_applications_self_sanction_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reason'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Reason'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Reason'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/applications/{id}/substitute-response:
+    post:
+      operationId: v1_elm_applications_substitute_response_create
+      description: Shared shape of an action on one application.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubstituteResponse'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/applications/{id}/unit-head:
+    post:
+      operationId: v1_elm_applications_unit_head_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnitHeadDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UnitHeadDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UnitHeadDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/applications/{id}/verify-resumption:
+    post:
+      operationId: v1_elm_applications_verify_resumption_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyResumption'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyResumption'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyResumption'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/applications/{id}/withdraw:
+    post:
+      operationId: v1_elm_applications_withdraw_create
+      description: Shared shape of an action on one application.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/balances:
+    get:
+      operationId: v1_elm_balances_retrieve
+      description: 'The caller''s balances for a year (default: this one).'
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceList'
+          description: ''
+  /api/v1/elm/calendar:
+    get:
+      operationId: v1_elm_calendar_retrieve
+      description: 'GET: the published calendar. POST: add an entry (administrators).'
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calendar'
+          description: ''
+    post:
+      operationId: v1_elm_calendar_create
+      description: 'GET: the published calendar. POST: add an entry (administrators).'
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalendarEntryInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CalendarEntryInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CalendarEntryInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calendar'
+          description: ''
+  /api/v1/elm/notifications:
+    get:
+      operationId: v1_elm_notifications_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationList'
+          description: ''
+  /api/v1/elm/offline:
+    post:
+      operationId: v1_elm_offline_create
+      description: Record leave that was sanctioned on paper (BR-EL-029).
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfflineInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OfflineInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OfflineInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveApplication'
+          description: ''
+  /api/v1/elm/tasks:
+    get:
+      operationId: v1_elm_tasks_retrieve
+      description: The applications waiting on the caller's role.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationList'
+          description: ''
+  /api/v1/elm/year-end:
+    post:
+      operationId: v1_elm_year_end_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/YearEndInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/YearEndInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/YearEndInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/YearEndReport'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1898,6 +2439,15 @@ components:
       - status
       - user_id
       - withdrawn_reason
+    ApplicationList:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveApplication'
+      required:
+      - results
     ApplicationStatusEnum:
       enum:
       - draft
@@ -1942,6 +2492,44 @@ components:
           nullable: true
       required:
       - posting_id
+    ApplyInput:
+      type: object
+      description: The applicant never says whether SCL is admissible; the sanctioning
+        authority does.
+      properties:
+        leave_type:
+          $ref: '#/components/schemas/LeaveTypeEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        half_day:
+          allOf:
+          - $ref: '#/components/schemas/ElmHalfDayEnum'
+          default: NONE
+        special_purpose:
+          type: string
+          default: ''
+        medical_reference:
+          type: string
+          default: ''
+          maxLength: 200
+        station_leave:
+          type: boolean
+          default: false
+        station_address:
+          type: string
+          default: ''
+          maxLength: 200
+        substitute_user_id:
+          type: integer
+          nullable: true
+      required:
+      - end_date
+      - leave_type
+      - start_date
     ApplySanction:
       type: object
       properties:
@@ -1993,6 +2581,15 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BalanceList:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveBalance'
+      required:
+      - results
     BulkOutcome:
       type: object
       properties:
@@ -2045,6 +2642,58 @@ components:
       required:
       - application_ids
       - to_status
+    Calendar:
+      type: object
+      properties:
+        restricted_holidays:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        closed_holidays:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        vacation_periods:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - closed_holidays
+      - restricted_holidays
+      - vacation_periods
+    CalendarEntryInput:
+      type: object
+      properties:
+        kind:
+          $ref: '#/components/schemas/CalendarEntryInputKindEnum'
+        name:
+          type: string
+          maxLength: 255
+        date:
+          type: string
+          format: date
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+      required:
+      - kind
+      - name
+    CalendarEntryInputKindEnum:
+      enum:
+      - restricted
+      - closed
+      - vacation
+      type: string
+      description: |-
+        * `restricted` - restricted
+        * `closed` - closed
+        * `vacation` - vacation
     Candidate:
       type: object
       description: A person as the ERP portal and the IAM describe them. Read-only
@@ -2315,6 +2964,18 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DecisionEnum:
+      enum:
+      - approve
+      - reject
+      - recommend
+      - not_recommend
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
+        * `recommend` - recommend
+        * `not_recommend` - not_recommend
     Detail:
       type: object
       properties:
@@ -2407,6 +3068,70 @@ components:
       - season_decision
       - semester
       - standing
+    ElmApplicationSourceEnum:
+      enum:
+      - ONLINE
+      - OFFLINE
+      type: string
+      description: |-
+        * `ONLINE` - Applied in ELM
+        * `OFFLINE` - Recorded from an offline sanction
+    ElmApplicationStatusEnum:
+      enum:
+      - AWAITING_SUBSTITUTE
+      - SUBSTITUTE_DECLINED
+      - AWAITING_UNIT_HEAD
+      - AWAITING_ESTABLISHMENT
+      - AWAITING_FINAL_SANCTION
+      - AWAITING_DIRECTOR_SELF_SANCTION
+      - APPROVED
+      - REJECTED
+      - WITHDRAWN
+      - CANCELLED
+      - RESUMPTION_PENDING
+      - COMPLETED
+      type: string
+      description: |-
+        * `AWAITING_SUBSTITUTE` - Awaiting substitute
+        * `SUBSTITUTE_DECLINED` - Substitute declined
+        * `AWAITING_UNIT_HEAD` - Awaiting Unit Head
+        * `AWAITING_ESTABLISHMENT` - Awaiting Establishment
+        * `AWAITING_FINAL_SANCTION` - Awaiting final sanction
+        * `AWAITING_DIRECTOR_SELF_SANCTION` - Awaiting Director self-sanction
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
+        * `WITHDRAWN` - Withdrawn
+        * `CANCELLED` - Cancelled
+        * `RESUMPTION_PENDING` - Resumption awaiting verification
+        * `COMPLETED` - Completed
+    ElmHalfDayEnum:
+      enum:
+      - NONE
+      - FIRST
+      - SECOND
+      type: string
+      description: |-
+        * `NONE` - Whole day(s)
+        * `FIRST` - First half
+        * `SECOND` - Second half
+    ExtendInput:
+      type: object
+      properties:
+        end_date:
+          type: string
+          format: date
+        substitute_user_id:
+          type: integer
+          nullable: true
+        medical_reference:
+          type: string
+          default: ''
+          maxLength: 200
+        special_purpose:
+          type: string
+          default: ''
+      required:
+      - end_date
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2637,6 +3362,407 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        leave_type:
+          allOf:
+          - $ref: '#/components/schemas/LeaveTypeEnum'
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+          readOnly: true
+        end_date:
+          type: string
+          format: date
+          readOnly: true
+        half_day:
+          allOf:
+          - $ref: '#/components/schemas/ElmHalfDayEnum'
+          readOnly: true
+        days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        special_purpose:
+          type: string
+          readOnly: true
+        special_purpose_admissible:
+          type: boolean
+          readOnly: true
+          nullable: true
+        medical_reference:
+          type: string
+          readOnly: true
+        station_leave:
+          type: boolean
+          readOnly: true
+        station_address:
+          type: string
+          readOnly: true
+        substitute_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ElmApplicationStatusEnum'
+          readOnly: true
+        pending_action:
+          type: string
+          readOnly: true
+        unit_head_recommendation:
+          type: string
+          readOnly: true
+        decided_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decision_reason:
+          type: string
+          readOnly: true
+        extends:
+          type: integer
+          readOnly: true
+          nullable: true
+        resumed_on:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        actual_end_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        restored_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        source:
+          allOf:
+          - $ref: '#/components/schemas/ElmApplicationSourceEnum'
+          readOnly: true
+        offline_reference:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actual_end_date
+      - created_at
+      - days
+      - decided_at
+      - decided_by
+      - decision_reason
+      - end_date
+      - extends
+      - half_day
+      - id
+      - leave_type
+      - medical_reference
+      - offline_reference
+      - pending_action
+      - restored_days
+      - resumed_on
+      - source
+      - special_purpose
+      - special_purpose_admissible
+      - start_date
+      - station_address
+      - station_leave
+      - status
+      - substitute_user_id
+      - unit_head_recommendation
+      - user_id
+    LeaveApplicationDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        leave_type:
+          allOf:
+          - $ref: '#/components/schemas/LeaveTypeEnum'
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+          readOnly: true
+        end_date:
+          type: string
+          format: date
+          readOnly: true
+        half_day:
+          allOf:
+          - $ref: '#/components/schemas/ElmHalfDayEnum'
+          readOnly: true
+        days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        special_purpose:
+          type: string
+          readOnly: true
+        special_purpose_admissible:
+          type: boolean
+          readOnly: true
+          nullable: true
+        medical_reference:
+          type: string
+          readOnly: true
+        station_leave:
+          type: boolean
+          readOnly: true
+        station_address:
+          type: string
+          readOnly: true
+        substitute_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ElmApplicationStatusEnum'
+          readOnly: true
+        pending_action:
+          type: string
+          readOnly: true
+        unit_head_recommendation:
+          type: string
+          readOnly: true
+        decided_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decision_reason:
+          type: string
+          readOnly: true
+        extends:
+          type: integer
+          readOnly: true
+          nullable: true
+        resumed_on:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        actual_end_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        restored_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        source:
+          allOf:
+          - $ref: '#/components/schemas/ElmApplicationSourceEnum'
+          readOnly: true
+        offline_reference:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveEvent'
+          readOnly: true
+      required:
+      - actual_end_date
+      - created_at
+      - days
+      - decided_at
+      - decided_by
+      - decision_reason
+      - end_date
+      - events
+      - extends
+      - half_day
+      - id
+      - leave_type
+      - medical_reference
+      - offline_reference
+      - pending_action
+      - restored_days
+      - resumed_on
+      - source
+      - special_purpose
+      - special_purpose_admissible
+      - start_date
+      - station_address
+      - station_leave
+      - status
+      - substitute_user_id
+      - unit_head_recommendation
+      - user_id
+    LeaveBalance:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          readOnly: true
+        leave_type:
+          allOf:
+          - $ref: '#/components/schemas/LeaveTypeEnum'
+          readOnly: true
+        entitled:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        carried_in:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        used:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        lapsed:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        remaining:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        closed:
+          type: boolean
+          readOnly: true
+      required:
+      - carried_in
+      - closed
+      - entitled
+      - id
+      - lapsed
+      - leave_type
+      - remaining
+      - used
+      - user_id
+      - year
+    LeaveEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        action:
+          type: string
+          readOnly: true
+        from_status:
+          type: string
+          readOnly: true
+        to_status:
+          type: string
+          readOnly: true
+        actor_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        note:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - actor_user_id
+      - created_at
+      - from_status
+      - id
+      - note
+      - to_status
+    LeaveNotification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        topic:
+          type: string
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+        application:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        read_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - application
+      - created_at
+      - id
+      - message
+      - read_at
+      - topic
+    LeaveTypeEnum:
+      enum:
+      - CL
+      - RH
+      - SCL
+      - EL
+      - COL
+      - VL
+      type: string
+      description: |-
+        * `CL` - Casual Leave
+        * `RH` - Restricted Holiday
+        * `SCL` - Special Casual Leave
+        * `EL` - Earned Leave
+        * `COL` - Commuted Leave
+        * `VL` - Vacation Leave
     LiftSanction:
       type: object
       properties:
@@ -2732,6 +3858,15 @@ components:
       - is_late
       - message
       - record
+    NotificationList:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveNotification'
+      required:
+      - results
     OffCampusRecord:
       type: object
       properties:
@@ -2864,6 +3999,52 @@ components:
         * `revoked` - Revoked
         * `superseded` - Superseded
         * `expired` - Expired
+    OfflineInput:
+      type: object
+      description: The applicant never says whether SCL is admissible; the sanctioning
+        authority does.
+      properties:
+        leave_type:
+          $ref: '#/components/schemas/LeaveTypeEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        half_day:
+          allOf:
+          - $ref: '#/components/schemas/ElmHalfDayEnum'
+          default: NONE
+        special_purpose:
+          type: string
+          default: ''
+        medical_reference:
+          type: string
+          default: ''
+          maxLength: 200
+        station_leave:
+          type: boolean
+          default: false
+        station_address:
+          type: string
+          default: ''
+          maxLength: 200
+        substitute_user_id:
+          type: integer
+          nullable: true
+        user_id:
+          type: integer
+          minimum: 1
+        offline_reference:
+          type: string
+          maxLength: 120
+      required:
+      - end_date
+      - leave_type
+      - offline_reference
+      - start_date
+      - user_id
     Ok:
       type: object
       properties:
@@ -3099,7 +4280,7 @@ components:
           readOnly: true
         source:
           allOf:
-          - $ref: '#/components/schemas/SourceEnum'
+          - $ref: '#/components/schemas/PlacementRecordDetailSourceEnum'
           readOnly: true
         kind:
           type: string
@@ -3145,6 +4326,14 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    PlacementRecordDetailSourceEnum:
+      enum:
+      - campus
+      - off_campus
+      type: string
+      description: |-
+        * `campus` - Through the Placement Cell
+        * `off_campus` - Off campus (rules 5 and 24)
     ProfileDocument:
       type: object
       description: |-
@@ -3201,6 +4390,13 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    Reason:
+      type: object
+      properties:
+        reason:
+          type: string
+          default: ''
+          maxLength: 300
     Recommendation:
       type: object
       description: |-
@@ -3466,6 +4662,14 @@ components:
       - message
       - reason
       - route
+    Resume:
+      type: object
+      properties:
+        resumed_on:
+          type: string
+          format: date
+      required:
+      - resumed_on
     RoundOutcome:
       type: object
       properties:
@@ -3539,6 +4743,27 @@ components:
         * `absent` - Absent
         * `passed` - Passed
         * `failed` - Failed
+    Route:
+      type: object
+      properties:
+        note:
+          type: string
+          default: ''
+          maxLength: 300
+    Sanction:
+      type: object
+      properties:
+        reason:
+          type: string
+          default: ''
+          maxLength: 300
+        approve:
+          type: boolean
+        special_purpose_admissible:
+          type: boolean
+          nullable: true
+      required:
+      - approve
     SanctionEnum:
       enum:
       - bar_next_two
@@ -3655,14 +4880,6 @@ components:
       - id
       - kind
       - username
-    SourceEnum:
-      enum:
-      - campus
-      - off_campus
-      type: string
-      description: |-
-        * `campus` - Through the Placement Cell
-        * `off_campus` - Off campus (rules 5 and 24)
     StaffStats:
       type: object
       description: PC-UC-011/012. Operational figures, staff only.
@@ -3698,6 +4915,13 @@ components:
           type: integer
       required:
       - document_id
+    SubstituteResponse:
+      type: object
+      properties:
+        accept:
+          type: boolean
+      required:
+      - accept
     TopicEnum:
       enum:
       - drive
@@ -3769,6 +4993,17 @@ components:
       - application_id
       - redacted
       - results
+    UnitHeadDecision:
+      type: object
+      properties:
+        reason:
+          type: string
+          default: ''
+          maxLength: 300
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+      required:
+      - decision
     UserRef:
       type: object
       properties:
@@ -3814,6 +5049,12 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    VerifyResumption:
+      type: object
+      properties:
+        verified:
+          type: boolean
+          default: true
     WaiveIncident:
       type: object
       properties:
@@ -3830,6 +5071,48 @@ components:
           maxLength: 300
       required:
       - reason
+    YearEndInput:
+      type: object
+      properties:
+        year:
+          type: integer
+          maximum: 2200
+          minimum: 2000
+        force:
+          type: boolean
+          default: false
+      required:
+      - year
+    YearEndReport:
+      type: object
+      properties:
+        year:
+          type: integer
+        processed:
+          type: integer
+        lapsed_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        carried_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        converted_el_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        skipped_user_ids:
+          type: array
+          items:
+            type: integer
+      required:
+      - carried_days
+      - converted_el_days
+      - lapsed_days
+      - processed
+      - skipped_user_ids
+      - year
   securitySchemes:
     iamSession:
       type: apiKey

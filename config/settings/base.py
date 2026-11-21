@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.elm",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -230,6 +231,12 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    # Names for choice sets that several modules share a field name for.
+    "ENUM_NAME_OVERRIDES": {
+        "ElmHalfDayEnum": "modules.elm.models.HalfDay.choices",
+        "ElmApplicationStatusEnum": "modules.elm.models.LeaveApplicationStatus.choices",
+        "ElmApplicationSourceEnum": "modules.elm.models.ApplicationSource.choices",
+    },
 }
 
 CORS_ALLOW_ALL_ORIGINS = False
