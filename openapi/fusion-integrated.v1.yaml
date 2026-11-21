@@ -63,6 +63,324 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/fts/audit-logs/:
+    get:
+      operationId: v1_fts_audit_logs_list
+      description: Governance audit log access for system administrators.
+      summary: View system audit logs
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FTSAuditLog'
+          description: ''
+  /api/v1/fts/drafts/:
+    get:
+      operationId: v1_fts_drafts_list
+      description: Return uncirculated draft files created by the authenticated employee.
+      summary: List draft files
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FTSFileList'
+          description: ''
+  /api/v1/fts/files/:
+    post:
+      operationId: v1_fts_files_create
+      description: Create a new institutional file in draft or directly into circulation.
+      summary: Create file or save draft
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateFile'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FTSFileDetail'
+          description: ''
+        '400':
+          description: Validation error or missing comment
+        '403':
+          description: Non-employee or administrative user rejected
+  /api/v1/fts/files/{file_identifier}/:
+    get:
+      operationId: v1_fts_files_retrieve
+      description: Return file metadata, movements, comments and attachments if associated.
+      summary: Get file details
+      parameters:
+      - in: path
+        name: file_identifier
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FTSFileDetail'
+          description: ''
+        '404':
+          description: File not found or unassociated user
+  /api/v1/fts/files/{file_identifier}/archive/:
+    post:
+      operationId: v1_fts_files_archive_create
+      description: Archive a completed circulating file (owner only).
+      summary: Archive completed file
+      parameters:
+      - in: path
+        name: file_identifier
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchiveFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ArchiveFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ArchiveFile'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FTSFileDetail'
+          description: ''
+        '403':
+          description: Actor is not the file owner
+        '404':
+          description: File not found
+        '409':
+          description: File is not in circulating state
+  /api/v1/fts/files/{file_identifier}/draft/:
+    patch:
+      operationId: v1_fts_files_draft_partial_update
+      description: Edit subject, description, comment or attachments on an uncirculated
+        draft.
+      summary: Edit draft file
+      parameters:
+      - in: path
+        name: file_identifier
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEditDraft'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEditDraft'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEditDraft'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FTSFileDetail'
+          description: ''
+        '404':
+          description: Draft not found
+        '409':
+          description: Not in draft state
+    delete:
+      operationId: v1_fts_files_draft_destroy
+      description: Permanently discard an uncirculated draft file.
+      summary: Discard draft file
+      parameters:
+      - in: path
+        name: file_identifier
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: Draft successfully discarded
+        '404':
+          description: Draft not found
+        '409':
+          description: Not in draft state
+  /api/v1/fts/files/{file_identifier}/forward/:
+    post:
+      operationId: v1_fts_files_forward_create
+      description: Forward an active file to the next institute employee.
+      summary: Forward file
+      parameters:
+      - in: path
+        name: file_identifier
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForwardFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ForwardFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ForwardFile'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileMovement'
+          description: ''
+        '400':
+          description: Validation error or self-forwarding
+        '403':
+          description: Not the current holder
+        '404':
+          description: File not found
+  /api/v1/fts/files/{file_identifier}/return/:
+    post:
+      operationId: v1_fts_files_return_create
+      description: Return an active file to its immediate previous sender.
+      summary: Return file
+      parameters:
+      - in: path
+        name: file_identifier
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReturnFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReturnFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReturnFile'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileMovement'
+          description: ''
+        '400':
+          description: Missing comment or self-return
+        '403':
+          description: Not current holder
+        '404':
+          description: File not found
+  /api/v1/fts/inbox/:
+    get:
+      operationId: v1_fts_inbox_list
+      description: Return circulating files currently held by the authenticated employee.
+      summary: List inbox files
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FTSFileList'
+          description: ''
+  /api/v1/fts/outbox/:
+    get:
+      operationId: v1_fts_outbox_list
+      description: Return files sent or forwarded by the authenticated employee.
+      summary: List outbox files
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FTSFileList'
+          description: ''
+  /api/v1/fts/users/search/:
+    get:
+      operationId: v1_fts_users_search_retrieve
+      description: Lookup active faculty and staff members for file routing.
+      summary: Search recipient employees
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: List of employee objects
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1763,6 +2081,18 @@ components:
       - semester
       - semester_type
       - user_id
+    ActionEnum:
+      enum:
+      - created
+      - forwarded
+      - returned
+      - archived
+      type: string
+      description: |-
+        * `created` - Created
+        * `forwarded` - Forwarded
+        * `returned` - Returned
+        * `archived` - Archived
     AddCandidates:
       type: object
       properties:
@@ -1981,6 +2311,32 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    ArchiveFile:
+      type: object
+      properties:
+        remarks:
+          type: string
+          default: ''
+    AttachmentInput:
+      type: object
+      properties:
+        file_name:
+          type: string
+          maxLength: 255
+        file_path:
+          type: string
+          default: ''
+          maxLength: 512
+        file_size:
+          type: integer
+          minimum: 0
+          default: 0
+        mime_type:
+          type: string
+          default: application/octet-stream
+          maxLength: 128
+      required:
+      - file_name
     AudienceEnum:
       enum:
       - students
@@ -2315,6 +2671,33 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    CreateFile:
+      type: object
+      properties:
+        subject:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          default: ''
+        initial_comment:
+          type: string
+        is_draft:
+          type: boolean
+          default: false
+        receiver_id:
+          type: integer
+          nullable: true
+        receiver_designation:
+          type: string
+          default: ''
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachmentInput'
+      required:
+      - initial_comment
+      - subject
     Detail:
       type: object
       properties:
@@ -2407,6 +2790,176 @@ components:
       - season_decision
       - semester
       - standing
+    FTSAuditLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        actor_id:
+          type: integer
+          readOnly: true
+        actor_role:
+          type: string
+          readOnly: true
+        action_type:
+          type: string
+          readOnly: true
+        details:
+          readOnly: true
+        timestamp:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action_type
+      - actor_id
+      - actor_role
+      - details
+      - id
+      - timestamp
+    FTSFileDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        file_id:
+          type: string
+          readOnly: true
+        subject:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/FTSFileStatusEnum'
+          readOnly: true
+        creator_id:
+          type: integer
+          readOnly: true
+        creator_designation:
+          type: string
+          readOnly: true
+        owner_id:
+          type: integer
+          readOnly: true
+        current_holder_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        current_holder_designation:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        movements:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileMovement'
+          readOnly: true
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileComment'
+          readOnly: true
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileAttachment'
+          readOnly: true
+      required:
+      - attachments
+      - comments
+      - created_at
+      - creator_designation
+      - creator_id
+      - current_holder_designation
+      - current_holder_id
+      - description
+      - file_id
+      - id
+      - movements
+      - owner_id
+      - status
+      - subject
+      - updated_at
+    FTSFileList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        file_id:
+          type: string
+          readOnly: true
+        subject:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/FTSFileStatusEnum'
+          readOnly: true
+        creator_id:
+          type: integer
+          readOnly: true
+        creator_designation:
+          type: string
+          readOnly: true
+        owner_id:
+          type: integer
+          readOnly: true
+        current_holder_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        current_holder_designation:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - creator_designation
+      - creator_id
+      - current_holder_designation
+      - current_holder_id
+      - description
+      - file_id
+      - id
+      - owner_id
+      - status
+      - subject
+      - updated_at
+    FTSFileStatusEnum:
+      enum:
+      - draft
+      - circulating
+      - archived
+      - discarded
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `circulating` - Circulating
+        * `archived` - Archived
+        * `discarded` - Discarded
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2423,6 +2976,123 @@ components:
       - fee_reference
       - season
       - user_id
+    FileAttachment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uploader_id:
+          type: integer
+          readOnly: true
+        file_name:
+          type: string
+          readOnly: true
+        file_path:
+          type: string
+          readOnly: true
+        file_size:
+          type: integer
+          readOnly: true
+        mime_type:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - file_name
+      - file_path
+      - file_size
+      - id
+      - mime_type
+      - uploader_id
+    FileComment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        author_id:
+          type: integer
+          readOnly: true
+        author_designation:
+          type: string
+          readOnly: true
+        comment_text:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author_designation
+      - author_id
+      - comment_text
+      - created_at
+      - id
+    FileMovement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        sequence_number:
+          type: integer
+          readOnly: true
+        sender_id:
+          type: integer
+          readOnly: true
+        sender_designation:
+          type: string
+          readOnly: true
+        receiver_id:
+          type: integer
+          readOnly: true
+        receiver_designation:
+          type: string
+          readOnly: true
+        action:
+          allOf:
+          - $ref: '#/components/schemas/ActionEnum'
+          readOnly: true
+        remarks:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - created_at
+      - id
+      - receiver_designation
+      - receiver_id
+      - remarks
+      - sender_designation
+      - sender_id
+      - sequence_number
+    ForwardFile:
+      type: object
+      properties:
+        receiver_id:
+          type: integer
+        receiver_designation:
+          type: string
+          default: ''
+        remarks:
+          type: string
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachmentInput'
+      required:
+      - receiver_id
+      - remarks
     IncidentRecorded:
       type: object
       properties:
@@ -3000,6 +3670,20 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PatchedEditDraft:
+      type: object
+      properties:
+        subject:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        comment:
+          type: string
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachmentInput'
     PatchedJobPosting:
       type: object
       properties:
@@ -3466,6 +4150,17 @@ components:
       - message
       - reason
       - route
+    ReturnFile:
+      type: object
+      properties:
+        remarks:
+          type: string
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachmentInput'
+      required:
+      - remarks
     RoundOutcome:
       type: object
       properties:

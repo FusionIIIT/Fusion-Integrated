@@ -1,0 +1,200 @@
+[
+  {
+    "test_id": "T_FTS-UC-001_MAIN",
+    "source_id": "FTS-UC-001",
+    "purpose": "Create New File: main flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "1. Employee opens the file-creation function. 2. Employee enters the initial mandatory comment. 3. Employee optionally adds attachments. 4. Employee saves the created file as a draft/pre-circulation file. 5. FTS validates the required comment, persists the file object and records creation/comment/attachment audit information. * **Alternative Flows:** - If employee chooses immediate circulation instead of retaining draft, proceeds directly to FTS-UC-003. - If no attachment is supplied, creation proceeds (attachments are optional). * **Exception Flows:** - If initial comment is missing, FTS blocks save. - If selected role is not authorized, FTS denies action. * **Success Postcondition:** Valid file exists in draft/pre-circulation state with initial comment and attachments preserved. * **Related Business Rules:** BR-FTS-001, BR-FTS-003, BR-FTS-004, BR-FTS-005, BR-FTS-010, BR-FTS-011.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "main"
+  },
+  {
+    "test_id": "T_FTS-UC-001_ALT1",
+    "source_id": "FTS-UC-001",
+    "purpose": "Create New File: alt1 flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "If employee chooses immediate circulation instead of retaining draft, proceeds directly to FTS-UC-003.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "alt1"
+  },
+  {
+    "test_id": "T_FTS-UC-001_ALT2",
+    "source_id": "FTS-UC-001",
+    "purpose": "Create New File: alt2 flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "If no attachment is supplied, creation proceeds (attachments are optional).\n* **Exception Flows:**",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "alt2"
+  },
+  {
+    "test_id": "T_FTS-UC-001_ALT3",
+    "source_id": "FTS-UC-001",
+    "purpose": "Create New File: alt3 flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "If initial comment is missing, FTS blocks save.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "alt3"
+  },
+  {
+    "test_id": "T_FTS-UC-001_ALT4",
+    "source_id": "FTS-UC-001",
+    "purpose": "Create New File: alt4 flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "If selected role is not authorized, FTS denies action.\n* **Success Postcondition:** Valid file exists in draft/pre-circulation state with initial comment and attachments preserved.\n* **Related Business Rules:** BR-FTS-001, BR-FTS-003, BR-FTS-004, BR-FTS-005, BR-FTS-010, BR-FTS-011.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "alt4"
+  },
+  {
+    "test_id": "T_FTS-UC-002_MAIN",
+    "source_id": "FTS-UC-002",
+    "purpose": "Edit or Discard Draft File: main flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "1. Employee opens an authorized draft. 2. Employee edits draft comment and/or attachments. 3. Employee saves updated draft. 4. FTS persists updates and records audit/version info. * **Alternative Flow (Discard):** Employee chooses Discard instead of Save; FTS removes the draft because it has not yet been submitted/circulated. * **Exception Flows:** - If file has already been submitted/circulated, FTS denies discard. - If employee is not authorized for the draft, FTS denies access. * **Success Postcondition:** Draft is either updated and retained or discarded before circulation. * **Related Business Rules:** BR-FTS-005, BR-FTS-010, BR-FTS-011.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "main"
+  },
+  {
+    "test_id": "T_FTS-UC-002_ALT1",
+    "source_id": "FTS-UC-002",
+    "purpose": "Edit or Discard Draft File: alt1 flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "If file has already been submitted/circulated, FTS denies discard.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "alt1"
+  },
+  {
+    "test_id": "T_FTS-UC-002_ALT2",
+    "source_id": "FTS-UC-002",
+    "purpose": "Edit or Discard Draft File: alt2 flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "If employee is not authorized for the draft, FTS denies access.\n* **Success Postcondition:** Draft is either updated and retained or discarded before circulation.\n* **Related Business Rules:** BR-FTS-005, BR-FTS-010, BR-FTS-011.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "alt2"
+  },
+  {
+    "test_id": "T_FTS-UC-003_MAIN",
+    "source_id": "FTS-UC-003",
+    "purpose": "Send / Forward File to Employee: main flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "1. Sender opens actionable file and selects a recipient Institute Employee. 2. Sender enters mandatory movement comment. 3. Sender optionally adds attachments for this movement stage. 4. Sender confirms Send/Forward. 5. FTS validates authorization, file state, recipient, and mandatory comment. 6. FTS records sender, receiver, timestamp, movement comment, and attachments chronologically; updates current holder/pending recipient; records audit/version info. 7. FTS triggers file-forwarded/file-received notification events. * **Exception Flows:** - Missing mandatory movement comment: forwarding blocked. - Invalid recipient: forwarding blocked. - Unauthorized action or archived file: forwarding blocked. * **Success Postcondition:** File remains active/circulated and is held by recipient; history/audit updated; notifications triggered. * **Related Business Rules:** BR-FTS-001, BR-FTS-003, BR-FTS-005, BR-FTS-006, BR-FTS-007, BR-FTS-008, BR-FTS-010, BR-FTS-011, BR-FTS-012, BR-FTS-013.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "main"
+  },
+  {
+    "test_id": "T_FTS-UC-003_ALT1",
+    "source_id": "FTS-UC-003",
+    "purpose": "Send / Forward File to Employee: alt1 flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "Missing mandatory movement comment: forwarding blocked.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "alt1"
+  },
+  {
+    "test_id": "T_FTS-UC-003_ALT2",
+    "source_id": "FTS-UC-003",
+    "purpose": "Send / Forward File to Employee: alt2 flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "Invalid recipient: forwarding blocked.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "alt2"
+  },
+  {
+    "test_id": "T_FTS-UC-003_ALT3",
+    "source_id": "FTS-UC-003",
+    "purpose": "Send / Forward File to Employee: alt3 flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "Unauthorized action or archived file: forwarding blocked.\n* **Success Postcondition:** File remains active/circulated and is held by recipient; history/audit updated; notifications triggered.\n* **Related Business Rules:** BR-FTS-001, BR-FTS-003, BR-FTS-005, BR-FTS-006, BR-FTS-007, BR-FTS-008, BR-FTS-010, BR-FTS-011, BR-FTS-012, BR-FTS-013.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "alt3"
+  },
+  {
+    "test_id": "T_FTS-UC-004_MAIN",
+    "source_id": "FTS-UC-004",
+    "purpose": "Return Received File: main flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "1. Recipient opens received file and selects Return. 2. Recipient enters mandatory movement comment. 3. Recipient optionally adds attachments for this movement stage. 4. Recipient confirms Return. 5. FTS validates authorization, active file state, and mandatory comment. 6. FTS records return chronologically; updates current holder to previous sender; records audit/version info. 7. FTS triggers file-returned notification event. * **Exception Flows:** - Missing mandatory movement comment: return blocked. - Unauthorized action or archived file: return blocked. * **Success Postcondition:** File returned to previous sender; history/audit updated; notification triggered. * **Related Business Rules:** BR-FTS-006, BR-FTS-007, BR-FTS-008, BR-FTS-010, BR-FTS-011, BR-FTS-012, BR-FTS-013.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "main"
+  },
+  {
+    "test_id": "T_FTS-UC-004_ALT1",
+    "source_id": "FTS-UC-004",
+    "purpose": "Return Received File: alt1 flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "Missing mandatory movement comment: return blocked.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "alt1"
+  },
+  {
+    "test_id": "T_FTS-UC-004_ALT2",
+    "source_id": "FTS-UC-004",
+    "purpose": "Return Received File: alt2 flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "Unauthorized action or archived file: return blocked.\n* **Success Postcondition:** File returned to previous sender; history/audit updated; notification triggered.\n* **Related Business Rules:** BR-FTS-006, BR-FTS-007, BR-FTS-008, BR-FTS-010, BR-FTS-011, BR-FTS-012, BR-FTS-013.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "alt2"
+  },
+  {
+    "test_id": "T_FTS-UC-005_MAIN",
+    "source_id": "FTS-UC-005",
+    "purpose": "View Inbox, Outbox, and Open Files: main flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "1. Employee opens Inbox or Outbox. 2. FTS lists received files in Inbox and sent files in Outbox, subject to authorization. 3. Employee selects an authorized file. 4. FTS displays file contents, comments, attachments, status, and permitted actions. * **Alternative Flow:** Archived file is displayed as read-only. * **Exception Flows:** - Unauthorized file: FTS denies access. * **Success Postcondition:** File information displayed; viewing alone does not change business state. * **Related Business Rules:** BR-FTS-009, BR-FTS-010, BR-FTS-012.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "main"
+  },
+  {
+    "test_id": "T_FTS-UC-005_ALT1",
+    "source_id": "FTS-UC-005",
+    "purpose": "View Inbox, Outbox, and Open Files: alt1 flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "Unauthorized file: FTS denies access.\n* **Success Postcondition:** File information displayed; viewing alone does not change business state.\n* **Related Business Rules:** BR-FTS-009, BR-FTS-010, BR-FTS-012.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "alt1"
+  },
+  {
+    "test_id": "T_FTS-UC-006_MAIN",
+    "source_id": "FTS-UC-006",
+    "purpose": "View File Tracking History: main flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "1. Employee selects an associated file and requests tracking history. 2. FTS retrieves chronological history from creation onward. 3. FTS displays movement events with sender, receiver, timestamp, comments, and attachments. * **Exception Flows:** Unauthorized access denied. * **Success Postcondition:** Tracking history displayed without state change. * **Related Business Rules:** BR-FTS-008, BR-FTS-010, BR-FTS-011.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "main"
+  },
+  {
+    "test_id": "T_FTS-UC-007_MAIN",
+    "source_id": "FTS-UC-007",
+    "purpose": "Archive Completed File: main flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "1. Owner opens active circulated file and selects Archive. 2. FTS verifies ownership and authorization. 3. FTS changes file to Archived / Read-only state. 4. FTS prevents subsequent modification and forwarding, while retaining permanent read access. 5. FTS records archival audit/version event and triggers file-archived notification event. * **Exception Flows:** - Non-owner archival attempt denied. - Already archived: presents existing read-only state. * **Success Postcondition:** File is Archived / Read-only, permanently retained for reading, closed to movement. * **Related Business Rules:** BR-FTS-009, BR-FTS-010, BR-FTS-011, BR-FTS-012, BR-FTS-013.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "main"
+  },
+  {
+    "test_id": "T_FTS-UC-007_ALT1",
+    "source_id": "FTS-UC-007",
+    "purpose": "Archive Completed File: alt1 flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "Non-owner archival attempt denied.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "alt1"
+  },
+  {
+    "test_id": "T_FTS-UC-007_ALT2",
+    "source_id": "FTS-UC-007",
+    "purpose": "Archive Completed File: alt2 flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "Already archived: presents existing read-only state.\n* **Success Postcondition:** File is Archived / Read-only, permanently retained for reading, closed to movement.\n* **Related Business Rules:** BR-FTS-009, BR-FTS-010, BR-FTS-011, BR-FTS-012, BR-FTS-013.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "alt2"
+  },
+  {
+    "test_id": "T_FTS-UC-008_MAIN",
+    "source_id": "FTS-UC-008",
+    "purpose": "Select Assigned Role Context for FTS: main flow",
+    "preconditions": "As specified for this use case.",
+    "action_or_input": "1. Employee selects assigned role context through Fusion. 2. FTS applies selected role context to determine permitted access/actions. 3. FTS preserves existing file ownership and previously recorded audit history across switch. * **Success Postcondition:** Selected role context governs subsequent FTS authorization; existing ownership and history unchanged. * **Related Business Rules:** BR-FTS-002, BR-FTS-010.",
+    "expected_result": "The specified flow outcome and postcondition hold; exception flows are denied as stated.",
+    "test_type": "main"
+  }
+]
