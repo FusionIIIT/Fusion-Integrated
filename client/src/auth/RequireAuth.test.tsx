@@ -17,9 +17,7 @@ function renderAt(status: string, path = "/placement/reports") {
   useAuth.mockReturnValue({ status });
   return render(
     <MantineProvider>
-      <MemoryRouter initialEntries={[path]}
-                    future={{ v7_startTransition: true,
-                              v7_relativeSplatPath: true }}>
+      <MemoryRouter initialEntries={[path]}>
         <Routes>
           <Route path="/login" element={<div>login screen</div>} />
           <Route path="/placement/reports"

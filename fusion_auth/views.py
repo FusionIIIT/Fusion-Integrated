@@ -18,6 +18,7 @@ from core.api.exceptions import AuthenticationFailedError as AuthFailed
 from core.api.exceptions import DomainError
 from core.observability.middleware import get_request_id
 from fusion_auth.client import IamThrottled, IamUnavailable, get_client
+from fusion_auth.principal import Principal
 from fusion_auth.serializers import LoginSerializer, OkSerializer, RoleSerializer, SessionSerializer
 from modules.accesscontrol import contracts as accesscontrol
 
@@ -122,12 +123,25 @@ class MeView(APIView):
             "csrf_token": csrf.token_for(request.auth or ""),
         })
 
+    @staticmethod
+    def _principal_after_switch(client, token):
+        session = client.resolve_session(auth_token=token)
+        if session is None:
+            raise IamUnavailable("IAM did not return a session after role switching.")
+        return Principal.from_session(session)
+
     @extend_schema(request=RoleSerializer, responses=SessionSerializer)
     def patch(self, request):
         """Switch which designation the sidebar and screens present them as."""
-        role = (request.data.get("active_role") or "").strip()
+        payload = RoleSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        role = payload.validated_data["active_role"]
         try:
-            get_client().set_active_role(request.auth or "", role)
+            client = get_client()
+            client.set_active_role(request.auth or "", role)
+            # Authentication built request.principal before the role was switched.
+            # Refresh it so the PATCH response reflects the new designation.
+            request.principal = self._principal_after_switch(client, request.auth or "")
         except ValueError as exc:
             raise DomainError(str(exc), code="unknown_role") from exc
         except IamUnavailable as exc:

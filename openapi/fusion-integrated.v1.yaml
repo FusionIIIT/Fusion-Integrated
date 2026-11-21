@@ -63,6 +63,711 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/hreis/audit/:
+    get:
+      operationId: v1_hreis_audit_list
+      summary: View role-restricted HR compliance audit history
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAuditReadList'
+          description: ''
+  /api/v1/hreis/compliance/requests/:
+    get:
+      operationId: v1_hreis_compliance_requests_list
+      summary: HR-only compliance status of all requests, excluding private forms
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedComplianceRequestList'
+          description: ''
+  /api/v1/hreis/compliance/requests/{id}/:
+    get:
+      operationId: v1_hreis_compliance_requests_retrieve
+      summary: Read a single redacted HR compliance request status
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplianceRequest'
+          description: ''
+  /api/v1/hreis/leave-balances/credits/:
+    post:
+      operationId: v1_hreis_leave_balances_credits_create
+      summary: Record HR-verified leave entitlement credit against an explicit source
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifiedLeaveCredit'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifiedLeaveCredit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifiedLeaveCredit'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifiedLeaveCreditRead'
+          description: ''
+  /api/v1/hreis/leave/balances/:
+    get:
+      operationId: v1_hreis_leave_balances_retrieve
+      summary: Read the authenticated user's verified ledger balances
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyLeaveBalances'
+          description: ''
+  /api/v1/hreis/notifications/:
+    get:
+      operationId: v1_hreis_notifications_list
+      summary: See notifications addressed to the current employee
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNotificationReadList'
+          description: ''
+  /api/v1/hreis/notifications/{id}/read/:
+    post:
+      operationId: v1_hreis_notifications_read_create
+      summary: Mark one of the current user's notifications as read
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationRead'
+          description: ''
+  /api/v1/hreis/policies/:
+    get:
+      operationId: v1_hreis_policies_list
+      summary: Read configured institutional HR policy revisions
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPolicyReadList'
+          description: ''
+    post:
+      operationId: v1_hreis_policies_create
+      summary: Record an explicit immutable HR policy version
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolicyCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PolicyCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PolicyCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyRead'
+          description: ''
+  /api/v1/hreis/requests/:
+    get:
+      operationId: v1_hreis_requests_list
+      summary: Track HR requests in the current acting role's scope
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRequestReadList'
+          description: ''
+  /api/v1/hreis/requests/{id}/:
+    get:
+      operationId: v1_hreis_requests_retrieve
+      summary: Read one request only within the current role's server-side scope
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestDetailRead'
+          description: ''
+  /api/v1/hreis/requests/{id}/appraisal-decision/:
+    post:
+      operationId: v1_hreis_requests_appraisal_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppraisalDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AppraisalDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AppraisalDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestRead'
+          description: ''
+  /api/v1/hreis/requests/{id}/assign-reviewers/:
+    post:
+      operationId: v1_hreis_requests_assign_reviewers_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewerAssignment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReviewerAssignment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReviewerAssignment'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestRead'
+          description: ''
+  /api/v1/hreis/requests/{id}/decision/:
+    post:
+      operationId: v1_hreis_requests_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Decision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Decision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Decision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestRead'
+          description: ''
+  /api/v1/hreis/requests/{id}/financial-processing/:
+    post:
+      operationId: v1_hreis_requests_financial_processing_create
+      summary: Record externally referenced Accountant financial processing
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinancialProcessing'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FinancialProcessing'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FinancialProcessing'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestRead'
+          description: ''
+  /api/v1/hreis/requests/{id}/financial-review/:
+    post:
+      operationId: v1_hreis_requests_financial_review_create
+      summary: Independently attest financial correctness of an approved HR claim
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinancialReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FinancialReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FinancialReview'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialReviewRead'
+          description: ''
+  /api/v1/hreis/requests/{id}/verify-claim/:
+    post:
+      operationId: v1_hreis_requests_verify_claim_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClaimReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ClaimReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ClaimReview'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestRead'
+          description: ''
+  /api/v1/hreis/requests/appraisals/:
+    post:
+      operationId: v1_hreis_requests_appraisals_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppraisalSubmit'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AppraisalSubmit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AppraisalSubmit'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestRead'
+          description: ''
+  /api/v1/hreis/requests/approvals/:
+    get:
+      operationId: v1_hreis_requests_approvals_list
+      summary: Current HR-EIS approval queue for the actor's designated role
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRequestReadList'
+          description: ''
+  /api/v1/hreis/requests/claims/:
+    post:
+      operationId: v1_hreis_requests_claims_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClaimSubmit'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ClaimSubmit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ClaimSubmit'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestRead'
+          description: ''
+  /api/v1/hreis/requests/leave/:
+    post:
+      operationId: v1_hreis_requests_leave_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveSubmit'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveSubmit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveSubmit'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestRead'
+          description: ''
+  /api/v1/hreis/service-records/:
+    get:
+      operationId: v1_hreis_service_records_list
+      summary: List employee records visible to this role
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRecordReadList'
+          description: ''
+    post:
+      operationId: v1_hreis_service_records_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordCreate'
+            examples:
+              ServiceRecord:
+                value:
+                  user_id: 42
+                  appointment_details:
+                    date: '2026-01-01'
+                  department: CSE
+                  designation_snapshot: Professor
+                  service_history: []
+                summary: Service record
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RecordCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RecordCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordRead'
+          description: ''
+  /api/v1/hreis/service-records/{id}/:
+    get:
+      operationId: v1_hreis_service_records_retrieve
+      summary: Read a service record within this role's row scope
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordRead'
+          description: ''
+    patch:
+      operationId: v1_hreis_service_records_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRecordUpdate'
+            examples:
+              Revision:
+                value:
+                  expected_revision: 1
+                  department: Design
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRecordUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRecordUpdate'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordRead'
+          description: ''
+  /api/v1/hreis/service-records/me/:
+    get:
+      operationId: v1_hreis_service_records_me_retrieve
+      summary: Read the current employee's own service record
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordRead'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1964,6 +2669,47 @@ components:
       - sanction
       - season
       - user_id
+    AppraisalDecision:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/AppraisalDecisionEventEnum'
+      required:
+      - event
+    AppraisalDecisionEventEnum:
+      enum:
+      - forward
+      - finalize
+      type: string
+      description: |-
+        * `forward` - forward
+        * `finalize` - finalize
+    AppraisalSubmit:
+      type: object
+      properties:
+        period_key:
+          type: string
+          maxLength: 80
+        submitted_form: {}
+      required:
+      - period_key
+      - submitted_form
+    AppraisalSummary:
+      type: object
+      properties:
+        period_key:
+          type: string
+        submitted_form:
+          type: object
+          additionalProperties: {}
+        reviewer_user_ids:
+          type: array
+          items:
+            type: integer
+      required:
+      - period_key
+      - reviewer_user_ids
+      - submitted_form
     Approval:
       type: object
       properties:
@@ -1993,6 +2739,48 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    AuditRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        actor_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        acting_designation:
+          type: string
+          readOnly: true
+        subject_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        action:
+          type: string
+          readOnly: true
+        resource_kind:
+          type: string
+          readOnly: true
+        resource_id:
+          type: integer
+          readOnly: true
+        data:
+          readOnly: true
+        recorded_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - acting_designation
+      - action
+      - actor_user_id
+      - data
+      - id
+      - recorded_at
+      - resource_id
+      - resource_kind
+      - subject_user_id
     BulkOutcome:
       type: object
       properties:
@@ -2082,6 +2870,75 @@ components:
       - resume_link
       - roll_no
       - user_id
+    ClaimReview:
+      type: object
+      properties:
+        document_review_reference:
+          type: string
+        eligibility_basis:
+          type: string
+      required:
+      - document_review_reference
+      - eligibility_basis
+    ClaimSubmit:
+      type: object
+      properties:
+        family:
+          $ref: '#/components/schemas/ClaimSubmitFamilyEnum'
+        subtype:
+          $ref: '#/components/schemas/SubtypeEnum'
+        prescribed_form_reference:
+          type: string
+        purpose:
+          type: string
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,14}(?:\.\d{0,6})?$
+        document_references:
+          type: array
+          items:
+            type: string
+      required:
+      - family
+      - subtype
+    ClaimSubmitFamilyEnum:
+      enum:
+      - ltc
+      - cpda
+      type: string
+      description: |-
+        * `ltc` - ltc
+        * `cpda` - cpda
+    ClaimSummary:
+      type: object
+      properties:
+        purpose:
+          type: string
+        amount:
+          type: string
+          nullable: true
+        prescribed_form_reference:
+          type: string
+        hr_verified:
+          type: boolean
+        financial_verified:
+          type: boolean
+        payment_status:
+          type: string
+          nullable: true
+        status_history:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinancialStatusRead'
+      required:
+      - amount
+      - financial_verified
+      - hr_verified
+      - payment_status
+      - prescribed_form_reference
+      - purpose
+      - status_history
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2262,6 +3119,39 @@ components:
         * `prospect` - Prospect
         * `active` - Active
         * `blacklisted` - Blacklisted
+    ComplianceRequest:
+      type: object
+      description: 'Restricted status-only response: no medical reasons, forms or
+        claim evidence.'
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        family:
+          type: string
+          readOnly: true
+        state:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - family
+      - id
+      - state
+      - submitted_at
+      - user_id
     ConductIncident:
       type: object
       properties:
@@ -2315,6 +3205,26 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    Decision:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/DecisionEventEnum'
+        reason:
+          type: string
+          default: ''
+      required:
+      - event
+    DecisionEventEnum:
+      enum:
+      - approve
+      - reject
+      - forward
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
+        * `forward` - forward
     Detail:
       type: object
       properties:
@@ -2423,6 +3333,59 @@ components:
       - fee_reference
       - season
       - user_id
+    FinancialProcessing:
+      type: object
+      properties:
+        financial_review_reference:
+          type: string
+        source_system:
+          $ref: '#/components/schemas/SourceSystemEnum'
+        external_status_reference:
+          type: string
+        payment_status:
+          $ref: '#/components/schemas/PaymentStatusEnum'
+      required:
+      - external_status_reference
+      - financial_review_reference
+      - payment_status
+      - source_system
+    FinancialReview:
+      type: object
+      properties:
+        financial_review_reference:
+          type: string
+      required:
+      - financial_review_reference
+    FinancialReviewRead:
+      type: object
+      properties:
+        request_id:
+          type: integer
+        financial_review_reference:
+          type: string
+        reviewed_by_user_id:
+          type: integer
+      required:
+      - financial_review_reference
+      - request_id
+      - reviewed_by_user_id
+    FinancialStatusRead:
+      type: object
+      properties:
+        source_system:
+          type: string
+        external_status_reference:
+          type: string
+        payment_status:
+          type: string
+        recorded_at:
+          type: string
+          format: date-time
+      required:
+      - external_status_reference
+      - payment_status
+      - recorded_at
+      - source_system
     IncidentRecorded:
       type: object
       properties:
@@ -2637,6 +3600,37 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveSubmit:
+      type: object
+      properties:
+        leave_type:
+          $ref: '#/components/schemas/LeaveTypeEnum'
+        duration:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,14}(?:\.\d{0,4})?$
+        justification:
+          type: string
+      required:
+      - duration
+      - justification
+      - leave_type
+    LeaveTypeEnum:
+      enum:
+      - Casual
+      - Restricted
+      - Medical
+      - Earned
+      - Vacation
+      - Sabbatical
+      type: string
+      description: |-
+        * `Casual` - Casual
+        * `Restricted` - Restricted
+        * `Medical` - Medical
+        * `Earned` - Earned
+        * `Vacation` - Vacation
+        * `Sabbatical` - Sabbatical
     LiftSanction:
       type: object
       properties:
@@ -2671,6 +3665,20 @@ components:
       description: |-
         * `online` - Online
         * `offline` - Offline
+    MyLeaveBalances:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          readOnly: true
+        leave_balances:
+          type: object
+          additionalProperties:
+            type: string
+          readOnly: true
+      required:
+      - leave_balances
+      - user_id
     NavGroup:
       type: object
       description: |-
@@ -2732,6 +3740,38 @@ components:
       - is_late
       - message
       - record
+    NotificationRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+        request_id:
+          type: integer
+          nullable: true
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        read_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - id
+      - message
+      - read_at
+      - request_id
+      - title
     OffCampusRecord:
       type: object
       properties:
@@ -2924,6 +3964,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Application'
+    PaginatedAuditReadList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRead'
     PaginatedCompanyList:
       type: object
       required:
@@ -2943,6 +4002,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Company'
+    PaginatedComplianceRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComplianceRequest'
     PaginatedInterviewRoundList:
       type: object
       required:
@@ -2981,6 +4059,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedNotificationReadList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationRead'
     PaginatedOfferList:
       type: object
       required:
@@ -3000,6 +4097,63 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PaginatedPolicyReadList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyRead'
+    PaginatedRecordReadList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecordRead'
+    PaginatedRequestReadList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RequestRead'
     PatchedJobPosting:
       type: object
       properties:
@@ -3080,11 +4234,42 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PatchedRecordUpdate:
+      type: object
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 0
+        appointment_details: {}
+        department:
+          type: string
+          maxLength: 120
+        designation_snapshot:
+          type: string
+          maxLength: 150
+        service_history:
+          type: array
+          items: {}
+        retirement_status:
+          type: string
+          maxLength: 100
     PatchedRole:
       type: object
       properties:
         active_role:
           type: string
+    PaymentStatusEnum:
+      enum:
+      - processing
+      - payment_pending
+      - paid
+      - failed
+      type: string
+      description: |-
+        * `processing` - processing
+        * `payment_pending` - payment_pending
+        * `paid` - paid
+        * `failed` - failed
     PlacementRecordDetail:
       type: object
       description: A student's own record, with what rules 22 and 24 still want from
@@ -3145,6 +4330,82 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    PolicyCreate:
+      type: object
+      properties:
+        family:
+          $ref: '#/components/schemas/PolicyCreateFamilyEnum'
+        version:
+          type: integer
+          minimum: 1
+        effective_from:
+          type: string
+          format: date-time
+        effective_until:
+          type: string
+          format: date-time
+          nullable: true
+        parameters: {}
+      required:
+      - effective_from
+      - family
+      - parameters
+      - version
+    PolicyCreateFamilyEnum:
+      enum:
+      - leave
+      - appraisal
+      - ltc
+      - cpda
+      type: string
+      description: |-
+        * `leave` - leave
+        * `appraisal` - appraisal
+        * `ltc` - ltc
+        * `cpda` - cpda
+    PolicyRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        family:
+          type: string
+          readOnly: true
+        version:
+          type: integer
+          readOnly: true
+        effective_from:
+          type: string
+          format: date-time
+          readOnly: true
+        effective_until:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        parameters:
+          readOnly: true
+        approved_by_user_id:
+          type: integer
+          readOnly: true
+        approved_designation:
+          type: string
+          readOnly: true
+        recorded_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - approved_by_user_id
+      - approved_designation
+      - effective_from
+      - effective_until
+      - family
+      - id
+      - parameters
+      - recorded_at
+      - version
     ProfileDocument:
       type: object
       description: |-
@@ -3220,6 +4481,32 @@ components:
       - message
       - rule
       - sanction
+    RecordCreate:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          minimum: 1
+        appointment_details: {}
+        department:
+          type: string
+          maxLength: 120
+        designation_snapshot:
+          type: string
+          maxLength: 150
+        service_history:
+          type: array
+          items: {}
+        retirement_status:
+          type: string
+          default: ''
+          maxLength: 100
+      required:
+      - appointment_details
+      - department
+      - designation_snapshot
+      - service_history
+      - user_id
     RecordIncident:
       type: object
       properties:
@@ -3251,6 +4538,56 @@ components:
         * `consent_failure` - consent_failure
         * `code_of_conduct` - code_of_conduct
         * `misrepresentation` - misrepresentation
+    RecordRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        appointment_details:
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        designation_snapshot:
+          type: string
+          readOnly: true
+        service_history:
+          readOnly: true
+        leave_balances:
+          type: object
+          additionalProperties:
+            type: string
+          readOnly: true
+        retirement_status:
+          type: string
+          readOnly: true
+        revision:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - appointment_details
+      - created_at
+      - department
+      - designation_snapshot
+      - id
+      - leave_balances
+      - retirement_status
+      - revision
+      - service_history
+      - updated_at
+      - user_id
     RecruiterAccept:
       type: object
       properties:
@@ -3466,6 +4803,190 @@ components:
       - message
       - reason
       - route
+    RequestDetailRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        family:
+          type: string
+          readOnly: true
+        subtype:
+          type: string
+          readOnly: true
+        state:
+          type: string
+          readOnly: true
+        payload:
+          readOnly: true
+        claim_summary:
+          allOf:
+          - $ref: '#/components/schemas/ClaimSummary'
+          nullable: true
+          readOnly: true
+        appraisal_summary:
+          allOf:
+          - $ref: '#/components/schemas/AppraisalSummary'
+          nullable: true
+          readOnly: true
+        route_step:
+          type: integer
+          readOnly: true
+        route_total_steps:
+          type: integer
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/RequestTransitionRead'
+          readOnly: true
+      required:
+      - appraisal_summary
+      - claim_summary
+      - created_at
+      - family
+      - history
+      - id
+      - payload
+      - route_step
+      - route_total_steps
+      - state
+      - submitted_at
+      - subtype
+      - updated_at
+      - user_id
+    RequestRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        family:
+          allOf:
+          - $ref: '#/components/schemas/RequestReadFamilyEnum'
+          readOnly: true
+        subtype:
+          type: string
+          readOnly: true
+        state:
+          type: string
+          readOnly: true
+        payload:
+          readOnly: true
+        claim_summary:
+          allOf:
+          - $ref: '#/components/schemas/ClaimSummary'
+          nullable: true
+          readOnly: true
+        appraisal_summary:
+          allOf:
+          - $ref: '#/components/schemas/AppraisalSummary'
+          nullable: true
+          readOnly: true
+        route_step:
+          type: integer
+          readOnly: true
+        route_total_steps:
+          type: integer
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - appraisal_summary
+      - claim_summary
+      - created_at
+      - family
+      - id
+      - payload
+      - route_step
+      - route_total_steps
+      - state
+      - submitted_at
+      - subtype
+      - updated_at
+      - user_id
+    RequestReadFamilyEnum:
+      enum:
+      - leave
+      - appraisal
+      - ltc
+      - cpda
+      type: string
+      description: |-
+        * `leave` - Leave
+        * `appraisal` - Appraisal
+        * `ltc` - LTC
+        * `cpda` - CPDA
+    RequestTransitionRead:
+      type: object
+      properties:
+        source:
+          type: string
+          readOnly: true
+        event:
+          type: string
+          readOnly: true
+        target:
+          type: string
+          readOnly: true
+        acting_designation:
+          type: string
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        recorded_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - acting_designation
+      - event
+      - reason
+      - recorded_at
+      - source
+      - target
+    ReviewerAssignment:
+      type: object
+      properties:
+        reviewer_user_ids:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+      required:
+      - reviewer_user_ids
     RoundOutcome:
       type: object
       properties:
@@ -3663,6 +5184,14 @@ components:
       description: |-
         * `campus` - Through the Placement Cell
         * `off_campus` - Off campus (rules 5 and 24)
+    SourceSystemEnum:
+      enum:
+      - payroll
+      - finance
+      type: string
+      description: |-
+        * `payroll` - payroll
+        * `finance` - finance
     StaffStats:
       type: object
       description: PC-UC-011/012. Operational figures, staff only.
@@ -3698,6 +5227,14 @@ components:
           type: integer
       required:
       - document_id
+    SubtypeEnum:
+      enum:
+      - advance
+      - reimbursement
+      type: string
+      description: |-
+        * `advance` - advance
+        * `reimbursement` - reimbursement
     TopicEnum:
       enum:
       - drive
@@ -3814,6 +5351,53 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    VerifiedLeaveCredit:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          minimum: 1
+        leave_type:
+          $ref: '#/components/schemas/LeaveTypeEnum'
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,14}(?:\.\d{0,4})?$
+        evidence_reference:
+          type: string
+          maxLength: 250
+      required:
+      - evidence_reference
+      - leave_type
+      - quantity
+      - user_id
+    VerifiedLeaveCreditRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        leave_type:
+          type: string
+          readOnly: true
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,14}(?:\.\d{0,4})?$
+          readOnly: true
+        recorded_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - id
+      - leave_type
+      - quantity
+      - recorded_at
+      - user_id
     WaiveIncident:
       type: object
       properties:

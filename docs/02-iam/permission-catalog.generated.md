@@ -13,6 +13,32 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `hreis`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `hreis.service_record.view` | View scoped HR service records | `Accounts Admin`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `faculty`, `hradmin`, `staff` |
+| `hreis.service_record.create` | Create official employee service records | `hradmin` |
+| `hreis.service_record.update` | Maintain official employee service records | `hradmin` |
+| `hreis.request.view` | View scoped HR requests | `Accounts Admin`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `faculty`, `hradmin`, `staff` |
+| `hreis.approval.view` | Open the assigned HR-EIS approval queue | `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar` |
+| `hreis.leave.create` | Submit own leave requests | `faculty`, `staff` |
+| `hreis.balance.manage` | Record verified, audited employee leave credits | `hradmin` |
+| `hreis.leave.approve` | Approve or reject assigned leave requests | `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar` |
+| `hreis.appraisal.create` | Submit own appraisal | `faculty`, `staff` |
+| `hreis.appraisal.assign` | Assign appraisal reviewers | `hradmin` |
+| `hreis.appraisal.approve` | Finalize assigned appraisals | `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar` |
+| `hreis.claim.create` | Submit own LTC/CPDA claims | `faculty`, `staff` |
+| `hreis.claim.review` | HR verify LTC/CPDA documentation and eligibility | `hradmin` |
+| `hreis.claim.approve` | Approve assigned LTC/CPDA claims | `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar` |
+| `hreis.finance.review` | Verify financial correctness of approved LTC/CPDA claims | `Accounts Admin` |
+| `hreis.finance.update` | Record externally reported LTC/CPDA processing status | `Accounts Admin` |
+| `hreis.policy.view` | Read effective HR policy | `hradmin` |
+| `hreis.policy.manage` | Create effective-dated HR policy | `hradmin` |
+| `hreis.audit.view` | Review restricted HR compliance trail | `hradmin` |
+| `hreis.notification.view` | Read own HR-EIS notifications | `Accounts Admin`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `faculty`, `hradmin`, `staff` |
+| `hreis.notification.publish` | System generate HR notifications | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
