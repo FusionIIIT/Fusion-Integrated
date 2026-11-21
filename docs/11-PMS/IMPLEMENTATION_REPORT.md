@@ -157,3 +157,73 @@ The role registry in `client/e2e/accounts.ts` contains `stu00001` (student) and 
 | UC-PMS-032 | Director | Not run — author walkthrough needed |
 | UC-PMS-033 | Attorney | Not run — author walkthrough needed |
 | Plain user | No PMS role | Not run — author walkthrough needed |
+
+## R3 remediation update — 2026-11-22
+
+This addendum supersedes the earlier R2 continuation counts above where they differ. The
+code snapshot checked here is `809b474` on `assignment9_PMS`; this report and the generated
+reference are updated in a separate documentation commit after that code snapshot.
+
+- **Frontend:** `make check-client` passed after the R3 page-test additions: TypeScript
+  checks passed for the app and E2E project, all 87 client tests passed (19 files), and the
+  Vite production build completed. The existing shared JavaScript chunk warning remains.
+  PMS page tests now exist for all 12 routed page components; direct-route refusal tests cover
+  all 13 PMS child routes. The new page tests cover representative API loading, empty and
+  error states, permission-hidden controls, and available actions. They do not yet prove the
+  successful mutation outcome for every page action, so R3-10 remains partial.
+- **Backend journeys:** `pytest modules/pms/tests/test_journeys.py --collect-only -q` collected
+  eight journeys. Running the eight tests with the local `fusion_integrated` test settings
+  failed at database setup because PostgreSQL at `127.0.0.1:5432` refused the connection.
+  These results are blocked, not passed. The journeys still do not cover every live use-case
+  main, alternate, and exception flow, so R3-07 remains partial.
+- **Concurrency:** the added transactional thread/barrier test covers concurrent notification
+  outbox de-duplication and asserts one row. It has not executed because PostgreSQL is
+  unavailable. It does not establish concurrency behavior for every other idempotent task;
+  R3-06 remains partial.
+- **Test citations:** a literal scan of identifiers extracted from the five DOCX documents
+  found 350 unique requirement, business-rule, use-case, and workflow identifiers; 110 occur
+  in backend or PMS client tests and 240 do not. This includes 202 AFR identifiers, six CFR
+  identifiers, and 32 BR identifiers with no exact citation. All extracted UC and workflow
+  identifiers appear somewhere in tests, but citation presence alone does not prove each
+  behavior is asserted. No placeholder citation-only tests were added. R3-04 remains open.
+  The supplied spreadsheet is not part of this DOCX identifier scan.
+- **Reference:** `.venv/bin/python ops/docs/pms_reference.py` regenerated the 371-row
+  implementation reference; `.venv/bin/python ops/docs/pms_reference.py --check` passed.
+- **Migrations:** four migration files remain. A local migration-application status was not
+  confirmed because PostgreSQL is unavailable. Consolidation was not attempted: it would
+  replace committed migration history and includes data-repair behavior that cannot be
+  validated against a fresh database here. R3-12 remains open pending a verified fresh-install
+  environment and an approved migration-history plan.
+- **Operations:** R3-13 is implemented in the readiness, seed-configuration, and manual
+  scheduled-task commands, with tests and deployment instructions. Readiness correctly reports
+  the outstanding IAM Director-domain projection, trusted malware scanning/private storage,
+  and external prior-art source dependencies. It does not satisfy those dependencies.
+- **Walkthrough evidence:** Assignment Guide Step 6.9 and the module prompt require a role,
+  dump username, use case, result, actual `runserver` request-log lines for each row, and one
+  keyboard-only flow. The guide does not require screenshots and defines no evidence folder or
+  naming convention; it also prohibits production-ERP screenshots. No browser walkthrough or
+  genuine request-log evidence was captured, so all walkthrough rows remain not run (R3-08).
+  The E2E account registry still lacks PMS designation accounts, no PMS Playwright specs exist,
+  and the earlier `make e2e` attempt failed before the web server started (R3-09).
+
+### Remaining R3 findings and external dependencies
+
+- **R3-01:** open. Each retained live gap needs written acceptance from the actual assignment
+  approver, or the requirement must be implemented. No approver identity or acceptance record
+  is available in this checkout.
+- **R3-02:** open. Replacing `PmsRoleAssignment` requires the approved IAM-owned Director-domain
+  assignment projection/API and test access to it. No such interface or approval is available.
+- **R3-03:** open. Document acceptance still needs a trusted malware scanner and private binary
+  storage integration. Fail-closed behavior is implemented, but the service and content path are
+  unavailable.
+- **R3-04, R3-06, R3-07, R3-10, R3-12:** remain partial/open as qualified above; backend DB
+  execution and comprehensive scenario coverage remain outstanding.
+- **R3-08, R3-09:** require real PMS role accounts, a running backend/IAM/browser stack, Playwright
+  harness setup, and authentic walkthrough logs. Screenshots are optional, not required.
+- **R3-11:** open. No approved blueprint or authoritative decision record was found; one must be
+  supplied before creating an approved blueprint that records approver decisions.
+- **R3-13:** addressed in code and docs, subject to the external services reported by readiness.
+
+No R3 pass or assignment completion is claimed. PostgreSQL, Docker fresh-install access, IAM
+designation data, scanner/storage integration, approver acceptance, PMS E2E accounts, and live
+browser walkthrough evidence remain unavailable or unverified.
