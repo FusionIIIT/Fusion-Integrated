@@ -172,6 +172,39 @@ class TestReturnValidation:
         assert valid is False
         assert "Draft files cannot be returned" in msg
 
+    def test_archived_file_cannot_be_returned(self):
+        valid, msg = can_return_file(
+            current_status=STATUS_ARCHIVED,
+            sender_id="emp_02",
+            current_holder_id="emp_02",
+            previous_senders=["emp_01"],
+            comment="Attempt return",
+        )
+        assert valid is False
+        assert "Archived files cannot be returned" in msg
+
+    def test_non_custodian_cannot_return_file(self):
+        valid, msg = can_return_file(
+            current_status=STATUS_RECEIVED,
+            sender_id="emp_99",
+            current_holder_id="emp_02",
+            previous_senders=["emp_01"],
+            comment="Attempt return",
+        )
+        assert valid is False
+        assert "Only the current custodian can return this file" in msg
+
+    def test_return_requires_non_empty_comment(self):
+        valid, msg = can_return_file(
+            current_status=STATUS_RECEIVED,
+            sender_id="emp_02",
+            current_holder_id="emp_02",
+            previous_senders=["emp_01"],
+            comment="   ",
+        )
+        assert valid is False
+        assert "Movement comment is mandatory" in msg
+
 
 class TestArchivalValidation:
     """Tests for can_archive_file (BR-FTS-012)."""
@@ -215,6 +248,16 @@ class TestArchivalValidation:
         )
         assert valid is False
         assert "Draft files cannot be archived" in msg
+
+    def test_cannot_archive_already_archived_file(self):
+        valid, msg = can_archive_file(
+            current_status=STATUS_ARCHIVED,
+            user_id="emp_01",
+            creator_id="emp_01",
+            current_holder_id="emp_01",
+        )
+        assert valid is False
+        assert "File is already archived" in msg
 
 
 class TestDraftEditValidation:

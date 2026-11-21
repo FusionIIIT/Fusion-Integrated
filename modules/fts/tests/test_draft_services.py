@@ -129,6 +129,68 @@ class TestDraftUpdateAndDiscard:
         assert result["status"] == "discarded"
         assert not FTSFile.objects.filter(id=created["file_id"]).exists()
 
+    def test_update_nonexistent_draft_raises_error(self):
+        with pytest.raises(ValueError, match="File not found"):
+            update_file_draft(
+                file_id=999999,
+                user_id="emp_01",
+                subject="Nonexistent",
+            )
+
+    def test_update_draft_empty_subject_raises_error(self):
+        created = create_file_draft(
+            creator_id="emp_01",
+            creator_role="Staff",
+            subject="Valid Subject",
+            initial_comment="Valid comment",
+        )
+        with pytest.raises(ValueError, match="File subject cannot be empty"):
+            update_file_draft(
+                file_id=created["file_id"],
+                user_id="emp_01",
+                subject="   ",
+            )
+
+    def test_update_draft_full_fields(self):
+        created = create_file_draft(
+            creator_id="emp_01",
+            creator_role="Staff",
+            subject="Initial Subject",
+            initial_comment="Initial comment",
+        )
+        updated = update_file_draft(
+            file_id=created["file_id"],
+            user_id="emp_01",
+            subject="Updated Subject",
+            priority="high",
+            category="finance",
+            description="Updated description",
+        )
+        assert updated["subject"] == "Updated Subject"
+        file_obj = FTSFile.objects.get(id=created["file_id"])
+        assert file_obj.priority == "high"
+        assert file_obj.category == "finance"
+        assert file_obj.description == "Updated description"
+
+    def test_discard_nonexistent_draft_raises_error(self):
+        with pytest.raises(ValueError, match="File not found"):
+            discard_file_draft(file_id=999999, user_id="emp_01")
+
+
+    def test_discard_circulated_file_raises_error(self):
+        created = create_file_draft(
+            creator_id="emp_01",
+            creator_role="Staff",
+            subject="Circulated File",
+            initial_comment="Moving",
+        )
+        file_obj = FTSFile.objects.get(id=created["file_id"])
+        file_obj.status = STATUS_IN_TRANSIT
+        file_obj.save()
+        with pytest.raises(PermissionError, match="Only files in draft status"):
+            discard_file_draft(file_id=created["file_id"], user_id="emp_01")
+
+
 
 @pytest.mark.django_db
 class TestDraftSelectors:

@@ -125,3 +125,28 @@ class TestArchivalService:
                 user_role="Staff",
                 remarks="Malicious archive attempt",
             )
+
+    def test_archive_nonexistent_file_raises_error(self):
+        with pytest.raises(ValueError, match="File not found"):
+            archive_file(
+                file_id=999999,
+                user_id="user_e",
+                user_role="Faculty",
+                remarks="Does not exist",
+            )
+
+    def test_archive_empty_remarks_raises_error(self):
+        draft = create_file_draft(
+            creator_id="user_e",
+            creator_role="Faculty",
+            subject="Remarks Test",
+            initial_comment="Testing empty remarks",
+        )
+        with pytest.raises(ValueError, match="Archival remark is mandatory"):
+            archive_file(
+                file_id=draft["file_id"],
+                user_id="user_e",
+                user_role="Faculty",
+                remarks="   ",
+            )
+

@@ -140,6 +140,83 @@ class TestMovementServices:
                 comment="Trying to return draft",
             )
 
+    def test_forward_nonexistent_file_raises_error(self):
+        with pytest.raises(ValueError, match="File not found"):
+            forward_file(
+                file_id=999999,
+                sender_id="emp_01",
+                sender_role="Staff",
+                receiver_id="emp_02",
+                receiver_role="HOD",
+                comment="Forwarding nonexistent",
+            )
+
+    def test_return_nonexistent_file_raises_error(self):
+        with pytest.raises(ValueError, match="File not found"):
+            return_file(
+                file_id=999999,
+                sender_id="emp_01",
+                sender_role="Staff",
+                comment="Returning nonexistent",
+            )
+
+    def test_return_file_to_specific_target_receiver(self):
+        draft = create_file_draft(
+            creator_id="emp_01",
+            creator_role="Staff",
+            subject="Multi-hop File",
+            initial_comment="Start",
+        )
+        forward_file(
+            file_id=draft["file_id"],
+            sender_id="emp_01",
+            sender_role="Staff",
+            receiver_id="emp_02",
+            receiver_role="HOD",
+            comment="Hop 1",
+        )
+        forward_file(
+            file_id=draft["file_id"],
+            sender_id="emp_02",
+            sender_role="HOD",
+            receiver_id="emp_03",
+            receiver_role="Dean",
+            comment="Hop 2",
+        )
+        result = return_file(
+            file_id=draft["file_id"],
+            sender_id="emp_03",
+            sender_role="Dean",
+            comment="Returning straight to creator",
+            target_receiver_id="emp_01",
+        )
+        assert result["returned_to_id"] == "emp_01"
+
+    def test_return_file_to_invalid_target_receiver_raises_error(self):
+        draft = create_file_draft(
+            creator_id="emp_01",
+            creator_role="Staff",
+            subject="Invalid Target Return",
+            initial_comment="Start",
+        )
+        forward_file(
+            file_id=draft["file_id"],
+            sender_id="emp_01",
+            sender_role="Staff",
+            receiver_id="emp_02",
+            receiver_role="HOD",
+            comment="Forward 1",
+        )
+        with pytest.raises(ValueError, match="is not in the historical movement chain"):
+            return_file(
+                file_id=draft["file_id"],
+                sender_id="emp_02",
+                sender_role="HOD",
+                comment="Invalid target",
+                target_receiver_id="unrelated_user",
+            )
+
+
 
 @pytest.mark.django_db
 class TestMovementSelectors:

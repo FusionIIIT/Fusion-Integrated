@@ -23,6 +23,11 @@ from modules.fts.services.archival import archive_file
 from modules.fts.services.drafts import create_file_draft
 from modules.fts.services.movements import forward_file, return_file
 
+PERM_FILE_VIEW = "fts.file.view"
+PERM_FILE_CREATE = "fts.file.create"
+PERM_FILE_REVIEW = "fts.file.review"
+PERM_FILE_MANAGE = "fts.file.manage"
+
 
 class FTSFileViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet for managing FTS file operations and queries."""
