@@ -3,7 +3,7 @@ PY := .venv/bin/python
 export DJANGO_SETTINGS_MODULE ?= config.settings.dev
 
 help:  ## show this help
-	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk -F':.*?## ' '{printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
+	@grep -hE '^[a-z0-9-]+:.*?## ' $(MAKEFILE_LIST) | awk -F':.*?## ' '{printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
 
 install:  ## create the venv and install everything
 	uv venv --python 3.12 .venv
@@ -40,6 +40,9 @@ check: ## everything CI runs
 check-client: ## the client half of CI
 	cd client && npm run typecheck && npm test && npm run build
 
+e2e: ## browser tests; needs the IAM on 8001 and `make dev` running (E2E_IAM_DIR to grant roles)
+	cd client && npm run e2e
+
 SCHEMA := openapi/fusion-integrated.v1.yaml
 
 schema:  ## regenerate the committed OpenAPI schema
@@ -58,4 +61,4 @@ schema-check:  ## the committed schema must match the code
 	@echo "openapi schema matches the code"
 
 .PHONY: help install up migrate seed dev test check check-client schema \
-	schema-check permissions module-structure
+	schema-check permissions module-structure e2e
