@@ -1,0 +1,78 @@
+..s..............F...................F...sssss...                        [100%]
+=================================== FAILURES ===================================
+________________________________ test_tc_br_018 ________________________________
+
+    @pytest.mark.django_db
+    def test_tc_br_018():
+        """TC_BR_018 - BR-FTS-007: Verify a recipient who is not a valid Institute Employee is not accepted
+    
+        Action/Input: Attempt to forward the file with a movement comment to that recipient
+        Expected Result: The recipient is not accepted and the file is not sent
+        Test Type: negative
+        """
+        # TC_BR_018: Recipient who is not valid (empty string) must be rejected
+        draft = create_file_draft("emp_1", "Officer", "Invalid Recipient BR", "Init")
+        fid = draft["file_id"]
+>       with pytest.raises((ValueError, PermissionError)):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE any of (ValueError, PermissionError)
+
+tests/a8/br/test_br_spec.py:259: Failed
+________________________________ test_tc_br_038 ________________________________
+
+    @pytest.mark.django_db
+    def test_tc_br_038():
+        """TC_BR_038 - BR-FTS-012: Verify a user who is not the file owner cannot archive the file
+    
+        Action/Input: The non-owner requests archival
+        Expected Result: Archival is not permitted and the file is not archived
+        Test Type: negative
+        """
+        # TC_BR_038: User who is not file owner cannot archive the file (BR-FTS-012)
+        draft = create_file_draft("emp_owner", "Officer", "Non-Owner Archival", "Init")
+        fid = draft["file_id"]
+        forward_file(fid, "emp_owner", "Officer", "emp_custodian", "Reviewer", "Custody transferred")
+>       with pytest.raises(PermissionError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PermissionError
+
+tests/a8/br/test_br_spec.py:558: Failed
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.15-final-0 _______________
+
+Name                                           Stmts   Miss Branch BrPart  Cover   Missing
+------------------------------------------------------------------------------------------
+modules/fts/__init__.py                            0      0      0      0   100%
+modules/fts/api/__init__.py                        0      0      0      0   100%
+modules/fts/api/serializers.py                    26     26      0      0     0%   3-75
+modules/fts/api/urls.py                            5      5      0      0     0%   3-10
+modules/fts/api/views.py                          82     82      2      0     0%   3-146
+modules/fts/apps.py                                4      0      0      0   100%
+modules/fts/contracts.py                          25      5      4      0    76%   62-78
+modules/fts/domain/__init__.py                     0      0      0      0   100%
+modules/fts/domain/workflow.py                    70     11     36     11    79%   58, 66, 84, 112, 140, 143, 146, 169, 172, 175, 186
+modules/fts/migrations/0001_initial.py             6      0      0      0   100%
+modules/fts/migrations/__init__.py                 0      0      0      0   100%
+modules/fts/models.py                             62      4      0      0    94%   63, 93, 118, 143
+modules/fts/registry.py                           10     10      0      0     0%   3-61
+modules/fts/selectors/__init__.py                  0      0      0      0   100%
+modules/fts/selectors/drafts.py                   11     11      0      0     0%   6-64
+modules/fts/selectors/inbox_outbox.py              9      0      0      0   100%
+modules/fts/selectors/movements.py                15      0      6      0   100%
+modules/fts/services/__init__.py                   0      0      0      0   100%
+modules/fts/services/archival.py                  20      4      4      2    75%   33-34, 38, 48
+modules/fts/services/drafts.py                    48      9     14      6    76%   110-111, 120, 122->128, 125, 129, 132, 135, 152-153
+modules/fts/services/movements.py                 47      9     10      2    77%   42-43, 112-113, 131, 137-140
+modules/fts/tests/__init__.py                      0      0      0      0   100%
+modules/fts/tests/test_archival_and_inbox.py      40     40      0      0     0%   6-122
+modules/fts/tests/test_contracts_and_api.py       50     50      0      0     0%   3-134
+modules/fts/tests/test_domain_workflow.py         96     96      0      0     0%   6-248
+modules/fts/tests/test_draft_services.py          65     65      0      0     0%   6-174
+modules/fts/tests/test_movement_services.py       56     56      0      0     0%   6-175
+------------------------------------------------------------------------------------------
+TOTAL                                            747    483     76     21    38%
+Coverage XML written to file a8_results/br/coverage.xml
+=========================== short test summary info ============================
+FAILED tests/a8/br/test_br_spec.py::test_tc_br_018 - Failed: DID NOT RAISE an...
+FAILED tests/a8/br/test_br_spec.py::test_tc_br_038 - Failed: DID NOT RAISE Pe...
+2 failed, 41 passed, 6 skipped in 4.35s

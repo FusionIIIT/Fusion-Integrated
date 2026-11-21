@@ -63,6 +63,253 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/fts/files/:
+    get:
+      operationId: v1_fts_files_list
+      description: ViewSet for managing FTS file operations and queries.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFTSFileList'
+          description: ''
+  /api/v1/fts/files/{id}/:
+    get:
+      operationId: v1_fts_files_retrieve
+      description: ViewSet for managing FTS file operations and queries.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this File.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FTSFile'
+          description: ''
+  /api/v1/fts/files/{id}/archive/:
+    post:
+      operationId: v1_fts_files_archive_create
+      description: Endpoint to archive a completed file.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this File.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FTSFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FTSFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FTSFile'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FTSFile'
+          description: ''
+  /api/v1/fts/files/{id}/forward/:
+    post:
+      operationId: v1_fts_files_forward_create
+      description: Endpoint to forward an active file to another employee.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this File.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FTSFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FTSFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FTSFile'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FTSFile'
+          description: ''
+  /api/v1/fts/files/{id}/history/:
+    get:
+      operationId: v1_fts_files_history_retrieve
+      description: Endpoint to view the chronological movement and comment history
+        of a file.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this File.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FTSFile'
+          description: ''
+  /api/v1/fts/files/{id}/return_file_action/:
+    post:
+      operationId: v1_fts_files_return_file_action_create
+      description: Endpoint to return a file to a previous sender.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this File.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FTSFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FTSFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FTSFile'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FTSFile'
+          description: ''
+  /api/v1/fts/files/create-draft/:
+    post:
+      operationId: v1_fts_files_create_draft_create
+      description: Endpoint to create a new file draft with mandatory initial comment.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FTSFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FTSFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FTSFile'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FTSFile'
+          description: ''
+  /api/v1/fts/files/drafts/:
+    get:
+      operationId: v1_fts_files_drafts_retrieve
+      description: Endpoint to get saved drafts created by requesting employee.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FTSFile'
+          description: ''
+  /api/v1/fts/files/inbox/:
+    get:
+      operationId: v1_fts_files_inbox_retrieve
+      description: Endpoint to get current active files in custody of requesting employee.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FTSFile'
+          description: ''
+  /api/v1/fts/files/outbox/:
+    get:
+      operationId: v1_fts_files_outbox_retrieve
+      description: Endpoint to get active files sent by requesting employee to others.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FTSFile'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -2407,6 +2654,77 @@ components:
       - season_decision
       - semester
       - standing
+    FTSFile:
+      type: object
+      description: Serializer for FTSFile model.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uin:
+          type: string
+          readOnly: true
+        subject:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        priority:
+          $ref: '#/components/schemas/PriorityEnum'
+        category:
+          type: string
+          maxLength: 64
+        status:
+          allOf:
+          - $ref: '#/components/schemas/FTSFileStatusEnum'
+          readOnly: true
+        creator_id:
+          type: string
+          readOnly: true
+        creator_role:
+          type: string
+          maxLength: 64
+        current_holder_id:
+          type: string
+          readOnly: true
+        current_holder_role:
+          type: string
+          maxLength: 64
+        is_draft:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - creator_id
+      - current_holder_id
+      - id
+      - is_draft
+      - status
+      - subject
+      - uin
+      - updated_at
+    FTSFileStatusEnum:
+      enum:
+      - draft
+      - in_transit
+      - received
+      - returned
+      - archived
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `in_transit` - In Transit
+        * `received` - Received
+        * `returned` - Returned
+        * `archived` - Archived
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2943,6 +3261,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Company'
+    PaginatedFTSFileList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/FTSFile'
     PaginatedInterviewRoundList:
       type: object
       required:
@@ -3145,6 +3482,18 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    PriorityEnum:
+      enum:
+      - low
+      - medium
+      - high
+      - urgent
+      type: string
+      description: |-
+        * `low` - Low
+        * `medium` - Medium
+        * `high` - High
+        * `urgent` - Urgent
     ProfileDocument:
       type: object
       description: |-
