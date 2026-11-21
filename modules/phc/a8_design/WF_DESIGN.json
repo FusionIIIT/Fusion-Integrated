@@ -1,0 +1,74 @@
+[
+  {
+    "test_id": "WF-01",
+    "source_id": "BW-PHC-01 reimbursement forward path",
+    "purpose": "A submitted claim moves through PHC Staff review, Accounts & Audit verification, Approving Authority sanction, and Accounts & Audit payment in the defined order.",
+    "preconditions": "An eligible employee has submitted a claim in Submitted state.",
+    "action_or_input": "Advance the claim through each workflow stage in the defined forward order.",
+    "expected_result": "The claim progresses sequentially: Submitted -> Pending PHC Review -> Pending Accounts Verification -> Pending Sanction -> Approved for Payment -> Reimbursed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-02",
+    "source_id": "BW-PHC-02 sanction approval path",
+    "purpose": "When the Approving Authority approves the sanction, the claim becomes Approved for Payment and is routed to Accounts & Audit.",
+    "preconditions": "A verified claim is in Pending Sanction state.",
+    "action_or_input": "The Approving Authority selects Approve for the sanction.",
+    "expected_result": "The claim state becomes Approved for Payment and is routed to Accounts & Audit.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-03",
+    "source_id": "BW-PHC-02 sanction rejection path",
+    "purpose": "When the Approving Authority rejects the sanction, the claim state becomes Rejected and the current progression ends.",
+    "preconditions": "A verified claim is in Pending Sanction state.",
+    "action_or_input": "The Approving Authority selects Reject for the sanction.",
+    "expected_result": "The claim state becomes Rejected and the current reimbursement progression ends.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-04",
+    "source_id": "CW-PHC-01 terminal rejection",
+    "purpose": "Rejection at sanction is terminal; any later application must be submitted as a new claim.",
+    "preconditions": "A claim has been Rejected at sanction.",
+    "action_or_input": "The employee attempts to modify or reopen the rejected claim.",
+    "expected_result": "The rejected claim is not modified or reopened; a new claim must be submitted.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-05",
+    "source_id": "BW-PHC-03 requisition submit route",
+    "purpose": "PHC Staff creates and submits a procurement requisition routed to the Approving Authority.",
+    "preconditions": "PHC Staff has created a requisition with items and quantities.",
+    "action_or_input": "PHC Staff submits the requisition.",
+    "expected_result": "The requisition is created in Pending Approval state and routed to the Approving Authority.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-06",
+    "source_id": "BW-PHC-04 requisition approve path",
+    "purpose": "When the Approving Authority approves a requisition, the state becomes Approved and the originator is notified.",
+    "preconditions": "A requisition is in Pending Approval state.",
+    "action_or_input": "The Approving Authority selects Approve.",
+    "expected_result": "The requisition state becomes Approved and the originator is notified.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-07",
+    "source_id": "BW-PHC-04 requisition reject path",
+    "purpose": "When the Approving Authority rejects a requisition, the state becomes Rejected and the workflow ends.",
+    "preconditions": "A requisition is in Pending Approval state.",
+    "action_or_input": "The Approving Authority selects Reject.",
+    "expected_result": "The requisition state becomes Rejected and the requisition workflow ends.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-08",
+    "source_id": "CW-PHC-02 fulfill after delivery",
+    "purpose": "PHC Staff marks an approved requisition Fulfilled after supplies are delivered; fulfillment does not auto-post stock.",
+    "preconditions": "A requisition is Approved and supplies are delivered.",
+    "action_or_input": "PHC Staff marks the requisition Fulfilled.",
+    "expected_result": "The requisition state becomes Fulfilled and the workflow is closed; stock is not automatically updated.",
+    "test_type": "positive"
+  }
+]
