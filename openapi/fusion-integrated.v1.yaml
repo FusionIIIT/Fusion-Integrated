@@ -4,6 +4,167 @@ info:
   version: 1.0.0
   description: Non-academic platform. Independent modules, one login.
 paths:
+  /api/fts/v1/:
+    post:
+      operationId: fts_v1_create
+      tags:
+      - fts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FileCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileCreate'
+          description: ''
+  /api/fts/v1/{file_id}/archive/:
+    post:
+      operationId: fts_v1_archive_create
+      parameters:
+      - in: path
+        name: file_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - fts
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/fts/v1/{file_id}/discard/:
+    delete:
+      operationId: fts_v1_discard_destroy
+      parameters:
+      - in: path
+        name: file_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - fts
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+        '400':
+          description: No response body
+  /api/fts/v1/{file_id}/edit/:
+    put:
+      operationId: fts_v1_edit_update
+      parameters:
+      - in: path
+        name: file_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - fts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileEdit'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FileEdit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileEdit'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileEdit'
+          description: ''
+  /api/fts/v1/{file_id}/forward/:
+    post:
+      operationId: fts_v1_forward_create
+      parameters:
+      - in: path
+        name: file_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - fts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileForward'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FileForward'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileForward'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileForward'
+          description: ''
+  /api/fts/v1/{file_id}/return/:
+    post:
+      operationId: fts_v1_return_create
+      parameters:
+      - in: path
+        name: file_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - fts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileReturn'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FileReturn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileReturn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileReturn'
+          description: ''
   /api/v1/auth/login:
     post:
       operationId: v1_auth_login_create
@@ -2423,6 +2584,53 @@ components:
       - fee_reference
       - season
       - user_id
+    FileCreate:
+      type: object
+      properties:
+        initial_comment:
+          type: string
+        attachment_urls:
+          type: array
+          items:
+            type: string
+      required:
+      - initial_comment
+    FileEdit:
+      type: object
+      properties:
+        new_comment:
+          type: string
+        new_attachment_urls:
+          type: array
+          items:
+            type: string
+      required:
+      - new_comment
+    FileForward:
+      type: object
+      properties:
+        receiver_id:
+          type: string
+        movement_comment:
+          type: string
+        attachment_urls:
+          type: array
+          items:
+            type: string
+      required:
+      - movement_comment
+      - receiver_id
+    FileReturn:
+      type: object
+      properties:
+        movement_comment:
+          type: string
+        attachment_urls:
+          type: array
+          items:
+            type: string
+      required:
+      - movement_comment
     IncidentRecorded:
       type: object
       properties:
