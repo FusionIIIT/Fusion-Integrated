@@ -66,7 +66,7 @@ class TestInboxOutboxSelectors:
 class TestArchivalService:
     """Tests for archive_file (FTS-UC-007, BR-FTS-012)."""
 
-    def test_successful_archival_by_holder(self):
+    def test_successful_archival_by_owner(self):
         draft = create_file_draft(
             creator_id="user_d",
             creator_role="Faculty",
@@ -84,8 +84,8 @@ class TestArchivalService:
 
         result = archive_file(
             file_id=draft["file_id"],
-            user_id="registrar_01",
-            user_role="Registrar",
+            user_id="user_d",
+            user_role="Faculty",
             remarks="Sanctioned and archived into institute record.",
         )
 
@@ -101,6 +101,30 @@ class TestArchivalService:
 
         # Verify movement
         assert FTSMovement.objects.filter(file=file_obj, action="archived").exists()
+
+    def test_non_owner_holder_cannot_archive(self):
+        draft = create_file_draft(
+            creator_id="user_d_non_owner",
+            creator_role="Faculty",
+            subject="Non-owner archive attempt",
+            initial_comment="All done",
+        )
+        forward_file(
+            file_id=draft["file_id"],
+            sender_id="user_d_non_owner",
+            sender_role="Faculty",
+            receiver_id="registrar_01",
+            receiver_role="Registrar",
+            comment="Final signoff needed",
+        )
+
+        with pytest.raises(PermissionError, match="Only the file owner can archive this file"):
+            archive_file(
+                file_id=draft["file_id"],
+                user_id="registrar_01",
+                user_role="Registrar",
+                remarks="Attempt by non-owner holder",
+            )
 
     def test_unauthorized_user_cannot_archive(self):
         draft = create_file_draft(
@@ -118,7 +142,7 @@ class TestArchivalService:
             comment="Review needed",
         )
 
-        with pytest.raises(PermissionError, match="Only the creator or current holder"):
+        with pytest.raises(PermissionError, match="Only the file owner can archive this file"):
             archive_file(
                 file_id=draft["file_id"],
                 user_id="intruder_x",

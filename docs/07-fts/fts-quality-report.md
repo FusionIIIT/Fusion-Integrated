@@ -71,7 +71,7 @@ modules/fts/api/views.py                   86      2      2      0    98%   84-8
 modules/fts/apps.py                         4      0      0      0   100%
 modules/fts/contracts.py                   25      0      4      0   100%
 modules/fts/domain/__init__.py              0      0      0      0   100%
-modules/fts/domain/workflow.py             70      0     36      0   100%
+modules/fts/domain/workflow.py             72      0     38      0   100%
 modules/fts/models.py                      62      0      0      0   100%
 modules/fts/registry.py                    13      0      0      0   100%
 modules/fts/selectors/__init__.py           0      0      0      0   100%
@@ -81,11 +81,11 @@ modules/fts/selectors/movements.py         15      0      6      0   100%
 modules/fts/services/__init__.py            0      0      0      0   100%
 modules/fts/services/archival.py           20      0      4      0   100%
 modules/fts/services/drafts.py             48      0     14      2    97%   122->128, 131->134
-modules/fts/services/movements.py          47      1     10      1    96%   139
+modules/fts/services/movements.py          50      1     12      1    97%   142
 -----------------------------------------------------------------------------------
-TOTAL                                     441      8     76      3    98%
-Required test coverage of 90% reached. Total coverage: 97.87%
-68 passed in 4.29s
+TOTAL                                     446      8     80      3    98%
+Required test coverage of 90% reached. Total coverage: 97.91%
+71 passed in 4.32s
 ```
 
 ### Domain Layer Coverage (`--cov=modules/fts/domain`, target >= 95%)
@@ -99,11 +99,11 @@ Output:
 Name                             Stmts   Miss Branch BrPart  Cover   Missing
 ----------------------------------------------------------------------------
 modules/fts/domain/__init__.py       0      0      0      0   100%
-modules/fts/domain/workflow.py      70      0     36      0   100%
+modules/fts/domain/workflow.py      72      0     38      0   100%
 ----------------------------------------------------------------------------
-TOTAL                               70      0     36      0   100%
+TOTAL                               72      0     38      0   100%
 Required test coverage of 95% reached. Total coverage: 100.00%
-68 passed in 4.34s
+71 passed in 4.33s
 ```
 
 ---
@@ -113,12 +113,12 @@ Required test coverage of 95% reached. Total coverage: 100.00%
 ### Test Counts per File
 | Test File | Test Count | Scope |
 | :--- | :--- | :--- |
-| `modules/fts/tests/test_domain_workflow.py` | 27 | Pure Python domain invariants, state machines, guards |
+| `modules/fts/tests/test_domain_workflow.py` | 28 | Pure Python domain invariants, state machines, guards |
 | `modules/fts/tests/test_draft_services.py` | 13 | File draft creation, updates, and discards |
-| `modules/fts/tests/test_movement_services.py` | 9 | Forwarding, return chains, movement recording |
-| `modules/fts/tests/test_archival_and_inbox.py` | 6 | Archival services, inbox and outbox selectors |
+| `modules/fts/tests/test_movement_services.py` | 10 | Forwarding, return chains, movement recording |
+| `modules/fts/tests/test_archival_and_inbox.py` | 7 | Archival services, inbox and outbox selectors |
 | `modules/fts/tests/test_contracts_and_api.py` | 13 | Plural contracts, models `__str__`, REST API endpoints |
-| **Total Backend Tests** | **68** | **All passing** |
+| **Total Backend Tests** | **71** | **All passing** |
 
 ### Journey Mapping to Use Cases
 - `FTS-UC-001` (Create New File): `test_draft_services.py::TestDraftCreation::test_successful_draft_creation`
@@ -127,7 +127,7 @@ Required test coverage of 95% reached. Total coverage: 100.00%
 - `FTS-UC-004` (Return File): `test_movement_services.py::TestReturnMovement::test_return_file_to_previous_sender`
 - `FTS-UC-005` (View Inbox/Outbox): `test_archival_and_inbox.py::TestInboxOutboxSelectors::test_inbox_and_outbox_isolation`
 - `FTS-UC-006` (View Tracking History): `test_movement_services.py::TestMovementSelectors::test_previous_senders_extraction`
-- `FTS-UC-007` (Archive File): `test_archival_and_inbox.py::TestArchivalService::test_successful_archival_by_holder`
+- `FTS-UC-007` (Archive File): `test_archival_and_inbox.py::TestArchivalService::test_successful_archival_by_owner`
 - `FTS-UC-008` (Role Context Selection): `test_contracts_and_api.py::TestFTSAPIEndpoints::test_authenticated_user_context`
 - `FTS-UC-009` (Administer Access Context): `test_contracts_and_api.py::TestFTSRegistry::test_registry_metadata`
 - `FTS-UC-010` (Workflow Support APIs): `test_contracts_and_api.py::TestFTSContracts::test_get_files_by_uins_plural`
@@ -257,3 +257,27 @@ Self-review conducted strictly against the nine review dimensions of `docs/08-de
 | 8 | Operability & docs | 10/10 | 0 | 0 | 0 | `fts_reference.py` validates all 118 links; clean git status |
 | 9 | Hygiene | 10/10 | 0 | 0 | 0 | Zero AI attribution, Student 1 identity, no production data |
 | **Total** | **Overall Verdict** | **10/10** | **0** | **0** | **0** | **VERDICT: 10/10 in all nine dimensions** |
+
+---
+
+## 13. Phase 4 Defect Triage & Resolution Log
+
+The following implementation defects identified during Phase 3 specification testing (Review Round Q1) have been resolved and verified:
+
+### DEF-001: Archival Non-Owner Authorization Check
+- **Citations**: `AFR-FTS-003`, `AFR-FTS-043`, `BR-FTS-012`, `FTS-UC-007 Exception Flow 1`
+- **Failing Spec Tests (Baseline)**: `FR-055`, `UC-029`, `BR-037`
+- **Root Cause**: `can_archive_file` in `modules/fts/domain/workflow.py` previously checked `user_id not in {creator_id, current_holder_id}`, permitting non-owner current holders to archive the file, contradicting AFR-FTS-003 and BR-FTS-012 which restrict archival strictly to the file creator/owner.
+- **Resolution**:
+  - Updated `can_archive_file` in `modules/fts/domain/workflow.py` to enforce `if user_id != creator_id:` and return `(False, ("Only the file owner can archive this file (BR-FTS-012, AFR-FTS-003). " "Only the creator/owner is permitted."))`.
+  - Confirmed `archive_file` in `modules/fts/services/archival.py` raises `PermissionError` when a non-owner requests archival.
+- **Verification Evidence**: `FR-055`, `UC-029`, and `BR-037` pass cleanly. Unit test `test_non_owner_holder_cannot_archive` verified in `test_domain_workflow.py` and `test_archival_and_inbox.py`.
+
+### DEF-002: Forward Recipient Validation
+- **Citations**: `BR-FTS-007`, `FTS-UC-003 Exception Flow 2`
+- **Failing Spec Tests (Baseline)**: `UC-014`, `BR-020`
+- **Root Cause**: `forward_file` in `modules/fts/services/movements.py` did not validate whether `receiver_id` was non-empty and non-whitespace, permitting forwards with invalid or blank recipient strings without validation refusal.
+- **Resolution**:
+  - Added recipient validation in `can_forward_file` in `modules/fts/domain/workflow.py`: `if not receiver_id or not str(receiver_id).strip(): return (False, ("Invalid or non-existent recipient: Recipient identifier must be a valid, " "non-empty employee ID (BR-FTS-007)."))`.
+  - In `forward_file` in `modules/fts/services/movements.py`, added check to raise `ValueError` for invalid/non-existent recipient, while preserving `PermissionError` for unauthorized custodian attempts.
+- **Verification Evidence**: `UC-014` and `BR-020` pass cleanly. Unit test `test_forward_file_invalid_recipient_raises_value_error` verified in `test_movement_services.py`.

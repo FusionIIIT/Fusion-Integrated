@@ -135,6 +135,17 @@ class TestForwardingValidation:
         assert valid is False
         assert "Archived files are terminal" in msg
 
+    def test_empty_or_whitespace_recipient_disallowed(self):
+        valid, msg = can_forward_file(
+            current_status=STATUS_RECEIVED,
+            sender_id="emp_01",
+            current_holder_id="emp_01",
+            receiver_id="   ",
+            comment="Forward with empty recipient",
+        )
+        assert valid is False
+        assert "Invalid or non-existent recipient" in msg
+
 
 class TestReturnValidation:
     """Tests for can_return_file (BR-FTS-007)."""
@@ -209,15 +220,15 @@ class TestReturnValidation:
 class TestArchivalValidation:
     """Tests for can_archive_file (BR-FTS-012)."""
 
-    def test_valid_archive_by_current_holder(self):
+    def test_non_owner_holder_cannot_archive(self):
         valid, msg = can_archive_file(
             current_status=STATUS_RECEIVED,
             user_id="emp_02",
             creator_id="emp_01",
             current_holder_id="emp_02",
         )
-        assert valid is True
-        assert msg == ""
+        assert valid is False
+        assert "Only the file owner can archive this file" in msg
 
     def test_valid_archive_by_creator(self):
         valid, msg = can_archive_file(
@@ -237,7 +248,7 @@ class TestArchivalValidation:
             current_holder_id="emp_02",
         )
         assert valid is False
-        assert "Only the creator or current holder" in msg
+        assert "Only the file owner can archive this file" in msg
 
     def test_cannot_archive_draft(self):
         valid, msg = can_archive_file(

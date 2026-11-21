@@ -82,6 +82,24 @@ class TestMovementServices:
                 comment="Sneaky forward",
             )
 
+    def test_forward_file_invalid_recipient_raises_value_error(self):
+        draft = create_file_draft(
+            creator_id="emp_01",
+            creator_role="Staff",
+            subject="Recipient Validation",
+            initial_comment="Need check",
+        )
+
+        with pytest.raises(ValueError, match="Invalid or non-existent recipient"):
+            forward_file(
+                file_id=draft["file_id"],
+                sender_id="emp_01",
+                sender_role="Staff",
+                receiver_id="   ",
+                receiver_role="Director",
+                comment="Forwarding to empty recipient",
+            )
+
     def test_return_file_success(self):
         # 1. Create draft and forward emp_01 -> hod_01
         draft = create_file_draft(

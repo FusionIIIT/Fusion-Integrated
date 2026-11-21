@@ -51,14 +51,17 @@ def forward_file(
         comment=comment,
     )
     if not allowed:
+        if "Invalid or non-existent recipient" in msg:
+            raise ValueError(msg)
         raise PermissionError(msg)
 
+    clean_receiver_id = receiver_id.strip()
     clean_comment = comment.strip()
 
     # 2. Update File state (transitions out of draft if applicable)
     file_obj.status = STATUS_IN_TRANSIT
     file_obj.is_draft = False
-    file_obj.current_holder_id = receiver_id
+    file_obj.current_holder_id = clean_receiver_id
     file_obj.current_holder_role = receiver_role
     file_obj.save()
 
@@ -67,7 +70,7 @@ def forward_file(
         file=file_obj,
         from_user_id=sender_id,
         from_role=sender_role,
-        to_user_id=receiver_id,
+        to_user_id=clean_receiver_id,
         to_role=receiver_role,
         action=ACTION_FORWARDED,
     )

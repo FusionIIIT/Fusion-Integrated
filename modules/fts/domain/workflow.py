@@ -108,6 +108,15 @@ def can_forward_file(
     if sender_id != current_holder_id:
         return False, "Only the current custodian can forward this file (BR-FTS-001)."
 
+    if not receiver_id or not str(receiver_id).strip():
+        return (
+            False,
+            (
+                "Invalid or non-existent recipient: Recipient identifier must be a valid, "
+                "non-empty employee ID (BR-FTS-007)."
+            ),
+        )
+
     if sender_id == receiver_id:
         return False, "Cannot forward a file to yourself."
 
@@ -171,8 +180,14 @@ def can_archive_file(
     if current_status == STATUS_DRAFT:
         return False, "Draft files cannot be archived; discard the draft instead."
 
-    if user_id not in {creator_id, current_holder_id}:
-        return False, "Only the creator or current holder can archive this file (BR-FTS-012)."
+    if user_id != creator_id:
+        return (
+            False,
+            (
+                "Only the file owner can archive this file (BR-FTS-012, AFR-FTS-003). "
+                "Only the creator/owner is permitted."
+            ),
+        )
 
     return True, ""
 
