@@ -1,0 +1,171 @@
+Problem Statement
+
+Gymkhana Module
+
+Status: SYNCHRONIZED v1.0
+
+1. Background and Purpose
+
+The Gymkhana Module supports the administration of student clubs and selected student-activity functions within Fusion ERP. The module is intended to replace fragmented manual handling of club governance, membership, venue scheduling, club budget requests, event reporting, and student polling with a controlled, traceable system.
+
+The functional baseline below is intentionally limited to behavior supported by the reviewed package and the accepted module decisions. Functions that exist only as implementation remnants or lack an accepted policy are not treated as current requirements.
+
+2. Problem Domain
+
+Student Admin creation and approval of clubs, with validated student leaders and a Club Faculty Councillor.
+
+Club leadership maintenance for coordinator and co-coordinator roles.
+
+Club session and event booking with venue/time conflict prevention across both sessions and events.
+
+Student club-membership application and Club Head approval.
+
+Club budget-request submission and tracking, without an online approval/rejection lifecycle in the current scope.
+
+Club event-report submission and review/access by the Club Faculty Councillor.
+
+Voting poll creation, targeting, notification, and one-vote-per-student participation.
+
+3. Problems to be Addressed
+
+3.1 Club Governance
+
+Club records require valid student coordinators and a valid faculty councillor, and club activation must be under Student Admin control. The system should maintain a clear current leadership assignment.
+
+3.2 Venue Scheduling
+
+Sessions and events may compete for the same physical venue. Separate checks for sessions and events are insufficient because a session and an event can also conflict. The module must prevent any overlapping booking in the same venue on the same date.
+
+3.3 Membership Management
+
+Students need a traceable way to apply to clubs, while Club Heads need a controlled way to approve pending applications. Duplicate applications to the same club must be prevented while applications to different clubs remain allowed.
+
+3.4 Club Budget Requests
+
+Club Heads need a centralized mechanism to submit and retain club budget requests together with supporting documentation. Approval/rejection of those requests is not part of the current Gymkhana baseline.
+
+3.5 Event Reporting
+
+Club Heads need to submit event documentation to a centralized repository, and the assigned Club Faculty Councillor must be able to access and review submitted reports.
+
+3.6 Student Polling
+
+Club Heads need to create polls for selected student groups, notify the intended audience, and prevent duplicate voting by the same student in the same poll.
+
+4. Scope
+
+4.1 In Scope
+
+Club creation by Student Admin and approval/confirmation of an open club by Student Admin.
+
+Validation of club coordinator, co-coordinator, and Club Faculty Councillor assignments.
+
+Club category control and club leadership changes.
+
+Session and event booking, including valid time ranges, configured venues, and cross-type venue conflict detection.
+
+Notifications for newly booked sessions and events.
+
+Membership application and approval only (apply + approve).
+
+Voting poll creation, target-group selection, notification, and student voting.
+
+Club budget-request submission and tracking only.
+
+Club event-report submission and Club Faculty Councillor review/access.
+
+4.2 Out of Scope for the Current Baseline
+
+Membership rejection and membership cancellation/withdrawal functions.
+
+Online approval or rejection of club budget requests and all fest-budget functions.
+
+Core-team applications for fest management.
+
+Student registration-form management.
+
+Generic administrative file tracking (handled outside this module).
+
+Financial payment processing.
+
+External third-party integrations beyond existing shared authentication/notification services.
+
+Mobile-specific interfaces, real-time chat, and event-attendance tracking.
+
+5. Stakeholders and Actors
+
+Student Admin
+
+Separate administrative role for student modules; creates and approves Gymkhana clubs and oversees the module baseline.
+
+Club Head
+
+Club coordinator or co-coordinator; manages club operations, membership approvals, activities, polls, leadership changes, budget requests, and reports.
+
+Student
+
+Applies for club membership and participates in eligible polls; receives activity notifications.
+
+Club Faculty Councillor
+
+Assigned faculty member for a club; provides faculty oversight and reviews/accesses submitted club event reports.
+
+Shared Authentication / User Registry
+
+Provides authenticated user and student/faculty records used for validation.
+
+Notification Service
+
+Delivers session, event, and voting notifications to intended recipients.
+
+6. Business Constraints
+
+Club coordinator and co-coordinator assignments must refer to valid students.
+
+The Club Faculty Councillor assignment must refer to a valid faculty member.
+
+Club category is restricted to Technical, Sports, or Cultural.
+
+A new club is initially open and becomes confirmed when approved by Student Admin.
+
+A booking start time must precede its end time.
+
+No session or event may overlap any other session or event in the same venue on the same date.
+
+Membership applications are allowed only for confirmed clubs; a student may apply to multiple different clubs but not submit a duplicate application to the same club.
+
+Only the applicable Club Head may approve pending membership applications for that club.
+
+A voting poll must contain at least two choices, and a student may cast at most one vote per poll.
+
+Club budget amounts must be non-negative and budget requests must include the required supporting file.
+
+Club event reports must include the required report/details file.
+
+7. Assumptions
+
+Authentication and authoritative student/faculty identity records are supplied by shared Fusion services.
+
+Configured venues are available to the Gymkhana module for selection.
+
+The shared notification mechanisms used by Gymkhana are operational.
+
+File-upload storage is available for posters, budget documents, and report documents.
+
+The current requirements package specifies business behavior and does not prescribe database cascade, primary-key, serialization, or string-storage implementation mechanisms.
+
+8. Success Criteria
+
+Club records are created and confirmed only under Student Admin control with valid leader/faculty assignments.
+
+No accepted booking creates a session-session, event-event, or session-event overlap in the same venue and time window.
+
+Membership applications are traceable from open to confirmed for approved applications, with duplicate same-club applications prevented.
+
+Poll participation enforces intended audience/active-poll conditions and one vote per student per poll.
+
+Club budget requests and event reports are centrally stored with the required documentation.
+
+The assigned Club Faculty Councillor can access and review the club event reports relevant to the assigned club.
+
+All accepted functional requirements are traceable through the synchronized UC/BR/WF package and RTM.

@@ -1,0 +1,137 @@
+[
+  {
+    "test_id": "TC-WF-01",
+    "source_id": "BW-GYM-01 T1-apply-success",
+    "purpose": "Verify Transition 1 success path in BW-GYM-01: No Membership Application -> Membership Application Open.",
+    "preconditions": "Student has no application for confirmed club.",
+    "action_or_input": "Student invokes UC-GYM-004 (Apply for Club Membership) with valid details.",
+    "expected_result": "Application transitions from 'No Membership Application' to 'Membership Application Open'.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-02",
+    "source_id": "BW-GYM-01 T1-apply-rejected",
+    "purpose": "Verify Transition 1 guard failure path in BW-GYM-01: target club is unconfirmed or duplicate application exists.",
+    "preconditions": "Target club is in status 'open' (unconfirmed) OR student already has application for club.",
+    "action_or_input": "Student invokes UC-GYM-004.",
+    "expected_result": "Guard fails; application is rejected and system remains in 'No Membership Application' state for that club.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-03",
+    "source_id": "BW-GYM-01 T2-approve-success",
+    "purpose": "Verify Transition 2 success path in BW-GYM-01: Membership Application Open -> Membership Confirmed.",
+    "preconditions": "Application in 'Membership Application Open'; Club Head authenticated.",
+    "action_or_input": "Club Head invokes UC-GYM-005 (Approve Club Membership) on open application.",
+    "expected_result": "Application transitions from 'Membership Application Open' to 'Membership Confirmed'.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-04",
+    "source_id": "BW-GYM-01 T2-approve-rejected",
+    "purpose": "Verify Transition 2 guard failure path in BW-GYM-01: actor is not applicable Club Head or application is not open.",
+    "preconditions": "Requester is not coordinator/co-coordinator for club OR application is already confirmed.",
+    "action_or_input": "Requester invokes UC-GYM-005.",
+    "expected_result": "Guard fails; approval rejected and application remains in its prior state ('Membership Application Open').",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-05",
+    "source_id": "BW-GYM-01 full-progression-path",
+    "purpose": "Verify complete end-to-end success path for BW-GYM-01 from no application to confirmed membership.",
+    "preconditions": "Confirmed club exists; student has no prior application; applicable Club Head available.",
+    "action_or_input": "Student executes UC-GYM-004 (Apply) -> Club Head executes UC-GYM-005 (Approve).",
+    "expected_result": "Lifecycle moves: No Application -> Application Open -> Membership Confirmed.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-06",
+    "source_id": "BW-GYM-02 T1-create-success",
+    "purpose": "Verify Transition 1 success path in BW-GYM-02: Poll Not Available -> Poll Open / Target Audience Defined / Student Not Yet Voted.",
+    "preconditions": "Actor is Club Head of confirmed club; poll does not exist.",
+    "action_or_input": "Club Head invokes UC-GYM-006 (Create Voting Poll) with >= 2 choices and target batch/branch.",
+    "expected_result": "Poll created; state becomes 'Poll Open / Target Audience Defined / Student Not Yet Voted'; notification dispatched.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-07",
+    "source_id": "BW-GYM-02 T1-create-rejected",
+    "purpose": "Verify Transition 1 guard failure path in BW-GYM-02: actor not Club Head or fewer than 2 choices.",
+    "preconditions": "Requester is unauthorized OR poll data has only 1 choice.",
+    "action_or_input": "Requester invokes UC-GYM-006.",
+    "expected_result": "Guard fails; poll creation rejected; remains in 'Poll Not Available'.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-08",
+    "source_id": "BW-GYM-02 T2-vote-success",
+    "purpose": "Verify Transition 2 success path in BW-GYM-02: Student Not Yet Voted -> Student Vote Recorded.",
+    "preconditions": "Poll is open and unexpired; student is in target audience and has not yet voted.",
+    "action_or_input": "Student invokes UC-GYM-007 (Vote in Poll) and selects valid choice.",
+    "expected_result": "Vote accepted; tally updated; state becomes 'Poll Open / Target Audience Defined / Student Vote Recorded'.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-09",
+    "source_id": "BW-GYM-02 T2-vote-rejected",
+    "purpose": "Verify Transition 2 guard failure path in BW-GYM-02: poll expired, student not in target group, or duplicate vote.",
+    "preconditions": "Poll is expired OR student outside target group OR student already voted.",
+    "action_or_input": "Student invokes UC-GYM-007.",
+    "expected_result": "Guard fails; vote rejected; tally unchanged; remains in 'Student Not Yet Voted' (or rejected for ineligible/duplicate).",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-10",
+    "source_id": "BW-GYM-02 full-progression-path",
+    "purpose": "Verify complete end-to-end success path for BW-GYM-02 from poll creation to recorded vote.",
+    "preconditions": "Club Head and eligible student in target group ready.",
+    "action_or_input": "Club Head creates poll (UC-GYM-006) -> eligible student casts vote (UC-GYM-007).",
+    "expected_result": "Workflow progresses: Poll Not Available -> Poll Open (Not Yet Voted) -> Poll Open (Student Vote Recorded).",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-11",
+    "source_id": "BW-GYM-03 T1-create-open",
+    "purpose": "Verify Transition 1 success path in BW-GYM-03: Club Not Created -> Club Open.",
+    "preconditions": "Student Admin authenticated; valid leaders, faculty councillor, and allowed category provided.",
+    "action_or_input": "Student Admin invokes UC-GYM-001 (Create New Club).",
+    "expected_result": "Club created; state transitions from 'Club Not Created' to 'Club Open'.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-12",
+    "source_id": "BW-GYM-03 T1-create-rejected",
+    "purpose": "Verify Transition 1 guard failure path in BW-GYM-03: invalid student leaders, invalid faculty, or invalid category.",
+    "preconditions": "Coordinator not valid student OR faculty councillor not valid faculty OR category not allowed.",
+    "action_or_input": "Student Admin invokes UC-GYM-001 with invalid parameter.",
+    "expected_result": "Guard fails; club creation rejected; remains in 'Club Not Created'.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-13",
+    "source_id": "BW-GYM-03 T2-approve-confirmed",
+    "purpose": "Verify Transition 2 success path in BW-GYM-03: Club Open -> Club Confirmed.",
+    "preconditions": "Club exists with status 'open'; Student Admin authenticated.",
+    "action_or_input": "Student Admin invokes UC-GYM-011 (Approve Club).",
+    "expected_result": "Club status transitions from 'Club Open' to 'Club Confirmed'.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-14",
+    "source_id": "BW-GYM-03 T2-approve-rejected",
+    "purpose": "Verify Transition 2 guard failure path in BW-GYM-03: actor is not Student Admin or club is already confirmed.",
+    "preconditions": "Requester is not Student Admin OR club is already confirmed.",
+    "action_or_input": "Requester invokes UC-GYM-011.",
+    "expected_result": "Guard fails; approval rejected; club status remains unchanged ('Club Open').",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-15",
+    "source_id": "BW-GYM-03 full-progression-path",
+    "purpose": "Verify complete end-to-end success path for BW-GYM-03 from no club to confirmed club.",
+    "preconditions": "Student Admin authenticated; valid leaders and faculty councillor available.",
+    "action_or_input": "Student Admin executes UC-GYM-001 (Create) -> Student Admin executes UC-GYM-011 (Approve).",
+    "expected_result": "Workflow progresses: Club Not Created -> Club Open -> Club Confirmed.",
+    "test_type": "workflow"
+  }
+]

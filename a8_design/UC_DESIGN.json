@@ -1,0 +1,272 @@
+[
+  {
+    "test_id": "TC-UC-01",
+    "source_id": "UC-GYM-001 Main Flow",
+    "purpose": "Verify main success scenario for creating a new club by Student Admin.",
+    "preconditions": "Student Admin authenticated; valid student and faculty records available.",
+    "action_or_input": "Student Admin inputs name='Astronomy Club', description='Stargazing club', category='Science/Technical' (Technical), coordinator='student_01', co_coordinator='student_02', faculty_councillor='faculty_01'.",
+    "expected_result": "Club created with status 'open', confirmation message returned.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-02",
+    "source_id": "UC-GYM-001 Alternative Flow",
+    "purpose": "Verify alternative flow where an invalid leader or faculty assignment is identified and allows correction without creating the club.",
+    "preconditions": "Student Admin authenticated; selected coordinator ID does not correspond to an active student.",
+    "action_or_input": "Student Admin submits club form with invalid coordinator; system identifies invalid assignment; Student Admin corrects to valid student ID and resubmits.",
+    "expected_result": "Invalid assignment is flagged without creating club; upon correction, club is successfully created with status 'open'.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-UC-03",
+    "source_id": "UC-GYM-001 Exception Flow",
+    "purpose": "Verify exception flow when required club data cannot be stored, club is not created, and system reports failure.",
+    "preconditions": "Student Admin authenticated; database storage error simulated or mandatory database constraint violated.",
+    "action_or_input": "Student Admin attempts to submit club creation when storage fails.",
+    "expected_result": "No partial or corrupted club record is created; system reports failure to Student Admin.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-04",
+    "source_id": "UC-GYM-002 Main Flow",
+    "purpose": "Verify main success scenario for booking a club session by Club Head without scheduling conflict.",
+    "preconditions": "Actor is Club Head of confirmed club; configured venue available; valid time range; no overlapping bookings.",
+    "action_or_input": "Club Head books session: venue='Studio-1', date='2026-11-22', start_time='16:00', end_time='18:00', description='Weekly Jam', poster='jam.png'.",
+    "expected_result": "Session created, student recipients notified, booking confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-05",
+    "source_id": "UC-GYM-002 Alternative Flow",
+    "purpose": "Verify alternative flow when requested session slot overlaps an existing session or event, system rejects booking and prompts for another slot.",
+    "preconditions": "An existing booking occupies 'Studio-1' on '2026-11-22' from '16:00' to '18:00'.",
+    "action_or_input": "Club Head attempts booking for same venue/date from '17:00' to '19:00'.",
+    "expected_result": "System rejects booking due to conflict and prompts actor to select a different slot; no booking is created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-06",
+    "source_id": "UC-GYM-002 Exception Flow",
+    "purpose": "Verify exception flow when venue is invalid, time range is invalid, or processing fails, no booking is recorded.",
+    "preconditions": "Actor is Club Head of confirmed club.",
+    "action_or_input": "Club Head attempts session booking with invalid time range (start_time='18:00', end_time='16:00') or unconfigured venue.",
+    "expected_result": "System rejects submission; no successful booking is recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-07",
+    "source_id": "UC-GYM-003 Main Flow",
+    "purpose": "Verify main success scenario for booking a club event by Club Head.",
+    "preconditions": "Actor is Club Head of confirmed club; valid faculty councillor context; configured venue available; no conflicts.",
+    "action_or_input": "Club Head books event: name='HackFusion', faculty_councillor='faculty_01', venue='Auditorium', date='2026-11-28', start_time='09:00', end_time='17:00', poster='hack.jpg', description='Hackathon'.",
+    "expected_result": "Event created, student recipients notified, booking confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-08",
+    "source_id": "UC-GYM-003 Alternative Flow",
+    "purpose": "Verify alternative flow when requested event slot overlaps an existing session or event, system rejects booking and prompts for another slot.",
+    "preconditions": "Existing session booked in 'Auditorium' on '2026-11-28' from '10:00' to '12:00'.",
+    "action_or_input": "Club Head attempts event booking in 'Auditorium' on '2026-11-28' from '11:00' to '15:00'.",
+    "expected_result": "System rejects booking due to cross-type venue conflict and asks actor to select another slot.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-09",
+    "source_id": "UC-GYM-003 Exception Flow",
+    "purpose": "Verify exception flow when venue, faculty reference, or time range is invalid, no successful event booking is recorded.",
+    "preconditions": "Actor is Club Head of confirmed club.",
+    "action_or_input": "Club Head submits event booking with invalid faculty councillor reference ('non_existent_faculty').",
+    "expected_result": "System rejects booking with validation error; no event booking is recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-10",
+    "source_id": "UC-GYM-004 Main Flow",
+    "purpose": "Verify main success scenario where student applies for membership in a confirmed club.",
+    "preconditions": "Student is authenticated; target club is confirmed; student has no existing application to this club.",
+    "action_or_input": "Student selects confirmed club and submits application with description='Interested in robotics workshops'.",
+    "expected_result": "System verifies no duplicate application exists, records application with status 'open', and confirms submission.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-11",
+    "source_id": "UC-GYM-004 Alternative Flow",
+    "purpose": "Verify alternative flow where student applies to another different club when applications to other clubs exist.",
+    "preconditions": "Student has an active open application to Club A; Club B is a confirmed club.",
+    "action_or_input": "Student submits membership application to Club B.",
+    "expected_result": "Application to Club B is accepted and recorded with status 'open'; previous application to Club A remains unchanged.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-12",
+    "source_id": "UC-GYM-004 Exception Flow",
+    "purpose": "Verify exception flow when duplicate same-club application is detected, duplicate is rejected and existing application is left unchanged.",
+    "preconditions": "Student already has an application on record for Club A.",
+    "action_or_input": "Student attempts to submit another membership application for Club A.",
+    "expected_result": "System detects duplicate, rejects submission, and leaves existing application state unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-13",
+    "source_id": "UC-GYM-005 Main Flow",
+    "purpose": "Verify main success scenario for approving a single pending club membership application by Club Head.",
+    "preconditions": "Actor is Club Head for the club; an open membership application exists for the club.",
+    "action_or_input": "Club Head selects open application, enters remarks='Accepted based on interview', and submits approval.",
+    "expected_result": "Application status changes from 'open' to 'confirmed', remarks stored, approval confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-14",
+    "source_id": "UC-GYM-005 Alternative Flow",
+    "purpose": "Verify alternative flow where Club Head approves multiple selected pending applications in one interaction, each evaluated independently.",
+    "preconditions": "Actor is Club Head; two open applications exist for the club.",
+    "action_or_input": "Club Head selects both open applications and triggers batch approval.",
+    "expected_result": "Both applications are evaluated and transition independently from 'open' to 'confirmed'.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-15",
+    "source_id": "UC-GYM-005 Exception Flow",
+    "purpose": "Verify exception flow when application is no longer open or does not belong to actor's club, it is not changed.",
+    "preconditions": "Actor is Club Head of Club A; application belongs to Club B OR application is already confirmed.",
+    "action_or_input": "Actor attempts to approve the application.",
+    "expected_result": "System refuses approval; application remains unchanged in its prior state.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-UC-16",
+    "source_id": "UC-GYM-006 Main Flow",
+    "purpose": "Verify main success scenario for creating a voting poll with choices, expiry, target audience, and notifications.",
+    "preconditions": "Actor is Club Head of confirmed club.",
+    "action_or_input": "Club Head enters title='T-shirt design', description='Choose club tee', expiry='2026-12-10', choices=['Design 1', 'Design 2'], target_batch='2023', target_branch='ECE'.",
+    "expected_result": "Poll and choices created, students in target groups notified, poll creation confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-17",
+    "source_id": "UC-GYM-006 Alternative Flow",
+    "purpose": "Verify alternative flow where target branch selection represents all branches for a selected batch where configured.",
+    "preconditions": "Actor is Club Head of confirmed club.",
+    "action_or_input": "Club Head creates poll specifying target_batch='2024' and target_branch='ALL'.",
+    "expected_result": "Poll is created and target audience is expanded to include all branches for batch 2024; notifications dispatched accordingly.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-18",
+    "source_id": "UC-GYM-006 Exception Flow",
+    "purpose": "Verify exception flow when fewer than two choices are supplied or target information is invalid, poll is not created.",
+    "preconditions": "Actor is Club Head of confirmed club.",
+    "action_or_input": "Club Head submits poll with only 1 choice or invalid target batch.",
+    "expected_result": "System rejects poll submission with validation error; no poll is created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-19",
+    "source_id": "UC-GYM-007 Main Flow",
+    "purpose": "Verify main success scenario where eligible student views active poll and casts one vote.",
+    "preconditions": "Student authenticated; poll is active/unexpired; student in target group; student has not yet voted.",
+    "action_or_input": "Student selects Choice A and submits vote.",
+    "expected_result": "System verifies eligibility, records vote, increments Choice A tally, marks student as voted, and confirms success.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-20",
+    "source_id": "UC-GYM-007 Exception Flow",
+    "purpose": "Verify exception flow when student has already voted, is not eligible, or poll is not active, vote is rejected and tally unchanged.",
+    "preconditions": "Student has already voted in this poll (or student is not in target group, or poll is expired).",
+    "action_or_input": "Student attempts to cast a vote.",
+    "expected_result": "System rejects the vote; poll tally remains unchanged; no duplicate vote recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-21",
+    "source_id": "UC-GYM-008 Main Flow",
+    "purpose": "Verify main success scenario for replacing club coordinator and co-coordinator by Club Head.",
+    "preconditions": "Actor is authorized Club Head; proposed leaders are valid students.",
+    "action_or_input": "Club Head specifies new coordinator student_03 and new co-coordinator student_04.",
+    "expected_result": "System validates leaders, updates club record, records new designations, removes superseded designations, confirms change.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-22",
+    "source_id": "UC-GYM-008 Exception Flow",
+    "purpose": "Verify exception flow when proposed leader is invalid or actor is unauthorized, current leadership remains unchanged.",
+    "preconditions": "Actor is not the Club Head (unauthorized) OR proposed new leader is not a valid student.",
+    "action_or_input": "Actor attempts leadership change.",
+    "expected_result": "System rejects request; existing coordinator and co-coordinator designations remain intact.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-UC-23",
+    "source_id": "UC-GYM-009 Main Flow",
+    "purpose": "Verify main success scenario for submitting and retaining a club budget request for tracking.",
+    "preconditions": "Actor is Club Head of confirmed club.",
+    "action_or_input": "Club Head submits: purpose='Equipment purchase', amount='15000.00', supporting_file='quote.pdf', description='New badminton rackets'.",
+    "expected_result": "System validates amount and file presence, stores request with status 'open' for tracking, confirms submission.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-24",
+    "source_id": "UC-GYM-009 Exception Flow",
+    "purpose": "Verify exception flow when amount is negative or required file is missing, request is rejected and not stored.",
+    "preconditions": "Actor is Club Head of confirmed club.",
+    "action_or_input": "Club Head submits budget request with amount='-500.00' OR missing supporting file.",
+    "expected_result": "System rejects request with validation error; request is not stored.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-25",
+    "source_id": "UC-GYM-010 Main Flow",
+    "purpose": "Verify main success scenario for submitting documented club event report by Club Head.",
+    "preconditions": "Actor is Club Head of confirmed club; event has occurred.",
+    "action_or_input": "Club Head submits: student_incharge='student_01', event_name='Coding Contest', datetime='2026-11-10 18:00', description='Over 50 participants', report_file='event_summary.pdf'.",
+    "expected_result": "System validates fields and file, stores report in repository, confirms submission.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-26",
+    "source_id": "UC-GYM-010 Exception Flow",
+    "purpose": "Verify exception flow when required report file or required references are missing/invalid, report is not accepted.",
+    "preconditions": "Actor is Club Head of confirmed club.",
+    "action_or_input": "Club Head submits event report with missing report_file.",
+    "expected_result": "System rejects submission; no incomplete report is accepted or saved.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-27",
+    "source_id": "UC-GYM-011 Main Flow",
+    "purpose": "Verify main success scenario for approving an open club by Student Admin.",
+    "preconditions": "Student Admin authenticated; club exists with status 'open'.",
+    "action_or_input": "Student Admin opens club record, reviews info, and executes approve action.",
+    "expected_result": "System changes club status from 'open' to 'confirmed', confirms approval.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-28",
+    "source_id": "UC-GYM-011 Exception Flow",
+    "purpose": "Verify exception flow when club is not open or cannot be updated, no approval transition occurs.",
+    "preconditions": "Club already has status 'confirmed' (not open) OR requester is not Student Admin.",
+    "action_or_input": "User attempts approval action on the club.",
+    "expected_result": "System rejects approval transition; club retains its prior status.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-29",
+    "source_id": "UC-GYM-012 Main Flow",
+    "purpose": "Verify main success scenario where assigned Club Faculty Councillor accesses and reviews submitted reports for assigned club.",
+    "preconditions": "Faculty user authenticated; user is assigned Club Faculty Councillor for Club A; submitted report exists.",
+    "action_or_input": "Faculty Councillor opens club report area, selects report.",
+    "expected_result": "System displays report metadata and makes submitted report/details file available for review.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-30",
+    "source_id": "UC-GYM-012 Exception Flow",
+    "purpose": "Verify exception flow when faculty user is not assigned to the club, system denies access to club's reports.",
+    "preconditions": "Faculty user is authenticated but is NOT the assigned Club Faculty Councillor for Club A.",
+    "action_or_input": "Faculty user attempts to access submitted reports for Club A.",
+    "expected_result": "System denies access with authorization error; report content is not exposed.",
+    "test_type": "authorization"
+  }
+]

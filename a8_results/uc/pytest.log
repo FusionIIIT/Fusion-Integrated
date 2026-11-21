@@ -1,0 +1,60 @@
+........F.....................                                           [100%]
+=================================== FAILURES ===================================
+_ TestEventBooking.test_tc_uc_09_book_club_event_invalid_faculty_reference_exception_flow _
+
+self = <uc.test_uc.TestEventBooking object at 0x71553a394470>
+
+    def test_tc_uc_09_book_club_event_invalid_faculty_reference_exception_flow(self):
+        """TC-UC-09 (source_id: UC-GYM-003 Exception Flow):
+        Verify exception flow when venue, faculty reference, or time range is invalid,
+        no successful event booking is recorded.
+        """
+        coordinator = _make_user("coord_uc09")
+        co_coordinator = _make_user("cocoord_uc09")
+        faculty = _make_user("faculty_uc09")
+        club = _make_club(coordinator, co_coordinator, faculty, status="confirmed")
+        venue = _make_venue("Auditorium")
+    
+        client = APIClient()
+        client.force_authenticate(user=coordinator)
+    
+        payload = {
+            "club": club.pk,
+            "name": _unique_name("EventInvalidFaculty"),
+            "faculty_councillor": "non_existent_faculty",
+            "venue": venue.pk,
+            "date": "2026-11-28",
+            "start_time": "09:00",
+            "end_time": "17:00",
+            "description": "Event with invalid faculty reference",
+        }
+        resp = client.post("/api/gymkhana/events/", payload, format="multipart")
+>       assert resp.status_code == status.HTTP_400_BAD_REQUEST, (
+            f"Expected rejection with validation error for invalid faculty councillor reference, got {resp.status_code}: {resp.data}"
+        )
+E       AssertionError: Expected rejection with validation error for invalid faculty councillor reference, got 201: {'id': 3, 'club': 9, 'name': 'EventInvalidFaculty_46', 'venue': 6, 'date': '2026-11-28', 'start_time': '09:00:00', 'end_time': '17:00:00', 'description': 'Event with invalid faculty reference', 'poster': None, 'created_by': 28, 'created_at': '2026-11-09T02:26:11.242559+05:30', 'updated_at': '2026-11-09T02:26:11.242568+05:30'}
+E       assert 201 == 400
+E        +  where 201 = <Response status_code=201, "application/json">.status_code
+E        +  and   400 = status.HTTP_400_BAD_REQUEST
+
+tests/a8/uc/test_uc.py:418: AssertionError
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.3-final-0 ________________
+
+Name                                               Stmts   Miss Branch BrPart  Cover   Missing
+----------------------------------------------------------------------------------------------
+applications/gymkhana/__init__.py                      0      0      0      0   100%
+applications/gymkhana/apps.py                          5      0      0      0   100%
+applications/gymkhana/migrations/0001_initial.py       7      0      0      0   100%
+applications/gymkhana/migrations/__init__.py           0      0      0      0   100%
+applications/gymkhana/models.py                      186     22     22      5    84%   67, 71-74, 111, 115-116, 133, 163, 168, 172->exit, 210, 215, 217->exit, 254, 285, 302, 320, 355, 359-360, 396, 435
+applications/gymkhana/serializers.py                 129      9     32     11    88%   55, 83, 88->97, 91, 144, 209, 213, 216->220, 218, 245, 266
+applications/gymkhana/tests.py                       266    266      0      0     0%   20-549
+applications/gymkhana/urls.py                         14      0      0      0   100%
+applications/gymkhana/views.py                       149     25     22      7    80%   101, 139, 158, 165, 201, 215-220, 233, 245-250, 275, 296, 320-323, 343
+----------------------------------------------------------------------------------------------
+TOTAL                                                756    322     76     23    58%
+Coverage XML written to file a8_results/uc/coverage.xml
+=========================== short test summary info ============================
+FAILED tests/a8/uc/test_uc.py::TestEventBooking::test_tc_uc_09_book_club_event_invalid_faculty_reference_exception_flow
+1 failed, 29 passed in 3.21s

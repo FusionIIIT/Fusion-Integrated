@@ -1,0 +1,25 @@
+Workflow / Pattern ID,Name,Type,Status / Purpose,Constituent / Applies To
+BW-EL-01,New Leave — Substitute Consent Accepted (No Loop),Basis,Substitute-consent prefix; accepted response routes to applicant-appropriate next approval state.,CW-EL-01
+BW-EL-02,"New Leave — Substitute Declined, Replacement Accepted (One Loop Traversal)",Basis,Exactly one substitute-decline recovery traversal ending in accepted replacement.,CW-EL-01
+BW-EL-03,New CL/RH — Approved,Basis,Direct Unit-Head-final approval path for CL/RH without substitute gate.,CW-EL-01
+BW-EL-04,New CL/RH — Rejected,Basis,Direct Unit-Head-final rejection path for CL/RH without substitute gate.,CW-EL-01
+BW-EL-05,New Higher-Sanction Leave — Approved,Basis,Higher-sanction approval path with optional configured Establishment step.,CW-EL-01
+BW-EL-06,New Higher-Sanction Leave — Rejected,Basis,Higher-sanction rejection path with optional configured Establishment step.,CW-EL-01
+BW-EL-07,Director Self-Sanction — Approved,Basis,Director-applicant new-leave self-sanction approval after any required substitute gate.,CW-EL-01
+BW-EL-08,Director Self-Sanction — Rejected,Basis,Director-applicant new-leave self-sanction rejection after any required substitute gate.,CW-EL-01
+BW-EL-09,CL/RH Approved-Leave Cancellation — Approved,Basis,Unit-Head-final pre-start cancellation approval.,CW-EL-02
+BW-EL-10,CL/RH Approved-Leave Cancellation — Rejected,Basis,Unit-Head-final pre-start cancellation rejection; original approval preserved.,CW-EL-02
+BW-EL-11,Higher-Sanction Approved-Leave Cancellation — Approved,Basis,Higher-sanction cancellation approval through the same applicable hierarchy.,CW-EL-02
+BW-EL-12,Higher-Sanction Approved-Leave Cancellation — Rejected,Basis,Higher-sanction cancellation rejection; original approval preserved.,CW-EL-02
+BW-EL-13,Extension — Substitute Consent Accepted (No Loop),Basis,Substitute-consent prefix for an admissible EL/COL/VL extension.,CW-EL-03
+BW-EL-14,"Extension — Substitute Declined, Replacement Accepted (One Loop Traversal)",Basis,Exactly one extension substitute-decline recovery traversal.,CW-EL-03
+BW-EL-15,Ongoing Leave Extension — Approved,Basis,Higher-sanction extension approval; only incremental additional period posted.,CW-EL-03
+BW-EL-16,Ongoing Leave Extension — Rejected,Basis,Higher-sanction extension rejection; original ongoing leave preserved.,CW-EL-03
+BW-EL-17,Normal Resumption Review,Basis,Sanctioning Authority review; no leave-period/balance adjustment.,CW-EL-04
+BW-EL-18,Early Resumption Review,Basis,Early return review; actual period/balance and records synchronized.,CW-EL-04
+BW-EL-19,Late Resumption Review,Basis,Late return review; actual period/balance and records synchronized.,CW-EL-04
+CW-EL-01,New Leave Processing and Pending Withdrawal,Composite,"End-to-end new-leave progression including substitute recovery, CL/RH and higher-sanction decisions, Director self-sanction, and cross-cutting pending withdrawal.",BW-EL-01–08
+CW-EL-02,Approved Leave Cancellation,Composite,"Pre-start cancellation through the same applicable decision hierarchy, with approved/rejected effects.",BW-EL-09–12
+CW-EL-03,Ongoing Leave Extension,Composite,"EL/COL/VL extension with validation, substitute recovery, higher-sanction decision, and pending-extension withdrawal.",BW-EL-13–16
+CW-EL-04,Resumption Review,Composite,Normal/early/late resumption review by applicable Sanctioning Authority without generic closure state.,BW-EL-17–19
+XTP-EL-01,Cross-Cutting SLA Routing / Responsibility Escalation,Transition Pattern,Automatic System transition used only when configured SLA escalation changes routing/responsibility; notification-only escalation is not a WF transition.,Applicable CW-EL-01–04

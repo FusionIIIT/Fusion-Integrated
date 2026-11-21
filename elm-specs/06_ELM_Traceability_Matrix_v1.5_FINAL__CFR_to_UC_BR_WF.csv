@@ -1,0 +1,33 @@
+CFR ID,Requirement / Short Name,UC Trace,BR Trace,Workflow Trace,Minimum Satisfaction Set,Coverage,Mapping Rationale
+CFR-EL-001,Role-based ELM access,N/A,BR-EL-036,N/A,BR,Full,Cross-cutting authorization rule; no standalone UC/WF required.
+CFR-EL-002,Create and submit leave application,EL-UC-001,"BR-EL-001, BR-EL-013, BR-EL-036",CW-EL-01,UC+BR,Full,UC provides actor goal; BRs provide supported-category/Station Leave/access constraints.
+CFR-EL-003,Validate a leave request before progression,EL-UC-001,"BR-EL-001–012, BR-EL-030–031",CW-EL-01,UC+BR,Full,"Validation is interaction-bound and policy governed; WF is broad traceability, not needed for minimum satisfaction."
+CFR-EL-004,CL entitlement and treatment,EL-UC-001; EL-UC-020,"BR-EL-002, BR-EL-010",CW-EL-01,BR,Full,Policy is sufficient for semantic satisfaction; execution points trace broadly.
+CFR-EL-005,RH entitlement and treatment,"EL-UC-001, EL-UC-015; EL-UC-020","BR-EL-003, BR-EL-031",CW-EL-01,BR,Full,Pure policy/calendar constraint.
+CFR-EL-006,SCL entitlement and treatment,"EL-UC-001, EL-UC-005; EL-UC-020",BR-EL-004,CW-EL-01,BR,Full,Policy/authority constraint.
+CFR-EL-007,EL entitlement and carry-forward,EL-UC-001; EL-UC-020,BR-EL-005,N/A,BR,Full,Policy obligation; scheduled execution is traced separately.
+CFR-EL-008,Faculty VL and VL-to-EL conversion,EL-UC-001; EL-UC-020,BR-EL-006–008,N/A,UC+BR,Full,Faculty VL policy and event-triggered year-end execution are both required; no workflow is implied solely by the time trigger.
+CFR-EL-009,COL entitlement and treatment,EL-UC-001; EL-UC-020,BR-EL-009,N/A,BR,Full,Policy/evidence/carry-forward semantics.
+CFR-EL-010,Continuous-day counting,"EL-UC-001, EL-UC-009",BR-EL-011,CW-EL-01; CW-EL-03,BR,Full,Counting policy is sufficient.
+CFR-EL-011,Nominate an eligible substitute,"EL-UC-001, EL-UC-019","BR-EL-014, BR-EL-036",CW-EL-01; CW-EL-03,UC+BR,Full,Actor nomination plus eligibility constraints.
+CFR-EL-012,Obtain substitute response and enforce consent gate,"EL-UC-002, EL-UC-019",BR-EL-014–015,CW-EL-01; CW-EL-03,UC+BR+WF,Full,"Interaction, consent policy, and decline/accept progression all material."
+CFR-EL-013,CL/RH Unit Head final decision,EL-UC-003,BR-EL-016,CW-EL-01,UC+BR+WF,Full,"Unit Head interaction, authority rule, and lifecycle branch are all needed."
+CFR-EL-014,Higher-sanction progression to final decision,EL-UC-003–005,"BR-EL-017–019, BR-EL-030",CW-EL-01,UC+BR+WF,Full,Multiple actor goals + routing policy + explicit progression.
+CFR-EL-015,Director self-sanction,EL-UC-005,BR-EL-020,CW-EL-01,BR+WF,Full,The distinguishing requirement is the exception policy plus altered progression; EL-UC-005 is broad traceability.
+CFR-EL-016,Record and communicate final leave decision,"EL-UC-003, EL-UC-005, EL-UC-012",BR-EL-035–036,CW-EL-01,UC+WF,Full,Final-decision actor interaction and terminal progression/effects; no independent domain policy is required for the core obligation.
+CFR-EL-017,No post-submission modification,"EL-UC-007, EL-UC-001",BR-EL-034,CW-EL-01,BR,Full,Constraint prohibits the former capability and directs change via withdrawal/new application.
+CFR-EL-018,Immediate withdrawal of pending request,EL-UC-007,BR-EL-022,CW-EL-01; CW-EL-03 where a pending extension request is withdrawn,UC+WF,Full,"Actor goal + immediate terminal lifecycle effect; withdrawal is cross-cutting in new-leave processing and, where applicable, in a pending extension request."
+CFR-EL-019,Cancel approved leave before start,"EL-UC-008, EL-UC-003–005","BR-EL-016–019, BR-EL-023–024, BR-EL-030",CW-EL-02,UC+BR+WF,Full,"Pre-start policy, multi-actor decision, and state/account outcomes."
+CFR-EL-020,Extend ongoing EL/COL/VL,"EL-UC-009, EL-UC-002–005, EL-UC-019","BR-EL-011, BR-EL-014–019, BR-EL-025, BR-EL-030–031",CW-EL-03,UC+BR+WF,Full,"Interaction, eligibility/routing policy and extension progression."
+CFR-EL-021,Review resumption and adjust actual leave where required,EL-UC-010–011,BR-EL-027–028,CW-EL-04,UC+BR+WF,Full,"Employee submission, authority review policy, and outcome-dependent progression/synchronization."
+CFR-EL-022,View leave balances and history,EL-UC-012,BR-EL-036,N/A,UC,Full,Simple information-access actor goal.
+CFR-EL-023,Obtain printable/exportable leave application,EL-UC-013,BR-EL-036,N/A,UC,Full,Simple actor capability; access rule is cross-cutting.
+CFR-EL-024,Maintain policy parameters and hierarchy configuration,EL-UC-014,"BR-EL-030, BR-EL-036",N/A,UC+BR,Full,Admin interaction + current-config/no-publication policy.
+CFR-EL-025,Maintain and publish holiday/RH calendar,EL-UC-015,"BR-EL-003, BR-EL-031, BR-EL-036",N/A,UC+BR,Full,Admin interaction + effective-published-calendar semantics.
+CFR-EL-026,Maintain authorized leave records,EL-UC-017,BR-EL-036–037,N/A,UC+BR,Full,Admin interaction + authorization/non-sanction boundary.
+CFR-EL-027,Record already-sanctioned offline leave,EL-UC-016,"BR-EL-029, BR-EL-036–037",N/A,UC+BR,Full,Single-actor synchronization governed by record-integrity policy; no second workflow.
+CFR-EL-028,Execute and record year-end leave-account processing,EL-UC-020,BR-EL-002–010,N/A,UC+BR,Full,Event-triggered year-end execution is represented by EL-UC-020 and governed by the applicable year-end BRs; no separate workflow is required.
+CFR-EL-029,Configure workflow-task SLA thresholds,EL-UC-018,"BR-EL-038, BR-EL-036",N/A,UC+BR,Full,Admin configuration actor goal + threshold policy.
+CFR-EL-030,Notify a user when an actionable task is assigned,Affected task-generating UCs,BR-EL-035,CW-EL-01–04 (broad),BR,Full,Event/notification rule is the minimum sufficient representation.
+CFR-EL-031,Remind on a still-pending SLA task,EL-UC-021,"BR-EL-032, BR-EL-038",N/A,UC+BR,Full,EL-UC-021 expresses the event-triggered reminder behavior; BRs provide threshold and still-pending constraints. Reminder alone is not a workflow progression.
+CFR-EL-032,Escalate a still-pending SLA task,EL-UC-021,"BR-EL-033, BR-EL-038",XTP-EL-01 within the applicable CW-EL-01–04 only when configured escalation changes task routing/responsibility; otherwise N/A,UC+BR,Full,"EL-UC-021 + BR-EL-033/038 are sufficient for the generic escalation obligation. Where configuration changes routing/responsibility, the automatic System transition is represented by XTP-EL-01 within the affected composite workflow."
