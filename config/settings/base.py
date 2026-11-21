@@ -79,6 +79,7 @@ THIRD_PARTY_APPS = [
 # No models. Installed so its AppConfig runs and registers the session checks.
 LOCAL_APPS = [
     "fusion_auth",
+    #"modules.hr_eis.apps.HrEisConfig",
 ]
 
 # Each module is an independent Django app: own tables, migrations and contract.
@@ -90,6 +91,8 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+     "modules.hr_eis",
+
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
