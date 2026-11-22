@@ -3,6 +3,7 @@
 Declared for the OpenAPI document rather than for validation — these views
 build their payloads by hand from the principal, which is not a model.
 """
+
 from rest_framework import serializers
 
 
@@ -22,6 +23,20 @@ class SessionUserSerializer(serializers.Serializer):
     display_name = serializers.CharField(allow_blank=True)
     kind = serializers.CharField()
     email = serializers.EmailField(allow_blank=True)
+    department = serializers.CharField(allow_blank=True)
+
+
+class DepartmentAssignmentSerializer(serializers.Serializer):
+    department_code = serializers.CharField()
+    department_name = serializers.CharField()
+    role = serializers.ChoiceField(choices=["HOD", "Dept_Admin"])
+    starts_on = serializers.DateField()
+    ends_on = serializers.DateField(allow_null=True)
+
+
+class DepartmentContextSerializer(serializers.Serializer):
+    code = serializers.CharField()
+    name = serializers.CharField()
 
 
 class NavItemSerializer(serializers.Serializer):
@@ -45,6 +60,8 @@ class SessionSerializer(serializers.Serializer):
     user = SessionUserSerializer()
     active_role = serializers.CharField(allow_null=True)
     roles = serializers.ListField(child=serializers.CharField())
+    department_assignments = DepartmentAssignmentSerializer(many=True)
+    department_contexts = DepartmentContextSerializer(many=True)
     permissions = serializers.ListField(child=serializers.CharField())
     modules = serializers.ListField(child=serializers.CharField())
     navigation = NavGroupSerializer(many=True)

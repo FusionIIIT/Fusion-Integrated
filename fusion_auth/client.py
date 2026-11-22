@@ -5,6 +5,7 @@ user table. Fails closed: a network error or non-200 means "not authenticated"
 or "no such user", never "allow". Directory lookups are batched by signature,
 so an N+1 is hard to write.
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -40,7 +41,7 @@ class IamSession:
     user_id: int
     username: str
     display_name: str
-    kind: str                       # student | faculty | staff | operator
+    kind: str  # student | faculty | staff | operator
     active_role: str | None = None
     roles: tuple[str, ...] = ()
     permissions: frozenset[str] = frozenset()
@@ -48,6 +49,9 @@ class IamSession:
     #: The whole sidebar. Empty from an older IAM, and the caller falls back.
     navigation: tuple[dict, ...] = ()
     email: str = ""
+    department: str = ""
+    department_assignments: tuple[dict, ...] = ()
+    department_contexts: tuple[dict, ...] = ()
 
     def has_permission(self, code: str) -> bool:
         return code in self.permissions
@@ -78,8 +82,9 @@ class UserRef:
 
 
 class IamClient:
-    def __init__(self, base_url: str | None = None, token: str | None = None,
-                 timeout: int | None = None):
+    def __init__(
+        self, base_url: str | None = None, token: str | None = None, timeout: int | None = None
+    ):
         self.base = (base_url or settings.IAM_BASE_URL).rstrip("/")
         self.prefix = settings.IAM_API_PREFIX.rstrip("/")
         self.token = token if token is not None else settings.IAM_SERVICE_TOKEN
@@ -92,18 +97,23 @@ class IamClient:
     def _get(self, path: str, *, params=None, cookies=None, auth_token=None):
         headers = {"Accept": "application/json"}
         if auth_token:
-            headers["Authorization"] = f"Token {auth_token}"     # as the person
+            headers["Authorization"] = f"Token {auth_token}"  # as the person
         elif self.token:
             # As the service: a separate scheme, so a machine is never a person.
             headers["Authorization"] = f"Service {self.token}"
         try:
-            r = requests.get(self._url(path), params=params, headers=headers,
-                             cookies=cookies or {}, timeout=self.timeout)
+            r = requests.get(
+                self._url(path),
+                params=params,
+                headers=headers,
+                cookies=cookies or {},
+                timeout=self.timeout,
+            )
         except requests.RequestException as exc:
             log.warning("iam.unreachable path=%s err=%s", path, exc)
             raise IamUnavailable(str(exc)) from exc
         if r.status_code in (401, 403):
-            return None                       # not authenticated / not allowed
+            return None  # not authenticated / not allowed
         if r.status_code == 404:
             return None
         if r.status_code >= 500:
@@ -116,8 +126,9 @@ class IamClient:
             raise IamUnavailable("IAM returned a non-JSON body") from exc
 
     # -- identity ---------------------------------------------------------
-    def resolve_session(self, *, auth_token: str | None = None,
-                        cookies: dict | None = None) -> IamSession | None:
+    def resolve_session(
+        self, *, auth_token: str | None = None, cookies: dict | None = None
+    ) -> IamSession | None:
         """Who is holding this credential? None means 'not authenticated'."""
         key = None
         ttl = settings.IAM_SESSION_CACHE_SECONDS
@@ -125,7 +136,7 @@ class IamClient:
             key = f"iam:session:{auth_token[:48]}"
             hit = cache.get(key)
             if hit is not None:
-                return hit or None            # cached negative stays negative
+                return hit or None  # cached negative stays negative
 
         payload = self._get("iam/v1/me", auth_token=auth_token, cookies=cookies)
         session = self._to_session(payload) if payload else None
@@ -150,20 +161,25 @@ class IamClient:
             display_name=user.get("display_name") or user.get("name", ""),
             kind=user.get("kind") or p.get("kind", "student"),
             email=user.get("email", ""),
+            department=user.get("department", ""),
             active_role=p.get("active_role"),
             roles=tuple(p.get("roles", ())),
             permissions=frozenset(p.get("permissions", ())),
             modules=tuple(p.get("modules", ())),
             navigation=tuple(p.get("navigation", ())),
+            department_assignments=tuple(p.get("department_assignments", ())),
+            department_contexts=tuple(p.get("department_contexts", ())),
         )
 
     def set_active_role(self, auth_token: str, role: str) -> None:
         """Remember the designation this person chose to work as."""
         try:
-            r = requests.patch(self._url("iam/v1/me"),
-                               json={"last_selected_role": role},
-                               headers={"Authorization": f"Token {auth_token}"},
-                               timeout=self.timeout)
+            r = requests.patch(
+                self._url("iam/v1/me"),
+                json={"last_selected_role": role},
+                headers={"Authorization": f"Token {auth_token}"},
+                timeout=self.timeout,
+            )
         except requests.RequestException as exc:
             raise IamUnavailable(str(exc)) from exc
         if r.status_code == 400:
@@ -172,8 +188,7 @@ class IamClient:
             raise IamUnavailable(f"IAM returned {r.status_code}")
         self.forget_session(auth_token)
 
-    def login(self, username: str, password: str,
-              client_ip: str | None = None) -> str | None:
+    def login(self, username: str, password: str, client_ip: str | None = None) -> str | None:
         """Exchange credentials for a session token at the IAM.
 
         This service never checks a password itself. None means bad
@@ -182,9 +197,12 @@ class IamClient:
         # The IAM limits logins per caller; without this every user shares our address.
         headers = {"X-Forwarded-For": client_ip} if client_ip else {}
         try:
-            r = requests.post(self._url("iam/v1/auth/login"),
-                              json={"username": username, "password": password},
-                              headers=headers, timeout=self.timeout)
+            r = requests.post(
+                self._url("iam/v1/auth/login"),
+                json={"username": username, "password": password},
+                headers=headers,
+                timeout=self.timeout,
+            )
         except requests.RequestException as exc:
             raise IamUnavailable(str(exc)) from exc
         if r.status_code == 429:
@@ -201,9 +219,11 @@ class IamClient:
     def logout(self, auth_token: str) -> None:
         # Best effort: a failure here must not stop someone signing out.
         with contextlib.suppress(requests.RequestException):
-            requests.post(self._url("iam/v1/auth/logout"),
-                          headers={"Authorization": f"Token {auth_token}"},
-                          timeout=self.timeout)
+            requests.post(
+                self._url("iam/v1/auth/logout"),
+                headers={"Authorization": f"Token {auth_token}"},
+                timeout=self.timeout,
+            )
 
     # -- directory (batched by design) ------------------------------------
     def get_users(self, user_ids: Sequence[int]) -> dict[int, UserRef]:
@@ -212,8 +232,7 @@ class IamClient:
         ids = sorted({int(i) for i in user_ids if i is not None})
         if not ids:
             return {}
-        payload = self._get("iam/v1/directory/users",
-                            params={"ids": ",".join(map(str, ids))})
+        payload = self._get("iam/v1/directory/users", params={"ids": ",".join(map(str, ids))})
         if not payload:
             return {}
         rows = payload.get("results", payload if isinstance(payload, list) else [])
@@ -237,11 +256,27 @@ class IamClient:
             is_active=bool(r.get("is_active", True)),
             resume_link=r.get("resume_link", "") or "",
             profile_completed=bool(r.get("profile_completed", False)),
-            extra={k: v for k, v in r.items()
-                   if k not in {"user_id", "id", "username", "display_name", "name",
-                                "kind", "email", "department", "programme",
-                                "discipline", "batch_year", "is_active",
-                                "resume_link", "profile_completed"}},
+            extra={
+                k: v
+                for k, v in r.items()
+                if k
+                not in {
+                    "user_id",
+                    "id",
+                    "username",
+                    "display_name",
+                    "name",
+                    "kind",
+                    "email",
+                    "department",
+                    "programme",
+                    "discipline",
+                    "batch_year",
+                    "is_active",
+                    "resume_link",
+                    "profile_completed",
+                }
+            },
         )
 
     # -- academic standing (declared CPI) ---------------------------------
@@ -255,8 +290,7 @@ class IamClient:
         ids = sorted({int(i) for i in user_ids if i is not None})
         if not ids:
             return {}
-        payload = self._get("iam/v1/academics/standings",
-                            params={"ids": ",".join(map(str, ids))})
+        payload = self._get("iam/v1/academics/standings", params={"ids": ",".join(map(str, ids))})
         if not payload:
             return {}
         out: dict[int, dict] = {}
@@ -279,13 +313,50 @@ class IamClient:
         payload = self._get("iam/v1/academics/filters")
         return payload or {"disciplines": [], "batch_years": [], "programmes": []}
 
+    def get_department_appointments(self, department_code: str) -> list[dict]:
+        """Active office holders for one department, from IAM's appointment source."""
+        payload = self._get(
+            "iam/v1/dept/appointments", params={"department_code": department_code}, auth_token=None
+        )
+        if not isinstance(payload, dict):
+            raise IamUnavailable("IAM did not return department appointments")
+        return payload.get("results", [])
+
     def employee_page(self, *, limit: int = 500, offset: int = 0) -> dict:
         """One page of the payroll."""
-        payload = self._get("iam/v1/directory/users",
-                            params={"employees": 1, "limit": limit, "offset": offset})
+        payload = self._get(
+            "iam/v1/directory/users", params={"employees": 1, "limit": limit, "offset": offset}
+        )
         if not isinstance(payload, dict):
             raise IamUnavailable("directory returned no page")
         return payload
+
+    def department_page(
+        self, *, department: str, kind: str, limit: int = 500, offset: int = 0
+    ) -> dict:
+        """One page of users in a specific department and identity kind."""
+        payload = self._get(
+            "iam/v1/directory/users",
+            params={"department": department, "kind": kind, "limit": limit, "offset": offset},
+        )
+        if not isinstance(payload, dict) or "count" not in payload:
+            raise IamUnavailable("IAM did not return a department directory page")
+        return payload
+
+    def iter_department_users(self, *, department: str, kind: str, page_size: int = 500):
+        offset = 0
+        while True:
+            page = self.department_page(
+                department=department, kind=kind, limit=page_size, offset=offset
+            )
+            rows = page.get("results", [])
+            for row in rows:
+                ref = self._to_ref(row)
+                if ref:
+                    yield ref
+            offset += len(rows)
+            if not rows or offset >= int(page.get("count", 0)):
+                return
 
     def count_employees(self) -> int:
         return int(self.employee_page(limit=1).get("count", 0))
@@ -303,8 +374,7 @@ class IamClient:
             if not rows or offset >= int(page.get("count", 0)):
                 return
 
-    def search_users(self, q: str = "", kind: str | None = None,
-                     limit: int = 25) -> list[UserRef]:
+    def search_users(self, q: str = "", kind: str | None = None, limit: int = 25) -> list[UserRef]:
         params = {"q": q, "limit": limit}
         if kind:
             params["kind"] = kind
@@ -329,7 +399,7 @@ def _retry_after(r: requests.Response) -> int | None:
 
 
 def get_client() -> IamClient:
-    global _client                                             # noqa: PLW0603
+    global _client  # noqa: PLW0603
     if _client is None:
         _client = IamClient()
     return _client
@@ -337,5 +407,5 @@ def get_client() -> IamClient:
 
 def reset_client() -> None:
     """Test hook — drops the memoized client so settings changes take effect."""
-    global _client                                             # noqa: PLW0603
+    global _client  # noqa: PLW0603
     _client = None

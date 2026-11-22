@@ -1,5 +1,281 @@
 {
   "modules": {
+    "dept": {
+      "grants": {
+        "Dept_Admin": [
+          "dept.announcement.create",
+          "dept.announcement.view",
+          "dept.department.update",
+          "dept.department.view",
+          "dept.feedback.review",
+          "dept.feedback.view",
+          "dept.notification.update",
+          "dept.notification.view",
+          "dept.profile.update",
+          "dept.profile.view",
+          "dept.resource.create",
+          "dept.resource.update",
+          "dept.resource.view",
+          "dept.stock_item.create",
+          "dept.stock_item.update",
+          "dept.stock_item.view",
+          "dept.stock_request.update",
+          "dept.stock_request.view",
+          "dept.timetable.create",
+          "dept.timetable.update",
+          "dept.timetable.view"
+        ],
+        "HOD": [
+          "dept.announcement.create",
+          "dept.announcement.update",
+          "dept.announcement.view",
+          "dept.department.approve",
+          "dept.department.view",
+          "dept.feedback.review",
+          "dept.feedback.view",
+          "dept.notification.update",
+          "dept.notification.view",
+          "dept.profile.view",
+          "dept.resource.view",
+          "dept.stock_item.view",
+          "dept.stock_request.approve",
+          "dept.stock_request.view",
+          "dept.timetable.view"
+        ],
+        "Professor": [
+          "dept.announcement.create",
+          "dept.announcement.view",
+          "dept.department.view",
+          "dept.feedback.create",
+          "dept.feedback.view",
+          "dept.notification.update",
+          "dept.notification.view",
+          "dept.profile.view",
+          "dept.resource.view",
+          "dept.stock_item.view",
+          "dept.stock_request.create",
+          "dept.stock_request.view",
+          "dept.timetable.view"
+        ],
+        "Student": [
+          "dept.announcement.view",
+          "dept.department.view",
+          "dept.feedback.create",
+          "dept.feedback.view",
+          "dept.notification.update",
+          "dept.notification.view",
+          "dept.profile.view",
+          "dept.timetable.view"
+        ],
+        "faculty": [
+          "dept.announcement.create",
+          "dept.announcement.view",
+          "dept.department.view",
+          "dept.feedback.create",
+          "dept.feedback.view",
+          "dept.notification.update",
+          "dept.notification.view",
+          "dept.profile.view",
+          "dept.resource.view",
+          "dept.stock_item.view",
+          "dept.stock_request.create",
+          "dept.stock_request.view",
+          "dept.timetable.view"
+        ],
+        "student": [
+          "dept.announcement.view",
+          "dept.department.view",
+          "dept.feedback.create",
+          "dept.feedback.view",
+          "dept.notification.update",
+          "dept.notification.view",
+          "dept.profile.view",
+          "dept.timetable.view"
+        ]
+      },
+      "module_grants": [
+        "Dept_Admin",
+        "HOD",
+        "Professor",
+        "Student",
+        "faculty",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/dept",
+        "icon": "Buildings",
+        "items": [
+          {
+            "code": "dept.announcements",
+            "icon": "Megaphone",
+            "label": "Announcements",
+            "required_permission": "dept.announcement.view",
+            "sort_order": 10,
+            "to": "/dept/announcements"
+          },
+          {
+            "code": "dept.stock",
+            "icon": "Package",
+            "label": "Stock Requests",
+            "required_permission": "dept.stock_request.view",
+            "sort_order": 20,
+            "to": "/dept/stock"
+          },
+          {
+            "code": "dept.feedback",
+            "icon": "ChatCircleText",
+            "label": "Feedback",
+            "required_permission": "dept.feedback.view",
+            "sort_order": 30,
+            "to": "/dept/feedback"
+          },
+          {
+            "code": "dept.timetable",
+            "icon": "CalendarBlank",
+            "label": "Timetable",
+            "required_permission": "dept.timetable.view",
+            "sort_order": 40,
+            "to": "/dept/timetable"
+          },
+          {
+            "code": "dept.resources",
+            "icon": "Wrench",
+            "label": "Lab Resources",
+            "required_permission": "dept.resource.view",
+            "sort_order": 50,
+            "to": "/dept/resources"
+          },
+          {
+            "code": "dept.profiles",
+            "icon": "Users",
+            "label": "Profiles",
+            "required_permission": "dept.profile.view",
+            "sort_order": 60,
+            "to": "/dept/profiles"
+          },
+          {
+            "code": "dept.details",
+            "icon": "Buildings",
+            "label": "Department Details",
+            "required_permission": "dept.department.view",
+            "sort_order": 70,
+            "to": "/dept/details"
+          }
+        ],
+        "label": "Department",
+        "nav_section": "Modules",
+        "sort_order": 30,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "dept.announcement.view",
+          "label": "View relevant announcements"
+        },
+        {
+          "code": "dept.announcement.create",
+          "label": "Publish announcements"
+        },
+        {
+          "code": "dept.announcement.update",
+          "label": "Maintain active announcements"
+        },
+        {
+          "code": "dept.stock_item.view",
+          "label": "View inventory"
+        },
+        {
+          "code": "dept.stock_item.create",
+          "label": "Record inventory additions"
+        },
+        {
+          "code": "dept.stock_item.update",
+          "label": "Manage inventory items"
+        },
+        {
+          "code": "dept.stock_request.view",
+          "label": "View own or scoped stock requests"
+        },
+        {
+          "code": "dept.stock_request.create",
+          "label": "Request stock"
+        },
+        {
+          "code": "dept.stock_request.approve",
+          "label": "Approve or reject requests"
+        },
+        {
+          "code": "dept.stock_request.update",
+          "label": "Issue or cancel approved requests"
+        },
+        {
+          "code": "dept.feedback.view",
+          "label": "View own or scoped confidential feedback"
+        },
+        {
+          "code": "dept.feedback.create",
+          "label": "Submit feedback"
+        },
+        {
+          "code": "dept.feedback.review",
+          "label": "Review and resolve feedback"
+        },
+        {
+          "code": "dept.profile.view",
+          "label": "View permitted department profiles"
+        },
+        {
+          "code": "dept.profile.update",
+          "label": "Maintain DEPT profile details"
+        },
+        {
+          "code": "dept.timetable.view",
+          "label": "View academic timetable"
+        },
+        {
+          "code": "dept.timetable.create",
+          "label": "Create timetable entries"
+        },
+        {
+          "code": "dept.timetable.update",
+          "label": "Update timetable entries"
+        },
+        {
+          "code": "dept.resource.view",
+          "label": "View lab resources"
+        },
+        {
+          "code": "dept.resource.create",
+          "label": "Create lab resource profiles"
+        },
+        {
+          "code": "dept.resource.update",
+          "label": "Update lab resource profiles"
+        },
+        {
+          "code": "dept.department.view",
+          "label": "View department information"
+        },
+        {
+          "code": "dept.department.update",
+          "label": "Update department information"
+        },
+        {
+          "code": "dept.department.approve",
+          "label": "Approve official department changes"
+        },
+        {
+          "code": "dept.notification.view",
+          "label": "View personal notifications"
+        },
+        {
+          "code": "dept.notification.update",
+          "label": "Mark personal notifications read"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "directory": {
       "grants": {
         "Dean Academic": [

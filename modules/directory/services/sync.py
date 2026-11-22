@@ -4,8 +4,10 @@ from __future__ import annotations
 import logging
 from collections.abc import Iterable
 from datetime import timedelta
+from hashlib import sha256
 
 from django.conf import settings
+from django.core.cache import cache
 from django.utils import timezone
 
 from fusion_auth.client import IamUnavailable, get_client
@@ -33,6 +35,35 @@ def ensure_users_cached(user_ids: Iterable[int]) -> int:
         log.warning("directory.sync_failed stale=%d err=%s", len(stale), exc)
         return 0
     return upsert(fetched.values())
+
+
+def ensure_department_users_cached(departments: Iterable[str], kinds: Iterable[str]) -> int:
+    """Refresh a department's directory slice, including students, on demand."""
+    department_keys = tuple(sorted({value.strip() for value in departments if value.strip()}))
+    kind_keys = tuple(sorted(set(kinds)))
+    if not department_keys or not kind_keys:
+        return 0
+    cache_digest = sha256(
+        ("|".join(department_keys) + ":" + "|".join(kind_keys)).encode()
+    ).hexdigest()[:24]
+    cache_key = f"directory:department:{cache_digest}"
+    if cache.get(cache_key):
+        return 0
+
+    fetched = {}
+    try:
+        client = get_client()
+        for department in department_keys:
+            for kind in kind_keys:
+                for user in client.iter_department_users(department=department, kind=kind):
+                    fetched[user.user_id] = user
+    except IamUnavailable as exc:
+        log.warning("directory.department_sync_failed departments=%s err=%s", department_keys, exc)
+        return 0
+
+    written = upsert(fetched.values())
+    cache.set(cache_key, True, settings.DIRECTORY_MAX_AGE_SECONDS)
+    return written
 
 
 #: Column widths, read off the model so they cannot drift from the migration.
