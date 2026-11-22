@@ -3,7 +3,7 @@
 Student 1 (git author name): Akshat01g
 Student 2 (git author name): Ruthvik Gundelli
 Design commit (hash and subject): 6f4a7e2 Add spec-based test designs for FR, UC, BR and WF
-Baseline commit (hash and subject): TO FILL AFTER THE BASELINE COMMIT
+Baseline commit (hash and subject): 13a0484 Add spec tests and triage for baseline run
 Student 1's 10/10 commit the baseline ran on (hash): 6780668 (confirm with Student 1)
 
 ## Results
