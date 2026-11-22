@@ -34,6 +34,278 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "mms": {
+      "grants": {
+        "mess_admin": [
+          "mms.announcement.view",
+          "mms.menu.view",
+          "mms.role.manage"
+        ],
+        "mess_caretaker": [
+          "mms.announcement.publish",
+          "mms.announcement.view",
+          "mms.bill.manage",
+          "mms.deregistration.review",
+          "mms.feedback.view",
+          "mms.menu.manage",
+          "mms.menu.view",
+          "mms.rebate.review",
+          "mms.registration.review",
+          "mms.report.operational",
+          "mms.special_food.fulfill",
+          "mms.special_food.review",
+          "mms.vacation.manage",
+          "mms.window.manage"
+        ],
+        "mess_warden": [
+          "mms.announcement.publish",
+          "mms.announcement.view",
+          "mms.feedback.view",
+          "mms.menu.view",
+          "mms.registration.view_oversight",
+          "mms.report.supervisory"
+        ],
+        "student": [
+          "mms.announcement.view",
+          "mms.bill.view_self",
+          "mms.deregistration.self",
+          "mms.feedback.submit",
+          "mms.menu.view",
+          "mms.rebate.self",
+          "mms.registration.self",
+          "mms.special_food.self",
+          "mms.vacation.respond"
+        ]
+      },
+      "module_grants": [
+        "mess_admin",
+        "mess_caretaker",
+        "mess_warden",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/mms",
+        "icon": "ForkKnife",
+        "items": [
+          {
+            "code": "mms.student.registration",
+            "icon": "Checks",
+            "label": "Mess Registration",
+            "required_permission": "mms.registration.self",
+            "sort_order": 10,
+            "to": "/mms/registration"
+          },
+          {
+            "code": "mms.student.menu",
+            "icon": "CalendarBlank",
+            "label": "Mess Menu",
+            "required_permission": "mms.menu.view",
+            "sort_order": 20,
+            "to": "/mms/menu"
+          },
+          {
+            "code": "mms.student.rebate",
+            "icon": "ClockCounterClockwise",
+            "label": "Mess Rebate",
+            "required_permission": "mms.rebate.self",
+            "sort_order": 30,
+            "to": "/mms/rebates"
+          },
+          {
+            "code": "mms.student.special_food",
+            "icon": "BowlFood",
+            "label": "Special Food",
+            "required_permission": "mms.special_food.self",
+            "sort_order": 40,
+            "to": "/mms/special-food"
+          },
+          {
+            "code": "mms.student.bills",
+            "icon": "Receipt",
+            "label": "Mess Bills",
+            "required_permission": "mms.bill.view_self",
+            "sort_order": 50,
+            "to": "/mms/bills"
+          },
+          {
+            "code": "mms.student.feedback",
+            "icon": "ChatText",
+            "label": "Submit Feedback",
+            "required_permission": "mms.feedback.submit",
+            "sort_order": 60,
+            "to": "/mms/feedback"
+          },
+          {
+            "code": "mms.caretaker.dashboard",
+            "icon": "Gauge",
+            "label": "Caretaker Operations",
+            "required_permission": "mms.registration.review",
+            "sort_order": 110,
+            "to": "/mms/operations"
+          },
+          {
+            "code": "mms.caretaker.windows",
+            "icon": "DoorOpen",
+            "label": "Registration Windows",
+            "required_permission": "mms.window.manage",
+            "sort_order": 120,
+            "to": "/mms/windows"
+          },
+          {
+            "code": "mms.caretaker.menu",
+            "icon": "PencilSimpleLine",
+            "label": "Manage Menu",
+            "required_permission": "mms.menu.manage",
+            "sort_order": 130,
+            "to": "/mms/manage-menu"
+          },
+          {
+            "code": "mms.caretaker.bills",
+            "icon": "CurrencyInr",
+            "label": "Billing Management",
+            "required_permission": "mms.bill.manage",
+            "sort_order": 140,
+            "to": "/mms/manage-bills"
+          },
+          {
+            "code": "mms.caretaker.reports",
+            "icon": "ChartBar",
+            "label": "Operational Reports",
+            "required_permission": "mms.report.operational",
+            "sort_order": 150,
+            "to": "/mms/operational-reports"
+          },
+          {
+            "code": "mms.warden.oversight",
+            "icon": "Eye",
+            "label": "Warden Oversight",
+            "required_permission": "mms.registration.view_oversight",
+            "sort_order": 210,
+            "to": "/mms/oversight"
+          },
+          {
+            "code": "mms.warden.reports",
+            "icon": "FileText",
+            "label": "Supervisory Reports",
+            "required_permission": "mms.report.supervisory",
+            "sort_order": 220,
+            "to": "/mms/supervisory-reports"
+          },
+          {
+            "code": "mms.admin.roles",
+            "icon": "UserGear",
+            "label": "MMS Role Assignment",
+            "required_permission": "mms.role.manage",
+            "sort_order": 310,
+            "to": "/mms/roles"
+          }
+        ],
+        "label": "Mess Management",
+        "nav_section": "Services",
+        "sort_order": 25,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "mms.role.manage",
+          "label": "Assign and reassign active Caretaker and Warden roles"
+        },
+        {
+          "code": "mms.window.manage",
+          "label": "Open and close mess registration windows"
+        },
+        {
+          "code": "mms.registration.self",
+          "label": "Submit mess registration requests"
+        },
+        {
+          "code": "mms.registration.review",
+          "label": "Review and approve/reject registration requests"
+        },
+        {
+          "code": "mms.registration.view_oversight",
+          "label": "View registration and deregistration requests for oversight"
+        },
+        {
+          "code": "mms.deregistration.self",
+          "label": "Submit mess deregistration requests"
+        },
+        {
+          "code": "mms.deregistration.review",
+          "label": "Review and approve/reject deregistration requests"
+        },
+        {
+          "code": "mms.menu.view",
+          "label": "View weekly mess menu"
+        },
+        {
+          "code": "mms.menu.manage",
+          "label": "Publish and update weekly mess menu"
+        },
+        {
+          "code": "mms.rebate.self",
+          "label": "Submit mess rebate requests and view status"
+        },
+        {
+          "code": "mms.rebate.review",
+          "label": "Review, modify dates, and decide rebate requests"
+        },
+        {
+          "code": "mms.vacation.manage",
+          "label": "Create vacation food continuity surveys and reminders"
+        },
+        {
+          "code": "mms.vacation.respond",
+          "label": "Respond to vacation food continuity survey"
+        },
+        {
+          "code": "mms.special_food.self",
+          "label": "Submit special food requests and view status"
+        },
+        {
+          "code": "mms.special_food.review",
+          "label": "Review and decide special food requests"
+        },
+        {
+          "code": "mms.special_food.fulfill",
+          "label": "Update special food fulfillment status to served or cancelled"
+        },
+        {
+          "code": "mms.bill.view_self",
+          "label": "View personal monthly mess bills and balances"
+        },
+        {
+          "code": "mms.bill.manage",
+          "label": "Review, finalize, and publish monthly mess bills"
+        },
+        {
+          "code": "mms.announcement.publish",
+          "label": "Publish mess-related announcements"
+        },
+        {
+          "code": "mms.announcement.view",
+          "label": "View mess-related announcements"
+        },
+        {
+          "code": "mms.feedback.submit",
+          "label": "Submit student mess feedback"
+        },
+        {
+          "code": "mms.feedback.view",
+          "label": "Review student mess feedback entries"
+        },
+        {
+          "code": "mms.report.operational",
+          "label": "Generate and view Caretaker operational reports"
+        },
+        {
+          "code": "mms.report.supervisory",
+          "label": "View and search Warden supervisory reports"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
