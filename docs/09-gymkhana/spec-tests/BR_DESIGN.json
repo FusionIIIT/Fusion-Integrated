@@ -1,0 +1,407 @@
+[
+  {
+    "test_id": "TC-BR-001-P",
+    "source_id": "BR-GYM-001 permitted",
+    "purpose": "Verify valid positive student IDs for coordinator and co-coordinator are accepted",
+    "preconditions": "Coordinator and co-coordinator IDs are valid distinct positive integers",
+    "action_or_input": "Call validate_student_leadership(coordinator_id=101, co_coordinator_id=102)",
+    "expected_result": "(True, 'Valid student leadership.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-001-N1",
+    "source_id": "BR-GYM-001 prohibited-invalid-id",
+    "purpose": "Verify non-positive student IDs are rejected",
+    "preconditions": "Coordinator ID is negative or zero",
+    "action_or_input": "Call validate_student_leadership(coordinator_id=-1, co_coordinator_id=102)",
+    "expected_result": "(False, error message starting with 'Coordinator must reference a valid positive student ID.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-001-N2",
+    "source_id": "BR-GYM-001 prohibited-same-leader",
+    "purpose": "Verify coordinator and co-coordinator cannot be the same student",
+    "preconditions": "Coordinator and co-coordinator IDs are identical",
+    "action_or_input": "Call validate_student_leadership(coordinator_id=101, co_coordinator_id=101)",
+    "expected_result": "(False, 'Coordinator and co-coordinator cannot be the same student.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-002-P",
+    "source_id": "BR-GYM-002 permitted",
+    "purpose": "Verify valid positive faculty councillor ID is accepted",
+    "preconditions": "Faculty councillor ID is valid positive integer",
+    "action_or_input": "Call validate_faculty_councillor(faculty_councillor_id=201)",
+    "expected_result": "(True, 'Valid faculty councillor.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-002-N",
+    "source_id": "BR-GYM-002 prohibited",
+    "purpose": "Verify invalid faculty councillor ID (<= 0) is rejected",
+    "preconditions": "Faculty councillor ID is 0 or negative",
+    "action_or_input": "Call validate_faculty_councillor(faculty_councillor_id=0)",
+    "expected_result": "(False, error message indicating invalid faculty ID)",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-003-P",
+    "source_id": "BR-GYM-003 permitted",
+    "purpose": "Verify Technical, Sports, and Cultural categories are accepted",
+    "preconditions": "Category is one of Technical, Sports, Cultural",
+    "action_or_input": "Call validate_club_category for 'Technical', 'Sports', 'Cultural'",
+    "expected_result": "(True, 'Valid category.') for all three",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-003-N",
+    "source_id": "BR-GYM-003 prohibited",
+    "purpose": "Verify unlisted club category is rejected",
+    "preconditions": "Category is 'Music'",
+    "action_or_input": "Call validate_club_category('Music')",
+    "expected_result": "(False, error message indicating invalid category)",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-004-P",
+    "source_id": "BR-GYM-004 permitted",
+    "purpose": "Verify transition from 'open' to 'confirmed' status is accepted",
+    "preconditions": "Current club status is 'open'",
+    "action_or_input": "Call validate_club_confirmation_transition('open')",
+    "expected_result": "(True, 'Valid transition to confirmed.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-004-N",
+    "source_id": "BR-GYM-004 prohibited",
+    "purpose": "Verify non-open club cannot transition to confirmed",
+    "preconditions": "Current club status is 'confirmed'",
+    "action_or_input": "Call validate_club_confirmation_transition('confirmed')",
+    "expected_result": "(False, error message indicating only open club can be confirmed)",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-005-P",
+    "source_id": "BR-GYM-005 permitted",
+    "purpose": "Verify start_time earlier than end_time is accepted",
+    "preconditions": "start_time=10:00, end_time=12:00",
+    "action_or_input": "Call validate_booking_time_range(time(10, 0), time(12, 0))",
+    "expected_result": "(True, 'Valid booking time range.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-005-N1",
+    "source_id": "BR-GYM-005 prohibited-equal",
+    "purpose": "Verify equal start_time and end_time is rejected",
+    "preconditions": "start_time=10:00, end_time=10:00",
+    "action_or_input": "Call validate_booking_time_range(time(10, 0), time(10, 0))",
+    "expected_result": "(False, error message indicating start must be earlier than end)",
+    "test_type": "boundary/rule"
+  },
+  {
+    "test_id": "TC-BR-005-N2",
+    "source_id": "BR-GYM-005 prohibited-inverted",
+    "purpose": "Verify start_time later than end_time is rejected",
+    "preconditions": "start_time=14:00, end_time=12:00",
+    "action_or_input": "Call validate_booking_time_range(time(14, 0), time(12, 0))",
+    "expected_result": "(False, error message indicating start must be earlier than end)",
+    "test_type": "boundary/rule"
+  },
+  {
+    "test_id": "TC-BR-006-P",
+    "source_id": "BR-GYM-006 permitted",
+    "purpose": "Verify non-overlapping time slot in same venue is allowed",
+    "preconditions": "Existing slot (10:00, 12:00)",
+    "action_or_input": "Call check_cross_type_venue_conflict([(time(10, 0), time(12, 0))], time(14, 0), time(16, 0))",
+    "expected_result": "False (no conflict)",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-006-N1",
+    "source_id": "BR-GYM-006 prohibited-overlap-inside",
+    "purpose": "Verify slot completely within existing booking is detected as conflict",
+    "preconditions": "Existing slot (10:00, 14:00)",
+    "action_or_input": "Call check_cross_type_venue_conflict([(time(10, 0), time(14, 0))], time(11, 0), time(13, 0))",
+    "expected_result": "True (conflict exists)",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-006-N2",
+    "source_id": "BR-GYM-006 prohibited-overlap-cross-boundary",
+    "purpose": "Verify slot partially overlapping boundary of existing booking is detected as conflict",
+    "preconditions": "Existing slot (10:00, 12:00)",
+    "action_or_input": "Call check_cross_type_venue_conflict([(time(10, 0), time(12, 0))], time(11, 0), time(13, 0))",
+    "expected_result": "True (conflict exists)",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-007-P",
+    "source_id": "BR-GYM-007 permitted",
+    "purpose": "Verify membership application is permitted when club status is 'confirmed'",
+    "preconditions": "club_status='confirmed', has_existing_app=False",
+    "action_or_input": "Call validate_membership_application('confirmed', False)",
+    "expected_result": "(True, 'Eligible to apply for club membership.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-007-N",
+    "source_id": "BR-GYM-007 prohibited",
+    "purpose": "Verify membership application is rejected when club status is 'open'",
+    "preconditions": "club_status='open', has_existing_app=False",
+    "action_or_input": "Call validate_membership_application('open', False)",
+    "expected_result": "(False, error message indicating club must be confirmed)",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-008-P",
+    "source_id": "BR-GYM-008 permitted",
+    "purpose": "Verify student can maintain membership applications to multiple different clubs",
+    "preconditions": "Club A and Club B confirmed; student 301 applies to both",
+    "action_or_input": "Apply to Club A and Club B",
+    "expected_result": "Both applications created with status 'open'",
+    "test_type": "integration/rule"
+  },
+  {
+    "test_id": "TC-BR-009-N",
+    "source_id": "BR-GYM-009 prohibited",
+    "purpose": "Verify duplicate membership application to same club is prohibited",
+    "preconditions": "club_status='confirmed', has_existing_app=True",
+    "action_or_input": "Call validate_membership_application('confirmed', True)",
+    "expected_result": "(False, error message indicating duplicate application)",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-010-P",
+    "source_id": "BR-GYM-010 permitted",
+    "purpose": "Verify actor who is active coordinator or co-coordinator is authorized as Club Head",
+    "preconditions": "active_coordinator_id=101, active_co_coordinator_id=102",
+    "action_or_input": "Call validate_club_head_authorization(101, 101, 102) and (102, 101, 102)",
+    "expected_result": "True for both coordinator and co-coordinator",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-010-N",
+    "source_id": "BR-GYM-010 prohibited",
+    "purpose": "Verify actor who is not coordinator or co-coordinator is rejected",
+    "preconditions": "active_coordinator_id=101, active_co_coordinator_id=102, actor_id=999",
+    "action_or_input": "Call validate_club_head_authorization(999, 101, 102)",
+    "expected_result": "False",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-011-P",
+    "source_id": "BR-GYM-011 permitted",
+    "purpose": "Verify open membership status can transition to confirmed",
+    "preconditions": "current_status='open'",
+    "action_or_input": "Call validate_membership_approval_transition('open')",
+    "expected_result": "(True, 'Valid membership approval transition.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-011-N",
+    "source_id": "BR-GYM-011 prohibited",
+    "purpose": "Verify already confirmed membership cannot be approved again",
+    "preconditions": "current_status='confirmed'",
+    "action_or_input": "Call validate_membership_approval_transition('confirmed')",
+    "expected_result": "(False, error message indicating only open memberships can be approved)",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-012-P",
+    "source_id": "BR-GYM-012 permitted",
+    "purpose": "Verify poll creation with 2 or more options is accepted",
+    "preconditions": "num_options=2, target_batch='2024', target_branch='CSE'",
+    "action_or_input": "Call validate_poll_creation(2, '2024', 'CSE')",
+    "expected_result": "(True, 'Valid poll creation.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-012-N",
+    "source_id": "BR-GYM-012 prohibited",
+    "purpose": "Verify poll creation with fewer than 2 options is rejected",
+    "preconditions": "num_options=1",
+    "action_or_input": "Call validate_poll_creation(1, '2024', 'CSE')",
+    "expected_result": "(False, error message indicating at least 2 choices required)",
+    "test_type": "boundary/rule"
+  },
+  {
+    "test_id": "TC-BR-013-P",
+    "source_id": "BR-GYM-013 permitted",
+    "purpose": "Verify poll targeting defines target audience via batch and/or branch",
+    "preconditions": "target_batch='2024', target_branch='ALL'",
+    "action_or_input": "Call validate_poll_creation(2, '2024', 'ALL')",
+    "expected_result": "(True, 'Valid poll creation.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-013-N",
+    "source_id": "BR-GYM-013 prohibited",
+    "purpose": "Verify poll targeting rejects blank batch and branch",
+    "preconditions": "target_batch='', target_branch=''",
+    "action_or_input": "Call validate_poll_creation(2, '', '')",
+    "expected_result": "(False, error message indicating target audience cannot be blank)",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-014-P",
+    "source_id": "BR-GYM-014 permitted",
+    "purpose": "Verify eligible student can participate in active, unexpired poll matching audience",
+    "preconditions": "poll is active, unexpired, student matches batch '2024', branch 'CSE', already_voted=False",
+    "action_or_input": "Call validate_vote_eligibility(poll_is_active=True, expires_at=future, current_time=now, student_batch='2024', student_branch='CSE', target_batch='2024', target_branch='CSE', already_voted=False)",
+    "expected_result": "(True, 'Eligible to vote in poll.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-014-N1",
+    "source_id": "BR-GYM-014 prohibited-inactive",
+    "purpose": "Verify voting in inactive poll is prohibited",
+    "preconditions": "poll_is_active=False",
+    "action_or_input": "Call validate_vote_eligibility with poll_is_active=False",
+    "expected_result": "(False, 'This poll is no longer active.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-014-N2",
+    "source_id": "BR-GYM-014 prohibited-expired",
+    "purpose": "Verify voting in expired poll is prohibited",
+    "preconditions": "current_time >= expires_at",
+    "action_or_input": "Call validate_vote_eligibility with current_time later than expires_at",
+    "expected_result": "(False, 'This poll has expired.')",
+    "test_type": "boundary/rule"
+  },
+  {
+    "test_id": "TC-BR-014-N3",
+    "source_id": "BR-GYM-014 prohibited-target-mismatch",
+    "purpose": "Verify voting by student outside target batch or branch is prohibited",
+    "preconditions": "target_branch='CSE', student_branch='ECE'",
+    "action_or_input": "Call validate_vote_eligibility with student_branch='ECE' and target_branch='CSE'",
+    "expected_result": "(False, error message indicating branch mismatch)",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-015-P",
+    "source_id": "BR-GYM-015 permitted",
+    "purpose": "Verify first vote by student in poll is permitted",
+    "preconditions": "already_voted=False",
+    "action_or_input": "Call validate_vote_eligibility with already_voted=False",
+    "expected_result": "True validation result",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-015-N",
+    "source_id": "BR-GYM-015 prohibited",
+    "purpose": "Verify second vote by same student in same poll is prohibited",
+    "preconditions": "already_voted=True",
+    "action_or_input": "Call validate_vote_eligibility with already_voted=True",
+    "expected_result": "(False, 'You have already cast a vote in this poll (one vote limit).')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-016-P",
+    "source_id": "BR-GYM-016 permitted",
+    "purpose": "Verify superseded leadership assignment is marked inactive when succession occurs",
+    "preconditions": "Club has old leadership row",
+    "action_or_input": "Call validate_leadership_succession(is_superseded=True)",
+    "expected_result": "(False, 'Superseded leadership assignments cannot remain active.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-017-P1",
+    "source_id": "BR-GYM-017 permitted-zero-boundary",
+    "purpose": "Verify budget request with amount exactly zero is accepted",
+    "preconditions": "amount=Decimal('0.0'), has_supporting_file=True",
+    "action_or_input": "Call validate_budget_amount(Decimal('0.0'), True)",
+    "expected_result": "(True, 'Valid budget request.')",
+    "test_type": "boundary/rule"
+  },
+  {
+    "test_id": "TC-BR-017-P2",
+    "source_id": "BR-GYM-017 permitted-positive",
+    "purpose": "Verify budget request with positive amount is accepted",
+    "preconditions": "amount=Decimal('1000.0'), has_supporting_file=True",
+    "action_or_input": "Call validate_budget_amount(Decimal('1000.0'), True)",
+    "expected_result": "(True, 'Valid budget request.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-017-N",
+    "source_id": "BR-GYM-017 prohibited-negative",
+    "purpose": "Verify budget request with negative amount is rejected",
+    "preconditions": "amount=Decimal('-1.0'), has_supporting_file=True",
+    "action_or_input": "Call validate_budget_amount(Decimal('-1.0'), True)",
+    "expected_result": "(False, error message indicating amount cannot be negative)",
+    "test_type": "boundary/rule"
+  },
+  {
+    "test_id": "TC-BR-018-P",
+    "source_id": "BR-GYM-018 permitted",
+    "purpose": "Verify budget request with supporting file present is accepted",
+    "preconditions": "amount=Decimal('500.0'), has_supporting_file=True",
+    "action_or_input": "Call validate_budget_amount(Decimal('500.0'), True)",
+    "expected_result": "(True, 'Valid budget request.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-018-N",
+    "source_id": "BR-GYM-018 prohibited",
+    "purpose": "Verify budget request without supporting file is rejected",
+    "preconditions": "amount=Decimal('500.0'), has_supporting_file=False",
+    "action_or_input": "Call validate_budget_amount(Decimal('500.0'), False)",
+    "expected_result": "(False, 'A supporting file is required for submitting a club budget request.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-019-P",
+    "source_id": "BR-GYM-019 permitted",
+    "purpose": "Verify event report with report file present is accepted",
+    "preconditions": "has_report_file=True",
+    "action_or_input": "Call validate_event_report(True)",
+    "expected_result": "(True, 'Valid event report submission.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-019-N",
+    "source_id": "BR-GYM-019 prohibited",
+    "purpose": "Verify event report without report file is rejected",
+    "preconditions": "has_report_file=False",
+    "action_or_input": "Call validate_event_report(False)",
+    "expected_result": "(False, 'An event report documentation file is required.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-020-P",
+    "source_id": "BR-GYM-020 permitted",
+    "purpose": "Verify booking at configured venue is accepted",
+    "preconditions": "venue_name='Student Activity Center (SAC)'",
+    "action_or_input": "Call validate_configured_venue('Student Activity Center (SAC)')",
+    "expected_result": "(True, 'Valid configured venue.')",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-020-N",
+    "source_id": "BR-GYM-020 prohibited",
+    "purpose": "Verify booking at unconfigured venue is rejected",
+    "preconditions": "venue_name='Off-Campus Cafe'",
+    "action_or_input": "Call validate_configured_venue('Off-Campus Cafe')",
+    "expected_result": "(False, error message indicating venue is not in configured venues)",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-021-P",
+    "source_id": "BR-GYM-021 permitted",
+    "purpose": "Verify assigned Club Faculty Councillor is authorized to review reports",
+    "preconditions": "actor_faculty_id=201, assigned_councillor_id=201",
+    "action_or_input": "Call validate_faculty_report_review(201, 201)",
+    "expected_result": "True",
+    "test_type": "unit/rule"
+  },
+  {
+    "test_id": "TC-BR-021-N",
+    "source_id": "BR-GYM-021 prohibited",
+    "purpose": "Verify unassigned faculty member is denied authorization to review reports",
+    "preconditions": "actor_faculty_id=999, assigned_councillor_id=201",
+    "action_or_input": "Call validate_faculty_report_review(999, 201)",
+    "expected_result": "False",
+    "test_type": "unit/rule"
+  }
+]

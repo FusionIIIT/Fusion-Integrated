@@ -1,0 +1,146 @@
+[
+  {
+    "test_id": "TC-WF-001",
+    "source_id": "WF-01 full-success-path",
+    "purpose": "Verify complete successful progression of Club Membership Enrollment workflow (BW-GYM-01)",
+    "preconditions": "Confirmed club exists with coordinator 101, student 301 has no existing application",
+    "action_or_input": "Step 1: Student 301 calls apply_club_membership; Step 2: Coordinator 101 calls approve_club_membership",
+    "expected_result": "Step 1 yields status 'open'; Step 2 transitions status to 'confirmed'",
+    "test_type": "workflow/progression"
+  },
+  {
+    "test_id": "TC-WF-002",
+    "source_id": "WF-01 guard-unconfirmed-club",
+    "purpose": "Verify BW-GYM-01 transition 1 guard blocks membership application when club is unconfirmed",
+    "preconditions": "Club exists in 'open' status",
+    "action_or_input": "Student 301 calls apply_club_membership on the open club",
+    "expected_result": "Application rejected with ValueError; workflow does not start",
+    "test_type": "workflow/guard"
+  },
+  {
+    "test_id": "TC-WF-003",
+    "source_id": "WF-01 guard-duplicate-application",
+    "purpose": "Verify BW-GYM-01 transition 1 guard blocks duplicate same-club membership application",
+    "preconditions": "Student 301 has an open membership application in confirmed club",
+    "action_or_input": "Student 301 calls apply_club_membership again for the same club",
+    "expected_result": "Operation rejected with ValueError; application state remains single open application",
+    "test_type": "workflow/guard"
+  },
+  {
+    "test_id": "TC-WF-004",
+    "source_id": "WF-01 guard-unauthorized-approver",
+    "purpose": "Verify BW-GYM-01 transition 2 guard blocks membership approval by non-coordinator",
+    "preconditions": "Open membership application exists for club",
+    "action_or_input": "Actor 999 (not coordinator) calls approve_club_membership",
+    "expected_result": "Rejected with PermissionError; membership remains in 'open' status",
+    "test_type": "workflow/guard"
+  },
+  {
+    "test_id": "TC-WF-005",
+    "source_id": "WF-01 guard-already-confirmed-application",
+    "purpose": "Verify BW-GYM-01 transition 2 guard blocks re-approval of an already confirmed application",
+    "preconditions": "Membership application has already reached 'confirmed' status",
+    "action_or_input": "Coordinator 101 calls approve_club_membership on the confirmed application",
+    "expected_result": "Rejected with ValueError; state remains confirmed",
+    "test_type": "workflow/guard"
+  },
+  {
+    "test_id": "TC-WF-006",
+    "source_id": "WF-02 full-success-path",
+    "purpose": "Verify complete successful progression of Targeted Poll Participation workflow (BW-GYM-02)",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Step 1: Coordinator 101 creates poll with 2 choices and target batch '2024'; Step 2: Student 301 in batch '2024' casts vote",
+    "expected_result": "Step 1 creates active poll; Step 2 records vote in poll tally",
+    "test_type": "workflow/progression"
+  },
+  {
+    "test_id": "TC-WF-007",
+    "source_id": "WF-02 guard-unauthorized-creator",
+    "purpose": "Verify BW-GYM-02 transition 1 guard blocks poll creation by non-coordinator",
+    "preconditions": "Confirmed club exists",
+    "action_or_input": "Actor 999 (not coordinator) calls create_voting_poll",
+    "expected_result": "Rejected with PermissionError; poll is not created",
+    "test_type": "workflow/guard"
+  },
+  {
+    "test_id": "TC-WF-008",
+    "source_id": "WF-02 guard-insufficient-choices",
+    "purpose": "Verify BW-GYM-02 transition 1 guard blocks poll creation with fewer than 2 choices",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Coordinator 101 calls create_voting_poll with 1 choice",
+    "expected_result": "Rejected with ValueError; poll is not created",
+    "test_type": "workflow/guard"
+  },
+  {
+    "test_id": "TC-WF-009",
+    "source_id": "WF-02 guard-expired-poll",
+    "purpose": "Verify BW-GYM-02 transition 2 guard blocks voting when poll has expired",
+    "preconditions": "Active poll was created, but expires_at has passed",
+    "action_or_input": "Targeted student attempts to cast vote in the expired poll",
+    "expected_result": "Vote rejected with ValueError; tally unchanged",
+    "test_type": "workflow/guard"
+  },
+  {
+    "test_id": "TC-WF-010",
+    "source_id": "WF-02 guard-audience-mismatch",
+    "purpose": "Verify BW-GYM-02 transition 2 guard blocks voting when student does not match target audience",
+    "preconditions": "Poll targets batch '2024', student 302 is in batch '2025'",
+    "action_or_input": "Student 302 calls cast_poll_vote",
+    "expected_result": "Vote rejected with ValueError; tally unchanged",
+    "test_type": "workflow/guard"
+  },
+  {
+    "test_id": "TC-WF-011",
+    "source_id": "WF-02 guard-duplicate-vote",
+    "purpose": "Verify BW-GYM-02 transition 2 guard blocks duplicate vote by same student in same poll",
+    "preconditions": "Student 301 has already voted in active poll",
+    "action_or_input": "Student 301 calls cast_poll_vote a second time",
+    "expected_result": "Vote rejected with ValueError; second vote not recorded",
+    "test_type": "workflow/guard"
+  },
+  {
+    "test_id": "TC-WF-012",
+    "source_id": "WF-03 full-success-path",
+    "purpose": "Verify complete successful progression of Club Establishment and Confirmation workflow (BW-GYM-03)",
+    "preconditions": "Student Admin authenticated, valid student leaders and faculty councillor available",
+    "action_or_input": "Step 1: Call create_club -> Club Open; Step 2: Call confirm_club -> Club Confirmed",
+    "expected_result": "Club created with status 'open' and then confirmed with status 'confirmed'",
+    "test_type": "workflow/progression"
+  },
+  {
+    "test_id": "TC-WF-013",
+    "source_id": "WF-03 guard-invalid-leader",
+    "purpose": "Verify BW-GYM-03 transition 1 guard blocks club creation when student leaders are invalid",
+    "preconditions": "Student Admin authenticated",
+    "action_or_input": "Call create_club with invalid student ID (<= 0) or same coordinator & co-coordinator",
+    "expected_result": "Rejected with ValueError; club not created",
+    "test_type": "workflow/guard"
+  },
+  {
+    "test_id": "TC-WF-013a",
+    "source_id": "WF-03 guard-invalid-faculty",
+    "purpose": "Verify BW-GYM-03 transition 1 guard blocks club creation when faculty councillor is invalid",
+    "preconditions": "Student Admin authenticated",
+    "action_or_input": "Call create_club with invalid faculty councillor ID (<= 0)",
+    "expected_result": "Rejected with ValueError; club not created",
+    "test_type": "workflow/guard"
+  },
+  {
+    "test_id": "TC-WF-014",
+    "source_id": "WF-03 guard-invalid-category",
+    "purpose": "Verify BW-GYM-03 transition 1 guard blocks club creation when category is not allowed",
+    "preconditions": "Student Admin authenticated",
+    "action_or_input": "Call create_club with category='InvalidCategory'",
+    "expected_result": "Rejected with ValueError; club not created",
+    "test_type": "workflow/guard"
+  },
+  {
+    "test_id": "TC-WF-015",
+    "source_id": "WF-03 guard-already-confirmed-club",
+    "purpose": "Verify BW-GYM-03 transition 2 guard blocks re-approval of an already confirmed club",
+    "preconditions": "Club exists with status 'confirmed'",
+    "action_or_input": "Call confirm_club on the confirmed club",
+    "expected_result": "Rejected with ValueError; club status remains 'confirmed'",
+    "test_type": "workflow/guard"
+  }
+]
