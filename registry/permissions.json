@@ -34,6 +34,221 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "leave": {
+      "grants": {
+        "Authorized administrative role": [
+          "leave.application.export",
+          "leave.application.view",
+          "leave.calendar.manage",
+          "leave.calendar.publish",
+          "leave.policy.manage",
+          "leave.record.import",
+          "leave.record.update",
+          "leave.sla.manage"
+        ],
+        "Deputy Registrar (Estt.) / Establishment Processing Role": [
+          "leave.application.review",
+          "leave.application.view"
+        ],
+        "Director": [
+          "leave.application.approve",
+          "leave.application.view",
+          "leave.resumption.review"
+        ],
+        "Leave Administrator": [
+          "leave.application.export",
+          "leave.application.view",
+          "leave.calendar.manage",
+          "leave.calendar.publish",
+          "leave.policy.manage",
+          "leave.record.import",
+          "leave.record.update",
+          "leave.sla.manage"
+        ],
+        "Sanctioning Authority": [
+          "leave.application.approve",
+          "leave.application.view",
+          "leave.resumption.review"
+        ],
+        "Unit Head": [
+          "leave.application.review",
+          "leave.application.view"
+        ],
+        "faculty": [
+          "leave.application.create",
+          "leave.application.delete",
+          "leave.application.export",
+          "leave.application.update",
+          "leave.application.view",
+          "leave.balance.view",
+          "leave.substitute.update"
+        ],
+        "staff": [
+          "leave.application.create",
+          "leave.application.delete",
+          "leave.application.export",
+          "leave.application.update",
+          "leave.application.view",
+          "leave.balance.view",
+          "leave.substitute.update"
+        ]
+      },
+      "module_grants": [
+        "Authorized administrative role",
+        "Deputy Registrar (Estt.) / Establishment Processing Role",
+        "Director",
+        "Leave Administrator",
+        "Sanctioning Authority",
+        "Unit Head",
+        "faculty",
+        "staff"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "Calendar",
+        "items": [
+          {
+            "code": "leave.mine",
+            "icon": "User",
+            "label": "My Leave",
+            "required_permission": "leave.application.view",
+            "sort_order": 10,
+            "to": "/leave/mine"
+          },
+          {
+            "code": "leave.apply",
+            "icon": "Plus",
+            "label": "Apply for Leave",
+            "required_permission": "leave.application.create",
+            "sort_order": 20,
+            "to": "/leave/apply"
+          },
+          {
+            "code": "leave.tasks",
+            "icon": "Clipboard",
+            "label": "Assigned Tasks",
+            "required_permission": "leave.application.review",
+            "sort_order": 30,
+            "to": "/leave/tasks"
+          },
+          {
+            "code": "leave.balances",
+            "icon": "History",
+            "label": "Balances and History",
+            "required_permission": "leave.balance.view",
+            "sort_order": 40,
+            "to": "/leave/balances"
+          },
+          {
+            "code": "leave.resumptions",
+            "icon": "Check",
+            "label": "Resumption of Duty",
+            "required_permission": "leave.application.create",
+            "sort_order": 45,
+            "to": "/leave/resumptions"
+          },
+          {
+            "code": "leave.calendar",
+            "icon": "Calendar",
+            "label": "Leave Calendar",
+            "required_permission": "leave.calendar.manage",
+            "sort_order": 50,
+            "to": "/leave/calendar"
+          },
+          {
+            "code": "leave.admin",
+            "icon": "Settings",
+            "label": "Leave Administration",
+            "required_permission": "leave.policy.manage",
+            "sort_order": 60,
+            "to": "/leave/admin"
+          }
+        ],
+        "label": "Employee Leave Management",
+        "nav_section": "Employee Services",
+        "sort_order": 30,
+        "status": "planned"
+      },
+      "permissions": [
+        {
+          "code": "leave.application.view",
+          "label": "View leave applications within assigned scope"
+        },
+        {
+          "code": "leave.application.create",
+          "label": "Submit leave applications"
+        },
+        {
+          "code": "leave.application.update",
+          "label": "Update substitute nomination before routing"
+        },
+        {
+          "code": "leave.application.delete",
+          "label": "Withdraw or request cancellation of leave"
+        },
+        {
+          "code": "leave.application.review",
+          "label": "Review and route leave applications"
+        },
+        {
+          "code": "leave.application.approve",
+          "label": "Make final leave decisions"
+        },
+        {
+          "code": "leave.application.export",
+          "label": "Export an accessible leave application"
+        },
+        {
+          "code": "leave.year_end.process",
+          "label": "Process annual leave account closing"
+        },
+        {
+          "code": "leave.sla.process",
+          "label": "Process workflow SLA thresholds"
+        },
+        {
+          "code": "leave.substitute.update",
+          "label": "Respond to a substitute request"
+        },
+        {
+          "code": "leave.balance.view",
+          "label": "View leave balances and history"
+        },
+        {
+          "code": "leave.policy.manage",
+          "label": "Maintain leave policy and hierarchy"
+        },
+        {
+          "code": "leave.calendar.manage",
+          "label": "Maintain leave calendars"
+        },
+        {
+          "code": "leave.calendar.publish",
+          "label": "Publish a holiday and restricted-holiday calendar"
+        },
+        {
+          "code": "leave.record.import",
+          "label": "Record already-sanctioned offline leave"
+        },
+        {
+          "code": "leave.record.update",
+          "label": "Maintain authorized leave records"
+        },
+        {
+          "code": "leave.resumption.review",
+          "label": "Review leave resumption"
+        },
+        {
+          "code": "leave.sla.manage",
+          "label": "Configure workflow task SLA thresholds"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "leave.sla.process",
+        "leave.year_end.process"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

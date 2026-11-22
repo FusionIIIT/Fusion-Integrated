@@ -13,6 +13,29 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave.application.view` | View leave applications within assigned scope | `Authorized administrative role`, `Deputy Registrar (Estt.) / Establishment Processing Role`, `Director`, `Leave Administrator`, `Sanctioning Authority`, `Unit Head`, `faculty`, `staff` |
+| `leave.application.create` | Submit leave applications | `faculty`, `staff` |
+| `leave.application.update` | Update substitute nomination before routing | `faculty`, `staff` |
+| `leave.application.delete` | Withdraw or request cancellation of leave | `faculty`, `staff` |
+| `leave.application.review` | Review and route leave applications | `Deputy Registrar (Estt.) / Establishment Processing Role`, `Unit Head` |
+| `leave.application.approve` | Make final leave decisions | `Director`, `Sanctioning Authority` |
+| `leave.application.export` | Export an accessible leave application | `Authorized administrative role`, `Leave Administrator`, `faculty`, `staff` |
+| `leave.year_end.process` | Process annual leave account closing | _service only_ |
+| `leave.sla.process` | Process workflow SLA thresholds | _service only_ |
+| `leave.substitute.update` | Respond to a substitute request | `faculty`, `staff` |
+| `leave.balance.view` | View leave balances and history | `faculty`, `staff` |
+| `leave.policy.manage` | Maintain leave policy and hierarchy | `Authorized administrative role`, `Leave Administrator` |
+| `leave.calendar.manage` | Maintain leave calendars | `Authorized administrative role`, `Leave Administrator` |
+| `leave.calendar.publish` | Publish a holiday and restricted-holiday calendar | `Authorized administrative role`, `Leave Administrator` |
+| `leave.record.import` | Record already-sanctioned offline leave | `Authorized administrative role`, `Leave Administrator` |
+| `leave.record.update` | Maintain authorized leave records | `Authorized administrative role`, `Leave Administrator` |
+| `leave.resumption.review` | Review leave resumption | `Director`, `Sanctioning Authority` |
+| `leave.sla.manage` | Configure workflow task SLA thresholds | `Authorized administrative role`, `Leave Administrator` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
