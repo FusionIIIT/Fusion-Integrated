@@ -364,7 +364,7 @@ export function AppShellLayout({
             </Box>
           </Group>
           <Group gap="sm" wrap="nowrap" className={classes.headerRight}>
-            <Text size="xs" c="dimmed" fw={800} visibleFrom="lg"
+            <Text size="xs" c="gray.7" fw={800} visibleFrom="lg"
                   style={{ fontFamily: "monospace" }}>
               {today()}
             </Text>
@@ -375,7 +375,8 @@ export function AppShellLayout({
                 <FaBell size={18} />
               </ActionIcon>
             </Indicator>
-            <Button variant="light" color="red" size="xs"
+            <Button variant="subtle" color="red" size="xs"
+                    style={{ color: "var(--mantine-color-red-9)" }}
                     leftSection={<FaSignOutAlt size={14} />}
                     onClick={onLogout} visibleFrom="sm">
               Logout

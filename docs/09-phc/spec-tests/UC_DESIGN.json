@@ -1,0 +1,434 @@
+[
+  {
+    "test_id": "UC-01",
+    "source_id": "PHC-UC-01 Main Flow",
+    "purpose": "Patient views the static weekly doctor schedule together with current-day real-time attendance status.",
+    "preconditions": "The user is authenticated as a patient.",
+    "action_or_input": "The patient opens Doctor Availability.",
+    "expected_result": "Doctor schedule and current availability are displayed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-01-E1",
+    "source_id": "PHC-UC-01 Exception E1",
+    "purpose": "If schedule or attendance data cannot be retrieved, the system reports the failure without presenting stale data as current.",
+    "preconditions": "The user is authenticated as a patient; schedule or attendance data cannot be retrieved.",
+    "action_or_input": "The patient opens Doctor Availability while data retrieval fails.",
+    "expected_result": "The system reports the failure without presenting stale data as current.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-02",
+    "source_id": "PHC-UC-02 Main Flow",
+    "purpose": "Patient views their own medical history and associated prescriptions in read-only form.",
+    "preconditions": "The user is authenticated as a patient.",
+    "action_or_input": "The patient opens My Medical Records.",
+    "expected_result": "The patient's own medical history and prescriptions are displayed read-only.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-02-E1",
+    "source_id": "PHC-UC-02 Exception E1",
+    "purpose": "If the user attempts to access another patient's record, access is denied.",
+    "preconditions": "The user is authenticated as a patient; another patient's record exists.",
+    "action_or_input": "The patient attempts to access another patient's record.",
+    "expected_result": "Access is denied.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-03",
+    "source_id": "PHC-UC-03 Main Flow",
+    "purpose": "Patient downloads a PDF copy of selected records from their own medical history.",
+    "preconditions": "The user is authenticated as a patient; the selected records belong to the authenticated patient.",
+    "action_or_input": "The patient requests a PDF download while viewing their records.",
+    "expected_result": "The requested PDF copy is provided.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-03-E1",
+    "source_id": "PHC-UC-03 Exception E1",
+    "purpose": "If PDF generation fails, the system reports the failure and provides no partial file.",
+    "preconditions": "The user is authenticated as a patient; PDF generation fails.",
+    "action_or_input": "The patient requests a PDF download while generation fails.",
+    "expected_result": "The system reports the failure and provides no partial file.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-04",
+    "source_id": "PHC-UC-04 Main Flow",
+    "purpose": "Employee submits an eligible medical bill reimbursement claim.",
+    "preconditions": "The user is authenticated; the user is an employee eligible to use reimbursement.",
+    "action_or_input": "The employee starts a new reimbursement claim, enters claim information including medical expense date, selects a valid prescription, and submits.",
+    "expected_result": "A valid claim is created and enters the reimbursement progression.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-04-A1",
+    "source_id": "PHC-UC-04 Alternative A1",
+    "purpose": "If the user is not an employee, submission is denied.",
+    "preconditions": "The user is not an employee.",
+    "action_or_input": "A non-employee attempts to submit a reimbursement claim.",
+    "expected_result": "Submission is denied.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-04-A2",
+    "source_id": "PHC-UC-04 Alternative A2",
+    "purpose": "If the linked prescription is invalid or does not belong to the claimant, submission is denied.",
+    "preconditions": "The linked prescription is invalid or does not belong to the claimant.",
+    "action_or_input": "The employee attempts to submit with an invalid or non-owned prescription.",
+    "expected_result": "Submission is denied.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-04-A3",
+    "source_id": "PHC-UC-04 Alternative A3",
+    "purpose": "If the claim is outside the configured submission window, submission is denied.",
+    "preconditions": "The claim is outside the configured submission window.",
+    "action_or_input": "The employee attempts to submit outside the submission window.",
+    "expected_result": "Submission is denied.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-04-E1",
+    "source_id": "PHC-UC-04 Exception E1",
+    "purpose": "If claim creation fails, no workflow instance is created.",
+    "preconditions": "Claim creation fails.",
+    "action_or_input": "The employee attempts to submit a valid claim while creation fails.",
+    "expected_result": "No workflow instance is created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-05",
+    "source_id": "PHC-UC-05 Main Flow",
+    "purpose": "Employee views the current status and action history of their submitted reimbursement claims.",
+    "preconditions": "The user is authenticated as an employee.",
+    "action_or_input": "The employee opens My Reimbursement Claims.",
+    "expected_result": "The employee can see current claim status and action history.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-05-E1",
+    "source_id": "PHC-UC-05 Exception E1",
+    "purpose": "If claim data cannot be retrieved, the system reports the failure without exposing another employee's claims.",
+    "preconditions": "Claim data cannot be retrieved.",
+    "action_or_input": "The employee opens My Reimbursement Claims while retrieval fails.",
+    "expected_result": "The system reports the failure without exposing another employee's claims.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-06",
+    "source_id": "PHC-UC-06 Main Flow",
+    "purpose": "PHC Staff finds a patient and records a visit together with a digitized prescription.",
+    "preconditions": "The user is authenticated as PHC Staff.",
+    "action_or_input": "PHC Staff searches for and selects the patient profile, creates the visit record, enters the physical prescription linked to the patient/visit, and the system saves the visit and prescription.",
+    "expected_result": "The patient record contains the new visit and linked prescription; the covered patient-record change is recorded in the immutable audit trail.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-06-E1",
+    "source_id": "PHC-UC-06 Exception E1",
+    "purpose": "If required record information is missing, the system does not save the incomplete record.",
+    "preconditions": "Required record information is missing.",
+    "action_or_input": "PHC Staff attempts to save an incomplete patient record.",
+    "expected_result": "The system does not save the incomplete record.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-07",
+    "source_id": "PHC-UC-07 Main Flow",
+    "purpose": "PHC Staff maintains the static weekly schedule of visiting doctors.",
+    "preconditions": "The user is authenticated as PHC Staff.",
+    "action_or_input": "PHC Staff opens doctor schedule maintenance, selects the doctor, updates the applicable days and hours, and the system saves the updated master schedule.",
+    "expected_result": "The doctor master schedule is updated.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-07-E1",
+    "source_id": "PHC-UC-07 Exception E1",
+    "purpose": "If schedule data is invalid, the system does not save the change.",
+    "preconditions": "Schedule data is invalid.",
+    "action_or_input": "PHC Staff attempts to save invalid schedule data.",
+    "expected_result": "The system does not save the change.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-08",
+    "source_id": "PHC-UC-08 Main Flow",
+    "purpose": "PHC Staff updates a visiting doctor's real-time attendance status when the doctor arrives or leaves.",
+    "preconditions": "The user is authenticated as PHC Staff.",
+    "action_or_input": "PHC Staff opens current-day doctor attendance and marks the doctor Available (arrival) or Departed (departure); the system saves the current status.",
+    "expected_result": "The doctor's current attendance status is updated for patient-facing availability display.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-08-E1",
+    "source_id": "PHC-UC-08 Exception E1",
+    "purpose": "If the status update fails, the prior status remains in effect and the system reports the failure.",
+    "preconditions": "The status update fails.",
+    "action_or_input": "PHC Staff attempts to mark attendance while the update fails.",
+    "expected_result": "The prior status remains in effect and the system reports the failure.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-09",
+    "source_id": "PHC-UC-09 Main Flow",
+    "purpose": "PHC Staff adds to or deducts from inventory stock levels and obtains low-stock alerts when required.",
+    "preconditions": "The user is authenticated as PHC Staff; stock is received, consumed, or requires quantity adjustment.",
+    "action_or_input": "PHC Staff opens Inventory Management, selects an item, enters the quantity to add or deduct; the system updates the stock level, records the change in the audit trail, compares against the reorder threshold, and generates a low-stock alert if below threshold.",
+    "expected_result": "The inventory level is updated; a low-stock alert exists when the threshold condition is met.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-09-A1",
+    "source_id": "PHC-UC-09 Alternative A1",
+    "purpose": "If the updated stock is not below the threshold, no low-stock alert is generated.",
+    "preconditions": "The updated stock is not below the reorder threshold.",
+    "action_or_input": "PHC Staff updates stock such that it remains above the threshold.",
+    "expected_result": "No low-stock alert is generated.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-09-E1",
+    "source_id": "PHC-UC-09 Exception E1",
+    "purpose": "If the stock adjustment is invalid, the system rejects the update.",
+    "preconditions": "The stock adjustment is invalid.",
+    "action_or_input": "PHC Staff attempts an invalid stock adjustment.",
+    "expected_result": "The system rejects the update.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-10",
+    "source_id": "PHC-UC-10 Main Flow",
+    "purpose": "PHC Staff creates and submits an inventory procurement requisition.",
+    "preconditions": "The user is authenticated as PHC Staff.",
+    "action_or_input": "PHC Staff starts a new requisition, adds required items and quantities, and submits; the system creates the requisition in Pending Approval state and routes it to the Approving Authority.",
+    "expected_result": "A requisition is pending decision by the Approving Authority.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-10-E1",
+    "source_id": "PHC-UC-10 Exception E1",
+    "purpose": "If required requisition data is missing, submission is blocked.",
+    "preconditions": "Required requisition data is missing.",
+    "action_or_input": "PHC Staff attempts to submit a requisition with missing data.",
+    "expected_result": "Submission is blocked.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-11",
+    "source_id": "PHC-UC-11 Main Flow",
+    "purpose": "PHC Staff records ambulance usage with timestamp, patient name, and destination.",
+    "preconditions": "The user is authenticated as PHC Staff.",
+    "action_or_input": "PHC Staff starts a new ambulance log entry, records the timestamp, patient name, and destination; the system validates and saves the log entry.",
+    "expected_result": "The ambulance usage is recorded with all required fields.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-11-E1",
+    "source_id": "PHC-UC-11 Exception E1",
+    "purpose": "If a required field is missing, the system does not save the log entry.",
+    "preconditions": "A required field is missing.",
+    "action_or_input": "PHC Staff attempts to save an incomplete ambulance log entry.",
+    "expected_result": "The system does not save the log entry.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-12",
+    "source_id": "PHC-UC-12 Main Flow",
+    "purpose": "PHC Staff publishes health advisories to patient dashboards.",
+    "preconditions": "The user is authenticated as PHC Staff.",
+    "action_or_input": "PHC Staff opens announcement management, enters the health advisory content, and publishes; the system makes the announcement visible to all patients on their dashboards.",
+    "expected_result": "The health advisory is visible to patients.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-12-E1",
+    "source_id": "PHC-UC-12 Exception E1",
+    "purpose": "If required announcement content is missing, publication is blocked.",
+    "preconditions": "Required announcement content is missing.",
+    "action_or_input": "PHC Staff attempts to publish an announcement with missing content.",
+    "expected_result": "Publication is blocked.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-13",
+    "source_id": "PHC-UC-13 Main Flow",
+    "purpose": "PHC Staff generates administrative reports on patient demographics, service utilization, or inventory consumption without exposing patient-identifiable information.",
+    "preconditions": "The user is authenticated as PHC Staff.",
+    "action_or_input": "PHC Staff opens Reports, selects the report category and parameters; the system aggregates the data, anonymizes/protects patient-identifiable information, and provides the report.",
+    "expected_result": "An anonymized/protected report is generated.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-13-E1",
+    "source_id": "PHC-UC-13 Exception E1",
+    "purpose": "If report parameters are invalid or generation fails, the system reports the failure without exposing partial identifiable data.",
+    "preconditions": "Report parameters are invalid or generation fails.",
+    "action_or_input": "PHC Staff requests a report with invalid parameters.",
+    "expected_result": "The system reports the failure without exposing partial identifiable data.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-14",
+    "source_id": "PHC-UC-14 Main Flow",
+    "purpose": "PHC Staff closes an approved inventory requisition after the ordered supplies are delivered.",
+    "preconditions": "The user is authenticated as PHC Staff; the requisition state is Approved; the ordered supplies have been delivered.",
+    "action_or_input": "PHC Staff opens the approved requisition, confirms delivery, and marks it Fulfilled; the system changes the state to Fulfilled and closes the progression.",
+    "expected_result": "The requisition is Fulfilled and closed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-14-E1",
+    "source_id": "PHC-UC-14 Exception E1",
+    "purpose": "If the requisition is not Approved, the system does not allow Fulfilled to be set.",
+    "preconditions": "The requisition is not Approved.",
+    "action_or_input": "PHC Staff attempts to mark a non-approved requisition Fulfilled.",
+    "expected_result": "The system does not allow Fulfilled to be set.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-15",
+    "source_id": "PHC-UC-15 Main Flow",
+    "purpose": "PHC Staff reviews a submitted reimbursement claim and forwards it to Accounts & Audit on the supported progression path.",
+    "preconditions": "The user is authenticated as PHC Staff; the claim state is Pending PHC Review.",
+    "action_or_input": "PHC Staff opens the pending claim, reviews the claim information, and forwards it to Accounts & Audit; the system changes the state to Pending Accounts Verification.",
+    "expected_result": "The claim is pending Accounts & Audit verification.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-15-E1",
+    "source_id": "PHC-UC-15 Exception E1",
+    "purpose": "No reject, return-for-clarification, or modification outcome is modeled at this stage; processing continues only on the defined forward path.",
+    "preconditions": "A submitted claim is at the PHC review stage.",
+    "action_or_input": "PHC Staff attempts to reject, return-for-clarification, or modify the claim at this stage.",
+    "expected_result": "No reject/return/modification outcome is modeled; processing continues only on the defined forward path.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-16",
+    "source_id": "PHC-UC-16 Main Flow",
+    "purpose": "Approving Authority approves or rejects a pending inventory requisition.",
+    "preconditions": "The user is authenticated as Approving Authority; the requisition state is Pending Approval.",
+    "action_or_input": "The Approving Authority opens the pending requisition, reviews items/quantities, and selects Approve or Reject; the system records the outcome and notifies the originating PHC Staff.",
+    "expected_result": "The requisition is Approved or Rejected.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-16-A1",
+    "source_id": "PHC-UC-16 Alternative A1",
+    "purpose": "Approve: the requisition state becomes Approved and may proceed to procurement/delivery.",
+    "preconditions": "The requisition is Pending Approval.",
+    "action_or_input": "The Approving Authority selects Approve.",
+    "expected_result": "The requisition state becomes Approved.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-16-A2",
+    "source_id": "PHC-UC-16 Alternative A2",
+    "purpose": "Reject: the requisition state becomes Rejected and the requisition workflow ends.",
+    "preconditions": "The requisition is Pending Approval.",
+    "action_or_input": "The Approving Authority selects Reject.",
+    "expected_result": "The requisition state becomes Rejected and the workflow ends.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-16-E1",
+    "source_id": "PHC-UC-16 Exception E1",
+    "purpose": "If the requisition is no longer Pending Approval, the system blocks a second decision.",
+    "preconditions": "The requisition is no longer Pending Approval.",
+    "action_or_input": "The Approving Authority attempts a second decision.",
+    "expected_result": "The system blocks a second decision.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-19",
+    "source_id": "PHC-UC-19 Main Flow",
+    "purpose": "Accounts & Audit verifies the financial details of a reimbursement claim and forwards it for sanction.",
+    "preconditions": "The user is authenticated as Accounts & Audit; the claim state is Pending Accounts Verification.",
+    "action_or_input": "Accounts & Audit opens the pending claim, verifies financial details, records successful verification; the system changes the state to Pending Sanction and routes to Approving Authority.",
+    "expected_result": "The claim is pending sanction by the Approving Authority.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-19-E1",
+    "source_id": "PHC-UC-19 Exception E1",
+    "purpose": "No reject, return-for-clarification, or modification outcome is modeled at this stage; processing continues only on the defined forward path.",
+    "preconditions": "A claim is at Pending Accounts Verification.",
+    "action_or_input": "Accounts & Audit attempts to reject, return, or modify at this stage.",
+    "expected_result": "No reject/return/modification outcome is modeled; processing continues only on the defined forward path.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-20",
+    "source_id": "PHC-UC-20 Main Flow",
+    "purpose": "Approving Authority approves or rejects the reimbursement sanction for a verified claim.",
+    "preconditions": "The user is authenticated as Approving Authority; the claim state is Pending Sanction.",
+    "action_or_input": "The Approving Authority opens the verified claim, reviews the sanction, and selects Approve or Reject; the system records the decision.",
+    "expected_result": "The claim is Approved for Payment or Rejected.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-20-A1",
+    "source_id": "PHC-UC-20 Alternative A1",
+    "purpose": "Approve: the claim state becomes Approved for Payment and is routed to Accounts & Audit.",
+    "preconditions": "The claim is Pending Sanction.",
+    "action_or_input": "The Approving Authority selects Approve.",
+    "expected_result": "The claim state becomes Approved for Payment and is routed to Accounts & Audit.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-20-A2",
+    "source_id": "PHC-UC-20 Alternative A2",
+    "purpose": "Reject: the claim state becomes Rejected and the current reimbursement progression ends; any later application is a new claim.",
+    "preconditions": "The claim is Pending Sanction.",
+    "action_or_input": "The Approving Authority selects Reject.",
+    "expected_result": "The claim state becomes Rejected and the current progression ends.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-20-E1",
+    "source_id": "PHC-UC-20 Exception E1",
+    "purpose": "If the claim is no longer Pending Sanction, the system blocks a duplicate decision.",
+    "preconditions": "The claim is no longer Pending Sanction.",
+    "action_or_input": "The Approving Authority attempts a duplicate decision.",
+    "expected_result": "The system blocks a duplicate decision.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-21",
+    "source_id": "PHC-UC-21 Main Flow",
+    "purpose": "Accounts & Audit processes the final payment for an approved reimbursement claim and closes it as reimbursed.",
+    "preconditions": "The user is authenticated as Accounts & Audit; the claim state is Approved for Payment.",
+    "action_or_input": "Accounts & Audit opens the approved claim, processes the final payment, records payment completion; the system changes the claim state to Reimbursed.",
+    "expected_result": "The claim is Reimbursed and closed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-21-E1",
+    "source_id": "PHC-UC-21 Exception E1",
+    "purpose": "If payment completion cannot be recorded, the claim remains Approved for Payment.",
+    "preconditions": "Payment completion cannot be recorded.",
+    "action_or_input": "Accounts & Audit attempts to process payment while recording fails.",
+    "expected_result": "The claim remains Approved for Payment.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-22",
+    "source_id": "PHC-UC-22 Main Flow",
+    "purpose": "PHC Staff creates a doctor schedule and publishes it for patient visibility.",
+    "preconditions": "The user is authenticated as PHC Staff.",
+    "action_or_input": "PHC Staff creates/configures a doctor schedule, selects the schedule for publication, and the system publishes it; the published schedule becomes available to patient-facing doctor availability.",
+    "expected_result": "A doctor schedule is published for patient visibility.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-22-E1",
+    "source_id": "PHC-UC-22 Exception E1",
+    "purpose": "If schedule data is invalid, the system does not publish the schedule.",
+    "preconditions": "Schedule data is invalid.",
+    "action_or_input": "PHC Staff attempts to publish an invalid schedule.",
+    "expected_result": "The system does not publish the schedule.",
+    "test_type": "negative"
+  }
+]

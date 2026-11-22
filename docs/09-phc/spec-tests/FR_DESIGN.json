@@ -1,0 +1,344 @@
+[
+  {
+    "test_id": "FR-001",
+    "source_id": "AFR-001",
+    "purpose": "Patient can view the static weekly doctor schedule together with current-day real-time attendance status.",
+    "preconditions": "User authenticated as a patient; a published doctor schedule exists and today's attendance is recorded.",
+    "action_or_input": "Patient opens Doctor Availability.",
+    "expected_result": "The published weekly schedule and current-day attendance status are displayed together; no schedule data is changed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-002",
+    "source_id": "AFR-002",
+    "purpose": "PHC Staff can maintain the static weekly schedule of visiting doctors.",
+    "preconditions": "User authenticated as PHC Staff; a doctor schedule record exists.",
+    "action_or_input": "PHC Staff updates the applicable days and hours for a doctor's weekly schedule.",
+    "expected_result": "The doctor master schedule is updated; previous schedule remains unchanged if data is invalid.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-003",
+    "source_id": "AFR-003",
+    "purpose": "PHC Staff can mark a visiting doctor Available or Departed in real time.",
+    "preconditions": "User authenticated as PHC Staff; the doctor's current-day attendance record exists.",
+    "action_or_input": "PHC Staff marks the doctor Available (arrival) or Departed (departure).",
+    "expected_result": "The doctor's current attendance status is updated and saved for patient-facing availability display.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-004",
+    "source_id": "AFR-004",
+    "purpose": "PHC Staff can create a doctor schedule.",
+    "preconditions": "User authenticated as PHC Staff; no schedule exists for the doctor on that day.",
+    "action_or_input": "PHC Staff creates/configures a doctor schedule with doctor name, day, start and end time.",
+    "expected_result": "A doctor schedule is created under PHC Staff authorization; not published until explicitly published.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-005",
+    "source_id": "AFR-005",
+    "purpose": "PHC Staff can publish a doctor schedule for patient visibility.",
+    "preconditions": "User authenticated as PHC Staff; an unpublished doctor schedule exists.",
+    "action_or_input": "PHC Staff selects the schedule and publishes it.",
+    "expected_result": "The published schedule becomes available to patient-facing doctor availability.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-006",
+    "source_id": "AFR-006",
+    "purpose": "PHC Staff can search for a patient profile.",
+    "preconditions": "User authenticated as PHC Staff; patient profiles exist in the system.",
+    "action_or_input": "PHC Staff searches for a patient by name or ID.",
+    "expected_result": "Matching patient profiles are returned to authorized PHC Staff.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-007",
+    "source_id": "AFR-007",
+    "purpose": "PHC Staff can create a patient visit record.",
+    "preconditions": "User authenticated as PHC Staff; a patient profile exists.",
+    "action_or_input": "PHC Staff creates a visit record under the selected patient profile after a consultation.",
+    "expected_result": "The patient record contains the new visit; incomplete records are not persisted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-008",
+    "source_id": "AFR-008",
+    "purpose": "PHC Staff can digitize a physical prescription linked to a patient record.",
+    "preconditions": "User authenticated as PHC Staff; a visit record exists for the patient.",
+    "action_or_input": "PHC Staff enters the physical prescription and links it to the patient/visit record.",
+    "expected_result": "The prescription is stored under the corresponding patient record.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-009",
+    "source_id": "AFR-009",
+    "purpose": "Patient has read-only access to their own medical history.",
+    "preconditions": "User authenticated as a patient; the patient has visit records.",
+    "action_or_input": "Patient opens My Medical Records.",
+    "expected_result": "The patient's own medical history is displayed in read-only form; no medical record is modified.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-010",
+    "source_id": "AFR-010",
+    "purpose": "Patient can access prescriptions associated with their own medical history.",
+    "preconditions": "User authenticated as a patient; prescriptions are linked to the patient's records.",
+    "action_or_input": "Patient views their medical history.",
+    "expected_result": "Prescriptions linked to the authenticated patient's records are displayed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-011",
+    "source_id": "AFR-011",
+    "purpose": "Patient can download PDF copies of their own medical records.",
+    "preconditions": "User authenticated as a patient; selected records belong to the authenticated patient.",
+    "action_or_input": "Patient requests a PDF download while viewing their records.",
+    "expected_result": "A PDF copy of the selected record(s) is provided to the patient.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-012",
+    "source_id": "AFR-012",
+    "purpose": "Access to patient medical data is restricted by role and ownership; patient cannot access another patient's records.",
+    "preconditions": "User authenticated as a patient; another patient's record exists.",
+    "action_or_input": "Patient attempts to access another patient's record.",
+    "expected_result": "Access is denied; no medical record is exposed to an unauthorized user.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-013",
+    "source_id": "AFR-013",
+    "purpose": "Reimbursement submission is restricted to institute employees; students are excluded.",
+    "preconditions": "A student user is authenticated; a valid prescription exists for the student.",
+    "action_or_input": "Student attempts to submit a medical bill reimbursement claim.",
+    "expected_result": "Submission is denied; only eligible employees may submit claims.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-014",
+    "source_id": "AFR-014",
+    "purpose": "Each reimbursement claim must be linked to a valid prescription already recorded for the claimant.",
+    "preconditions": "User authenticated as an employee; no valid prescription exists for the employee.",
+    "action_or_input": "Employee attempts to submit a claim without a valid recorded prescription link.",
+    "expected_result": "Submission is denied; the prescription link is validated before accepting the claim.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-015",
+    "source_id": "AFR-015",
+    "purpose": "The configured reimbursement submission window is enforced against the medical expense date.",
+    "preconditions": "User authenticated as an employee; valid prescription linked; expense date is outside the submission window.",
+    "action_or_input": "Employee attempts to submit a claim with an expense date outside the configured window.",
+    "expected_result": "Submission is denied; the claim is accepted only when within the configured submission window.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-016",
+    "source_id": "AFR-016",
+    "purpose": "An eligible employee can submit a medical bill reimbursement claim entering the approval progression.",
+    "preconditions": "User authenticated as an employee; valid prescription linked; expense date within submission window.",
+    "action_or_input": "Employee submits a valid claim with claim information and selected prescription.",
+    "expected_result": "A valid claim is created and placed in Submitted/Pending PHC Review state, routed to PHC Staff.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-017",
+    "source_id": "AFR-017",
+    "purpose": "A submitted claim moves through PHC review -> A&A verification -> Approving Authority sanction -> A&A payment in order.",
+    "preconditions": "An eligible employee has submitted a claim in Submitted state.",
+    "action_or_input": "The claim is advanced through each stage in the defined forward order.",
+    "expected_result": "The claim progresses sequentially across the stated stages without skipping or reversing.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-018",
+    "source_id": "AFR-018",
+    "purpose": "PHC Staff can review a submitted claim and forward it to Accounts & Audit.",
+    "preconditions": "User authenticated as PHC Staff; claim state is Pending PHC Review.",
+    "action_or_input": "PHC Staff reviews the claim and forwards it to Accounts & Audit.",
+    "expected_result": "The PHC review outcome is recorded; the claim is forwarded to Accounts & Audit (Pending Accounts Verification).",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-019",
+    "source_id": "AFR-019",
+    "purpose": "Accounts & Audit can verify the financial details of a reimbursement claim.",
+    "preconditions": "User authenticated as Accounts & Audit; claim state is Pending Accounts Verification.",
+    "action_or_input": "Accounts & Audit verifies the claim's financial details.",
+    "expected_result": "Verification is recorded; on success the claim is forwarded for sanction (Pending Sanction).",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-020",
+    "source_id": "AFR-020",
+    "purpose": "Approving Authority can approve or reject a reimbursement sanction.",
+    "preconditions": "User authenticated as Approving Authority; claim state is Pending Sanction.",
+    "action_or_input": "Approving Authority selects Approve or Reject for the verified claim.",
+    "expected_result": "Approval or rejection is recorded and the claim state is updated accordingly.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-021",
+    "source_id": "AFR-021",
+    "purpose": "Accounts & Audit can process the final payment for an approved reimbursement claim.",
+    "preconditions": "User authenticated as Accounts & Audit; claim state is Approved for Payment.",
+    "action_or_input": "Accounts & Audit processes the final payment.",
+    "expected_result": "Payment completion is recorded and the claim is closed as Reimbursed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-022",
+    "source_id": "AFR-022",
+    "purpose": "Employee can view current status and action history of their submitted reimbursement claims.",
+    "preconditions": "User authenticated as an employee; the employee has submitted claims.",
+    "action_or_input": "Employee opens My Reimbursement Claims / reimbursement dashboard.",
+    "expected_result": "Current workflow stage and recorded action history are displayed for the employee's claims only.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-023",
+    "source_id": "AFR-023",
+    "purpose": "The claimant is notified when a reimbursement claim status changes, including rejection and payment.",
+    "preconditions": "A claim status transition occurs (e.g. rejection or payment processing).",
+    "action_or_input": "A reimbursement claim status changes.",
+    "expected_result": "A status-change notification is generated for the claimant.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-024",
+    "source_id": "AFR-024",
+    "purpose": "PHC Staff can add to or deduct from inventory stock levels.",
+    "preconditions": "User authenticated as PHC Staff; an inventory item exists.",
+    "action_or_input": "PHC Staff records a stock receipt (add) or consumption (deduct) with a quantity.",
+    "expected_result": "The selected inventory item's stock level is updated; invalid adjustments are rejected.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-025",
+    "source_id": "AFR-025",
+    "purpose": "The updated inventory stock level is compared with the item's reorder threshold.",
+    "preconditions": "An inventory stock level has been updated; the item has a configured reorder threshold.",
+    "action_or_input": "The system evaluates the stock level against the threshold after an update.",
+    "expected_result": "The stock level is evaluated against the configured threshold.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-026",
+    "source_id": "AFR-026",
+    "purpose": "PHC Staff is notified when an inventory item's stock falls below its reorder threshold.",
+    "preconditions": "An updated stock level is below the item's reorder threshold.",
+    "action_or_input": "Stock is updated such that it falls below the reorder threshold.",
+    "expected_result": "A low-stock warning/alert is generated for PHC Staff.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-027",
+    "source_id": "AFR-027",
+    "purpose": "PHC Staff can create and submit an inventory procurement requisition with required items and quantities.",
+    "preconditions": "User authenticated as PHC Staff; inventory items exist.",
+    "action_or_input": "PHC Staff creates a requisition, adds items/quantities, and submits it.",
+    "expected_result": "A requisition is created and submitted in Pending Approval state, routed to the Approving Authority.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-028",
+    "source_id": "AFR-028",
+    "purpose": "A submitted requisition is routed to the Approving Authority for decision.",
+    "preconditions": "A requisition is in Pending Approval state.",
+    "action_or_input": "The submitted requisition reaches the Approving Authority.",
+    "expected_result": "The requisition is routed to the Approving Authority for decision.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-029",
+    "source_id": "AFR-029",
+    "purpose": "Approving Authority can approve or reject a pending inventory requisition.",
+    "preconditions": "User authenticated as Approving Authority; requisition state is Pending Approval.",
+    "action_or_input": "Approving Authority selects Approve or Reject for the pending requisition.",
+    "expected_result": "An Approved or Rejected outcome is recorded; the originating PHC Staff is notified.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-030",
+    "source_id": "AFR-030",
+    "purpose": "The originating PHC Staff member is notified when a requisition is approved or rejected.",
+    "preconditions": "A requisition becomes Approved or Rejected.",
+    "action_or_input": "The Approving Authority records a decision on a requisition.",
+    "expected_result": "A status notification is generated for the requisition originator.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-031",
+    "source_id": "AFR-031",
+    "purpose": "PHC Staff can mark an approved requisition as Fulfilled after supplies are delivered.",
+    "preconditions": "User authenticated as PHC Staff; requisition state is Approved; supplies delivered.",
+    "action_or_input": "PHC Staff marks the approved requisition Fulfilled.",
+    "expected_result": "The requisition state becomes Fulfilled and the workflow is closed; fulfillment does not auto-post stock.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-032",
+    "source_id": "AFR-032",
+    "purpose": "PHC Staff can record ambulance usage with timestamp, patient name, and destination.",
+    "preconditions": "User authenticated as PHC Staff; the PHC ambulance is used.",
+    "action_or_input": "PHC Staff records timestamp, patient name, and destination for the ambulance use.",
+    "expected_result": "The ambulance usage is recorded with all required fields; incomplete entries are not persisted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-033",
+    "source_id": "AFR-033",
+    "purpose": "PHC Staff can publish health advisories visible to all patients on their dashboards.",
+    "preconditions": "User authenticated as PHC Staff; health advisory content exists.",
+    "action_or_input": "PHC Staff publishes a health advisory.",
+    "expected_result": "The health advisory is visible to all patients on their dashboards.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-034",
+    "source_id": "AFR-034",
+    "purpose": "PHC Staff can generate administrative reports on patient demographics, service utilization, and inventory consumption.",
+    "preconditions": "User authenticated as PHC Staff; PHC data exists.",
+    "action_or_input": "PHC Staff requests an administrative report with a category and parameters.",
+    "expected_result": "A report is generated from PHC data for the selected category.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-035",
+    "source_id": "AFR-035",
+    "purpose": "Report output is anonymized and patient-identifiable information is protected.",
+    "preconditions": "A report containing patient-derived data is generated.",
+    "action_or_input": "PHC Staff generates a report with patient-derived data.",
+    "expected_result": "No patient-identifiable information appears in the report output.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-036",
+    "source_id": "AFR-036",
+    "purpose": "Access to every PHC function is restricted according to the authenticated user's assigned role.",
+    "preconditions": "A user attempts to access a PHC function without the required role.",
+    "action_or_input": "A user attempts to access a PHC function.",
+    "expected_result": "Access is authorized or denied based on the user's assigned role.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-037",
+    "source_id": "AFR-037",
+    "purpose": "An immutable audit trail records successful actions creating/modifying/deleting sensitive patient records, inventory levels, or reimbursement-claim status.",
+    "preconditions": "A covered sensitive-data action succeeds (e.g. claim status change, inventory adjustment).",
+    "action_or_input": "A sensitive-data change action is performed.",
+    "expected_result": "An immutable audit record is appended for the action.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-038",
+    "source_id": "AFR-038",
+    "purpose": "Any post-submission change or post-rejection resubmission is made as a new claim, not by modifying or reopening the existing claim.",
+    "preconditions": "A claim is submitted or rejected; the employee needs to change it or claim again.",
+    "action_or_input": "Employee attempts to change a submitted claim or reapply after rejection.",
+    "expected_result": "The existing claim and its history are preserved; a separate new reimbursement claim is required.",
+    "test_type": "negative"
+  }
+]
