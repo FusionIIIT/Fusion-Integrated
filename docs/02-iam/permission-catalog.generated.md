@@ -7,6 +7,18 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `badms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `badms.backup.view` | View authorized backup history | `HoD`, `IT Security Team`, `Super Admin`, `SysAdmin`, `faculty`, `staff`, `student` |
+| `badms.backup.run` | Run a manual database backup | `Super Admin`, `SysAdmin` |
+| `badms.archive.submit` | Submit and track archival requests | `faculty`, `staff`, `student` |
+| `badms.archive.review` | Review archival requests | `HoD` |
+| `badms.archive.classify` | Assign authoritative archival classification | `Super Admin`, `SysAdmin` |
+| `badms.archive.secure` | Complete Sensitive-data encryption and archive creation | `IT Security Team` |
+| `badms.audit.view` | View authorized BADMS audit history | `HoD`, `IT Security Team`, `Super Admin`, `SysAdmin` |
+
 ## `directory`
 
 | Code | What it allows | Held by |

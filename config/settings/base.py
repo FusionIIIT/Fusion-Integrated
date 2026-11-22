@@ -59,6 +59,7 @@ def env_list(name, default=None):
 
 
 SECRET_KEY = env("DJANGO_SECRET_KEY", "django-insecure-dev-only-change-me")
+BADMS_ARCHIVE_ENCRYPTION_KEY = env("BADMS_ARCHIVE_ENCRYPTION_KEY", "")
 DEBUG = False
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", ["localhost", "127.0.0.1"])
 
@@ -90,6 +91,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.badms",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
