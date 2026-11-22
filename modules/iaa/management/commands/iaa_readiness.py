@@ -12,7 +12,7 @@ class Command(BaseCommand):
         problems = []
         if policy_selectors.current_version() is None:
             problems.append("No policy is in effect: publish one under Configuration.")
-        year = policy_selectors.financial_year_on(timezone.now().date())
+        year = policy_selectors.financial_year_on(timezone.localdate())
         if year is None:
             problems.append("No financial year covers today: add one under Configuration.")
         elif not BudgetEntry.objects.filter(financial_year=year).exists():

@@ -215,6 +215,7 @@ REST_FRAMEWORK = {
         "recruiter_invite_accept": "10/hour",
         "apply": "30/hour",
         "export": "5/hour",
+        "iaa_write": "60/min",
         "upload": "20/hour",
         "directory_search": "120/hour",
     },

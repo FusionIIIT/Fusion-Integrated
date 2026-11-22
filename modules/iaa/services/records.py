@@ -4,6 +4,7 @@ from __future__ import annotations
 from decimal import Decimal
 
 from django.db import transaction
+from django.utils import timezone
 
 from core.api.exceptions import ConflictError, DomainError
 from modules.iaa.domain import roles
@@ -44,7 +45,7 @@ def _check_submission(record: FinancialRecord, documents: int) -> None:
 
 
 def _attach_financial_year(record: FinancialRecord) -> None:
-    year = policy_selectors.financial_year_on(now().date())
+    year = policy_selectors.financial_year_on(timezone.localdate())
     if year is None:
         raise ConflictError(
             "No financial year covers today, so nothing can be submitted. Ask the IAA System "

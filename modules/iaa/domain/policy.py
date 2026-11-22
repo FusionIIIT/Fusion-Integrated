@@ -118,10 +118,13 @@ def parse(raw: dict) -> Policy:
     if not types:
         errors.append({"field": "request_types", "message": "Add at least one request type."})
     docs = raw.get("required_documents") or {}
+    if not isinstance(docs, dict):
+        errors.append({"field": "required_documents", "message": "Give a number for each kind."})
+        docs = {}
     required: dict[str, int] = {}
     for kind in KINDS:
         try:
-            required[kind] = int(docs.get(kind, 0)) if isinstance(docs, dict) else 0
+            required[kind] = int(docs.get(kind, 0))
         except (TypeError, ValueError):
             required[kind] = -1
         if required[kind] < 0:

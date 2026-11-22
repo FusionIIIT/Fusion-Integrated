@@ -92,11 +92,21 @@ def _detail(actor, pk):
     return Response(s.RecordDetailSerializer(record).data)
 
 
+WRITE_THROTTLE = "iaa_write"
+
+
 class _ByMethod(APIView):
     """Module grant first, then the permission that this HTTP method needs."""
 
     read: tuple[str, ...] = ()
     write: tuple[str, ...] = ()
+    throttle_scope: str | None = None
+
+    def check_throttles(self, request):
+        # Every write is limited per caller; a view's own scope (the export) wins.
+        if self.throttle_scope is None and request.method not in ("GET", "HEAD", "OPTIONS"):
+            self.throttle_scope = WRITE_THROTTLE
+        super().check_throttles(request)
 
     def get_permissions(self):
         codes = self.read if self.request.method in ("GET", "HEAD", "OPTIONS") else self.write
@@ -119,7 +129,7 @@ class RecordListView(_ByMethod):
     @extend_schema(responses=s.RecordSerializer(many=True), examples=[RECORD_EXAMPLE])
     def get(self, request):
         actor = _actor(request)
-        qs = scoping.records_for(actor)
+        qs = scoping.records_for(actor).select_related("financial_year")
         params = request.query_params
         kind = _choice_param(params, "kind", sm.KINDS)
         state = _choice_param(params, "status", sm.RECORD_STATES)
