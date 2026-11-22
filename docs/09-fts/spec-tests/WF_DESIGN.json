@@ -1,0 +1,254 @@
+[
+  {
+    "action_or_input": "Employee A selects Send/Forward on the active file, provides a mandatory movement comment, and designates Employee B as recipient.",
+    "expected_result": "File state transitions to Active/Circulated held by Employee B. Movement history, audit log updated with sender details, receiver details, timestamp, and comment. Notification event triggered for Employee B.",
+    "preconditions": "An active/circulated file exists held by Institute Employee A (authorized sender). Institute Employee B is a valid recipient. File is not archived.",
+    "purpose": "Verify that an authorized current holder can forward an active file to a valid recipient with a mandatory comment, resulting in the file being held by the recipient.",
+    "source_id": "BW-FTS-01 forward-authorized-path",
+    "test_id": "TC-WF-001",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Employee attempts to forward the file without entering a movement comment.",
+    "expected_result": "Forward action is rejected. File state remains unchanged. No movement history or audit entry created for this action. No notification triggered.",
+    "preconditions": "An active/circulated file exists held by an authorized Institute Employee. A valid recipient is designated.",
+    "purpose": "Verify that forwarding is rejected when no mandatory movement comment is provided.",
+    "source_id": "BW-FTS-01 guard-no-comment",
+    "test_id": "TC-WF-002",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Employee attempts to forward the archived file with a mandatory comment and a valid recipient.",
+    "expected_result": "Forward action is rejected. File remains in Archived/Read-only state. No new movement record created.",
+    "preconditions": "A file exists in Archived state. Institute Employee is associated with the file.",
+    "purpose": "Verify that forwarding is rejected when the file is already archived.",
+    "source_id": "BW-FTS-01 guard-archived-file",
+    "test_id": "TC-WF-003",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Employee C attempts to forward the file with a mandatory comment and a valid recipient.",
+    "expected_result": "Forward action is rejected due to insufficient authorization. File state unchanged. No movement or audit entry created.",
+    "preconditions": "An active/circulated file exists. Institute Employee C is not an authorized holder of the file.",
+    "purpose": "Verify that an unauthorized user cannot forward a file.",
+    "source_id": "BW-FTS-01 guard-unauthorized-sender",
+    "test_id": "TC-WF-004",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Employee B selects Forward on the received active file, provides a mandatory movement comment, and designates Employee C as next recipient.",
+    "expected_result": "File state transitions to Active/Circulated held by Employee C. Movement/history/audit updated. Notification event triggered for Employee C.",
+    "preconditions": "An active/circulated file is held by Institute Employee B (who received it from Employee A). Employee C is a valid next recipient. File is not archived.",
+    "purpose": "Verify that a current holder of an active circulated file can forward it onward to a next recipient with a mandatory comment, completing one loop traversal.",
+    "source_id": "BW-FTS-02 onward-forwarding-one-loop",
+    "test_id": "TC-WF-005",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Current holder attempts to forward the file onward without providing a movement comment.",
+    "expected_result": "Onward forward action rejected. File state unchanged. No movement history entry or audit record created.",
+    "preconditions": "An active/circulated file is held by an authorized current recipient. A valid next recipient is selected.",
+    "purpose": "Verify that onward forwarding is rejected when mandatory movement comment is absent.",
+    "source_id": "BW-FTS-02 guard-no-comment",
+    "test_id": "TC-WF-006",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Employee B selects Return, provides a mandatory movement comment, and confirms return to Employee A.",
+    "expected_result": "File state transitions to Active/Circulated held by Employee A. Return action recorded in movement history with sender details, receiver details, timestamp, and comment. Return notification event triggered for Employee A.",
+    "preconditions": "An active/circulated file is held by Institute Employee B. Previous sender Employee A is known. File is not archived.",
+    "purpose": "Verify that an authorized current recipient can return an active file to the previous sender with a mandatory comment.",
+    "source_id": "BW-FTS-03 return-authorized-path",
+    "test_id": "TC-WF-007",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Employee attempts to return the file without entering a movement comment.",
+    "expected_result": "Return action rejected. File state remains unchanged. No return movement record or audit entry created. No notification triggered.",
+    "preconditions": "An active/circulated file is held by an authorized current recipient. Previous sender is known.",
+    "purpose": "Verify that the return action is rejected when no mandatory movement comment is provided.",
+    "source_id": "BW-FTS-03 guard-no-comment",
+    "test_id": "TC-WF-008",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Employee D attempts to return the file with a mandatory comment.",
+    "expected_result": "Return action rejected due to insufficient authorization. File state unchanged.",
+    "preconditions": "An active/circulated file exists. Institute Employee D is not the current authorized recipient.",
+    "purpose": "Verify that an unauthorized user cannot return a file.",
+    "source_id": "BW-FTS-03 guard-unauthorized-recipient",
+    "test_id": "TC-WF-009",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "File owner selects Archive on the active file.",
+    "expected_result": "File transitions to Archived/Read-only/Permanently retained state. Archive action recorded in audit log. Archive notification event triggered for associated employees. File cannot be modified or forwarded further.",
+    "preconditions": "An active/circulated file exists. The requesting Institute Employee is the file owner. File is not already archived. Intended collaborative objective is complete.",
+    "purpose": "Verify that the file owner can archive a completed active/circulated file, closing the lifecycle.",
+    "source_id": "BW-FTS-04 archive-owner-path",
+    "test_id": "TC-WF-010",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Employee B attempts to archive the file.",
+    "expected_result": "Archive action rejected. File state remains Active/Circulated. No archive audit entry created.",
+    "preconditions": "An active/circulated file exists. Institute Employee B is not the file owner.",
+    "purpose": "Verify that a non-owner cannot archive a file.",
+    "source_id": "BW-FTS-04 guard-non-owner-cannot-archive",
+    "test_id": "TC-WF-011",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "File owner attempts to archive the already-archived file.",
+    "expected_result": "Archive action rejected. File remains in Archived state. No duplicate audit entry created.",
+    "preconditions": "A file already in Archived state exists. The requesting employee is the file owner.",
+    "purpose": "Verify that archiving an already-archived file is rejected.",
+    "source_id": "BW-FTS-04 guard-already-archived",
+    "test_id": "TC-WF-012",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "An associated authorized employee attempts to forward or add a comment to the archived file.",
+    "expected_result": "Modification and forwarding actions are rejected. File remains in Archived/Read-only state.",
+    "preconditions": "A file is in Archived/Read-only state.",
+    "purpose": "Verify that an archived file cannot be forwarded or modified.",
+    "source_id": "BW-FTS-04 archived-file-read-only",
+    "test_id": "TC-WF-013",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Employee creates a new file with a mandatory initial comment (and optional attachments), saves as draft, then immediately forwards it to a recipient with a mandatory movement comment.",
+    "expected_result": "State transitions: (No record) \u2192 Draft/Pre-circulation \u2192 Active/Circulated held by Recipient. File creation and forwarding are recorded in movement history and audit log. Notification triggered for recipient.",
+    "preconditions": "No existing FTS file record for this new file. Institute Employee (Creator/Sender) is authorized. A valid recipient exists.",
+    "purpose": "Verify that a new file can be created with a mandatory initial comment, saved as draft, and immediately forwarded to a recipient with a mandatory movement comment without any draft edit.",
+    "source_id": "BW-FTS-05 create-and-circulate-zero-draft-edit",
+    "test_id": "TC-WF-014",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Employee attempts to create a new file without providing the mandatory initial comment.",
+    "expected_result": "File creation rejected. No Draft file record created. No audit entry for creation.",
+    "preconditions": "No existing FTS file record. Authorized employee initiates new file creation.",
+    "purpose": "Verify that file creation is rejected when the mandatory initial comment is absent.",
+    "source_id": "BW-FTS-05 guard-missing-initial-comment",
+    "test_id": "TC-WF-015",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Employee creates a new file with a mandatory initial comment and one or more optional attachments.",
+    "expected_result": "Draft file record created with the initial comment and attachments. Attachments recorded in audit/history. File saved as Draft/Pre-circulation.",
+    "preconditions": "No existing FTS file record. Authorized employee initiates new file creation.",
+    "purpose": "Verify that optional attachments can be added during file creation and are recorded.",
+    "source_id": "BW-FTS-05 optional-attachment-at-creation",
+    "test_id": "TC-WF-016",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Step 1 \u2013 Employee creates a new file with a mandatory initial comment (Draft created). Step 2 \u2013 Employee opens the draft and edits it (one edit traversal). Step 3 \u2013 Employee forwards the updated draft to a recipient with a mandatory movement comment.",
+    "expected_result": "State transitions: (No record) \u2192 Draft \u2192 Updated Draft \u2192 Active/Circulated held by Recipient. All three transitions are recorded. Notification triggered for recipient.",
+    "preconditions": "No existing FTS file record. Authorized employee has a saved Draft/Pre-circulation file. A valid recipient exists.",
+    "purpose": "Verify the full path: create draft, edit once, then forward to recipient.",
+    "source_id": "BW-FTS-06 create-edit-once-then-circulate",
+    "test_id": "TC-WF-017",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Employee attempts to use the draft-edit function on the active/circulated file.",
+    "expected_result": "Edit action rejected or unavailable. Active/Circulated file state unchanged.",
+    "preconditions": "An active/circulated file exists (not a draft).",
+    "purpose": "Verify that draft edit is only possible when file is in Draft/Pre-circulation state.",
+    "source_id": "BW-FTS-06 guard-draft-edit-requires-draft-state",
+    "test_id": "TC-WF-018",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Employee creates a new file with a mandatory initial comment (Draft created). Employee immediately selects Discard on the draft without editing.",
+    "expected_result": "State transitions: (No record) \u2192 Draft \u2192 Discarded/No active file retained. No active file remains. Discard recorded. File cannot be forwarded or archived.",
+    "preconditions": "No existing FTS file record. Authorized employee has just created a Draft/Pre-circulation file.",
+    "purpose": "Verify that a draft created with zero edit traversals can be discarded before submission.",
+    "source_id": "BW-FTS-07 create-and-discard-zero-draft-edit",
+    "test_id": "TC-WF-019",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Employee attempts to discard the active/circulated file.",
+    "expected_result": "Discard action rejected or unavailable. Active/Circulated file state unchanged.",
+    "preconditions": "An active/circulated file exists (already submitted and circulated).",
+    "purpose": "Verify that discard is only available for draft files and not for circulated files.",
+    "source_id": "BW-FTS-07 guard-discard-only-before-submission",
+    "test_id": "TC-WF-020",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Step 1 \u2013 Employee creates a new file with a mandatory initial comment (Draft created). Step 2 \u2013 Employee edits the draft once (Updated Draft). Step 3 \u2013 Employee selects Discard on the updated draft.",
+    "expected_result": "State transitions: (No record) \u2192 Draft \u2192 Updated Draft \u2192 Discarded/No active file retained. No active file remains. Discarded state recorded.",
+    "preconditions": "No existing FTS file record. Authorized employee has a saved Draft/Pre-circulation file.",
+    "purpose": "Verify that a draft can be edited once and then discarded before circulation.",
+    "source_id": "BW-FTS-08 edit-once-then-discard",
+    "test_id": "TC-WF-021",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Step 1 \u2013 Employee A forwards to Employee B with mandatory comment. Step 2 \u2013 Employee B forwards to Employee C with mandatory comment. Step 3 \u2013 Employee A (file owner) archives the file.",
+    "expected_result": "After Step 1: File held by B, movement history updated, notification to B. After Step 2: File held by C, movement history updated, notification to C. After Step 3: File Archived/Read-only, archive audit recorded, archive notification triggered.",
+    "preconditions": "An active file is held by Employee A (sender). Employee B and Employee C are valid recipients. Employee A is the file owner.",
+    "purpose": "Verify the composite collaborative lifecycle: initial forward (BW-FTS-01) \u2192 onward forward (BW-FTS-02) \u2192 archive (BW-FTS-04).",
+    "source_id": "CW-FTS-01 forward-then-onward-forward-then-archive",
+    "test_id": "TC-WF-022",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Step 1 \u2013 Employee A forwards to Employee B with mandatory comment. Step 2 \u2013 Employee B returns to Employee A with mandatory comment. Step 3 \u2013 Employee A (file owner) archives the file.",
+    "expected_result": "After Step 1: File held by B, movement history updated. After Step 2: File held by A, return recorded, return notification triggered. After Step 3: File Archived/Read-only, archive audit recorded.",
+    "preconditions": "An active file is held by Employee A (sender/file owner). Employee B is a valid recipient.",
+    "purpose": "Verify the composite collaborative lifecycle: initial forward (BW-FTS-01) \u2192 return (BW-FTS-03) \u2192 archive (BW-FTS-04).",
+    "source_id": "CW-FTS-01 forward-then-return-then-archive",
+    "test_id": "TC-WF-023",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Step 1 \u2013 Employee A forwards to Employee B. Step 2 \u2013 Employee B forwards to Employee C. Step 3 \u2013 Employee C returns to Employee B. Step 4 \u2013 Employee A archives the file.",
+    "expected_result": "Each transition updates movement history and triggers required notifications. After Step 4 file is Archived/Read-only. Audit log reflects all four transitions chronologically.",
+    "preconditions": "An active file is held by Employee A (sender/file owner). Employees B and C are valid recipients.",
+    "purpose": "Verify the composite path: initial forward \u2192 onward forward \u2192 return after onward traversal \u2192 archive.",
+    "source_id": "CW-FTS-01 forward-onward-return-archive",
+    "test_id": "TC-WF-024",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Creator makes a new file with mandatory initial comment, then immediately forwards to recipient with mandatory movement comment.",
+    "expected_result": "State: (No record) \u2192 Draft \u2192 Active/Circulated held by Recipient. Full creation-to-circulation audit chain recorded. Notification triggered.",
+    "preconditions": "No existing FTS file record. Authorized employee (Creator/Sender) and a valid recipient exist.",
+    "purpose": "Verify the composite new-file path: create \u2192 circulate immediately (BW-FTS-05 integrated via CW-FTS-02).",
+    "source_id": "CW-FTS-02 new-file-zero-draft-edit-circulate",
+    "test_id": "TC-WF-025",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Creator makes a new file with mandatory initial comment (Draft), edits the draft once (Updated Draft), then forwards to recipient with mandatory movement comment.",
+    "expected_result": "State: (No record) \u2192 Draft \u2192 Updated Draft \u2192 Active/Circulated held by Recipient. All transitions recorded in audit. Notification triggered.",
+    "preconditions": "No existing FTS file record. Authorized employee (Creator/Sender) and a valid recipient exist.",
+    "purpose": "Verify the composite new-file path: create \u2192 edit draft once \u2192 circulate (BW-FTS-06 integrated via CW-FTS-02).",
+    "source_id": "CW-FTS-02 new-file-one-draft-edit-then-circulate",
+    "test_id": "TC-WF-026",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Creator makes a new file with mandatory initial comment (Draft), then immediately selects Discard without editing.",
+    "expected_result": "State: (No record) \u2192 Draft \u2192 Discarded. No active file remains. Discard recorded. No notification for forwarding/archiving triggered.",
+    "preconditions": "No existing FTS file record. Authorized employee initiates new file creation.",
+    "purpose": "Verify the composite new-file path: create \u2192 discard immediately with no prior edit (BW-FTS-07 integrated via CW-FTS-02).",
+    "source_id": "CW-FTS-02 new-file-zero-draft-edit-discard",
+    "test_id": "TC-WF-027",
+    "test_type": "functional"
+  },
+  {
+    "action_or_input": "Creator makes a new file with mandatory initial comment (Draft), edits the draft once (Updated Draft), then selects Discard.",
+    "expected_result": "State: (No record) \u2192 Draft \u2192 Updated Draft \u2192 Discarded. No active file remains. All transitions recorded. No forwarding or archiving notification triggered.",
+    "preconditions": "No existing FTS file record. Authorized employee initiates new file creation.",
+    "purpose": "Verify the composite new-file path: create \u2192 edit draft once \u2192 discard (BW-FTS-08 integrated via CW-FTS-02).",
+    "source_id": "CW-FTS-02 new-file-one-draft-edit-then-discard",
+    "test_id": "TC-WF-028",
+    "test_type": "functional"
+  }
+]
