@@ -34,6 +34,131 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "elm": {
+      "grants": {
+        "Employee": [
+          "elm.leave_balances.view",
+          "elm.leave_policies.view",
+          "elm.leave_requests.view",
+          "elm.leave_types.view"
+        ],
+        "Leave Administrator": [
+          "elm.leave_balances.view",
+          "elm.leave_policies.manage",
+          "elm.leave_policies.view",
+          "elm.leave_requests.view",
+          "elm.leave_types.view"
+        ],
+        "Unit Head": [
+          "elm.leave_balances.manage",
+          "elm.leave_balances.view",
+          "elm.leave_policies.view",
+          "elm.leave_requests.approve",
+          "elm.leave_requests.view",
+          "elm.leave_types.view"
+        ]
+      },
+      "module_grants": [
+        "Employee",
+        "Leave Administrator",
+        "Unit Head"
+      ],
+      "nav": {
+        "base_path": "/elm",
+        "icon": "CalendarMinus",
+        "items": [
+          {
+            "code": "elm.leave_requests",
+            "icon": "CalendarMinus",
+            "label": "Leave Requests",
+            "required_permission": "elm.leave_requests.view",
+            "sort_order": 10,
+            "to": "/elm/requests"
+          },
+          {
+            "code": "elm.leave_balances",
+            "icon": "CalendarCheck",
+            "label": "Leave Balances",
+            "required_permission": "elm.leave_balances.view",
+            "sort_order": 20,
+            "to": "/elm/balances"
+          },
+          {
+            "code": "elm.leave_types",
+            "icon": "Tag",
+            "label": "Leave Types",
+            "required_permission": "elm.leave_types.view",
+            "sort_order": 30,
+            "to": "/elm/types"
+          },
+          {
+            "code": "elm.leave_policies",
+            "icon": "FileText",
+            "label": "Leave Policies",
+            "required_permission": "elm.leave_policies.view",
+            "sort_order": 40,
+            "to": "/elm/policies"
+          }
+        ],
+        "label": "Employee Leave Management",
+        "nav_section": "HR",
+        "sort_order": 5,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "elm.leave_requests.view",
+          "label": "View leave requests"
+        },
+        {
+          "code": "elm.leave_balances.view",
+          "label": "View leave balances"
+        },
+        {
+          "code": "elm.leave_types.view",
+          "label": "View leave types"
+        },
+        {
+          "code": "elm.leave_policies.view",
+          "label": "View leave policies"
+        },
+        {
+          "code": "elm.leave_requests.approve",
+          "label": "Process generated leave-request actions"
+        },
+        {
+          "code": "elm.leave_balances.manage",
+          "label": "Update leave balances"
+        },
+        {
+          "code": "elm.leave_policies.manage",
+          "label": "Maintain generated leave configuration"
+        },
+        {
+          "code": "elm.leave_requests.auto_approve",
+          "label": "auto_approve"
+        },
+        {
+          "code": "elm.leave_requests.manual_approve",
+          "label": "manual_approve"
+        },
+        {
+          "code": "elm.leave_balances.update",
+          "label": "update"
+        },
+        {
+          "code": "elm.leave_policies.edit",
+          "label": "edit"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "elm.leave_balances.update",
+        "elm.leave_policies.edit",
+        "elm.leave_requests.auto_approve",
+        "elm.leave_requests.manual_approve"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
