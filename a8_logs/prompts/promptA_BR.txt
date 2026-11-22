@@ -1,0 +1,358 @@
+You are designing automated specification-based tests for the LMS (Course Management) Fusion ERP module.
+
+Source of truth: Use ONLY the supplied Problem Statement and Business Rules from the Business Rule Specifications.
+Do NOT inspect implementation code.
+Do NOT infer behavior from implementation.
+Do NOT introduce behavior unsupported by the supplied specification.
+Generate the minimum non-redundant set of test cases needed to satisfy the strategy-specific adequacy rule below. Do not stop at an arbitrary number, do not omit an explicit test obligation to reduce the test count, and do not invent unsupported behavior. Prefer observable behavior that can subsequently be automated using pytest/pytest-django.
+
+For every test case output exactly these fields:
+- test_id
+- source_id
+- purpose
+- preconditions
+- action_or_input
+- expected_result
+- test_type
+- source_id must identify the exact obligation covered (for example: AFR-03, UC-05 Main Flow, UC-05 Alternative A1, BR-07 condition-false, WF-02 approval-rejected path).
+
+Output ONLY a valid JSON array. Do not provide explanation or additional prose.
+
+=== STRATEGY-SPECIFIC ADEQUACY RULE (apply exactly) ===
+Cover every Business Rule with at least one test. Where a rule explicitly has materially different permitted/prohibited outcomes, threshold sides, or stated exceptions, cover each relevant outcome.
+
+Test obligation = one explicitly specified behavior/flow/rule/path that the rule above requires to be tested. A single test may cover more than one closely related obligation, but unrelated obligations should not be merged merely to reduce the number of tests.
+
+=== PROBLEM STATEMENT (v1.0, unchanged) ===
+[Title] LMS (Course Management)
+Problem Statement
+--- TABLE ---
+Module | LMS (Course Management) | Status | DRAFT
+Version | v1.0 | Date | 2026-08-31
+--- END TABLE ---
+[Heading 1] 1. Overview
+Right now, when a student opens a course in Fusion, they just see basic course info. This module, LMS (Course Management), adds a proper course page for every course, similar to how Canvas works. When a student clicks on a course they are registered in, it opens that course's own page with its details, materials, announcements, and assignments, all in one place.
+Inside a course page, students can view materials, read announcements, submit assignments, and check their grades. Faculty can post materials and announcements, create assignments, and grade student submissions. TAs help with grading and posting updates. Observers can only view the course, without touching or seeing student-specific data.
+This module uses the course registration data that already exists in Fusion. It does not change how registration, add/drop, or the academic calendar work. The focus here is simple: the right people should see the right course content, and assignments should move smoothly from posted to submitted to graded.
+[Heading 1] 2. Actors
+[Heading 2] 2.1 Student
+[List Paragraph] Views course details, materials, and announcements for courses they are registered in.
+[List Paragraph] Views and downloads published assignments.
+[List Paragraph] Submits assignment work within the configured submission window.
+[List Paragraph] Views their own submission status and grade/feedback once released.
+[Heading 2] 2.2 Faculty
+[List Paragraph] Owns and configures the course workspace for assigned courses.
+[List Paragraph] Publishes and edits course details and materials.
+[List Paragraph] Posts announcements.
+[List Paragraph] Creates, edits, and publishes assignments, including due date, instructions, submission type, and points possible.
+[List Paragraph] Grades submissions and releases grades/feedback to students.
+[Heading 2] 2.3 Teaching Assistant (TA)
+[List Paragraph] Views course details, materials, and announcements.
+[List Paragraph] Posts announcements where permitted by Faculty for the course.
+[List Paragraph] Views student submissions for the assigned course.
+[List Paragraph] Grades submissions; grading actions are attributed to the TA.
+[List Paragraph] Cannot create or edit assignments, materials, or course structure.
+[Heading 2] 2.4 Observer
+[List Paragraph] Has read-only access to course details, materials, and announcements for a course they are linked to.
+[List Paragraph] Cannot view individual student submissions, grades, or any other student-specific data.
+[List Paragraph] Has no write access anywhere in the module.
+[Heading 1] 3. Functional Scope
+[Heading 2] 3.1 Course Access and Details
+[List Paragraph] Clicking a registered course opens a dedicated course workspace (course home page).
+[List Paragraph] Course home displays syllabus, schedule, instructor(s), and TA(s) for the course.
+[List Paragraph] Access to a course workspace is restricted to users enrolled in, or linked to, that specific course.
+[Heading 2] 3.2 Course Materials
+[List Paragraph] Faculty upload and organize materials (files, links, notes) into modules or weekly sections.
+[List Paragraph] Materials may be scheduled for a future release date.
+[List Paragraph] Students, TAs, and Observers have read-only access to published materials.
+[Heading 2] 3.3 Announcements
+[List Paragraph] Faculty, and TAs where permitted, post course-wide announcements.
+[List Paragraph] Announcements are timestamped and visible to all users enrolled in, or linked to, the course.
+[List Paragraph] Notification delivery channel for new announcements is to be defined.
+[Heading 2] 3.4 Assignments
+[List Paragraph] Faculty create assignments with a due date, instructions, submission type, and points possible.
+[List Paragraph] Assignments have a draft state before they are published to students.
+[List Paragraph] Assignment visibility to students follows the configured release date.
+[Heading 2] 3.5 Assignment Submission
+[List Paragraph] Students submit work (file, text, or link, per the assignment's configured submission type) before the due date.
+[List Paragraph] Late-submission handling is to be defined (e.g., blocked, flagged as late, or admin-overridable).
+[List Paragraph] Students can view their own submission history and status (submitted, late, missing).
+[List Paragraph] Resubmission policy is to be defined.
+[Heading 2] 3.6 Grading
+[List Paragraph] Faculty and TAs grade individual submissions and enter points and feedback.
+[List Paragraph] Grades are held in a draft state until released; students cannot see a grade before release.
+[List Paragraph] Once released, students view their grade and feedback in read-only form.
+[List Paragraph] Grade changes made after release are logged, recording who made the change and when.
+[Heading 1] 4. Out of Scope for the Current Baseline
+[List Paragraph] Course registration, add/drop, and waitlist management (handled by the existing academic-registration functionality).
+[List Paragraph] Final result computation and official grade-sheet publication (handled by the Examination (EX) module).
+[List Paragraph] Plagiarism detection or originality checking.
+[List Paragraph] Live classes, video conferencing, or real-time chat.
+[List Paragraph] Discussion forums or Q&A boards.
+[List Paragraph] Peer review or peer grading.
+[List Paragraph] Rubric-based structured grading (single score plus feedback only, for this baseline).
+[List Paragraph] Group assignments and group submissions.
+[Heading 1] 5. Open Questions for Discussion
+[List Paragraph] Exact late-submission policy: hard block, flag-as-late, or Faculty/admin override.
+[List Paragraph] Whether TA announcement and grading permissions are configurable per course or fixed for all courses.
+[List Paragraph] Notification channel(s) for announcements and grade release (email, in-app, or both).
+[List Paragraph] Whether an Observer account is linked to one specific student or to an entire course section.
+[List Paragraph] Resubmission policy: number of attempts allowed, and whether late resubmissions are treated differently.
+
+=== Business Rules from the Business Rule Specifications ===
+[Title] LMS (Course Management)
+Business Rule Specifications — Version 1.0
+SYNCHRONIZED DRAFT — unresolved policy is not invented
+[Heading 1] 1. Rule scope
+This registry contains active reusable governing logic supported by the Problem Statement. Items explicitly left open in the Problem Statement are recorded in the Issue Register and are not converted into fabricated Business Rules.
+[Heading 1] 2. Business Rule Registry
+--- TABLE ---
+BR ID | Rule Name | Type | Applies To | Related CFRs | Status
+BR-LMS-001 | Course-specific access control | Authorization | UC-LMS-001, 004, 006, 009 |  | Active
+BR-LMS-002 | Student registration data governs Student course access | Authorization | UC-LMS-001, 009, 010, 011, 014 |  | Active
+BR-LMS-003 | Observer read-only and student-data restriction | Authorization/Privacy | UC-LMS-001, 004, 006 |  | Active
+BR-LMS-004 | TA authoring restriction | Authorization | UC-LMS-002, 003, 005, 007, 012 |  | Active
+BR-LMS-005 | Published material visibility | Lifecycle/Visibility | UC-LMS-003, 004, 015 |  | Active
+BR-LMS-006 | Scheduled material release | Trigger/Time | UC-LMS-003, 015 |  | Active
+BR-LMS-007 | Announcement posting authority | Authorization | UC-LMS-005 |  | Active
+BR-LMS-008 | Announcement timestamp and audience | Lifecycle/Visibility | UC-LMS-005, 006 |  | Active
+BR-LMS-009 | Assignment required configuration | Validation | UC-LMS-007, 008 |  | Active
+BR-LMS-010 | Assignment draft-before-publication | Lifecycle | UC-LMS-007, 008 |  | Active
+BR-LMS-011 | Assignment release-date visibility | Trigger/Time/Visibility | UC-LMS-008, 009, 015 |  | Active
+BR-LMS-012 | Submission-type conformity | Validation | UC-LMS-010 |  | Active
+BR-LMS-013 | Baseline on-time submission | Time/Validation | UC-LMS-010 |  | Active with unresolved late-policy extension
+BR-LMS-014 | Submission ownership/privacy | Authorization/Privacy | UC-LMS-010, 011 |  | Active
+BR-LMS-015 | Grading authority and attribution | Authorization/Audit | UC-LMS-012 |  | Active
+BR-LMS-016 | Draft grade visibility | Lifecycle/Visibility | UC-LMS-012, 013, 014 |  | Active
+BR-LMS-017 | Grade release authority | Authorization | UC-LMS-013 |  | Active
+BR-LMS-018 | Released grade read-only to Student | Authorization/Visibility | UC-LMS-013, 014 |  | Active
+BR-LMS-019 | Post-release grade-change audit | Audit | UC-LMS-012 |  | Active audit obligation
+--- END TABLE ---
+[Heading 2] BR-LMS-001 — Course-specific access control
+--- TABLE ---
+Rule Type | Authorization
+Rule Statement | A user may access a course workspace only for a course in which the user is enrolled, assigned, or otherwise linked.
+Applies To | UC-LMS-001, 004, 006, 009
+Condition / Trigger | Course access requested
+Required Outcome / Constraint | Allow only if course-specific association is established.
+Exceptions / Exclusions | Observer linkage granularity remains unresolved.
+Source / Rationale | PS §3.1
+Related CFRs | 
+Status | Active
+--- END TABLE ---
+[Heading 2] BR-LMS-002 — Student registration data governs Student course access
+--- TABLE ---
+Rule Type | Authorization
+Rule Statement | Student course access shall be based on the existing Fusion course-registration data; this module shall not redefine registration/add-drop/waitlist rules.
+Applies To | UC-LMS-001, 009, 010, 011, 014
+Condition / Trigger | Student course access requested
+Required Outcome / Constraint | Use existing registration data as authority for Student course membership.
+Exceptions / Exclusions | Registration/add-drop/waitlist processing remains out of scope.
+Source / Rationale | PS §1; §4
+Related CFRs | 
+Status | Active
+--- END TABLE ---
+[Heading 2] BR-LMS-003 — Observer read-only and student-data restriction
+--- TABLE ---
+Rule Type | Authorization/Privacy
+Rule Statement | An Observer may read course details, published materials, and announcements for the linked course, but may not view individual submissions, grades, or other Student-specific data and may not perform any write action.
+Applies To | UC-LMS-001, 004, 006
+Condition / Trigger | Observer accesses LMS
+Required Outcome / Constraint | Permit only non-student-specific read operations for linked course.
+Exceptions / Exclusions | Exact linkage scope unresolved.
+Source / Rationale | PS §2.4
+Related CFRs | 
+Status | Active
+--- END TABLE ---
+[Heading 2] BR-LMS-004 — TA authoring restriction
+--- TABLE ---
+Rule Type | Authorization
+Rule Statement | A TA may view permitted course content, view submissions, grade, and post announcements where permitted, but may not create/edit assignments, materials, or course structure.
+Applies To | UC-LMS-002, 003, 005, 007, 012
+Condition / Trigger | TA attempts course action
+Required Outcome / Constraint | Allow only capabilities explicitly assigned to TA role.
+Exceptions / Exclusions | Whether announcement/grading permissions are configurable or fixed remains unresolved.
+Source / Rationale | PS §2.3
+Related CFRs | 
+Status | Active
+--- END TABLE ---
+[Heading 2] BR-LMS-005 — Published material visibility
+--- TABLE ---
+Rule Type | Lifecycle/Visibility
+Rule Statement | Students, TAs, and Observers may view course materials only after those materials are published/released for the course.
+Applies To | UC-LMS-003, 004, 015
+Condition / Trigger | Material access or release
+Required Outcome / Constraint | Expose only published material.
+Exceptions / Exclusions | N/A
+Source / Rationale | PS §3.2
+Related CFRs | 
+Status | Active
+--- END TABLE ---
+[Heading 2] BR-LMS-006 — Scheduled material release
+--- TABLE ---
+Rule Type | Trigger/Time
+Rule Statement | A course material configured with a future release date shall remain unavailable until that release date/time is reached.
+Applies To | UC-LMS-003, 015
+Condition / Trigger | Future material release configured
+Required Outcome / Constraint | Maintain Scheduled state until trigger; release at configured time.
+Exceptions / Exclusions | N/A
+Source / Rationale | PS §3.2
+Related CFRs | 
+Status | Active
+--- END TABLE ---
+[Heading 2] BR-LMS-007 — Announcement posting authority
+--- TABLE ---
+Rule Type | Authorization
+Rule Statement | Faculty may post course announcements; a TA may post only where permitted by Faculty for that course.
+Applies To | UC-LMS-005
+Condition / Trigger | Announcement post attempted
+Required Outcome / Constraint | Allow Faculty; allow TA only if permission condition holds.
+Exceptions / Exclusions | Mechanism/configurability unresolved.
+Source / Rationale | PS §2.3; §3.3
+Related CFRs | 
+Status | Active
+--- END TABLE ---
+[Heading 2] BR-LMS-008 — Announcement timestamp and audience
+--- TABLE ---
+Rule Type | Lifecycle/Visibility
+Rule Statement | Each posted announcement shall be timestamped and visible to all users enrolled in or linked to the course.
+Applies To | UC-LMS-005, 006
+Condition / Trigger | Announcement posted
+Required Outcome / Constraint | Record timestamp and expose course-wide to authorized course users.
+Exceptions / Exclusions | Notification channel is unresolved and is not part of this active rule.
+Source / Rationale | PS §3.3
+Related CFRs | 
+Status | Active
+--- END TABLE ---
+[Heading 2] BR-LMS-009 — Assignment required configuration
+--- TABLE ---
+Rule Type | Validation
+Rule Statement | An assignment must define due date, instructions, submission type, and points possible before publication.
+Applies To | UC-LMS-007, 008
+Condition / Trigger | Assignment saved/published
+Required Outcome / Constraint | Require all specified fields.
+Exceptions / Exclusions | N/A
+Source / Rationale | PS §3.4
+Related CFRs | 
+Status | Active
+--- END TABLE ---
+[Heading 2] BR-LMS-010 — Assignment draft-before-publication
+--- TABLE ---
+Rule Type | Lifecycle
+Rule Statement | An assignment shall remain in Draft state before Faculty publishes it.
+Applies To | UC-LMS-007, 008
+Condition / Trigger | Assignment created/edited
+Required Outcome / Constraint | Keep Draft until publish action succeeds.
+Exceptions / Exclusions | N/A
+Source / Rationale | PS §3.4
+Related CFRs | 
+Status | Active
+--- END TABLE ---
+[Heading 2] BR-LMS-011 — Assignment release-date visibility
+--- TABLE ---
+Rule Type | Trigger/Time/Visibility
+Rule Statement | A published assignment shall become visible to Students only when its configured release date/time condition is satisfied.
+Applies To | UC-LMS-008, 009, 015
+Condition / Trigger | Publish/release/access
+Required Outcome / Constraint | Withhold until release condition; expose after release.
+Exceptions / Exclusions | N/A
+Source / Rationale | PS §3.4
+Related CFRs | 
+Status | Active
+--- END TABLE ---
+[Heading 2] BR-LMS-012 — Submission-type conformity
+--- TABLE ---
+Rule Type | Validation
+Rule Statement | A Student submission must use the submission type configured for the assignment: file, text, or link.
+Applies To | UC-LMS-010
+Condition / Trigger | Submission attempted
+Required Outcome / Constraint | Accept only configured submission type.
+Exceptions / Exclusions | N/A
+Source / Rationale | PS §3.5
+Related CFRs | 
+Status | Active
+--- END TABLE ---
+[Heading 2] BR-LMS-013 — Baseline on-time submission
+--- TABLE ---
+Rule Type | Time/Validation
+Rule Statement | The current baseline explicitly supports Student submission before the due date; late-submission behavior is unresolved and shall not be invented.
+Applies To | UC-LMS-010
+Condition / Trigger | Submission attempted
+Required Outcome / Constraint | Accept baseline on-time submission; defer late behavior to resolved policy.
+Exceptions / Exclusions | ISS-LMS-001
+Source / Rationale | PS §3.5
+Related CFRs | 
+Status | Active with unresolved late-policy extension
+--- END TABLE ---
+[Heading 2] BR-LMS-014 — Submission ownership/privacy
+--- TABLE ---
+Rule Type | Authorization/Privacy
+Rule Statement | A Student may view only the Student’s own submission history and status.
+Applies To | UC-LMS-010, 011
+Condition / Trigger | Submission history/status requested
+Required Outcome / Constraint | Return only requesting Student’s data.
+Exceptions / Exclusions | N/A
+Source / Rationale | PS §3.5
+Related CFRs | 
+Status | Active
+--- END TABLE ---
+[Heading 2] BR-LMS-015 — Grading authority and attribution
+--- TABLE ---
+Rule Type | Authorization/Audit
+Rule Statement | Faculty and TAs may grade individual submissions for the applicable course, and each grading action shall be attributed to the person who performed it.
+Applies To | UC-LMS-012
+Condition / Trigger | Grading attempted
+Required Outcome / Constraint | Require valid Faculty/TA course role and record grader identity.
+Exceptions / Exclusions | TA permission configuration unresolved.
+Source / Rationale | PS §2.2–2.3; §3.6
+Related CFRs | 
+Status | Active
+--- END TABLE ---
+[Heading 2] BR-LMS-016 — Draft grade visibility
+--- TABLE ---
+Rule Type | Lifecycle/Visibility
+Rule Statement | Grades and feedback shall remain Draft and invisible to Students until released.
+Applies To | UC-LMS-012, 013, 014
+Condition / Trigger | Grade created/viewed
+Required Outcome / Constraint | Hide Draft grade from Student; expose only Released grade.
+Exceptions / Exclusions | N/A
+Source / Rationale | PS §3.6
+Related CFRs | 
+Status | Active
+--- END TABLE ---
+[Heading 2] BR-LMS-017 — Grade release authority
+--- TABLE ---
+Rule Type | Authorization
+Rule Statement | Under the current baseline, Faculty releases grades and feedback to Students; TA grading does not by itself release grades.
+Applies To | UC-LMS-013
+Condition / Trigger | Grade release attempted
+Required Outcome / Constraint | Allow release by Faculty.
+Exceptions / Exclusions | PS does not state TA release authority.
+Source / Rationale | PS §2.2–2.3; §3.6
+Related CFRs | 
+Status | Active
+--- END TABLE ---
+[Heading 2] BR-LMS-018 — Released grade read-only to Student
+--- TABLE ---
+Rule Type | Authorization/Visibility
+Rule Statement | After release, a Student may view the Student’s own grade and feedback in read-only form.
+Applies To | UC-LMS-013, 014
+Condition / Trigger | Released grade viewed
+Required Outcome / Constraint | Show corresponding Student’s released grade/feedback; no Student write access.
+Exceptions / Exclusions | N/A
+Source / Rationale | PS §2.1; §3.6
+Related CFRs | 
+Status | Active
+--- END TABLE ---
+[Heading 2] BR-LMS-019 — Post-release grade-change audit
+--- TABLE ---
+Rule Type | Audit
+Rule Statement | Whenever a released grade is changed, the system shall log the change, recording who made it and when.
+Applies To | UC-LMS-012
+Condition / Trigger | Released grade changed
+Required Outcome / Constraint | Create audit record containing actor identity and timestamp.
+Exceptions / Exclusions | Authority/effect of post-release change unresolved; ISS-LMS-006.
+Source / Rationale | PS §3.6
+Related CFRs | 
+Status | Active audit obligation
+--- END TABLE ---
