@@ -34,6 +34,195 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "lms": {
+      "grants": {
+        "Assistant Professor": [
+          "lms.announcement.create",
+          "lms.announcement.view",
+          "lms.assignment.manage",
+          "lms.assignment.view",
+          "lms.course.manage",
+          "lms.course.view",
+          "lms.grade.create",
+          "lms.grade.release",
+          "lms.grade.view",
+          "lms.material.manage",
+          "lms.material.view",
+          "lms.submission.view"
+        ],
+        "Associate Professor": [
+          "lms.announcement.create",
+          "lms.announcement.view",
+          "lms.assignment.manage",
+          "lms.assignment.view",
+          "lms.course.manage",
+          "lms.course.view",
+          "lms.grade.create",
+          "lms.grade.release",
+          "lms.grade.view",
+          "lms.material.manage",
+          "lms.material.view",
+          "lms.submission.view"
+        ],
+        "Observer": [
+          "lms.announcement.view",
+          "lms.course.view",
+          "lms.material.view"
+        ],
+        "Professor": [
+          "lms.announcement.create",
+          "lms.announcement.view",
+          "lms.assignment.manage",
+          "lms.assignment.view",
+          "lms.course.manage",
+          "lms.course.view",
+          "lms.grade.create",
+          "lms.grade.release",
+          "lms.grade.view",
+          "lms.material.manage",
+          "lms.material.view",
+          "lms.submission.view"
+        ],
+        "Teaching Assistant": [
+          "lms.announcement.create",
+          "lms.announcement.view",
+          "lms.assignment.view",
+          "lms.course.view",
+          "lms.grade.create",
+          "lms.material.view",
+          "lms.submission.view"
+        ],
+        "student": [
+          "lms.announcement.view",
+          "lms.assignment.view",
+          "lms.course.view",
+          "lms.grade.view",
+          "lms.material.view",
+          "lms.submission.create",
+          "lms.submission.view_own"
+        ]
+      },
+      "module_grants": [
+        "Assistant Professor",
+        "Associate Professor",
+        "Observer",
+        "Professor",
+        "Teaching Assistant",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/lms",
+        "icon": "BookOpen",
+        "items": [
+          {
+            "code": "lms.course",
+            "icon": "BookOpen",
+            "label": "Course Workspace",
+            "required_permission": "lms.course.view",
+            "sort_order": 10,
+            "to": "/lms/courses/:id"
+          },
+          {
+            "code": "lms.materials",
+            "icon": "Files",
+            "label": "Course Materials",
+            "required_permission": "lms.material.view",
+            "sort_order": 20,
+            "to": "/lms/courses/:id/materials"
+          },
+          {
+            "code": "lms.announcements",
+            "icon": "Megaphone",
+            "label": "Announcements",
+            "required_permission": "lms.announcement.view",
+            "sort_order": 30,
+            "to": "/lms/courses/:id/announcements"
+          },
+          {
+            "code": "lms.assignments",
+            "icon": "ClipboardText",
+            "label": "Assignments",
+            "required_permission": "lms.assignment.view",
+            "sort_order": 40,
+            "to": "/lms/courses/:id/assignments"
+          },
+          {
+            "code": "lms.gradebook",
+            "icon": "ChartBar",
+            "label": "Gradebook",
+            "required_permission": "lms.grade.view",
+            "sort_order": 50,
+            "to": "/lms/courses/:id/gradebook"
+          }
+        ],
+        "label": "LMS (Course Management)",
+        "nav_section": "Academic",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "lms.course.view",
+          "label": "View course workspace"
+        },
+        {
+          "code": "lms.course.manage",
+          "label": "Manage course details"
+        },
+        {
+          "code": "lms.material.view",
+          "label": "View published materials"
+        },
+        {
+          "code": "lms.material.manage",
+          "label": "Create and schedule materials"
+        },
+        {
+          "code": "lms.announcement.view",
+          "label": "View announcements"
+        },
+        {
+          "code": "lms.announcement.create",
+          "label": "Post announcements"
+        },
+        {
+          "code": "lms.assignment.view",
+          "label": "View published assignments"
+        },
+        {
+          "code": "lms.assignment.manage",
+          "label": "Create and publish assignments"
+        },
+        {
+          "code": "lms.submission.create",
+          "label": "Submit assignment work"
+        },
+        {
+          "code": "lms.submission.view_own",
+          "label": "View own submission history"
+        },
+        {
+          "code": "lms.submission.view",
+          "label": "View submissions"
+        },
+        {
+          "code": "lms.grade.create",
+          "label": "Grade submissions"
+        },
+        {
+          "code": "lms.grade.release",
+          "label": "Release grades and feedback"
+        },
+        {
+          "code": "lms.grade.view",
+          "label": "View released grades"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "lms.scheduled_release.run"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

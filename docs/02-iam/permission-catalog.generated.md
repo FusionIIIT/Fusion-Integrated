@@ -13,6 +13,25 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `lms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `lms.course.view` | View course workspace | `Assistant Professor`, `Associate Professor`, `Observer`, `Professor`, `Teaching Assistant`, `student` |
+| `lms.course.manage` | Manage course details | `Assistant Professor`, `Associate Professor`, `Professor` |
+| `lms.material.view` | View published materials | `Assistant Professor`, `Associate Professor`, `Observer`, `Professor`, `Teaching Assistant`, `student` |
+| `lms.material.manage` | Create and schedule materials | `Assistant Professor`, `Associate Professor`, `Professor` |
+| `lms.announcement.view` | View announcements | `Assistant Professor`, `Associate Professor`, `Observer`, `Professor`, `Teaching Assistant`, `student` |
+| `lms.announcement.create` | Post announcements | `Assistant Professor`, `Associate Professor`, `Professor`, `Teaching Assistant` |
+| `lms.assignment.view` | View published assignments | `Assistant Professor`, `Associate Professor`, `Professor`, `Teaching Assistant`, `student` |
+| `lms.assignment.manage` | Create and publish assignments | `Assistant Professor`, `Associate Professor`, `Professor` |
+| `lms.submission.create` | Submit assignment work | `student` |
+| `lms.submission.view_own` | View own submission history | `student` |
+| `lms.submission.view` | View submissions | `Assistant Professor`, `Associate Professor`, `Professor`, `Teaching Assistant` |
+| `lms.grade.create` | Grade submissions | `Assistant Professor`, `Associate Professor`, `Professor`, `Teaching Assistant` |
+| `lms.grade.release` | Release grades and feedback | `Assistant Professor`, `Associate Professor`, `Professor` |
+| `lms.grade.view` | View released grades | `Assistant Professor`, `Associate Professor`, `Professor`, `student` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
