@@ -10,22 +10,27 @@ Student 1's 10/10 commit the baseline ran on (hash): f1dce95fa4943123c22cc6f32d2
 ## Results
 | Run | Strategy | Cases | Passed | Failed | Skipped | Line % | Branch % |
 |-----|----------|-------|--------|--------|---------|--------|----------|
-| baseline | FR | 65 | 58 | 7 | 0 | 49.71 | 2.49 |
-| baseline | UC | 66 | 59 | 7 | 0 | 50.32 | 4.10 |
-| baseline | BR | 76 | 72 | 4 | 0 | 50.27 | 4.10 |
-| baseline | WF | 18 | 17 | 1 | 0 | 48.80 | 1.87 |
-| Q2 | FR | 65 | 58 | 7 | 0 | 49.84 | 2.74 |
-| Q2 | UC | 66 | 61 | 5 | 0 | 50.45 | 4.35 |
-| Q2 | BR | 76 | 73 | 3 | 0 | 50.40 | 4.35 |
-| Q2 | WF | 18 | 18 | 0 | 0 | 48.80 | 1.87 |
-| Q3 | FR | 65 | 60 | 5 | 0 | 50.35 | 3.23 |
-| Q3 | UC | 66 | 66 | 0 | 0 | 50.80 | 4.35 |
-| Q3 | BR | 76 | 76 | 0 | 0 | 50.70 | 4.35 |
-| Q3 | WF | 18 | 18 | 0 | 0 | 48.74 | 1.62 |
-| Q4 | FR | 65 | 65 | 0 | 0 | 50.53 | 3.73 |
-| Q4 | UC | 66 | 66 | 0 | 0 | 50.80 | 4.35 |
-| Q4 | BR | 76 | 76 | 0 | 0 | 50.70 | 4.35 |
-| Q4 | WF | 18 | 18 | 0 | 0 | 48.74 | 1.62 |
+| baseline | FR | 65 | 58 | 7 | 0 | 86% | 66% |
+| baseline | UC | 66 | 59 | 7 | 0 | 86% | 66% |
+| baseline | BR | 76 | 72 | 4 | 0 | 86% | 66% |
+| baseline | WF | 18 | 17 | 1 | 0 | 85% | 65% |
+| Q2 | FR | 65 | 58 | 7 | 0 | 86% | 66% |
+| Q2 | UC | 66 | 61 | 5 | 0 | 87% | 67% |
+| Q2 | BR | 76 | 73 | 3 | 0 | 87% | 67% |
+| Q2 | WF | 18 | 18 | 0 | 0 | 87% | 67% |
+| Q3 | FR | 65 | 60 | 5 | 0 | 87% | 67% |
+| Q3 | UC | 66 | 66 | 0 | 0 | 88% | 68% |
+| Q3 | BR | 76 | 76 | 0 | 0 | 87% | 68% |
+| Q3 | WF | 18 | 18 | 0 | 0 | 87% | 67% |
+| Q4 | FR | 65 | 65 | 0 | 0 | 88% | 68% |
+| Q4 | UC | 66 | 66 | 0 | 0 | 88% | 68% |
+| Q4 | BR | 76 | 76 | 0 | 0 | 87% | 68% |
+| Q4 | WF | 18 | 18 | 0 | 0 | 87% | 67% |
+
+- **Total Spec Tests:** 225 passed out of 225 (0 failures, 0 skipped)
+- **Total Combined Tests (Builder + Spec):** 590 passed in 8.65s
+- **Consolidated Statement Coverage:** 87.6%
+- **Consolidated Branch Coverage:** 68.5%
 
 ## Failures and skips
 | Test id | Source id | Strategies | Category | Evidence | Outcome (fixing commit, covering test, or agreed reading with the spec sentence) | Open? |
