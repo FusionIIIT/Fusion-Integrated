@@ -1,0 +1,317 @@
+[
+  {
+    "test_id": "TC-WF-001",
+    "source_id": "BW-IAA-01",
+    "purpose": "Verify complete standard success workflow for expense/voucher from creation to recorded completion (one-level approval).",
+    "preconditions": "Basic User is authenticated and authorized to create expense/voucher requests. Available departmental budget is sufficient for requested amount.",
+    "action_or_input": "1. Basic User executes IAA-UC-101 to save request as Draft.\\n2. Basic User executes IAA-UC-102 to submit request.\\n3. Finance Staff executes IAA-UC-103 to validate request (passes validation).\\n4. Assigned Approving Authority executes IAA-UC-201 to approve request (no further level required).\\n5. Finance Staff executes IAA-UC-105 to complete internal processing.",
+    "expected_result": "Request successfully transitions through states: Not Created -> Draft -> Submitted -> Finance Validated -> Approved -> Recorded. System records complete audit log and timestamp history.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-002",
+    "source_id": "BW-IAA-01",
+    "purpose": "Verify segregation of duties constraint during expense/voucher standard approval.",
+    "preconditions": "Expense/voucher request is in Finance Validated state. Approving Authority is identical to the Basic User who created the request.",
+    "action_or_input": "Creator attempting to act as Approving Authority invokes IAA-UC-201 to approve the request.",
+    "expected_result": "Approval action by creator is blocked under segregation of duties (IAA-BR-001) and the request is routed to the next eligible configured authority.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-WF-003",
+    "source_id": "BW-IAA-02",
+    "purpose": "Verify expense/voucher workflow traversal across two sequential configured approval levels to recorded completion.",
+    "preconditions": "Basic User is authenticated. Multi-level approval routing is configured requiring two distinct approval authorities.",
+    "action_or_input": "1. Basic User creates Draft (IAA-UC-101) and submits request (IAA-UC-102).\\n2. Finance Staff validates request (IAA-UC-103).\\n3. First Assigned Approving Authority approves with another level required (IAA-UC-201).\\n4. Next Assigned Approving Authority approves with no further level required (IAA-UC-201).\\n5. Finance Staff processes and records request (IAA-UC-105).",
+    "expected_result": "Request successfully transitions: Not Created -> Draft -> Submitted -> Finance Validated -> Approval Pending -> Approved -> Recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-004",
+    "source_id": "BW-IAA-03",
+    "purpose": "Verify expense/voucher workflow path ending in authority rejection with mandatory remarks.",
+    "preconditions": "Expense/voucher request is in Finance Validated state.",
+    "action_or_input": "Assigned Approving Authority executes IAA-UC-201 to reject the request, entering mandatory rejection remarks.",
+    "expected_result": "Request transitions from Finance Validated to Rejected state. Workflow terminates in Rejected state with remarks and authority identity recorded in audit trail.",
+    "test_type": "rejection"
+  },
+  {
+    "test_id": "TC-WF-005",
+    "source_id": "BW-IAA-04",
+    "purpose": "Verify expense/voucher Finance clarification query and response cycle followed by successful approval and recording.",
+    "preconditions": "Expense/voucher request is in Submitted state.",
+    "action_or_input": "1. Finance Staff reviews request and raises clarification query (IAA-UC-103).\\n2. Basic User submits clarification response and supporting documents (IAA-UC-104).\\n3. Finance Staff re-validates request and confirms validation passes (IAA-UC-103).\\n4. Assigned Approving Authority approves request (IAA-UC-201).\\n5. Finance Staff processes and records request (IAA-UC-105).",
+    "expected_result": "Request successfully transitions: Submitted -> Query Raised -> Query Responded -> Finance Validated -> Approved -> Recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-006",
+    "source_id": "BW-IAA-05",
+    "purpose": "Verify automatic timeout escalation of overdue expense/voucher approval and subsequent approval by higher authority.",
+    "preconditions": "Expense/voucher request is in Finance Validated or Approval Pending state. Pending authority approval action duration exceeds configured time limit.",
+    "action_or_input": "1. System triggers IAA-UC-203 upon expiration of configured timeout duration.\\n2. Next/Higher Assigned Approving Authority executes IAA-UC-202 to approve request (no further level required).\\n3. Finance Staff executes IAA-UC-105 to complete internal processing.",
+    "expected_result": "Request transitions: (Finance Validated or Approval Pending) -> Escalated (via System timeout) -> Approved (via higher authority) -> Recorded.",
+    "test_type": "escalation"
+  },
+  {
+    "test_id": "TC-WF-007",
+    "source_id": "BW-IAA-06",
+    "purpose": "Verify rejection of overdue escalated expense/voucher request by higher authority.",
+    "preconditions": "Expense/voucher request is in Escalated state following System timeout escalation (IAA-UC-203).",
+    "action_or_input": "Next/Higher Assigned Approving Authority executes IAA-UC-202 providing rejection remarks.",
+    "expected_result": "Request transitions from Escalated to Rejected state. Rejection remarks, escalation history, and higher authority identity are recorded.",
+    "test_type": "rejection"
+  },
+  {
+    "test_id": "TC-WF-008",
+    "source_id": "BW-IAA-07",
+    "purpose": "Verify standard Travel Allowance (TA) processing workflow where claim amount does not require authority approval.",
+    "preconditions": "Eligible employee is authenticated. TA claim value is below configured high-value threshold.",
+    "action_or_input": "1. Basic User (Employee) submits valid TA form with required trip details and documents (IAA-UC-401).\\n2. Finance Staff verifies TA form confirming compliance and that high-value approval is not required (IAA-UC-402).\\n3. Finance Staff completes internal processing and records the claim (IAA-UC-404).",
+    "expected_result": "TA claim transitions: Not Submitted -> Submitted -> Verified -> Recorded. Request becomes read-only and recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-009",
+    "source_id": "BW-IAA-08",
+    "purpose": "Verify high-value TA claim workflow requiring single-level approving authority decision to recorded completion.",
+    "preconditions": "TA claim amount meets or exceeds configured high-value threshold.",
+    "action_or_input": "1. Basic User submits TA form (IAA-UC-401).\\n2. Finance Staff verifies TA form and determines high-value approval is required (IAA-UC-402).\\n3. Assigned Approving Authority approves claim with no further level required (IAA-UC-403).\\n4. Finance Staff processes and records TA claim (IAA-UC-404).",
+    "expected_result": "TA claim transitions: Not Submitted -> Submitted -> Approval Pending -> Approved -> Recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-010",
+    "source_id": "BW-IAA-08",
+    "purpose": "Verify segregation of duties enforcement on high-value TA approval when approver is the claimant.",
+    "preconditions": "High-value TA claim is in Approval Pending state. Assigned approving authority is identical to claimant.",
+    "action_or_input": "Claimant acting as approving authority attempts to execute IAA-UC-403 to approve own TA claim.",
+    "expected_result": "Approval action is blocked under segregation of duties (IAA-BR-001) and claim is routed to next eligible configured authority.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-WF-011",
+    "source_id": "BW-IAA-09",
+    "purpose": "Verify high-value TA claim traversal across two sequential configured approval levels.",
+    "preconditions": "High-value TA claim requires multi-level authority approval per configured routing policy.",
+    "action_or_input": "1. Basic User submits TA form (IAA-UC-401).\\n2. Finance Staff verifies TA form requiring approval (IAA-UC-402).\\n3. First Assigned Approving Authority approves with another level required (IAA-UC-403).\\n4. Next Assigned Approving Authority approves with no further level required (IAA-UC-403).\\n5. Finance Staff processes and records TA claim (IAA-UC-404).",
+    "expected_result": "TA claim transitions: Not Submitted -> Submitted -> Approval Pending -> Approval Pending -> Approved -> Recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-012",
+    "source_id": "BW-IAA-10",
+    "purpose": "Verify rejection of high-value TA claim by assigned approving authority.",
+    "preconditions": "High-value TA claim is in Approval Pending state.",
+    "action_or_input": "Assigned Approving Authority executes IAA-UC-403 to reject claim, providing required remarks.",
+    "expected_result": "TA claim transitions from Approval Pending to Rejected state. Lifecycle terminates with rejection remarks recorded.",
+    "test_type": "rejection"
+  },
+  {
+    "test_id": "TC-WF-013",
+    "source_id": "BW-IAA-11",
+    "purpose": "Verify TA claim clarification query and response cycle during Finance verification.",
+    "preconditions": "TA claim is in Submitted state.",
+    "action_or_input": "1. Finance Staff reviews TA claim and raises clarification query (IAA-UC-402).\\n2. Basic User (Employee) submits clarification response (IAA-UC-104).\\n3. Finance Staff re-verifies TA form confirming no authority approval is required (IAA-UC-402).\\n4. Finance Staff processes and records TA claim (IAA-UC-404).",
+    "expected_result": "TA claim transitions: Submitted -> Query Raised -> Query Responded -> Verified -> Recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-014",
+    "source_id": "BW-IAA-12",
+    "purpose": "Verify manual flagging of material anomaly by Finance/Auditor and direct resolution by designated resolver.",
+    "preconditions": "Financial record or transaction is under review with No Anomaly state.",
+    "action_or_input": "1. Finance Staff or Auditor executes IAA-UC-302 confirming material anomaly.\\n2. Designated Anomaly Resolver executes IAA-UC-303 to resolve the anomaly.",
+    "expected_result": "Anomaly transitions: No Anomaly -> Open -> Resolved. Resolution details, resolver identity, and timestamps are recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-015",
+    "source_id": "BW-IAA-13",
+    "purpose": "Verify manual anomaly workflow with one escalation traversal before final resolution.",
+    "preconditions": "Financial record has No Anomaly.",
+    "action_or_input": "1. Finance Staff or Auditor flags material anomaly (IAA-UC-302).\\n2. Initial Designated Resolver determines escalation is required and executes IAA-UC-303.\\n3. Next Designated Resolver reviews escalated anomaly and executes IAA-UC-303 to resolve.",
+    "expected_result": "Anomaly transitions: No Anomaly -> Open -> Escalated -> Resolved.",
+    "test_type": "escalation"
+  },
+  {
+    "test_id": "TC-WF-016",
+    "source_id": "BW-IAA-14",
+    "purpose": "Verify audit observation straight closure path upon satisfactory first response.",
+    "preconditions": "Auditor is reviewing financial records in No Observation state.",
+    "action_or_input": "1. Auditor executes IAA-UC-501 to raise audit observation.\\n2. Basic User / Department Representative submits response and evidence (IAA-UC-502).\\n3. Auditor verifies response, finds verification satisfactory, and closes observation (IAA-UC-503).",
+    "expected_result": "Audit observation transitions: No Observation -> Open -> Responded -> Closed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-017",
+    "source_id": "BW-IAA-15",
+    "purpose": "Verify audit observation workflow with one unsatisfactory response revision cycle returning to Open before final closure.",
+    "preconditions": "Auditor is reviewing financial records in No Observation state.",
+    "action_or_input": "1. Auditor raises observation (IAA-UC-501).\\n2. Department Representative submits initial response (IAA-UC-502).\\n3. Auditor evaluates response as unsatisfactory and returns it (IAA-UC-503).\\n4. Department Representative submits revised response and evidence (IAA-UC-502).\\n5. Auditor verifies revised response as satisfactory and closes observation (IAA-UC-503).",
+    "expected_result": "Audit observation transitions: No Observation -> Open -> Responded -> Open -> Responded -> Closed.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-WF-018",
+    "source_id": "BW-IAA-16",
+    "purpose": "Verify automatic timeout escalation of overdue high-value TA approval and approval by higher authority.",
+    "preconditions": "High-value TA claim is in Approval Pending state. Approving authority action exceeds configured time limit.",
+    "action_or_input": "1. System triggers IAA-UC-203 escalating overdue approval.\\n2. Next/Higher Assigned Approving Authority approves claim with no further approval level required (IAA-UC-202).\\n3. Finance Staff processes and records claim (IAA-UC-404).",
+    "expected_result": "TA claim transitions: Approval Pending -> Escalated (via System timeout) -> Approved (via higher authority) -> Recorded.",
+    "test_type": "escalation"
+  },
+  {
+    "test_id": "TC-WF-019",
+    "source_id": "BW-IAA-17",
+    "purpose": "Verify rejection of overdue escalated high-value TA claim by higher authority.",
+    "preconditions": "High-value TA claim is in Escalated state following System timeout escalation.",
+    "action_or_input": "Next/Higher Assigned Approving Authority executes IAA-UC-202 with rejection remarks.",
+    "expected_result": "TA claim transitions from Escalated to Rejected state. Rejection remarks and escalation history are recorded.",
+    "test_type": "rejection"
+  },
+  {
+    "test_id": "TC-WF-020",
+    "source_id": "BW-IAA-18",
+    "purpose": "Verify automatic detection and creation of material anomaly by System and direct resolution.",
+    "preconditions": "System detects a configured material anomaly condition (e.g., budget threshold breach or rule discrepancy). Current anomaly state is No Anomaly.",
+    "action_or_input": "1. System triggers IAA-UC-304 upon detecting configured condition to create anomaly.\\n2. Designated Anomaly Resolver executes IAA-UC-303 to resolve anomaly.",
+    "expected_result": "Anomaly transitions: No Anomaly -> Open (via System) -> Resolved (via resolver). System detection details and resolver action are logged.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-021",
+    "source_id": "BW-IAA-19",
+    "purpose": "Verify automatic anomaly creation followed by one escalation traversal to higher resolver before resolution.",
+    "preconditions": "System detects configured material anomaly condition in No Anomaly state.",
+    "action_or_input": "1. System triggers IAA-UC-304 creating Open anomaly.\\n2. Initial Designated Resolver determines further escalation is required (IAA-UC-303).\\n3. Next Designated Resolver executes IAA-UC-303 to resolve anomaly.",
+    "expected_result": "Anomaly transitions: No Anomaly -> Open (via System) -> Escalated -> Resolved.",
+    "test_type": "escalation"
+  },
+  {
+    "test_id": "TC-WF-022",
+    "source_id": "CW-IAA-01",
+    "purpose": "Verify full composite Expense/Voucher lifecycle exercising Draft creation, submission, clarification loop, validation, and multi-level approval to Recorded completion.",
+    "preconditions": "Basic User is authorized. Multi-level approval is configured. Request requires clarification during Finance review.",
+    "action_or_input": "1. Basic User saves Draft (IAA-UC-101).\\n2. Basic User submits request (IAA-UC-102).\\n3. Finance Staff raises clarification query (IAA-UC-103).\\n4. Basic User responds to query (IAA-UC-104).\\n5. Finance Staff validates request (IAA-UC-103).\\n6. Approving Authority approves requiring another level (IAA-UC-201).\\n7. Next Approving Authority grants final approval (IAA-UC-201).\\n8. Finance Staff completes internal processing and records request (IAA-UC-105).",
+    "expected_result": "Request progresses through composite path: Not Created -> Draft -> Submitted -> Query Raised -> Query Responded -> Finance Validated -> Approval Pending -> Approved -> Recorded.",
+    "test_type": "composite"
+  },
+  {
+    "test_id": "TC-WF-023",
+    "source_id": "CW-IAA-01",
+    "purpose": "Verify composite Expense/Voucher lifecycle path ending in rejection by assigned approving authority.",
+    "preconditions": "Expense/voucher request is submitted and validated by Finance (Finance Validated or Approval Pending state).",
+    "action_or_input": "Assigned Approving Authority executes IAA-UC-201 to reject request with remarks.",
+    "expected_result": "Request transitions from (Finance Validated or Approval Pending) to Rejected state. Workflow terminates.",
+    "test_type": "rejection"
+  },
+  {
+    "test_id": "TC-WF-024",
+    "source_id": "CW-IAA-01",
+    "purpose": "Verify composite Expense/Voucher lifecycle escalation path via System timeout and approval by higher authority.",
+    "preconditions": "Expense/voucher request is in Finance Validated or Approval Pending state. Pending authority approval action duration exceeds configured time limit.",
+    "action_or_input": "1. System executes IAA-UC-203 upon timeout trigger.\\n2. Next/Higher Assigned Approving Authority executes IAA-UC-202 approving the request.\\n3. Finance Staff executes IAA-UC-105 recording the request.",
+    "expected_result": "Request transitions: (Finance Validated or Approval Pending) -> Escalated -> Approved (or Approval Pending if further level required) -> Recorded.",
+    "test_type": "escalation"
+  },
+  {
+    "test_id": "TC-WF-025",
+    "source_id": "CW-IAA-01",
+    "purpose": "Verify composite Expense/Voucher lifecycle escalation path via System timeout and rejection by higher authority.",
+    "preconditions": "Expense/voucher request is in Escalated state following timeout escalation.",
+    "action_or_input": "Next/Higher Assigned Approving Authority executes IAA-UC-202 to reject request with remarks.",
+    "expected_result": "Request transitions from Escalated to Rejected state. Workflow terminates with rejection logged.",
+    "test_type": "rejection"
+  },
+  {
+    "test_id": "TC-WF-026",
+    "source_id": "CW-IAA-02",
+    "purpose": "Verify composite TA lifecycle path for standard TA with Finance clarification traversal to Recorded completion.",
+    "preconditions": "Eligible employee submits TA claim not requiring authority approval.",
+    "action_or_input": "1. Basic User submits TA form (IAA-UC-401).\\n2. Finance Staff requests clarification (IAA-UC-402).\\n3. Basic User responds to clarification (IAA-UC-104).\\n4. Finance Staff verifies TA form (IAA-UC-402, no authority approval required).\\n5. Finance Staff records TA request (IAA-UC-404).",
+    "expected_result": "TA claim transitions: Not Submitted -> Submitted -> Query Raised -> Query Responded -> Verified -> Recorded.",
+    "test_type": "composite"
+  },
+  {
+    "test_id": "TC-WF-027",
+    "source_id": "CW-IAA-02",
+    "purpose": "Verify composite TA lifecycle path with direct Finance rejection on policy verification failure.",
+    "preconditions": "TA claim is submitted or query responded.",
+    "action_or_input": "Finance Staff executes IAA-UC-402 verifying claim against policy and identifies non-compliant policy violation.",
+    "expected_result": "TA claim transitions from (Submitted or Query Responded) directly to Rejected state (IAA-BR-201). Claim is closed.",
+    "test_type": "rejection"
+  },
+  {
+    "test_id": "TC-WF-028",
+    "source_id": "CW-IAA-02",
+    "purpose": "Verify composite TA lifecycle high-value path with multi-level authority approval to Recorded completion.",
+    "preconditions": "High-value TA claim verified by Finance requiring authority approval across multiple configured levels.",
+    "action_or_input": "1. Finance Staff verifies TA form requiring authority approval (IAA-UC-402).\\n2. Assigned Approving Authority approves claim with further level required (IAA-UC-403).\\n3. Next Assigned Approving Authority grants final approval (IAA-UC-403).\\n4. Finance Staff records approved TA request (IAA-UC-404).",
+    "expected_result": "TA claim transitions: (Submitted or Query Responded) -> Approval Pending -> Approval Pending -> Approved -> Recorded.",
+    "test_type": "composite"
+  },
+  {
+    "test_id": "TC-WF-029",
+    "source_id": "CW-IAA-02",
+    "purpose": "Verify composite TA lifecycle path where approving authority rejects high-value TA claim.",
+    "preconditions": "High-value TA claim is in Approval Pending state.",
+    "action_or_input": "Assigned Approving Authority executes IAA-UC-403 to reject claim with remarks.",
+    "expected_result": "TA claim transitions from Approval Pending to Rejected state.",
+    "test_type": "rejection"
+  },
+  {
+    "test_id": "TC-WF-030",
+    "source_id": "CW-IAA-02",
+    "purpose": "Verify composite TA lifecycle path with System timeout escalation and higher authority approval.",
+    "preconditions": "High-value TA claim is in Approval Pending state. Authority action exceeds configured timeout.",
+    "action_or_input": "1. System executes IAA-UC-203 escalating overdue approval.\\n2. Next/Higher Assigned Approving Authority executes IAA-UC-202 approving claim.\\n3. Finance Staff records approved request (IAA-UC-404).",
+    "expected_result": "TA claim transitions: Approval Pending -> Escalated -> Approved (or Approval Pending if another level required) -> Recorded.",
+    "test_type": "escalation"
+  },
+  {
+    "test_id": "TC-WF-031",
+    "source_id": "CW-IAA-02",
+    "purpose": "Verify composite TA lifecycle path with System timeout escalation and higher authority rejection.",
+    "preconditions": "High-value TA claim is in Escalated state following System timeout.",
+    "action_or_input": "Next/Higher Assigned Approving Authority executes IAA-UC-202 to reject claim with remarks.",
+    "expected_result": "TA claim transitions from Escalated to Rejected state.",
+    "test_type": "rejection"
+  },
+  {
+    "test_id": "TC-WF-032",
+    "source_id": "CW-IAA-03",
+    "purpose": "Verify composite Anomaly lifecycle from manual flagging through resolution or escalation.",
+    "preconditions": "Financial record has No Anomaly. Finance Staff or Auditor detects material anomaly.",
+    "action_or_input": "1. Finance Staff or Auditor executes IAA-UC-302 to flag anomaly.\\n2. Designated Anomaly Resolver executes IAA-UC-303 to resolve anomaly directly.",
+    "expected_result": "Anomaly transitions: No Anomaly -> Open -> Resolved.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-033",
+    "source_id": "CW-IAA-03",
+    "purpose": "Verify composite Anomaly lifecycle from automatic system detection through escalation and resolution.",
+    "preconditions": "System detects configured material anomaly condition (IAA-BR-102, IAA-BR-103) in No Anomaly state.",
+    "action_or_input": "1. System executes IAA-UC-304 creating Open anomaly.\\n2. Initial Designated Anomaly Resolver executes IAA-UC-303 escalating anomaly.\\n3. Next Designated Anomaly Resolver executes IAA-UC-303 resolving anomaly.",
+    "expected_result": "Anomaly transitions: No Anomaly -> Open (via System) -> Escalated -> Resolved.",
+    "test_type": "composite"
+  },
+  {
+    "test_id": "TC-WF-034",
+    "source_id": "CW-IAA-04",
+    "purpose": "Verify composite Audit Observation lifecycle integrating response submission and straight closure.",
+    "preconditions": "Auditor reviews record in No Observation state.",
+    "action_or_input": "1. Auditor executes IAA-UC-501 to raise observation.\\n2. Department Representative executes IAA-UC-502 submitting response and evidence.\\n3. Auditor executes IAA-UC-503 verifying response as satisfactory and closing observation.",
+    "expected_result": "Audit observation transitions: No Observation -> Open -> Responded -> Closed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-035",
+    "source_id": "CW-IAA-04",
+    "purpose": "Verify composite Audit Observation lifecycle with unsatisfactory response returning to Open before satisfactory closure.",
+    "preconditions": "Audit observation is in Responded state with initial response submitted.",
+    "action_or_input": "1. Auditor executes IAA-UC-503 finding verification unsatisfactory.\\n2. Department Representative executes IAA-UC-502 submitting revised response and evidence.\\n3. Auditor executes IAA-UC-503 finding verification satisfactory and closing observation.",
+    "expected_result": "Audit observation transitions: Responded -> Open (verification unsatisfactory) -> Responded (revised response) -> Closed (verification satisfactory).",
+    "test_type": "alternative"
+  }
+]

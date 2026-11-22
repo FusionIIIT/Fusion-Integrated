@@ -1,0 +1,740 @@
+[
+  {
+    "test_id": "TC_FR_001",
+    "source_id": "AFR-IAA-001",
+    "purpose": "Verify that an authorized Basic User can create an expense/voucher request and save it as Draft",
+    "preconditions": "User is authenticated with active Basic User role",
+    "action_or_input": "Invoke creation of an expense/voucher request and save as Draft",
+    "expected_result": "The expense/voucher request is created in Draft status and saved",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_002",
+    "source_id": "AFR-IAA-002",
+    "purpose": "Verify that the request creator can enter request type, amount, department, description, and supporting information",
+    "preconditions": "User is authenticated with active Basic User role and has an editable Draft request",
+    "action_or_input": "Enter request type, amount, department, description, and supporting information on the Draft request",
+    "expected_result": "The entered request type, amount, department, description, and supporting information are stored on the request",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_003",
+    "source_id": "AFR-IAA-003",
+    "purpose": "Verify that the request creator can attach supporting documents to an expense/voucher request",
+    "preconditions": "User is authenticated with active Basic User role and has a Draft request",
+    "action_or_input": "Attach a supporting document to the expense/voucher request",
+    "expected_result": "The document attachment is successfully associated with the expense/voucher request",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_004",
+    "source_id": "AFR-IAA-004",
+    "purpose": "Verify that saving a Draft with missing submission-mandatory information is permitted and missing information is identified",
+    "preconditions": "User is authenticated with active Basic User role",
+    "action_or_input": "Save an expense/voucher Draft with submission-mandatory fields omitted",
+    "expected_result": "The Draft request is successfully saved and the missing submission-mandatory information is identified by the system",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC_FR_005",
+    "source_id": "AFR-IAA-005",
+    "purpose": "Verify that a Basic User can submit a complete Draft expense/voucher request for formal processing",
+    "preconditions": "User is authenticated with active Basic User role and has a complete Draft request with all required fields and documents",
+    "action_or_input": "Submit the complete Draft request for formal processing",
+    "expected_result": "The expense/voucher request is submitted for formal processing",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_006_01",
+    "source_id": "AFR-IAA-006",
+    "purpose": "Verify that formal submission of an expense/voucher request is blocked when mandatory fields are missing",
+    "preconditions": "User is authenticated with active Basic User role and has a Draft request with missing mandatory fields",
+    "action_or_input": "Attempt formal submission of the Draft request",
+    "expected_result": "Formal submission is blocked due to missing mandatory fields",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC_FR_006_02",
+    "source_id": "AFR-IAA-006",
+    "purpose": "Verify that formal submission of an expense/voucher request is blocked when required documents are missing",
+    "preconditions": "User is authenticated with active Basic User role and has a Draft request with mandatory fields filled but required documents missing",
+    "action_or_input": "Attempt formal submission of the Draft request",
+    "expected_result": "Formal submission is blocked due to missing required documents",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC_FR_007",
+    "source_id": "AFR-IAA-007",
+    "purpose": "Verify that upon successful submission, the request status becomes Submitted and it is routed to Finance Staff",
+    "preconditions": "User is authenticated with active Basic User role and has a complete Draft request with required documents",
+    "action_or_input": "Execute formal submission of the Draft request",
+    "expected_result": "The request status transitions to Submitted and the request is routed to Finance Staff",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_008_01",
+    "source_id": "AFR-IAA-008",
+    "purpose": "Verify that ordinary creator editing of an expense/voucher request is prevented after submission",
+    "preconditions": "An expense/voucher request exists in Submitted status created by the Basic User",
+    "action_or_input": "Basic User attempts ordinary direct editing of the submitted request fields",
+    "expected_result": "Direct editing is blocked and the request content remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC_FR_008_02",
+    "source_id": "AFR-IAA-008",
+    "purpose": "Verify that creator editing/correction of an expense/voucher request is permitted through supported clarification/correction response",
+    "preconditions": "An expense/voucher request is under Finance review and Finance has requested clarification/correction",
+    "action_or_input": "Basic User submits clarification response with required corrections/evidence",
+    "expected_result": "The clarification response and corrections are accepted and recorded for the request",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_009",
+    "source_id": "AFR-IAA-009",
+    "purpose": "Verify that the system preserves a complete action and status history for an expense/voucher request",
+    "preconditions": "An expense/voucher request has undergone creation, saving, and submission actions",
+    "action_or_input": "Retrieve the action and status history of the expense/voucher request",
+    "expected_result": "The complete history showing all recorded actions and status changes is present",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_010",
+    "source_id": "AFR-IAA-010",
+    "purpose": "Verify that Finance Staff can review submitted expense/voucher request details and supporting documents",
+    "preconditions": "User is authenticated with active Finance Staff role; an expense/voucher request exists in Submitted status with attached documents",
+    "action_or_input": "Finance Staff accesses and reviews request details and supporting documents",
+    "expected_result": "The submitted request details and attached supporting documents are displayed and accessible for review",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_011",
+    "source_id": "AFR-IAA-011",
+    "purpose": "Verify that Finance Staff can validate expense/voucher requests against applicable financial and policy requirements",
+    "preconditions": "User is authenticated with active Finance Staff role; an expense/voucher request is in Submitted status under review",
+    "action_or_input": "Finance Staff performs validation against applicable financial and policy requirements",
+    "expected_result": "Validation checks are executed against financial and policy requirements and validation outcome is recorded",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_012",
+    "source_id": "AFR-IAA-012",
+    "purpose": "Verify that Finance Staff can request clarification or additional evidence during validation",
+    "preconditions": "User is authenticated with active Finance Staff role; an expense/voucher request is undergoing Finance review",
+    "action_or_input": "Finance Staff initiates a clarification query requesting additional information or evidence from the creator",
+    "expected_result": "Clarification request is recorded and the request awaits response from the creator",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_013",
+    "source_id": "AFR-IAA-013",
+    "purpose": "Verify that the concerned Basic User can respond to a Finance clarification query with information or evidence",
+    "preconditions": "User is authenticated with active Basic User role; an expense/voucher request has an open Finance clarification query",
+    "action_or_input": "Basic User submits response containing clarification information and attached evidence",
+    "expected_result": "Clarification response and evidence are successfully recorded for the request",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_014",
+    "source_id": "AFR-IAA-014",
+    "purpose": "Verify that after a clarification response, the request returns to Finance review without losing prior history",
+    "preconditions": "A clarification response has been submitted by the Basic User for an expense/voucher request",
+    "action_or_input": "Check request status, queue, and action history after clarification response submission",
+    "expected_result": "Request returns to Finance review status and all prior action and status history is fully retained",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_015",
+    "source_id": "AFR-IAA-015",
+    "purpose": "Verify that a request that passes Finance validation becomes Finance Validated and enters its configured approval route",
+    "preconditions": "User is authenticated with active Finance Staff role; an expense/voucher request has passed all Finance validation checks",
+    "action_or_input": "Finance Staff marks validation as passed / completes validation",
+    "expected_result": "The request status transitions to Finance Validated and it enters its configured approval route",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_016",
+    "source_id": "AFR-IAA-016",
+    "purpose": "Verify that Finance Staff can mark an approved expense/voucher request as internally processed/recorded",
+    "preconditions": "User is authenticated with active Finance Staff role; an expense/voucher request has received all required approvals",
+    "action_or_input": "Finance Staff records internal processing completion for the approved request",
+    "expected_result": "The expense/voucher request status transitions to internally processed/recorded",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_017",
+    "source_id": "AFR-IAA-017",
+    "purpose": "Verify that internal processing/recording states do not execute or imply a real bank transfer",
+    "preconditions": "An approved expense/voucher request is marked internally processed/recorded by Finance Staff",
+    "action_or_input": "Verify system operations and external gateway integrations during internal recording",
+    "expected_result": "No real bank transfer or payment gateway transaction is initiated or executed; record is strictly internal governance completion",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_018",
+    "source_id": "AFR-IAA-018",
+    "purpose": "Verify that processed financial records are retained for subsequent audit review",
+    "preconditions": "An expense/voucher request has reached internally processed/recorded status",
+    "action_or_input": "Query the system for processed financial records as an Auditor",
+    "expected_result": "The processed financial record is retained in the system and accessible for subsequent audit review",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_019",
+    "source_id": "AFR-IAA-019",
+    "purpose": "Verify that the required approval route is determined using configured request amount, request type, department, and hierarchy rules",
+    "preconditions": "Approval hierarchy routing rules configured by System Admin based on amount thresholds, request type, and department",
+    "action_or_input": "Submit and validate requests matching distinct configured combinations of amount, request type, and department",
+    "expected_result": "Each request is assigned to the exact approval route determined by the matching amount, type, department, and hierarchy configuration",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_020",
+    "source_id": "AFR-IAA-020",
+    "purpose": "Verify that HoD, Dean, and Director are represented as distinct approval authorities and assigned according to the configured route",
+    "preconditions": "Distinct users hold roles HoD, Dean, and Director; approval routes configured for each distinct authority",
+    "action_or_input": "Evaluate approval routing assignments across routes configured for HoD, Dean, and Director",
+    "expected_result": "HoD, Dean, and Director are handled as distinct authority roles and requests are assigned strictly to the configured authority",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_021",
+    "source_id": "AFR-IAA-021",
+    "purpose": "Verify that the assigned Approving Authority can review a routed request",
+    "preconditions": "User is authenticated with the active Approving Authority role assigned to the routed request",
+    "action_or_input": "Approving Authority accesses and views the routed request details and supporting documentation",
+    "expected_result": "The routed request details, justification, and attachments are accessible and viewable by the assigned authority",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_022",
+    "source_id": "AFR-IAA-022",
+    "purpose": "Verify that the assigned Approving Authority can approve a routed request with recorded remarks",
+    "preconditions": "User is authenticated with the assigned Approving Authority role; request is pending approval with that authority",
+    "action_or_input": "Approving Authority submits approval decision accompanied by remarks",
+    "expected_result": "The approval decision and recorded remarks are stored, and the approval action is recorded",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_023",
+    "source_id": "AFR-IAA-023",
+    "purpose": "Verify that the assigned Approving Authority can reject a routed request with recorded remarks",
+    "preconditions": "User is authenticated with the assigned Approving Authority role; request is pending approval with that authority",
+    "action_or_input": "Approving Authority submits rejection decision accompanied by remarks",
+    "expected_result": "The request status transitions to Rejected and the rejection decision with remarks is recorded",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_024",
+    "source_id": "AFR-IAA-024",
+    "purpose": "Verify that the system prevents a request creator from approving that same request",
+    "preconditions": "A user is the creator of a request and also holds an Approving Authority role (e.g. HoD)",
+    "action_or_input": "The creator attempts to execute an approval decision on their own submitted request",
+    "expected_result": "Approval is prevented due to segregation of duties (self-approval prohibited), and item is routed to next eligible authority",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC_FR_025",
+    "source_id": "AFR-IAA-025",
+    "purpose": "Verify that when another approval level is required, an approved request remains pending and routes to the next configured eligible authority",
+    "preconditions": "A multi-level approval route is configured; the request has received approval at the first level",
+    "action_or_input": "Execute first-level approval on the multi-level request",
+    "expected_result": "Request remains in pending approval status and is routed to the next configured eligible authority in the hierarchy",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_026",
+    "source_id": "AFR-IAA-026",
+    "purpose": "Verify that a pending approval that exceeds its configured action time limit is escalated automatically",
+    "preconditions": "A request is pending approval with an assigned authority; configured action time limit has elapsed without action",
+    "action_or_input": "Trigger timeout evaluation / scheduled escalation check",
+    "expected_result": "The pending approval is automatically escalated by the system due to exceeding the configured action time limit",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC_FR_027",
+    "source_id": "AFR-IAA-027",
+    "purpose": "Verify that an escalated approval is routed to the next eligible configured authority",
+    "preconditions": "An approval action has been escalated due to timeout",
+    "action_or_input": "Inspect routing assignment of the escalated approval",
+    "expected_result": "The escalated approval is assigned and routed to the next eligible configured authority in the hierarchy",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_028_01",
+    "source_id": "AFR-IAA-028",
+    "purpose": "Verify that the assigned higher/next authority can review and resolve an escalated request by approval",
+    "preconditions": "User is authenticated as the assigned higher/next authority; request is routed as escalated approval",
+    "action_or_input": "Higher authority reviews and submits approval decision on the escalated request",
+    "expected_result": "The escalated request is resolved with approval status and recorded decision details",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_028_02",
+    "source_id": "AFR-IAA-028",
+    "purpose": "Verify that the assigned higher/next authority can review and resolve an escalated request by rejection",
+    "preconditions": "User is authenticated as the assigned higher/next authority; request is routed as escalated approval",
+    "action_or_input": "Higher authority reviews and submits rejection decision on the escalated request",
+    "expected_result": "The escalated request is resolved with rejection status and recorded decision details",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_029",
+    "source_id": "AFR-IAA-029",
+    "purpose": "Verify that the system compares the applicable request/claim amount with available departmental budget during Finance validation",
+    "preconditions": "Departmental budget allocation is configured; an expense request or TA claim is undergoing Finance validation",
+    "action_or_input": "Finance Staff initiates budget check during validation",
+    "expected_result": "The system evaluates the request/claim amount against the remaining available departmental budget",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_030",
+    "source_id": "AFR-IAA-030",
+    "purpose": "Verify that budget insufficiency is flagged for configured review/escalation rather than automatically causing rejection",
+    "preconditions": "An expense request or TA claim amount exceeds available departmental budget",
+    "action_or_input": "Perform Finance validation on the budget-insufficient request/claim",
+    "expected_result": "The request is flagged for configured anomaly review/escalation and is NOT automatically rejected",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC_FR_031",
+    "source_id": "AFR-IAA-031",
+    "purpose": "Verify that Finance Staff can manually flag a material anomaly or policy violation",
+    "preconditions": "User is authenticated with active Finance Staff role; reviewing a financial request or claim",
+    "action_or_input": "Finance Staff flags a material anomaly or policy violation on the record with description/category",
+    "expected_result": "A material anomaly record is created and linked to the financial request",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_032",
+    "source_id": "AFR-IAA-032",
+    "purpose": "Verify that an Auditor can manually flag a material anomaly or policy violation",
+    "preconditions": "User is authenticated with active Auditor role; reviewing a financial record",
+    "action_or_input": "Auditor flags a material anomaly or policy violation on the record with description/category",
+    "expected_result": "A material anomaly record is created and linked to the financial record",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_033",
+    "source_id": "AFR-IAA-033",
+    "purpose": "Verify that the system automatically creates an anomaly record for configured material anomaly conditions",
+    "preconditions": "System configuration defines automatic material anomaly trigger conditions (e.g. budget insufficiency or policy thresholds)",
+    "action_or_input": "A transaction occurs meeting configured material anomaly condition",
+    "expected_result": "The system automatically generates a material anomaly record linked to the transaction",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_034",
+    "source_id": "AFR-IAA-034",
+    "purpose": "Verify that the system tracks each anomaly from Open until it is Resolved or Escalated",
+    "preconditions": "A newly created anomaly record exists in Open status",
+    "action_or_input": "Track lifecycle transitions as resolution or escalation action is taken on the anomaly record",
+    "expected_result": "The anomaly record starts in Open state and transitions to Resolved or Escalated according to the recorded outcome",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_035_01",
+    "source_id": "AFR-IAA-035",
+    "purpose": "Verify that the designated anomaly resolver can record a resolution outcome for an anomaly",
+    "preconditions": "User is authenticated as designated anomaly resolver; an anomaly record is in Open status",
+    "action_or_input": "Designated resolver records a resolution outcome with justification",
+    "expected_result": "The anomaly record status transitions to Resolved with resolver remarks and timestamp",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_035_02",
+    "source_id": "AFR-IAA-035",
+    "purpose": "Verify that the designated anomaly resolver can record an escalation outcome for an anomaly",
+    "preconditions": "User is authenticated as designated anomaly resolver; an anomaly record is in Open status",
+    "action_or_input": "Designated resolver records an escalation outcome with justification",
+    "expected_result": "The anomaly record status transitions to Escalated with resolver remarks and timestamp",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_036",
+    "source_id": "AFR-IAA-036",
+    "purpose": "Verify that an eligible employee can submit a TA claim",
+    "preconditions": "User is authenticated as an eligible employee with Basic User role",
+    "action_or_input": "Submit a complete TA claim for formal processing",
+    "expected_result": "The TA claim is successfully submitted and enters the processing lifecycle",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_037",
+    "source_id": "AFR-IAA-037",
+    "purpose": "Verify that the system captures TA trip dates, purpose, claimed amount, and other required trip details",
+    "preconditions": "User is creating a TA claim",
+    "action_or_input": "Input trip start date, trip end date, travel purpose, claimed amount, and required trip details",
+    "expected_result": "All entered trip dates, purpose, claimed amount, and required details are accurately captured and stored",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_038",
+    "source_id": "AFR-IAA-038",
+    "purpose": "Verify that the employee can attach required TA supporting documents to a TA claim",
+    "preconditions": "User is preparing a TA claim",
+    "action_or_input": "Attach required TA supporting documents (e.g. travel tickets, boarding passes, receipts)",
+    "expected_result": "The supporting documents are successfully attached and associated with the TA claim",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_039_01",
+    "source_id": "AFR-IAA-039",
+    "purpose": "Verify that TA claim submission is blocked when mandatory TA fields are missing",
+    "preconditions": "User has prepared a TA claim omitting mandatory fields (e.g. trip dates or purpose)",
+    "action_or_input": "Attempt submission of the incomplete TA claim",
+    "expected_result": "TA claim submission is blocked and missing mandatory fields are indicated",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC_FR_039_02",
+    "source_id": "AFR-IAA-039",
+    "purpose": "Verify that TA claim submission is blocked when required documents are missing",
+    "preconditions": "User has prepared a TA claim with mandatory fields filled but required supporting documents missing",
+    "action_or_input": "Attempt submission of the TA claim lacking required documents",
+    "expected_result": "TA claim submission is blocked due to missing required supporting documents",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC_FR_040",
+    "source_id": "AFR-IAA-040",
+    "purpose": "Verify that Finance Staff can verify a submitted TA claim for policy compliance",
+    "preconditions": "User is authenticated with active Finance Staff role; a TA claim is in submitted status",
+    "action_or_input": "Finance Staff reviews and verifies the TA claim against applicable institutional travel policies",
+    "expected_result": "Policy compliance checks are performed and policy verification result is recorded",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_041",
+    "source_id": "AFR-IAA-041",
+    "purpose": "Verify that the system validates a submitted TA claim against applicable available departmental budget",
+    "preconditions": "A TA claim has been submitted; departmental budget is configured",
+    "action_or_input": "Execute budget validation check on the submitted TA claim",
+    "expected_result": "The claimed amount is compared against available departmental budget and budget check status is recorded",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_042",
+    "source_id": "AFR-IAA-042",
+    "purpose": "Verify that Finance Staff can request clarification/evidence on a TA claim and the claimant can respond",
+    "preconditions": "User authenticated as Finance Staff reviewing a TA claim; claimant is an eligible Basic User",
+    "action_or_input": "Finance Staff issues a clarification/evidence request, then claimant submits clarification response with evidence",
+    "expected_result": "Clarification request is recorded, claimant successfully submits response, and response is recorded on the TA claim",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_043",
+    "source_id": "AFR-IAA-043",
+    "purpose": "Verify that a TA claim requiring high-value approval is routed through the configured approval route",
+    "preconditions": "High-value TA threshold is configured; a submitted TA claim meets or exceeds the high-value criteria and passes Finance verification",
+    "action_or_input": "Complete Finance verification on the high-value TA claim",
+    "expected_result": "The TA claim is routed into the configured approval route for authority decision",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_044_01",
+    "source_id": "AFR-IAA-044",
+    "purpose": "Verify that the assigned Approving Authority can approve a high-value TA claim with remarks",
+    "preconditions": "User is authenticated with the assigned Approving Authority role for a routed high-value TA claim",
+    "action_or_input": "Approving Authority submits approval decision with remarks",
+    "expected_result": "The high-value TA claim is approved and the approval decision with remarks is recorded",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_044_02",
+    "source_id": "AFR-IAA-044",
+    "purpose": "Verify that the assigned Approving Authority can reject a high-value TA claim with remarks",
+    "preconditions": "User is authenticated with the assigned Approving Authority role for a routed high-value TA claim",
+    "action_or_input": "Approving Authority submits rejection decision with remarks",
+    "expected_result": "The high-value TA claim status transitions to Rejected and the rejection decision with remarks is recorded",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_045",
+    "source_id": "AFR-IAA-045",
+    "purpose": "Verify that a TA claimant cannot approve their own TA claim",
+    "preconditions": "The TA claimant holds an Approving Authority role (e.g. HoD or Dean)",
+    "action_or_input": "The claimant attempts to approve their own submitted TA claim",
+    "expected_result": "Approval is prevented due to segregation of duties (self-approval prohibited)",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC_FR_046",
+    "source_id": "AFR-IAA-046",
+    "purpose": "Verify that Finance Staff can internally process and record a verified/approved TA claim",
+    "preconditions": "User is authenticated with active Finance Staff role; TA claim has completed required verification/approval",
+    "action_or_input": "Finance Staff executes internal processing and recording of the TA claim",
+    "expected_result": "The TA claim is marked internally processed and recorded",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_047",
+    "source_id": "AFR-IAA-047",
+    "purpose": "Verify that a processed and recorded TA claim becomes read-only and reaches its terminal recorded state",
+    "preconditions": "A TA claim has been internally processed and recorded by Finance Staff",
+    "action_or_input": "Attempt modification of details on the recorded TA claim",
+    "expected_result": "The claim is in terminal recorded state and modifications are prevented as the record is strictly read-only",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_048",
+    "source_id": "AFR-IAA-048",
+    "purpose": "Verify that Auditors can review completed and in-process financial records within authorized scope",
+    "preconditions": "User is authenticated with active Auditor role; completed and in-process financial records exist within scope",
+    "action_or_input": "Auditor accesses and inspects completed and in-process financial records",
+    "expected_result": "The financial records and their complete audit histories within scope are accessible for review",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_049",
+    "source_id": "AFR-IAA-049",
+    "purpose": "Verify that an Auditor can raise an audit observation linked to a relevant financial record or process",
+    "preconditions": "User is authenticated with active Auditor role reviewing a financial record or process",
+    "action_or_input": "Auditor submits a new audit observation specifying details, observation category, and link to the record",
+    "expected_result": "The audit observation is created and successfully linked to the target financial record/process",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_050",
+    "source_id": "AFR-IAA-050",
+    "purpose": "Verify that a newly raised audit observation enters Open state",
+    "preconditions": "An Auditor raises a new audit observation against a financial record",
+    "action_or_input": "Check the initial state of the newly created audit observation",
+    "expected_result": "The audit observation is initialized and enters Open state",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_051",
+    "source_id": "AFR-IAA-051",
+    "purpose": "Verify that the concerned user/department can submit corrective-action response information for an Open observation",
+    "preconditions": "User is authenticated as the concerned user or department representative; an audit observation is in Open state",
+    "action_or_input": "Submit corrective-action response information addressing the observation",
+    "expected_result": "The corrective-action response details are recorded for the audit observation",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_052",
+    "source_id": "AFR-IAA-052",
+    "purpose": "Verify that supporting evidence can be attached to an audit-observation response",
+    "preconditions": "Concerned user is submitting a response to an Open audit observation",
+    "action_or_input": "Attach supporting evidence files/documents to the response submission",
+    "expected_result": "The supporting evidence attachments are linked and saved with the audit-observation response",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_053",
+    "source_id": "AFR-IAA-053",
+    "purpose": "Verify that a submitted audit-observation response moves the observation to Responded state",
+    "preconditions": "An audit observation is in Open state",
+    "action_or_input": "Concerned user/department submits the completed corrective-action response",
+    "expected_result": "The audit observation status transitions from Open to Responded",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_054",
+    "source_id": "AFR-IAA-054",
+    "purpose": "Verify that the Auditor can verify the response, corrective action, and supporting evidence",
+    "preconditions": "User is authenticated with active Auditor role; an audit observation is in Responded state with attached evidence",
+    "action_or_input": "Auditor reviews and verifies the submitted response narrative, corrective action, and attached evidence",
+    "expected_result": "The Auditor can inspect all response components and record verification findings",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_055",
+    "source_id": "AFR-IAA-055",
+    "purpose": "Verify that an audit observation is closable only after Auditor verification of the response and evidence",
+    "preconditions": "An audit observation is in Open or unverified Responded state",
+    "action_or_input": "Attempt to close the observation prior to satisfactory Auditor verification of response and evidence",
+    "expected_result": "Closure is blocked; observation can only transition to Closed following satisfactory Auditor verification",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC_FR_056",
+    "source_id": "AFR-IAA-056",
+    "purpose": "Verify that if the response is unsatisfactory, the observation returns from Responded to Open for another response cycle",
+    "preconditions": "User is authenticated as Auditor; an audit observation is in Responded state",
+    "action_or_input": "Auditor marks the response as unsatisfactory with rejection/unsatisfactory remarks",
+    "expected_result": "The audit observation transitions from Responded back to Open state for another response cycle",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_057",
+    "source_id": "AFR-IAA-057",
+    "purpose": "Verify that audit observations cannot be deleted in a way that removes their recorded history",
+    "preconditions": "An audit observation exists in the system with associated history",
+    "action_or_input": "Attempt to delete or purge the audit observation record",
+    "expected_result": "Deletion is prevented or rejected; the observation and its recorded history remain intact and immutable",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC_FR_058",
+    "source_id": "AFR-IAA-058",
+    "purpose": "Verify that the system provides authorized users a read-only dashboard/report of request status summaries",
+    "preconditions": "User is authenticated with an authorized reporting role (Finance Staff, Approving Authority, Auditor)",
+    "action_or_input": "Access the status summary dashboard/report",
+    "expected_result": "Read-only request status summaries scoped to the user role are displayed accurately",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_059",
+    "source_id": "AFR-IAA-059",
+    "purpose": "Verify that the system provides approval turnaround-time information to authorized reporting users",
+    "preconditions": "User is authenticated with an authorized reporting role; requests have completed approval cycles",
+    "action_or_input": "Access turnaround-time reporting view",
+    "expected_result": "Calculated approval turnaround-time metrics and details are displayed for authorized review",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_060",
+    "source_id": "AFR-IAA-060",
+    "purpose": "Verify that the system provides authorized reporting users information on flagged anomalies and audit observations",
+    "preconditions": "User is authenticated with an authorized reporting role; anomalies and audit observations exist",
+    "action_or_input": "Access reporting view for anomalies and audit observations",
+    "expected_result": "Information and metrics on flagged anomalies and audit observations are displayed according to role scope",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_061",
+    "source_id": "AFR-IAA-061",
+    "purpose": "Verify that authorized reporting users can export a read-only report for offline reference",
+    "preconditions": "User is authenticated with an authorized reporting role viewing a report",
+    "action_or_input": "Execute report export action",
+    "expected_result": "A read-only report file is generated and exported for offline reference without altering data",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_062",
+    "source_id": "AFR-IAA-062",
+    "purpose": "Verify that a Basic User can track the status and history of their own expense/voucher requests and TA claims",
+    "preconditions": "User is authenticated with active Basic User role; multiple requests and TA claims exist from this user and other users",
+    "action_or_input": "Basic User queries their request and TA claim status/history view",
+    "expected_result": "The status and complete action history of the user own requests and TA claims are displayed, excluding other users records",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_063",
+    "source_id": "AFR-IAA-063",
+    "purpose": "Verify that the system notifies relevant actors of request/claim submission and status changes",
+    "preconditions": "A request or TA claim is submitted or undergoes a status change",
+    "action_or_input": "Check notification generation for relevant actors (e.g. submitter and assigned Finance Staff)",
+    "expected_result": "Notifications for submission and status changes are generated for the relevant actors",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_064",
+    "source_id": "AFR-IAA-064",
+    "purpose": "Verify that the system notifies relevant actors of approval, rejection, and escalation events",
+    "preconditions": "An approval, rejection, or timeout escalation occurs on a financial request or claim",
+    "action_or_input": "Check notifications delivered to relevant actors (creator, prior authority, next authority)",
+    "expected_result": "Notifications detailing the approval, rejection, or escalation event are generated and delivered to relevant actors",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_065",
+    "source_id": "AFR-IAA-065",
+    "purpose": "Verify that the system notifies relevant actors of anomaly and audit-observation events",
+    "preconditions": "A material anomaly is flagged or an audit observation is raised",
+    "action_or_input": "Check notifications generated for designated anomaly resolvers and concerned department actors",
+    "expected_result": "Notifications detailing the anomaly or audit-observation event are generated for the relevant actors",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_066",
+    "source_id": "AFR-IAA-066",
+    "purpose": "Verify that the system notifies relevant actors of pending actions and overdue follow-ups",
+    "preconditions": "Action items are pending or have exceeded follow-up thresholds for an actor",
+    "action_or_input": "Trigger pending action / overdue follow-up notification check",
+    "expected_result": "Notifications highlighting pending actions and overdue follow-ups are generated for the assigned actors",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_067",
+    "source_id": "AFR-IAA-067",
+    "purpose": "Verify that IAA notifications are visible through the Fusion dashboard",
+    "preconditions": "Notifications have been generated for an authenticated user across IAA events",
+    "action_or_input": "User accesses the Fusion dashboard notification view",
+    "expected_result": "The generated IAA notifications are displayed and visible within the user Fusion dashboard",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_068",
+    "source_id": "AFR-IAA-068",
+    "purpose": "Verify that System Admin can assign and manage IAA roles",
+    "preconditions": "User is authenticated with active System Admin role",
+    "action_or_input": "System Admin creates role assignment or updates user IAA roles",
+    "expected_result": "The role assignment/update is saved successfully in the system configuration",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_069",
+    "source_id": "AFR-IAA-069",
+    "purpose": "Verify that System Admin can configure approval hierarchy and threshold/routing parameters",
+    "preconditions": "User is authenticated with active System Admin role",
+    "action_or_input": "System Admin updates approval hierarchy levels, amount thresholds, and routing parameters",
+    "expected_result": "The updated approval hierarchy and routing configuration parameters are successfully stored",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_070",
+    "source_id": "AFR-IAA-070",
+    "purpose": "Verify that System Admin can configure financial years and policy parameters",
+    "preconditions": "User is authenticated with active System Admin role",
+    "action_or_input": "System Admin configures financial year boundaries and institutional policy parameters",
+    "expected_result": "The financial year definitions and policy parameters are successfully updated and stored",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_071_01",
+    "source_id": "AFR-IAA-071",
+    "purpose": "Verify that System Admin is not permitted to access operational financial request content",
+    "preconditions": "User is authenticated with active System Admin role",
+    "action_or_input": "System Admin attempts to view or access operational financial request content or vouchers",
+    "expected_result": "Access is denied/blocked as System Admin is prohibited from operational financial request content",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC_FR_071_02",
+    "source_id": "AFR-IAA-071",
+    "purpose": "Verify that System Admin is not permitted to perform operational approvals",
+    "preconditions": "User is authenticated with active System Admin role; a financial request is pending approval",
+    "action_or_input": "System Admin attempts to approve or reject the operational financial request",
+    "expected_result": "Action is blocked as System Admin has no operational approval privileges",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC_FR_072",
+    "source_id": "AFR-IAA-072",
+    "purpose": "Verify that the system requires a multi-role user to explicitly switch/activate the role used for a role-specific action",
+    "preconditions": "User holds multiple roles (e.g. Basic User and HoD) and has one role active",
+    "action_or_input": "User attempts an action specific to another held role without activating/switching to it",
+    "expected_result": "Action requires explicit role activation/switch to the intended role before execution is permitted",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC_FR_073",
+    "source_id": "AFR-IAA-073",
+    "purpose": "Verify that role changes do not alter historical records or the recorded identity/role of completed actions",
+    "preconditions": "A user performed an approval or submission under role R1; subsequently user role is changed to R2",
+    "action_or_input": "Inspect previously completed audit trails and historical records for that user actions",
+    "expected_result": "Historical records remain unchanged, retaining the original identity and role under which actions were performed",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC_FR_074",
+    "source_id": "AFR-IAA-074",
+    "purpose": "Verify that the system enforces role-based access control across all IAA features and data views",
+    "preconditions": "User is authenticated with a role lacking permission for a restricted feature/view (e.g. Basic User accessing Finance review)",
+    "action_or_input": "User attempts unauthorized access to restricted IAA features or data views",
+    "expected_result": "Access is denied and RBAC enforcement blocks unauthorized interaction or data viewing",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC_FR_075",
+    "source_id": "AFR-IAA-075",
+    "purpose": "Verify that the system logs IAA actions with user identity, active role, timestamp, action, and resulting status",
+    "preconditions": "An authorized user performs an operational or configuration action in IAA",
+    "action_or_input": "Retrieve the audit trail log entry generated for the performed action",
+    "expected_result": "The audit log records user identity, active role, timestamp, action description, and resulting status",
+    "test_type": "functional"
+  }
+]

@@ -1,0 +1,812 @@
+[
+  {
+    "test_id": "TC-UC-001",
+    "source_id": "IAA-UC-101",
+    "purpose": "Verify successful creation and saving of an expense/voucher request as Draft (MSS)",
+    "preconditions": "User is authenticated and authorized to create financial requests.",
+    "action_or_input": "User selects Create Expense/Voucher Request, enters available request details, attaches supporting documents as needed, and selects save.",
+    "expected_result": "System creates/updates the request in Draft state, records the action, and keeps the request editable by its creator.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-002",
+    "source_id": "IAA-UC-101",
+    "purpose": "Verify saving an incomplete expense/voucher request as Draft (Alternative Flow)",
+    "preconditions": "User is authenticated and authorized to create financial requests.",
+    "action_or_input": "User enters partial request details with missing submission-mandatory information and selects save.",
+    "expected_result": "System identifies missing submission-mandatory information but still permits saving the request in Draft state.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-003",
+    "source_id": "IAA-UC-101",
+    "purpose": "Verify denial of expense/voucher request creation when user lacks authorization (Exception Flow)",
+    "preconditions": "User is not authorized to create financial requests.",
+    "action_or_input": "User attempts to select Create Expense/Voucher Request.",
+    "expected_result": "Request creation is denied; no new request is created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-004",
+    "source_id": "IAA-UC-102",
+    "purpose": "Verify successful submission of a complete Draft expense/voucher request for Finance validation (MSS)",
+    "preconditions": "Request exists in Draft state with all submission-mandatory information complete.",
+    "action_or_input": "Creator selects Submit Request.",
+    "expected_result": "System validates submission completeness, sets status to Submitted, locks ordinary creator editing, routes the request to Finance Staff, records the transition, and creates relevant submission notification(s).",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-005",
+    "source_id": "IAA-UC-102",
+    "purpose": "Verify submission validation failure for an incomplete Draft expense/voucher request (Alternative Flow)",
+    "preconditions": "Request exists in Draft state with missing or invalid submission information.",
+    "action_or_input": "Creator selects Submit Request.",
+    "expected_result": "System validation fails, shows missing/invalid information, and request remains in Draft state.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-006",
+    "source_id": "IAA-UC-102",
+    "purpose": "Verify handling of routing failure during expense/voucher request submission (Exception Flow)",
+    "preconditions": "Request exists in Draft state and submission validation succeeds, but routing failure occurs.",
+    "action_or_input": "Creator selects Submit Request.",
+    "expected_result": "Request remains in Submitted state but is flagged for administrative recovery without losing history.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-007",
+    "source_id": "IAA-UC-103",
+    "purpose": "Verify successful Finance review and validation passing all financial, policy, and departmental budget checks (MSS)",
+    "preconditions": "Request is in Submitted or Query Responded state, and Finance Staff is authorized for the request.",
+    "action_or_input": "Finance Staff reviews request details and documents, performs applicable financial and policy checks, performs departmental budget check, and confirms validation when all checks pass.",
+    "expected_result": "System sets status to Finance Validated and routes the request to the configured approval route.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-008",
+    "source_id": "IAA-UC-103",
+    "purpose": "Verify raising a Finance clarification query during request review (Alternative Flow)",
+    "preconditions": "Request is in Submitted or Query Responded state, and Finance Staff identifies clarification is needed.",
+    "action_or_input": "Finance Staff records a clarification query on the request.",
+    "expected_result": "System sets status to Query Raised and notifies the request creator.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-009",
+    "source_id": "IAA-UC-103",
+    "purpose": "Verify handling when material anomaly is detected during Finance review (Alternative Flow)",
+    "preconditions": "Request is in Submitted or Query Responded state, and Finance Staff identifies a material anomaly.",
+    "action_or_input": "Finance Staff records/initiates anomaly handling for the detected issue.",
+    "expected_result": "System initiates anomaly handling and ensures the request does not become Finance Validated.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-010",
+    "source_id": "IAA-UC-103",
+    "purpose": "Verify handling when required departmental budget reference is unavailable (Exception Flow)",
+    "preconditions": "Request is in Submitted or Query Responded state, and required departmental budget reference is unavailable.",
+    "action_or_input": "Finance Staff attempts to complete Finance validation.",
+    "expected_result": "Finance validation cannot complete; the issue is recorded for recovery/clarification, and no false validation is recorded.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-011",
+    "source_id": "IAA-UC-104",
+    "purpose": "Verify successful response submission to a Finance clarification query (MSS)",
+    "preconditions": "A Finance query is open for a record owned/represented by the user.",
+    "action_or_input": "User reviews the query, enters response information, attaches requested evidence, and submits the response.",
+    "expected_result": "System records the response, sets query status to Query Responded, and notifies Finance Staff.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-012",
+    "source_id": "IAA-UC-104",
+    "purpose": "Verify prevention of response submission when required response information is incomplete (Alternative Flow)",
+    "preconditions": "A Finance query is open for a record owned/represented by the user.",
+    "action_or_input": "User enters incomplete response information omitting required fields/evidence and attempts to submit.",
+    "expected_result": "System prevents response submission, identifies missing required response information, and query remains open with prior history preserved.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-013",
+    "source_id": "IAA-UC-104",
+    "purpose": "Verify access denial when user lacks ownership or representation authority for the query (Exception Flow)",
+    "preconditions": "User lacks ownership or representation authority for the record with the open Finance query.",
+    "action_or_input": "User attempts to access or submit a response to the Finance clarification query.",
+    "expected_result": "Access is denied; no response is recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-014",
+    "source_id": "IAA-UC-105",
+    "purpose": "Verify successful internal Finance processing and recording of an approved expense/voucher request (MSS)",
+    "preconditions": "Request status is Approved, and internal processing information is complete.",
+    "action_or_input": "Finance Staff confirms completion of internal processing.",
+    "expected_result": "System records processing details, user, and timestamp, sets terminal internal record state to Recorded, makes the request read-only, and creates relevant status notification(s).",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-015",
+    "source_id": "IAA-UC-105",
+    "purpose": "Verify prevention of completion when internal processing record is incomplete (Alternative Flow)",
+    "preconditions": "Request status is Approved, and required processing record details are incomplete.",
+    "action_or_input": "Finance Staff attempts to confirm completion of internal processing.",
+    "expected_result": "System prevents completion, retains Approved state, and no false record-completion state is stored.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-016",
+    "source_id": "IAA-UC-105",
+    "purpose": "Verify no real payment or bank-transfer operation is invoked during recording (Exception Flow)",
+    "preconditions": "Request status is Approved.",
+    "action_or_input": "Finance Staff confirms internal processing recording.",
+    "expected_result": "System records internal completion and sets state to Recorded without invoking real payment or bank-transfer operations.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-017",
+    "source_id": "IAA-UC-201",
+    "purpose": "Verify authority approval routing to next authority when further approval level is required (MSS)",
+    "preconditions": "Request is Finance Validated or Approval Pending, actor is configured current approver eligible under segregation of duties, and another approval level is required.",
+    "action_or_input": "Authority reviews request, Finance validation, and prior approval history, selects Approve, and records remarks.",
+    "expected_result": "System records the decision, routes to the next eligible authority, status becomes/remains Approval Pending, and relevant actors are notified.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-018",
+    "source_id": "IAA-UC-201",
+    "purpose": "Verify authority approval reaching final Approved status when no further level is required (MSS)",
+    "preconditions": "Request is Finance Validated or Approval Pending, actor is configured current approver eligible under segregation of duties, and no further approval level is required.",
+    "action_or_input": "Authority reviews request and prior history, selects Approve, and records remarks.",
+    "expected_result": "System records decision, sets request status to Approved, and notifies relevant actors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-019",
+    "source_id": "IAA-UC-201",
+    "purpose": "Verify authority rejection of an expense/voucher request (Alternative Flow)",
+    "preconditions": "Request is Finance Validated or Approval Pending, and actor is the configured current approver.",
+    "action_or_input": "Authority selects Reject and records remarks.",
+    "expected_result": "System records the decision, sets request status to Rejected, and notifies relevant actors.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-020",
+    "source_id": "IAA-UC-201",
+    "purpose": "Verify blocking of approval decision upon self-approval detection (Alternative Flow)",
+    "preconditions": "Request is Finance Validated or Approval Pending, and current approver is detected as the request creator/beneficiary (self-approval).",
+    "action_or_input": "Actor attempts to approve the request.",
+    "expected_result": "System blocks the self-approval decision and routes the request to the next eligible configured authority under segregation of duties.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-021",
+    "source_id": "IAA-UC-201",
+    "purpose": "Verify handling of approval action timeout (Exception Flow)",
+    "preconditions": "Request is Finance Validated or Approval Pending, assigned to an authority, and action time limit expires.",
+    "action_or_input": "Approval action times out without an authority decision.",
+    "expected_result": "System initiates overdue approval escalation under IAA-BR-401 / IAA-UC-202.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-022",
+    "source_id": "IAA-UC-202",
+    "purpose": "Verify authority approval of an escalated approval item routing to next level (MSS)",
+    "preconditions": "Expense/voucher request or high-value TA claim is in Escalated state/context, assigned to actor under configured route, and another configured approval level remains.",
+    "action_or_input": "Authority reviews item, Finance verification/validation, escalation reason, and approval history, selects Approve, and records remarks.",
+    "expected_result": "System records decision, routes to next eligible authority, status becomes Approval Pending, audit-logs action, and notifies relevant actors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-023",
+    "source_id": "IAA-UC-202",
+    "purpose": "Verify final authority approval of an escalated approval item when no further level remains (MSS)",
+    "preconditions": "Expense/voucher request or high-value TA claim is in Escalated state/context, assigned to actor under configured route, and no further approval level remains.",
+    "action_or_input": "Authority selects Approve and records remarks.",
+    "expected_result": "System records decision, sets status to Approved, audit-logs action, and notifies relevant actors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-024",
+    "source_id": "IAA-UC-202",
+    "purpose": "Verify authority rejection of an escalated approval item (Alternative Flow)",
+    "preconditions": "Expense/voucher request or high-value TA claim is in Escalated state/context, assigned to actor under configured route.",
+    "action_or_input": "Authority selects Reject and records remarks.",
+    "expected_result": "System records decision, sets status to Rejected, audit-logs action, and notifies relevant actors.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-025",
+    "source_id": "IAA-UC-202",
+    "purpose": "Verify blocking and rerouting when self-approval or ineligibility is detected on escalated item (Alternative Flow)",
+    "preconditions": "Expense/voucher request or high-value TA claim is in Escalated state/context, and actor is detected as ineligible/self-approver.",
+    "action_or_input": "Ineligible actor attempts to decide the escalated item.",
+    "expected_result": "System blocks the decision and routes to the next eligible configured authority.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-026",
+    "source_id": "IAA-UC-202",
+    "purpose": "Verify exception handling when no eligible configured authority can be resolved for escalated item (Exception Flow)",
+    "preconditions": "Expense/voucher request or high-value TA claim is in Escalated state/context, and no eligible configured authority can be resolved.",
+    "action_or_input": "System evaluates routing for the escalated item.",
+    "expected_result": "System preserves the Escalated item, records a routing exception for administrative recovery, and does not apply an unauthorized decision.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-027",
+    "source_id": "IAA-UC-203",
+    "purpose": "Verify automatic escalation of overdue approval to the next eligible authority (MSS)",
+    "preconditions": "Expense/voucher request is Finance Validated or Approval Pending (or high-value TA claim is Approval Pending), assignment and timestamp exist, timeout expires, and no valid decision has completed approval.",
+    "action_or_input": "Timeout event is evaluated against active approval assignment and configured limit.",
+    "expected_result": "System confirms approval is still pending, determines next eligible authority under configured route and segregation-of-duties rules, sets approval item to Escalated, routes it to that authority, records escalation, and notifies relevant actors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-028",
+    "source_id": "IAA-UC-203",
+    "purpose": "Verify skipping of ineligible candidate authority during automatic escalation (Alternative Flow)",
+    "preconditions": "Approval item is overdue for escalation, and the immediate candidate authority is ineligible under segregation-of-duties rules.",
+    "action_or_input": "System evaluates overdue approval and identifies the next candidate authority.",
+    "expected_result": "System skips the ineligible candidate and selects/routes to the next eligible configured authority.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-029",
+    "source_id": "IAA-UC-203",
+    "purpose": "Verify exception handling when no eligible configured authority is available during escalation (Exception Flow)",
+    "preconditions": "Approval item is overdue for escalation, and no eligible configured authority is available in the route.",
+    "action_or_input": "System attempts to route the overdue approval item.",
+    "expected_result": "System preserves the Escalated item, records a routing exception for administrative recovery, does not auto-approve or auto-reject, and preserves prior decision history intact.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-030",
+    "source_id": "IAA-UC-302",
+    "purpose": "Verify authorized actor successfully flags a traceable anomaly in Open state (MSS)",
+    "preconditions": "Relevant financial record/process exists and actor is authorized to flag anomalies.",
+    "action_or_input": "Actor identifies/selects affected record, enters anomaly category, description, and available evidence/remarks, and submits.",
+    "expected_result": "System creates/links an anomaly record in Open state, routes anomaly to configured designated resolver, and notifies relevant recipients.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-031",
+    "source_id": "IAA-UC-302",
+    "purpose": "Verify non-material validation errors do not create an anomaly (Exception Flow)",
+    "preconditions": "Financial record exhibits ordinary completeness or validation error that is not configured as a material anomaly.",
+    "action_or_input": "System/actor performs routine validation check.",
+    "expected_result": "Ordinary error is handled in its normal validation path and does not create an anomaly record; source record remains intact.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-032",
+    "source_id": "IAA-UC-303",
+    "purpose": "Verify designated resolver successfully resolves an anomaly (MSS)",
+    "preconditions": "Anomaly is in Open or Escalated state, and actor is the configured resolver for its category.",
+    "action_or_input": "Resolver reviews anomaly details, evidence, and related record history, records resolution evidence/remarks, and submits resolution.",
+    "expected_result": "System sets anomaly state to Resolved and records the resolution action with traceable history.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-033",
+    "source_id": "IAA-UC-303",
+    "purpose": "Verify designated resolver escalates an anomaly to the next resolver (Alternative Flow)",
+    "preconditions": "Anomaly is in Open or Escalated state, actor is designated resolver, and further escalation is required.",
+    "action_or_input": "Resolver records escalation reason and submits.",
+    "expected_result": "System sets anomaly state to Escalated and routes anomaly to the next designated resolver.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-034",
+    "source_id": "IAA-UC-303",
+    "purpose": "Verify action denial when actor is not the designated resolver for anomaly category (Exception Flow)",
+    "preconditions": "Anomaly is in Open or Escalated state, and actor is not the configured designated resolver for its category.",
+    "action_or_input": "Actor attempts to resolve or escalate the anomaly.",
+    "expected_result": "Action is denied; existing anomaly state and history remain unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-035",
+    "source_id": "IAA-UC-304",
+    "purpose": "Verify automatic anomaly creation and routing upon detection of material condition (MSS)",
+    "preconditions": "Relevant IAA financial record/process exists, and a detected condition is configured as a material anomaly condition.",
+    "action_or_input": "System detects condition and validates that it is configured as material.",
+    "expected_result": "System creates and links an anomaly record in Open state to affected record/process, records category/context, routes anomaly to configured designated resolver, audit-logs event, and notifies relevant recipients.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-036",
+    "source_id": "IAA-UC-304",
+    "purpose": "Verify no anomaly is created when detected condition is not configured as material (Alternative Flow)",
+    "preconditions": "Relevant IAA financial record/process exists, and detected condition is not configured as material.",
+    "action_or_input": "System evaluates detected validation/process condition.",
+    "expected_result": "No anomaly record is created; underlying validation outcome remains in its normal path.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-037",
+    "source_id": "IAA-UC-304",
+    "purpose": "Verify handling when automatic anomaly creation or routing cannot complete (Exception Flow)",
+    "preconditions": "Configured material anomaly condition occurs, but anomaly creation or routing fails to complete.",
+    "action_or_input": "System attempts to create and route automatic anomaly.",
+    "expected_result": "System preserves source record, records a recoverable processing exception without inventing a resolution outcome, and records no unsupported anomaly or false state.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-038",
+    "source_id": "IAA-UC-401",
+    "purpose": "Verify successful submission of a complete employee TA claim (MSS)",
+    "preconditions": "User is authenticated and eligible to submit TA claims.",
+    "action_or_input": "User enters trip dates, purpose, claimed amount, required details, attaches supporting documents, and submits the claim.",
+    "expected_result": "System validates submission completeness, creates TA record, sets status to Submitted, locks ordinary edits, and notifies Finance Staff.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-039",
+    "source_id": "IAA-UC-401",
+    "purpose": "Verify validation error and submission prevention when mandatory TA information is missing (Alternative Flow)",
+    "preconditions": "User is authenticated and eligible to submit TA claims.",
+    "action_or_input": "User omits mandatory TA information/documents and attempts to submit claim.",
+    "expected_result": "System displays validation errors, does not submit the claim, and no invalid TA submission is created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-040",
+    "source_id": "IAA-UC-401",
+    "purpose": "Verify submission denial when user is ineligible to submit TA claims (Exception Flow)",
+    "preconditions": "User is not eligible to submit TA claims.",
+    "action_or_input": "User attempts to submit a TA claim.",
+    "expected_result": "Submission is denied; no TA submission is created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-041",
+    "source_id": "IAA-UC-402",
+    "purpose": "Verify successful TA form verification setting status to Verified when no authority approval is required (MSS)",
+    "preconditions": "TA claim is in Submitted or Query Responded state, policy requirements and budget pass, and no authority approval is required.",
+    "action_or_input": "Finance Staff reviews claim details and supporting documents, verifies policy compliance, checks departmental budget, and confirms verification.",
+    "expected_result": "System sets TA claim status to Verified and readies it for internal processing.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-042",
+    "source_id": "IAA-UC-402",
+    "purpose": "Verify TA form verification routing to Approval Pending when high-value approval is required (MSS)",
+    "preconditions": "TA claim is in Submitted or Query Responded state, meets high-value threshold requiring authority approval, and policy and budget checks pass.",
+    "action_or_input": "Finance Staff verifies policy compliance, checks departmental budget, and confirms verification.",
+    "expected_result": "System sets TA claim status to Approval Pending and routes the claim for high-value authority approval.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-043",
+    "source_id": "IAA-UC-402",
+    "purpose": "Verify Finance Staff raising clarification query on submitted TA claim (Alternative Flow)",
+    "preconditions": "TA claim is in Submitted or Query Responded state, and Finance Staff identifies clarification is needed.",
+    "action_or_input": "Finance Staff raises a query on the TA claim.",
+    "expected_result": "System sets TA claim status to Query Raised and notifies the claim submitter.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-044",
+    "source_id": "IAA-UC-402",
+    "purpose": "Verify TA claim rejection with remarks when policy verification fails (Alternative Flow)",
+    "preconditions": "TA claim is in Submitted or Query Responded state, and fails configured TA policy requirements.",
+    "action_or_input": "Finance Staff rejects the claim with recorded remarks.",
+    "expected_result": "System sets TA claim status to Rejected with recorded remarks.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-045",
+    "source_id": "IAA-UC-402",
+    "purpose": "Verify initiation of anomaly handling for material budget/policy issue during TA verification (Alternative Flow)",
+    "preconditions": "TA claim is in Submitted or Query Responded state, and a material budget/policy issue is identified.",
+    "action_or_input": "Finance Staff initiates anomaly handling for the material issue.",
+    "expected_result": "System initiates anomaly handling rather than silently rejecting solely for budget insufficiency; no false verification is recorded.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-046",
+    "source_id": "IAA-UC-402",
+    "purpose": "Verify TA verification handling when required policy or budget configuration is unavailable (Exception Flow)",
+    "preconditions": "TA claim is in Submitted or Query Responded state, and required policy or budget configuration is unavailable.",
+    "action_or_input": "Finance Staff attempts to perform verification.",
+    "expected_result": "Verification cannot complete; the issue is recorded, and no false verification is recorded.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-047",
+    "source_id": "IAA-UC-403",
+    "purpose": "Verify authority approval of high-value TA claim routing to next level when required (MSS)",
+    "preconditions": "TA claim is in Approval Pending state, actor is eligible current approver, and another approval level is required.",
+    "action_or_input": "Authority reviews claim, Finance verification, and prior history, selects Approve, and records remarks.",
+    "expected_result": "System records decision, routes claim onward, and claim remains in Approval Pending state.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-048",
+    "source_id": "IAA-UC-403",
+    "purpose": "Verify authority approval of high-value TA claim reaching final Approved status (MSS)",
+    "preconditions": "TA claim is in Approval Pending state, actor is eligible current approver, and no further approval level is required.",
+    "action_or_input": "Authority reviews claim and prior history, selects Approve, and records remarks.",
+    "expected_result": "System records decision and sets TA claim status to Approved.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-049",
+    "source_id": "IAA-UC-403",
+    "purpose": "Verify authority rejection of high-value TA claim with remarks (Alternative Flow)",
+    "preconditions": "TA claim is in Approval Pending state, and actor is eligible current approver.",
+    "action_or_input": "Authority selects Reject and records remarks.",
+    "expected_result": "System records decision and sets TA claim status to Rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-050",
+    "source_id": "IAA-UC-403",
+    "purpose": "Verify blocking and rerouting upon self-approval detection on high-value TA claim (Alternative Flow)",
+    "preconditions": "TA claim is in Approval Pending state, and current approver is detected as the claim submitter/beneficiary.",
+    "action_or_input": "Actor attempts to approve the TA claim.",
+    "expected_result": "System blocks the decision and routes the claim to the next eligible configured authority.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-051",
+    "source_id": "IAA-UC-403",
+    "purpose": "Verify handling when pending high-value TA approval times out (Exception Flow)",
+    "preconditions": "TA claim is in Approval Pending state assigned to an authority, and action time limit expires.",
+    "action_or_input": "Approval action times out without an authority decision.",
+    "expected_result": "System initiates overdue approval escalation under IAA-BR-401.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-052",
+    "source_id": "IAA-UC-404",
+    "purpose": "Verify successful internal processing and recording of verified or approved TA claim (MSS)",
+    "preconditions": "TA claim is in Verified status (with no further authority approval required) or Approved status, and processing information is complete.",
+    "action_or_input": "Finance Staff confirms completion of internal processing.",
+    "expected_result": "System records processing details and timestamp, sets terminal internal state to Recorded, makes TA record read-only, and notifies relevant actors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-053",
+    "source_id": "IAA-UC-404",
+    "purpose": "Verify prevention of TA processing completion when required processing information is missing (Alternative Flow)",
+    "preconditions": "TA claim is in Verified or Approved status, and required processing information is missing.",
+    "action_or_input": "Finance Staff attempts to confirm processing completion.",
+    "expected_result": "System prevents completion, retains prior valid state, and no false completion is recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-054",
+    "source_id": "IAA-UC-404",
+    "purpose": "Verify no real payment or bank-transfer operation occurs during TA recording (Exception Flow)",
+    "preconditions": "TA claim is in Verified or Approved status.",
+    "action_or_input": "Finance Staff records processing completion.",
+    "expected_result": "System records internal completion and sets state to Recorded without executing real payment or bank-transfer operations.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-055",
+    "source_id": "IAA-UC-501",
+    "purpose": "Verify authorized auditor successfully raises an audit observation in Open state (MSS)",
+    "preconditions": "Auditor is authorized and target financial record/process exists.",
+    "action_or_input": "Auditor selects target, enters observation details, and submits.",
+    "expected_result": "System creates observation in Open state, links it to target record/process, and notifies concerned user/department.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-056",
+    "source_id": "IAA-UC-501",
+    "purpose": "Verify prevention of observation creation when mandatory observation information is missing (Alternative Flow)",
+    "preconditions": "Auditor is authorized and target financial record/process exists.",
+    "action_or_input": "Auditor omits mandatory observation information and attempts to create observation.",
+    "expected_result": "System prevents creation, identifies validation errors, and no incomplete observation is created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-057",
+    "source_id": "IAA-UC-501",
+    "purpose": "Verify denial of audit observation creation when target is outside auditor scope (Exception Flow)",
+    "preconditions": "Target record/process is not accessible under auditor authorized scope.",
+    "action_or_input": "Auditor attempts to raise an observation against the target.",
+    "expected_result": "Creation is denied; no observation is created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-058",
+    "source_id": "IAA-UC-502",
+    "purpose": "Verify authorized user successfully submits response and evidence to an Open audit observation (MSS)",
+    "preconditions": "Observation is in Open state, and user is authorized to respond.",
+    "action_or_input": "User reviews observation, records corrective action/response, attaches required supporting evidence, and submits response.",
+    "expected_result": "System sets observation status to Responded, preserves response and evidence history, and notifies Auditor.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-059",
+    "source_id": "IAA-UC-502",
+    "purpose": "Verify prevention of response submission when response or evidence is incomplete (Alternative Flow)",
+    "preconditions": "Observation is in Open state, and user is authorized to respond.",
+    "action_or_input": "User enters incomplete response or omits required evidence and attempts to submit.",
+    "expected_result": "System prevents submission, observation remains Open, and prior information is preserved.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-060",
+    "source_id": "IAA-UC-502",
+    "purpose": "Verify denial of audit observation response when user is unauthorized (Exception Flow)",
+    "preconditions": "Observation is in Open state, and user is not authorized to respond.",
+    "action_or_input": "User attempts to submit a response to the observation.",
+    "expected_result": "Response action is denied; observation remains Open with prior history preserved.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-061",
+    "source_id": "IAA-UC-503",
+    "purpose": "Verify auditor closes an audit observation upon satisfactory verification of corrective action (MSS)",
+    "preconditions": "Observation is in Responded state, and auditor verifies corrective action and evidence as satisfactory.",
+    "action_or_input": "Auditor selects Close.",
+    "expected_result": "System sets observation status to Closed, records closure details, and makes the closed record read-only.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-062",
+    "source_id": "IAA-UC-503",
+    "purpose": "Verify auditor returns observation to Open when response is unsatisfactory (Alternative Flow)",
+    "preconditions": "Observation is in Responded state, and auditor determines response/corrective action is unsatisfactory.",
+    "action_or_input": "Auditor records reasons for dissatisfaction and returns the observation.",
+    "expected_result": "System sets observation status back to Open and notifies concerned user for another response cycle.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-063",
+    "source_id": "IAA-UC-503",
+    "purpose": "Verify blocking of observation closure when attempted without required verification (Exception Flow)",
+    "preconditions": "Observation is in Responded state, but required verification has not been performed.",
+    "action_or_input": "Auditor attempts to select Close without performing required verification.",
+    "expected_result": "System blocks closure, and observation remains in Responded state.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-064",
+    "source_id": "IAA-UC-504",
+    "purpose": "Verify auditor successfully reviews authorized in-process or completed financial records (MSS)",
+    "preconditions": "Auditor is authenticated and authorized for the record scope.",
+    "action_or_input": "Auditor selects an authorized record from presented records.",
+    "expected_result": "System displays record details, approvals, anomalies, status history, and audit trail in read-only form without modifying operational state.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-065",
+    "source_id": "IAA-UC-504",
+    "purpose": "Verify informational result when no financial records match auditor filter (Alternative Flow)",
+    "preconditions": "Auditor is authenticated and authorized for the record scope.",
+    "action_or_input": "Auditor applies search/filter criteria for which no records match.",
+    "expected_result": "System displays an informational result indicating no records match filter; no operational data is modified.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-066",
+    "source_id": "IAA-UC-504",
+    "purpose": "Verify access denial when auditor attempts to access record outside authorized scope (Exception Flow)",
+    "preconditions": "Auditor is authenticated, but target record is outside auditor authorized scope.",
+    "action_or_input": "Auditor attempts to access the record.",
+    "expected_result": "Access is denied; no record details are displayed or modified.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-067",
+    "source_id": "IAA-UC-601",
+    "purpose": "Verify authorized user views permitted read-only IAA reports and dashboards (MSS)",
+    "preconditions": "User is authenticated and active role has reporting access.",
+    "action_or_input": "User selects a report/dashboard view permitted to active role and applies optional filters.",
+    "expected_result": "System displays request status summaries, approval turnaround information, anomalies, and audit observations within authorized scope without operational state change.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-068",
+    "source_id": "IAA-UC-601",
+    "purpose": "Verify informational message when no data is available for selected report/dashboard view (Alternative Flow)",
+    "preconditions": "User is authenticated and active role has reporting access.",
+    "action_or_input": "User selects an authorized view/filter combination containing no matching data.",
+    "expected_result": "System displays an informational message indicating no data for selection.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-069",
+    "source_id": "IAA-UC-601",
+    "purpose": "Verify access denial when user attempts to access report or scope unauthorized for active role (Exception Flow)",
+    "preconditions": "User is authenticated, but selected report or scope is unauthorized for active role.",
+    "action_or_input": "User attempts to view unauthorized report or scope.",
+    "expected_result": "Access is denied; no unauthorized data is disclosed or modified.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-070",
+    "source_id": "IAA-UC-602",
+    "purpose": "Verify successful export of authorized read-only report in allowed configured format (MSS)",
+    "preconditions": "User is viewing an authorized report.",
+    "action_or_input": "User selects export in an allowed configured format.",
+    "expected_result": "System generates an export in the allowed configured format and provides it to the user without altering source data.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-071",
+    "source_id": "IAA-UC-602",
+    "purpose": "Verify user notification when exporting a report with no data/export content (Alternative Flow)",
+    "preconditions": "User is viewing an authorized report that contains no data/content.",
+    "action_or_input": "User initiates report export.",
+    "expected_result": "System informs the user that there is no data/export content, and no file is exported.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-072",
+    "source_id": "IAA-UC-602",
+    "purpose": "Verify error reporting without altering source data when export generation fails (Exception Flow)",
+    "preconditions": "User is viewing an authorized report, but export generation encounters a system failure.",
+    "action_or_input": "User initiates report export.",
+    "expected_result": "System reports an error to the user without altering source data.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-073",
+    "source_id": "IAA-UC-603",
+    "purpose": "Verify user successfully views status and visible history of own requests and TA claims (MSS)",
+    "preconditions": "User is authenticated.",
+    "action_or_input": "User selects an owned/represented record from the displayed list.",
+    "expected_result": "System displays current status and visible history in read-only form without changing record state.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-074",
+    "source_id": "IAA-UC-603",
+    "purpose": "Verify informational message when user has no matching own records (Alternative Flow)",
+    "preconditions": "User is authenticated and has no owned or represented records.",
+    "action_or_input": "User accesses the tracking view.",
+    "expected_result": "System displays an informational message indicating no matching records found.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-075",
+    "source_id": "IAA-UC-603",
+    "purpose": "Verify access denial when attempting to track record outside permitted ownership or scope (Exception Flow)",
+    "preconditions": "User is authenticated.",
+    "action_or_input": "User attempts to view a record outside permitted ownership/representation scope.",
+    "expected_result": "Access is denied; no record details or history are displayed.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-076",
+    "source_id": "IAA-UC-604",
+    "purpose": "Verify user views permitted notifications and pending actions with navigation to related record (MSS)",
+    "preconditions": "User is authenticated and has an active role.",
+    "action_or_input": "User opens a notification from the list of notifications permitted for active role/ownership/assignment.",
+    "expected_result": "System displays event/pending-action context and provides navigation to related IAA record where permitted without changing operational state.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-077",
+    "source_id": "IAA-UC-604",
+    "purpose": "Verify empty/informational state displayed when user has no notifications (Alternative Flow)",
+    "preconditions": "User is authenticated and has an active role, with no notifications present.",
+    "action_or_input": "User accesses notifications view.",
+    "expected_result": "System displays an empty/informational state.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-078",
+    "source_id": "IAA-UC-604",
+    "purpose": "Verify non-disclosure of linked operational data when notification target is no longer authorized (Exception Flow)",
+    "preconditions": "User is authenticated, but authorization for notification target record has lapsed/revoked.",
+    "action_or_input": "User attempts to access linked operational data via the notification.",
+    "expected_result": "Linked operational data is not disclosed; access to unauthorized record is denied.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-079",
+    "source_id": "IAA-UC-701",
+    "purpose": "Verify user successfully switches active IAA role among assigned roles (MSS)",
+    "preconditions": "User is authenticated and has at least two assigned IAA roles.",
+    "action_or_input": "User selects an assigned role from displayed list to switch.",
+    "expected_result": "System activates selected role for IAA authorization context, records role-switch event, and subsequent actions execute under that role context.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-080",
+    "source_id": "IAA-UC-701",
+    "purpose": "Verify activation denial and retention of current role when selected role is no longer assigned (Alternative Flow)",
+    "preconditions": "User is authenticated, but selected role is no longer assigned to user.",
+    "action_or_input": "User attempts to switch to the unassigned role.",
+    "expected_result": "Activation is denied, and user current active role remains unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-081",
+    "source_id": "IAA-UC-701",
+    "purpose": "Verify re-authentication requirement when session is invalid during role switch (Exception Flow)",
+    "preconditions": "User session is invalid or expired.",
+    "action_or_input": "User attempts to switch active IAA role.",
+    "expected_result": "Role switch is blocked, and re-authentication is required.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-082",
+    "source_id": "IAA-UC-702",
+    "purpose": "Verify Admin manages IAA role assignments without exposing operational financial content (MSS)",
+    "preconditions": "Admin is authenticated with IAA configuration privilege.",
+    "action_or_input": "Admin selects a user, views current IAA role assignments displayed without operational financial content, adds or removes roles, and saves.",
+    "expected_result": "System validates and saves configuration, logs the change, updates role assignments, and preserves historical action records intact.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-083",
+    "source_id": "IAA-UC-702",
+    "purpose": "Verify rejection of invalid role/user combination change (Alternative Flow)",
+    "preconditions": "Admin is authenticated with IAA configuration privilege.",
+    "action_or_input": "Admin attempts to assign an invalid role/user combination.",
+    "expected_result": "System rejects the change, and existing role assignment configuration remains unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-084",
+    "source_id": "IAA-UC-702",
+    "purpose": "Verify denial of access to operational financial data during role administration (Exception Flow)",
+    "preconditions": "Admin is performing IAA role administration.",
+    "action_or_input": "Admin attempts to access operational financial request content/data.",
+    "expected_result": "Access to operational financial data is denied; only role configuration functions are accessible.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-085",
+    "source_id": "IAA-UC-703",
+    "purpose": "Verify Admin successfully configures approval hierarchy levels, thresholds, and routing parameters (MSS)",
+    "preconditions": "Admin is authenticated with IAA configuration privilege.",
+    "action_or_input": "Admin defines/updates hierarchy levels, authority roles, amount criteria, request-type/department routing criteria, and timeout parameters, and saves.",
+    "expected_result": "System validates configuration consistency, saves configuration, audit-logs the change, and makes valid approval-routing configuration active for subsequent routing.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-086",
+    "source_id": "IAA-UC-703",
+    "purpose": "Verify blocking of activation and identification of errors for invalid or incomplete hierarchy configuration (Alternative Flow)",
+    "preconditions": "Admin is authenticated with IAA configuration privilege.",
+    "action_or_input": "Admin enters an invalid or incomplete hierarchy configuration and attempts to activate/save.",
+    "expected_result": "System blocks activation, identifies configuration errors, and prior valid configuration remains active.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-087",
+    "source_id": "IAA-UC-703",
+    "purpose": "Verify configuration privilege does not grant Admin operational approval rights (Exception Flow)",
+    "preconditions": "Admin has IAA configuration privilege but lacks operational approval rights.",
+    "action_or_input": "Admin attempts to perform an operational approval on an expense/voucher or TA request.",
+    "expected_result": "Operational approval action is denied; approval configuration privilege does not grant operational approval rights.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-088",
+    "source_id": "IAA-UC-704",
+    "purpose": "Verify Admin successfully configures financial year and policy parameters (MSS)",
+    "preconditions": "Admin is authenticated with IAA configuration privilege.",
+    "action_or_input": "Admin creates/updates financial-year and supported policy parameters and saves.",
+    "expected_result": "System validates values and effective periods, saves configuration, logs the change, and stores valid configuration for subsequent IAA processing.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-089",
+    "source_id": "IAA-UC-704",
+    "purpose": "Verify blocking of activation for invalid or overlapping financial year or policy configuration (Alternative Flow)",
+    "preconditions": "Admin is authenticated with IAA configuration privilege.",
+    "action_or_input": "Admin enters invalid or overlapping financial-year/policy parameters and attempts to save.",
+    "expected_result": "System blocks activation, identifies errors, and prior valid configuration remains unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-090",
+    "source_id": "IAA-UC-704",
+    "purpose": "Verify operational financial request content is not exposed during policy and financial year configuration (Exception Flow)",
+    "preconditions": "Admin is configuring IAA policy and financial year parameters.",
+    "action_or_input": "Admin accesses policy/financial year configuration screens.",
+    "expected_result": "Operational financial request content is not exposed to Admin; screen displays configuration parameters only.",
+    "test_type": "negative"
+  }
+]
