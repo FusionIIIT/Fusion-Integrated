@@ -13,6 +13,44 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `oap`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `oap.leave_application.create` | Submit a leave application | `student` |
+| `oap.leave_application.view_self` | See one's own leave applications | `student` |
+| `oap.leave_application.view` | See leave applications routed to you | `Head of Department` |
+| `oap.leave_application.approve` | Approve or reject a leave application | `Head of Department` |
+| `oap.bonafide_request.create` | Request a bonafide certificate | `student` |
+| `oap.bonafide_request.view_self` | See one's own bonafide requests | `student` |
+| `oap.bonafide_request.view` | See bonafide requests routed to you | `Academic Administrator` |
+| `oap.bonafide_request.review` | Verify a bonafide request | `Academic Administrator` |
+| `oap.bonafide_request.approve` | Approve or reject a bonafide request | `Academic Administrator` |
+| `oap.bonafide_certificate.view_self` | Download one's own approved bonafide certificate | `student` |
+| `oap.no_dues_case.create` | Initiate no-dues clearance | `student` |
+| `oap.no_dues_case.view_self` | Track one's own no-dues clearance | `student` |
+| `oap.no_dues_case.view` | See no-dues cases for clearance | `Academic Administrator`, `Hostel Warden`, `Lab Supervisor`, `Librarian`, `Mess In-charge` |
+| `oap.no_dues_case.approve` | Finalize no-dues clearance | `Academic Administrator` |
+| `oap.no_dues_result.update` | Record one's own no-dues domain result | `Hostel Warden`, `Lab Supervisor`, `Librarian`, `Mess In-charge` |
+| `oap.no_dues_certificate.view_self` | Download one's own no-dues certificate | `student` |
+| `oap.assistantship_claim.create` | Submit an assistantship claim | `PG Student` |
+| `oap.assistantship_claim.view_self` | Track one's own assistantship claims | `PG Student` |
+| `oap.assistantship_claim.view` | See assistantship claims routed to you | `Academic Administrator`, `Department Administrator`, `Head of Department` |
+| `oap.assistantship_claim.review` | Review and forward an assistantship claim | `Department Administrator` |
+| `oap.assistantship_claim.approve` | Approve or reject an assistantship claim | `Head of Department` |
+| `oap.assistantship_claim.update` | Record stipend processing | `Academic Administrator` |
+| `oap.assistantship_verification.review` | Verify a claim in an assigned supervisor role | `faculty` |
+| `oap.thesis_supervisor_assignment.assign` | Record a thesis-supervisor assignment | `Department Administrator` |
+| `oap.thesis_supervisor_assignment.view` | See thesis-supervisor assignments | `Department Administrator` |
+| `oap.ta_assignment.assign` | Record a TA assignment | `Department Administrator` |
+| `oap.ta_assignment.view` | See TA assignments | `Department Administrator` |
+| `oap.seminar_request.create` | Request graduate seminar scheduling | `PG Student` |
+| `oap.seminar_request.view_self` | See one's own seminar requests | `PG Student` |
+| `oap.seminar_request.view` | See seminar requests routed to you | `Department Administrator` |
+| `oap.seminar_schedule.update` | Schedule and log a graduate seminar | `Department Administrator` |
+| `oap.seminar_schedule.view` | View graduate seminar schedules | `Department Administrator`, `PG Student`, `faculty` |
+| `oap.notification.view_self` | See one's own OAP alerts | `student` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

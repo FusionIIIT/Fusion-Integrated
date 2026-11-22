@@ -105,6 +105,793 @@ paths:
               schema:
                 $ref: '#/components/schemas/Session'
           description: ''
+  /api/v1/oap/assistantship-claims:
+    get:
+      operationId: v1_oap_assistantship_claims_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedClaimList'
+          description: ''
+    post:
+      operationId: v1_oap_assistantship_claims_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Claim'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Claim'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Claim'
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+          description: ''
+  /api/v1/oap/assistantship-claims/{id}:
+    get:
+      operationId: v1_oap_assistantship_claims_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+          description: ''
+  /api/v1/oap/assistantship-claims/{id}/decision:
+    post:
+      operationId: v1_oap_assistantship_claims_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Outcome'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Outcome'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Outcome'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+          description: ''
+  /api/v1/oap/assistantship-claims/{id}/forward:
+    post:
+      operationId: v1_oap_assistantship_claims_forward_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+          description: ''
+  /api/v1/oap/assistantship-claims/{id}/stipend:
+    post:
+      operationId: v1_oap_assistantship_claims_stipend_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+          description: ''
+  /api/v1/oap/assistantship-claims/{id}/verifications:
+    post:
+      operationId: v1_oap_assistantship_claims_verifications_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyClaim'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyClaim'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyClaim'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+          description: ''
+  /api/v1/oap/bonafide-requests:
+    get:
+      operationId: v1_oap_bonafide_requests_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBonafideList'
+          description: ''
+    post:
+      operationId: v1_oap_bonafide_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Bonafide'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Bonafide'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Bonafide'
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bonafide'
+          description: ''
+  /api/v1/oap/bonafide-requests/{id}:
+    get:
+      operationId: v1_oap_bonafide_requests_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bonafide'
+          description: ''
+  /api/v1/oap/bonafide-requests/{id}/certificate:
+    get:
+      operationId: v1_oap_bonafide_requests_certificate_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/oap/bonafide-requests/{id}/decision:
+    post:
+      operationId: v1_oap_bonafide_requests_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Outcome'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Outcome'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Outcome'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bonafide'
+          description: ''
+  /api/v1/oap/bonafide-requests/{id}/verify:
+    post:
+      operationId: v1_oap_bonafide_requests_verify_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bonafide'
+          description: ''
+  /api/v1/oap/leave-applications:
+    get:
+      operationId: v1_oap_leave_applications_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveList'
+          description: ''
+    post:
+      operationId: v1_oap_leave_applications_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Leave'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Leave'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Leave'
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Leave'
+          description: ''
+  /api/v1/oap/leave-applications/{id}:
+    get:
+      operationId: v1_oap_leave_applications_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Leave'
+          description: ''
+  /api/v1/oap/leave-applications/{id}/decision:
+    post:
+      operationId: v1_oap_leave_applications_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Outcome'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Outcome'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Outcome'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Leave'
+          description: ''
+  /api/v1/oap/no-dues-cases:
+    get:
+      operationId: oap_no_dues_cases_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    post:
+      operationId: v1_oap_no_dues_cases_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/oap/no-dues-cases/{id}:
+    get:
+      operationId: v1_oap_no_dues_cases_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/oap/no-dues-cases/{id}/certificate:
+    get:
+      operationId: v1_oap_no_dues_cases_certificate_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/oap/no-dues-cases/{id}/finalize:
+    post:
+      operationId: v1_oap_no_dues_cases_finalize_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/oap/no-dues-cases/{id}/results:
+    post:
+      operationId: v1_oap_no_dues_cases_results_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoDuesResult'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NoDuesResult'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NoDuesResult'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/oap/notifications:
+    get:
+      operationId: v1_oap_notifications_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNotificationList'
+          description: ''
+  /api/v1/oap/seminar-requests:
+    get:
+      operationId: v1_oap_seminar_requests_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSeminarRequestList'
+          description: ''
+    post:
+      operationId: v1_oap_seminar_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeminarRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SeminarRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SeminarRequest'
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeminarRequest'
+          description: ''
+  /api/v1/oap/seminar-requests/{id}/schedule:
+    post:
+      operationId: v1_oap_seminar_requests_schedule_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeminarScheduleInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SeminarScheduleInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SeminarScheduleInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeminarSchedule'
+          description: ''
+  /api/v1/oap/seminar-schedules:
+    get:
+      operationId: v1_oap_seminar_schedules_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSeminarScheduleList'
+          description: ''
+  /api/v1/oap/ta-assignments:
+    get:
+      operationId: v1_oap_ta_assignments_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTAAssignmentList'
+          description: ''
+    post:
+      operationId: v1_oap_ta_assignments_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TAAssignment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TAAssignment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TAAssignment'
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TAAssignment'
+          description: ''
+  /api/v1/oap/thesis-supervisor-assignments:
+    get:
+      operationId: v1_oap_thesis_supervisor_assignments_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedThesisAssignmentList'
+          description: ''
+    post:
+      operationId: v1_oap_thesis_supervisor_assignments_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThesisAssignment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ThesisAssignment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ThesisAssignment'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThesisAssignment'
+          description: ''
   /api/v1/placement/announcements:
     get:
       operationId: v1_placement_announcements_list
@@ -1993,6 +2780,39 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    Bonafide:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        purpose:
+          type: string
+          readOnly: true
+        verified_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - decided_at
+      - id
+      - purpose
+      - status
+      - verified_at
     BulkOutcome:
       type: object
       properties:
@@ -2082,6 +2902,55 @@ components:
       - resume_link
       - roll_no
       - user_id
+    Claim:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        thesis_supervisor_user_id:
+          type: integer
+          readOnly: true
+        ta_supervisor_user_id:
+          type: integer
+          readOnly: true
+        verifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/Verification'
+          readOnly: true
+        department_forwarded_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        hod_decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        stipend_processed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - department_forwarded_at
+      - hod_decided_at
+      - id
+      - status
+      - stipend_processed_at
+      - ta_supervisor_user_id
+      - thesis_supervisor_user_id
+      - verifications
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2637,6 +3506,48 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    Leave:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        from_date:
+          type: string
+          format: date
+          readOnly: true
+        to_date:
+          type: string
+          format: date
+          readOnly: true
+        supporting_document_link:
+          type: string
+          format: uri
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - decided_at
+      - from_date
+      - id
+      - reason
+      - status
+      - supporting_document_link
+      - to_date
     LiftSanction:
       type: object
       properties:
@@ -2708,6 +3619,13 @@ components:
       - icon
       - label
       - to
+    NoDuesResult:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultEnum'
+      required:
+      - result
     NotJoining:
       type: object
       properties:
@@ -2732,6 +3650,31 @@ components:
       - is_late
       - message
       - record
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        subject:
+          type: string
+          readOnly: true
+        body:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - body
+      - created_at
+      - id
+      - status
+      - subject
     OffCampusRecord:
       type: object
       properties:
@@ -2886,6 +3829,21 @@ components:
           maxLength: 300
       required:
       - season
+    Outcome:
+      type: object
+      properties:
+        outcome:
+          $ref: '#/components/schemas/OutcomeOutcomeEnum'
+      required:
+      - outcome
+    OutcomeOutcomeEnum:
+      enum:
+      - approve
+      - reject
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
     PaginatedAnnouncementList:
       type: object
       required:
@@ -2924,6 +3882,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Application'
+    PaginatedBonafideList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Bonafide'
+    PaginatedClaimList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Claim'
     PaginatedCompanyList:
       type: object
       required:
@@ -2981,6 +3977,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedLeaveList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Leave'
+    PaginatedNotificationList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
     PaginatedOfferList:
       type: object
       required:
@@ -3000,6 +4034,82 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PaginatedSeminarRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SeminarRequest'
+    PaginatedSeminarScheduleList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SeminarSchedule'
+    PaginatedTAAssignmentList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/TAAssignment'
+    PaginatedThesisAssignmentList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ThesisAssignment'
     PatchedJobPosting:
       type: object
       properties:
@@ -3466,6 +4576,22 @@ components:
       - message
       - reason
       - route
+    ResultEnum:
+      enum:
+      - clear
+      - outstanding
+      type: string
+      description: |-
+        * `clear` - clear
+        * `outstanding` - outstanding
+    RoleEnum:
+      enum:
+      - thesis
+      - ta
+      type: string
+      description: |-
+        * `thesis` - thesis
+        * `ta` - ta
     RoundOutcome:
       type: object
       properties:
@@ -3598,6 +4724,61 @@ components:
         * `it` - IT / software
         * `core` - Core engineering
         * `other` - Other
+    SeminarRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - status
+    SeminarSchedule:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        request_id:
+          type: integer
+          readOnly: true
+        scheduled_for:
+          type: string
+          format: date-time
+          readOnly: true
+        venue:
+          type: string
+          readOnly: true
+        scheduled_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - id
+      - request_id
+      - scheduled_at
+      - scheduled_for
+      - venue
+    SeminarScheduleInput:
+      type: object
+      properties:
+        scheduled_for:
+          type: string
+          format: date-time
+        venue:
+          type: string
+          maxLength: 200
+      required:
+      - scheduled_for
+      - venue
     Session:
       type: object
       properties:
@@ -3698,6 +4879,61 @@ components:
           type: integer
       required:
       - document_id
+    TAAssignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_user_id:
+          type: integer
+          readOnly: true
+        course_code:
+          type: string
+          readOnly: true
+        supervisor_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        assigned_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - assigned_at
+      - course_code
+      - id
+      - student_user_id
+      - supervisor_user_id
+    ThesisAssignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        supervisor_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        assigned_at:
+          type: string
+          format: date-time
+          readOnly: true
+        superseded_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - assigned_at
+      - id
+      - student_user_id
+      - superseded_at
+      - supervisor_user_id
     TopicEnum:
       enum:
       - drive
@@ -3814,6 +5050,27 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    Verification:
+      type: object
+      properties:
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          readOnly: true
+        verified_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - role
+      - verified_at
+    VerifyClaim:
+      type: object
+      properties:
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+      required:
+      - role
     WaiveIncident:
       type: object
       properties:
