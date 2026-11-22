@@ -1,0 +1,110 @@
+[
+  {
+    "test_id": "WF-TEST-001",
+    "source_id": "BW-LMS-01 path-released",
+    "purpose": "Scheduled Course Material Release: Draft -> Scheduled -> Published when release date arrives",
+    "preconditions": "Course exists; Faculty creates material with future release date",
+    "action_or_input": "Material scheduled; time advances past scheduled_release_at",
+    "expected_result": "Material status transitions to published and is visible to students",
+    "test_type": "workflow-positive"
+  },
+  {
+    "test_id": "WF-TEST-002",
+    "source_id": "BW-LMS-01 path-pending",
+    "purpose": "Scheduled Course Material Release: Time not reached -> Remains Scheduled and hidden",
+    "preconditions": "Material scheduled in future; current time before release date",
+    "action_or_input": "Student queries course materials",
+    "expected_result": "Material remains scheduled and is omitted from student view",
+    "test_type": "workflow-negative"
+  },
+  {
+    "test_id": "WF-TEST-003",
+    "source_id": "BW-LMS-02 path-immediate-on-time",
+    "purpose": "Assignment Immediate Release and On-Time Submission: Draft -> Available -> On-Time Submission -> Status Submitted",
+    "preconditions": "Course exists; Faculty creates draft assignment",
+    "action_or_input": "Faculty publishes immediately; Student submits work before deadline",
+    "expected_result": "Assignment available immediately; Student submission created with status=submitted",
+    "test_type": "workflow-positive"
+  },
+  {
+    "test_id": "WF-TEST-004",
+    "source_id": "BW-LMS-02 path-late-submission",
+    "purpose": "Assignment Immediate Release with Late Submission: Draft -> Available -> Submission after due date -> Status Late",
+    "preconditions": "Assignment is published; due_date has passed",
+    "action_or_input": "Student submits work after due_date",
+    "expected_result": "Student submission created with status=late",
+    "test_type": "workflow-positive"
+  },
+  {
+    "test_id": "WF-TEST-005",
+    "source_id": "BW-LMS-03 path-scheduled-on-time",
+    "purpose": "Assignment Scheduled Release and On-Time Submission: Draft -> Scheduled -> Release event -> Available -> On-Time Submission",
+    "preconditions": "Faculty creates assignment scheduled for future release",
+    "action_or_input": "Release time arrives; assignment becomes available; Student submits on-time",
+    "expected_result": "Assignment transitions to available; Student submits on-time successfully",
+    "test_type": "workflow-positive"
+  },
+  {
+    "test_id": "WF-TEST-006",
+    "source_id": "BW-LMS-03 path-blocked-before-release",
+    "purpose": "Assignment Scheduled Release: Attempt to access or submit before release date is blocked",
+    "preconditions": "Assignment has status=scheduled with release date in future",
+    "action_or_input": "Student attempts to submit work to scheduled assignment",
+    "expected_result": "Submission rejected / AssignmentNotAvailable error",
+    "test_type": "workflow-negative"
+  },
+  {
+    "test_id": "WF-TEST-007",
+    "source_id": "BW-LMS-04 path-faculty-grade-release",
+    "purpose": "Faculty Grading and Grade Release: Submission -> Faculty evaluates -> Draft Grade -> Faculty releases -> Released Grade -> Student views",
+    "preconditions": "Student submission exists; User is Faculty",
+    "action_or_input": "Faculty enters score -> grade held in draft -> Faculty triggers release -> Student reads score",
+    "expected_result": "Grade transitions from draft to released; student can read score and feedback",
+    "test_type": "workflow-positive"
+  },
+  {
+    "test_id": "WF-TEST-008",
+    "source_id": "BW-LMS-04 path-grade-hold",
+    "purpose": "Faculty Grading Hold: Submission -> Faculty evaluates -> Draft Grade -> Grade unreleased -> Hidden from student",
+    "preconditions": "Grade created in draft status by Faculty",
+    "action_or_input": "Student queries grades before release action",
+    "expected_result": "Draft grade is withheld / not visible to student",
+    "test_type": "workflow-negative"
+  },
+  {
+    "test_id": "WF-TEST-009",
+    "source_id": "BW-LMS-05 path-ta-grading-faculty-release",
+    "purpose": "TA Grading and Faculty Grade Release: Submission -> TA evaluates -> Draft Grade (attributed to TA) -> Faculty releases -> Released Grade",
+    "preconditions": "Student submission exists; Users are TA and Faculty",
+    "action_or_input": "TA grades submission -> Grade saved with graded_by_user_id=TA -> Faculty releases grades",
+    "expected_result": "Grade transitions to released with TA attribution preserved and Faculty release recorded",
+    "test_type": "workflow-positive"
+  },
+  {
+    "test_id": "WF-TEST-010",
+    "source_id": "BW-LMS-05 path-ta-release-rejected",
+    "purpose": "TA Grading and Unauthorized TA Release Attempt: Submission -> TA evaluates -> TA attempts release -> Rejected -> Remains Draft",
+    "preconditions": "Draft grade exists; User is TA",
+    "action_or_input": "TA invokes release_assignment_grades service",
+    "expected_result": "Raises GradeReleaseAuthorityViolation; Grade remains in draft status",
+    "test_type": "workflow-negative"
+  },
+  {
+    "test_id": "WF-TEST-011",
+    "source_id": "CW-LMS-01 composite-publication-submission",
+    "purpose": "Assignment Publication and Submission Composite Lifecycle: Create -> Schedule -> Immediate Publish -> Student Submit -> Validate Final State",
+    "preconditions": "CourseWorkspace exists with enrolled Faculty and Student",
+    "action_or_input": "Full sequential workflow from assignment creation to submission",
+    "expected_result": "Entire lifecycle completes cleanly in order",
+    "test_type": "workflow-composite"
+  },
+  {
+    "test_id": "WF-TEST-012",
+    "source_id": "CW-LMS-02 composite-grading-release-audit",
+    "purpose": "Grading, Grade Release, and Post-Release Modification Composite Lifecycle: Submission -> TA Grading -> Faculty Release -> Post-Release Modification -> Audit Log",
+    "preconditions": "Student submission exists; TA and Faculty enrolled",
+    "action_or_input": "Full sequential grading workflow with post-release score change and audit log verification",
+    "expected_result": "All steps succeed and GradeChangeLog captures modification details",
+    "test_type": "workflow-composite"
+  }
+]
