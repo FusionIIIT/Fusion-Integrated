@@ -105,6 +105,529 @@ paths:
               schema:
                 $ref: '#/components/schemas/Session'
           description: ''
+  /api/v1/phc/announcements:
+    get:
+      operationId: v1_phc_announcements_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPhcAnnouncementList'
+          description: ''
+    post:
+      operationId: v1_phc_announcements_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhcAnnouncement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PhcAnnouncement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PhcAnnouncement'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhcAnnouncement'
+          description: ''
+  /api/v1/phc/appointments:
+    get:
+      operationId: v1_phc_appointments_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAppointmentList'
+          description: ''
+    post:
+      operationId: v1_phc_appointments_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+  /api/v1/phc/appointments/{appointment_id}/consultation:
+    post:
+      operationId: v1_phc_appointments_consultation_create
+      parameters:
+      - in: path
+        name: appointment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsultationCreate'
+            examples:
+              RecordConsultation:
+                value:
+                  symptoms: Cough
+                  diagnosis: Upper respiratory infection
+                  observations: No fever
+                  treatment: Rest and fluids
+                  medicines: []
+                summary: record consultation
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConsultationCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConsultationCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Consultation'
+          description: ''
+  /api/v1/phc/appointments/{id}/transition:
+    post:
+      operationId: v1_phc_appointments_transition_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentTransition'
+            examples:
+              ConfirmAppointment:
+                value:
+                  status: confirmed
+                summary: confirm appointment
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AppointmentTransition'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AppointmentTransition'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+  /api/v1/phc/consultations:
+    get:
+      operationId: v1_phc_consultations_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedConsultationList'
+          description: ''
+  /api/v1/phc/doctors:
+    get:
+      operationId: v1_phc_doctors_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDoctorList'
+          description: ''
+  /api/v1/phc/doctors/{id}:
+    patch:
+      operationId: v1_phc_doctors_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDoctorUpdate'
+            examples:
+              AvailabilityUpdate:
+                value:
+                  is_available: false
+                summary: availability update
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDoctorUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDoctorUpdate'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Doctor'
+          description: ''
+  /api/v1/phc/doctors/manage:
+    post:
+      operationId: v1_phc_doctors_manage_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DoctorCreate'
+            examples:
+              NewDoctor:
+                value:
+                  user_id: 4102
+                  specialty: General Medicine
+                summary: new doctor
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DoctorCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DoctorCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Doctor'
+          description: ''
+  /api/v1/phc/inventory/transactions:
+    get:
+      operationId: v1_phc_inventory_transactions_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInventoryTransactionList'
+          description: ''
+  /api/v1/phc/medicines:
+    get:
+      operationId: v1_phc_medicines_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMedicineList'
+          description: ''
+    post:
+      operationId: v1_phc_medicines_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Medicine'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Medicine'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Medicine'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medicine'
+          description: ''
+  /api/v1/phc/medicines/{id}/stock:
+    post:
+      operationId: v1_phc_medicines_stock_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Stock'
+            examples:
+              AddStock:
+                value:
+                  quantity: 100
+                  action: addition
+                summary: add stock
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Stock'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Stock'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medicine'
+          description: ''
+  /api/v1/phc/patients:
+    get:
+      operationId: v1_phc_patients_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPatientList'
+          description: ''
+    post:
+      operationId: v1_phc_patients_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Patient'
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+  /api/v1/phc/schedules:
+    get:
+      operationId: v1_phc_schedules_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Schedule'
+          description: ''
+    post:
+      operationId: v1_phc_schedules_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Schedule'
+            examples:
+              WeeklySchedule:
+                value:
+                  doctor: 1
+                  weekday: 0
+                  starts_at: 09:00:00
+                  ends_at: '17:00:00'
+                  slot_minutes: 15
+                  effective_from: '2026-12-01'
+                  effective_until: null
+                summary: weekly schedule
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Schedule'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Schedule'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+          description: ''
   /api/v1/placement/announcements:
     get:
       operationId: v1_placement_announcements_list
@@ -1763,6 +2286,14 @@ components:
       - semester
       - semester_type
       - user_id
+    ActionEnum:
+      enum:
+      - addition
+      - dispense
+      type: string
+      description: |-
+        * `addition` - addition
+        * `dispense` - dispense
     AddCandidates:
       type: object
       properties:
@@ -1964,6 +2495,82 @@ components:
       - sanction
       - season
       - user_id
+    Appointment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient:
+          type: integer
+          readOnly: true
+        doctor:
+          type: integer
+          readOnly: true
+        starts_at:
+          type: string
+          format: date-time
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/AppointmentStatusEnum'
+          readOnly: true
+          default: pending
+        reason:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - doctor
+      - id
+      - patient
+      - reason
+      - starts_at
+      - status
+    AppointmentStatusEnum:
+      enum:
+      - pending
+      - confirmed
+      - completed
+      - cancelled
+      - rejected
+      - no_show
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `confirmed` - Confirmed
+        * `completed` - Completed
+        * `cancelled` - Cancelled
+        * `rejected` - Rejected
+        * `no_show` - No Show
+    AppointmentTransition:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/AppointmentTransitionStatusEnum'
+        reason:
+          type: string
+          maxLength: 300
+      required:
+      - status
+    AppointmentTransitionStatusEnum:
+      enum:
+      - confirmed
+      - completed
+      - cancelled
+      - rejected
+      - no_show
+      type: string
+      description: |-
+        * `confirmed` - confirmed
+        * `completed` - completed
+        * `cancelled` - cancelled
+        * `rejected` - rejected
+        * `no_show` - no_show
     Approval:
       type: object
       properties:
@@ -2315,6 +2922,77 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    Consultation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        appointment_id:
+          type: integer
+          readOnly: true
+        patient_user_id:
+          type: integer
+          readOnly: true
+        symptoms:
+          type: string
+          readOnly: true
+        observations:
+          type: string
+          readOnly: true
+        diagnosis:
+          type: string
+          readOnly: true
+        treatment:
+          type: string
+          readOnly: true
+        finalized_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        prescriptions:
+          type: array
+          items: {}
+          readOnly: true
+      required:
+      - appointment_id
+      - created_at
+      - diagnosis
+      - finalized_at
+      - id
+      - observations
+      - patient_user_id
+      - prescriptions
+      - symptoms
+      - treatment
+    ConsultationCreate:
+      type: object
+      properties:
+        symptoms:
+          type: string
+          maxLength: 4000
+        observations:
+          type: string
+          maxLength: 4000
+        diagnosis:
+          type: string
+          maxLength: 2000
+        treatment:
+          type: string
+          maxLength: 4000
+        medicines:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - diagnosis
+      - symptoms
     Detail:
       type: object
       properties:
@@ -2322,6 +3000,36 @@ components:
           type: string
       required:
       - detail
+    Doctor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        specialty:
+          type: string
+          readOnly: true
+        is_available:
+          type: boolean
+          readOnly: true
+      required:
+      - id
+      - is_available
+      - specialty
+      - user_id
+    DoctorCreate:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        specialty:
+          type: string
+          maxLength: 100
+      required:
+      - user_id
     DocumentLink:
       type: object
       description: A Drive link. Validated in core.files.drive.
@@ -2508,6 +3216,49 @@ components:
         * `tech` - Technical interview
         * `hr` - HR interview
         * `other` - Other
+    InventoryTransaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        medicine:
+          type: integer
+          readOnly: true
+        medicine_name:
+          type: string
+          readOnly: true
+        transaction_type:
+          allOf:
+          - $ref: '#/components/schemas/TransactionTypeEnum'
+          readOnly: true
+        quantity:
+          type: integer
+          readOnly: true
+        actor_user_id:
+          type: integer
+          readOnly: true
+        patient_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        note:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actor_user_id
+      - created_at
+      - id
+      - medicine
+      - medicine_name
+      - note
+      - patient_id
+      - quantity
+      - transaction_type
     JobPosting:
       type: object
       properties:
@@ -2663,6 +3414,36 @@ components:
       required:
       - password
       - username
+    Medicine:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        unit:
+          type: string
+          maxLength: 40
+        quantity:
+          type: integer
+          readOnly: true
+        low_stock_threshold:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        expires_on:
+          type: string
+          format: date
+          nullable: true
+        is_active:
+          type: boolean
+      required:
+      - id
+      - name
+      - quantity
+      - unit
     ModeEnum:
       enum:
       - online
@@ -2924,6 +3705,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Application'
+    PaginatedAppointmentList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Appointment'
     PaginatedCompanyList:
       type: object
       required:
@@ -2943,6 +3743,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Company'
+    PaginatedConsultationList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Consultation'
+    PaginatedDoctorList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Doctor'
     PaginatedInterviewRoundList:
       type: object
       required:
@@ -2962,6 +3800,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/InterviewRound'
+    PaginatedInventoryTransactionList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryTransaction'
     PaginatedJobPostingList:
       type: object
       required:
@@ -2981,6 +3838,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedMedicineList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Medicine'
     PaginatedOfferList:
       type: object
       required:
@@ -3000,6 +3876,52 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PaginatedPatientList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Patient'
+    PaginatedPhcAnnouncementList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PhcAnnouncement'
+    PatchedDoctorUpdate:
+      type: object
+      properties:
+        specialty:
+          type: string
+          maxLength: 100
+        is_available:
+          type: boolean
     PatchedJobPosting:
       type: object
       properties:
@@ -3085,6 +4007,52 @@ components:
       properties:
         active_role:
           type: string
+    Patient:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        patient_number:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - patient_number
+      - user_id
+    PhcAnnouncement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 160
+        body:
+          type: string
+          maxLength: 3000
+        published:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - body
+      - created_at
+      - id
+      - published
+      - title
     PlacementRecordDetail:
       type: object
       description: A student's own record, with what rules 22 and 24 still want from
@@ -3551,6 +4519,46 @@ components:
         * `deregister` - deregister
         * `bar_season` - bar_season
         * `bar_permanent` - bar_permanent
+    Schedule:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        doctor:
+          type: integer
+        weekday:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        starts_at:
+          type: string
+          format: time
+        ends_at:
+          type: string
+          format: time
+        slot_minutes:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        effective_from:
+          type: string
+          format: date
+        effective_until:
+          type: string
+          format: date
+          nullable: true
+        is_active:
+          type: boolean
+          readOnly: true
+      required:
+      - doctor
+      - effective_from
+      - ends_at
+      - id
+      - is_active
+      - starts_at
+      - weekday
     ScheduledCount:
       type: object
       properties:
@@ -3691,6 +4699,23 @@ components:
       required:
       - available
       - season
+    Stock:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          minimum: 1
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+        patient_id:
+          type: integer
+          nullable: true
+        note:
+          type: string
+          maxLength: 300
+      required:
+      - action
+      - quantity
     SubmitOfferLetter:
       type: object
       properties:
@@ -3714,6 +4739,14 @@ components:
         * `workshop` - Workshop
         * `internship` - Internship programme
         * `general` - General
+    TransactionTypeEnum:
+      enum:
+      - addition
+      - dispense
+      type: string
+      description: |-
+        * `addition` - Addition
+        * `dispense` - Dispense
     Transition:
       type: object
       properties:

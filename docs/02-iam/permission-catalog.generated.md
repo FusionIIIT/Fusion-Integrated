@@ -13,6 +13,28 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `phc`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `phc.patient.register_self` | Register own patient record | `faculty`, `staff`, `student` |
+| `phc.patient.register` | Register institute patients | `Compounder`, `Doctor`, `PHC Admin` |
+| `phc.patient.view` | View patient records | `Compounder`, `Doctor`, `PHC Admin` |
+| `phc.patient.view_self` | View own patient record | `Compounder`, `Doctor`, `PHC Admin`, `faculty`, `staff`, `student` |
+| `phc.appointment.view_self` | View own appointments | `faculty`, `staff`, `student` |
+| `phc.appointment.view` | View PHC appointments | `Compounder`, `Doctor`, `PHC Admin` |
+| `phc.appointment.view_all` | View all PHC appointments | `PHC Admin` |
+| `phc.appointment.book` | Book an appointment | `faculty`, `staff`, `student` |
+| `phc.appointment.manage` | Manage appointments and schedules | `Compounder`, `Doctor`, `PHC Admin` |
+| `phc.doctor.register` | Register PHC doctors | `Compounder`, `PHC Admin` |
+| `phc.consultation.view` | View clinical records | `Doctor`, `PHC Admin` |
+| `phc.consultation.view_all` | View all clinical records | `PHC Admin` |
+| `phc.consultation.record` | Record consultations and prescriptions | `Doctor`, `PHC Admin` |
+| `phc.inventory.view` | View medicine inventory | `Compounder`, `Doctor`, `PHC Admin` |
+| `phc.inventory.manage` | Manage medicine stock | `PHC Admin` |
+| `phc.announcement.view` | View PHC announcements | `Compounder`, `Doctor`, `PHC Admin`, `faculty`, `staff`, `student` |
+| `phc.announcement.publish` | Publish PHC announcements | `Compounder`, `Doctor`, `PHC Admin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

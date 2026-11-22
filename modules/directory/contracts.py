@@ -3,6 +3,7 @@
 Plural by signature on purpose: there is no get_user(id), because a singular
 lookup is what gets called inside a loop.
 """
+
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -31,10 +32,17 @@ class UserDTO:
 
 def _to_dto(r: UserRef) -> UserDTO:
     return UserDTO(
-        user_id=r.user_id, username=r.username, display_name=r.display_name,
-        kind=r.kind, email=r.email, department=r.department,
-        programme=r.programme, discipline=r.discipline, batch_year=r.batch_year,
-        resume_link=r.resume_link, profile_completed=r.profile_completed,
+        user_id=r.user_id,
+        username=r.username,
+        display_name=r.display_name,
+        kind=r.kind,
+        email=r.email,
+        department=r.department,
+        programme=r.programme,
+        discipline=r.discipline,
+        batch_year=r.batch_year,
+        resume_link=r.resume_link,
+        profile_completed=r.profile_completed,
     )
 
 
@@ -48,10 +56,21 @@ def get_users(user_ids: Sequence[int]) -> dict[int, UserDTO]:
     return {r.user_id: _to_dto(r) for r in UserRef.objects.filter(user_id__in=ids)}
 
 
+def get_active_users(user_ids: Sequence[int]) -> dict[int, UserDTO]:
+    """Batched lookup for workflows that must reject inactive identities."""
+    ids = {int(i) for i in user_ids if i is not None}
+    if not ids:
+        return {}
+    ensure_users_cached(ids)
+    rows = UserRef.objects.filter(user_id__in=ids, is_active=True)
+    return {row.user_id: _to_dto(row) for row in rows}
+
+
 def user_ids_in_discipline(discipline: str) -> list[int]:
     return list(
-        UserRef.objects.filter(discipline=discipline, kind="student", is_active=True)
-        .values_list("user_id", flat=True)
+        UserRef.objects.filter(discipline=discipline, kind="student", is_active=True).values_list(
+            "user_id", flat=True
+        )
     )
 
 
@@ -59,17 +78,17 @@ def get_employees() -> list[UserDTO]:
     """Everyone on the payroll: faculty and staff, not students."""
     return [
         _to_dto(r)
-        for r in UserRef.objects.filter(
-            kind__in=("faculty", "staff"), is_active=True
-        ).order_by("user_id")
+        for r in UserRef.objects.filter(kind__in=("faculty", "staff"), is_active=True).order_by(
+            "user_id"
+        )
     ]
 
 
 def held_employee_ids() -> set[int]:
     return set(
-        UserRef.objects.filter(
-            kind__in=("faculty", "staff"), is_active=True
-        ).values_list("user_id", flat=True)
+        UserRef.objects.filter(kind__in=("faculty", "staff"), is_active=True).values_list(
+            "user_id", flat=True
+        )
     )
 
 

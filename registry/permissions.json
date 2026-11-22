@@ -34,6 +34,211 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "phc": {
+      "grants": {
+        "Compounder": [
+          "phc.announcement.publish",
+          "phc.announcement.view",
+          "phc.appointment.manage",
+          "phc.appointment.view",
+          "phc.doctor.register",
+          "phc.inventory.view",
+          "phc.patient.register",
+          "phc.patient.view",
+          "phc.patient.view_self"
+        ],
+        "Doctor": [
+          "phc.announcement.publish",
+          "phc.announcement.view",
+          "phc.appointment.manage",
+          "phc.appointment.view",
+          "phc.consultation.record",
+          "phc.consultation.view",
+          "phc.inventory.view",
+          "phc.patient.register",
+          "phc.patient.view",
+          "phc.patient.view_self"
+        ],
+        "PHC Admin": [
+          "phc.announcement.publish",
+          "phc.announcement.view",
+          "phc.appointment.manage",
+          "phc.appointment.view",
+          "phc.appointment.view_all",
+          "phc.consultation.record",
+          "phc.consultation.view",
+          "phc.consultation.view_all",
+          "phc.doctor.register",
+          "phc.inventory.manage",
+          "phc.inventory.view",
+          "phc.patient.register",
+          "phc.patient.view",
+          "phc.patient.view_self"
+        ],
+        "faculty": [
+          "phc.announcement.view",
+          "phc.appointment.book",
+          "phc.appointment.view_self",
+          "phc.patient.register_self",
+          "phc.patient.view_self"
+        ],
+        "staff": [
+          "phc.announcement.view",
+          "phc.appointment.book",
+          "phc.appointment.view_self",
+          "phc.patient.register_self",
+          "phc.patient.view_self"
+        ],
+        "student": [
+          "phc.announcement.view",
+          "phc.appointment.book",
+          "phc.appointment.view_self",
+          "phc.patient.register_self",
+          "phc.patient.view_self"
+        ]
+      },
+      "module_grants": [
+        "Compounder",
+        "Doctor",
+        "PHC Admin",
+        "faculty",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/phc",
+        "icon": "FaIdCard",
+        "items": [
+          {
+            "code": "phc.appointments",
+            "icon": "FaCalendarAlt",
+            "label": "Appointments",
+            "required_permission": "phc.appointment.view_self",
+            "sort_order": 10,
+            "to": "/phc/appointments"
+          },
+          {
+            "code": "phc.patients",
+            "icon": "FaUsers",
+            "label": "Patients",
+            "required_permission": "phc.patient.view_self",
+            "sort_order": 20,
+            "to": "/phc/patients"
+          },
+          {
+            "code": "phc.inventory",
+            "icon": "FaClipboardList",
+            "label": "Medicine Inventory",
+            "required_permission": "phc.inventory.view",
+            "sort_order": 30,
+            "to": "/phc/inventory"
+          },
+          {
+            "code": "phc.consultations",
+            "icon": "FaIdBadge",
+            "label": "Consultations",
+            "required_permission": "phc.consultation.record",
+            "sort_order": 35,
+            "to": "/phc/consultations"
+          },
+          {
+            "code": "phc.schedules",
+            "icon": "FaCalendarAlt",
+            "label": "Doctor Schedules",
+            "required_permission": "phc.appointment.manage",
+            "sort_order": 36,
+            "to": "/phc/schedules"
+          },
+          {
+            "code": "phc.announcements",
+            "icon": "FaBullhorn",
+            "label": "Announcements",
+            "required_permission": "phc.announcement.view",
+            "sort_order": 40,
+            "to": "/phc/announcements"
+          }
+        ],
+        "label": "Health Center",
+        "nav_section": "Campus",
+        "sort_order": 40,
+        "status": "planned"
+      },
+      "permissions": [
+        {
+          "code": "phc.patient.register_self",
+          "label": "Register own patient record"
+        },
+        {
+          "code": "phc.patient.register",
+          "label": "Register institute patients"
+        },
+        {
+          "code": "phc.patient.view",
+          "label": "View patient records"
+        },
+        {
+          "code": "phc.patient.view_self",
+          "label": "View own patient record"
+        },
+        {
+          "code": "phc.appointment.view_self",
+          "label": "View own appointments"
+        },
+        {
+          "code": "phc.appointment.view",
+          "label": "View PHC appointments"
+        },
+        {
+          "code": "phc.appointment.view_all",
+          "label": "View all PHC appointments"
+        },
+        {
+          "code": "phc.appointment.book",
+          "label": "Book an appointment"
+        },
+        {
+          "code": "phc.appointment.manage",
+          "label": "Manage appointments and schedules"
+        },
+        {
+          "code": "phc.doctor.register",
+          "label": "Register PHC doctors"
+        },
+        {
+          "code": "phc.consultation.view",
+          "label": "View clinical records"
+        },
+        {
+          "code": "phc.consultation.view_all",
+          "label": "View all clinical records"
+        },
+        {
+          "code": "phc.consultation.record",
+          "label": "Record consultations and prescriptions"
+        },
+        {
+          "code": "phc.inventory.view",
+          "label": "View medicine inventory"
+        },
+        {
+          "code": "phc.inventory.manage",
+          "label": "Manage medicine stock"
+        },
+        {
+          "code": "phc.announcement.view",
+          "label": "View PHC announcements"
+        },
+        {
+          "code": "phc.announcement.publish",
+          "label": "Publish PHC announcements"
+        }
+      ],
+      "scope_permissions": [
+        "phc.appointment.view_all",
+        "phc.consultation.view_all"
+      ],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
