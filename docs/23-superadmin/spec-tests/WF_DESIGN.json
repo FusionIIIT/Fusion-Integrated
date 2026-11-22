@@ -1,0 +1,92 @@
+[
+  {
+    "test_id": "WF-TEST-001",
+    "source_id": "BW-SA-01 approval-path",
+    "purpose": "Execute Permanent Data Purge \u2014 Approved Path",
+    "preconditions": "Retention-expired archive record exists",
+    "action_or_input": "Super Admin requests purge; IT Head authorizes purge",
+    "expected_result": "Purge completed; archive status PURGED",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-TEST-002",
+    "source_id": "BW-SA-02 rejection-path",
+    "purpose": "Execute Permanent Data Purge \u2014 Rejected Path",
+    "preconditions": "Purge request in REQUESTED status",
+    "action_or_input": "IT Head rejects purge request with reason",
+    "expected_result": "Purge request REJECTED; archive remains intact",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-TEST-003",
+    "source_id": "BW-SA-03 time-bound-expiry",
+    "purpose": "Execute Immediate Time-Bound Role Assignment to Expiry",
+    "preconditions": "Active faculty user",
+    "action_or_input": "Assign immediate role; time advances past valid_to; scheduled task runs",
+    "expected_result": "Role transitions to EXPIRED automatically",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-TEST-004",
+    "source_id": "BW-SA-04 future-dated-activation",
+    "purpose": "Execute Future-Dated Role Assignment to Expiry",
+    "preconditions": "Active faculty user",
+    "action_or_input": "Assign future role (SCHEDULED); time reaches valid_from; task runs",
+    "expected_result": "Role transitions from SCHEDULED to ACTIVE",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-TEST-005",
+    "source_id": "BW-SA-05 role-extension",
+    "purpose": "Execute Role Validity Extension Workflow",
+    "preconditions": "Active role assignment nearing expiry",
+    "action_or_input": "Submit extension before end date; new valid_to applied",
+    "expected_result": "Role validity extended successfully",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-TEST-006",
+    "source_id": "BW-SA-06 user-reactivation",
+    "purpose": "Execute Deactivated User Reactivation Workflow",
+    "preconditions": "User account is DEACTIVATED",
+    "action_or_input": "Submit reactivation with justification and audit record",
+    "expected_result": "Account restored to ACTIVE status",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-TEST-007",
+    "source_id": "BW-SA-07 reversible-restore",
+    "purpose": "Execute Archived User Restoration Within Reversible Window",
+    "preconditions": "User is ARCHIVED_REVERSIBLE within 90 days",
+    "action_or_input": "Submit restoration with reason",
+    "expected_result": "Account restored to ACTIVE status",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-TEST-008",
+    "source_id": "BW-SA-08 window-expiry",
+    "purpose": "Execute Archived User Reversibility Window Expiry (Assigned Focus)",
+    "preconditions": "User is ARCHIVED_REVERSIBLE; 90 days elapse; periodic task sweeps",
+    "action_or_input": "Scheduled task runs or restore is attempted after expiry",
+    "expected_result": "User finalized to ARCHIVED_PERMANENT (non-restorable)",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-TEST-009",
+    "source_id": "BW-SA-09 historical-restore",
+    "purpose": "Execute Historical Data Archive and Restore Workflow",
+    "preconditions": "Inactive historical dataset exists",
+    "action_or_input": "Archive dataset with verified backup; restore when requested",
+    "expected_result": "Historical archive created then restored to active state",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-TEST-010",
+    "source_id": "CW-SA-01 composite-purge-lifecycle",
+    "purpose": "Execute Composite Purge Authorization Lifecycle",
+    "preconditions": "Multiple archive records",
+    "action_or_input": "Request, review, and dual-authorization lifecycle",
+    "expected_result": "Complete lifecycle tracked with audit entries",
+    "test_type": "workflow"
+  }
+]
