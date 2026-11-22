@@ -365,7 +365,6 @@ class FeedbackView(APIView):
 
     permission_classes = [
         HasModuleGrant("mess_module"),
-        HasPermission("mess_module.feedback.submit"),
     ]
 
     def get(self, request):
@@ -380,6 +379,11 @@ class FeedbackView(APIView):
         return Response(ser.data)
 
     def post(self, request):
+        if not request.principal.has_permission("mess_module.feedback.submit"):
+            return Response(
+                {"detail": "Not authorized to submit feedback."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         ser = SubmitFeedbackInputSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         data = ser.validated_data

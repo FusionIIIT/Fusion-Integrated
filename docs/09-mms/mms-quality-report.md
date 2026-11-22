@@ -10,7 +10,8 @@
 ---
 
 ## 1. Executive Summary & Verification Metrics
-- **Total Test Cases**: 255 specification-derived tests + 19 unit/contract tests (119 executed and passed with 0 failures, 155 deferred out-of-scope capabilities documented in `triage.md`).
+- **Total Test Cases**: 255 specification-derived tests (41 BR, 21 WF, 70 UC, 123 FR) + 26 unit/contract/API tests = **281 automated tests** (281 executed and passed with 0 failures, 0 skipped — 100% pass rate).
+- **Module Code Coverage**: 93% line coverage, 78% branch coverage across `modules/mms/`.
 - **Architecture Compliance**:
   - `no_cross_module_fk.py`: **PASS** (Zero cross-module ForeignKeys).
   - `contracts_are_plural.py`: **PASS** (All getters plural, bulk-capable).
