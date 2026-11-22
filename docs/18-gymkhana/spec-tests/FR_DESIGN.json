@@ -1,0 +1,479 @@
+[
+  {
+    "test_id": "GYM-AFR-001",
+    "source_id": "AFR-GYM-001 Club creation",
+    "purpose": "Verify that Student Admin can create a club with all required club data.",
+    "preconditions": "A Student Admin is authenticated; valid student coordinator and co-coordinator records and a valid faculty councillor record exist.",
+    "action_or_input": "Submit club creation with name, a valid category, valid coordinator, valid co-coordinator, valid Club Faculty Councillor, and description.",
+    "expected_result": "The club is created with the supplied club data.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "GYM-AFR-002-valid",
+    "source_id": "AFR-GYM-002 Valid student leaders",
+    "purpose": "Verify that valid student coordinator and co-coordinator assignments are accepted.",
+    "preconditions": "Two distinct valid student records exist.",
+    "action_or_input": "Create a club selecting the two valid students as coordinator and co-coordinator.",
+    "expected_result": "The club is created with both valid student leaders.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "GYM-AFR-002-invalid-coordinator",
+    "source_id": "AFR-GYM-002 Invalid coordinator",
+    "purpose": "Verify that an invalid coordinator is rejected.",
+    "preconditions": "The selected coordinator identifier does not identify a valid student.",
+    "action_or_input": "Submit club creation with the invalid coordinator and a valid co-coordinator.",
+    "expected_result": "Club creation is rejected and no club is created.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-002-invalid-co-coordinator",
+    "source_id": "AFR-GYM-002 Invalid co-coordinator",
+    "purpose": "Verify that an invalid co-coordinator is rejected.",
+    "preconditions": "The selected co-coordinator identifier does not identify a valid student.",
+    "action_or_input": "Submit club creation with a valid coordinator and the invalid co-coordinator.",
+    "expected_result": "Club creation is rejected and no club is created.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-003-valid",
+    "source_id": "AFR-GYM-003 Valid Club Faculty Councillor",
+    "purpose": "Verify that a valid faculty councillor is accepted.",
+    "preconditions": "A valid faculty member record exists.",
+    "action_or_input": "Create a club or event context using the valid faculty member as Club Faculty Councillor.",
+    "expected_result": "The faculty assignment is accepted.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "GYM-AFR-003-invalid",
+    "source_id": "AFR-GYM-003 Invalid Club Faculty Councillor",
+    "purpose": "Verify that a non-faculty or invalid councillor assignment is rejected.",
+    "preconditions": "The selected councillor identifier does not identify a valid faculty member.",
+    "action_or_input": "Submit club creation with the invalid Club Faculty Councillor.",
+    "expected_result": "Club creation is rejected and no club is created.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-004-categories",
+    "source_id": "AFR-GYM-004 Allowed categories",
+    "purpose": "Verify that each explicitly allowed club category is accepted.",
+    "preconditions": "A Student Admin is authenticated and valid leader and faculty selections are available.",
+    "action_or_input": "Create three clubs using category values Technical, Sports, and Cultural.",
+    "expected_result": "All three club categories are accepted and recorded.",
+    "test_type": "Boundary"
+  },
+  {
+    "test_id": "GYM-AFR-004-invalid",
+    "source_id": "AFR-GYM-004 Prohibited category",
+    "purpose": "Verify that a category outside the allowed list is rejected.",
+    "preconditions": "A Student Admin is authenticated and valid leader and faculty selections are available.",
+    "action_or_input": "Submit club creation with a category other than Technical, Sports, or Cultural.",
+    "expected_result": "Club creation is rejected and no club is created.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-005",
+    "source_id": "AFR-GYM-005 Open club lifecycle",
+    "purpose": "Verify that a newly created club remains open pending approval.",
+    "preconditions": "The required club data passes validation.",
+    "action_or_input": "Student Admin creates a new club.",
+    "expected_result": "The club is recorded in open status.",
+    "test_type": "Lifecycle"
+  },
+  {
+    "test_id": "GYM-AFR-006",
+    "source_id": "AFR-GYM-006 Student Admin approval",
+    "purpose": "Verify that Student Admin can confirm an open club.",
+    "preconditions": "A club exists in open status; Student Admin is authenticated.",
+    "action_or_input": "Student Admin approves the open club.",
+    "expected_result": "The club status changes to confirmed.",
+    "test_type": "Lifecycle"
+  },
+  {
+    "test_id": "GYM-AFR-007",
+    "source_id": "AFR-GYM-007 Leadership replacement",
+    "purpose": "Verify that the applicable Club Head can replace both leadership assignments.",
+    "preconditions": "An existing club and its applicable Club Head are authenticated; two valid replacement student records exist.",
+    "action_or_input": "Submit replacement coordinator and co-coordinator assignments for the club.",
+    "expected_result": "The club leadership assignments are updated.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "GYM-AFR-008-invalid-coordinator",
+    "source_id": "AFR-GYM-008 Invalid replacement coordinator",
+    "purpose": "Verify that a replacement coordinator must be a valid student.",
+    "preconditions": "The replacement coordinator identifier does not identify a valid student.",
+    "action_or_input": "Submit a leadership change with an invalid replacement coordinator and a valid replacement co-coordinator.",
+    "expected_result": "The leadership change is rejected and existing assignments remain unchanged.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-008-invalid-co-coordinator",
+    "source_id": "AFR-GYM-008 Invalid replacement co-coordinator",
+    "purpose": "Verify that a replacement co-coordinator must be a valid student.",
+    "preconditions": "The replacement co-coordinator identifier does not identify a valid student.",
+    "action_or_input": "Submit a leadership change with a valid replacement coordinator and an invalid replacement co-coordinator.",
+    "expected_result": "The leadership change is rejected and existing assignments remain unchanged.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-009",
+    "source_id": "AFR-GYM-009 Current leadership assignments",
+    "purpose": "Verify that only the new coordinator and co-coordinator remain active after a leadership change.",
+    "preconditions": "A club has existing coordinator and co-coordinator assignments; the Club Head provides two valid replacements.",
+    "action_or_input": "Complete the leadership replacement.",
+    "expected_result": "The old leadership assignments are no longer active and only the two replacements remain current.",
+    "test_type": "Lifecycle"
+  },
+  {
+    "test_id": "GYM-AFR-010",
+    "source_id": "AFR-GYM-010 Session booking",
+    "purpose": "Verify that Club Head can book a session with the required session fields.",
+    "preconditions": "A configured venue is available and no conflicting booking exists.",
+    "action_or_input": "Submit a session booking with configured venue, date, start time, end time, description, and optional poster.",
+    "expected_result": "The session booking is accepted.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "GYM-AFR-011-valid",
+    "source_id": "AFR-GYM-011 Valid time range",
+    "purpose": "Verify that a start time preceding the end time is accepted.",
+    "preconditions": "A configured venue is available.",
+    "action_or_input": "Submit a session or event booking with start time earlier than end time.",
+    "expected_result": "The booking passes time-range validation.",
+    "test_type": "Boundary"
+  },
+  {
+    "test_id": "GYM-AFR-011-equal",
+    "source_id": "AFR-GYM-011 Equal time boundary",
+    "purpose": "Verify that equal start and end times are rejected.",
+    "preconditions": "A configured venue is available.",
+    "action_or_input": "Submit a session or event booking where start time equals end time.",
+    "expected_result": "The booking is rejected and not stored.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-011-reversed",
+    "source_id": "AFR-GYM-011 Reversed time range",
+    "purpose": "Verify that a start time after the end time is rejected.",
+    "preconditions": "A configured venue is available.",
+    "action_or_input": "Submit a session or event booking with start time later than end time.",
+    "expected_result": "The booking is rejected and not stored.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-012-session-session",
+    "source_id": "AFR-GYM-012 Session-session overlap",
+    "purpose": "Verify that an overlapping session cannot be booked in a venue already used by a session.",
+    "preconditions": "A session exists for the configured venue on the requested date and its time window.",
+    "action_or_input": "Submit another session with the same venue and date and an overlapping time window.",
+    "expected_result": "The second session is rejected and no overlap is accepted.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-012-event-event",
+    "source_id": "AFR-GYM-012 Event-event overlap",
+    "purpose": "Verify that an overlapping event cannot be booked in a venue already used by an event.",
+    "preconditions": "An event exists for the configured venue on the requested date and its time window.",
+    "action_or_input": "Submit another event with the same venue and date and an overlapping time window.",
+    "expected_result": "The second event is rejected and no overlap is accepted.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-012-cross-type",
+    "source_id": "AFR-GYM-012 Cross-type overlap",
+    "purpose": "Verify that session and event bookings conflict with each other in the same venue and date.",
+    "preconditions": "Two scenarios are prepared: a session existing before an event, and an event existing before a session.",
+    "action_or_input": "For each scenario, submit the opposite booking type with the same venue, date, and an overlapping time window.",
+    "expected_result": "Both cross-type overlapping bookings are rejected.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-012-separation",
+    "source_id": "AFR-GYM-012 Venue and date separation",
+    "purpose": "Verify that overlap prevention is limited to the same venue and date.",
+    "preconditions": "An existing session or event has a time window; a different configured venue and a different date are available.",
+    "action_or_input": "Submit bookings for the same time window at a different venue or on a different date.",
+    "expected_result": "The bookings are accepted because neither conflicts in both venue and date.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "GYM-AFR-013",
+    "source_id": "AFR-GYM-013 Successful session notification",
+    "purpose": "Verify that successful session booking triggers notification to intended student recipients.",
+    "preconditions": "A valid session booking is accepted and intended student recipients are identifiable.",
+    "action_or_input": "Complete a successful session booking.",
+    "expected_result": "The notification service records or delivers a new-session notification to the intended student recipients.",
+    "test_type": "Integration"
+  },
+  {
+    "test_id": "GYM-AFR-014",
+    "source_id": "AFR-GYM-014 Event booking",
+    "purpose": "Verify that Club Head can book an event with all required event fields.",
+    "preconditions": "A valid faculty context exists and a configured venue is available.",
+    "action_or_input": "Submit event details, Club Faculty Councillor information, configured venue, date, start time, end time, poster, and description.",
+    "expected_result": "The event booking is accepted.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "GYM-AFR-015",
+    "source_id": "AFR-GYM-015 Successful event notification",
+    "purpose": "Verify that successful event booking triggers notification to intended student recipients.",
+    "preconditions": "A valid event booking is accepted and intended student recipients are identifiable.",
+    "action_or_input": "Complete a successful event booking.",
+    "expected_result": "The notification service records or delivers a new-event notification to the intended student recipients.",
+    "test_type": "Integration"
+  },
+  {
+    "test_id": "GYM-AFR-016",
+    "source_id": "AFR-GYM-016 Confirmed-club membership application",
+    "purpose": "Verify that a student can apply to a confirmed club with application information.",
+    "preconditions": "The student is authenticated and the target club is confirmed.",
+    "action_or_input": "Submit a membership application containing a description or achievements.",
+    "expected_result": "The membership application is accepted.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "GYM-AFR-016-open-club",
+    "source_id": "AFR-GYM-016 Open-club membership restriction",
+    "purpose": "Verify that students cannot apply to clubs that are not confirmed.",
+    "preconditions": "The student is authenticated and the target club is open.",
+    "action_or_input": "Submit a membership application to the open club.",
+    "expected_result": "The application is rejected and no membership application is created.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-017",
+    "source_id": "AFR-GYM-017 Multiple-club applications",
+    "purpose": "Verify that a student may maintain applications to different clubs.",
+    "preconditions": "The student is authenticated and two distinct clubs are confirmed.",
+    "action_or_input": "Submit one membership application to each confirmed club.",
+    "expected_result": "Both applications are accepted and remain associated with the student and their respective clubs.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "GYM-AFR-018",
+    "source_id": "AFR-GYM-018 Duplicate same-club application",
+    "purpose": "Verify that duplicate applications to the same club are prevented.",
+    "preconditions": "The student already has an existing membership application for the confirmed club.",
+    "action_or_input": "Submit another membership application for the same student and club.",
+    "expected_result": "The duplicate application is rejected and only one application record is retained.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-019",
+    "source_id": "AFR-GYM-019 Application open status",
+    "purpose": "Verify that a newly submitted membership application is open.",
+    "preconditions": "A student submits a valid application to a confirmed club.",
+    "action_or_input": "Complete the membership application submission.",
+    "expected_result": "The application is recorded with open status.",
+    "test_type": "Lifecycle"
+  },
+  {
+    "test_id": "GYM-AFR-020-authorized",
+    "source_id": "AFR-GYM-020 Applicable Club Head access",
+    "purpose": "Verify that the applicable Club Head can access pending applications for its club.",
+    "preconditions": "Pending applications exist for the club and the authenticated Club Head is applicable to that club.",
+    "action_or_input": "Open or query the pending membership applications for that club.",
+    "expected_result": "The applicable Club Head receives the pending applications for the club.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "GYM-AFR-020-unauthorized",
+    "source_id": "AFR-GYM-020 Club Head authorization",
+    "purpose": "Verify that a Club Head not applicable to the club cannot access that club's pending applications.",
+    "preconditions": "Pending applications exist for a club other than the authenticated Club Head's club.",
+    "action_or_input": "Request the other club's pending membership applications.",
+    "expected_result": "Access is denied and the applications are not returned.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-021",
+    "source_id": "AFR-GYM-021 Approval with optional remarks",
+    "purpose": "Verify that the applicable Club Head can approve an open application and optionally record remarks.",
+    "preconditions": "An open membership application exists for the authenticated applicable Club Head's club.",
+    "action_or_input": "Approve the application once without remarks and once with remarks in two independent setup cases.",
+    "expected_result": "Both approvals are accepted and any supplied remarks are retained.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "GYM-AFR-021-unauthorized",
+    "source_id": "AFR-GYM-021 Applicable Club Head authorization",
+    "purpose": "Verify that a Club Head not applicable to the club cannot approve the application.",
+    "preconditions": "An open membership application exists for a club other than the authenticated Club Head's club.",
+    "action_or_input": "Attempt to approve the open application.",
+    "expected_result": "Approval is denied and the application remains open.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-022",
+    "source_id": "AFR-GYM-022 Approved application confirmed",
+    "purpose": "Verify that approved membership status changes from open to confirmed.",
+    "preconditions": "An open membership application exists and the applicable Club Head approves it.",
+    "action_or_input": "Complete membership approval.",
+    "expected_result": "The application status changes from open to confirmed.",
+    "test_type": "Lifecycle"
+  },
+  {
+    "test_id": "GYM-AFR-023",
+    "source_id": "AFR-GYM-023 Voting poll creation",
+    "purpose": "Verify that an authorized Club Head can create a targeted active poll.",
+    "preconditions": "The Club Head is authenticated and valid batch and branch target groups exist.",
+    "action_or_input": "Create a poll with title, description, expiration date, at least two choices, and batch/branch target groups.",
+    "expected_result": "The poll is created with active status and the supplied target groups and choices.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "GYM-AFR-024-valid",
+    "source_id": "AFR-GYM-024 Two-choice boundary",
+    "purpose": "Verify that a poll with exactly two choices is accepted.",
+    "preconditions": "An authenticated Club Head creates a poll.",
+    "action_or_input": "Set exactly two choices and submit the poll.",
+    "expected_result": "The poll is created.",
+    "test_type": "Boundary"
+  },
+  {
+    "test_id": "GYM-AFR-024-invalid",
+    "source_id": "AFR-GYM-024 Fewer than two choices",
+    "purpose": "Verify that polls with fewer than two choices are rejected.",
+    "preconditions": "An authenticated Club Head creates a poll.",
+    "action_or_input": "Submit separate polls with zero and one choice.",
+    "expected_result": "Each poll is rejected and not created.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-025",
+    "source_id": "AFR-GYM-025 Poll target notifications",
+    "purpose": "Verify that creation of a poll notifies students in selected target groups.",
+    "preconditions": "Students belong to selected batch and branch target groups and notification service is available.",
+    "action_or_input": "Create a poll with the selected target groups.",
+    "expected_result": "All target-group students receive or have a poll notification recorded; students outside the target groups do not.",
+    "test_type": "Integration"
+  },
+  {
+    "test_id": "GYM-AFR-026-targeted-active",
+    "source_id": "AFR-GYM-026 Eligible active poll access",
+    "purpose": "Verify that an eligible targeted student can access an active poll and its choices.",
+    "preconditions": "The student belongs to a selected target group and the poll is active before expiration.",
+    "action_or_input": "Student opens or queries the active poll.",
+    "expected_result": "The poll and all available choices are returned.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "GYM-AFR-026-untargeted",
+    "source_id": "AFR-GYM-026 Untargeted student access",
+    "purpose": "Verify that a student outside the target groups cannot access the poll.",
+    "preconditions": "The student belongs to no selected batch or branch target group.",
+    "action_or_input": "The untargeted student requests the active poll.",
+    "expected_result": "Access is denied and the poll choices are not returned.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-026-expired",
+    "source_id": "AFR-GYM-026 Expired poll access",
+    "purpose": "Verify that an expired poll is not available as an active poll.",
+    "preconditions": "The student is in a selected target group and the poll expiration date has passed.",
+    "action_or_input": "The student requests the expired poll.",
+    "expected_result": "The active poll is not available and its choices are not accepted for voting.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-027",
+    "source_id": "AFR-GYM-027 Eligible student vote",
+    "purpose": "Verify that an eligible targeted student can cast one choice in an active poll.",
+    "preconditions": "The student is targeted, the poll is active, and the student has not previously voted.",
+    "action_or_input": "Select one available choice and submit it.",
+    "expected_result": "The vote is accepted.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "GYM-AFR-028-duplicate",
+    "source_id": "AFR-GYM-028 Duplicate vote prevention",
+    "purpose": "Verify that the same student cannot vote more than once in the same poll.",
+    "preconditions": "The student has already cast one accepted vote in the active poll.",
+    "action_or_input": "Attempt to cast a second choice, whether the same or different choice.",
+    "expected_result": "The second vote is rejected and no additional vote is added.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-028-tally",
+    "source_id": "AFR-GYM-028 Accepted vote tally",
+    "purpose": "Verify that an accepted vote is recorded in the poll tally.",
+    "preconditions": "A targeted eligible student has not voted and the active poll has a known initial tally.",
+    "action_or_input": "Cast one choice.",
+    "expected_result": "The selected choice's tally increases by exactly one.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "GYM-AFR-029",
+    "source_id": "AFR-GYM-029 Budget request submission",
+    "purpose": "Verify that an authorized Club Head can submit a complete budget request.",
+    "preconditions": "The Club Head is applicable to the club and required file storage is available.",
+    "action_or_input": "Submit a non-negative amount, purpose, description, and supporting file.",
+    "expected_result": "The budget request is accepted with the supplied data and file.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "GYM-AFR-030-negative",
+    "source_id": "AFR-GYM-030 Negative budget amount",
+    "purpose": "Verify that a negative budget amount is rejected.",
+    "preconditions": "A supporting file is available.",
+    "action_or_input": "Submit a budget request with a negative amount and the supporting file.",
+    "expected_result": "The budget request is rejected and not stored.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-030-missing-file",
+    "source_id": "AFR-GYM-030 Missing supporting file",
+    "purpose": "Verify that a budget request without the required supporting file is rejected.",
+    "preconditions": "The budget amount is non-negative.",
+    "action_or_input": "Submit a budget request with amount, purpose, and description but omit the supporting file.",
+    "expected_result": "The budget request is rejected and not stored.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-031",
+    "source_id": "AFR-GYM-031 Open budget request tracking",
+    "purpose": "Verify that an accepted budget request is stored as open for tracking without an approval or rejection lifecycle.",
+    "preconditions": "The budget request passes amount and supporting-file validation.",
+    "action_or_input": "Submit the valid budget request and retrieve its stored status.",
+    "expected_result": "The request is stored as open for tracking and has no online approval or rejection state.",
+    "test_type": "Lifecycle"
+  },
+  {
+    "test_id": "GYM-AFR-032",
+    "source_id": "AFR-GYM-032 Event report submission",
+    "purpose": "Verify that Club Head can submit a complete club event report.",
+    "preconditions": "The Club Head is applicable to the club and report file storage is available.",
+    "action_or_input": "Submit the club, student incharge, event name, event date/time, description, and report/details file.",
+    "expected_result": "The event report is accepted and centrally stored.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "GYM-AFR-033",
+    "source_id": "AFR-GYM-033 Required report file",
+    "purpose": "Verify that an event report without the required report/details file is rejected.",
+    "preconditions": "The remaining event report fields are complete.",
+    "action_or_input": "Submit the club event report while omitting the report/details file.",
+    "expected_result": "The event report is rejected and not stored.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "GYM-AFR-034-assigned",
+    "source_id": "AFR-GYM-034 Assigned councillor access",
+    "purpose": "Verify that the assigned Club Faculty Councillor can access and review reports for the assigned club.",
+    "preconditions": "Submitted event reports exist for a club and the authenticated councillor is assigned to that club.",
+    "action_or_input": "Open or query the submitted reports and review them.",
+    "expected_result": "The assigned councillor can access and review the reports for that club.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "GYM-AFR-034-unassigned",
+    "source_id": "AFR-GYM-034 Unassigned councillor prohibition",
+    "purpose": "Verify that a councillor not assigned to the club cannot access that club's event reports.",
+    "preconditions": "Submitted event reports exist for a club and the authenticated councillor is not assigned to that club.",
+    "action_or_input": "Request the other club's submitted event reports.",
+    "expected_result": "Access is denied and the reports are not returned.",
+    "test_type": "Negative"
+  }
+]
