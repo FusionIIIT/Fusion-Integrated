@@ -451,6 +451,7 @@ def escalate_complaint_manually(
 
 @transaction.atomic
 def check_and_escalate_sla_breaches() -> int:
+    # Atomic transaction guard to prevent concurrent double-escalation of overdue complaints
     """UC-CMS-022 / BW-CMS-08: Automatically Escalate Complaint on SLA Breach."""
     now = timezone.now()
     unresolved_statuses = [
