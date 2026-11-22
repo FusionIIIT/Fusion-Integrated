@@ -34,6 +34,307 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "hr": {
+      "grants": {
+        "Accountant": [
+          "hr.claim.manage",
+          "hr.notification.view"
+        ],
+        "Director": [
+          "hr.appraisal.review",
+          "hr.claim.approve",
+          "hr.leave.approve",
+          "hr.notification.view"
+        ],
+        "Head of Department": [
+          "hr.appraisal.review",
+          "hr.claim.approve",
+          "hr.leave.approve",
+          "hr.notification.view"
+        ],
+        "Registrar": [
+          "hr.appraisal.review",
+          "hr.claim.approve",
+          "hr.leave.approve",
+          "hr.notification.view"
+        ],
+        "faculty": [
+          "hr.appraisal.create",
+          "hr.appraisal.view_self",
+          "hr.claim.create",
+          "hr.claim.view_self",
+          "hr.employee.view_self",
+          "hr.leave.create",
+          "hr.leave.view_self",
+          "hr.notification.view"
+        ],
+        "hr_officer": [
+          "hr.appraisal.assign",
+          "hr.appraisal.view_self",
+          "hr.audit.view",
+          "hr.claim.verify",
+          "hr.claim.view",
+          "hr.employee.create",
+          "hr.employee.update",
+          "hr.employee.view",
+          "hr.employment.manage",
+          "hr.leave.view",
+          "hr.leave_balance.manage",
+          "hr.notification.manage",
+          "hr.notification.view",
+          "hr.workflow.manage"
+        ],
+        "staff": [
+          "hr.appraisal.create",
+          "hr.appraisal.view_self",
+          "hr.claim.create",
+          "hr.claim.view_self",
+          "hr.employee.view_self",
+          "hr.leave.create",
+          "hr.leave.view_self",
+          "hr.notification.view"
+        ]
+      },
+      "module_grants": [
+        "Accountant",
+        "Director",
+        "Head of Department",
+        "Registrar",
+        "faculty",
+        "hr_officer",
+        "staff"
+      ],
+      "nav": {
+        "base_path": "/hr",
+        "icon": "FaIdCard",
+        "items": [
+          {
+            "code": "hr.records",
+            "icon": "FaIdCard",
+            "label": "My Service Record",
+            "required_permission": "hr.employee.view_self",
+            "sort_order": 10,
+            "to": "/hr/records"
+          },
+          {
+            "code": "hr.employee-directory",
+            "icon": "FaUsers",
+            "label": "Employee Directory",
+            "required_permission": "hr.employee.view",
+            "sort_order": 11,
+            "to": "/hr/employees"
+          },
+          {
+            "code": "hr.claims",
+            "icon": "FaFileSignature",
+            "label": "Claims",
+            "required_permission": "hr.claim.view_self",
+            "sort_order": 20,
+            "to": "/hr/claims"
+          },
+          {
+            "code": "hr.claim-queue",
+            "icon": "FaInbox",
+            "label": "Claim Queue",
+            "required_permission": "hr.claim.view",
+            "sort_order": 21,
+            "to": "/hr/claims/queue"
+          },
+          {
+            "code": "hr.claim-approvals",
+            "icon": "FaCheckDouble",
+            "label": "Claim Approvals",
+            "required_permission": "hr.claim.approve",
+            "sort_order": 22,
+            "to": "/hr/claims/approvals"
+          },
+          {
+            "code": "hr.claim-processing",
+            "icon": "FaFileSignature",
+            "label": "Claim Processing",
+            "required_permission": "hr.claim.manage",
+            "sort_order": 23,
+            "to": "/hr/claims/processing"
+          },
+          {
+            "code": "hr.leave-queue",
+            "icon": "FaCalendarCheck",
+            "label": "Leave Queue",
+            "required_permission": "hr.leave.view",
+            "sort_order": 25,
+            "to": "/hr/leaves/queue"
+          },
+          {
+            "code": "hr.leaves",
+            "icon": "FaCalendarAlt",
+            "label": "My Leave Requests",
+            "required_permission": "hr.leave.view_self",
+            "sort_order": 25,
+            "to": "/hr/leaves"
+          },
+          {
+            "code": "hr.leave-approvals",
+            "icon": "FaCalendarCheck",
+            "label": "Leave Approvals",
+            "required_permission": "hr.leave.approve",
+            "sort_order": 26,
+            "to": "/hr/leaves/approvals"
+          },
+          {
+            "code": "hr.leave-balances",
+            "icon": "FaCalendarAlt",
+            "label": "Leave Balances",
+            "required_permission": "hr.leave_balance.manage",
+            "sort_order": 27,
+            "to": "/hr/leave-balances"
+          },
+          {
+            "code": "hr.appraisals",
+            "icon": "FaClipboardCheck",
+            "label": "Appraisals",
+            "required_permission": "hr.appraisal.view_self",
+            "sort_order": 30,
+            "to": "/hr/appraisals"
+          },
+          {
+            "code": "hr.appraisal-assignment",
+            "icon": "FaUserCheck",
+            "label": "Appraisal Assignment",
+            "required_permission": "hr.appraisal.assign",
+            "sort_order": 31,
+            "to": "/hr/appraisals/assignment"
+          },
+          {
+            "code": "hr.appraisal-reviews",
+            "icon": "FaClipboardCheck",
+            "label": "Appraisal Reviews",
+            "required_permission": "hr.appraisal.review",
+            "sort_order": 32,
+            "to": "/hr/appraisals/reviews"
+          },
+          {
+            "code": "hr.admin",
+            "icon": "FaCog",
+            "label": "HR Administration",
+            "required_permission": "hr.employee.view",
+            "sort_order": 40,
+            "to": "/hr/administration"
+          },
+          {
+            "code": "hr.notifications",
+            "icon": "FaBullhorn",
+            "label": "Notifications",
+            "required_permission": "hr.notification.view",
+            "sort_order": 50,
+            "to": "/hr/notifications"
+          }
+        ],
+        "label": "Human Resources",
+        "nav_section": "Administration",
+        "sort_order": 30,
+        "status": "planned"
+      },
+      "permissions": [
+        {
+          "code": "hr.employee.view_self",
+          "label": "View own employee service record"
+        },
+        {
+          "code": "hr.employee.view",
+          "label": "View employee service records"
+        },
+        {
+          "code": "hr.employee.create",
+          "label": "Create employee service records"
+        },
+        {
+          "code": "hr.employee.update",
+          "label": "Update employee service records"
+        },
+        {
+          "code": "hr.employment.manage",
+          "label": "Manage employee appointment facts"
+        },
+        {
+          "code": "hr.claim.view_self",
+          "label": "View own HR claims"
+        },
+        {
+          "code": "hr.claim.view",
+          "label": "View HR claims within assigned authority"
+        },
+        {
+          "code": "hr.claim.create",
+          "label": "Submit LTC or CPDA claims"
+        },
+        {
+          "code": "hr.claim.verify",
+          "label": "Verify submitted LTC or CPDA claims"
+        },
+        {
+          "code": "hr.claim.approve",
+          "label": "Decide routed LTC or CPDA claims"
+        },
+        {
+          "code": "hr.claim.manage",
+          "label": "Record approved claim processing and status"
+        },
+        {
+          "code": "hr.appraisal.view_self",
+          "label": "View own appraisals"
+        },
+        {
+          "code": "hr.appraisal.create",
+          "label": "Submit yearly appraisals"
+        },
+        {
+          "code": "hr.appraisal.assign",
+          "label": "Assign appraisal reviewers"
+        },
+        {
+          "code": "hr.appraisal.review",
+          "label": "Review assigned appraisals"
+        },
+        {
+          "code": "hr.workflow.manage",
+          "label": "Configure HR workflow routes and windows"
+        },
+        {
+          "code": "hr.audit.view",
+          "label": "Review HR audit records"
+        },
+        {
+          "code": "hr.notification.view",
+          "label": "View addressed HR notifications"
+        },
+        {
+          "code": "hr.notification.manage",
+          "label": "Publish configured HR notices"
+        },
+        {
+          "code": "hr.leave.view_self",
+          "label": "View own leave requests"
+        },
+        {
+          "code": "hr.leave.view",
+          "label": "View leave requests within HR authority"
+        },
+        {
+          "code": "hr.leave.create",
+          "label": "Submit leave requests"
+        },
+        {
+          "code": "hr.leave.approve",
+          "label": "Decide assigned leave requests"
+        },
+        {
+          "code": "hr.leave_balance.manage",
+          "label": "Configure employee leave balances and eligibility"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

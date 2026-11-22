@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.hr",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -216,6 +217,7 @@ REST_FRAMEWORK = {
         "export": "5/hour",
         "upload": "20/hour",
         "directory_search": "120/hour",
+        "hr_write": "30/hour",
     },
 }
 
@@ -230,6 +232,21 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "HREmployeeCategory": [
+            ("faculty", "Faculty"), ("staff", "Staff"),
+        ],
+        "HREmploymentStatus": [
+            ("active", "Active"), ("retired", "Retired"),
+            ("separated", "Separated"),
+        ],
+        "HRClaimRequestType": [
+            ("ltc_advance", "LTC advance"),
+            ("ltc_reimbursement", "LTC reimbursement"),
+            ("cpda_advance", "CPDA advance"),
+            ("cpda_reimbursement", "CPDA reimbursement"),
+        ],
+    },
 }
 
 CORS_ALLOW_ALL_ORIGINS = False

@@ -13,6 +13,35 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `hr`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `hr.employee.view_self` | View own employee service record | `faculty`, `staff` |
+| `hr.employee.view` | View employee service records | `hr_officer` |
+| `hr.employee.create` | Create employee service records | `hr_officer` |
+| `hr.employee.update` | Update employee service records | `hr_officer` |
+| `hr.employment.manage` | Manage employee appointment facts | `hr_officer` |
+| `hr.claim.view_self` | View own HR claims | `faculty`, `staff` |
+| `hr.claim.view` | View HR claims within assigned authority | `hr_officer` |
+| `hr.claim.create` | Submit LTC or CPDA claims | `faculty`, `staff` |
+| `hr.claim.verify` | Verify submitted LTC or CPDA claims | `hr_officer` |
+| `hr.claim.approve` | Decide routed LTC or CPDA claims | `Director`, `Head of Department`, `Registrar` |
+| `hr.claim.manage` | Record approved claim processing and status | `Accountant` |
+| `hr.appraisal.view_self` | View own appraisals | `faculty`, `hr_officer`, `staff` |
+| `hr.appraisal.create` | Submit yearly appraisals | `faculty`, `staff` |
+| `hr.appraisal.assign` | Assign appraisal reviewers | `hr_officer` |
+| `hr.appraisal.review` | Review assigned appraisals | `Director`, `Head of Department`, `Registrar` |
+| `hr.workflow.manage` | Configure HR workflow routes and windows | `hr_officer` |
+| `hr.audit.view` | Review HR audit records | `hr_officer` |
+| `hr.notification.view` | View addressed HR notifications | `Accountant`, `Director`, `Head of Department`, `Registrar`, `faculty`, `hr_officer`, `staff` |
+| `hr.notification.manage` | Publish configured HR notices | `hr_officer` |
+| `hr.leave.view_self` | View own leave requests | `faculty`, `staff` |
+| `hr.leave.view` | View leave requests within HR authority | `hr_officer` |
+| `hr.leave.create` | Submit leave requests | `faculty`, `staff` |
+| `hr.leave.approve` | Decide assigned leave requests | `Director`, `Head of Department`, `Registrar` |
+| `hr.leave_balance.manage` | Configure employee leave balances and eligibility | `hr_officer` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
