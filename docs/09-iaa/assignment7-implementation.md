@@ -55,3 +55,6 @@ QuerySet deletion is prohibited in addition to instance deletion.
 
 Supporting-document references are validated and canonicalised with Fusion's existing
 Google Drive link validator; arbitrary URLs and non-Drive references are rejected.
+
+
+Formatting and static-analysis checks are run by the repository CI workflow.
