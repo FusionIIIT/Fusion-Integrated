@@ -51,8 +51,8 @@ pytest modules/rspc --ignore=modules/rspc/tests/spec --cov=modules/rspc --cov-br
 ```
 **Output**:
 ```text
-66 passed in 5.96s
-Required test coverage of 90% reached. Total coverage: 90.99%
+70 passed in 2.72s
+Required test coverage of 90% reached. Total coverage: 91.80%
 ```
 
 ### Gate 4: Student 2 Spec Test Suite (Baseline Run & Fixes)
@@ -190,7 +190,7 @@ Manual verification performed via browser session against local frontend and bac
 | **4. Security & Permissions** | **10/10** | Dual-gate access control, write throttling on all 13 write views, CSRF verification, and 404 scoping isolation. |
 | **5. Query Budgets & Performance** | **10/10** | Plural contracts in `contracts.py`. Query counts verified identical with 2 rows and with 20 rows. |
 | **6. Asynchronous Tasks & Ops** | **10/10** | Celery beat schedule and task routes registered in `config/celery.py`. Management commands `rspc_check_deadlines` and `rspc_readiness` implemented. |
-| **7. Test Quality & Coverage** | **10/10** | 66 backend tests (90.99% coverage), 98 spec tests (0 failures), 5 journey tests, and 55 frontend tests. |
+| **7. Test Quality & Coverage** | **10/10** | 70 backend tests (91.80% coverage), 98 spec tests (0 failures), 5 journey tests, and 55 frontend tests. |
 | **8. Frontend & User Experience** | **10/10** | TanStack Query hooks, `ErrorState` banners, page tests for loading/empty/error/permission-hidden/action. |
 | **9. Repository Hygiene** | **10/10** | Ruff check 0 errors, lint-imports 0 errors, no roll numbers or personal info, clean git authoring. |
 

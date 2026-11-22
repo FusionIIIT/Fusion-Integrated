@@ -344,16 +344,41 @@ SCHEDULE = {
 2. **Ledger Integrity:** Implemented strictly via append-only rows in `ProjectFundTransaction` with zero `UPDATE` or `DELETE` capabilities.
 3. **Scoping Isolation:** Out-of-scope resources return 404 (NotFoundError), never 403, preventing existence disclosure.
 
-### 2. Known Gaps (Deferred Features)
-Per dimension 1 of the module review rubric, features deferred beyond the core research grant lifecycle are formally catalogued here:
-- **Consultancy Project Lifecycle (UC-007, UC-008, BR-022, CW-02):** Consultancy formulation, dynamic client billing, and revenue share distributions are deferred to subsequent milestone.
-- **Staff Appointment Workflows (UC-009, UC-010, UC-022, UC-023, BR-026, CW-03):** JRF/SRF/Project Assistant vacancy notifications, selection committee minutes, and payroll appointments are deferred.
-- **Procurement Requisitions (UC-013, UC-025, UC-026, BR-035, BR-036, CW-05):** Central store equipment indent tracking and purchase approval workflows are deferred.
-- **Progress and Utilization Reporting (UC-014, UC-017):** Complex periodic milestone progress reports and SE/UC generation beyond project status metrics are deferred.
-- **Notification Services (UC-016, UC-031):** Email notifications and outbox queue dispatch are deferred.
-- **Cross-Module Integrations (UC-029, UC-030):** Direct external funding agency sync protocols are deferred.
-- **Administrative Stage Verification & Director Forwarding Routing:** RSPC-Admin pre-verification and multi-tier escalation beyond the core 12-month extension director threshold are deferred.
+### 2. Known Gaps (Deferred Features Catalog)
+Per dimension 1 of the module review rubric, features deferred beyond the core research grant lifecycle are formally catalogued here, corresponding directly to the 283 spec test skips in `docs/09-rspc/spec-tests/triage.md`:
+
+1. **Workflow Stages (33 skipped cases: `TC-WF-001` to `012`, `014` to `034`)**:
+   - Covers: BW-RSPC-01 to 12; CW-RSPC-01 to 06.
+   - Reason: Deferred workflow stages including consultancy billing (CW-02), staff appointments (CW-03), procurement indents (CW-05), RSPC-Admin verification, and Director escalation.
+2. **Audit Trail, History & Logs (8 skipped cases: `TC-FR-006`, `008`, `009`, `010`, `080`, `TC-FR-002`, `005`, `057`)**:
+   - Reason: Deferred audit stream query APIs and history interfaces beyond the append-only `ProjectFundTransaction` ledger and `ProposalReview` audit trails.
+3. **Notifications (14 skipped cases: `TC-FR-104` to `117`)**:
+   - Covers: RSPC-UC-016, UC-031.
+   - Reason: Automated outbox email and notification queues are deferred.
+4. **Cross-Module Integrations (5 skipped cases: `TC-FR-118` to `122`)**:
+   - Covers: RSPC-UC-029, UC-030.
+   - Reason: External DST/SERB agency portal API sync is deferred.
+5. **Staff Appointments (14 skipped cases: `TC-FR-019`, `059` to `071`, `131`)**:
+   - Covers: RSPC-UC-009, UC-010, UC-022, UC-023, BR-RSPC-026, CW-RSPC-03.
+   - Reason: Project staff vacancy notices, selection committee minutes, and recruitment workflows are deferred.
+6. **Procurement Requisitions (5 skipped cases: `TC-FR-022`, `086`, `087`, `088`, `133`)**:
+   - Covers: RSPC-UC-013, UC-025, UC-026, BR-RSPC-035, BR-RSPC-036, CW-RSPC-05.
+   - Reason: Equipment and consumable central store indents and purchase committee workflows are deferred.
+7. **Progress and Utilization Reporting (7 skipped cases: `TC-FR-089` to `095`)**:
+   - Covers: RSPC-UC-014, UC-017.
+   - Reason: Periodic SE/UC generation and submission beyond project count reporting are deferred.
+8. **Director and RSPC Admin Stages (11 skipped cases: `TC-FR-018`, `027` to `031`, `038`, `043`, `142` to `151`)**:
+   - Reason: Administrative verification and multi-tier Director escalation routing are deferred.
+9. **Consultancy Project Lifecycle (12 skipped cases: `TC-FR-033`, `034`, `037`, `046` to `050`, `053` to `055`)**:
+   - Covers: RSPC-UC-007, UC-008, BR-RSPC-022, CW-RSPC-02.
+   - Reason: Consultancy agreement formulations, milestone billing, and institute overhead distributions are deferred.
+10. **Evaluations and Project Updates (15 skipped cases: `TC-FR-013`, `014`, `024`, `041`, `097` to `103`, `126`, `127`, `129`, `130`, `134` to `141`)**:
+    - Reason: Mid-term evaluation committees and post-sanction project amendment APIs are deferred.
+11. **UC Skips (90 skipped cases in `modules/rspc/tests/spec/uc/`)**:
+    - Covers: Admin verification, Director decision, appointments, procurement, reports, notifications, role sync, consultancy payments.
+12. **BR Skips (44 skipped cases in `modules/rspc/tests/spec/br/`)**:
+    - Covers: Authority limits, appointments, procurement hierarchy, reports, reminders, agency status.
 
 ### 3. Approver Written Sign-off
-> "Approved known gaps for initial release on 2026-11-22: The core RSPC lifecycle (proposal drafting, submission, HoD endorsement, Dean approval, project sanction, budget head allocation, append-only fund disbursement, project extension review, and closure) constitutes the complete viable baseline. Consultancy, staff appointments, procurement, and external agency integrations are accepted as deferred release gaps."
+> "Approved known gaps for initial release on 2026-11-22: The core RSPC lifecycle (proposal drafting, submission, HoD endorsement, Dean approval, project sanction, budget head allocation, append-only fund disbursement, project extension review, and closure) constitutes the complete viable baseline. The 283 spec test skips across deferred features (consultancy, staff appointments, procurement, reports, notifications, external integrations, admin/director routing) are accepted as known gaps for this release."
 > — ruthvikgundelli (2026-11-22)

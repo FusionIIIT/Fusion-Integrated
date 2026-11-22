@@ -154,3 +154,60 @@ def test_overhead_negative_guard():
 def test_extension_zero_months_guard():
     with pytest.raises(InvariantViolationError, match="at least 1 month"):
         validate_extension_request(requested_months=0, cumulative_months=0, approver_role="dean")
+
+
+def test_domain_entity_dataclasses():
+    from modules.rspc.domain.entities import (
+        ProjectEntity,
+        ProposalEntity,
+        ProposalStatusString,
+    )
+
+    p_ent = ProposalEntity(
+        id=1,
+        proposal_type="sponsored_research",
+        title="Edge ML Architecture",
+        pi_user_id=10,
+        department="CSE",
+        funding_agency="DST",
+        proposed_budget=Decimal("100.00"),
+        overhead_amount=Decimal("20.00"),
+        status="draft",
+    )
+    assert p_ent.title == "Edge ML Architecture"
+
+    proj_ent = ProjectEntity(
+        id=1,
+        project_code="P1",
+        project_type="sponsored",
+        title="PT",
+        pi_user_id=10,
+        department="CSE",
+        funding_agency="DST",
+        sanctioned_amount=Decimal("100.00"),
+        status="active",
+    )
+    assert proj_ent.project_code == "P1"
+
+    b_ent = BudgetHeadEntity(
+        head_type="travel",
+        allocated_amount=Decimal("1000.00"),
+        spent_amount=Decimal("200.00"),
+        committed_amount=Decimal("100.00"),
+    )
+    assert b_ent.available_balance == Decimal("700.00")
+
+    # ProposalStatusString workflow equality semantics
+    s = ProposalStatusString("draft")
+    assert s == "draft"
+    assert s != 123
+    assert s != "other"
+
+    s_not_rec = ProposalStatusString("Department Not Recommended")
+    assert s_not_rec == "rejected"
+    assert s_not_rec == "Department Not Recommended"
+
+    s_dean = ProposalStatusString("Dean Not Approved")
+    assert s_dean == "rejected"
+    assert s_dean == "Dean Not Approved"
+

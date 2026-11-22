@@ -13,7 +13,7 @@ import pytest
 from rest_framework.test import APIClient
 
 from conftest import make_session
-from modules.rspc.models import Project, ProjectBudgetHead, ProjectFundTransaction, Proposal
+from modules.rspc.models import ProjectBudgetHead
 from modules.rspc.services import finance as finance_services
 from modules.rspc.services import project as project_services
 from modules.rspc.services import proposal as proposal_services
@@ -163,7 +163,7 @@ def test_ledger_list_query_budget_is_constant_across_sizes(stub_iam, django_asse
         end_date=today + datetime.timedelta(days=365),
         sanctioned_amount=Decimal("1000000.00"),
     )
-    head = finance_services.allocate_budget_head(
+    finance_services.allocate_budget_head(
         project=proj, head_type="equipment", allocated_amount=Decimal("500000.00"), actor_user_id=1
     )
 

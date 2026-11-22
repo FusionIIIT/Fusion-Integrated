@@ -18,7 +18,6 @@ from rest_framework.test import APIClient
 
 from conftest import make_session
 from modules.rspc import registry
-from modules.rspc.models import Project, Proposal
 from modules.rspc.services import finance as finance_services
 from modules.rspc.services import project as project_services
 from modules.rspc.services import proposal as proposal_services
@@ -329,7 +328,7 @@ def test_disburse_approve_forbidden_without_approve_grant(stub_iam):
         end_date=datetime.date.today() + datetime.timedelta(days=365),
         sanctioned_amount=Decimal("100000.00"),
     )
-    head = finance_services.allocate_budget_head(
+    finance_services.allocate_budget_head(
         project=proj, head_type="equipment", allocated_amount=Decimal("50000.00"), actor_user_id=1
     )
     tx = finance_services.disburse_funds(

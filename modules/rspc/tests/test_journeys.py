@@ -15,19 +15,14 @@ from rest_framework.test import APIClient
 
 from conftest import make_session
 from modules.rspc.models import (
-    Project,
-    ProjectBudgetHead,
-    ProjectClosureRequest,
-    ProjectExtensionRequest,
-    ProjectFundTransaction,
     Proposal,
     ProposalReview,
 )
 from modules.rspc.registry import ROLE_GRANTS
 from modules.rspc.services import (
-    extension as extension_services,
-    finance as finance_services,
     project as project_services,
+)
+from modules.rspc.services import (
     proposal as proposal_services,
 )
 
@@ -143,7 +138,6 @@ def test_journey_uc_002_003_004_proposal_full_lifecycle(stub_iam):
 def test_journey_uc_003_alternate_hod_not_recommended(stub_iam):
     """RSPC-UC-003 Alternative Flow: HoD records 'not recommended'."""
     faculty = Actor(stub_iam, user_id=10, role="faculty")
-    hod = Actor(stub_iam, user_id=20, role="Head of Department")
 
     create_resp = faculty.post(
         "/api/v1/rspc/proposals/",
@@ -255,7 +249,6 @@ def test_journey_uc_027_028_project_extension_and_closure(stub_iam):
     3. Faculty requests project closure.
     4. Dean approves closure -> status becomes closed.
     """
-    admin = Actor(stub_iam, user_id=1, role="admin")
     faculty = Actor(stub_iam, user_id=10, role="faculty")
     dean = Actor(stub_iam, user_id=30, role="Dean (RSPC)")
 

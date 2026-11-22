@@ -6,7 +6,7 @@ from decimal import Decimal
 import pytest
 from django.core.exceptions import PermissionDenied
 
-from core.api.exceptions import ConflictError, DomainError
+from core.api.exceptions import BadRequestError, ConflictError, DomainError
 from modules.rspc.models import Proposal
 from modules.rspc.services import (
     extension as extension_services,
@@ -366,4 +366,204 @@ def test_concurrent_proposal_approval_prevented_by_select_for_update():
     assert len(errors) == 1
     assert isinstance(errors[0], (ConflictError, OperationalError))
     assert prop.reviews.filter(action="approve").count() == 1
+
+
+@pytest.mark.django_db
+def test_proposal_service_edge_cases():
+    with pytest.raises(DomainError, match="strictly positive"):
+        proposal_services.create_proposal(
+            user_id=10,
+            title="T",
+            proposal_type="sponsored_research",
+            department="CSE",
+            funding_agency="DST",
+            proposed_budget=Decimal("-10.00"),
+        )
+
+    prop = proposal_services.create_proposal(
+        user_id=10,
+        title="",
+        proposal_type="sponsored_research",
+        department="CSE",
+        funding_agency="DST",
+        proposed_budget=Decimal("100.00"),
+    )
+    with pytest.raises(DomainError, match="missing mandatory fields"):
+        proposal_services.submit_proposal(proposal=prop, actor_user_id=10)
+
+    prop.title = "Valid Title"
+    prop.save()
+    with pytest.raises(BadRequestError, match="Only the Principal Investigator"):
+        proposal_services.submit_proposal(proposal=prop, actor_user_id=99)
+
+    prop.status = "approved_dean"
+    prop.save()
+    with pytest.raises(ConflictError, match="Illegal transition"):
+        proposal_services.submit_proposal(proposal=prop, actor_user_id=10)
+
+
+@pytest.mark.django_db
+def test_project_service_edge_cases():
+    today = datetime.date.today()
+    with pytest.raises(BadRequestError, match="greater than or equal to start date"):
+        project_services.sanction_and_register_project(
+            user_id=10,
+            project_code="P-ERR-1",
+            project_type="sponsored",
+            title="T",
+            department="CSE",
+            funding_agency="DST",
+            sanction_order_no="SO",
+            sanction_date=today,
+            start_date=today,
+            end_date=today - datetime.timedelta(days=1),
+            sanctioned_amount=Decimal("100.00"),
+        )
+
+    with pytest.raises(BadRequestError, match="strictly positive"):
+        project_services.sanction_and_register_project(
+            user_id=10,
+            project_code="P-ERR-2",
+            project_type="sponsored",
+            title="T",
+            department="CSE",
+            funding_agency="DST",
+            sanction_order_no="SO",
+            sanction_date=today,
+            start_date=today,
+            end_date=today + datetime.timedelta(days=10),
+            sanctioned_amount=Decimal("-100.00"),
+        )
+
+    proj = project_services.sanction_and_register_project(
+        user_id=10,
+        project_code="P-ACT-TWICE",
+        project_type="sponsored",
+        title="T",
+        department="CSE",
+        funding_agency="DST",
+        sanction_order_no="SO",
+        sanction_date=today,
+        start_date=today,
+        end_date=today + datetime.timedelta(days=10),
+        sanctioned_amount=Decimal("100.00"),
+    )
+    project_services.activate_project(project=proj, actor_role="admin")
+    with pytest.raises(ConflictError, match="Illegal transition"):
+        project_services.activate_project(project=proj, actor_role="admin")
+
+
+@pytest.mark.django_db
+def test_finance_service_edge_cases():
+    today = datetime.date.today()
+    proj = project_services.sanction_and_register_project(
+        user_id=10,
+        project_code="P-FIN-EDGES",
+        project_type="sponsored",
+        title="T",
+        department="CSE",
+        funding_agency="DST",
+        sanction_order_no="SO",
+        sanction_date=today,
+        start_date=today,
+        end_date=today + datetime.timedelta(days=10),
+        sanctioned_amount=Decimal("100.00"),
+    )
+
+    with pytest.raises(BadRequestError, match="cannot be negative"):
+        finance_services.allocate_budget_head(
+            project=proj, head_type="travel", allocated_amount=Decimal("-50.00"), actor_user_id=1
+        )
+
+    with pytest.raises(BadRequestError, match="not configured"):
+        finance_services.disburse_funds(
+            project=proj,
+            head_type="contingency",
+            amount=Decimal("10.00"),
+            reference_no="X",
+            description="",
+            actor_user_id=1,
+        )
+
+    with pytest.raises(BadRequestError, match="not found"):
+        finance_services.record_reversal_transaction(
+            original_transaction_id=999999,
+            reversal_amount=Decimal("10.00"),
+            reason="Refund",
+            actor_user_id=1,
+        )
+
+    finance_services.allocate_budget_head(
+        project=proj, head_type="travel", allocated_amount=Decimal("100.00"), actor_user_id=1
+    )
+    tx = finance_services.disburse_funds(
+        project=proj,
+        head_type="travel",
+        amount=Decimal("50.00"),
+        reference_no="PO-REV",
+        description="",
+        actor_user_id=1,
+    )
+    with pytest.raises(BadRequestError, match="must be positive"):
+        finance_services.record_reversal_transaction(
+            original_transaction_id=tx.pk,
+            reversal_amount=Decimal("0.00"),
+            reason="Refund",
+            actor_user_id=1,
+        )
+
+
+@pytest.mark.django_db
+def test_extension_service_edge_cases():
+    today = datetime.date.today()
+    proj = project_services.sanction_and_register_project(
+        user_id=10,
+        project_code="P-EXT-EDGES",
+        project_type="sponsored",
+        title="T",
+        department="CSE",
+        funding_agency="DST",
+        sanction_order_no="SO",
+        sanction_date=today,
+        start_date=today,
+        end_date=today + datetime.timedelta(days=10),
+        sanctioned_amount=Decimal("100.00"),
+    )
+
+    with pytest.raises(BadRequestError, match="Only the Principal Investigator"):
+        extension_services.request_project_extension(
+            project=proj,
+            requested_end_date=today + datetime.timedelta(days=50),
+            months_requested=2,
+            justification="J",
+            actor_user_id=99,
+        )
+
+    req = extension_services.request_project_extension(
+        project=proj,
+        requested_end_date=today + datetime.timedelta(days=50),
+        months_requested=2,
+        justification="J",
+        actor_user_id=10,
+    )
+    extension_services.review_project_extension(
+        extension_request=req, approved=True, actor_user_id=30, actor_role="dean"
+    )
+    with pytest.raises(ConflictError, match=r"Extension request has already been reviewed\."):
+        extension_services.review_project_extension(
+            extension_request=req, approved=True, actor_user_id=30, actor_role="dean"
+        )
+
+    req13 = extension_services.request_project_extension(
+        project=proj,
+        requested_end_date=today + datetime.timedelta(days=400),
+        months_requested=13,
+        justification="Large extension",
+        actor_user_id=10,
+    )
+    with pytest.raises(ConflictError, match="require Director approval"):
+        extension_services.review_project_extension(
+            extension_request=req13, approved=True, actor_user_id=30, actor_role="dean"
+        )
+
 
