@@ -1,0 +1,101 @@
+[
+  {
+    "test_id": "test_br_001_active_role_authorization",
+    "source_id": "BR-IWD-001 active-role",
+    "purpose": "Enforce that actions require the specific authorized active role.",
+    "preconditions": "User has wrong role header.",
+    "action_or_input": "POST /api/iwd/estimates/<id>/approve/ with X-Role: employee.",
+    "expected_result": "HTTP 422 Unprocessable Entity / 403 Forbidden.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "test_br_003_cost_band_low_routing",
+    "source_id": "BR-IWD-003 condition-low",
+    "purpose": "Verify estimate below 25,000 INR categorized as LOW band.",
+    "preconditions": "Estimate created with total 15,000 INR.",
+    "action_or_input": "Calculate cost band.",
+    "expected_result": "cost_band == 'LOW'.",
+    "test_type": "rule"
+  },
+  {
+    "test_id": "test_br_003_cost_band_mid_routing",
+    "source_id": "BR-IWD-003 condition-mid",
+    "purpose": "Verify estimate between 25,000 and 250,000 INR categorized as MID band.",
+    "preconditions": "Estimate created with total 75,000 INR.",
+    "action_or_input": "Calculate cost band.",
+    "expected_result": "cost_band == 'MID'.",
+    "test_type": "rule"
+  },
+  {
+    "test_id": "test_br_003_cost_band_high_routing",
+    "source_id": "BR-IWD-003 condition-high",
+    "purpose": "Verify estimate above 250,000 INR categorized as HIGH band.",
+    "preconditions": "Estimate created with total 300,000 INR.",
+    "action_or_input": "Calculate cost band.",
+    "expected_result": "cost_band == 'HIGH'.",
+    "test_type": "rule"
+  },
+  {
+    "test_id": "test_br_004_low_cost_admin_approval",
+    "source_id": "BR-IWD-004 condition-true",
+    "purpose": "IWD Admin can approve LOW cost estimate.",
+    "preconditions": "Estimate total 10,000 INR, X-Role: admin.",
+    "action_or_input": "POST /api/iwd/estimates/<id>/approve/ by Admin.",
+    "expected_result": "HTTP 200 OK, status APPROVED.",
+    "test_type": "rule"
+  },
+  {
+    "test_id": "test_br_005_mid_range_committee_required",
+    "source_id": "BR-IWD-005 condition-unreviewed",
+    "purpose": "Mid-range estimate without committee review cannot be approved.",
+    "preconditions": "Estimate total 50,000 INR with committee_reviewed=False.",
+    "action_or_input": "POST /api/iwd/estimates/<id>/approve/ by HOD.",
+    "expected_result": "HTTP 422 Unprocessable Entity, committee review required.",
+    "test_type": "rule"
+  },
+  {
+    "test_id": "test_br_007_high_cost_director_approval_required",
+    "source_id": "BR-IWD-007 condition-high-cost",
+    "purpose": "High-cost estimate (> 2.5L) requires Director approval.",
+    "preconditions": "Estimate total 400,000 INR, X-Role: hod.",
+    "action_or_input": "POST /api/iwd/estimates/<id>/approve/ by HOD.",
+    "expected_result": "HTTP 422 Unprocessable Entity, requires Director.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "test_br_009_rejection_reason_mandatory",
+    "source_id": "BR-IWD-009 rejection-reason",
+    "purpose": "Rejection without reason must be refused.",
+    "preconditions": "Estimate in PENDING_APPROVAL state.",
+    "action_or_input": "POST /api/iwd/estimates/<id>/reject/ with empty reason.",
+    "expected_result": "HTTP 400 Bad Request.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "test_br_014_verify_before_resolution",
+    "source_id": "BR-IWD-014 verification-guard",
+    "purpose": "Complaint cannot be marked resolved if physical verification failed.",
+    "preconditions": "Work completed, physical verification failed (passed=False).",
+    "action_or_input": "POST /api/iwd/complaints/<id>/verify/ with passed=False.",
+    "expected_result": "Complaint status remains IN_PROGRESS, rework_count incremented.",
+    "test_type": "rule"
+  },
+  {
+    "test_id": "test_br_016_settlement_sequence_guard",
+    "source_id": "BR-IWD-016 settlement-sequence",
+    "purpose": "Accounts settlement refused before auditor and director approvals.",
+    "preconditions": "FinalBill without auditor verification.",
+    "action_or_input": "POST /api/iwd/bills/<id>/settle/ with X-Role: accounts.",
+    "expected_result": "HTTP 409 Conflict, prior approvals missing.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "test_br_018_dean_hod_separation",
+    "source_id": "BR-IWD-018 role-separation",
+    "purpose": "Dean role cannot masquerade as HOD for mid-range approvals.",
+    "preconditions": "Mid-range estimate reviewed by committee.",
+    "action_or_input": "POST /api/iwd/estimates/<id>/approve/ with X-Role: dean.",
+    "expected_result": "HTTP 422 Unprocessable Entity, requires Department Head.",
+    "test_type": "authorization"
+  }
+]
