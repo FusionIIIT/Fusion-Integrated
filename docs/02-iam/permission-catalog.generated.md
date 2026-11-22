@@ -38,3 +38,27 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `systemadmin`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `systemadmin.dashboard.view` | View the Super Admin monitoring dashboard and metrics | `IT Head`, `Super Admin` |
+| `systemadmin.user.view` | View basic user profiles and directory information | `Super Admin` |
+| `systemadmin.user.create` | Create Student, Faculty, and Staff basic-user accounts | `Super Admin` |
+| `systemadmin.user.edit` | Update editable basic-user profile information | `Super Admin` |
+| `systemadmin.user.status` | Deactivate and reactivate basic-user accounts | `Super Admin` |
+| `systemadmin.user.bulk` | Execute bulk CSV user creation and batch status operations | `Super Admin` |
+| `systemadmin.role.view` | Inspect system-maintained role definitions and availability | `Super Admin` |
+| `systemadmin.role.assign` | Assign additional roles to eligible basic users | `Super Admin` |
+| `systemadmin.role.reassign` | Reassign active roles to new holders with work handover | `Super Admin` |
+| `systemadmin.role.revoke` | Revoke active and scheduled role assignments early | `Super Admin` |
+| `systemadmin.role.extend` | Extend validity of time-bound role assignments | `Super Admin` |
+| `systemadmin.archive.view` | Search and view archived users and historical records | `IT Head`, `Super Admin` |
+| `systemadmin.archive.execute` | Archive eligible deactivated users and historical data | `Super Admin` |
+| `systemadmin.archive.restore` | Restore eligible archived users and historical datasets | `Super Admin` |
+| `systemadmin.purge.request` | Submit dual-authorization permanent data purge requests | `Super Admin` |
+| `systemadmin.purge.authorize` | Authorize or reject permanent data purge requests as IT Head | `IT Head` |
+| `systemadmin.audit.view` | Inspect immutable Super Admin audit logs | `IT Head`, `Super Admin` |
+| `systemadmin.audit.report` | Generate and export tabular and graphical audit reports | `Super Admin` |
+| `systemadmin.config.manage` | Configure permitted system-wide parameters | `Super Admin` |
