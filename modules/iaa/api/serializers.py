@@ -1,4 +1,5 @@
 """IAA API serializers with explicit writable fields."""
+from decimal import Decimal
 from rest_framework import serializers
 from modules.iaa.models import (Anomaly,ApprovalRule,ApprovalStep,AuditLog,AuditObservation,
  DashboardNotification,DepartmentBudget,FinancialRecord,FinancialYearPolicy,FinanceQuery,
@@ -7,8 +8,9 @@ class PageSerializer(serializers.Serializer):
     count=serializers.IntegerField()
     results=serializers.ListField(child=serializers.DictField())
 class FinancialRecordWriteSerializer(serializers.Serializer):
-    request_type=serializers.CharField(max_length=80); department=serializers.CharField(max_length=120)
-    amount=serializers.DecimalField(max_digits=14,decimal_places=2,min_value=0)
+    request_type=serializers.CharField(max_length=80,required=False,allow_blank=True,default="")
+    department=serializers.CharField(max_length=120,required=False,allow_blank=True,default="")
+    amount=serializers.DecimalField(max_digits=14,decimal_places=2,min_value=0,required=False,default=Decimal("0"))
     description=serializers.CharField(required=False,allow_blank=True,default="")
     financial_year=serializers.CharField(max_length=12,required=False,allow_blank=True)
     trip_start_date=serializers.DateField(required=False,allow_null=True)
