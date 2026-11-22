@@ -1,0 +1,371 @@
+[
+  {
+    "test_id": "TC-UC-01",
+    "source_id": "UC-LMS-001 Main Flow",
+    "purpose": "Verify an authorized user can access the course workspace and view course home information including syllabus, schedule, instructors, and TAs.",
+    "preconditions": "Course exists; user is enrolled/assigned as student, faculty, TA, or observer.",
+    "action_or_input": "Authorized user requests course workspace details for the enrolled course.",
+    "expected_result": "Access granted; course workspace details with syllabus, schedule, and rosters are returned.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-02",
+    "source_id": "UC-LMS-001 Alternative A1",
+    "purpose": "Verify that course access is denied when the requesting user is not authorized or not enrolled in the selected course.",
+    "preconditions": "Course exists; requesting user has no enrollment or assignment in the course.",
+    "action_or_input": "Unenrolled user attempts to access course workspace details.",
+    "expected_result": "Access is denied or returns None, preventing workspace exposure.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-03",
+    "source_id": "UC-LMS-001 Exception E1",
+    "purpose": "Verify that when registration/link data are missing or unavailable, the system does not expose workspace content.",
+    "preconditions": "User exists but has no registration record in the course.",
+    "action_or_input": "User queries workspace details for an unlinked course.",
+    "expected_result": "Workspace data is not exposed; access confirmation fails.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-04",
+    "source_id": "UC-LMS-002 Main Flow",
+    "purpose": "Verify assigned faculty can configure and update course workspace details.",
+    "preconditions": "Faculty is assigned to the course.",
+    "action_or_input": "Assigned faculty updates course syllabus, schedule, and description.",
+    "expected_result": "Course details are successfully updated and reflected in course workspace.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-05",
+    "source_id": "UC-LMS-002 Alternative A1",
+    "purpose": "Verify assigned faculty can edit previously published course details.",
+    "preconditions": "Course details have previously been published; faculty is assigned.",
+    "action_or_input": "Faculty edits existing syllabus and schedule with updated text.",
+    "expected_result": "Updated course details overwrite previous values and are saved successfully.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-06",
+    "source_id": "UC-LMS-002 Exception E1",
+    "purpose": "Verify that an unauthorized user or faculty not assigned to the course cannot update course details.",
+    "preconditions": "User is not assigned faculty for the course (e.g. unassigned faculty or student).",
+    "action_or_input": "Unauthorized user attempts to update course details.",
+    "expected_result": "Action is rejected with permission/authorization error.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-07",
+    "source_id": "UC-LMS-003 Main Flow",
+    "purpose": "Verify assigned faculty can add course material (file, link, or note) with immediate publication.",
+    "preconditions": "Faculty is assigned to the course.",
+    "action_or_input": "Faculty adds a material in a module section with status published.",
+    "expected_result": "Material is saved and marked published immediately.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-08",
+    "source_id": "UC-LMS-003 Alternative A1",
+    "purpose": "Verify assigned faculty can add course material scheduled for future release.",
+    "preconditions": "Faculty is assigned to the course.",
+    "action_or_input": "Faculty adds material with future release date/time and scheduled status.",
+    "expected_result": "Material is saved and marked Scheduled.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-09",
+    "source_id": "UC-LMS-003 Alternative A2",
+    "purpose": "Verify assigned faculty can edit or reorganize existing course material.",
+    "preconditions": "Course material exists in the course; faculty is assigned.",
+    "action_or_input": "Faculty updates material title, section, or content.",
+    "expected_result": "Material configuration is updated successfully.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-10",
+    "source_id": "UC-LMS-003 Exception E1",
+    "purpose": "Verify that student, TA, or observer attempts to add or manage course materials are rejected.",
+    "preconditions": "User is enrolled as student, TA, or observer (not faculty).",
+    "action_or_input": "Non-faculty user attempts to add course material.",
+    "expected_result": "Write attempt is rejected with permission error.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-11",
+    "source_id": "UC-LMS-004 Main Flow",
+    "purpose": "Verify authorized course user (Student, TA, Observer) can view published course materials in read-only form.",
+    "preconditions": "User has course access; material is published.",
+    "action_or_input": "Authorized user requests course materials.",
+    "expected_result": "Published materials are listed and readable.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-12",
+    "source_id": "UC-LMS-004 Alternative A1",
+    "purpose": "Verify scheduled or unpublished course material is omitted from student view until released.",
+    "preconditions": "Course has materials in scheduled or draft status; student is enrolled.",
+    "action_or_input": "Student lists course materials.",
+    "expected_result": "Scheduled and draft materials are not included in student view.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-13",
+    "source_id": "UC-LMS-004 Exception E1",
+    "purpose": "Verify that unauthorized course access to course materials is denied.",
+    "preconditions": "User is not enrolled in the course.",
+    "action_or_input": "Unenrolled user attempts to list course materials.",
+    "expected_result": "Access is denied or returns None, preventing material exposure.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-14",
+    "source_id": "UC-LMS-005 Main Flow",
+    "purpose": "Verify assigned faculty can post a course-wide announcement with timestamp.",
+    "preconditions": "Faculty is assigned to the course.",
+    "action_or_input": "Faculty submits a new announcement with title and content.",
+    "expected_result": "Announcement is stored with timestamp and made visible course-wide.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-15",
+    "source_id": "UC-LMS-005 Alternative A1",
+    "purpose": "Verify permitted TA can post a course-wide announcement when permitted.",
+    "preconditions": "TA is assigned to course with announcement permission.",
+    "action_or_input": "Permitted TA submits a new announcement.",
+    "expected_result": "Announcement is saved and visible course-wide.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-16",
+    "source_id": "UC-LMS-005 Exception E1",
+    "purpose": "Verify unauthorized user (e.g. Student or unpermitted user) cannot post announcements.",
+    "preconditions": "User is enrolled as student or is not a permitted poster.",
+    "action_or_input": "Student attempts to post a course announcement.",
+    "expected_result": "Posting is rejected with authorization/permission error.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-17",
+    "source_id": "UC-LMS-006 Main Flow",
+    "purpose": "Verify authorized course users can view timestamped course announcements.",
+    "preconditions": "Course has announcements; user is enrolled.",
+    "action_or_input": "Authorized user requests course announcements.",
+    "expected_result": "Announcements list is returned with timestamps and content.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-18",
+    "source_id": "UC-LMS-006 Exception E1",
+    "purpose": "Verify unauthorized user cannot view course announcements.",
+    "preconditions": "User is not enrolled in the course.",
+    "action_or_input": "Unenrolled user attempts to view course announcements.",
+    "expected_result": "Access is denied or returns empty/None, protecting announcement content.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-19",
+    "source_id": "UC-LMS-007 Main Flow",
+    "purpose": "Verify assigned faculty can create a new assignment in Draft state with due date, instructions, submission type, and points.",
+    "preconditions": "Faculty is assigned to the course.",
+    "action_or_input": "Faculty creates assignment with required parameters.",
+    "expected_result": "Assignment is created and stored in Draft state.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-20",
+    "source_id": "UC-LMS-007 Alternative A1",
+    "purpose": "Verify assigned faculty can edit an existing Draft assignment configuration.",
+    "preconditions": "Assignment exists in Draft state; faculty is assigned.",
+    "action_or_input": "Faculty modifies instructions, points possible, or due date of draft assignment.",
+    "expected_result": "Assignment details are updated and remain in Draft state.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-21",
+    "source_id": "UC-LMS-007 Exception E1",
+    "purpose": "Verify TA, student, or observer cannot create or edit assignments.",
+    "preconditions": "User is enrolled as TA, student, or observer.",
+    "action_or_input": "Non-faculty user attempts to create or edit an assignment.",
+    "expected_result": "Operation is rejected with permission error.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-22",
+    "source_id": "UC-LMS-008 Main Flow",
+    "purpose": "Verify assigned faculty can publish a valid Draft assignment for immediate availability.",
+    "preconditions": "Assignment is in Draft state with valid configuration (instructions, future due date, points).",
+    "action_or_input": "Faculty publishes the assignment without future release date.",
+    "expected_result": "Assignment transitions to Published state and becomes Available to students.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-23",
+    "source_id": "UC-LMS-008 Alternative A1",
+    "purpose": "Verify assigned faculty can publish an assignment scheduled for future release.",
+    "preconditions": "Assignment is Draft with valid configuration and future release date.",
+    "action_or_input": "Faculty publishes assignment configured with future release date.",
+    "expected_result": "Assignment is marked Published/Scheduled for Release, waiting for scheduled release time.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-24",
+    "source_id": "UC-LMS-008 Exception E1",
+    "purpose": "Verify that an invalid Draft assignment cannot be published.",
+    "preconditions": "Draft assignment lacks required fields (e.g. invalid/missing due date or empty title/instructions).",
+    "action_or_input": "Faculty attempts to publish invalid Draft assignment.",
+    "expected_result": "Publication fails with validation rule error; assignment remains Draft.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-25",
+    "source_id": "UC-LMS-009 Main Flow",
+    "purpose": "Verify registered student can view and download published available assignment details.",
+    "preconditions": "Assignment is published and available; student is registered in course.",
+    "action_or_input": "Student retrieves assignment details.",
+    "expected_result": "Assignment details, instructions, due date, and points are visible.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-26",
+    "source_id": "UC-LMS-009 Alternative A1",
+    "purpose": "Verify draft or future-dated unreleased assignments are omitted from student view.",
+    "preconditions": "Assignment is Draft or Scheduled for future release; student is registered.",
+    "action_or_input": "Student queries available assignments in course.",
+    "expected_result": "Unreleased assignment is not visible in student list.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-27",
+    "source_id": "UC-LMS-009 Exception E1",
+    "purpose": "Verify unauthorized user (not registered in course) cannot view assignment.",
+    "preconditions": "User is not registered in the course.",
+    "action_or_input": "Unenrolled user attempts to view assignment details.",
+    "expected_result": "Access is denied or returns None.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-28",
+    "source_id": "UC-LMS-010 Main Flow",
+    "purpose": "Verify registered student can submit on-time assignment work matching configured submission type.",
+    "preconditions": "Assignment is published/available; current time is before due date; student is registered.",
+    "action_or_input": "Student submits work matching configured submission type.",
+    "expected_result": "Submission is recorded with timestamp and valid status.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-29",
+    "source_id": "UC-LMS-010 Alternative A1",
+    "purpose": "Verify submission handling when submission occurs after due date (late submission).",
+    "preconditions": "Assignment is published; due date has passed; student is registered.",
+    "action_or_input": "Student submits work after due date.",
+    "expected_result": "System marks submission status as late or applies policy validation.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-30",
+    "source_id": "UC-LMS-010 Exception E1",
+    "purpose": "Verify submission with type inconsistent with assignment configuration is rejected.",
+    "preconditions": "Assignment requires file upload; student is registered.",
+    "action_or_input": "Student attempts submission with mismatched type (e.g. text/link when file required or empty content).",
+    "expected_result": "Submission is rejected with validation error.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-31",
+    "source_id": "UC-LMS-011 Main Flow",
+    "purpose": "Verify registered student can view their own assignment submission history and status.",
+    "preconditions": "Student has submitted an assignment.",
+    "action_or_input": "Student requests own submission history for the assignment.",
+    "expected_result": "Own submission record, timestamp, and status are returned.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-32",
+    "source_id": "UC-LMS-011 Alternative A1",
+    "purpose": "Verify submission status reflects appropriate status (submitted, late, or missing).",
+    "preconditions": "Student has not submitted an assignment and due date is past, or submitted late.",
+    "action_or_input": "Student checks status for the assignment.",
+    "expected_result": "System reports accurate submission status (late, submitted, or missing).",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-33",
+    "source_id": "UC-LMS-011 Exception E1",
+    "purpose": "Verify access to another student submission data is denied.",
+    "preconditions": "Two students are registered; student A has submitted work.",
+    "action_or_input": "Student B attempts to view Student A submission details.",
+    "expected_result": "Access is denied or returns None, protecting student privacy.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-34",
+    "source_id": "UC-LMS-012 Main Flow",
+    "purpose": "Verify faculty or TA can grade a student submission, recording points, feedback, and grader attribution in Draft state.",
+    "preconditions": "Submission exists; grader is faculty or TA for course.",
+    "action_or_input": "Grader enters valid points and feedback for submission.",
+    "expected_result": "Grade is recorded in Draft state with grader attribution and timestamp.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-35",
+    "source_id": "UC-LMS-012 Alternative A1",
+    "purpose": "Verify that regrading or editing an already graded submission records an updated grade with audit tracking.",
+    "preconditions": "Submission has already been graded; grader is assigned faculty.",
+    "action_or_input": "Faculty updates points and feedback on previously graded submission.",
+    "expected_result": "Updated grade is recorded with updated timestamp and grader attribution.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-36",
+    "source_id": "UC-LMS-012 Exception E1",
+    "purpose": "Verify unauthorized user (e.g. Student or observer) cannot grade submissions.",
+    "preconditions": "Submission exists; actor is student or observer.",
+    "action_or_input": "Unauthorized user attempts to submit a grade.",
+    "expected_result": "Grading action is rejected with permission error.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-37",
+    "source_id": "UC-LMS-013 Main Flow",
+    "purpose": "Verify assigned faculty can release draft grades and feedback to students.",
+    "preconditions": "Draft grades exist for assignment; actor is assigned faculty.",
+    "action_or_input": "Faculty releases grades for the assignment.",
+    "expected_result": "Grades transition from Draft to Released and become available to students.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-38",
+    "source_id": "UC-LMS-013 Exception E1",
+    "purpose": "Verify TA or unauthorized user cannot release grades.",
+    "preconditions": "Draft grades exist; actor is TA or student.",
+    "action_or_input": "TA attempts to release grades.",
+    "expected_result": "Release action is rejected with permission error.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-39",
+    "source_id": "UC-LMS-014 Main Flow",
+    "purpose": "Verify registered student can view their own released grade and feedback in read-only form.",
+    "preconditions": "Grade has been released for the student.",
+    "action_or_input": "Student queries grade for the assignment.",
+    "expected_result": "Student views points, feedback, and released status.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-40",
+    "source_id": "UC-LMS-014 Alternative A1",
+    "purpose": "Verify unreleased draft grade is not exposed to student.",
+    "preconditions": "Submission has been graded by faculty but grade is still in Draft state (unreleased).",
+    "action_or_input": "Student queries grade for the assignment.",
+    "expected_result": "Grade is not exposed (returns None or empty), preserving draft confidentiality.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-41",
+    "source_id": "UC-LMS-015 Main Flow",
+    "purpose": "Verify scheduled content (material or assignment) whose release time has passed is transitioned to Published/Available.",
+    "preconditions": "Content exists in Scheduled state with release time in the past.",
+    "action_or_input": "Scheduled content release processor is executed.",
+    "expected_result": "Eligible scheduled content transitions to Published state and becomes visible.",
+    "test_type": "positive"
+  }
+]
