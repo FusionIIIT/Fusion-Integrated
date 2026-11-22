@@ -61,6 +61,8 @@ def validate_travel_completeness(
         raise DomainValidationError("Travel purpose is mandatory.")
     if not departure_date or not arrival_date:
         raise DomainValidationError("Departure and arrival dates are mandatory.")
+    if str(arrival_date) < str(departure_date):
+        raise DomainValidationError("Arrival date cannot be earlier than departure date.")
     if not source_location or not destination_location:
         raise DomainValidationError("Source and destination locations are mandatory.")
     if claimed_amount is None or claimed_amount <= Decimal("0"):
