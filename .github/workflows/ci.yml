@@ -100,7 +100,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v3
       - name: Python dependencies
-        run: uvx pip-audit --strict --desc -r <(uvx pip-compile --quiet -o - pyproject.toml)
+        run: uvx pip-audit --strict --desc -r <(uvx --from pip-tools pip-compile --quiet -o - pyproject.toml)
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
