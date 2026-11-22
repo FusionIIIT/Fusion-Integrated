@@ -1,13 +1,13 @@
 from datetime import timedelta
 
 import pytest
+from django.apps import apps
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from django.utils import timezone
 from rest_framework.test import APIClient
 
 from conftest import make_session
-from modules.directory.models import UserRef
 from modules.gymkhana import registry
 from modules.gymkhana.models import (
     BudgetRequest,
@@ -47,7 +47,8 @@ def _client(stub_iam, *, user_id=2001, kind="student", role=None, permissions=No
 
 
 def _person(user_id, kind="student", *, batch_year=2024, discipline="CSE"):
-    return UserRef.objects.create(
+    user_ref = apps.get_model("directory", "UserRef")
+    return user_ref.objects.create(
         user_id=user_id,
         username=f"u{user_id}",
         display_name=f"Person {user_id}",
