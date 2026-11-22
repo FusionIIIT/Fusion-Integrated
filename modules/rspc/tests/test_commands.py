@@ -37,8 +37,9 @@ def test_registry_readiness_error_branches(monkeypatch):
     unmet = registry.readiness()
     assert any("Database tables missing" in u for u in unmet)
 
-    from config.celery import app
+    import config.celery
 
-    monkeypatch.setattr(app.conf, "beat_schedule", {})
+    fake_app = type("FakeCeleryApp", (), {"conf": type("FakeConf", (), {"beat_schedule": {}})()})()
+    monkeypatch.setattr(config.celery, "app", fake_app)
     unmet2 = registry.readiness()
     assert any("Celery beat schedule missing" in u for u in unmet2)
