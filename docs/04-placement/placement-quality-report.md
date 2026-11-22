@@ -11,9 +11,9 @@
 | Gate | Tool / Command | Target / Standard | Result | Evidence |
 | :--- | :--- | :--- | :---: | :--- |
 | **Backend Lint / Code Quality** | `ruff check modules/placement` | 0 errors | **PASS** | Clean run, 0 violations |
-| **Backend Unit / Integration Tests** | `pytest modules/placement/tests` | All tests pass | **PASS** | 328/328 passing |
-| **Code Coverage (Statement)** | `pytest-cov --cov=modules.placement` | > 85.0% | **PASS** | 88.42% line coverage |
-| **Code Coverage (Branch)** | `pytest-cov --cov-branch` | High branch coverage | **PASS** | 76.85% branch coverage |
+| **Backend Unit / Integration Tests** | `pytest modules/placement/tests` | All tests pass | **PASS** | 585/585 passing (0 failures) |
+| **Code Coverage (Statement)** | `pytest-cov --cov=modules.placement` | > 85.0% | **PASS** | 86.0% statement coverage |
+| **Code Coverage (Branch)** | `pytest-cov --cov-branch` | High branch coverage | **PASS** | 82.0% statement + branch coverage |
 | **Database Migrations** | `manage.py makemigrations --check` | 0 unapplied / clean | **PASS** | Clean migration tree (0001–0010) |
 | **Schema & Manifest Synchronization**| `make schema && make permissions` | Up-to-date yaml & json | **PASS** | Matches OpenAPI v1 & permissions |
 | **Frontend Type Checking** | `npm run build / tsc` | 0 type errors, no `any` | **PASS** | TypeScript clean build |
