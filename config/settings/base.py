@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.pms.apps.PmsConfig",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -180,6 +181,13 @@ NOTIFY_MAX_PER_RUN = env_int("NOTIFY_MAX_PER_RUN", 500)
 NOTIFY_MAX_ATTEMPTS = env_int("NOTIFY_MAX_ATTEMPTS", 5)
 #: A dozen events a day is legitimate during a drive; thirty is a bug.
 NOTIFY_DAILY_CAP_PER_RECIPIENT = env_int("NOTIFY_DAILY_CAP_PER_RECIPIENT", 20)
+
+#: Optional malware scanner executable (for example, clamscan); no shell is used.
+PMS_MALWARE_SCAN_COMMAND = env("PMS_MALWARE_SCAN_COMMAND", "")
+PMS_UPLOAD_ROOT = env(
+    "PMS_UPLOAD_ROOT",
+    str(Path.home() / ".local" / "share" / "fusion-integrated" / "pms-uploads"),
+)
 
 #: Pre-Drive uploads, still served but never written; outside BASE_DIR or boot fails.
 PLACEMENT_UPLOAD_ROOT = env(

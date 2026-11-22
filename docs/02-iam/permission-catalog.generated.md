@@ -38,3 +38,43 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `pms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `pms.application.create` | Create a PMS application draft | `Applicant`, `applicant` |
+| `pms.application.view_self` | View own patent applications | `Applicant`, `applicant` |
+| `pms.application.view_all` | View PMS applications in assigned oversight scope | `Attorney`, `Director`, `PCC_ADMIN`, `attorney`, `director`, `pcc_admin` |
+| `pms.application.submit` | Submit a patent application | `Applicant`, `applicant` |
+| `pms.application.review` | Review an assigned patent application | `Director`, `director` |
+| `pms.application.resubmit` | Revise and resubmit an application | `Applicant`, `applicant` |
+| `pms.application.withdraw` | Withdraw an eligible pre-filing application | `Applicant`, `applicant` |
+| `pms.inventor.manage` | Manage inventors and agreement records | `Applicant`, `PCC_ADMIN`, `applicant`, `pcc_admin` |
+| `pms.inventor.consent` | Record an inventor agreement consent | `Applicant`, `applicant` |
+| `pms.document.upload` | Upload a PMS document version | `Applicant`, `Attorney`, `applicant`, `attorney` |
+| `pms.document.view_confidential` | View confidential/restricted PMS documents | `Attorney`, `Director`, `PCC_ADMIN`, `attorney`, `director`, `pcc_admin` |
+| `pms.workflow.assign_director` | Assign an application to a Director | `PCC_ADMIN`, `pcc_admin` |
+| `pms.workflow.assign_attorney` | Assign an approved application to an Attorney | `PCC_ADMIN`, `pcc_admin` |
+| `pms.workflow.manage` | Monitor workflow and handle exceptions | `PCC_ADMIN`, `pcc_admin` |
+| `pms.attorney_assignment.respond` | Accept or decline an Attorney assignment | `Attorney`, `attorney` |
+| `pms.legal_opinion.create` | Record a patentability opinion | `Attorney`, `attorney` |
+| `pms.budget.propose` | Create a patent budget proposal | `Attorney`, `attorney` |
+| `pms.budget.decide` | Approve, reject, or escalate a patent budget | `Director`, `director` |
+| `pms.filing.record` | Record external patent-office filing details | `Attorney`, `attorney` |
+| `pms.office_action.record` | Record patent-office communications | `Attorney`, `attorney` |
+| `pms.office_action.respond` | Prepare and submit an office-action response | `Attorney`, `attorney` |
+| `pms.office_action_response.review` | Approve an office-action response when required | `Applicant`, `applicant` |
+| `pms.appeal.file` | File an appeal against a rejected application | `Applicant`, `applicant` |
+| `pms.appeal.review` | Review an assigned appeal | `Director`, `director` |
+| `pms.configuration.manage` | Manage PMS-specific configuration | `PCC_ADMIN`, `pcc_admin` |
+| `pms.panel.manage` | Maintain the approved Attorney panel and expertise | `PCC_ADMIN`, `pcc_admin` |
+| `pms.audit.view` | View PMS audit/compliance history | `PCC_ADMIN`, `pcc_admin` |
+| `pms.report.view` | View system-wide PMS reports and analytics | `Director`, `PCC_ADMIN`, `director`, `pcc_admin` |
+| `pms.report.view_self` | View reports for own applications | `Applicant`, `Attorney`, `applicant`, `attorney` |
+| `pms.prior_art.search` | Search and attach supported prior art | `Applicant`, `Attorney`, `applicant`, `attorney` |
+| `pms.licensing.submit` | Submit a licensing/technology-transfer request | `Applicant`, `applicant` |
+| `pms.licensing.review` | Review licensing/technology-transfer requests | `PCC_ADMIN`, `pcc_admin` |
+| `pms.maintenance.manage` | Manage post-grant maintenance tracking | `Attorney`, `attorney` |
+| `pms.maintenance.decide` | Decide whether to renew a patent | `Director`, `director` |
+| `pms.deadline.view` | View PMS deadlines in authorized scope | `Applicant`, `Attorney`, `Director`, `applicant`, `attorney`, `director` |
