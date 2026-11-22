@@ -1,8 +1,11 @@
 # LMS policy decisions — adopted ruling record
 
-**Decision version:** A9-LMS-D-2026-11-22-v1  
-**Received:** 22 November 2026 (IST)  
-**Authority represented:** Formal Student 2 ruling supplied through Student 1  
+**Decision version:** A9-LMS-D-2026-11-22-v2
+
+**Received:** 22 November 2026 (IST)
+
+**Authority represented:** Formal Student 2 ruling supplied through Student 1
+
 **Blueprint approval:** Continues to be withheld
 
 This record separates adopted clarifications from the unchanged LMS v1.0 source documents. The original forwarded ruling is preserved in the external run/review record. Its identity and exact hash are recorded in the blueprint manifest; this document does not reproduce personal identifiers or claim a completed blueprint approval.
@@ -72,6 +75,16 @@ All module endpoints use `/api/v1/lms/`. Apply the existing error envelope and t
 | 409 | Lifecycle/uniqueness conflicts, including an already recorded submission |
 | 422 | Semantic or business-rule refusal, including deadline exceeded, type mismatch or negative points |
 
+## Additional adopted Stage A design rulings
+
+The staged authorization received on 22 November 2026, SHA-256 `2c887167c5a212a04f36245cc5b0da56f4d3edb50e6719421fe4553898ebf1a1`, adopts:
+
+- **F-03:** Module-neutral private `core/files/writers.py`, standard-library content verification, 25,000,000-byte material / 10,000,000-byte submission caps, allowed `.pdf/.zip/.tar.gz/.txt/.docx/.ipynb`, blocked direct executable/scriptable formats, sanitized parent-authorized attachment streaming. Shared implementation remains Stage B work.
+- **F-04:** Submission type immutable after first successful submission; points possible immutable after first grade; due date may remain or extend monotonically and never precede any recorded submission. Faculty may edit instructions/title. Invalid edits receive 422 with no state change.
+- **F-05:** Post-commit ETA dispatch plus 60-second, 50-item catch-up scans. Lock and re-read current state/time to avoid early/duplicate transitions and audits.
+- **Actor model:** Real local `lms_ta`/`lms_observer` markers plus module grant, action permission and live offering scope. Context roles never bypass `HasPermission` or union different acting roles.
+- **Working identifiers:** `lms` and `docs/10-lms/` are pair working values. Separate official instructor confirmation is not claimed.
+
 ## Remaining authorization boundary
 
-Adoption of D-01–D-06 does not authorize LMS implementation. The formal ruling keeps blueprint approval withheld until a complete, versioned blueprint and the course-association dependency are reviewed. Module/docs identifiers have pair endorsement but await instructor confirmation. Missing roles, upload support, shared-file changes and new dependencies need their applicable approval/contract records.
+Stage A is delivered at local IAM revision `494160849bd101a5cb77a1b1c9f0881307079888` with 341 passing PostgreSQL tests and actual HTTP 200 verification of both course endpoints. Its source registrations remain unchanged; synthetic nonstudent data are labelled explicitly. Stage A authorization does not approve LMS application implementation. The actual approver must review the revised blueprint A9-LMS-BP-0.2 and prerequisite evidence and issue the separate dated final decision before Stage B code or builder tests begin.

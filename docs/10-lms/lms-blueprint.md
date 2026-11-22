@@ -1,14 +1,22 @@
 # LMS (Course Management) blueprint
 
-**Version:** A9-LMS-BP-0.1  
-**Prepared:** 22 November 2026 (IST)  
-**Status:** DRAFT — blocked; application implementation not authorized  
-**Branch:** `module/lms`  
-**Proposed location:** `docs/10-lms/lms-blueprint.md`; pair endorsement received, instructor identifier confirmation pending  
-**Platform base:** `5595be6628b4cdc6f8b47cf74bac267a2470f780`  
-**IAM source inspected:** `d143e4e61b11a2a5e21c03355f8b784d83103b5d`
+**Version:** A9-LMS-BP-0.2
 
-This document is a source-derived design draft. It does not claim that the module, registry, routes, tasks, storage extension or IAM endpoints already exist. The named enforcement points below are planned module functions, not promises of a currently available external API. Application code remains on hold under the received ruling and builder prompt Step 3.6.
+**Prepared:** 22 November 2026 (IST)
+
+**Status:** DRAFT — Stage A delivered; final LMS blueprint approval pending
+
+**Branch:** `module/lms`
+
+**Proposed location:** `docs/10-lms/lms-blueprint.md`; pair working values endorsed by the staged ruling; no separate instructor confirmation claimed
+
+**Platform base:** `5595be6628b4cdc6f8b47cf74bac267a2470f780`
+
+**Verified local IAM main revision:** `494160849bd101a5cb77a1b1c9f0881307079888` (parent `d143e4e61b11a2a5e21c03355f8b784d83103b5d`; no official upstream merge claimed)
+
+This is the revised LMS design draft, not an implemented LMS module. Stage A is now implemented, committed and verified on local IAM `main` at `494160849bd101a5cb77a1b1c9f0881307079888`: 341 PostgreSQL IAM tests passed, and both real course endpoints returned HTTP 200. The module registry, LMS routes, client pages, scheduled releases and approved shared byte-upload extension remain planned Stage B work. Final LMS application implementation remains on hold pending review and actual approval of this exact revised blueprint.
+
+The staged authorization received on 22 November 2026 has SHA-256 `2c887167c5a212a04f36245cc5b0da56f4d3edb50e6719421fe4553898ebf1a1`. It approves the real local role model, shared file profile, assignment edit rules and release-dispatch design. Those approvals are distinguished from final blueprint approval.
 
 Inputs are the six original LMS v1.0 specification artifacts and the formal D-01–D-06 ruling received on 22 November 2026. The unmodified ruling is preserved in the external review record, SHA-256 `9199d3a2259d6bcb6fb29d421fc5d9c679823e789d86c5731b4fe808e38bfacb`. Policy detail is in [policy-decisions.md](policy-decisions.md). Original obligations and later policy clarifications are distinguished throughout. The four preliminary Student 2 test-design files are not design authority for this blueprint.
 
@@ -18,9 +26,9 @@ All 103 live IDs are listed once: 15 CFRs, 47 AFRs, 19 BRs, 15 UCs, five BWs and
 
 | ID | What it requires | Layer | Planned enforcement point | Notes |
 |---|---|---|---|---|
-| CFR-LMS-001 | The system shall provide a dedicated course workspace for each course and allow an authorized course user to open that workspace and view the course home information for the specific course to which the user is enrolled in, assigned to, or otherwise linked. | selectors + services | selectors/scoping.py; services/workspaces.py::open_workspace | Authoritative course associations are blocked by BPR-001. |
+| CFR-LMS-001 | The system shall provide a dedicated course workspace for each course and allow an authorized course user to open that workspace and view the course home information for the specific course to which the user is enrolled in, assigned to, or otherwise linked. | selectors + services | selectors/scoping.py; services/workspaces.py::open_workspace | Use the verified IAM offering/association contract; only the acting role's scoped associations authorize. |
 | CFR-LMS-002 | The system shall allow Faculty to own/configure the workspace for assigned courses and to publish and edit the course details presented in that workspace. | services + models | services/workspaces.py::update_details; models/workspaces.py | Faculty must be assigned to the selected offering. |
-| CFR-LMS-003 | The system shall allow Faculty to upload course materials as files, links, or notes, organize them into modules or weekly sections, and optionally schedule a future release date. | domain + services + tasks | services/materials.py; domain/releases.py; tasks.py::release_due_materials | Real file support requires the shared-file decision in BPR-005. |
+| CFR-LMS-003 | The system shall allow Faculty to upload course materials as files, links, or notes, organize them into modules or weekly sections, and optionally schedule a future release date. | domain + services + tasks | services/materials.py; domain/releases.py; tasks.py::release_due_materials | The shared byte-upload extension/profile is approved and planned for Stage B. |
 | CFR-LMS-004 | The system shall provide Students, TAs, and Observers with read-only access to published course materials for courses they are authorized to access. | selectors + API | selectors/materials.py::visible_materials; read-only serializers | Only released material in the actor's course scope. |
 | CFR-LMS-005 | The system shall allow Faculty, and TAs where permitted, to post timestamped course-wide announcements and shall make posted announcements visible to all users enrolled in or linked to the course. | domain + services + selectors | services/announcements.py::post_announcement; domain/capabilities.py | D-02 TA posting flag; D-03 visibility only. |
 | CFR-LMS-006 | The system shall allow Faculty to create and edit an assignment for an assigned course, capturing due date, instructions, submission type, and points possible, with the assignment remaining in Draft state before publication. | domain + models + services | services/assignments.py::save_draft; domain/assignment_rules.py | Required configuration and Draft state. |
@@ -31,17 +39,17 @@ All 103 live IDs are listed once: 15 CFRs, 47 AFRs, 19 BRs, 15 UCs, five BWs and
 | CFR-LMS-011 | The system shall keep grades and feedback in Draft state until Faculty releases them, shall prevent Students from seeing draft grades, and shall make released grades/feedback available to the applicable Student. | domain + services + selectors | services/grading.py::release_grade; selectors/grades.py | Only Faculty releases; students see no Draft score or feedback. |
 | CFR-LMS-012 | The system shall allow a Student to view the Student’s own released grade and feedback in read-only form. | selectors + API | selectors/grades.py::own_released_grades; read-only serializers | Student reads only their own Released grade. |
 | CFR-LMS-013 | Whenever a released grade is changed, the system shall log the change and record who made the change and when it was made. | services + models | services/grading.py::change_released_grade; GradeAuditLog | Original actor/time obligation plus separately attributed D-06 extension. |
-| CFR-LMS-014 | The system shall provide TAs with course viewing, submission-viewing and grading capabilities for assigned courses, while preventing TAs from creating or editing assignments, materials, or course structure; announcement posting is allowed only where permitted. | registry + domain + selectors | registry.py; domain/capabilities.py; selectors/scoping.py | TA designation unresolved; never grant authoring as a workaround. |
+| CFR-LMS-014 | The system shall provide TAs with course viewing, submission-viewing and grading capabilities for assigned courses, while preventing TAs from creating or editing assignments, materials, or course structure; announcement posting is allowed only where permitted. | registry + domain + selectors | registry.py; domain/capabilities.py; selectors/scoping.py | Use provisioned lms_ta plus per-offering TA association; no authoring permissions. |
 | CFR-LMS-015 | The system shall provide an Observer with read-only access to course details, published materials, and announcements for the linked course while preventing access to individual submissions, grades, and other Student-specific data and preventing all write actions. | registry + selectors + API | registry.py; selectors/scoping.py; audience-specific serializers | D-04 course linkage; no student-specific reads or any writes. |
-| AFR-LMS-001.1 | The system shall open a dedicated course workspace when a user selects a course for which the user has authorized course access. | selectors + services | selectors/scoping.py; services/workspaces.py::open_workspace | Authoritative course associations are blocked by BPR-001. |
-| AFR-LMS-001.2 | The system shall display the course syllabus, schedule, instructor(s), and TA(s) on the course home page. | selectors + services | selectors/scoping.py; services/workspaces.py::open_workspace | Authoritative course associations are blocked by BPR-001. |
-| AFR-LMS-001.3 | The system shall restrict a course workspace to users enrolled in, assigned to, or linked to that specific course. | selectors + services | selectors/scoping.py; services/workspaces.py::open_workspace | Authoritative course associations are blocked by BPR-001. |
+| AFR-LMS-001.1 | The system shall open a dedicated course workspace when a user selects a course for which the user has authorized course access. | selectors + services | selectors/scoping.py; services/workspaces.py::open_workspace | Use the verified IAM offering/association contract; only the acting role's scoped associations authorize. |
+| AFR-LMS-001.2 | The system shall display the course syllabus, schedule, instructor(s), and TA(s) on the course home page. | selectors + services | selectors/scoping.py; services/workspaces.py::open_workspace | Use the verified IAM offering/association contract; only the acting role's scoped associations authorize. |
+| AFR-LMS-001.3 | The system shall restrict a course workspace to users enrolled in, assigned to, or linked to that specific course. | selectors + services | selectors/scoping.py; services/workspaces.py::open_workspace | Use the verified IAM offering/association contract; only the acting role's scoped associations authorize. |
 | AFR-LMS-002.1 | The system shall allow Faculty to configure the course workspace for courses assigned to that Faculty member. | services + models | services/workspaces.py::update_details; models/workspaces.py | Faculty must be assigned to the selected offering. |
 | AFR-LMS-002.2 | The system shall allow Faculty to publish and edit course details for an assigned course workspace. | services + models | services/workspaces.py::update_details; models/workspaces.py | Faculty must be assigned to the selected offering. |
-| AFR-LMS-003.1 | The system shall allow Faculty to add course materials as files, links, or notes. | domain + services + tasks | services/materials.py; domain/releases.py; tasks.py::release_due_materials | Real file support requires the shared-file decision in BPR-005. |
-| AFR-LMS-003.2 | The system shall allow Faculty to organize course materials into modules or weekly sections. | domain + services + tasks | services/materials.py; domain/releases.py; tasks.py::release_due_materials | Real file support requires the shared-file decision in BPR-005. |
-| AFR-LMS-003.3 | The system shall allow Faculty to configure a future release date for course material. | domain + services + tasks | services/materials.py; domain/releases.py; tasks.py::release_due_materials | Real file support requires the shared-file decision in BPR-005. |
-| AFR-LMS-003.4 | When a scheduled material release time is reached, the system shall make that material published/available to authorized course users. | domain + services + tasks | services/materials.py; domain/releases.py; tasks.py::release_due_materials | Real file support requires the shared-file decision in BPR-005. |
+| AFR-LMS-003.1 | The system shall allow Faculty to add course materials as files, links, or notes. | domain + services + tasks | services/materials.py; domain/releases.py; tasks.py::release_due_materials | The shared byte-upload extension/profile is approved and planned for Stage B. |
+| AFR-LMS-003.2 | The system shall allow Faculty to organize course materials into modules or weekly sections. | domain + services + tasks | services/materials.py; domain/releases.py; tasks.py::release_due_materials | The shared byte-upload extension/profile is approved and planned for Stage B. |
+| AFR-LMS-003.3 | The system shall allow Faculty to configure a future release date for course material. | domain + services + tasks | services/materials.py; domain/releases.py; tasks.py::release_due_materials | The shared byte-upload extension/profile is approved and planned for Stage B. |
+| AFR-LMS-003.4 | When a scheduled material release time is reached, the system shall make that material published/available to authorized course users. | domain + services + tasks | services/materials.py; domain/releases.py; tasks.py::release_due_materials | The shared byte-upload extension/profile is approved and planned for Stage B. |
 | AFR-LMS-004.1 | The system shall allow a Student to view published course materials for the Student’s registered course in read-only form. | selectors + API | selectors/materials.py::visible_materials; read-only serializers | Only released material in the actor's course scope. |
 | AFR-LMS-004.2 | The system shall allow a TA to view published course materials for the assigned course in read-only form. | selectors + API | selectors/materials.py::visible_materials; read-only serializers | Only released material in the actor's course scope. |
 | AFR-LMS-004.3 | The system shall allow an Observer to view published course materials for the linked course in read-only form. | selectors + API | selectors/materials.py::visible_materials; read-only serializers | Only released material in the actor's course scope. |
@@ -71,16 +79,16 @@ All 103 live IDs are listed once: 15 CFRs, 47 AFRs, 19 BRs, 15 UCs, five BWs and
 | AFR-LMS-012.2 | The system shall present released grade and feedback to the Student in read-only form. | selectors + API | selectors/grades.py::own_released_grades; read-only serializers | Student reads only their own Released grade. |
 | AFR-LMS-013.1 | When a released grade is changed, the system shall record who made the change. | services + models | services/grading.py::change_released_grade; GradeAuditLog | Original actor/time obligation plus separately attributed D-06 extension. |
 | AFR-LMS-013.2 | When a released grade is changed, the system shall record when the change was made. | services + models | services/grading.py::change_released_grade; GradeAuditLog | Original actor/time obligation plus separately attributed D-06 extension. |
-| AFR-LMS-014.1 | The system shall allow a TA to view course details, published materials, and announcements for the assigned course. | registry + domain + selectors | registry.py; domain/capabilities.py; selectors/scoping.py | TA designation unresolved; never grant authoring as a workaround. |
-| AFR-LMS-014.2 | The system shall allow a TA to view Student submissions for the assigned course. | registry + domain + selectors | registry.py; domain/capabilities.py; selectors/scoping.py | TA designation unresolved; never grant authoring as a workaround. |
-| AFR-LMS-014.3 | The system shall prevent a TA from creating or editing assignments. | registry + domain + selectors | registry.py; domain/capabilities.py; selectors/scoping.py | TA designation unresolved; never grant authoring as a workaround. |
-| AFR-LMS-014.4 | The system shall prevent a TA from creating or editing course materials. | registry + domain + selectors | registry.py; domain/capabilities.py; selectors/scoping.py | TA designation unresolved; never grant authoring as a workaround. |
-| AFR-LMS-014.5 | The system shall prevent a TA from modifying course structure. | registry + domain + selectors | registry.py; domain/capabilities.py; selectors/scoping.py | TA designation unresolved; never grant authoring as a workaround. |
+| AFR-LMS-014.1 | The system shall allow a TA to view course details, published materials, and announcements for the assigned course. | registry + domain + selectors | registry.py; domain/capabilities.py; selectors/scoping.py | Use provisioned lms_ta plus per-offering TA association; no authoring permissions. |
+| AFR-LMS-014.2 | The system shall allow a TA to view Student submissions for the assigned course. | registry + domain + selectors | registry.py; domain/capabilities.py; selectors/scoping.py | Use provisioned lms_ta plus per-offering TA association; no authoring permissions. |
+| AFR-LMS-014.3 | The system shall prevent a TA from creating or editing assignments. | registry + domain + selectors | registry.py; domain/capabilities.py; selectors/scoping.py | Use provisioned lms_ta plus per-offering TA association; no authoring permissions. |
+| AFR-LMS-014.4 | The system shall prevent a TA from creating or editing course materials. | registry + domain + selectors | registry.py; domain/capabilities.py; selectors/scoping.py | Use provisioned lms_ta plus per-offering TA association; no authoring permissions. |
+| AFR-LMS-014.5 | The system shall prevent a TA from modifying course structure. | registry + domain + selectors | registry.py; domain/capabilities.py; selectors/scoping.py | Use provisioned lms_ta plus per-offering TA association; no authoring permissions. |
 | AFR-LMS-015.1 | The system shall allow an Observer to view course details, published materials, and announcements for the linked course in read-only form. | registry + selectors + API | registry.py; selectors/scoping.py; audience-specific serializers | D-04 course linkage; no student-specific reads or any writes. |
 | AFR-LMS-015.2 | The system shall prevent an Observer from viewing individual Student submissions. | registry + selectors + API | registry.py; selectors/scoping.py; audience-specific serializers | D-04 course linkage; no student-specific reads or any writes. |
 | AFR-LMS-015.3 | The system shall prevent an Observer from viewing grades or any other Student-specific data. | registry + selectors + API | registry.py; selectors/scoping.py; audience-specific serializers | D-04 course linkage; no student-specific reads or any writes. |
 | AFR-LMS-015.4 | The system shall prevent an Observer from performing write actions anywhere in the LMS Course Management module. | registry + selectors + API | registry.py; selectors/scoping.py; audience-specific serializers | D-04 course linkage; no student-specific reads or any writes. |
-| BR-LMS-001 | A user may access a course workspace only for a course in which the user is enrolled, assigned, or otherwise linked. | selectors + contracts | selectors/scoping.py::accessible_workspaces | BPR-001; out-of-scope resources are 404. |
+| BR-LMS-001 | A user may access a course workspace only for a course in which the user is enrolled, assigned, or otherwise linked. | selectors + contracts | selectors/scoping.py::accessible_workspaces | Verified IAM contract; out-of-scope resources are 404. |
 | BR-LMS-002 | Student course access shall be based on the existing Fusion course-registration data; this module shall not redefine registration/add-drop/waitlist rules. | contracts + selectors | approved IAM course-association contract; selectors/scoping.py | No local enrollment authority or direct ERP connection. |
 | BR-LMS-003 | An Observer may read course details, published materials, and announcements for the linked course, but may not view individual submissions, grades, or other Student-specific data and may not perform any write action. | domain + selectors + API | domain/capabilities.py; audience-specific serializers | D-04; exclude submissions, grades and rosters. |
 | BR-LMS-004 | A TA may view permitted course content, view submissions, grade, and post announcements where permitted, but may not create/edit assignments, materials, or course structure. | registry + domain | registry.py; domain/capabilities.py | D-02; TA read/grade only, with conditional announcements. |
@@ -128,22 +136,28 @@ All 103 live IDs are listed once: 15 CFRs, 47 AFRs, 19 BRs, 15 UCs, five BWs and
 
 All LMS business tables live in `fusion_integrated`. Each aggregate uses `TimeStampedModel`; person-owned submissions use `UserScopedModel`. Every actor/owner/grader reference is a plain integer IAM `user_id`, never a foreign key to a user or another module. Foreign keys below stay within `modules.lms`.
 
-The authoritative offering identifier's final wire type, stability and term/section semantics depend on BPR-001. `external_offering_key` below is a logical field, not an invented supported IAM identifier. Finalize its database representation only after receiving the real contract. Source-owned instructor/TA assignments and membership are not copied into a locally editable LMS authority.
+`CourseWorkspace.id` is an internal integer primary key used as `workspace_id` in module URLs. `external_offering_key` is a unique indexed `CharField(max_length=68)` containing the real IAM contract's `cof_<sha256>` key. The digest encodes version 1 plus exact source course ID, working year, session, semester type and scalar semester ID using canonical JSON; null and empty are distinct. Do not derive a term calendar or match instructor integers to user IDs. Source-owned membership/assignments are not copied into an editable LMS authority.
+
+An idempotent setup/refresh command will initialize workspace scaffolds from paginated IAM offering metadata, preserving Faculty-edited LMS content and using no fictitious human owner for System initialization. It runs during fresh setup and after source catalogue refresh. A missing/unverified course association never becomes a locally editable enrollment; it prevents access. These module setup commands remain planned Stage B work.
 
 | Planned entity | Fields and purpose | Database constraints / invariants |
 |---|---|---|
-| `CourseWorkspace` | Authoritative external offering key; LMS-owned syllabus and schedule text; details publication timestamp; configuring actor ID. Instructor/TA display comes from the approved source and existing user-directory enrichment. | Unique authoritative offering key (`lms_workspace_offering_uniq`); no editable enrollment/assignment fields. Data type blocked by the upstream contract. |
+| `CourseWorkspace` | Internal integer `id`; external 68-character offering key; LMS-owned syllabus/schedule text, details publication time and configuring actor ID (nullable for initial System scaffold). Instructor/TA display is enriched from verified IAM metadata. | Unique `external_offering_key` (`lms_workspace_offering_uniq`); no editable registration or teaching-assignment fields. Never use a user ID of zero to impersonate System. |
 | `CoursePolicyVersion` | Workspace, monotonically increasing version, effective-from UTC timestamp, `can_ta_post_announcements` (default false), policy decision version and author ID. | Unique `(workspace, version)` and `(workspace, effective_from)`; append new versions instead of editing prior policy. Under a workspace row lock, select the latest version effective at the action timestamp. No policy means the documented safe default, not a 500. |
 | `MaterialSection` | Workspace, grouping kind (module or week), label and display order. | Workspace-local relationship; nonnegative order (`lms_section_order_nonnegative`); scoped section IDs validated on writes. |
 | `Material` | Workspace, optional section, content kind FILE/LINK/NOTE, note body/link/file reference, order, state DRAFT/SCHEDULED/PUBLISHED, release time, author ID and publication timestamp. | State/kind check constraints; exactly the payload appropriate to the kind; SCHEDULED requires release time. Section and material workspace must agree, enforced transactionally. Named scope/state/release-time indexes match listing and due-content scans. |
 | `Announcement` | Workspace, content, author ID and server-created timestamp. | Nonempty content validated before insert; author immutable. D-03 requires course-scoped pull visibility only. |
-| `Assignment` | Workspace, instructions, due timestamp, submission kind FILE/TEXT/LINK, points possible, state DRAFT/SCHEDULED/AVAILABLE, optional release timestamp, author and publishing actor IDs. | Kind/state checks; points possible nonnegative (`lms_assignment_points_nonnegative`); required configuration before publication; SCHEDULED requires a release timestamp. No unapproved bonus-score, date-order or withdrawal rule is silently added. |
+| `Assignment` | Workspace, optional display title, instructions, due timestamp, FILE/TEXT/LINK submission kind, points possible, DRAFT/SCHEDULED/AVAILABLE state, optional release time and author/publisher IDs. | Kind/state checks; nonnegative points; the four original publication fields remain required. F-04 edit guards apply transactionally; title is not added as a fifth required publication field. |
 | `Submission` | Workspace-local assignment FK, owner `user_id`, content kind and exactly one file/text/link payload, authoritative `submitted_at`, policy decision version used. A persisted row represents a successfully recorded submission. | Unique `(assignment, user_id)` (`lms_submission_assignment_user_uniq`) implements D-05 under concurrent requests. Payload-kind and local relationship checks; owner/time are server-owned. Rejected validation creates no row and consumes no attempt. |
 | `Grade` | One-to-one local submission FK, points, feedback, state DRAFT/RELEASED, last grader ID/time, releasing Faculty ID/time. | One grade per submission; nonnegative points (`lms_grade_points_nonnegative`); RELEASED requires release actor/time. Student has no write path. No upper-score cap is invented beyond approved policy/source constraints. |
 | `GradeAuditLog` | Local submission FK, actor ID, operation, previous/new score, previous/new feedback, previous/new state, server UTC `changed_at`. | Append-only through the grading service; no update/delete API. Parent rows protected from deletion. Every grading action is attributed; D-06 released edits require all specified before/after fields in the same transaction as the grade update. |
-| `StoredFile` | Workspace and owner ID, opaque storage key, sanitized original name, content-detected media type, size, digest and creation time. Used only by material/submission file variants. | No public storage URL or filesystem path in API output. Opaque unique key; storage outside repository/web root; download authorization follows the parent resource. Core upload writer/type/size validation is currently absent: BPR-005. |
+| `StoredFile` | Workspace/owner ID, opaque storage key, sanitized name, detected media type, size, digest and creation time; referenced by FILE material/submission variants only. | Use the approved module-neutral `core/files/writers.py` extension in Stage B; private storage and validated bytes. Caps: 25,000,000 material bytes / 10,000,000 submission bytes. No public path or executable processing. |
 
 Text/link/file exclusivity and legal-state checks belong in named database `CheckConstraint`s wherever expressible. The submission uniqueness constraint is mandatory even when a service also checks for an existing row. Cross-row rules (same workspace, actor association, grading cap if later approved) belong in the transactional service/domain boundary, not a misleading cross-table check constraint.
+
+### Adopted assignment-edit guards (F-04)
+
+Assigned Faculty may edit instructions and an optional display title. After the first successful submission, submission kind is immutable and due time can remain unchanged or extend: it must be `>= current_due_at` and `>=` all recorded submission timestamps. After any grade exists, points possible is immutable. Forbidden semantic edits receive 422 without state changes. Assignment edits, first submissions and grading use a consistent assignment-first lock order so concurrent operations cannot bypass these guards. No CLOSED assignment state is invented.
 
 ### Transaction boundaries
 
@@ -200,17 +214,19 @@ BW-LMS-04 and BW-LMS-05 differ in the actor of the first grading edge. CW-LMS-02
 
 ## 3.4 — Permissions, registry and actor mapping
 
-### Actor mapping: incomplete and blocking
+### Verified actor mapping and actual course context
 
-| Conceptual actor | Verified platform fact | Binding status |
+| Actor | IAM acting-role value | Additional offering constraint |
 |---|---|---|
-| Student | Basic `student` role exists; use that acting role plus authoritative course registration. | Basic-role mapping available; membership API missing. |
-| Faculty | `faculty` is a basic role per the platform RBAC model; course teaching assignment is an independent scope check. | Basic-role mapping available; assignment API missing. |
-| TA | No TA/Teaching Assistant designation was present in the inspected synthetic catalogue. A Student basic role alone does not grant TA powers. | BPR-002: obtain approved real designation/expressible acting-role model; no invented alias. |
-| Observer | No Observer designation was present in that catalogue. `Auditor` or another similarly named office is not assumed to mean LMS Observer. | BPR-002: obtain approved designation and authoritative section linkage. |
-| System | Scheduled automatic actor, not a human IAM designation. | System-only permission, never granted to a person. |
+| Student | `student` | A current `STUDENT` association read directly from ERP registration. |
+| Faculty | `faculty` | A valid `FACULTY` association. Public-fixture teaching rows are explicitly seeded and marked synthetic, not recovered ERP facts. |
+| TA | `lms_ta` | The real local functional designation is provisioned; require a valid `TA` association in this offering. |
+| Observer | `lms_observer` | The real local functional designation is provisioned; require valid offering-level `OBSERVER` linkage and restrict all data/actions accordingly. |
+| System | No human designation | The internal scheduled-release permission is never granted to a human. |
 
-The following is proposed registry data. The TA/Observer bundles deliberately remain unbound; this is not final deployable `registry.py` and cannot pass approval as a complete four-role grant map until BPR-002 closes.
+Resolve `Principal.active_role` through this exact mapping, not through a union of `Principal.roles` or a client-supplied role. Query IAM associations with the matching `course_role`; a person may have several physical associations but only the selected role authorizes the current action. Unsupported acting roles have no module row scope.
+
+The following is the planned Stage B registry content. Its labels now correspond to real local designations verified during Stage A at `494160849bd101a5cb77a1b1c9f0881307079888`. The LMS registry itself has not yet been implemented.
 
 ```python
 MODULE = {
@@ -251,13 +267,16 @@ SCOPE_PERMISSIONS = ("lms.course.view",)
 _COMMON = ["lms.course.view", "lms.material.view", "lms.announcement.view"]
 _STUDENT = [*_COMMON, "lms.assignment.view", "lms.submission.view",
             "lms.submission.create", "lms.grade.view"]
-_FACULTY = [code for code, _ in PERMISSIONS if code not in SYSTEM_PERMISSIONS]
+_FACULTY = [code for code, _ in PERMISSIONS
+            if code not in SYSTEM_PERMISSIONS and code != "lms.submission.create"]
 _TA = [*_COMMON, "lms.assignment.view", "lms.announcement.create",
        "lms.submission.view", "lms.grade.view", "lms.grade.create", "lms.grade.update"]
 _OBSERVER = [*_COMMON]
 
-ROLE_GRANTS = {"student": _STUDENT, "faculty": _FACULTY}
-# No TA/Observer keys are invented. Bind _TA/_OBSERVER only after BPR-002.
+ROLE_GRANTS = {
+    "student": _STUDENT, "faculty": _FACULTY,
+    "lms_ta": _TA, "lms_observer": _OBSERVER,
+}
 
 NAV_ITEMS = [
     {"code": "lms.courses", "label": "Courses", "icon": "BookOpen",
@@ -275,7 +294,7 @@ The proposed nav routes are the only top-level module pages. Course detail, mate
 
 ## 3.5 — Endpoint list and client integration
 
-All paths below are relative to `/api/v1/lms/`. Every endpoint has `IsAuthenticatedPrincipal`, `HasModuleGrant("lms")` and the listed `HasPermission` check. Services then require the correct acting course role and scoped related IDs; read selectors start from `selectors/scoping.py`. A permission allows a verb, not every row. No Student/Observer serializer includes hidden grading/submission fields.
+All paths below are relative to `/api/v1/lms/`. Every endpoint has `IsAuthenticatedPrincipal`, `HasModuleGrant("lms")` and the listed `HasPermission` check. Services then require the correct acting course role and scoped related IDs; read selectors start from `selectors/scoping.py`. A permission allows a verb, not every row. No Student/Observer serializer includes hidden grading/submission fields. Audience-specific DTOs derive from the trusted acting role and live offering association; they do not use the person's basic kind to union privileges. Read-only capability flags may communicate whether this TA can post announcements without exposing or granting Faculty policy controls.
 
 | Method and relative path | Required permission | Scope, response and source obligations |
 |---|---|---|
@@ -287,7 +306,7 @@ All paths below are relative to `/api/v1/lms/`. Every endpoint has `IsAuthentica
 | `POST courses/{workspace_id}/sections/` | `lms.section.create` | Assigned Faculty creates module/week section; UC-LMS-003. |
 | `PATCH sections/{section_id}/` | `lms.section.update` | Scoped Faculty organization; validate same-course references; UC-LMS-003. |
 | `GET courses/{workspace_id}/materials/` | `lms.material.view` | Audience-specific list; non-Faculty gets Published only; UC-LMS-004. |
-| `POST courses/{workspace_id}/materials/` | `lms.material.create` | Faculty creates FILE/LINK/NOTE material; multipart only for FILE; UC-LMS-003; file path blocked by BPR-005. |
+| `POST courses/{workspace_id}/materials/` | `lms.material.create` | Faculty creates FILE/LINK/NOTE material; multipart only for FILE; UC-LMS-003; approved private file writer/profile is planned for Stage B. |
 | `GET materials/{material_id}/` | `lms.material.view` | Scoped visible material DTO, no storage key; UC-LMS-004. |
 | `PATCH materials/{material_id}/` | `lms.material.update` | Faculty edits/reorganizes; source-policy validation before any state effect; UC-LMS-003. |
 | `POST materials/{material_id}/publish/` | `lms.material.publish` | Explicit immediate/scheduled transition; UC-LMS-003, BW-LMS-01. |
@@ -298,7 +317,7 @@ All paths below are relative to `/api/v1/lms/`. Every endpoint has `IsAuthentica
 | `GET courses/{workspace_id}/assignments/` | `lms.assignment.view` | Student list contains Available only; Faculty/TA operational view is course-scoped; UC-LMS-009. |
 | `POST courses/{workspace_id}/assignments/` | `lms.assignment.create` | Faculty creates a configured Draft; UC-LMS-007. |
 | `GET assignments/{assignment_id}/` | `lms.assignment.view` | Scoped DTO with due date, instructions, submission kind and points possible; UC-LMS-009. |
-| `PATCH assignments/{assignment_id}/` | `lms.assignment.update` | Faculty edits an allowed assignment state; do not invent post-publication edit effects; Q-04. |
+| `PATCH assignments/{assignment_id}/` | `lms.assignment.update` | Faculty edits under adopted F-04 type/points immutability and monotonic due-date guards; failure is 422 with no change. |
 | `POST assignments/{assignment_id}/publish/` | `lms.assignment.publish` | Faculty publishes immediate or scheduled; invalid draft refused; UC-LMS-008. |
 | `POST assignments/{assignment_id}/withdraw/` | `lms.assignment.publish` | Faculty unpublishes a not-yet-released scheduled item; UC-LMS-015 alternative. |
 | `GET assignments/{assignment_id}/download/` | `lms.assignment.view` | Download released instructions/configuration as a plain UTF-8 document; no new PDF dependency; UC-LMS-009. |
@@ -345,26 +364,38 @@ IAM seeding makes the module grantable and publishes its per-role nav; it does n
 
 ## 3.6 — Contracts and shared boundaries
 
-### Required external read contract — unavailable
+### Verified IAM read contract
 
-These are required capabilities for the platform owner to supply, not invented endpoint paths or `IamClient` signatures:
+**Implemented service revision:** `494160849bd101a5cb77a1b1c9f0881307079888` on local IAM `main`. Both actual routes were exercised on `http://127.0.0.1:8001/` with the existing service credential. This is a local verified commit, not a claim of an official upstream merge.
 
-1. Batch retrieval/listing of stable course offerings with term/section identity and course-home display information.
-2. The authenticated principal's authoritative offering-specific Student registration, Faculty assignment, TA assignment and D-04 Observer linkage, with acting-role interpretation and validity/revocation semantics.
-3. Batch enrichment of instructor/TA user IDs through the already supported user-directory operation; avoid per-row requests.
-4. Defined authentication, pagination, absent/missing associations, upstream unavailability, stale/revoked membership handling and supported source revision.
+| Real operation | Filters and envelope | Authorization/freshness facts |
+|---|---|---|
+| `GET /api/iam/v1/academics/course-offerings` | Optional `offering_keys` (max 200), `limit` 1–200 (default 50), nonnegative `offset`; returns `results`, full filtered `count`, `limit`, `offset`. | Existing service-token auth only. Offering metadata has `offering_key`, source course/term fields, syllabus, freshness and origin, instructor/TA user IDs and individually provenance-labelled `staff_associations`; no Student roster or Observer list. |
+| `GET /api/iam/v1/academics/course-associations` | Required numeric `user_ids` (max 500), optional `offering_keys` (max 200), optional exact `course_role`, same pagination. Each result contains `user_id`, `offering_key`, `course_role`, `source_origin`. | Student rows are live `fusion_registration` facts. Current explicitly seeded nonstudent fixture bindings are `synthetic_fixture`, with revocation/validity and real designation checks. Missing/inactive source/IAM identity does not authorize. |
 
-BPR-001 closes only when a real supported contract is identified or delivered on official IAM main. A fake client endpoint and tests against fabricated memberships are not substitutes. Do not query or write the ERP from LMS. On unavailable/unverifiable associations, do not expose the workspace or authorize a write. The precise outage status and error code must follow the owner/platform contract; they are not guessed here. Do not authorize from a stale local editable membership cache.
+The 68-character key encoding and null semantics are fixed in the service's contract tests. Existing registrations supply the context; the fixture's absent semester/instructor tables are not fabricated. Module-only teaching/TA/Observer data are explicitly synthetic and must not be presented as recovered production teaching facts. A real production teaching-source adapter remains outside this local Stage A delivery.
+
+Stage A synchronized 3,686 offering contexts, provisioned the real local `lms_ta`/`lms_observer` markers and three labelled synthetic nonstudent associations, passed all 341 PostgreSQL IAM tests, and preserved all 117,264 source registration rows byte-for-byte under the recorded ordered-row digest. Live HTTP evidence and the exact code/authorization hashes are retained outside the repository.
+
+Planned Integrated client additions now target these real routes: batched `get_course_offerings` and `get_course_associations`. Fetch all pages for a bounded request, preserve the explicit role filter, and never authorize a partial first page as the whole scope. Student enrollment changes take effect in the live association read. An unavailable source or unsynchronized newly seen context returns 503 rather than a false empty success. Upstream service-auth failure is a dependency/configuration problem, not a reason to misidentify the person's login as invalid; fail closed without exposing content.
+
+Selectors obtain the acting person's complete allowed offering-key set before narrowing local querysets. Related body IDs must belong to that same scope. No membership cache becomes an editable source of truth. Enrich permitted instructor/TA display contacts in batches through the existing directory client; expose no unrelated identity/academic fields or Student-specific data to Observers.
+
+Read `docs/lms-course-contract.md` at the pinned IAM revision for exact wire examples, source synchronization, synthetic opt-ins and verification commands. Later tests may stub this now-implemented interface; no unsupported fake endpoint is introduced first.
 
 ### Planned LMS exports
 
 No supplied requirement names a consuming module or asks LMS to publish grades to Examination. Therefore the initial `contracts.py` has no invented cross-module grade export or registration API. If a supported consumer is subsequently identified, expose only an approved minimal DTO through a plural getter accepting a sequence of IDs; do not let the caller import models, selectors or services. This choice satisfies the plural-getter rule without introducing an unused singular API.
 
-### File capability drift — BPR-005
+### Approved shared byte-upload extension — planned Stage B work
 
-PS §§3.2/3.5, AFR-LMS-003.1/008.1 and UC-LMS-003/010 require genuine file content in addition to link/text variants. Current `core/files/validators.py` sanitizes names only, and `core/files/storage.py` is explicitly read-only legacy storage. The Drive-link parser cannot stand in for a file-upload implementation without an approved specification change.
+The staged decision approves module-neutral `core/files/writers.py`; the existing legacy read-only storage and Drive-link parser remain unchanged. The writer must be independent of `modules` and `fusion_auth`, return a stored-file descriptor, and validate actual content/container signatures without executing or extracting uploads. Use the approved standard-library validation approach; no `python-magic` or other new dependency is authorized or required.
 
-Proposed additional shared change for explicit approval: extend `core/files` with a module-neutral validated byte-upload writer, content-based media/type and configured-size checks, opaque storage keys, private roots and authorized parent downloads. Keep LMS metadata/ownership in the module; keep `core` independent of `modules` and `fusion_auth`. Preserve Placement's current read-only/Drive behavior. Specify accepted file types, size limits and root configuration before implementation; no new dependency is approved or selected by this draft. An approved supported external upload service is an alternative only if it preserves the genuine FILE semantics and its contract is supplied.
+The adopted profile permits `.pdf`, `.zip`, `.tar.gz`, `.txt`, `.docx`, `.ipynb`; it blocks direct `.exe`, `.sh`, `.bat`, `.py`, `.html`, `.svg` uploads and refuses format/extension mismatches. Limits are 25,000,000 bytes for materials and 10,000,000 bytes for submissions. This is an adopted technical profile, not an assertion that the original PS contained an extension allowlist.
+
+Configure a private `MEDIA_ROOT` outside the repository/web root, defaulting under `~/.local/share/fusion-integrated/`; the writer stores `private/lms/<year>/<opaque-key>`. Do not expose this root through a public media URL. Parent-authorized Django attachment streaming uses a sanitized filename, no user-controlled path traversal and no executable rendering. Staging/storage failures leave no successful submission or consumed attempt and clean up newly created bytes.
+
+This shared change is approved but not implemented during Stage A. It is part of the proposed Stage B implementation after final LMS blueprint approval. File metadata and authorization belong to LMS; byte storage/validation stays in `core` and must preserve Placement behavior.
 
 ### Planned shared registration changes
 
@@ -372,42 +403,41 @@ Use only the builder prompt's preapproved registration changes for app, URL, cli
 
 ## 3.7 — Scheduled work
 
-| Task / beat entry | Planned cadence and trigger | Guards, repeated-run behavior and failure effect |
+The staged ruling adopts post-commit ETA execution plus a 60-second fallback sweep, capped at 50 items per invocation. `BEAT_SCHEDULE` and `TASK_ROUTES` are owned by the module and merged in `config/celery.py`. No user holds `lms.content.publish`.
+
+| Planned task | Trigger and bounds | Transaction and failure behavior |
 |---|---|---|
-| `lms.release_due_materials` / `lms.release-due-materials` | Proposed 15-second bounded catch-up scan; request an ETA execution after a committed scheduling change where the existing broker contract permits it. | Only still-SCHEDULED, valid, due materials. Lock/re-read each candidate and use the ordinary material transition service. Early, withdrawn, repeated or competing runs create no extra transition/audit. Worker failure leaves content unavailable and records operational failure, per UC-LMS-015. |
-| `lms.release_due_assignments` / `lms.release-due-assignments` | Same proposed cadence and post-commit due-time dispatch strategy. | Only still-SCHEDULED assignments whose release condition is met. Same transactional choke point; no duplicate publication. Failure keeps content unavailable and is recorded. |
+| `lms.release_due_materials` | Schedule due execution after commit when Faculty sets `release_at`; 60-second catch-up sweep, at most 50 due items. | Lock and re-read current state/time, then use the ordinary transition service. A stale ETA after a changed time cannot publish early; withdrawn or already-published rows do not transition again. |
+| `lms.release_due_assignments` | Same ETA plus bounded 60-second recovery pattern. | Same service choke point; two sequential/concurrent workers produce no duplicate transition or audit. Missing processing leaves content unavailable and records operational failure per UC-LMS-015. |
 
-`BEAT_SCHEDULE` and `TASK_ROUTES` are exported from the module's `schedule.py` and merged through `config/celery.py`; human roles never hold the system release permission. Use bounded batches and record IDs/counts/failures, not bodies or personal names. No Student request invokes the System permission. Selectors remain reads; they do not secretly publish content during GET.
+Broker-dispatch failure must be recorded and the fallback scan must recover still-scheduled due rows. Document worker/beat requirements, broker ETA configuration, queue choice and observed release latency; a scheduled timestamp is not a promise of availability while workers are down. Tasks operate on database IDs, not serialized content or caller-supplied privileges. Selectors remain reads and do not secretly publish content on GET.
 
-The exact cadence/queue and ETA-dispatch failure path are design proposals for blueprint approval, not source-mandated timing numbers. Normal release is triggered at the configured timestamp by the worker; recovery scans catch missed dispatches. Operational latency and worker/beat availability must be documented; if timing cannot meet the required interpretation, record a gap instead of pretending immediate release during an outage. Both tasks must pass sequential double-run and concurrent double-run tests.
+D-03 needs no outbound notification job. D-01 validates the deadline during submission, without inventing an expiry/CLOSED state. D-05 needs no attempt-reset job.
 
-D-03 requires no notification delivery task, outbox mailer, push/SMS integration or new notification UI. D-01 validates deadlines at submission time; no invented expiry task or CLOSED assignment state is needed. D-05 uses successful-row uniqueness, not an attempt-reset timer.
+Deployment sequence: approved configuration/private root → migrations → idempotent workspace scaffold refresh from IAM → default effective policy seed → module registration → generated manifest and IAM permission seed → readiness → worker/beat → API/client. Source refresh and workspace synchronization must not overwrite Faculty-authored details. Every command must be idempotent and fresh setup must work without manual ORM changes. These module commands and jobs remain unimplemented Stage B deliverables.
 
-Deployment sequence: approved dependencies/configuration → migrations → idempotent baseline policy seed → module registration → generated manifest and IAM permission seed → readiness → worker and beat → API/client. A fresh database must support first use without manual ORM work. The environment baseline's existing Placement worker configuration is not proof that LMS tasks or readiness have been implemented.
+## 3.8 — Approvals, remaining decisions and readiness
 
-## 3.8 — Open questions, approvals and readiness
+### Recorded adopted decisions
 
-### Adoption record
+D-01–D-06 remain adopted under their original formal ruling. The later staged decision, SHA-256 `2c887167c5a212a04f36245cc5b0da56f4d3edb50e6719421fe4553898ebf1a1`, additionally authorizes Stage A, the real local `lms_ta`/`lms_observer` model with mandatory module/permission/scope gates, the F-03 shared file profile, F-04 edit guards and F-05 ETA/60-second/50-item scheduling pattern. It endorses `lms` and `docs/10-lms/` as working pair values without claiming separate instructor confirmation.
 
-D-01 through D-06 are recorded as adopted in the supplied formal ruling, with exact evidence hash in the header. They close the six policy-choice proposals at the pair level. They do not approve this blueprint, supply IAM endpoints, provision missing designations, authorize a shared file writer, or establish an implementation score.
-
-| Open item | Required closure before implementation / final approval |
+| Item | Revised status and evidence |
 |---|---|
-| BPR-001 — Course-association contract | Real supported owner contract and official source revision; offering keys, all four associations, display metadata, batch semantics, revocations and failure behavior. No local authority/fake endpoint workaround. |
-| BPR-002 — Actors and identifiers | Instructor confirmation of code/docs number; real TA/Observer designation mapping or an explicitly approved platform-supported alternative. Pair endorsement alone does not establish instructor assignment or role availability. |
-| BPR-004 — Exact blueprint approval | Complete the remaining blocked design details, identify this version/hash or the student's documentation commit, and obtain the actual approver's dated written decision. No approval is represented by this draft. |
-| BPR-005 — Genuine file support | Approve the specified shared-kernel extension or supply a supported equivalent contract; settle file profile/limits/root and separately approve any new dependency. |
-| Q-04 — Assignment edit effects not settled by v1.0 | Confirm whether already-available assignments may be edited and what happens to existing submissions. Scheduled withdrawal before release is explicitly supported. Material edits preserve the current publication state unless a separately supported scheduling operation is selected; Published-material withdrawal is not added. Do not invent a CLOSED lifecycle or silently change due dates after submissions. |
-| Q-05 — Timing and publication behavior | Approve task cadence/queue, due-time dispatch and failure/recovery behavior consistent with UC-LMS-015, including observable scheduling latency. |
+| BPR-001 — Real course contract | Stage A delivered on local IAM main `494160849bd101a5cb77a1b1c9f0881307079888`; both service-authenticated routes returned HTTP 200. The service uses actual registrations and explicitly labelled synthetic nonstudent bindings; no LMS ERP connection or fabricated client endpoint exists. |
+| BPR-002 — Roles and working identifiers | Real local `lms_ta` and `lms_observer` functional designations provisioned through IAM's existing path; actor bundles are now bound in the proposed registry. Working identifiers are pair-endorsed, not falsely attributed to an instructor. |
+| BPR-003 — D-01–D-06 | Adopted; preserve exact evidence and source-versus-policy distinctions. |
+| BPR-005 — Shared byte writer | Design/profile explicitly approved. Implementation and checks remain Stage B work, not a claim that `core/files/writers.py` already exists. |
+| Q-04 — Assignment edit effects | Resolved by adopted F-04 monotonic due time, type immutability after first submission, points immutability after first grade, and Faculty instruction/title edits. |
+| Q-05 — Scheduled execution | Resolved at design level by adopted ETA plus 60-second/50-item catch-up, with lock/re-read/idempotency. Actual execution and failure evidence remains Stage B testing. |
+| BPR-004 — Final blueprint approval | **Still pending.** Stage A authorization is not final authorization for LMS application code. The actual approver must review version 0.2 and the Stage A evidence/commit and give a dated decision identifying this exact revision. |
 
-The formal ruling says 400 for omitted required request fields and 422 for semantic failures; the API section preserves that distinction. D-01's inclusive exact deadline is recorded as an adopted clarification to the source's general “before due date” language. Old/new score/feedback audit fields and Faculty-only retained-Released edits are D-06 additions, not requirements falsely attributed to unchanged BR-LMS-019 alone.
+### Remaining evidence and review boundaries
 
-### Planned validation and review handoff
+The real IAM prerequisite is locally committed and tested. No official upstream merge or production teaching adapter is claimed. All deployment/testing uses only synthetic data. The original instructor-confirmation status is recorded transparently as pending external confirmation, rather than blocking pair work that the staged ruling explicitly endorses.
 
-After prerequisites and blueprint approval, implement bottom-up using module-local `domain/`, `models/`, `selectors/`, `services/`, `api/`, registry and schedules, followed by client pages. Every live UC must have an HTTP-level journey with its explicit success/alternative/exception obligations, with exact source IDs. Include D-01 equality/before/after clocks, D-05 rejected-versus-successful attempt consumption and concurrent duplicates, D-06 rollback/attribution/released visibility, all actor/scope refusals, scheduled withdrawal/failure/repeated/concurrent runs and query budgets. These are planned builder checks, not completed Student 2 frozen designs.
+The four original JSON design outputs remain preliminary historical artifacts. No official Step 8 design freeze/automation, LMS builder test suite, implementation review round or 10/10 score is represented by this blueprint. Stage A's 341 IAM tests are prerequisite regression checks, not LMS spec tests.
 
-Run the exact gates in the current official builder/review prompt, including backend/client/browser checks, real PostgreSQL and required coverage, controlled mutation checks, deployment readiness and fresh-database behavior. Record every actual review output and round; do not assign a 10/10 score here. Students perform any commit/push/PR actions themselves under the assignment's rules. No publishing is authorized by this document.
+After actual final approval, implement bottom-up in the module layers and approved shared file extension. Every live UC needs HTTP journeys for its source-defined success/alternative/exception flows. Planned checks include: inclusive UTC deadline boundaries; rejected-versus-successful attempt consumption; concurrent duplicate submissions; source/scope/acting-role isolation; grade/audit transaction rollback; released visibility; approved file limits/formats/download authorization; F-04 edit/grading/submission races; scheduled withdrawal/failure/repeated/concurrent runs; query budgets; client five-state/page guards; the official coverage, mutation and fresh-install gates. These checks are planned, not reported as executed LMS tests.
 
-Student 2's official spec-only design/automation process starts at its required milestone and uses fresh contexts plus only its permitted source artifacts. The original specifications remain unchanged; policy clarifications and their provenance remain distinguishable. No preliminary test, score or different assignment's implementation is backdated into that sequence.
-
-**Current conclusion:** all 103 specification IDs have a planned design location, but this version is not ready for implementation approval while its upstream, role and file-support dependencies remain unresolved.
+Local commits are handled under the user's later explicit authorization; push/PR still requires separate user review. Actual final blueprint approval is the next gate, not an inferred result of this documentation update.
