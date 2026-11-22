@@ -1,0 +1,164 @@
+﻿[
+  {
+    "test_id": "BR-001",
+    "source_id": "BR-CMS-001 / BR-CMS-003 / BR-CMS-006",
+    "purpose": "Verify accepted complaint submission succeeds anytime, records submission timestamp, and assigns a unique identifier across submissions.",
+    "preconditions": "Authenticated Complainant.",
+    "action_or_input": "Submit two valid complaints sequentially.",
+    "expected_result": "Both complaints succeed with non-null submission timestamps and distinct unique complaint identifiers.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-002",
+    "source_id": "BR-CMS-002",
+    "purpose": "Verify complaint submission is refused when mandatory category or description is missing or blank.",
+    "preconditions": "Authenticated Complainant.",
+    "action_or_input": "Submit complaint with empty category or empty description.",
+    "expected_result": "Submission is refused and no complaint is persisted.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-003",
+    "source_id": "BR-CMS-004 / BR-CMS-005",
+    "purpose": "Verify attachment validation enforces configured file-type, file-size, and count constraints.",
+    "preconditions": "Authenticated Complainant and configured attachment settings.",
+    "action_or_input": "Upload an attachment matching configured rules, and attempt uploading an invalid extension or oversized file.",
+    "expected_result": "Valid attachment is accepted; invalid extension or oversized file is refused.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-004",
+    "source_id": "BR-CMS-007 / BR-CMS-008 / BR-CMS-010",
+    "purpose": "Verify submitted complaints start unassigned (no automatic assignment) and require manual handler assignment and categorization.",
+    "preconditions": "New complaint is submitted; active Complaint Handler exists.",
+    "action_or_input": "Check newly submitted complaint before handler action, then manually assign and categorize as Handler.",
+    "expected_result": "Initial complaint has no automatic handler assignment; after manual setup, assignment and category are recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-005",
+    "source_id": "BR-CMS-009 / BR-CMS-010",
+    "purpose": "Verify complaint priority accepts Low, Medium, and High and rejects any other priority value.",
+    "preconditions": "Active Complaint Handler and submitted complaint exist.",
+    "action_or_input": "Set priority to Low, Medium, High, and then attempt an unsupported value like Urgent.",
+    "expected_result": "Low, Medium, and High succeed and persist; unsupported value is refused.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-006",
+    "source_id": "BR-CMS-011 / BR-CMS-012",
+    "purpose": "Verify CMS enforces valid lifecycle states (Submitted, In Progress, Resolved, Rejected, Closed) and records status and progress history.",
+    "preconditions": "Complaint exists in Submitted state.",
+    "action_or_input": "Progress complaint through valid lifecycle transitions and attempt an invalid direct transition (e.g., Submitted directly to Closed).",
+    "expected_result": "Valid transitions record status/progress history; unsupported transition is refused.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-007",
+    "source_id": "BR-CMS-013 / BR-CMS-015",
+    "purpose": "Verify a complaint cannot be resolved without resolution details, and valid resolution triggers complainant notification.",
+    "preconditions": "Active Complaint Handler and unresolved complaint exist.",
+    "action_or_input": "Attempt resolution with blank resolution details, then resolve with valid resolution details.",
+    "expected_result": "Blank resolution details are refused; valid resolution persists details and triggers outcome notification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-008",
+    "source_id": "BR-CMS-014 / BR-CMS-015",
+    "purpose": "Verify a complaint cannot be rejected without rejection reason, and valid rejection records reason and triggers notification.",
+    "preconditions": "Active Complaint Handler and unresolved complaint exist.",
+    "action_or_input": "Attempt rejection with blank rejection reason, then reject with valid rejection reason.",
+    "expected_result": "Blank rejection reason is refused; valid rejection persists reason and triggers outcome notification.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-009",
+    "source_id": "BR-CMS-016 / BR-CMS-017",
+    "purpose": "Verify closure verification enforces the configured verifier (Complainant vs Supervisor) and records Closed status only after verification.",
+    "preconditions": "Complaint is in Resolved state.",
+    "action_or_input": "Attempt closure by the wrong role, then verify closure by the configured verifier.",
+    "expected_result": "Wrong role is refused; configured verifier transitions complaint to Closed and records closure.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-010",
+    "source_id": "BR-CMS-018",
+    "purpose": "Verify reopening may be requested only for a Closed complaint by its Complainant, and is refused for non-Closed complaints or other users.",
+    "preconditions": "One complaint in Submitted/Resolved state and one complaint in Closed state.",
+    "action_or_input": "Attempt reopening request on non-Closed complaint, and by a non-owner user on Closed complaint.",
+    "expected_result": "Both invalid reopening attempts are refused.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-011",
+    "source_id": "BR-CMS-019 / BR-CMS-020 / BR-CMS-021",
+    "purpose": "Verify only Complaint Supervisor can decide reopening requests, updating status on approval and auditing every decision.",
+    "preconditions": "Closed complaint with pending reopening request; Handler, Supervisor, and Complainant accounts exist.",
+    "action_or_input": "Handler attempts to decide reopening (refused); Supervisor approves or denies reopening.",
+    "expected_result": "Non-Supervisor decision is refused; Supervisor decision is audited and updates status upon approval.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-012",
+    "source_id": "BR-CMS-022 / BR-CMS-023",
+    "purpose": "Verify feedback is permitted only after resolution or closure by the Complainant, and can be reviewed by Handler and Supervisor.",
+    "preconditions": "One complaint in Submitted state and one in Resolved/Closed state.",
+    "action_or_input": "Attempt feedback on Submitted complaint (refused), submit feedback on Resolved/Closed complaint, and read as Handler/Supervisor.",
+    "expected_result": "Early feedback is refused; post-resolution/closure feedback is accepted and visible to Handler and Supervisor.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-013",
+    "source_id": "BR-CMS-024 / BR-CMS-025",
+    "purpose": "Verify unresolved complaints can be manually escalated with tracked escalation status, while Closed/Rejected complaints cannot.",
+    "preconditions": "One unresolved complaint and one Closed complaint.",
+    "action_or_input": "Escalate unresolved complaint, and attempt to escalate Closed complaint.",
+    "expected_result": "Unresolved complaint records escalation status; Closed complaint escalation is refused.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-014",
+    "source_id": "BR-CMS-026 / BR-CMS-027 / BR-CMS-028 / BR-CMS-029",
+    "purpose": "Verify SLA timelines come from configuration (not hardcoded) and drive idempotent pre-breach reminders and automatic escalation.",
+    "preconditions": "Configured SLA hours and unresolved complaints past reminder and breach thresholds.",
+    "action_or_input": "Run SLA processor twice consecutively.",
+    "expected_result": "Reminder and automatic escalation fire once and are not duplicated on the second run.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-015",
+    "source_id": "BR-CMS-030 / BR-CMS-031",
+    "purpose": "Verify only Handler and Supervisor can publish announcements and configured announcement notifications are triggered.",
+    "preconditions": "Complainant, Handler, and Supervisor accounts exist.",
+    "action_or_input": "Complainant attempts to publish announcement (refused); Handler publishes announcement.",
+    "expected_result": "Complainant is refused; Handler succeeds and triggers announcement notification.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-016",
+    "source_id": "BR-CMS-032 / BR-CMS-033 / BR-CMS-034",
+    "purpose": "Verify report/summary/analytics role gating and notification-trigger-only boundary.",
+    "preconditions": "Complainant, Handler, Supervisor, and System Admin accounts exist.",
+    "action_or_input": "Query reports/summaries across roles and verify notification records remain internal trigger events.",
+    "expected_result": "Unauthorized roles are refused; authorized roles see only allowed CMS scope; notification triggers are recorded cleanly.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-017",
+    "source_id": "BR-CMS-035 / BR-CMS-036 / BR-CMS-037 / BR-CMS-038",
+    "purpose": "Verify System Admin time-bounded role assignment/reassignment enforces single active holder per role and rejects non-CMS roles.",
+    "preconditions": "System Admin and multiple institutional users exist.",
+    "action_or_input": "Assign Handler role to User A, reassign to User B, and attempt invalid role code.",
+    "expected_result": "User B becomes the sole active Handler, User A is deactivated, and invalid role codes are refused.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-018",
+    "source_id": "BR-CMS-039 / BR-CMS-040 / BR-CMS-041",
+    "purpose": "Verify CMS enforces cross-module boundaries (no cross-module foreign keys or external HR/payroll/maintenance execution).",
+    "preconditions": "CMS models and API routes are loaded.",
+    "action_or_input": "Inspect CMS model relations and exposed endpoints.",
+    "expected_result": "Zero foreign keys to external domain tables and zero excluded external service execution endpoints.",
+    "test_type": "boundary"
+  }
+]

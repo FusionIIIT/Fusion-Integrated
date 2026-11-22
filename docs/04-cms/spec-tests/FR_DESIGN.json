@@ -1,0 +1,200 @@
+﻿[
+  {
+    "test_id": "FR-001",
+    "source_id": "CFR-CMS-001 / AFR-CMS-001..004, AFR-CMS-009..010",
+    "purpose": "Verify complete complaint submission records category, description, timestamp, assigns a unique complaint ID, and returns confirmation.",
+    "preconditions": "Authenticated User / Complainant account exists.",
+    "action_or_input": "Submit a complaint with valid category, description, and no attachments.",
+    "expected_result": "Complaint is accepted and persisted with recorded category, description, submission date/time, a unique complaint identifier, and submission confirmation is returned.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-002",
+    "source_id": "CFR-CMS-001 / AFR-CMS-006",
+    "purpose": "Verify mandatory complaint fields are validated before accepting a complaint submission.",
+    "preconditions": "Authenticated User / Complainant account exists.",
+    "action_or_input": "Attempt to submit complaints missing category or missing description.",
+    "expected_result": "Submission is rejected/refused and no complaint record is created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-003",
+    "source_id": "CFR-CMS-001 / AFR-CMS-005, AFR-CMS-007..008",
+    "purpose": "Verify supporting attachments meeting configured file-type, size, and count constraints are accepted with a complaint submission.",
+    "preconditions": "Authenticated User / Complainant account exists and valid attachment constraints are configured.",
+    "action_or_input": "Submit a complaint with valid supporting attachment(s) matching configured extension, size, and count limits.",
+    "expected_result": "Complaint and attachment metadata/files are accepted and stored.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-004",
+    "source_id": "CFR-CMS-001 / AFR-CMS-007..008",
+    "purpose": "Verify attachments violating configured file-type, file-size, or count constraints are rejected before acceptance.",
+    "preconditions": "Authenticated User / Complainant account exists and attachment limits are configured.",
+    "action_or_input": "Attempt to submit a complaint with a disallowed file extension, oversized file, or excess attachment count.",
+    "expected_result": "Submission/attachment is refused and rejected without persisting invalid attachment.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-005",
+    "source_id": "CFR-CMS-002 / AFR-CMS-011..015",
+    "purpose": "Verify Complaint Handler can manually assign, categorize, and set Low/Medium/High priority on a submitted complaint and record these details.",
+    "preconditions": "Active Complaint Handler exists and a complaint is in Submitted state.",
+    "action_or_input": "Handler sets operational assignment, category, and priority (Low, Medium, or High) on the submitted complaint.",
+    "expected_result": "Assignment and priority details are persisted on the complaint for downstream handling, reminders, and escalation.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-006",
+    "source_id": "CFR-CMS-002 / AFR-CMS-013",
+    "purpose": "Verify invalid priority values outside Low, Medium, and High are rejected.",
+    "preconditions": "Active Complaint Handler exists and a submitted complaint exists.",
+    "action_or_input": "Attempt to assign a priority value other than Low, Medium, or High.",
+    "expected_result": "Request is refused with a validation error and complaint priority remains unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-007",
+    "source_id": "CFR-CMS-003 / AFR-CMS-016..021",
+    "purpose": "Verify complainant tracking and handler review/progress updates maintain complete status and progress history throughout lifecycle.",
+    "preconditions": "Submitted complaint exists with assigned Complaint Handler and owning Complainant.",
+    "action_or_input": "Handler reviews assigned complaint and adds progress updates; Complainant queries complaint status and history.",
+    "expected_result": "Both status history and progress history entries are preserved chronologically and visible to the owning Complainant.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-008",
+    "source_id": "CFR-CMS-003 / AFR-CMS-016..017",
+    "purpose": "Verify a complainant cannot track or access another user's private complaint status or history.",
+    "preconditions": "Two distinct Complainants exist; Complainant A owns a submitted complaint.",
+    "action_or_input": "Complainant B requests details/history of Complainant A's complaint.",
+    "expected_result": "Access is refused and Complainant A's complaint data is not disclosed.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-009",
+    "source_id": "CFR-CMS-004 / AFR-CMS-022..026",
+    "purpose": "Verify Complaint Handler can resolve a complaint with required resolution details and notify the Complainant.",
+    "preconditions": "Active Complaint Handler and an unresolved complaint exist.",
+    "action_or_input": "Handler marks the complaint as Resolved with resolution details.",
+    "expected_result": "Complaint transitions to Resolved, resolution details and status history are recorded, and outcome/status notification trigger is created.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-010",
+    "source_id": "CFR-CMS-004 / AFR-CMS-022..026",
+    "purpose": "Verify Complaint Handler can reject a complaint with required rejection reason and notify the Complainant.",
+    "preconditions": "Active Complaint Handler and an unresolved complaint exist.",
+    "action_or_input": "Handler rejects the complaint with rejection details/reason.",
+    "expected_result": "Complaint transitions to Rejected, rejection reason and status history are recorded, and outcome/status notification trigger is created.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-011",
+    "source_id": "CFR-CMS-004 / AFR-CMS-023..024",
+    "purpose": "Verify resolving or rejecting a complaint without required outcome details is refused.",
+    "preconditions": "Active Complaint Handler and an unresolved complaint exist.",
+    "action_or_input": "Handler attempts to resolve without resolution details or reject without rejection reason.",
+    "expected_result": "Action is refused and complaint status remains unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-012",
+    "source_id": "CFR-CMS-005 / AFR-CMS-027..029",
+    "purpose": "Verify resolved complaint closure via Complainant verification or Supervisor verification records Closed status.",
+    "preconditions": "A complaint is in Resolved status and closure verification mode is configured (complainant or supervisor).",
+    "action_or_input": "Authorized verifier (Complainant or Supervisor per configuration) confirms closure verification.",
+    "expected_result": "Complaint status transitions to Closed and closure is recorded in lifecycle history.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-013",
+    "source_id": "CFR-CMS-006 / AFR-CMS-030..034",
+    "purpose": "Verify Complainant can request reopening of a closed complaint and Supervisor can approve or deny it, recording the decision and updating status.",
+    "preconditions": "A complaint is in Closed status; owning Complainant and active Complaint Supervisor exist.",
+    "action_or_input": "Complainant submits a reopening request; Supervisor reviews and approves (and in a separate check denies) the request.",
+    "expected_result": "Reopening decision is recorded; approval reopens the complaint to the configured active state and triggers notification; denial keeps complaint Closed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-014",
+    "source_id": "CFR-CMS-007 / AFR-CMS-035..037",
+    "purpose": "Verify Complainant can submit feedback after resolution or closure and Handler/Supervisor can review submitted feedback.",
+    "preconditions": "A complaint is in Resolved or Closed status.",
+    "action_or_input": "Owning Complainant submits feedback; Complaint Handler and Complaint Supervisor retrieve/review feedback.",
+    "expected_result": "Feedback is persisted, notification event is triggered where applicable, and both Handler and Supervisor can view the feedback.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-015",
+    "source_id": "CFR-CMS-008 / AFR-CMS-038..040",
+    "purpose": "Verify manual escalation of an unresolved complaint records escalation status and allows Supervisor oversight.",
+    "preconditions": "An unresolved complaint exists along with active Complaint Supervisor.",
+    "action_or_input": "Authorized actor manually escalates the unresolved complaint; Complaint Supervisor views escalated complaints.",
+    "expected_result": "Escalation status is recorded, escalation notification is triggered, and complaint appears in Supervisor escalated complaints view.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-016",
+    "source_id": "CFR-CMS-009 / AFR-CMS-041..044",
+    "purpose": "Verify priority-based SLA processing triggers pre-breach reminder notifications and automatically escalates breached unresolved complaints without hardcoded durations.",
+    "preconditions": "SLA durations are configured; unresolved complaints with assigned priority exist past reminder threshold and past breach threshold.",
+    "action_or_input": "Execute SLA processing task.",
+    "expected_result": "Pre-breach reminder notification is triggered for approaching complaint; breached complaint is automatically escalated and escalation notification is triggered.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-017",
+    "source_id": "CFR-CMS-010 / AFR-CMS-045..048",
+    "purpose": "Verify Handler and Supervisor can publish announcements, Complainants can view them, and announcement notifications are triggered.",
+    "preconditions": "Active Complaint Handler, Complaint Supervisor, and Complainant accounts exist.",
+    "action_or_input": "Handler and Supervisor publish complaint-related announcements; Complainant lists/views announcements.",
+    "expected_result": "Announcements are persisted, visible to Complainants, and announcement notification trigger events are created.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-018",
+    "source_id": "CFR-CMS-010 / AFR-CMS-045..046",
+    "purpose": "Verify plain User / Complainant is refused permission to publish announcements.",
+    "preconditions": "Authenticated plain User / Complainant without Handler or Supervisor role.",
+    "action_or_input": "Plain User attempts to publish an announcement.",
+    "expected_result": "Request is refused with authorization error and no announcement is created.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-019",
+    "source_id": "CFR-CMS-011 / AFR-CMS-049..054",
+    "purpose": "Verify role-scoped complaint reports, complaint summaries, escalation summaries, and analytics visibility for Handler, Supervisor, and System Admin.",
+    "preconditions": "Sample complaints and escalations exist; Handler, Supervisor, System Admin, and plain User accounts exist.",
+    "action_or_input": "Each role queries CMS reports/summaries/analytics endpoints.",
+    "expected_result": "Handler accesses operational reports, Supervisor accesses complaint and escalation summaries, System Admin accesses CMS reports/analytics, and plain User is refused.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-020",
+    "source_id": "CFR-CMS-012 / AFR-CMS-055..063",
+    "purpose": "Verify CMS records email notification trigger events for submission, status update, resolution, rejection, escalation, reopening, feedback, and announcements without external email delivery.",
+    "preconditions": "Configured CMS environment.",
+    "action_or_input": "Execute submission, status update, resolution, rejection, escalation, reopening outcome, feedback, and announcement actions.",
+    "expected_result": "Corresponding CMS notification trigger records/events are persisted for each event within CMS boundary.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-021",
+    "source_id": "CFR-CMS-013 / AFR-CMS-064..070",
+    "purpose": "Verify System Admin can assign and reassign time-bounded Complaint Handler and Complaint Supervisor roles while enforcing at most one active holder per role.",
+    "preconditions": "System Admin and institutional user accounts exist.",
+    "action_or_input": "System Admin assigns Handler and Supervisor roles with durations, then reassigns each role mid-cycle to another user.",
+    "expected_result": "Roles are assigned and reassigned cleanly, and at all times at most one active Handler and one active Supervisor exist.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-022",
+    "source_id": "CFR-CMS-014 / AFR-CMS-071..073",
+    "purpose": "Verify CMS confines functionality strictly to complaint-handling scope and exposes no excluded cross-module HR, payroll, accounting, procurement, or platform account administration endpoints.",
+    "preconditions": "CMS URLs and permission manifest are loaded.",
+    "action_or_input": "Inspect registered CMS routes and permissions.",
+    "expected_result": "Only complaint-handling, role-appointment, announcement, feedback, escalation, and reporting capabilities exist.",
+    "test_type": "boundary"
+  }
+]

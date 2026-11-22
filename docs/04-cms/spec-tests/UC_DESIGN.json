@@ -1,0 +1,200 @@
+﻿[
+  {
+    "test_id": "UC-001",
+    "source_id": "UC-CMS-001 Main Flow",
+    "purpose": "Verify Submit Complaint main flow creates a complaint with unique ID, metadata, and optional valid attachment.",
+    "preconditions": "Authenticated User / Complainant.",
+    "action_or_input": "Invoke complaint submission with valid category, description, and valid attachment.",
+    "expected_result": "Complaint is created in Submitted state with unique ID and stored attachment.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-002",
+    "source_id": "UC-CMS-001 Exception Flow",
+    "purpose": "Verify Submit Complaint exception flow rejects missing mandatory fields or invalid attachments.",
+    "preconditions": "Authenticated User / Complainant.",
+    "action_or_input": "Invoke complaint submission with missing mandatory fields or disallowed attachment.",
+    "expected_result": "Submission is refused without creating a complaint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-003",
+    "source_id": "UC-CMS-002 Main Flow",
+    "purpose": "Verify Track Submitted Complaint Status and History returns current state and full history to the complainant.",
+    "preconditions": "Complainant has a submitted complaint with recorded status/progress entries.",
+    "action_or_input": "Complainant retrieves their complaint list and detail/history.",
+    "expected_result": "Current status and chronological status/progress history are returned.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-004",
+    "source_id": "UC-CMS-003 Main Flow",
+    "purpose": "Verify Review Assigned Complaints allows an active Complaint Handler to view their assigned worklist.",
+    "preconditions": "Active Complaint Handler exists and complaints are assigned.",
+    "action_or_input": "Complaint Handler queries assigned complaints list.",
+    "expected_result": "Assigned complaints are returned to the active Handler.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-005",
+    "source_id": "UC-CMS-004 Main Flow",
+    "purpose": "Verify Assign, Categorize, and Prioritize Complaint sets handler assignment, category, and Low/Medium/High priority.",
+    "preconditions": "Active Complaint Handler and a submitted complaint exist.",
+    "action_or_input": "Handler submits handling setup with assignee, category, and priority.",
+    "expected_result": "Complaint records updated handler assignment, category, and priority.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-006",
+    "source_id": "UC-CMS-005 Main Flow",
+    "purpose": "Verify Update Complaint Progress records progress notes and maintains progress history.",
+    "preconditions": "Active Complaint Handler and an active complaint exist.",
+    "action_or_input": "Handler posts a complaint progress update.",
+    "expected_result": "Progress entry is appended to complaint progress history.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-007",
+    "source_id": "UC-CMS-006 Alternative A1 (Resolve)",
+    "purpose": "Verify Resolve Complaint outcome flow transitions complaint to Resolved with resolution details and triggers notification.",
+    "preconditions": "Active Complaint Handler and unresolved complaint exist.",
+    "action_or_input": "Handler resolves complaint with non-empty resolution details.",
+    "expected_result": "Status becomes Resolved, resolution details are saved, and notification trigger is created.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-008",
+    "source_id": "UC-CMS-006 Alternative A2 (Reject)",
+    "purpose": "Verify Reject Complaint outcome flow transitions complaint to Rejected with rejection reason and triggers notification.",
+    "preconditions": "Active Complaint Handler and unresolved complaint exist.",
+    "action_or_input": "Handler rejects complaint with non-empty rejection reason.",
+    "expected_result": "Status becomes Rejected, rejection reason is saved, and notification trigger is created.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-009",
+    "source_id": "UC-CMS-007 Main Flow",
+    "purpose": "Verify User / Complainant closure verification transitions a Resolved complaint to Closed when complainant verification is active.",
+    "preconditions": "Complaint is Resolved and closure verifier is set to complainant.",
+    "action_or_input": "Owning Complainant confirms closure verification.",
+    "expected_result": "Complaint transitions to Closed and history is updated.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-010",
+    "source_id": "UC-CMS-008 Main Flow",
+    "purpose": "Verify Request Complaint Reopening allows Complainant to request reopening on a Closed complaint.",
+    "preconditions": "Complaint is in Closed state.",
+    "action_or_input": "Owning Complainant submits a reopening request with dissatisfaction reason.",
+    "expected_result": "Pending reopening request is recorded against the closed complaint.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-011",
+    "source_id": "UC-CMS-009 Main Flow",
+    "purpose": "Verify Submit Feedback allows Complainant to submit feedback on a Resolved or Closed complaint.",
+    "preconditions": "Complaint is Resolved or Closed.",
+    "action_or_input": "Owning Complainant submits feedback.",
+    "expected_result": "Feedback record is saved and linked to the complaint.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-012",
+    "source_id": "UC-CMS-010 Main Flow",
+    "purpose": "Verify Review Submitted Feedback allows Complaint Handler and Complaint Supervisor to view feedback.",
+    "preconditions": "Feedback has been submitted on a complaint.",
+    "action_or_input": "Handler and Supervisor query submitted feedback.",
+    "expected_result": "Submitted feedback entries are returned to Handler and Supervisor.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-013",
+    "source_id": "UC-CMS-011 Main Flow",
+    "purpose": "Verify Manually Escalate Unresolved Complaint marks complaint as escalated and triggers notification.",
+    "preconditions": "Complaint is in an unresolved state.",
+    "action_or_input": "Authorized actor triggers manual escalation with reason.",
+    "expected_result": "Complaint is marked escalated and escalation notification trigger is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-014",
+    "source_id": "UC-CMS-012 Main Flow",
+    "purpose": "Verify Monitor Escalated Complaints allows Complaint Supervisor to view all escalated complaints.",
+    "preconditions": "Active Complaint Supervisor and at least one escalated complaint exist.",
+    "action_or_input": "Complaint Supervisor queries escalated complaints.",
+    "expected_result": "Escalated complaints are returned to the Supervisor.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-015",
+    "source_id": "UC-CMS-013 Main Flow",
+    "purpose": "Verify Publish Complaint-Related Announcement allows Handler or Supervisor to publish an announcement.",
+    "preconditions": "Active Complaint Handler or Complaint Supervisor.",
+    "action_or_input": "Publish complaint announcement with title and body.",
+    "expected_result": "Announcement is saved and notification trigger event is created.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-016",
+    "source_id": "UC-CMS-014 Main Flow",
+    "purpose": "Verify View Complaint-Related Announcements allows Complainants to read published announcements.",
+    "preconditions": "At least one published announcement exists.",
+    "action_or_input": "Complainant lists complaint announcements.",
+    "expected_result": "Published announcements are returned.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-017",
+    "source_id": "UC-CMS-015 / UC-CMS-016 / UC-CMS-017 Main Flow",
+    "purpose": "Verify operational reports, complaint/escalation summaries, and CMS analytics work for Handler, Supervisor, and System Admin.",
+    "preconditions": "Complaints exist in the database; Handler, Supervisor, and System Admin accounts exist.",
+    "action_or_input": "Handler generates operational report; Supervisor views complaint and escalation summaries; Admin views CMS reports and analytics.",
+    "expected_result": "Each authorized role receives its corresponding report/summary/analytics payload.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-018",
+    "source_id": "UC-CMS-018 Main Flow",
+    "purpose": "Verify Manage CMS Roles allows System Admin to assign and reassign time-bounded Handler and Supervisor roles.",
+    "preconditions": "System Admin and institutional users exist.",
+    "action_or_input": "System Admin assigns Handler and Supervisor roles with duration, then reassigns them.",
+    "expected_result": "Active role assignments reflect the latest holder and prior holder is deactivated.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-019",
+    "source_id": "UC-CMS-019 Main Flow",
+    "purpose": "Verify Supervisor closure verification transitions a Resolved complaint to Closed when supervisor verification is configured.",
+    "preconditions": "Complaint is Resolved and closure verifier is set to supervisor.",
+    "action_or_input": "Active Complaint Supervisor verifies closure.",
+    "expected_result": "Complaint transitions to Closed and history is updated.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-020",
+    "source_id": "UC-CMS-020 Main Flow & Alternative (Approve / Deny)",
+    "purpose": "Verify Review Complaint Reopening Request handles both Supervisor approval (reopening complaint) and denial (keeping Closed).",
+    "preconditions": "Closed complaint with a pending reopening request and active Complaint Supervisor.",
+    "action_or_input": "Supervisor approves a reopening request on one complaint and denies a reopening request on another.",
+    "expected_result": "Approved complaint reopens to configured status; denied complaint stays Closed; both decisions are audited.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-021",
+    "source_id": "UC-CMS-021 Main Flow",
+    "purpose": "Verify Trigger Pre-Breach SLA Reminder sends a reminder notification when an unresolved complaint nears its SLA deadline.",
+    "preconditions": "Unresolved complaint with priority and configured SLA hours has reached the reminder window.",
+    "action_or_input": "Run SLA processor.",
+    "expected_result": "Pre-breach reminder notification trigger is recorded without duplicate triggers on re-run.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-022",
+    "source_id": "UC-CMS-022 Main Flow",
+    "purpose": "Verify Automatically Escalate Complaint on SLA Breach escalates an unresolved complaint once SLA duration expires.",
+    "preconditions": "Unresolved complaint with priority and configured SLA hours has exceeded its SLA deadline.",
+    "action_or_input": "Run SLA processor.",
+    "expected_result": "Complaint is automatically escalated and escalation notification trigger is recorded.",
+    "test_type": "positive"
+  }
+]

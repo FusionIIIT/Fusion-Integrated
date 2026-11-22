@@ -1,0 +1,74 @@
+﻿[
+  {
+    "test_id": "WF-001",
+    "source_id": "BW-CMS-01 / CW-CMS-01 (Intake to Resolved)",
+    "purpose": "Verify end-to-end workflow path from complaint submission through handler assignment/progress to Resolved state.",
+    "preconditions": "Complainant and active Complaint Handler accounts exist.",
+    "action_or_input": "Submit complaint -> assign handler/category/priority -> post progress update -> resolve with resolution details.",
+    "expected_result": "Complaint transitions cleanly to Resolved with full status and progress audit history.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-002",
+    "source_id": "BW-CMS-02 / CW-CMS-01 (Intake to User-Verified Closure)",
+    "purpose": "Verify complete workflow path from intake to Closed via User / Complainant closure verification.",
+    "preconditions": "Closure verifier configured as complainant; Complainant and Handler exist.",
+    "action_or_input": "Submit complaint -> handle and resolve -> Complainant verifies closure.",
+    "expected_result": "Complaint reaches Closed state with recorded complainant verification and notification triggers.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-003",
+    "source_id": "BW-CMS-03 / CW-CMS-01 (Intake to Supervisor-Verified Closure)",
+    "purpose": "Verify complete workflow path from intake to Closed via Complaint Supervisor closure verification.",
+    "preconditions": "Closure verifier configured as supervisor; Complainant, Handler, and Supervisor exist.",
+    "action_or_input": "Submit complaint -> handle and resolve -> Supervisor verifies closure.",
+    "expected_result": "Complaint reaches Closed state with recorded supervisor verification and notification triggers.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-004",
+    "source_id": "BW-CMS-04 / CW-CMS-01 (Intake to Rejection)",
+    "purpose": "Verify workflow path from complaint submission to Rejected outcome with required rejection reason.",
+    "preconditions": "Complainant and active Complaint Handler exist.",
+    "action_or_input": "Submit complaint -> assign handler -> reject complaint with rejection reason.",
+    "expected_result": "Complaint transitions to Rejected, rejection reason is stored, and rejection notification is triggered.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-005",
+    "source_id": "BW-CMS-05 / CW-CMS-02 (Reopening Request Denied)",
+    "purpose": "Verify reopening decision workflow when Supervisor denies a Complainant's reopening request.",
+    "preconditions": "Closed complaint exists; Complainant and active Complaint Supervisor exist.",
+    "action_or_input": "Complainant requests reopening -> Supervisor denies reopening request.",
+    "expected_result": "Denial decision is recorded and complaint remains in Closed state.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-006",
+    "source_id": "BW-CMS-06 / CW-CMS-02 (Reopening Request Approved)",
+    "purpose": "Verify reopening decision workflow when Supervisor approves a Complainant's reopening request.",
+    "preconditions": "Closed complaint exists; Complainant and active Complaint Supervisor exist.",
+    "action_or_input": "Complainant requests reopening -> Supervisor approves reopening request.",
+    "expected_result": "Approval decision is recorded, complaint reopens to configured active state, and notification is triggered.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-007",
+    "source_id": "BW-CMS-07 / CW-CMS-03 (Manual Escalation Path)",
+    "purpose": "Verify manual escalation workflow path for an unresolved complaint.",
+    "preconditions": "Unresolved complaint and active Complaint Supervisor exist.",
+    "action_or_input": "Manually escalate unresolved complaint -> Supervisor inspects escalated complaints list.",
+    "expected_result": "Complaint is marked manually escalated, appears in Supervisor oversight list, and triggers escalation notification.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-008",
+    "source_id": "BW-CMS-08 / CW-CMS-03 (Automatic SLA Escalation Path)",
+    "purpose": "Verify automatic SLA escalation workflow path when an unresolved complaint breaches its priority SLA timeline.",
+    "preconditions": "Unresolved complaint with priority and configured SLA hours has breached its deadline.",
+    "action_or_input": "Execute SLA processor task.",
+    "expected_result": "Complaint is automatically escalated, escalation status is recorded, and escalation notification is triggered.",
+    "test_type": "positive"
+  }
+]
