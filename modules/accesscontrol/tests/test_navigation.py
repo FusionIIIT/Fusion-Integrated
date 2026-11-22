@@ -74,9 +74,9 @@ def test_planned_module_is_never_shown_even_if_granted():
 
 def test_seed_modules_retires_a_module_no_code_declares_any_more():
     """Upsert-only seeding leaves a deleted module granted and reachable."""
-    _module(code="hr", status="active")
+    _module(code="retired_module", status="active")
     call_command("seed_modules", stdout=StringIO())
-    assert Module.objects.get(code="hr").status == "deprecated"
+    assert Module.objects.get(code="retired_module").status == "deprecated"
 
 
 def test_seed_modules_drops_a_nav_item_its_registry_no_longer_declares():
