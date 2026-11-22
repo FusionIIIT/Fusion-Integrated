@@ -29,6 +29,35 @@ def test_valid_token_resolves_a_principal(stub_iam):
     assert r.json()["user"]["id"] == 42
 
 
+def test_role_switch_responds_with_the_new_active_role(stub_iam):
+    stub_iam(
+        make_session(
+            user_id=42,
+            kind="staff",
+            active_role="staff",
+            roles=("staff", "hradmin"),
+            permissions=("hreis.service_record.view",),
+            modules=("hreis",),
+        )
+    )
+    c = APIClient()
+    c.credentials(HTTP_AUTHORIZATION="Token abc")
+    changed = c.patch("/api/v1/me", {"active_role": "hradmin"}, format="json")
+    assert changed.status_code == 200
+    assert changed.json()["active_role"] == "hradmin"
+    assert c.get("/api/v1/me").json()["active_role"] == "hradmin"
+
+
+@pytest.mark.parametrize("payload", [{"active_role": ["hradmin"]}, {"active_role": {"role": "hradmin"}}, []])
+def test_malformed_role_switch_is_rejected_without_changing_session(stub_iam, payload):
+    stub_iam(make_session(active_role="staff", roles=("staff", "hradmin"), kind="staff"))
+    client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION="Token abc")
+    response = client.patch("/api/v1/me", payload, format="json")
+    assert response.status_code == 400
+    assert client.get("/api/v1/me").json()["active_role"] == "staff"
+
+
 def test_iam_rejecting_the_token_is_401(stub_iam):
     stub_iam(None)                      # IAM says: not a valid session
     c = APIClient()

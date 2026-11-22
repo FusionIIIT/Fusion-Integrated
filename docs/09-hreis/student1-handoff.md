@@ -1,0 +1,149 @@
+# HR-EIS — Student 1 technical handoff
+
+**Branch:** [module/hreis](https://github.com/keptbeetle/Fusion-Integrated/tree/module/hreis)
+**Working checkout:** `D:\fusion\Fusion-Integrated-A9-HREIS`
+**Date:** 2026-11-22
+**Status:** technical handoff candidate; independent review and formal approvals must be read from the latest quality-report checkpoint.
+
+## Read first
+
+- `hreis-quality-report.md`, section 25: current verification and open boundaries;
+  earlier numbered sections are historical checkpoints.
+- `browser-coverage.md`: all 21 live use-case mappings and isolated test commands.
+- `hreis-blueprint.md`: source interpretation and unresolved institutional choices.
+- `hreis-traceability-status.md`: 193 live IDs, 188 direct builder-test links and
+  six explicit source/integration gaps.
+- `browser-walkthrough.md`: all twelve designations and real request-log evidence.
+- `hreis-reference.md`: generated, validated enforcement links for 193 live IDs.
+- `review-remediation.md`: the initial independent scorecard and candidate fixes.
+- `procedure-deviation.md`: owner's instruction to continue, and the absence of
+  independent written Student 2 approval.
+- `student2-approval-request.md`: unsigned paperwork for later review.
+
+## Implemented journeys
+
+Employees read their official records and verified balances, submit and track
+leave, submit LTC/CPDA advances or reimbursements, and submit annual appraisals.
+Request Details shows the maintained authority history, rejection reasons and
+reported financial status history within the same server-side row scope.
+
+HR creates/revises official records, records verified leave credits, publishes
+immutable effective-dated policy, verifies documentary/eligibility evidence,
+assigns appraisal reviewers, and reads restricted audit/compliance information.
+HOD/current authority forwards or rejects; final authority approves or finalizes
+appraisals into immutable service history. Self-approval is refused.
+
+Accountant correctness review and externally referenced status recording are
+separate permissions. Terminal financial statuses are immutable, and each
+recorded status has an immutable historical entry. Processing can be recorded
+while external status is unavailable, then a later report is appended. These operations record
+externally attested information; they do not execute or verify an actual payment.
+
+Workflow notifications, configured pending-action reminders and policy/deadline
+notices create durable dashboard/outbox evidence. Generation is idempotent and
+does not advance workflow state. The configured email backend is the delivery
+boundary; official SMTP/provider operation is not certified by synthetic tests.
+
+## Reproduce verification
+
+Use the README's Linux/WSL setup, Node 20.19 or a newer supported LTS, PostgreSQL
+and Redis. Supply the local development DB credential in the environment without
+committing it. Run `make check`, `make check-client`, the two coverage commands in
+the quality report, and the production-settings deployment check from CI.
+
+For Chromium use `client/e2e/hreis/run-isolated.sh` as documented in
+`browser-coverage.md`. It requires synthetic IAM on 8001 and free ports 8002/5173.
+It creates, migrates and drops its own database. A temporary synthetic IAM service
+credential is revoked at exit. Never point the fixture opt-in at institutional IAM.
+
+Builder tests are under `modules/hreis/tests`, frontend tests under
+`client/src/modules/hreis`, and browser journeys under `client/e2e/hreis`.
+Raw logs, audit output and previous mutation/mobile evidence are outside Git at
+`D:\HR(EIS)\lab 9\evidence` and the adjacent mutation-results directories.
+
+The unmerged module now has one clean initial migration. Use a fresh database
+for a clean installation; preserve and separately upgrade any older draft data.
+
+## Deferred boundaries
+
+Student 2 communication and written approvals remain deferred at the owner's
+request. No signature, institutional policy ruling or formal review score is
+assumed. The provisional `Accounts Admin` mapping still requires institutional
+confirmation. Actual document storage, finance exchange, provider credentials and
+operational delivery need the external systems described in the source documents.
+
+Student 2's reserved `modules/hreis/tests/spec` and
+`docs/09-hreis/spec-tests` have not been authored or edited by Student 1. The
+independent specification-test phase and final institutional pull request are
+separate from this branch handoff. Do not describe this document as final
+Assignment 9 approval or a production deployment certificate.
+
+## Post-R2 Student 1 technical closure (2026-11-22)
+
+- R2's four reproducible policy, reminder, active-reviewer and acting-role
+  notification defects are now fixed with dedicated backend regression tests.
+- Final `make check`: PASS; `make check-client`: PASS (67/67 frontend tests);
+  branch/statement module coverage 92.25% and domain coverage 95.79%: PASS.
+- Repeated disposable-database Chromium test suite: **58/58 PASS** including
+  the ten independently denied deep links and 21 live HR-EIS use-case mappings.
+  The temporary database and service token were removed at exit; raw backend
+  proof is outside Git in `D:\HR(EIS)\lab 9\evidence\r2-closure-20261122\`.
+- Production-settings Django security check: PASS. Reference/documentation
+  generators are in sync. Technical modifications are detailed in
+  `review-remediation.md` and `hreis-quality-report.md` section 26.
+- External providers, the provisional Accountant mapping, source uncertainties,
+  Student 2's reserved tests, written approval and formal final 10/10 review
+  have **not** been completed or asserted. Communication remains deferred.
+
+## Student 2 share-ready packet (2026-11-22)
+
+Use `student2-review-packet.md` as the up-to-date entry point for Student 2's
+approval and independent-test phase. It links this fork branch, the supplied
+six original specifications, the reproducible gate commands and the
+required written choices. The unsigned `student2-approval-request.md`
+now distinguishes platform-file changes that the module-only review rubric
+cannot waive from shared changes that need an ordinary written decision.
+
+R3's executable technical findings (strict HR-EIS list query validation and
+three continued comments) were addressed in module-owned files. Student 2's
+written approval, the five unresolved live-ID test links, the protected
+shared-file baseline and real external provider contracts remain explicitly
+pending. The handoff is ready for review, **not** certified for a 10/10 merge.
+
+## Verified share-ready checkpoint (2026-11-22)
+
+- `make check`: PASS; `make check-client`: PASS (67/67 and build).
+- `pytest` module coverage: 92.30%; domain coverage: 95.79%; both PASS.
+- Disposable Chromium: 58/58 PASS; synthetic DB dropped, IAM credential
+  revoked. Actual server/migration/readiness logs in
+  `D:\HR(EIS)\lab 9\evidence\R3-20261122-share-ready\`.
+- Strict list input validation and the corrected browser locator are
+  implemented only in allowed HR-EIS module/browser-test paths.
+- Ready to share `student2-review-packet.md` for Student 2's written
+  blueprint/gap decisions and staged test preparation. The formal fresh
+  10/10 review, protected platform-baseline resolution, real external
+  provider contracts and Student 2's independent specs remain open.
+
+## Post-preflight Student 1 scope remediation (2026-11-22)
+
+The rubric-protected Playwright/auth/frontend/dependency files have been
+restored to `upstream/main`; the HR-EIS runner now owns its synthetic IAM
+fixture seed and serial browser execution. All 11 HR-EIS read hooks use
+principal-and-designation-scoped cache keys with 12 passing module-owned
+frontend regression cases. Three documentation utilities moved under
+`docs/09-hreis/scripts/`; directory's broken `get_users` docstring
+was restored. The official upstream review prompt itself was not changed.
+
+Technical checks on the updated implementation: `make check` PASS;
+`make check-client` PASS with 78/78 frontend tests and production build;
+488/488 HR-EIS backend tests at 92.30% coverage, 488/488 domain tests
+at 95.79%, and isolated synthetic Chromium 58/58 PASS. The Chromium run
+used actual server requests; the synthetic DB and token were discarded.
+Local sanitized proof is in
+`D:\HR(EIS)\lab 9\evidence\scope-remediation-20261122-browser\`.
+Only the independent preflight has happened; genuine written approvals,
+the final formal Step 7 review, source/external-policy decisions, and
+the other student's official Step 8 spec tests still remain pending.
+The upstream-pinned frontend dependencies have outstanding audit advisories
+for the platform to triage; they were not silently upgraded on this module
+branch.

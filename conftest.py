@@ -1,6 +1,7 @@
 """Shared fixtures. `stub_iam` replaces the IAM client with an in-memory fake,
 so the suite runs with no network and no Fusion_System_Administrator."""
 import sys
+from dataclasses import replace
 
 import pytest
 
@@ -40,6 +41,16 @@ class FakeIam:
     def resolve_session(self, *, auth_token=None, cookies=None):
         self.calls.append(("resolve_session", auth_token))
         return self.session
+
+    def set_active_role(self, auth_token, role):
+        self.calls.append(("set_active_role", role))
+        if self.session is None or (role and role not in self.session.roles):
+            raise ValueError("The requested role is not held.")
+        current = role or next(
+            (item for item in self.session.roles if item != self.session.kind),
+            self.session.kind,
+        )
+        self.session = replace(self.session, active_role=current)
 
     def get_users(self, user_ids):
         ids = list(user_ids)

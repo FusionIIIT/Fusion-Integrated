@@ -56,7 +56,7 @@ class Command(BaseCommand):
                 )
                 declared_items.add(item["code"])
             seeded += 1
-            self.stdout.write(f"  registered {spec['code']} ({spec['status']})")
+            self.stdout.write(f"  registered {spec['code']} ({module.status})")
 
         self._retire(declared, declared_items)
         self.stdout.write(self.style.SUCCESS(f"{seeded} module(s) registered"))
