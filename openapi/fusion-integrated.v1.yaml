@@ -1674,6 +1674,935 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/rspc/audit:
+    get:
+      operationId: v1_rspc_audit_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRSPCAuditTrailList'
+          description: ''
+  /api/v1/rspc/closures:
+    get:
+      operationId: v1_rspc_closures_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProjectClosureList'
+          description: ''
+    post:
+      operationId: v1_rspc_closures_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectClosure'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProjectClosure'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProjectClosure'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectClosure'
+          description: ''
+  /api/v1/rspc/closures/{id}:
+    get:
+      operationId: v1_rspc_closures_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectClosure'
+          description: ''
+    put:
+      operationId: v1_rspc_closures_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectClosure'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProjectClosure'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProjectClosure'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectClosure'
+          description: ''
+    patch:
+      operationId: v1_rspc_closures_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectClosure'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectClosure'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectClosure'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectClosure'
+          description: ''
+  /api/v1/rspc/consultancies:
+    get:
+      operationId: v1_rspc_consultancies_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedConsultancyProjectList'
+          description: ''
+    post:
+      operationId: v1_rspc_consultancies_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsultancyProject'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConsultancyProject'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConsultancyProject'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultancyProject'
+          description: ''
+  /api/v1/rspc/consultancies/{id}:
+    get:
+      operationId: v1_rspc_consultancies_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultancyProject'
+          description: ''
+    put:
+      operationId: v1_rspc_consultancies_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsultancyProject'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConsultancyProject'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConsultancyProject'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultancyProject'
+          description: ''
+    patch:
+      operationId: v1_rspc_consultancies_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedConsultancyProject'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedConsultancyProject'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedConsultancyProject'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultancyProject'
+          description: ''
+  /api/v1/rspc/financial:
+    get:
+      operationId: v1_rspc_financial_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFinancialRequestList'
+          description: ''
+    post:
+      operationId: v1_rspc_financial_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinancialRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FinancialRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FinancialRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRequest'
+          description: ''
+  /api/v1/rspc/financial/{id}:
+    get:
+      operationId: v1_rspc_financial_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRequest'
+          description: ''
+    put:
+      operationId: v1_rspc_financial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinancialRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FinancialRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FinancialRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRequest'
+          description: ''
+    patch:
+      operationId: v1_rspc_financial_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFinancialRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedFinancialRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFinancialRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRequest'
+          description: ''
+  /api/v1/rspc/procurement:
+    get:
+      operationId: v1_rspc_procurement_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProcurementRequestList'
+          description: ''
+    post:
+      operationId: v1_rspc_procurement_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcurementRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProcurementRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProcurementRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcurementRequest'
+          description: ''
+  /api/v1/rspc/procurement/{id}:
+    get:
+      operationId: v1_rspc_procurement_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcurementRequest'
+          description: ''
+    put:
+      operationId: v1_rspc_procurement_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcurementRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProcurementRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProcurementRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcurementRequest'
+          description: ''
+    patch:
+      operationId: v1_rspc_procurement_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProcurementRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProcurementRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProcurementRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcurementRequest'
+          description: ''
+  /api/v1/rspc/proposals:
+    get:
+      operationId: v1_rspc_proposals_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResearchProposalList'
+          description: ''
+    post:
+      operationId: v1_rspc_proposals_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResearchProposal'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResearchProposal'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResearchProposal'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchProposal'
+          description: ''
+  /api/v1/rspc/proposals/{id}:
+    get:
+      operationId: v1_rspc_proposals_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchProposal'
+          description: ''
+    put:
+      operationId: v1_rspc_proposals_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResearchProposal'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResearchProposal'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResearchProposal'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchProposal'
+          description: ''
+    patch:
+      operationId: v1_rspc_proposals_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedResearchProposal'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedResearchProposal'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedResearchProposal'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchProposal'
+          description: ''
+  /api/v1/rspc/proposals/{id}/transition:
+    post:
+      operationId: v1_rspc_proposals_transition_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResearchProposal'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResearchProposal'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResearchProposal'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchProposal'
+          description: ''
+  /api/v1/rspc/reports:
+    get:
+      operationId: v1_rspc_reports_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProgressReportList'
+          description: ''
+    post:
+      operationId: v1_rspc_reports_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProgressReport'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProgressReport'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProgressReport'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgressReport'
+          description: ''
+  /api/v1/rspc/reports/{id}:
+    get:
+      operationId: v1_rspc_reports_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgressReport'
+          description: ''
+  /api/v1/rspc/staff:
+    get:
+      operationId: v1_rspc_staff_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProjectStaffAppointmentList'
+          description: ''
+    post:
+      operationId: v1_rspc_staff_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectStaffAppointment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProjectStaffAppointment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProjectStaffAppointment'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectStaffAppointment'
+          description: ''
+  /api/v1/rspc/staff/{id}:
+    get:
+      operationId: v1_rspc_staff_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectStaffAppointment'
+          description: ''
+    put:
+      operationId: v1_rspc_staff_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectStaffAppointment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProjectStaffAppointment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProjectStaffAppointment'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectStaffAppointment'
+          description: ''
+    patch:
+      operationId: v1_rspc_staff_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectStaffAppointment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectStaffAppointment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectStaffAppointment'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectStaffAppointment'
+          description: ''
 components:
   schemas:
     AcademicDirectory:
@@ -2315,6 +3244,66 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    ConsultancyProject:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        pi_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: User ID of Faculty Consultant (plain int)
+        client_name:
+          type: string
+          maxLength: 200
+        client_address:
+          type: string
+        scope_of_work:
+          type: string
+        deliverables:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        total_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        institutional_share:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        status:
+          type: string
+          maxLength: 40
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - client_name
+      - created_at
+      - deliverables
+      - end_date
+      - id
+      - pi_id
+      - scope_of_work
+      - start_date
+      - title
+      - total_cost
+      - updated_at
     Detail:
       type: object
       properties:
@@ -2423,6 +3412,53 @@ components:
       - fee_reference
       - season
       - user_id
+    FinancialRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        project_type:
+          type: string
+          maxLength: 20
+        requested_by_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: User ID of requester
+        budget_head:
+          type: string
+          maxLength: 100
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        purpose:
+          type: string
+        status:
+          type: string
+          maxLength: 40
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - budget_head
+      - created_at
+      - id
+      - project_id
+      - purpose
+      - requested_by_id
+      - updated_at
     IncidentRecorded:
       type: object
       properties:
@@ -2943,6 +3979,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Company'
+    PaginatedConsultancyProjectList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsultancyProject'
+    PaginatedFinancialRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinancialRequest'
     PaginatedInterviewRoundList:
       type: object
       required:
@@ -3000,6 +4074,206 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PaginatedProcurementRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProcurementRequest'
+    PaginatedProgressReportList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProgressReport'
+    PaginatedProjectClosureList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectClosure'
+    PaginatedProjectStaffAppointmentList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectStaffAppointment'
+    PaginatedRSPCAuditTrailList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RSPCAuditTrail'
+    PaginatedResearchProposalList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResearchProposal'
+    PatchedConsultancyProject:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        pi_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: User ID of Faculty Consultant (plain int)
+        client_name:
+          type: string
+          maxLength: 200
+        client_address:
+          type: string
+        scope_of_work:
+          type: string
+        deliverables:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        total_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        institutional_share:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        status:
+          type: string
+          maxLength: 40
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedFinancialRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        project_type:
+          type: string
+          maxLength: 20
+        requested_by_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: User ID of requester
+        budget_head:
+          type: string
+          maxLength: 100
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        purpose:
+          type: string
+        status:
+          type: string
+          maxLength: 40
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
     PatchedJobPosting:
       type: object
       properties:
@@ -3080,6 +4354,182 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PatchedProcurementRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        project_type:
+          type: string
+          maxLength: 20
+        requested_by_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        item_name:
+          type: string
+          maxLength: 200
+        item_type:
+          type: string
+          maxLength: 50
+        estimated_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        specifications:
+          type: string
+        status:
+          type: string
+          maxLength: 40
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedProjectClosure:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        project_type:
+          type: string
+          maxLength: 20
+        submitted_by_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        financial_settlement_status:
+          type: string
+          maxLength: 50
+        asset_declaration:
+          type: string
+        closure_summary:
+          type: string
+        status:
+          type: string
+          maxLength: 40
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedProjectStaffAppointment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: Project ID (ResearchProposal or Consultancy)
+        project_type:
+          type: string
+          maxLength: 20
+        pi_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: User ID of PI
+        position_title:
+          type: string
+          maxLength: 100
+        stipend_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        duration_months:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        advertisement_details:
+          type: string
+        selected_candidate_name:
+          type: string
+          maxLength: 150
+        status:
+          type: string
+          maxLength: 40
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedResearchProposal:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          description: Title of the research project
+          maxLength: 255
+        pi_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: User ID of Principal Investigator (plain int)
+        department:
+          type: string
+          maxLength: 100
+        funding_agency:
+          type: string
+          maxLength: 200
+        scheme_name:
+          type: string
+          maxLength: 200
+        budget:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        objectives:
+          type: string
+        timeline_months:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        resource_requirements:
+          type: string
+        is_strategic:
+          type: boolean
+        status:
+          type: string
+          maxLength: 40
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
     PatchedRole:
       type: object
       properties:
@@ -3145,6 +4595,54 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    ProcurementRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        project_type:
+          type: string
+          maxLength: 20
+        requested_by_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        item_name:
+          type: string
+          maxLength: 200
+        item_type:
+          type: string
+          maxLength: 50
+        estimated_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        specifications:
+          type: string
+        status:
+          type: string
+          maxLength: 40
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - estimated_cost
+      - id
+      - item_name
+      - project_id
+      - requested_by_id
+      - updated_at
     ProfileDocument:
       type: object
       description: |-
@@ -3201,6 +4699,186 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    ProgressReport:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        project_type:
+          type: string
+          maxLength: 20
+        submitted_by_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        report_type:
+          type: string
+          maxLength: 50
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        summary:
+          type: string
+        achievements:
+          type: string
+        funds_utilized:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        status:
+          type: string
+          maxLength: 40
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - period_end
+      - period_start
+      - project_id
+      - submitted_by_id
+      - summary
+    ProjectClosure:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        project_type:
+          type: string
+          maxLength: 20
+        submitted_by_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        financial_settlement_status:
+          type: string
+          maxLength: 50
+        asset_declaration:
+          type: string
+        closure_summary:
+          type: string
+        status:
+          type: string
+          maxLength: 40
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - asset_declaration
+      - closure_summary
+      - created_at
+      - id
+      - project_id
+      - submitted_by_id
+      - updated_at
+    ProjectStaffAppointment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: Project ID (ResearchProposal or Consultancy)
+        project_type:
+          type: string
+          maxLength: 20
+        pi_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: User ID of PI
+        position_title:
+          type: string
+          maxLength: 100
+        stipend_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        duration_months:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        advertisement_details:
+          type: string
+        selected_candidate_name:
+          type: string
+          maxLength: 150
+        status:
+          type: string
+          maxLength: 40
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - pi_id
+      - position_title
+      - project_id
+      - stipend_amount
+      - updated_at
+    RSPCAuditTrail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        entity_type:
+          type: string
+          maxLength: 50
+        entity_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        actor_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: User ID who executed the action
+        action:
+          type: string
+          maxLength: 50
+        remarks:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - actor_id
+      - entity_id
+      - entity_type
+      - id
+      - timestamp
     Recommendation:
       type: object
       description: |-
@@ -3466,6 +5144,73 @@ components:
       - message
       - reason
       - route
+    ResearchProposal:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          description: Title of the research project
+          maxLength: 255
+        pi_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: User ID of Principal Investigator (plain int)
+        department:
+          type: string
+          maxLength: 100
+        funding_agency:
+          type: string
+          maxLength: 200
+        scheme_name:
+          type: string
+          maxLength: 200
+        budget:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        objectives:
+          type: string
+        timeline_months:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        resource_requirements:
+          type: string
+        is_strategic:
+          type: boolean
+        status:
+          type: string
+          maxLength: 40
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - budget
+      - created_at
+      - department
+      - end_date
+      - funding_agency
+      - id
+      - objectives
+      - pi_id
+      - start_date
+      - title
+      - updated_at
     RoundOutcome:
       type: object
       properties:

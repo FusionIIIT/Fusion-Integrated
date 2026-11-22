@@ -38,3 +38,30 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `rspc`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `rspc.proposal.view` | View research proposals | `dean_rspc`, `director`, `faculty`, `hod`, `rspc_admin` |
+| `rspc.proposal.submit` | Submit research proposals | `faculty`, `hod` |
+| `rspc.proposal.recommend_hod` | HoD review and recommend research proposals | `hod` |
+| `rspc.proposal.verify_admin` | RSPC Admin verify research proposals | `dean_rspc`, `director`, `rspc_admin` |
+| `rspc.proposal.approve_dean` | Dean RSPC approve research proposals | `dean_rspc`, `director` |
+| `rspc.proposal.authorize_director` | Director authorize high-value proposals | `director` |
+| `rspc.consultancy.view` | View consultancy projects | `dean_rspc`, `director`, `faculty`, `hod`, `rspc_admin` |
+| `rspc.consultancy.register` | Register consultancy projects | `faculty`, `hod` |
+| `rspc.consultancy.recommend_hod` | HoD recommend consultancy projects | `hod` |
+| `rspc.consultancy.approve_dean` | Dean RSPC approve consultancy projects | `dean_rspc`, `director` |
+| `rspc.staff.request` | Request project staff appointment | `faculty`, `hod` |
+| `rspc.staff.manage` | Manage and verify project staff appointments | `dean_rspc`, `director`, `rspc_admin` |
+| `rspc.financial.request` | Submit fund utilization and expenditure request | `faculty`, `hod` |
+| `rspc.financial.verify` | Verify financial requests | `dean_rspc`, `director`, `rspc_admin` |
+| `rspc.financial.approve_dean` | Approve financial requests within delegated powers | `dean_rspc`, `director` |
+| `rspc.financial.authorize_director` | Authorize high-value expenditure requests | `director` |
+| `rspc.procurement.request` | Request project equipment or consumable procurement | `dean_rspc`, `director`, `faculty`, `hod`, `rspc_admin` |
+| `rspc.procurement.approve` | Approve project procurement requests | `dean_rspc`, `director` |
+| `rspc.report.submit` | Submit periodic progress and utilization reports | `dean_rspc`, `director`, `faculty`, `hod`, `rspc_admin` |
+| `rspc.closure.submit` | Submit project closure request | `faculty`, `hod` |
+| `rspc.closure.approve` | Approve project closure and archival | `dean_rspc`, `director`, `rspc_admin` |
+| `rspc.audit.view` | View RSPC audit trails and compliance records | `dean_rspc`, `director`, `rspc_admin` |
