@@ -405,7 +405,6 @@ SCOPE_PERMISSIONS = []
 
 # Baseline Kind Grants (Held by definition, no ERP designation needed)
 _STUDENT = [
-    "badms.backup.view",
     "badms.archival.view",
     "badms.archival.create",
     "badms.storage.view",

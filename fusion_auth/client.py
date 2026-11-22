@@ -48,6 +48,7 @@ class IamSession:
     #: The whole sidebar. Empty from an older IAM, and the caller falls back.
     navigation: tuple[dict, ...] = ()
     email: str = ""
+    department: str = ""
 
     def has_permission(self, code: str) -> bool:
         return code in self.permissions
@@ -155,6 +156,7 @@ class IamClient:
             permissions=frozenset(p.get("permissions", ())),
             modules=tuple(p.get("modules", ())),
             navigation=tuple(p.get("navigation", ())),
+            department=user.get("department") or p.get("department", "") or "",
         )
 
     def set_active_role(self, auth_token: str, role: str) -> None:

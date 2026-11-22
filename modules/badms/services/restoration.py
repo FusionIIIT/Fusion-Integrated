@@ -9,6 +9,7 @@ from modules.badms.domain.state_machine import (
     transition_restoration,
 )
 from modules.badms.models import ArchivalRequest, RestorationRequest
+from modules.badms.selectors import resolve_actor_department
 from modules.badms.services.audit import log_audit_event
 
 
@@ -17,11 +18,12 @@ def request_data_restoration(
     actor, archival_request_id: int, target_destination: str
 ) -> RestorationRequest:
     user_id = getattr(actor, "user_id", None) or 0
-    dept = getattr(actor, "department", "") or ""
 
     archive = ArchivalRequest.objects.filter(id=archival_request_id).first()
     if not archive:
         raise NotFoundError("Archived dataset not found.")
+
+    dept = resolve_actor_department(actor, default=archive.department)
 
     classification = archive.authoritative_classification or archive.initial_classification
     event = "request_sensitive" if classification == "Sensitive" else "request_non_sensitive"

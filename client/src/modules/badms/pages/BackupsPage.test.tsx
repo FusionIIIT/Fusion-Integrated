@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { BackupRecord } from "../api/types";
+import { RequirePermission } from "../../../auth/RequirePermission";
 import BackupsPage from "./BackupsPage";
 
 const authMock = vi.hoisted(() => ({
@@ -94,5 +95,22 @@ describe("BackupsPage", () => {
     );
 
     expect(screen.getByText("No backup records found")).toBeInTheDocument();
+  });
+
+  it("shows Not available to your role when wrapped in RequirePermission for role lacking badms.backup.view", () => {
+    authMock.useAuth.mockReturnValue({
+      can: (perm: string) => perm !== "badms.backup.view",
+    });
+
+    render(
+      <MantineProvider>
+        <RequirePermission permission="badms.backup.view">
+          <BackupsPage />
+        </RequirePermission>
+      </MantineProvider>
+    );
+
+    expect(screen.getByText("Not available to your role")).toBeInTheDocument();
+    expect(screen.queryByText("Database Backups")).toBeNull();
   });
 });

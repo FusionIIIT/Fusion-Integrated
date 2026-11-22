@@ -172,3 +172,33 @@ def test_cookie_write_without_csrf_token_answers_403(stub_iam):
         format="json",
     )
     assert res.status_code == 403
+
+
+def test_student_refused_backup_and_schedule_endpoints_with_403(stub_iam):
+    """Regression test: Student lacking badms.backup.view must receive 403 on restricted backup endpoints."""
+    c = _client(
+        stub_iam,
+        user_id=1001,
+        kind="student",
+        modules=("badms",),
+        permissions=(
+            "badms.archival.view",
+            "badms.archival.create",
+            "badms.storage.view",
+            "badms.storage.create",
+            "badms.restoration.view",
+            "badms.restoration.create",
+        ),
+    )
+    # GET /api/v1/badms/backups/
+    res_backups = c.get("/api/v1/badms/backups/")
+    assert res_backups.status_code == 403, f"Expected 403 Forbidden, got {res_backups.status_code}"
+
+    # GET /api/v1/badms/backups/1/
+    res_backup_detail = c.get("/api/v1/badms/backups/1/")
+    assert res_backup_detail.status_code == 403, f"Expected 403 Forbidden, got {res_backup_detail.status_code}"
+
+    # GET /api/v1/badms/schedules/
+    res_schedules = c.get("/api/v1/badms/schedules/")
+    assert res_schedules.status_code == 403, f"Expected 403 Forbidden, got {res_schedules.status_code}"
+

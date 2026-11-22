@@ -252,14 +252,14 @@ Required test coverage of 95% reached. Total coverage: 98.20%
 
 ## 3. Test Counts & Inventory
 
-Total: **89 backend tests** across 13 test files (plus 58 client vitest unit tests across 15 files and 5 Playwright E2E suites).
+Total: **91 backend tests** across 13 test files (plus 59 client vitest unit tests across 15 files and 5 Playwright E2E suites).
 
 | Test File | Test Count | Description & Tested Concerns |
 |---|---|---|
 | `test_domain.py` | 32 | Pure Python domain tests: transitions, schedule cron parser, quota math, AES-256-GCM crypto, retention |
 | `test_client_route_guards.py` | 2 | Navigation permission parity and client route guards |
-| `test_scoping.py` | 5 | Department isolation, student self-scope, HOD role-derived scoping |
-| `test_privilege_escalation.py` | 10 | 401 unauthenticated, 403 unauthorized across roles, missing CSRF token, and empty modules |
+| `test_scoping.py` | 6 | Department isolation, student self-scope, HOD role-derived scoping, and dynamic faculty-to-department directory mapping |
+| `test_privilege_escalation.py` | 11 | 401 unauthenticated, 403 unauthorized across roles, missing CSRF token, empty modules, and route refusal |
 | `test_services.py` | 10 | Transactional service orchestration (backups, archival, quotas, restores, invalid state refusal) |
 | `test_schedule.py` | 4 | Celery catch-up scheduler, quota monitoring, failure alert SLA, purge |
 | `test_contracts.py` | 4 | Plural read-only cross-module contract queries |
@@ -344,9 +344,10 @@ All four background periodic tasks were executed and verified:
 | Role | Acting Role | Action / URL | HTTP Status | Response / Outcome |
 |---|---|---|---|---|
 | Student | `student` | `GET /api/v1/badms/storage-extensions/` | `200 OK` | Sees only own requests |
+| Student | `student` | `GET /badms/backups` | Client Route Refusal | Refused via `RequirePermission("badms.backup.manage")`; renders `NotPermitted` screen |
 | Student | `student` | `POST /api/v1/badms/backups/manual/` | `403 Forbidden` | Refused without `badms.backup.manage` |
-| Faculty | `faculty` | `POST /api/v1/badms/archival-requests/` | `201 Created` | Request submitted as `submitted` |
-| HOD (CSE) | `HOD (CSE)` | `GET /api/v1/badms/archival-requests/` | `200 OK` | Sees CSE departmental requests only |
+| Faculty | `faculty` | `POST /api/v1/badms/archival-requests/` | `201 Created` | Request submitted as `submitted`; department dynamically resolved from IAM/directory to `CSE` |
+| HOD (CSE) | `HOD (CSE)` | `GET /api/v1/badms/archival-requests/` | `200 OK` | Sees CSE departmental requests only (Request ID 4 visible; Request IDs 2 & 3 in General not visible) |
 | HOD (CSE) | `HOD (CSE)` | `POST /api/v1/badms/archival-requests/1/decide/` | `200 OK` | Approves request -> `hod_approved` |
 | SysAdmin | `SysAdmin` | `POST /api/v1/badms/archival-requests/1/classify/` | `200 OK` | Authoritatively classifies as `Sensitive` |
 | IT Security | `IT Security` | `POST /api/v1/badms/archival-requests/1/configure-encryption/` | `200 OK` | Encrypts archive -> `sensitive_archive_encrypted` |

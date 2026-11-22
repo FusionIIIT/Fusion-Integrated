@@ -20,6 +20,7 @@ from modules.badms.models import (
     StorageLedgerEntry,
     UserStorageQuota,
 )
+from modules.badms.selectors import resolve_actor_department
 from modules.badms.services.audit import log_audit_event
 
 
@@ -35,10 +36,7 @@ def submit_archival_request(
     department: str = "",
 ) -> ArchivalRequest:
     user_id = getattr(actor, "user_id", None) or 0
-    dept = department or getattr(actor, "department", "") or "General"
-    active_role = getattr(actor, "active_role", "") or ""
-    if dept == "General" and active_role.startswith("HOD (") and active_role.endswith(")"):
-        dept = active_role[5:-1]
+    dept = department or resolve_actor_department(actor, default="General")
 
     quota_obj, created = UserStorageQuota.objects.select_for_update().get_or_create(
         user_id=user_id,
@@ -88,10 +86,7 @@ def decide_archival_request(
     actor, request_id: int, decision: str, remarks: str = ""
 ) -> ArchivalRequest:
     user_id = getattr(actor, "user_id", None) or 0
-    dept = getattr(actor, "department", "") or ""
-    active_role = getattr(actor, "active_role", "") or ""
-    if not dept and active_role.startswith("HOD (") and active_role.endswith(")"):
-        dept = active_role[5:-1]
+    dept = resolve_actor_department(actor, default="")
 
     req = ArchivalRequest.objects.select_for_update().filter(id=request_id).first()
     if not req:

@@ -1,4 +1,5 @@
 from modules.badms.models import AuditEvent
+from modules.badms.selectors import resolve_actor_department
 
 
 def log_audit_event(
@@ -12,7 +13,7 @@ def log_audit_event(
 ) -> AuditEvent:
     user_id = getattr(actor, "user_id", None) or 0
     role = getattr(actor, "active_role", "") or ""
-    dept = department or getattr(actor, "department", "") or ""
+    dept = department or resolve_actor_department(actor, default="")
     return AuditEvent.objects.create(
         event_type=event_type,
         actor_user_id=user_id,

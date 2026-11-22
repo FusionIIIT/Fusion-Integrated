@@ -1,6 +1,7 @@
 import { lazy, type ReactNode } from "react";
 import { Navigate, type RouteObject } from "react-router-dom";
 
+import { useAuth } from "../../auth/AuthProvider";
 import { RequirePermission } from "../../auth/RequirePermission";
 
 const BackupsPage = lazy(() => import("./pages/BackupsPage"));
@@ -16,8 +17,16 @@ function guarded(permission: string, page: ReactNode) {
   return <RequirePermission permission={permission}>{page}</RequirePermission>;
 }
 
+function BadmsIndex() {
+  const { can } = useAuth();
+  if (can("badms.backup.view")) {
+    return <Navigate to="backups" replace />;
+  }
+  return <Navigate to="archival-requests" replace />;
+}
+
 export const routes: RouteObject[] = [
-  { index: true, element: <Navigate to="backups" replace /> },
+  { index: true, element: <BadmsIndex /> },
   { path: "backups", element: guarded("badms.backup.view", <BackupsPage />) },
   { path: "schedules", element: guarded("badms.backup.view", <SchedulesPage />) },
   { path: "archival-requests", element: guarded("badms.archival.view", <ArchivalRequestsPage />) },

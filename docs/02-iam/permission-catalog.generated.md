@@ -11,7 +11,7 @@ For the intended taxonomy of modules not yet built, see
 
 | Code | What it allows | Held by |
 |---|---|---|
-| `badms.backup.view` | View backup status, history, and schedules | `Director`, `HOD`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Super Admin`, `SysAdmin`, `acadadmin`, `faculty`, `staff`, `student` |
+| `badms.backup.view` | View backup status, history, and schedules | `Director`, `HOD`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Super Admin`, `SysAdmin`, `acadadmin` |
 | `badms.backup.manage` | Trigger manual backups and configure local schedules | `Director`, `Super Admin`, `SysAdmin`, `acadadmin` |
 | `badms.backup_policy.manage` | Define global backup schedules and default policies | `Director`, `Super Admin` |
 | `badms.archival.view` | View secure archival requests and status | `Director`, `HOD`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `IT Security`, `Super Admin`, `SysAdmin`, `acadadmin`, `faculty`, `staff`, `student` |

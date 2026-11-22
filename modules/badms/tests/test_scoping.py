@@ -227,3 +227,133 @@ def test_direct_selector_functions_coverage():
     assert selectors.scope_user_storage_quotas(user).count() >= 1
     assert selectors.scope_security_policies(user).count() >= 1
     assert selectors.scope_backup_schedules(user).count() >= 1
+
+
+def test_faculty_archival_request_maps_to_directory_department_and_visible_to_hod(stub_iam):
+    """Regression test: Requester's department is resolved from IAM/directory profile data,
+    assigning CSE faculty requests to CSE so HOD (CSE) sees and can approve them.
+    """
+    from fusion_auth.client import UserRef
+    from modules.badms.models import ArchivalRequest
+
+    # Directory users in IAM
+    users = {
+        2001: UserRef(
+            user_id=2001,
+            username="fac00002",
+            display_name="CSE Faculty",
+            kind="faculty",
+            department="CSE",
+        ),
+        3001: UserRef(
+            user_id=3001,
+            username="fac00003",
+            display_name="ME Faculty",
+            kind="faculty",
+            department="ME",
+        ),
+        5001: UserRef(
+            user_id=5001,
+            username="fac00049",
+            display_name="HOD CSE",
+            kind="faculty",
+            department="CSE",
+        ),
+    }
+
+    # 1. CSE faculty submits without passing department in request payload
+    c_cse = APIClient()
+    stub_iam(
+        make_session(
+            user_id=2001,
+            kind="faculty",
+            roles=("faculty",),
+            active_role="faculty",
+            modules=("badms",),
+            permissions=("badms.archival.create", "badms.archival.view"),
+        ),
+        users=users,
+    )
+    c_cse.credentials(HTTP_AUTHORIZATION="Token tok_cse")
+    res_cse = c_cse.post(
+        "/api/v1/badms/archival-requests/",
+        {
+            "file_name": "cse_dataset.tar.gz",
+            "file_type": "archive",
+            "file_size_bytes": 1024,
+            "reason": "CSE AI project dataset",
+            "file_storage_path": "/tmp/cse_dataset",
+        },
+    )
+    assert res_cse.status_code == 201, res_cse.json()
+    cse_req_id = res_cse.json()["id"]
+    cse_req = ArchivalRequest.objects.get(id=cse_req_id)
+    assert cse_req.department == "CSE", f"Expected department 'CSE', got '{cse_req.department}'"
+
+    # 2. ME faculty submits without passing department in request payload
+    c_me = APIClient()
+    stub_iam(
+        make_session(
+            user_id=3001,
+            kind="faculty",
+            roles=("faculty",),
+            active_role="faculty",
+            modules=("badms",),
+            permissions=("badms.archival.create", "badms.archival.view"),
+        ),
+        users=users,
+    )
+    c_me.credentials(HTTP_AUTHORIZATION="Token tok_me")
+    res_me = c_me.post(
+        "/api/v1/badms/archival-requests/",
+        {
+            "file_name": "me_cad_model.zip",
+            "file_type": "archive",
+            "file_size_bytes": 2048,
+            "reason": "ME CAD files",
+            "file_storage_path": "/tmp/me_cad",
+        },
+    )
+    assert res_me.status_code == 201, res_me.json()
+    me_req_id = res_me.json()["id"]
+    me_req = ArchivalRequest.objects.get(id=me_req_id)
+    assert me_req.department == "ME", f"Expected department 'ME', got '{me_req.department}'"
+
+    # 3. HOD CSE queries archival requests
+    c_hod = APIClient()
+    stub_iam(
+        make_session(
+            user_id=5001,
+            kind="faculty",
+            roles=("HOD (CSE)", "faculty"),
+            active_role="HOD (CSE)",
+            modules=("badms",),
+            permissions=("badms.archival.view", "badms.archival.approve"),
+        ),
+        users=users,
+    )
+    c_hod.credentials(HTTP_AUTHORIZATION="Token tok_hod")
+    res_list = c_hod.get("/api/v1/badms/archival-requests/")
+    assert res_list.status_code == 200
+    listed_ids = [item["id"] for item in res_list.json()["results"]]
+
+    # HOD CSE sees the CSE faculty request, but NOT the ME faculty request
+    assert cse_req_id in listed_ids, "HOD CSE must see request from CSE faculty"
+    assert me_req_id not in listed_ids, "HOD CSE must NOT see request from ME faculty"
+
+    # 4. HOD CSE can approve the CSE faculty request
+    res_approve = c_hod.post(
+        f"/api/v1/badms/archival-requests/{cse_req_id}/decide/",
+        {"decision": "approve", "remarks": "Approved by HOD CSE"},
+    )
+    assert res_approve.status_code == 200, res_approve.json()
+    cse_req.refresh_from_db()
+    assert cse_req.status == "hod_approved"
+
+    # 5. HOD CSE attempting to decide the ME faculty request is refused with 404
+    res_refuse = c_hod.post(
+        f"/api/v1/badms/archival-requests/{me_req_id}/decide/",
+        {"decision": "approve", "remarks": "Invalid"},
+    )
+    assert res_refuse.status_code == 404
+

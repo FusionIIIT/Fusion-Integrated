@@ -108,6 +108,7 @@ class MeView(APIView):
                 "display_name": p.display_name,
                 "kind": p.kind,
                 "email": p.email,
+                "department": p.department,
             },
             "active_role": p.active_role,
             "roles": list(p.roles),

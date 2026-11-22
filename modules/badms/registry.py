@@ -105,7 +105,6 @@ SYSTEM_PERMISSIONS = [
 SCOPE_PERMISSIONS: list[str] = []
 
 _STUDENT = [
-    "badms.backup.view",
     "badms.archival.view",
     "badms.archival.create",
     "badms.storage.view",

@@ -1,6 +1,7 @@
 from django.db.models import Count
 
 from modules.badms.selectors.scoping import (
+    resolve_actor_department,
     scope_archival_requests,
     scope_audit_events,
     scope_backup_records,
@@ -26,6 +27,7 @@ def get_department_report(actor, department: str) -> dict:
 
 __all__ = [
     "get_department_report",
+    "resolve_actor_department",
     "scope_archival_requests",
     "scope_audit_events",
     "scope_backup_records",
