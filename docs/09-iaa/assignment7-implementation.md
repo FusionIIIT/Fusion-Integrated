@@ -58,3 +58,5 @@ Google Drive link validator; arbitrary URLs and non-Drive references are rejecte
 
 
 Formatting and static-analysis checks are run by the repository CI workflow.
+
+Ruff formatting is performed before the repository lint check.
