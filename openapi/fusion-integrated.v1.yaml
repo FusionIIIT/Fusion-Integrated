@@ -63,6 +63,351 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/filetracking/files/:
+    post:
+      operationId: v1_filetracking_files_create
+      description: Create a file as draft or directly submit into circulation.
+      summary: Create a new file
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateFileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateFileRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackedFileDetail'
+          description: ''
+  /api/v1/filetracking/files/{file_id}/:
+    get:
+      operationId: v1_filetracking_files_retrieve
+      description: Retrieve full file details and history if user is associated.
+      summary: Retrieve file detail
+      parameters:
+      - in: path
+        name: file_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackedFileDetail'
+          description: ''
+  /api/v1/filetracking/files/{file_id}/archive/:
+    post:
+      operationId: v1_filetracking_files_archive_create
+      description: Archive a completed circulated file (owner only).
+      summary: Archive file
+      parameters:
+      - in: path
+        name: file_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchiveFileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ArchiveFileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ArchiveFileRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackedFileDetail'
+          description: ''
+  /api/v1/filetracking/files/{file_id}/draft/:
+    put:
+      operationId: v1_filetracking_files_draft_update
+      description: Edit subject or description on an uncirculated draft (owner only).
+      summary: Update draft file
+      parameters:
+      - in: path
+        name: file_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDraftRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UpdateDraftRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateDraftRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackedFileDetail'
+          description: ''
+  /api/v1/filetracking/files/{file_id}/draft/discard/:
+    delete:
+      operationId: v1_filetracking_files_draft_discard_destroy
+      description: Delete an uncirculated draft file (owner only; fails if circulated).
+      summary: Discard draft file
+      parameters:
+      - in: path
+        name: file_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/filetracking/files/{file_id}/forward/:
+    post:
+      operationId: v1_filetracking_files_forward_create
+      description: Forward an active file to another employee with mandatory comment.
+      summary: Forward file
+      parameters:
+      - in: path
+        name: file_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForwardFileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ForwardFileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ForwardFileRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileMovement'
+          description: ''
+  /api/v1/filetracking/files/{file_id}/history/:
+    get:
+      operationId: v1_filetracking_files_history_list
+      description: View chronological movement history (associated users only).
+      summary: File movement history
+      parameters:
+      - in: path
+        name: file_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FileMovement'
+          description: ''
+  /api/v1/filetracking/files/{file_id}/return/:
+    post:
+      operationId: v1_filetracking_files_return_create
+      description: Return an active received file to its previous sender with mandatory
+        comment.
+      summary: Return file
+      parameters:
+      - in: path
+        name: file_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReturnFileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReturnFileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReturnFileRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileMovement'
+          description: ''
+  /api/v1/filetracking/files/archived/:
+    get:
+      operationId: v1_filetracking_files_archived_list
+      description: Completed archived files associated with user.
+      summary: List archived files
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrackedFileList'
+          description: ''
+  /api/v1/filetracking/files/drafts/:
+    get:
+      operationId: v1_filetracking_files_drafts_list
+      description: Uncirculated draft files created by user.
+      summary: List draft files
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrackedFileList'
+          description: ''
+  /api/v1/filetracking/files/inbox/:
+    get:
+      operationId: v1_filetracking_files_inbox_list
+      description: Files currently held by user awaiting action.
+      summary: List inbox files
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrackedFileList'
+          description: ''
+  /api/v1/filetracking/files/outbox/:
+    get:
+      operationId: v1_filetracking_files_outbox_list
+      description: Active files previously created or sent by user.
+      summary: List outbox files
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrackedFileList'
+          description: ''
+  /api/v1/filetracking/governance/audit/:
+    get:
+      operationId: v1_filetracking_governance_audit_list
+      description: View system audit trail entries for governance oversight.
+      summary: Governance audit logs
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FileAuditLog'
+          description: ''
+  /api/v1/filetracking/integration/initiate/:
+    post:
+      operationId: v1_filetracking_integration_initiate_create
+      description: External module initiates file-based tracking chain.
+      summary: Initiate workflow tracking chain
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntegrationInitiateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IntegrationInitiateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IntegrationInitiateRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationInitiateResponse'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1981,6 +2326,32 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    ArchiveFileRequest:
+      type: object
+      properties:
+        comment:
+          type: string
+          default: ''
+    AttachmentInput:
+      type: object
+      properties:
+        file_name:
+          type: string
+          maxLength: 255
+        file_path:
+          type: string
+          default: ''
+          maxLength: 512
+        file_size:
+          type: integer
+          minimum: 1
+        mime_type:
+          type: string
+          default: application/pdf
+          maxLength: 128
+      required:
+      - file_name
+      - file_size
     AudienceEnum:
       enum:
       - students
@@ -2315,6 +2686,31 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    CreateFileRequest:
+      type: object
+      properties:
+        subject:
+          type: string
+          maxLength: 255
+        initial_comment:
+          type: string
+        is_draft:
+          type: boolean
+          default: false
+        recipient_user_id:
+          type: integer
+          nullable: true
+        recipient_designation:
+          type: string
+          default: ''
+          maxLength: 128
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachmentInput'
+      required:
+      - initial_comment
+      - subject
     Detail:
       type: object
       properties:
@@ -2423,6 +2819,165 @@ components:
       - fee_reference
       - season
       - user_id
+    FileAttachment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        file_id:
+          type: integer
+          readOnly: true
+        movement_id:
+          type: integer
+          nullable: true
+          readOnly: true
+        uploaded_by_user_id:
+          type: integer
+          readOnly: true
+        uploader_designation:
+          type: string
+          readOnly: true
+        file_name:
+          type: string
+          readOnly: true
+        file_path:
+          type: string
+          readOnly: true
+        file_size:
+          type: integer
+          readOnly: true
+        mime_type:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - file_id
+      - file_name
+      - file_path
+      - file_size
+      - id
+      - mime_type
+      - movement_id
+      - uploaded_by_user_id
+      - uploader_designation
+    FileAuditLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        file_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        action:
+          type: string
+          readOnly: true
+        actor_user_id:
+          type: integer
+          readOnly: true
+        actor_designation:
+          type: string
+          readOnly: true
+        payload:
+          readOnly: true
+        ip_address:
+          type: string
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - actor_designation
+      - actor_user_id
+      - created_at
+      - file_id
+      - id
+      - ip_address
+      - payload
+    FileMovement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        sequence_number:
+          type: integer
+          readOnly: true
+        action:
+          type: string
+          readOnly: true
+        sender_user_id:
+          type: integer
+          readOnly: true
+        sender_designation:
+          type: string
+          readOnly: true
+        receiver_user_id:
+          type: integer
+          readOnly: true
+        receiver_designation:
+          type: string
+          readOnly: true
+        comment:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileAttachment'
+          readOnly: true
+      required:
+      - action
+      - attachments
+      - comment
+      - created_at
+      - id
+      - receiver_designation
+      - receiver_user_id
+      - sender_designation
+      - sender_user_id
+      - sequence_number
+    FiletrackingStatusEnum:
+      enum:
+      - draft
+      - circulating
+      - archived
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `circulating` - Circulating
+        * `archived` - Archived
+    ForwardFileRequest:
+      type: object
+      properties:
+        recipient_user_id:
+          type: integer
+        recipient_designation:
+          type: string
+          default: ''
+          maxLength: 128
+        comment:
+          type: string
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachmentInput'
+      required:
+      - comment
+      - recipient_user_id
     IncidentRecorded:
       type: object
       properties:
@@ -2433,6 +2988,52 @@ components:
       required:
       - incident
       - recommendation
+    IntegrationInitiateRequest:
+      type: object
+      properties:
+        initiator_user_id:
+          type: integer
+        initiator_designation:
+          type: string
+          maxLength: 128
+        subject:
+          type: string
+          maxLength: 255
+        initial_comment:
+          type: string
+        recipient_user_id:
+          type: integer
+        recipient_designation:
+          type: string
+          default: ''
+          maxLength: 128
+        external_reference:
+          type: string
+          default: ''
+          maxLength: 255
+      required:
+      - initial_comment
+      - initiator_designation
+      - initiator_user_id
+      - recipient_user_id
+      - subject
+    IntegrationInitiateResponse:
+      type: object
+      properties:
+        file_id:
+          type: integer
+        file_number:
+          type: string
+        status:
+          type: string
+        current_holder_user_id:
+          type: integer
+          nullable: true
+      required:
+      - current_holder_user_id
+      - file_id
+      - file_number
+      - status
     InterviewRound:
       type: object
       properties:
@@ -3466,6 +4067,17 @@ components:
       - message
       - reason
       - route
+    ReturnFileRequest:
+      type: object
+      properties:
+        comment:
+          type: string
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachmentInput'
+      required:
+      - comment
     RoundOutcome:
       type: object
       properties:
@@ -3714,6 +4326,138 @@ components:
         * `workshop` - Workshop
         * `internship` - Internship programme
         * `general` - General
+    TrackedFileDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        file_number:
+          type: string
+          readOnly: true
+        subject:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/FiletrackingStatusEnum'
+          readOnly: true
+        created_by_user_id:
+          type: integer
+          readOnly: true
+        creator_designation:
+          type: string
+          readOnly: true
+        current_holder_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        current_holder_designation:
+          type: string
+          readOnly: true
+        is_archived:
+          type: boolean
+          readOnly: true
+        archived_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        movements:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileMovement'
+          readOnly: true
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileAttachment'
+          readOnly: true
+      required:
+      - archived_at
+      - attachments
+      - created_at
+      - created_by_user_id
+      - creator_designation
+      - current_holder_designation
+      - current_holder_user_id
+      - description
+      - file_number
+      - id
+      - is_archived
+      - movements
+      - status
+      - subject
+      - updated_at
+    TrackedFileList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        file_number:
+          type: string
+          readOnly: true
+        subject:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/FiletrackingStatusEnum'
+          readOnly: true
+        created_by_user_id:
+          type: integer
+          readOnly: true
+        creator_designation:
+          type: string
+          readOnly: true
+        current_holder_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        current_holder_designation:
+          type: string
+          readOnly: true
+        is_archived:
+          type: boolean
+          readOnly: true
+        archived_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - archived_at
+      - created_at
+      - created_by_user_id
+      - creator_designation
+      - current_holder_designation
+      - current_holder_user_id
+      - file_number
+      - id
+      - is_archived
+      - status
+      - subject
+      - updated_at
     Transition:
       type: object
       properties:
@@ -3769,6 +4513,18 @@ components:
       - application_id
       - redacted
       - results
+    UpdateDraftRequest:
+      type: object
+      properties:
+        subject:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachmentInput'
     UserRef:
       type: object
       properties:

@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.filetracking",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -216,6 +217,8 @@ REST_FRAMEWORK = {
         "export": "5/hour",
         "upload": "20/hour",
         "directory_search": "120/hour",
+        "filetracking_create": "60/hour",
+        "filetracking_action": "120/hour",
     },
 }
 
@@ -230,6 +233,9 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "FiletrackingStatusEnum": "modules.filetracking.models.files.TrackedFile.STATUS_CHOICES",
+    },
 }
 
 CORS_ALLOW_ALL_ORIGINS = False
