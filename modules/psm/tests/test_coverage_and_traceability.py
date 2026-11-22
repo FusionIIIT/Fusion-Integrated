@@ -632,6 +632,31 @@ def test_r1_04_discrepancy_resolve_atomic_inventory_and_accounting_adjustments()
         billed_quantity=3,
         billed_amount=Decimal("15000.00"),
     )
+    # R2-01: unconfirmed GRN must NOT allow discrepancy resolution to verify/pay the invoice
+    case_unconf = discrepancies.report_discrepancy(
+        actor=p_emp,
+        grn_id=grn.pk,
+        discrepancy_type="damaged",
+        affected_quantity=1,
+        description="Cracked display before confirmation",
+        requested_resolution="return_and_adjust",
+    )
+    inv.refresh_from_db()
+    assert inv.status == "on_hold"
+    discrepancies.resolve_case(
+        actor=p_ps,
+        case_id=case_unconf.pk,
+        resolution_action="resolve",
+        resolution_notes="Resolved before GRN confirmation",
+        inventory_adjusted=False,
+        accounting_adjusted=True,
+    )
+    inv.refresh_from_db()
+    assert inv.status == "on_hold"
+    assert inv.eligible_amount == Decimal("0.00")
+
+    # Confirm the GRN first (BR-PSM-009), then open & resolve discrepancy with atomic adjustments
+    receipts.confirm_receipt(actor=p_emp, grn_id=grn.pk)
     case = discrepancies.report_discrepancy(
         actor=p_emp,
         grn_id=grn.pk,
@@ -640,8 +665,6 @@ def test_r1_04_discrepancy_resolve_atomic_inventory_and_accounting_adjustments()
         description="Cracked display",
         requested_resolution="return_and_adjust",
     )
-    inv.refresh_from_db()
-    assert inv.status == "on_hold"
     resolved = discrepancies.resolve_case(
         actor=p_ps,
         case_id=case.pk,
@@ -732,3 +755,208 @@ def test_r1_07_r1_09_po_state_machine_and_direct_spec_assertions():
     sched.save(update_fields=["next_run_at"])
     assert reports.run_due_schedules() == 1
     assert ReportGenerationLog.objects.filter(schedule=sched, status="succeeded").exists()
+
+
+def test_r2_02_03_04_07_queue_ordering_replacement_mismatch_overflow_and_bounds(stub_iam):
+    # R2-02 (AFR-PSM-025), R2-03, R2-04, R2-07 (AFR-PSM-014, AFR-PSM-023, discrepancy qty bounds)
+    from modules.psm.models import PsmNotification
+
+    p_emp, p_dept, _p_hod, p_ps, _p_dir, _p_acc, _p_aud = _setup_actors()
+    policy.seed_default_policy()
+
+    # AFR-PSM-014: stock_available notification on check_and_reserve
+    loc = stock.create_stock_location(
+        actor=p_ps, code="LOC-R2", name="CSE R2", department="CSE", is_central=False
+    )
+    item = stock.create_stock_item(actor=p_ps, sku="SKU-R2", name="Meter")
+    stock.record_adjustment(
+        actor=p_ps, item_id=item.pk, location_id=loc.pk, quantity_delta=10, reason="Init"
+    )
+    ind_stk = indents.create_indent(
+        actor=p_emp,
+        department="CSE",
+        item_id=item.pk,
+        item_description="Meter",
+        quantity=2,
+        estimated_cost=Decimal("1000.00"),
+        justification="Stock test",
+        submit=True,
+    )
+    stock.check_and_reserve(actor=p_dept, indent_id=ind_stk.pk)
+    assert PsmNotification.objects.filter(
+        topic="indent.stock_available", recipient_user_id=p_emp.user_id
+    ).exists()
+
+    # AFR-PSM-025 (R2-02): ?queue=1 orders critical/urgent -> high -> normal
+    ind_norm = indents.create_indent(
+        actor=p_emp,
+        department="CSE",
+        item_description="Normal Item",
+        quantity=1,
+        estimated_cost=Decimal("5000.00"),
+        justification="Normal",
+        submit=True,
+    )
+    stock.check_and_reserve(actor=p_dept, indent_id=ind_norm.pk)
+    approvals.dept_admin_review(
+        actor=p_dept, indent_id=ind_norm.pk, decision="approve", priority="normal"
+    )
+    ind_high = indents.create_indent(
+        actor=p_emp,
+        department="CSE",
+        item_description="High Item",
+        quantity=1,
+        estimated_cost=Decimal("6000.00"),
+        justification="High",
+        submit=True,
+    )
+    stock.check_and_reserve(actor=p_dept, indent_id=ind_high.pk)
+    approvals.dept_admin_review(
+        actor=p_dept, indent_id=ind_high.pk, decision="approve", priority="high"
+    )
+    ind_crit = indents.create_indent(
+        actor=p_emp,
+        department="CSE",
+        item_description="Critical Item",
+        quantity=1,
+        estimated_cost=Decimal("7000.00"),
+        justification="Critical",
+        submit=True,
+    )
+    stock.check_and_reserve(actor=p_dept, indent_id=ind_crit.pk)
+    approvals.dept_admin_review(
+        actor=p_dept, indent_id=ind_crit.pk, decision="approve", priority="critical"
+    )
+    c_ps = _client(stub_iam, uid=9104, role="ps_admin")
+    r_q = c_ps.get("/api/v1/psm/indents?queue=1&status=department_reviewed")
+    assert r_q.status_code == 200
+    returned_ids = [row["id"] for row in r_q.json()["results"]]
+    assert returned_ids == [ind_crit.pk, ind_high.pk, ind_norm.pk]
+
+    # AFR-PSM-023: high-priority direct approval bypasses HOD into procurement_authorized
+    direct_ind = procurement.review_and_select_method(actor=p_ps, indent_id=ind_high.pk)
+    assert direct_ind.status == "procurement_authorized"
+
+    # R2-03 & R2-07: replacement GRN cross-PO mismatch refused + discrepancy qty bounds enforced
+    v = vendors.onboard_vendor(
+        actor=p_ps,
+        name="R2 Vendor",
+        gstin="23ABCDE7777F1Z5",
+        bank_account_number="776655443322",
+        bank_ifsc="SBIN0001234",
+        bank_name="SBI",
+        compliance_documents=["gst.pdf"],
+        contact_email="r2@v.test",
+    )
+    vendors.verify_vendor(actor=p_ps, vendor_id=v.pk)
+    po1 = procurement.create_and_issue_po(
+        actor=p_ps,
+        indent_id=ind_high.pk,
+        vendor_id=v.pk,
+        ordered_quantity=1,
+        unit_price=Decimal("6000.00"),
+        planned_delivery_date=date.today() + timedelta(days=5),
+    )
+    procurement.review_and_select_method(actor=p_ps, indent_id=ind_crit.pk)
+    po2 = procurement.create_and_issue_po(
+        actor=p_ps,
+        indent_id=ind_crit.pk,
+        vendor_id=v.pk,
+        ordered_quantity=1,
+        unit_price=Decimal("7000.00"),
+        planned_delivery_date=date.today() + timedelta(days=5),
+    )
+    grn1 = receipts.record_grn(
+        actor=p_emp,
+        purchase_order_id=po1.pk,
+        received_quantity=1,
+        accepted_quantity=0,
+        rejected_quantity=1,
+    )
+    # R2-07: affected_quantity <= 0 and > received_quantity must fail
+    with pytest.raises(DomainError) as exc_zero:
+        discrepancies.report_discrepancy(
+            actor=p_emp,
+            grn_id=grn1.pk,
+            discrepancy_type="damage",
+            affected_quantity=0,
+            description="Zero qty",
+            requested_resolution="replacement",
+        )
+    assert exc_zero.value.code == "invalid_affected_quantity"
+    with pytest.raises(DomainError) as exc_over:
+        discrepancies.report_discrepancy(
+            actor=p_emp,
+            grn_id=grn1.pk,
+            discrepancy_type="damage",
+            affected_quantity=2,
+            description="Over qty",
+            requested_resolution="replacement",
+        )
+    assert exc_over.value.code == "invalid_affected_quantity"
+    case1 = discrepancies.report_discrepancy(
+        actor=p_emp,
+        grn_id=grn1.pk,
+        discrepancy_type="damage",
+        affected_quantity=1,
+        description="Broken",
+        requested_resolution="replacement",
+    )
+    discrepancies.resolve_case(
+        actor=p_ps,
+        case_id=case1.pk,
+        resolution_action="await_replacement",
+        resolution_notes="Vendor replacing",
+    )
+    # R2-03: using case1 (from po1) on po2 must be refused with ConflictError
+    with pytest.raises(ConflictError) as exc_mis:
+        receipts.record_grn(
+            actor=p_emp,
+            purchase_order_id=po2.pk,
+            replacement_for_case_id=case1.pk,
+            received_quantity=1,
+            accepted_quantity=1,
+        )
+    assert exc_mis.value.code == "replacement_source_mismatch"
+
+    # R2-04: 32-bit integer overflow returns clean 400 validation_error JSON (never 500)
+    c_emp = _client(stub_iam, uid=9101, role="faculty")
+    r_ov1 = c_emp.post(
+        "/api/v1/psm/indents",
+        {
+            "department": "CSE",
+            "item_description": "Overflow",
+            "quantity": 9_999_999_999,
+            "estimated_cost": "100.00",
+            "justification": "Test",
+        },
+        format="json",
+    )
+    assert r_ov1.status_code == 400
+    assert r_ov1.json()["error"]["code"] == "validation_error"
+    c_ps = _client(stub_iam, uid=9104, role="ps_admin")
+    r_ov2 = c_ps.post(
+        "/api/v1/psm/stock/adjustments",
+        {
+            "item_id": item.pk,
+            "location_id": loc.pk,
+            "quantity_delta": 9_999_999_999,
+            "reason": "Overflow",
+        },
+        format="json",
+    )
+    assert r_ov2.status_code == 400
+    assert r_ov2.json()["error"]["code"] == "validation_error"
+    c_acc = _client(stub_iam, uid=9106, role="Accounts Admin")
+    r_ov3 = c_acc.post(
+        "/api/v1/psm/invoices",
+        {
+            "purchase_order_id": po1.pk,
+            "invoice_number": "INV-OV-1",
+            "billed_quantity": 9_999_999_999,
+            "billed_amount": "100.00",
+        },
+        format="json",
+    )
+    assert r_ov3.status_code == 400
+    assert r_ov3.json()["error"]["code"] == "validation_error"

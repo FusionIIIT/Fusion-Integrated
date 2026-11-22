@@ -30,9 +30,8 @@ stateDiagram-v2
     hod_recommended --> procurement_authorized : ps_admin
     awaiting_final_approval --> procurement_authorized : final_authority
     awaiting_final_approval --> rejected : final_authority
-    procurement_authorized --> tender_open : ps_admin
+    procurement_authorized --> tender_awarded : ps_admin
     procurement_authorized --> po_issued : ps_admin
-    tender_open --> tender_awarded : ps_admin
     tender_awarded --> po_issued : ps_admin
     po_issued --> fulfilled : employee
 ```

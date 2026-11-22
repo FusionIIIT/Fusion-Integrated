@@ -4,16 +4,19 @@ from __future__ import annotations
 from decimal import Decimal
 
 from django.db import transaction
+from django.db.models import Sum
 from django.utils import timezone
 
 from core.api.exceptions import ConflictError, DomainError, NotFoundError
 from core.files.drive import InvalidDriveLink
 from core.files.drive import parse as parse_drive_link
 from core.files.validators import sanitise_filename
+from modules.psm.domain import finance_rules as fr
 from modules.psm.domain import state_machine as sm
 from modules.psm.models import (
     DiscrepancyCase,
     DiscrepancyCommunication,
+    GoodsReceiptNote,
     Invoice,
     StockItem,
     StockLedgerEntry,
@@ -24,6 +27,8 @@ from modules.psm.services.common import (
     audit_record,
     enqueue_notification,
     next_number,
+    policy_to_spec,
+    require_active_policy,
     translate_errors,
 )
 
@@ -89,11 +94,66 @@ def _apply_inventory_adjustment(actor, case: DiscrepancyCase, notes: str) -> Non
     )
 
 
+def _reconcile_invoice(
+    *, actor, inv: Invoice, po, case: DiscrepancyCase, confirmed_qty: int, other_open: bool, spec
+) -> None:
+    """Re-evaluate three-way match and transition invoice strictly via state_machine (R2-01)."""
+    deduct_qty = 0 if case.replacement_count > 0 else case.affected_quantity
+    deduct_amt = (Decimal(deduct_qty) * po.unit_price).quantize(Decimal("0.01"))
+    adj_qty = max(0, inv.billed_quantity - deduct_qty)
+    adj_amt = max(Decimal("0.00"), (inv.billed_amount - deduct_amt).quantize(Decimal("0.01")))
+    outcome = fr.three_way_match(
+        fr.ThreeWayMatchInput(
+            po_ordered_quantity=po.ordered_quantity,
+            po_unit_price=po.unit_price,
+            po_total_amount=po.total_amount,
+            confirmed_accepted_quantity=confirmed_qty,
+            billed_quantity=adj_qty,
+            billed_amount=adj_amt,
+            has_open_discrepancy=other_open,
+            vendor_verified=inv.vendor.is_verified and inv.vendor.is_active,
+            partial_payment_enabled=spec.partial_payment_enabled,
+        )
+    )
+    old_status = inv.status
+    if outcome.matched and adj_amt > Decimal("0.00"):
+        target = sm.INV_VERIFIED
+        inv.eligible_amount = min(outcome.eligible_amount, adj_amt)
+        inv.hold_reason = ""
+    else:
+        target = sm.INV_ON_HOLD
+        inv.eligible_amount = Decimal("0.00")
+        inv.hold_reason = (
+            outcome.hold_reason or f"Adjusted to 0.00 after discrepancy {case.case_number}"
+        )
+    if target != old_status:
+        with translate_errors():
+            sm.resolve("invoice", old_status, target, sm.ACCOUNTS)
+        inv.status = target
+    inv.save(update_fields=["eligible_amount", "status", "hold_reason", "updated_at"])
+    audit_record(
+        actor=actor,
+        action="invoice.discrepancy_adjusted",
+        target_type="invoice",
+        target_id=inv.pk,
+        from_state=old_status,
+        to_state=inv.status,
+        details={"case_number": case.case_number, "eligible_amount": str(inv.eligible_amount)},
+    )
+
+
 def _apply_accounting_adjustment(actor, case: DiscrepancyCase) -> None:
-    """Recalculate linked invoice eligible_amount and hold status atomically (AFR-PSM-055)."""
+    """Recalculate linked invoice eligibility against confirmed GRNs atomically (AFR-PSM-055)."""
     po = case.grn.purchase_order
     if po is None:
         return
+    spec = policy_to_spec(require_active_policy())
+    confirmed_qty = (
+        GoodsReceiptNote.objects.filter(purchase_order=po, status="confirmed").aggregate(
+            t=Sum("accepted_quantity")
+        )["t"]
+        or 0
+    )
     other_open = (
         DiscrepancyCase.objects.filter(
             grn__purchase_order_id=po.pk,
@@ -102,34 +162,23 @@ def _apply_accounting_adjustment(actor, case: DiscrepancyCase) -> None:
         .exclude(pk=case.pk)
         .exists()
     )
-    deduction = (
-        Decimal("0.00")
-        if case.replacement_count > 0
-        else (Decimal(case.affected_quantity) * po.unit_price).quantize(Decimal("0.01"))
-    )
-    invoices = Invoice.objects.select_for_update().filter(
-        purchase_order_id=po.pk,
-        status__in=(sm.INV_SUBMITTED, sm.INV_ON_HOLD, sm.INV_VERIFIED),
+    invoices = (
+        Invoice.objects.select_for_update(of=("self",))
+        .select_related("vendor")
+        .filter(
+            purchase_order_id=po.pk,
+            status__in=(sm.INV_SUBMITTED, sm.INV_ON_HOLD, sm.INV_VERIFIED),
+        )
     )
     for inv in invoices:
-        old_inv_status = inv.status
-        base = inv.eligible_amount if inv.eligible_amount > Decimal("0.00") else inv.billed_amount
-        inv.eligible_amount = max(Decimal("0.00"), (base - deduction).quantize(Decimal("0.01")))
-        if inv.eligible_amount == Decimal("0.00"):
-            inv.status = sm.INV_ON_HOLD
-            inv.hold_reason = f"Adjusted to 0.00 after discrepancy {case.case_number}"
-        elif inv.status == sm.INV_ON_HOLD and not other_open:
-            inv.status = sm.INV_VERIFIED
-            inv.hold_reason = ""
-        inv.save(update_fields=["eligible_amount", "status", "hold_reason", "updated_at"])
-        audit_record(
+        _reconcile_invoice(
             actor=actor,
-            action="invoice.discrepancy_adjusted",
-            target_type="invoice",
-            target_id=inv.pk,
-            from_state=old_inv_status,
-            to_state=inv.status,
-            details={"case_number": case.case_number, "eligible_amount": str(inv.eligible_amount)},
+            inv=inv,
+            po=po,
+            case=case,
+            confirmed_qty=confirmed_qty,
+            other_open=other_open,
+            spec=spec,
         )
 
 

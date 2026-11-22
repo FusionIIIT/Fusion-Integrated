@@ -1,36 +1,44 @@
-// End-to-end Playwright workflows for PSM requester and procurement operations.
+// End-to-end Playwright workflows covering all PSM actor roles and live UC main flows (R2-06).
+import type { Browser } from "@playwright/test";
+
+import { ACCOUNTS, type AccountKey } from "../accounts";
 import {
   actAs, expect, openModuleNav, sidebar, signedInAs, test, uniqueName,
 } from "../support/test";
 
-test.describe("psm: requester indent lifecycle", () => {
+async function ensureActiveRole(browser: Browser, key: AccountKey): Promise<void> {
+  const context = await browser.newContext(signedInAs(key));
+  try {
+    const meRes = await context.request.get("/api/v1/me");
+    if (meRes.ok()) {
+      const me = (await meRes.json()) as { active_role?: string; csrf_token?: string };
+      const wanted = ACCOUNTS[key].role;
+      if (me.active_role !== wanted) {
+        await context.request.patch("/api/v1/me", {
+          headers: me.csrf_token ? { "X-CSRF-Token": me.csrf_token } : {},
+          data: { active_role: wanted },
+        });
+      }
+    }
+  } finally {
+    await context.close();
+  }
+}
+
+test.describe("psm: requester indent and receipt lifecycle", () => {
   test.use(signedInAs("psmRequester"));
 
   test.beforeAll(async ({ browser }) => {
-    const context = await browser.newContext(signedInAs("psmRequester"));
-    try {
-      const meRes = await context.request.get("/api/v1/me");
-      if (meRes.ok()) {
-        const me = (await meRes.json()) as { active_role?: string; csrf_token?: string };
-        if (me.active_role !== "faculty") {
-          await context.request.patch("/api/v1/me", {
-            headers: me.csrf_token ? { "X-CSRF-Token": me.csrf_token } : {},
-            data: { active_role: "faculty" },
-          });
-        }
-      }
-    } finally {
-      await context.close();
-    }
+    await ensureActiveRole(browser, "psmRequester");
   });
 
-  test("faculty submits, views history, and withdraws an indent (PSM-UC-001, PSM-UC-005)", async ({ page }) => {
+  test("faculty submits, inspects history, withdraws indent, and views receipts (PSM-UC-001, 002, 005, 020, 024, 028)", async ({ page }) => {
     const itemDesc = uniqueName("E2E Oscilloscope");
 
     await page.goto("/");
     await actAs(page, "psmRequester");
     await openModuleNav(page, "Procurement & Stores");
-    await sidebar(page).getByRole("link", { name: "Indents" }).click();
+    await sidebar(page).getByRole("link", { name: "Indents", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Purchase Indents", level: 2 })).toBeVisible();
 
     await page.getByRole("button", { name: "New indent" }).click();
@@ -47,17 +55,28 @@ test.describe("psm: requester indent lifecycle", () => {
     const row = page.getByRole("row").filter({ hasText: itemDesc });
     await expect(row).toBeVisible();
 
+    await row.getByRole("button", { name: "History" }).click();
+    await expect(page.getByText(/indent history/i)).toBeVisible();
+    await page.keyboard.press("Escape");
+
     const withdrawn = page.waitForResponse((r) =>
       r.url().includes("/withdraw") && r.request().method() === "POST");
     await row.getByRole("button", { name: "Withdraw" }).click();
     expect((await withdrawn).status()).toBe(200);
+
+    await sidebar(page).getByRole("link", { name: "Receipts & Discrepancies", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Receipts & Discrepancies", level: 2 })).toBeVisible();
   });
 });
 
 test.describe("psm: procurement operations", () => {
   test.use(signedInAs("psAdmin"));
 
-  test("ps_admin opens dashboard, onboards vendor, adds stock, and generates report (PSM-UC-019, 026, 010, 030)", async ({ page }) => {
+  test.beforeAll(async ({ browser }) => {
+    await ensureActiveRole(browser, "psAdmin");
+  });
+
+  test("ps_admin runs dashboard, vendor, stock, tender, PO, reports, and policy pages (PSM-UC-010, 019, 022, 025, 026, 027, 030, 031)", async ({ page }) => {
     const vendorName = uniqueName("E2E Vendor");
     const sku = uniqueName("SKU").replace(/\s+/g, "-").slice(0, 24);
 
@@ -85,7 +104,12 @@ test.describe("psm: procurement operations", () => {
     expect((await created).status()).toBe(201);
 
     await expect(dialog).toBeHidden();
-    await expect(page.getByRole("row").filter({ hasText: vendorName })).toBeVisible();
+    const vRow = page.getByRole("row").filter({ hasText: vendorName });
+    await expect(vRow).toBeVisible();
+    const verified = page.waitForResponse((r) =>
+      r.url().includes("/verify") && r.request().method() === "POST");
+    await vRow.getByRole("button", { name: "Verify" }).click();
+    expect((await verified).status()).toBe(200);
 
     await sidebar(page).getByRole("link", { name: "Stock & Issues", exact: true }).click();
     await page.getByRole("button", { name: "Add stock item" }).click();
@@ -97,10 +121,89 @@ test.describe("psm: procurement operations", () => {
     await stockDialog.getByRole("button", { name: "Create item" }).click();
     expect((await itemRes).status()).toBe(201);
 
+    await sidebar(page).getByRole("link", { name: "Tenders", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Tenders", level: 2 })).toBeVisible();
+
+    await sidebar(page).getByRole("link", { name: "Purchase Orders", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Purchase Orders", level: 2 })).toBeVisible();
+
     await sidebar(page).getByRole("link", { name: "Reports", exact: true }).click();
     const repRes = page.waitForResponse((r) =>
       r.url().includes("/api/v1/psm/reports/generate") && r.request().method() === "POST");
     await page.getByRole("button", { name: "Generate report" }).click();
     expect((await repRes).status()).toBe(200);
+
+    await sidebar(page).getByRole("link", { name: "Policy", exact: true }).click();
+    await expect(page.getByRole("heading", { name: /psm policy/i, level: 2 })).toBeVisible();
+  });
+});
+
+test.describe("psm: departmental, finance, final authority, and audit roles", () => {
+  test.describe("deptadmin_cse", () => {
+    test.use(signedInAs("psmDeptAdmin"));
+
+    test.beforeAll(async ({ browser }) => {
+      await ensureActiveRole(browser, "psmDeptAdmin");
+    });
+
+    test("deptadmin_cse views indents, stock, and transfers (PSM-UC-007, 008, 009, 011, 017, 021, 033, 034)", async ({ page }) => {
+      await page.goto("/");
+      await actAs(page, "psmDeptAdmin");
+      await openModuleNav(page, "Procurement & Stores");
+      await sidebar(page).getByRole("link", { name: "Stock & Issues", exact: true }).click();
+      await expect(page.getByRole("heading", { name: "Stock & Internal Issues", level: 2 })).toBeVisible();
+      await sidebar(page).getByRole("link", { name: "Stock Transfers", exact: true }).click();
+      await expect(page.getByRole("heading", { name: "Inter-Departmental Stock Transfers", level: 2 })).toBeVisible();
+    });
+  });
+
+  test.describe("HOD (CSE)", () => {
+    test.use(signedInAs("psmHod"));
+
+    test.beforeAll(async ({ browser }) => {
+      await ensureActiveRole(browser, "psmHod");
+    });
+
+    test("HOD (CSE) views departmental indents and operational reports (PSM-UC-010, 016)", async ({ page }) => {
+      await page.goto("/");
+      await actAs(page, "psmHod");
+      await openModuleNav(page, "Procurement & Stores");
+      await sidebar(page).getByRole("link", { name: "Indents", exact: true }).click();
+      await expect(page.getByRole("heading", { name: "Purchase Indents", level: 2 })).toBeVisible();
+      await sidebar(page).getByRole("link", { name: "Reports", exact: true }).click();
+      await expect(page.getByRole("heading", { name: "Reports & Schedules", level: 2 })).toBeVisible();
+    });
+  });
+
+  test.describe("Accounts Admin", () => {
+    test.use(signedInAs("psmAccounts"));
+
+    test.beforeAll(async ({ browser }) => {
+      await ensureActiveRole(browser, "psmAccounts");
+    });
+
+    test("Accounts Admin accesses invoices & payments and financial reports (PSM-UC-013, 015, 029)", async ({ page }) => {
+      await page.goto("/");
+      await actAs(page, "psmAccounts");
+      await openModuleNav(page, "Procurement & Stores");
+      await sidebar(page).getByRole("link", { name: "Invoices & Payments", exact: true }).click();
+      await expect(page.getByRole("heading", { name: "Invoices & Payments", level: 2 })).toBeVisible();
+    });
+  });
+
+  test.describe("Auditor", () => {
+    test.use(signedInAs("psmAuditor"));
+
+    test.beforeAll(async ({ browser }) => {
+      await ensureActiveRole(browser, "psmAuditor");
+    });
+
+    test("Auditor accesses read-only audit trail and dashboard (PSM-UC-014, 015, 030)", async ({ page }) => {
+      await page.goto("/");
+      await actAs(page, "psmAuditor");
+      await openModuleNav(page, "Procurement & Stores");
+      await sidebar(page).getByRole("link", { name: "Audit Trail", exact: true }).click();
+      await expect(page.getByRole("heading", { name: "Audit Trail", level: 2 })).toBeVisible();
+    });
   });
 });

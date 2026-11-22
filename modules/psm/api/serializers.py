@@ -1,6 +1,11 @@
 # Explicit-field DRF serializers for PSM read and write payloads.
 from rest_framework import serializers
 
+_MAX_ID = 2_147_483_647
+_MAX_QTY = 1_000_000
+_MAX_HOURS = 8760
+_MAX_WINDOW_DAYS = 365
+
 
 def _validate_choice(value: str, allowed: tuple[str, ...]) -> str:
     if value not in allowed:
@@ -22,12 +27,18 @@ class PsmPolicySerializer(serializers.Serializer):
     withdrawable_states = serializers.ListField(
         child=serializers.CharField(max_length=32), required=False
     )
-    sla_reminder_hours = serializers.IntegerField(min_value=1, default=24)
-    sla_escalation_hours = serializers.IntegerField(min_value=2, default=48)
-    high_priority_sla_reminder_hours = serializers.IntegerField(min_value=1, default=12)
-    high_priority_sla_escalation_hours = serializers.IntegerField(min_value=2, default=24)
+    sla_reminder_hours = serializers.IntegerField(max_value=_MAX_HOURS, min_value=1, default=24)
+    sla_escalation_hours = serializers.IntegerField(max_value=_MAX_HOURS, min_value=2, default=48)
+    high_priority_sla_reminder_hours = serializers.IntegerField(
+        max_value=_MAX_HOURS, min_value=1, default=12
+    )
+    high_priority_sla_escalation_hours = serializers.IntegerField(
+        max_value=_MAX_HOURS, min_value=2, default=24
+    )
     partial_payment_enabled = serializers.BooleanField(default=True)
-    duplicate_window_days = serializers.IntegerField(min_value=1, default=14)
+    duplicate_window_days = serializers.IntegerField(
+        max_value=_MAX_WINDOW_DAYS, min_value=1, default=14
+    )
 
 
 class IndentVersionSerializer(serializers.Serializer):
@@ -75,9 +86,11 @@ class IndentDetailSerializer(IndentReadSerializer):
 
 class IndentCreateSerializer(serializers.Serializer):
     department = serializers.CharField(max_length=64)
-    item_id = serializers.IntegerField(required=False, allow_null=True)
+    item_id = serializers.IntegerField(
+        min_value=1, max_value=_MAX_ID, required=False, allow_null=True
+    )
     item_description = serializers.CharField(max_length=300)
-    quantity = serializers.IntegerField()
+    quantity = serializers.IntegerField(min_value=1, max_value=_MAX_QTY)
     estimated_cost = serializers.DecimalField(max_digits=14, decimal_places=2)
     justification = serializers.CharField()
     submit = serializers.BooleanField(default=True)
@@ -85,9 +98,11 @@ class IndentCreateSerializer(serializers.Serializer):
 
 class IndentUpdateSerializer(serializers.Serializer):
     department = serializers.CharField(max_length=64, required=False)
-    item_id = serializers.IntegerField(required=False, allow_null=True)
+    item_id = serializers.IntegerField(
+        min_value=1, max_value=_MAX_ID, required=False, allow_null=True
+    )
     item_description = serializers.CharField(max_length=300, required=False)
-    quantity = serializers.IntegerField(required=False)
+    quantity = serializers.IntegerField(min_value=1, max_value=_MAX_QTY, required=False)
     estimated_cost = serializers.DecimalField(max_digits=14, decimal_places=2, required=False)
     justification = serializers.CharField(required=False)
 
@@ -159,13 +174,15 @@ class StockAvailabilitySerializer(serializers.Serializer):
 
 
 class StockAdjustmentCreateSerializer(serializers.Serializer):
-    item_id = serializers.IntegerField()
-    location_id = serializers.IntegerField()
-    quantity_delta = serializers.IntegerField()
+    item_id = serializers.IntegerField(min_value=1, max_value=_MAX_ID)
+    location_id = serializers.IntegerField(min_value=1, max_value=_MAX_ID)
+    quantity_delta = serializers.IntegerField(min_value=-_MAX_QTY, max_value=_MAX_QTY)
     reason = serializers.CharField(max_length=300)
     entry_type = serializers.ChoiceField(choices=["opening", "adjustment"], default="adjustment")
     source_ref_type = serializers.CharField(max_length=32, required=False, default="manual")
-    source_ref_id = serializers.IntegerField(required=False, allow_null=True)
+    source_ref_id = serializers.IntegerField(
+        min_value=1, max_value=_MAX_ID, required=False, allow_null=True
+    )
 
 
 class StockLedgerEntrySerializer(serializers.Serializer):
@@ -218,10 +235,10 @@ class StockTransferReadSerializer(serializers.Serializer):
 
 
 class StockTransferCreateSerializer(serializers.Serializer):
-    item_id = serializers.IntegerField()
-    source_location_id = serializers.IntegerField()
-    destination_location_id = serializers.IntegerField()
-    quantity = serializers.IntegerField()
+    item_id = serializers.IntegerField(min_value=1, max_value=_MAX_ID)
+    source_location_id = serializers.IntegerField(min_value=1, max_value=_MAX_ID)
+    destination_location_id = serializers.IntegerField(min_value=1, max_value=_MAX_ID)
+    quantity = serializers.IntegerField(min_value=1, max_value=_MAX_QTY)
     notes = serializers.CharField(required=False, allow_blank=True, default="")
 
 
@@ -316,7 +333,7 @@ class TenderReadSerializer(serializers.Serializer):
 
 
 class TenderCreateSerializer(serializers.Serializer):
-    indent_id = serializers.IntegerField()
+    indent_id = serializers.IntegerField(min_value=1, max_value=_MAX_ID)
     title = serializers.CharField(max_length=200)
     scope = serializers.CharField()
     evaluation_criteria = serializers.CharField()
@@ -324,12 +341,12 @@ class TenderCreateSerializer(serializers.Serializer):
 
 
 class TenderBidCreateSerializer(serializers.Serializer):
-    vendor_id = serializers.IntegerField()
+    vendor_id = serializers.IntegerField(min_value=1, max_value=_MAX_ID)
     quoted_amount = serializers.DecimalField(max_digits=14, decimal_places=2)
 
 
 class TenderEvaluateItemSerializer(serializers.Serializer):
-    bid_id = serializers.IntegerField()
+    bid_id = serializers.IntegerField(min_value=1, max_value=_MAX_ID)
     technical_score = serializers.DecimalField(
         max_digits=6, decimal_places=2, required=False, allow_null=True
     )
@@ -346,7 +363,7 @@ class TenderEvaluateSerializer(serializers.Serializer):
 
 
 class TenderAwardSerializer(serializers.Serializer):
-    bid_id = serializers.IntegerField()
+    bid_id = serializers.IntegerField(min_value=1, max_value=_MAX_ID)
     committee_minutes = serializers.CharField(required=False, allow_blank=True, default="")
 
 
@@ -369,12 +386,16 @@ class PurchaseOrderReadSerializer(serializers.Serializer):
 
 
 class PurchaseOrderCreateSerializer(serializers.Serializer):
-    indent_id = serializers.IntegerField()
-    vendor_id = serializers.IntegerField()
+    indent_id = serializers.IntegerField(min_value=1, max_value=_MAX_ID)
+    vendor_id = serializers.IntegerField(min_value=1, max_value=_MAX_ID)
     unit_price = serializers.DecimalField(max_digits=14, decimal_places=2)
     planned_delivery_date = serializers.DateField()
-    ordered_quantity = serializers.IntegerField(required=False, allow_null=True)
-    tender_id = serializers.IntegerField(required=False, allow_null=True)
+    ordered_quantity = serializers.IntegerField(
+        min_value=1, max_value=_MAX_QTY, required=False, allow_null=True
+    )
+    tender_id = serializers.IntegerField(
+        min_value=1, max_value=_MAX_ID, required=False, allow_null=True
+    )
     delivery_notes = serializers.CharField(required=False, allow_blank=True, default="")
 
 
@@ -404,12 +425,18 @@ class GrnReadSerializer(serializers.Serializer):
 
 
 class GrnCreateSerializer(serializers.Serializer):
-    purchase_order_id = serializers.IntegerField(required=False, allow_null=True)
-    internal_issue_id = serializers.IntegerField(required=False, allow_null=True)
-    replacement_for_case_id = serializers.IntegerField(required=False, allow_null=True)
-    received_quantity = serializers.IntegerField()
-    accepted_quantity = serializers.IntegerField()
-    rejected_quantity = serializers.IntegerField(default=0)
+    purchase_order_id = serializers.IntegerField(
+        min_value=1, max_value=_MAX_ID, required=False, allow_null=True
+    )
+    internal_issue_id = serializers.IntegerField(
+        min_value=1, max_value=_MAX_ID, required=False, allow_null=True
+    )
+    replacement_for_case_id = serializers.IntegerField(
+        min_value=1, max_value=_MAX_ID, required=False, allow_null=True
+    )
+    received_quantity = serializers.IntegerField(min_value=1, max_value=_MAX_QTY)
+    accepted_quantity = serializers.IntegerField(min_value=0, max_value=_MAX_QTY)
+    rejected_quantity = serializers.IntegerField(min_value=0, max_value=_MAX_QTY, default=0)
     inspection_notes = serializers.CharField(required=False, allow_blank=True, default="")
 
 
@@ -442,11 +469,11 @@ class DiscrepancyReadSerializer(serializers.Serializer):
 
 
 class DiscrepancyCreateSerializer(serializers.Serializer):
-    grn_id = serializers.IntegerField()
+    grn_id = serializers.IntegerField(min_value=1, max_value=_MAX_ID)
     discrepancy_type = serializers.ChoiceField(
         choices=["damage", "shortage", "wrong_item", "quality_defect"]
     )
-    affected_quantity = serializers.IntegerField()
+    affected_quantity = serializers.IntegerField(min_value=1, max_value=_MAX_QTY)
     description = serializers.CharField()
     requested_resolution = serializers.ChoiceField(
         choices=["return", "replacement", "warranty", "adjustment"]
@@ -490,9 +517,9 @@ class InvoiceReadSerializer(serializers.Serializer):
 
 
 class InvoiceCreateSerializer(serializers.Serializer):
-    purchase_order_id = serializers.IntegerField()
+    purchase_order_id = serializers.IntegerField(min_value=1, max_value=_MAX_ID)
     invoice_number = serializers.CharField(max_length=64)
-    billed_quantity = serializers.IntegerField()
+    billed_quantity = serializers.IntegerField(min_value=1, max_value=_MAX_QTY)
     billed_amount = serializers.DecimalField(max_digits=14, decimal_places=2)
 
 

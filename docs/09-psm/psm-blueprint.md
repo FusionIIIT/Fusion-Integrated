@@ -674,8 +674,7 @@ All endpoints sit behind `[HasModuleGrant("psm"), HasPermission(...)]` (never `A
 | `GET /discrepancies` | `psm.grn.view` | Scoped discrepancy cases | `PSM-UC-020`, `AFR-PSM-053` |
 | `POST /discrepancies` | `psm.grn.create` | Logged discrepancy case (+ optional validated Google Drive `evidence_url` and sanitized `evidence_filename`; supersedes separate `/discrepancies/{id}/evidence` download endpoint) | `PSM-UC-020`, `AFR-PSM-049`, `BR-PSM-009`, `BR-PSM-019` |
 | `POST /discrepancies/{id}/communications` | `psm.discrepancy.update` | Appended vendor communication | `PSM-UC-032`, `AFR-PSM-052` |
-| `POST /discrepancies/{id}/resolve` | `psm.discrepancy.update` | Resolved case (return/adjustment or replacement awaited) | `PSM-UC-032`, `BR-PSM-019`, `BW-PSM-06`, `BW-PSM-10` |
-| `POST /discrepancies/{id}/resolve` | `psm.discrepancy.update` | Resolve discrepancy (return/adjustment with atomic stock & invoice adjustments, or one replacement cycle) | `PSM-UC-032`, `AFR-PSM-054`, `AFR-PSM-055`, `BR-PSM-025`, `BW-PSM-06`, `BW-PSM-10` |
+| `POST /discrepancies/{id}/resolve` | `psm.discrepancy.update` | Resolve discrepancy (return/adjustment with atomic stock & invoice adjustments, or one replacement cycle) | `PSM-UC-032`, `AFR-PSM-054`, `AFR-PSM-055`, `BR-PSM-019`, `BR-PSM-025`, `BW-PSM-06`, `BW-PSM-10` |
 | `GET /invoices` | `psm.invoice.view` | Scoped invoices + payments | `PSM-UC-013`, `PSM-UC-029` |
 | `POST /invoices` | `psm.invoice.create` | Recorded vendor invoice against PO | `PSM-UC-013` |
 | `POST /invoices/{id}/verify` | `psm.invoice.review` | Three-way match result (`verified` or `on_hold`) | `PSM-UC-013`, `BR-PSM-017`, `BR-PSM-018`, `BR-PSM-022` |

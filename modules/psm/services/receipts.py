@@ -70,13 +70,14 @@ def _load_grn_source(actor, purchase_order_id: int | None, internal_issue_id: in
     return None, issue, issue.indent.quantity, prev or 0, issue.indent.user_id
 
 
-def _load_replacement_case(actor, replacement_for_case_id: int | None):
-    """Lock and validate an optional replacement discrepancy case."""
+def _load_replacement_case(actor, replacement_for_case_id: int | None, po, issue):
+    """Lock and validate an optional replacement discrepancy case matches the GRN source (R2-03)."""
     if not replacement_for_case_id:
         return None
     rep_case = (
         scoping.discrepancies_for(actor)
         .select_for_update(of=("self",))
+        .select_related("grn")
         .filter(pk=replacement_for_case_id)
         .first()
     )
@@ -86,6 +87,13 @@ def _load_replacement_case(actor, replacement_for_case_id: int | None):
         raise ConflictError(
             "Replacement GRN requires a case in replacement_awaited state.",
             code="not_awaiting_replacement",
+        )
+    po_id = po.pk if po is not None else None
+    issue_id = issue.pk if issue is not None else None
+    if rep_case.grn.purchase_order_id != po_id or rep_case.grn.internal_issue_id != issue_id:
+        raise ConflictError(
+            "Replacement GRN must belong to the same purchase order or internal issue as the case.",
+            code="replacement_source_mismatch",
         )
     return rep_case
 
@@ -177,7 +185,7 @@ def record_grn(
     po, issue, ordered_qty, prev_accepted, requestor_id = _load_grn_source(
         actor, purchase_order_id, internal_issue_id
     )
-    rep_case = _load_replacement_case(actor, replacement_for_case_id)
+    rep_case = _load_replacement_case(actor, replacement_for_case_id, po, issue)
     with translate_errors():
         grn_status = rr.validate_grn_quantities(
             ordered_quantity=ordered_qty,

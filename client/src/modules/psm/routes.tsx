@@ -30,7 +30,7 @@ export const routes: RouteObject[] = [
   { path: "vendors", element: office("psm.vendor.view", <VendorsPage />) },
   { path: "tenders", element: office("psm.tender.view", <TendersPage />) },
   { path: "purchase-orders", element: office("psm.purchase_order.view", <PurchaseOrdersPage />) },
-  { path: "receipts", element: <ReceiptsPage /> },
+  { path: "receipts", element: office("psm.grn.view", <ReceiptsPage />) },
   { path: "invoices", element: office("psm.invoice.view", <InvoicesPage />) },
   { path: "reports", element: office("psm.report.view", <ReportsPage />) },
   { path: "audit", element: office("psm.audit.view", <AuditPage />) },

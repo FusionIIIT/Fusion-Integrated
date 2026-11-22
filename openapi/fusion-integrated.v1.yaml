@@ -4018,10 +4018,14 @@ components:
       properties:
         grn_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
         discrepancy_type:
           $ref: '#/components/schemas/DiscrepancyTypeEnum'
         affected_quantity:
           type: integer
+          maximum: 1000000
+          minimum: 1
         description:
           type: string
         requested_resolution:
@@ -4266,19 +4270,31 @@ components:
       properties:
         purchase_order_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
           nullable: true
         internal_issue_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
           nullable: true
         replacement_for_case_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
           nullable: true
         received_quantity:
           type: integer
+          maximum: 1000000
+          minimum: 1
         accepted_quantity:
           type: integer
+          maximum: 1000000
+          minimum: 0
         rejected_quantity:
           type: integer
+          maximum: 1000000
+          minimum: 0
           default: 0
         inspection_notes:
           type: string
@@ -4386,12 +4402,16 @@ components:
           maxLength: 64
         item_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
           nullable: true
         item_description:
           type: string
           maxLength: 300
         quantity:
           type: integer
+          maximum: 1000000
+          minimum: 1
         estimated_cost:
           type: string
           format: decimal
@@ -4779,11 +4799,15 @@ components:
       properties:
         purchase_order_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
         invoice_number:
           type: string
           maxLength: 64
         billed_quantity:
           type: integer
+          maximum: 1000000
+          minimum: 1
         billed_amount:
           type: string
           format: decimal
@@ -5392,12 +5416,16 @@ components:
           maxLength: 64
         item_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
           nullable: true
         item_description:
           type: string
           maxLength: 300
         quantity:
           type: integer
+          maximum: 1000000
+          minimum: 1
         estimated_cost:
           type: string
           format: decimal
@@ -5770,18 +5798,22 @@ components:
             maxLength: 32
         sla_reminder_hours:
           type: integer
+          maximum: 8760
           minimum: 1
           default: 24
         sla_escalation_hours:
           type: integer
+          maximum: 8760
           minimum: 2
           default: 48
         high_priority_sla_reminder_hours:
           type: integer
+          maximum: 8760
           minimum: 1
           default: 12
         high_priority_sla_escalation_hours:
           type: integer
+          maximum: 8760
           minimum: 2
           default: 24
         partial_payment_enabled:
@@ -5789,6 +5821,7 @@ components:
           default: true
         duplicate_window_days:
           type: integer
+          maximum: 365
           minimum: 1
           default: 14
       required:
@@ -5803,8 +5836,12 @@ components:
       properties:
         indent_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
         vendor_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
         unit_price:
           type: string
           format: decimal
@@ -5814,9 +5851,13 @@ components:
           format: date
         ordered_quantity:
           type: integer
+          maximum: 1000000
+          minimum: 1
           nullable: true
         tender_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
           nullable: true
         delivery_notes:
           type: string
@@ -6512,10 +6553,16 @@ components:
       properties:
         item_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
         location_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
         quantity_delta:
           type: integer
+          maximum: 1000000
+          minimum: -1000000
         reason:
           type: string
           maxLength: 300
@@ -6529,6 +6576,8 @@ components:
           maxLength: 32
         source_ref_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
           nullable: true
       required:
       - item_id
@@ -6683,12 +6732,20 @@ components:
       properties:
         item_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
         source_location_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
         destination_location_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
         quantity:
           type: integer
+          maximum: 1000000
+          minimum: 1
         notes:
           type: string
           default: ''
@@ -6774,6 +6831,8 @@ components:
       properties:
         bid_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
         committee_minutes:
           type: string
           default: ''
@@ -6784,6 +6843,8 @@ components:
       properties:
         vendor_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
         quoted_amount:
           type: string
           format: decimal
@@ -6840,6 +6901,8 @@ components:
       properties:
         indent_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
         title:
           type: string
           maxLength: 200
@@ -6877,6 +6940,8 @@ components:
       properties:
         bid_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
         technical_score:
           type: string
           format: decimal

@@ -11,6 +11,7 @@ OFFICE_PAGES = {
     "vendors",
     "tenders",
     "purchase-orders",
+    "receipts",
     "invoices",
     "reports",
     "audit",

@@ -58,7 +58,7 @@ class IndentListCreateView(APIView):
             # Order approval queues by criticality first (BR-PSM-014, AFR-PSM-025).
             qs = qs.annotate(
                 priority_rank=Case(
-                    When(priority="critical", then=0),
+                    When(priority__in=("urgent", "critical"), then=0),
                     When(priority="high", then=1),
                     default=2,
                     output_field=IntegerField(),
