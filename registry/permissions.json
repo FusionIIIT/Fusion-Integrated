@@ -34,18 +34,154 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "iwd": {
+      "grants": {
+        "iwd_director": [
+          "iwd.budget.manage",
+          "iwd.budget.view",
+          "iwd.contractor.manage",
+          "iwd.inventory.manage",
+          "iwd.report.view",
+          "iwd.work_request.approve",
+          "iwd.work_request.assign",
+          "iwd.work_request.close",
+          "iwd.work_request.create",
+          "iwd.work_request.view"
+        ],
+        "iwd_engineer": [
+          "iwd.inventory.manage",
+          "iwd.work_request.create",
+          "iwd.work_request.view"
+        ],
+        "iwd_requester": [
+          "iwd.work_request.create",
+          "iwd.work_request.view"
+        ],
+        "iwd_supervisor": [
+          "iwd.budget.view",
+          "iwd.contractor.manage",
+          "iwd.inventory.manage",
+          "iwd.report.view",
+          "iwd.work_request.approve",
+          "iwd.work_request.assign",
+          "iwd.work_request.create",
+          "iwd.work_request.view"
+        ]
+      },
+      "module_grants": [
+        "iwd_director",
+        "iwd_engineer",
+        "iwd_requester",
+        "iwd_supervisor"
+      ],
+      "nav": {
+        "base_path": "/iwd",
+        "icon": "Wrench",
+        "items": [
+          {
+            "code": "iwd.requests",
+            "icon": "ClipboardText",
+            "label": "Work Requests",
+            "required_permission": "iwd.work_request.view",
+            "sort_order": 10,
+            "to": "/iwd/requests"
+          },
+          {
+            "code": "iwd.new_request",
+            "icon": "PlusCircle",
+            "label": "Submit Request",
+            "required_permission": "iwd.work_request.create",
+            "sort_order": 20,
+            "to": "/iwd/new-request"
+          },
+          {
+            "code": "iwd.approvals",
+            "icon": "CheckSquare",
+            "label": "Approvals",
+            "required_permission": "iwd.work_request.approve",
+            "sort_order": 30,
+            "to": "/iwd/approvals"
+          },
+          {
+            "code": "iwd.contractors",
+            "icon": "Buildings",
+            "label": "Contractors",
+            "required_permission": "iwd.contractor.manage",
+            "sort_order": 40,
+            "to": "/iwd/contractors"
+          },
+          {
+            "code": "iwd.inventory",
+            "icon": "Package",
+            "label": "Inventory",
+            "required_permission": "iwd.inventory.manage",
+            "sort_order": 50,
+            "to": "/iwd/inventory"
+          },
+          {
+            "code": "iwd.reports",
+            "icon": "ChartBar",
+            "label": "Reports",
+            "required_permission": "iwd.report.view",
+            "sort_order": 60,
+            "to": "/iwd/reports"
+          }
+        ],
+        "label": "Institute Works Department",
+        "nav_section": "Administration",
+        "sort_order": 30,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "iwd.work_request.view",
+          "label": "View work requests"
+        },
+        {
+          "code": "iwd.work_request.create",
+          "label": "Submit a new work request"
+        },
+        {
+          "code": "iwd.work_request.approve",
+          "label": "Approve or reject work requests"
+        },
+        {
+          "code": "iwd.work_request.assign",
+          "label": "Assign work requests to engineers"
+        },
+        {
+          "code": "iwd.work_request.close",
+          "label": "Close and complete work requests"
+        },
+        {
+          "code": "iwd.contractor.manage",
+          "label": "Manage contractor records"
+        },
+        {
+          "code": "iwd.inventory.manage",
+          "label": "Manage materials and inventory"
+        },
+        {
+          "code": "iwd.budget.view",
+          "label": "View budget allocations"
+        },
+        {
+          "code": "iwd.budget.manage",
+          "label": "Manage and update budgets"
+        },
+        {
+          "code": "iwd.report.view",
+          "label": "View IWD operational reports"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
           "placement_cell.academic_directory.view",
           "placement_cell.announcement.publish",
-          "placement_cell.application.view",
-          "placement_cell.job_posting.view",
-          "placement_cell.report.view"
-        ],
-        "acadadmin": [
-          "placement_cell.academic_directory.view",
-          "placement_cell.application.review",
           "placement_cell.application.view",
           "placement_cell.job_posting.view",
           "placement_cell.report.view"
@@ -91,12 +227,109 @@
       },
       "module_grants": [
         "Dean Academic",
-        "acadadmin",
         "placement_chairman",
         "placement_coordinator",
         "placement_officer",
         "student"
       ],
+      "nav": {
+        "base_path": "/placement",
+        "icon": "Briefcase",
+        "items": [
+          {
+            "code": "placement.registration",
+            "icon": "Checks",
+            "label": "Season Registration",
+            "required_permission": "placement_cell.registration.self",
+            "sort_order": 5,
+            "to": "/placement/registration"
+          },
+          {
+            "code": "placement.postings",
+            "icon": "ClipboardText",
+            "label": "Opportunities",
+            "required_permission": "placement_cell.job_posting.view",
+            "sort_order": 10,
+            "to": "/placement/postings"
+          },
+          {
+            "code": "placement.mine",
+            "icon": "UserCheck",
+            "label": "My Applications",
+            "required_permission": "placement_cell.application.view_self",
+            "sort_order": 20,
+            "to": "/placement/mine"
+          },
+          {
+            "code": "placement.offers",
+            "icon": "Signature",
+            "label": "My Offers",
+            "required_permission": "placement_cell.offer.respond",
+            "sort_order": 30,
+            "to": "/placement/offers"
+          },
+          {
+            "code": "placement.applications",
+            "icon": "Users",
+            "label": "Applications",
+            "required_permission": "placement_cell.application.view",
+            "sort_order": 50,
+            "to": "/placement/applications"
+          },
+          {
+            "code": "placement.registrations",
+            "icon": "Checks",
+            "label": "Registrations",
+            "required_permission": "placement_cell.registration.manage",
+            "sort_order": 55,
+            "to": "/placement/registration-approvals"
+          },
+          {
+            "code": "placement.companies",
+            "icon": "Buildings",
+            "label": "Companies",
+            "required_permission": "placement_cell.company.manage",
+            "sort_order": 60,
+            "to": "/placement/companies"
+          },
+          {
+            "code": "placement.interviews",
+            "icon": "CalendarBlank",
+            "label": "Interviews",
+            "required_permission": "placement_cell.interview.schedule",
+            "sort_order": 70,
+            "to": "/placement/interviews"
+          },
+          {
+            "code": "placement.announcements",
+            "icon": "Megaphone",
+            "label": "Announcements",
+            "required_permission": "placement_cell.announcement.publish",
+            "sort_order": 80,
+            "to": "/placement/announcements"
+          },
+          {
+            "code": "placement.cpi",
+            "icon": "GraduationCap",
+            "label": "Student CPI",
+            "required_permission": "placement_cell.academic_directory.view",
+            "sort_order": 85,
+            "to": "/placement/students-cpi"
+          },
+          {
+            "code": "placement.reports",
+            "icon": "ChartBar",
+            "label": "Reports",
+            "required_permission": "placement_cell.report.view",
+            "sort_order": 90,
+            "to": "/placement/reports"
+          }
+        ],
+        "label": "Placement Cell",
+        "nav_section": "Placement",
+        "sort_order": 10,
+        "status": "active"
+      },
       "permissions": [
         {
           "code": "placement_cell.job_posting.view",
@@ -190,5 +423,6 @@
       ]
     }
   },
-  "version": 1
+  "publisher": "integrated",
+  "version": 2
 }
