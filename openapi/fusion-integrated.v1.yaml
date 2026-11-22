@@ -1674,6 +1674,742 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/vms/analytics/dashboard/:
+    get:
+      operationId: v1_vms_analytics_dashboard_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsDashboard'
+          description: ''
+  /api/v1/vms/audit/:
+    get:
+      operationId: v1_vms_audit_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GateCheckLog'
+          description: ''
+  /api/v1/vms/blacklist/:
+    get:
+      operationId: v1_vms_blacklist_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BlacklistEntry'
+          description: ''
+    post:
+      operationId: v1_vms_blacklist_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlacklistCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BlacklistCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BlacklistCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlacklistEntry'
+          description: ''
+  /api/v1/vms/blacklist/{id}/safe-list/:
+    post:
+      operationId: v1_vms_blacklist_safe_list_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SafeListInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SafeListInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SafeListInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlacklistEntry'
+          description: ''
+  /api/v1/vms/dashboard/live/:
+    get:
+      operationId: v1_vms_dashboard_live_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VisitRequest'
+          description: ''
+  /api/v1/vms/emergency/muster/:
+    post:
+      operationId: v1_vms_emergency_muster_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmergencyMusterInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmergencyMusterInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmergencyMusterInput'
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmergencyMusterResponse'
+          description: ''
+  /api/v1/vms/emergency/roll-call/{id}/:
+    post:
+      operationId: v1_vms_emergency_roll_call_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RollCallInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RollCallInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RollCallInput'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmergencyRoster'
+          description: ''
+  /api/v1/vms/emergency/roster/:
+    get:
+      operationId: v1_vms_emergency_roster_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EmergencyRoster'
+          description: ''
+  /api/v1/vms/gate/check-in/:
+    post:
+      operationId: v1_vms_gate_check_in_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GateCheckInInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GateCheckInInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GateCheckInInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GateCheckLog'
+          description: ''
+  /api/v1/vms/gate/check-out/:
+    post:
+      operationId: v1_vms_gate_check_out_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GateCheckOutInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GateCheckOutInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GateCheckOutInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GateCheckLog'
+          description: ''
+  /api/v1/vms/gate/offline-sync/:
+    post:
+      operationId: v1_vms_gate_offline_sync_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfflineSyncInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OfflineSyncInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OfflineSyncInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfflineSyncResponse'
+          description: ''
+  /api/v1/vms/gate/override/:
+    post:
+      operationId: v1_vms_gate_override_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GateOverrideInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GateOverrideInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GateOverrideInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GateCheckLog'
+          description: ''
+  /api/v1/vms/gate/validate/:
+    post:
+      operationId: v1_vms_gate_validate_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GateValidateInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GateValidateInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GateValidateInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GateValidateResponse'
+          description: ''
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GateValidateResponse'
+          description: ''
+  /api/v1/vms/passes/{id}/:
+    get:
+      operationId: v1_vms_passes_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pass'
+          description: ''
+  /api/v1/vms/policies/:
+    get:
+      operationId: v1_vms_policies_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccessPolicy'
+          description: ''
+    post:
+      operationId: v1_vms_policies_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessPolicy'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AccessPolicy'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AccessPolicy'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessPolicy'
+          description: ''
+  /api/v1/vms/policies/{version}/publish/:
+    post:
+      operationId: v1_vms_policies_publish_create
+      parameters:
+      - in: path
+        name: version
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessPolicy'
+          description: ''
+  /api/v1/vms/pre-authorizations/:
+    post:
+      operationId: v1_vms_pre_authorizations_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreAuthorization'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PreAuthorization'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PreAuthorization'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreAuthorization'
+          description: ''
+  /api/v1/vms/visits/:
+    get:
+      operationId: v1_vms_visits_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VisitRequest'
+          description: ''
+  /api/v1/vms/visits/{id}/:
+    get:
+      operationId: v1_vms_visits_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitRequest'
+          description: ''
+  /api/v1/vms/visits/{id}/contingency-approve/:
+    post:
+      operationId: v1_vms_visits_contingency_approve_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContingencyInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ContingencyInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ContingencyInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitRequest'
+          description: ''
+  /api/v1/vms/visits/{id}/decide/:
+    post:
+      operationId: v1_vms_visits_decide_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecisionInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DecisionInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DecisionInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitRequest'
+          description: ''
+  /api/v1/vms/visits/{id}/extend/:
+    post:
+      operationId: v1_vms_visits_extend_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtensionInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExtensionInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExtensionInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitRequest'
+          description: ''
+  /api/v1/vms/visits/{id}/terminate/:
+    post:
+      operationId: v1_vms_visits_terminate_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TerminateInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TerminateInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TerminateInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitRequest'
+          description: ''
+  /api/v1/vms/visits/bulk/:
+    post:
+      operationId: v1_vms_visits_bulk_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkRegisterInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BulkRegisterInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BulkRegisterInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VisitRequest'
+          description: ''
+  /api/v1/vms/visits/pre-register/:
+    post:
+      operationId: v1_vms_visits_pre_register_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreRegisterInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PreRegisterInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PreRegisterInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitRequest'
+          description: ''
+  /api/v1/vms/visits/walk-in/:
+    post:
+      operationId: v1_vms_visits_walk_in_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalkInInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WalkInInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WalkInInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitRequest'
+          description: ''
+  /api/v1/vms/zones/elevate/:
+    post:
+      operationId: v1_vms_zones_elevate_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneElevateInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ZoneElevateInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ZoneElevateInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZoneElevateResponse'
+          description: ''
+  /api/v1/vms/zones/validate/:
+    post:
+      operationId: v1_vms_zones_validate_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneValidateInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ZoneValidateInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ZoneValidateInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZoneValidateResponse'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZoneValidateResponse'
+          description: ''
 components:
   schemas:
     AcademicDirectory:
@@ -1763,6 +2499,62 @@ components:
       - semester
       - semester_type
       - user_id
+    AccessPolicy:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        version:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        visiting_hours_start:
+          type: string
+          format: time
+        visiting_hours_end:
+          type: string
+          format: time
+        max_duration_hours:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        is_published:
+          type: boolean
+        published_at:
+          type: string
+          format: date-time
+          nullable: true
+        policy_notes:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - version
+    AccountabilityStatusEnum:
+      enum:
+      - UNACCOUNTED
+      - ACCOUNTED
+      type: string
+      description: |-
+        * `UNACCOUNTED` - Unaccounted
+        * `ACCOUNTED` - Accounted
+    ActionEnum:
+      enum:
+      - CHECK_IN
+      - CHECK_OUT
+      - DENIED
+      - OVERRIDE
+      type: string
+      description: |-
+        * `CHECK_IN` - Check In
+        * `CHECK_OUT` - Check Out
+        * `DENIED` - Access Denied
+        * `OVERRIDE` - Manual Override
     AddCandidates:
       type: object
       properties:
@@ -1774,6 +2566,31 @@ components:
           minItems: 1
       required:
       - application_ids
+    AnalyticsDashboard:
+      type: object
+      properties:
+        total_today:
+          type: integer
+        onsite_now:
+          type: integer
+        approved:
+          type: integer
+        pending:
+          type: integer
+        rejected:
+          type: integer
+        overstays:
+          type: integer
+        completed:
+          type: integer
+      required:
+      - approved
+      - completed
+      - onsite_now
+      - overstays
+      - pending
+      - rejected
+      - total_today
     Announcement:
       type: object
       properties:
@@ -1993,6 +2810,84 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BlacklistCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        id_document_type:
+          type: string
+          maxLength: 30
+        id_document_number:
+          type: string
+          maxLength: 100
+        phone:
+          type: string
+          default: ''
+          maxLength: 20
+        reason:
+          type: string
+          minLength: 3
+      required:
+      - id_document_number
+      - id_document_type
+      - name
+      - reason
+    BlacklistEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        id_document_type:
+          type: string
+          maxLength: 30
+        id_document_number:
+          type: string
+          maxLength: 100
+        phone:
+          type: string
+          maxLength: 20
+        reason:
+          type: string
+        status:
+          $ref: '#/components/schemas/BlacklistEntryStatusEnum'
+        safe_list_until:
+          type: string
+          format: date-time
+          nullable: true
+        safe_list_reason:
+          type: string
+        safe_listed_by_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - id_document_number
+      - id_document_type
+      - name
+      - reason
+    BlacklistEntryStatusEnum:
+      enum:
+      - ACTIVE
+      - SAFE_LISTED
+      - INACTIVE
+      type: string
+      description: |-
+        * `ACTIVE` - Active Blacklist
+        * `SAFE_LISTED` - Temporarily Safe-Listed
+        * `INACTIVE` - Inactive
     BulkOutcome:
       type: object
       properties:
@@ -2009,6 +2904,36 @@ components:
       - code
       - error
       - moved
+    BulkRegisterInput:
+      type: object
+      properties:
+        records:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        host_id:
+          type: integer
+          minimum: 1
+        purpose:
+          type: string
+          maxLength: 255
+        scheduled_start:
+          type: string
+          format: date-time
+        scheduled_end:
+          type: string
+          format: date-time
+        external_event_ref:
+          type: string
+          default: ''
+          maxLength: 100
+      required:
+      - host_id
+      - purpose
+      - records
+      - scheduled_end
+      - scheduled_start
     BulkResult:
       type: object
       description: |-
@@ -2082,6 +3007,16 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CheckpointTypeEnum:
+      enum:
+      - ENTRY
+      - EXIT
+      - ZONE_CHECK
+      type: string
+      description: |-
+        * `ENTRY` - Entry Gate
+        * `EXIT` - Exit Gate
+        * `ZONE_CHECK` - Zone Checkpoint
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2315,6 +3250,36 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    ContingencyInput:
+      type: object
+      properties:
+        reason:
+          type: string
+          minLength: 3
+      required:
+      - reason
+    DecisionEnum:
+      enum:
+      - APPROVE
+      - REJECT
+      - approve
+      - reject
+      type: string
+      description: |-
+        * `APPROVE` - APPROVE
+        * `REJECT` - REJECT
+        * `approve` - approve
+        * `reject` - reject
+    DecisionInput:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        reason:
+          type: string
+          default: ''
+      required:
+      - decision
     Detail:
       type: object
       properties:
@@ -2407,6 +3372,87 @@ components:
       - season_decision
       - semester
       - standing
+    EmergencyMusterInput:
+      type: object
+      properties:
+        assembly_point:
+          type: string
+          default: Central Ground
+          maxLength: 100
+    EmergencyMusterResponse:
+      type: object
+      properties:
+        muster_id:
+          type: string
+        status:
+          type: string
+      required:
+      - muster_id
+      - status
+    EmergencyRoster:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        muster_id:
+          type: string
+          maxLength: 64
+        assembly_point:
+          type: string
+          maxLength: 100
+        initiated_by_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        initiated_at:
+          type: string
+          format: date-time
+        visitor:
+          allOf:
+          - $ref: '#/components/schemas/Visitor'
+          readOnly: true
+        pass_record:
+          allOf:
+          - $ref: '#/components/schemas/Pass'
+          readOnly: true
+        check_in_time:
+          type: string
+          format: date-time
+        accountability_status:
+          $ref: '#/components/schemas/AccountabilityStatusEnum'
+        accounted_at:
+          type: string
+          format: date-time
+          nullable: true
+        accounted_by_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+        notes:
+          type: string
+      required:
+      - assembly_point
+      - check_in_time
+      - id
+      - initiated_at
+      - initiated_by_id
+      - muster_id
+      - pass_record
+      - visitor
+    ExtensionInput:
+      type: object
+      properties:
+        hours:
+          type: integer
+          maximum: 8
+          minimum: 1
+        reason:
+          type: string
+          default: ''
+      required:
+      - hours
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2423,6 +3469,122 @@ components:
       - fee_reference
       - season
       - user_id
+    GateCheckInInput:
+      type: object
+      properties:
+        pass_id:
+          type: integer
+        gate_name:
+          type: string
+          default: Main Gate
+          maxLength: 100
+      required:
+      - pass_id
+    GateCheckLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        pass_number:
+          type: string
+          readOnly: true
+        gate_name:
+          type: string
+          maxLength: 100
+        checkpoint_type:
+          $ref: '#/components/schemas/CheckpointTypeEnum'
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+        operator_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+        is_override:
+          type: boolean
+        override_reason:
+          type: string
+        is_offline_sync:
+          type: boolean
+        timestamp:
+          type: string
+          format: date-time
+      required:
+      - action
+      - gate_name
+      - id
+      - pass_number
+      - timestamp
+    GateCheckOutInput:
+      type: object
+      properties:
+        pass_id:
+          type: integer
+        gate_name:
+          type: string
+          default: Main Gate
+          maxLength: 100
+      required:
+      - pass_id
+    GateOverrideInput:
+      type: object
+      properties:
+        pass_id:
+          type: integer
+        reason:
+          type: string
+          minLength: 3
+        gate_name:
+          type: string
+          default: Main Gate Override
+          maxLength: 100
+      required:
+      - pass_id
+      - reason
+    GateValidateInput:
+      type: object
+      properties:
+        qr_token:
+          type: string
+        gate_name:
+          type: string
+          default: Main Gate
+          maxLength: 100
+      required:
+      - qr_token
+    GateValidateResponse:
+      type: object
+      properties:
+        is_valid:
+          type: boolean
+        message:
+          type: string
+        pass_record:
+          allOf:
+          - $ref: '#/components/schemas/Pass'
+          nullable: true
+      required:
+      - is_valid
+      - message
+    IdDocumentTypeEnum:
+      enum:
+      - AADHAAR
+      - PAN
+      - PASSPORT
+      - VOTER_ID
+      - DRIVING_LICENSE
+      - INSTITUTE_ID
+      - OTHER
+      type: string
+      description: |-
+        * `AADHAAR` - Aadhaar Card
+        * `PAN` - PAN Card
+        * `PASSPORT` - Passport
+        * `VOTER_ID` - Voter ID
+        * `DRIVING_LICENSE` - Driving License
+        * `INSTITUTE_ID` - Institute ID
+        * `OTHER` - Other Government ID
     IncidentRecorded:
       type: object
       properties:
@@ -2864,6 +4026,26 @@ components:
         * `revoked` - Revoked
         * `superseded` - Superseded
         * `expired` - Expired
+    OfflineSyncInput:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - events
+    OfflineSyncResponse:
+      type: object
+      properties:
+        synced:
+          type: integer
+        failed:
+          type: integer
+      required:
+      - failed
+      - synced
     Ok:
       type: object
       properties:
@@ -3000,6 +4182,65 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    Pass:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        pass_number:
+          type: string
+          maxLength: 64
+        qr_token:
+          type: string
+          maxLength: 128
+        pass_type:
+          $ref: '#/components/schemas/PassTypeEnum'
+        valid_from:
+          type: string
+          format: date-time
+        valid_to:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/PassStatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - pass_number
+      - qr_token
+      - valid_from
+      - valid_to
+    PassStatusEnum:
+      enum:
+      - ACTIVE
+      - USED
+      - EXPIRED
+      - REVOKED
+      type: string
+      description: |-
+        * `ACTIVE` - Active
+        * `USED` - Used
+        * `EXPIRED` - Expired
+        * `REVOKED` - Revoked
+    PassTypeEnum:
+      enum:
+      - PRE_REGISTERED
+      - WALK_IN
+      - VIP
+      - CONTRACTOR
+      - EVENT
+      type: string
+      description: |-
+        * `PRE_REGISTERED` - Pre-registered
+        * `WALK_IN` - Walk-in
+        * `VIP` - VIP
+        * `CONTRACTOR` - Contractor
+        * `EVENT` - Event Attendee
     PatchedJobPosting:
       type: object
       properties:
@@ -3145,6 +4386,97 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    PreAuthorization:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        host_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        visitor_email:
+          type: string
+          format: email
+          maxLength: 254
+        visitor_name:
+          type: string
+          maxLength: 150
+        valid_from:
+          type: string
+          format: date
+        valid_to:
+          type: string
+          format: date
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - host_id
+      - id
+      - valid_from
+      - valid_to
+      - visitor_email
+      - visitor_name
+    PreRegisterInput:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          maxLength: 20
+        organization:
+          type: string
+          maxLength: 150
+        id_document_type:
+          type: string
+          default: AADHAAR
+          maxLength: 30
+        id_document_number:
+          type: string
+          maxLength: 100
+        host_id:
+          type: integer
+          minimum: 1
+        purpose:
+          type: string
+          maxLength: 255
+        scheduled_start:
+          type: string
+          format: date-time
+        scheduled_end:
+          type: string
+          format: date-time
+        access_zones:
+          type: array
+          items:
+            type: string
+        is_urgent_exception:
+          type: boolean
+          default: false
+        external_event_ref:
+          type: string
+          default: ''
+          maxLength: 100
+      required:
+      - email
+      - host_id
+      - id_document_number
+      - name
+      - phone
+      - purpose
+      - scheduled_end
+      - scheduled_start
     ProfileDocument:
       type: object
       description: |-
@@ -3466,6 +4798,24 @@ components:
       - message
       - reason
       - route
+    RollCallInput:
+      type: object
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RollCallInputStatusEnum'
+          default: ACCOUNTED
+        notes:
+          type: string
+          default: ''
+    RollCallInputStatusEnum:
+      enum:
+      - ACCOUNTED
+      - UNACCOUNTED
+      type: string
+      description: |-
+        * `ACCOUNTED` - ACCOUNTED
+        * `UNACCOUNTED` - UNACCOUNTED
     RoundOutcome:
       type: object
       properties:
@@ -3539,6 +4889,19 @@ components:
         * `absent` - Absent
         * `passed` - Passed
         * `failed` - Failed
+    SafeListInput:
+      type: object
+      properties:
+        hours:
+          type: integer
+          maximum: 72
+          minimum: 1
+        reason:
+          type: string
+          minLength: 3
+      required:
+      - hours
+      - reason
     SanctionEnum:
       enum:
       - bar_next_two
@@ -3698,6 +5061,14 @@ components:
           type: integer
       required:
       - document_id
+    TerminateInput:
+      type: object
+      properties:
+        reason:
+          type: string
+          minLength: 3
+      required:
+      - reason
     TopicEnum:
       enum:
       - drive
@@ -3814,6 +5185,136 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    VisitRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        visitor:
+          allOf:
+          - $ref: '#/components/schemas/Visitor'
+          readOnly: true
+        host_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        host_name:
+          type: string
+          maxLength: 150
+        purpose:
+          type: string
+          maxLength: 255
+        scheduled_start:
+          type: string
+          format: date-time
+        scheduled_end:
+          type: string
+          format: date-time
+        actual_check_in:
+          type: string
+          format: date-time
+          nullable: true
+        actual_check_out:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          $ref: '#/components/schemas/VisitRequestStatusEnum'
+        pass_type:
+          $ref: '#/components/schemas/PassTypeEnum'
+        access_zones: {}
+        admin_notes:
+          type: string
+        rejection_reason:
+          type: string
+        is_urgent_exception:
+          type: boolean
+        extension_hours:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        external_event_ref:
+          type: string
+          maxLength: 100
+        digital_pass:
+          allOf:
+          - $ref: '#/components/schemas/Pass'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - digital_pass
+      - host_id
+      - id
+      - purpose
+      - scheduled_end
+      - scheduled_start
+      - visitor
+    VisitRequestStatusEnum:
+      enum:
+      - PENDING_APPROVAL
+      - APPROVED
+      - REJECTED
+      - EXPIRED
+      - CANCELLED
+      - CHECKED_IN
+      - CHECKED_OUT
+      - AUTO_CHECKED_OUT
+      - TERMINATED_EARLY
+      type: string
+      description: |-
+        * `PENDING_APPROVAL` - Pending Host Approval
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
+        * `EXPIRED` - Expired
+        * `CANCELLED` - Cancelled
+        * `CHECKED_IN` - Checked In
+        * `CHECKED_OUT` - Checked Out
+        * `AUTO_CHECKED_OUT` - Auto Checked Out
+        * `TERMINATED_EARLY` - Terminated Early
+    Visitor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        phone:
+          type: string
+          maxLength: 20
+        organization:
+          type: string
+          maxLength: 150
+        id_document_type:
+          $ref: '#/components/schemas/IdDocumentTypeEnum'
+        id_document_number:
+          type: string
+          maxLength: 100
+        is_vip:
+          type: boolean
+        vip_reason:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - email
+      - id
+      - id_document_number
+      - name
+      - phone
     WaiveIncident:
       type: object
       properties:
@@ -3822,6 +5323,47 @@ components:
           maxLength: 300
       required:
       - reason
+    WalkInInput:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          maxLength: 20
+        organization:
+          type: string
+          maxLength: 150
+        id_document_type:
+          type: string
+          default: AADHAAR
+          maxLength: 30
+        id_document_number:
+          type: string
+          maxLength: 100
+        host_id:
+          type: integer
+          minimum: 1
+        purpose:
+          type: string
+          maxLength: 255
+        duration_hours:
+          type: integer
+          default: 4
+        auto_approve:
+          type: boolean
+          default: false
+      required:
+      - email
+      - host_id
+      - id_document_number
+      - name
+      - phone
+      - purpose
     Withdraw:
       type: object
       properties:
@@ -3830,6 +5372,61 @@ components:
           maxLength: 300
       required:
       - reason
+    ZoneElevateInput:
+      type: object
+      properties:
+        pass_id:
+          type: integer
+        zone_name:
+          type: string
+          maxLength: 100
+        hours:
+          type: integer
+          maximum: 12
+          minimum: 1
+        reason:
+          type: string
+          minLength: 3
+      required:
+      - hours
+      - pass_id
+      - reason
+      - zone_name
+    ZoneElevateResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        status:
+          type: string
+        valid_to:
+          type: string
+          format: date-time
+      required:
+      - id
+      - status
+      - valid_to
+    ZoneValidateInput:
+      type: object
+      properties:
+        pass_id:
+          type: integer
+        zone_name:
+          type: string
+          maxLength: 100
+      required:
+      - pass_id
+      - zone_name
+    ZoneValidateResponse:
+      type: object
+      properties:
+        allowed:
+          type: boolean
+        message:
+          type: string
+      required:
+      - allowed
+      - message
   securitySchemes:
     iamSession:
       type: apiKey
