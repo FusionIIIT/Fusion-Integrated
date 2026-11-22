@@ -7,6 +7,28 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `badms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `badms.backup.trigger_manual` | Trigger manual on-demand backup | `superadmin`, `sysadmin` |
+| `badms.backup.view_history` | View backup execution history and status | `superadmin`, `sysadmin` |
+| `badms.schedule.manage_local` | Configure dataset-specific local backup schedules | `superadmin`, `sysadmin` |
+| `badms.schedule.manage_global` | Define institution-wide global backup schedules and default policies | `superadmin` |
+| `badms.archival.submit` | Submit secure archival requests | `faculty`, `hod`, `staff`, `student` |
+| `badms.archival.review_hod` | Review and decide archival requests for own department | `hod` |
+| `badms.archival.classify_sysadmin` | Assign authoritative classification to approved archival requests | `superadmin`, `sysadmin` |
+| `badms.archival.configure_encryption` | Configure AES-256 encryption for Sensitive archival data | `it_security` |
+| `badms.archival.special_operate` | Perform offline-triggered special archival operations | `superadmin` |
+| `badms.storage.request_extension` | Submit storage quota extension request | `faculty`, `hod`, `staff`, `student` |
+| `badms.storage.review_extension` | Review departmental storage extension requests | `hod` |
+| `badms.storage.monitor_threshold` | Monitor storage quotas and threshold alerts | `superadmin`, `sysadmin` |
+| `badms.restoration.request` | Request data restoration for archived files | `faculty`, `hod`, `staff`, `student` |
+| `badms.restoration.approve_sensitive` | Approve restoration requests for Sensitive data | `superadmin`, `sysadmin` |
+| `badms.restoration.execute` | Execute technical data restoration | `superadmin`, `sysadmin` |
+| `badms.audit.view_operational` | View BADMS audit logs and operational reports | `hod`, `it_security`, `superadmin`, `sysadmin` |
+| `badms.security.administer` | Manage RBAC permissions and security administration | `it_security`, `superadmin` |
+
 ## `directory`
 
 | Code | What it allows | Held by |

@@ -1,0 +1,1731 @@
+[
+  {
+    "id": "TC-BADMS-201",
+    "strategy": "BR",
+    "title": "SysAdmin Manual Backup Trigger Permitted",
+    "primary_obligation": "BR-BA-001 Permitted",
+    "linked_obligations": [
+      "BA-UC-001"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that an authorized System Administrator (SysAdmin) is permitted to trigger an immediate manual database backup.",
+    "pre_conditions": "SysAdmin user 'sysadmin_01' is authenticated; database service is operational and ready for dump.",
+    "test_inputs": {
+      "actor_role": "SysAdmin",
+      "user_id": "sysadmin_01",
+      "action": "trigger_manual_backup",
+      "target_dataset": "production_core_db"
+    },
+    "execution_steps": [
+      "1. Authenticate as SysAdmin user 'sysadmin_01'.",
+      "2. Issue manual backup request for 'production_core_db'.",
+      "3. Verify BADMS authorizes the request and initiates database state dump."
+    ],
+    "expected_outcome": "Manual backup request is accepted; backup execution begins; timestamp and start status recorded.",
+    "failure_guarantee": "If manual backup fails to start, system state remains unchanged and failure alert is triggered to SysAdmin."
+  },
+  {
+    "id": "TC-BADMS-202",
+    "strategy": "BR",
+    "title": "Super Admin Manual Backup Trigger Permitted",
+    "primary_obligation": "BR-BA-001 Permitted",
+    "linked_obligations": [
+      "BA-UC-001"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that an authorized Super Admin is permitted to trigger an immediate manual database backup.",
+    "pre_conditions": "Super Admin user 'superadmin_01' is authenticated; target database dataset is accessible.",
+    "test_inputs": {
+      "actor_role": "Super Admin",
+      "user_id": "superadmin_01",
+      "action": "trigger_manual_backup",
+      "target_dataset": "institution_main_db"
+    },
+    "execution_steps": [
+      "1. Authenticate as Super Admin user 'superadmin_01'.",
+      "2. Issue manual backup request for 'institution_main_db'.",
+      "3. Verify BADMS evaluates authorization and triggers backup operation."
+    ],
+    "expected_outcome": "Manual backup request is authorized; database state dump begins; Success status recorded upon completion.",
+    "failure_guarantee": "Unauthorized state modification is prevented; target database remains in a consistent state."
+  },
+  {
+    "id": "TC-BADMS-203",
+    "strategy": "BR",
+    "title": "Regular User Manual Backup Trigger Prohibited",
+    "primary_obligation": "BR-BA-001 Prohibited",
+    "linked_obligations": [
+      "BA-UC-001"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that a regular User (Faculty/Student/Staff) is prohibited from triggering a manual database backup.",
+    "pre_conditions": "Regular user 'user_faculty_01' is authenticated with role 'User'.",
+    "test_inputs": {
+      "actor_role": "User",
+      "user_id": "user_faculty_01",
+      "action": "trigger_manual_backup",
+      "target_dataset": "production_core_db"
+    },
+    "execution_steps": [
+      "1. Authenticate as regular User 'user_faculty_01'.",
+      "2. Attempt to trigger manual backup for 'production_core_db'.",
+      "3. Observe response and authorization enforcement."
+    ],
+    "expected_outcome": "Manual backup request is denied with 403 Forbidden; no backup job is spawned; security audit log records unauthorized attempt.",
+    "failure_guarantee": "No database state dump or backup process is created; database integrity and resources remain undisturbed."
+  },
+  {
+    "id": "TC-BADMS-204",
+    "strategy": "BR",
+    "title": "Department Head Manual Backup Trigger Prohibited",
+    "primary_obligation": "BR-BA-001 Prohibited",
+    "linked_obligations": [
+      "BA-UC-001"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that a Department Head (HoD) without SysAdmin/Super Admin privileges is prohibited from triggering a manual backup.",
+    "pre_conditions": "HoD user 'hod_cs_01' is authenticated; role is strictly 'HoD'.",
+    "test_inputs": {
+      "actor_role": "HoD",
+      "user_id": "hod_cs_01",
+      "action": "trigger_manual_backup",
+      "target_dataset": "cs_dept_db"
+    },
+    "execution_steps": [
+      "1. Authenticate as HoD user 'hod_cs_01'.",
+      "2. Submit request to trigger manual backup for 'cs_dept_db'.",
+      "3. Verify access control rejection."
+    ],
+    "expected_outcome": "Request is denied due to lack of manual backup authority; audit log records unauthorized access attempt.",
+    "failure_guarantee": "Database state dump is not triggered; system operational boundaries are preserved."
+  },
+  {
+    "id": "TC-BADMS-205",
+    "strategy": "BR",
+    "title": "Respective HoD Decision on Departmental Secure Archival Permitted",
+    "primary_obligation": "BR-BA-002 Permitted",
+    "linked_obligations": [
+      "BA-UC-002",
+      "BA-UC-003"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that the HoD of the requester's department is permitted to approve or reject a secure archival request.",
+    "pre_conditions": "Secure archival request 'REQ-ARCH-101' submitted by user in 'Computer Science' department; status is 'Submitted'.",
+    "test_inputs": {
+      "actor_role": "HoD",
+      "user_id": "hod_cs_01",
+      "department": "Computer Science",
+      "request_id": "REQ-ARCH-101",
+      "decision": "Approve"
+    },
+    "execution_steps": [
+      "1. Authenticate as 'hod_cs_01' (HoD of Computer Science).",
+      "2. Access secure archival request 'REQ-ARCH-101' originating from Computer Science.",
+      "3. Submit approval decision."
+    ],
+    "expected_outcome": "Approval is accepted; request status transitions from 'Submitted' to 'HoD-Approved'; request is routed to SysAdmin.",
+    "failure_guarantee": "If approval recording encounters an error, request status remains 'Submitted' and does not route to SysAdmin."
+  },
+  {
+    "id": "TC-BADMS-206",
+    "strategy": "BR",
+    "title": "Cross-Department HoD Secure Archival Decision Prohibited",
+    "primary_obligation": "BR-BA-002 Prohibited",
+    "linked_obligations": [
+      "BA-UC-002",
+      "BA-UC-003",
+      "BR-BA-010"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that an HoD from a different department is prohibited from deciding a secure archival request outside their department.",
+    "pre_conditions": "Secure archival request 'REQ-ARCH-102' submitted by requester in 'Mechanical Engineering' department; status is 'Submitted'.",
+    "test_inputs": {
+      "actor_role": "HoD",
+      "user_id": "hod_cs_01",
+      "department": "Computer Science",
+      "request_id": "REQ-ARCH-102",
+      "decision": "Approve"
+    },
+    "execution_steps": [
+      "1. Authenticate as 'hod_cs_01' (HoD of Computer Science).",
+      "2. Attempt to approve or reject request 'REQ-ARCH-102' belonging to Mechanical Engineering.",
+      "3. Verify authorization boundary enforcement."
+    ],
+    "expected_outcome": "Decision is rejected with departmental scope violation error; request 'REQ-ARCH-102' remains in 'Submitted' state.",
+    "failure_guarantee": "Request routing and status are unmodified; unauthorized departmental crossover is prevented."
+  },
+  {
+    "id": "TC-BADMS-207",
+    "strategy": "BR",
+    "title": "Non-HoD Actor Secure Archival Decision Prohibited",
+    "primary_obligation": "BR-BA-002 Prohibited",
+    "linked_obligations": [
+      "BA-UC-002",
+      "BA-UC-003"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that non-HoD actors (such as SysAdmin or regular User) are prohibited from approving or rejecting secure archival requests.",
+    "pre_conditions": "Secure archival request 'REQ-ARCH-103' in 'Submitted' state awaiting HoD approval.",
+    "test_inputs": {
+      "actor_role": "SysAdmin",
+      "user_id": "sysadmin_01",
+      "request_id": "REQ-ARCH-103",
+      "decision": "Approve"
+    },
+    "execution_steps": [
+      "1. Authenticate as SysAdmin 'sysadmin_01'.",
+      "2. Attempt to record HoD approval decision on request 'REQ-ARCH-103'.",
+      "3. Observe system rejection."
+    ],
+    "expected_outcome": "Action is denied; SysAdmin cannot bypass or substitute for respective HoD approval; request status remains 'Submitted'.",
+    "failure_guarantee": "Request remains in 'Submitted' state awaiting respective HoD action; no routing to classification stage occurs."
+  },
+  {
+    "id": "TC-BADMS-208",
+    "strategy": "BR",
+    "title": "IT Security Encryption Configuration for Sensitive Data Permitted",
+    "primary_obligation": "BR-BA-003 Permitted",
+    "linked_obligations": [
+      "BA-UC-005",
+      "BR-BA-007"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that an authorized IT Security Team member is permitted to configure encryption for data authoritatively classified as Sensitive.",
+    "pre_conditions": "Secure archival request 'REQ-ARCH-104' authoritatively classified as Sensitive by SysAdmin and routed to IT Security.",
+    "test_inputs": {
+      "actor_role": "IT Security Team",
+      "user_id": "it_sec_01",
+      "request_id": "REQ-ARCH-104",
+      "cipher": "AES-256",
+      "key_parameters": {
+        "mode": "GCM",
+        "key_length": 256
+      }
+    },
+    "execution_steps": [
+      "1. Authenticate as IT Security user 'it_sec_01'.",
+      "2. Select routed Sensitive request 'REQ-ARCH-104'.",
+      "3. Configure encryption using AES-256 cipher parameters and submit."
+    ],
+    "expected_outcome": "Encryption configuration is accepted; BADMS initiates creation of AES-256 encrypted archive.",
+    "failure_guarantee": "Unencrypted data is never written to long-term storage if encryption configuration fails."
+  },
+  {
+    "id": "TC-BADMS-209",
+    "strategy": "BR",
+    "title": "SysAdmin Encryption Configuration Prohibited",
+    "primary_obligation": "BR-BA-003 Prohibited",
+    "linked_obligations": [
+      "BA-UC-005"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that a SysAdmin is prohibited from configuring encryption parameters for Sensitive archival requests.",
+    "pre_conditions": "Secure archival request 'REQ-ARCH-105' classified as Sensitive and routed to IT Security.",
+    "test_inputs": {
+      "actor_role": "SysAdmin",
+      "user_id": "sysadmin_01",
+      "request_id": "REQ-ARCH-105",
+      "cipher": "AES-256"
+    },
+    "execution_steps": [
+      "1. Authenticate as SysAdmin 'sysadmin_01'.",
+      "2. Attempt to configure encryption settings on Sensitive archival request 'REQ-ARCH-105'.",
+      "3. Verify access control response."
+    ],
+    "expected_outcome": "Configuration attempt is denied with authorization error; encryption configuration interface is restricted to IT Security.",
+    "failure_guarantee": "Separation of duties is maintained; encryption parameters remain unconfigured until IT Security acts."
+  },
+  {
+    "id": "TC-BADMS-210",
+    "strategy": "BR",
+    "title": "Regular User Encryption Configuration Prohibited",
+    "primary_obligation": "BR-BA-003 Prohibited",
+    "linked_obligations": [
+      "BA-UC-005"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that a regular User is prohibited from configuring encryption parameters for Sensitive data.",
+    "pre_conditions": "Archival request 'REQ-ARCH-106' classified Sensitive pending encryption configuration.",
+    "test_inputs": {
+      "actor_role": "User",
+      "user_id": "user_staff_01",
+      "request_id": "REQ-ARCH-106",
+      "cipher": "AES-256"
+    },
+    "execution_steps": [
+      "1. Authenticate as regular user 'user_staff_01'.",
+      "2. Attempt to invoke encryption configuration endpoint on 'REQ-ARCH-106'.",
+      "3. Observe authorization rejection."
+    ],
+    "expected_outcome": "HTTP 403 Forbidden error returned; unauthorized user blocked from encryption configuration.",
+    "failure_guarantee": "Encryption parameters are unmodified; security configuration integrity is protected."
+  },
+  {
+    "id": "TC-BADMS-211",
+    "strategy": "BR",
+    "title": "SysAdmin Authoritative Classification After HoD Approval Permitted",
+    "primary_obligation": "BR-BA-004 Permitted",
+    "linked_obligations": [
+      "BA-UC-004"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that an authorized SysAdmin is permitted to assign authoritative classification (Critical, Sensitive, Routine, Archival) to an HoD-approved request.",
+    "pre_conditions": "Secure archival request 'REQ-ARCH-107' approved by respective HoD; routed to SysAdmin.",
+    "test_inputs": {
+      "actor_role": "SysAdmin",
+      "user_id": "sysadmin_01",
+      "request_id": "REQ-ARCH-107",
+      "authoritative_classification": "Sensitive"
+    },
+    "execution_steps": [
+      "1. Authenticate as SysAdmin 'sysadmin_01'.",
+      "2. Open HoD-approved request 'REQ-ARCH-107'.",
+      "3. Assign authoritative classification 'Sensitive' and confirm."
+    ],
+    "expected_outcome": "Authoritative classification 'Sensitive' is saved; request is routed to IT Security for encryption configuration.",
+    "failure_guarantee": "If classification assignment fails, request remains in HoD-approved queue without downstream processing."
+  },
+  {
+    "id": "TC-BADMS-212",
+    "strategy": "BR",
+    "title": "Non-SysAdmin Authoritative Classification Assignment Prohibited",
+    "primary_obligation": "BR-BA-004 Prohibited",
+    "linked_obligations": [
+      "BA-UC-004"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that non-SysAdmin actors (e.g. HoD or User) are prohibited from assigning authoritative classification.",
+    "pre_conditions": "Secure archival request 'REQ-ARCH-108' has HoD approval recorded.",
+    "test_inputs": {
+      "actor_role": "HoD",
+      "user_id": "hod_cs_01",
+      "request_id": "REQ-ARCH-108",
+      "authoritative_classification": "Critical"
+    },
+    "execution_steps": [
+      "1. Authenticate as HoD 'hod_cs_01'.",
+      "2. Attempt to assign authoritative classification 'Critical' to 'REQ-ARCH-108'.",
+      "3. Verify system enforces SysAdmin-only authorization constraint."
+    ],
+    "expected_outcome": "Action is denied with 403 Forbidden; authoritative classification can only be assigned by SysAdmin.",
+    "failure_guarantee": "Request authoritative classification remains unassigned; security and retention policies are not misapplied."
+  },
+  {
+    "id": "TC-BADMS-213",
+    "strategy": "BR",
+    "title": "SysAdmin Classification Prior to HoD Approval Prohibited",
+    "primary_obligation": "BR-BA-004 Prohibited",
+    "linked_obligations": [
+      "BA-UC-004"
+    ],
+    "test_type": "state-transition",
+    "description": "Verify that SysAdmin cannot assign authoritative classification to a request that has not yet received HoD approval.",
+    "pre_conditions": "Secure archival request 'REQ-ARCH-109' is in 'Submitted' state; HoD has not yet approved.",
+    "test_inputs": {
+      "actor_role": "SysAdmin",
+      "user_id": "sysadmin_01",
+      "request_id": "REQ-ARCH-109",
+      "authoritative_classification": "Routine"
+    },
+    "execution_steps": [
+      "1. Authenticate as SysAdmin 'sysadmin_01'.",
+      "2. Attempt to assign authoritative classification to unapproved request 'REQ-ARCH-109'.",
+      "3. Observe validation response."
+    ],
+    "expected_outcome": "Operation rejected with state error; authoritative classification is only permitted after HoD approval.",
+    "failure_guarantee": "Request remains in 'Submitted' state; HoD approval prerequisite cannot be bypassed."
+  },
+  {
+    "id": "TC-BADMS-214",
+    "strategy": "BR",
+    "title": "Authoritative Classification Value Boundary and Rejection",
+    "primary_obligation": "BR-BA-004 Boundary",
+    "linked_obligations": [
+      "BA-UC-004"
+    ],
+    "test_type": "boundary",
+    "description": "Verify that authoritative classification accepts exactly the four valid domain values (Critical, Sensitive, Routine, Archival) and rejects any undefined value.",
+    "pre_conditions": "Secure archival request 'REQ-ARCH-110' is approved by HoD and ready for classification.",
+    "test_inputs": {
+      "actor_role": "SysAdmin",
+      "user_id": "sysadmin_01",
+      "request_id": "REQ-ARCH-110",
+      "valid_values": [
+        "Critical",
+        "Sensitive",
+        "Routine",
+        "Archival"
+      ],
+      "invalid_value": "Confidential"
+    },
+    "execution_steps": [
+      "1. Authenticate as SysAdmin 'sysadmin_01'.",
+      "2. Attempt to set classification to 'Confidential' on 'REQ-ARCH-110'.",
+      "3. Verify rejection.",
+      "4. Submit valid classification 'Archival' and verify acceptance."
+    ],
+    "expected_outcome": "Invalid value 'Confidential' is rejected with validation error; valid value 'Archival' is successfully applied.",
+    "failure_guarantee": "Data classification domain remains strictly constrained to {Critical, Sensitive, Routine, Archival}."
+  },
+  {
+    "id": "TC-BADMS-215",
+    "strategy": "BR",
+    "title": "Sensitive Restoration Permitted Following SysAdmin Approval",
+    "primary_obligation": "BR-BA-005 Permitted",
+    "linked_obligations": [
+      "BA-UC-016",
+      "BA-UC-017",
+      "BA-UC-018"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify that restoration of archived data classified as Sensitive proceeds after SysAdmin approval is recorded.",
+    "pre_conditions": "Restoration request 'REST-REQ-201' for Sensitive archive is submitted; SysAdmin 'sysadmin_01' reviews and records approval.",
+    "test_inputs": {
+      "actor_role": "SysAdmin",
+      "user_id": "sysadmin_01",
+      "request_id": "REST-REQ-201",
+      "data_classification": "Sensitive",
+      "approval_status": "Approved"
+    },
+    "execution_steps": [
+      "1. User submits restoration request 'REST-REQ-201' for Sensitive archived data.",
+      "2. SysAdmin reviews request and submits approval.",
+      "3. BADMS verifies SysAdmin approval and triggers restoration procedure."
+    ],
+    "expected_outcome": "Restoration begins execution; status updates to 'Restoring'/'Completed'; audit log records SysAdmin approval.",
+    "failure_guarantee": "Restoration does not execute without recording verified SysAdmin approval in the audit trail."
+  },
+  {
+    "id": "TC-BADMS-216",
+    "strategy": "BR",
+    "title": "Sensitive Restoration Blocked Without SysAdmin Approval",
+    "primary_obligation": "BR-BA-005 Prohibited",
+    "linked_obligations": [
+      "BA-UC-016",
+      "BA-UC-017",
+      "BA-UC-018"
+    ],
+    "test_type": "functional-negative",
+    "description": "Verify that restoration of Sensitive archived data is blocked from proceeding if SysAdmin approval has not been granted.",
+    "pre_conditions": "Restoration request 'REST-REQ-202' for Sensitive archive is submitted; SysAdmin approval has not been recorded (Pending/Rejected).",
+    "test_inputs": {
+      "actor_role": "User",
+      "user_id": "user_01",
+      "request_id": "REST-REQ-202",
+      "data_classification": "Sensitive",
+      "action": "execute_restoration"
+    },
+    "execution_steps": [
+      "1. Submit restoration request 'REST-REQ-202' for Sensitive data.",
+      "2. Attempt to trigger data recovery/restoration while approval is Pending or Rejected.",
+      "3. Verify execution gate."
+    ],
+    "expected_outcome": "Restoration execution is blocked; status remains 'Pending Approval' or 'Rejected'; no data is restored.",
+    "failure_guarantee": "Sensitive data remains securely protected in archive storage; unauthorized disclosure is prevented."
+  },
+  {
+    "id": "TC-BADMS-217",
+    "strategy": "BR",
+    "title": "Non-Sensitive Restoration Standard Path Permitted",
+    "primary_obligation": "BR-BA-005 Permitted",
+    "linked_obligations": [
+      "BA-UC-016",
+      "BA-UC-018"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify that restoration of data classified Routine or Archival follows the standard restoration path without requiring SysAdmin approval.",
+    "pre_conditions": "Restoration request 'REST-REQ-203' submitted for data authoritatively classified as 'Routine'.",
+    "test_inputs": {
+      "actor_role": "User",
+      "user_id": "user_02",
+      "request_id": "REST-REQ-203",
+      "data_classification": "Routine"
+    },
+    "execution_steps": [
+      "1. Authenticate as User 'user_02'.",
+      "2. Submit restoration request 'REST-REQ-203' for Routine dataset.",
+      "3. Observe restoration workflow path."
+    ],
+    "expected_outcome": "Request proceeds directly along standard restoration path without routing for SysAdmin approval gate.",
+    "failure_guarantee": "Non-Sensitive workflows are not inappropriately blocked by Sensitive-only approval requirements."
+  },
+  {
+    "id": "TC-BADMS-218",
+    "strategy": "BR",
+    "title": "User-Specified Initial Classification Preserved",
+    "primary_obligation": "BR-BA-006 Permitted",
+    "linked_obligations": [
+      "BA-UC-002"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify that when a user provides an initial classification upon upload, BADMS preserves the provided classification.",
+    "pre_conditions": "User 'user_01' is authenticated and has valid quota available.",
+    "test_inputs": {
+      "actor_role": "User",
+      "user_id": "user_01",
+      "file_name": "research_dataset.tar.gz",
+      "file_type": "archive",
+      "reason": "Grant backup",
+      "initial_classification": "Sensitive"
+    },
+    "execution_steps": [
+      "1. Authenticate as User 'user_01'.",
+      "2. Submit secure archival request with initial_classification='Sensitive'.",
+      "3. Inspect created request record."
+    ],
+    "expected_outcome": "Request is created in 'Submitted' state; initial_classification field retains value 'Sensitive'.",
+    "failure_guarantee": "User-supplied metadata is accurately preserved in request record."
+  },
+  {
+    "id": "TC-BADMS-219",
+    "strategy": "BR",
+    "title": "Omitted Initial Classification Defaults to Routine",
+    "primary_obligation": "BR-BA-006 Boundary",
+    "linked_obligations": [
+      "BA-UC-002"
+    ],
+    "test_type": "boundary",
+    "description": "Verify that when a user omits the initial classification upon upload, BADMS automatically assigns 'Routine' as the default.",
+    "pre_conditions": "User 'user_01' is authenticated and has storage quota available.",
+    "test_inputs": {
+      "actor_role": "User",
+      "user_id": "user_01",
+      "file_name": "lab_notes.pdf",
+      "file_type": "pdf",
+      "reason": "Coursework archive",
+      "initial_classification": null
+    },
+    "execution_steps": [
+      "1. Authenticate as User 'user_01'.",
+      "2. Submit secure archival request leaving initial_classification field blank/omitted.",
+      "3. Inspect created request record."
+    ],
+    "expected_outcome": "Request is successfully submitted; initial_classification defaults to 'Routine'; routed to respective HoD.",
+    "failure_guarantee": "Request does not fail validation due to missing classification; default assignment is deterministic."
+  },
+  {
+    "id": "TC-BADMS-220",
+    "strategy": "BR",
+    "title": "AES-256 Encryption at Rest and Transit for Sensitive Data",
+    "primary_obligation": "BR-BA-007 Permitted",
+    "linked_obligations": [
+      "BA-UC-005",
+      "BR-BA-003"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify that data authoritatively classified as Sensitive is encrypted using AES-256 both at rest and in transit.",
+    "pre_conditions": "Archive package 'ARCH-SENS-301' classified as Sensitive; IT Security configured encryption.",
+    "test_inputs": {
+      "actor_role": "System / IT Security",
+      "archive_id": "ARCH-SENS-301",
+      "classification": "Sensitive",
+      "cipher_suite": "AES-256-GCM",
+      "transit_tls": "TLSv1.3-AES_256_GCM_SHA384"
+    },
+    "execution_steps": [
+      "1. Trigger archive generation for 'ARCH-SENS-301'.",
+      "2. Monitor transit channel encryption and storage write encryption.",
+      "3. Inspect archive metadata and stored ciphertext."
+    ],
+    "expected_outcome": "Data is transmitted using TLS AES-256 and stored on disk with AES-256 encryption; encryption confirmation logged.",
+    "failure_guarantee": "No plaintext copy of Sensitive data is persisted to disk or transmitted over unencrypted channels."
+  },
+  {
+    "id": "TC-BADMS-221",
+    "strategy": "BR",
+    "title": "Archival of Sensitive Data Without AES-256 Prohibited",
+    "primary_obligation": "BR-BA-007 Prohibited",
+    "linked_obligations": [
+      "BA-UC-005"
+    ],
+    "test_type": "functional-negative",
+    "description": "Verify that BADMS rejects any attempt to archive data classified Sensitive using non-AES-256 encryption or plaintext.",
+    "pre_conditions": "Archive request classified Sensitive is being processed.",
+    "test_inputs": {
+      "actor_role": "IT Security / System",
+      "archive_id": "ARCH-SENS-302",
+      "classification": "Sensitive",
+      "requested_cipher": "DES",
+      "plaintext_flag": true
+    },
+    "execution_steps": [
+      "1. Attempt to bypass AES-256 encryption by selecting an insecure cipher or plaintext storage.",
+      "2. Trigger archive finalization.",
+      "3. Verify security policy enforcement."
+    ],
+    "expected_outcome": "Archive operation is aborted; security exception raised; audit alert generated for non-compliant cipher configuration.",
+    "failure_guarantee": "Sensitive data is never stored without AES-256 compliant encryption."
+  },
+  {
+    "id": "TC-BADMS-222",
+    "strategy": "BR",
+    "title": "Non-Sensitive Data Bypasses Mandatory AES-256 Routing",
+    "primary_obligation": "BR-BA-007 Permitted",
+    "linked_obligations": [
+      "BA-UC-004",
+      "BA-UC-005"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify that data classified Routine or Archival does not require mandatory AES-256 IT Security routing.",
+    "pre_conditions": "Secure archival request 'REQ-ARCH-111' authoritatively classified as 'Routine' by SysAdmin.",
+    "test_inputs": {
+      "actor_role": "SysAdmin",
+      "request_id": "REQ-ARCH-111",
+      "authoritative_classification": "Routine"
+    },
+    "execution_steps": [
+      "1. SysAdmin assigns authoritative classification 'Routine'.",
+      "2. Check routing destination.",
+      "3. Verify request proceeds to archive creation without routing to IT Security for encryption."
+    ],
+    "expected_outcome": "Request proceeds directly to routine storage without requiring IT Security encryption configuration.",
+    "failure_guarantee": "IT Security queue is not loaded with non-Sensitive routine archival requests."
+  },
+  {
+    "id": "TC-BADMS-223",
+    "strategy": "BR",
+    "title": "Retention Policy Applied According to Authoritative Classification",
+    "primary_obligation": "BR-BA-008 Permitted",
+    "linked_obligations": [
+      "BA-UC-004"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify that data retention treatment is applied according to institute-defined policy associated with the authoritative classification.",
+    "pre_conditions": "Dataset 'DS-ARCH-401' assigned authoritative classification 'Critical'.",
+    "test_inputs": {
+      "actor_role": "SysAdmin",
+      "dataset_id": "DS-ARCH-401",
+      "classification": "Critical",
+      "institute_policy_set": "Standard-2026"
+    },
+    "execution_steps": [
+      "1. SysAdmin records authoritative classification 'Critical' on dataset.",
+      "2. Trigger retention policy association.",
+      "3. Verify assigned retention treatment."
+    ],
+    "expected_outcome": "BADMS associates the institute retention rule for 'Critical' data with dataset 'DS-ARCH-401'.",
+    "failure_guarantee": "Retention treatment cannot be dissociated from the authoritative classification of the data."
+  },
+  {
+    "id": "TC-BADMS-224",
+    "strategy": "BR",
+    "title": "Retention Treatment Without Authoritative Classification Prohibited",
+    "primary_obligation": "BR-BA-008 Prohibited",
+    "linked_obligations": [
+      "BA-UC-004"
+    ],
+    "test_type": "functional-negative",
+    "description": "Verify that BADMS rejects binding retention treatment or purging data when authoritative classification is missing.",
+    "pre_conditions": "Data package 'DS-ARCH-402' has initial classification 'Routine' but authoritative classification is not yet assigned (null).",
+    "test_inputs": {
+      "actor_role": "System / Automated Service",
+      "dataset_id": "DS-ARCH-402",
+      "authoritative_classification": null,
+      "action": "apply_retention_schedule"
+    },
+    "execution_steps": [
+      "1. Invoke retention binding service on dataset with null authoritative classification.",
+      "2. Observe validation response."
+    ],
+    "expected_outcome": "Operation fails with error requiring authoritative classification before retention treatment binding.",
+    "failure_guarantee": "Unclassified data is never subjected to arbitrary retention disposal or unverified policy rules."
+  },
+  {
+    "id": "TC-BADMS-225",
+    "strategy": "BR",
+    "title": "Distinct Retention Treatment Selection Across Classifications",
+    "primary_obligation": "BR-BA-008 Boundary",
+    "linked_obligations": [
+      "BA-UC-004"
+    ],
+    "test_type": "boundary",
+    "description": "Verify that each distinct classification (Critical, Sensitive, Routine, Archival) maps to its respective institute retention rule.",
+    "pre_conditions": "Four identical test records prepared for classification mapping.",
+    "test_inputs": {
+      "actor_role": "SysAdmin",
+      "classifications": [
+        "Critical",
+        "Sensitive",
+        "Routine",
+        "Archival"
+      ]
+    },
+    "execution_steps": [
+      "1. Assign each classification to respective datasets DS-1, DS-2, DS-3, DS-4.",
+      "2. Query resolved retention treatment for each dataset.",
+      "3. Compare applied policy identifiers."
+    ],
+    "expected_outcome": "Each dataset binds strictly to the institute retention treatment specified for its respective classification.",
+    "failure_guarantee": "Cross-classification policy pollution is prevented; classification-to-retention binding is deterministic."
+  },
+  {
+    "id": "TC-BADMS-226",
+    "strategy": "BR",
+    "title": "Storage-Extension Decided by Respective HoD Permitted",
+    "primary_obligation": "BR-BA-009 Permitted",
+    "linked_obligations": [
+      "BA-UC-007",
+      "BA-UC-008"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that a storage-extension request is routed to and decided by the respective Department Head (HoD).",
+    "pre_conditions": "Storage-extension request 'REQ-EXT-501' submitted by User in 'Civil Engineering'; usage validated; status is 'Pending HoD Review'.",
+    "test_inputs": {
+      "actor_role": "HoD",
+      "user_id": "hod_civil_01",
+      "department": "Civil Engineering",
+      "request_id": "REQ-EXT-501",
+      "decision": "Approve"
+    },
+    "execution_steps": [
+      "1. Authenticate as 'hod_civil_01'.",
+      "2. Open request 'REQ-EXT-501'.",
+      "3. Submit decision 'Approve'."
+    ],
+    "expected_outcome": "Decision is recorded; request status updates to 'Approved'; notification sent to requester; workflow completes.",
+    "failure_guarantee": "Storage-extension decision is logged with HoD identity and cannot be altered post-decision."
+  },
+  {
+    "id": "TC-BADMS-227",
+    "strategy": "BR",
+    "title": "Generic Admin or SysAdmin Approval of Storage-Extension Prohibited",
+    "primary_obligation": "BR-BA-009 Prohibited",
+    "linked_obligations": [
+      "BA-UC-007",
+      "BA-UC-008"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that a generic Admin or SysAdmin is prohibited from approving a storage-extension request.",
+    "pre_conditions": "Storage-extension request 'REQ-EXT-502' in 'Pending HoD Review' state.",
+    "test_inputs": {
+      "actor_role": "SysAdmin",
+      "user_id": "sysadmin_01",
+      "request_id": "REQ-EXT-502",
+      "decision": "Approve"
+    },
+    "execution_steps": [
+      "1. Authenticate as SysAdmin 'sysadmin_01'.",
+      "2. Attempt to approve storage-extension request 'REQ-EXT-502'.",
+      "3. Observe access control response."
+    ],
+    "expected_outcome": "Action is denied with 403 Forbidden; system enforces that only the respective HoD can approve storage extensions.",
+    "failure_guarantee": "Request remains in 'Pending HoD Review' state; unauthorized administrative bypass is prevented."
+  },
+  {
+    "id": "TC-BADMS-228",
+    "strategy": "BR",
+    "title": "Requester Self-Approval of Storage-Extension Prohibited",
+    "primary_obligation": "BR-BA-009 Prohibited",
+    "linked_obligations": [
+      "BA-UC-007",
+      "BA-UC-008"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that a user who submitted a storage-extension request cannot self-approve their own request.",
+    "pre_conditions": "Storage-extension request 'REQ-EXT-503' submitted by user 'user_01'.",
+    "test_inputs": {
+      "actor_role": "User",
+      "user_id": "user_01",
+      "request_id": "REQ-EXT-503",
+      "decision": "Approve"
+    },
+    "execution_steps": [
+      "1. Authenticate as User 'user_01'.",
+      "2. Attempt to submit approval on 'REQ-EXT-503'.",
+      "3. Observe response."
+    ],
+    "expected_outcome": "Self-approval attempt is denied; non-HoD actor cannot decide storage-extension requests.",
+    "failure_guarantee": "Request status remains pending; quota allocation cannot be self-expanded."
+  },
+  {
+    "id": "TC-BADMS-229",
+    "strategy": "BR",
+    "title": "HoD Intra-Department Action and Report Access Permitted",
+    "primary_obligation": "BR-BA-010 Permitted",
+    "linked_obligations": [
+      "BA-UC-002",
+      "BA-UC-007",
+      "BA-UC-021"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that an HoD can view operational reports and decide requests belonging to their own department.",
+    "pre_conditions": "HoD 'hod_cs_01' belongs to 'Computer Science'; requests and reports exist for Computer Science department.",
+    "test_inputs": {
+      "actor_role": "HoD",
+      "user_id": "hod_cs_01",
+      "department": "Computer Science",
+      "requested_scope": "Computer Science"
+    },
+    "execution_steps": [
+      "1. Authenticate as 'hod_cs_01'.",
+      "2. Request departmental operational reports for 'Computer Science'.",
+      "3. Access pending Computer Science archival requests."
+    ],
+    "expected_outcome": "Reports and pending requests for Computer Science are successfully displayed to HoD.",
+    "failure_guarantee": "Departmental access grants do not leak data across administrative boundaries."
+  },
+  {
+    "id": "TC-BADMS-230",
+    "strategy": "BR",
+    "title": "HoD Access to Foreign Department Reports Prohibited",
+    "primary_obligation": "BR-BA-010 Prohibited",
+    "linked_obligations": [
+      "BA-UC-021",
+      "BR-BA-020"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that an HoD is prohibited from accessing operational reports belonging to a different department.",
+    "pre_conditions": "HoD 'hod_cs_01' belongs to 'Computer Science'; departmental reports exist for 'Electrical Engineering'.",
+    "test_inputs": {
+      "actor_role": "HoD",
+      "user_id": "hod_cs_01",
+      "department": "Computer Science",
+      "requested_scope": "Electrical Engineering",
+      "target_report": "dept_ops_summary_ee"
+    },
+    "execution_steps": [
+      "1. Authenticate as 'hod_cs_01'.",
+      "2. Attempt to request operational report 'dept_ops_summary_ee'.",
+      "3. Verify access control response."
+    ],
+    "expected_outcome": "Access is denied with authorization error; report content is withheld.",
+    "failure_guarantee": "Confidentiality of foreign departmental operational data is preserved."
+  },
+  {
+    "id": "TC-BADMS-231",
+    "strategy": "BR",
+    "title": "HoD Decision on Foreign Department Storage Extension Prohibited",
+    "primary_obligation": "BR-BA-010 Prohibited",
+    "linked_obligations": [
+      "BA-UC-008"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that an HoD is prohibited from reviewing or deciding storage-extension requests from other departments.",
+    "pre_conditions": "Storage-extension request 'REQ-EXT-504' submitted by Physics department user; HoD 'hod_cs_01' is Computer Science.",
+    "test_inputs": {
+      "actor_role": "HoD",
+      "user_id": "hod_cs_01",
+      "department": "Computer Science",
+      "request_id": "REQ-EXT-504",
+      "target_department": "Physics",
+      "decision": "Approve"
+    },
+    "execution_steps": [
+      "1. Authenticate as 'hod_cs_01'.",
+      "2. Attempt to approve request 'REQ-EXT-504'.",
+      "3. Observe department scope validation."
+    ],
+    "expected_outcome": "Operation is denied with department scope mismatch error; request remains pending Physics HoD review.",
+    "failure_guarantee": "Department scope isolation prevents unauthorized quota allocation across departments."
+  },
+  {
+    "id": "TC-BADMS-232",
+    "strategy": "BR",
+    "title": "Valid Local Dataset Schedule Overrides Global Schedule Permitted",
+    "primary_obligation": "BR-BA-011 Permitted",
+    "linked_obligations": [
+      "BA-UC-006",
+      "BA-UC-009",
+      "BA-UC-011"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify that when a valid local backup schedule is defined for a dataset, BADMS executes according to the local schedule, overriding the global schedule.",
+    "pre_conditions": "Global backup schedule set to Daily at 02:00 UTC; Dataset 'ds_grades' has valid local schedule configured for Daily at 22:00 UTC.",
+    "test_inputs": {
+      "actor_role": "System / Scheduler",
+      "dataset_id": "ds_grades",
+      "global_schedule_time": "02:00 UTC",
+      "local_schedule_time": "22:00 UTC"
+    },
+    "execution_steps": [
+      "1. Query resolved schedule for dataset 'ds_grades'.",
+      "2. Advance clock to 22:00 UTC and observe execution.",
+      "3. Advance clock to 02:00 UTC and observe execution."
+    ],
+    "expected_outcome": "Backup triggers at 22:00 UTC following local schedule; does not trigger redundant backup at 02:00 UTC global time.",
+    "failure_guarantee": "Dataset backup strictly obeys configured local schedule priority over global default."
+  },
+  {
+    "id": "TC-BADMS-233",
+    "strategy": "BR",
+    "title": "Global Backup Schedule Applies When No Local Schedule Exists",
+    "primary_obligation": "BR-BA-011 Permitted",
+    "linked_obligations": [
+      "BA-UC-006",
+      "BA-UC-011"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify that where no local schedule exists for a dataset, the institution-wide global backup schedule applies automatically.",
+    "pre_conditions": "Global backup schedule set to Daily at 03:00 UTC; Dataset 'ds_admissions' has no local schedule configured.",
+    "test_inputs": {
+      "actor_role": "System / Scheduler",
+      "dataset_id": "ds_admissions",
+      "local_schedule": null,
+      "global_schedule_time": "03:00 UTC"
+    },
+    "execution_steps": [
+      "1. Resolve effective backup schedule for 'ds_admissions'.",
+      "2. Advance simulation clock to 03:00 UTC.",
+      "3. Monitor backup execution."
+    ],
+    "expected_outcome": "Schedule resolution returns global schedule; automatic backup of 'ds_admissions' executes at 03:00 UTC.",
+    "failure_guarantee": "Datasets without local schedules are never left unscheduled or unprotected."
+  },
+  {
+    "id": "TC-BADMS-234",
+    "strategy": "BR",
+    "title": "Invalidated Local Schedule Fallback to Global Boundary",
+    "primary_obligation": "BR-BA-011 Boundary",
+    "linked_obligations": [
+      "BA-UC-006",
+      "BA-UC-009"
+    ],
+    "test_type": "boundary",
+    "description": "Verify that if a local schedule is removed or disabled, BADMS seamlessly falls back to the institution-wide global schedule.",
+    "pre_conditions": "Dataset 'ds_library' had a local schedule; SysAdmin deletes local schedule; global schedule is Daily at 01:00 UTC.",
+    "test_inputs": {
+      "actor_role": "SysAdmin",
+      "user_id": "sysadmin_01",
+      "dataset_id": "ds_library",
+      "action": "delete_local_schedule"
+    },
+    "execution_steps": [
+      "1. Delete local schedule for 'ds_library'.",
+      "2. Query resolved schedule for 'ds_library'.",
+      "3. Verify effective schedule parameters."
+    ],
+    "expected_outcome": "Local schedule reference is removed; effective schedule immediately switches to global default (01:00 UTC).",
+    "failure_guarantee": "Transition between local and global schedule causes no gap in disaster recovery coverage."
+  },
+  {
+    "id": "TC-BADMS-235",
+    "strategy": "BR",
+    "title": "Valid Backup Schedule Configuration Applied Permitted",
+    "primary_obligation": "BR-BA-012 Permitted",
+    "linked_obligations": [
+      "BA-UC-009",
+      "BA-UC-011"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify that a new or modified backup schedule with valid parameters and no conflicts is successfully validated and applied.",
+    "pre_conditions": "SysAdmin user 'sysadmin_01' is authenticated; dataset 'ds_research' has no active schedule.",
+    "test_inputs": {
+      "actor_role": "SysAdmin",
+      "dataset_id": "ds_research",
+      "frequency": "Weekly",
+      "day": "Sunday",
+      "time": "01:00 UTC",
+      "classification_filter": "Archival"
+    },
+    "execution_steps": [
+      "1. SysAdmin submits new schedule with frequency='Weekly', time='01:00 UTC'.",
+      "2. BADMS validates parameters and checks for resource/time conflicts.",
+      "3. SysAdmin saves configuration."
+    ],
+    "expected_outcome": "Validation succeeds with no conflicts; schedule is saved and scheduled for execution; audit log records configuration.",
+    "failure_guarantee": "If persistence fails, previous schedule state remains intact."
+  },
+  {
+    "id": "TC-BADMS-236",
+    "strategy": "BR",
+    "title": "Invalid Schedule Parameters Rejected With Effective Schedule Preserved",
+    "primary_obligation": "BR-BA-012 Prohibited",
+    "linked_obligations": [
+      "BA-UC-009"
+    ],
+    "test_type": "functional-negative",
+    "description": "Verify that submitting invalid schedule parameters (e.g. malformed cron, invalid time format) is rejected and existing effective schedule is preserved.",
+    "pre_conditions": "Dataset 'ds_finance' has effective daily schedule at 23:00 UTC.",
+    "test_inputs": {
+      "actor_role": "SysAdmin",
+      "dataset_id": "ds_finance",
+      "frequency": "InvalidFrequency",
+      "time": "25:70 UTC"
+    },
+    "execution_steps": [
+      "1. Attempt to update schedule with invalid frequency and impossible time '25:70 UTC'.",
+      "2. Submit update request.",
+      "3. Observe validation response."
+    ],
+    "expected_outcome": "Validation fails with parameter error; update rejected; existing schedule (Daily at 23:00 UTC) remains in effect.",
+    "failure_guarantee": "Invalid configuration is rejected prior to state change; effective schedule is never corrupted."
+  },
+  {
+    "id": "TC-BADMS-237",
+    "strategy": "BR",
+    "title": "Conflicting Backup Schedule Configuration Rejected",
+    "primary_obligation": "BR-BA-012 Prohibited",
+    "linked_obligations": [
+      "BA-UC-009"
+    ],
+    "test_type": "functional-negative",
+    "description": "Verify that a modified backup schedule that produces a direct timing/resource lock conflict on the same dataset is rejected.",
+    "pre_conditions": "Dataset 'ds_core' already has an active local schedule at 04:00 UTC.",
+    "test_inputs": {
+      "actor_role": "SysAdmin",
+      "dataset_id": "ds_core",
+      "frequency": "Daily",
+      "time": "04:00 UTC",
+      "conflict_type": "overlapping_dataset_lock"
+    },
+    "execution_steps": [
+      "1. Submit conflicting schedule targeting the same dataset and lock window.",
+      "2. System runs schedule conflict detection.",
+      "3. Verify rejection outcome."
+    ],
+    "expected_outcome": "BADMS rejects the schedule modification due to conflict; existing active schedule remains unchanged.",
+    "failure_guarantee": "Conflicting jobs cannot be scheduled concurrently on the same locked dataset."
+  },
+  {
+    "id": "TC-BADMS-238",
+    "strategy": "BR",
+    "title": "Automatic Backup Succeeds When Repository Reachable Permitted",
+    "primary_obligation": "BR-BA-013 Permitted",
+    "linked_obligations": [
+      "BA-UC-006"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify that scheduled automatic backup executes successfully when the scheduled repository is online and reachable.",
+    "pre_conditions": "Automatic backup due; destination storage repository 'repo_primary' status is 'Reachable' and verified.",
+    "test_inputs": {
+      "actor_role": "Scheduled Service",
+      "dataset_id": "ds_erp",
+      "repository_id": "repo_primary",
+      "reachability_status": true
+    },
+    "execution_steps": [
+      "1. Scheduler initiates automatic backup at scheduled time.",
+      "2. BADMS performs repository reachability check.",
+      "3. Reachability confirmed; BADMS reads dataset and transfers to recovery storage."
+    ],
+    "expected_outcome": "Backup completes successfully; data integrity verified; status recorded as 'Success'; timestamp logged.",
+    "failure_guarantee": "Integrity verification confirms backup consistency upon transfer completion."
+  },
+  {
+    "id": "TC-BADMS-239",
+    "strategy": "BR",
+    "title": "Automatic Backup Fails and Triggers Failure Handling When Repository Unreachable",
+    "primary_obligation": "BR-BA-013 Prohibited",
+    "linked_obligations": [
+      "BA-UC-006",
+      "BR-BA-014"
+    ],
+    "test_type": "functional-negative",
+    "description": "Verify that when a scheduled repository is unreachable, automatic backup halts, status is marked Failure, and failure handling is triggered.",
+    "pre_conditions": "Automatic backup due; repository 'repo_secondary' is unreachable (network timeout / connection refused).",
+    "test_inputs": {
+      "actor_role": "Scheduled Service",
+      "dataset_id": "ds_erp",
+      "repository_id": "repo_secondary",
+      "reachability_status": false
+    },
+    "execution_steps": [
+      "1. Scheduler triggers automatic backup for 'ds_erp'.",
+      "2. Reachability check fails with connection timeout.",
+      "3. System halts transfer and applies failure handling."
+    ],
+    "expected_outcome": "Backup status recorded as 'Failure'; failure alert dispatched to SysAdmin; no partial or corrupt backup artifact marked valid.",
+    "failure_guarantee": "Unreachable storage does not result in false 'Success' or corrupted recovery points."
+  },
+  {
+    "id": "TC-BADMS-240",
+    "strategy": "BR",
+    "title": "Backup Failure Dispatches SysAdmin Alert Within SLA Permitted",
+    "primary_obligation": "BR-BA-014 Permitted",
+    "linked_obligations": [
+      "BA-UC-001",
+      "BA-UC-006"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify that when a backup fails, BADMS delivers an alert to the SysAdmin within the 5-minute SLA.",
+    "pre_conditions": "Backup job 'BKP-FAIL-601' encounters an error and status transitions to 'Failure' at t0.",
+    "test_inputs": {
+      "actor_role": "System / Notification",
+      "backup_id": "BKP-FAIL-601",
+      "failure_timestamp": "2026-11-09T10:00:00Z",
+      "recipient_role": "SysAdmin"
+    },
+    "execution_steps": [
+      "1. Record backup failure at t0 = 10:00:00Z.",
+      "2. Notification service queues and delivers failure alert to SysAdmin.",
+      "3. Measure elapsed time between failure event and alert delivery."
+    ],
+    "expected_outcome": "Alert is delivered to SysAdmin at t <= t0 + 5 minutes (e.g. 10:01:30Z); alert contains backup ID, timestamp, and failure cause.",
+    "failure_guarantee": "Alert queue guarantees notification delivery attempt upon failure state transition."
+  },
+  {
+    "id": "TC-BADMS-241",
+    "strategy": "BR",
+    "title": "Backup Failure Alert SLA Threshold at Exactly 5 Minutes Boundary",
+    "primary_obligation": "BR-BA-014 Boundary",
+    "linked_obligations": [
+      "BA-UC-001",
+      "BA-UC-006"
+    ],
+    "test_type": "boundary",
+    "description": "Verify alert delivery compliance at the exact boundary threshold of 300 seconds (5 minutes) from failure occurrence.",
+    "pre_conditions": "Backup job 'BKP-FAIL-602' marks Failure at t0 = 12:00:00Z.",
+    "test_inputs": {
+      "actor_role": "System / Notification",
+      "backup_id": "BKP-FAIL-602",
+      "failure_timestamp": "12:00:00Z",
+      "alert_delivery_timestamp": "12:05:00Z",
+      "elapsed_seconds": 300
+    },
+    "execution_steps": [
+      "1. Trigger failure state at 12:00:00Z.",
+      "2. Simulate delivery at exact boundary timestamp 12:05:00Z (elapsed = 300s).",
+      "3. Check SLA compliance engine."
+    ],
+    "expected_outcome": "Delivery at exactly 300s is evaluated as compliant with the 'within five minutes' SLA.",
+    "failure_guarantee": "SLA calculation uses inclusive upper bound <= 300 seconds."
+  },
+  {
+    "id": "TC-BADMS-242",
+    "strategy": "BR",
+    "title": "Backup Failure Alert Exceeding 5 Minutes SLA Breach Prohibited",
+    "primary_obligation": "BR-BA-014 Prohibited",
+    "linked_obligations": [
+      "BA-UC-001",
+      "BA-UC-006"
+    ],
+    "test_type": "functional-negative",
+    "description": "Verify that an alert delivered after more than 5 minutes (301+ seconds) is flagged as an SLA violation.",
+    "pre_conditions": "Backup job 'BKP-FAIL-603' failed at 14:00:00Z; alert delivery delayed until 14:05:01Z (301 seconds).",
+    "test_inputs": {
+      "actor_role": "System / Notification",
+      "backup_id": "BKP-FAIL-603",
+      "failure_timestamp": "14:00:00Z",
+      "alert_delivery_timestamp": "14:05:01Z",
+      "elapsed_seconds": 301
+    },
+    "execution_steps": [
+      "1. Record backup failure at 14:00:00Z.",
+      "2. Deliver alert at 14:05:01Z.",
+      "3. Evaluate SLA compliance tracking."
+    ],
+    "expected_outcome": "System records SLA breach for notification delivery exceeding 5 minutes; compliance metric updated.",
+    "failure_guarantee": "SLA monitoring logs late delivery event for audit review."
+  },
+  {
+    "id": "TC-BADMS-243",
+    "strategy": "BR",
+    "title": "Consecutive Failures Count 1 and 2 Do Not Escalate Boundary",
+    "primary_obligation": "BR-BA-015 Boundary",
+    "linked_obligations": [
+      "BA-UC-001",
+      "BA-UC-006",
+      "BR-BA-014"
+    ],
+    "test_type": "boundary",
+    "description": "Verify that after 1 and 2 consecutive backup failures, SysAdmin is alerted but NO escalation notification is sent to the Director of IT.",
+    "pre_conditions": "Backup history has 0 consecutive failures.",
+    "test_inputs": {
+      "actor_role": "System / Scheduler",
+      "consecutive_failures": [
+        1,
+        2
+      ]
+    },
+    "execution_steps": [
+      "1. Trigger 1st backup failure; verify SysAdmin alert dispatched and check Director of IT notification queue.",
+      "2. Trigger 2nd consecutive backup failure; verify SysAdmin alert dispatched and check Director of IT notification queue."
+    ],
+    "expected_outcome": "SysAdmin receives failure alerts; Director of IT receives 0 notifications; consecutive_failures counter equals 2.",
+    "failure_guarantee": "Director of IT notification is strictly suppressed when consecutive failure count is below 3."
+  },
+  {
+    "id": "TC-BADMS-244",
+    "strategy": "BR",
+    "title": "Exactly Three Consecutive Backup Failures Triggers Escalation Boundary",
+    "primary_obligation": "BR-BA-015 Boundary",
+    "linked_obligations": [
+      "BA-UC-001",
+      "BA-UC-006"
+    ],
+    "test_type": "boundary",
+    "description": "Verify that upon occurrence of exactly the third consecutive backup failure, BADMS escalates the condition to the Director of IT.",
+    "pre_conditions": "Backup history has exactly 2 consecutive failures.",
+    "test_inputs": {
+      "actor_role": "System / Notification",
+      "consecutive_failure_count": 3,
+      "backup_id": "BKP-FAIL-604"
+    },
+    "execution_steps": [
+      "1. Current consecutive failure count is 2.",
+      "2. 3rd backup failure occurs on 'BKP-FAIL-604'.",
+      "3. System increments counter to 3 and evaluates escalation threshold."
+    ],
+    "expected_outcome": "Escalation notification is generated and dispatched to Director of IT; SysAdmin also alerted; escalation logged in audit trail.",
+    "failure_guarantee": "Escalation to Director of IT is guaranteed upon reaching the threshold of 3 consecutive failures."
+  },
+  {
+    "id": "TC-BADMS-245",
+    "strategy": "BR",
+    "title": "Successful Backup Resets Consecutive Failure Counter Boundary",
+    "primary_obligation": "BR-BA-015 Boundary",
+    "linked_obligations": [
+      "BA-UC-001",
+      "BA-UC-006"
+    ],
+    "test_type": "boundary",
+    "description": "Verify that an intervening successful backup resets the consecutive failure counter to zero, preventing premature escalation.",
+    "pre_conditions": "System has recorded 2 consecutive backup failures.",
+    "test_inputs": {
+      "actor_role": "System / Scheduler",
+      "sequence": [
+        "Failure_1",
+        "Failure_2",
+        "Success",
+        "Failure_3"
+      ]
+    },
+    "execution_steps": [
+      "1. System has 2 consecutive failures.",
+      "2. Next scheduled backup completes with status 'Success'.",
+      "3. Observe consecutive failure counter.",
+      "4. Subsequent backup fails (Failure_3).",
+      "5. Check if Director of IT is notified."
+    ],
+    "expected_outcome": "Success resets consecutive failure counter to 0; Failure_3 sets counter to 1; NO escalation notification is sent to Director of IT.",
+    "failure_guarantee": "Counter strictly counts *consecutive* failures; non-consecutive failures do not cause escalation."
+  },
+  {
+    "id": "TC-BADMS-246",
+    "strategy": "BR",
+    "title": "Subsequent Failure Beyond Three Maintains Escalation Permitted",
+    "primary_obligation": "BR-BA-015 Permitted",
+    "linked_obligations": [
+      "BA-UC-001",
+      "BA-UC-006"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify system behavior when a 4th consecutive failure occurs without recovery, confirming ongoing escalation state.",
+    "pre_conditions": "Consecutive failure counter is at 3; initial escalation notification already sent.",
+    "test_inputs": {
+      "actor_role": "System / Notification",
+      "consecutive_failure_count": 4,
+      "backup_id": "BKP-FAIL-605"
+    },
+    "execution_steps": [
+      "1. Record 4th consecutive failure.",
+      "2. Check escalation status and notifications.",
+      "3. Verify alert handling."
+    ],
+    "expected_outcome": "Consecutive failure counter increments to 4; Director of IT escalation status remains active / re-notified according to policy; SysAdmin alerted.",
+    "failure_guarantee": "Counter does not overflow or reset until an explicit Success backup occurs."
+  },
+  {
+    "id": "TC-BADMS-247",
+    "strategy": "BR",
+    "title": "Storage-Extension Request Validated When Quota Full Permitted",
+    "primary_obligation": "BR-BA-016 Permitted",
+    "linked_obligations": [
+      "BA-UC-007"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify that a storage-extension request is validated and routed to HoD when the user's quota is full (100% usage).",
+    "pre_conditions": "User 'user_01' allocated 100 GB; current usage is 100 GB (100% full quota).",
+    "test_inputs": {
+      "actor_role": "User",
+      "user_id": "user_01",
+      "allocated_quota_gb": 100,
+      "current_usage_gb": 100,
+      "requested_extension_gb": 50,
+      "justification": "Research data expansion"
+    },
+    "execution_steps": [
+      "1. User submits storage-extension request for 50 GB.",
+      "2. BADMS validates current storage usage against allocated quota.",
+      "3. Confirm quota usage is full."
+    ],
+    "expected_outcome": "Request passes validation; request status set to 'Submitted' / 'Pending HoD Review'; routed to requester's HoD.",
+    "failure_guarantee": "Valid extension requests from users with full quotas are properly forwarded to HoD for decision."
+  },
+  {
+    "id": "TC-BADMS-248",
+    "strategy": "BR",
+    "title": "Storage-Extension Request Rejected When Quota Not Full Prohibited",
+    "primary_obligation": "BR-BA-016 Prohibited",
+    "linked_obligations": [
+      "BA-UC-007"
+    ],
+    "test_type": "functional-negative",
+    "description": "Verify that a storage-extension request is rejected/flagged as invalid when the user's storage quota is not full.",
+    "pre_conditions": "User 'user_02' allocated 100 GB; current usage is 45 GB (quota is not full).",
+    "test_inputs": {
+      "actor_role": "User",
+      "user_id": "user_02",
+      "allocated_quota_gb": 100,
+      "current_usage_gb": 45,
+      "requested_extension_gb": 50,
+      "justification": "Anticipated future need"
+    },
+    "execution_steps": [
+      "1. User submits storage-extension request.",
+      "2. BADMS checks current usage against allocated quota.",
+      "3. System detects quota is not full."
+    ],
+    "expected_outcome": "Request is rejected at validation; error returned informing user quota must be full; request is NOT routed to HoD; state unchanged.",
+    "failure_guarantee": "Premature storage-extension requests do not alter request state or burden HoD review."
+  },
+  {
+    "id": "TC-BADMS-249",
+    "strategy": "BR",
+    "title": "Storage-Extension Usage Threshold Boundary Testing",
+    "primary_obligation": "BR-BA-016 Boundary",
+    "linked_obligations": [
+      "BA-UC-007"
+    ],
+    "test_type": "boundary",
+    "description": "Verify storage usage validation at the boundary: usage just below 100% (99.9%) rejected vs exactly 100% accepted.",
+    "pre_conditions": "User has 100.0 GB quota allocation.",
+    "test_inputs": {
+      "actor_role": "User",
+      "user_id": "user_03",
+      "boundary_test_cases": [
+        {
+          "usage_gb": 99.9,
+          "expected": "Reject"
+        },
+        {
+          "usage_gb": 100.0,
+          "expected": "Accept"
+        }
+      ]
+    },
+    "execution_steps": [
+      "1. Test with usage at 99.9 GB: submit extension request, observe validation rejection.",
+      "2. Increase usage to exactly 100.0 GB: submit extension request, observe validation acceptance."
+    ],
+    "expected_outcome": "99.9 GB usage is rejected (quota not full); exactly 100.0 GB usage passes validation and routes to HoD.",
+    "failure_guarantee": "Storage-extension validation enforces strict boundary check before accepting submission."
+  },
+  {
+    "id": "TC-BADMS-250",
+    "strategy": "BR",
+    "title": "HoD Storage-Extension Decision Informed by Criteria Permitted",
+    "primary_obligation": "BR-BA-017 Permitted",
+    "linked_obligations": [
+      "BA-UC-007",
+      "BA-UC-008"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify that HoD reviews available storage infrastructure, departmental policies, and user justification to decide a storage-extension request.",
+    "pre_conditions": "Valid storage-extension request pending; system presents available infrastructure info, departmental policy limits, and user justification.",
+    "test_inputs": {
+      "actor_role": "HoD",
+      "user_id": "hod_cs_01",
+      "request_id": "REQ-EXT-505",
+      "available_infrastructure_gb": 500,
+      "departmental_policy_limit_gb": 100,
+      "justification_reviewed": true,
+      "decision": "Approve"
+    },
+    "execution_steps": [
+      "1. HoD accesses request review screen displaying infrastructure availability, departmental policy, and justification.",
+      "2. HoD reviews details and submits approval.",
+      "3. BADMS records HoD decision."
+    ],
+    "expected_outcome": "Decision is recorded as 'Approved'; requester is notified; workflow completes without post-approval S-POST requirement.",
+    "failure_guarantee": "Recorded decision permanently stores references to the review criteria presented at decision time."
+  },
+  {
+    "id": "TC-BADMS-251",
+    "strategy": "BR",
+    "title": "HoD Storage-Extension Decision Without Stated Criteria Prohibited",
+    "primary_obligation": "BR-BA-017 Prohibited",
+    "linked_obligations": [
+      "BA-UC-007",
+      "BA-UC-008"
+    ],
+    "test_type": "functional-negative",
+    "description": "Verify that BADMS blocks recorded decision if required review criteria (e.g. user justification or infrastructure verification) are missing/unvalidated.",
+    "pre_conditions": "Extension request submitted with missing justification or corrupted infrastructure metrics.",
+    "test_inputs": {
+      "actor_role": "HoD",
+      "user_id": "hod_cs_01",
+      "request_id": "REQ-EXT-506",
+      "justification": null,
+      "infrastructure_data": "unavailable"
+    },
+    "execution_steps": [
+      "1. HoD attempts to record decision on request lacking mandatory justification and infrastructure context.",
+      "2. System evaluates decision prerequisites.",
+      "3. Verify decision block."
+    ],
+    "expected_outcome": "Decision submission is blocked with validation error requiring all review criteria to be present.",
+    "failure_guarantee": "Arbitrary extension decisions without complete context cannot be recorded in BADMS."
+  },
+  {
+    "id": "TC-BADMS-252",
+    "strategy": "BR",
+    "title": "Requested Storage Exceeding Available Infrastructure Detected Boundary",
+    "primary_obligation": "BR-BA-017 Boundary",
+    "linked_obligations": [
+      "BA-UC-007",
+      "BA-UC-008"
+    ],
+    "test_type": "boundary",
+    "description": "Verify that when requested storage extension exceeds available infrastructure capacity, BADMS detects and flags the shortfall during review.",
+    "pre_conditions": "Available infrastructure storage is 100 GB; user requests 200 GB extension.",
+    "test_inputs": {
+      "actor_role": "HoD",
+      "user_id": "hod_cs_01",
+      "request_id": "REQ-EXT-507",
+      "requested_extension_gb": 200,
+      "available_infrastructure_gb": 100
+    },
+    "execution_steps": [
+      "1. HoD opens review for 'REQ-EXT-507'.",
+      "2. BADMS computes requested storage against available infrastructure.",
+      "3. Observe system detection and presentation."
+    ],
+    "expected_outcome": "BADMS flags that requested storage (200 GB) exceeds available infrastructure (100 GB); surfaces notification to HoD; records decision as informed without requiring automated shortfall remediation.",
+    "failure_guarantee": "System guarantees detection and visibility of capacity shortfalls to decision-maker."
+  },
+  {
+    "id": "TC-BADMS-253",
+    "strategy": "BR",
+    "title": "Super Admin Offline-Initiated Special Archival Permitted",
+    "primary_obligation": "BR-BA-018 Permitted",
+    "linked_obligations": [
+      "BA-UC-010"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that Super Admin alone is permitted to perform a special archival operation in BADMS following an offline request from an authority.",
+    "pre_conditions": "Super Admin 'superadmin_01' received an offline special archival request from Dean of Research for extended storage of Sensitive research data.",
+    "test_inputs": {
+      "actor_role": "Super Admin",
+      "user_id": "superadmin_01",
+      "offline_originator": "Dean of Research",
+      "dataset_id": "special_research_genomics",
+      "classification": "Sensitive",
+      "extended_storage": true
+    },
+    "execution_steps": [
+      "1. Authenticate as Super Admin 'superadmin_01'.",
+      "2. Access special archival operation interface.",
+      "3. Enter dataset details and execute special archival operation."
+    ],
+    "expected_outcome": "Operation is permitted and successfully executed; BADMS records operation outcome and audit entry; no online HoD approval required.",
+    "failure_guarantee": "Special archival operation outcome is permanently recorded with Super Admin attribution."
+  },
+  {
+    "id": "TC-BADMS-254",
+    "strategy": "BR",
+    "title": "SysAdmin Special Archival Operation Prohibited",
+    "primary_obligation": "BR-BA-018 Prohibited",
+    "linked_obligations": [
+      "BA-UC-010"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that a SysAdmin is prohibited from performing the special archival operation within BADMS.",
+    "pre_conditions": "SysAdmin 'sysadmin_01' is authenticated.",
+    "test_inputs": {
+      "actor_role": "SysAdmin",
+      "user_id": "sysadmin_01",
+      "dataset_id": "special_research_genomics",
+      "action": "execute_special_archival"
+    },
+    "execution_steps": [
+      "1. Authenticate as SysAdmin 'sysadmin_01'.",
+      "2. Attempt to invoke special archival operation.",
+      "3. Observe authorization rejection."
+    ],
+    "expected_outcome": "Operation is denied with 403 Forbidden; special archival restricted exclusively to Super Admin role.",
+    "failure_guarantee": "Special archival privilege cannot be exercised by regular administrative roles."
+  },
+  {
+    "id": "TC-BADMS-255",
+    "strategy": "BR",
+    "title": "Regular User or HoD Special Archival Operation Prohibited",
+    "primary_obligation": "BR-BA-018 Prohibited",
+    "linked_obligations": [
+      "BA-UC-010"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that a regular User or HoD is prohibited from performing or initiating online special archival operations in BADMS.",
+    "pre_conditions": "User 'user_faculty_01' is authenticated.",
+    "test_inputs": {
+      "actor_role": "User",
+      "user_id": "user_faculty_01",
+      "dataset_id": "my_research_archive",
+      "action": "execute_special_archival"
+    },
+    "execution_steps": [
+      "1. Authenticate as User 'user_faculty_01'.",
+      "2. Attempt to trigger special archival endpoint.",
+      "3. Check authorization response."
+    ],
+    "expected_outcome": "Access denied; no online submission workflow exists for special archival in BADMS (offline request to Super Admin only).",
+    "failure_guarantee": "Offline-originator scope discipline is preserved; online endpoint access denied."
+  },
+  {
+    "id": "TC-BADMS-256",
+    "strategy": "BR",
+    "title": "Super Admin Global Backup Policy Configuration Permitted",
+    "primary_obligation": "BR-BA-019 Permitted",
+    "linked_obligations": [
+      "BA-UC-011"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that Super Admin holds highest authority to define and modify institution-wide global backup schedules and default policies.",
+    "pre_conditions": "Super Admin 'superadmin_01' is authenticated.",
+    "test_inputs": {
+      "actor_role": "Super Admin",
+      "user_id": "superadmin_01",
+      "global_schedule": {
+        "frequency": "Daily",
+        "time": "02:30 UTC"
+      },
+      "default_policy": {
+        "default_retention_days": 365,
+        "compression": true
+      }
+    },
+    "execution_steps": [
+      "1. Authenticate as Super Admin 'superadmin_01'.",
+      "2. Submit new institution-wide global backup schedule and default policy.",
+      "3. BADMS validates and applies configuration."
+    ],
+    "expected_outcome": "Configuration accepted and applied globally; audit log records global policy change under Super Admin.",
+    "failure_guarantee": "Institution-wide default configuration remains intact if update transaction fails."
+  },
+  {
+    "id": "TC-BADMS-257",
+    "strategy": "BR",
+    "title": "SysAdmin Global Backup Schedule Configuration Prohibited",
+    "primary_obligation": "BR-BA-019 Prohibited",
+    "linked_obligations": [
+      "BA-UC-011",
+      "BA-UC-009"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that a SysAdmin is prohibited from modifying institution-wide global backup schedules or default backup policies.",
+    "pre_conditions": "SysAdmin 'sysadmin_01' is authenticated.",
+    "test_inputs": {
+      "actor_role": "SysAdmin",
+      "user_id": "sysadmin_01",
+      "target_config": "global_backup_schedule",
+      "new_schedule": {
+        "frequency": "Daily",
+        "time": "05:00 UTC"
+      }
+    },
+    "execution_steps": [
+      "1. Authenticate as SysAdmin 'sysadmin_01'.",
+      "2. Attempt to update global backup schedule.",
+      "3. Verify access control response."
+    ],
+    "expected_outcome": "Operation is denied with 403 Forbidden; SysAdmin authority is limited to local/dataset schedules.",
+    "failure_guarantee": "Global backup policy cannot be altered by departmental or local administrators."
+  },
+  {
+    "id": "TC-BADMS-258",
+    "strategy": "BR",
+    "title": "IT Security Global Backup Policy Configuration Prohibited",
+    "primary_obligation": "BR-BA-019 Prohibited",
+    "linked_obligations": [
+      "BA-UC-011",
+      "BR-BA-021"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that IT Security is prohibited from modifying institution-wide global backup schedules and default backup policies.",
+    "pre_conditions": "IT Security user 'it_sec_01' is authenticated.",
+    "test_inputs": {
+      "actor_role": "IT Security Team",
+      "user_id": "it_sec_01",
+      "target_config": "global_backup_schedule",
+      "action": "update_global_schedule"
+    },
+    "execution_steps": [
+      "1. Authenticate as IT Security user 'it_sec_01'.",
+      "2. Attempt to update institution-wide global backup schedule.",
+      "3. Observe authorization rejection."
+    ],
+    "expected_outcome": "Action is denied; IT Security owns security/RBAC policy, not global backup schedule authority.",
+    "failure_guarantee": "Separation of duties between IT Security and Super Admin is strictly enforced."
+  },
+  {
+    "id": "TC-BADMS-259",
+    "strategy": "BR",
+    "title": "Authorized Scope Protected Information Display Permitted",
+    "primary_obligation": "BR-BA-020 Permitted",
+    "linked_obligations": [
+      "BA-UC-012",
+      "BA-UC-013",
+      "BA-UC-014",
+      "BA-UC-015"
+    ],
+    "test_type": "functional-positive",
+    "description": "Verify that SysAdmin can review audit logs, IT Security can review security reports, and Users can track their own request status.",
+    "pre_conditions": "Users of various roles authenticated with active records in system.",
+    "test_inputs": {
+      "actor_role": "SysAdmin / IT Security / User",
+      "queries": [
+        {
+          "role": "SysAdmin",
+          "target": "audit_logs"
+        },
+        {
+          "role": "IT Security",
+          "target": "security_reports"
+        },
+        {
+          "role": "User",
+          "target": "own_request_status"
+        }
+      ]
+    },
+    "execution_steps": [
+      "1. SysAdmin queries system audit logs -> verify access granted.",
+      "2. IT Security queries security reports -> verify access granted.",
+      "3. User queries tracking status of own submitted request -> verify access granted."
+    ],
+    "expected_outcome": "Each role successfully views protected information corresponding to their authorized scope.",
+    "failure_guarantee": "Protected information is disclosed strictly according to verified role and ownership credentials."
+  },
+  {
+    "id": "TC-BADMS-260",
+    "strategy": "BR",
+    "title": "Regular User Access to Audit Logs or Foreign Requests Prohibited",
+    "primary_obligation": "BR-BA-020 Prohibited",
+    "linked_obligations": [
+      "BA-UC-012",
+      "BA-UC-014"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that a regular User is prohibited from viewing system audit logs or tracking request status belonging to other users.",
+    "pre_conditions": "User 'user_01' is authenticated; request 'REQ-ARCH-999' belongs to user 'user_02'.",
+    "test_inputs": {
+      "actor_role": "User",
+      "user_id": "user_01",
+      "targets": [
+        "system_audit_logs",
+        "foreign_request_REQ-ARCH-999"
+      ]
+    },
+    "execution_steps": [
+      "1. User 'user_01' attempts to query system audit logs.",
+      "2. User 'user_01' attempts to view details of request 'REQ-ARCH-999' owned by user 'user_02'.",
+      "3. Observe access control responses."
+    ],
+    "expected_outcome": "Both requests are denied with 403 Forbidden; audit logs and other users' request details are concealed.",
+    "failure_guarantee": "User data isolation and audit log confidentiality are maintained."
+  },
+  {
+    "id": "TC-BADMS-261",
+    "strategy": "BR",
+    "title": "HoD Access to Out-of-Department Protected Information Prohibited",
+    "primary_obligation": "BR-BA-020 Prohibited",
+    "linked_obligations": [
+      "BA-UC-012",
+      "BA-UC-021",
+      "BR-BA-010"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that an HoD is prohibited from viewing audit logs, backup status, or reports outside their own department.",
+    "pre_conditions": "HoD 'hod_cs_01' belongs to Computer Science.",
+    "test_inputs": {
+      "actor_role": "HoD",
+      "user_id": "hod_cs_01",
+      "department": "Computer Science",
+      "targets": [
+        "foreign_dept_ee_reports",
+        "global_system_audit_logs"
+      ]
+    },
+    "execution_steps": [
+      "1. HoD 'hod_cs_01' requests Electrical Engineering departmental reports.",
+      "2. HoD attempts to view global system audit logs.",
+      "3. Verify access control response."
+    ],
+    "expected_outcome": "Access denied; HoD visibility is strictly restricted to Computer Science departmental scope.",
+    "failure_guarantee": "Department scope restriction prevents cross-departmental surveillance or data leakage."
+  },
+  {
+    "id": "TC-BADMS-262",
+    "strategy": "BR",
+    "title": "IT Security Manages RBAC and Security Policies Permitted",
+    "primary_obligation": "BR-BA-021 Permitted",
+    "linked_obligations": [
+      "BA-UC-013",
+      "BA-UC-019",
+      "BA-UC-020"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that authorized IT Security Team members are permitted to manage RBAC user permissions and configure security policies.",
+    "pre_conditions": "IT Security user 'it_sec_01' is authenticated.",
+    "test_inputs": {
+      "actor_role": "IT Security Team",
+      "user_id": "it_sec_01",
+      "action": "update_rbac_permissions",
+      "target_user": "analyst_01",
+      "assigned_role": "SecurityAuditor",
+      "policy_update": {
+        "password_policy": "standard_institutional"
+      }
+    },
+    "execution_steps": [
+      "1. Authenticate as IT Security user 'it_sec_01'.",
+      "2. Submit update to user 'analyst_01' RBAC permissions.",
+      "3. Update institutional security policy.",
+      "4. Verify changes applied."
+    ],
+    "expected_outcome": "RBAC permissions updated; security policy modified; operation logged in security audit history.",
+    "failure_guarantee": "Permission changes are transactionally applied and audited."
+  },
+  {
+    "id": "TC-BADMS-263",
+    "strategy": "BR",
+    "title": "SysAdmin Management of RBAC and Security Policies Prohibited",
+    "primary_obligation": "BR-BA-021 Prohibited",
+    "linked_obligations": [
+      "BA-UC-019",
+      "BA-UC-020"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that a SysAdmin is prohibited from modifying RBAC user permissions or configuring security policies.",
+    "pre_conditions": "SysAdmin 'sysadmin_01' is authenticated.",
+    "test_inputs": {
+      "actor_role": "SysAdmin",
+      "user_id": "sysadmin_01",
+      "action": "modify_rbac_role",
+      "target_user": "user_02"
+    },
+    "execution_steps": [
+      "1. Authenticate as SysAdmin 'sysadmin_01'.",
+      "2. Attempt to modify RBAC permissions for 'user_02'.",
+      "3. Observe access control response."
+    ],
+    "expected_outcome": "Operation is denied with 403 Forbidden; RBAC management is restricted exclusively to IT Security role.",
+    "failure_guarantee": "Separation of duties prevents operational administrators from modifying security privileges."
+  },
+  {
+    "id": "TC-BADMS-264",
+    "strategy": "BR",
+    "title": "Super Admin Modification of IT Security RBAC Policies Prohibited",
+    "primary_obligation": "BR-BA-021 Prohibited",
+    "linked_obligations": [
+      "BA-UC-019",
+      "BA-UC-020"
+    ],
+    "test_type": "authorization",
+    "description": "Verify that Super Admin cannot override or modify IT Security RBAC permissions and security policies.",
+    "pre_conditions": "Super Admin 'superadmin_01' is authenticated.",
+    "test_inputs": {
+      "actor_role": "Super Admin",
+      "user_id": "superadmin_01",
+      "action": "override_security_policy",
+      "policy_id": "SEC-POL-001"
+    },
+    "execution_steps": [
+      "1. Authenticate as Super Admin 'superadmin_01'.",
+      "2. Attempt to alter IT Security policy 'SEC-POL-001'.",
+      "3. Observe system separation of duties enforcement."
+    ],
+    "expected_outcome": "Operation denied; Super Admin authority is bounded to global backup policies/schedules and special archival, leaving security/RBAC policy to IT Security.",
+    "failure_guarantee": "Institutional separation of duties between Super Admin and IT Security is preserved."
+  }
+]
