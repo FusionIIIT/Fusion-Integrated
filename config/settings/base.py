@@ -4,6 +4,7 @@ Every value comes from the environment. This service holds NO user table:
 identity, RBAC and directory data all come from Fusion_System_Administrator
 over HTTP — see fusion_auth/.
 """
+
 import os
 from pathlib import Path
 
@@ -83,17 +84,17 @@ LOCAL_APPS = [
 
 # Each module is an independent Django app: own tables, migrations and contract.
 PLATFORM_MODULES = [
-    "modules.directory",         # who people are, projected from IAM
-    "modules.accesscontrol",     # which modules a role may enter
+    "modules.directory",  # who people are, projected from IAM
+    "modules.accesscontrol",  # which modules a role may enter
 ]
 
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
+    "modules.elm",
     "modules.placement",
 ]
 
-INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
-                  + PLATFORM_MODULES + DOMAIN_MODULES)
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS + PLATFORM_MODULES + DOMAIN_MODULES
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -164,15 +165,13 @@ CELERY_TASK_ACKS_LATE = True
 CELERY_TASK_REJECT_ON_WORKER_LOST = True
 
 # Console by default, so a laptop never mails 3,000 students by accident.
-EMAIL_BACKEND = env("DJANGO_EMAIL_BACKEND",
-                    "django.core.mail.backends.console.EmailBackend")
+EMAIL_BACKEND = env("DJANGO_EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
 EMAIL_HOST = env("EMAIL_HOST", "localhost")
 EMAIL_PORT = env_int("EMAIL_PORT", 25)
 EMAIL_HOST_USER = env("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", False)
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL",
-                         "Placement Cell <placement@iiitdmj.ac.in>")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", "Placement Cell <placement@iiitdmj.ac.in>")
 
 #: Ceiling per worker pass, so a runaway loop cannot mail the institute.
 NOTIFY_MAX_PER_RUN = env_int("NOTIFY_MAX_PER_RUN", 500)
@@ -183,8 +182,8 @@ NOTIFY_DAILY_CAP_PER_RECIPIENT = env_int("NOTIFY_DAILY_CAP_PER_RECIPIENT", 20)
 
 #: Pre-Drive uploads, still served but never written; outside BASE_DIR or boot fails.
 PLACEMENT_UPLOAD_ROOT = env(
-    "PLACEMENT_UPLOAD_ROOT",
-    str(Path.home() / ".local" / "share" / "fusion-integrated" / "uploads"))
+    "PLACEMENT_UPLOAD_ROOT", str(Path.home() / ".local" / "share" / "fusion-integrated" / "uploads")
+)
 #: When set, legacy reads go to nginx via X-Accel-Redirect. Must be `internal;`.
 PLACEMENT_UPLOAD_INTERNAL_PREFIX = env("PLACEMENT_UPLOAD_INTERNAL_PREFIX", "")
 
@@ -230,6 +229,7 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {"EmployeeKindEnum": [("faculty", "Faculty"), ("staff", "Staff")]},
 }
 
 CORS_ALLOW_ALL_ORIGINS = False
