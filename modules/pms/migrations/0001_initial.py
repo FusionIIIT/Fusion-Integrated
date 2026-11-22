@@ -1,0 +1,218 @@
+import django.db.models.deletion
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = []
+
+    operations = [
+        migrations.CreateModel(
+            name="PatentApplication",
+            fields=[
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("application_no", models.CharField(db_index=True, max_length=64, unique=True)),
+                ("title", models.CharField(max_length=512)),
+                ("abstract", models.TextField()),
+                ("detailed_description", models.TextField(blank=True, default="")),
+                ("claims", models.TextField(blank=True, default="")),
+                ("field_of_invention", models.CharField(blank=True, default="", max_length=256)),
+                ("applicant_user_id", models.IntegerField(db_index=True)),
+                ("status", models.CharField(db_index=True, default="draft", max_length=32)),
+                ("filing_type", models.CharField(default="provisional", max_length=32)),
+                ("official_filing_number", models.CharField(blank=True, default="", max_length=64)),
+                ("official_filing_date", models.DateField(blank=True, null=True)),
+                ("grant_number", models.CharField(blank=True, default="", max_length=64)),
+                ("grant_date", models.DateField(blank=True, null=True)),
+                ("assigned_director_id", models.IntegerField(blank=True, db_index=True, null=True)),
+                ("assigned_attorney_id", models.IntegerField(blank=True, db_index=True, null=True)),
+                ("is_active", models.BooleanField(default=True)),
+            ],
+            options={
+                "db_table": "pms_patent_application",
+                "ordering": ["-created_at"],
+            },
+        ),
+        migrations.CreateModel(
+            name="PatentBudget",
+            fields=[
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("estimated_filing_fee", models.DecimalField(decimal_places=2, default=0.0, max_digits=12)),
+                ("estimated_attorney_fee", models.DecimalField(decimal_places=2, default=0.0, max_digits=12)),
+                ("estimated_search_fee", models.DecimalField(decimal_places=2, default=0.0, max_digits=12)),
+                ("total_estimated_amount", models.DecimalField(decimal_places=2, default=0.0, max_digits=12)),
+                ("approved_amount", models.DecimalField(blank=True, decimal_places=2, max_digits=12, null=True)),
+                ("budget_status", models.CharField(default="pending", max_length=32)),
+                ("decided_by_user_id", models.IntegerField(blank=True, null=True)),
+                ("decision_date", models.DateTimeField(blank=True, null=True)),
+                ("escalation_notes", models.TextField(blank=True, default="")),
+                ("application", models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name="budget", to="pms.patentapplication")),
+            ],
+            options={
+                "db_table": "pms_patent_budget",
+            },
+        ),
+        migrations.CreateModel(
+            name="PatentAuditEvent",
+            fields=[
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("event_name", models.CharField(db_index=True, max_length=128)),
+                ("from_status", models.CharField(blank=True, default="", max_length=32)),
+                ("to_status", models.CharField(blank=True, default="", max_length=32)),
+                ("actor_user_id", models.IntegerField(db_index=True)),
+                ("payload", models.JSONField(default=dict)),
+                ("application", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="audit_events", to="pms.patentapplication")),
+            ],
+            options={
+                "db_table": "pms_audit_event",
+                "ordering": ["-created_at"],
+            },
+        ),
+        migrations.CreateModel(
+            name="CoInventor",
+            fields=[
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("user_id", models.IntegerField(db_index=True)),
+                ("inventor_name", models.CharField(max_length=256)),
+                ("affiliation", models.CharField(blank=True, default="", max_length=256)),
+                ("contribution_percentage", models.DecimalField(decimal_places=2, max_digits=5)),
+                ("agreement_signed", models.BooleanField(default=False)),
+                ("agreement_signed_at", models.DateTimeField(blank=True, null=True)),
+                ("signature_hash", models.CharField(blank=True, default="", max_length=128)),
+                ("application", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="inventors", to="pms.patentapplication")),
+            ],
+            options={
+                "db_table": "pms_coinventor",
+            },
+        ),
+        migrations.CreateModel(
+            name="PriorArtReference",
+            fields=[
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("title", models.CharField(max_length=512)),
+                ("citation_type", models.CharField(default="patent", max_length=32)),
+                ("publication_number_or_doi", models.CharField(blank=True, default="", max_length=128)),
+                ("relevance_summary", models.TextField()),
+                ("attached_file_drive_link", models.URLField(blank=True, default="", max_length=1024)),
+                ("application", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="prior_art_references", to="pms.patentapplication")),
+            ],
+            options={
+                "db_table": "pms_prior_art_reference",
+            },
+        ),
+        migrations.CreateModel(
+            name="InternalReview",
+            fields=[
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("reviewer_user_id", models.IntegerField(db_index=True)),
+                ("review_stage", models.CharField(default="preliminary_scrutiny", max_length=32)),
+                ("verdict", models.CharField(max_length=32)),
+                ("comments", models.TextField()),
+                ("novelty_score", models.IntegerField(default=5)),
+                ("inventive_step_score", models.IntegerField(default=5)),
+                ("commercial_viability_score", models.IntegerField(default=5)),
+                ("application", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="reviews", to="pms.patentapplication")),
+            ],
+            options={
+                "db_table": "pms_internal_review",
+                "ordering": ["-created_at"],
+            },
+        ),
+        migrations.CreateModel(
+            name="OfficeAction",
+            fields=[
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("action_type", models.CharField(default="fer", max_length=32)),
+                ("issuing_authority", models.CharField(default="Indian Patent Office", max_length=128)),
+                ("issue_date", models.DateField()),
+                ("statutory_deadline", models.DateField(db_index=True)),
+                ("objections_summary", models.TextField()),
+                ("response_draft", models.TextField(blank=True, default="")),
+                ("response_status", models.CharField(default="pending", max_length=32)),
+                ("response_submitted_date", models.DateField(blank=True, null=True)),
+                ("handled_by_attorney_id", models.IntegerField(db_index=True)),
+                ("application", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="office_actions", to="pms.patentapplication")),
+            ],
+            options={
+                "db_table": "pms_office_action",
+                "ordering": ["statutory_deadline"],
+            },
+        ),
+        migrations.CreateModel(
+            name="MaintenanceRenewal",
+            fields=[
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("renewal_year", models.IntegerField(db_index=True)),
+                ("due_date", models.DateField(db_index=True)),
+                ("grace_period_deadline", models.DateField()),
+                ("annuity_fee", models.DecimalField(decimal_places=2, max_digits=12)),
+                ("decision", models.CharField(default="pending", max_length=32)),
+                ("decided_by_user_id", models.IntegerField(blank=True, null=True)),
+                ("payment_reference", models.CharField(blank=True, default="", max_length=128)),
+                ("application", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="renewals", to="pms.patentapplication")),
+            ],
+            options={
+                "db_table": "pms_maintenance_renewal",
+                "ordering": ["due_date"],
+            },
+        ),
+        migrations.CreateModel(
+            name="PatentFinancialTransaction",
+            fields=[
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("transaction_type", models.CharField(max_length=32)),
+                ("amount", models.DecimalField(decimal_places=2, max_digits=12)),
+                ("currency", models.CharField(default="INR", max_length=8)),
+                ("payment_status", models.CharField(default="recorded", max_length=32)),
+                ("reference_no", models.CharField(db_index=True, max_length=128)),
+                ("recorded_by_user_id", models.IntegerField(db_index=True)),
+                ("effective_date", models.DateField()),
+                ("description", models.CharField(blank=True, default="", max_length=512)),
+                ("reversal_of_transaction_id", models.IntegerField(blank=True, null=True)),
+                ("application", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="financial_transactions", to="pms.patentapplication")),
+            ],
+            options={
+                "db_table": "pms_financial_transaction",
+                "ordering": ["-created_at"],
+            },
+        ),
+        migrations.CreateModel(
+            name="PatentDocumentVersion",
+            fields=[
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("doc_type", models.CharField(max_length=32)),
+                ("version_number", models.IntegerField(default=1)),
+                ("title", models.CharField(max_length=256)),
+                ("drive_link", models.URLField(max_length=1024)),
+                ("file_size_bytes", models.BigIntegerField(default=0)),
+                ("uploaded_by_user_id", models.IntegerField(db_index=True)),
+                ("application", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="documents", to="pms.patentapplication")),
+            ],
+            options={
+                "db_table": "pms_document_version",
+                "ordering": ["-version_number"],
+            },
+        ),
+    ]
