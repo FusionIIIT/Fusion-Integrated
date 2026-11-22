@@ -1,0 +1,686 @@
+[
+  {
+    "test_id": "TC-BR-001-PERM",
+    "source_id": "PC-BR-001 condition-true",
+    "purpose": "Verify PC-BR-001 permitted outcome: Profile Completeness Before Application",
+    "preconditions": "Preconditions satisfied where rule condition holds: Student initiates application and the posting/process requires profile completeness.",
+    "action_or_input": "Execute operation conforming to rule statement: Where profile completeness is configured as required for application, PCMS shall not allow application submission until ",
+    "expected_result": "Outcome permitted: Application may proceed only when the configured profile-completeness condition is satisfied.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-001-PROH",
+    "source_id": "PC-BR-001 condition-false",
+    "purpose": "Verify PC-BR-001 prohibited outcome or violation handling: Profile Completeness Before Application",
+    "preconditions": "Preconditions where condition for PC-BR-001 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: Where profile completeness is configured as required for application, PCMS shall not allow application submission until ",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-002-PERM",
+    "source_id": "PC-BR-002 condition-true",
+    "purpose": "Verify PC-BR-002 permitted outcome: Eligibility Enforcement Before Application",
+    "preconditions": "Preconditions satisfied where rule condition holds: Student initiates application.",
+    "action_or_input": "Execute operation conforming to rule statement: PCMS shall enforce job-posting eligibility checks before allowing a Student to apply and shall prevent ineligible Studen",
+    "expected_result": "Outcome permitted: Only eligible Students may submit the application.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-002-PROH",
+    "source_id": "PC-BR-002 condition-false",
+    "purpose": "Verify PC-BR-002 prohibited outcome or violation handling: Eligibility Enforcement Before Application",
+    "preconditions": "Preconditions where condition for PC-BR-002 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: PCMS shall enforce job-posting eligibility checks before allowing a Student to apply and shall prevent ineligible Studen",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-002-EXCP",
+    "source_id": "PC-BR-002 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-002: Eligibility is limited to criteria recorded for the posting; PCMS does not create external policy.",
+    "preconditions": "Context matching explicitly stated exception: Eligibility is limited to criteria recorded for the posting; PCMS does not create external policy.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-003-PERM",
+    "source_id": "PC-BR-003 condition-true",
+    "purpose": "Verify PC-BR-003 permitted outcome: Job Posting Required Content",
+    "preconditions": "Preconditions satisfied where rule condition holds: A posting is saved/published/submitted as a PCMS opportunity.",
+    "action_or_input": "Execute operation conforming to rule statement: Each PCMS job posting shall include role description, eligibility criteria, and application deadline.",
+    "expected_result": "Outcome permitted: Required posting content must be present.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-003-PROH",
+    "source_id": "PC-BR-003 condition-false",
+    "purpose": "Verify PC-BR-003 prohibited outcome or violation handling: Job Posting Required Content",
+    "preconditions": "Preconditions where condition for PC-BR-003 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: Each PCMS job posting shall include role description, eligibility criteria, and application deadline.",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-003-EXCP",
+    "source_id": "PC-BR-003 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-003: No extra mandatory fields are asserted.",
+    "preconditions": "Context matching explicitly stated exception: No extra mandatory fields are asserted.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-004-PERM",
+    "source_id": "PC-BR-004 condition-true",
+    "purpose": "Verify PC-BR-004 permitted outcome: Eligibility Criteria Scope",
+    "preconditions": "Preconditions satisfied where rule condition holds: Eligibility criteria are defined/recorded.",
+    "action_or_input": "Execute operation conforming to rule statement: PCMS eligibility criteria may include CGPA, branch, year, skills, and other criteria explicitly recorded for the posting",
+    "expected_result": "Outcome permitted: PCMS evaluates only criteria represented for the posting.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-004-PROH",
+    "source_id": "PC-BR-004 condition-false",
+    "purpose": "Verify PC-BR-004 prohibited outcome or violation handling: Eligibility Criteria Scope",
+    "preconditions": "Preconditions where condition for PC-BR-004 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: PCMS eligibility criteria may include CGPA, branch, year, skills, and other criteria explicitly recorded for the posting",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-004-EXCP",
+    "source_id": "PC-BR-004 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-004: External criteria not represented in PCMS are outside this rule.",
+    "preconditions": "Context matching explicitly stated exception: External criteria not represented in PCMS are outside this rule.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-005-PERM",
+    "source_id": "PC-BR-005 condition-true",
+    "purpose": "Verify PC-BR-005 permitted outcome: TPO Job Posting Authority",
+    "preconditions": "Preconditions satisfied where rule condition holds: TPO creates/updates/publishes a posting.",
+    "action_or_input": "Execute operation conforming to rule statement: TPO may upload and manage job postings on behalf of or in coordination with Companies/Recruiters.",
+    "expected_result": "Outcome permitted: PCMS permits the action within TPO posting scope.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-005-PROH",
+    "source_id": "PC-BR-005 condition-false",
+    "purpose": "Verify PC-BR-005 prohibited outcome or violation handling: TPO Job Posting Authority",
+    "preconditions": "Preconditions where condition for PC-BR-005 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: TPO may upload and manage job postings on behalf of or in coordination with Companies/Recruiters.",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-005-EXCP",
+    "source_id": "PC-BR-005 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-005: Does not grant TPO external recruitment-decision authority.",
+    "preconditions": "Context matching explicitly stated exception: Does not grant TPO external recruitment-decision authority.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-006-PERM",
+    "source_id": "PC-BR-006 condition-true",
+    "purpose": "Verify PC-BR-006 permitted outcome: Company Opportunity Authority",
+    "preconditions": "Preconditions satisfied where rule condition holds: Company/Recruiter creates an opportunity.",
+    "action_or_input": "Execute operation conforming to rule statement: An authorized Company/Recruiter may publish or submit jobs/internships and define eligibility criteria through PCMS only",
+    "expected_result": "Outcome permitted: Publish/submit/criteria actions are permitted only within the Company/Recruiter authorized scope.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-006-PROH",
+    "source_id": "PC-BR-006 condition-false",
+    "purpose": "Verify PC-BR-006 prohibited outcome or violation handling: Company Opportunity Authority",
+    "preconditions": "Preconditions where condition for PC-BR-006 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: An authorized Company/Recruiter may publish or submit jobs/internships and define eligibility criteria through PCMS only",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-006-EXCP",
+    "source_id": "PC-BR-006 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-006: Institutional approval remains outside PCMS except as represented by recorded status/boundary.",
+    "preconditions": "Context matching explicitly stated exception: Institutional approval remains outside PCMS except as represented by recorded status/boundary.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-007-PERM",
+    "source_id": "PC-BR-007 condition-true",
+    "purpose": "Verify PC-BR-007 permitted outcome: Company Registration Approval Boundary",
+    "preconditions": "Preconditions satisfied where rule condition holds: Company registration is submitted or company functions are requested.",
+    "action_or_input": "Execute operation conforming to rule statement: Company/Recruiter registration is subject to institute approval. PCMS may record an approval status where represented, b",
+    "expected_result": "Outcome permitted: Company functions are available only when the represented authorization state permits them.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-007-PROH",
+    "source_id": "PC-BR-007 condition-false",
+    "purpose": "Verify PC-BR-007 prohibited outcome or violation handling: Company Registration Approval Boundary",
+    "preconditions": "Preconditions where condition for PC-BR-007 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: Company/Recruiter registration is subject to institute approval. PCMS may record an approval status where represented, b",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-007-EXCP",
+    "source_id": "PC-BR-007 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-007: The baseline does not assign the institutional approval decision to TPO or another PCMS actor.",
+    "preconditions": "Context matching explicitly stated exception: The baseline does not assign the institutional approval decision to TPO or another PCMS actor.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-009-PERM",
+    "source_id": "PC-BR-009 condition-true",
+    "purpose": "Verify PC-BR-009 permitted outcome: Company Application Access Restriction",
+    "preconditions": "Preconditions satisfied where rule condition holds: Company/Recruiter opens or changes an application.",
+    "action_or_input": "Execute operation conforming to rule statement: Companies/Recruiters may view or manage only applications relevant to their own authorized opportunities.",
+    "expected_result": "Outcome permitted: PCMS limits access/action to applications in the Company/Recruiter opportunity scope.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-009-PROH",
+    "source_id": "PC-BR-009 condition-false",
+    "purpose": "Verify PC-BR-009 prohibited outcome or violation handling: Company Application Access Restriction",
+    "preconditions": "Preconditions where condition for PC-BR-009 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: Companies/Recruiters may view or manage only applications relevant to their own authorized opportunities.",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-009-EXCP",
+    "source_id": "PC-BR-009 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-009: None beyond explicitly authorized access.",
+    "preconditions": "Context matching explicitly stated exception: None beyond explicitly authorized access.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-010-PERM",
+    "source_id": "PC-BR-010 condition-true",
+    "purpose": "Verify PC-BR-010 permitted outcome: TPO Application Management Authority",
+    "preconditions": "Preconditions satisfied where rule condition holds: TPO opens/manages applications.",
+    "action_or_input": "Execute operation conforming to rule statement: TPO may view, review, filter, and administratively manage Student applications within PCMS.",
+    "expected_result": "Outcome permitted: PCMS permits supported TPO application-management actions within TPO scope.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-010-PROH",
+    "source_id": "PC-BR-010 condition-false",
+    "purpose": "Verify PC-BR-010 prohibited outcome or violation handling: TPO Application Management Authority",
+    "preconditions": "Preconditions where condition for PC-BR-010 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: TPO may view, review, filter, and administratively manage Student applications within PCMS.",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-010-EXCP",
+    "source_id": "PC-BR-010 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-010: Does not by itself grant authority to make an external Company/Recruiter selection decision.",
+    "preconditions": "Context matching explicitly stated exception: Does not by itself grant authority to make an external Company/Recruiter selection decision.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-011-PERM",
+    "source_id": "PC-BR-011 condition-true",
+    "purpose": "Verify PC-BR-011 permitted outcome: Interview Schedule Content Rule",
+    "preconditions": "Preconditions satisfied where rule condition holds: TPO or Company/Recruiter records an interview schedule.",
+    "action_or_input": "Execute operation conforming to rule statement: A recorded PCMS interview schedule shall include interview date, time slot, and mode as online or offline.",
+    "expected_result": "Outcome permitted: Required schedule fields are recorded before Interview Scheduled is established.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-011-PROH",
+    "source_id": "PC-BR-011 condition-false",
+    "purpose": "Verify PC-BR-011 prohibited outcome or violation handling: Interview Schedule Content Rule",
+    "preconditions": "Preconditions where condition for PC-BR-011 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: A recorded PCMS interview schedule shall include interview date, time slot, and mode as online or offline.",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-012-PERM",
+    "source_id": "PC-BR-012 condition-true",
+    "purpose": "Verify PC-BR-012 permitted outcome: Interview Notification Rule",
+    "preconditions": "Preconditions satisfied where rule condition holds: An interview schedule is recorded for eligible/shortlisted Students.",
+    "action_or_input": "Execute operation conforming to rule statement: PCMS shall notify eligible and shortlisted Students about recorded interview details.",
+    "expected_result": "Outcome permitted: PCMS triggers the interview notification event.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-012-PROH",
+    "source_id": "PC-BR-012 condition-false",
+    "purpose": "Verify PC-BR-012 prohibited outcome or violation handling: Interview Notification Rule",
+    "preconditions": "Preconditions where condition for PC-BR-012 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: PCMS shall notify eligible and shortlisted Students about recorded interview details.",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-012-EXCP",
+    "source_id": "PC-BR-012 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-012: Email transport is governed by PC-BR-021.",
+    "preconditions": "Context matching explicitly stated exception: Email transport is governed by PC-BR-021.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-013-PERM",
+    "source_id": "PC-BR-013 condition-true",
+    "purpose": "Verify PC-BR-013 permitted outcome: Offer Response Deadline Rule",
+    "preconditions": "Preconditions satisfied where rule condition holds: Student attempts to respond to Offer Extended.",
+    "action_or_input": "Execute operation conforming to rule statement: Students shall accept or reject job offers within the deadline represented for the offer in PCMS.",
+    "expected_result": "Outcome permitted: PCMS permits a response only when the applicable represented deadline condition allows it.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-013-PROH",
+    "source_id": "PC-BR-013 condition-false",
+    "purpose": "Verify PC-BR-013 prohibited outcome or violation handling: Offer Response Deadline Rule",
+    "preconditions": "Preconditions where condition for PC-BR-013 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: Students shall accept or reject job offers within the deadline represented for the offer in PCMS.",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-013-EXCP",
+    "source_id": "PC-BR-013 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-013: Deadline values/policy are institutional/configured and not invented here.",
+    "preconditions": "Context matching explicitly stated exception: Deadline values/policy are institutional/configured and not invented here.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-014-PERM",
+    "source_id": "PC-BR-014 condition-true",
+    "purpose": "Verify PC-BR-014 permitted outcome: Offer Acceptance Placement Record Update",
+    "preconditions": "Preconditions satisfied where rule condition holds: Offer response outcome is Accept.",
+    "action_or_input": "Execute operation conforming to rule statement: When a Student accepts a job offer, PCMS shall update the placement record accordingly.",
+    "expected_result": "Outcome permitted: Offer state becomes accepted and the placement record is updated.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-014-PROH",
+    "source_id": "PC-BR-014 condition-false",
+    "purpose": "Verify PC-BR-014 prohibited outcome or violation handling: Offer Acceptance Placement Record Update",
+    "preconditions": "Preconditions where condition for PC-BR-014 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: When a Student accepts a job offer, PCMS shall update the placement record accordingly.",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-014-EXCP",
+    "source_id": "PC-BR-014 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-014: Does not define external employment policy beyond the recorded acceptance.",
+    "preconditions": "Context matching explicitly stated exception: Does not define external employment policy beyond the recorded acceptance.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-015-PERM",
+    "source_id": "PC-BR-015 condition-true",
+    "purpose": "Verify PC-BR-015 permitted outcome: Multiple Offer Policy Boundary",
+    "preconditions": "Preconditions satisfied where rule condition holds: More than one offer/policy condition applies.",
+    "action_or_input": "Execute operation conforming to rule statement: PCMS handles multiple offers only according to institutional placement-policy logic explicitly represented in PCMS.",
+    "expected_result": "Outcome permitted: Only represented policy logic may restrict, record, notify, or report the situation.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-015-PROH",
+    "source_id": "PC-BR-015 condition-false",
+    "purpose": "Verify PC-BR-015 prohibited outcome or violation handling: Multiple Offer Policy Boundary",
+    "preconditions": "Preconditions where condition for PC-BR-015 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: PCMS handles multiple offers only according to institutional placement-policy logic explicitly represented in PCMS.",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-015-EXCP",
+    "source_id": "PC-BR-015 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-015: Policy interpretation itself remains external.",
+    "preconditions": "Context matching explicitly stated exception: Policy interpretation itself remains external.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-016-PERM",
+    "source_id": "PC-BR-016 condition-true",
+    "purpose": "Verify PC-BR-016 permitted outcome: Student Anonymized Statistics Restriction",
+    "preconditions": "Preconditions satisfied where rule condition holds: Student requests placement statistics.",
+    "action_or_input": "Execute operation conforming to rule statement: Students may view only anonymized placement statistics made available to Students, not unrestricted sensitive placement ",
+    "expected_result": "Outcome permitted: PCMS applies anonymization/access restriction before display.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-016-PROH",
+    "source_id": "PC-BR-016 condition-false",
+    "purpose": "Verify PC-BR-016 prohibited outcome or violation handling: Student Anonymized Statistics Restriction",
+    "preconditions": "Preconditions where condition for PC-BR-016 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: Students may view only anonymized placement statistics made available to Students, not unrestricted sensitive placement ",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-016-EXCP",
+    "source_id": "PC-BR-016 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-016: Historical data is limited to data made available to Students.",
+    "preconditions": "Context matching explicitly stated exception: Historical data is limited to data made available to Students.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-017-PERM",
+    "source_id": "PC-BR-017 condition-true",
+    "purpose": "Verify PC-BR-017 permitted outcome: Announcement Content Boundary",
+    "preconditions": "Preconditions satisfied where rule condition holds: Authorized actor creates an announcement.",
+    "action_or_input": "Execute operation conforming to rule statement: Placement announcements may include placement drives, company visits, training sessions, workshops, and the actor-specif",
+    "expected_result": "Outcome permitted: PCMS accepts only placement-related announcement content within the supported scope.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-017-PROH",
+    "source_id": "PC-BR-017 condition-false",
+    "purpose": "Verify PC-BR-017 prohibited outcome or violation handling: Announcement Content Boundary",
+    "preconditions": "Preconditions where condition for PC-BR-017 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: Placement announcements may include placement drives, company visits, training sessions, workshops, and the actor-specif",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-017-EXCP",
+    "source_id": "PC-BR-017 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-017: No unrelated announcement domain is introduced.",
+    "preconditions": "Context matching explicitly stated exception: No unrelated announcement domain is introduced.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-019-PERM",
+    "source_id": "PC-BR-019 condition-true",
+    "purpose": "Verify PC-BR-019 permitted outcome: Alumni Restricted Read-Only Access",
+    "preconditions": "Preconditions satisfied where rule condition holds: Alumni requests placement data.",
+    "action_or_input": "Execute operation conforming to rule statement: Alumni access to placement data is restricted to mentorship/networking purposes and is read-only unless a later explicit",
+    "expected_result": "Outcome permitted: PCMS limits Alumni to permitted read-only data views.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-019-PROH",
+    "source_id": "PC-BR-019 condition-false",
+    "purpose": "Verify PC-BR-019 prohibited outcome or violation handling: Alumni Restricted Read-Only Access",
+    "preconditions": "Preconditions where condition for PC-BR-019 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: Alumni access to placement data is restricted to mentorship/networking purposes and is read-only unless a later explicit",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-019-EXCP",
+    "source_id": "PC-BR-019 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-019: Active placement participation remains prohibited by PC-BR-020.",
+    "preconditions": "Context matching explicitly stated exception: Active placement participation remains prohibited by PC-BR-020.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-020-PERM",
+    "source_id": "PC-BR-020 condition-true",
+    "purpose": "Verify PC-BR-020 permitted outcome: Alumni Active Workflow Prohibition",
+    "preconditions": "Preconditions satisfied where rule condition holds: Alumni attempts an active placement action.",
+    "action_or_input": "Execute operation conforming to rule statement: PCMS shall prevent Alumni from participating in active placement workflows such as applying, shortlisting, scheduling, o",
+    "expected_result": "Outcome permitted: PCMS blocks the active placement action.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-020-PROH",
+    "source_id": "PC-BR-020 condition-false",
+    "purpose": "Verify PC-BR-020 prohibited outcome or violation handling: Alumni Active Workflow Prohibition",
+    "preconditions": "Preconditions where condition for PC-BR-020 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: PCMS shall prevent Alumni from participating in active placement workflows such as applying, shortlisting, scheduling, o",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-020-EXCP",
+    "source_id": "PC-BR-020 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-020: None unless the baseline is explicitly changed.",
+    "preconditions": "Context matching explicitly stated exception: None unless the baseline is explicitly changed.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-021-PERM",
+    "source_id": "PC-BR-021 condition-true",
+    "purpose": "Verify PC-BR-021 permitted outcome: Email Notification Delivery Rule",
+    "preconditions": "Preconditions satisfied where rule condition holds: PC-UC-007 is triggered by a supported notification event: new job posting, application submission, shortlisting update, ",
+    "action_or_input": "Execute operation conforming to rule statement: Supported PCMS notification events shall be handed off through system-generated emails; central email delivery infrastru",
+    "expected_result": "Outcome permitted: PCMS generates and hands off the supported email notification without assuming recipient policy that is not established ",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-021-PROH",
+    "source_id": "PC-BR-021 condition-false",
+    "purpose": "Verify PC-BR-021 prohibited outcome or violation handling: Email Notification Delivery Rule",
+    "preconditions": "Preconditions where condition for PC-BR-021 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: Supported PCMS notification events shall be handed off through system-generated emails; central email delivery infrastru",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-021-EXCP",
+    "source_id": "PC-BR-021 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-021: Recipient sets are used only where specified/configured; unspecified recipient policy is not invente",
+    "preconditions": "Context matching explicitly stated exception: Recipient sets are used only where specified/configured; unspecified recipient policy is not invented.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-022-PERM",
+    "source_id": "PC-BR-022 condition-true",
+    "purpose": "Verify PC-BR-022 permitted outcome: Placement Data Role Restriction",
+    "preconditions": "Preconditions satisfied where rule condition holds: Actor requests a PCMS function/data item.",
+    "action_or_input": "Execute operation conforming to rule statement: PCMS shall restrict placement-data access and actions according to the actor\\'s PCMS role and access scope.",
+    "expected_result": "Outcome permitted: PCMS permits only role-authorized access/actions.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-022-PROH",
+    "source_id": "PC-BR-022 condition-false",
+    "purpose": "Verify PC-BR-022 prohibited outcome or violation handling: Placement Data Role Restriction",
+    "preconditions": "Preconditions where condition for PC-BR-022 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: PCMS shall restrict placement-data access and actions according to the actor\\'s PCMS role and access scope.",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-022-EXCP",
+    "source_id": "PC-BR-022 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-022: Platform-wide identity/RBAC infrastructure remains external per PC-BR-026.",
+    "preconditions": "Context matching explicitly stated exception: Platform-wide identity/RBAC infrastructure remains external per PC-BR-026.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-023-PERM",
+    "source_id": "PC-BR-023 condition-true",
+    "purpose": "Verify PC-BR-023 permitted outcome: Sensitive Data View Restriction",
+    "preconditions": "Preconditions satisfied where rule condition holds: Actor requests sensitive placement data.",
+    "action_or_input": "Execute operation conforming to rule statement: Only authorized stakeholders may view sensitive placement data.",
+    "expected_result": "Outcome permitted: PCMS denies unauthorized view access.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-023-PROH",
+    "source_id": "PC-BR-023 condition-false",
+    "purpose": "Verify PC-BR-023 prohibited outcome or violation handling: Sensitive Data View Restriction",
+    "preconditions": "Preconditions where condition for PC-BR-023 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: Only authorized stakeholders may view sensitive placement data.",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-023-EXCP",
+    "source_id": "PC-BR-023 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-023: Student statistics additionally constrained by PC-BR-016.",
+    "preconditions": "Context matching explicitly stated exception: Student statistics additionally constrained by PC-BR-016.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-024-PERM",
+    "source_id": "PC-BR-024 condition-true",
+    "purpose": "Verify PC-BR-024 permitted outcome: Sensitive Data Modify Restriction",
+    "preconditions": "Preconditions satisfied where rule condition holds: Actor requests a placement-data modification.",
+    "action_or_input": "Execute operation conforming to rule statement: Only authorized stakeholders may modify sensitive placement data.",
+    "expected_result": "Outcome permitted: PCMS denies unauthorized modification.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-024-PROH",
+    "source_id": "PC-BR-024 condition-false",
+    "purpose": "Verify PC-BR-024 prohibited outcome or violation handling: Sensitive Data Modify Restriction",
+    "preconditions": "Preconditions where condition for PC-BR-024 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: Only authorized stakeholders may modify sensitive placement data.",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-024-EXCP",
+    "source_id": "PC-BR-024 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-024: Alumni are read-only under PC-BR-019.",
+    "preconditions": "Context matching explicitly stated exception: Alumni are read-only under PC-BR-019.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-025-PERM",
+    "source_id": "PC-BR-025 condition-true",
+    "purpose": "Verify PC-BR-025 permitted outcome: Academic Master Data Boundary",
+    "preconditions": "Preconditions satisfied where rule condition holds: PCMS reads/uses academic data.",
+    "action_or_input": "Execute operation conforming to rule statement: Academic master data remains external to PCMS ownership unless PCMS explicitly references/imports it for profile, eligib",
+    "expected_result": "Outcome permitted: PCMS treats the data as externally owned and only uses the represented data needed by PCMS.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-025-PROH",
+    "source_id": "PC-BR-025 condition-false",
+    "purpose": "Verify PC-BR-025 prohibited outcome or violation handling: Academic Master Data Boundary",
+    "preconditions": "Preconditions where condition for PC-BR-025 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: Academic master data remains external to PCMS ownership unless PCMS explicitly references/imports it for profile, eligib",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-025-EXCP",
+    "source_id": "PC-BR-025 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-025: PCMS does not create academic master-data management functions.",
+    "preconditions": "Context matching explicitly stated exception: PCMS does not create academic master-data management functions.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-026-PERM",
+    "source_id": "PC-BR-026 condition-true",
+    "purpose": "Verify PC-BR-026 permitted outcome: Platform Authentication/RBAC Boundary",
+    "preconditions": "Preconditions satisfied where rule condition holds: PCMS actor accesses a function/data item.",
+    "action_or_input": "Execute operation conforming to rule statement: Platform-wide authentication, identity administration, and RBAC infrastructure are external; PCMS is responsible only fo",
+    "expected_result": "Outcome permitted: PCMS enforces module access using the available platform identity/role context.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-026-PROH",
+    "source_id": "PC-BR-026 condition-false",
+    "purpose": "Verify PC-BR-026 prohibited outcome or violation handling: Platform Authentication/RBAC Boundary",
+    "preconditions": "Preconditions where condition for PC-BR-026 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: Platform-wide authentication, identity administration, and RBAC infrastructure are external; PCMS is responsible only fo",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-026-EXCP",
+    "source_id": "PC-BR-026 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-026: PCMS does not own platform-wide authentication/RBAC administration.",
+    "preconditions": "Context matching explicitly stated exception: PCMS does not own platform-wide authentication/RBAC administration.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-029-PERM",
+    "source_id": "PC-BR-029 condition-true",
+    "purpose": "Verify PC-BR-029 permitted outcome: TPO Student and Alumni Record Update Rule",
+    "preconditions": "Preconditions satisfied where rule condition holds: TPO updates a Student/Alumni placement record.",
+    "action_or_input": "Execute operation conforming to rule statement: TPO may update placement records for Students and Alumni within the supported placement-record function.",
+    "expected_result": "Outcome permitted: PCMS permits the update within TPO record-maintenance scope.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-029-PROH",
+    "source_id": "PC-BR-029 condition-false",
+    "purpose": "Verify PC-BR-029 prohibited outcome or violation handling: TPO Student and Alumni Record Update Rule",
+    "preconditions": "Preconditions where condition for PC-BR-029 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: TPO may update placement records for Students and Alumni within the supported placement-record function.",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-029-EXCP",
+    "source_id": "PC-BR-029 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-029: Does not grant Alumni write access.",
+    "preconditions": "Context matching explicitly stated exception: Does not grant Alumni write access.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-030-PERM",
+    "source_id": "PC-BR-030 condition-true",
+    "purpose": "Verify PC-BR-030 permitted outcome: External Recruitment Decision Boundary",
+    "preconditions": "Preconditions satisfied where rule condition holds: A recruitment decision/status update is represented in PCMS.",
+    "action_or_input": "Execute operation conforming to rule statement: PCMS shall not make external recruiting-company selection decisions; it may record and expose authorized shortlist, inte",
+    "expected_result": "Outcome permitted: PCMS records the authorized status/update without claiming to make the external decision.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-030-PROH",
+    "source_id": "PC-BR-030 condition-false",
+    "purpose": "Verify PC-BR-030 prohibited outcome or violation handling: External Recruitment Decision Boundary",
+    "preconditions": "Preconditions where condition for PC-BR-030 is violated or unauthorized.",
+    "action_or_input": "Attempt operation violating rule constraint: PCMS shall not make external recruiting-company selection decisions; it may record and expose authorized shortlist, inte",
+    "expected_result": "PCMS prohibits action and enforces rule constraint.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-030-EXCP",
+    "source_id": "PC-BR-030 stated-exception",
+    "purpose": "Verify stated exception for PC-BR-030: The detailed rejection-state model is not specified beyond supported rejection updates/notifications",
+    "preconditions": "Context matching explicitly stated exception: The detailed rejection-state model is not specified beyond supported rejection updates/notifications.",
+    "action_or_input": "Execute operation matching the exception condition.",
+    "expected_result": "Exception handling executed according to specification.",
+    "test_type": "boundary"
+  }
+]

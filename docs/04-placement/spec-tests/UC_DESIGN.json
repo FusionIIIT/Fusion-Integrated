@@ -1,0 +1,596 @@
+[
+  {
+    "test_id": "TC-UC-001-MAIN",
+    "source_id": "PC-UC-001 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-001: Create and Maintain Student Placement Profile",
+    "preconditions": "Preconditions for PC-UC-001 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. Student opens the placement profile.\\ 2\\. PCMS displays the profile fields and any previously saved profile data.\\ 3\\. Student enters or",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-001-ALT",
+    "source_id": "PC-UC-001 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-001: A1. Student may save/update only the profile sections currently being maintained, subject to configu",
+    "preconditions": "Preconditions for PC-UC-001 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: A1. Student may save/update only the profile sections currently being maintained, subject to configured completeness rules.",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-001-EXC",
+    "source_id": "PC-UC-001 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-001: E1. If required data for the attempted save is missing or invalid, PCMS rejects that save and identi",
+    "preconditions": "Condition triggering exception in PC-UC-001 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. If required data for the attempted save is missing or invalid, PCMS rejects that save and identifies the data requiring correction.\\ E2.",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-002-MAIN",
+    "source_id": "PC-UC-002 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-002: Browse Placement Opportunities",
+    "preconditions": "Preconditions for PC-UC-002 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. Student opens the placement-opportunity list.\\ 2\\. PCMS displays job and internship opportunities available to the Student role.\\ 3\\. St",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-002-ALT",
+    "source_id": "PC-UC-002 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-002: A1. If no opportunities are currently available, PCMS displays an empty/no-opportunity result withou",
+    "preconditions": "Preconditions for PC-UC-002 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: A1. If no opportunities are currently available, PCMS displays an empty/no-opportunity result without changing placement data.",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-002-EXC",
+    "source_id": "PC-UC-002 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-002: E1. PCMS blocks access to opportunity data outside the Student role scope. **Success Postcondition**",
+    "preconditions": "Condition triggering exception in PC-UC-002 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. PCMS blocks access to opportunity data outside the Student role scope. **Success Postcondition** Student views available opportunity inf",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-003-MAIN",
+    "source_id": "PC-UC-003 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-003: Apply for Eligible Job Posting",
+    "preconditions": "Preconditions for PC-UC-003 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. Student initiates an application for the selected job posting.\\ 2\\. PCMS checks any configured profile-completeness requirement.\\ 3\\. PC",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-003-ALT",
+    "source_id": "PC-UC-003 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-003: None explicitly modeled.",
+    "preconditions": "Preconditions for PC-UC-003 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: None explicitly modeled.",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-003-EXC",
+    "source_id": "PC-UC-003 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-003: E1. If profile completeness is required and not satisfied, PCMS blocks submission.\\ E2. If the Stude",
+    "preconditions": "Condition triggering exception in PC-UC-003 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. If profile completeness is required and not satisfied, PCMS blocks submission.\\ E2. If the Student is ineligible for the posting, PCMS b",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-004-MAIN",
+    "source_id": "PC-UC-004 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-004: Track Application, Interview, Offer, and Placement Status",
+    "preconditions": "Preconditions for PC-UC-004 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. Student opens placement-status tracking.\\ 2\\. PCMS lists the Student\\'s accessible applications and current recorded statuses.\\ 3\\. Stud",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-004-ALT",
+    "source_id": "PC-UC-004 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-004: A1. If no placement records exist, PCMS displays an empty history without changing data.",
+    "preconditions": "Preconditions for PC-UC-004 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: A1. If no placement records exist, PCMS displays an empty history without changing data.",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-004-EXC",
+    "source_id": "PC-UC-004 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-004: E1. PCMS blocks access to another Student\\'s restricted placement data. **Success Postcondition** St",
+    "preconditions": "Condition triggering exception in PC-UC-004 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. PCMS blocks access to another Student\\'s restricted placement data. **Success Postcondition** Student views current and historical statu",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-005-MAIN",
+    "source_id": "PC-UC-005 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-005: Respond to Job Offer",
+    "preconditions": "Preconditions for PC-UC-005 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. Student opens the offer and PCMS displays the recorded offer details and response deadline.\\ 2\\. Student chooses Accept or Reject.\\ 3\\. ",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-005-ALT",
+    "source_id": "PC-UC-005 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-005: A1. Accept outcome: offer state becomes Offer Accepted and the placement record is updated.\\ A2. Rej",
+    "preconditions": "Preconditions for PC-UC-005 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: A1. Accept outcome: offer state becomes Offer Accepted and the placement record is updated.\\ A2. Reject outcome: offer state becomes Offer R",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-005-EXC",
+    "source_id": "PC-UC-005 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-005: E1. If the recorded response deadline has passed, PCMS blocks a new response unless an externally de",
+    "preconditions": "Condition triggering exception in PC-UC-005 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. If the recorded response deadline has passed, PCMS blocks a new response unless an externally defined policy explicitly represented in P",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-006-MAIN",
+    "source_id": "PC-UC-006 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-006: Upload and Manage Job Postings",
+    "preconditions": "Preconditions for PC-UC-006 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. TPO creates a new posting or opens an existing/submitted opportunity for management.\\ 2\\. TPO records or updates role description, eligi",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-006-ALT",
+    "source_id": "PC-UC-006 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-006: A1. For a Company/Recruiter-submitted opportunity, TPO may complete/manage the posting before making",
+    "preconditions": "Preconditions for PC-UC-006 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: A1. For a Company/Recruiter-submitted opportunity, TPO may complete/manage the posting before making it available where that process is used",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-006-EXC",
+    "source_id": "PC-UC-006 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-006: E1. If required posting content is missing, PCMS does not publish the posting.\\ E2. If TPO lacks acc",
+    "preconditions": "Condition triggering exception in PC-UC-006 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. If required posting content is missing, PCMS does not publish the posting.\\ E2. If TPO lacks access to the requested posting action, PCM",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-007-MAIN",
+    "source_id": "PC-UC-007 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-007: Issue Automated Placement Notifications",
+    "preconditions": "Preconditions for PC-UC-007 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. PCMS recognizes one of the supported notification-triggering events.\\ 2\\. PCMS determines the recipient set only from the accepted event",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-007-ALT",
+    "source_id": "PC-UC-007 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-007: A1. For Interview Scheduled, Job Offer Extended, and New Announcement events, the affected Student r",
+    "preconditions": "Preconditions for PC-UC-007 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: A1. For Interview Scheduled, Job Offer Extended, and New Announcement events, the affected Student recipient(s) are used as explicitly suppo",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-007-EXC",
+    "source_id": "PC-UC-007 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-007: E1. If the accepted baseline does not identify the recipient policy for an Application Submitted, Sh",
+    "preconditions": "Condition triggering exception in PC-UC-007 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. If the accepted baseline does not identify the recipient policy for an Application Submitted, Shortlisting Update, or Rejection Update e",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-008-MAIN",
+    "source_id": "PC-UC-008 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-008: Review, Filter, and Administratively Manage Applications",
+    "preconditions": "Preconditions for PC-UC-008 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. TPO opens applications for a selected posting or placement activity.\\ 2\\. PCMS displays application records within TPO scope.\\ 3\\. TPO r",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-008-ALT",
+    "source_id": "PC-UC-008 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-008: A1. TPO may filter or view applications without changing any application record.",
+    "preconditions": "Preconditions for PC-UC-008 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: A1. TPO may filter or view applications without changing any application record.",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-008-EXC",
+    "source_id": "PC-UC-008 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-008: E1. PCMS blocks access or modification outside TPO scope.\\ E2. PCMS does not treat TPO administrativ",
+    "preconditions": "Condition triggering exception in PC-UC-008 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. PCMS blocks access or modification outside TPO scope.\\ E2. PCMS does not treat TPO administrative management as authority to make an ext",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-009-MAIN",
+    "source_id": "PC-UC-009 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-009: Schedule Interviews and Track Interview Progress",
+    "preconditions": "Preconditions for PC-UC-009 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. TPO selects the relevant shortlisted application and coordinates interview details with the Company/Recruiter.\\ 2\\. TPO records intervie",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-009-ALT",
+    "source_id": "PC-UC-009 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-009: None explicitly modeled.",
+    "preconditions": "Preconditions for PC-UC-009 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: None explicitly modeled.",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-009-EXC",
+    "source_id": "PC-UC-009 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-009: E1. If required interview details are missing, PCMS does not save the schedule.\\ E2. If TPO lacks ac",
+    "preconditions": "Condition triggering exception in PC-UC-009 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. If required interview details are missing, PCMS does not save the schedule.\\ E2. If TPO lacks access to the application, PCMS blocks the",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-010-MAIN",
+    "source_id": "PC-UC-010 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-010: Maintain Placement Records and Outcomes",
+    "preconditions": "Preconditions for PC-UC-010 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. TPO opens the relevant Student/Alumni placement record or outcome record.\\ 2\\. TPO enters or updates the placement outcome/record inform",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-010-ALT",
+    "source_id": "PC-UC-010 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-010: A1. TPO may update an Alumni placement record only within the placement-record function; this does n",
+    "preconditions": "Preconditions for PC-UC-010 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: A1. TPO may update an Alumni placement record only within the placement-record function; this does not grant Alumni an active placement role",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-010-EXC",
+    "source_id": "PC-UC-010 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-010: E1. PCMS blocks unauthorized or out-of-scope modification. **Success Postcondition** Authorized plac",
+    "preconditions": "Condition triggering exception in PC-UC-010 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. PCMS blocks unauthorized or out-of-scope modification. **Success Postcondition** Authorized placement record/outcome is updated. **Failu",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-011-MAIN",
+    "source_id": "PC-UC-011 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-011: Generate Placement Reports and Analytics",
+    "preconditions": "Preconditions for PC-UC-011 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. TPO selects the required placement report/analytics view.\\ 2\\. PCMS applies the TPO role and report scope.\\ 3\\. PCMS generates the reque",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-011-ALT",
+    "source_id": "PC-UC-011 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-011: A1. TPO may select a different supported report type without changing placement data.",
+    "preconditions": "Preconditions for PC-UC-011 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: A1. TPO may select a different supported report type without changing placement data.",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-011-EXC",
+    "source_id": "PC-UC-011 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-011: E1. PCMS blocks access to report data outside TPO scope. **Success Postcondition** Supported report/",
+    "preconditions": "Condition triggering exception in PC-UC-011 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. PCMS blocks access to report data outside TPO scope. **Success Postcondition** Supported report/analytics output is presented to the TPO",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-012-MAIN",
+    "source_id": "PC-UC-012 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-012: View Oversight Reports and Monitor Company Engagement",
+    "preconditions": "Preconditions for PC-UC-012 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. Placement Chairman opens an oversight view.\\ 2\\. PCMS applies Placement Chairman access scope.\\ 3\\. PCMS displays available placement st",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-012-ALT",
+    "source_id": "PC-UC-012 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-012: None explicitly modeled.",
+    "preconditions": "Preconditions for PC-UC-012 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: None explicitly modeled.",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-012-EXC",
+    "source_id": "PC-UC-012 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-012: E1. PCMS blocks access to information outside the Placement Chairman scope. **Success Postcondition*",
+    "preconditions": "Condition triggering exception in PC-UC-012 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. PCMS blocks access to information outside the Placement Chairman scope. **Success Postcondition** Oversight information is displayed; op",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-013-MAIN",
+    "source_id": "PC-UC-013 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-013: Publish Official Placement Announcements",
+    "preconditions": "Preconditions for PC-UC-013 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. Placement Chairman opens announcement publication.\\ 2\\. Placement Chairman enters supported announcement content, including job opportun",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-013-ALT",
+    "source_id": "PC-UC-013 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-013: None explicitly modeled.",
+    "preconditions": "Preconditions for PC-UC-013 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: None explicitly modeled.",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-013-EXC",
+    "source_id": "PC-UC-013 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-013: E1. PCMS blocks publication when the actor lacks authority or required announcement data is missing.",
+    "preconditions": "Condition triggering exception in PC-UC-013 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. PCMS blocks publication when the actor lacks authority or required announcement data is missing. **Success Postcondition** The official ",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-014-MAIN",
+    "source_id": "PC-UC-014 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-014: Register Company Subject to Institute Approval",
+    "preconditions": "Preconditions for PC-UC-014 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. Company/Recruiter enters and submits registration information.\\ 2\\. PCMS records the registration request as subject to institute approv",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-014-ALT",
+    "source_id": "PC-UC-014 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-014: A1. If approval status is not represented in PCMS, the institutional approval process remains entire",
+    "preconditions": "Preconditions for PC-UC-014 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: A1. If approval status is not represented in PCMS, the institutional approval process remains entirely outside this use case after submissio",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-014-EXC",
+    "source_id": "PC-UC-014 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-014: E1. If required registration information is missing, PCMS does not record a complete registration re",
+    "preconditions": "Condition triggering exception in PC-UC-014 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. If required registration information is missing, PCMS does not record a complete registration request. **Success Postcondition** Registr",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-015-MAIN",
+    "source_id": "PC-UC-015 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-015: Publish or Submit Company Opportunities and Define Eligibility",
+    "preconditions": "Preconditions for PC-UC-015 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. Company/Recruiter creates a job or internship opportunity.\\ 2\\. Company/Recruiter enters role description, eligibility criteria, and app",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-015-ALT",
+    "source_id": "PC-UC-015 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-015: A1. Direct-publication outcome: opportunity state becomes Published/Available.\\ A2. Submission outco",
+    "preconditions": "Preconditions for PC-UC-015 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: A1. Direct-publication outcome: opportunity state becomes Published/Available.\\ A2. Submission outcome: opportunity state becomes Submitted ",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-015-EXC",
+    "source_id": "PC-UC-015 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-015: E1. Missing required posting content prevents publication/submission completion.\\ E2. Unauthorized C",
+    "preconditions": "Condition triggering exception in PC-UC-015 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. Missing required posting content prevents publication/submission completion.\\ E2. Unauthorized Company/Recruiter action is blocked. **Su",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-016-MAIN",
+    "source_id": "PC-UC-016 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-016: Review Applications and Record Shortlist/Rejection Update",
+    "preconditions": "Preconditions for PC-UC-016 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. Company/Recruiter opens relevant applications.\\ 2\\. PCMS displays only applications within the Company/Recruiter authorized opportunity ",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-016-ALT",
+    "source_id": "PC-UC-016 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-016: A1. If an externally determined rejection update is recorded through the supported process, PCMS rec",
+    "preconditions": "Preconditions for PC-UC-016 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: A1. If an externally determined rejection update is recorded through the supported process, PCMS records the update and the Rejection Update",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-016-EXC",
+    "source_id": "PC-UC-016 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-016: E1. PCMS blocks access to applications unrelated to the Company/Recruiter opportunity.\\ E2. PCMS doe",
+    "preconditions": "Condition triggering exception in PC-UC-016 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. PCMS blocks access to applications unrelated to the Company/Recruiter opportunity.\\ E2. PCMS does not make the external recruitment deci",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-017-MAIN",
+    "source_id": "PC-UC-017 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-017: Restricted Alumni Placement Data Access",
+    "preconditions": "Preconditions for PC-UC-017 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. Alumni opens the permitted placement-data view.\\ 2\\. PCMS applies Alumni access scope.\\ 3\\. PCMS displays only placement data made avail",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-017-ALT",
+    "source_id": "PC-UC-017 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-017: None explicitly modeled.",
+    "preconditions": "Preconditions for PC-UC-017 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: None explicitly modeled.",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-017-EXC",
+    "source_id": "PC-UC-017 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-017: E1. PCMS blocks access to data outside the Alumni scope.\\ E2. PCMS blocks attempts by Alumni to modi",
+    "preconditions": "Condition triggering exception in PC-UC-017 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. PCMS blocks access to data outside the Alumni scope.\\ E2. PCMS blocks attempts by Alumni to modify placement data or enter active placem",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-020-MAIN",
+    "source_id": "PC-UC-020 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-020: Publish TPO Announcements",
+    "preconditions": "Preconditions for PC-UC-020 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. TPO opens announcement publication.\\ 2\\. TPO enters supported content such as a placement drive, company visit, training session, or wor",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-020-ALT",
+    "source_id": "PC-UC-020 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-020: None explicitly modeled.",
+    "preconditions": "Preconditions for PC-UC-020 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: None explicitly modeled.",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-020-EXC",
+    "source_id": "PC-UC-020 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-020: E1. PCMS blocks publication when required announcement data or TPO authority is missing. **Success P",
+    "preconditions": "Condition triggering exception in PC-UC-020 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. PCMS blocks publication when required announcement data or TPO authority is missing. **Success Postcondition** The TPO announcement is p",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-021-MAIN",
+    "source_id": "PC-UC-021 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-021: Schedule Company-Led Interview",
+    "preconditions": "Preconditions for PC-UC-021 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. Company/Recruiter selects a relevant shortlisted candidate.\\ 2\\. Company/Recruiter records interview date, time slot, and mode (online/o",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-021-ALT",
+    "source_id": "PC-UC-021 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-021: None explicitly modeled.",
+    "preconditions": "Preconditions for PC-UC-021 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: None explicitly modeled.",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-021-EXC",
+    "source_id": "PC-UC-021 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-021: E1. Missing required interview details prevent scheduling.\\ E2. PCMS blocks scheduling for applicati",
+    "preconditions": "Condition triggering exception in PC-UC-021 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. Missing required interview details prevent scheduling.\\ E2. PCMS blocks scheduling for applications outside the Company/Recruiter opport",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-022-MAIN",
+    "source_id": "PC-UC-022 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-022: Extend Job Offer",
+    "preconditions": "Preconditions for PC-UC-022 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. Company/Recruiter selects the candidate and initiates an offer.\\ 2\\. Company/Recruiter records the offer information, including the resp",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-022-ALT",
+    "source_id": "PC-UC-022 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-022: None explicitly modeled.",
+    "preconditions": "Preconditions for PC-UC-022 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: None explicitly modeled.",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-022-EXC",
+    "source_id": "PC-UC-022 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-022: E1. PCMS blocks an offer for an application outside the Company/Recruiter opportunity scope.\\ E2. PC",
+    "preconditions": "Condition triggering exception in PC-UC-022 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. PCMS blocks an offer for an application outside the Company/Recruiter opportunity scope.\\ E2. PCMS does not make the external hiring dec",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-023-MAIN",
+    "source_id": "PC-UC-023 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-023: Generate Resume from Placement Profile",
+    "preconditions": "Preconditions for PC-UC-023 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. Student requests resume generation.\\ 2\\. PCMS reads the Student\\'s saved placement profile data.\\ 3\\. PCMS generates the structured resu",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-023-ALT",
+    "source_id": "PC-UC-023 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-023: None explicitly modeled.",
+    "preconditions": "Preconditions for PC-UC-023 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: None explicitly modeled.",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-023-EXC",
+    "source_id": "PC-UC-023 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-023: E1. If required profile data for generation is unavailable, PCMS reports that the resume cannot be g",
+    "preconditions": "Condition triggering exception in PC-UC-023 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. If required profile data for generation is unavailable, PCMS reports that the resume cannot be generated from the current profile. **Suc",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-UC-024-MAIN",
+    "source_id": "PC-UC-024 Main Flow",
+    "purpose": "Exercise Main Success Scenario of PC-UC-024: View Student Placement Statistics and Historical Data",
+    "preconditions": "Preconditions for PC-UC-024 satisfied with valid actor.",
+    "action_or_input": "Execute main flow steps: 1\\. Student opens placement statistics/history.\\ 2\\. PCMS applies Student access restrictions and anonymization requirements.\\ 3\\. PCMS disp",
+    "expected_result": "All main flow steps complete successfully and final state is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-024-ALT",
+    "source_id": "PC-UC-024 Alternative Flow",
+    "purpose": "Exercise explicitly specified Alternative Flow of PC-UC-024: None explicitly modeled.",
+    "preconditions": "Preconditions for PC-UC-024 alternative path satisfied.",
+    "action_or_input": "Execute alternative flow: None explicitly modeled.",
+    "expected_result": "Alternative outcome succeeds within specified constraints.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "TC-UC-024-EXC",
+    "source_id": "PC-UC-024 Exception Flow",
+    "purpose": "Exercise explicitly specified Exception Flow of PC-UC-024: E1. PCMS blocks access to non-anonymized or otherwise unauthorized sensitive placement data. **Succe",
+    "preconditions": "Condition triggering exception in PC-UC-024 is present.",
+    "action_or_input": "Attempt operation triggering exception flow: E1. PCMS blocks access to non-anonymized or otherwise unauthorized sensitive placement data. **Success Postcondition** Student views the per",
+    "expected_result": "PCMS halts the flow and returns appropriate error or rejection.",
+    "test_type": "exception"
+  }
+]
