@@ -63,6 +63,320 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/iwd/complaints/:
+    get:
+      operationId: v1_iwd_complaints_retrieve
+      description: Return complaints scoped to the requesting principal's role.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_iwd_complaints_create
+      description: Submit a new maintenance complaint with automatic engineer assignment.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/iwd/complaints/{id}/:
+    get:
+      operationId: v1_iwd_complaints_retrieve_2
+      description: Retrieve a scoped complaint record or return 404 if inaccessible.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/iwd/complaints/{id}/assess/:
+    post:
+      operationId: v1_iwd_complaints_assess_create
+      description: Record technical assessment.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/iwd/complaints/{id}/audit/:
+    post:
+      operationId: v1_iwd_complaints_audit_create
+      description: Audit and validate final bill.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/iwd/complaints/{id}/complete-work/:
+    post:
+      operationId: v1_iwd_complaints_complete_work_create
+      description: Mark repair work complete.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/iwd/complaints/{id}/estimates/:
+    post:
+      operationId: v1_iwd_complaints_estimates_create
+      description: Submit repair cost estimate.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/iwd/complaints/{id}/feedback/:
+    post:
+      operationId: v1_iwd_complaints_feedback_create
+      description: Submit feedback on resolved complaint.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/iwd/complaints/{id}/final-bill/:
+    post:
+      operationId: v1_iwd_complaints_final_bill_create
+      description: Submit final repair bill packet.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/iwd/complaints/{id}/flag-urgent/:
+    post:
+      operationId: v1_iwd_complaints_flag_urgent_create
+      description: Flag complaint as urgent.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/iwd/complaints/{id}/issue-material/:
+    post:
+      operationId: v1_iwd_complaints_issue_material_create
+      description: Check stock and issue materials.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/iwd/complaints/{id}/resubmit/:
+    post:
+      operationId: v1_iwd_complaints_resubmit_create
+      description: Modify and resubmit rejected estimate.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/iwd/complaints/{id}/review-director/:
+    post:
+      operationId: v1_iwd_complaints_review_director_create
+      description: Review high-cost or forwarded estimate.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/iwd/complaints/{id}/review-low-cost/:
+    post:
+      operationId: v1_iwd_complaints_review_low_cost_create
+      description: Review low-cost estimate.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/iwd/complaints/{id}/review-mid-range/:
+    post:
+      operationId: v1_iwd_complaints_review_mid_range_create
+      description: Review mid-range estimate.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/iwd/complaints/{id}/review-urgent/:
+    post:
+      operationId: v1_iwd_complaints_review_urgent_create
+      description: Review fast-track urgent flag.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/iwd/complaints/{id}/settle/:
+    post:
+      operationId: v1_iwd_complaints_settle_create
+      description: Approve or record settlement.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/iwd/complaints/{id}/verify/:
+    post:
+      operationId: v1_iwd_complaints_verify_create
+      description: Verify completed repair work.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/iwd/inventory/:
+    get:
+      operationId: v1_iwd_inventory_retrieve
+      description: List all inventory items.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_iwd_inventory_create
+      description: Add new inventory item.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
