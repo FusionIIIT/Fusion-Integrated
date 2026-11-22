@@ -1,0 +1,1109 @@
+[
+{
+"test_id": "BR-TC-001",
+"source_id": "BR-PMS-003: permitted access to own patent application report information",
+"purpose": "Verify an Applicant can access report information for their own patent application.",
+"preconditions": "User has a valid Applicant role and owns at least one patent application with report data.",
+"action_or_input": "Request report information for an application owned by the Applicant.",
+"expected_result": "Access to the report information for the Applicant's own application is permitted.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-002",
+"source_id": "BR-PMS-003: prohibited access to another user's patent application report information",
+"purpose": "Verify an Applicant cannot access report information for another Applicant's patent application.",
+"preconditions": "User has a valid Applicant role; a patent application belongs to a different Applicant.",
+"action_or_input": "Request report information for an application not owned by the requesting Applicant.",
+"expected_result": "Access to report information for another user's patent application is denied.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-003",
+"source_id": "BR-PMS-005: permitted access to reports and analytics within authorized PMS scope",
+"purpose": "Verify a Director can access PMS reports and analytics within their authorized PMS scope.",
+"preconditions": "User has a valid Director role with authorized reporting/analytics scope.",
+"action_or_input": "Request PMS reports and analytics within the Director's authorized scope.",
+"expected_result": "Access to the requested PMS reports and analytics is permitted.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-004",
+"source_id": "BR-PMS-005: prohibited access to reports and analytics outside authorized PMS scope",
+"purpose": "Verify a Director cannot access PMS reports and analytics outside their authorized PMS scope.",
+"preconditions": "User has a valid Director role; requested report/analytics data is outside the Director's authorized PMS scope.",
+"action_or_input": "Request PMS reports and analytics outside the Director's authorized scope.",
+"expected_result": "Access to out-of-scope PMS reports and analytics is denied.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-005",
+"source_id": "BR-PMS-006: permitted workflow oversight within Director's domain",
+"purpose": "Verify a Director has workflow-oversight access for application workflows in their own domain.",
+"preconditions": "User has a valid Director role; target application workflow belongs to the Director's domain.",
+"action_or_input": "Request workflow oversight for an application in the Director's domain.",
+"expected_result": "Workflow-oversight access is permitted for the application in the Director's domain.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-006",
+"source_id": "BR-PMS-006: prohibited workflow oversight outside Director's domain",
+"purpose": "Verify a Director cannot access workflow oversight for application workflows outside their domain.",
+"preconditions": "User has a valid Director role; target application workflow belongs to a different domain.",
+"action_or_input": "Request workflow oversight for an application outside the Director's domain.",
+"expected_result": "Workflow-oversight access is denied for the application outside the Director's domain.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-007",
+"source_id": "BR-PMS-014: permitted PDF supporting document for submission",
+"purpose": "Verify a supporting document in PDF format is accepted during submission validation.",
+"preconditions": "Applicant is submitting an application with a valid supporting document in PDF format.",
+"action_or_input": "Submit supporting document with PDF file format.",
+"expected_result": "Supporting document passes the PDF file format validation rule.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-008",
+"source_id": "BR-PMS-014: prohibited non-PDF supporting document for submission",
+"purpose": "Verify a supporting document that is not a PDF file is rejected for submission.",
+"preconditions": "Applicant is submitting an application with a non-PDF supporting document (e.g., DOCX or TXT).",
+"action_or_input": "Submit supporting document in a non-PDF format.",
+"expected_result": "Supporting document is rejected because accepted submission supporting documents must be PDF files.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-009",
+"source_id": "BR-PMS-015: boundary below 50 MB accepted",
+"purpose": "Verify an application document strictly under 50 MB (e.g., 49.99 MB) passes the size validation rule.",
+"preconditions": "Applicant has an application document sized strictly under 50 MB.",
+"action_or_input": "Validate/submit application document with size strictly less than 50 MB.",
+"expected_result": "Document passes the under-50 MB size check.",
+"test_type": "boundary"
+},
+{
+"test_id": "BR-TC-010",
+"source_id": "BR-PMS-015: boundary at or above 50 MB rejected",
+"purpose": "Verify an application document equal to or exceeding 50 MB (e.g., 50 MB) is not accepted.",
+"preconditions": "Applicant has an application document sized at 50 MB or greater.",
+"action_or_input": "Validate/submit application document with size equal to or greater than 50 MB.",
+"expected_result": "Document is rejected because it is not under 50 MB.",
+"test_type": "boundary"
+},
+{
+"test_id": "BR-TC-011",
+"source_id": "BR-PMS-016: permitted document passing malware validation",
+"purpose": "Verify a submitted application document that passes malware validation is accepted.",
+"preconditions": "Submitted application document is clean and passes malware validation.",
+"action_or_input": "Run malware validation on the submitted application document.",
+"expected_result": "Document passes malware validation and is eligible for acceptance.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-012",
+"source_id": "BR-PMS-016: prohibited document failing malware validation",
+"purpose": "Verify a submitted application document that fails malware validation is not accepted.",
+"preconditions": "Submitted application document fails or is flagged by malware validation.",
+"action_or_input": "Run malware validation on the submitted application document.",
+"expected_result": "Document is not accepted because it did not pass malware validation.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-013",
+"source_id": "BR-PMS-017: permitted submission with all required application fields complete",
+"purpose": "Verify PMS accepts an application submission when all required fields are complete.",
+"preconditions": "Applicant has populated all required application fields (title, abstract, detailed description, claims, inventor information, supporting documents).",
+"action_or_input": "Submit the completed patent application.",
+"expected_result": "PMS accepts the application submission.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-014",
+"source_id": "BR-PMS-017: prohibited submission when required application fields are incomplete",
+"purpose": "Verify PMS does not accept an application submission when one or more required fields are missing or incomplete.",
+"preconditions": "Applicant omits or leaves incomplete at least one required application field.",
+"action_or_input": "Attempt to submit the incomplete patent application.",
+"expected_result": "PMS rejects/blocks the application submission due to incomplete required fields.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-015",
+"source_id": "BR-PMS-020: permitted external filing with completed inventor agreements",
+"purpose": "Verify external filing is allowed when inventor agreements are completed.",
+"preconditions": "All required inventor agreements for the application are completed.",
+"action_or_input": "Attempt external filing for the application.",
+"expected_result": "Inventor-agreement prerequisite is satisfied for external filing.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-016",
+"source_id": "BR-PMS-020: prohibited external filing with incomplete inventor agreements",
+"purpose": "Verify external filing is blocked when inventor agreements are not completed.",
+"preconditions": "One or more inventor agreements for the application are incomplete.",
+"action_or_input": "Attempt external filing for the application.",
+"expected_result": "External filing is prevented because inventor agreements must be completed first.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-022",
+"source_id": "BR-PMS-022: permitted automatic Director assignment when rules available and criteria applied",
+"purpose": "Verify automatic Director assignment succeeds when configured assignment rules are available and governing criteria are applied.",
+"preconditions": "Configured Director assignment rules are available in PMS and eligible Directors exist.",
+"action_or_input": "Trigger automatic Director assignment applying governing assignment criteria.",
+"expected_result": "Automatic Director assignment completes using configured rules and governing criteria.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-023",
+"source_id": "BR-PMS-022: exception when configured assignment rules are unavailable",
+"purpose": "Verify automatic Director assignment is not authorized when configured assignment rules are unavailable.",
+"preconditions": "Configured Director assignment rules are not available in PMS.",
+"action_or_input": "Attempt automatic Director assignment.",
+"expected_result": "Automatic Director assignment is not performed/authorized because configured assignment rules are unavailable.",
+"test_type": "exception"
+},
+{
+"test_id": "BR-TC-024",
+"source_id": "BR-PMS-023: Director expertise matching with application domain",
+"purpose": "Verify Director expertise matching with the application domain is applied during assignment.",
+"preconditions": "Application has a defined domain; candidate Directors have domain expertise profiles.",
+"action_or_input": "Perform Director assignment for the application.",
+"expected_result": "Director expertise matching with the application domain is evaluated/applied as an assignment criterion.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-025",
+"source_id": "BR-PMS-024: Director workload balance criterion",
+"purpose": "Verify Director workload balance is applied during assignment.",
+"preconditions": "Candidate Directors have differing current review workloads.",
+"action_or_input": "Perform Director assignment for the application.",
+"expected_result": "Director workload balance is evaluated/applied as an assignment criterion.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-026",
+"source_id": "BR-PMS-025: conflict-of-interest check prior to Director assignment",
+"purpose": "Verify PMS performs a conflict-of-interest check before assigning a Director.",
+"preconditions": "Application is ready for Director assignment and conflict-of-interest data is present.",
+"action_or_input": "Initiate Director assignment for the application.",
+"expected_result": "PMS performs a conflict-of-interest check prior to completing Director assignment.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-027",
+"source_id": "BR-PMS-026: prohibited review by Director listed as inventor",
+"purpose": "Verify a Director listed as an inventor on an application cannot review that application.",
+"preconditions": "A Director is listed among the inventors of the application.",
+"action_or_input": "Attempt to assign or have that Director review the application.",
+"expected_result": "The Director is prohibited from reviewing the application where they are listed as an inventor.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-028",
+"source_id": "BR-PMS-027: prohibited reviewer role for PCC_ADMIN listed as inventor",
+"purpose": "Verify PCC_ADMIN cannot act as reviewer for an application where PCC_ADMIN is listed as an inventor.",
+"preconditions": "PCC_ADMIN is listed among the inventors of the application.",
+"action_or_input": "Attempt to assign or have PCC_ADMIN act as reviewer for the application.",
+"expected_result": "PCC_ADMIN is prohibited from acting as reviewer for an application where PCC_ADMIN is an inventor.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-029",
+"source_id": "BR-PMS-029: permitted Director review decisions (Approve, Reject, Needs Revision)",
+"purpose": "Verify a Director can finalize a review decision using one of the permitted values: Approve, Reject, or Needs Revision.",
+"preconditions": "An application is assigned to a Director for review.",
+"action_or_input": "Finalize Director review decisions with each permitted value: Approve, Reject, and Needs Revision (in separate cases/steps).",
+"expected_result": "Each decision value (Approve, Reject, Needs Revision) is accepted as a valid Director review decision.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-030",
+"source_id": "BR-PMS-029: prohibited invalid or multiple Director review decisions",
+"purpose": "Verify PMS rejects a Director review decision that is not one of Approve, Reject, or Needs Revision.",
+"preconditions": "An application is assigned to a Director for review.",
+"action_or_input": "Attempt to finalize a Director review decision with an invalid/unsupported decision value.",
+"expected_result": "Decision is rejected because a Director review decision must be exactly one of Approve, Reject, or Needs Revision.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-031",
+"source_id": "BR-PMS-030: boundary justification of 50 characters accepted",
+"purpose": "Verify a Director review decision with a justification of exactly 50 characters is accepted.",
+"preconditions": "Director is finalizing a review decision on an assigned application.",
+"action_or_input": "Submit a review decision with a justification string of exactly 50 characters.",
+"expected_result": "Decision and 50-character justification are accepted.",
+"test_type": "boundary"
+},
+{
+"test_id": "BR-TC-032",
+"source_id": "BR-PMS-030: boundary justification of 49 characters or empty rejected",
+"purpose": "Verify a Director review decision with fewer than 50 characters (e.g., 49 characters) in justification is rejected.",
+"preconditions": "Director is finalizing a review decision on an assigned application.",
+"action_or_input": "Submit a review decision with a justification string of 49 characters.",
+"expected_result": "Decision is rejected because justification must be at least 50 characters.",
+"test_type": "boundary"
+},
+{
+"test_id": "BR-TC-033",
+"source_id": "BR-PMS-031: Director review completed within 15 business days boundary",
+"purpose": "Verify Director review completed on or before 15 business days from assignment satisfies the 15-business-day deadline.",
+"preconditions": "Application was assigned to Director; simulated clock is at or before 15 business days from assignment.",
+"action_or_input": "Complete Director review within 15 business days of assignment.",
+"expected_result": "Review is recorded as completed within the 15-business-day deadline.",
+"test_type": "boundary"
+},
+{
+"test_id": "BR-TC-034",
+"source_id": "BR-PMS-033: permitted revision when status is Needs Revision",
+"purpose": "Verify an Applicant is permitted to revise an application whose status is Needs Revision.",
+"preconditions": "Application status is Needs Revision.",
+"action_or_input": "Request/perform application revision as the Applicant.",
+"expected_result": "Application revision is permitted.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-035",
+"source_id": "BR-PMS-034: permitted revision when status is Rejected",
+"purpose": "Verify an Applicant is permitted to revise an application whose status is Rejected.",
+"preconditions": "Application status is Rejected.",
+"action_or_input": "Request/perform application revision as the Applicant.",
+"expected_result": "Application revision is permitted.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-036",
+"source_id": "BR-PMS-035: resubmission on or before day 60 from decision date",
+"purpose": "Verify a revised application resubmitted within 60 days from the rejection or revision-request decision date is accepted on time.",
+"preconditions": "Application has a rejection or revision-request decision date; current date is within 60 days of that decision date.",
+"action_or_input": "Resubmit the revised application on or before day 60 from the decision date.",
+"expected_result": "Resubmission is within the 60-day resubmission period.",
+"test_type": "boundary"
+},
+{
+"test_id": "BR-TC-037",
+"source_id": "BR-PMS-036: permitted resubmission addressing recorded Director feedback",
+"purpose": "Verify a resubmitted revision that addresses the recorded Director feedback passes revision validation.",
+"preconditions": "Director feedback is recorded on the application; Applicant prepares a revision addressing that feedback.",
+"action_or_input": "Resubmit the revision addressing the recorded Director feedback.",
+"expected_result": "Revision passes validation for addressing the recorded Director feedback.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-038",
+"source_id": "BR-PMS-036: prohibited resubmission not addressing recorded Director feedback",
+"purpose": "Verify a resubmitted revision that fails to address the recorded Director feedback is rejected.",
+"preconditions": "Director feedback is recorded on the application; Applicant submits a revision without addressing the feedback.",
+"action_or_input": "Attempt to resubmit the revision without addressing recorded Director feedback.",
+"expected_result": "Revision fails validation because it must address the recorded Director feedback.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-039",
+"source_id": "BR-PMS-038: status updated to Expired after 60-day resubmission period expires",
+"purpose": "Verify PMS changes application status to Expired when the 60-day resubmission period expires without valid resubmission.",
+"preconditions": "Application is awaiting resubmission after rejection/revision request; 60-day resubmission period expires without valid resubmission.",
+"action_or_input": "Advance time past the 60-day resubmission period without a valid resubmission.",
+"expected_result": "PMS changes the application status to Expired.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-040",
+"source_id": "BR-PMS-040: permitted Attorney assignment by PCC_ADMIN on Approved application",
+"purpose": "Verify PCC_ADMIN can assign an Attorney to an Approved application.",
+"preconditions": "Application status is Approved; user has PCC_ADMIN role.",
+"action_or_input": "Assign an Attorney to the Approved application as PCC_ADMIN.",
+"expected_result": "Attorney assignment to the Approved application succeeds.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-041",
+"source_id": "BR-PMS-040: prohibited Attorney assignment by non-PCC_ADMIN user",
+"purpose": "Verify a user without PCC_ADMIN role cannot assign an Attorney to an Approved application.",
+"preconditions": "Application status is Approved; user is not PCC_ADMIN (e.g., Applicant or Director).",
+"action_or_input": "Attempt to assign an Attorney to the Approved application.",
+"expected_result": "Attorney assignment is denied because only PCC_ADMIN may assign an Attorney to an Approved application.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-042",
+"source_id": "BR-PMS-041: permitted Attorney selection from approved panel",
+"purpose": "Verify an Attorney selected from the approved panel can be assigned.",
+"preconditions": "PCC_ADMIN assigns an Attorney who is a member of the approved panel.",
+"action_or_input": "Assign the approved-panel Attorney to the application.",
+"expected_result": "Assignment of the approved-panel Attorney is permitted.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-043",
+"source_id": "BR-PMS-041: exception allowing non-panel Attorney when institutional exception is recorded or allowed",
+"purpose": "Verify an Attorney outside the approved panel may be assigned when an institutional exception is recorded or allowed.",
+"preconditions": "Target Attorney is not on the approved panel; an institutional exception is recorded or allowed.",
+"action_or_input": "Assign the non-panel Attorney with the recorded/allowed institutional exception.",
+"expected_result": "Assignment is permitted under the institutional exception.",
+"test_type": "exception"
+},
+{
+"test_id": "BR-TC-044",
+"source_id": "BR-PMS-041: prohibited non-panel Attorney without institutional exception",
+"purpose": "Verify an Attorney outside the approved panel cannot be assigned without an institutional exception.",
+"preconditions": "Target Attorney is not on the approved panel; no institutional exception is recorded or allowed.",
+"action_or_input": "Attempt to assign the non-panel Attorney.",
+"expected_result": "Assignment is rejected because the Attorney is not on the approved panel and no institutional exception applies.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-045",
+"source_id": "BR-PMS-042: Attorney expertise matching application domain criterion",
+"purpose": "Verify Attorney expertise matching the application domain is applied as an assignment criterion.",
+"preconditions": "Application has a technical domain; candidate Attorneys have domain expertise records.",
+"action_or_input": "Perform Attorney assignment evaluation for the application.",
+"expected_result": "Attorney expertise matching the application domain is evaluated/applied as an assignment criterion.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-046",
+"source_id": "BR-PMS-043: Attorney current workload criterion",
+"purpose": "Verify Attorney current workload is applied as an assignment criterion.",
+"preconditions": "Candidate Attorneys have recorded current workloads.",
+"action_or_input": "Perform Attorney assignment evaluation for the application.",
+"expected_result": "Attorney current workload is evaluated/applied as an assignment criterion.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-047",
+"source_id": "BR-PMS-044: conflict-of-interest check before Attorney assignment",
+"purpose": "Verify PMS performs a conflict-of-interest check before assigning an Attorney.",
+"preconditions": "PCC_ADMIN initiates Attorney assignment for an application.",
+"action_or_input": "Attempt to assign an Attorney to the application.",
+"expected_result": "PMS performs a conflict-of-interest check prior to completing Attorney assignment.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-048",
+"source_id": "BR-PMS-045: permitted Applicant Attorney preference when preferred Attorney is in approved panel",
+"purpose": "Verify Applicant Attorney preference may be considered when the preferred Attorney is in the approved panel.",
+"preconditions": "Applicant has specified a preferred Attorney who belongs to the approved panel.",
+"action_or_input": "Evaluate/perform Attorney assignment with Applicant preference set to an approved-panel Attorney.",
+"expected_result": "Applicant's Attorney preference is eligible to be considered during assignment.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-049",
+"source_id": "BR-PMS-045: preference not authorized when preferred Attorney is not in approved panel",
+"purpose": "Verify Applicant Attorney preference is not authorized when the preferred Attorney is not in the approved panel.",
+"preconditions": "Applicant has specified a preferred Attorney who is not in the approved panel.",
+"action_or_input": "Evaluate/perform Attorney assignment with Applicant preference set to a non-panel Attorney.",
+"expected_result": "Applicant preference for a non-panel Attorney is not authorized by this rule.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-050",
+"source_id": "BR-PMS-046: permitted finalized opinion recommendations (File Patent, Do Not File, Needs Amendment)",
+"purpose": "Verify a finalized Attorney patentability opinion is accepted when it contains exactly one of: File Patent, Do Not File, or Needs Amendment.",
+"preconditions": "Attorney is finalizing a patentability opinion on an assigned application.",
+"action_or_input": "Finalize patentability opinion with each single recommendation: File Patent, Do Not File, and Needs Amendment.",
+"expected_result": "Each opinion with a single valid recommendation is accepted.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-051",
+"source_id": "BR-PMS-046: prohibited opinion with missing or multiple recommendations",
+"purpose": "Verify PMS rejects a finalized Attorney patentability opinion that has no recommendation or more than one recommendation.",
+"preconditions": "Attorney attempts to finalize a patentability opinion.",
+"action_or_input": "Attempt to finalize opinion with zero or multiple recommendations.",
+"expected_result": "Opinion finalization is rejected because it must contain exactly one valid recommendation.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-052",
+"source_id": "BR-PMS-048: budget information includes filing fees",
+"purpose": "Verify produced budget information includes filing fees.",
+"preconditions": "Budget information is being created/produced for an application.",
+"action_or_input": "Produce budget information including filing fees.",
+"expected_result": "Budget information includes filing fees as required.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-053",
+"source_id": "BR-PMS-049: budget information includes attorney fees",
+"purpose": "Verify produced budget information includes attorney fees.",
+"preconditions": "Budget information is being created/produced for an application.",
+"action_or_input": "Produce budget information including attorney fees.",
+"expected_result": "Budget information includes attorney fees as required.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-054",
+"source_id": "BR-PMS-050: budget information includes administrative costs",
+"purpose": "Verify produced budget information includes administrative costs.",
+"preconditions": "Budget information is being created/produced for an application.",
+"action_or_input": "Produce budget information including administrative costs.",
+"expected_result": "Budget information includes administrative costs as required.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-055",
+"source_id": "BR-PMS-051: escalation when total patent cost exceeds configured threshold",
+"purpose": "Verify PMS routes/escalates the case to the applicable higher authority when total patent cost exceeds the configured threshold.",
+"preconditions": "A configured cost threshold exists; total patent cost exceeds that configured threshold.",
+"action_or_input": "Submit/evaluate budget where total patent cost is above the configured threshold.",
+"expected_result": "PMS routes/escalates the case to the applicable higher authority.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-056",
+"source_id": "BR-PMS-052: permitted budget approval when application status is Approved",
+"purpose": "Verify budget approval is permitted when the application status is Approved.",
+"preconditions": "Application status is Approved; Director requests budget approval.",
+"action_or_input": "Approve budget for the Approved application.",
+"expected_result": "Budget approval is permitted.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-057",
+"source_id": "BR-PMS-052: prohibited budget approval when application status is not Approved",
+"purpose": "Verify budget approval is not permitted when the application status is not Approved.",
+"preconditions": "Application status is not Approved (e.g., Submitted or Under Review).",
+"action_or_input": "Attempt to approve budget for the non-Approved application.",
+"expected_result": "Budget approval is denied because application status is not Approved.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-058",
+"source_id": "BR-PMS-053: budget availability validated before approval when information is available",
+"purpose": "Verify PMS validates budget availability before approval when budget-availability information is available to PMS.",
+"preconditions": "Budget-availability information is available to PMS for the application.",
+"action_or_input": "Attempt budget approval with available vs. insufficient budget availability data.",
+"expected_result": "Budget availability is validated before approval; insufficient budget prevents approval.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-059",
+"source_id": "BR-PMS-053: exception when budget-availability information is not available to PMS",
+"purpose": "Verify behavior when budget-availability information is not available to PMS.",
+"preconditions": "Budget-availability information is not available to PMS.",
+"action_or_input": "Request budget approval when budget-availability data is unavailable.",
+"expected_result": "Pre-approval budget-availability check applies only when budget-availability information is available to PMS.",
+"test_type": "exception"
+},
+{
+"test_id": "BR-TC-060",
+"source_id": "BR-PMS-055: filing package format validation when rules are available",
+"purpose": "Verify filing package must satisfy applicable patent-office format standards before PMS records compliant readiness when validation rules are available.",
+"preconditions": "Patent-office format validation rules are available to PMS.",
+"action_or_input": "Validate a compliant vs. non-compliant filing package for compliant readiness.",
+"expected_result": "Compliant package can be recorded as ready; non-compliant package fails format validation.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-061",
+"source_id": "BR-PMS-056: permitted international filing with additional justification recorded",
+"purpose": "Verify an international filing is accepted when additional justification is recorded in PMS.",
+"preconditions": "Attorney is recording/submitting an international patent filing and provides additional justification.",
+"action_or_input": "Submit international filing with recorded additional justification.",
+"expected_result": "International filing with additional justification is accepted.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-062",
+"source_id": "BR-PMS-056: prohibited international filing without additional justification",
+"purpose": "Verify an international filing without additional justification recorded in PMS is rejected.",
+"preconditions": "Attorney attempts an international filing without providing additional justification.",
+"action_or_input": "Attempt international filing without additional justification.",
+"expected_result": "International filing is rejected because additional justification must be recorded in PMS.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-063",
+"source_id": "BR-PMS-059: permitted post-grant tracking when patent status is Granted",
+"purpose": "Verify post-grant tracking is activated when patent status is Granted.",
+"preconditions": "Patent status is Granted.",
+"action_or_input": "Activate/evaluate post-grant tracking for the Granted patent.",
+"expected_result": "Post-grant tracking is activated.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-064",
+"source_id": "BR-PMS-059: prohibited post-grant tracking when patent status is not Granted",
+"purpose": "Verify post-grant tracking is not activated when patent status is not Granted.",
+"preconditions": "Patent/application status is not Granted (e.g., Filed).",
+"action_or_input": "Attempt to activate post-grant tracking when status is not Granted.",
+"expected_result": "Post-grant tracking is not activated.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-065",
+"source_id": "BR-PMS-060: maintenance-fee schedule determined from grant date and jurisdiction when rules available",
+"purpose": "Verify maintenance-fee schedule is determined from grant date and jurisdiction when applicable schedule rules are available.",
+"preconditions": "Applicable maintenance-fee schedule rules are available; patent has a grant date and jurisdiction.",
+"action_or_input": "Generate/calculate the maintenance-fee schedule using grant date and jurisdiction.",
+"expected_result": "Maintenance-fee schedule is determined from the grant date and jurisdiction.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-066",
+"source_id": "BR-PMS-061: explicit Renew or Do Not Renew decision required before maintenance deadline",
+"purpose": "Verify an explicit Renew or Do Not Renew decision is required from the Director before each maintenance deadline.",
+"preconditions": "A tracked patent has an upcoming maintenance deadline.",
+"action_or_input": "Record Director's decision (Renew or Do Not Renew) prior to the maintenance deadline.",
+"expected_result": "Explicit Renew or Do Not Renew decision is recorded before the maintenance deadline.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-067",
+"source_id": "BR-PMS-065: office-action response recorded within applicable deadline",
+"purpose": "Verify an office-action response recorded as submitted within the applicable deadline is accepted.",
+"preconditions": "An office action has an applicable response deadline; current time is within that deadline.",
+"action_or_input": "Record submission of the office-action response before the deadline expires.",
+"expected_result": "Office-action response submission is recorded as timely.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-068",
+"source_id": "BR-PMS-065: exception when permitted extension applies for office-action response",
+"purpose": "Verify an office-action response is allowed beyond the initial deadline when a permitted extension applies.",
+"preconditions": "Initial office-action response deadline has passed, and a permitted extension applies.",
+"action_or_input": "Record submission of the office-action response within the permitted extension period.",
+"expected_result": "Submission is permitted under the applicable extension.",
+"test_type": "exception"
+},
+{
+"test_id": "BR-TC-069",
+"source_id": "BR-PMS-066: automated office-action response deadline tracking when deadline rules/data available",
+"purpose": "Verify office-action response deadline tracking is automated when applicable deadline data/rules are available to PMS.",
+"preconditions": "Applicable office-action deadline rules/data are available to PMS; an office action is recorded.",
+"action_or_input": "Trigger/evaluate office-action response deadline tracking.",
+"expected_result": "PMS automates office-action response deadline tracking.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-070",
+"source_id": "BR-PMS-066: exception when applicable deadline data/rules are unavailable",
+"purpose": "Verify automated office-action response deadline tracking is not performed when deadline rules/data are unavailable.",
+"preconditions": "Applicable office-action deadline data/rules are not available to PMS.",
+"action_or_input": "Evaluate office-action response deadline tracking without available rules/data.",
+"expected_result": "Automated deadline tracking is not applied because deadline data/rules are unavailable.",
+"test_type": "exception"
+},
+{
+"test_id": "BR-TC-071",
+"source_id": "BR-PMS-067: permitted withdrawal before the filing stage",
+"purpose": "Verify withdrawal is permitted when the application is before the filing stage.",
+"preconditions": "Application is at a pre-filing stage.",
+"action_or_input": "Request withdrawal of the pre-filing application.",
+"expected_result": "Withdrawal is permitted.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-072",
+"source_id": "BR-PMS-067: prohibited withdrawal at or after the filing stage",
+"purpose": "Verify withdrawal is not permitted once the application has reached the filing stage (e.g., Filed).",
+"preconditions": "Application is at or past the filing stage (status Filed).",
+"action_or_input": "Attempt to withdraw the filed application.",
+"expected_result": "Withdrawal is denied because withdrawal is permitted only before the filing stage.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-073",
+"source_id": "BR-PMS-068: permitted withdrawal when status is withdrawal-eligible under PMS rule/configuration",
+"purpose": "Verify withdrawal is permitted when the current application status is eligible under PMS rule/configuration.",
+"preconditions": "Current application status is configured/eligible for withdrawal.",
+"action_or_input": "Request withdrawal for the withdrawal-eligible application.",
+"expected_result": "Withdrawal is permitted.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-074",
+"source_id": "BR-PMS-068: prohibited withdrawal when status is not withdrawal-eligible",
+"purpose": "Verify withdrawal is denied when the current application status is not withdrawal-eligible.",
+"preconditions": "Current application status is not eligible for withdrawal under PMS rule/configuration.",
+"action_or_input": "Attempt withdrawal for the ineligible application.",
+"expected_result": "Withdrawal is not authorized/permitted for the current status.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-075",
+"source_id": "BR-PMS-069: permitted withdrawal request with Applicant-provided reason",
+"purpose": "Verify a withdrawal request is accepted when an Applicant-provided reason is supplied.",
+"preconditions": "Application is eligible for withdrawal; Applicant supplies a non-empty withdrawal reason.",
+"action_or_input": "Submit withdrawal request with an Applicant-provided reason.",
+"expected_result": "Withdrawal request satisfies the reason requirement.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-076",
+"source_id": "BR-PMS-069: prohibited withdrawal request without Applicant-provided reason",
+"purpose": "Verify a withdrawal request without an Applicant-provided reason is rejected.",
+"preconditions": "Applicant attempts to withdraw an application without providing a reason.",
+"action_or_input": "Submit withdrawal request with missing/blank reason.",
+"expected_result": "Withdrawal request is rejected because an Applicant-provided reason is required.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-077",
+"source_id": "BR-PMS-070: co-inventor consent recorded when required for withdrawal",
+"purpose": "Verify co-inventor consent for withdrawal is recorded when required by the applicable process.",
+"preconditions": "Applicable process requires co-inventor consent for withdrawal; co-inventor consent is provided.",
+"action_or_input": "Record co-inventor consent and complete withdrawal.",
+"expected_result": "Co-inventor consent for withdrawal is recorded.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-078",
+"source_id": "BR-PMS-073: permitted inventor information change passing PMS validation",
+"purpose": "Verify valid inventor information passes PMS validation before the change is accepted.",
+"preconditions": "Applicant submits valid inventor information.",
+"action_or_input": "Submit inventor information change.",
+"expected_result": "Inventor information passes validation and the change is accepted.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-079",
+"source_id": "BR-PMS-073: prohibited inventor information change failing PMS validation",
+"purpose": "Verify invalid inventor information is rejected by PMS validation before acceptance.",
+"preconditions": "Applicant submits invalid/incomplete inventor information.",
+"action_or_input": "Attempt to apply invalid inventor information change.",
+"expected_result": "Inventor information fails PMS validation and the change is not accepted.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-080",
+"source_id": "BR-PMS-074: permitted inventor ownership percentages passing PMS validation",
+"purpose": "Verify valid inventor ownership percentages pass PMS validation before the change is accepted.",
+"preconditions": "Applicant submits valid inventor ownership percentages.",
+"action_or_input": "Submit inventor ownership percentage change.",
+"expected_result": "Ownership percentages pass PMS validation and the change is accepted.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-081",
+"source_id": "BR-PMS-074: prohibited inventor ownership percentages failing PMS validation",
+"purpose": "Verify invalid inventor ownership percentages are rejected by PMS validation before acceptance.",
+"preconditions": "Applicant submits invalid inventor ownership percentages.",
+"action_or_input": "Attempt to apply invalid inventor ownership percentages.",
+"expected_result": "Ownership percentages fail PMS validation and the change is not accepted.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-082",
+"source_id": "BR-PMS-075: required inventor consent obtained before filing",
+"purpose": "Verify required inventor consent is obtained before filing.",
+"preconditions": "Required inventor consent is obtained prior to filing.",
+"action_or_input": "Proceed toward filing with required inventor consent recorded.",
+"expected_result": "Required inventor consent prerequisite before filing is satisfied.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-083",
+"source_id": "BR-PMS-075: prohibited filing when required inventor consent is missing",
+"purpose": "Verify filing is blocked when required inventor consent has not been obtained.",
+"preconditions": "Required inventor consent has not been obtained.",
+"action_or_input": "Attempt filing without required inventor consent.",
+"expected_result": "Filing is blocked because required inventor consent must be obtained before filing.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-084",
+"source_id": "BR-PMS-076: permitted electronic signature collection when legally permitted and configured",
+"purpose": "Verify electronic signatures for inventor consent/agreement are collected when legally permitted and configured.",
+"preconditions": "Electronic signature collection for inventor consent/agreement is legally permitted and configured.",
+"action_or_input": "Collect electronic signature for inventor consent/agreement.",
+"expected_result": "Electronic signature collection is permitted.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-085",
+"source_id": "BR-PMS-076: prohibited electronic signature collection when not legally permitted or not configured",
+"purpose": "Verify electronic signatures for inventor consent/agreement are not authorized when not legally permitted or not configured.",
+"preconditions": "Electronic signature collection is not legally permitted or not configured.",
+"action_or_input": "Attempt to collect electronic signature for inventor consent/agreement.",
+"expected_result": "Electronic signature collection is not authorized outside the stated condition.",
+"test_type": "exception"
+},
+{
+"test_id": "BR-TC-086",
+"source_id": "BR-PMS-077: electronic-signature validation when legally permitted and configured",
+"purpose": "Verify electronic-signature validation is performed when legally permitted and configured.",
+"preconditions": "Electronic signature validation is legally permitted and configured; a signature is submitted.",
+"action_or_input": "Validate submitted inventor electronic signature.",
+"expected_result": "Electronic-signature validation executes under the configured/legally permitted condition.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-087",
+"source_id": "BR-PMS-077: exception when electronic-signature validation is not legally permitted or not configured",
+"purpose": "Verify electronic-signature validation rule does not authorize validation outside legally permitted/configured state.",
+"preconditions": "Electronic-signature validation is not legally permitted or not configured.",
+"action_or_input": "Trigger electronic-signature validation without legal permission or configuration.",
+"expected_result": "Electronic-signature validation is not authorized outside the stated condition.",
+"test_type": "exception"
+},
+{
+"test_id": "BR-TC-088",
+"source_id": "BR-PMS-078: inventor agreements complete before filing",
+"purpose": "Verify inventor agreements must be complete before filing.",
+"preconditions": "Inventor agreements are marked complete for the application.",
+"action_or_input": "Attempt filing with all inventor agreements complete.",
+"expected_result": "Inventor-agreement completeness prerequisite before filing is satisfied.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-089",
+"source_id": "BR-PMS-078: prohibited filing when inventor agreements are incomplete",
+"purpose": "Verify filing is blocked when inventor agreements are not complete.",
+"preconditions": "One or more inventor agreements remain incomplete.",
+"action_or_input": "Attempt filing with incomplete inventor agreements.",
+"expected_result": "Filing is blocked because inventor agreements must be complete before filing.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-090",
+"source_id": "BR-PMS-082: automatic version numbering for new document versions",
+"purpose": "Verify PMS assigns automatic version numbers when new document versions are produced.",
+"preconditions": "An application document exists; a new document version is uploaded/created.",
+"action_or_input": "Create/upload a new document version.",
+"expected_result": "PMS automatically assigns a version number to the new document version.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-091",
+"source_id": "BR-PMS-084: access to previous document versions governed by role and status rules",
+"purpose": "Verify access to previous document versions is permitted when allowed and restricted when disallowed by role and application-status rules.",
+"preconditions": "Previous document versions exist on an application with a given status and user role.",
+"action_or_input": "Request access to a previous document version under permitted and restricted role/status combinations.",
+"expected_result": "Access to previous document versions matches applicable role and application-status access rules.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-092",
+"source_id": "BR-PMS-086: document access controlled by user role and application status",
+"purpose": "Verify document access is enforced according to user role and application status.",
+"preconditions": "User with a specific role requests access to a document on an application in a specific status.",
+"action_or_input": "Request document access.",
+"expected_result": "Document access is granted only when permitted by user role and application status, and denied otherwise.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-093",
+"source_id": "BR-PMS-087: permitted document editing by Applicant when status is Needs Revision",
+"purpose": "Verify an Applicant may edit application documents while the application status is Needs Revision.",
+"preconditions": "Application status is Needs Revision; user is the Applicant.",
+"action_or_input": "Edit application documents.",
+"expected_result": "Document editing by the Applicant is permitted.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-094",
+"source_id": "BR-PMS-087: prohibited document editing by Applicant when status is not Needs Revision",
+"purpose": "Verify an Applicant cannot edit application documents when the application status is not Needs Revision.",
+"preconditions": "Application status is not Needs Revision (e.g., Submitted or Under Review); user is the Applicant.",
+"action_or_input": "Attempt to edit application documents.",
+"expected_result": "Document editing by the Applicant is denied.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-095",
+"source_id": "BR-PMS-088: licensing or technology-transfer request routing",
+"purpose": "Verify licensing/technology-transfer requests are routed to the appropriate committee or Director per the institutional process.",
+"preconditions": "An Applicant submits a licensing or technology-transfer request; institutional routing rule is configured.",
+"action_or_input": "Submit a licensing or technology-transfer request.",
+"expected_result": "Request is routed to the appropriate committee or Director according to the applicable institutional process.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-096",
+"source_id": "BR-PMS-091: confidentiality controls on license records",
+"purpose": "Verify license records are protected by confidentiality controls.",
+"preconditions": "License records exist in PMS; confidentiality controls are configured.",
+"action_or_input": "Access/manage license records as authorized vs. unauthorized users.",
+"expected_result": "Confidentiality controls are enforced on license records.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-097",
+"source_id": "BR-PMS-092: permitted appeal when application status is Rejected",
+"purpose": "Verify an application in Rejected status is eligible for an Applicant appeal.",
+"preconditions": "Application status is Rejected.",
+"action_or_input": "Initiate an appeal as the Applicant for the Rejected application.",
+"expected_result": "Application is eligible for appeal.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-098",
+"source_id": "BR-PMS-092: prohibited appeal when application status is not Rejected",
+"purpose": "Verify an application not in Rejected status is ineligible for an Applicant appeal.",
+"preconditions": "Application status is not Rejected (e.g., Approved or Submitted).",
+"action_or_input": "Attempt to file an appeal as the Applicant.",
+"expected_result": "Appeal is rejected because only an application in Rejected status is eligible.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-099",
+"source_id": "BR-PMS-093: appeal filed within applicable allowed period",
+"purpose": "Verify an appeal filed within the configured or institutionally defined allowed period is accepted.",
+"preconditions": "Application is Rejected; current time is within the configured/institutionally defined appeal period.",
+"action_or_input": "File appeal within the allowed period.",
+"expected_result": "Appeal is accepted as filed within the allowed time period.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-100",
+"source_id": "BR-PMS-094: permitted appeal with Applicant-provided grounds and justification",
+"purpose": "Verify an appeal is accepted when it includes Applicant-provided grounds and justification.",
+"preconditions": "Eligible application; Applicant provides grounds and justification.",
+"action_or_input": "Submit appeal with grounds and justification.",
+"expected_result": "Appeal satisfies the grounds and justification requirement.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-101",
+"source_id": "BR-PMS-094: prohibited appeal without grounds and justification",
+"purpose": "Verify an appeal missing Applicant-provided grounds or justification is rejected.",
+"preconditions": "Applicant attempts to submit an appeal without grounds and/or justification.",
+"action_or_input": "Submit appeal lacking grounds and/or justification.",
+"expected_result": "Appeal is rejected because grounds and justification must be provided.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-102",
+"source_id": "BR-PMS-095: permitted Director appeal outcomes (Uphold Rejection, Remand for Amendment, Modify Decision)",
+"purpose": "Verify a Director appeal outcome is accepted when it is one of: Uphold Rejection, Remand for Amendment, or Modify Decision.",
+"preconditions": "An appeal is under Director review.",
+"action_or_input": "Finalize Director appeal outcome with each permitted option: Uphold Rejection, Remand for Amendment, and Modify Decision.",
+"expected_result": "Each valid appeal outcome is accepted.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-103",
+"source_id": "BR-PMS-095: prohibited invalid Director appeal outcome",
+"purpose": "Verify PMS rejects a Director appeal outcome outside Uphold Rejection, Remand for Amendment, or Modify Decision.",
+"preconditions": "An appeal is under Director review.",
+"action_or_input": "Attempt to finalize an appeal outcome with an invalid value.",
+"expected_result": "Appeal outcome is rejected.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-104",
+"source_id": "BR-PMS-097: PMS calculates/monitors Director review deadline",
+"purpose": "Verify PMS calculates/monitors the Director review deadline using the applicable review-deadline rule.",
+"preconditions": "Review-deadline rule is active; an application is assigned to a Director.",
+"action_or_input": "Assign application to Director and evaluate review deadline tracking.",
+"expected_result": "PMS calculates and monitors the Director review deadline per the applicable rule.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-105",
+"source_id": "BR-PMS-098: PMS calculates/monitors revision deadline",
+"purpose": "Verify PMS calculates/monitors the revision deadline using the applicable revision-deadline rule.",
+"preconditions": "Revision-deadline rule is active; an application enters revision/resubmission period.",
+"action_or_input": "Trigger revision period and evaluate revision deadline tracking.",
+"expected_result": "PMS calculates and monitors the revision deadline per the applicable rule.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-106",
+"source_id": "BR-PMS-099: PMS calculates/monitors office-action response deadlines when rules/data available",
+"purpose": "Verify PMS calculates/monitors office-action response deadlines when applicable deadline rules/data are available.",
+"preconditions": "Applicable office-action response deadline rules/data are available.",
+"action_or_input": "Record an office action and evaluate deadline calculation/monitoring.",
+"expected_result": "PMS calculates and monitors the office-action response deadline.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-107",
+"source_id": "BR-PMS-099: exception when office-action deadline rules/data are unavailable",
+"purpose": "Verify PMS does not calculate/monitor office-action response deadlines when applicable deadline rules/data are unavailable.",
+"preconditions": "Applicable office-action response deadline rules/data are unavailable.",
+"action_or_input": "Record an office action without available deadline rules/data.",
+"expected_result": "Deadline calculation/monitoring is not authorized when applicable rules/data are unavailable.",
+"test_type": "exception"
+},
+{
+"test_id": "BR-TC-108",
+"source_id": "BR-PMS-100: PMS calculates/monitors maintenance-fee deadlines when jurisdictional rules/data available",
+"purpose": "Verify PMS calculates/monitors maintenance-fee deadlines when applicable jurisdictional schedule rules/data are available.",
+"preconditions": "Applicable jurisdictional maintenance-fee schedule rules/data are available.",
+"action_or_input": "Evaluate maintenance-fee deadline calculation/monitoring for a tracked patent.",
+"expected_result": "PMS calculates and monitors the maintenance-fee deadline.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-109",
+"source_id": "BR-PMS-100: exception when jurisdictional maintenance-fee schedule rules/data are unavailable",
+"purpose": "Verify PMS does not calculate/monitor maintenance-fee deadlines when jurisdictional schedule rules/data are unavailable.",
+"preconditions": "Applicable jurisdictional maintenance-fee schedule rules/data are unavailable.",
+"action_or_input": "Evaluate maintenance-fee deadline tracking without available jurisdictional rules/data.",
+"expected_result": "Maintenance-fee deadline calculation/monitoring is not authorized when rules/data are unavailable.",
+"test_type": "exception"
+},
+{
+"test_id": "BR-TC-110",
+"source_id": "BR-PMS-101: alert generated 30 days before tracked deadline where applicable",
+"purpose": "Verify PMS generates an alert at 30 days before a tracked deadline where applicable.",
+"preconditions": "A tracked deadline is applicable; current date is 30 days prior to the deadline.",
+"action_or_input": "Trigger scheduled deadline alert evaluation at 30 days before the deadline.",
+"expected_result": "PMS generates a 30-day pre-deadline alert.",
+"test_type": "boundary"
+},
+{
+"test_id": "BR-TC-111",
+"source_id": "BR-PMS-102: alert generated 15 days before tracked deadline where applicable",
+"purpose": "Verify PMS generates an alert at 15 days before a tracked deadline where applicable.",
+"preconditions": "A tracked deadline is applicable; current date is 15 days prior to the deadline.",
+"action_or_input": "Trigger scheduled deadline alert evaluation at 15 days before the deadline.",
+"expected_result": "PMS generates a 15-day pre-deadline alert.",
+"test_type": "boundary"
+},
+{
+"test_id": "BR-TC-112",
+"source_id": "BR-PMS-103: alert generated 5 days before tracked deadline where applicable",
+"purpose": "Verify PMS generates an alert at 5 days before a tracked deadline where applicable.",
+"preconditions": "A tracked deadline is applicable; current date is 5 days prior to the deadline.",
+"action_or_input": "Trigger scheduled deadline alert evaluation at 5 days before the deadline.",
+"expected_result": "PMS generates a 5-day pre-deadline alert.",
+"test_type": "boundary"
+},
+{
+"test_id": "BR-TC-113",
+"source_id": "BR-PMS-104: escalation triggered when tracked deadline is missed",
+"purpose": "Verify a missed tracked deadline triggers escalation according to the configured escalation chain.",
+"preconditions": "A tracked deadline is missed; an escalation chain is configured.",
+"action_or_input": "Evaluate deadline status after the tracked deadline has passed without completion.",
+"expected_result": "Escalation is triggered according to the configured escalation chain.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-114",
+"source_id": "BR-PMS-116: PMS triggers system-generated email notifications within PMS scope",
+"purpose": "Verify PMS triggers system-generated email notifications while external email delivery infrastructure remains outside PMS scope.",
+"preconditions": "An event occurs that triggers a system-generated email notification in PMS.",
+"action_or_input": "Execute the notification-triggering event in PMS.",
+"expected_result": "PMS triggers the system-generated email notification within its module scope.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-121",
+"source_id": "BR-PMS-121: audit record includes required fields where applicable",
+"purpose": "Verify applicable audit records include user ID, action type, timestamp, application ID, previous state, and new state.",
+"preconditions": "Audit logging is applicable for a state-changing action on an application.",
+"action_or_input": "Perform the state-changing action and inspect the generated audit record.",
+"expected_result": "Audit record includes user ID, action type, timestamp, application ID, previous state, and new state where applicable.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-122",
+"source_id": "BR-PMS-122: critical PMS operations create immutable audit records",
+"purpose": "Verify critical PMS operations create audit records that are immutable.",
+"preconditions": "A critical PMS operation is executed and an audit record is created.",
+"action_or_input": "Execute a critical PMS operation and attempt to modify or delete the resulting audit record.",
+"expected_result": "Immutable audit record is created and modification/deletion is prevented.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-126",
+"source_id": "BR-PMS-126: permitted access with valid PMS role assignment",
+"purpose": "Verify a user with a valid PMS role assignment can access patent-management functions.",
+"preconditions": "User holds a valid PMS role assignment.",
+"action_or_input": "Request access to a patent-management function.",
+"expected_result": "Access to the patent-management function is permitted.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-127",
+"source_id": "BR-PMS-126: prohibited access without a valid PMS role assignment",
+"purpose": "Verify a user without a valid PMS role assignment cannot access patent-management functions.",
+"preconditions": "User does not have a valid PMS role assignment.",
+"action_or_input": "Attempt to access a patent-management function.",
+"expected_result": "Access to patent-management functions is denied.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-128",
+"source_id": "BR-PMS-127: prohibited Attorney assignment before Director approval is recorded",
+"purpose": "Verify Attorney assignment does not occur before Director approval is recorded.",
+"preconditions": "Application does not have a recorded Director approval.",
+"action_or_input": "Attempt to assign an Attorney to the application.",
+"expected_result": "Attorney assignment is prevented because Director approval has not been recorded.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-129",
+"source_id": "BR-PMS-128: prohibited external filing before required approvals and budget allocation are complete",
+"purpose": "Verify external filing does not occur until required approvals and budget allocation are complete.",
+"preconditions": "Required approvals or budget allocation for the application are incomplete.",
+"action_or_input": "Attempt external filing for the application.",
+"expected_result": "External filing is prevented until required approvals and budget allocation are complete.",
+"test_type": "negative"
+},
+{
+"test_id": "BR-TC-130",
+"source_id": "BR-PMS-130: confidential patent information protected by role-based access control",
+"purpose": "Verify confidential patent information is protected by role-based access control.",
+"preconditions": "Confidential patent information exists; users have differing role-based access permissions.",
+"action_or_input": "Request confidential patent information using authorized and unauthorized roles.",
+"expected_result": "Role-based access control grants access only to authorized roles and denies unauthorized roles.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-131",
+"source_id": "BR-PMS-131: PMS maintains exactly one active PCC_ADMIN oversight role",
+"purpose": "Verify PMS maintains exactly one active PCC_ADMIN oversight role.",
+"preconditions": "PMS role configuration is evaluated.",
+"action_or_input": "Check active PCC_ADMIN oversight role count and attempt role changes affecting PCC_ADMIN.",
+"expected_result": "Exactly one active PCC_ADMIN oversight role is maintained in PMS.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-138",
+"source_id": "BR-PMS-138: external patent-office systems boundary",
+"purpose": "Verify PMS records/tracks/notifies/logs/reports based on filing/status/communication data without controlling external patent-office processing or decisions.",
+"preconditions": "Filing, status, or communication data from an external patent office is available.",
+"action_or_input": "Record or process patent-office filing/status/communication data in PMS.",
+"expected_result": "PMS updates internal records/tracking/notifications/logs/reports without controlling external patent-office processing or decisions.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-139",
+"source_id": "BR-PMS-139: external financial systems boundary",
+"purpose": "Verify PMS handles financial metadata/approvals/records within PMS or available integration while payment/accounting execution remains external.",
+"preconditions": "Financial data or integration state is configured.",
+"action_or_input": "Record, approve, or exchange financial metadata in PMS.",
+"expected_result": "PMS records/validates/approves/tracks/logs/exchanges financial metadata as supported without owning external payment/accounting execution.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-140",
+"source_id": "BR-PMS-140: external document-management systems boundary",
+"purpose": "Verify PMS owns only the document/version/access/audit behavior explicitly represented within PMS or an available integration.",
+"preconditions": "Document-management integration or PMS document records are present.",
+"action_or_input": "Perform document version, access, or audit actions represented in PMS.",
+"expected_result": "PMS enforces document/version/access/audit behavior within its explicit PMS/integration scope.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-141",
+"source_id": "BR-PMS-141: external prior-art databases as query sources",
+"purpose": "Verify external prior-art databases act as query sources rather than PMS-owned repositories.",
+"preconditions": "Prior-art search query integration is available.",
+"action_or_input": "Execute a prior-art search querying external prior-art databases.",
+"expected_result": "External databases are queried as external sources and not treated as PMS-owned repositories.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-142",
+"source_id": "BR-PMS-142: external filing success not treated as internally controlled",
+"purpose": "Verify PMS records submitted filing details and confirmations without treating external patent-office filing success as internally controlled.",
+"preconditions": "An external patent-office filing is submitted and confirmation/filing details are recorded.",
+"action_or_input": "Record submitted external filing details and confirmation in PMS.",
+"expected_result": "PMS records the submitted filing details and confirmation without asserting internal control over external filing success.",
+"test_type": "positive"
+},
+{
+"test_id": "BR-TC-146",
+"source_id": "BR-PMS-146: Applicant review and approval of office-action response when required by applicable process",
+"purpose": "Verify Applicant review and approval of an office-action response is required when the applicable process requires it, and not required outside that condition.",
+"preconditions": "An office-action response is prepared under a process that either requires or does not require Applicant review.",
+"action_or_input": "Process the office-action response under a process requiring Applicant review vs. a process not requiring Applicant review.",
+"expected_result": "Applicant review and approval is required only when the applicable process requires Applicant review.",
+"test_type": "positive"
+}
+]

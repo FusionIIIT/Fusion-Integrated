@@ -1,0 +1,200 @@
+[
+{
+"test_id": "WF-TC-001",
+"source_id": "BW-PMS-01: Step 1-3 (Initial Review Approval Path)",
+"purpose": "Verify a patent application transitions from Draft / Not Submitted through submission, Director assignment, and Director approval to Approved.",
+"preconditions": "Applicant has a patent application in Draft / Not Submitted state; PCC_ADMIN and eligible Director are available without conflict of interest.",
+"action_or_input": "Applicant submits application with complete required fields and valid documents; PCC_ADMIN assigns to an eligible Director; Director reviews within 15 business days with decision = Approve and justification >= 50 characters.",
+"expected_result": "Application transitions to Submitted, then Under Review, then Approved with justification recorded.",
+"test_type": "positive"
+},
+{
+"test_id": "WF-TC-002",
+"source_id": "BW-PMS-01: Step 1 Guard (Submission Validation Failure)",
+"purpose": "Verify application submission is rejected when completeness or document validation fails.",
+"preconditions": "Applicant has a patent application in Draft / Not Submitted state.",
+"action_or_input": "Applicant submits application missing a required field or containing an invalid/non-PDF/oversized/infected document.",
+"expected_result": "Submission is not accepted and application remains in Draft / Not Submitted.",
+"test_type": "negative"
+},
+{
+"test_id": "WF-TC-003",
+"source_id": "BW-PMS-01: Step 3 Guard (Review Justification < 50 Characters)",
+"purpose": "Verify Director review decision is not accepted when justification is fewer than 50 characters.",
+"preconditions": "Application is in Under Review state assigned to an eligible Director within the 15-business-day review window.",
+"action_or_input": "Director submits decision = Approve with a justification string shorter than 50 characters.",
+"expected_result": "Decision is rejected due to insufficient justification length and application remains Under Review.",
+"test_type": "negative"
+},
+{
+"test_id": "WF-TC-004",
+"source_id": "BW-PMS-02: Step 1-4 (Revision and Re-Approval Path)",
+"purpose": "Verify an application sent to Needs Revision is revised and resubmitted within 60 days, reassigned to a Director, and approved.",
+"preconditions": "Application is in Under Review state within the review window; eligible Director and PCC_ADMIN are active.",
+"action_or_input": "Director decides Needs Revision with valid justification >= 50 characters; Applicant revises addressing feedback and resubmits within 60 days; PCC_ADMIN assigns to Director; Director decides Approve with valid justification.",
+"expected_result": "Application transitions to Needs Revision, Resubmitted, Under Review, and finally Approved.",
+"test_type": "positive"
+},
+{
+"test_id": "WF-TC-005",
+"source_id": "BW-PMS-02: Step 2 Guard (Resubmission After 60 Days / Unaddressed Feedback)",
+"purpose": "Verify resubmission is rejected or expires when outside the 60-day resubmission period or not addressing Director feedback.",
+"preconditions": "Application is in Needs Revision state.",
+"action_or_input": "Applicant attempts resubmission after the 60-day resubmission period expires or without addressing Director feedback.",
+"expected_result": "Invalid resubmission is rejected and upon resubmission deadline expiration application status becomes Expired.",
+"test_type": "negative"
+},
+{
+"test_id": "WF-TC-006",
+"source_id": "BW-PMS-03: Step 1-3 (Appeal Remand Path)",
+"purpose": "Verify a rejected application appealed by the Applicant can result in Remanded for Amendment.",
+"preconditions": "Application is in Under Review state; eligible Director is available.",
+"action_or_input": "Director decides Reject with valid justification; Applicant files appeal within allowed period with grounds/justification; Director reviews appeal and selects outcome = Remand for Amendment.",
+"expected_result": "Application transitions to Rejected, then Appeal Submitted, then Remanded for Amendment.",
+"test_type": "positive"
+},
+{
+"test_id": "WF-TC-007",
+"source_id": "BW-PMS-04: Step 1-3 (Appeal Rejection-Upheld Path)",
+"purpose": "Verify a rejected application appealed by the Applicant can result in Rejection Upheld.",
+"preconditions": "Application is in Under Review state; eligible Director is available.",
+"action_or_input": "Director decides Reject with valid justification; Applicant files appeal within allowed period with grounds/justification; Director reviews appeal and selects outcome = Uphold Rejection.",
+"expected_result": "Application transitions to Rejected, then Appeal Submitted, then Rejection Upheld.",
+"test_type": "positive"
+},
+{
+"test_id": "WF-TC-008",
+"source_id": "BW-PMS-05: Step 1-3 (Appeal Modified-Decision Path)",
+"purpose": "Verify a rejected application appealed by the Applicant can result in Decision Modified.",
+"preconditions": "Application is in Under Review state; eligible Director is available.",
+"action_or_input": "Director decides Reject with valid justification; Applicant files appeal within allowed period with grounds/justification; Director reviews appeal and selects outcome = Modify Decision.",
+"expected_result": "Application transitions to Rejected, then Appeal Submitted, then Decision Modified.",
+"test_type": "positive"
+},
+{
+"test_id": "WF-TC-009",
+"source_id": "BW-PMS-06: Step 1-2 (Attorney Assignment Acceptance Path)",
+"purpose": "Verify PCC_ADMIN assigns an eligible Attorney to an Approved application and the Attorney accepts to reach Attorney Assigned.",
+"preconditions": "Application is in Approved state; eligible Attorney from approved panel (or permitted exception) with no conflict is available.",
+"action_or_input": "PCC_ADMIN assigns eligible Attorney; Attorney selects Accept.",
+"expected_result": "Application transitions from Approved to Assignment Offered, then to Attorney Assigned.",
+"test_type": "positive"
+},
+{
+"test_id": "WF-TC-010",
+"source_id": "BW-PMS-07: Step 1-4 (Attorney Decline and One Reassignment Path)",
+"purpose": "Verify an offered Attorney assignment can be declined to Pending Review, reassigned to another eligible Attorney, and accepted.",
+"preconditions": "Application is in Approved state; two eligible Attorneys are available.",
+"action_or_input": "PCC_ADMIN assigns first eligible Attorney; first Attorney selects Decline; PCC_ADMIN reassigns second eligible Attorney; second Attorney selects Accept.",
+"expected_result": "Application transitions Approved -> Assignment Offered -> Pending Review -> Assignment Offered -> Attorney Assigned.",
+"test_type": "alternate"
+},
+{
+"test_id": "WF-TC-011",
+"source_id": "BW-PMS-08: Step 1 (Budget Approval Path)",
+"purpose": "Verify Director approves a budget within threshold for an Approved application.",
+"preconditions": "Application is in Approved state; total cost is within configured threshold and budget availability is validated where data exists.",
+"action_or_input": "Director reviews budget and selects outcome = Approve.",
+"expected_result": "Application transitions to Budget Approved and financial/authorization log is recorded.",
+"test_type": "positive"
+},
+{
+"test_id": "WF-TC-012",
+"source_id": "BW-PMS-09: Step 1 (Budget Rejection Path)",
+"purpose": "Verify Director rejects a budget for an Approved application.",
+"preconditions": "Application is in Approved state.",
+"action_or_input": "Director reviews budget and selects outcome = Reject.",
+"expected_result": "Application transitions to Budget Rejected.",
+"test_type": "negative"
+},
+{
+"test_id": "WF-TC-013",
+"source_id": "BW-PMS-10: Step 1-2 (Budget Escalation Path)",
+"purpose": "Verify above-threshold budget escalates and is handled/tracked by PCC_ADMIN within PMS scope.",
+"preconditions": "Application is in Approved state; total budget cost exceeds configured threshold.",
+"action_or_input": "Director reviews budget exceeding threshold; PCC_ADMIN handles/routes the escalated case within PMS scope.",
+"expected_result": "Application transitions to Escalated and then Escalation Tracked / External Decision Pending.",
+"test_type": "exception"
+},
+{
+"test_id": "WF-TC-014",
+"source_id": "BW-PMS-11: Step 1 (External Filing Path)",
+"purpose": "Verify external filing is recorded when all pre-filing preconditions are satisfied.",
+"preconditions": "Application is in Pre-Filing Preconditions Satisfied state with required approvals/budget complete, inventor agreements complete, format rules satisfied, and international justification provided if international.",
+"action_or_input": "Attorney prepares and records external patent filing with filing details.",
+"expected_result": "Application transitions to Filed with external filing details recorded.",
+"test_type": "positive"
+},
+{
+"test_id": "WF-TC-015",
+"source_id": "BW-PMS-12: Step 1-4 (Office-Action Response with Applicant Review)",
+"purpose": "Verify recording an office action, obtaining Applicant approval, and submitting the response within deadline/extension.",
+"preconditions": "Application is in Filed / Post-Filing Active state; process requires Applicant review.",
+"action_or_input": "Attorney records office action; Attorney prepares draft response requiring Applicant review; Applicant approves response; Attorney submits finalized response within deadline or permitted extension.",
+"expected_result": "Application transitions Filed / Post-Filing Active -> Office Action Recorded -> Awaiting Applicant Approval -> Applicant Approved -> Response Submitted.",
+"test_type": "positive"
+},
+{
+"test_id": "WF-TC-016",
+"source_id": "BW-PMS-13: Step 1-3 (Office-Action Response without Applicant Review)",
+"purpose": "Verify recording an office action and submitting the response without Applicant review when not required.",
+"preconditions": "Application is in Filed / Post-Filing Active state; process does not require Applicant review.",
+"action_or_input": "Attorney records office action; Attorney finalizes draft response without Applicant review; Attorney submits response within deadline or permitted extension.",
+"expected_result": "Application transitions Filed / Post-Filing Active -> Office Action Recorded -> Response Ready -> Response Submitted.",
+"test_type": "alternate"
+},
+{
+"test_id": "WF-TC-017",
+"source_id": "BW-PMS-14: Step 1-3 (Maintenance Renewal Path)",
+"purpose": "Verify a maintenance renewal request is approved by the Director and recorded by the Attorney with next cycle scheduled.",
+"preconditions": "Patent is in Granted / Maintenance Cycle Active state and maintenance decision is due.",
+"action_or_input": "Attorney requests maintenance decision; Director decides Renew; Attorney records maintenance action.",
+"expected_result": "Patent transitions Granted / Maintenance Cycle Active -> Renewal Decision Requested -> Renewal Approved -> Renewed / Next Cycle Scheduled.",
+"test_type": "positive"
+},
+{
+"test_id": "WF-TC-018",
+"source_id": "BW-PMS-15: Step 1-2 (Maintenance Non-Renewal Path)",
+"purpose": "Verify a maintenance decision due can result in a Do Not Renew decision by the Director.",
+"preconditions": "Patent is in Granted / Maintenance Cycle Active state and maintenance decision is due.",
+"action_or_input": "Attorney requests maintenance decision; Director decides Do Not Renew.",
+"expected_result": "Patent transitions Granted / Maintenance Cycle Active -> Renewal Decision Requested -> Do Not Renew.",
+"test_type": "negative"
+},
+{
+"test_id": "WF-TC-019",
+"source_id": "BW-PMS-16: Step 1 (Generic Pre-Filing Withdrawal Transition)",
+"purpose": "Verify pre-filing withdrawal succeeds when application is in a configured withdrawal-eligible pre-filing state with reason and required consent.",
+"preconditions": "Application is in a configured withdrawal-eligible pre-filing state prior to filing; required co-inventor consent is obtained if applicable.",
+"action_or_input": "Applicant submits withdrawal request before filing with a withdrawal reason.",
+"expected_result": "Application transitions to Withdrawn, is removed from active queue, and withdrawal history is recorded.",
+"test_type": "positive"
+},
+{
+"test_id": "WF-TC-020",
+"source_id": "BW-PMS-16: Step 1 Guard (Withdrawal Eligibility / Reason / Consent Missing)",
+"purpose": "Verify withdrawal is not permitted when status is not withdrawal-eligible, reason is missing, or required co-inventor consent is lacking.",
+"preconditions": "Application is in a non-eligible state or lacks required reason/co-inventor consent.",
+"action_or_input": "Applicant attempts to withdraw application without meeting eligibility, reason, or required co-inventor consent guards.",
+"expected_result": "Withdrawal is rejected and application remains in its prior state.",
+"test_type": "negative"
+},
+{
+"test_id": "WF-TC-021",
+"source_id": "CW-PMS-01: Step 1-7 (Initial Review Reject Outcome)",
+"purpose": "Verify an application in Under Review can be directly rejected by the Director.",
+"preconditions": "Application is in Under Review state.",
+"action_or_input": "Director completes review within deadline with decision = Reject and justification >= 50 characters.",
+"expected_result": "Application transitions to Rejected and feedback is sent to Applicant.",
+"test_type": "negative"
+},
+{
+"test_id": "WF-TC-022",
+"source_id": "CW-PMS-05: Step 1-7 (Candidate Pre-Filing States Withdrawal Coverage)",
+"purpose": "Verify withdrawal across candidate pre-filing states (Submitted, Under Review, Needs Revision, Rejected, Approved, Attorney Assigned, Pending Review) when configured as eligible.",
+"preconditions": "Applications exist in candidate pre-filing states configured as withdrawal-eligible prior to filing with reason and required consent.",
+"action_or_input": "Applicant withdraws each eligible pre-filing application before filing with a valid reason.",
+"expected_result": "Each eligible application transitions to Withdrawn.",
+"test_type": "positive"
+}
+]

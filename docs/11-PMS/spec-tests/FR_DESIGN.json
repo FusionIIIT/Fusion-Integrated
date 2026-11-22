@@ -1,0 +1,1892 @@
+[
+{
+"test_id": "TC-001",
+"source_id": "PMS-AFR-010: track application status and progress",
+"purpose": "Verify an Applicant can view the current status and progress of their own submitted patent applications.",
+"preconditions": "An authenticated Applicant owns at least one patent application in PMS.",
+"action_or_input": "Applicant requests status and progress view for their patent application.",
+"expected_result": "PMS displays the status and progress information for the Applicant's application.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-002",
+"source_id": "PMS-AFR-016: view reports for own applications",
+"purpose": "Verify an Applicant can view reports concerning their own patent applications.",
+"preconditions": "An authenticated Applicant has patent application records in PMS.",
+"action_or_input": "Applicant requests personal application reports for their applications.",
+"expected_result": "PMS provides report data for applications belonging to that Applicant.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-003",
+"source_id": "PMS-AFR-023: Director domain workflow oversight",
+"purpose": "Verify a Director receives oversight information for application workflows in their domain.",
+"preconditions": "An authenticated Director has applications in their domain/oversight scope.",
+"action_or_input": "Director accesses workflow oversight information within their domain.",
+"expected_result": "PMS displays workflow oversight information for applications in the Director's domain.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-004",
+"source_id": "PMS-AFR-026: PCC_ADMIN monitor workflows and resolve conflict-of-interest cases",
+"purpose": "Verify PCC_ADMIN can monitor workflows and resolve a conflict-of-interest case within PMS.",
+"preconditions": "An authenticated PCC_ADMIN is active in PMS and a conflict-of-interest case exists in a PMS workflow.",
+"action_or_input": "PCC_ADMIN monitors active workflows and records resolution for the conflict-of-interest case.",
+"expected_result": "PMS reflects workflow monitoring data and records the conflict-of-interest resolution within PMS scope.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-005",
+"source_id": "PMS-AFR-027: PCC_ADMIN manage configuration and role assignments",
+"purpose": "Verify PCC_ADMIN can update PMS configuration and user-role assignments.",
+"preconditions": "An authenticated PCC_ADMIN is active in PMS and a target user account exists.",
+"action_or_input": "PCC_ADMIN submits a PMS configuration update and assigns a PMS role to the target user.",
+"expected_result": "PMS saves the updated configuration and applies the user-role assignment.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-006",
+"source_id": "PMS-AFR-029: PCC_ADMIN handle escalations and exceptional cases",
+"purpose": "Verify PCC_ADMIN can handle PMS escalations and exceptional cases.",
+"preconditions": "An authenticated PCC_ADMIN is active and an escalated or exceptional PMS item exists.",
+"action_or_input": "PCC_ADMIN processes and records action on the escalation or exceptional case.",
+"expected_result": "PMS updates the escalated/exceptional case according to PCC_ADMIN's handling action.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-007",
+"source_id": "PMS-AFR-030: PCC_ADMIN maintain attorney panels and expertise mappings",
+"purpose": "Verify PCC_ADMIN can add or update attorney panel membership and domain expertise mappings.",
+"preconditions": "An authenticated PCC_ADMIN is active and an Attorney record exists.",
+"action_or_input": "PCC_ADMIN adds/updates the Attorney on an approved panel and assigns expertise domain mappings.",
+"expected_result": "PMS persists the updated attorney panel status and expertise mappings.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-008",
+"source_id": "PMS-AFR-037: Attorney legal advice records",
+"purpose": "Verify an Attorney can record legal advice throughout the patent lifecycle.",
+"preconditions": "An authenticated Attorney is assigned to or handling a patent application within authorized scope.",
+"action_or_input": "Attorney submits a legal advice record on the patent application.",
+"expected_result": "PMS stores the legal advice record associated with the patent application.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-009",
+"source_id": "PMS-AFR-038: submit patent application with required sections",
+"purpose": "Verify an Applicant can submit a patent application containing title, abstract, detailed description, claims, inventor information, and supporting documents.",
+"preconditions": "An authenticated Applicant prepares a complete application with title, abstract, detailed description, claims, inventor information, and valid supporting PDF documents.",
+"action_or_input": "Applicant submits the completed patent application.",
+"expected_result": "PMS accepts the application submission with all provided required sections and supporting documents.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-010",
+"source_id": "PMS-AFR-039: require patent application documents to be PDF files",
+"purpose": "Verify PMS accepts PDF files for patent application documents.",
+"preconditions": "An authenticated Applicant is submitting a patent application document.",
+"action_or_input": "Applicant attaches a PDF document file.",
+"expected_result": "PMS accepts the document file format as a PDF file.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-011",
+"source_id": "PMS-AFR-039: reject non-PDF patent application documents",
+"purpose": "Verify PMS rejects non-PDF application documents.",
+"preconditions": "An authenticated Applicant is submitting a patent application with a non-PDF file.",
+"action_or_input": "Applicant attempts to attach or submit the non-PDF file.",
+"expected_result": "PMS rejects the non-PDF document.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-012",
+"source_id": "PMS-AFR-040: reject documents larger than 50 MB",
+"purpose": "Verify PMS rejects a patent application document exceeding 50 MB.",
+"preconditions": "An authenticated Applicant has a PDF document larger than 50 MB.",
+"action_or_input": "Applicant attempts to upload or submit the document larger than 50 MB.",
+"expected_result": "PMS rejects the document because its size exceeds 50 MB.",
+"test_type": "boundary"
+},
+{
+"test_id": "TC-013",
+"source_id": "PMS-AFR-041: validate documents as malware-free before accepting",
+"purpose": "Verify PMS checks submitted application documents for malware before accepting them and rejects infected files.",
+"preconditions": "An authenticated Applicant submits a document flagged as containing malware.",
+"action_or_input": "Applicant submits the malware-flagged document.",
+"expected_result": "PMS does not accept the malware-flagged document.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-014",
+"source_id": "PMS-AFR-042: validate completeness of submission information",
+"purpose": "Verify PMS rejects an application submission when required submission information is incomplete.",
+"preconditions": "An authenticated Applicant prepares a patent application missing required submission information.",
+"action_or_input": "Applicant attempts to submit the incomplete application.",
+"expected_result": "PMS rejects the submission due to incomplete application information.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-015",
+"source_id": "PMS-AFR-043: classify submitted documents by sensitivity",
+"purpose": "Verify PMS classifies submitted documents by sensitivity.",
+"preconditions": "An authenticated Applicant submits application documents.",
+"action_or_input": "Applicant submits the application documents.",
+"expected_result": "PMS records a sensitivity classification on the submitted documents.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-016",
+"source_id": "PMS-AFR-044: assign unique application ID",
+"purpose": "Verify PMS assigns a unique application ID to each accepted patent application.",
+"preconditions": "Two valid patent applications are submitted by Applicants.",
+"action_or_input": "Submit both patent applications.",
+"expected_result": "Each accepted application receives a distinct, unique application ID.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-017",
+"source_id": "PMS-AFR-045: set status to Submitted upon submission",
+"purpose": "Verify PMS sets application status to Submitted after successful submission.",
+"preconditions": "An authenticated Applicant submits a valid, complete patent application.",
+"action_or_input": "Complete application submission.",
+"expected_result": "The application's status is set to Submitted.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-018",
+"source_id": "PMS-AFR-046: require inventor agreements before filing",
+"purpose": "Verify PMS enforces completion of inventor agreements before filing.",
+"preconditions": "A patent application has incomplete inventor agreements.",
+"action_or_input": "Attempt to proceed to filing while inventor agreements are incomplete.",
+"expected_result": "PMS prevents progression to filing until inventor agreements are completed.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-019",
+"source_id": "PMS-AFR-047: record application history",
+"purpose": "Verify PMS records application history for each patent application.",
+"preconditions": "A patent application is submitted and undergoes a recorded workflow event.",
+"action_or_input": "Submit the application and perform a recorded history event.",
+"expected_result": "PMS appends the events to the application's history record.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-020",
+"source_id": "PMS-AFR-048: notify stakeholders after submission or status update",
+"purpose": "Verify PMS notifies relevant stakeholders after application submission or a history-relevant status update.",
+"preconditions": "Relevant stakeholders are associated with the application.",
+"action_or_input": "Submit a patent application or trigger a history-relevant status update.",
+"expected_result": "PMS triggers notifications to the relevant stakeholders.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-021",
+"source_id": "PMS-AFR-049: PCC_ADMIN assigns submitted applications to Directors",
+"purpose": "Verify PCC_ADMIN can assign a submitted application to an eligible Director.",
+"preconditions": "An application has status Submitted and an eligible Director exists.",
+"action_or_input": "PCC_ADMIN assigns the application to the Director.",
+"expected_result": "PMS records the Director assignment on the application.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-022",
+"source_id": "PMS-AFR-050: automatic assignment to Directors when rules are available",
+"purpose": "Verify PMS can automatically assign submitted applications to Directors when configured assignment rules are available.",
+"preconditions": "Configured automatic assignment rules and eligible Directors are available, and a valid application is submitted.",
+"action_or_input": "Submit a patent application with automatic assignment rules active.",
+"expected_result": "PMS automatically assigns the application to a Director according to the configured rules.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-023",
+"source_id": "PMS-AFR-051: Director expertise matching criterion",
+"purpose": "Verify Director assignment matches Director expertise with the application domain.",
+"preconditions": "Applications exist in distinct technical domains and Directors have mapped expertise domains.",
+"action_or_input": "Assign or route an application to a Director.",
+"expected_result": "PMS selects a Director whose expertise matches the application domain.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-024",
+"source_id": "PMS-AFR-052: Director workload balance criterion",
+"purpose": "Verify Director assignment considers Director workload balance.",
+"preconditions": "Multiple eligible Directors match domain expertise with different current review workloads.",
+"action_or_input": "Assign or route an application across the eligible Directors.",
+"expected_result": "PMS applies workload balance when selecting the assigned Director.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-025",
+"source_id": "PMS-AFR-053: conflict-of-interest checks before Director assignment",
+"purpose": "Verify PMS performs conflict-of-interest checks before assigning an application to a Director.",
+"preconditions": "A conflict of interest exists between a Director and a patent application.",
+"action_or_input": "Attempt to assign or route the conflicted application to that Director.",
+"expected_result": "PMS flags or blocks assignment to the conflicted Director based on the conflict-of-interest check.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-026",
+"source_id": "PMS-AFR-054: prevent Director from reviewing own inventor application",
+"purpose": "Verify PMS prevents a Director from reviewing an application where they are listed as an inventor.",
+"preconditions": "A Director is listed as an inventor on a patent application.",
+"action_or_input": "Attempt to assign or have that Director review the application.",
+"expected_result": "PMS prevents the inventor-Director from being assigned/reviewing the application.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-027",
+"source_id": "PMS-AFR-055: prevent PCC_ADMIN from reviewing own inventor application",
+"purpose": "Verify PMS prevents PCC_ADMIN from reviewing an application where they are listed as an inventor.",
+"preconditions": "PCC_ADMIN is listed as an inventor on a patent application.",
+"action_or_input": "Attempt to have PCC_ADMIN review the application.",
+"expected_result": "PMS prevents PCC_ADMIN from reviewing an application where they are an inventor.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-028",
+"source_id": "PMS-AFR-056: update status to Under Review upon assignment",
+"purpose": "Verify PMS updates application status to Under Review upon Director assignment.",
+"preconditions": "A submitted patent application is assigned to a Director.",
+"action_or_input": "Complete Director assignment for the application.",
+"expected_result": "The application status changes to Under Review.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-029",
+"source_id": "PMS-AFR-057: notify assigned Director and initiate review timeline",
+"purpose": "Verify PMS notifies the assigned Director and initiates the review timeline upon assignment.",
+"preconditions": "An application is assigned to a Director.",
+"action_or_input": "Assign the application to the Director.",
+"expected_result": "PMS sends a notification to the assigned Director and starts the review timeline.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-030",
+"source_id": "PMS-AFR-058: Director views assigned application details and documents",
+"purpose": "Verify an assigned Director can view application details, documents, and supporting materials.",
+"preconditions": "An application with documents and supporting materials is assigned to a Director.",
+"action_or_input": "Director opens the assigned application's details, documents, and supporting materials.",
+"expected_result": "PMS displays the application details, documents, and supporting materials to the assigned Director.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-031",
+"source_id": "PMS-AFR-059: Director chooses Approve, Reject, or Needs Revision",
+"purpose": "Verify a Director can record a review decision of Approve, Reject, or Needs Revision.",
+"preconditions": "An application is assigned to a Director for review with valid justification of at least 50 characters.",
+"action_or_input": "Director submits a review decision choosing Approve, Reject, or Needs Revision.",
+"expected_result": "PMS records the chosen review decision on the application.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-032",
+"source_id": "PMS-AFR-060: reject decision with fewer than 50 characters of justification",
+"purpose": "Verify PMS rejects a Director decision when justification has fewer than 50 characters.",
+"preconditions": "An assigned Director is recording a review decision.",
+"action_or_input": "Director submits a decision with a justification shorter than 50 characters.",
+"expected_result": "PMS rejects the decision because justification must be at least 50 characters.",
+"test_type": "boundary"
+},
+{
+"test_id": "TC-032b",
+"source_id": "PMS-AFR-060: accept decision with at least 50 characters of justification",
+"purpose": "Verify PMS accepts a Director decision when justification has at least 50 characters.",
+"preconditions": "An assigned Director is recording a review decision.",
+"action_or_input": "Director submits a decision with a justification of at least 50 characters.",
+"expected_result": "PMS accepts the justification length requirement for the decision.",
+"test_type": "boundary"
+},
+{
+"test_id": "TC-033",
+"source_id": "PMS-AFR-061: enforce 15-business-day Director review completion",
+"purpose": "Verify PMS enforces the 15-business-day review timeline from assignment for Director review.",
+"preconditions": "An application is assigned to a Director and the 15-business-day review window is tracked.",
+"action_or_input": "Advance simulated time past 15 business days from assignment without a completed review.",
+"expected_result": "PMS reflects that the 15-business-day review timeline condition has elapsed.",
+"test_type": "boundary"
+},
+{
+"test_id": "TC-034",
+"source_id": "PMS-AFR-062: notify Applicant with detailed feedback on rejection",
+"purpose": "Verify PMS notifies the Applicant with detailed feedback when an application is rejected.",
+"preconditions": "An assigned Director rejects an application with detailed justification/feedback.",
+"action_or_input": "Director submits the Reject decision.",
+"expected_result": "PMS sends a notification to the Applicant containing the detailed rejection feedback.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-035",
+"source_id": "PMS-AFR-063: notify Applicant with detailed feedback on revision request",
+"purpose": "Verify PMS notifies the Applicant with detailed feedback when Needs Revision is chosen.",
+"preconditions": "An assigned Director selects Needs Revision with detailed justification/feedback.",
+"action_or_input": "Director submits the Needs Revision decision.",
+"expected_result": "PMS sends a notification to the Applicant containing the detailed revision feedback.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-036",
+"source_id": "PMS-AFR-064: route approved applications to attorney assignment",
+"purpose": "Verify PMS routes approved applications to the attorney assignment stage.",
+"preconditions": "An assigned Director approves an application.",
+"action_or_input": "Director submits the Approve decision.",
+"expected_result": "PMS routes the approved application to the attorney assignment workflow step.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-037",
+"source_id": "PMS-AFR-065: audit trail of Director review process",
+"purpose": "Verify PMS maintains an audit trail of the Director review process.",
+"preconditions": "An assigned Director reviews and records a decision on an application.",
+"action_or_input": "Director completes a review decision.",
+"expected_result": "PMS records audit trail entries for the review actions and decision.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-038",
+"source_id": "PMS-AFR-066: revise applications with status Needs Revision",
+"purpose": "Verify an Applicant can revise an application whose status is Needs Revision.",
+"preconditions": "A patent application has status Needs Revision.",
+"action_or_input": "Applicant revises the application to address feedback and resubmits within 60 days.",
+"expected_result": "PMS allows revision and processes the resubmission for an application with status Needs Revision.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-039",
+"source_id": "PMS-AFR-067: revise applications with status Rejected",
+"purpose": "Verify an Applicant can revise an application whose status is Rejected.",
+"preconditions": "A patent application has status Rejected.",
+"action_or_input": "Applicant revises the application and resubmits within 60 days of the rejection decision date.",
+"expected_result": "PMS allows revision and processes the resubmission for an application with status Rejected.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-040",
+"source_id": "PMS-AFR-068: 60-day resubmission period",
+"purpose": "Verify PMS enforces the 60-day resubmission window from the rejection or revision-request decision date.",
+"preconditions": "An application received a Rejected or Needs Revision decision more than 60 days ago.",
+"action_or_input": "Applicant attempts to resubmit after the 60-day resubmission period has passed.",
+"expected_result": "PMS rejects late resubmission outside the 60-day resubmission period.",
+"test_type": "boundary"
+},
+{
+"test_id": "TC-041",
+"source_id": "PMS-AFR-069: validate revision addresses Director feedback",
+"purpose": "Verify PMS validates that a revision submission addresses Director feedback.",
+"preconditions": "An application requires revision based on Director feedback.",
+"action_or_input": "Applicant submits a revision that does not address the Director feedback.",
+"expected_result": "PMS validation rejects or flags the revision for failing to address Director feedback.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-042",
+"source_id": "PMS-AFR-070: start new review cycle after resubmission",
+"purpose": "Verify PMS starts a new review cycle after a valid revised application is resubmitted.",
+"preconditions": "An eligible revised application is validly resubmitted within the allowed period.",
+"action_or_input": "Submit the revised application.",
+"expected_result": "PMS initiates a new review cycle for the resubmitted application.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-043",
+"source_id": "PMS-AFR-071: version control for revised applications",
+"purpose": "Verify PMS maintains version control for revised applications.",
+"preconditions": "An application is revised and resubmitted.",
+"action_or_input": "Submit a revised version of the application.",
+"expected_result": "PMS retains version history distinguishing the revised version from prior versions.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-044",
+"source_id": "PMS-AFR-072: expire application when resubmission deadline expires",
+"purpose": "Verify PMS changes application status to Expired when the revision resubmission deadline expires.",
+"preconditions": "An application is awaiting revision/resubmission and its resubmission deadline expires.",
+"action_or_input": "Advance time past the resubmission deadline without resubmission.",
+"expected_result": "PMS updates the application status to Expired.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-045",
+"source_id": "PMS-AFR-074: only PCC_ADMIN may assign attorneys to approved applications",
+"purpose": "Verify only PCC_ADMIN can assign attorneys to approved applications and non-PCC_ADMIN users are denied.",
+"preconditions": "An application is Approved; a non-PCC_ADMIN user attempts attorney assignment.",
+"action_or_input": "Non-PCC_ADMIN user attempts to assign an attorney to the approved application.",
+"expected_result": "PMS denies the attorney assignment attempt.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-046",
+"source_id": "PMS-AFR-075: require attorneys from approved panel unless exception granted",
+"purpose": "Verify PMS requires attorneys to be selected from the approved panel unless an exception is granted.",
+"preconditions": "An Attorney is not on the approved panel and no exception has been granted.",
+"action_or_input": "PCC_ADMIN attempts to assign the non-panel Attorney without an exception.",
+"expected_result": "PMS rejects assigning an Attorney outside the approved panel when no exception is granted.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-047",
+"source_id": "PMS-AFR-076: consider attorney expertise matching domain",
+"purpose": "Verify attorney assignment considers attorney expertise matching the application domain.",
+"preconditions": "Attorneys have domain expertise mappings and an approved application has a technical domain.",
+"action_or_input": "Perform attorney assignment for the application.",
+"expected_result": "PMS evaluates/matches attorney expertise against the application domain.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-048",
+"source_id": "PMS-AFR-077: consider attorney current workload",
+"purpose": "Verify attorney assignment considers each attorney's current workload.",
+"preconditions": "Eligible attorneys have different current assignment workloads.",
+"action_or_input": "Perform attorney assignment.",
+"expected_result": "PMS factors attorney workload into the assignment selection.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-049",
+"source_id": "PMS-AFR-078: conflict-of-interest checks before attorney assignment",
+"purpose": "Verify PMS performs conflict-of-interest checks before attorney assignment.",
+"preconditions": "A conflict of interest exists between an Attorney and the application.",
+"action_or_input": "Attempt to assign the application to the conflicted Attorney.",
+"expected_result": "PMS detects/prevents assignment to the conflicted Attorney.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-050",
+"source_id": "PMS-AFR-079: consider Applicant preference when preferred attorney is in approved panel",
+"purpose": "Verify PMS considers Applicant attorney preference when the preferred attorney is in the approved panel.",
+"preconditions": "An Applicant specifies a preferred attorney who is on the approved panel.",
+"action_or_input": "Assign an attorney for the application.",
+"expected_result": "PMS considers the Applicant's preference for the approved-panel attorney.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-050b",
+"source_id": "PMS-AFR-079: do not apply Applicant preference when preferred attorney is outside approved panel",
+"purpose": "Verify PMS does not honor Applicant attorney preference when the preferred attorney is not in the approved panel.",
+"preconditions": "An Applicant specifies a preferred attorney who is not on the approved panel.",
+"action_or_input": "Assign an attorney for the application.",
+"expected_result": "PMS does not apply the Applicant's preference for the attorney outside the approved panel.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-051",
+"source_id": "PMS-AFR-080: assigned Attorney accepts or declines assignment",
+"purpose": "Verify an assigned Attorney can accept or decline an assignment.",
+"preconditions": "An application assignment is offered to an Attorney.",
+"action_or_input": "Attorney records either acceptance or decline of the assignment.",
+"expected_result": "PMS records the Attorney's acceptance or decline decision.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-052",
+"source_id": "PMS-AFR-081: record assignment outcome as Attorney Assigned or Pending Review",
+"purpose": "Verify PMS records the attorney-assignment outcome using Attorney Assigned or Pending Review as applicable.",
+"preconditions": "An attorney assignment action/response occurs on an application.",
+"action_or_input": "Complete attorney assignment / acceptance outcome.",
+"expected_result": "PMS sets/records the applicable status (Attorney Assigned or Pending Review).",
+"test_type": "functional"
+},
+{
+"test_id": "TC-053",
+"source_id": "PMS-AFR-082: Attorney records legal and patentability analysis",
+"purpose": "Verify an Attorney can record legal and patentability analysis for an assigned application.",
+"preconditions": "An Attorney is assigned to an application.",
+"action_or_input": "Attorney submits legal and patentability analysis content.",
+"expected_result": "PMS saves the legal and patentability analysis for the application.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-054",
+"source_id": "PMS-AFR-083: Attorney records prior-art searches in relevant databases",
+"purpose": "Verify an Attorney can record prior-art searches performed in relevant databases.",
+"preconditions": "An Attorney is conducting patentability review on an assigned application.",
+"action_or_input": "Attorney records prior-art search details from relevant databases.",
+"expected_result": "PMS stores the recorded prior-art search information on the assessment.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-055",
+"source_id": "PMS-AFR-084: Attorney records novelty, non-obviousness, and utility evaluations",
+"purpose": "Verify an Attorney can record evaluations of novelty, non-obviousness, and utility.",
+"preconditions": "An Attorney is performing patentability assessment on an assigned application.",
+"action_or_input": "Attorney submits evaluations for novelty, non-obviousness, and utility.",
+"expected_result": "PMS records the novelty, non-obviousness, and utility evaluations.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-056",
+"source_id": "PMS-AFR-085: patentability opinion recommendation constraint",
+"purpose": "Verify an Attorney's patentability opinion includes one of File Patent, Do Not File, or Needs Amendment.",
+"preconditions": "An Attorney is recording a patentability opinion.",
+"action_or_input": "Attorney submits a patentability opinion selecting File Patent, Do Not File, or Needs Amendment.",
+"expected_result": "PMS accepts and records the opinion with the selected valid recommendation.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-057",
+"source_id": "PMS-AFR-086: Attorney requests additional information during legal review",
+"purpose": "Verify an Attorney can request additional information during legal review.",
+"preconditions": "An Attorney is conducting legal review of an application.",
+"action_or_input": "Attorney submits a request for additional information.",
+"expected_result": "PMS records the request for additional information.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-058",
+"source_id": "PMS-AFR-087: Attorney requests extensions during legal review",
+"purpose": "Verify an Attorney can request an extension during legal review.",
+"preconditions": "An Attorney is conducting legal review of an application.",
+"action_or_input": "Attorney submits a legal review extension request.",
+"expected_result": "PMS records the extension request for legal review.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-059",
+"source_id": "PMS-AFR-088: record Attorney patentability opinion",
+"purpose": "Verify PMS records a completed Attorney patentability opinion.",
+"preconditions": "An Attorney completes a patentability opinion on an assigned application.",
+"action_or_input": "Submit the patentability opinion.",
+"expected_result": "PMS persists the recorded patentability opinion on the application.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-060",
+"source_id": "PMS-AFR-089: notify stakeholders after Attorney opinion recorded",
+"purpose": "Verify PMS notifies relevant stakeholders after an Attorney patentability opinion is recorded.",
+"preconditions": "Stakeholders are associated with the application.",
+"action_or_input": "Record an Attorney patentability opinion.",
+"expected_result": "PMS triggers notifications to relevant stakeholders.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-061",
+"source_id": "PMS-AFR-090: Director reviews patent filing and prosecution costs",
+"purpose": "Verify a Director can review costs for patent filing and prosecution.",
+"preconditions": "A patent application has filing and prosecution budget cost information.",
+"action_or_input": "Director opens the budget/cost details for review.",
+"expected_result": "PMS displays the filing and prosecution cost details to the Director.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-062",
+"source_id": "PMS-AFR-091: Director approves filing and prosecution costs",
+"purpose": "Verify a Director can approve costs for an eligible application within threshold and budget availability.",
+"preconditions": "An application has status Approved, budget costs are within threshold, and budget availability is satisfied.",
+"action_or_input": "Director approves the filing and prosecution costs.",
+"expected_result": "PMS records the Director's budget approval.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-063",
+"source_id": "PMS-AFR-092: include filing fees in budget information",
+"purpose": "Verify budget information includes filing fees.",
+"preconditions": "A patent budget record is created or viewed.",
+"action_or_input": "Provide or inspect budget cost components.",
+"expected_result": "Filing fees are represented in the budget information.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-064",
+"source_id": "PMS-AFR-093: include attorney fees in budget information",
+"purpose": "Verify budget information includes attorney fees.",
+"preconditions": "A patent budget record is created or viewed.",
+"action_or_input": "Provide or inspect budget cost components.",
+"expected_result": "Attorney fees are represented in the budget information.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-065",
+"source_id": "PMS-AFR-094: include administrative costs in budget information",
+"purpose": "Verify budget information includes administrative costs.",
+"preconditions": "A patent budget record is created or viewed.",
+"action_or_input": "Provide or inspect budget cost components.",
+"expected_result": "Administrative costs are represented in the budget information.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-066",
+"source_id": "PMS-AFR-095: escalate when total cost exceeds configured threshold limit",
+"purpose": "Verify PMS escalates to higher authority when total budget cost exceeds the configured threshold limit.",
+"preconditions": "A configured cost threshold limit exists and a budget's total cost exceeds that threshold.",
+"action_or_input": "Submit or route the budget whose total cost exceeds the configured threshold limit.",
+"expected_result": "PMS routes/escalates the budget case to higher authority.",
+"test_type": "boundary"
+},
+{
+"test_id": "TC-067",
+"source_id": "PMS-AFR-096: allow budget approval only for status Approved",
+"purpose": "Verify PMS blocks budget approval when application status is not Approved.",
+"preconditions": "A patent application is in a status other than Approved.",
+"action_or_input": "Attempt to approve budget costs for the non-Approved application.",
+"expected_result": "PMS rejects budget approval because the application status is not Approved.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-068",
+"source_id": "PMS-AFR-097: validate budget availability before approval",
+"purpose": "Verify PMS validates budget availability before approval when budget-availability information is available.",
+"preconditions": "Budget-availability data is available and indicates insufficient budget for approval.",
+"action_or_input": "Attempt to approve the budget when budget availability is insufficient.",
+"expected_result": "PMS prevents budget approval due to insufficient budget availability.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-069",
+"source_id": "PMS-AFR-098: log financial transactions with authorization-level information",
+"purpose": "Verify PMS logs financial transactions along with authorization-level information.",
+"preconditions": "A budget/financial action is recorded with authorization metadata.",
+"action_or_input": "Record the financial budget action.",
+"expected_result": "PMS logs the financial transaction including authorization-level information.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-070",
+"source_id": "PMS-AFR-099: Attorney prepares application package for filing",
+"purpose": "Verify an Attorney can prepare an application package for patent-office filing.",
+"preconditions": "An Attorney is assigned to an eligible application.",
+"action_or_input": "Attorney prepares and saves the filing application package.",
+"expected_result": "PMS records the prepared application package for filing.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-071",
+"source_id": "PMS-AFR-100: validate filing-package format compliance",
+"purpose": "Verify PMS validates filing-package format compliance against available patent-office standard rules.",
+"preconditions": "Patent-office format validation rules are available and a non-compliant package is submitted.",
+"action_or_input": "Submit a filing package that violates the available format compliance rules.",
+"expected_result": "PMS rejects or flags the filing package for format non-compliance.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-072",
+"source_id": "PMS-AFR-101: record submission to Indian Patent Office",
+"purpose": "Verify an Attorney can record submission of an application to the Indian Patent Office.",
+"preconditions": "An Attorney is handling an application eligible for filing.",
+"action_or_input": "Attorney records filing submission to the Indian Patent Office with required filing details.",
+"expected_result": "PMS records the Indian Patent Office filing submission.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-073",
+"source_id": "PMS-AFR-102: record submission to international patent offices",
+"purpose": "Verify an Attorney can record submission of an application to an international patent office.",
+"preconditions": "An Attorney is handling an application eligible for international filing and provides required justification.",
+"action_or_input": "Attorney records filing submission to an international patent office with justification and filing details.",
+"expected_result": "PMS records the international patent office filing submission.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-074",
+"source_id": "PMS-AFR-103: require additional justification for international filings",
+"purpose": "Verify PMS rejects or blocks recording an international filing when additional justification is missing.",
+"preconditions": "An Attorney attempts to record an international patent-office filing without providing additional justification.",
+"action_or_input": "Submit international filing details with missing justification.",
+"expected_result": "PMS requires additional justification and rejects the incomplete international filing record.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-075",
+"source_id": "PMS-AFR-104: capture external filing ID, filing date, and confirmation",
+"purpose": "Verify PMS captures external filing ID, filing date, and confirmation for a recorded filing.",
+"preconditions": "An Attorney records a patent-office filing.",
+"action_or_input": "Provide external filing ID, filing date, and confirmation information and save.",
+"expected_result": "PMS stores the external filing ID, filing date, and confirmation on the filing record.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-076",
+"source_id": "PMS-AFR-105: update application status to Filed after recording filing",
+"purpose": "Verify PMS updates application status to Filed after filing is recorded.",
+"preconditions": "A valid patent-office filing is recorded for an eligible application.",
+"action_or_input": "Save the recorded filing.",
+"expected_result": "PMS updates the application status to Filed.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-077",
+"source_id": "PMS-AFR-106: log official communications with patent offices",
+"purpose": "Verify PMS logs official communications with patent offices.",
+"preconditions": "An official communication with a patent office is recorded in PMS.",
+"action_or_input": "Record the official patent-office communication.",
+"expected_result": "PMS stores the official communication in the application/office communication log.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-078",
+"source_id": "PMS-AFR-107: activate post-grant tracking only for status Granted",
+"purpose": "Verify post-grant tracking is active for Granted patents and not activated for non-Granted applications.",
+"preconditions": "One application has status Granted and another has a non-Granted status.",
+"action_or_input": "Inspect or trigger post-grant tracking on both records.",
+"expected_result": "Post-grant tracking operates for the Granted patent and is not active for the non-Granted application.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-079",
+"source_id": "PMS-AFR-108: calculate maintenance-fee schedule from grant date and jurisdiction",
+"purpose": "Verify PMS calculates maintenance-fee schedules based on grant date and jurisdiction when schedule rules are available.",
+"preconditions": "A Granted patent has a grant date and jurisdiction with available maintenance schedule rules.",
+"action_or_input": "Generate or view the maintenance-fee schedule for the Granted patent.",
+"expected_result": "PMS calculates the maintenance-fee schedule using the grant date and jurisdiction rules.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-080",
+"source_id": "PMS-AFR-109: Attorney manages maintenance-fee reminders and deadline tracking",
+"purpose": "Verify an Attorney can manage maintenance-fee reminders and deadline tracking.",
+"preconditions": "A Granted patent has maintenance-fee tracking in PMS.",
+"action_or_input": "Attorney configures or updates maintenance-fee reminders and deadline tracking.",
+"expected_result": "PMS saves the Attorney's maintenance-fee reminder and deadline-tracking settings.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-081",
+"source_id": "PMS-AFR-110: require explicit renewal decision before maintenance deadline",
+"purpose": "Verify PMS requires an explicit renewal decision before each maintenance deadline.",
+"preconditions": "A Granted patent approaches a maintenance deadline without a recorded renewal decision.",
+"action_or_input": "Check renewal prerequisite status prior to the maintenance deadline.",
+"expected_result": "PMS indicates that an explicit renewal decision is required before the maintenance deadline.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-082",
+"source_id": "PMS-AFR-111: Attorney seeks renewal decision from Director",
+"purpose": "Verify an Attorney can request a renewal decision from a Director for a maintenance cycle.",
+"preconditions": "A Granted patent has an upcoming maintenance deadline.",
+"action_or_input": "Attorney submits a renewal decision request to the Director.",
+"expected_result": "PMS records and routes the renewal decision request to the Director.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-083",
+"source_id": "PMS-AFR-112: Director decides Renew or Do Not Renew",
+"purpose": "Verify a Director can decide Renew or Do Not Renew for a maintenance decision.",
+"preconditions": "A maintenance renewal decision is pending for a Director.",
+"action_or_input": "Director records a decision of Renew or Do Not Renew.",
+"expected_result": "PMS records the Director's Renew or Do Not Renew decision.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-084",
+"source_id": "PMS-AFR-113: Attorney records maintenance action when renewal is approved",
+"purpose": "Verify an Attorney can record the maintenance action, transaction information, and resulting status when renewal is approved.",
+"preconditions": "Renewal is approved for a Granted patent's maintenance cycle.",
+"action_or_input": "Attorney records the maintenance action, transaction information, and resulting status.",
+"expected_result": "PMS stores the recorded maintenance action, transaction information, and status.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-085",
+"source_id": "PMS-AFR-114: maintain renewal history",
+"purpose": "Verify PMS maintains renewal history across maintenance actions.",
+"preconditions": "A maintenance renewal decision/action is recorded on a patent.",
+"action_or_input": "View the patent's renewal history.",
+"expected_result": "PMS preserves and displays the recorded renewal history entries.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-086",
+"source_id": "PMS-AFR-115: schedule next maintenance cycle after completion",
+"purpose": "Verify PMS schedules the next maintenance cycle after a renewal cycle is completed.",
+"preconditions": "A maintenance renewal cycle is completed for a Granted patent with applicable schedule rules.",
+"action_or_input": "Complete the current maintenance renewal cycle.",
+"expected_result": "PMS schedules the subsequent maintenance cycle.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-087",
+"source_id": "PMS-AFR-116: record office actions received from patent offices",
+"purpose": "Verify PMS allows recording office actions received from patent offices.",
+"preconditions": "An application has been filed with a patent office.",
+"action_or_input": "Record an office action received from the patent office.",
+"expected_result": "PMS saves the office action record linked to the application.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-088",
+"source_id": "PMS-AFR-117: Attorney reviews recorded office actions",
+"purpose": "Verify an Attorney can review a recorded office action.",
+"preconditions": "An office action is recorded on an application handled by the Attorney.",
+"action_or_input": "Attorney opens and reviews the office action details.",
+"expected_result": "PMS displays the recorded office action to the Attorney.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-089",
+"source_id": "PMS-AFR-118: Attorney prepares draft office-action responses",
+"purpose": "Verify an Attorney can prepare a draft response to an office action.",
+"preconditions": "A recorded office action exists for an application handled by the Attorney.",
+"action_or_input": "Attorney creates and saves a draft office-action response.",
+"expected_result": "PMS stores the draft office-action response.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-090",
+"source_id": "PMS-AFR-119: Applicant reviews and approves office-action responses when needed",
+"purpose": "Verify an Applicant can review and approve an office-action response when required.",
+"preconditions": "A draft office-action response requires Applicant review and approval.",
+"action_or_input": "Applicant reviews the response and submits approval.",
+"expected_result": "PMS records the Applicant's review and approval of the office-action response.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-091",
+"source_id": "PMS-AFR-120: Attorney finalizes office-action responses",
+"purpose": "Verify an Attorney can finalize an office-action response.",
+"preconditions": "A draft office-action response exists and any required approval is complete.",
+"action_or_input": "Attorney marks/submits the office-action response as finalized.",
+"expected_result": "PMS records the finalized office-action response.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-092",
+"source_id": "PMS-AFR-121: Attorney records submission of office-action response within deadline",
+"purpose": "Verify an Attorney can record submission of an office-action response within the applicable deadline.",
+"preconditions": "A finalized office-action response exists and the current date is within the applicable response deadline.",
+"action_or_input": "Attorney records the office-action response submission within the deadline.",
+"expected_result": "PMS records the timely submission of the office-action response.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-093",
+"source_id": "PMS-AFR-122: Attorney records extension requests when permitted",
+"purpose": "Verify an Attorney can record an extension request when additional response time is needed and allowed.",
+"preconditions": "An office-action response deadline applies and extensions are allowed by the applicable process.",
+"action_or_input": "Attorney submits a response extension request.",
+"expected_result": "PMS records the office-action extension request.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-094",
+"source_id": "PMS-AFR-123: track response submission status",
+"purpose": "Verify PMS tracks and updates the status of office-action response submissions.",
+"preconditions": "An office-action response moves through preparation/submission states.",
+"action_or_input": "Update or record office-action response progress/submission.",
+"expected_result": "PMS reflects the current response submission status.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-095",
+"source_id": "PMS-AFR-124: automate office-action response deadline tracking",
+"purpose": "Verify PMS automates office-action response deadline tracking when deadline data is available.",
+"preconditions": "An office action is recorded with applicable deadline data available to PMS.",
+"action_or_input": "Record the office action with deadline data.",
+"expected_result": "PMS calculates and tracks the office-action response deadline automatically.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-096",
+"source_id": "PMS-AFR-125: Applicant withdraws application before filing stage",
+"purpose": "Verify an Applicant can withdraw an application prior to the filing stage when eligible.",
+"preconditions": "An application is in a pre-filing status eligible for withdrawal and owned by the Applicant.",
+"action_or_input": "Applicant submits a withdrawal request with a reason.",
+"expected_result": "PMS processes the pre-filing withdrawal.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-097",
+"source_id": "PMS-AFR-126: validate withdrawal eligibility based on current status",
+"purpose": "Verify PMS rejects withdrawal when the current application status does not allow withdrawal.",
+"preconditions": "An application is in a status where withdrawal is not allowed.",
+"action_or_input": "Applicant attempts to withdraw the application with a reason.",
+"expected_result": "PMS rejects the withdrawal based on current application status.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-098",
+"source_id": "PMS-AFR-127: require reason for withdrawal",
+"purpose": "Verify PMS requires an Applicant to provide a withdrawal reason.",
+"preconditions": "An application is eligible for withdrawal.",
+"action_or_input": "Applicant attempts to withdraw the application without providing a reason.",
+"expected_result": "PMS rejects the withdrawal because a withdrawal reason is required.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-099",
+"source_id": "PMS-AFR-128: record co-inventor consent for withdrawal when required",
+"purpose": "Verify PMS supports recording co-inventor consent for withdrawal when required.",
+"preconditions": "An application has co-inventors and co-inventor consent is required for withdrawal.",
+"action_or_input": "Record co-inventor consent alongside the withdrawal request.",
+"expected_result": "PMS stores the co-inventor consent for the withdrawal.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-100",
+"source_id": "PMS-AFR-129: update status to Withdrawn after permitted withdrawal",
+"purpose": "Verify PMS updates application status to Withdrawn after a permitted withdrawal.",
+"preconditions": "A withdrawal request meets eligibility, reason, and any required consent conditions.",
+"action_or_input": "Complete the permitted withdrawal.",
+"expected_result": "PMS updates the application status to Withdrawn.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-101",
+"source_id": "PMS-AFR-130: remove withdrawn applications from active queue",
+"purpose": "Verify PMS removes withdrawn applications from the active queue.",
+"preconditions": "An application transitions to status Withdrawn.",
+"action_or_input": "Withdraw an active application and inspect the active queue.",
+"expected_result": "The withdrawn application no longer appears in the active queue.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-102",
+"source_id": "PMS-AFR-131: maintain withdrawal history",
+"purpose": "Verify PMS maintains withdrawal history for withdrawn applications.",
+"preconditions": "An application has been withdrawn.",
+"action_or_input": "Inspect the application's withdrawal history.",
+"expected_result": "PMS retains and displays the withdrawal history record.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-103",
+"source_id": "PMS-AFR-132: Applicant manages multiple inventors",
+"purpose": "Verify an Applicant can add and manage multiple inventors on an application.",
+"preconditions": "An authenticated Applicant is managing inventor details on an application.",
+"action_or_input": "Applicant adds multiple inventors to the application.",
+"expected_result": "PMS stores multiple inventors associated with the application.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-104",
+"source_id": "PMS-AFR-133: Applicant manages ownership shares for inventors",
+"purpose": "Verify an Applicant can specify and manage ownership shares for inventors.",
+"preconditions": "An application has one or more inventors.",
+"action_or_input": "Applicant assigns ownership shares across the inventors.",
+"expected_result": "PMS records the ownership shares for each inventor.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-105",
+"source_id": "PMS-AFR-134: validate inventor information",
+"purpose": "Verify PMS validates inventor information and rejects invalid/incomplete inventor data.",
+"preconditions": "An Applicant enters invalid or incomplete inventor information.",
+"action_or_input": "Submit the invalid inventor information.",
+"expected_result": "PMS rejects the invalid inventor information.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-106",
+"source_id": "PMS-AFR-135: validate ownership percentages for inventors",
+"purpose": "Verify PMS validates inventor ownership percentages and rejects invalid percentages.",
+"preconditions": "An Applicant enters invalid inventor ownership percentages.",
+"action_or_input": "Submit the invalid ownership percentages.",
+"expected_result": "PMS rejects the invalid ownership percentages.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-107",
+"source_id": "PMS-AFR-136: require inventor consent before filing",
+"purpose": "Verify PMS requires inventor consent prior to filing.",
+"preconditions": "An application lacks required inventor consent.",
+"action_or_input": "Attempt to proceed to filing without required inventor consent.",
+"expected_result": "PMS blocks progression to filing until required inventor consent is present.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-108",
+"source_id": "PMS-AFR-137: collect electronic signatures where legally permitted and configured",
+"purpose": "Verify PMS collects electronic signatures for inventor consent/agreement where legally permitted and configured.",
+"preconditions": "Electronic signature collection is legally permitted and configured for inventor consent/agreement.",
+"action_or_input": "Provide an electronic signature for an inventor consent/agreement.",
+"expected_result": "PMS captures and records the electronic signature.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-109",
+"source_id": "PMS-AFR-138: validate electronic signatures where legally permitted and configured",
+"purpose": "Verify PMS validates electronic signatures where legally permitted and configured and rejects invalid signatures.",
+"preconditions": "Electronic signature validation is legally permitted and configured, and an invalid electronic signature is provided.",
+"action_or_input": "Submit an invalid electronic signature for inventor consent/agreement.",
+"expected_result": "PMS rejects the invalid electronic signature.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-110",
+"source_id": "PMS-AFR-140: notify affected parties when inventor information changes",
+"purpose": "Verify PMS notifies affected parties when inventor information changes.",
+"preconditions": "An application has affected parties and inventor information is updated.",
+"action_or_input": "Modify inventor information on the application.",
+"expected_result": "PMS triggers notifications to affected parties about the inventor information change.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-111",
+"source_id": "PMS-AFR-141: Applicant searches prior-art references",
+"purpose": "Verify an Applicant can search prior-art references through PMS search support.",
+"preconditions": "An authenticated Applicant accesses PMS prior-art search.",
+"action_or_input": "Applicant executes a prior-art search query.",
+"expected_result": "PMS executes the prior-art search for the Applicant.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-112",
+"source_id": "PMS-AFR-142: Attorney searches prior-art references",
+"purpose": "Verify an Attorney can search prior-art references through PMS search support.",
+"preconditions": "An authenticated Attorney accesses PMS prior-art search.",
+"action_or_input": "Attorney executes a prior-art search query.",
+"expected_result": "PMS executes the prior-art search for the Attorney.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-113",
+"source_id": "PMS-AFR-143: query relevant patent databases when available",
+"purpose": "Verify PMS queries relevant patent databases during prior-art search where integration or search access is available.",
+"preconditions": "Patent database search integration/access is available.",
+"action_or_input": "Run a prior-art search targeting patent databases.",
+"expected_result": "PMS queries the available patent databases and returns results.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-114",
+"source_id": "PMS-AFR-144: query relevant publication databases when available",
+"purpose": "Verify PMS queries relevant publication databases during prior-art search where integration or search access is available.",
+"preconditions": "Publication database search integration/access is available.",
+"action_or_input": "Run a prior-art search targeting publication databases.",
+"expected_result": "PMS queries the available publication databases and returns results.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-115",
+"source_id": "PMS-AFR-145: display prior-art search results with relevance ranking",
+"purpose": "Verify PMS displays prior-art search results with relevance ranking.",
+"preconditions": "A prior-art search yields multiple matching references.",
+"action_or_input": "View the prior-art search results.",
+"expected_result": "PMS presents search results with relevance ranking.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-116",
+"source_id": "PMS-AFR-146: attach selected prior-art references to application",
+"purpose": "Verify a user can attach selected prior-art references to an application.",
+"preconditions": "Prior-art search results are available and a target patent application exists.",
+"action_or_input": "Select prior-art references and attach them to the application.",
+"expected_result": "PMS associates the selected prior-art references with the application.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-117",
+"source_id": "PMS-AFR-147: log prior-art search sessions for audit trail",
+"purpose": "Verify PMS logs prior-art search sessions for the audit trail.",
+"preconditions": "An authorized user runs a prior-art search session.",
+"action_or_input": "Execute a prior-art search.",
+"expected_result": "PMS records an audit log entry for the prior-art search session.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-118",
+"source_id": "PMS-AFR-148: support keyword optimization for prior-art search",
+"purpose": "Verify PMS supports keyword optimization during prior-art search.",
+"preconditions": "An authorized user performs a prior-art search using keyword optimization.",
+"action_or_input": "Use keyword optimization in a prior-art search.",
+"expected_result": "PMS applies keyword optimization to support the search.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-119",
+"source_id": "PMS-AFR-149: support classification mapping for prior-art search",
+"purpose": "Verify PMS supports classification mapping during prior-art search.",
+"preconditions": "An authorized user performs a prior-art search using classification mapping.",
+"action_or_input": "Use classification mapping in a prior-art search.",
+"expected_result": "PMS applies classification mapping to support the search.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-120",
+"source_id": "PMS-AFR-150: maintain version history for application documents",
+"purpose": "Verify PMS maintains version history for application documents across updates.",
+"preconditions": "An application document has an initial version and a subsequent version.",
+"action_or_input": "Upload a new version of an application document and inspect version history.",
+"expected_result": "PMS maintains the version history of the application document.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-121",
+"source_id": "PMS-AFR-151: allow uploading new document versions when role and status permit",
+"purpose": "Verify users can upload new document versions when permitted by their role and application status.",
+"preconditions": "An authenticated user has a role and application status that permit document upload.",
+"action_or_input": "Upload a new document version.",
+"expected_result": "PMS accepts and records the new document version.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-121b",
+"source_id": "PMS-AFR-151: reject uploading new document versions when role or status does not permit",
+"purpose": "Verify PMS rejects uploading a new document version when role or application status does not permit upload.",
+"preconditions": "A user's role or the application status does not permit uploading a new document version.",
+"action_or_input": "Attempt to upload a new document version.",
+"expected_result": "PMS rejects the document version upload.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-122",
+"source_id": "PMS-AFR-152: assign automatic version numbers to new document versions",
+"purpose": "Verify PMS automatically assigns version numbers to newly uploaded document versions.",
+"preconditions": "An existing application document version is present and a new version is uploaded.",
+"action_or_input": "Upload a new version of that document.",
+"expected_result": "PMS automatically assigns a version number to the new document version.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-123",
+"source_id": "PMS-AFR-153: archive previous document versions",
+"purpose": "Verify PMS archives previous document versions when a new version is uploaded.",
+"preconditions": "An application document has a prior version and a newer version is uploaded.",
+"action_or_input": "Upload a newer document version.",
+"expected_result": "The previous document version is preserved in archive.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-124",
+"source_id": "PMS-AFR-154: allow access to previous document versions when permitted by role and status rules",
+"purpose": "Verify users can access previous document versions when permitted by role and application-status access rules.",
+"preconditions": "Archived previous document versions exist and the user's role and application status permit access.",
+"action_or_input": "Request access to a previous document version.",
+"expected_result": "PMS grants access to the previous document version.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-124b",
+"source_id": "PMS-AFR-154: deny access to previous document versions when disallowed by role or status rules",
+"purpose": "Verify PMS denies access to previous document versions when role or application-status access rules do not permit it.",
+"preconditions": "Archived previous document versions exist and the user's role or application status does not permit access.",
+"action_or_input": "Request access to a previous document version.",
+"expected_result": "PMS denies access to the previous document version.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-125",
+"source_id": "PMS-AFR-155: log document modifications with user and timestamp",
+"purpose": "Verify PMS logs document modifications recording the user and timestamp.",
+"preconditions": "An authorized user modifies or uploads a document.",
+"action_or_input": "Perform a document modification.",
+"expected_result": "PMS records a log entry containing the acting user and timestamp.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-126",
+"source_id": "PMS-AFR-156: control document access based on role and application status",
+"purpose": "Verify PMS enforces document access control based on user role and application status.",
+"preconditions": "Application documents exist under a defined application status and a user has a role/status not permitted access.",
+"action_or_input": "Attempt to access application documents.",
+"expected_result": "PMS denies document access when role and application-status rules do not permit it.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-127",
+"source_id": "PMS-AFR-157: allow Applicant to edit documents when status is Needs Revision",
+"purpose": "Verify an Applicant can edit application documents when application status is Needs Revision.",
+"preconditions": "An Applicant owns an application whose status is Needs Revision.",
+"action_or_input": "Applicant edits an application document.",
+"expected_result": "PMS allows editing the application document when status is Needs Revision.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-127b",
+"source_id": "PMS-AFR-157: prevent Applicant from editing documents when status is not Needs Revision",
+"purpose": "Verify an Applicant cannot edit application documents when application status is not Needs Revision.",
+"preconditions": "An Applicant owns an application whose status is not Needs Revision.",
+"action_or_input": "Applicant attempts to edit an application document.",
+"expected_result": "PMS prevents editing the application document when status is not Needs Revision.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-128",
+"source_id": "PMS-AFR-158: Applicant submits licensing requests",
+"purpose": "Verify an Applicant can submit a patent licensing request.",
+"preconditions": "An authenticated Applicant has an eligible patent/application.",
+"action_or_input": "Applicant submits a licensing request.",
+"expected_result": "PMS records the submitted licensing request.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-129",
+"source_id": "PMS-AFR-159: Applicant submits technology transfer requests",
+"purpose": "Verify an Applicant can submit a technology-transfer request.",
+"preconditions": "An authenticated Applicant has an eligible patent/application.",
+"action_or_input": "Applicant submits a technology-transfer request.",
+"expected_result": "PMS records the submitted technology-transfer request.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-130",
+"source_id": "PMS-AFR-160: route licensing or technology-transfer requests to committee or Director",
+"purpose": "Verify PMS routes licensing or technology-transfer requests to the appropriate committee or Director.",
+"preconditions": "A licensing or technology-transfer request is submitted.",
+"action_or_input": "Submit the licensing or technology-transfer request.",
+"expected_result": "PMS routes the request to the appropriate committee or Director.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-131",
+"source_id": "PMS-AFR-161: track negotiation process information",
+"purpose": "Verify PMS tracks negotiation process information for licensing or technology-transfer requests.",
+"preconditions": "A licensing or technology-transfer request is in negotiation.",
+"action_or_input": "Record negotiation process updates on the request.",
+"expected_result": "PMS stores and tracks the negotiation process information.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-132",
+"source_id": "PMS-AFR-162: document final licensing or technology-transfer agreements",
+"purpose": "Verify PMS allows recording final licensing or technology-transfer agreements.",
+"preconditions": "A licensing or technology-transfer request reaches a final agreement.",
+"action_or_input": "Record the final licensing or technology-transfer agreement.",
+"expected_result": "PMS persists the final agreement record.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-133",
+"source_id": "PMS-AFR-163: update or share financial-system information when integration available",
+"purpose": "Verify PMS updates or shares licensing/technology-transfer financial-system information when an applicable integration is available.",
+"preconditions": "Financial-system integration is available and licensing/technology-transfer financial data is recorded.",
+"action_or_input": "Process licensing/technology-transfer financial information with integration enabled.",
+"expected_result": "PMS updates or shares the financial-system information through the available integration.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-134",
+"source_id": "PMS-AFR-164: maintain license records with confidentiality controls",
+"purpose": "Verify PMS maintains license records with confidentiality controls restricting unauthorized access.",
+"preconditions": "Confidential license records exist in PMS.",
+"action_or_input": "Attempt to access confidential license records without authorization.",
+"expected_result": "PMS enforces confidentiality controls and denies unauthorized access.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-135",
+"source_id": "PMS-AFR-165: Applicant files appeals against rejected applications",
+"purpose": "Verify an Applicant can file an appeal against a rejected application.",
+"preconditions": "An application has status Rejected and is within the allowed appeal period with grounds and justification provided.",
+"action_or_input": "Applicant submits an appeal against the rejected application.",
+"expected_result": "PMS records the appeal for the rejected application.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-136",
+"source_id": "PMS-AFR-166: require appeals within applicable allowed time period",
+"purpose": "Verify PMS rejects an appeal filed after the applicable configured or institutionally defined allowed time period.",
+"preconditions": "An application was rejected and the allowed appeal time period has elapsed.",
+"action_or_input": "Applicant attempts to file an appeal after the allowed time period has expired.",
+"expected_result": "PMS rejects the untimely appeal.",
+"test_type": "boundary"
+},
+{
+"test_id": "TC-137",
+"source_id": "PMS-AFR-167: require grounds and justification for appeal",
+"purpose": "Verify PMS requires an Applicant to provide grounds and justification when filing an appeal.",
+"preconditions": "An Applicant is filing an appeal against a rejected application.",
+"action_or_input": "Applicant attempts to submit an appeal without grounds and justification.",
+"expected_result": "PMS rejects the appeal due to missing grounds and justification.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-138",
+"source_id": "PMS-AFR-168: Director reviews appeals and supporting documentation",
+"purpose": "Verify a Director can view and review an appeal and its supporting documentation.",
+"preconditions": "An appeal with supporting documentation is submitted for Director review.",
+"action_or_input": "Director opens the appeal and supporting documentation.",
+"expected_result": "PMS displays the appeal and supporting documentation to the Director.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-139",
+"source_id": "PMS-AFR-169: Director chooses Uphold Rejection, Remand for Amendment, or Modify Decision",
+"purpose": "Verify a Director can select Uphold Rejection, Remand for Amendment, or Modify Decision as an appeal outcome.",
+"preconditions": "An appeal is under Director review.",
+"action_or_input": "Director submits an appeal outcome of Uphold Rejection, Remand for Amendment, or Modify Decision.",
+"expected_result": "PMS accepts and records the selected appeal outcome.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-140",
+"source_id": "PMS-AFR-170: record appeal outcomes",
+"purpose": "Verify PMS records the appeal outcome on the appeal/application record.",
+"preconditions": "A Director chooses a valid appeal outcome.",
+"action_or_input": "Submit the appeal decision.",
+"expected_result": "PMS persists the recorded appeal outcome.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-141",
+"source_id": "PMS-AFR-171: initiate next steps after appeal outcome recording",
+"purpose": "Verify PMS initiates the applicable next step after recording an appeal outcome.",
+"preconditions": "A Director records a valid appeal outcome.",
+"action_or_input": "Record the appeal outcome.",
+"expected_result": "PMS initiates the next applicable workflow step corresponding to the recorded outcome.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-142",
+"source_id": "PMS-AFR-172: calculate and monitor Director review deadlines",
+"purpose": "Verify PMS calculates and monitors Director review deadlines using the applicable review-deadline rule.",
+"preconditions": "A Director review assignment exists with an applicable review-deadline rule.",
+"action_or_input": "Assign application for Director review.",
+"expected_result": "PMS calculates and monitors the Director review deadline.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-143",
+"source_id": "PMS-AFR-173: calculate and monitor revision/resubmission deadlines",
+"purpose": "Verify PMS calculates and monitors revision/resubmission deadlines using the applicable revision-deadline rule.",
+"preconditions": "An application enters revision/resubmission with an applicable revision-deadline rule.",
+"action_or_input": "Trigger revision/resubmission state.",
+"expected_result": "PMS calculates and monitors the revision/resubmission deadline.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-144",
+"source_id": "PMS-AFR-174: calculate and monitor office-action response deadlines",
+"purpose": "Verify PMS calculates and monitors office-action response deadlines when applicable deadline rules/data are available.",
+"preconditions": "An office action is recorded with applicable deadline rules/data available.",
+"action_or_input": "Record the office action.",
+"expected_result": "PMS calculates and monitors the office-action response deadline.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-145",
+"source_id": "PMS-AFR-175: calculate and monitor maintenance-fee deadlines",
+"purpose": "Verify PMS calculates and monitors maintenance-fee deadlines when applicable jurisdictional schedule rules/data are available.",
+"preconditions": "A Granted patent has jurisdictional maintenance schedule rules/data available.",
+"action_or_input": "Calculate/track maintenance schedule for the patent.",
+"expected_result": "PMS calculates and monitors the maintenance-fee deadline.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-146",
+"source_id": "PMS-AFR-176: generate deadline alert 30 days before deadline",
+"purpose": "Verify PMS generates a deadline alert 30 days before a tracked deadline where applicable.",
+"preconditions": "A tracked deadline is 30 days away and the 30-day alert interval applies.",
+"action_or_input": "Evaluate deadline alerts at 30 days prior to the deadline.",
+"expected_result": "PMS generates the 30-day advance deadline alert.",
+"test_type": "boundary"
+},
+{
+"test_id": "TC-147",
+"source_id": "PMS-AFR-177: generate deadline alert 15 days before deadline",
+"purpose": "Verify PMS generates a deadline alert 15 days before a tracked deadline where applicable.",
+"preconditions": "A tracked deadline is 15 days away and the 15-day alert interval applies.",
+"action_or_input": "Evaluate deadline alerts at 15 days prior to the deadline.",
+"expected_result": "PMS generates the 15-day advance deadline alert.",
+"test_type": "boundary"
+},
+{
+"test_id": "TC-148",
+"source_id": "PMS-AFR-178: generate deadline alert 5 days before deadline",
+"purpose": "Verify PMS generates a deadline alert 5 days before a tracked deadline where applicable.",
+"preconditions": "A tracked deadline is 5 days away and the 5-day alert interval applies.",
+"action_or_input": "Evaluate deadline alerts at 5 days prior to the deadline.",
+"expected_result": "PMS generates the 5-day advance deadline alert.",
+"test_type": "boundary"
+},
+{
+"test_id": "TC-149",
+"source_id": "PMS-AFR-179: send deadline notifications to relevant stakeholders",
+"purpose": "Verify PMS sends deadline notifications to relevant stakeholders.",
+"preconditions": "A deadline alert/event occurs for a tracked deadline with associated stakeholders.",
+"action_or_input": "Trigger deadline alert/notification processing.",
+"expected_result": "PMS sends deadline notifications to the relevant stakeholders.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-150",
+"source_id": "PMS-AFR-180: escalate missed deadlines per configured chain",
+"purpose": "Verify PMS triggers escalations for missed deadlines according to the configured escalation chain.",
+"preconditions": "A tracked deadline is missed and an escalation chain is configured.",
+"action_or_input": "Advance time past a tracked deadline without completion.",
+"expected_result": "PMS triggers escalation according to the configured escalation chain.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-151",
+"source_id": "PMS-AFR-181: log deadline tracking activities",
+"purpose": "Verify PMS logs deadline tracking activities.",
+"preconditions": "Deadline calculation, alert generation, or missed-deadline processing occurs.",
+"action_or_input": "Run deadline tracking evaluation.",
+"expected_result": "PMS records log entries for the deadline tracking activities.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-152",
+"source_id": "PMS-AFR-182: PCC_ADMIN and Directors generate application status and progress reports",
+"purpose": "Verify PCC_ADMIN and Directors can generate application status and progress reports.",
+"preconditions": "Authenticated PCC_ADMIN and Director users exist with application data.",
+"action_or_input": "Generate an application status and progress report as PCC_ADMIN and as Director.",
+"expected_result": "PMS generates the application status and progress report for both PCC_ADMIN and Director.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-153",
+"source_id": "PMS-AFR-183: PCC_ADMIN and Directors generate financial and budget reports",
+"purpose": "Verify PCC_ADMIN and Directors can generate financial and budget reports.",
+"preconditions": "Authenticated PCC_ADMIN and Director users exist with financial/budget data.",
+"action_or_input": "Generate a financial and budget report as PCC_ADMIN and as Director.",
+"expected_result": "PMS generates the financial and budget report for PCC_ADMIN and Director.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-154",
+"source_id": "PMS-AFR-184: PCC_ADMIN and Directors generate deadline and pending action reports",
+"purpose": "Verify PCC_ADMIN and Directors can generate deadline and pending action reports.",
+"preconditions": "Authenticated PCC_ADMIN and Director users exist with deadline/pending-action data.",
+"action_or_input": "Generate a deadline and pending action report as PCC_ADMIN and as Director.",
+"expected_result": "PMS generates the deadline and pending action report for PCC_ADMIN and Director.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-155",
+"source_id": "PMS-AFR-185: PCC_ADMIN and Directors generate inventor and co-inventor reports",
+"purpose": "Verify PCC_ADMIN and Directors can generate inventor and co-inventor reports.",
+"preconditions": "Authenticated PCC_ADMIN and Director users exist with inventor/co-inventor data.",
+"action_or_input": "Generate an inventor and co-inventor report as PCC_ADMIN and as Director.",
+"expected_result": "PMS generates the inventor and co-inventor report for PCC_ADMIN and Director.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-156",
+"source_id": "PMS-AFR-186: PCC_ADMIN and Directors generate patent portfolio analysis reports",
+"purpose": "Verify PCC_ADMIN and Directors can generate patent portfolio analysis reports.",
+"preconditions": "Authenticated PCC_ADMIN and Director users exist with patent portfolio data.",
+"action_or_input": "Generate a patent portfolio analysis report as PCC_ADMIN and as Director.",
+"expected_result": "PMS generates the patent portfolio analysis report for PCC_ADMIN and Director.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-157",
+"source_id": "PMS-AFR-187: PCC_ADMIN and Directors generate workload and assignment reports",
+"purpose": "Verify PCC_ADMIN and Directors can generate workload and assignment reports.",
+"preconditions": "Authenticated PCC_ADMIN and Director users exist with workload/assignment data.",
+"action_or_input": "Generate a workload and assignment report as PCC_ADMIN and as Director.",
+"expected_result": "PMS generates the workload and assignment report for PCC_ADMIN and Director.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-158",
+"source_id": "PMS-AFR-188: authorized users schedule reports",
+"purpose": "Verify authorized users can schedule reports.",
+"preconditions": "An authorized user accesses report scheduling.",
+"action_or_input": "Create a scheduled report configuration.",
+"expected_result": "PMS saves the report schedule for the authorized user.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-159",
+"source_id": "PMS-AFR-189: authorized users export reports",
+"purpose": "Verify authorized users can export reports.",
+"preconditions": "An authorized user generates a report in PMS.",
+"action_or_input": "Export the report.",
+"expected_result": "PMS produces an exported representation of the report for the authorized user.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-160",
+"source_id": "PMS-AFR-190: authorized users customize reports",
+"purpose": "Verify authorized users can customize reports.",
+"preconditions": "An authorized user configures report parameters/filters/fields.",
+"action_or_input": "Generate a report with customization options.",
+"expected_result": "PMS applies the customization options to the generated report.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-161",
+"source_id": "PMS-AFR-191: log access to reports for audit purposes",
+"purpose": "Verify PMS logs report access for audit purposes.",
+"preconditions": "An authorized user accesses or generates a report.",
+"action_or_input": "Access a report in PMS.",
+"expected_result": "PMS records an audit log entry for the report access.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-162",
+"source_id": "PMS-AFR-192: trigger email notification for application submission",
+"purpose": "Verify PMS triggers a system-generated email notification upon application submission.",
+"preconditions": "A valid patent application is submitted.",
+"action_or_input": "Submit the patent application.",
+"expected_result": "PMS triggers a system-generated email notification for the application submission.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-163",
+"source_id": "PMS-AFR-193: trigger email notification for application status changes",
+"purpose": "Verify PMS triggers a system-generated email notification when an application's status changes.",
+"preconditions": "An application undergoes a status change.",
+"action_or_input": "Change the application's status.",
+"expected_result": "PMS triggers a system-generated email notification for the status change.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-164",
+"source_id": "PMS-AFR-194: trigger email notification for assignment to Director",
+"purpose": "Verify PMS triggers a system-generated email notification upon assignment to a Director.",
+"preconditions": "An application is assigned to a Director.",
+"action_or_input": "Assign the application to the Director.",
+"expected_result": "PMS triggers a system-generated email notification for the Director assignment.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-165",
+"source_id": "PMS-AFR-195: trigger email notification for assignment to Attorney",
+"purpose": "Verify PMS triggers a system-generated email notification upon assignment to an Attorney.",
+"preconditions": "An application is assigned to an Attorney.",
+"action_or_input": "Assign the application to the Attorney.",
+"expected_result": "PMS triggers a system-generated email notification for the Attorney assignment.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-166",
+"source_id": "PMS-AFR-196: trigger email notification for review decisions",
+"purpose": "Verify PMS triggers a system-generated email notification for Director review decisions.",
+"preconditions": "A Director records a review decision on an application.",
+"action_or_input": "Submit a review decision.",
+"expected_result": "PMS triggers a system-generated email notification for the review decision.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-167",
+"source_id": "PMS-AFR-197: trigger email notification for budget approval or rejection",
+"purpose": "Verify PMS triggers a system-generated email notification when a budget is approved or rejected.",
+"preconditions": "A Director approves or rejects a proposed patent budget.",
+"action_or_input": "Record budget approval or budget rejection.",
+"expected_result": "PMS triggers a system-generated email notification for the budget approval or rejection.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-168",
+"source_id": "PMS-AFR-198: trigger email notification for filing confirmations",
+"purpose": "Verify PMS triggers a system-generated email notification for filing confirmations.",
+"preconditions": "A patent-office filing confirmation is recorded.",
+"action_or_input": "Record filing confirmation details.",
+"expected_result": "PMS triggers a system-generated email notification for the filing confirmation.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-169",
+"source_id": "PMS-AFR-199: trigger email notification for office actions",
+"purpose": "Verify PMS triggers a system-generated email notification for office actions.",
+"preconditions": "An office action is recorded for an application.",
+"action_or_input": "Record the office action.",
+"expected_result": "PMS triggers a system-generated email notification for the office action.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-170",
+"source_id": "PMS-AFR-200: trigger email notification for deadline reminders",
+"purpose": "Verify PMS triggers a system-generated email notification for deadline reminders.",
+"preconditions": "A tracked deadline reaches a reminder point.",
+"action_or_input": "Trigger deadline reminder generation.",
+"expected_result": "PMS triggers a system-generated email notification for the deadline reminder.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-171",
+"source_id": "PMS-AFR-201: trigger email notification for deadline escalations",
+"purpose": "Verify PMS triggers a system-generated email notification for deadline escalations.",
+"preconditions": "A deadline escalation is triggered for a missed deadline.",
+"action_or_input": "Escalate a missed deadline.",
+"expected_result": "PMS triggers a system-generated email notification for the deadline escalation.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-172",
+"source_id": "PMS-AFR-202: trigger email notification for maintenance-fee reminders",
+"purpose": "Verify PMS triggers a system-generated email notification for maintenance-fee reminders.",
+"preconditions": "A maintenance-fee reminder is triggered for a tracked patent.",
+"action_or_input": "Trigger a maintenance-fee reminder.",
+"expected_result": "PMS triggers a system-generated email notification for the maintenance-fee reminder.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-173",
+"source_id": "PMS-AFR-203: trigger email notification for document updates",
+"purpose": "Verify PMS triggers a system-generated email notification when a document is updated.",
+"preconditions": "An application document is updated.",
+"action_or_input": "Update an application document.",
+"expected_result": "PMS triggers a system-generated email notification for the document update.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-174",
+"source_id": "PMS-AFR-204: trigger email notification for document version changes",
+"purpose": "Verify PMS triggers a system-generated email notification when a document version changes.",
+"preconditions": "A new document version is created/changed.",
+"action_or_input": "Upload a new document version.",
+"expected_result": "PMS triggers a system-generated email notification for the document version change.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-175",
+"source_id": "PMS-AFR-206: notification scope limited to triggering system-generated emails",
+"purpose": "Verify PMS triggers the outbound email notification event within module scope without treating external email delivery infrastructure as PMS scope.",
+"preconditions": "External email delivery infrastructure is outside PMS scope.",
+"action_or_input": "Trigger a notifiable PMS event.",
+"expected_result": "PMS triggers the system-generated email notification within module scope.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-176",
+"source_id": "PMS-AFR-207: maintain audit trail of PMS actions",
+"purpose": "Verify PMS maintains an audit trail of PMS actions.",
+"preconditions": "PMS actions are performed by authorized users.",
+"action_or_input": "Execute PMS actions and query the audit trail.",
+"expected_result": "PMS maintains audit trail entries for the performed PMS actions.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-177",
+"source_id": "PMS-AFR-208: log all user actions",
+"purpose": "Verify PMS logs user actions across PMS operations.",
+"preconditions": "An authenticated user performs a PMS action.",
+"action_or_input": "Perform the user action.",
+"expected_result": "PMS records a log entry for the user action.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-178",
+"source_id": "PMS-AFR-209: log all status changes",
+"purpose": "Verify PMS logs application/record status changes.",
+"preconditions": "A PMS record transitions from one status to another.",
+"action_or_input": "Trigger a status change.",
+"expected_result": "PMS records a log entry capturing the status change.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-179",
+"source_id": "PMS-AFR-210: log all document modifications",
+"purpose": "Verify PMS logs document modifications.",
+"preconditions": "A document is modified in PMS.",
+"action_or_input": "Modify a document.",
+"expected_result": "PMS records a log entry for the document modification.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-180",
+"source_id": "PMS-AFR-211: audit log required fields",
+"purpose": "Verify PMS audit logs include user ID, action type, timestamp, application ID, previous state, and new state.",
+"preconditions": "A state-changing action occurs on a patent application.",
+"action_or_input": "Perform a state-changing action on an application and inspect the resulting audit log entry.",
+"expected_result": "The audit log entry includes user ID, action type, timestamp, application ID, previous state, and new state.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-181",
+"source_id": "PMS-AFR-212: immutable audit records for critical operations",
+"purpose": "Verify PMS creates immutable audit records for critical operations and prevents modification/deletion.",
+"preconditions": "A critical operation has generated an audit record.",
+"action_or_input": "Attempt to alter or delete the critical audit record.",
+"expected_result": "Modification or deletion of the critical audit record is prevented, preserving immutability.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-182",
+"source_id": "PMS-AFR-213: audit logs for compliance verification and forensic analysis",
+"purpose": "Verify audit logs are provided for compliance verification and forensic analysis.",
+"preconditions": "Audit log records exist for PMS operations.",
+"action_or_input": "Query audit logs by application ID, user ID, action type, or timestamp.",
+"expected_result": "PMS returns matching audit records to support compliance verification and forensic analysis.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-183",
+"source_id": "PMS-AFR-214: encryption at rest where implemented at boundary",
+"purpose": "Verify encryption at rest is applied to PMS data where this security control is implemented at the module/platform boundary.",
+"preconditions": "Encryption at rest is configured/implemented at the module/platform boundary.",
+"action_or_input": "Persist PMS data and inspect stored data / boundary encryption configuration.",
+"expected_result": "Stored PMS data is protected by encryption at rest at the implemented boundary.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-184",
+"source_id": "PMS-AFR-215: encryption in transit where implemented at boundary",
+"purpose": "Verify encryption in transit is applied to PMS data where this security control is implemented at the module/platform boundary.",
+"preconditions": "Encryption in transit is configured/implemented at the module/platform boundary.",
+"action_or_input": "Transmit PMS data across the module/platform boundary.",
+"expected_result": "Data in transit is protected by encryption in transit at the implemented boundary.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-185",
+"source_id": "PMS-AFR-216: require valid role assignment before accessing PMS functions",
+"purpose": "Verify PMS denies access to patent-management functions when a user lacks a valid PMS role assignment.",
+"preconditions": "A user has no valid assigned PMS role.",
+"action_or_input": "User attempts to access a patent-management function.",
+"expected_result": "PMS denies access because no valid PMS role is assigned.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-186",
+"source_id": "PMS-AFR-217: prevent attorney assignment until Director approval is recorded",
+"purpose": "Verify PMS prevents attorney assignment when Director approval has not been recorded.",
+"preconditions": "An application does not have a recorded Director approval.",
+"action_or_input": "PCC_ADMIN attempts to assign an attorney to the unapproved application.",
+"expected_result": "PMS prevents attorney assignment until Director approval is recorded.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-187",
+"source_id": "PMS-AFR-218: prevent external filing until required approvals and budget allocation are complete",
+"purpose": "Verify PMS prevents external filing when required approvals or budget allocation are incomplete.",
+"preconditions": "An application lacks required approvals or completed budget allocation.",
+"action_or_input": "Attempt to perform/record external filing before required approvals and budget allocation are complete.",
+"expected_result": "PMS prevents external filing until required approvals and budget allocation are complete.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-188",
+"source_id": "PMS-AFR-220: role-based access control for confidential patent information",
+"purpose": "Verify PMS enforces role-based access control over confidential patent information.",
+"preconditions": "Confidential patent information exists and a user lacks a role authorized for that confidential information.",
+"action_or_input": "Unauthorized role attempts to access confidential patent information.",
+"expected_result": "PMS denies access to the confidential patent information.",
+"test_type": "authorization"
+},
+{
+"test_id": "TC-189",
+"source_id": "PMS-AFR-221: maintain one active PCC_ADMIN as system oversight role",
+"purpose": "Verify PMS maintains one active PCC_ADMIN as the system oversight role.",
+"preconditions": "PMS system oversight role configuration is active.",
+"action_or_input": "Inspect active PCC_ADMIN oversight role assignment.",
+"expected_result": "PMS maintains one active PCC_ADMIN as the system oversight role.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-190",
+"source_id": "PMS-AFR-222: multiple Directors handle reviews by expertise domain",
+"purpose": "Verify multiple Directors can handle reviews across their respective expertise domains.",
+"preconditions": "Multiple Directors exist with distinct expertise domains and assigned applications in those domains.",
+"action_or_input": "Each Director reviews applications within their expertise domain.",
+"expected_result": "PMS supports multiple Directors handling domain reviews.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-191",
+"source_id": "PMS-AFR-223: multiple Attorneys from approved panels conduct assessments",
+"purpose": "Verify multiple Attorneys from approved panels can conduct legal assessments.",
+"preconditions": "Multiple Attorneys on approved panels exist and have assigned applications.",
+"action_or_input": "Multiple approved-panel Attorneys conduct and record legal assessments.",
+"expected_result": "PMS allows multiple approved-panel Attorneys to conduct legal assessments.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-192",
+"source_id": "PMS-AFR-224: multiple Applicants submit patent applications",
+"purpose": "Verify multiple Applicants can submit patent applications in PMS.",
+"preconditions": "Two or more valid Applicant users exist with complete applications.",
+"action_or_input": "Each Applicant submits a patent application.",
+"expected_result": "PMS accepts submissions from multiple Applicants.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-193",
+"source_id": "PMS-AFR-225: enforce status-driven handling and valid transitions",
+"purpose": "Verify PMS enforces defined business states and rejects invalid status-changing transitions.",
+"preconditions": "A patent application is in a given status and an invalid status transition is attempted.",
+"action_or_input": "Attempt a state-changing action that is invalid for the application's current status.",
+"expected_result": "PMS rejects the invalid transition and keeps the application in a valid state.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-194",
+"source_id": "PMS-AFR-226: support escalation mechanisms for delayed actions",
+"purpose": "Verify PMS supports escalation mechanisms when actions are delayed.",
+"preconditions": "A workflow action is delayed beyond its allowed timeframe.",
+"action_or_input": "Trigger delayed-action evaluation.",
+"expected_result": "PMS activates the configured escalation mechanism for the delayed action.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-195",
+"source_id": "PMS-AFR-227: permit parallel processing where explicitly defined or configured",
+"purpose": "Verify PMS allows parallel processing where an explicitly defined or configured PMS process permits it.",
+"preconditions": "An explicitly defined or configured PMS process permits parallel processing.",
+"action_or_input": "Execute the permitted parallel processing step.",
+"expected_result": "PMS permits the parallel processing step.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-195b",
+"source_id": "PMS-AFR-227: restrict parallel processing where not explicitly defined or configured",
+"purpose": "Verify PMS does not permit parallel processing where no explicitly defined or configured PMS process allows it.",
+"preconditions": "A process does not have an explicitly defined or configured rule permitting parallel processing.",
+"action_or_input": "Attempt parallel processing on that process.",
+"expected_result": "PMS does not permit parallel processing where not explicitly defined or configured.",
+"test_type": "validation"
+},
+{
+"test_id": "TC-196",
+"source_id": "PMS-AFR-228: patent-office system integration boundary",
+"purpose": "Verify PMS treats patent-office system integration as external unless recording filing, status, or communication data.",
+"preconditions": "External patent-office system is external to PMS and filing, status, or communication data is recorded in PMS.",
+"action_or_input": "Record filing, status, or communication data in PMS.",
+"expected_result": "PMS records the supported filing, status, or communication data within PMS scope.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-197",
+"source_id": "PMS-AFR-229: financial-system integration boundary",
+"purpose": "Verify PMS treats financial-system integration as external unless recording budget, authorization, or transaction metadata.",
+"preconditions": "External financial system is outside PMS and budget, authorization, or transaction metadata is recorded in PMS.",
+"action_or_input": "Record budget, authorization, or transaction metadata in PMS.",
+"expected_result": "PMS records the budget, authorization, or transaction metadata in PMS.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-198",
+"source_id": "PMS-AFR-230: document-management-system integration boundary",
+"purpose": "Verify PMS treats document-management-system integration as external unless storing document versions, access, or audit metadata.",
+"preconditions": "Document versions, access rules, or audit metadata are managed in PMS.",
+"action_or_input": "Store or access document versions, access controls, or audit metadata in PMS.",
+"expected_result": "PMS manages the supported document version, access, and audit metadata within PMS scope.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-199",
+"source_id": "PMS-AFR-231: external prior-art databases treated as query sources",
+"purpose": "Verify PMS queries external prior-art databases as query sources rather than treating them as PMS-owned repositories.",
+"preconditions": "Prior-art search queries external patent/publication sources.",
+"action_or_input": "Execute a prior-art search query.",
+"expected_result": "PMS retrieves search results from queried sources without treating external prior-art databases as PMS-owned repositories.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-200",
+"source_id": "PMS-AFR-232: external patent-office filing success not internally controlled",
+"purpose": "Verify PMS records submitted filing details and confirmations without treating external patent-office filing success as internally controlled.",
+"preconditions": "An Attorney submits external filing details and confirmation data to PMS.",
+"action_or_input": "Record external filing details and confirmation in PMS.",
+"expected_result": "PMS stores the submitted filing details and confirmation without treating external patent-office filing success as internally controlled.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-201",
+"source_id": "PMS-AFR-236: Director rejects proposed patent budget and records outcome",
+"purpose": "Verify a Director can reject a proposed patent budget and PMS records the rejection outcome.",
+"preconditions": "A proposed patent budget is available for Director review.",
+"action_or_input": "Director selects to reject the proposed patent budget.",
+"expected_result": "PMS records the budget rejection outcome.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-202",
+"source_id": "PMS-AFR-237: dashboards within PMS reporting scope",
+"purpose": "Verify PMS provides dashboards within the explicitly stated PMS reporting scope.",
+"preconditions": "An authorized user accesses PMS dashboards.",
+"action_or_input": "Open PMS dashboards.",
+"expected_result": "PMS displays dashboard views within the PMS reporting scope.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-203",
+"source_id": "PMS-AFR-238: historical data analysis within PMS reporting scope",
+"purpose": "Verify PMS provides historical data analysis within the explicitly stated PMS reporting scope.",
+"preconditions": "Historical PMS data exists and an authorized user requests historical analysis.",
+"action_or_input": "Run historical data analysis within PMS reporting scope.",
+"expected_result": "PMS returns historical data analysis results within PMS reporting scope.",
+"test_type": "functional"
+},
+{
+"test_id": "TC-204",
+"source_id": "PMS-AFR-239: trend reporting within PMS reporting scope",
+"purpose": "Verify PMS provides trend reporting within the explicitly stated PMS reporting scope.",
+"preconditions": "PMS data exists across periods and an authorized user requests trend reporting.",
+"action_or_input": "Generate a trend report within PMS reporting scope.",
+"expected_result": "PMS produces trend reporting outputs within PMS reporting scope.",
+"test_type": "functional"
+}
+]
