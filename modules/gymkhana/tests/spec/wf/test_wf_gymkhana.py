@@ -3,18 +3,16 @@ Spec tests derived from WF (Workflow / Business Workflow) design.
 Frozen design: docs/09-gymkhana/spec-tests/WF_DESIGN.json
 """
 
-import pytest
-from decimal import Decimal
 from datetime import date, time, timedelta
+from decimal import Decimal
+
+import pytest
 from django.test import TestCase
 from django.utils import timezone
 
 from modules.gymkhana.models import (
-    Club,
     ClubLeadership,
-    ClubMembership,
     PollVote,
-    VotingPoll,
 )
 from modules.gymkhana.services.applications import (
     apply_club_membership,

@@ -3,9 +3,10 @@ Spec tests derived from FR (Functional Requirements / CFR+AFR) design.
 Frozen design: docs/09-gymkhana/spec-tests/FR_DESIGN.json
 """
 
-import pytest
-from decimal import Decimal
 from datetime import date, time, timedelta
+from decimal import Decimal
+
+import pytest
 from django.test import TestCase
 from django.utils import timezone
 

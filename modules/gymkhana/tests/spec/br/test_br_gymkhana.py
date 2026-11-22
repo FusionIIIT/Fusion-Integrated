@@ -3,9 +3,9 @@ Spec tests derived from BR (Business Rules) design.
 Frozen design: docs/09-gymkhana/spec-tests/BR_DESIGN.json
 """
 
-import pytest
-from datetime import datetime, time, timedelta
+from datetime import time, timedelta
 from decimal import Decimal
+
 from django.test import SimpleTestCase
 
 from modules.gymkhana.domain.policy import (
@@ -34,7 +34,7 @@ class TestBRStudentLeadership(SimpleTestCase):
 
     def test_tc_br_001_p_valid_leadership(self):
         """TC-BR-001-P: Valid distinct positive student IDs accepted."""
-        ok, msg = validate_student_leadership(101, 102)
+        ok, _msg = validate_student_leadership(101, 102)
         assert ok is True
 
     def test_tc_br_001_n1_negative_coordinator(self):
@@ -61,12 +61,12 @@ class TestBRFacultyCouncillor(SimpleTestCase):
 
     def test_tc_br_002_p_valid(self):
         """TC-BR-002-P: Valid positive faculty ID accepted."""
-        ok, msg = validate_faculty_councillor(201)
+        ok, _msg = validate_faculty_councillor(201)
         assert ok is True
 
     def test_tc_br_002_n_negative(self):
         """TC-BR-002-N: Negative faculty ID rejected."""
-        ok, msg = validate_faculty_councillor(-5)
+        ok, _msg = validate_faculty_councillor(-5)
         assert ok is False
 
 
@@ -74,15 +74,15 @@ class TestBRClubCategory(SimpleTestCase):
     """TC-BR-003: Allowed Club Categories."""
 
     def test_tc_br_003_p_technical(self):
-        ok, msg = validate_club_category("Technical")
+        ok, _msg = validate_club_category("Technical")
         assert ok is True
 
     def test_tc_br_003_p_sports(self):
-        ok, msg = validate_club_category("Sports")
+        ok, _msg = validate_club_category("Sports")
         assert ok is True
 
     def test_tc_br_003_p_cultural(self):
-        ok, msg = validate_club_category("Cultural")
+        ok, _msg = validate_club_category("Cultural")
         assert ok is True
 
     def test_tc_br_003_n_invalid(self):
@@ -91,7 +91,7 @@ class TestBRClubCategory(SimpleTestCase):
         assert "invalid" in msg.lower()
 
     def test_tc_br_003_n_empty(self):
-        ok, msg = validate_club_category("")
+        ok, _msg = validate_club_category("")
         assert ok is False
 
 
@@ -99,11 +99,11 @@ class TestBRClubConfirmation(SimpleTestCase):
     """TC-BR-004: Club Confirmation Lifecycle."""
 
     def test_tc_br_004_p_open_to_confirmed(self):
-        ok, msg = validate_club_confirmation_transition("open")
+        ok, _msg = validate_club_confirmation_transition("open")
         assert ok is True
 
     def test_tc_br_004_n_already_confirmed(self):
-        ok, msg = validate_club_confirmation_transition("confirmed")
+        ok, _msg = validate_club_confirmation_transition("confirmed")
         assert ok is False
 
 
@@ -111,15 +111,15 @@ class TestBRBookingTimeRange(SimpleTestCase):
     """TC-BR-005: Valid Booking Time Range."""
 
     def test_tc_br_005_p_valid_range(self):
-        ok, msg = validate_booking_time_range(time(10, 0), time(12, 0))
+        ok, _msg = validate_booking_time_range(time(10, 0), time(12, 0))
         assert ok is True
 
     def test_tc_br_005_n_start_equals_end(self):
-        ok, msg = validate_booking_time_range(time(10, 0), time(10, 0))
+        ok, _msg = validate_booking_time_range(time(10, 0), time(10, 0))
         assert ok is False
 
     def test_tc_br_005_n_start_after_end(self):
-        ok, msg = validate_booking_time_range(time(14, 0), time(12, 0))
+        ok, _msg = validate_booking_time_range(time(14, 0), time(12, 0))
         assert ok is False
 
 
@@ -146,11 +146,11 @@ class TestBRMembershipApplication(SimpleTestCase):
     """TC-BR-007/008/009: Club Membership Rules."""
 
     def test_tc_br_007_p_confirmed_club(self):
-        ok, msg = validate_membership_application("confirmed", False)
+        ok, _msg = validate_membership_application("confirmed", False)
         assert ok is True
 
     def test_tc_br_007_n_unconfirmed_club(self):
-        ok, msg = validate_membership_application("open", False)
+        ok, _msg = validate_membership_application("open", False)
         assert ok is False
 
     def test_tc_br_009_n_duplicate(self):
@@ -176,11 +176,11 @@ class TestBRMembershipApproval(SimpleTestCase):
     """TC-BR-011: Membership Approval Transition."""
 
     def test_tc_br_011_p_open_to_confirmed(self):
-        ok, msg = validate_membership_approval_transition("open")
+        ok, _msg = validate_membership_approval_transition("open")
         assert ok is True
 
     def test_tc_br_011_n_already_confirmed(self):
-        ok, msg = validate_membership_approval_transition("confirmed")
+        ok, _msg = validate_membership_approval_transition("confirmed")
         assert ok is False
 
 
@@ -188,7 +188,7 @@ class TestBRPollCreation(SimpleTestCase):
     """TC-BR-012/013: Poll Creation and Targeting."""
 
     def test_tc_br_012_p_two_options(self):
-        ok, msg = validate_poll_creation(2, "2024", "CSE")
+        ok, _msg = validate_poll_creation(2, "2024", "CSE")
         assert ok is True
 
     def test_tc_br_012_n_one_option(self):
@@ -214,7 +214,7 @@ class TestBRVoteEligibility(SimpleTestCase):
         return timezone.now()
 
     def test_tc_br_014_p_eligible(self):
-        ok, msg = validate_vote_eligibility(
+        ok, _msg = validate_vote_eligibility(
             poll_is_active=True,
             expires_at=self._future(),
             current_time=self._now(),
@@ -303,11 +303,11 @@ class TestBRLeadershipSuccession(SimpleTestCase):
     """TC-BR-016: Leadership Succession."""
 
     def test_tc_br_016_p_not_superseded(self):
-        ok, msg = validate_leadership_succession(False)
+        ok, _msg = validate_leadership_succession(False)
         assert ok is True
 
     def test_tc_br_016_n_superseded(self):
-        ok, msg = validate_leadership_succession(True)
+        ok, _msg = validate_leadership_succession(True)
         assert ok is False
 
 
@@ -315,11 +315,11 @@ class TestBRBudgetAmount(SimpleTestCase):
     """TC-BR-017/018: Club Budget Validation."""
 
     def test_tc_br_017_p_valid_amount(self):
-        ok, msg = validate_budget_amount(Decimal("5000.00"), True)
+        ok, _msg = validate_budget_amount(Decimal("5000.00"), True)
         assert ok is True
 
     def test_tc_br_017_p_zero_amount(self):
-        ok, msg = validate_budget_amount(Decimal("0.00"), True)
+        ok, _msg = validate_budget_amount(Decimal("0.00"), True)
         assert ok is True
 
     def test_tc_br_017_n_negative(self):
@@ -337,11 +337,11 @@ class TestBREventReport(SimpleTestCase):
     """TC-BR-019: Event Report File Required."""
 
     def test_tc_br_019_p_has_file(self):
-        ok, msg = validate_event_report(True)
+        ok, _msg = validate_event_report(True)
         assert ok is True
 
     def test_tc_br_019_n_no_file(self):
-        ok, msg = validate_event_report(False)
+        ok, _msg = validate_event_report(False)
         assert ok is False
 
 
@@ -349,16 +349,16 @@ class TestBRConfiguredVenue(SimpleTestCase):
     """TC-BR-020: Configured Venue Required."""
 
     def test_tc_br_020_p_valid_venue(self):
-        ok, msg = validate_configured_venue("Student Activity Center (SAC)")
+        ok, _msg = validate_configured_venue("Student Activity Center (SAC)")
         assert ok is True
 
     def test_tc_br_020_n_invalid_venue(self):
-        ok, msg = validate_configured_venue("Random Field")
+        ok, _msg = validate_configured_venue("Random Field")
         assert ok is False
 
     def test_tc_br_020_all_configured(self):
         for venue in CONFIG_ALLOWED_VENUES:
-            ok, msg = validate_configured_venue(venue)
+            ok, _msg = validate_configured_venue(venue)
             assert ok is True, f"Venue {venue} should be valid"
 
 

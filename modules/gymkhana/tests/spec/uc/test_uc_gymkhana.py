@@ -3,18 +3,13 @@ Spec tests derived from UC (Use Case) design.
 Frozen design: docs/09-gymkhana/spec-tests/UC_DESIGN.json
 """
 
-import pytest
-from decimal import Decimal
 from datetime import date, time, timedelta
+from decimal import Decimal
+
+import pytest
 from django.test import TestCase
 from django.utils import timezone
 
-from modules.gymkhana.models import (
-    Club,
-    ClubLeadership,
-    ClubMembership,
-    VotingPoll,
-)
 from modules.gymkhana.services.applications import (
     apply_club_membership,
     approve_club_membership,
@@ -56,7 +51,7 @@ class TestUCClubRegistration(TestCase):
             co_coordinator_id=104,
             faculty_councillor_id=202,
         )
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: B017
             create_club(
                 name="Unique Club",
                 category="Cultural",
