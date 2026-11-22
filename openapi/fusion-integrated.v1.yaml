@@ -1674,6 +1674,731 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/superadmin/archive/:
+    get:
+      operationId: v1_superadmin_archive_list
+      summary: List historical archives
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HistoricalArchive'
+          description: ''
+    post:
+      operationId: v1_superadmin_archive_create
+      summary: Archive historical dataset
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HistoricalArchive'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HistoricalArchive'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HistoricalArchive'
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoricalArchive'
+          description: ''
+  /api/v1/superadmin/archive/{archive_id}/restore/:
+    post:
+      operationId: v1_superadmin_archive_restore_create
+      summary: Restore archived historical dataset
+      parameters:
+      - in: path
+        name: archive_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusReason'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StatusReason'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StatusReason'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoricalArchive'
+          description: ''
+  /api/v1/superadmin/archive/export/:
+    get:
+      operationId: v1_superadmin_archive_export_list
+      summary: Export historical archives
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HistoricalArchive'
+          description: ''
+  /api/v1/superadmin/audit/:
+    get:
+      operationId: v1_superadmin_audit_list
+      summary: List immutable audit logs
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditLog'
+          description: ''
+  /api/v1/superadmin/audit/export/:
+    get:
+      operationId: v1_superadmin_audit_export_list
+      summary: Export immutable audit logs
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditLog'
+          description: ''
+  /api/v1/superadmin/config/:
+    get:
+      operationId: v1_superadmin_config_list
+      summary: List active system parameters
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SystemParameter'
+          description: ''
+    post:
+      operationId: v1_superadmin_config_create
+      summary: Configure versioned system parameter
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSystemParameter'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UpdateSystemParameter'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateSystemParameter'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemParameter'
+          description: ''
+  /api/v1/superadmin/dashboard/:
+    get:
+      operationId: v1_superadmin_dashboard_retrieve
+      summary: Administrative dashboard metrics
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardMetrics'
+          description: ''
+  /api/v1/superadmin/purge/requests/:
+    get:
+      operationId: v1_superadmin_purge_requests_list
+      summary: List purge requests
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurgeRequest'
+          description: ''
+    post:
+      operationId: v1_superadmin_purge_requests_create
+      summary: Request permanent data purge
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestPurge'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RequestPurge'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RequestPurge'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurgeRequest'
+          description: ''
+  /api/v1/superadmin/purge/requests/{request_id}/authorize/:
+    post:
+      operationId: v1_superadmin_purge_requests_authorize_create
+      summary: Authorize or reject purge request
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorizePurge'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthorizePurge'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuthorizePurge'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurgeRequest'
+          description: ''
+  /api/v1/superadmin/roles/:
+    get:
+      operationId: v1_superadmin_roles_list
+      summary: List role assignments
+      parameters:
+      - in: query
+        name: role_name
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+      - in: query
+        name: user_id
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoleAssignment'
+          description: ''
+    post:
+      operationId: v1_superadmin_roles_create
+      summary: Assign additional role
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignRole'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AssignRole'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AssignRole'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleAssignment'
+          description: ''
+  /api/v1/superadmin/roles/{assignment_id}/extend/:
+    post:
+      operationId: v1_superadmin_roles_extend_create
+      summary: Extend role assignment validity
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtendRole'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExtendRole'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExtendRole'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleAssignment'
+          description: ''
+  /api/v1/superadmin/roles/{assignment_id}/reassign/:
+    post:
+      operationId: v1_superadmin_roles_reassign_create
+      summary: Reassign role with handover
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReassignRole'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReassignRole'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReassignRole'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleAssignment'
+          description: ''
+  /api/v1/superadmin/roles/{assignment_id}/revoke/:
+    post:
+      operationId: v1_superadmin_roles_revoke_create
+      summary: Revoke held role assignment
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusReason'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StatusReason'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StatusReason'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleAssignment'
+          description: ''
+  /api/v1/superadmin/users/:
+    get:
+      operationId: v1_superadmin_users_list
+      summary: List user accounts
+      parameters:
+      - in: query
+        name: search
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+      - in: query
+        name: user_type
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserAccount'
+          description: ''
+    post:
+      operationId: v1_superadmin_users_create
+      summary: Create new basic user account
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserAccount'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateUserAccount'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateUserAccount'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+          description: ''
+  /api/v1/superadmin/users/{user_id}/:
+    get:
+      operationId: v1_superadmin_users_retrieve
+      summary: Get user account detail
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+          description: ''
+    patch:
+      operationId: v1_superadmin_users_partial_update
+      summary: Update editable profile fields
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateUserProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateUserProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateUserProfile'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+          description: ''
+  /api/v1/superadmin/users/{user_id}/archive/:
+    post:
+      operationId: v1_superadmin_users_archive_create
+      summary: Archive deactivated user (BW-SA-08 Transition 1)
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusReason'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StatusReason'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StatusReason'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+          description: ''
+  /api/v1/superadmin/users/{user_id}/deactivate/:
+    post:
+      operationId: v1_superadmin_users_deactivate_create
+      summary: Deactivate user account
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusReason'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StatusReason'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StatusReason'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+          description: ''
+  /api/v1/superadmin/users/{user_id}/reactivate/:
+    post:
+      operationId: v1_superadmin_users_reactivate_create
+      summary: Reactivate deactivated user account
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusReason'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StatusReason'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StatusReason'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+          description: ''
+  /api/v1/superadmin/users/{user_id}/restore/:
+    post:
+      operationId: v1_superadmin_users_restore_create
+      summary: Restore archived user within reversibility window (BW-SA-07)
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusReason'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StatusReason'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StatusReason'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+          description: ''
+  /api/v1/superadmin/users/bulk-create/:
+    post:
+      operationId: v1_superadmin_users_bulk_create_create
+      summary: Bulk create users from CSV data
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkUserCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BulkUserCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BulkUserCreate'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkOperationResult'
+          description: ''
+  /api/v1/superadmin/users/bulk-status/:
+    post:
+      operationId: v1_superadmin_users_bulk_status_create
+      summary: Bulk update user activation statuses
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkStatusUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BulkStatusUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BulkStatusUpdate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkOperationResult'
+          description: ''
+  /api/v1/superadmin/users/export/:
+    get:
+      operationId: v1_superadmin_users_export_list
+      summary: Export user accounts directory
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserAccount'
+          description: ''
 components:
   schemas:
     AcademicDirectory:
@@ -1763,6 +2488,26 @@ components:
       - semester
       - semester_type
       - user_id
+    ActionEnum:
+      enum:
+      - APPROVE
+      - REJECT
+      type: string
+      description: |-
+        * `APPROVE` - APPROVE
+        * `REJECT` - REJECT
+    ActivationStatusEnum:
+      enum:
+      - ACTIVE
+      - DEACTIVATED
+      - ARCHIVED_REVERSIBLE
+      - ARCHIVED_PERMANENT
+      type: string
+      description: |-
+        * `ACTIVE` - Active
+        * `DEACTIVATED` - Deactivated
+        * `ARCHIVED_REVERSIBLE` - Archived (Reversible)
+        * `ARCHIVED_PERMANENT` - Archived (Permanently Non-Restorable)
     AddCandidates:
       type: object
       properties:
@@ -1981,6 +2726,41 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    AssignRole:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          minimum: 1
+        role_name:
+          type: string
+          maxLength: 128
+        valid_from:
+          type: string
+          format: date-time
+        valid_to:
+          type: string
+          format: date-time
+          nullable: true
+        scope_type:
+          type: string
+          default: ''
+          maxLength: 64
+        scope_id:
+          type: string
+          default: ''
+          maxLength: 64
+        is_singular:
+          type: boolean
+          default: false
+        reason:
+          type: string
+          default: ''
+          maxLength: 500
+      required:
+      - role_name
+      - user_id
+      - valid_from
     AudienceEnum:
       enum:
       - students
@@ -1993,6 +2773,74 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    AuditLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        event_type:
+          type: string
+          readOnly: true
+        actor_user_id:
+          type: integer
+          readOnly: true
+        target_entity:
+          type: string
+          readOnly: true
+        target_id:
+          type: string
+          readOnly: true
+        ip_address:
+          type: string
+          readOnly: true
+          nullable: true
+        action_details:
+          readOnly: true
+        is_immutable:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action_details
+      - actor_user_id
+      - created_at
+      - event_type
+      - id
+      - ip_address
+      - is_immutable
+      - target_entity
+      - target_id
+    AuthorizePurge:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+        reason:
+          type: string
+          default: ''
+          maxLength: 500
+      required:
+      - action
+    BulkOperationResult:
+      type: object
+      properties:
+        total:
+          type: integer
+        success_count:
+          type: integer
+        errors:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - errors
+      - success_count
+      - total
     BulkOutcome:
       type: object
       properties:
@@ -2027,6 +2875,24 @@ components:
       - moved
       - refused
       - results
+    BulkStatusUpdate:
+      type: object
+      properties:
+        user_ids:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+          minItems: 1
+        target_status:
+          $ref: '#/components/schemas/TargetStatusEnum'
+        reason:
+          type: string
+          maxLength: 500
+      required:
+      - reason
+      - target_status
+      - user_ids
     BulkTransition:
       type: object
       properties:
@@ -2045,6 +2911,15 @@ components:
       required:
       - application_ids
       - to_status
+    BulkUserCreate:
+      type: object
+      properties:
+        csv_data:
+          type: string
+        file:
+          type: string
+          format: uri
+          nullable: true
     Candidate:
       type: object
       description: A person as the ERP portal and the IAM describe them. Read-only
@@ -2315,6 +3190,66 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    CreateUserAccount:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          minimum: 1
+        institute_id:
+          type: string
+          maxLength: 64
+        email:
+          type: string
+          format: email
+        user_type:
+          $ref: '#/components/schemas/CreateUserAccountUserTypeEnum'
+        department:
+          type: string
+          default: ''
+          maxLength: 128
+        program:
+          type: string
+          default: ''
+          maxLength: 64
+        batch:
+          type: string
+          default: ''
+          maxLength: 32
+      required:
+      - email
+      - institute_id
+      - user_id
+      - user_type
+    CreateUserAccountUserTypeEnum:
+      enum:
+      - STUDENT
+      - FACULTY
+      - STAFF
+      type: string
+      description: |-
+        * `STUDENT` - STUDENT
+        * `FACULTY` - FACULTY
+        * `STAFF` - STAFF
+    DashboardMetrics:
+      type: object
+      properties:
+        total_users:
+          type: integer
+        active_users:
+          type: integer
+        deactivated_users:
+          type: integer
+        archived_reversible_users:
+          type: integer
+        archived_permanent_users:
+          type: integer
+      required:
+      - active_users
+      - archived_permanent_users
+      - archived_reversible_users
+      - deactivated_users
+      - total_users
     Detail:
       type: object
       properties:
@@ -2407,6 +3342,18 @@ components:
       - season_decision
       - semester
       - standing
+    ExtendRole:
+      type: object
+      properties:
+        new_valid_to:
+          type: string
+          format: date-time
+        reason:
+          type: string
+          maxLength: 500
+      required:
+      - new_valid_to
+      - reason
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2423,6 +3370,62 @@ components:
       - fee_reference
       - season
       - user_id
+    HistoricalArchive:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        entity_type:
+          type: string
+          readOnly: true
+        record_identifier:
+          type: string
+          readOnly: true
+        payload:
+          readOnly: true
+        backup_reference:
+          type: string
+          readOnly: true
+        retention_period_days:
+          type: integer
+          readOnly: true
+        purge_eligible_at:
+          type: string
+          format: date-time
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/HistoricalArchiveStatusEnum'
+          readOnly: true
+        archived_by_user_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - archived_by_user_id
+      - backup_reference
+      - created_at
+      - entity_type
+      - id
+      - payload
+      - purge_eligible_at
+      - record_identifier
+      - retention_period_days
+      - status
+    HistoricalArchiveStatusEnum:
+      enum:
+      - ARCHIVED
+      - RESTORED
+      - PURGED
+      type: string
+      description: |-
+        * `ARCHIVED` - Archived
+        * `RESTORED` - Restored
+        * `PURGED` - Purged
     IncidentRecorded:
       type: object
       properties:
@@ -3085,6 +4088,18 @@ components:
       properties:
         active_role:
           type: string
+    PatchedUpdateUserProfile:
+      type: object
+      properties:
+        department:
+          type: string
+          maxLength: 128
+        program:
+          type: string
+          maxLength: 64
+        batch:
+          type: string
+          maxLength: 32
     PlacementRecordDetail:
       type: object
       description: A student's own record, with what rules 22 and 24 still want from
@@ -3201,6 +4216,78 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    PurgeRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        archive_record:
+          type: integer
+        requested_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        request_reason:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/PurgeRequestStatusEnum'
+          readOnly: true
+        authorized_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        authorized_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        rejection_reason:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - archive_record
+      - authorized_at
+      - authorized_by_user_id
+      - created_at
+      - id
+      - rejection_reason
+      - request_reason
+      - requested_by_user_id
+      - status
+    PurgeRequestStatusEnum:
+      enum:
+      - PENDING
+      - AUTHORIZED
+      - REJECTED
+      - COMPLETED
+      type: string
+      description: |-
+        * `PENDING` - Pending Dual Authorization
+        * `AUTHORIZED` - Authorized
+        * `REJECTED` - Rejected
+        * `COMPLETED` - Purge Executed
+    ReassignRole:
+      type: object
+      properties:
+        successor_user_id:
+          type: integer
+          minimum: 1
+        effective_date:
+          type: string
+          format: date-time
+        handover_summary:
+          type: string
+          default: ''
+          maxLength: 1000
+      required:
+      - effective_date
+      - successor_user_id
     Recommendation:
       type: object
       description: |-
@@ -3466,6 +4553,90 @@ components:
       - message
       - reason
       - route
+    RequestPurge:
+      type: object
+      properties:
+        archive_id:
+          type: integer
+          minimum: 1
+        reason:
+          type: string
+          maxLength: 500
+      required:
+      - archive_id
+      - reason
+    RoleAssignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        role_name:
+          type: string
+          maxLength: 128
+        scope_type:
+          type: string
+          maxLength: 64
+        scope_id:
+          type: string
+          maxLength: 64
+        valid_from:
+          type: string
+          format: date-time
+        valid_to:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RoleAssignmentStatusEnum'
+          readOnly: true
+          default: SCHEDULED
+        is_singular:
+          type: boolean
+          default: false
+        assigned_by_user_id:
+          type: integer
+          readOnly: true
+        assignment_reason:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - assigned_by_user_id
+      - created_at
+      - id
+      - role_name
+      - status
+      - updated_at
+      - user_id
+      - valid_from
+    RoleAssignmentStatusEnum:
+      enum:
+      - SCHEDULED
+      - ACTIVE
+      - EXTENDED
+      - EXPIRED
+      - REVOKED
+      - REASSIGNED
+      type: string
+      description: |-
+        * `SCHEDULED` - Scheduled
+        * `ACTIVE` - Active
+        * `EXTENDED` - Extended
+        * `EXPIRED` - Expired
+        * `REVOKED` - Revoked
+        * `REASSIGNED` - Reassigned
     RoundOutcome:
       type: object
       properties:
@@ -3691,6 +4862,14 @@ components:
       required:
       - available
       - season
+    StatusReason:
+      type: object
+      properties:
+        reason:
+          type: string
+          maxLength: 500
+      required:
+      - reason
     SubmitOfferLetter:
       type: object
       properties:
@@ -3698,6 +4877,58 @@ components:
           type: integer
       required:
       - document_id
+    SystemParameter:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        parameter_key:
+          type: string
+          readOnly: true
+        parameter_value:
+          readOnly: true
+        version:
+          type: integer
+          readOnly: true
+          default: 1
+        effective_from:
+          type: string
+          format: date-time
+          readOnly: true
+        effective_to:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        is_active:
+          type: boolean
+          readOnly: true
+        updated_by_user_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - effective_from
+      - effective_to
+      - id
+      - is_active
+      - parameter_key
+      - parameter_value
+      - updated_by_user_id
+      - version
+    TargetStatusEnum:
+      enum:
+      - ACTIVE
+      - DEACTIVATED
+      type: string
+      description: |-
+        * `ACTIVE` - ACTIVE
+        * `DEACTIVATED` - DEACTIVATED
     TopicEnum:
       enum:
       - drive
@@ -3769,6 +5000,97 @@ components:
       - application_id
       - redacted
       - results
+    UpdateSystemParameter:
+      type: object
+      properties:
+        parameter_key:
+          type: string
+          maxLength: 128
+        parameter_value: {}
+        effective_from:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - parameter_key
+      - parameter_value
+    UserAccount:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        institute_id:
+          type: string
+          maxLength: 64
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        user_type:
+          $ref: '#/components/schemas/UserAccountUserTypeEnum'
+        activation_status:
+          allOf:
+          - $ref: '#/components/schemas/ActivationStatusEnum'
+          readOnly: true
+        deactivation_date:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        archival_date:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        reversibility_expires_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        department:
+          type: string
+          maxLength: 128
+        program:
+          type: string
+          maxLength: 64
+        batch:
+          type: string
+          maxLength: 32
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - activation_status
+      - archival_date
+      - created_at
+      - deactivation_date
+      - email
+      - id
+      - institute_id
+      - reversibility_expires_at
+      - updated_at
+      - user_id
+      - user_type
+    UserAccountUserTypeEnum:
+      enum:
+      - STUDENT
+      - FACULTY
+      - STAFF
+      type: string
+      description: |-
+        * `STUDENT` - Student
+        * `FACULTY` - Faculty
+        * `STAFF` - Staff
     UserRef:
       type: object
       properties:
