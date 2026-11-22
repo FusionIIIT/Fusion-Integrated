@@ -1,0 +1,965 @@
+[
+  {
+    "test_id": "UC-PMS-001-MAIN",
+    "source_id": "UC-PMS-001 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Create and submit a complete patent application for institutional processing.",
+    "preconditions": "Applicant has a valid PMS role. A submission draft can be created.",
+    "action_or_input": "1. Applicant enters title, abstract, detailed description, claims, inventor information, and supporting documents. 2. PMS validates required-field completeness and validates each submitted document as PDF, under 50 MB, and malware-free. 3. PMS classifies accepted documents by sensitivity. 4. Applicant confirms submission. 5. PMS accepts the application, assigns a unique application ID, sets status to Submitted, records history/audit data, and triggers the submission notification.",
+    "expected_result": "An accepted application has a unique ID and status Submitted; its submission/history/audit record exists.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-001-ALT01",
+    "source_id": "UC-PMS-001 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Create and submit a complete patent application for institutional processing.",
+    "preconditions": "Applicant has a valid PMS role. A submission draft can be created.",
+    "action_or_input": "If required information is incomplete, PMS identifies the missing information and keeps the application unsubmitted.",
+    "expected_result": "If required information is incomplete, PMS identifies the missing information and keeps the application unsubmitted.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-001-ALT02",
+    "source_id": "UC-PMS-001 Alternative Flows ALT02",
+    "purpose": "Exercise the explicitly specified alternative flows for Create and submit a complete patent application for institutional processing.",
+    "preconditions": "Applicant has a valid PMS role. A submission draft can be created.",
+    "action_or_input": "If a document fails format, size, or malware validation, PMS rejects that document and keeps the valid prior application state.",
+    "expected_result": "If a document fails format, size, or malware validation, PMS rejects that document and keeps the valid prior application state.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-001-EXC01",
+    "source_id": "UC-PMS-001 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Create and submit a complete patent application for institutional processing.",
+    "preconditions": "Applicant has a valid PMS role. A submission draft can be created.",
+    "action_or_input": "If an external validation dependency is unavailable, PMS does not treat the application as successfully accepted unless the required validation has completed.",
+    "expected_result": "If an external validation dependency is unavailable, PMS does not treat the application as successfully accepted unless the required validation has completed.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-002-MAIN",
+    "source_id": "UC-PMS-002 Main Success Scenario",
+    "purpose": "Exercise the main success flow for View the current status, progress, and recorded history of the Applicant's own applications.",
+    "preconditions": "Applicant has a valid PMS role and access to the selected application.",
+    "action_or_input": "1. Applicant selects one of their patent applications. 2. PMS displays current status/progress and the recorded application history available to the Applicant.",
+    "expected_result": "The Applicant has viewed current status/progress/history; no business state changes.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-002-ALT01",
+    "source_id": "UC-PMS-002 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for View the current status, progress, and recorded history of the Applicant's own applications.",
+    "preconditions": "Applicant has a valid PMS role and access to the selected application.",
+    "action_or_input": "Applicant may navigate among their own applications and available history entries.",
+    "expected_result": "Applicant may navigate among their own applications and available history entries.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-002-EXC01",
+    "source_id": "UC-PMS-002 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for View the current status, progress, and recorded history of the Applicant's own applications.",
+    "preconditions": "Applicant has a valid PMS role and access to the selected application.",
+    "action_or_input": "If the Applicant is not authorized for the selected record, PMS blocks access.",
+    "expected_result": "If the Applicant is not authorized for the selected record, PMS blocks access.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-003-MAIN",
+    "source_id": "UC-PMS-003 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Maintain inventor identities, ownership shares, consents, and agreements for an application.",
+    "preconditions": "Applicant has access to the application and the current role/status permits the requested change.",
+    "action_or_input": "1. Applicant adds or updates inventor information and ownership shares. 2. PMS validates inventor information and ownership percentages. 3. Where required, PMS records inventor consent and, where legally permitted and configured, collects/validates electronic signatures. 4. PMS records agreement information and notifies affected parties when inventor information changes.",
+    "expected_result": "Valid inventor/agreement information is stored; agreement-completion state is available for the filing prerequisite.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-003-ALT01",
+    "source_id": "UC-PMS-003 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Maintain inventor identities, ownership shares, consents, and agreements for an application.",
+    "preconditions": "Applicant has access to the application and the current role/status permits the requested change.",
+    "action_or_input": "Applicant may update the inventor set or ownership shares before filing, subject to applicable access/state rules.",
+    "expected_result": "Applicant may update the inventor set or ownership shares before filing, subject to applicable access/state rules.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-003-EXC01",
+    "source_id": "UC-PMS-003 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Maintain inventor identities, ownership shares, consents, and agreements for an application.",
+    "preconditions": "Applicant has access to the application and the current role/status permits the requested change.",
+    "action_or_input": "Invalid inventor information, ownership percentages, consent, or signature validation prevents the affected change from being accepted.",
+    "expected_result": "Invalid inventor information, ownership percentages, consent, or signature validation prevents the affected change from being accepted.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-004-MAIN",
+    "source_id": "UC-PMS-004 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Search prior-art sources and attach selected references to an application.",
+    "preconditions": "Actor has a valid PMS role; external search access/integration is available when an external query is required.",
+    "action_or_input": "1. Actor enters or optimizes search terms/classification information. 2. PMS queries available patent/publication sources and displays ranked results. 3. Actor reviews results and selects references. 4. PMS attaches selected references to the application and logs the search session.",
+    "expected_result": "Selected references, if any, are attached and the search session is logged.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-004-ALT01",
+    "source_id": "UC-PMS-004 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Search prior-art sources and attach selected references to an application.",
+    "preconditions": "Actor has a valid PMS role; external search access/integration is available when an external query is required.",
+    "action_or_input": "Actor may refine keywords/classification mapping and repeat the search.",
+    "expected_result": "Actor may refine keywords/classification mapping and repeat the search.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-004-EXC01",
+    "source_id": "UC-PMS-004 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Search prior-art sources and attach selected references to an application.",
+    "preconditions": "Actor has a valid PMS role; external search access/integration is available when an external query is required.",
+    "action_or_input": "If an external source is unavailable, PMS does not represent the external source as successfully queried; any already-recorded PMS data remains intact.",
+    "expected_result": "If an external source is unavailable, PMS does not represent the external source as successfully queried; any already-recorded PMS data remains intact.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-005-MAIN",
+    "source_id": "UC-PMS-005 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Revise an application after a Needs Revision or Rejected decision and resubmit it for a new review cycle.",
+    "preconditions": "Application status is Needs Revision or Rejected; the 60-day resubmission period has not expired.",
+    "action_or_input": "1. Applicant reviews the Director feedback. 2. Applicant edits permitted application content/documents and uploads revised versions. 3. PMS validates that the resubmission addresses the Director feedback and applies document/version rules. 4. Applicant submits the revision. 5. PMS records the revised version and starts a new review cycle.",
+    "expected_result": "A revised application is recorded for a new review cycle.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-005-ALT01",
+    "source_id": "UC-PMS-005 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Revise an application after a Needs Revision or Rejected decision and resubmit it for a new review cycle.",
+    "preconditions": "Application status is Needs Revision or Rejected; the 60-day resubmission period has not expired.",
+    "action_or_input": "The Applicant may save revisions before final resubmission while the permitted revision state remains active.",
+    "expected_result": "The Applicant may save revisions before final resubmission while the permitted revision state remains active.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-005-EXC01",
+    "source_id": "UC-PMS-005 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Revise an application after a Needs Revision or Rejected decision and resubmit it for a new review cycle.",
+    "preconditions": "Application status is Needs Revision or Rejected; the 60-day resubmission period has not expired.",
+    "action_or_input": "If the deadline has expired, PMS changes the application to Expired and does not accept a late resubmission.",
+    "expected_result": "If the deadline has expired, PMS changes the application to Expired and does not accept a late resubmission.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-005-EXC02",
+    "source_id": "UC-PMS-005 Exception Flows EXC02",
+    "purpose": "Exercise the explicitly specified exception flows for Revise an application after a Needs Revision or Rejected decision and resubmit it for a new review cycle.",
+    "preconditions": "Application status is Needs Revision or Rejected; the 60-day resubmission period has not expired.",
+    "action_or_input": "If the submitted revision does not address the recorded Director feedback, PMS rejects the resubmission and retains the prior valid state.",
+    "expected_result": "If the submitted revision does not address the recorded Director feedback, PMS rejects the resubmission and retains the prior valid state.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-006-MAIN",
+    "source_id": "UC-PMS-006 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Withdraw an application when the applicable pre-filing status permits withdrawal.",
+    "preconditions": "Application has not reached Filed status and the current application status is configured/defined as withdrawal-eligible.",
+    "action_or_input": "1. PMS checks that withdrawal is allowed for the current application status and before filing. 2. Applicant provides a withdrawal reason. 3. Where the applicable process requires it, PMS records co-inventor consent. 4. Applicant confirms withdrawal. 5. PMS sets status to Withdrawn, removes the application from the active queue, and records withdrawal history/status change.",
+    "expected_result": "The application is Withdrawn and no longer appears in the active queue.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-006-ALT01",
+    "source_id": "UC-PMS-006 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Withdraw an application when the applicable pre-filing status permits withdrawal.",
+    "preconditions": "Application has not reached Filed status and the current application status is configured/defined as withdrawal-eligible.",
+    "action_or_input": "None beyond the conditional co-inventor-consent requirement.",
+    "expected_result": "None beyond the conditional co-inventor-consent requirement.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-006-EXC01",
+    "source_id": "UC-PMS-006 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Withdraw an application when the applicable pre-filing status permits withdrawal.",
+    "preconditions": "Application has not reached Filed status and the current application status is configured/defined as withdrawal-eligible.",
+    "action_or_input": "If the current status is not withdrawal-eligible, PMS blocks withdrawal and retains the current state.",
+    "expected_result": "If the current status is not withdrawal-eligible, PMS blocks withdrawal and retains the current state.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-007-MAIN",
+    "source_id": "UC-PMS-007 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Assign a Submitted application to an eligible Director and start the review timeline.",
+    "preconditions": "Application status is Submitted; PCC_ADMIN is authorized, or configured automatic routing is enabled.",
+    "action_or_input": "1. PMS/PCC_ADMIN evaluates Director expertise, workload, and conflict-of-interest constraints. 2. PMS prevents assignment to a Director who is listed as an inventor; PCC_ADMIN cannot act as reviewer where they are an inventor. 3. PCC_ADMIN confirms the selected Director, or PMS performs configured automatic routing using the same rules. 4. PMS records the assignment, sets status to Under Review, notifies the Director, and initiates the review deadline.",
+    "expected_result": "The application is assigned and status is Under Review, or remains Submitted if assignment is blocked.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-007-ALT01",
+    "source_id": "UC-PMS-007 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Assign a Submitted application to an eligible Director and start the review timeline.",
+    "preconditions": "Application status is Submitted; PCC_ADMIN is authorized, or configured automatic routing is enabled.",
+    "action_or_input": "Automatic routing may perform the assignment without treating the System as a primary actor.",
+    "expected_result": "Automatic routing may perform the assignment without treating the System as a primary actor.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-007-EXC01",
+    "source_id": "UC-PMS-007 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Assign a Submitted application to an eligible Director and start the review timeline.",
+    "preconditions": "Application status is Submitted; PCC_ADMIN is authorized, or configured automatic routing is enabled.",
+    "action_or_input": "If no eligible assignment is available, PMS leaves the application Submitted and records/raises the exceptional case for PCC_ADMIN handling.",
+    "expected_result": "If no eligible assignment is available, PMS leaves the application Submitted and records/raises the exceptional case for PCC_ADMIN handling.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-008-MAIN",
+    "source_id": "UC-PMS-008 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Review an assigned application and record one supported technical-merit decision.",
+    "preconditions": "Director is the assigned, non-conflicted reviewer; the application is Under Review.",
+    "action_or_input": "1. Director reviews application details, documents, and supporting materials. 2. Director selects exactly one outcome: Approve, Reject, or Needs Revision. 3. Director enters a detailed justification of at least 50 characters. 4. Director submits the decision within the 15-business-day review period. 5. PMS records the decision/audit trail. Approved applications become eligible for attorney assignment; Reject/Needs Revision decisions trigger detailed feedback to the Applicant.",
+    "expected_result": "One review outcome is recorded with justification and audit history.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-008-ALT01",
+    "source_id": "UC-PMS-008 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Review an assigned application and record one supported technical-merit decision.",
+    "preconditions": "Director is the assigned, non-conflicted reviewer; the application is Under Review.",
+    "action_or_input": "Reject and Needs Revision are valid alternative outcomes to Approve.",
+    "expected_result": "Reject and Needs Revision are valid alternative outcomes to Approve.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-008-EXC01",
+    "source_id": "UC-PMS-008 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Review an assigned application and record one supported technical-merit decision.",
+    "preconditions": "Director is the assigned, non-conflicted reviewer; the application is Under Review.",
+    "action_or_input": "A decision without the required justification is not accepted.",
+    "expected_result": "A decision without the required justification is not accepted.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-008-EXC02",
+    "source_id": "UC-PMS-008 Exception Flows EXC02",
+    "purpose": "Exercise the explicitly specified exception flows for Review an assigned application and record one supported technical-merit decision.",
+    "preconditions": "Director is the assigned, non-conflicted reviewer; the application is Under Review.",
+    "action_or_input": "A conflicted/unassigned Director is not allowed to submit the review decision.",
+    "expected_result": "A conflicted/unassigned Director is not allowed to submit the review decision.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-009-MAIN",
+    "source_id": "UC-PMS-009 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Review filing/prosecution costs and record a budget decision or escalation.",
+    "preconditions": "Application status is Approved.",
+    "action_or_input": "1. PMS presents filing fees, attorney fees, administrative costs, and available budget information where such data is available. 2. Director reviews the proposed cost. 3. If the cost is within the configured threshold, Director records the budget decision. 4. If the cost exceeds the configured threshold, PMS routes/escalates the case to the applicable higher authority. 5. PMS records financial/authorization metadata and triggers the applicable budget notification.",
+    "expected_result": "Budget decision or escalation state is recorded with audit/financial metadata.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-009-ALT01",
+    "source_id": "UC-PMS-009 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Review filing/prosecution costs and record a budget decision or escalation.",
+    "preconditions": "Application status is Approved.",
+    "action_or_input": "Within-threshold outcome may be Budget Approved or Budget Rejected.",
+    "expected_result": "Within-threshold outcome may be Budget Approved or Budget Rejected.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-009-ALT02",
+    "source_id": "UC-PMS-009 Alternative Flows ALT02",
+    "purpose": "Exercise the explicitly specified alternative flows for Review filing/prosecution costs and record a budget decision or escalation.",
+    "preconditions": "Application status is Approved.",
+    "action_or_input": "Above-threshold cases result in Escalated rather than an invented higher-authority decision.",
+    "expected_result": "Above-threshold cases result in Escalated rather than an invented higher-authority decision.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-009-EXC01",
+    "source_id": "UC-PMS-009 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Review filing/prosecution costs and record a budget decision or escalation.",
+    "preconditions": "Application status is Approved.",
+    "action_or_input": "If budget-availability data is required and available but validation fails, PMS does not record approval.",
+    "expected_result": "If budget-availability data is required and available but validation fails, PMS does not record approval.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-010-MAIN",
+    "source_id": "UC-PMS-010 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Select and assign an eligible Attorney to an Approved application.",
+    "preconditions": "Application status is Approved; PCC_ADMIN is authorized.",
+    "action_or_input": "1. PCC_ADMIN reviews eligible attorneys using approved-panel status, expertise, workload, conflict-of-interest, and permitted Applicant preference. 2. PMS blocks a non-panel attorney unless a recorded institutional exception permits the assignment. 3. PCC_ADMIN selects and records the Attorney assignment. 4. PMS records the assignment and notifies the Attorney for acceptance/decline.",
+    "expected_result": "An Attorney assignment is recorded and is awaiting/subject to the Attorney response.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-010-ALT01",
+    "source_id": "UC-PMS-010 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Select and assign an eligible Attorney to an Approved application.",
+    "preconditions": "Application status is Approved; PCC_ADMIN is authorized.",
+    "action_or_input": "A preferred Attorney is considered only when that Attorney is in the approved panel.",
+    "expected_result": "A preferred Attorney is considered only when that Attorney is in the approved panel.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-010-ALT02",
+    "source_id": "UC-PMS-010 Alternative Flows ALT02",
+    "purpose": "Exercise the explicitly specified alternative flows for Select and assign an eligible Attorney to an Approved application.",
+    "preconditions": "Application status is Approved; PCC_ADMIN is authorized.",
+    "action_or_input": "An approved institutional exception may permit a non-panel attorney.",
+    "expected_result": "An approved institutional exception may permit a non-panel attorney.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-010-EXC01",
+    "source_id": "UC-PMS-010 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Select and assign an eligible Attorney to an Approved application.",
+    "preconditions": "Application status is Approved; PCC_ADMIN is authorized.",
+    "action_or_input": "If conflict-of-interest or other assignment constraints fail, PMS does not record the assignment.",
+    "expected_result": "If conflict-of-interest or other assignment constraints fail, PMS does not record the assignment.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-011-MAIN",
+    "source_id": "UC-PMS-011 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Record the assigned Attorney's acceptance or decline decision.",
+    "preconditions": "An assignment to the Attorney exists.",
+    "action_or_input": "1. Attorney reviews the assignment. 2. Attorney chooses Accept or Decline. 3. PMS records the response. 4. On acceptance, PMS records the assignment as accepted/Attorney Assigned; on decline, PMS records Pending Review as applicable and notifies PCC_ADMIN.",
+    "expected_result": "The Attorney response and applicable assignment/application state are recorded.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-011-ALT01",
+    "source_id": "UC-PMS-011 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Record the assigned Attorney's acceptance or decline decision.",
+    "preconditions": "An assignment to the Attorney exists.",
+    "action_or_input": "Accept and Decline are the two supported outcomes.",
+    "expected_result": "Accept and Decline are the two supported outcomes.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-011-EXC01",
+    "source_id": "UC-PMS-011 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Record the assigned Attorney's acceptance or decline decision.",
+    "preconditions": "An assignment to the Attorney exists.",
+    "action_or_input": "If no active assignment exists for the Attorney, PMS does not accept a response.",
+    "expected_result": "If no active assignment exists for the Attorney, PMS does not accept a response.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-012-MAIN",
+    "source_id": "UC-PMS-012 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Record legal/patentability analysis and a supported filing recommendation.",
+    "preconditions": "Attorney has the assigned application and required access.",
+    "action_or_input": "1. Attorney reviews the application and performs/records relevant prior-art research. 2. Attorney evaluates novelty, non-obviousness, and utility. 3. Attorney records a detailed patentability opinion. 4. Attorney selects one recommendation: File Patent, Do Not File, or Needs Amendment. 5. PMS records the opinion and notifies relevant stakeholders.",
+    "expected_result": "A patentability opinion and recommendation are recorded.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-012-ALT01",
+    "source_id": "UC-PMS-012 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Record legal/patentability analysis and a supported filing recommendation.",
+    "preconditions": "Attorney has the assigned application and required access.",
+    "action_or_input": "Attorney may request additional information or an extension where PMS/the applicable process supports it.",
+    "expected_result": "Attorney may request additional information or an extension where PMS/the applicable process supports it.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-012-EXC01",
+    "source_id": "UC-PMS-012 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Record legal/patentability analysis and a supported filing recommendation.",
+    "preconditions": "Attorney has the assigned application and required access.",
+    "action_or_input": "If the opinion does not contain one supported recommendation, PMS does not finalize the opinion.",
+    "expected_result": "If the opinion does not contain one supported recommendation, PMS does not finalize the opinion.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-013-MAIN",
+    "source_id": "UC-PMS-013 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Prepare a filing package, perform supported validation, submit externally, and record filing confirmation in PMS.",
+    "preconditions": "Required approvals and budget allocation are complete; inventor agreements are complete; Attorney has filing authority/access.",
+    "action_or_input": "1. Attorney prepares the application package. 2. Where validation rules are available, PMS validates the package against applicable patent-office standards. 3. For an international filing, Attorney records the required additional justification. 4. Attorney submits the package to the selected patent office outside PMS. 5. Attorney/PMS records the external filing ID, filing date, and confirmation. 6. PMS sets application status to Filed, records audit/history, and triggers filing confirmation.",
+    "expected_result": "External filing details are recorded and application status is Filed.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-013-ALT01",
+    "source_id": "UC-PMS-013 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Prepare a filing package, perform supported validation, submit externally, and record filing confirmation in PMS.",
+    "preconditions": "Required approvals and budget allocation are complete; inventor agreements are complete; Attorney has filing authority/access.",
+    "action_or_input": "National and international filings use their applicable requirements; international filing additionally requires justification.",
+    "expected_result": "National and international filings use their applicable requirements; international filing additionally requires justification.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-013-EXC01",
+    "source_id": "UC-PMS-013 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Prepare a filing package, perform supported validation, submit externally, and record filing confirmation in PMS.",
+    "preconditions": "Required approvals and budget allocation are complete; inventor agreements are complete; Attorney has filing authority/access.",
+    "action_or_input": "If a required approval/budget/agreement prerequisite is missing, PMS blocks filing.",
+    "expected_result": "If a required approval/budget/agreement prerequisite is missing, PMS blocks filing.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-013-EXC02",
+    "source_id": "UC-PMS-013 Exception Flows EXC02",
+    "purpose": "Exercise the explicitly specified exception flows for Prepare a filing package, perform supported validation, submit externally, and record filing confirmation in PMS.",
+    "preconditions": "Required approvals and budget allocation are complete; inventor agreements are complete; Attorney has filing authority/access.",
+    "action_or_input": "If external submission or confirmation is not obtained, PMS does not represent the filing as successfully Filed.",
+    "expected_result": "If external submission or confirmation is not obtained, PMS does not represent the filing as successfully Filed.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-014-MAIN",
+    "source_id": "UC-PMS-014 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Record official patent-office communication, including an office action, for lifecycle tracking.",
+    "preconditions": "Application/family record exists; Attorney has access.",
+    "action_or_input": "1. Attorney records the communication type, date, details, and supporting document/identifier. 2. PMS logs the communication. 3. If the communication is an office action, PMS creates/updates the office-action tracking information and triggers the office-action notification.",
+    "expected_result": "The official communication is recorded; office actions are available for response tracking.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-014-ALT01",
+    "source_id": "UC-PMS-014 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Record official patent-office communication, including an office action, for lifecycle tracking.",
+    "preconditions": "Application/family record exists; Attorney has access.",
+    "action_or_input": "Non-office-action official communications are recorded without initiating an office-action response path.",
+    "expected_result": "Non-office-action official communications are recorded without initiating an office-action response path.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-014-EXC01",
+    "source_id": "UC-PMS-014 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Record official patent-office communication, including an office action, for lifecycle tracking.",
+    "preconditions": "Application/family record exists; Attorney has access.",
+    "action_or_input": "Invalid/unrelated communication data is not attached to another application.",
+    "expected_result": "Invalid/unrelated communication data is not attached to another application.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-015-MAIN",
+    "source_id": "UC-PMS-015 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Prepare, finalize, and record submission of an office-action response within applicable timing rules.",
+    "preconditions": "Office action exists; Attorney has access; applicable deadline/extension data is available where required.",
+    "action_or_input": "1. Attorney reviews the office action and prepares a draft response. 2. If Applicant review is required, PMS makes the draft available for UC-PMS-029 and records the response as awaiting Applicant approval. 3. If Applicant review is not required, or after required Applicant approval is recorded, Attorney finalizes the response. 4. Attorney submits the response externally and records submission/status in PMS. 5. PMS updates response tracking and audit/history information.",
+    "expected_result": "Response submission/extension status is recorded.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-015-ALT01",
+    "source_id": "UC-PMS-015 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Prepare, finalize, and record submission of an office-action response within applicable timing rules.",
+    "preconditions": "Office action exists; Attorney has access; applicable deadline/extension data is available where required.",
+    "action_or_input": "If additional time is needed and the applicable process permits an extension, Attorney records/files an extension request.",
+    "expected_result": "If additional time is needed and the applicable process permits an extension, Attorney records/files an extension request.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-015-EXC01",
+    "source_id": "UC-PMS-015 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Prepare, finalize, and record submission of an office-action response within applicable timing rules.",
+    "preconditions": "Office action exists; Attorney has access; applicable deadline/extension data is available where required.",
+    "action_or_input": "PMS does not mark a response submitted unless the required Applicant approval (when applicable) and submission record exist.",
+    "expected_result": "PMS does not mark a response submitted unless the required Applicant approval (when applicable) and submission record exist.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-015-EXC02",
+    "source_id": "UC-PMS-015 Exception Flows EXC02",
+    "purpose": "Exercise the explicitly specified exception flows for Prepare, finalize, and record submission of an office-action response within applicable timing rules.",
+    "preconditions": "Office action exists; Attorney has access; applicable deadline/extension data is available where required.",
+    "action_or_input": "A missed deadline is handled by the deadline/escalation rules; PMS does not invent a legal outcome.",
+    "expected_result": "A missed deadline is handled by the deadline/escalation rules; PMS does not invent a legal outcome.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-016-MAIN",
+    "source_id": "UC-PMS-016 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Monitor calculated deadlines, reminders, missed-deadline escalations, and pending actions.",
+    "preconditions": "PCC_ADMIN has an active authorized role; deadline records may exist.",
+    "action_or_input": "1. PMS calculates/maintains applicable review, revision, office-action, and maintenance deadlines using available rules/data. 2. PMS generates configured 30/15/5-day alerts where applicable and triggers notifications. 3. PCC_ADMIN reviews upcoming/missed deadlines and escalation records. 4. PCC_ADMIN routes or handles delayed-action exceptional cases within PMS scope. 5. PMS logs deadline-tracking/escalation activity.",
+    "expected_result": "Deadline and escalation records are current and visible to authorized actors.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-016-ALT01",
+    "source_id": "UC-PMS-016 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Monitor calculated deadlines, reminders, missed-deadline escalations, and pending actions.",
+    "preconditions": "PCC_ADMIN has an active authorized role; deadline records may exist.",
+    "action_or_input": "Where deadline rules/data are unavailable, PMS does not fabricate a deadline; the item remains flagged as requiring applicable data/configuration.",
+    "expected_result": "Where deadline rules/data are unavailable, PMS does not fabricate a deadline; the item remains flagged as requiring applicable data/configuration.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-016-EXC01",
+    "source_id": "UC-PMS-016 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Monitor calculated deadlines, reminders, missed-deadline escalations, and pending actions.",
+    "preconditions": "PCC_ADMIN has an active authorized role; deadline records may exist.",
+    "action_or_input": "A missed deadline may be escalated according to the configured chain; legal consequences outside PMS are not inferred.",
+    "expected_result": "A missed deadline may be escalated according to the configured chain; legal consequences outside PMS are not inferred.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-017-MAIN",
+    "source_id": "UC-PMS-017 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Track granted patents, maintenance schedules, renewal decisions, and recorded maintenance actions.",
+    "preconditions": "Patent status is Granted for post-grant tracking.",
+    "action_or_input": "1. PMS activates post-grant tracking and calculates the applicable maintenance schedule where schedule rules/data are available. 2. Attorney monitors the upcoming maintenance deadline and requests an explicit renewal decision from the Director. 3. After a Renew decision is recorded through UC-PMS-018, Attorney processes/records the maintenance action, transaction information, and resulting status. 4. PMS maintains renewal history and schedules the next maintenance cycle.",
+    "expected_result": "Post-grant maintenance state/history is updated according to the Director decision.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-017-ALT01",
+    "source_id": "UC-PMS-017 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Track granted patents, maintenance schedules, renewal decisions, and recorded maintenance actions.",
+    "preconditions": "Patent status is Granted for post-grant tracking.",
+    "action_or_input": "If the Director records Do Not Renew, no renewal maintenance action is recorded as approved.",
+    "expected_result": "If the Director records Do Not Renew, no renewal maintenance action is recorded as approved.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-017-EXC01",
+    "source_id": "UC-PMS-017 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Track granted patents, maintenance schedules, renewal decisions, and recorded maintenance actions.",
+    "preconditions": "Patent status is Granted for post-grant tracking.",
+    "action_or_input": "If schedule rules/data are unavailable, PMS does not fabricate a maintenance schedule.",
+    "expected_result": "If schedule rules/data are unavailable, PMS does not fabricate a maintenance schedule.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-018-MAIN",
+    "source_id": "UC-PMS-018 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Record the required Renew or Do Not Renew decision for an upcoming maintenance deadline.",
+    "preconditions": "Patent is in post-grant tracking and a renewal decision is due.",
+    "action_or_input": "1. Director reviews the patent and available maintenance information. 2. Director chooses Renew or Do Not Renew. 3. PMS records the decision and makes it available to the Attorney for the next applicable maintenance action.",
+    "expected_result": "One renewal decision is recorded for the maintenance cycle.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-018-ALT01",
+    "source_id": "UC-PMS-018 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Record the required Renew or Do Not Renew decision for an upcoming maintenance deadline.",
+    "preconditions": "Patent is in post-grant tracking and a renewal decision is due.",
+    "action_or_input": "Renew and Do Not Renew are the supported outcomes.",
+    "expected_result": "Renew and Do Not Renew are the supported outcomes.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-018-EXC01",
+    "source_id": "UC-PMS-018 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Record the required Renew or Do Not Renew decision for an upcoming maintenance deadline.",
+    "preconditions": "Patent is in post-grant tracking and a renewal decision is due.",
+    "action_or_input": "If the patent is not in the applicable Granted/post-grant context, PMS does not accept the renewal decision.",
+    "expected_result": "If the patent is not in the applicable Granted/post-grant context, PMS does not accept the renewal decision.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-019-MAIN",
+    "source_id": "UC-PMS-019 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Upload, version, archive, and access application documents under role/status controls.",
+    "preconditions": "User has a valid PMS role; requested action is permitted for the role and application status.",
+    "action_or_input": "1. User uploads a new document version where permitted. 2. PMS assigns the next version number and archives the previous version. 3. PMS records the modification user and timestamp. 4. Authorized users may access previous versions according to role/status rules.",
+    "expected_result": "Document version history and access metadata are updated consistently.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-019-ALT01",
+    "source_id": "UC-PMS-019 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Upload, version, archive, and access application documents under role/status controls.",
+    "preconditions": "User has a valid PMS role; requested action is permitted for the role and application status.",
+    "action_or_input": "Applicants may edit application documents only in Needs Revision status.",
+    "expected_result": "Applicants may edit application documents only in Needs Revision status.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-019-ALT02",
+    "source_id": "UC-PMS-019 Alternative Flows ALT02",
+    "purpose": "Exercise the explicitly specified alternative flows for Upload, version, archive, and access application documents under role/status controls.",
+    "preconditions": "User has a valid PMS role; requested action is permitted for the role and application status.",
+    "action_or_input": "Other roles may upload/access versions only where their role/status permission permits.",
+    "expected_result": "Other roles may upload/access versions only where their role/status permission permits.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-019-EXC01",
+    "source_id": "UC-PMS-019 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Upload, version, archive, and access application documents under role/status controls.",
+    "preconditions": "User has a valid PMS role; requested action is permitted for the role and application status.",
+    "action_or_input": "Unauthorized upload/access is blocked and logged according to applicable audit/security behavior.",
+    "expected_result": "Unauthorized upload/access is blocked and logged according to applicable audit/security behavior.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-020-MAIN",
+    "source_id": "UC-PMS-020 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Submit a licensing or technology-transfer request linked to patent/IP records.",
+    "preconditions": "Applicant has access to the relevant patent/IP record.",
+    "action_or_input": "1. Applicant selects the request type and enters the required request information. 2. Applicant submits the request. 3. PMS routes the request to the appropriate committee or Director according to the applicable institutional process and records the routing/tracking state.",
+    "expected_result": "The request is submitted and routed/tracked.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-020-ALT01",
+    "source_id": "UC-PMS-020 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Submit a licensing or technology-transfer request linked to patent/IP records.",
+    "preconditions": "Applicant has access to the relevant patent/IP record.",
+    "action_or_input": "Licensing and technology-transfer requests use the same submission goal with different request type.",
+    "expected_result": "Licensing and technology-transfer requests use the same submission goal with different request type.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-020-EXC01",
+    "source_id": "UC-PMS-020 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Submit a licensing or technology-transfer request linked to patent/IP records.",
+    "preconditions": "Applicant has access to the relevant patent/IP record.",
+    "action_or_input": "If the applicable routing target/process cannot be determined from configuration/policy, PMS does not invent a committee decision.",
+    "expected_result": "If the applicable routing target/process cannot be determined from configuration/policy, PMS does not invent a committee decision.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-021-MAIN",
+    "source_id": "UC-PMS-021 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Review a request routed to the Director and record negotiation/final-agreement information within PMS authority.",
+    "preconditions": "Request exists and the Director is the applicable routing target.",
+    "action_or_input": "1. Director reviews the request information. 2. PMS records negotiation-process information as it becomes available. 3. Authorized PMS users record the final agreement when one exists. 4. Where integration is available, PMS updates/shares the applicable financial-system information and maintains the license record with confidentiality controls.",
+    "expected_result": "Available negotiation/agreement/license information is recorded and protected.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-021-ALT01",
+    "source_id": "UC-PMS-021 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Review a request routed to the Director and record negotiation/final-agreement information within PMS authority.",
+    "preconditions": "Request exists and the Director is the applicable routing target.",
+    "action_or_input": "If the institutional process routes the request to a committee instead of the Director, the committee's decision process remains outside the defined PMS actor model; PMS may record resulting information.",
+    "expected_result": "If the institutional process routes the request to a committee instead of the Director, the committee's decision process remains outside the defined PMS actor model; PMS may record resulting information.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-021-EXC01",
+    "source_id": "UC-PMS-021 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Review a request routed to the Director and record negotiation/final-agreement information within PMS authority.",
+    "preconditions": "Request exists and the Director is the applicable routing target.",
+    "action_or_input": "PMS does not invent approval/rejection semantics that are not stated in the frozen PS.",
+    "expected_result": "PMS does not invent approval/rejection semantics that are not stated in the frozen PS.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-022-MAIN",
+    "source_id": "UC-PMS-022 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Submit a supported appeal against a Rejected application within the applicable appeal period.",
+    "preconditions": "Application is Rejected; the configured/institutional appeal period has not expired.",
+    "action_or_input": "1. Applicant enters grounds and justification for appeal. 2. Applicant submits the appeal. 3. PMS validates appeal eligibility/timing and records the appeal for Director review.",
+    "expected_result": "An eligible appeal is recorded as submitted for review.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-022-ALT01",
+    "source_id": "UC-PMS-022 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Submit a supported appeal against a Rejected application within the applicable appeal period.",
+    "preconditions": "Application is Rejected; the configured/institutional appeal period has not expired.",
+    "action_or_input": "None.",
+    "expected_result": "None.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-022-EXC01",
+    "source_id": "UC-PMS-022 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Submit a supported appeal against a Rejected application within the applicable appeal period.",
+    "preconditions": "Application is Rejected; the configured/institutional appeal period has not expired.",
+    "action_or_input": "An appeal submitted for a non-Rejected application or outside the allowed period is not accepted.",
+    "expected_result": "An appeal submitted for a non-Rejected application or outside the allowed period is not accepted.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-023-MAIN",
+    "source_id": "UC-PMS-023 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Review an appeal and record one permitted appeal outcome.",
+    "preconditions": "Appeal exists and is assigned/available for Director review.",
+    "action_or_input": "1. Director reviews the appeal and supporting documentation. 2. Director selects one outcome: Uphold Rejection, Remand for Amendment, or Modify Decision. 3. PMS records the appeal outcome and initiates the next applicable process step without inventing unspecified legal/process details.",
+    "expected_result": "Appeal outcome is recorded and the corresponding next-step state is initiated where defined.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-023-ALT01",
+    "source_id": "UC-PMS-023 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Review an appeal and record one permitted appeal outcome.",
+    "preconditions": "Appeal exists and is assigned/available for Director review.",
+    "action_or_input": "The three listed outcomes are alternative success results.",
+    "expected_result": "The three listed outcomes are alternative success results.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-023-EXC01",
+    "source_id": "UC-PMS-023 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Review an appeal and record one permitted appeal outcome.",
+    "preconditions": "Appeal exists and is assigned/available for Director review.",
+    "action_or_input": "An unsupported appeal outcome is not accepted.",
+    "expected_result": "An unsupported appeal outcome is not accepted.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-024-MAIN",
+    "source_id": "UC-PMS-024 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Generate authorized system-wide PMS reports, dashboards, analytics, schedules, and exports.",
+    "preconditions": "PCC_ADMIN has the active authorized role.",
+    "action_or_input": "1. PCC_ADMIN selects the report/analytics type and applicable filters. 2. PMS generates the requested authorized output using recorded PMS data. 3. Where supported, PCC_ADMIN schedules, customizes, or exports the report. 4. PMS logs report access.",
+    "expected_result": "Requested authorized report/analytics output is produced and access is logged.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-024-ALT01",
+    "source_id": "UC-PMS-024 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Generate authorized system-wide PMS reports, dashboards, analytics, schedules, and exports.",
+    "preconditions": "PCC_ADMIN has the active authorized role.",
+    "action_or_input": "Available report types include status/progress, financial/budget, deadlines/pending actions, inventors, portfolio, and workload/assignment views.",
+    "expected_result": "Available report types include status/progress, financial/budget, deadlines/pending actions, inventors, portfolio, and workload/assignment views.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-024-EXC01",
+    "source_id": "UC-PMS-024 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Generate authorized system-wide PMS reports, dashboards, analytics, schedules, and exports.",
+    "preconditions": "PCC_ADMIN has the active authorized role.",
+    "action_or_input": "Unauthorized data is excluded; unavailable data is not fabricated.",
+    "expected_result": "Unauthorized data is excluded; unavailable data is not fabricated.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-025-MAIN",
+    "source_id": "UC-PMS-025 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Manage PMS-specific configuration and role assignments within module scope.",
+    "preconditions": "Exactly one active PCC_ADMIN exists and the actor is authorized.",
+    "action_or_input": "1. PCC_ADMIN reviews PMS configuration and role assignments. 2. PCC_ADMIN creates/updates PMS-specific role mappings or configuration values within module scope. 3. PMS validates that role/access constraints and the single-active-PCC_ADMIN rule remain satisfied. 4. PMS records the configuration/role change for audit.",
+    "expected_result": "PMS-specific configuration/role assignments are updated consistently.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-025-ALT01",
+    "source_id": "UC-PMS-025 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Manage PMS-specific configuration and role assignments within module scope.",
+    "preconditions": "Exactly one active PCC_ADMIN exists and the actor is authorized.",
+    "action_or_input": "Configuration may include applicable thresholds, deadlines, routing rules, escalation rules, or integration references where the PS leaves values configurable.",
+    "expected_result": "Configuration may include applicable thresholds, deadlines, routing rules, escalation rules, or integration references where the PS leaves values configurable.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-025-EXC01",
+    "source_id": "UC-PMS-025 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Manage PMS-specific configuration and role assignments within module scope.",
+    "preconditions": "Exactly one active PCC_ADMIN exists and the actor is authorized.",
+    "action_or_input": "Platform-wide account administration and HR master-data changes are outside PMS.",
+    "expected_result": "Platform-wide account administration and HR master-data changes are outside PMS.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-026-MAIN",
+    "source_id": "UC-PMS-026 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Maintain approved attorney-panel membership and expertise mappings used by assignment.",
+    "preconditions": "PCC_ADMIN is authorized.",
+    "action_or_input": "1. PCC_ADMIN adds/updates/removes approved-panel information and expertise mappings within PMS scope. 2. PMS records the maintained panel/expertise information. 3. The updated information becomes available to attorney-assignment validation/routing.",
+    "expected_result": "Attorney panel/expertise data is current for assignment use.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-026-ALT01",
+    "source_id": "UC-PMS-026 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Maintain approved attorney-panel membership and expertise mappings used by assignment.",
+    "preconditions": "PCC_ADMIN is authorized.",
+    "action_or_input": "Institutional exceptions may be recorded separately when an assignment outside the panel is permitted.",
+    "expected_result": "Institutional exceptions may be recorded separately when an assignment outside the panel is permitted.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-026-EXC01",
+    "source_id": "UC-PMS-026 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Maintain approved attorney-panel membership and expertise mappings used by assignment.",
+    "preconditions": "PCC_ADMIN is authorized.",
+    "action_or_input": "Invalid/unauthorized panel changes are not committed.",
+    "expected_result": "Invalid/unauthorized panel changes are not committed.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-027-MAIN",
+    "source_id": "UC-PMS-027 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Monitor PMS workflows and handle/route conflicts, delayed actions, escalations, and exceptional cases within PMS scope.",
+    "preconditions": "PCC_ADMIN is authorized; workflow/exception records may exist.",
+    "action_or_input": "1. PCC_ADMIN reviews workflow state, pending actions, assignment conflicts, delayed items, and escalation records. 2. PCC_ADMIN resolves a case where the frozen PS gives PCC_ADMIN authority, or routes it to the configured/institutional authority where the outcome is external. 3. PMS records the handling/routing action and resulting tracking state.",
+    "expected_result": "Exceptional-case handling/routing is recorded within PMS scope.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-027-ALT01",
+    "source_id": "UC-PMS-027 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Monitor PMS workflows and handle/route conflicts, delayed actions, escalations, and exceptional cases within PMS scope.",
+    "preconditions": "PCC_ADMIN is authorized; workflow/exception records may exist.",
+    "action_or_input": "Examples include no eligible assignee, conflict-of-interest cases, and delayed-action escalations.",
+    "expected_result": "Examples include no eligible assignee, conflict-of-interest cases, and delayed-action escalations.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-027-EXC01",
+    "source_id": "UC-PMS-027 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Monitor PMS workflows and handle/route conflicts, delayed actions, escalations, and exceptional cases within PMS scope.",
+    "preconditions": "PCC_ADMIN is authorized; workflow/exception records may exist.",
+    "action_or_input": "PMS does not grant PCC_ADMIN an unstated legal, patent-office, financial-payment, or higher-authority decision power.",
+    "expected_result": "PMS does not grant PCC_ADMIN an unstated legal, patent-office, financial-payment, or higher-authority decision power.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-028-MAIN",
+    "source_id": "UC-PMS-028 Main Success Scenario",
+    "purpose": "Exercise the main success flow for View audit/compliance records for authorized verification or forensic analysis.",
+    "preconditions": "Actor has access to audit/compliance information.",
+    "action_or_input": "1. Actor selects an application, time range, user, or action scope. 2. PMS displays available audit records including required audit fields. 3. Actor reviews/export/views the records within authorization.",
+    "expected_result": "Audit/compliance information is viewed; no business state changes.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-028-ALT01",
+    "source_id": "UC-PMS-028 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for View audit/compliance records for authorized verification or forensic analysis.",
+    "preconditions": "Actor has access to audit/compliance information.",
+    "action_or_input": "Director access, where available, is limited by the applicable authority/domain.",
+    "expected_result": "Director access, where available, is limited by the applicable authority/domain.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-028-EXC01",
+    "source_id": "UC-PMS-028 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for View audit/compliance records for authorized verification or forensic analysis.",
+    "preconditions": "Actor has access to audit/compliance information.",
+    "action_or_input": "Unauthorized audit access is blocked.",
+    "expected_result": "Unauthorized audit access is blocked.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-029-MAIN",
+    "source_id": "UC-PMS-029 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Review and approve an Attorney-prepared office-action response when the applicable process requires Applicant review.",
+    "preconditions": "The applicable process requires Applicant review; a draft response exists.",
+    "action_or_input": "1. Applicant reviews the draft response. 2. Applicant records approval of the response. 3. PMS records the approval so the Attorney can finalize/submit the response.",
+    "expected_result": "Required Applicant approval is recorded.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-029-ALT01",
+    "source_id": "UC-PMS-029 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Review and approve an Attorney-prepared office-action response when the applicable process requires Applicant review.",
+    "preconditions": "The applicable process requires Applicant review; a draft response exists.",
+    "action_or_input": "If Applicant review is not required, this use case is not invoked.",
+    "expected_result": "If Applicant review is not required, this use case is not invoked.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-029-EXC01",
+    "source_id": "UC-PMS-029 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Review and approve an Attorney-prepared office-action response when the applicable process requires Applicant review.",
+    "preconditions": "The applicable process requires Applicant review; a draft response exists.",
+    "action_or_input": "If approval is not recorded, PMS must not treat the response as Applicant-approved; the PS does not define an alternate Applicant decision outcome.",
+    "expected_result": "If approval is not recorded, PMS must not treat the response as Applicant-approved; the PS does not define an alternate Applicant decision outcome.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-030-MAIN",
+    "source_id": "UC-PMS-030 Main Success Scenario",
+    "purpose": "Exercise the main success flow for View report information for the Applicant's own patent applications.",
+    "preconditions": "Applicant has a valid PMS role.",
+    "action_or_input": "1. Applicant selects an available personal application report. 2. PMS restricts the dataset to the Applicant's own applications and displays the report.",
+    "expected_result": "Applicant views authorized personal report data.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-030-ALT01",
+    "source_id": "UC-PMS-030 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for View report information for the Applicant's own patent applications.",
+    "preconditions": "Applicant has a valid PMS role.",
+    "action_or_input": "Available presentation/export options are provided only where the authorized report function supports them.",
+    "expected_result": "Available presentation/export options are provided only where the authorized report function supports them.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-030-EXC01",
+    "source_id": "UC-PMS-030 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for View report information for the Applicant's own patent applications.",
+    "preconditions": "Applicant has a valid PMS role.",
+    "action_or_input": "PMS blocks access to another Applicant's report data.",
+    "expected_result": "PMS blocks access to another Applicant's report data.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-031-MAIN",
+    "source_id": "UC-PMS-031 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Generate/view PMS reports and analytics within the Director's authorized scope.",
+    "preconditions": "Director has an authorized PMS role.",
+    "action_or_input": "1. Director selects an available report/analytics view. 2. PMS generates the output using PMS data within the Director's authorized scope/domain. 3. PMS logs report access.",
+    "expected_result": "Director views authorized report/analytics output.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-031-ALT01",
+    "source_id": "UC-PMS-031 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Generate/view PMS reports and analytics within the Director's authorized scope.",
+    "preconditions": "Director has an authorized PMS role.",
+    "action_or_input": "Where authorized, scheduled/export/customized report functions may be used.",
+    "expected_result": "Where authorized, scheduled/export/customized report functions may be used.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-031-EXC01",
+    "source_id": "UC-PMS-031 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Generate/view PMS reports and analytics within the Director's authorized scope.",
+    "preconditions": "Director has an authorized PMS role.",
+    "action_or_input": "Unauthorized report scope is blocked.",
+    "expected_result": "Unauthorized report scope is blocked.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-032-MAIN",
+    "source_id": "UC-PMS-032 Main Success Scenario",
+    "purpose": "Exercise the main success flow for View workflow oversight information for applications in the Director's domain.",
+    "preconditions": "Director has an authorized role and domain scope.",
+    "action_or_input": "1. Director selects the relevant workflow/application scope. 2. PMS displays workflow states, pending actions, and oversight information within the Director's domain.",
+    "expected_result": "Director views domain-scoped workflow oversight.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-032-ALT01",
+    "source_id": "UC-PMS-032 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for View workflow oversight information for applications in the Director's domain.",
+    "preconditions": "Director has an authorized role and domain scope.",
+    "action_or_input": "None.",
+    "expected_result": "None.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-032-EXC01",
+    "source_id": "UC-PMS-032 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for View workflow oversight information for applications in the Director's domain.",
+    "preconditions": "Director has an authorized role and domain scope.",
+    "action_or_input": "Out-of-domain information is not disclosed.",
+    "expected_result": "Out-of-domain information is not disclosed.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-033-MAIN",
+    "source_id": "UC-PMS-033 Main Success Scenario",
+    "purpose": "Exercise the main success flow for Record legal advice associated with a patent application throughout its lifecycle.",
+    "preconditions": "Attorney has a valid role and access to the application.",
+    "action_or_input": "1. Attorney selects the application/context. 2. Attorney records the legal advice note/opinion information. 3. PMS associates the advice with the application history/audit record as applicable.",
+    "expected_result": "Legal advice information is recorded for the application.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-033-ALT01",
+    "source_id": "UC-PMS-033 Alternative Flows ALT01",
+    "purpose": "Exercise the explicitly specified alternative flows for Record legal advice associated with a patent application throughout its lifecycle.",
+    "preconditions": "Attorney has a valid role and access to the application.",
+    "action_or_input": "This use case may occur at different lifecycle stages; it does not itself impose a new application-state transition.",
+    "expected_result": "This use case may occur at different lifecycle stages; it does not itself impose a new application-state transition.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "UC-PMS-033-EXC01",
+    "source_id": "UC-PMS-033 Exception Flows EXC01",
+    "purpose": "Exercise the explicitly specified exception flows for Record legal advice associated with a patent application throughout its lifecycle.",
+    "preconditions": "Attorney has a valid role and access to the application.",
+    "action_or_input": "Unauthorized access or invalid application reference prevents the record from being stored.",
+    "expected_result": "Unauthorized access or invalid application reference prevents the record from being stored.",
+    "test_type": "pytest-django backend test"
+  }
+]
