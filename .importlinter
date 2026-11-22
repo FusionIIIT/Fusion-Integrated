@@ -13,6 +13,7 @@ name = Modules may reach each other ONLY through contracts.py
 type = forbidden
 source_modules =
     modules.placement
+    modules.department
     modules.directory
     modules.accesscontrol
 forbidden_modules =
@@ -21,6 +22,9 @@ forbidden_modules =
     modules.placement.selectors
     modules.placement.api
     modules.placement.domain
+    modules.department.models
+    modules.department.selectors
+    modules.department.api
     modules.directory.models
     modules.directory.services
     modules.directory.api
@@ -66,3 +70,11 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+
+[importlinter:contract:department-layers]
+name = Layering inside department
+type = layers
+layers =
+    modules.department.api
+    modules.department.selectors
+    modules.department.models

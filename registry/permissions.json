@@ -1,5 +1,45 @@
 {
   "modules": {
+    "department": {
+      "grants": {
+        "faculty": [
+          "department.announcement.view"
+        ],
+        "student": [
+          "department.announcement.view"
+        ]
+      },
+      "module_grants": [
+        "faculty",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/department",
+        "icon": "Buildings",
+        "items": [
+          {
+            "code": "department.announcements",
+            "icon": "Megaphone",
+            "label": "Announcements",
+            "required_permission": "department.announcement.view",
+            "sort_order": 10,
+            "to": "/department/announcements"
+          }
+        ],
+        "label": "Department",
+        "nav_section": "Department",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "department.announcement.view",
+          "label": "View relevant Department announcements"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "directory": {
       "grants": {
         "Dean Academic": [
