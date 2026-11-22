@@ -1,0 +1,605 @@
+[
+  {
+    "test_id": "TEST-UC-001",
+    "source_id": "HR-UC-001 Main Flow",
+    "purpose": "Verify employee can view their own official service record in read-only mode",
+    "preconditions": "Employee is authenticated and has an employee service record",
+    "action_or_input": "Employee queries own service record",
+    "expected_result": "HR-EIS displays own service record details; prevents unauthorized modification",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-002",
+    "source_id": "HR-UC-001 Alternative A1",
+    "purpose": "Verify employee holding an additional role (e.g. HOD) still sees own record in read-only mode in employee context",
+    "preconditions": "Employee is authenticated with dual roles (faculty + HOD) and has a service record",
+    "action_or_input": "Employee queries own service record under employee context",
+    "expected_result": "Own service record displayed read-only; permissions of other role govern separate actions",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-003",
+    "source_id": "HR-UC-001 Exception E1",
+    "purpose": "Verify unauthenticated or unpermitted user cannot access service records",
+    "preconditions": "User is unauthenticated or has invalid token",
+    "action_or_input": "User attempts to view service record",
+    "expected_result": "Access denied (401/403) and denied action recorded where applicable",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-004",
+    "source_id": "HR-UC-002 Main Flow",
+    "purpose": "Verify HR Administrator can update employee service record and changes are committed auditably",
+    "preconditions": "HR Administrator is authenticated with hr_admin role and target employee record exists",
+    "action_or_input": "HR Administrator submits valid updates to employee service record",
+    "expected_result": "Service record updated consistently and audit log entry created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-005",
+    "source_id": "HR-UC-002 Alternative A1",
+    "purpose": "Verify cancelling update leaves employee service record unchanged",
+    "preconditions": "Target employee record exists with baseline data",
+    "action_or_input": "No commit performed / transaction rollback",
+    "expected_result": "Official record remains completely unchanged",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-006",
+    "source_id": "HR-UC-002 Exception E1",
+    "purpose": "Verify non-HR admin cannot modify employee service records",
+    "preconditions": "Regular faculty/staff employee is authenticated without hr_admin role",
+    "action_or_input": "Employee attempts to update service record",
+    "expected_result": "Request rejected with 403 Forbidden; prior record intact",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-007",
+    "source_id": "HR-UC-003 Main Flow",
+    "purpose": "Verify employee can submit a valid leave request and it enters Pending Current Authority state",
+    "preconditions": "Employee is authenticated with sufficient leave balance",
+    "action_or_input": "Employee submits valid Casual leave request with dates and justification",
+    "expected_result": "Leave request created in pending/submitted status and routed to first authority",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-008",
+    "source_id": "HR-UC-003 Alternative A1",
+    "purpose": "Verify leave request with invalid data or insufficient balance is rejected at submission",
+    "preconditions": "Employee has insufficient leave balance or submits invalid date range",
+    "action_or_input": "Employee attempts to submit invalid leave request",
+    "expected_result": "Submission rejected with validation error; request does not enter approval workflow",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-009",
+    "source_id": "HR-UC-003 Exception E1",
+    "purpose": "Verify unauthenticated actor or actor without leave permission cannot submit leave",
+    "preconditions": "User lacks hr_eis leave submission permission or is unauthenticated",
+    "action_or_input": "User attempts to submit leave request",
+    "expected_result": "Submission blocked with 401/403; no routed request created",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-010",
+    "source_id": "HR-UC-004 Main Flow",
+    "purpose": "Verify designated approving authority can approve a pending HR request",
+    "preconditions": "Leave/HR request is in pending status assigned to HOD authority",
+    "action_or_input": "HOD approves the request with remarks",
+    "expected_result": "Request status transitions to approved or next stage; approval recorded auditably",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-011",
+    "source_id": "HR-UC-004 Alternative A1",
+    "purpose": "Verify designated approving authority can reject a pending HR request ending approval path",
+    "preconditions": "Request is pending current authority",
+    "action_or_input": "Approving authority rejects the request with remarks",
+    "expected_result": "Request status becomes rejected and approval workflow terminates",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-012",
+    "source_id": "HR-UC-004 Alternative A2",
+    "purpose": "Verify approving authority can forward request to next configured authority",
+    "preconditions": "Request is pending current authority with multi-tier workflow",
+    "action_or_input": "Authority forwards request to next authority (e.g. Registrar/Director)",
+    "expected_result": "Request recorded as pending next authority",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-013",
+    "source_id": "HR-UC-004 Exception E1",
+    "purpose": "Verify non-designated authority or unauthorized actor cannot decide a request",
+    "preconditions": "Request is pending HOD; calling user is regular employee without authority",
+    "action_or_input": "Unauthorized user attempts to approve or reject request",
+    "expected_result": "Action blocked with 403 Forbidden; request state unchanged",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-014",
+    "source_id": "HR-UC-005 Main Flow",
+    "purpose": "Verify employee can track the current status of their own submitted HR requests",
+    "preconditions": "Employee has submitted requests in the system",
+    "action_or_input": "Employee queries own submitted request status list/detail",
+    "expected_result": "HR-EIS returns request details with current status and workflow stage",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-015",
+    "source_id": "HR-UC-005 Alternative A1",
+    "purpose": "Verify employee tracking with no submitted requests receives empty result gracefully",
+    "preconditions": "Employee has no submitted requests in HR-EIS",
+    "action_or_input": "Employee queries submitted requests",
+    "expected_result": "HR-EIS returns empty list or indicates no authorized matching request available",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-016",
+    "source_id": "HR-UC-005 Exception E1",
+    "purpose": "Verify employee cannot access or track another employee's request without authorization",
+    "preconditions": "Employee A and Employee B exist; Employee A has submitted a request",
+    "action_or_input": "Employee B attempts to access Employee A's request detail",
+    "expected_result": "Access denied (403/404); other employee request not disclosed",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-017",
+    "source_id": "HR-UC-006 Main Flow",
+    "purpose": "Verify employee can submit yearly appraisal during active submission window",
+    "preconditions": "Employee is authenticated; appraisal cycle is open/configured",
+    "action_or_input": "Employee submits appraisal with self-assessment details",
+    "expected_result": "Appraisal created in submitted status and ready for reviewer assignment",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-018",
+    "source_id": "HR-UC-006 Alternative A1",
+    "purpose": "Verify appraisal submission is rejected when cycle window is closed or inactive",
+    "preconditions": "Appraisal cycle is closed or inactive",
+    "action_or_input": "Employee attempts to submit appraisal",
+    "expected_result": "Submission rejected; appraisal not accepted",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-019",
+    "source_id": "HR-UC-006 Exception E1",
+    "purpose": "Verify unauthorized actor cannot submit appraisal",
+    "preconditions": "User lacks employee appraisal submission permission",
+    "action_or_input": "User attempts to submit appraisal",
+    "expected_result": "Submission blocked with 401/403 Forbidden",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-020",
+    "source_id": "HR-UC-007 Main Flow",
+    "purpose": "Verify HR Administrator can assign reviewers to a submitted appraisal",
+    "preconditions": "Appraisal is in submitted status; HR Admin is authenticated",
+    "action_or_input": "HR Admin assigns reviewer IDs to appraisal",
+    "expected_result": "Reviewers assigned; appraisal status transitions to reviewer_assigned / pending_review",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-021",
+    "source_id": "HR-UC-007 Alternative A1",
+    "purpose": "Verify HR Admin can revise reviewer assignment before review begins",
+    "preconditions": "Appraisal is in reviewer_assigned state; no final review completed",
+    "action_or_input": "HR Admin updates assigned reviewer list",
+    "expected_result": "Reviewer assignment updated; appraisal outcome unchanged",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-022",
+    "source_id": "HR-UC-007 Exception E1",
+    "purpose": "Verify non-HR admin cannot assign appraisal reviewers",
+    "preconditions": "Regular faculty/staff employee is authenticated without admin role",
+    "action_or_input": "Employee attempts to assign appraisal reviewers",
+    "expected_result": "Request rejected with 403 Forbidden",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-023",
+    "source_id": "HR-UC-008 Main Flow",
+    "purpose": "Verify designated reviewer/authority can review and finalize appraisal",
+    "preconditions": "Appraisal is pending review by designated authority",
+    "action_or_input": "Designated reviewer submits evaluation and finalizes appraisal",
+    "expected_result": "Appraisal finalized with score/remarks and status updated to completed/closed",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-024",
+    "source_id": "HR-UC-008 Alternative A1",
+    "purpose": "Verify multi-level appraisal review traversal preserves workflow semantics",
+    "preconditions": "Appraisal requires secondary review stage (e.g. Director after HOD)",
+    "action_or_input": "Initial reviewer evaluates and forwards to final authority",
+    "expected_result": "Appraisal transitions to next review stage according to configured route",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-025",
+    "source_id": "HR-UC-008 Exception E1",
+    "purpose": "Verify modification or re-finalization of a closed appraisal is blocked",
+    "preconditions": "Appraisal is already in finalized/closed status",
+    "action_or_input": "Reviewer attempts to modify evaluation or re-finalize",
+    "expected_result": "Modification rejected; closed appraisal remains immutable",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-026",
+    "source_id": "HR-UC-008 Exception E2",
+    "purpose": "Verify actor not designated as reviewer cannot finalize appraisal",
+    "preconditions": "Appraisal is pending review; non-reviewer attempts decision",
+    "action_or_input": "Non-designated user attempts to submit review evaluation",
+    "expected_result": "Action rejected with 403 Forbidden",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-027",
+    "source_id": "HR-UC-009 Main Flow",
+    "purpose": "Verify employee can submit a valid LTC advance request",
+    "preconditions": "Employee is authenticated with active service record",
+    "action_or_input": "Employee submits LTC advance request with travel block, estimated cost, and advance amount",
+    "expected_result": "LTC request created in submitted status and routed for HR verification",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-028",
+    "source_id": "HR-UC-009 Exception E1",
+    "purpose": "Verify unauthorized user cannot submit LTC advance request",
+    "preconditions": "Unauthenticated user or user without LTC permissions",
+    "action_or_input": "User attempts to submit LTC advance request",
+    "expected_result": "Submission blocked with 401/403 Forbidden; no LTC request created",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-029",
+    "source_id": "HR-UC-010 Main Flow",
+    "purpose": "Verify employee can submit a valid LTC reimbursement request with bills",
+    "preconditions": "Employee is authenticated with active service record",
+    "action_or_input": "Employee submits LTC reimbursement request with claimed amount and bills",
+    "expected_result": "LTC reimbursement created in submitted status and routed for verification",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-030",
+    "source_id": "HR-UC-010 Exception E1",
+    "purpose": "Verify unauthorized user cannot submit LTC reimbursement request",
+    "preconditions": "Unauthenticated user or user without LTC reimbursement permissions",
+    "action_or_input": "User attempts to submit LTC reimbursement request",
+    "expected_result": "Submission blocked with 401/403 Forbidden; no request created",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-031",
+    "source_id": "HR-UC-011 Main Flow",
+    "purpose": "Verify HR Admin can verify LTC request documentation and advance it to approval routing",
+    "preconditions": "LTC request is in submitted status; HR Admin is authenticated",
+    "action_or_input": "HR Admin verifies LTC request with verdict=approved/verified",
+    "expected_result": "LTC request recorded as verified and enters approval routing (pending authority)",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-032",
+    "source_id": "HR-UC-011 Alternative A1",
+    "purpose": "Verify unconfirmed/rejected LTC verification does not enter approval routing",
+    "preconditions": "LTC request is in submitted status",
+    "action_or_input": "HR Admin rejects verification (verdict=rejected)",
+    "expected_result": "Request does not enter approval routing; verification rejection recorded auditably",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-033",
+    "source_id": "HR-UC-011 Exception E1",
+    "purpose": "Verify non-HR admin cannot verify LTC requests",
+    "preconditions": "Regular employee is authenticated without hr_admin role",
+    "action_or_input": "Employee attempts to verify LTC request",
+    "expected_result": "Action rejected with 403 Forbidden",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-034",
+    "source_id": "HR-UC-012 Main Flow",
+    "purpose": "Verify Accountant can record settlement for approved LTC claim",
+    "preconditions": "LTC claim is approved; Accountant is authenticated with accountant role",
+    "action_or_input": "Accountant submits settlement with reference ID and remarks",
+    "expected_result": "Claim marked settled/paid with disbursement recorded auditably",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-035",
+    "source_id": "HR-UC-012 Alternative A1",
+    "purpose": "Verify approved LTC claim remains in approved/processing state when payment pending",
+    "preconditions": "LTC claim is approved; external payment processing is pending",
+    "action_or_input": "Accountant checks approved claims awaiting payment",
+    "expected_result": "Claim remains in approved state awaiting settlement record",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-036",
+    "source_id": "HR-UC-012 Exception E1",
+    "purpose": "Verify HR-EIS does not execute external banking/payroll and only records settlement",
+    "preconditions": "Accountant processes claim settlement",
+    "action_or_input": "Accountant records settlement reference",
+    "expected_result": "Only internal settlement and audit record updated; no banking gateway invoked",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-037",
+    "source_id": "HR-UC-012 Exception E2",
+    "purpose": "Verify non-accountant cannot process LTC claim settlement",
+    "preconditions": "Regular employee or HR admin without accountant role",
+    "action_or_input": "User attempts to settle approved LTC claim",
+    "expected_result": "Action rejected with 403 Forbidden",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-038",
+    "source_id": "HR-UC-013 Main Flow",
+    "purpose": "Verify employee can submit a valid CPDA advance request within available balance",
+    "preconditions": "Employee has active CPDA balance and valid service record",
+    "action_or_input": "Employee submits CPDA advance request with advance_type and amount",
+    "expected_result": "CPDA request created in submitted status and routed for verification",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-039",
+    "source_id": "HR-UC-013 Alternative A1",
+    "purpose": "Verify CPDA advance submission with missing required information is rejected",
+    "preconditions": "Employee attempts submission with missing amount or purpose",
+    "action_or_input": "Employee submits invalid CPDA request payload",
+    "expected_result": "Submission rejected with validation error (400 Bad Request)",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-040",
+    "source_id": "HR-UC-013 Exception E1",
+    "purpose": "Verify unauthorized user cannot submit CPDA advance request",
+    "preconditions": "Unauthenticated user or user lacking CPDA submission rights",
+    "action_or_input": "User attempts to submit CPDA advance request",
+    "expected_result": "Submission blocked with 401/403 Forbidden",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-041",
+    "source_id": "HR-UC-014 Main Flow",
+    "purpose": "Verify employee can submit a valid CPDA reimbursement request with expenditure bills",
+    "preconditions": "Employee has active CPDA entitlement and service record",
+    "action_or_input": "Employee submits CPDA reimbursement request with bills and amount",
+    "expected_result": "CPDA reimbursement created in submitted status and routed for verification",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-042",
+    "source_id": "HR-UC-014 Alternative A1",
+    "purpose": "Verify CPDA reimbursement submission with missing bills or required fields is rejected",
+    "preconditions": "Employee submits incomplete reimbursement payload",
+    "action_or_input": "Employee submits reimbursement without required details",
+    "expected_result": "Submission rejected with validation error (400 Bad Request)",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-043",
+    "source_id": "HR-UC-014 Exception E1",
+    "purpose": "Verify unauthorized user cannot submit CPDA reimbursement request",
+    "preconditions": "User lacks CPDA reimbursement rights",
+    "action_or_input": "User attempts to submit CPDA reimbursement request",
+    "expected_result": "Submission blocked with 401/403 Forbidden",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-044",
+    "source_id": "HR-UC-015 Main Flow",
+    "purpose": "Verify HR Admin can verify submitted CPDA claim and route it to approval",
+    "preconditions": "CPDA claim is in submitted status; HR Admin is authenticated",
+    "action_or_input": "HR Admin verifies CPDA claim with verdict=approved/verified",
+    "expected_result": "CPDA claim recorded as verified and enters approval routing",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-045",
+    "source_id": "HR-UC-015 Alternative A1",
+    "purpose": "Verify unconfirmed CPDA verification does not enter approval routing",
+    "preconditions": "CPDA claim is in submitted status",
+    "action_or_input": "HR Admin rejects CPDA verification (verdict=rejected)",
+    "expected_result": "Claim remains outside approval routing; verification rejection recorded auditably",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-046",
+    "source_id": "HR-UC-015 Exception E1",
+    "purpose": "Verify non-HR admin cannot verify CPDA claims",
+    "preconditions": "Regular employee is authenticated without hr_admin role",
+    "action_or_input": "Employee attempts to verify CPDA claim",
+    "expected_result": "Action rejected with 403 Forbidden",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-047",
+    "source_id": "HR-UC-016 Main Flow",
+    "purpose": "Verify Accountant can settle approved CPDA claim and deduct balance",
+    "preconditions": "CPDA claim is approved; Accountant is authenticated; service record exists",
+    "action_or_input": "Accountant submits settlement with voucher_no and remarks",
+    "expected_result": "Claim status updated to settled/paid and CPDA balance deducted in service record",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-048",
+    "source_id": "HR-UC-016 Alternative A1",
+    "purpose": "Verify approved CPDA claim remains in approved state until settlement is received",
+    "preconditions": "CPDA claim is approved; settlement has not been recorded",
+    "action_or_input": "Accountant inspects approved CPDA claims",
+    "expected_result": "Claim remains in approved state awaiting settlement recording",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-049",
+    "source_id": "HR-UC-016 Exception E1",
+    "purpose": "Verify HR-EIS does not execute direct bank disbursement or alter payroll rules",
+    "preconditions": "Accountant records settlement",
+    "action_or_input": "Accountant settles approved CPDA claim",
+    "expected_result": "Only internal claim status, service record balance, and audit log updated",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-050",
+    "source_id": "HR-UC-016 Exception E2",
+    "purpose": "Verify non-accountant cannot settle CPDA claims",
+    "preconditions": "Regular employee or HR admin without accountant role",
+    "action_or_input": "User attempts to settle CPDA claim",
+    "expected_result": "Action rejected with 403 Forbidden",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-051",
+    "source_id": "HR-UC-017 Main Flow",
+    "purpose": "Verify HR Admin can configure module workflow settings within HR-EIS scope",
+    "preconditions": "HR Admin is authenticated with workflow configuration permissions",
+    "action_or_input": "HR Admin updates workflow configuration (e.g. leave auto-forwarding or thresholds)",
+    "expected_result": "Workflow settings updated and recorded auditably",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-052",
+    "source_id": "HR-UC-017 Alternative A1",
+    "purpose": "Verify HR-EIS rejects configuring settings outside module scope (e.g. platform RBAC)",
+    "preconditions": "HR Admin attempts to pass unsupported or external setting keys",
+    "action_or_input": "HR Admin submits invalid configuration keys",
+    "expected_result": "Configuration rejected or external keys ignored; invalid configuration blocked",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-053",
+    "source_id": "HR-UC-017 Exception E1",
+    "purpose": "Verify non-HR admin cannot modify workflow settings",
+    "preconditions": "Regular employee is authenticated without admin role",
+    "action_or_input": "Employee attempts to update workflow configuration",
+    "expected_result": "Action rejected with 403 Forbidden; settings remain unchanged",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-054",
+    "source_id": "HR-UC-018 Main Flow",
+    "purpose": "Verify HR Admin can view immutable audit log records with actor, timestamp, and action",
+    "preconditions": "HR Admin is authenticated; audit log records exist in the system",
+    "action_or_input": "HR Admin queries audit log endpoint",
+    "expected_result": "Audit logs returned with actor ID, timestamp, action type, and details",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-055",
+    "source_id": "HR-UC-018 Alternative A1",
+    "purpose": "Verify audit history for rejected or returned requests remains available and intact",
+    "preconditions": "A rejected or returned request exists in the audit trail",
+    "action_or_input": "HR Admin queries audit logs filtered by target request or action",
+    "expected_result": "Audit records for rejected/returned request returned accurately without omission",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-056",
+    "source_id": "HR-UC-018 Exception E1",
+    "purpose": "Verify non-authorized users cannot access compliance and audit logs",
+    "preconditions": "Regular faculty/staff employee is authenticated without audit permissions",
+    "action_or_input": "Employee attempts to query audit log records",
+    "expected_result": "Access denied with 403 Forbidden",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-057",
+    "source_id": "HR-UC-019 Main Flow",
+    "purpose": "Verify user can view notifications addressed to their user ID or role",
+    "preconditions": "User is authenticated; notifications exist addressed to the user",
+    "action_or_input": "User queries notification list endpoint",
+    "expected_result": "Notifications addressed to user displayed with message, timestamp, and read status",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-058",
+    "source_id": "HR-UC-019 Alternative A1",
+    "purpose": "Verify policy/deadline notifications appear when configured in the system",
+    "preconditions": "A policy/deadline notification has been issued to the user",
+    "action_or_input": "User queries notification list",
+    "expected_result": "Policy notification displayed with correct details",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-059",
+    "source_id": "HR-UC-019 Exception E1",
+    "purpose": "Verify notifications not addressed to the actor are not disclosed",
+    "preconditions": "User A and User B exist; notification addressed only to User B",
+    "action_or_input": "User A queries notifications",
+    "expected_result": "User B's notification is not present in User A's notification list",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-060",
+    "source_id": "HR-UC-021 Main Flow",
+    "purpose": "Verify system generates pending-action reminder notification for requests pending authority decision",
+    "preconditions": "Request is pending current authority; reminder service is triggered",
+    "action_or_input": "Reminder generation logic evaluates pending request",
+    "expected_result": "Reminder notification created addressed to current pending authority",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-061",
+    "source_id": "HR-UC-021 Alternative A1",
+    "purpose": "Verify resolved request does not generate reminder notifications",
+    "preconditions": "Request is already in approved or rejected status",
+    "action_or_input": "Reminder evaluation runs for resolved request",
+    "expected_result": "No reminder notification is generated for resolved request",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-062",
+    "source_id": "HR-UC-021 Alternative A2",
+    "purpose": "Verify reminder notification addresses only the currently responsible authority when multiple roles exist",
+    "preconditions": "Request is pending stage 1 authority in a multi-tier routing",
+    "action_or_input": "Reminder generation executes",
+    "expected_result": "Notification generated only for the stage 1 authority, not stage 2 authority",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-063",
+    "source_id": "HR-UC-021 Exception E1",
+    "purpose": "Verify request information is not disclosed to unauthorized users if recipient cannot be determined",
+    "preconditions": "Pending request has invalid or unresolvable routing recipient",
+    "action_or_input": "Reminder service evaluates request",
+    "expected_result": "No notification sent to arbitrary or unauthorized users; request state unchanged",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-UC-064",
+    "source_id": "HR-UC-022 Main Flow",
+    "purpose": "Verify system generates policy/deadline update notification when configured event occurs",
+    "preconditions": "Policy deadline event is configured with target audience",
+    "action_or_input": "Policy notification service issues broadcast/targeted notification",
+    "expected_result": "Notification generated for authorized recipient and visible in dashboard view",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-065",
+    "source_id": "HR-UC-022 Alternative A1",
+    "purpose": "Verify unconfigured policy/deadline events do not generate spurious notifications",
+    "preconditions": "No policy/deadline event is configured",
+    "action_or_input": "Notification dispatch runs",
+    "expected_result": "No spurious notifications generated",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-066",
+    "source_id": "HR-UC-022 Alternative A2",
+    "purpose": "Verify policy notification recipient scope strictly follows configured role/access restrictions",
+    "preconditions": "Policy notification configured specifically for faculty role",
+    "action_or_input": "Policy notification dispatched",
+    "expected_result": "Notification addressed to faculty; staff users do not receive faculty-specific notification",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-067",
+    "source_id": "HR-UC-022 Exception E1",
+    "purpose": "Verify recipient authorization failure prevents notification disclosure",
+    "preconditions": "User lacks authorization for specific sensitive policy notice",
+    "action_or_input": "User queries notifications",
+    "expected_result": "Sensitive notice not disclosed to unauthorized user",
+    "test_type": "security"
+  }
+]

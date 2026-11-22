@@ -1,0 +1,326 @@
+[
+  {
+    "test_id": "TEST-WF-001",
+    "source_id": "BW-HR-01 Direct Approval Path",
+    "purpose": "Verify finite workflow path from draft leave request to approved leave without forwarding",
+    "preconditions": "Employee has active service record with casual balance 8",
+    "action_or_input": "Employee submits leave; HOD approves leave",
+    "expected_result": "Request transitions Draft -> Pending -> Approved; balance deducted to 6",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-002",
+    "source_id": "BW-HR-01 Validation Guard",
+    "purpose": "Verify invalid leave request fails validation guard and does not transition to Pending",
+    "preconditions": "Employee has casual balance 1",
+    "action_or_input": "Employee applies for 3 days of leave",
+    "expected_result": "Validation guard fails; request does not enter workflow",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-003",
+    "source_id": "BW-HR-02 Rejection Path",
+    "purpose": "Verify finite workflow path from draft leave request to rejection ending approval path",
+    "preconditions": "Employee submits valid leave request",
+    "action_or_input": "HOD rejects the leave request with remarks",
+    "expected_result": "Request transitions Draft -> Pending -> Rejected; approval path terminates; balance intact",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-004",
+    "source_id": "BW-HR-02 Terminal State Guard",
+    "purpose": "Verify rejected leave request cannot be approved subsequently",
+    "preconditions": "Leave request is in rejected status",
+    "action_or_input": "Attempt to approve rejected leave request",
+    "expected_result": "Transition blocked; request remains rejected",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-005",
+    "source_id": "BW-HR-03 Forwarding Traversal Path",
+    "purpose": "Verify exactly one traversal of approval forwarding loop before final approval",
+    "preconditions": "Sabbatical leave request submitted pending initial authority (HOD)",
+    "action_or_input": "HOD forwards to Director; Director approves request",
+    "expected_result": "Request transitions Pending -> Forwarded -> Approved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-006",
+    "source_id": "BW-HR-03 Forwarding Authority Guard",
+    "purpose": "Verify non-current authority cannot forward or decide request during traversal",
+    "preconditions": "Request is forwarded to Director",
+    "action_or_input": "Unauthorized actor attempts decision",
+    "expected_result": "Decision blocked; request remains pending current authority",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-WF-007",
+    "source_id": "CW-HR-01 Full Approval Lifecycle",
+    "purpose": "Verify composite leave lifecycle combining submission, routing, approval, balance deduction, and audit trail",
+    "preconditions": "Employee has valid service record",
+    "action_or_input": "Submit leave -> HOD approves -> verify balance -> verify audit log",
+    "expected_result": "Complete lifecycle executes consistently with all state transitions recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-008",
+    "source_id": "CW-HR-01 Full Rejection Lifecycle",
+    "purpose": "Verify composite leave lifecycle with rejection preserves audit history and balance integrity",
+    "preconditions": "Employee has valid service record",
+    "action_or_input": "Submit leave -> HOD rejects -> verify audit log",
+    "expected_result": "Lifecycle terminates at rejected; audit entry created; balance untouched",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-009",
+    "source_id": "CW-HR-01 Multi-Tier Forwarding Lifecycle",
+    "purpose": "Verify composite leave lifecycle with multi-tier routing through forwarding to final decision",
+    "preconditions": "Long duration sabbatical leave submitted",
+    "action_or_input": "Submit -> Forward -> Final Approve -> Deduct balance",
+    "expected_result": "Multi-tier lifecycle completes successfully",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-010",
+    "source_id": "BW-HR-04 Direct Finalization Path",
+    "purpose": "Verify appraisal workflow with zero intermediate traversal before finalization",
+    "preconditions": "Appraisal window is active; appraisal submitted",
+    "action_or_input": "HR Admin assigns reviewer; designated authority reviews and finalizes",
+    "expected_result": "Appraisal transitions Submitted -> Under Review -> Finalized",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-011",
+    "source_id": "BW-HR-04 Immutability Guard",
+    "purpose": "Verify finalized appraisal cannot undergo further review or modification",
+    "preconditions": "Appraisal is in finalized status",
+    "action_or_input": "Attempt review modification on finalized appraisal",
+    "expected_result": "Action rejected; appraisal remains finalized and immutable",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-012",
+    "source_id": "BW-HR-05 One Additional Authority Path",
+    "purpose": "Verify appraisal path with exactly one additional designated-authority review before finalization",
+    "preconditions": "Appraisal has two assigned reviewers",
+    "action_or_input": "Reviewer 1 reviews -> Reviewer 2 reviews -> Director finalizes",
+    "expected_result": "Appraisal transitions through both review stages and reaches Finalized",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-013",
+    "source_id": "BW-HR-05 Review Order Guard",
+    "purpose": "Verify unassigned reviewer cannot submit intermediate appraisal evaluation",
+    "preconditions": "Appraisal assigned to reviewer 401 only",
+    "action_or_input": "Non-assigned user 500 attempts review submission",
+    "expected_result": "Action rejected; appraisal state unchanged",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-WF-014",
+    "source_id": "CW-HR-02 Composite Appraisal Lifecycle",
+    "purpose": "Verify complete composite appraisal lifecycle: window check -> submit -> assign -> review -> finalize -> archive",
+    "preconditions": "Active appraisal window and employee service record",
+    "action_or_input": "Execute full appraisal cycle from submission to service record archiving",
+    "expected_result": "Appraisal archived in employee service history; status finalized",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-015",
+    "source_id": "CW-HR-02 Closed Window Guard",
+    "purpose": "Verify appraisal lifecycle cannot start when appraisal window is inactive",
+    "preconditions": "Appraisal window inactive",
+    "action_or_input": "Employee attempts appraisal submission",
+    "expected_result": "Submission blocked at initial guard",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-016",
+    "source_id": "CW-HR-02 Audit Trail Consistency",
+    "purpose": "Verify composite appraisal lifecycle produces complete immutable audit trail",
+    "preconditions": "Full appraisal lifecycle executed",
+    "action_or_input": "Inspect HrAuditLog for appraisal transitions",
+    "expected_result": "Audit entries exist for submission, reviewer assignment, and finalization",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-017",
+    "source_id": "BW-HR-06 Advance Approval & Settlement Path",
+    "purpose": "Verify full workflow path for LTC Advance from submission through verification, approval, and settlement",
+    "preconditions": "Employee has active service record",
+    "action_or_input": "Submit advance -> HR Admin verifies -> Authority approves -> Accountant settles",
+    "expected_result": "Request transitions Submitted -> Pending Approval -> Approved -> Settled",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-018",
+    "source_id": "BW-HR-06 Verification Guard",
+    "purpose": "Verify unverified LTC Advance cannot enter approval routing",
+    "preconditions": "LTC advance is submitted",
+    "action_or_input": "Authority attempts to approve unverified request",
+    "expected_result": "Approval blocked; request must be verified first",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-019",
+    "source_id": "BW-HR-07 Reimbursement Approval & Settlement Path",
+    "purpose": "Verify full workflow path for LTC Reimbursement with bills through verification, approval, and settlement",
+    "preconditions": "Employee has active service record and travel vouchers",
+    "action_or_input": "Submit reimbursement -> Verify -> Approve -> Settle",
+    "expected_result": "Transitions Submitted -> Pending Approval -> Approved -> Settled",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-020",
+    "source_id": "BW-HR-07 Settlement Role Guard",
+    "purpose": "Verify non-accountant cannot record settlement for approved LTC reimbursement",
+    "preconditions": "LTC reimbursement is approved",
+    "action_or_input": "Non-accountant attempts settlement",
+    "expected_result": "Action rejected; claim remains approved awaiting accountant settlement",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-WF-021",
+    "source_id": "BW-HR-08 Verification Rejection Path",
+    "purpose": "Verify LTC request rejected during HR verification terminates without entering approval",
+    "preconditions": "LTC request is submitted",
+    "action_or_input": "HR Admin rejects verification (verdict=rejected)",
+    "expected_result": "Request status becomes rejected; workflow terminates",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-022",
+    "source_id": "BW-HR-08 Authority Rejection Path",
+    "purpose": "Verify verified LTC request rejected by Approving Authority terminates workflow",
+    "preconditions": "LTC request is verified and pending approval",
+    "action_or_input": "Authority rejects request with remarks",
+    "expected_result": "Request status becomes rejected; workflow terminates",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-023",
+    "source_id": "BW-HR-09 Forwarding Traversal Path",
+    "purpose": "Verify verified LTC request forwarded through one authority traversal to final approval",
+    "preconditions": "LTC request verified and pending initial authority",
+    "action_or_input": "Authority forwards to Registrar/Director -> Final authority approves",
+    "expected_result": "Request transitions Pending -> Forwarded -> Approved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-024",
+    "source_id": "BW-HR-09 Forwarding State Integrity",
+    "purpose": "Verify forwarded LTC request cannot be settled before reaching approved status",
+    "preconditions": "LTC request is in forwarded/pending status",
+    "action_or_input": "Accountant attempts settlement on non-approved request",
+    "expected_result": "Settlement blocked; request must be approved first",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-025",
+    "source_id": "CW-HR-03 Advance Lifecycle",
+    "purpose": "Verify complete composite lifecycle for LTC Advance with audit logging",
+    "preconditions": "Employee service record exists",
+    "action_or_input": "Submit -> Verify -> Approve -> Settle with passed amount",
+    "expected_result": "All transitions executed; full audit trail maintained",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-026",
+    "source_id": "CW-HR-03 Reimbursement Lifecycle",
+    "purpose": "Verify complete composite lifecycle for LTC Reimbursement with bills and settlement",
+    "preconditions": "Employee service record exists",
+    "action_or_input": "Submit reimbursement -> Verify -> Approve -> Settle",
+    "expected_result": "All transitions executed; full audit trail maintained",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-027",
+    "source_id": "CW-HR-03 Rejection Audit Trail Lifecycle",
+    "purpose": "Verify rejected LTC request lifecycle preserves complete immutable audit trail",
+    "preconditions": "LTC request submitted and rejected",
+    "action_or_input": "Reject LTC request and check audit logs",
+    "expected_result": "Audit history preserved with rejection remarks",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-028",
+    "source_id": "BW-HR-10 Advance Approval & Settlement Path",
+    "purpose": "Verify full workflow path for CPDA Advance from submission through verification, approval, settlement, and balance deduction",
+    "preconditions": "Employee has CPDA balance 200000",
+    "action_or_input": "Submit advance 25000 -> Verify -> Approve -> Settle with voucher",
+    "expected_result": "Transitions Submitted -> Pending -> Approved -> Settled; balance deducted to 175000",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-029",
+    "source_id": "BW-HR-10 CPDA Balance Guard",
+    "purpose": "Verify CPDA Advance exceeding available balance fails initial guard",
+    "preconditions": "Employee has CPDA balance 20000",
+    "action_or_input": "Employee applies for advance of 50000",
+    "expected_result": "Submission rejected; request does not enter workflow",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-030",
+    "source_id": "BW-HR-11 Reimbursement Approval & Settlement Path",
+    "purpose": "Verify full workflow path for CPDA Reimbursement with bills through verification, approval, settlement, and deduction",
+    "preconditions": "Employee has CPDA balance 150000",
+    "action_or_input": "Submit reimbursement 15000 -> Verify -> Approve -> Settle",
+    "expected_result": "Transitions Submitted -> Pending -> Approved -> Settled; balance deducted to 135000",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-031",
+    "source_id": "BW-HR-11 Settlement Voucher Guard",
+    "purpose": "Verify unapproved CPDA reimbursement cannot be settled by Accountant",
+    "preconditions": "CPDA claim is submitted but not approved",
+    "action_or_input": "Accountant attempts settlement",
+    "expected_result": "Settlement blocked; claim must be approved first",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-032",
+    "source_id": "BW-HR-12 Verification Rejection Path",
+    "purpose": "Verify CPDA claim rejected during verification terminates workflow without entering approval",
+    "preconditions": "CPDA claim is submitted",
+    "action_or_input": "HR Admin rejects verification (verdict=rejected)",
+    "expected_result": "Claim status becomes rejected; workflow ends; balance untouched",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-033",
+    "source_id": "BW-HR-12 Authority Rejection Path",
+    "purpose": "Verify verified CPDA claim rejected by Approving Authority terminates workflow without deduction",
+    "preconditions": "CPDA claim verified and pending approval; balance 100000",
+    "action_or_input": "Authority rejects claim",
+    "expected_result": "Claim status becomes rejected; balance remains 100000",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-034",
+    "source_id": "BW-HR-13 Forwarding Traversal Path",
+    "purpose": "Verify verified CPDA claim forwarded through one authority traversal to final approval",
+    "preconditions": "CPDA claim verified and pending initial authority",
+    "action_or_input": "Authority forwards to Director -> Director approves",
+    "expected_result": "Claim transitions Pending -> Forwarded -> Approved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-035",
+    "source_id": "BW-HR-13 Forwarding Authority Guard",
+    "purpose": "Verify non-designated authority cannot forward or decide CPDA claim during traversal",
+    "preconditions": "CPDA claim is forwarded to Director",
+    "action_or_input": "Unauthorized actor attempts decision",
+    "expected_result": "Action rejected; claim remains pending designated authority",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-WF-036",
+    "source_id": "CW-HR-04 Full Lifecycle with Balance Consistency",
+    "purpose": "Verify composite CPDA lifecycle maintains balance consistency and audit logging across full lifecycle",
+    "preconditions": "Employee has valid service record with initial balance 250000",
+    "action_or_input": "Submit 20000 -> Verify -> Approve -> Settle 20000",
+    "expected_result": "Claim settled; balance accurately deducted to 230000; audit trail complete",
+    "test_type": "positive"
+  }
+]
