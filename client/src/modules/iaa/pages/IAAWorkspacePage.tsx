@@ -60,20 +60,19 @@ export function IAAWorkspacePage({section}:{section:Section}){
  const [queryQuestion,setQueryQuestion]=useState("");
  const [observationKind,setObservationKind]=useState("expense_voucher");
  const [highValueThreshold,setHighValueThreshold]=useState<number|string>("");
- const [assignmentUserId,setAssignmentUserId]=useState<number|string>("");
- const [assignmentRole,setAssignmentRole]=useState("finance_staff");
  const [category,setCategory]=useState("policy_violation");
  const [details,setDetails]=useState("");
  const [observationTitle,setObservationTitle]=useState("");
  const [observationDetails,setObservationDetails]=useState("");
  const [responseText,setResponseText]=useState("");
  const [evidenceReference,setEvidenceReference]=useState("");
- const [financialYear,setFinancialYear]=useState("2026-27");
- const [fyStart,setFyStart]=useState("2026-04-01");
- const [fyEnd,setFyEnd]=useState("2027-03-31");
+ const [financialYear,setFinancialYear]=useState("");
+ const [fyStart,setFyStart]=useState("");
+ const [fyEnd,setFyEnd]=useState("");
  const [budget,setBudget]=useState<number|string>("");
  const [approvalRole,setApprovalRole]=useState("hod");
- const [timeoutHours,setTimeoutHours]=useState<number|string>(24);
+ const [nextApprovalRole,setNextApprovalRole]=useState("");
+ const [timeoutHours,setTimeoutHours]=useState<number|string>("");
 
  const send=(path:string,payload:Record<string,unknown>={},message="IAA change saved")=>{
   mutation.mutate({path,payload},{
@@ -84,7 +83,7 @@ export function IAAWorkspacePage({section}:{section:Section}){
  const rows=(data.data as Page<FinancialRecord>|undefined)?.results??[];
  const submitRecord=(r:FinancialRecord)=>send(
   r.record_kind==="ta"?`/iaa/ta/${r.id}/submit`:`/iaa/requests/${r.id}/submit`,{},"Request submitted");
- const recordApproved=(r:FinancialRecord)=>send(`/iaa/requests/${r.id}/record`,{},"Internal record completed");
+ const recordApproved=(r:FinancialRecord)=>send(r.record_kind==="ta"?`/iaa/ta/${r.id}/record`:`/iaa/requests/${r.id}/record`,{},"Internal record completed");
  const createDraft=()=>{
   const payload:Record<string,unknown>={request_type:requestType,department,amount:Number(amount),description};
   if(section==="ta")Object.assign(payload,{trip_start_date:tripStart,trip_end_date:tripEnd,trip_purpose:tripPurpose});
@@ -120,11 +119,11 @@ export function IAAWorkspacePage({section}:{section:Section}){
    {!data.isError&&<RecordTable rows={rows} onSubmit={submitRecord} onRecord={recordApproved}/>}
    <Card withBorder>
     <Title order={4}>Attach a supporting document reference</Title>
-    <Text size="sm" c="dimmed">First save a draft. Supply a file reference issued by the configured Fusion storage service.</Text>
+    <Text size="sm" c="dimmed">First save a draft. Paste the Google Drive share link for the supporting document.</Text>
     <SimpleGrid cols={{base:1,sm:2}} mt="sm">
      <NumberInput label="Draft record ID" min={1} value={documentRecordId} onChange={setDocumentRecordId}/>
      <TextInput label="Document name" value={documentName} onChange={e=>setDocumentName(e.currentTarget.value)}/>
-     <TextInput label="Storage reference" value={storageReference} onChange={e=>setStorageReference(e.currentTarget.value)}/>
+     <TextInput label="Google Drive share link" value={storageReference} onChange={e=>setStorageReference(e.currentTarget.value)}/>
     </SimpleGrid>
     <Button mt="sm" onClick={()=>send(`/iaa/requests/${Number(documentRecordId)}/attachments`,{name:documentName,storage_reference:storageReference},"Supporting document attached")}>Attach reference</Button>
    </Card>
@@ -233,17 +232,14 @@ export function IAAWorkspacePage({section}:{section:Section}){
    <Card withBorder><Title order={4}>Approval hierarchy rule</Title>
     <Select label="First approval authority" value={approvalRole} onChange={v=>v&&setApprovalRole(v)}
      data={[{value:"hod",label:"HoD"},{value:"dean",label:"Dean"},{value:"director",label:"Director"}]}/>
-    <NumberInput label="Timeout hours" min={1} value={timeoutHours} onChange={setTimeoutHours} mt="sm"/>
-    <Button mt="sm" onClick={()=>send("/iaa/admin/approval-rules",{record_kind:"",request_type:"",department:"",min_amount:null,max_amount:null,levels:[{role:approvalRole,timeout_hours:Number(timeoutHours)}],priority:100,is_active:true},"Approval route configured")}>Save approval route</Button>
+    <Select label="Next authority (required when timeout is configured)" value={nextApprovalRole||null}
+     onChange={v=>setNextApprovalRole(v??"")} clearable placeholder="No additional level"
+     data={[{value:"hod",label:"HoD"},{value:"dean",label:"Dean"},{value:"director",label:"Director"}].filter(x=>x.value!==approvalRole)} mt="sm"/>
+    <NumberInput label="First-level timeout hours (blank means no timeout)" min={1} value={timeoutHours} onChange={setTimeoutHours} mt="sm"/>
+    <Button mt="sm" onClick={()=>send("/iaa/admin/approval-rules",{record_kind:"",request_type:"",department:"",min_amount:null,max_amount:null,levels:[{role:approvalRole,timeout_hours:Number(timeoutHours)||null},...(nextApprovalRole?[{role:nextApprovalRole}]:[])],priority:100,is_active:true},"Approval route configured")}>Save approval route</Button>
    </Card>
-   <Card withBorder><Title order={4}>Record IAA role assignment</Title>
-    <NumberInput label="IAM user ID" min={1} value={assignmentUserId} onChange={setAssignmentUserId}/>
-    <Select label="IAA role" value={assignmentRole} onChange={v=>v&&setAssignmentRole(v)} mt="sm"
-     data={[{value:"finance_staff",label:"Finance Staff"},{value:"hod",label:"HoD"},{value:"dean",label:"Dean"},{value:"director",label:"Director"},{value:"auditor",label:"Auditor"},{value:"basic_user",label:"Basic User"}]}/>
-    <Button mt="sm" onClick={()=>send("/iaa/admin/roles",{user_id:Number(assignmentUserId),role:assignmentRole,is_active:true},"IAA role assignment recorded")}>Record assignment</Button>
-   </Card>
-   <Alert color="blue" title="Role administration requires IAM provisioning">
-    IAA records assignment changes for its local workflow configuration. Effective Fusion role grants are controlled by IAM; the current Fusion IAM client does not expose a role-grant mutation endpoint.
+   <Alert color="blue" title="Role membership is managed by Fusion IAM">
+    IAA uses roles and the active role returned by the existing Fusion identity service. It does not create a second user or role-assignment store. Designation grants must be administered through the Fusion IAM role-management workflow.
    </Alert>
   </>}
 
