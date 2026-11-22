@@ -13,7 +13,7 @@ import type {
 } from "./types";
 
 const KEY = "superadmin";
-const BASE = "/api/v1/superadmin";
+const BASE = "/superadmin";
 
 export const keys = {
   dashboard: () => [KEY, "dashboard"] as const,

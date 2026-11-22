@@ -43,7 +43,7 @@ describe("superadmin api hooks", () => {
       const { result } = renderHook(() => useDashboard(), { wrapper });
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(http.get).toHaveBeenCalledWith("/api/v1/superadmin/dashboard/");
+      expect(http.get).toHaveBeenCalledWith("/superadmin/dashboard/");
       expect(result.current.data).toEqual(mockMetrics);
     });
   });
@@ -57,7 +57,7 @@ describe("superadmin api hooks", () => {
       const { result } = renderHook(() => useArchivedUsers(filters), { wrapper });
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(http.get).toHaveBeenCalledWith("/api/v1/superadmin/archival/users/", { params: filters });
+      expect(http.get).toHaveBeenCalledWith("/superadmin/archival/users/", { params: filters });
       expect(result.current.data).toEqual(mockPage);
     });
   });
@@ -70,7 +70,7 @@ describe("superadmin api hooks", () => {
       const { result } = renderHook(() => useHistoricalArchives(), { wrapper });
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(http.get).toHaveBeenCalledWith("/api/v1/superadmin/archival/datasets/", { params: undefined });
+      expect(http.get).toHaveBeenCalledWith("/superadmin/archival/datasets/", { params: undefined });
       expect(result.current.data).toEqual(mockPage);
     });
   });
@@ -85,7 +85,7 @@ describe("superadmin api hooks", () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
       expect(http.post).toHaveBeenCalledWith(
-        "/api/v1/superadmin/archival/users/101/restore/",
+        "/superadmin/archival/users/101/restore/",
         { restoration_reason: "Court order" },
       );
       expect(result.current.data).toEqual(mockResponse);
@@ -101,7 +101,7 @@ describe("superadmin api hooks", () => {
       const { result } = renderHook(() => usePurgeRequests(filters), { wrapper });
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(http.get).toHaveBeenCalledWith("/api/v1/superadmin/purge/requests/", { params: filters });
+      expect(http.get).toHaveBeenCalledWith("/superadmin/purge/requests/", { params: filters });
       expect(result.current.data).toEqual(mockPage);
     });
   });
@@ -116,7 +116,7 @@ describe("superadmin api hooks", () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
       expect(http.post).toHaveBeenCalledWith(
-        "/api/v1/superadmin/purge/requests/",
+        "/superadmin/purge/requests/",
         { archive_id: 2, request_reason: "Mandatory purge" },
       );
       expect(result.current.data).toEqual(mockResponse);
@@ -133,7 +133,7 @@ describe("superadmin api hooks", () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
       expect(http.post).toHaveBeenCalledWith(
-        "/api/v1/superadmin/purge/requests/5/decision/",
+        "/superadmin/purge/requests/5/decision/",
         { approve: true, comments: "Approved by IT Head" },
       );
       expect(result.current.data).toEqual(mockResponse);
@@ -150,7 +150,7 @@ describe("superadmin api hooks", () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
       expect(http.post).toHaveBeenCalledWith(
-        "/api/v1/superadmin/purge/requests/5/execute/",
+        "/superadmin/purge/requests/5/execute/",
         {},
       );
       expect(result.current.data).toEqual(mockResponse);
@@ -165,7 +165,7 @@ describe("superadmin api hooks", () => {
       const { result } = renderHook(() => usePolicyParams(), { wrapper });
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(http.get).toHaveBeenCalledWith("/api/v1/superadmin/policy/parameters/");
+      expect(http.get).toHaveBeenCalledWith("/superadmin/policy/parameters/");
       expect(result.current.data).toEqual(mockPage);
     });
   });
@@ -180,7 +180,7 @@ describe("superadmin api hooks", () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
       expect(http.post).toHaveBeenCalledWith(
-        "/api/v1/superadmin/policy/parameters/",
+        "/superadmin/policy/parameters/",
         { key: "archival.window", value: "60", description: "Updated window" },
       );
       expect(result.current.data).toEqual(mockResponse);
@@ -196,7 +196,7 @@ describe("superadmin api hooks", () => {
       const { result } = renderHook(() => useAuditLogs(filters), { wrapper });
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(http.get).toHaveBeenCalledWith("/api/v1/superadmin/audit/logs/", { params: filters });
+      expect(http.get).toHaveBeenCalledWith("/superadmin/audit/logs/", { params: filters });
       expect(result.current.data).toEqual(mockPage);
     });
   });
