@@ -54,3 +54,32 @@ The entries below describe candidate changes; they are not a replacement review 
 The protected-file and approval findings are not waived. No external finance
 service, file-storage provider, signature or undefined LTC return transition is invented.
 Fresh committed-clone review results belong in the latest quality-report checkpoint.
+
+## R2 exploratory probe closure — Student 1 technical patch (2026-11-22)
+
+The follow-up review's four concrete probe defects were fixed and covered by
+`modules/hreis/tests/test_review_probe_regressions.py`:
+
+| R2 probe | Code change and verified behavior |
+|---|---|
+| Reuse of an expired family/version | `services/policies.py` refuses a duplicate immutable family/version under the serialized family lock, returning a controlled HTTP 409 rather than a database HTTP 500 |
+| Unbounded reminder-hours value | `services/policies.py` refuses unrepresentable policy delays; `services/notifications.py` compares elapsed seconds so even a legacy bad value cannot overflow the scheduler |
+| Inactive IAM appraisal reviewer | `services/appraisals.py` refuses an inactive directory user; existing reviewer test fixtures now represent active users explicitly |
+| Reminder leaking across acting roles | `selectors/scoping.py` restricts request-linked notices to the owner or current assigned role. A Registrar with notification-only permission may view its generic assigned reminder without gaining access to the underlying private form; acting as staff cannot view that other employee's reminder. `mark_notification_read` row-locks only the notification table to avoid nullable-join PostgreSQL errors |
+
+The isolated browser runner's root-created evidence directory now permits its
+synthetic IAM fixture user to write and restore the temporary permission snapshot.
+Its test script remains Unix-LF and its cleanup successfully revoked the temporary
+IAM service token and dropped the disposable database.
+
+**Latest verification:** `make check` passed (all repository pytest, architecture,
+lint, migrations, manifest and OpenAPI gates); `make check-client` passed (67/67
+Vitest, TypeScript and production build); combined module coverage **92.25%**
+(minimum 90%) and domain coverage **95.79%** (minimum 95%); real Chromium **58/58**
+including 49 HR-EIS and 9 shared cases; production-settings deployment check
+passed with zero unsilenced issues. The original independent R1 verdict is not
+retroactively changed, and no new formal independent 10/10 verdict is claimed.
+
+Student 2 approval, shared-file exception rulings, external provider integration,
+institutional policy values and the source's unspecified LTC-return outcome remain
+separate pending decisions. None has been signed or faked.

@@ -1059,3 +1059,37 @@ preserved by a merge; the verified implementation remains based on upstream
 main `5595be6628b4cdc6f8b47cf74bac267a2470f780`. The owner's current request
 authorizes the technical Git handoff. It does not supply Student 2 signatures,
 a production deployment or the final institutional pull request.
+
+## 26. R2 technical defect closure and final builder gates (2026-11-22)
+
+After the second independent review's exploratory probes, Student 1 repaired
+duplicate expired policy-version handling, oversized notification delays, inactive
+reviewer assignment and reminders visible under an unrelated acting role. Four
+additional direct regression tests in
+`modules/hreis/tests/test_review_probe_regressions.py` exercise the discovered
+scenarios. The notification read path also uses `FOR UPDATE OF` its own row so
+PostgreSQL does not try to lock the nullable joined request table.
+
+| Most recent Student 1 technical gate | Result |
+|---|---|
+| Complete `make check` | **PASS**, exit 0; all backend tests, architecture, migrations, lint, nav, permissions and OpenAPI consistency |
+| Complete `make check-client` | **PASS**, 67/67 Vitest, TypeScript and production build; existing nonfatal large-entry-chunk warning |
+| HR-EIS combined module statement/branch coverage | **PASS**, 92.25% (threshold 90%) |
+| HR-EIS domain combined statement/branch coverage | **PASS**, 95.79% (threshold 95%) |
+| Isolated synthetic Chromium `run-isolated.sh` | **PASS**, 58/58, including 49 HR-EIS tests covering all 21 live use cases and 9 shared/platform cases |
+| Production-settings `manage.py check --deploy --fail-level WARNING` | **PASS**, zero unsilenced findings (2 documented silences) |
+| Disposable test environment cleanup | **PASS**; unique browser DB dropped and temporary IAM token revoked; ports 8002 and 5173 released |
+
+The repaired browser runner's synthetic IAM permission fixture now has write
+access to the isolated `/tmp` evidence directory. Raw runserver, migration and
+readiness logs were preserved outside Git in
+`D:\HR(EIS)\lab 9\evidence\r2-closure-20261122\`.
+The generated enforcement reference was refreshed; this is not a new real
+institutional configuration or a payment/provider integration.
+
+**Status boundary:** This is a verified Student 1 technical handoff candidate,
+not a final independent nine-dimension 10/10 review. The institutional
+policy/role rulings, protected shared-file permissions, five uncited live IDs
+and the six source/external uncertainties recorded earlier remain open.
+Student 2 has not provided written approval or their own independent tests,
+and no such approval is implied by these pass results.

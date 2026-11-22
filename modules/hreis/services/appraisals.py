@@ -34,10 +34,15 @@ def _validate_reviewers(row, reviewer_user_ids):
             "Choose distinct, verified reviewer user IDs.", code="invalid_reviewers"
         )
     users = get_users(reviewer_user_ids)
-    if any(i not in users or users[i].kind not in {"faculty", "staff"} for i in reviewer_user_ids):
+    if any(
+        i not in users
+        or users[i].kind not in {"faculty", "staff"}
+        or not getattr(users[i], "is_active", False)
+        for i in reviewer_user_ids
+    ):
         raise ConflictError(
-            "At least one reviewer is missing from IAM. Contact HR to resolve this before "
-            "retrying.",
+            "At least one reviewer is missing or inactive in IAM. Contact HR to resolve this "
+            "before retrying.",
             code="reviewer_unknown",
         )
 

@@ -102,7 +102,30 @@ def notifications_for(actor) -> QuerySet[Notification]:
     base = Notification.objects.all()
     if not _valid(actor, P_NOTIFICATION_VIEW):
         return base.none()
-    return base.filter(recipient_user_id=actor.user_id)
+    # A request-linked reminder follows its current acting-role assignment. A
+    # notification grant may show the generic reminder without granting form access.
+    assigned = HRRequest.objects.none()
+    if actor.active_role == HR_ADMIN:
+        assigned = HRRequest.objects.exclude(user_id=actor.user_id).filter(
+            Q(family__in=["ltc", "cpda"], state="awaiting_hr_verification")
+            | Q(family="appraisal", state="submitted")
+        )
+    elif actor.active_role in AUTHORITY_DESIGNATIONS:
+        assigned = HRRequest.objects.exclude(user_id=actor.user_id).filter(
+            authority_steps__designation=actor.active_role,
+            authority_steps__position=F("route_step"),
+            state__in=["pending_authority", "pending_review", "pending_next_appraisal_authority"],
+        ).filter(
+            Q(family__in=["leave", "ltc", "cpda"])
+            | Q(route_step__gt=0)
+            | Q(appraisal__reviewer_user_ids__contains=[actor.user_id])
+        )
+    return base.filter(recipient_user_id=actor.user_id).filter(
+        Q(request__isnull=True)
+        | Q(request__user_id=actor.user_id)
+        | Q(request_id__in=requests_for(actor).values("pk"))
+        | Q(request_id__in=assigned.values("pk"))
+    )
 
 
 def audit_events_for(actor) -> QuerySet[AuditEvent]:

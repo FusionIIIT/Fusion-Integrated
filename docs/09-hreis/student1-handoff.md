@@ -77,3 +77,20 @@ Student 2's reserved `modules/hreis/tests/spec` and
 independent specification-test phase and final institutional pull request are
 separate from this branch handoff. Do not describe this document as final
 Assignment 9 approval or a production deployment certificate.
+
+## Post-R2 Student 1 technical closure (2026-11-22)
+
+- R2's four reproducible policy, reminder, active-reviewer and acting-role
+  notification defects are now fixed with dedicated backend regression tests.
+- Final `make check`: PASS; `make check-client`: PASS (67/67 frontend tests);
+  branch/statement module coverage 92.25% and domain coverage 95.79%: PASS.
+- Repeated disposable-database Chromium test suite: **58/58 PASS** including
+  the ten independently denied deep links and 21 live HR-EIS use-case mappings.
+  The temporary database and service token were removed at exit; raw backend
+  proof is outside Git in `D:\HR(EIS)\lab 9\evidence\r2-closure-20261122\`.
+- Production-settings Django security check: PASS. Reference/documentation
+  generators are in sync. Technical modifications are detailed in
+  `review-remediation.md` and `hreis-quality-report.md` section 26.
+- External providers, the provisional Accountant mapping, source uncertainties,
+  Student 2's reserved tests, written approval and formal final 10/10 review
+  have **not** been completed or asserted. Communication remains deferred.

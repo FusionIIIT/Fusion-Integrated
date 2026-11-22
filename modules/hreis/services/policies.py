@@ -23,6 +23,8 @@ _ADMIN = frozenset({"hradmin"})
 _FAMILIES = frozenset({"leave", "appraisal", "ltc", "cpda"})
 _KINDS = frozenset({"faculty", "staff"})
 _FAMILY_LOCKS = {"leave": 142001, "appraisal": 142002, "ltc": 142003, "cpda": 142004}
+# Technical bound prevents unrepresentable scheduler delays; it is not a policy default.
+_MAX_REMINDER_DELAY_HOURS = 24 * 365 * 100
 
 
 def _check_parameters(family: str, parameters: dict) -> None:
@@ -174,6 +176,7 @@ def _check_conditions(family, parameters):
             if (
                 type(delay) is not int
                 or delay < 1
+                or delay > _MAX_REMINDER_DELAY_HOURS
                 or not isinstance(recipients, dict)
                 or not recipients
                 or any(
@@ -272,6 +275,11 @@ def _require_nonoverlapping_policy(family, version, effective_from, effective_un
     # A static family lock also serializes the first policy publication.
     with connection.cursor() as cursor:
         cursor.execute("SELECT pg_advisory_xact_lock(%s)", [_FAMILY_LOCKS[family]])
+    if HRPolicyVersion.objects.filter(family=family, version=version).exists():
+        raise ConflictError(
+            "That policy version already exists. Choose a new version and retry.",
+            code="policy_version_exists",
+        )
     # Endpoints are exclusive; a successor may begin when its predecessor ends.
     overlaps = HRPolicyVersion.objects.filter(family=family).filter(
         Q(effective_until__isnull=True) | Q(effective_until__gt=effective_from)

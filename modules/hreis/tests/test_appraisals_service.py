@@ -68,7 +68,7 @@ def submitted(monkeypatch):
     monkeypatch.setattr(
         appraisals,
         "get_users",
-        lambda ids: {i: SimpleNamespace(kind="faculty") for i in ids if i in {10, 201}},
+        lambda ids: {i: SimpleNamespace(kind="faculty", is_active=True) for i in ids if i in {10, 201}},
     )
     return submissions.submit_appraisal(
         principal(10, "faculty", ("hreis.appraisal.create",), kind="faculty"),
@@ -226,7 +226,7 @@ def test_three_stage_appraisal_can_forward_twice_then_finalize(monkeypatch):
     monkeypatch.setattr(
         appraisals,
         "get_users",
-        lambda ids: {i: SimpleNamespace(kind="faculty") for i in ids if i in {10, 201}},
+        lambda ids: {i: SimpleNamespace(kind="faculty", is_active=True) for i in ids if i in {10, 201}},
     )
     row = submissions.submit_appraisal(
         principal(10, "faculty", ("hreis.appraisal.create",), kind="faculty"),
@@ -299,7 +299,7 @@ def test_one_stage_appraisal_finalizes_without_unneeded_forward(monkeypatch):
     monkeypatch.setattr(
         appraisals,
         "get_users",
-        lambda ids: {i: SimpleNamespace(kind="faculty") for i in ids if i in {10, 201}},
+        lambda ids: {i: SimpleNamespace(kind="faculty", is_active=True) for i in ids if i in {10, 201}},
     )
     submitted = submissions.submit_appraisal(
         principal(10, "faculty", ("hreis.appraisal.create",), kind="faculty"),

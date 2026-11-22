@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from django.conf import settings
 from django.core.mail import send_mail
@@ -36,7 +36,12 @@ _PENDING = frozenset(
 @transaction.atomic
 def mark_notification_read(actor, *, notification_id: int):
     require(actor, "hreis.notification.view")
-    row = notifications_for(actor).select_for_update().filter(pk=notification_id).first()
+    row = (
+        notifications_for(actor)
+        .select_for_update(of=("self",))
+        .filter(pk=notification_id)
+        .first()
+    )
     if row is None:
         raise NotFoundError(
             "Open HR Notifications and choose an available notice.",
@@ -127,7 +132,7 @@ def create_pending_action_reminders(*, now=None) -> int:
             type(after_hours) is not int
             or after_hours <= 0
             or not isinstance(recipients, dict)
-            or now < row.updated_at + timedelta(hours=after_hours)
+            or (now - row.updated_at).total_seconds() < after_hours * 3600
         ):
             continue
         role, directly_assigned = _current_action(row)

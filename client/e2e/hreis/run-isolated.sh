@@ -15,6 +15,10 @@ iam_token_name=""
 created=0
 output="${E2E_EVIDENCE_DIR:-$(mktemp -d /tmp/hreis-e2e-evidence.XXXXXX)}"
 mkdir -p "$output"
+# The synthetic IAM fixture runs as the venv owner, even when Docker requires root.
+if [[ $(id -u) == 0 && -z "${E2E_EVIDENCE_DIR:-}" ]]; then
+  chown "$runner_user" "$output"
+fi
 export HREIS_E2E_PERMISSION_SNAPSHOT="$output/iam-staff-permissions.json"
 as_runner() { if [[ $(id -u) == 0 ]]; then runuser -u "$runner_user" -- "$@"; else "$@"; fi; }
 iam_command() {
