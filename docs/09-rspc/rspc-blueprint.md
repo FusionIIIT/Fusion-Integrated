@@ -7,7 +7,7 @@
 **Environment:** Module-only (Django + Vite/React + Postgres + Redis)  
 **Authors:** Student 1 (`24BCS176`) & Student 2 (`24BSM043`)  
 **Pair ID:** `PAIR-RSPC-03`  
-**Approval Status:** Approved by Student 2 (`24BSM043`) on 2026-11-22  
+**Approval Status:** Approved by Student 2 (`24BSM043`)  
 
 ---
 
@@ -188,4 +188,4 @@ No external module directly queries RSPC database tables; all access uses these 
 
 1. **Overhead Calculation Policy:** Institutional overhead share for consultancies was clarified in BR-RSPC-022 to be a minimum of 20% of total project cost. Approved by Student 2.
 2. **Approval Thresholds:** Director escalation threshold established at ₹10 Lakhs for proposals and consultancies, ₹2 Lakhs for financial expenditures and procurements, and ₹50,000 for staff appointments. Approved by Student 2.
-3. **Blueprint Sign-Off:** Student 2 (`24BSM043`) formally reviewed and approved this blueprint on 2026-11-22 prior to production implementation.
+3. **Blueprint Sign-Off:** Student 2 (`24BSM043`) formally reviewed and approved this blueprint prior to production implementation.

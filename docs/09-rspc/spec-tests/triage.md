@@ -95,21 +95,21 @@ Every failure observed during the baseline run was independently verified by Stu
 
 ## 3. Triage Status Table (Final Round Q2)
 
-| Row # | Test ID | Strategy | Spec ID | Defect Category | Assigned To | Status |
-| :---: | :--- | :---: | :--- | :--- | :---: | :---: |
-| 1 | `TEST-FR-007` | FR | RSPC-CFR-006 | Proposal Timeline Validation | Student 1 | **CLOSED** |
-| 2 | `TEST-FR-011` | FR | RSPC-CFR-009 | Minimum 20% Overhead Share | Student 1 | **CLOSED** |
-| 3 | `TEST-FR-012` | FR | RSPC-CFR-010 | Consultancy Director Escalation | Student 1 | **CLOSED** |
-| 4 | `TEST-FR-033` | FR | RSPC-CFR-028 | Lifecycle Update Invariant | Student 1 | **CLOSED** |
-| 5 | `TEST-UC-004` | UC | RSPC-UC-002 | Proposal Duration Exception | Student 1 | **CLOSED** |
-| 6 | `TEST-UC-013` | UC | RSPC-UC-007 | Consultancy Share Exception | Student 1 | **CLOSED** |
-| 7 | `TEST-UC-029` | UC | RSPC-UC-021 | Update Blocked on Archived | Student 1 | **CLOSED** |
-| 8 | `TEST-BR-009` | BR | BR-RSPC-014 | Positive Timeline Duration | Student 1 | **CLOSED** |
-| 9 | `TEST-BR-013` | BR | BR-RSPC-022 | Minimum Overhead Share | Student 1 | **CLOSED** |
-| 10 | `TEST-BR-014` | BR | BR-RSPC-022 | Director Escalation (Consultancy) | Student 1 | **CLOSED** |
-| 11 | `TEST-BR-033` | BR | BR-RSPC-065 | Lifecycle Permitted Updates | Student 1 | **CLOSED** |
-| 12 | `TEST-WF-008` | WF | BW-RSPC-04 | Consultancy Director Routing | Student 1 | **CLOSED** |
-| 13 | `TEST-WF-010` | WF | BW-RSPC-06 | Staff Stipend Director Routing | Student 1 | **CLOSED** |
-| 14 | `TEST-WF-032` | WF | CW-RSPC-01 | Workflow Transition Guard | Student 1 | **CLOSED** |
+| Row # | Test ID | Strategy | Spec ID | Defect Category | Fixed By (Builder) | Verified By (Spec Tests) | Status |
+| :---: | :--- | :---: | :--- | :--- | :---: | :---: | :---: |
+| 1 | `TEST-FR-007` | FR | RSPC-CFR-006 | Proposal Timeline Validation | Student 1 (`rules.py`) | Student 2 | **CLOSED** |
+| 2 | `TEST-FR-011` | FR | RSPC-CFR-009 | Minimum 20% Overhead Share | Student 1 (`rules.py`) | Student 2 | **CLOSED** |
+| 3 | `TEST-FR-012` | FR | RSPC-CFR-010 | Consultancy Director Escalation | Student 1 (`rules.py`) | Student 2 | **CLOSED** |
+| 4 | `TEST-FR-033` | FR | RSPC-CFR-028 | Lifecycle Update Invariant | Student 1 (`rules.py`) | Student 2 | **CLOSED** |
+| 5 | `TEST-UC-004` | UC | RSPC-UC-002 | Proposal Duration Exception | Student 1 (`rules.py`) | Student 2 | **CLOSED** |
+| 6 | `TEST-UC-013` | UC | RSPC-UC-007 | Consultancy Share Exception | Student 1 (`rules.py`) | Student 2 | **CLOSED** |
+| 7 | `TEST-UC-029` | UC | RSPC-UC-021 | Update Blocked on Archived | Student 1 (`rules.py`) | Student 2 | **CLOSED** |
+| 8 | `TEST-BR-009` | BR | BR-RSPC-014 | Positive Timeline Duration | Student 1 (`rules.py`) | Student 2 | **CLOSED** |
+| 9 | `TEST-BR-013` | BR | BR-RSPC-022 | Minimum Overhead Share | Student 1 (`rules.py`) | Student 2 | **CLOSED** |
+| 10 | `TEST-BR-014` | BR | BR-RSPC-022 | Director Escalation (Consultancy) | Student 1 (`rules.py`) | Student 2 | **CLOSED** |
+| 11 | `TEST-BR-033` | BR | BR-RSPC-065 | Lifecycle Permitted Updates | Student 1 (`rules.py`) | Student 2 | **CLOSED** |
+| 12 | `TEST-WF-008` | WF | BW-RSPC-04 | Consultancy Director Routing | Student 1 (`rules.py`) | Student 2 | **CLOSED** |
+| 13 | `TEST-WF-010` | WF | BW-RSPC-06 | Staff Stipend Director Routing | Student 1 (`rules.py`) | Student 2 | **CLOSED** |
+| 14 | `TEST-WF-032` | WF | CW-RSPC-01 | Workflow Transition Guard | Student 1 (`rules.py`) | Student 2 | **CLOSED** |
 
 **Zero open triage items remaining. All 139 tests passing.**
