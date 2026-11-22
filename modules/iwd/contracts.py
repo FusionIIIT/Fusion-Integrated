@@ -1,27 +1,50 @@
-"""
-Contracts interface for Institute Works Department (IWD).
-This is the ONLY file external modules are permitted to import from.
-"""
-from typing import Optional, Dict, Any
-from .models import Complaint, Estimate
+"""iwd's public surface. Plural by signature."""
+from __future__ import annotations
 
-def get_complaint_summary(complaint_id: int) -> Optional[Dict[str, Any]]:
-    try:
-        c = Complaint.objects.get(id=complaint_id)
-        return {
-            "id": c.id,
-            "title": c.title,
-            "category": c.category,
-            "status": c.status,
-            "urgency": c.urgency,
-            "requester_id": c.requester_id,
-        }
-    except Complaint.DoesNotExist:
-        return None
+from collections.abc import Sequence
+from dataclasses import dataclass
+from typing import Optional
+from modules.iwd.models import Complaint, Estimate
 
-def get_complaint_estimate_total(complaint_id: int) -> Optional[float]:
-    try:
-        e = Estimate.objects.get(complaint_id=complaint_id)
-        return float(e.total_cost)
-    except Estimate.DoesNotExist:
-        return None
+
+@dataclass(frozen=True)
+class ComplaintSummaryDTO:
+    id: int
+    title: str
+    category: str
+    status: str
+    urgency: str
+    requester_id: str
+
+
+def get_complaint_summaries(
+    complaint_ids: Sequence[int]
+) -> dict[int, ComplaintSummaryDTO]:
+    ids = {int(i) for i in complaint_ids if i is not None}
+    if not ids:
+        return {}
+    rows = Complaint.objects.filter(id__in=ids)
+    return {
+        c.id: ComplaintSummaryDTO(
+            id=c.id,
+            title=c.title,
+            category=c.category,
+            status=c.status,
+            urgency=c.urgency,
+            requester_id=c.requester_id,
+        )
+        for c in rows
+    }
+
+
+def get_complaint_estimates(
+    complaint_ids: Sequence[int]
+) -> dict[int, Optional[float]]:
+    ids = {int(i) for i in complaint_ids if i is not None}
+    if not ids:
+        return {}
+    rows = Estimate.objects.filter(complaint_id__in=ids)
+    res = {cid: None for cid in ids}
+    for e in rows:
+        res[e.complaint_id] = float(e.total_cost)
+    return res

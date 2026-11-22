@@ -6,4 +6,8 @@ export const routes: RouteObject[] = [
     path: "",
     element: <IwdDashboard />,
   },
+  {
+    path: "complaints",
+    element: <IwdDashboard />,
+  },
 ];
