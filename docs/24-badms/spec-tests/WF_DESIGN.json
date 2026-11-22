@@ -1,0 +1,92 @@
+[
+  {
+    "test_id": "WF-DESIGN-001",
+    "source_id": "BW-BA-01",
+    "purpose": "Verify the secure archival - hod rejection workflow.",
+    "preconditions": "A user has submitted a secure archival request and it is pending decision by the HoD of the requester's department.",
+    "action_or_input": "Submit a secure archival request, then have the respective HoD reject it through the archival decision operation.",
+    "expected_result": "The request follows the rejection path and reaches its rejected terminal state; no approved classification or encryption path is performed.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-DESIGN-002",
+    "source_id": "BW-BA-02",
+    "purpose": "Verify the secure archival - approved, non-sensitive classification workflow.",
+    "preconditions": "A user has submitted a secure archival request and the respective HoD is authorized to decide it; the request is eligible for non-Sensitive classification.",
+    "action_or_input": "Have the respective HoD approve the request, then have an authorized SysAdmin assign an authoritative non-Sensitive classification.",
+    "expected_result": "The request follows the approved non-Sensitive path and reaches the authoritative non-Sensitive classification outcome.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-DESIGN-003",
+    "source_id": "BW-BA-03",
+    "purpose": "Verify the secure archival - approved, sensitive encryption workflow.",
+    "preconditions": "A user has submitted a secure archival request; the respective HoD, authorized SysAdmin, and IT Security actor are available.",
+    "action_or_input": "Have the HoD approve the request, the SysAdmin classify it Sensitive, and IT Security configure encryption and create the encrypted archive.",
+    "expected_result": "The request follows the approved Sensitive path through HoD review, SysAdmin classification, and IT Security encryption/archive creation.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-DESIGN-004",
+    "source_id": "BW-BA-04",
+    "purpose": "Verify the storage extension - rejected workflow.",
+    "preconditions": "A user has submitted a storage-extension request and it is pending decision by the HoD of the user's department.",
+    "action_or_input": "Have the respective HoD reject the storage-extension request.",
+    "expected_result": "The request follows the rejection path and reaches the rejected outcome.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-DESIGN-005",
+    "source_id": "BW-BA-05",
+    "purpose": "Verify the storage extension - approved workflow.",
+    "preconditions": "A user has submitted a storage-extension request and it is pending decision by the HoD of the user's department.",
+    "action_or_input": "Have the respective HoD approve the storage-extension request.",
+    "expected_result": "The request follows the approval path and ends in the recorded Approved state for this version.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-DESIGN-006",
+    "source_id": "BW-BA-06",
+    "purpose": "Verify the restoration - non-sensitive standard path workflow.",
+    "preconditions": "An archived item is classified non-Sensitive and the restoration request satisfies standard checks and required conditions.",
+    "action_or_input": "Submit a restoration request and execute it through the standard restoration operation.",
+    "expected_result": "The non-Sensitive restoration follows the standard path and technical restoration is executed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-DESIGN-007",
+    "source_id": "BW-BA-07",
+    "purpose": "Verify the restoration - sensitive sysadmin approval workflow.",
+    "preconditions": "An archived item is classified Sensitive and a restoration request is pending; an authorized SysAdmin is available.",
+    "action_or_input": "Request restoration, obtain SysAdmin approval, then execute technical restoration.",
+    "expected_result": "The Sensitive restoration follows the explicit SysAdmin approval path; technical restoration occurs only after approval.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-DESIGN-008",
+    "source_id": "CW-BA-01",
+    "purpose": "Verify the secure archival request processing workflow.",
+    "preconditions": "A secure archival request is submitted and the required HoD, SysAdmin, and IT Security roles are available as applicable.",
+    "action_or_input": "Exercise the composite request-processing flow across HoD rejection, approved non-Sensitive classification, and approved Sensitive encryption/archive creation branches.",
+    "expected_result": "The composite archival processing supports all three materially different outcomes: rejection, approved non-Sensitive classification, and approved Sensitive encryption/archive creation.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-DESIGN-009",
+    "source_id": "CW-BA-02",
+    "purpose": "Verify the storage-extension request processing workflow.",
+    "preconditions": "A storage-extension request is submitted and the respective HoD is available to decide it.",
+    "action_or_input": "Exercise both the approved and rejected decision branches of the storage-extension processing flow.",
+    "expected_result": "The composite storage-extension processing supports both approved and rejected outcomes.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-DESIGN-010",
+    "source_id": "CW-BA-03",
+    "purpose": "Verify the data restoration processing workflow.",
+    "preconditions": "Restoration requests exist for both non-Sensitive and Sensitive archived data; an authorized SysAdmin is available for Sensitive approval.",
+    "action_or_input": "Exercise the standard non-Sensitive restoration branch and the Sensitive branch requiring SysAdmin approval before execution.",
+    "expected_result": "The composite restoration processing supports both paths, applying SysAdmin approval before technical restoration for Sensitive data.",
+    "test_type": "workflow"
+  }
+]
